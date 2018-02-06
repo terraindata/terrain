@@ -37,21 +37,6 @@
     display: flex;
     min-width: 0;
   }
-
-  .editor-settings-wrapper {
-    position: relative;
-
-    .editor-settings-arrow {
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 8px solid #ddd;
-      position: absolute;
-      top: -8px;
-      left: 8px;
-    }
-  }
 }
 
 // TemplateEditorFieldSettings
@@ -156,7 +141,15 @@
     }
   }
 
+  .transformation-fade-container {
+
+  }
+
   .transformation-editor {
+    padding: @spacing;
+  }
+
+  .transformation-creator {
     padding: @spacing;
   }
 }
@@ -210,7 +203,6 @@
   height: @settings-height + @spacing;
 
   .injected-content-content {
-    overflow: auto;
     border: 1px solid;
     display: flex;
     flex-direction: column;

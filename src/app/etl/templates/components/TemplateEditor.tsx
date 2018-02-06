@@ -104,48 +104,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
     });
   }
 
-  public renderSettingsSection()
-  {
-    // const { template, settingsKeyPath } = this.props.templateEditor;
-    // const renderSettings = settingsKeyPath !== null &&
-    //   settingsKeyPath !== undefined &&
-    //   template.rootField.hasIn(settingsKeyPath);
-    // const field = renderSettings ? template.rootField.getIn(settingsKeyPath) : null;
-
-    // return (
-    //   <div className='template-editor-settings-drawer'>
-    //     {
-    //       !renderSettings ? null :
-    //         <div
-    //           className='template-editor-settings-wrapper'
-    //           style={backgroundColor(Colors().bg2)}
-    //           tabIndex={-1}
-    //         >
-    //           <div
-    //             className='template-editor-close-row'
-    //             style={[borderColor(Colors().text3, Colors().text2), fontColor(Colors().text3, Colors().text2)]}
-    //             onClick={this.handleCloseDrawer}
-    //           >
-    //             <div className='settings-drawer-close-line' style={getStyle('marginRight', '12px')} />
-    //             <CloseIcon
-    //               className='settings-drawer-close-icon'
-    //               width='16px' height='16px'
-    //             />
-    //             <div className='settings-drawer-close-line' style={getStyle('marginLeft', '12px')} />
-    //           </div>
-    //           <TemplateEditorFieldSettings
-    //             keyPath={settingsKeyPath}
-    //             field={field}
-    //             preview={'placeholder'}
-    //             canEdit={true}
-    //             displayKeyPath={List([])}
-    //           />
-    //         </div>
-    //     }
-    //   </div>
-    // );
-  }
-
   public renderEditorSection(showEditor: boolean = true)
   {
     const { template, documents, previewIndex } = this.props.templateEditor;

@@ -140,7 +140,16 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
   {
     return (
       <div className='transformation-editor'>
-        I don't know what should go here yet.
+        I don't know what should go here yet. {this.state.currentIndex}
+      </div>
+    );
+  }
+
+  public renderCreateTransformationSection()
+  {
+    return (
+      <div className='transformation-creator'>
+        I also don't know what to put here...
       </div>
     );
   }
@@ -175,9 +184,14 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
           {transformations.map(this.renderTransformationListItem)}
           {this.renderNewTransformationButton()}
         </div>
-        <FadeInOut open={this.state.viewState === ViewState.EDIT}>
-          {this.renderEditTransformationSection()}
-        </FadeInOut>
+        <div className='transformation-fade-container'>
+          <FadeInOut open={this.state.viewState === ViewState.EDIT}>
+            {this.renderEditTransformationSection()}
+          </FadeInOut>
+          <FadeInOut open={this.state.viewState === ViewState.CREATE_NEW}>
+            {this.renderCreateTransformationSection()}
+          </FadeInOut>
+        </div>
       </div>
     );
   }
