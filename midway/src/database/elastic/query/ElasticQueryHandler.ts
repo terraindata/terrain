@@ -51,13 +51,12 @@ import * as winston from 'winston';
 import * as Elastic from 'elasticsearch';
 
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
-import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
-import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
 import QueryHandler from '../../../app/query/QueryHandler';
+import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
@@ -97,7 +96,7 @@ export default class ElasticQueryHandler extends QueryHandler
         let parser: any;
         try
         {
-          parser = this.getParsedQuery(request.body);
+          parser = getParsedQuery(request.body);
         }
         catch (errors)
         {
@@ -339,36 +338,6 @@ export default class ElasticQueryHandler extends QueryHandler
       }
     }
     return Promise.all(promises);
-  }
-
-  private getParsedQuery(bodyStr: string): ESParser
-  {
-    const parser = new ESJSONParser(bodyStr, true);
-    const valueInfo = parser.getValueInfo();
-
-    if (parser.hasError())
-    {
-      const es = parser.getErrors();
-      const errors: MidwayErrorItem[] = [];
-
-      es.forEach((e) =>
-      {
-        const row = (e.token !== null) ? e.token.row : 0;
-        const col = (e.token !== null) ? e.token.col : 0;
-        const pos = (e.token !== null) ? e.token.charNumber : 0;
-        const title: string = String(row) + ':' + String(col) + ':' + String(pos) + ' ' + String(e.message);
-        errors.push({ status: -1, title, detail: '', source: {} });
-      });
-
-      if (errors.length === 0)
-      {
-        errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
-      }
-
-      throw errors;
-    }
-
-    return parser;
   }
 
   private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
