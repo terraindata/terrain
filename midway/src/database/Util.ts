@@ -84,7 +84,7 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
     const password: string = q1[1];
     const host: string = q2[0];
     const port: number = parseInt(q2[1], 10);
-    const database: string = (h2 !== undefined && h2 !== '') ? h2 : 'terrain_midway';
+    const database: string = (h2 !== undefined && h2 !== '') ? h2 : 'midway';
 
     return {
       user,
