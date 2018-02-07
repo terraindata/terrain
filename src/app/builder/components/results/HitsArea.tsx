@@ -724,9 +724,9 @@ class HitsArea extends TerrainComponent<Props>
 
     const content = (
       <ETLExportDisplay
-        query={this.props.query}
-        serverId={this.props.db.id}
-        algorithmName={this.props.algorithmName}
+      // query={this.props.query}
+      // serverId={this.props.db.id}
+      // algorithmName={this.props.algorithmName}
       />
     );
 

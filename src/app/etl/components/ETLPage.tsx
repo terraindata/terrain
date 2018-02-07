@@ -43,39 +43,96 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Query from 'src/items/types/Query';
 import Util from 'util/Util';
 
-import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-
-import './ETLExportDisplay.less';
+import ETLExportDisplay from 'etl/components/ETLExportDisplay';
+import './ETLPage.less';
 
 export interface Props
 {
   placeholder?: any;
 }
 
+const enum ViewState
+{ // temporary stand in. TODO: use a combination of routing and redux
+  SHOW_BUTTONS,
+  SHOW_IMPORT,
+  SHOW_EXPORT,
+}
+
 @Radium
-export default class ETLExportDisplay extends TerrainComponent<Props>
+export default class ETLPage extends TerrainComponent<Props>
 {
+  public state: {
+    view: ViewState;
+  } = {
+      view: ViewState.SHOW_BUTTONS,
+    };
+
+  public renderButtons()
+  {
+    return (
+      <div className='button-holder' style={backgroundColor(Colors().bg3)}>
+        <div
+          key='import'
+          className='test-button'
+          style={[backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)]}
+          onClick={this.handleImportClicked}
+        >
+          Test Import Button
+        </div>
+        <div
+          key='export'
+          className='test-button'
+          style={[backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)]}
+          onClick={this.handleExportClicked}
+        >
+          Test Export Button
+        </div>
+      </div>
+    );
+  }
+
+  public renderImport()
+  {
+    return 'implement me please';
+  }
+
+  public renderExport()
+  {
+    return <ETLExportDisplay />;
+  }
+
   public render()
   {
     return (
-      <div
-        className='etl-export-display-wrapper'
-        style={[fontColor(Colors().text1)]}
-      >
-        <div className='export-display-logo-bg' />
-        <TemplateEditor />
+      <div className='etl-page-root'>
+        {(this.state.view === ViewState.SHOW_BUTTONS && this.renderButtons()) ||
+          (this.state.view === ViewState.SHOW_IMPORT && this.renderImport()) ||
+          (this.state.view === ViewState.SHOW_EXPORT && this.renderExport())
+        }
+
       </div>
     );
+  }
+
+  public handleImportClicked()
+  {
+    this.setState({
+      view: ViewState.SHOW_IMPORT,
+    });
+  }
+
+  public handleExportClicked()
+  {
+    this.setState({
+      view: ViewState.SHOW_EXPORT,
+    });
   }
 }

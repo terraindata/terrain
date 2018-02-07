@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
+
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -53,6 +54,7 @@ import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import ControlPage from './control/components/ControlPage';
+import ETLPage from './etl/components/ETLPage';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
@@ -130,7 +132,7 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/control' component={ControlPage} />
 
-          <Route path='/import' component={FileImport} />
+          <Route path='/import' component={ETLPage} />
           <Route path='/analytics'>
             <IndexRoute component={analyticsLibrary} />
             <Route path=':categoryId' component={analyticsLibrary}>
