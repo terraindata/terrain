@@ -317,6 +317,7 @@ const Actions =
         fetchVersion:
           (algorithmId: string, onNoVersion: (algorithmId: string) => void) =>
           {
+            return { type: 'noop' };
             // TODO
             // Ajax.getAlgorithmVersion(algorithmId, (algorithmVersion: LibraryTypes.Algorithm) =>
             // {
