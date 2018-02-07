@@ -57,7 +57,7 @@ import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import Util from 'app/util/Util';
 import BuilderActions from '../../../data/BuilderActions';
-import PathfinderColumn from '../PathfinderColumn';
+import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
@@ -174,12 +174,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public renderPath(path: Path, i: number)
   {
     return (
-      <PathfinderColumn
+      <PathfinderArea
         path={path}
         canEdit={this.props.pathfinderContext.canEdit}
         schema={this.props.pathfinderContext.schemaState}
-        keyPath={this.props.keyPath.push('nested').push(i)}
-        toSkip={this.props.toSkip + 3} // Every time you nest, the filter section needs to know how nested it is
+        keyPath={this.props.keyPath.butLast().toList().push('nested').push(i)}
+        toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
       />
     );
   }
@@ -219,9 +219,14 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       PathfinderText.referenceExplanation,
                     )
                   }
-                  <RemoveIcon onClick={this._fn(this.handleDeleteNested, i)} className='pf-more-nested-remove close' />
+                  <RemoveIcon
+                    onClick={this._fn(this.handleDeleteNested, i)}
+                    className='pf-more-nested-remove close'
+                  />
                 </div>
-                {nested.get(i) !== undefined && this.renderPath(nested.get(i), i)}
+                {
+                  nested.get(i) !== undefined && this.renderPath(nested.get(i), i)
+                }
               </div>
             );
           })

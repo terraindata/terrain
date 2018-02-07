@@ -1,591 +1,593 @@
 @import "../../../common/Common.less";
-
-.pathfinder-column {
-	padding: 0px @double-spacing;
-	padding-bottom: @double-spacing;
-	// padding-top: 2 * @spacing;
-	font-size: @pretty-large-font-size;
-	height: 100%;
-  	overflow: auto;
-  	border-radius: 3px;
-  	.pf-column-name-background {
-  		width: 100%;
-  		height: 54px;
-  		left: 0;
-  		z-index: 999999;
-  		position: absolute;
-	  	.pf-column-name {
-	  		max-width: 180px;
-	    	margin-top: 6px;
-	    	left: 1px;
-	    	position: absolute;
-	  	}
-  	}
-	.pf-section {
-		margin-bottom: 2 * @spacing;
-		
-		.pf-section-subtitle {
-			font-size: @font-size;
-			padding-top: 4px;
-			padding-bottom: 8px;
-			font-style: italic;
-		}
-		.pf-score-section-type {
-			display: inline-flex;
-			margin-top: 6px;
-			.dropdown-wrapper {
-				margin-left: 18px;
-			    margin-bottom: 12px;
-			    position: relative;
-			    top: -5px;
-			}
-		}
-		.pf-linear-score-line {
-			display: inline-flex;
-			.dropdown-wrapper:first-child {
-			    margin-left: 12px;
-    			margin-right: 6px;
-			}
-		}
-	}		
-	
-	.pf-section-title {
-		padding: @spacing;
-		margin: 0px -2 * @spacing;
-		margin-bottom: @spacing;
-		
-		.pf-section-title-title {
-			font-size: @large-font-size;
-		}
-		
-		.pf-section-title-text {
-			font-size: @font-size;
-		}
-	}
-
-	.pf-step-button {
-		font-size: 16px;
-	    margin-top: 12px;
-	    cursor: pointer;
-	    &:hover {
-	    	text-decoration: underline;
-	    }
-	}
-	
-	.pf-create {
-		.transition;
-		cursor: pointer;
-		font-size: @font-size;
-	}
-	.pf-filter-line
-	{
-		.map-component-search-bar {
-	    	margin-bottom: -18px;
-	    	width: calc(~"100% + 2px");
-	    }
-	    .pf-filter-map-component-wrapper {
-	    	flex-grow: 1;
-	    	.leaflet-container {
-		    	position: absolute;
-				width: 100%;
-		    	min-height: 250px;
-			    border-bottom-left-radius: 6px;
-			    border-bottom-right-radius: 6px;
-		    }
-		    .map-component-fade-in-out {
-		    	position: relative;
-		    	width: 100%;
-		    }
-		    #PlacesAutocomplete__autocomplete-container {
-		    	font-size: @font-size;
-		    }
-		}	
-		.close {
-			margin-top: 19px;
-    		margin-left: 3px;
-		}
-		.flex-container
-		{
-			.autocomplete {
-				margin-top: 12px;
-			}
-		}
-		.pf-filter-add-boost {
-			font-size: 14px;
-			padding-top: 18px;
-			padding-left: 6px;
-			opacity: 0.7;
-			cursor: pointer;
-			&:hover {
-				text-decoration: underline;
-				opacity: 1;
-			}
-		}
-		.pf-filter-boost {
-			font-size: 13px;
-		    display: inline-flex;
-		    margin-top: 12px;
-		    max-width: 75px;
-		    margin-left: 6px;
-		    span {
+.pathfinder-column-wrapper
+{
+	.pf-area {
+		// padding-top: 2 * @spacing;
+		font-size: @pretty-large-font-size;
+		height: 100%;
+	  	overflow: auto;
+	  	border-radius: 3px;
+		padding: 0px @double-spacing;
+		padding-bottom: @double-spacing;
+	  	.pf-column-name-background {
+	  		width: 100%;
+	  		height: 54px;
+	  		left: 0;
+	  		z-index: 999999;
+	  		position: absolute;
+		  	.pf-column-name {
+		  		max-width: 180px;
 		    	margin-top: 6px;
-		    	margin-right: 6px;
-		    }
-			input[type=number]::-webkit-inner-spin-button, 
-			input[type=number]::-webkit-outer-spin-button { 
-			    -webkit-appearance: none; 
-			    margin: 0; 
-			}
-		}
-	}
-
-	.pf-line {
-		display: flex;
-		align-items: center;
-		padding: @half-spacing 0px;
-		
-		.pf-piece {
-			margin: 0px @half-spacing;
-			display: block;
-			position: relative;
-
-			.fade-in-quick;
-			// opacity: 1;
-			// .transition;
+		    	left: 1px;
+		    	position: absolute;
+		  	}
+	  	}
+		.pf-section {
+			margin-bottom: 2 * @spacing;
 			
-			&.pf-piece-hidden {
-				display: none;
-				// opacity: 0;
+			.pf-section-subtitle {
+				font-size: @font-size;
+				padding-top: 4px;
+				padding-bottom: 8px;
+				font-style: italic;
+			}
+			.pf-score-section-type {
+				display: inline-flex;
+				margin-top: 6px;
+				.dropdown-wrapper {
+					margin-left: 18px;
+				    margin-bottom: 12px;
+				    position: relative;
+				    top: -5px;
+				}
+			}
+			.pf-linear-score-line {
+				display: inline-flex;
+				.dropdown-wrapper:first-child {
+				    margin-left: 12px;
+	    			margin-right: 6px;
+				}
+			}
+		}		
+		
+		.pf-section-title {
+			padding: @spacing;
+			margin: 0px -2 * @spacing;
+			margin-bottom: @spacing;
+			
+			.pf-section-title-title {
+				font-size: @large-font-size;
+			}
+			
+			.pf-section-title-text {
+				font-size: @font-size;
 			}
 		}
-		.pf-score-line-arrow {
+
+		.pf-step-button {
+			font-size: 16px;
+		    margin-top: 12px;
+		    cursor: pointer;
+		    &:hover {
+		    	text-decoration: underline;
+		    }
+		}
+		
+		.pf-create {
+			.transition;
+			cursor: pointer;
+			font-size: @font-size;
+		}
+		.pf-filter-line
+		{
+			.map-component-search-bar {
+		    	margin-bottom: -18px;
+		    	width: calc(~"100% + 2px");
+		    }
+		    .pf-filter-map-component-wrapper {
+		    	flex-grow: 1;
+		    	.leaflet-container {
+			    	position: absolute;
+					width: 100%;
+			    	min-height: 250px;
+				    border-bottom-left-radius: 6px;
+				    border-bottom-right-radius: 6px;
+			    }
+			    .map-component-fade-in-out {
+			    	position: relative;
+			    	width: 100%;
+			    }
+			    #PlacesAutocomplete__autocomplete-container {
+			    	font-size: @font-size;
+			    }
+			}	
+			.close {
+				margin-top: 19px;
+	    		margin-left: 3px;
+			}
+			.flex-container
+			{
+				.autocomplete {
+					margin-top: 12px;
+				}
+			}
+			.pf-filter-add-boost {
+				font-size: 14px;
+				padding-top: 18px;
+				padding-left: 6px;
+				opacity: 0.7;
+				cursor: pointer;
+				&:hover {
+					text-decoration: underline;
+					opacity: 1;
+				}
+			}
+			.pf-filter-boost {
+				font-size: 13px;
+			    display: inline-flex;
+			    margin-top: 12px;
+			    max-width: 75px;
+			    margin-left: 6px;
+			    span {
+			    	margin-top: 6px;
+			    	margin-right: 6px;
+			    }
+				input[type=number]::-webkit-inner-spin-button, 
+				input[type=number]::-webkit-outer-spin-button { 
+				    -webkit-appearance: none; 
+				    margin: 0; 
+				}
+			}
+		}
+
+		.pf-line {
+			display: flex;
+			align-items: center;
+			padding: @half-spacing 0px;
+			
+			.pf-piece {
+				margin: 0px @half-spacing;
+				display: block;
+				position: relative;
+
+				.fade-in-quick;
+				// opacity: 1;
+				// .transition;
+				
+				&.pf-piece-hidden {
+					display: none;
+					// opacity: 0;
+				}
+			}
+			.pf-score-line-arrow {
+				svg
+				{
+					height: 11px;
+				}
+		    	margin-left: 12px;
+		    	margin-right: -6px;
+		    	cursor: pointer;
+		    	.transition;
+				.rotate(90deg);
+				&.pf-score-line-arrow-open {
+					.rotate180;
+				}
+				&.pf-score-line-arrow {
+					display: inline-block;
+				}
+			}
+			.pf-score-line-inner {
+				position: relative;
+				.builder-tb {
+					flex-basis: 50px;
+					margin: 0px 4px;
+				}
+				@t: 6px;
+				.pf-score-line-transform-arrow-open {
+				    border-top: 2px solid #47a7ff;
+				    border-right: 2px solid #47a7ff;
+				    position: absolute;
+				    z-index: 9;
+				    -webkit-transition: all 0.15s;
+				    transition: all 0.15s;
+				    height: 30px;
+				    width: 10;
+				    right: 4px;
+				    top: 16px;
+				    .pf-score-line-transform-arrow-inner-open {
+				    	.transition;
+				      	position: absolute;
+				      	left: 5px;
+				      	bottom: -7px;
+				      	width: 0px;
+				      	height: 0px;
+				      	// http://html-tuts.com/css-arrows-up-down-left-right-triangle/
+				      	border-top: @t solid transparent; // change this one to the card color
+				      	border-bottom: @t solid transparent;
+				      	border-right: @t solid transparent;
+				      	border-left: @t solid transparent;
+				      	border-top-color: #46a7ff;
+				    }
+			 	}
+			 	.pf-score-line-transform-arrow-closed {
+					border-top: 2px solid #47a7ff;
+				    border-right: 2px solid #47a7ff;
+				    position: absolute;
+				    z-index: 9;
+				    .transition;
+				    width: 10;
+				    right: 50px;
+				    top: 16px;
+				    .pf-score-line-transform-arrow-inner-closed {
+				    	.transition;
+							.transition;
+						    position: absolute;
+						    left: 10px;
+						    bottom: -5px;
+						    width: 0px;
+						    height: 0px;
+					      	border-top: @t solid transparent; // change this one to the card color
+					      	border-bottom: @t solid transparent;
+					      	border-right: @t solid transparent;
+					      	border-left: @t solid transparent;
+						    border-top-color: #46a7ff;
+						    .rotate(-90deg);
+				    }
+			 	}
+			 	.pf-score-line-expand {
+			 		margin-left: 12px;
+			 	}
+			}
+			.pf-score-line-text {
+				font-size: @font-size;
+				margin: 0px 4px;
+				flex-basis: 50px;	
+			}	
+			&.pf-score-line-inner {
+				padding: 0px 12px;
+
+			}
+			.pf-line-right {
+				display: flex;
+				.expand {
+					cursor: pointer;
+				}
+				.close {
+					margin-top: 6px;
+	    			margin-left: 6px;
+				}
+			}
+		}
+		.pf-score-line-transform {
+			padding-bottom: 10px;
+			position: relative;
+			.menu-wrapper {
+				top: 12px;
+				right: 9px;
+			}
+			.transform-card-inner {
+				margin-left: -17px;
+				width: 100%;
+			}
+			.yLeftAxis, .bottomAxis {
+				font-size: @small-font-size;
+			}
+			.yRightAxis {
+				display: none;
+			}
+			.tp-text-wrapper {
+				left: 30px;
+			}
+		}
+		.pf-score-line {
+			margin: 12px;
+		}
+
+		.pf-section 
+		{
+			.drag-icon {
+				padding-top: 8px;
+			}
+		}
+
+		.pf-more-section {
+			.pathfinder-column-content {
+				margin-left: 24px;
+				margin-top: 62px;
+			}
+			.pf-line {
+				padding: 6px;
+				span {
+					padding: 0px 6px;
+				}
+				.close 
+				{
+					margin-top: 0px;
+				}
+			}
+			.drag-icon {
+				padding-top: 15px;
+			}
+			.pf-more-nested {
+				position: relative;
+				.pf-more-nested-remove {
+				    height: 12px;
+				    width: 12px;
+				    position: relative;
+				    top: 28px;
+				    margin-left: 6px;
+				}
+				.pf-more-nested-reference {
+					display: inline-flex;
+					.pf-more-nested-reference-input {
+						margin-top: 12px;
+			    		max-width: 180px;
+					}	
+				}
+				.pf-nested-line {
+					border-top: 2px solid #47a7ff;
+				    border-left: 2px solid #47a7ff;
+				    border-bottom: 2px solid #47a7ff;
+				    position: absolute;
+				    z-index: 9;
+				    -webkit-transition: all 0.15s;
+				    transition: all 0.15s;
+				    height: 55px;
+				    width: 10;
+				    top: 25px;
+				    left: -12px;
+					.pf-nested-line-inner {
+				    	.transition;
+				    		@t: 6px;
+						    position: absolute;
+							left: 5px;
+							bottom: -7px;
+						    width: 0px;
+						    height: 0px;
+					      	border-top: @t solid transparent; // change this one to the card color
+					      	border-bottom: @t solid transparent;
+					      	border-right: @t solid transparent;
+					      	border-left: @t solid transparent;
+						    border-left-color: #46a7ff;
+					 }
+				}
+			}
+		}
+		.pf-aggregation-advanced-name-line {
+			display: inline-flex;
+			font-size: 16px;
+			margin: 6px 12px;
+			
+			span {
+				padding: 0px 6px;
+				padding-top: 6px;
+			}
+		}
+
+		.pf-aggregation-arrow {
 			svg
 			{
 				height: 11px;
 			}
-	    	margin-left: 12px;
+	    	margin-left: 6px;
 	    	margin-right: -6px;
 	    	cursor: pointer;
 	    	.transition;
 			.rotate(90deg);
-			&.pf-score-line-arrow-open {
+			&.pf-aggregation-arrow-open {
 				.rotate180;
 			}
-			&.pf-score-line-arrow {
+			&.pf-aggregation-arrow {
 				display: inline-block;
 			}
 		}
-		.pf-score-line-inner {
-			position: relative;
-			.builder-tb {
-				flex-basis: 50px;
-				margin: 0px 4px;
-			}
-			@t: 6px;
-			.pf-score-line-transform-arrow-open {
-			    border-top: 2px solid #47a7ff;
-			    border-right: 2px solid #47a7ff;
-			    position: absolute;
-			    z-index: 9;
-			    -webkit-transition: all 0.15s;
-			    transition: all 0.15s;
-			    height: 30px;
-			    width: 10;
-			    right: 4px;
-			    top: 16px;
-			    .pf-score-line-transform-arrow-inner-open {
-			    	.transition;
-			      	position: absolute;
-			      	left: 5px;
-			      	bottom: -7px;
-			      	width: 0px;
-			      	height: 0px;
-			      	// http://html-tuts.com/css-arrows-up-down-left-right-triangle/
-			      	border-top: @t solid transparent; // change this one to the card color
-			      	border-bottom: @t solid transparent;
-			      	border-right: @t solid transparent;
-			      	border-left: @t solid transparent;
-			      	border-top-color: #46a7ff;
-			    }
-		 	}
-		 	.pf-score-line-transform-arrow-closed {
-				border-top: 2px solid #47a7ff;
-			    border-right: 2px solid #47a7ff;
-			    position: absolute;
-			    z-index: 9;
-			    .transition;
-			    width: 10;
-			    right: 50px;
-			    top: 16px;
-			    .pf-score-line-transform-arrow-inner-closed {
-			    	.transition;
-						.transition;
-					    position: absolute;
-					    left: 10px;
-					    bottom: -5px;
-					    width: 0px;
-					    height: 0px;
-				      	border-top: @t solid transparent; // change this one to the card color
-				      	border-bottom: @t solid transparent;
-				      	border-right: @t solid transparent;
-				      	border-left: @t solid transparent;
-					    border-top-color: #46a7ff;
-					    .rotate(-90deg);
-			    }
-		 	}
-		 	.pf-score-line-expand {
-		 		margin-left: 12px;
-		 	}
-		}
-		.pf-score-line-text {
-			font-size: @font-size;
-			margin: 0px 4px;
-			flex-basis: 50px;	
-		}	
-		&.pf-score-line-inner {
-			padding: 0px 12px;
 
-		}
-		.pf-line-right {
-			display: flex;
-			.expand {
-				cursor: pointer;
-			}
-			.close {
-				margin-top: 6px;
-    			margin-left: 6px;
-			}
-		}
-	}
-	.pf-score-line-transform {
-		padding-bottom: 10px;
-		position: relative;
-		.menu-wrapper {
-			top: 12px;
-			right: 9px;
-		}
-		.transform-card-inner {
-			margin-left: -17px;
-			width: 100%;
-		}
-		.yLeftAxis, .bottomAxis {
-			font-size: @small-font-size;
-		}
-		.yRightAxis {
-			display: none;
-		}
-		.tp-text-wrapper {
-			left: 30px;
-		}
-	}
-	.pf-score-line {
-		margin: 12px;
-	}
-
-	.pf-section 
-	{
-		.drag-icon {
-			padding-top: 8px;
-		}
-	}
-
-	.pf-more-section {
-		.pathfinder-column-content {
-			margin-left: 24px;
-			margin-top: 62px;
-		}
-		.pf-line {
-			padding: 6px;
-			span {
-				padding: 0px 6px;
-			}
-			.close 
-			{
-				margin-top: 0px;
-			}
-		}
-		.drag-icon {
-			padding-top: 15px;
-		}
-		.pf-more-nested {
-			position: relative;
-			.pf-more-nested-remove {
-			    height: 12px;
-			    width: 12px;
-			    position: relative;
-			    top: 28px;
-			    margin-left: 6px;
-			}
-			.pf-more-nested-reference {
-				display: inline-flex;
-				.pf-more-nested-reference-input {
-					margin-top: 12px;
-		    		max-width: 180px;
-				}	
-			}
-			.pf-nested-line {
-				border-top: 2px solid #47a7ff;
-			    border-left: 2px solid #47a7ff;
-			    border-bottom: 2px solid #47a7ff;
-			    position: absolute;
-			    z-index: 9;
-			    -webkit-transition: all 0.15s;
-			    transition: all 0.15s;
-			    height: 55px;
-			    width: 10;
-			    top: 25px;
-			    left: -12px;
-				.pf-nested-line-inner {
-			    	.transition;
-			    		@t: 6px;
-					    position: absolute;
-						left: 5px;
-						bottom: -7px;
-					    width: 0px;
-					    height: 0px;
-				      	border-top: @t solid transparent; // change this one to the card color
-				      	border-bottom: @t solid transparent;
-				      	border-right: @t solid transparent;
-				      	border-left: @t solid transparent;
-					    border-left-color: #46a7ff;
-				 }
-			}
-		}
-	}
-	.pf-aggregation-advanced-name-line {
-		display: inline-flex;
-		font-size: 16px;
-		margin: 6px 12px;
-		
-		span {
-			padding: 0px 6px;
-			padding-top: 6px;
-		}
-	}
-
-	.pf-aggregation-arrow {
-		svg
-		{
-			height: 11px;
-		}
-    	margin-left: 6px;
-    	margin-right: -6px;
-    	cursor: pointer;
-    	.transition;
-		.rotate(90deg);
-		&.pf-aggregation-arrow-open {
-			.rotate180;
-		}
-		&.pf-aggregation-arrow {
-			display: inline-block;
-		}
-	}
-
-	.pf-aggregation-arrow-advanced {
-		margin-right: 6px;
-	}
-
-	.pf-aggregation-advanced-wrapper {
-		margin-left: 120px;
-		.pf-advanced-section {
-			padding-bottom: 12px;
-			font-size: @font-size;
-			.pf-advanced-section-multiple-items {
-				display: inline-grid !important;
-				span {
-					width: 138px;
-				}
-			}
-			.pf-advanced-section-multiple-inline {
-				display: inline-flex !important;
-				.pf-advanced-section-item {
-					margin-left: 12px;
-				}
-				.pf-advanced-section-item-first {
-					margin-left: 36px;
-				}
-			}
-			.pf-aggregation-missing {
-				display: inline-flex;
-			    flex-wrap: wrap;
-			    max-width: 500px;
-			    .builder-tb {
-			    	flex-basis: 50px;
-			    }
-			    span {
-			    	padding: 0px 6px;
-			    	max-width: 100% !important;
-			    }
-			}
-			.pf-advanced-section-title
-			{
-				cursor: pointer;
-				padding-bottom: 6px;
-			}
-			.pf-advanced-section-item {
-				margin-left: 36px;
-			}
-			.radio-button {
-				position: relative;
-				top: 3px;
-			}
-			.builder-tb {
-				max-width: 350px;
-			}
-			.multi-input-wrapper {
-				max-width: 500px;
-				padding-top: 12px;
-				position: relative;
-    			top: -10px;
-			}
-			.pf-advanced-section-item {
-				display: inline-flex;
-				span {
-					position: relative;
-				    top: 7px;
-				    padding-right: 12px;				
-				    display: block;
-    				max-width: 138px;
-				}
-			}
-			.radio-button-option {
-				margin-left: 36px;
-				.pf-advanced-section-item {
-					margin-left: 0px;
-					
-				}
-				.pf-advanced-section-item-range {
-					margin-left: 0px;
-					display: block;
-					span {
-						top: -11px;
-						left: 18px;
-					}
-					.builder-tb {
-						padding-left: 6px;
-					}
-				}
-			}
-			.pf-advanced-map {
-				max-width: 500px;
-				.map-component-search-bar
-				{
-					width: 100%;
-					.map-component-address-input {
-						margin-bottom: 0px;
-					}				
-				}
-			}
-			br {
-				display: none;
-			}
-		}
-	}
-	.pf-aggregation-more-menu-wrapper {
-		position: relative;
-		height: 20px;
-		width: 20px;
-		margin-bottom: 10px;
-		margin-left: 100px;
-	}
-	.pf-aggregation-more-section {
-		margin-left: 114px;
-		font-size: 16px;
-		max-width: 500px;
-		border: 1px solid;
-		padding: 6px;
-		margin-bottom: 6px;
-		border-radius: 6px;
-		.pf-aggregation-more-section-title {
-			cursor: pointer;
-		}
-		.close {
-			float: right;
-			margin-top: 3px;
+		.pf-aggregation-arrow-advanced {
 			margin-right: 6px;
 		}
-		.pf-line {
-			.close {
-				margin-right: 0px;
-			}
-		}
-		.pf-aggregation-more-section-content {
-			margin-left: 30px;
-		}
-		.pf-aggregation-sampler-option {
-			display: inline-flex;
-			max-width: 400px;
-			.builder-tb {
-				flex-grow: 0;
-				flex-basis: 60px;
-				padding-right: 3px;
-			}
-			span {
-				position: relative;
-				top: 4px;
-				padding-right: 3px;
-			}
-		}
-		.pf-aggregation-script-section {
-			.pf-aggregation-script-item {
-				margin-bottom: 12px;
-			}
-			textarea {
-				min-width: 100%;
-				max-width: 100%;
-			}
-			.pf-aggregation-script-title {
-				display: flex;
-				margin-bottom: 6px;
-				span {
+
+		.pf-aggregation-advanced-wrapper {
+			margin-left: 120px;
+			.pf-advanced-section {
+				padding-bottom: 12px;
+				font-size: @font-size;
+				.pf-advanced-section-multiple-items {
+					display: inline-grid !important;
+					span {
+						width: 138px;
+					}
+				}
+				.pf-advanced-section-multiple-inline {
+					display: inline-flex !important;
+					.pf-advanced-section-item {
+						margin-left: 12px;
+					}
+					.pf-advanced-section-item-first {
+						margin-left: 36px;
+					}
+				}
+				.pf-aggregation-missing {
+					display: inline-flex;
+				    flex-wrap: wrap;
+				    max-width: 500px;
+				    .builder-tb {
+				    	flex-basis: 50px;
+				    }
+				    span {
+				    	padding: 0px 6px;
+				    	max-width: 100% !important;
+				    }
+				}
+				.pf-advanced-section-title
+				{
+					cursor: pointer;
+					padding-bottom: 6px;
+				}
+				.pf-advanced-section-item {
+					margin-left: 36px;
+				}
+				.radio-button {
 					position: relative;
-					top: 7px;
-					margin-right: 6px;
-					margin-left: 6px;
+					top: 3px;
 				}
 				.builder-tb {
-					width: 100%;
-					flex-basis: none;
+					max-width: 350px;
+				}
+				.multi-input-wrapper {
+					max-width: 500px;
+					padding-top: 12px;
+					position: relative;
+	    			top: -10px;
+				}
+				.pf-advanced-section-item {
+					display: inline-flex;
+					span {
+						position: relative;
+					    top: 7px;
+					    padding-right: 12px;				
+					    display: block;
+	    				max-width: 138px;
+					}
+				}
+				.radio-button-option {
+					margin-left: 36px;
+					.pf-advanced-section-item {
+						margin-left: 0px;
+						
+					}
+					.pf-advanced-section-item-range {
+						margin-left: 0px;
+						display: block;
+						span {
+							top: -11px;
+							left: 18px;
+						}
+						.builder-tb {
+							padding-left: 6px;
+						}
+					}
+				}
+				.pf-advanced-map {
+					max-width: 500px;
+					.map-component-search-bar
+					{
+						width: 100%;
+						.map-component-address-input {
+							margin-bottom: 0px;
+						}				
+					}
+				}
+				br {
+					display: none;
 				}
 			}
 		}
-	}
-	.pf-filter-map-input-wrapper {
-	    position: relative;
-	    display: inline-flex;
-	    .builder-tb {
-	    	flex-grow: 0;
-	    	flex-basis: 60px;
-	    	margin-right: 6px;
-	    	margin-top: 5px;
-	    	margin-left: -6px;
-	    }
-	    .dropdown-wrapper {
-	    	margin-top: 5px;
-	    	flex-grow: 0;
-	    	margin-right: 6px;
-	    }
-	    .map-component-search-bar {
-	    	margin-bottom: -18px;
-	    	width: calc(~"100% + 2px");
-	    }
-	    .pf-filter-map-component-wrapper {
-	    	flex-grow: 1;
-	    	.leaflet-container {
-		    	position: absolute;
-				width: 100%;
-		    	min-height: 250px;
-			    border-bottom-left-radius: 6px;
-			    border-bottom-right-radius: 6px;
+		.pf-aggregation-more-menu-wrapper {
+			position: relative;
+			height: 20px;
+			width: 20px;
+			margin-bottom: 10px;
+			margin-left: 100px;
+		}
+		.pf-aggregation-more-section {
+			margin-left: 114px;
+			font-size: 16px;
+			max-width: 500px;
+			border: 1px solid;
+			padding: 6px;
+			margin-bottom: 6px;
+			border-radius: 6px;
+			.pf-aggregation-more-section-title {
+				cursor: pointer;
+			}
+			.close {
+				float: right;
+				margin-top: 3px;
+				margin-right: 6px;
+			}
+			.pf-line {
+				.close {
+					margin-right: 0px;
+				}
+			}
+			.pf-aggregation-more-section-content {
+				margin-left: 30px;
+			}
+			.pf-aggregation-sampler-option {
+				display: inline-flex;
+				max-width: 400px;
+				.builder-tb {
+					flex-grow: 0;
+					flex-basis: 60px;
+					padding-right: 3px;
+				}
+				span {
+					position: relative;
+					top: 4px;
+					padding-right: 3px;
+				}
+			}
+			.pf-aggregation-script-section {
+				.pf-aggregation-script-item {
+					margin-bottom: 12px;
+				}
+				textarea {
+					min-width: 100%;
+					max-width: 100%;
+				}
+				.pf-aggregation-script-title {
+					display: flex;
+					margin-bottom: 6px;
+					span {
+						position: relative;
+						top: 7px;
+						margin-right: 6px;
+						margin-left: 6px;
+					}
+					.builder-tb {
+						width: 100%;
+						flex-basis: none;
+					}
+				}
+			}
+		}
+		.pf-filter-map-input-wrapper {
+		    position: relative;
+		    display: inline-flex;
+		    .builder-tb {
+		    	flex-grow: 0;
+		    	flex-basis: 60px;
+		    	margin-right: 6px;
+		    	margin-top: 5px;
+		    	margin-left: -6px;
 		    }
-		    .map-component-fade-in-out {
-		    	position: relative;
-		    	width: 100%;
+		    .dropdown-wrapper {
+		    	margin-top: 5px;
+		    	flex-grow: 0;
+		    	margin-right: 6px;
 		    }
-		    #PlacesAutocomplete__autocomplete-container {
-		    	font-size: @font-size;
+		    .map-component-search-bar {
+		    	margin-bottom: -18px;
+		    	width: calc(~"100% + 2px");
 		    }
-		}	
+		    .pf-filter-map-component-wrapper {
+		    	flex-grow: 1;
+		    	.leaflet-container {
+			    	position: absolute;
+					width: 100%;
+			    	min-height: 250px;
+				    border-bottom-left-radius: 6px;
+				    border-bottom-right-radius: 6px;
+			    }
+			    .map-component-fade-in-out {
+			    	position: relative;
+			    	width: 100%;
+			    }
+			    #PlacesAutocomplete__autocomplete-container {
+			    	font-size: @font-size;
+			    }
+			}	
+		}
 	}
 }
 

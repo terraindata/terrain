@@ -113,15 +113,13 @@ class PathC extends BaseClass
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
 {
-  if (config)
-  {
-    config['source'] = _Source(config['source']);
-    config['filterGroup'] = _FilterGroup(config['filterGroup']);
-    config['score'] = _Score(config['score']);
-    config['more'] = _More(config['more']);
-    config['nested'] = List(config['nested'].map((n) => _Path(n)));
-  }
-  return New<Path>(new PathC(config), config);
+  let path = New<Path>(new PathC(config || {}), config);
+  path = path.set('source', _Source(path.source));
+  path = path.set('filterGroup', _FilterGroup(path.filterGroup));
+  path = path.set('score', _Score(path.score));
+  path = path.set('more', _More(path.more));
+  path = path.set('nested', List(path.nested.map((n) => _Path(n))));
+  return path;
 };
 
 class FilterGroupC extends BaseClass
@@ -394,12 +392,9 @@ class SourceC extends BaseClass
 export type Source = SourceC & IRecord<SourceC>;
 export const _Source = (config?: { [key: string]: any }) =>
 {
-  if (config)
-  {
-    config.dataSource = _ElasticDataSource(config.dataSource);
-  }
-
-  return New<Source>(new SourceC(config), config);
+  let source = New<Source>(new SourceC(config), config);
+  source = source.set('dataSource', _ElasticDataSource(source.dataSource));
+  return source;
 };
 
 abstract class DataSource extends BaseClass

@@ -56,16 +56,11 @@ const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
-import FadeInOut from 'app/common/components/FadeInOut';
-import FloatingInput from 'app/common/components/FloatingInput';
+import Util from 'app/util/Util';
 import { SchemaState } from 'schema/SchemaTypes';
-import Util from 'util/Util';
-import PathfinderFilterSection from './filter/PathfinderFilterSection';
-import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
+import PathfinderArea from './PathfinderArea';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
-import PathfinderScoreSection from './score/PathfinderScoreSection';
-import PathfinderSourceSection from './source/PathfinderSourceSection';
 
 export interface Props
 {
@@ -81,17 +76,6 @@ export interface Props
 @Radium
 class PathfinderColumn extends TerrainComponent<Props>
 {
-  public state = {
-    pathfinderContext: _PathfinderContext(this.getPathfinderContext(this.props)),
-  };
-
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    this.setState({
-      pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
-        this.getPathfinderContext(nextProps)),
-    });
-  }
 
   public componentWillMount()
   {
@@ -107,112 +91,20 @@ class PathfinderColumn extends TerrainComponent<Props>
     });
   }
 
-  public getPathfinderContext(props: Props)
-  {
-    return {
-      canEdit: props.canEdit,
-      source: props.path.source,
-      step: props.path.step,
-      schemaState: props.schema,
-    };
-  }
-
-  public incrementStep(oldStep)
-  {
-    if (oldStep < PathfinderSteps.More)
-    {
-      BuilderActions.changePath(this.getKeyPath().push('step'), this.props.path.step + 1);
-    }
-  }
-
-  public getKeyPath()
-  {
-    return this.props.keyPath !== undefined ? this.props.keyPath : List(['query', 'path']);
-  }
-
-  public changePathName(value)
-  {
-    BuilderActions.changePath(this.getKeyPath().push('name'), value);
-  }
-
   public render()
   {
-    const { path } = this.props;
-    const keyPath = this.getKeyPath();
-    const { pathfinderContext } = this.state;
     return (
       <div
-        className='pathfinder-column'
+        className='pathfinder-column-wrapper'
         style={[
           backgroundColor(Colors().bg3),
           fontColor(Colors().text3),
         ]}
       >
-        <FadeInOut
-          children={
-            <div
-              className='pf-column-name-background'
-              style={backgroundColor(Colors().sidebarBg)}
-            >
-              <FloatingInput
-                value={path.name}
-                onChange={this.changePathName}
-                label={'Algorithm Name'}
-                isTextInput={true}
-                canEdit={pathfinderContext.canEdit}
-                className='pf-column-name'
-              />
-            </div>
-          }
-          open={path.name !== undefined}
+        <PathfinderArea
+           {...this.props}
+           keyPath={List(['query', 'path'])}
         />
-        <div className='pathfinder-column-content'>
-          <PathfinderSourceSection
-            pathfinderContext={pathfinderContext}
-            keyPath={keyPath.push('source')}
-            onStepChange={this.incrementStep}
-            step={path.step}
-            source={path.source}
-          />
-          <FadeInOut
-            children={
-              <PathfinderFilterSection
-                pathfinderContext={pathfinderContext}
-                filterGroup={path.filterGroup}
-                keyPath={keyPath.push('filterGroup')}
-                onStepChange={this.incrementStep}
-                step={path.step}
-                toSkip={this.props.toSkip}
-              />
-            }
-            open={path.step >= PathfinderSteps.Filter}
-          />
-          <FadeInOut
-            children={
-              <PathfinderScoreSection
-                pathfinderContext={pathfinderContext}
-                score={path.score}
-                keyPath={keyPath.push('score')}
-                step={path.step}
-                onStepChange={this.incrementStep}
-
-              />
-            }
-            open={path.step >= PathfinderSteps.Score}
-          />
-          <FadeInOut
-            children={
-              <PathfinderMoreSection
-                pathfinderContext={pathfinderContext}
-                more={path.more}
-                path={path}
-                keyPath={keyPath.push('more')}
-                toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
-              />
-            }
-            open={path.step >= PathfinderSteps.More}
-          />
-        </div>
       </div>
     );
   }
