@@ -15,6 +15,7 @@ before_script:
   - ( cd analytics.js && yarn )
 
 stages:
+  - fullstack
 #  - lint
 #  - style
 #  - test-front
@@ -22,7 +23,7 @@ stages:
 #  - test-sigint
 #  - build
 #  - deploy
-  - fullstack
+
 
 lint:
   script:
