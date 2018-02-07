@@ -112,3 +112,5 @@ deploy:
     name: production
     url: http://pa-terraformer01.terrain.int:3000
 
+after_script:
+  - killall node || true;
