@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
@@ -52,38 +52,17 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { FILE_TYPES } from 'shared/etl/ETLTypes';
 import { makeConstructor, makeDeepConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
+import
+{
+  _ElasticFieldSettings, _TemplateField,
+  ElasticFieldSettings, TemplateField,
+} from 'etl/templates/FieldTypes';
+import
+{
+  ELASTIC_TYPES, ExportTemplateBase,
+  ImportTemplateBase, TEMPLATE_TYPES,
+} from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-class ElasticFieldSettingsC
-{
-  public langType: string = 'elastic';
-  public isAnalyzed: boolean = true;
-  public analyzer: string = '';
-  public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
-  public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
-}
-export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
-export const _ElasticFieldSettings = makeDeepConstructor(ElasticFieldSettingsC, {
-  arrayType: List,
-});
-
-class TemplateFieldC
-{
-  public isIncluded: boolean = true;
-  public langSettings: ElasticFieldSettings = _ElasticFieldSettings();
-  public fieldId: number = 0;
-  public name: string = '';
-  public children: List<TemplateField> = List([]);
-}
-export type TemplateField = WithIRecord<TemplateFieldC>;
-export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
-  children: (config: object[] = []) =>
-  {
-    return List<TemplateField>(config.map((value: object, index) => _TemplateField(value, true)));
-  },
-  langSettings: _ElasticFieldSettings,
-});
 
 class TemplateEditorStateC
 {
@@ -98,38 +77,17 @@ class TemplateEditorStateC
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
 
-interface TemplateBase
-{
-  templateId: ID;
-  templateName: string;
-  type: TEMPLATE_TYPES;
-  filetype: FILE_TYPES;
-  rootField: TemplateField;
-  objectKey: string;
-  dbid: number;
-  dbname: string;
-  tablename: string;
-  transformationEngine: TransformationEngine;
-}
-
-interface ExportTemplateBase extends TemplateBase
-{
-  type: TEMPLATE_TYPES.EXPORT;
-  rank: boolean;
-}
-
-interface ImportTemplateBase extends TemplateBase
-{
-  type: TEMPLATE_TYPES.IMPORT;
-  primaryKeySettings: any;
-}
-
-function transformationEngineConstructor(config)
+function transformationEngineConstructor(config: object)
 {
   return TransformationEngine.load(config);
 }
 
-class ExportTemplateC implements ExportTemplateBase
+interface RootFieldType // backend templates don't know about TemplateField type
+{
+  rootField: TemplateField;
+}
+
+class ExportTemplateC implements ExportTemplateBase, RootFieldType
 {
   public templateId = -1;
   public templateName = '';
@@ -146,10 +104,10 @@ class ExportTemplateC implements ExportTemplateBase
 export type ExportTemplate = WithIRecord<ExportTemplateC>;
 export const _ExportTemplate = makeDeepConstructor(ExportTemplateC, {
   rootField: _TemplateField,
-  transformationEngine: transformationEngineConstructor,
+  transformationEngine: TransformationEngine.load,
 });
 
-class ImportTemplateC implements ImportTemplateBase
+class ImportTemplateC implements ImportTemplateBase, RootFieldType
 {
   public templateId = -1;
   public templateName = '';
@@ -166,7 +124,7 @@ class ImportTemplateC implements ImportTemplateBase
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
 export const _ImportTemplate = makeDeepConstructor(ImportTemplateC, {
   rootField: _TemplateField,
-  transformationEngine: transformationEngineConstructor,
+  transformationEngine: TransformationEngine.load,
 });
 
 export function destringifySavedTemplate(obj: object): object

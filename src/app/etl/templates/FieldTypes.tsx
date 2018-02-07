@@ -42,67 +42,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-export enum ELASTIC_TYPES
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+const { List, Map } = Immutable;
+import
 {
-  TEXT = 'text',
-  LONG = 'long',
-  BOOLEAN = 'boolean',
-  DATE = 'date',
-  ARRAY = 'array',
-  NESTED = 'nested',
-  DOUBLE = 'double',
-  SHORT = 'short',
-  BYTE = 'byte',
-  INTEGER = 'integer',
-  HALF_FLOAT = 'half_float',
-  FLOAT = 'float',
-  GEO_POINT = 'geo_point',
-}
+  ELASTIC_TYPES, ExportTemplateBase,
+  ImportTemplateBase, TEMPLATE_TYPES,
+} from 'shared/etl/ETLTypes';
+import { makeConstructor, makeDeepConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-export enum TEMPLATE_TYPES
+class ElasticFieldSettingsC
 {
-  EXPORT = 'export',
-  IMPORT = 'import',
+  public langType: string = 'elastic';
+  public isAnalyzed: boolean = true;
+  public analyzer: string = '';
+  public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
+  public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
 }
+export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
+export const _ElasticFieldSettings = makeDeepConstructor(ElasticFieldSettingsC, {
+  arrayType: List,
+});
 
-export enum FILE_TYPES
+class TemplateFieldC
 {
-  JSON = 'json',
-  JSON_TYPE_OBJECT = 'json [type object]',
-  CSV = 'csv',
+  public isIncluded: boolean = true;
+  public langSettings: ElasticFieldSettings = _ElasticFieldSettings();
+  public fieldId: number = 0;
+  public name: string = '';
+  public children: List<TemplateField> = List([]);
 }
-
-interface TemplateBase
-{
-  templateId: ID;
-  templateName: string;
-  type: TEMPLATE_TYPES;
-  filetype: FILE_TYPES;
-  objectKey: string;
-  dbid: number;
-  dbname: string;
-  tablename: string;
-  transformationEngine: TransformationEngine;
-}
-
-export interface ExportTemplateBase extends TemplateBase
-{
-  type: TEMPLATE_TYPES.EXPORT;
-  rank: boolean;
-}
-
-export interface ImportTemplateBase extends TemplateBase
-{
-  type: TEMPLATE_TYPES.IMPORT;
-  primaryKeySettings: any;
-}
-
-// for the backend
-export type ExportTemplate = ExportTemplateBase & { rootField: any };
-
-// for the backend
-export type ImportTemplate = ImportTemplateBase & { rootField: any };
+export type TemplateField = WithIRecord<TemplateFieldC>;
+export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
+  children: (config: object[] = []) =>
+  {
+    return List<TemplateField>(config.map((value: object, index) => _TemplateField(value, true)));
+  },
+  langSettings: _ElasticFieldSettings,
+});

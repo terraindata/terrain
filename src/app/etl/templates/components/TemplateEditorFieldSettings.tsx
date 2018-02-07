@@ -62,13 +62,19 @@ import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
 import ElasticFieldTypeSection from './ElasticFieldTypeSection';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldTransformations from './TemplateEditorFieldTransformations';
+
+import
+{
+  _ElasticFieldSettings, _TemplateField,
+  ElasticFieldSettings, TemplateField,
+} from 'etl/templates/FieldTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 export interface Props extends TemplateEditorFieldProps
 {

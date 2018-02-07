@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
 import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
 import { AuthReducers } from 'auth/data/AuthRedux';
-import { TemplateEditorReducers } from 'etl/templates/data/TemplateEditorRedux';
+import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';

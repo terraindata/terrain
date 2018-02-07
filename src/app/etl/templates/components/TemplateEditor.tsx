@@ -58,11 +58,13 @@ import TemplateEditorDocumentsPreview from 'etl/templates/components/TemplateEdi
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import TemplateEditorFieldSettings from 'etl/templates/components/TemplateEditorFieldSettings';
 import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEditorPreviewControl';
-import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+
+import { _TemplateField, ElasticFieldSettings, TemplateField } from 'etl/templates/FieldTypes';
 import
 {
-  _ElasticFieldSettings, _ExportTemplate, _TemplateField, destringifySavedTemplate,
-  ETLTemplate, TemplateEditorState, TemplateField, templateForSave,
+  _ExportTemplate, destringifySavedTemplate,
+  ETLTemplate, TemplateEditorState, templateForSave,
 } from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 

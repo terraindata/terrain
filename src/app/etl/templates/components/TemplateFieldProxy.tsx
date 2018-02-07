@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires import-spacing
+
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
@@ -53,8 +55,13 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import
+{
+  _ElasticFieldSettings, _TemplateField,
+  ElasticFieldSettings, TemplateField,
+} from 'etl/templates/FieldTypes';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 
 /*

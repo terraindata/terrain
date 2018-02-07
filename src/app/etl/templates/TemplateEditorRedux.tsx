@@ -49,10 +49,14 @@ import * as _ from 'lodash';
 
 import
 {
+  _ElasticFieldSettings, _TemplateField,
+  ElasticFieldSettings, TemplateField,
+} from 'etl/templates/FieldTypes';
+import
+{
   _TemplateEditorState,
   ETLTemplate,
   TemplateEditorState,
-  TemplateField,
 } from 'etl/templates/TemplateTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 

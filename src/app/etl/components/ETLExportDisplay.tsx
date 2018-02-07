@@ -53,7 +53,7 @@ import Query from 'src/items/types/Query';
 import Util from 'util/Util';
 
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 import './ETLExportDisplay.less';

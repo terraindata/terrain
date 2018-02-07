@@ -53,8 +53,9 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import TemplateEditorFieldNode from './TemplateEditorFieldNode';
 
 import './TemplateEditorDocumentsPreview.less';

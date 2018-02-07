@@ -46,9 +46,15 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import
 {
-  _ElasticFieldSettings, _ExportTemplate, _TemplateField,
-  ETLTemplate, TemplateEditorState, TemplateField,
+  _ElasticFieldSettings, _TemplateField,
+  ElasticFieldSettings, TemplateField,
+} from 'etl/templates/FieldTypes';
+import
+{
+  _ExportTemplate,
+  ETLTemplate, TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
+
 import * as Immutable from 'immutable';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 const { List } = Immutable;
