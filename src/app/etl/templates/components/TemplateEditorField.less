@@ -11,6 +11,7 @@
 .template-editor-field-block {
   display: flex;
   flex-direction: column;
+  padding: @quarter-spacing;
 
   .field-preview-label-group {
     flex: 0 0 200px;
@@ -20,7 +21,6 @@
   }
 
   .field-preview-label {
-    .big-text;
     padding: @half-spacing;
     cursor: pointer;
     text-overflow: ellipsis;
@@ -30,7 +30,6 @@
   }
 
   .field-preview-value {
-    .big-text;
     padding: @half-spacing;
     padding-left: @spacing;
   }
@@ -211,7 +210,7 @@
     justify-content: space-between;
     height: @settings-height;
     width: ~"calc(100% - @{settings-extra-space})";
-    left: @double-spacing;
+    left: @double-spacing - 3px;
     box-shadow: 2px 3px 10px rgba(0,0,0,0.25);
     position: absolute;
   }
