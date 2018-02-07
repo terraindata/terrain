@@ -47,8 +47,10 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
@@ -62,6 +64,7 @@ import { FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Sour
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
+import Util from 'app/util/Util';
 
 export interface Props
 {
@@ -72,163 +75,199 @@ export interface Props
   onStepChange?: (oldStep: PathfinderSteps) => void;
 }
 
+interface IMoveState
+{
+  moving: boolean;
+  originalMouseY?: number;
+  originalElTop?: number;
+  originalElBottom?: number;
+  elHeight?: number;
+  dY?: number;
+  minDY?: number;
+  maxDY?: number;
+  midpoints?: number[];
+  tops?: number[];
+  movedTo?: number;
+  movingIndex?: number;
+  movingRef?: string;
+}
+
+const DefaultMoveState: IMoveState =
+  {
+    moving: false,
+    movedTo: null,
+  };
+
+
+@Radium
 class PathfinderFilterSection extends TerrainComponent<Props>
 {
-  public state: {
+  public state: IMoveState = DefaultMoveState;
+  public bars = List(['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink']);
 
-  } = {
-
-    };
-
-  public render()
+  public handleMouseDown(index: number, name: string, event: MEvent)
   {
-    const { source, step, canEdit } = this.props.pathfinderContext;
-    const { filterGroup } = this.props;
+    $('body').on('mousemove', this.handleMouseMove);
+    $('body').on('mouseup', this.handleMouseUp);
+    $('body').on('mouseleave', this.handleMouseUp);
 
-    // flatten tree
-    const entries: FilterEntry[] = [];
-    this.buildFilterTree(filterGroup, entries, 0, this.props.keyPath);
-    return (
-      <div
-        className='pf-section'
-      >
-        {
-          entries.map(this.renderFilterEntry)
-        }
-        {
-          this.props.step === PathfinderSteps.Filter &&
-          <div
-            onClick={this.handleStepChange}
-            className='pf-step-button'
-          >
-            Filters look good for now
-          </div>
-        }
-      </div>
-    );
-  }
+    const parent = this.refs['all'];
 
-  private handleStepChange()
-  {
-    if (this.props.step === PathfinderSteps.Filter)
+    const cr = this.refs[name]['getBoundingClientRect']();
+    const parentCr = parent['getBoundingClientRect']();
+
+    const minDY = parentCr.top - cr.top;
+    const maxDY = parentCr.bottom - cr.bottom;
+
+    const siblings = Util.siblings(this.refs[name]);
+    const midpoints = [];
+    const tops = [];
+    _.range(0, siblings.length).map((i) =>
     {
-      this.props.onStepChange(this.props.step);
-    }
-  }
-
-  private handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean)
-  {
-    BuilderActions.changePath(keyPath, filter, notDirty, fieldChange);
-  }
-
-  private handleAddFilter(keyPath, filter: FilterGroup | FilterLine)
-  {
-    const oldLines = this.props.filterGroup.getIn(keyPath.skip(3).toList());
-    BuilderActions.changePath(keyPath, oldLines.push(filter));
-  }
-
-  private handleFilterDelete(keyPath: KeyPath)
-  {
-    const parentKeyPath = keyPath.butLast().toList();
-    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
-    const index = keyPath.last();
-    BuilderActions.changePath(parentKeyPath, parent.splice(index, 1));
-    // TODO consider 'removeIn' instead
-  }
-
-  private buildFilterTree(filterGroup: FilterGroup, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
-  {
-
-    entries.push({
-      filterGroup,
-      depth,
-      keyPath,
+      const sibCr = siblings[i]['getBoundingClientRect']();
+      midpoints.push((sibCr.top + sibCr.bottom) / 2); // - (i > this.props.index ? cr.height /**/ : 0));
+      tops.push(sibCr.top);
     });
 
-    keyPath = keyPath.push('lines');
-    filterGroup.lines.map((filterLine, index) =>
+    this.setState({
+      moving: true,
+      originalMouseY: event.pageY,
+      originalElTop: cr.top,
+      originalElBottom: cr.bottom,
+      elHeight: cr.height,
+      dY: 0,
+      minDY,
+      maxDY,
+      midpoints,
+      tops,
+      movingIndex: index,
+      movingRef: name,
+    });
+  }
+
+  public shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
+  {
+    const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
+
+    let index: number;
+
+    // TODO search from the bottom up if dragging downwards
+    if (dY < 0)
     {
-      if (filterLine.filterGroup)
+      // if dragged up, search from top down
+      for (
+        index = 0;
+        this.state.midpoints[index] < this.state.originalElTop + dY;
+        index++
+      )
       {
-        // it is a filter group
-        this.buildFilterTree(filterLine.filterGroup, entries, depth + 1, keyPath.push(index).push('filterGroup'));
+
+      }
+    }
+    else
+    {
+      for (
+        index = this.state.midpoints.length - 1;
+        this.state.midpoints[index] > this.state.originalElBottom + dY;
+        index--
+      )
+      {
+
+      }
+    }
+
+    const sibs = Util.siblings(this.refs[this.state.movingRef]);
+    _.range(0, sibs.length).map((i) =>
+    {
+      const el = sibs[i];
+      if (i === this.state.movingIndex)
+      {
+      //  $(el).removeClass('card-field-wrapper-moving');
+        return;
+      }
+
+      let shift = 0;
+      if (index < this.state.movingIndex)
+      {
+        // move things down
+        if (i < this.state.movingIndex && i >= index)
+        {
+          shift = 1;
+        }
       }
       else
       {
-        entries.push({
-          filterLine,
-          depth,
-          keyPath: keyPath.push(index),
-        });
+        // move up
+        if (i > this.state.movingIndex && i <= index)
+        {
+          shift = -1;
+        }
       }
+      console.log('Shift is ', shift);
+      console.log('Height is', this.state.elHeight);
+      el['style'].top = shift * this.state.elHeight;
+     // $(el).addClass('card-field-wrapper-moving');
     });
-
-    entries.push({
-      isCreateSection: true,
-      depth,
-      keyPath: keyPath.push(filterGroup.lines.size),
-    });
+    // console.log('Shift siblings', dY);
+    // console.log('Index ', index);
+    return {
+      dY,
+      index,
+    };
   }
 
-  private renderFilterEntry(filterEntry: FilterEntry, index: number): El
+  public handleMouseMove(evt)
   {
-    const { pathfinderContext } = this.props;
-    const { source, canEdit } = pathfinderContext;
-    if (filterEntry.filterGroup)
-    {
-      return (
-        <PathfinderFilterGroup
-          filterGroup={filterEntry.filterGroup}
-          canEdit={canEdit}
-          depth={filterEntry.depth}
-          keyPath={filterEntry.keyPath}
-          onChange={this.handleFilterChange}
-          key={index}
-          onDelete={this.handleFilterDelete}
-        />
-      );
-    }
-
-    if (filterEntry.filterLine)
-    {
-      return (
-        <PathfinderFilterLine
-          filterLine={filterEntry.filterLine}
-          canEdit={canEdit}
-          depth={filterEntry.depth}
-          keyPath={filterEntry.keyPath}
-          onChange={this.handleFilterChange}
-          onDelete={this.handleFilterDelete}
-          key={index}
-          pathfinderContext={pathfinderContext}
-        />
-      );
-    }
-
-    if (filterEntry.isCreateSection)
-    {
-      return (
-        <PathfinderFilterCreate
-          canEdit={canEdit}
-          depth={filterEntry.depth}
-          keyPath={filterEntry.keyPath.butLast().toList()}
-          onChange={this.handleAddFilter}
-          key={index}
-        />
-      );
-    }
-
-    throw new Error('Uncrecognized filter entry: ' + JSON.stringify(filterEntry));
+    const dY = this.shiftSiblings(evt, false).dY;
+    this.setState({
+      dY,
+    });
+    evt.preventDefault();
+    evt.stopPropagation();
   }
-}
 
-interface FilterEntry
-{
-  filterGroup?: FilterGroup;
-  filterLine?: FilterLine;
-  isCreateSection?: boolean;
-  depth: number;
-  keyPath: KeyPath;
+  public move()
+  {
+    console.log('move');
+   // $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
+  }
+
+  public handleMouseUp(evt)
+  {
+    $('body').off('mousemove', this.handleMouseMove);
+    $('body').off('mouseup', this.handleMouseUp);
+    $('body').off('mouseleave', this.handleMouseUp);
+
+    const { index } = this.shiftSiblings(evt, true);
+
+    setTimeout(this.move, 150);
+
+    this.setState({
+      movedTo: index,
+    });
+  }
+
+  public render()
+  {
+    return (
+      <div
+        className='pf-section'
+        ref='all'
+      >
+         {
+           this.bars.map((bar, i) =>
+              <div
+                style={[{height: 30,}, {width: 300}, {backgroundColor: bar}, {position: 'relative'}]}
+                ref={bar}
+                onMouseDown={this._fn(this.handleMouseDown, i, bar)}
+                key={bar}
+              >
+             </div>
+          )
+         }
+      </div>
+    );
+  }
 }
 
 export default PathfinderFilterSection;
