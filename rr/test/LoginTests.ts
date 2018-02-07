@@ -68,20 +68,20 @@ async function loginToBuilder(page, url)
   let image = await page.screenshot();
   // login screen
   (expect(image) as any).toMatchImageSnapshot();
-  winston.log('Compared the login page ' + url);
+  winston.info('Compared the login page ' + url);
   await page.waitForSelector(USERNAME_SELECTOR);
-  winston.log('Username selector is ready.');
+  winston.info('Username selector is ready.');
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type('admin@terraindata.com');
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('secret');
   await page.click(BUTTON_SELECTOR);
   sleep.sleep(5);
-  winston.log('Goto the starting page.');
+  winston.info('Goto the starting page.');
   image = await page.screenshot();
   // after login
   (expect(image) as any).toMatchImageSnapshot();
-  winston.log('Compared the starting page.');
+  winston.info('Compared the starting page.');
 }
 
 function getChromeDebugAddress()
@@ -94,7 +94,7 @@ function getChromeDebugAddress()
     return wsAddress;
   } catch (err)
   {
-    winston.err(err);
+    winston.error(err);
     return undefined;
   }
 }
@@ -125,6 +125,6 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   afterAll(async () =>
   {
     await page.close();
-    winston.log('The page is closed.');
+    winston.info('The page is closed.');
   });
 });
