@@ -13,7 +13,6 @@ before_script:
   - yarn
   - ( cd sigint && yarn )
   - ( cd analytics.js && yarn )
-  - FAILURE=0
 
 stages:
   - lint
@@ -87,13 +86,12 @@ fullstack:
   script:
     - MIDWAY_HOST=`hostname`:3000 yarn run build
     - yarn run test-fullstack-setup
-    - fuser -k -n tcp 3000 || true
+    - killall node
     - NODE_ENV=production yarn run start-midway > ./midwayConsole.log 2>&1&
     - sleep 5
-    - yarn run test-rr || FAILURE=1
-    - fuser -k -n tcp 3000 || true
+    - yarn run test-rr
+    - killall node
     - yarn run test-fullstack-teardown
-    - (exit $FAILURE)
   stage: fullstack
   when: always
 
