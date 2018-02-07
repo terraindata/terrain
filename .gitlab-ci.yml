@@ -86,11 +86,11 @@ fullstack:
   script:
     - MIDWAY_HOST=`hostname`:3000 yarn run build
     - yarn run test-fullstack-setup
-    - killall node
+    - killall node || true;
     - NODE_ENV=production yarn run start-midway > ./midwayConsole.log 2>&1&
     - sleep 5
     - yarn run test-rr
-    - killall node
+    - killall node || true;
     - yarn run test-fullstack-teardown
   stage: fullstack
   when: always
