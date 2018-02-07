@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 import nestedProperty = require('nested-property');
 import deepGet = require('utils-deep-get');
 import deepSet = require('utils-deep-set');
-import * as winston from 'winston';
+// import * as winston from 'winston'; // TODO what to do for error logging?
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
@@ -173,10 +173,10 @@ export class TransformationEngine
         const transformationResult: TransformationVisitResult = TransformationNodeVisitor.visit(this.dag.node(toTraverse[i]), output);
         if (transformationResult.errors !== undefined)
         {
-          winston.error('Transformation encountered errors!:');
+          // winston.error('Transformation encountered errors!:');
           transformationResult.errors.forEach((error: TransformationVisitError) =>
           {
-            winston.error(`\t -${error.message}`);
+            // winston.error(`\t -${error.message}`);
           });
           // TODO abort transforming if errors occur?
         }
@@ -271,6 +271,26 @@ export class TransformationEngine
         this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, TransformationEngine.updateKeyPath(field, oldName, newKeyPath));
       }
     });
+  }
+
+  public getInputKeyPath(fieldID: number): KeyPath
+  {
+    return this.fieldNameToIDMap.keyOf(fieldID);
+  }
+
+  public getOutputKeyPath(fieldID: number): KeyPath
+  {
+    return this.IDToFieldNameMap.get(fieldID);
+  }
+
+  public getAllFieldIDs(): List<number>
+  {
+    return this.IDToFieldNameMap.keySeq().toList();
+  }
+
+  public getAllFieldNames(): List<KeyPath>
+  {
+    return this.IDToFieldNameMap.valueSeq().toList();
   }
 
   private parseFieldIDs(fieldNamesOrIDs: List<KeyPath> | List<number>): List<number>
