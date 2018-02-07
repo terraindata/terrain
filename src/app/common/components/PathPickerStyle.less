@@ -6,6 +6,7 @@
 
 .pathpicker {
 	min-width: 125px; // arbitrary, can change
+	width: 100%;
 	
 	.pathpicker-box-value {
 		position: relative;
@@ -65,12 +66,19 @@
 		z-index: 1;
 		opacity: 1;
 		
-		
 		max-height: 450px;
+		overflow: auto;
+		
 		.transition;
 		
 		.pathpicker-picker-inner {
 			opacity: 1;
+		}
+		
+		.pathpicker-multi-picker-inner {
+			display: flex;
+			flex-wrap: nowrap;
+			align-items: top;
 		}
 		
 		.pathpicker-header {
@@ -82,9 +90,14 @@
 			display: flex;
 			flex-wrap: wrap;
 			
+			&.pathpicker-options-column {
+				flex-direction: column;
+			}
+			
 			.pathpicker-option {
 				flex-grow: 1;
-				min-width: 150px;
+		    flex-basis: 30%;
+		    min-width: 200px;
 		    max-width: @option-max-width;
 				max-height: @option-max-height;
 				margin: 6px;
@@ -157,6 +170,10 @@
 .pathpicker-option-name {
 	padding: 12px 24px;
 	font-size: 42px;
+	max-width: 100%;
+  // overflow: hidden; // TODO figure out how to make this work without making the name smaller
+  //  current turning this on will clip the name
+  text-overflow: ellipsis;
 }
 
 .pathpicker-veil, .pathpicker-veil-open {
@@ -256,4 +273,13 @@
 	// 	}
 	// }
 	
+}
+
+.pathpicker-box-values {
+	display: flex;
+	width: 100%;
+	
+	.pathpicker-box-value {
+		flex-grow: 1;
+	}
 }

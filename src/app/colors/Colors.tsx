@@ -77,7 +77,7 @@ const NTColors =
     blue4: '#157eb0',
   };
 
-const NewTheme: Theme =
+const NewTheme =
 {
   fontColor: NTColors.dark3,
   fontColor2: '#606262',
@@ -1108,10 +1108,10 @@ const newTheme = NewTheme;
 
 // contains the mash of the old theme and the new theme
 // only initialized once, as we need to reload browser anyway for theme changes
-const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme);
+const themeMash: (typeof NewTheme) & OldTheme = _.extend({}, oldTheme, newTheme);
 // ^ new theme comes second, overrides old theme's properties
 
-export function Colors(): Theme & OldTheme
+export function Colors(): (typeof NewTheme) & OldTheme
 {
   return themeMash;
 }

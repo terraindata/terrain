@@ -474,6 +474,7 @@ class ElasticDataSourceC extends DataSource
     const server = BuilderStore.getState().db.name;
     if (context.type === 'source')
     {
+      console.log(context.schemaState.databases.toList().toJS());
       // we need to make it clear what parts of Source are tracked
       const sources = context.schemaState.databases.toList().filter(
         (db) => db.serverId === server,
@@ -509,7 +510,7 @@ class ElasticDataSourceC extends DataSource
       return sources.map((source) =>
       {
         const databaseId = source.value; // String(source.value.serverId) + '/' + String(source.value.name);
-        console.log(databaseId, sourceExamples);
+        
         let sampleData = sourceExamples[databaseId];
         
         return _ChoiceOption({
@@ -548,26 +549,23 @@ class ElasticDataSourceC extends DataSource
       const { index, types } = dataSource as any;
       if (index)
       {
-        if (types && types.size)
+        const transformableCols = context.schemaState.columns.filter(
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(index) &&
+            transformableTypes.indexOf(column.datatype) !== -1,
+        );
+        let transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
         {
-          const transformableCols = context.schemaState.columns.filter(
-            (column) => column.serverId === String(server) &&
-              column.databaseId === String(index) &&
-              transformableTypes.indexOf(column.datatype) !== -1,
-          );
-          let transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
-          {
-            return _ChoiceOption({
-              displayName: col.name,
-              value: col.name,
-              sampleData: col.sampleData,
-            });
-          }).toList();
-          let fieldNames = transformableOptions.map((f) => f.value).toList();
-          fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
-          transformableOptions = transformableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
-          return transformableOptions.concat(defaultOptions).toList();
-        }
+          return _ChoiceOption({
+            displayName: col.name,
+            value: col.name,
+            sampleData: col.sampleData,
+          });
+        }).toList();
+        let fieldNames = transformableOptions.map((f) => f.value).toList();
+        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+        transformableOptions = transformableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
+        return transformableOptions.concat(defaultOptions).toList();
       }
       return defaultOptions;
     }
@@ -588,31 +586,28 @@ class ElasticDataSourceC extends DataSource
         });
       }));
       const { dataSource } = context.source;
-      const { index, types } = dataSource as any;
+      const { index } = dataSource as any;
       if (index)
       {
-        if (types && types.size)
+        const cols = context.schemaState.columns.filter(
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(index));
+        let fields = cols.map((col) =>
         {
-          const cols = context.schemaState.columns.filter(
-            (column) => column.serverId === String(server) &&
-              column.databaseId === String(index));
-          let fields = cols.map((col) =>
-          {
-            return _ChoiceOption({
-              displayName: col.name,
-              value: col.name,
-              sampleData: col.sampleData,
-              meta: {
-                fieldType: dataSource.dataTypeToFieldType(col.datatype),
-              },
-            });
-          }).toList();
-          // Sort fields (Sort their names, then use that to sort the choice options)
-          let fieldNames = fields.map((f) => f.value).toList();
-          fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
-          fields = fields.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
-          return fields.concat(defaultOptions).toList();
-        }
+          return _ChoiceOption({
+            displayName: col.name,
+            value: col.name,
+            sampleData: col.sampleData,
+            meta: {
+              fieldType: dataSource.dataTypeToFieldType(col.datatype),
+            },
+          });
+        }).toList();
+        // Sort fields (Sort their names, then use that to sort the choice options)
+        let fieldNames = fields.map((f) => f.value).toList();
+        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+        fields = fields.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
+        return fields.concat(defaultOptions).toList();
       }
       return defaultOptions;
     }

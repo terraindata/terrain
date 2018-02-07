@@ -65,6 +65,7 @@ import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import { MultiPathPicker, PathPickerOptionSet } from 'app/common/components/MultiPathPicker';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -112,11 +113,17 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         }}
       >
         {
+          this.renderPicker()
+        }
+        {/*{
           this.renderField()
         }
         {
-          this.renderValue()
+          this.renderMethod()
         }
+        {
+          this.renderValue()
+        }*/}
         {
           this.renderBoost()
         }
@@ -131,56 +138,136 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       </div>
     );
   }
-
-  private renderField()
+  
+  private renderPicker()
   {
+    const { props, state} = this;
+    
+    const fieldValue = props.filterLine.field;
+    const comparisonValue = props.filterLine.comparison;
+    const valueValue = props.filterLine.value;
+    const values = List([
+      fieldValue,
+      comparisonValue,
+      valueValue,
+    ]);
+    
+    return (
+      <MultiPathPicker
+        optionSets={this.getOptionSets() /* TODO store in state? */}
+        values={values}
+        onChange={this.handleFilterPickerChange}
+        canEdit={props.canEdit}
+      />
+    );
+  }
+  
+  private getOptionSets()
+  {
+    
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
 
-    if (filterLine.field !== null)
-    {
-      return (
-        <div
-          style={pieceStyle}
-          onClick={this._fn(this.handleChange, 'field', null, true)}
-        >
-          {
-            filterLine.field
-          }
-        </div>
-      );
-    }
-
-    const options = source.dataSource.getChoiceOptions({
+    const fieldOptions = source.dataSource.getChoiceOptions({
       type: 'fields',
       source,
       schemaState: pathfinderContext.schemaState,
     });
-
-    return (
-      <div>
-        {
-          options.map((choiceOption) =>
-            <div
-              style={pieceStyle}
-              onClick={this._fn(this.handleChange, 'field', choiceOption.value, choiceOption.meta && choiceOption.meta.fieldType)}
-              key={choiceOption.value}
-            >
-              {
-                choiceOption.displayName
-              }
-            </div>,
-          )
-        }
-      </div>
-    );
+    
+    const fieldSet = {
+      key: 'field',
+      options: fieldOptions,
+      shortNameText: 'Field',
+      headerText: 'Choose on which field to impose a condition',
+      column: true,
+      hideSampleData: true,
+      // hasOther: false,
+    };
+    
+    
+    const comparisonOptions = source.dataSource.getChoiceOptions({
+      type: 'comparison',
+      field: filterLine.field,
+      fieldType: filterLine.fieldType,
+      source,
+      schemaState: pathfinderContext.schemaState,
+    });
+    
+    const comparisonSet = {
+      key: 'comparison',
+      options: comparisonOptions,
+      shortNameText: 'Compare',
+      headerText: 'Choose how to compare your field to a value',
+      column: true,
+      hideSampleData: true,
+      // hasOther: false,
+    };
+    
+    
+    // TODO add more value options
+    // TODO add value component selector for Other
+    const valueOptions = pathfinderContext.source.dataSource.getChoiceOptions({
+      type: 'input',
+    });
+    
+    const valueSet = {
+      key: 'value',
+      options: valueOptions,
+      shortNameText: 'Value',
+      headerText: 'The value to use in the condition',
+      column: true,
+      hideSampleData: true,
+      // hasOther: true,
+      // otherComponent: TODO,
+    };
+    
+    
+    return List([
+      fieldSet,
+      comparisonSet,
+      valueSet,
+      // boostSet?
+    ]);
   }
-
-  private renderMethod()
+  
+  private handleFilterPickerChange(optionSetIndex: number, value: any)
   {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
-    const { source } = pathfinderContext;
+    console.log(optionSetIndex, value);
+    // , 'field', choiceOption.value, choiceOption.meta && choiceOption.meta.fieldType)
   }
+
+  // private renderField()
+  // {
+  //   const { filterLine, canEdit, pathfinderContext, depth } = this.props;
+  //   const { source } = pathfinderContext;
+
+  //   const options = source.dataSource.getChoiceOptions({
+  //     type: 'fields',
+  //     source,
+  //     schemaState: pathfinderContext.schemaState,
+  //   });
+    
+  //   return (
+  //     <PathPicker
+  //       value={filterLine.field}
+  //       onChange={this.handleFieldChange}
+  //       options={options}
+  //       canEdit={canEdit}
+  //       shortNameText={'Field'}
+  //       headerText={'Pick the field on which you want to impose some condition'}
+  //       hasOther={false}
+  //     />
+  //   );
+  // }
+
+  // private renderMethod()
+  // {
+  //   const { filterLine, canEdit, pathfinderContext, depth } = this.props;
+  //   const { source } = pathfinderContext;
+    
+  //   return ( null
+  //   );
+  // }
 
   private addBoost()
   {

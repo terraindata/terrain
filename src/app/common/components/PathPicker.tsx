@@ -412,34 +412,6 @@ class PathPicker extends TerrainComponent<Props>
         key={index}
       />
     );
-    
-    // TODO coordinate formatting with ResultsArea
-    // return (
-    //   <div
-    //     className='pathpicker-data-piece'
-    //     key={index}
-    //   >
-    //     {
-    //       _.map(data, (value, field) => (
-    //         <div
-    //           className='pathpicker-data-row'
-    //           key={field}
-    //         >
-    //           <div className='pathpicker-data-field'>
-    //             {
-    //               field
-    //             }
-    //           </div>
-    //           <div className='pathpicker-data-value'>
-    //             {
-    //               value
-    //             }
-    //           </div>
-    //         </div>
-    //       ))
-    //     }
-    //   </div>
-    // );
   }
   
   private renderVeil()

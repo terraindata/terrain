@@ -61,6 +61,7 @@ import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
+console.log(require('./Pathfinder.less'));
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';

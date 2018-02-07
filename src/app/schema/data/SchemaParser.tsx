@@ -256,7 +256,11 @@ export function parseElasticDb(elasticServer: object,
               {
                 const sampleData = results.hits.map((hit) =>
                 {
-                  return hit._source[fieldName];
+                  return _Hit({
+                    fields: Map({
+                      [fieldName]: hit._source[fieldName],
+                    }),
+                  });
                 });
                 column = column.set('sampleData', sampleData);
               }
