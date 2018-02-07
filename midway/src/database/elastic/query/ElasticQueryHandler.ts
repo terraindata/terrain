@@ -143,8 +143,17 @@ export default class ElasticQueryHandler extends QueryHandler
 
   private async handleGroupJoin(parser: ESParser, query: object): Promise<QueryResponse>
   {
+    // get the child (groupJoin) query
     const childQuery = query['groupJoin'];
     query['groupJoin'] = undefined;
+
+    // determine other groupJoin settings from the query
+    const ignoreEmpty = (childQuery['ignoreEmpty'] !== undefined) ? childQuery['ignoreEmpty'] : false;
+    delete childQuery['ignoreEmpty'];
+
+    const parentAlias = (childQuery['parentAlias'] !== undefined) ? childQuery['parentAlias'] : 'parent';
+    delete childQuery['parentAlias'];
+
     const parentQuery: Elastic.SearchParams | undefined = query;
     if (parentQuery === undefined)
     {
@@ -185,11 +194,28 @@ export default class ElasticQueryHandler extends QueryHandler
           // winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(response, null, 2));
           try
           {
-            await this.handleGroupJoinSubQueries(valueInfo, childQuery, response);
+            await this.handleGroupJoinSubQueries(valueInfo, childQuery, response, parentAlias);
           }
           catch (e)
           {
             return this.makeQueryCallback(res, rej)(e, allResponse);
+          }
+
+          rowsProcessed += response.hits.hits.length;
+          if (ignoreEmpty)
+          {
+            const subQueries = Object.keys(childQuery);
+            response.hits.hits = response.hits.hits.filter((r) =>
+            {
+              return subQueries.reduce((count, subQuery) =>
+              {
+                if (r[subQuery] !== undefined && Array.isArray(r[subQuery]))
+                {
+                  count += r[subQuery].length;
+                }
+                return count;
+              }, 0);
+            });
           }
 
           if (allResponse === null)
@@ -201,7 +227,6 @@ export default class ElasticQueryHandler extends QueryHandler
             allResponse.hits.hits = allResponse.hits.hits.concat(response.hits.hits);
           }
 
-          rowsProcessed += response.hits.hits.length;
           if (response.hits.hits.length > 0 && Math.min(response.hits.total, originalSize) > rowsProcessed)
           {
             scroll = originalScroll;
@@ -236,11 +261,8 @@ export default class ElasticQueryHandler extends QueryHandler
     });
   }
 
-  private async handleGroupJoinSubQueries(parentValueInfo: ESValueInfo, query: object, results: object)
+  private async handleGroupJoinSubQueries(parentValueInfo: ESValueInfo, query: object, results: object, parentAlias: string)
   {
-    const ignoreEmpty = (query['ignoreEmpty'] !== undefined) ? query['ignoreEmpty'] : false;
-    delete query['ignoreEmpty'];
-
     const promises: Array<Promise<any>> = [];
     for (const subQuery of Object.keys(query))
     {
@@ -250,12 +272,12 @@ export default class ElasticQueryHandler extends QueryHandler
         throw new Error('Error finding subquery property');
       }
 
-      promises.push(this.handleGroupJoinSubQuery(vi, subQuery, results, ignoreEmpty));
+      promises.push(this.handleGroupJoinSubQuery(vi, subQuery, results, parentAlias));
     }
     return Promise.all(promises);
   }
 
-  private async handleGroupJoinSubQuery(valueInfo: ESValueInfo, subQuery: string, parentResults: any, ignoreEmpty: boolean)
+  private async handleGroupJoinSubQuery(valueInfo: ESValueInfo, subQuery: string, parentResults: any, parentAlias: string)
   {
     const hits = parentResults.hits.hits;
     const promises: Array<Promise<any>> = [];
@@ -279,7 +301,7 @@ export default class ElasticQueryHandler extends QueryHandler
           const header = {};
           body.push(header);
 
-          const queryStr = ESParameterFiller.generate(valueInfo, { parent: hits[j]._source });
+          const queryStr = ESParameterFiller.generate(valueInfo, { [parentAlias]: hits[j]._source });
           body.push(queryStr);
         }
 
@@ -304,10 +326,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
               if (response.responses[j].hits !== undefined)
               {
-                if (!ignoreEmpty || response.responses[j].hits.hits.length > 0)
-                {
-                  hits[i + j][subQuery] = response.responses[j].hits.hits;
-                }
+                hits[i + j][subQuery] = response.responses[j].hits.hits;
               }
             }
             resolve();
