@@ -42,7 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+
+// tslint:disable:max-classes-per-file
 
 export enum ELASTIC_TYPES
 {
@@ -65,4 +67,11 @@ export enum TEMPLATE_TYPES
 {
   EXPORT = 'export',
   IMPORT = 'import',
+}
+
+export enum FILE_TYPES
+{
+  JSON = 'json',
+  JSON_TYPE_OBJECT = 'json [type object]',
+  CSV = 'csv',
 }

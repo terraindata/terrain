@@ -49,10 +49,10 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
-import { FILE_TYPES } from 'etl/ETLTypes';
+import { FILE_TYPES } from 'shared/etl/ETLTypes';
 import { makeConstructor, makeDeepConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class ElasticFieldSettingsC

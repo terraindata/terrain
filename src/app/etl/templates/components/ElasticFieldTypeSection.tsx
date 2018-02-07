@@ -60,7 +60,7 @@ import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, ElasticFieldSettings, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
 
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';

@@ -64,7 +64,6 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 import ElasticFieldTypeSection from './ElasticFieldTypeSection';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';

@@ -50,7 +50,7 @@ import
   ETLTemplate, TemplateEditorState, TemplateField,
 } from 'etl/templates/TemplateTypes';
 import * as Immutable from 'immutable';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 const { List } = Immutable;
 
 export const SampleDocuments = [

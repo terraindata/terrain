@@ -55,7 +55,6 @@ const { List, Map } = Immutable;
 
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 import { TemplateFieldProxy, TemplateFieldProxyProps } from './TemplateFieldProxy';
 /*
