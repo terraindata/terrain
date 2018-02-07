@@ -122,5 +122,6 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   afterAll(async () =>
   {
     await page.close();
+    console.log('The page is closed.');
   });
 });
