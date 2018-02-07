@@ -205,6 +205,7 @@ class PathfinderColumn extends TerrainComponent<Props>
               <PathfinderMoreSection
                 pathfinderContext={pathfinderContext}
                 more={path.more}
+                path={path}
                 keyPath={keyPath.push('more')}
                 toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
               />

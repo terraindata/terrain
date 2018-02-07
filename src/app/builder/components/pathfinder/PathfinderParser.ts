@@ -105,7 +105,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   }
   const moreObj = parseAggregations(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
-  const groupJoin = parseNested(path.more, inputs);
+  const groupJoin = parseNested(path.more, path.nested, inputs);
   if (groupJoin)
   {
     baseQuery = baseQuery.set('groupJoin', groupJoin);
@@ -544,19 +544,18 @@ function parseAggregations(more: More): {}
 }
 
 // Put a nested path inside of a groupJoin
-// TODO nestedQuery should be a user-inputed number
-function parseNested(more: More, inputs)
+function parseNested(more: More, nested: List<Path>, inputs)
 {
-  if (more.nested.size === 0)
+  if (nested.size === 0)
   {
     return undefined;
   }
   let groupJoins = Map({});
-  more.nested.forEach((nested) =>
+  nested.forEach((n) =>
   {
-    if (nested)
+    if (n)
     {
-      groupJoins = groupJoins.set(nested.name, parsePath(nested, inputs, true));
+      groupJoins = groupJoins.set(n.name, parsePath(n, inputs, true));
     }
   });
   return groupJoins;

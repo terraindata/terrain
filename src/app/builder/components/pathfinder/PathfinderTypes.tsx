@@ -107,6 +107,7 @@ class PathC extends BaseClass
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
+  public nested: List<Path> = List([]);
   public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
 }
 export type Path = PathC & IRecord<PathC>;
@@ -118,6 +119,7 @@ export const _Path = (config?: { [key: string]: any }) =>
     config['filterGroup'] = _FilterGroup(config['filterGroup']);
     config['score'] = _Score(config['score']);
     config['more'] = _More(config['more']);
+    config['nested'] = List(config['nested'].map((n) => _Path(n)));
   }
   return New<Path>(new PathC(config), config);
 };
@@ -216,7 +218,6 @@ class MoreC extends BaseClass
 {
   public aggregations: List<AggregationLine> = List([]);
   public references: List<string> = List([]); // What should this query be referred to in other queries (@parent in US query)
-  public nested: List<Path> = List([]);
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -225,7 +226,6 @@ export const _More = (config?: { [key: string]: any }) =>
   let more = New<More>(new MoreC(config || {}), config);
   more = more
     .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
-    .set('nested', List(more['nested'].map((nested) => _Path(nested))))
     .set('references', List(more['references']));
 
   return more;

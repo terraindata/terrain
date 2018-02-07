@@ -70,6 +70,7 @@ const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 export interface Props
 {
   pathfinderContext: PathfinderContext;
+  path: Path;
   more: More;
   keyPath: KeyPath;
   hideTitle?: boolean;
@@ -101,17 +102,18 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleReferenceChange(i, value)
   {
     BuilderActions.changePath(this.props.keyPath.push('references').push(i), value);
-    if (this.props.more.nested.get(i) === undefined)
+    if (this.props.path.nested.get(i) === undefined)
     {
-      BuilderActions.changePath(this.props.keyPath.push('nested').push(i), _Path({ name: '', step: 0 }), true);
+      const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
+      BuilderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
     }
   }
 
   public handleAddNested()
   {
-    const newReferences = this.props.more.references.push('');
-    BuilderActions.changePath(this.props.keyPath.push('references'), newReferences);
-    BuilderActions.changePath(this.props.keyPath.push('nested'), this.props.more.nested.push(undefined));
+    BuilderActions.changePath(this.props.keyPath.push('references'), this.props.more.references.push(''));
+    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested');
+    BuilderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
   }
 
   public handleDeleteNested(i)
@@ -120,9 +122,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       this.props.keyPath.push('references'),
       this.props.more.references.splice(i, 1),
     );
-    BuilderActions.changePath
-      (this.props.keyPath.push('nested'),
-      this.props.more.nested.splice(i, 1), true);
+    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested');
+    BuilderActions.changePath(
+      nestedKeyPath,
+      this.props.path.nested.splice(i, 1), true);
   }
 
   public handleAddLine()
@@ -183,7 +186,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public renderNestedPaths()
   {
-    const { nested, references } = this.props.more;
+    const { references } = this.props.more;
+    const { nested } = this.props.path;
     const { canEdit } = this.props.pathfinderContext;
     return (
       <div>
