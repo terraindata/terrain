@@ -996,6 +996,17 @@ export class Import
     {
       return true;
     }
+    try
+    {
+      if (typeof JSON.parse(item as any) === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
+      {
+        return true;
+      }
+    }
+    catch (e)
+    {
+      // do nothing
+    }
     if (typeObj['type'] !== thisType)
     {
       return false;
