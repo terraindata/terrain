@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 import nestedProperty = require('nested-property');
 import deepGet = require('utils-deep-get');
 import deepSet = require('utils-deep-set');
-// import * as winston from 'winston';
+// import * as winston from 'winston'; // TODO what to do for error logging?
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
@@ -82,6 +82,7 @@ export class TransformationEngine
     e.fieldNameToIDMap = Map<KeyPath, number>(parsedJSON['fieldNameToIDMap']);
     e.IDToFieldNameMap = Map<number, KeyPath>(parsedJSON['IDToFieldNameMap']);
     e.fieldTypes = Map<number, string>(parsedJSON['fieldTypes']);
+    e.fieldEnabled = Map<number, boolean>(parsedJSON['fieldEnabled']);
     return e;
   }
 
@@ -125,7 +126,7 @@ export class TransformationEngine
   private fieldNameToIDMap: Map<KeyPath, number> = Map<KeyPath, number>();
   private IDToFieldNameMap: Map<number, KeyPath> = Map<number, KeyPath>();
   private fieldTypes: Map<number, string> = Map<number, string>();
-  private fieldEnabled: Map<number, boolean> = Map<number, boolean>(); // TODO use + (de)serialize
+  private fieldEnabled: Map<number, boolean> = Map<number, boolean>();
 
   constructor(doc?: object)
   {
@@ -149,7 +150,9 @@ export class TransformationEngine
       && JSON.stringify(this.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray()) ===
       JSON.stringify(other.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray())
       && JSON.stringify(this.fieldTypes.map((v: string, k: number) => [k, v]).toArray()) ===
-      JSON.stringify(other.fieldTypes.map((v: string, k: number) => [k, v]).toArray());
+      JSON.stringify(other.fieldTypes.map((v: string, k: number) => [k, v]).toArray())
+      && JSON.stringify(this.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray()) ===
+      JSON.stringify(other.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray());
   }
 
   public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<KeyPath> | List<number>,
@@ -196,6 +199,7 @@ export class TransformationEngine
       fieldNameToIDMap: this.fieldNameToIDMap.map((v: number, k: KeyPath) => [k, v]).toArray(),
       IDToFieldNameMap: this.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray(),
       fieldTypes: this.fieldTypes.map((v: string, k: number) => [k, v]).toArray(),
+      fieldEnabled: this.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray(),
     };
   }
 
@@ -204,6 +208,7 @@ export class TransformationEngine
     this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
     this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
     this.fieldTypes = this.fieldTypes.set(this.uidField, typeName);
+    this.fieldEnabled = this.fieldEnabled.set(this.uidField, true);
 
     this.uidField++;
     return this.uidField - 1;
@@ -261,6 +266,25 @@ export class TransformationEngine
     }
   }
 
+  public deleteTransformation(transformationID: number): void
+  {
+    this.dag.removeNode(transformationID);
+    // TODO need to handle case where transformation is not at the top of the stack (add new edges etc.)
+  }
+
+  public setInputKeyPath(fieldID: number, newKeyPath: KeyPath, source?: any): void
+  {
+    const oldName: KeyPath = this.fieldNameToIDMap.keyOf(fieldID);
+    this.fieldNameToIDMap.forEach((id: number, field: KeyPath) =>
+    {
+      if (TransformationEngine.keyPathPrefixMatch(field, oldName))
+      {
+        this.fieldNameToIDMap = this.fieldNameToIDMap.delete(oldName);
+        this.fieldNameToIDMap = this.fieldNameToIDMap.set(TransformationEngine.updateKeyPath(field, oldName, newKeyPath), id);
+      }
+    });
+  }
+
   public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any): void
   {
     const oldName: KeyPath = this.IDToFieldNameMap.get(fieldID);
@@ -271,6 +295,36 @@ export class TransformationEngine
         this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, TransformationEngine.updateKeyPath(field, oldName, newKeyPath));
       }
     });
+  }
+
+  public getInputKeyPath(fieldID: number): KeyPath
+  {
+    return this.fieldNameToIDMap.keyOf(fieldID);
+  }
+
+  public getOutputKeyPath(fieldID: number): KeyPath
+  {
+    return this.IDToFieldNameMap.get(fieldID);
+  }
+
+  public getAllFieldIDs(): List<number>
+  {
+    return this.IDToFieldNameMap.keySeq().toList();
+  }
+
+  public getAllFieldNames(): List<KeyPath>
+  {
+    return this.IDToFieldNameMap.valueSeq().toList();
+  }
+
+  public enableField(fieldID: number): void
+  {
+    this.fieldEnabled = this.fieldEnabled.set(fieldID, true);
+  }
+
+  public disableField(fieldID: number): void
+  {
+    this.fieldEnabled = this.fieldEnabled.set(fieldID, false);
   }
 
   private parseFieldIDs(fieldNamesOrIDs: List<KeyPath> | List<number>): List<number>
@@ -320,7 +374,7 @@ export class TransformationEngine
     const output: object = {};
     this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
     {
-      if (obj !== undefined && obj.hasOwnProperty(key))
+      if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
       {
         deepSet(output, value.toArray(), obj[key], { create: true });
       }

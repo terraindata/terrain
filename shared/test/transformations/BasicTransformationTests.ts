@@ -134,6 +134,11 @@ test('serialize to JSON', () =>
       [1, 'number'],
       [2, 'string'],
     ],
+    fieldEnabled: [
+      [0, true],
+      [1, true],
+      [2, true],
+    ],
   });
 });
 
