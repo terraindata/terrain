@@ -51,6 +51,7 @@ import * as syncRequest from 'sync-request';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
+import * as winston from 'winston';
 const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 const CREATE_CATEGORY_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-1 > div.library-column-content > div > div.info-area-buttons-container';
@@ -63,24 +64,24 @@ async function loginToBuilder(page, url)
 {
   await page.goto(url);
   sleep.sleep(5);
-  console.log('goto ' + url);
+  winston.info('Goto the login page ' + url);
   let image = await page.screenshot();
-  console.log('screenshot ' + url);
-  //login screen
+  // login screen
   (expect(image) as any).toMatchImageSnapshot();
-  console.log('match ' + url);
+  winston.log('Compared the login page ' + url);
   await page.waitForSelector(USERNAME_SELECTOR);
+  winston.log('Username selector is ready.');
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type('admin@terraindata.com');
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('secret');
   await page.click(BUTTON_SELECTOR);
   sleep.sleep(5);
-  //await page.waitForSelector(CREATE_CATEGORY_SELECTOR);
-  console.log('Taking the screenshot after login.');
+  winston.log('Goto the starting page.');
   image = await page.screenshot();
-  //after login
+  // after login
   (expect(image) as any).toMatchImageSnapshot();
+  winston.log('Compared the starting page.');
 }
 
 function getChromeDebugAddress()
@@ -93,7 +94,7 @@ function getChromeDebugAddress()
     return wsAddress;
   } catch (err)
   {
-    console.log(err);
+    winston.err(err);
     return undefined;
   }
 }
@@ -107,13 +108,15 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   {
     const wsAddress = getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
-    //browser = await puppeteer.launch({headless: false});
-    //page = await browser.newPage();
+    winston.info('Connected to the Chrome ' + wsAddress);
+    // browser = await puppeteer.launch({headless: false});
+    // page = await browser.newPage();
   });
 
-  it('works', async () =>
+  it('login', async () =>
   {
     page = await browser.newPage();
+    winston.info('Created a new page.')
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
     await loginToBuilder(page, url);
@@ -122,6 +125,6 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   afterAll(async () =>
   {
     await page.close();
-    console.log('The page is closed.');
+    winston.log('The page is closed.');
   });
 });
