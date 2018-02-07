@@ -100,12 +100,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
       actionType: 'setDocuments',
       documents: List(SampleDocuments),
     });
-
-    this.props.act({
-      actionType: 'dfsForEach',
-      fn: (obj) => { return null; },
-      act: this.props.act,
-    });
   }
 
   public setModalRequests(requests)
@@ -169,15 +163,36 @@ class ETLExportDisplay extends TerrainComponent<Props>
     );
   }
 
+  public renderTopBar()
+  {
+    const itemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
+    return (
+      <div className='template-editor-top-bar'>
+        <div className='editor-top-bar-item' style={itemStyle} key='undo'>
+          Undo
+        </div>
+        <div className='editor-top-bar-item' style={itemStyle} key='redo'>
+          Redo
+        </div>
+        <div className='editor-top-bar-item' style={itemStyle} key='save'>
+          Save
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
     const { previewIndex, documents } = this.props.templateEditor;
     const showEditor = previewIndex >= 0 && previewIndex < documents.size;
     return (
       <div className='template-editor-root-container'>
-        <div className='template-editor-columns-area'>
-          {this.renderEditorSection(showEditor)}
-          {this.renderDocumentsSection()}
+        <div className='template-editor-width-spacer'>
+          {this.renderTopBar()}
+          <div className='template-editor-columns-area'>
+            {this.renderEditorSection(showEditor)}
+            {this.renderDocumentsSection()}
+          </div>
         </div>
         <MultiModal
           requests={this.props.templateEditor.modalRequests}

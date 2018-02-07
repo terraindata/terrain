@@ -1,14 +1,23 @@
 @import "../../../common/Common.less";
 
+@main-column-basis: 900px;
+@preview-column-basis: 600px;
+@total-column-basis: @main-column-basis + @preview-column-basis + 64px;
 .template-editor-root-container {
   position: relative;
   display: flex;
   height: 100%;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
+  
+  .template-editor-width-spacer {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 @total-column-basis;
+  }
 
   .template-editor-columns-area {
     display: flex;
-    flex: 1;
     flex-direction: row;
     justify-content: center;
 
@@ -21,7 +30,7 @@
       .transition;
 
       &.main-document-column {
-        flex: 0 1 800px;
+        flex: 0 1 @main-column-basis;
       }
 
       &.main-document-column-hidden {
@@ -29,10 +38,26 @@
       }
 
       &.preview-documents-column {
-        flex: 0 1 500px;
+        flex: 0 1 @preview-column-basis;
       }
     }
+  }
 
+  .template-editor-top-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .editor-top-bar-item {
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      border-radius: @spacing;
+      height: @double-spacing;
+      padding: 0px @spacing + @half-spacing;
+      margin-left: @spacing;
+      cursor: pointer;
+    }
   }
 
   .template-editor-preview-control-spacer {

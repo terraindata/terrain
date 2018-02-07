@@ -68,8 +68,8 @@ export const _ElasticFieldSettings = makeDeepConstructor(ElasticFieldSettingsC, 
 class TemplateFieldC
 {
   public isIncluded: boolean = true;
-  public langSettings: ElasticFieldSettings = _ElasticFieldSettings(); // if we add more languages, make this a union
-  public originalName: string = ''; // this may change based on how we implement transformations
+  public langSettings: ElasticFieldSettings = _ElasticFieldSettings();
+  public fieldId: number = 0;
   public name: string = '';
   public children: List<TemplateField> = List([]);
 }
