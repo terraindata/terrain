@@ -15,13 +15,13 @@ before_script:
   - ( cd analytics.js && yarn )
 
 stages:
-  - lint
-  - style
-  - test-front
-  - test-back
-  - test-sigint
-  - build
-  - deploy
+#  - lint
+#  - style
+#  - test-front
+#  - test-back
+#  - test-sigint
+#  - build
+#  - deploy
   - fullstack
 
 lint:
@@ -80,11 +80,12 @@ build-frontend-prod:
 
 fullstack:
   script:
-    - MIDWAY_HOST=pa-terraformer01.terrain.int:3000 yarn run build-prod
+    - MIDWAY_HOST=pa-terraformer01.terrain.int:3000 yarn run build
     - yarn run test-fullstack-setup
     - NODE_ENV=production yarn run start-midway > ./midwayConsole.log 2>&1&
     - sleep 5
     - yarn run test-rr
+    - fuser -k -n tcp 33000 || true
     - yarn run test-fullstack-teardown
   stage: fullstack
   when: always
