@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as asyncBusboy from 'async-busboy';
 import * as fs from 'fs';
 import * as http from 'http';
 import * as request from 'request';
@@ -53,80 +52,6 @@ import * as rimraf from 'rimraf';
 import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../shared/database/elastic/parser/ESParser';
 import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
-import { exportTemplates } from './io/templates/ExportTemplateRouter';
-import { importTemplates } from './io/templates/ImportTemplateRouter';
-import UserConfig from './users/UserConfig';
-import Users from './users/Users';
-
-const users = new Users();
-
-export async function authenticateNormal(req: object): Promise<UserConfig | null>
-{
-  return new Promise<UserConfig | null>(async (resolve, reject) =>
-  {
-    resolve(await users.loginWithAccessToken(Number(req['id']), req['accessToken']));
-  });
-}
-
-export async function authenticateStream(req: http.IncomingMessage): Promise<object>
-{
-  return new Promise<object>(async (resolve, reject) =>
-  {
-    const { files, fields } = await asyncBusboy(req);
-    const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-    resolve({ files, fields, user });
-  });
-}
-
-export async function authenticatePersistentAccessToken(req: object): Promise<object>
-{
-  return new Promise<object>(async (resolve, reject) =>
-  {
-    if (req['templateId'] === undefined || req['persistentAccessToken'] === undefined)
-    {
-      return reject('Missing one or more auth fields.');
-    }
-    const importTemplate: object[] =
-      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
-    const exportTemplate: object[] =
-      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
-    const template = importTemplate.concat(exportTemplate);
-    if (template.length === 0)
-    {
-      return resolve({ template: null });
-    }
-    resolve({ template: template[0] });
-  });
-}
-
-export async function authenticateStreamPersistentAccessToken(req: http.IncomingMessage): Promise<object>
-{
-  return new Promise<object>(async (resolve, reject) =>
-  {
-    try
-    {
-      const { files, fields } = await asyncBusboy(req);
-      if (fields['templateId'] === undefined || fields['persistentAccessToken'] === undefined)
-      {
-        return reject(`Missing one or more auth fields. ${fields['templateId']} , ${fields['persistentAccessToken']}`);
-      }
-      const importTemplate: object[] =
-        await importTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
-      const exportTemplate: object[] =
-        await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
-      const template = importTemplate.concat(exportTemplate);
-      if (template.length === 0)
-      {
-        return resolve({ files, fields, template: null });
-      }
-      return resolve({ files, fields, template: template[0] });
-    }
-    catch (e)
-    {
-      return resolve({ template: null });
-    }
-  });
-}
 
 export function getEmptyObject(payload: object): object
 {
