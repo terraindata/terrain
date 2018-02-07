@@ -50,6 +50,9 @@ import * as http from 'http';
 import * as request from 'request';
 import * as rimraf from 'rimraf';
 
+import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
+import ESParser from '../../../shared/database/elastic/parser/ESParser';
+import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
 import { exportTemplates } from './io/templates/ExportTemplateRouter';
 import { importTemplates } from './io/templates/ImportTemplateRouter';
 import UserConfig from './users/UserConfig';
@@ -269,4 +272,34 @@ export async function writeFile(fileName: string, data: string, options: object)
   {
     fs.writeFile(fileName, data, options, makePromiseCallbackVoid(resolve, reject));
   });
+}
+
+export function getParsedQuery(body: string): ESParser
+{
+  const parser = new ESJSONParser(body, true);
+  const valueInfo = parser.getValueInfo();
+
+  if (parser.hasError())
+  {
+    const es = parser.getErrors();
+    const errors: MidwayErrorItem[] = [];
+
+    es.forEach((e) =>
+    {
+      const row = (e.token !== null) ? e.token.row : 0;
+      const col = (e.token !== null) ? e.token.col : 0;
+      const pos = (e.token !== null) ? e.token.charNumber : 0;
+      const title: string = String(row) + ':' + String(col) + ':' + String(pos) + ' ' + String(e.message);
+      errors.push({ status: -1, title, detail: '', source: {} });
+    });
+
+    if (errors.length === 0)
+    {
+      errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
+    }
+
+    throw errors;
+  }
+
+  return parser;
 }
