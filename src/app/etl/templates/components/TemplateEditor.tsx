@@ -61,8 +61,8 @@ import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEdito
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import
 {
-  _ElasticFieldSettings, _ExportTemplate, _TemplateField,
-  ETLTemplate, TemplateEditorState, TemplateField,
+  _ElasticFieldSettings, _ExportTemplate, _TemplateField, destringifySavedTemplate,
+  ETLTemplate, TemplateEditorState, TemplateField, templateForSave,
 } from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
@@ -86,10 +86,14 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: 1,
       templateName: 'Test Template',
     });
+
+    // testing turning record into serializable object and back again. todo: remove this
     const rootField = treeFromDocument(SampleDocuments[0]);
     const jsRootField = recordForSave(rootField);
     const rebuiltRootField = _TemplateField(jsRootField, true);
     template = template.set('rootField', rebuiltRootField);
+
+    template = _ExportTemplate(destringifySavedTemplate(templateForSave(template)), true);
 
     this.props.act({
       actionType: 'loadTemplate',

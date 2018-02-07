@@ -46,15 +46,18 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 import { FILE_TYPES } from 'etl/ETLTypes';
-import { makeConstructor, makeDeepConstructor, WithIRecord } from 'src/app/Classes';
+import { makeConstructor, makeDeepConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class ElasticFieldSettingsC
 {
+  public langType: string = 'elastic';
   public isAnalyzed: boolean = true;
   public analyzer: string = '';
   public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
@@ -106,6 +109,7 @@ interface TemplateBase
   dbid: number;
   dbname: string;
   tablename: string;
+  transformationEngine: TransformationEngine;
 }
 
 interface ExportTemplateBase extends TemplateBase
@@ -120,6 +124,11 @@ interface ImportTemplateBase extends TemplateBase
   primaryKeySettings: any;
 }
 
+function transformationEngineConstructor(config)
+{
+  return TransformationEngine.load(config);
+}
+
 class ExportTemplateC implements ExportTemplateBase
 {
   public templateId = -1;
@@ -132,10 +141,12 @@ class ExportTemplateC implements ExportTemplateBase
   public dbname = '';
   public tablename = '';
   public rank = true;
+  public transformationEngine = new TransformationEngine();
 }
 export type ExportTemplate = WithIRecord<ExportTemplateC>;
 export const _ExportTemplate = makeDeepConstructor(ExportTemplateC, {
   rootField: _TemplateField,
+  transformationEngine: transformationEngineConstructor,
 });
 
 class ImportTemplateC implements ImportTemplateBase
@@ -150,10 +161,28 @@ class ImportTemplateC implements ImportTemplateBase
   public dbname = '';
   public tablename = '';
   public primaryKeySettings = {};
+  public transformationEngine = new TransformationEngine();
 }
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
 export const _ImportTemplate = makeDeepConstructor(ImportTemplateC, {
   rootField: _TemplateField,
+  transformationEngine: transformationEngineConstructor,
 });
+
+export function destringifySavedTemplate(obj: object): object
+{
+  const newObj: any = _.extend({}, obj);
+  newObj.rootField = JSON.parse(newObj.rootField);
+  newObj.transformationEngine = JSON.parse(newObj.transformationEngine);
+  return newObj;
+}
+
+export function templateForSave(template: ImportTemplate | ExportTemplate): object
+{
+  const obj = (template as any).toObject();
+  obj.rootField = JSON.stringify(recordForSave(obj.rootField));
+  obj.transformationEngine = JSON.stringify(obj.transformationEngine.json());
+  return obj;
+}
 
 export type ETLTemplate = ImportTemplate | ExportTemplate;

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
+// import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
