@@ -115,13 +115,15 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     });
     const sourceOptions = this.state.dataSourceOptions.map((option) =>
     {
+      const values = option.sampleData.size > 0 ?
+        _.keys(option.sampleData.get(0)._source).map((key) =>
+          `${key}: ${option.sampleData.get(0)._source[key]}`,
+        ) : List([]);
       return {
         title: String(option.displayName),
         key: option.value,
         subtitle: 'Sample Values',
-        values: _.keys(option.sampleData.get(0)._source).map((key) =>
-          `${key}: ${option.sampleData.get(0)._source[key]}`,
-        ),
+        values,
       };
     }).toList();
 
