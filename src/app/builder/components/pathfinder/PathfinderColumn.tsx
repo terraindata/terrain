@@ -102,8 +102,8 @@ class PathfinderColumn extends TerrainComponent<Props>
         ]}
       >
         <PathfinderArea
-           {...this.props}
-           keyPath={List(['query', 'path'])}
+          {...this.props}
+          keyPath={List(['query', 'path'])}
         />
       </div>
     );

@@ -126,7 +126,6 @@ class PathfinderArea extends TerrainComponent<Props>
     const { path } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
-    console.log('Path name is ', path.name);
     return (
       <div
         className='pf-area'
