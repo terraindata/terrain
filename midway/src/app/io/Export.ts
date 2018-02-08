@@ -64,8 +64,8 @@ import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
-import { ExportTemplates } from './templates/ExportTemplates';
-import { TemplateBase } from './templates/TemplateBase';
+import ExportTemplates from './templates/ExportTemplates';
+import TemplateBase from './templates/TemplateBase';
 
 const exportTemplates = new ExportTemplates();
 
