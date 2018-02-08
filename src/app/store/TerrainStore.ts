@@ -55,7 +55,7 @@ import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import RolesReducer from 'roles/data/RolesReducers';
 import { SchemaReducers } from 'schema/data/SchemaRedux';
-import BuilderStoreLogger from 'store/TerrainStoreLogger';
+import TerrainStoreLogger from 'store/TerrainStoreLogger';
 import { UserReducers } from 'users/data/UserRedux';
 import Ajax from 'util/Ajax';
 import { ColorsReducers } from '../colors/data/ColorsRedux';
@@ -75,7 +75,7 @@ const rootReducer = combineReducers(reducers);
 const initialState = Immutable.Map();
 
 const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax), BuilderStoreLogger.reduxMiddleWare),
+  applyMiddleware(thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
   window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
 ));
 
