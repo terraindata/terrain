@@ -24,63 +24,59 @@ stages:
   - deploy
   - fullstack
 
+lint:
+  script:
+   - yarn run lint-parallel
+  stage: lint
 
-#lint:
-#  script:
-#   - yarn run lint-parallel
-#  stage: lint
-#
-#style:
-#  script:
-#   - yarn run style
-#  stage: style
-#
-#test-frontend:
-#  script:
-#   - yarn run test-front
-#  stage: test-front
-#  when: always
-#
-#test-backend:
-#  script:
-#   - yarn run test-back-setup
-#   - yarn run test-back
-#   - yarn run test-back-teardown
-#  stage: test-back
-#  when: always
-#  artifacts:
-#    paths:
-#      - coverage
-#
-#test-sigint:
-#  script:
-#    - yarn run test-sigint-setup
-#    - ( cd sigint && yarn run test )
-#    - yarn run test-sigint-teardown
-#  stage: test-sigint
-#  when: always
-#
-#build-frontend:
-#  when: manual
-#  script:
-#   - yarn run build
-#  stage: build
-#  when: always
-#
-#build-analytics-js:
-#  when: manual
-#  script:
-#   - ( cd analytics.js && yarn run build )
-#  stage: build
-#  when: always
-#
-#build-frontend-prod:
-#  when: manual
-#  script:
-#   - yarn run build-prod
-#  only:
-#   - master
-#  stage: build
+style:
+  script:
+   - yarn run style
+  stage: style
+
+test-frontend:
+  script:
+   - yarn run test-front
+  stage: test-front
+  when: always
+
+test-backend:
+  script:
+   - yarn run test-back-setup
+   - yarn run test-back
+   - yarn run test-back-teardown
+  stage: test-back
+  when: always
+  artifacts:
+    paths:
+      - coverage
+
+test-sigint:
+  script:
+    - yarn run test-sigint-setup
+    - ( cd sigint && yarn run test )
+    - yarn run test-sigint-teardown
+  stage: test-sigint
+  when: always
+
+build-frontend:
+  script:
+   - yarn run build
+  stage: build
+  when: always
+
+build-analytics-js:
+  script:
+   - ( cd analytics.js && yarn run build )
+  stage: build
+  when: always
+
+build-frontend-prod:
+  script:
+   - yarn run build-prod
+  only:
+   - master
+  stage: build
 
 fullstack:
   script:
