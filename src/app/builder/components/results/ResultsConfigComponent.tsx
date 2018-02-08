@@ -128,6 +128,10 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     let { config } = this.state;
 
     // remove if already set
+    if (config.thumbnail === field)
+    {
+      config = config.set('thumbnail', null);
+    }
     if (config.name === field)
     {
       config = config.set('name', null);
@@ -188,6 +192,10 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     if (!config)
     {
       return null;
+    }
+    if (config.thumbnail === field)
+    {
+      return 'thumbnail';
     }
     if (config.name === field)
     {
@@ -293,6 +301,31 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               how this algorithm's results look in the Builder.
             </div>
             <div className='results-config-config' style={[backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3), shadowStyle]}>
+              <CRTarget
+                className='results-config-thumbnail'
+                type='thumbnail'
+                onDrop={this.handleDrop}
+              >
+                <div className='results-config-area-title' style={mainFontColor}>
+                  Thumbnail
+                </div>
+                {
+                  config && config.thumbnail ?
+                    <ResultsConfigResult
+                      field={config.thumbnail}
+                      is='score'
+                      onRemove={this.handleRemove}
+                      format={formats.get(config.thumbnail)}
+                      onFormatChange={this.handleFormatChange}
+                      primaryKeys={config.primaryKeys}
+                      onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                    />
+                    :
+                    <div className='results-config-placeholder' style={placeholderStyle}>
+                      Drag thumbnail field <em>(optional)</em>
+                    </div>
+                }
+              </CRTarget>
               <CRTarget
                 className='results-config-name'
                 type='name'
@@ -546,6 +579,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
           'results-config-field': true,
           'results-config-field-dragging': this.props.isDragging ||
             (this.props.draggingField && this.props.draggingField === this.props.field),
+          'results-config-field-thumbnail': this.props.is === 'thumbnail',
           'results-config-field-name': this.props.is === 'name',
           'results-config-field-score': this.props.is === 'score',
           'results-config-field-field': this.props.is === 'field',
