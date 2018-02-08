@@ -43,26 +43,60 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import UserActionTypes from 'users/data/UserActionTypes';
-import ActionTypes from './AuthActionTypes';
+import { browserHistory } from 'react-router';
 
-const $ = (type: string, payload: any) =>
+interface LibraryRouteComponents
 {
-  return { type, payload };
-};
+  basePath: string;
+  categoryId?: ID;
+  groupId?: ID;
+  algorithmId?: ID;
+  pinned?: number[];
+}
 
-const AuthActions =
+export function buildRoute(routeComponents: LibraryRouteComponents)
+{
+  let route = `/${routeComponents.basePath}`;
+
+  if (routeComponents.categoryId !== undefined)
   {
-    login:
-      (accessToken: string, id: number) => (dispatch) =>
+    route += `/${routeComponents.categoryId}`;
+
+    if (routeComponents.groupId !== undefined)
+    {
+      route += `/${routeComponents.groupId}`;
+
+      if (routeComponents.algorithmId !== undefined)
       {
-        dispatch($(ActionTypes.login, { accessToken, id }));
-        dispatch($(UserActionTypes.updateCurrentUser, { id }));
-      },
+        route += `/${routeComponents.algorithmId}`;
+      }
+    }
+  }
 
-    logout:
-      () =>
-        $(ActionTypes.logout, {}),
-  };
+  if (routeComponents.pinned !== undefined)
+  {
+    route += `?pinned=${routeComponents.pinned.join(',')}`;
+  }
 
-export default AuthActions;
+  return route;
+}
+
+export function replaceRoute(routeComponents: LibraryRouteComponents)
+{
+  browserHistory.replace(buildRoute(routeComponents));
+}
+
+export function saveLastRoute(basePath, location)
+{
+  const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
+  localStorage.setItem(lastPath, `${location.pathname}${location.search}`);
+}
+
+export function loadLastRoute(basePath: string)
+{
+  const lastPathKey = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
+  // no path given, redirect to last library path
+  const lastPath = localStorage.getItem(lastPathKey);
+
+  browserHistory.replace({ pathname: lastPath });
+}

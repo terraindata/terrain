@@ -71,6 +71,9 @@ import { scheduler } from './scheduler/SchedulerRouter';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
 
+const MAX_CONN_RETRIES = 5;
+const CONN_RETRY_TIMEOUT = 1000;
+
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
@@ -80,7 +83,7 @@ export class App
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DBUtil.makeDatabaseController(type, dsn);
+    const controller = DBUtil.makeDatabaseController(type, 0, dsn);
     return controller.getTasty();
   }
 
@@ -143,36 +146,57 @@ export class App
 
   public async start(): Promise<http.Server>
   {
+    const client: any = this.DB.getController().getClient();
+    let isConnected = await client.isConnected();
+    for (let i = 1; i <= MAX_CONN_RETRIES && !isConnected; ++i)
+    {
+      winston.warn('Failed to establish database connection');
+
+      winston.info('Retrying in ' + String(CONN_RETRY_TIMEOUT * i) + ' ms....');
+      winston.info('Attempt ' + String(i) + ' of ' + String(MAX_CONN_RETRIES));
+
+      await new Promise((resolve) => setTimeout(resolve, CONN_RETRY_TIMEOUT * i));
+      isConnected = await client.isConnected();
+    }
+
+    if (!isConnected)
+    {
+      throw new Error('Failed to establish database connection!');
+    }
+
     // create application schema
     await Schema.createAppSchema(this.config.db as string, this.DB);
+    winston.info('Finished creating application schema...');
 
     // process configuration options
     await Config.handleConfig(this.config);
+    winston.debug('Finished processing configuration options...');
 
     // create a default seed user
     await users.initializeDefaultUser();
+    winston.debug('Finished creating a default user...');
 
     // add local filesystem credential config
     await credentials.initializeLocalFilesystemCredential();
+    winston.debug('Finished adding local filesystem credentials...');
 
     // connect to configured databases
     const dbs = await databases.select(['id'], {});
     for (const db of dbs)
     {
-      if (db.id !== undefined)
-      {
-        await databases.connect({} as any, db.id);
-      }
+      await databases.connect({} as any, db.id);
 
       if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
       {
         await events.initializeEventMetadata(DB, db.analyticsIndex, db.analyticsType);
       }
     }
+    winston.debug('Finished connecting to configured databases...');
 
     // setup stored users
     await scheduler.initializeJobs();
     await scheduler.initializeSchedules();
+    winston.debug('Finished initializing scheduler jobs and schedules...');
 
     const heapStats: object = v8.getHeapStatistics();
     this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));

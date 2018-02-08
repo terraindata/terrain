@@ -50,8 +50,6 @@ import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import MetricConfig from './MetricConfig';
 
-// CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
-
 export class Metrics
 {
   private metricsTable: Tasty.Table;
@@ -98,7 +96,16 @@ export class Metrics
         events: 'conversion,impression',
       },
     ];
-    predefinedMetrics.map((m) => this.upsert(m));
+    const metrics = await this.select(['id', 'label']);
+    predefinedMetrics.map(async (metric) =>
+    {
+      const foundMetrics = metrics.filter((m) => m.label === metric.label);
+      if (foundMetrics.length > 0)
+      {
+        metric.id = foundMetrics[0].id;
+      }
+      await this.upsert(metric);
+    });
   }
 
   public async upsert(metric: MetricConfig): Promise<MetricConfig>
@@ -107,17 +114,10 @@ export class Metrics
     {
       throw new Error('Database, label and events fields are required to create a metric');
     }
-
-    if (metric.id === undefined)
-    {
-      const results: MetricConfig[] = await this.select(['id'], []);
-      metric.id = results.length + 1;
-    }
-
     return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
   }
 
-  public async select(columns: string[], filter: object): Promise<MetricConfig[]>
+  public async select(columns: string[], filter?: object): Promise<MetricConfig[]>
   {
     return new Promise<MetricConfig[]>(async (resolve, reject) =>
     {

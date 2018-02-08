@@ -60,6 +60,7 @@ import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/el
 import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreateCardTool';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import ESCardParser from '../conversion/ESCardParser';
 import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
@@ -204,8 +205,7 @@ export class FilterUtils
       return block;
     }
     const boolValueInfo = cardTree.getValueInfo();
-    const boolValue = boolValueInfo.value;
-    const filterBlocks = FilterUtils.extractFilterBlocks(boolValue);
+    const filterBlocks = FilterUtils.extractFilterBlocks(boolValueInfo);
     const indexFilters = [];
     const typeFilters = [];
     const otherFilters = [];
@@ -237,11 +237,15 @@ export class FilterUtils
     }
     if (queryBlock.cards.find((termBlock) =>
     {
+      const blockValue = new ESCardParser(termBlock);
       if ((termBlock.key === 'term' && termBlock.type === 'eqlterm_query') ||
-        (termBlock.key === 'range' && termBlock.type === 'eqlrange_query') ||
         (termBlock.key === 'match' && termBlock.type === 'eqlmatch'))
       {
-        return true;
+        return FilterUtils.isTermMatchFilterRow(blockValue.getValue());
+      }
+      if (termBlock.key === 'range' && termBlock.type === 'eqlrange_query')
+      {
+        return FilterUtils.isRangeFilterRow(blockValue.getValue());
       }
       return false;
     }) === undefined)
@@ -318,14 +322,16 @@ export class FilterUtils
     return block;
   }
 
-  public static extractFilterBlocks(boolValue): Block[]
+  public static extractFilterBlocks(boolValueInfo: ESValueInfo): Block[]
   {
+    const boolValue = boolValueInfo.value;
     let filters = [];
     for (const key of ['filter', 'must', 'should', 'must_not'])
     {
       if (boolValue[key] !== undefined)
       {
-        const fs = FilterUtils.ParseFilterBlock(key, boolValue[key]);
+        const filterValueInfo = boolValueInfo.objectChildren[key].propertyValue;
+        const fs = FilterUtils.ParseFilterBlock(key, filterValueInfo.value);
         if (fs)
         {
           filters = filters.concat(fs);
@@ -335,7 +341,59 @@ export class FilterUtils
     return filters;
   }
 
-  public static ParseFilterBlock(boolQuery: string, filters: any): Block[]
+  /**
+   * When we update cards, we extract filter rows from the query blocks, then delete qualified
+   * query blocks that are extracted into filter rows.
+   * Thus it is important that extracting filter rows uses the same checking function as deleting
+   * qualified blocks.
+   * @param obj : a term or match query object
+   * @returns {boolean} : true if we can turn this query object to a filter row
+   */
+  public static isTermMatchFilterRow(obj): boolean
+  {
+    // { "field" : value } is qualified
+    // { "field" : { } } or {} is not
+    const keys = Object.keys(obj);
+    if (keys.length !== 1)
+    {
+      return false;
+    }
+    const field = keys[0];
+    if (typeof obj[field] !== 'object' || obj[field] === null)
+    {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   *
+   * @param obj: a range query object
+   * @returns {boolean} : true if we can turn this range object to a filter row
+   */
+  public static isRangeFilterRow(obj): boolean
+  {
+    // { "field" : { gt/gte/lt/lte} } is qualified.
+    // { "field" : {boost} } or {} is not.
+    const keys = Object.keys(obj);
+    if (keys.length !== 1)
+    {
+      return false;
+    }
+    const field = keys[0];
+    if (typeof obj[field] !== 'object' || obj[field] === null)
+    {
+      return false;
+    }
+
+    if (obj[field]['boost'] !== undefined)
+    {
+      return false;
+    }
+    return true;
+  }
+
+  public static ParseFilterBlock(queryName: string, filters: any): Block[]
   {
     if (typeof filters !== 'object')
     {
@@ -344,7 +402,7 @@ export class FilterUtils
 
     if (!Array.isArray(filters))
     {
-      return FilterUtils.ParseFilterBlock(boolQuery, [filters]);
+      return FilterUtils.ParseFilterBlock(queryName, [filters]);
     }
 
     let filterBlocks = [];
@@ -356,38 +414,47 @@ export class FilterUtils
 
       if (obj['range'] !== undefined)
       {
-        field = Object.keys(obj['range'])[0];
-        const filterOps = Object.keys(obj['range'][field]);
-        filterOp = filterOps[0];
-        value = obj['range'][field][filterOp];
-        if (filterOps.length > 1)
+        if (FilterUtils.isRangeFilterRow(obj['range']))
         {
-          delete obj['range'][field][filterOp];
-          filterBlocks = filterBlocks.concat(FilterUtils.ParseFilterBlock(boolQuery, [obj]));
+          field = Object.keys(obj['range'])[0];
+          const filterOps = Object.keys(obj['range'][field]);
+          filterOp = filterOps[0];
+          value = String(obj['range'][field][filterOp]);
+          if (filterOps.length > 1)
+          {
+            delete obj['range'][field][filterOp];
+            filterBlocks = filterBlocks.concat(FilterUtils.ParseFilterBlock(queryName, [obj]));
+          }
+          filterOp = esRangeOperatorMap[filterOp];
+          console.assert(filterOp !== undefined, 'ParseFilterBlock could not parse the object ' + JSON.stringify(obj));
         }
-        filterOp = esRangeOperatorMap[filterOp];
-        console.assert(filterOp !== undefined, 'ParseFilterBlock could not parse the object ' + JSON.stringify(obj));
       }
       else if (obj['term'] !== undefined)
       {
-        field = Object.keys(obj['term'])[0];
-        filterOp = '=';
-        value = obj['term'][field];
+        if (FilterUtils.isTermMatchFilterRow(obj['term']))
+        {
+          field = Object.keys(obj['term'])[0];
+          filterOp = '=';
+          value = String(obj['term'][field]);
+        }
       }
       else if (obj['match'] !== undefined)
       {
-        field = Object.keys(obj['match'])[0];
-        filterOp = '≈';
-        value = obj['match'][field];
+        if (FilterUtils.isTermMatchFilterRow(obj['match']))
+        {
+          field = Object.keys(obj['match'])[0];
+          filterOp = '≈';
+          value = String(obj['match'][field]);
+        }
       }
 
-      if (field !== undefined)
+      if (field !== undefined && value !== undefined)
       {
         filterBlocks.push(
           BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
             field,
             value,
-            boolQuery,
+            boolQuery: queryName,
             filterOp,
           }, true),
         );
@@ -403,7 +470,9 @@ export class FilterUtils
     let queryCard;
     // detect the type of the value string
     let valueType = ':string';
-    const valueParser = new ESJSONParser(String(block['value']));
+    const valueString = String(block['value']);
+    const valueParser = new ESJSONParser(valueString);
+
     if (valueParser.hasError() === false)
     {
       if (typeof valueParser.getValue() === 'number')
@@ -420,7 +489,7 @@ export class FilterUtils
         {
           template: {
             'term:term_query': {
-              [templateField]: block['value'],
+              [templateField]: valueString,
             },
           },
         });
@@ -432,7 +501,7 @@ export class FilterUtils
         {
           template: {
             'match:match': {
-              [templateField]: block['value'],
+              [templateField]: valueString,
             },
           },
         });
@@ -448,7 +517,7 @@ export class FilterUtils
           template: {
             'range:range_query': {
               [rangeField]: {
-                [rangeOp]: block['value'],
+                [rangeOp]: valueString,
               },
             },
           },
@@ -508,7 +577,10 @@ export const elasticFilter = _card({
     title: 'Filter',
     description: 'Terrain\'s custom card for filtering results in a human-readable way.',
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
-    preview: '[cards.size] Properties',
+    preview: (c: Card) =>
+    {
+      return String(c['indexFilters'].size + c['typeFilters'].size + c['otherFilters'].size + c['cards'].size) + ' Filters';
+    },
     // this tql is same as tql of other clause cards.
     tql: (block, tqlTranslationFn, tqlConfig) =>
     {

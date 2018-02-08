@@ -53,9 +53,9 @@ import './DeployModal.less';
 
 import Modal from 'common/components/Modal';
 import LibraryActions from 'library/data/LibraryActions';
-import LibraryStore from 'library/data/LibraryStore';
 import * as LibraryTypes from 'library/LibraryTypes';
 import TerrainStore from 'store/TerrainStore';
+import Util from 'util/Util';
 import { ItemStatus } from '../../../items/types/Item';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
@@ -66,6 +66,8 @@ import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo'
 
 export interface Props
 {
+  library?: LibraryTypes.LibraryState;
+  algorithmActions?: typeof LibraryActions.algorithms;
 }
 
 class DeployModal extends TerrainComponent<Props>
@@ -74,7 +76,6 @@ class DeployModal extends TerrainComponent<Props>
     changingStatus: boolean;
     changingStatusOf: LibraryTypes.Algorithm;
     changingStatusTo: ItemStatus;
-    algorithms: IMMap<ID, LibraryTypes.Algorithm>;
     defaultChecked: boolean;
     errorModalMessage: string;
     showErrorModal: boolean;
@@ -83,50 +84,46 @@ class DeployModal extends TerrainComponent<Props>
       changingStatus: false,
       changingStatusOf: null,
       changingStatusTo: null,
-      algorithms: null,
       defaultChecked: false,
       errorModalMessage: '',
       showErrorModal: false,
       deployedName: '',
     };
 
-  public componentDidMount()
+  public componentWillReceiveProps(nextProps)
   {
-    this._subscribe(LibraryStore, {
-      updater: (state) =>
-      {
-        const { changingStatus, changingStatusOf, changingStatusTo, algorithms } = state;
-        if (
-          changingStatus !== this.state.changingStatus ||
-          changingStatusOf !== this.state.changingStatusOf ||
-          changingStatusTo !== this.state.changingStatusTo ||
-          algorithms !== this.state.algorithms
-        )
-        {
-          this.setState({
-            changingStatus,
-            changingStatusOf,
-            changingStatusTo,
-            algorithms,
-            defaultChecked: changingStatusTo === 'DEFAULT',
-            deployedName: (changingStatusOf && changingStatusOf.deployedName),
-          });
-        }
-      },
-      isMounted: true,
-    });
+    const {
+      changingStatus,
+      changingStatusOf,
+      changingStatusTo,
+    } = nextProps.library;
+
+    if (
+      changingStatus !== this.props.library.changingStatus ||
+      changingStatusOf !== this.props.library.changingStatusOf ||
+      changingStatusTo !== this.props.library.changingStatusTo
+    )
+    {
+      this.setState({
+        changingStatus,
+        changingStatusOf,
+        changingStatusTo,
+        defaultChecked: changingStatusTo === 'DEFAULT',
+        deployedName: (changingStatusOf && changingStatusOf.deployedName),
+      });
+    }
   }
 
   public handleClose()
   {
-    TerrainStore.dispatch(LibraryActions.algorithms.status(null, null));
+    this.props.algorithmActions.status(null, null);
   }
 
   public handleDeploy()
   {
     const algorithm = this.state.changingStatusOf;
 
-    const state = LibraryStore.getState();
+    const state = this.props.library;
     const category = state.getIn(['categories', algorithm.categoryId]) as LibraryTypes.Category;
     const group = state.getIn(['groups', algorithm.groupId]) as LibraryTypes.Group;
 
@@ -146,23 +143,12 @@ class DeployModal extends TerrainComponent<Props>
         this.toggleErrorModal();
         return;
       }
-      if (!this.haveValidDeployedName())
-      {
-        this.setState({
-          errorModalMessage: 'Error changing status of ' + this.state.changingStatusOf.name + ' to ' + changingStatusTo
-            + ': Deployed name ' + this.state.deployedName + ' is either already used or invalid.',
-        });
-        this.toggleErrorModal();
-        return;
-      }
       const template = EQLTemplateGenerator.generate(valueInfo);
       const body: object = {
         id: this.state.deployedName,
-        body: {
-          template,
-        },
+        body: template,
       };
-      TerrainStore.dispatch(LibraryActions.algorithms.deploy(algorithm, 'putTemplate', body, changingStatusTo, this.state.deployedName));
+      this.props.algorithmActions.deploy(algorithm, 'putTemplate', body, changingStatusTo, this.state.deployedName);
     }
     else if ((changingStatusTo !== ItemStatus.Live && algorithm.status === 'LIVE')
       || (changingStatusTo !== ItemStatus.Default && algorithm.status === 'DEFAULT'))
@@ -171,7 +157,7 @@ class DeployModal extends TerrainComponent<Props>
       const body: object = {
         id: this.state.deployedName,
       };
-      TerrainStore.dispatch(LibraryActions.algorithms.deploy(algorithm, 'deleteTemplate', body, changingStatusTo, this.state.deployedName));
+      this.props.algorithmActions.deploy(algorithm, 'deleteTemplate', body, changingStatusTo, this.state.deployedName);
     }
   }
 
@@ -241,7 +227,7 @@ class DeployModal extends TerrainComponent<Props>
     let defaultAlgorithm: LibraryTypes.Algorithm;
     if (this.state.defaultChecked)
     {
-      const libraryState = LibraryStore.getState();
+      const libraryState = this.props.library;
       defaultAlgorithm = libraryState.algorithms.find(
         (v) => v.groupId === changingStatusOf.groupId && v.status === 'DEFAULT',
       );
@@ -292,14 +278,12 @@ class DeployModal extends TerrainComponent<Props>
       </div>
     );
   }
-
-  private haveValidDeployedName(): boolean
-  {
-    return this.state.algorithms.valueSeq().filter((algorithm: LibraryTypes.Algorithm) =>
-    {
-      return algorithm !== this.state.changingStatusOf && algorithm.deployedName === this.state.deployedName;
-    }).toList().size === 0;
-  }
 }
 
-export default DeployModal;
+export default Util.createTypedContainer(
+  DeployModal,
+  ['library'],
+  {
+    algorithmActions: LibraryActions.algorithms,
+  },
+);

@@ -20,6 +20,7 @@
             "charts/*": ["app/charts/*"],
             "common/*": ["app/common/*"],
             "deploy/*": ["app/deploy/*"],
+            "etl*": ["src/app/etl/*"],
             "fileimport/*": ["app/fileimport/*"],
             "manual/*": ["app/manual/*"],
             "roles/*": ["app/roles/*"],

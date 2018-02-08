@@ -112,6 +112,7 @@ export default class ESInterpreter
       {
         root.clause = this.config.getClause('body');
       }
+
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
@@ -119,16 +120,22 @@ export default class ESInterpreter
           {
             if (info.parameter.split('.')[0] === 'parent')
             {
-              return false;
+              // give a special value to parameterValue
+              info.parameterValue = new ESJSONParser(info.value);
             }
-
-            const value: null | any = this.params[info.parameter];
-            if (value === undefined)
+            else
             {
-              this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
+              const value: null | any = this.params[info.parameter];
+              if (value === undefined)
+              {
+                this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
+              }
+              info.parameterValue = new ESJSONParser(JSON.stringify(value));
+              if (info.parameterValue.hasError())
+              {
+                this.accumulateError(info, 'Unable to parse parameter (' + info.parameter + ':' + JSON.stringify(value) + ')');
+              }
             }
-
-            return false; // don't validate parameters
           }
 
           if (info.clause !== undefined)

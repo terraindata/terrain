@@ -55,9 +55,6 @@ import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
 import ItemConfig from './ItemConfig';
 
-// CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
-// parent integer, status text, type text);
-
 export class Items
 {
   private itemTable: Tasty.Table;
@@ -215,11 +212,6 @@ export class Items
         await versions.create(user, 'items', id, items[0]);
 
         item = Util.updateObject(items[0], item);
-      }
-      else
-      {
-        const items: ItemConfig[] = await this.get();
-        item.id = items.length + 1;
       }
 
       resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);

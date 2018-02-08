@@ -71,7 +71,6 @@ export let LibraryActionTypes =
         loadVersion: '',
         select: '',
         unselect: '',
-        unselectAll: '',
       },
 
     loadState: '',
@@ -88,7 +87,6 @@ export const CleanLibraryActionTypes = // not dirty
     LibraryActionTypes.algorithms.loadVersion,
     LibraryActionTypes.algorithms.select,
     LibraryActionTypes.algorithms.unselect,
-    LibraryActionTypes.algorithms.unselectAll,
   ];
 
 export default LibraryActionTypes;

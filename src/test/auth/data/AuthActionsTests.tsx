@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import { _AuthState, AuthState } from 'auth/AuthTypes';
-import Actions from 'auth/data/AuthActions';
-import ActionTypes from 'auth/data/AuthActionTypes';
+import { AuthActions as Actions } from 'auth/data/AuthRedux';
 import * as Immutable from 'immutable';
 import { Ajax, createMockStore } from 'test-helpers/helpers';
 
@@ -87,18 +86,23 @@ describe('AuthActions', () =>
     {
       const expectedActions = [
         {
-          type: ActionTypes.login,
-          payload: { id: 2, accessToken: 'another_valid_token' },
-        },
-        {
-          type: 'users.updateCurrentUser',
-          payload: { id: 2 },
+          type: 'auth.login',
+
+          payload: {
+            id: 2,
+            accessToken: 'another_valid_token',
+            actionType: 'login',
+          },
         },
       ];
 
       const store = mockStore(Immutable.Map({ auth }));
 
-      store.dispatch(Actions.login('another_valid_token', 2));
+      store.dispatch(Actions({
+        actionType: 'login',
+        accessToken: 'another_valid_token',
+        id: 2,
+      }));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });
@@ -109,14 +113,18 @@ describe('AuthActions', () =>
     {
       const expectedActions = [
         {
-          type: ActionTypes.logout,
-          payload: {},
+          type: 'auth.logout',
+          payload: {
+            actionType: 'logout',
+          },
         },
       ];
 
       const store = mockStore(Immutable.Map({ auth }));
 
-      store.dispatch(Actions.logout());
+      store.dispatch(Actions({
+        actionType: 'logout',
+      }));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });

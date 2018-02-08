@@ -59,7 +59,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { SchemaState } from 'schema/SchemaTypes';
 import { Display } from '../../../blocks/displays/Display';
 import { Card, CardString, getCardTitle } from '../../../blocks/types/Card';
-import { isInput } from '../../../blocks/types/Input';
+import { isInput, isRuntimeInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
@@ -249,8 +249,10 @@ class BuilderTextbox extends TerrainComponent<Props>
     // {
     //   value = +value;
     // }
-
-    Actions.change(this.props.keyPath, value);
+    if (this.props.keyPath)
+    {
+      Actions.change(this.props.keyPath, value);
+    }
     this.props.onChange && this.props.onChange(value);
   }
 
@@ -386,7 +388,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     {
       options = this.props.getAutoTerms(schema);
     }
-    else
+    else if (this.props.keyPath)
     {
       options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema);
     }
@@ -548,7 +550,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   private valueIsInput(props: Props, value): boolean
   {
     if (typeof value === 'string' &&
-      isInput(value as string, BuilderStore.getState().query.inputs))
+      (isInput(value as string, BuilderStore.getState().query.inputs) || isRuntimeInput(value as string)))
     {
       return true;
     }

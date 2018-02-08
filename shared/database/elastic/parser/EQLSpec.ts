@@ -245,7 +245,7 @@ const EQLSpec: ESClause[] =
         path: ['control'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
-        template: '1000',
+        template: '100',
       }),
     new ESEnumClause('explain_wildcards',
       ['open', 'closed', 'none', 'all'],
@@ -306,7 +306,7 @@ const EQLSpec: ESClause[] =
           },
           'sort:elasticScore': null,
           'from:from': 0,
-          'size:size': 1000,
+          'size:size': 100,
           'track_scores:track_scores': true,
         },
         suggestions: ['query', 'sort', 'from', 'size'],
@@ -324,9 +324,19 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
       }),
     // Terrain Extension: groupJoin clause
+    new ESStringClause('parentAlias',
+      {
+        path: ['groupjoin'],
+        desc: 'Alias to refer to the parent query.',
+      }),
+    new ESBooleanClause('ignoreEmpty',
+      {
+        path: ['groupjoin'],
+        desc: 'Whether groupJoin should ignore subqueries with empty results.',
+      }),
     new ESMapClause('groupjoin_clause',
       'groupjoin_name',
-      'body',
+      'groupjoin_body',
       {
         path: ['groupjoin'],
         name: 'groupJoin query',
@@ -338,6 +348,15 @@ const EQLSpec: ESClause[] =
         path: ['groupjoin'],
         desc: 'names this groupJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
         url: '',
+      }),
+    new ESVariantClause('groupjoin_body',
+      {
+        string: 'parentAlias',
+        boolean: 'ignoreEmpty',
+        object: 'body',
+      },
+      {
+        path: ['groupjoin'],
       }),
     // aggregation
     // AggregatorFactories.java
@@ -1816,6 +1835,7 @@ const EQLSpec: ESClause[] =
       {
         object: 'terms_lookup',
         array: 'base[]',
+        number: 'boost',
       },
       {
         path: ['filter'],

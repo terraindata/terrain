@@ -77,10 +77,11 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * For Linux:
   * Make sure package lists are up to date: `sudo apt-get update`
   * Install parallel, bash, curl: `sudo apt-get install -y parallel bash curl`
-  * Install nodejs v7  repo: `sudo curl -sL https://deb.nodesource.com/setup_7.x | bash -`
-  * Update package lists again: `sudo apt-get update`
-  * Install nodejs: `sudo apt-get install -y nodejs`
-  * Install yarn: `sudo npm -g install yarn`
+  * Install build tools: `sudo apt-get install build-essential gcc g++`
+  * Install docker: https://docs.docker.com/
+  * Install docker-compose, at lease 1.18.0: https://docs.docker.com/compose/install/
+  * Install node 8.x repo: `sudo curl -sL https://deb.nodesource.com/setup_8.x | bash -` [url](https://yarnpkg.com/lang/en/docs/install/)
+  * Install yarn: https://yarnpkg.com/lang/en/docs/install/
 * Generate ssh keys for your computer (if you don't already have them)
     * https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 * Add these keys to your gitlab key set: https://git.terrain.int/profile/keys
@@ -101,6 +102,12 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * To get Analytics dummy data, clone the `Docker` repo and run `analytics/convert.py`
 
 Whenever new packages are installed by other devs / on other branches, run `yarn add` to get the new package locally.
+
+### Migrations
+
+1. You may want to run `cp -R postgres-data pg-backup` to create a backup of your Midway data
+2. Run the scripts in `/midway/migrations` (you only need to run each script once, ever, and only if
+   you had Midway running before the script was created)
 
 ### Auto Styling
 
@@ -219,7 +226,7 @@ Contains the TastyORM, a simple ORM used to abstract database queries from the s
 
 ### midway/test
 
-Contains unit tests for Midway. test's directory structure mirrors that of midway/src. Unit tests for a particular file in midway/src will be found in the same location in midway/test. Test files must be suffixed with 'Tests' in order to be run by jest. 
+Contains unit tests for Midway. test's directory structure mirrors that of midway/src. Unit tests for a particular file in midway/src will be found in the same location in midway/test. Test files must be suffixed with 'Tests' in order to be run by jest.
 
 
 ## Packages and Imports
@@ -235,7 +242,7 @@ You will then need to try to install any Typescript types that are available for
 `yarn add @types/[package-name] --dev` (`--dev` marks that this is a development dependency, not a production one).
 
 If this succeeds, Typescript types are available and you can import this
-package with `import * as PackageName from 'package-name';` or `import { ThingOne, ThingTwo } from 'package-name';` syntax. 
+package with `import * as PackageName from 'package-name';` or `import { ThingOne, ThingTwo } from 'package-name';` syntax.
 
 If this does not succeed, then there are no publicly
 available types, and you have to use `import Package = require('package');`.
@@ -256,16 +263,16 @@ To include another `.tsx` file from within the Terraformer codebase (`/src`), us
 `import NapoleonDynamite from '../../movies/NapoleonDynamite';`
 
 To include any file that's not a `.tsx` from within the Terraformer codebase, use
-`const [ClassName] = require('[relative path]')` 
-e.g.  
-`require('./Pay.less');`  
-`import FreddyAnd = require('../../data/FreddyAnd.json');`  
-`import CarrieMathison = require('./CarrieMathison.js');` (again, don't forget `./`)  
+`const [ClassName] = require('[relative path]')`
+e.g.
+`require('./Pay.less');`
+`import FreddyAnd = require('../../data/FreddyAnd.json');`
+`import CarrieMathison = require('./CarrieMathison.js');` (again, don't forget `./`)
 
 To include a package from `node_modules`, use `import * as [ClassName] from '[package_name]';` if there are typings
 available, and `import [ClassName] = require('[package_name]');` if not. e.g.
-`import * as TheForce from 'the-force';`  
-`import UnpopularLibrary = require('unpopular-library');`  
+`import * as TheForce from 'the-force';`
+`import UnpopularLibrary = require('unpopular-library');`
 
 ## Testing
 
@@ -307,8 +314,41 @@ test('GET /midway/v1/schema', (t) =>
 
 ### Front-end
 
-We do not yet have any front-end tests written.
+We are using Jest for front-end unit testing.
 
+#### How do I run front-end tests?
+
+To run all front-end tests, use:
+
+`yarn test-front`
+
+If you want to run an individual unit test, you can use:
+`./node_modules/.bin/jest <path/to/your/test/file>`
+
+#### Where are the test files?
+
+You can find them at `src/test`. It mirrors the structure of `src/app`.
+
+#### Writing your first test
+
+When you add a new feature in the front-end, you will have to test every new component, action creator and reducer. For examples of how to test each of these you can take a look at `src/test/analytics/`
+
+* In Component tests, you will be asserting on the component structure -make sure it renders the correct children in all variantions of component state and props- and also on the component interactions -event handlers and react lifecycle methods-
+* In redux action creator tests, you will be asserting that it dispatches all the actions that it is supposed to, to the redux store .
+* In redux reducer tests, you will be asserting that the state change is the expected.
+
+#### Test helpers
+
+In `src/test/test-helpers` you can find helper classes and functions that you can use to aid the creation of fake environments to isolate your unit tests and prevent duplicated code.
+
+#### Techonologies
+
+We combine [Jest](https://facebook.github.io/jest/) along with [Enzyme](http://airbnb.io/enzyme/) to fake the component render in unit tests.
+
+## Running in Production
+
+1. `yarn run build-prod` generates production `bundle.js` into `/midway/src/assets/bundle.js`
+1. Run midway with `NODE_ENV=production`
 
 ## Useful Tutorials and Articles
 
@@ -384,9 +424,9 @@ if(isJoey)
 {
   var catchphrase = "How you doin'?";
 }
-console.log(catchphrase); // either the string or undefined```  
+console.log(catchphrase); // either the string or undefined```
 
-Versus:  
+Versus:
 
 if(isPhoebe)
 {
@@ -421,6 +461,7 @@ doesntWork(); // nothing is logged
 
 * Don't panic.
 * Node or npm errors: `yarn` - you may be missing packages.
+* Infinite logo spinning and 401 errors in the console: try in dev tools, go to Application -> Local Storage -> http://localhost:8080/ -> clear local storage and refresh
 * Importing something and it comes up as `undefined`?
   - Check to make sure you don't have a circular dependency (importing something that imports itself)
   - Make sure you are `export`ing and `export default`ing from the file

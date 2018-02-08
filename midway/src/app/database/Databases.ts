@@ -56,9 +56,6 @@ import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import DatabaseConfig from './DatabaseConfig';
 
-// CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, \
-// dsn text NOT NULL, status text, isAnalytics bool NOT NULL, analyticsIndex text, analyticsType text);
-
 export class Databases
 {
   private databaseTable: Tasty.Table;
@@ -127,11 +124,6 @@ export class Databases
         db = Util.updateObject(results[0], db);
       }
     }
-    else
-    {
-      const results: DatabaseConfig[] = await this.get();
-      db.id = results.length + 1;
-    }
 
     if (db.isAnalytics === undefined)
     {
@@ -155,7 +147,7 @@ export class Databases
       throw new Error('Database does not have an ID');
     }
 
-    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn, db.analyticsIndex, db.analyticsType);
+    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.id, db.dsn, db.analyticsIndex, db.analyticsType);
     DatabaseRegistry.set(db.id, controller);
 
     // try to provision built-in scripts to the connected database

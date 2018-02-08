@@ -63,12 +63,23 @@ export default class ESBaseClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    switch (valueInfo.jsonType)
+    let jsonType = valueInfo.jsonType;
+
+    if (ESJSONType[valueInfo.jsonType] === 'parameter')
+    {
+      if (valueInfo.parameterValue !== null && valueInfo.parameterValue.getValueInfo() !== null)
+      {
+        jsonType = valueInfo.parameterValue.getValueInfo().jsonType;
+      }
+    }
+
+    switch (jsonType)
     {
       case ESJSONType.null:
       case ESJSONType.boolean:
       case ESJSONType.number:
       case ESJSONType.string:
+      case ESJSONType.parameter:
         break;
 
       default:

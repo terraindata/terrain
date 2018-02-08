@@ -188,12 +188,33 @@ abstract class ESClause
     valueInfo: ESValueInfo,
     expected: ESJSONType): boolean
   {
-    if (valueInfo.jsonType !== expected)
+    if (ESJSONType[valueInfo.jsonType] === 'parameter')
     {
-      interpreter.accumulateError(valueInfo,
-        'Expected a ' + ESJSONType[expected] + ', but found a ' +
-        ESJSONType[valueInfo.jsonType] + ' instead.');
-      return false;
+      if (valueInfo.parameterValue && valueInfo.parameterValue.getValueInfo())
+      {
+        const parameterType = valueInfo.parameterValue.getValueInfo().jsonType;
+        if (parameterType !== expected && ESJSONType[parameterType] !== 'parameter' && ESJSONType[parameterType] !== 'array')
+        {
+          interpreter.accumulateError(valueInfo,
+            'Expected a ' + ESJSONType[expected] + ', but found a parameter ' + String(valueInfo.parameter) +
+            ' whose type is ' + ESJSONType[parameterType] + ' instead.');
+          return false;
+        }
+      } else
+      {
+        interpreter.accumulateError(valueInfo,
+          'Expected a ' + ESJSONType[expected] + ', but found a parameter ' + String(valueInfo.parameter) +
+          ' whose type is unknown.');
+      }
+    } else
+    {
+      if (valueInfo.jsonType !== expected)
+      {
+        interpreter.accumulateError(valueInfo,
+          'Expected a ' + ESJSONType[expected] + ', but found a ' +
+          ESJSONType[valueInfo.jsonType] + ' instead.');
+        return false;
+      }
     }
 
     return true;

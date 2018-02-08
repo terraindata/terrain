@@ -68,9 +68,37 @@ export const TransformableTypes =
     'integer',
     'half_float',
     'float',
+    'date',
   ];
 
 export const ElasticBlockHelpers = {
+  getColumnType(schemaState: any, column: string): string
+  {
+    const serverName = BuilderStore.getState().db.name;
+    const index = getIndex();
+    const type = getType();
+
+    const key = serverName + '/' + String(index) + '.' + String(type) + '.c.' + column;
+    if (schemaState.columns instanceof Map)
+    {
+      const col = schemaState.columns.get(key);
+      if (col === undefined)
+      {
+        return undefined;
+      }
+      return col.get('datatype');
+    }
+    else
+    {
+      const col = schemaState.columns[key];
+      if (col === undefined)
+      {
+        return undefined;
+      }
+      return col.datatype;
+    }
+  },
+
   autocompleteMatches(schemaState, matchType: AutocompleteMatchType): List<string>
   {
     // 1. Need to get current index
@@ -152,50 +180,76 @@ export const ElasticBlockHelpers = {
   },
 };
 
-export function findCardType(name: string): Block | null
+export function findCardType(name: string): List<Block>
 {
   const state = BuilderStore.getState();
-  let theCard = null;
+  let theCards = List([]);
   forAllCards(state.query.cards, (card) =>
   {
     if (card.type === name)
     {
-      theCard = card;
+      theCards = theCards.push(card);
     }
   });
-  return theCard;
+  return theCards;
 }
 
-export function getIndex(notSetIndex: string = null): string | null
+export function getIndex(notSetIndex: string = null): string | List<string> | null
 {
-  const c = findCardType('elasticFilter');
-  if (c === null)
+  const cards = findCardType('elasticFilter');
+  if (cards.size === 0)
   {
     return notSetIndex;
-  } else
+  }
+  else if (cards.size === 1)
   {
+    const c = cards.get(0);
     if (c['currentIndex'] === '')
     {
       return notSetIndex;
     }
     return c['currentIndex'];
   }
+  // multiple filter cards, return all possible indexes
+  let indexes = List([]);
+  cards.forEach((c) =>
+  {
+    if (c['currentIndex'] !== '')
+    {
+      indexes = indexes.push(c['currentIndex']);
+    }
+  });
+  // If no indexes, return not set. If one, return as string. Otherwise return list
+  return (indexes.size === 0) ? notSetIndex : (indexes.size === 1) ? indexes.get(0) : indexes;
 }
 
-export function getType(notSetType: string = null): string | null
+export function getType(notSetType: string = null): string | List<string> | null
 {
-  const c = findCardType('elasticFilter');
-  if (c === null)
+  const cards = findCardType('elasticFilter');
+  if (cards.size === 0)
   {
     return notSetType;
-  } else
+  }
+  else if (cards.size === 1)
   {
+    const c = cards.get(0);
     if (c['currentType'] === '')
     {
       return notSetType;
     }
     return c['currentType'];
   }
+  // multiple filter cards, return all possible indexes
+  let types = List([]);
+  cards.forEach((c) =>
+  {
+    if (c['currentType'] !== '')
+    {
+      types = types.push(c['currentType']);
+    }
+  });
+  // If no types, return not set. If one, return as string. Otherwise return list
+  return (types.size === 0) ? notSetType : (types.size === 1) ? types.get(0) : types;
 }
 
 export default ElasticBlockHelpers;

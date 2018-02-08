@@ -52,6 +52,7 @@ import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
 import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
+import * as Tasty from '../../src/tasty/Tasty';
 import { readFile } from '../Utils';
 
 let elasticDB: ElasticDB;
@@ -79,6 +80,13 @@ beforeAll(async (done) =>
             analyticsIndex: 'terrain-analytics',
             analyticsType: 'events',
           },
+          {
+            name: 'MySQL Test Connection',
+            type: 'mysql',
+            dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
+            host: '127.0.0.1:63306',
+            isAnalytics: false,
+          },
         ],
       };
 
@@ -89,14 +97,70 @@ beforeAll(async (done) =>
       hosts: ['http://localhost:9200'],
     };
 
-    const elasticController: ElasticController = new ElasticController(config, 0, 'FileImportRouteTests');
+    const elasticController: ElasticController = new ElasticController(config, 0, 'RouteTests');
     elasticDB = elasticController.getTasty().getDB() as ElasticDB;
 
-    const sql = await readFile('./midway/test/scripts/test.sql');
-    const results = await new Promise(async (resolve, reject) =>
-    {
-      resolve(await DB.getDB().execute([sql.toString()]));
-    });
+    const items = [
+      {
+        meta: 'I won a Nobel prize! But Im more proud of my music',
+        name: 'Al Gore',
+        parent: 0,
+        status: 'Still Alive',
+        type: 'GROUP',
+      },
+      {
+        meta: '#realmusician',
+        name: 'Updated Item',
+        parent: 0,
+        status: 'LIVE',
+        type: 'CATEGORY',
+      },
+      {
+        meta: 'Are we an item?',
+        name: 'Justin Bieber',
+        parent: 0,
+        status: 'Baby',
+        type: 'ALGORITHM',
+      },
+    ];
+    const itemTable = new Tasty.Table(
+      'items',
+      ['id'],
+      [
+        'meta',
+        'name',
+        'parent',
+        'status',
+        'type',
+      ],
+    );
+    await DB.getDB().execute(
+      DB.getDB().generate(new Tasty.Query(itemTable).upsert(items)),
+    );
+
+    const versions = [
+      {
+        objectType: 'items',
+        objectId: 2,
+        object: '{"id":2,"meta":"#realmusician","name":"Updated Item","parent":0,"status":"LIVE","type":"CATEGORY"}',
+        createdAt: '2017-05-31 00:22:04',
+        createdByUserId: 1,
+      },
+    ];
+    const versionTable = new Tasty.Table(
+      'versions',
+      ['id'],
+      [
+        'createdAt',
+        'createdByUserId',
+        'object',
+        'objectId',
+        'objectType',
+      ],
+    );
+    await DB.getDB().execute(
+      DB.getDB().generate(new Tasty.Query(versionTable).upsert(versions)),
+    );
   }
   catch (e)
   {
@@ -115,24 +179,6 @@ beforeAll(async (done) =>
         isSuperUser: false,
         isDisabled: false,
         timezone: 'UTC',
-      },
-    })
-    .end(() =>
-    {
-      done();
-    });
-
-  request(server)
-    .post('/midway/v1/database/')
-    .send({
-      id: 1,
-      accessToken: 'ImAnAdmin',
-      body: {
-        name: 'MySQL Test Connection',
-        type: 'mysql',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
-        host: '127.0.0.1:63306',
-        isAnalytics: false,
       },
     })
     .end(() =>
@@ -234,10 +280,6 @@ describe('Version route tests', () =>
   {
     await request(server)
       .get('/midway/v1/versions')
-      .query({
-        id: 1,
-        accessToken: 'ImAnAdmin',
-      })
       .expect(200)
       .then((response) =>
       {
@@ -248,7 +290,6 @@ describe('Version route tests', () =>
           .toMatchObject({
             createdAt: '2017-05-31T00:22:04.000Z',
             createdByUserId: 1,
-            id: 1,
             object: '{"id":2,"meta":"#realmusician","name":"Updated Item","parent":0,"status":"LIVE","type":"CATEGORY"}',
             objectId: 2,
             objectType: 'items',
@@ -494,7 +535,6 @@ describe('Query route tests', () =>
           body: JSON.stringify({
             from: 0,
             size: 0,
-            query: {},
           }),
         },
       })
@@ -530,7 +570,6 @@ describe('Query route tests', () =>
           body: {
             from: 0,
             size: 0,
-            query: {},
           },
         },
       })
@@ -559,17 +598,17 @@ describe('Query route tests', () =>
     async () =>
     {
       const template: string = `{
-                   "from" : 0,
-                   "size" : {{#toJson}}size{{/toJson}},
-                   "query" : {
-                      "bool" : {
-                        "must" : [
-                          {"match" : {"_index" : "movies"}},
-                          {"match" : {"_type" : "data"}}
-                        ]
-                      }
-                   }
-                }`;
+          "from" : 0,
+          "size" : {{#toJson}}size{{/toJson}},
+          "query" : {
+            "bool" : {
+              "must" : [
+                {"match" : {"_index" : "movies"}},
+                {"match" : {"_type" : "data"}}
+              ]
+            }
+          }
+      }`;
 
       await request(server)
         .post('/midway/v1/query/')
@@ -581,9 +620,7 @@ describe('Query route tests', () =>
             type: 'putTemplate',
             body: {
               id: 'testTemplateQuery',
-              body: {
-                template,
-              },
+              body: template,
             },
           },
         }).expect(200).then((response) =>
@@ -613,9 +650,11 @@ describe('Query route tests', () =>
             {
               result: {
                 _id: 'testTemplateQuery',
-                lang: 'mustache',
                 found: true,
-                template,
+                script: {
+                  lang: 'mustache',
+                  source: template,
+                },
               }, errors: [], request: { database: 1, type: 'getTemplate', body: { id: 'testTemplateQuery' } },
             });
         }).catch((error) =>
@@ -658,11 +697,15 @@ describe('Query route tests', () =>
           expect(JSON.parse(response.text)).toMatchObject(
             {
               errors: [
-                {
-                  status: 404,
-                  title: 'Not Found',
-                },
+                // {
+                //   status: 404,
+                //   title: 'Not Found',
+                // },
               ],
+              result: {
+                _id: 'testTemplateQuery',
+                found: false,
+              },
             });
         }).catch((error) =>
         {
@@ -788,7 +831,6 @@ describe('File import route tests', () =>
               index: 'test_elastic_db',
               type: 'fileImportTestTable',
               body: {
-                query: {},
                 sort: [{ pkey: 'asc' }],
               },
             },
@@ -863,7 +905,6 @@ describe('File import route tests', () =>
               index: 'test_elastic_db',
               type: 'fileImportTestTable',
               body: {
-                query: {},
                 sort: [{ pkey: 'desc' }],
               },
             },
@@ -939,6 +980,7 @@ describe('File import route tests', () =>
 describe('File io templates route tests', () =>
 {
   let persistentImportMySQLAccessToken: string = '';
+  let mySQLImportTemplateID: string = '';
   test('Create import template for MySQL: POST /midway/v1/import/templates/create', async () =>
   {
     await request(server)
@@ -984,9 +1026,9 @@ describe('File io templates route tests', () =>
         const respData = JSON.parse(response.text);
         expect(respData.length).toBeGreaterThan(0);
         persistentImportMySQLAccessToken = respData[0]['persistentAccessToken'];
+        mySQLImportTemplateID = respData[0]['id'];
         expect(respData[0])
           .toMatchObject({
-            id: 1,
             name: 'mysql_import_template',
             dbid: 1,
             dbname: 'mysqlimport',
@@ -1024,6 +1066,7 @@ describe('File io templates route tests', () =>
   });
 
   let persistentExportAccessToken: string = '';
+  let exportTemplateID: string = '';
   test('Create export template: POST /midway/v1/export/templates/create', async () =>
   {
     await request(server)
@@ -1054,9 +1097,9 @@ describe('File io templates route tests', () =>
         const respData = JSON.parse(response.text);
         expect(respData.length).toBeGreaterThan(0);
         persistentExportAccessToken = respData[0]['persistentAccessToken'];
+        exportTemplateID = respData[0]['id'];
         expect(respData[0])
           .toMatchObject({
-            id: 1,
             name: 'my_template',
             dbid: 1,
             dbname: 'movies',
@@ -1094,10 +1137,9 @@ describe('File io templates route tests', () =>
         expect(response.text).not.toBe('Unauthorized');
         const respData = JSON.parse(response.text);
         expect(respData.length).toBeGreaterThan(0);
+        const persistentAccessToken = respData[0]['persistentAccessToken'];
         expect(respData[0]).toMatchObject({
-          id: 1,
           name: 'my_template',
-
           dbid: 1,
           dbname: 'movies',
           tablename: 'data',
@@ -1111,7 +1153,7 @@ describe('File io templates route tests', () =>
             },
           primaryKeys: ['pkey'],
           transformations: [],
-          persistentAccessToken: persistentExportAccessToken,
+          persistentAccessToken,
         });
       })
       .catch((error) =>
@@ -1150,7 +1192,7 @@ describe('File io templates route tests', () =>
     await request(server)
       .post('/midway/v1/import/headless')
       .send({
-        templateId: 1,
+        templateId: mySQLImportTemplateID,
         persistentAccessToken: persistentImportMySQLAccessToken,
         body: {
           source: {
@@ -1175,7 +1217,6 @@ describe('File io templates route tests', () =>
               index: 'mysqlimport',
               type: 'data',
               body: {
-                query: {},
                 sort: [{ movieid: 'asc' }],
               },
             },
@@ -1218,7 +1259,7 @@ describe('File io templates route tests', () =>
     await request(server)
       .post('/midway/v1/import/headless')
       .send({
-        templateId: 1,
+        templateId: mySQLImportTemplateID,
         persistentAccessToken: persistentImportMySQLAccessToken,
         body: {
           source: {
@@ -1249,12 +1290,12 @@ describe('File io templates route tests', () =>
     await request(server)
       .post('/midway/v1/export/headless')
       .send({
-        templateId: 1,
+        templateId: exportTemplateID,
         persistentAccessToken: persistentExportAccessToken,
         body: {
           dbid: 1,
           dbname: 'movies',
-          templateId: 1,
+          templateId: exportTemplateID,
           filetype: 'csv',
           query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
             + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
@@ -1323,7 +1364,7 @@ describe('Credentials tests', () =>
       {
         const result = JSON.parse(response.text);
         expect(result.length).toBeGreaterThanOrEqual(2);
-        expect(result.slice(0, 2)).toMatchObject([{
+        expect(result).toEqual(expect.arrayContaining([{
           createdBy: 1,
           id: 1,
           meta: '',
@@ -1338,7 +1379,7 @@ describe('Credentials tests', () =>
           name: 'SFTP Test 1',
           permissions: 1,
           type: 'sftp',
-        }]);
+        }]));
       })
       .catch((error) =>
       {
@@ -1384,8 +1425,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 7, 36, 4),
+        start: new Date(2018, 1, 16, 7, 24, 4),
+        end: new Date(2018, 1, 16, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'terrain_5',
         agg: 'select',
@@ -1399,7 +1440,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(2);
+        expect(respData['terrain_5'].length).toEqual(3);
       });
   });
 
@@ -1411,8 +1452,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 7, 36, 4),
+        start: new Date(2018, 1, 16, 7, 24, 4),
+        end: new Date(2018, 1, 16, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'terrain_5',
         agg: 'histogram',
@@ -1427,7 +1468,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(2);
+        expect(respData['terrain_5'].length).toEqual(5);
       });
   });
 
@@ -1439,8 +1480,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 10, 24, 4),
+        start: new Date(2018, 1, 31, 7, 24, 4),
+        end: new Date(2018, 1, 31, 10, 24, 4),
         eventname: 'click,impression',
         algorithmid: 'terrain_5',
         agg: 'rate',
@@ -1468,7 +1509,7 @@ describe('Analytics route tests', () =>
         accessToken: 'ImAnAdmin',
         body: {
           database: 1,
-          label: 'Click',
+          label: 'Clicks',
           events: 'click',
         },
       })
@@ -1482,7 +1523,7 @@ describe('Analytics route tests', () =>
         expect(respData[0])
           .toMatchObject({
             database: 1,
-            label: 'Click',
+            label: 'Clicks',
             events: 'click',
           });
       })

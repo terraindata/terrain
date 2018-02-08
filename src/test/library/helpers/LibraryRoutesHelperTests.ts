@@ -43,32 +43,43 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { buildRoute } from 'library/helpers/LibraryRoutesHelper';
 
-import * as AuthTypes from '../AuthTypes';
-import Ajax from './../../util/Ajax';
-import ActionTypes from './AuthActionTypes';
-
-const AuthReducer = {};
-
-AuthReducer[ActionTypes.login] =
-  (state: AuthTypes.AuthState, action: Action<{ accessToken: string, id: number }>) =>
+describe('LibraryRouterHelper', () =>
+{
+  describe('#buildRoute', () =>
   {
-    const { accessToken, id } = action.payload;
-    // store these values in localStorage so that the user is auto-logged in next time they visit
-    localStorage['accessToken'] = accessToken;
-    localStorage['id'] = id;
-    return state.set('accessToken', accessToken).set('id', +id);
-  };
-
-AuthReducer[ActionTypes.logout] =
-  (state: AuthTypes.AuthState, action) =>
-  {
-    Ajax.logout((success) =>
+    it('should create the next library/analytics route', () =>
     {
-      delete localStorage['accessToken'];
-      delete localStorage['id'];
-    });
-    return state.set('accessToken', null).set('id', null);
-  };
+      let route = buildRoute({ basePath: 'library' });
+      expect(route).toEqual('/library');
 
-export default AuthReducer;
+      route = buildRoute({ basePath: 'library', categoryId: 1 });
+      expect(route).toEqual('/library/1');
+
+      route = buildRoute({
+        basePath: 'library',
+        categoryId: 1,
+        groupId: 2,
+      });
+      expect(route).toEqual('/library/1/2');
+
+      route = buildRoute({
+        basePath: 'library',
+        categoryId: 1,
+        groupId: 2,
+        algorithmId: 3,
+      });
+      expect(route).toEqual('/library/1/2/3');
+
+      route = buildRoute({
+        basePath: 'library',
+        categoryId: 1,
+        groupId: 2,
+        algorithmId: 3,
+        pinned: [4, 5],
+      });
+      expect(route).toEqual('/library/1/2/3?pinned=4,5');
+    });
+  });
+});
