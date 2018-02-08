@@ -233,64 +233,18 @@ export class Export
       try
       {
         const docs: object[] = resp.hits.hits as object[];
-        const fieldArrayDepths: object = {};
-        let rankCounter = 1;
-        let isFirstJSONObj: boolean = true;
+        const cfg = {
+          extractTransformations,
+          exprt,
+          fieldArrayDepths: {},
+          id: 1,
+          mapping: originalMapping,
+        };
 
+        let isFirstJSONObj: boolean = true;
         for (let doc of docs)
         {
-          // merge groupJoins with _source if necessary
-          doc = this._mergeGroupJoin(doc);
-          // extract field after doing all merge joins
-          extractTransformations.forEach((transform) =>
-          {
-            const oldColName: string | undefined = transform['colName'];
-            const newColName: string | undefined = transform['args']['newName'];
-            const path: string | undefined = transform['args']['path'];
-            if (oldColName !== undefined && newColName !== undefined && path !== undefined)
-            {
-              doc['_source'][newColName] = _.get(doc['_source'], path);
-            }
-          });
-
-          // verify schema mapping with documents and fix documents accordingly
-          doc = this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
-          for (const field of Object.keys(doc))
-          {
-            if (doc[field] !== null && doc[field] !== undefined)
-            {
-              if (fieldArrayDepths[field] !== undefined)
-              {
-                fieldArrayDepths[field] = fieldArrayDepths[field] + this._getArrayDepth(doc[field]);
-                if (fieldArrayDepths[field] > 1)
-                {
-                  const errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
-                  return reject(errMsg);
-                }
-              }
-              else
-              {
-                fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
-              }
-
-              if (Array.isArray(doc[field]) && exprt.filetype === 'csv')
-              {
-                doc[field] = this._convertArrayToCSVArray(doc[field]);
-              }
-            }
-          }
-
-          doc = this._transformAndCheck(doc, exprt, false);
-          if (Boolean(exprt.rank))
-          {
-            if (doc['TERRAINRANK'] !== undefined)
-            {
-              return reject('Conflicting field: TERRAINRANK.');
-            }
-            doc['TERRAINRANK'] = rankCounter;
-            rankCounter++;
-          }
-
+          doc = this._postProcessDoc(doc, cfg);
           if (exprt.filetype === 'csv')
           {
             writer.write(doc);
@@ -335,6 +289,61 @@ export class Export
       throw new Error('File export currently is only supported for Elastic databases.');
     }
     return this._getAllFieldsAndTypesFromQuery(database, qry, dbid);
+  }
+
+  private _postProcessDoc(doc: object, cfg: any): object
+  {
+    // merge groupJoins with _source if necessary
+    doc = this._mergeGroupJoin(doc);
+    // extract field after doing all merge joins
+    cfg.extractTransformations.forEach((transform) =>
+    {
+      const oldColName: string | undefined = transform['colName'];
+      const newColName: string | undefined = transform['args']['newName'];
+      const path: string | undefined = transform['args']['path'];
+      if (oldColName !== undefined && newColName !== undefined && path !== undefined)
+      {
+        doc['_source'][newColName] = _.get(doc['_source'], path);
+      }
+    });
+
+    // verify schema mapping with documents and fix documents accordingly
+    doc = this._checkDocumentAgainstMapping(doc['_source'], cfg.mapping);
+    for (const field of Object.keys(doc))
+    {
+      if (doc[field] !== null && doc[field] !== undefined)
+      {
+        if (cfg.fieldArrayDepths[field] !== undefined)
+        {
+          cfg.fieldArrayDepths[field] = cfg.fieldArrayDepths[field] + this._getArrayDepth(doc[field]);
+          if (cfg.fieldArrayDepths[field] > 1)
+          {
+            throw new Error('Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.');
+          }
+        }
+        else
+        {
+          cfg.fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
+        }
+
+        if (Array.isArray(doc[field]) && cfg.exprt.filetype === 'csv')
+        {
+          doc[field] = this._convertArrayToCSVArray(doc[field]);
+        }
+      }
+    }
+
+    doc = this._transformAndCheck(doc, cfg.exprt, false);
+    if (Boolean(cfg.exprt.rank))
+    {
+      if (doc['TERRAINRANK'] !== undefined)
+      {
+        throw new Error('Conflicting field: TERRAINRANK.');
+      }
+      doc['TERRAINRANK'] = cfg.id;
+      cfg.id++;
+    }
+    return doc;
   }
 
   private _shouldRandomSample(qry: string): string
