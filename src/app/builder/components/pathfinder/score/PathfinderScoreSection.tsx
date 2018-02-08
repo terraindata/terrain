@@ -185,7 +185,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             canDelete={canEdit}
             onDelete={this.handleDeleteLine}
           />,
-          key: index.toString(),
+          key: String(index),
           draggable: true,
           dragHandle: <DragHandle />,
           dragHandleStyle: { 'padding-top': '8px' },
@@ -214,7 +214,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
         return (
           {
             content: <PathfinderScoreLine
-              key={index.toString()}
+              key={String(index)}
               line={line}
               step={step}
               onDelete={this.handleDeleteLine}
@@ -227,7 +227,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
               onAnimateScoreBars={this.handleAnimateScoreBars}
               pathfinderContext={this.props.pathfinderContext}
             />,
-            key: index.toString(),
+            key: String(index),
             draggable: true,
             dragHandle: <DragHandle />,
             dragHandleStyle: { 'padding-top': '8px' },
