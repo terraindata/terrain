@@ -81,7 +81,6 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 
 export class Export
 {
-  private BATCH_SIZE: number = 5000;
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
   private SCROLL_TIMEOUT: string = '60s';
   private MAX_ROW_THRESHOLD: number = 2000;
@@ -169,7 +168,6 @@ export class Export
         return reject(mapping);
       }
 
-      let rankCounter: number = 1;
       let writer: any;
       if (exprt.filetype === 'csv')
       {
@@ -222,81 +220,67 @@ export class Export
         return reject('Nothing to export.');
       }
       const resp = qryResponse.result;
-      if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
+      if (resp === undefined || resp.hits === undefined || resp.hits.total === 0 || resp.hits.hits.length === 0)
       {
         writer.end();
         return reject('Nothing to export.');
       }
 
-      const newDocs: object[] = resp.hits.hits as object[];
-      if (newDocs.length === 0)
-      {
-        writer.end();
-        return resolve(writer);
-      }
-
       const extractTransformations = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
       exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
 
-      const mergedDocs: object[] = [];
-      for (const doc of newDocs)
-      {
-        // merge groupJoins with _source if necessary
-        const mergedDoc = this._mergeGroupJoin(doc);
-        // extract field after doing all merge joins
-        extractTransformations.forEach((transform) =>
-        {
-          const oldColName: string | undefined = transform['colName'];
-          const newColName: string | undefined = transform['args']['newName'];
-          const path: string | undefined = transform['args']['path'];
-          if (oldColName !== undefined && newColName !== undefined && path !== undefined)
-          {
-            mergedDoc['_source'][newColName] = _.get(mergedDoc['_source'], path);
-          }
-        });
-
-        mergedDocs.push(mergedDoc);
-      }
-
-      let returnDocs: object[] = [];
-      const fieldArrayDepths: object = {};
-      for (const doc of mergedDocs)
-      {
-        // verify schema mapping with documents and fix documents accordingly
-        const newDoc: object = this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
-        for (const field of Object.keys(newDoc))
-        {
-          if (newDoc[field] !== null && newDoc[field] !== undefined)
-          {
-            if (fieldArrayDepths[field] === undefined)
-            {
-              fieldArrayDepths[field] = new Set<number>();
-            }
-            fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
-          }
-          if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
-          {
-            newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
-          }
-        }
-        returnDocs.push(newDoc as object);
-      }
-      for (const field of Object.keys(fieldArrayDepths))
-      {
-        if (fieldArrayDepths[field].size > 1)
-        {
-          const errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
-          return reject(errMsg);
-        }
-      }
-
       winston.info('Beginning export transformations.');
-      // transform documents with template
       try
       {
-        returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
-        for (const doc of returnDocs)
+        const docs: object[] = resp.hits.hits as object[];
+        const fieldArrayDepths: object = {};
+        let rankCounter = 1;
+        let isFirstJSONObj: boolean = true;
+
+        for (let doc of docs)
         {
+          // merge groupJoins with _source if necessary
+          doc = this._mergeGroupJoin(doc);
+          // extract field after doing all merge joins
+          extractTransformations.forEach((transform) =>
+          {
+            const oldColName: string | undefined = transform['colName'];
+            const newColName: string | undefined = transform['args']['newName'];
+            const path: string | undefined = transform['args']['path'];
+            if (oldColName !== undefined && newColName !== undefined && path !== undefined)
+            {
+              doc['_source'][newColName] = _.get(doc['_source'], path);
+            }
+          });
+
+          // verify schema mapping with documents and fix documents accordingly
+          doc = this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
+          for (const field of Object.keys(doc))
+          {
+            if (doc[field] !== null && doc[field] !== undefined)
+            {
+              if (fieldArrayDepths[field] !== undefined)
+              {
+                fieldArrayDepths[field] = fieldArrayDepths[field] + this._getArrayDepth(doc[field]);
+                if (fieldArrayDepths[field] > 1)
+                {
+                  const errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
+                  return reject(errMsg);
+                }
+              }
+              else
+              {
+                fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
+              }
+
+              if (Array.isArray(doc[field]) && exprt.filetype === 'csv')
+              {
+                doc[field] = this._convertArrayToCSVArray(doc[field]);
+              }
+            }
+          }
+
+          doc = this._transformAndCheck(doc, exprt, false);
           if (Boolean(exprt.rank))
           {
             if (doc['TERRAINRANK'] !== undefined)
@@ -304,8 +288,27 @@ export class Export
               return reject('Conflicting field: TERRAINRANK.');
             }
             doc['TERRAINRANK'] = rankCounter;
+            rankCounter++;
           }
-          rankCounter++;
+
+          if (exprt.filetype === 'csv')
+          {
+            writer.write(doc);
+          }
+          else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+          {
+            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+            writer.write(JSON.stringify(doc));
+          }
+
+          if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+          {
+            writer.write(']');
+            if (exprt.filetype === 'json [type object]')
+            {
+              writer.write('}');
+            }
+          }
         }
       }
       catch (e)
@@ -314,28 +317,6 @@ export class Export
         return reject(e);
       }
 
-      let isFirstJSONObj: boolean = true;
-      for (const returnDoc of returnDocs)
-      {
-        if (exprt.filetype === 'csv')
-        {
-          writer.write(returnDoc);
-        }
-        else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-        {
-          isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-          writer.write(JSON.stringify(returnDoc));
-        }
-      }
-
-      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        writer.write(']');
-        if (exprt.filetype === 'json [type object]')
-        {
-          writer.write('}');
-        }
-      }
       writer.end();
       resolve(writer);
     });
@@ -767,7 +748,7 @@ export class Export
   /* checks whether obj has the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _checkTypes(obj: object, exprt: ExportConfig): string
+  private _checkTypes(obj: object, exprt: ExportConfig): void
   {
     const targetHash: string = this._buildDesiredHash(exprt.columnTypes);
     const targetKeys: string = JSON.stringify(Object.keys(exprt.columnTypes).sort());
@@ -793,7 +774,7 @@ export class Export
     {
       if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
       {
-        return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
+        throw new Error('Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj));
       }
       for (const key of Object.keys(obj))
       {
@@ -801,8 +782,8 @@ export class Export
         {
           if (!this._jsonCheckTypesHelper(obj[key], exprt.columnTypes[key]))
           {
-            return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
-              JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
+            throw new Error('Encountered an object whose field "' + key + '"does not match the specified type (' +
+              JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj));
           }
         }
       }
@@ -815,12 +796,10 @@ export class Export
       {
         if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
         {
-          return 'Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj);
+          throw new Error('Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj));
         }
       }
     }
-
-    return '';
   }
 
   private _convertArrayToCSVArray(arr: any[]): string
@@ -1073,59 +1052,45 @@ export class Export
   }
 
   // asynchronously perform transformations on each item to upsert, and check against expected resultant types
-  private async _transformAndCheck(allItems: object[], exprt: ExportConfig,
-    dontCheck?: boolean): Promise<object[][]>
+  private _transformAndCheck(doc: object, exprt: ExportConfig, dontCheck?: boolean): object
   {
-    const promises: Array<Promise<object[]>> = [];
-    let items: object[];
-    while (allItems.length > 0)
+    try
     {
-      items = allItems.splice(0, this.BATCH_SIZE);
-      promises.push(
-        new Promise<object[]>(async (resolve, reject) =>
-        {
-          const transformedItems: object[] = [];
-          for (let item of items)
-          {
-            try
-            {
-              item = this._applyTransforms(item, exprt.transformations);
-            }
-            catch (e)
-            {
-              return reject('Failed to apply transforms: ' + String(e));
-            }
-            // only include the specified columns
-            // NOTE: unclear if faster to copy everything over or delete the unused ones
-            const trimmedItem: object = {};
-            for (const name of Object.keys(exprt.columnTypes))
-            {
-              if (exprt.columnTypes.hasOwnProperty(name))
-              {
-                if (typeof item[name] === 'string')
-                {
-                  trimmedItem[name] = item[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-                }
-                else
-                {
-                  trimmedItem[name] = item[name];
-                }
-              }
-            }
-            if (dontCheck !== true)
-            {
-              const typeError: string = this._checkTypes(trimmedItem, exprt);
-              if (typeError !== '')
-              {
-                return reject(typeError);
-              }
-            }
-            transformedItems.push(trimmedItem);
-          }
-          resolve(transformedItems);
-        }));
+      doc = this._applyTransforms(doc, exprt.transformations);
     }
-    return Promise.all(promises);
+    catch (e)
+    {
+      throw new Error('Failed to apply transforms: ' + String(e));
+    }
+    // only include the specified columns
+    // NOTE: unclear if faster to copy everything over or delete the unused ones
+    const trimmedDoc: object = {};
+    for (const name of Object.keys(exprt.columnTypes))
+    {
+      if (exprt.columnTypes.hasOwnProperty(name))
+      {
+        if (typeof doc[name] === 'string')
+        {
+          trimmedDoc[name] = doc[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        }
+        else
+        {
+          trimmedDoc[name] = doc[name];
+        }
+      }
+    }
+    if (dontCheck !== true)
+    {
+      try
+      {
+        this._checkTypes(trimmedDoc, exprt);
+      }
+      catch (e)
+      {
+        throw e;
+      }
+    }
+    return trimmedDoc;
   }
 }
 
