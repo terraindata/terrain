@@ -54,6 +54,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import Autocomplete from 'common/components/Autocomplete';
+import { SchemaState } from 'schema/SchemaTypes';
+import { BuilderState } from 'builder/data/BuilderState';
 // import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
@@ -68,12 +70,15 @@ export interface Props
   domain: List<number>;
   range: List<number>;
   onDomainChange: (domain: List<number>) => void;
+  inputKey: string;
   keyPath: KeyPath;
   canEdit: boolean;
   width: number;
   language: string;
   colors: [string, string];
+  builder?: BuilderState;
   builderActions?: typeof BuilderActions;
+  schema?: SchemaState;
 }
 
 const MAX_BARS = 100;
@@ -258,7 +263,10 @@ class TransformCardPeriscope extends TerrainComponent<Props>
       onDomainChangeStart: this.handleDomainChangeStart,
       width: (overrideState && overrideState['width']) || this.props.width,
       height: 40,
+      inputKey: overrideState['inputKey'] || this.props.inputKey,
       colors: this.props.colors,
+      schema: this.props.schema,
+      builder: this.props.builder,
     });
 
     return chartState;
@@ -299,8 +307,9 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     );
   }
 }
+
 export default Util.createTypedContainer(
   TransformCardPeriscope,
-  [],
+  ['schema'],
   { builderActions: BuilderActions },
 );

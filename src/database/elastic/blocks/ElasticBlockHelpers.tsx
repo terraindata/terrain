@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 
+import { SchemaState } from 'schema/SchemaTypes';
 import { BuilderState } from 'builder/data/BuilderState';
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
@@ -68,9 +69,37 @@ export const TransformableTypes =
     'integer',
     'half_float',
     'float',
+    'date',
   ];
 
 export const ElasticBlockHelpers = {
+  getColumnType(schemaState: SchemaState, builderState: BuilderState, column: string): string
+  {
+    const serverName = builderState.db.name;
+    const index = getIndex('', builderState);
+    const type = getType('', builderState);
+
+    const key = serverName + '/' + String(index) + '.' + String(type) + '.c.' + column;
+    if (schemaState.columns instanceof Map)
+    {
+      const col = schemaState.columns.get(key);
+      if (col === undefined)
+      {
+        return undefined;
+      }
+      return col.get('datatype');
+    }
+    else
+    {
+      const col = schemaState.columns[key];
+      if (col === undefined)
+      {
+        return undefined;
+      }
+      return col.datatype;
+    }
+  },
+
   autocompleteMatches(schemaState, builderState, matchType: AutocompleteMatchType): List<string>
   {
     // 1. Need to get current index

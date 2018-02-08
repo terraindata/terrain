@@ -468,7 +468,6 @@ class MapComponent extends TerrainComponent<Props>
           onViewportChanged={this.setZoomLevel}
           maxBounds={[[85, -180], [-85, 180]]}
           minZoom={1}
-          zoomDelta={0.5}
           zoomControl={!this.props.hideZoomControl}
           onClick={this.handleOnMapClick}
           onMouseDown={this.handleOnMapClick}

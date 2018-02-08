@@ -264,6 +264,7 @@ class TransformCard extends TerrainComponent<Props>
           language={this.props.language}
           colors={this.props.data.static.colors}
           mode={this.props.data.mode}
+          builder={this.props.builder}
         />
         <TransformCardPeriscope
           onDomainChange={this.handleChartDomainChange}
@@ -271,11 +272,13 @@ class TransformCard extends TerrainComponent<Props>
           domain={this.state.chartDomain}
           range={this.state.range}
           maxDomain={this.state.maxDomain}
+          inputKey={BlockUtils.transformAlias(this.props.data)}
           keyPath={this.props.keyPath}
           canEdit={this.props.canEdit}
           width={width}
           language={this.props.language}
           colors={this.props.data.static.colors}
+          builder={this.props.builder}
         />
       </div>
     );
