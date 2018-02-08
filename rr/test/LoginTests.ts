@@ -65,7 +65,7 @@ expect.extend({ toMatchImageSnapshot } as any);
 async function loginToBuilder(page, url)
 {
   await page.goto(url);
-  sleep.sleep(10);
+  sleep.sleep(5);
   winston.info('Goto the login page ' + url);
   let image = await page.screenshot();
   // login screen
@@ -117,12 +117,18 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
 
   it('login', async () =>
   {
-    page = await browser.newPage();
-    winston.info('Created a new page.');
-    await page.setViewport({ width: 1600, height: 1200 });
-    const url = `http://${ip.address()}:3000`;
-    await loginToBuilder(page, url);
-  }, 1000000);
+    try
+    {
+      page = await browser.newPage();
+      winston.info('Created a new page.');
+      await page.setViewport({width: 1600, height: 1200});
+      const url = `http://${ip.address()}:3000`;
+      await loginToBuilder(page, url);
+    } catch (e)
+    {
+      console.log('Error: ' + e);
+    }
+  }, 30000);
 
   afterAll(async () =>
   {
