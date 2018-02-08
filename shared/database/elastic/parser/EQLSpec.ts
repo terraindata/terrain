@@ -324,6 +324,11 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
       }),
     // Terrain Extension: groupJoin clause
+    new ESStringClause('parentAlias',
+      {
+        path: ['groupjoin'],
+        desc: 'Alias to refer to the parent query.',
+      }),
     new ESBooleanClause('ignoreEmpty',
       {
         path: ['groupjoin'],
@@ -346,6 +351,7 @@ const EQLSpec: ESClause[] =
       }),
     new ESVariantClause('groupjoin_body',
       {
+        string: 'parentAlias',
         boolean: 'ignoreEmpty',
         object: 'body',
       },
