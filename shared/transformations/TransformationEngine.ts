@@ -346,7 +346,7 @@ export class TransformationEngine
 
   private generateInitialFieldMaps(obj: object, currentKeyPath: KeyPath = List<string>()): List<number>
   {
-    let ids: List<number> = List<number>();
+    let ids: List<number> = List<number>([this.addField(currentKeyPath, 'object')]);
     for (const key of Object.keys(obj))
     {
       if (isPrimitive(obj[key]))
