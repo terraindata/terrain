@@ -307,6 +307,16 @@ export class TransformationEngine
     return this.IDToFieldNameMap.get(fieldID);
   }
 
+  public getFieldType(fieldID: number): string
+  {
+    return this.fieldTypes.get(fieldID);
+  }
+
+  public getFieldEnabled(fieldID: number): boolean
+  {
+    return this.fieldEnabled.get(fieldID) === true;
+  }
+
   public getAllFieldIDs(): List<number>
   {
     return this.IDToFieldNameMap.keySeq().toList();
