@@ -60,8 +60,6 @@ import
 } from 'etl/templates/TemplateTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 
-import { TemplateFieldProxy } from 'etl/templates/components/TemplateFieldProxy';
-
 const { List, Map } = Immutable;
 
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
@@ -72,7 +70,7 @@ export interface TemplateEditorActionTypes
     actionType: 'loadTemplate';
     template: ETLTemplate;
   };
-  setRoot: {
+  setRoot: { // this should be the only way to edit the template tree
     actionType: 'setRoot';
     rootField: TemplateField;
   };

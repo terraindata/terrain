@@ -57,7 +57,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import ExpandableView from 'common/components/ExpandableView';
-import { TemplateField } from 'etl/templates/FieldTypes';
+import { FieldUtil, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -143,9 +143,9 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
   {
     const { field, canEdit, preview, depth, label, displayKeyPath, injectedContent } = this.props;
     let content = null;
-    const simpleArrayDisplay: boolean = !this._isNested() && depth + 1 === this._arrayDepth();
+    const simpleArrayDisplay: boolean = !FieldUtil.isNested(field) && depth + 1 === FieldUtil.arrayDepth(field);
 
-    if (depth === this._arrayDepth() && this._isNested())
+    if (depth === FieldUtil.arrayDepth(field) && FieldUtil.isNested(field))
     {
       content = this.props.renderNestedFields(preview, displayKeyPath);
     }

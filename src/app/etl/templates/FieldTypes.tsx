@@ -84,6 +84,7 @@ export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
   langSettings: _ElasticFieldSettings,
 });
 
+const doNothing = () => null;
 // has methods that abstract how the tree is mutated
 // can also be constructed to create a 'tree' that emulates a store
 export class FieldTree
@@ -96,36 +97,49 @@ export class FieldTree
     return rootField.setIn(sourcePath.push('children', nextIndex), field);
   }
 
-  public static updateField(rootField: TemplateField, sourcePath: KeyPath,
+  public static setField(rootField: TemplateField, pathToField: KeyPath, field: TemplateField): TemplateField
+  {
+    return rootField.setIn(pathToField, field);
+  }
+
+  public static updateField(rootField: TemplateField, pathToField: KeyPath,
     key: string | number, value: any): TemplateField
   {
-    const keyPath = sourcePath.push(key);
+    const keyPath = pathToField.push(key);
     return rootField.setIn(keyPath, value);
   }
 
-  public static deleteField(rootField: TemplateField, sourcePath: KeyPath): TemplateField
+  public static deleteField(rootField: TemplateField, pathToField: KeyPath): TemplateField
   {
-    return rootField.deleteIn(sourcePath);
+    return rootField.deleteIn(pathToField);
   }
 
-  constructor(private root: TemplateField = _TemplateField())
-  {
+  private onMutate: (root: TemplateField) => void = doNothing;
 
+  constructor(private root: TemplateField, onMutate?: (f: TemplateField) => void)
+  {
+    if (onMutate !== undefined)
+    {
+      this.onMutate = onMutate;
+    }
   }
 
-  public createField(sourcePath: KeyPath, field: TemplateField)
+  public createField(pathToField: KeyPath, field: TemplateField)
   {
-    this.root = FieldTree.createField(this.root, sourcePath, field);
+    this.root = FieldTree.createField(this.root, pathToField, field);
+    this.onMutate(this.root);
   }
 
-  public updateField(sourcePath: KeyPath, key: string | number, value: any)
+  public updateField(pathToField: KeyPath, key: string | number, value: any)
   {
-    this.root = FieldTree.updateField(this.root, sourcePath, key, value);
+    this.root = FieldTree.updateField(this.root, pathToField, key, value);
+    this.onMutate(this.root);
   }
 
-  public deleteField(sourcePath: KeyPath)
+  public deleteField(pathToField: KeyPath)
   {
-    this.root = FieldTree.deleteField(this.root, sourcePath);
+    this.root = FieldTree.deleteField(this.root, pathToField);
+    this.onMutate(this.root);
   }
 
   public getRoot(): TemplateField
@@ -151,6 +165,11 @@ export class FieldTreeNode
 
   }
 
+  public exists()
+  {
+    return this.tree.getRoot().hasIn(this.path);
+  }
+
   public me(): TemplateField
   {
     return this.tree.getField(this.path);
@@ -172,5 +191,43 @@ export class FieldTreeNode
   public get<K extends keyof TemplateField>(key: K): TemplateField[K]
   {
     return this.me().get(key);
+  }
+
+  public deleteSelf()
+  {
+    this.tree.deleteField(this.path);
+  }
+
+  public clearChildren()
+  {
+    this.tree.updateField(this.path, 'children', List([]));
+  }
+}
+
+export abstract class FieldUtil
+{
+  public static isArray(field): boolean
+  {
+    const type = field.langSettings.type;
+    return type === ELASTIC_TYPES.ARRAY;
+  }
+
+  // returns how deep the array type is. For example, if the field's type is array of array of text, then the depth is 2.
+  public static arrayDepth(field): number
+  {
+    const { arrayType } = field.langSettings;
+    return FieldUtil.isArray(field) ? arrayType.size : 0;
+  }
+
+  public static isNested(field): boolean
+  {
+    const { type, arrayType } = field.langSettings;
+    return type === ELASTIC_TYPES.NESTED ||
+      (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
+  }
+
+  public static isRoot(keyPath: KeyPath): boolean
+  {
+    return keyPath.size === 0;
   }
 }

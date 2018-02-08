@@ -57,31 +57,52 @@ const { List, Map } = Immutable;
 
 import
 {
-  _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, TemplateField,
+  _TemplateField, FieldTree, FieldTreeNode, TemplateField
 } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-import { TemplateFieldProxy, TemplateFieldProxyProps } from './TemplateFieldProxy';
+import { TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
+
 /*
  *  This class defines a base class with useful functions that are used by components
  *  that handle UI for template editor fields.
  */
 
-export interface TemplateEditorFieldProps extends TemplateFieldProxyProps
+export interface TemplateEditorFieldProps
 {
+  keyPath: KeyPath; // keyPath from the root field to this field
+  field: TemplateField;
+
   canEdit: boolean;
   noInteract: boolean;
   preview: any;
   displayKeyPath: KeyPath; // not the key path in the store, but the key path in virtual DOM
+
+  templateEditor?: TemplateEditorState; // from container
+  act?: typeof TemplateEditorActions; // from container
 }
 
-export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TemplateFieldProxy<Props>
+export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
 {
   constructor(props)
   {
     super(props);
+  }
+
+  protected _setField(field: TemplateField)
+  {
+    const { act, keyPath } = this.props;
+    act({
+      actionType: 'setRoot',
+      rootField: FieldTree.setField(this._rootField(), keyPath, field)
+    });
+  }
+
+  protected _proxy(): FieldTreeNode
+  {
+    const tree = new FieldTree(this._rootField(), this.onRootMutation.bind(this));
+    return new FieldTreeNode(tree, this.props.keyPath);
   }
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps
@@ -106,5 +127,24 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _noopIfDisabled<F>(fn: F): F | undefined
   {
     return this._inputDisabled() ? undefined : fn;
+  }
+
+  protected _isExport(): boolean
+  {
+    return this.props.templateEditor.template !== undefined &&
+      this.props.templateEditor.template.type === TEMPLATE_TYPES.EXPORT;
+  }
+
+  protected _rootField()
+  {
+    return this.props.templateEditor.getIn(['template', 'rootField']);
+  }
+
+  private onRootMutation(field: TemplateField)
+  {
+    this.props.act({
+      actionType: 'setRoot',
+      rootField: field,
+    });
   }
 }

@@ -145,7 +145,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
       return;
     }
     value = value.toString();
-    this._set('name', value);
+    this._proxy().set('name', value);
 
     const engine = this.props.templateEditor.template.transformationEngine;
     let outputPath = engine.getOutputKeyPath(field.fieldId);
@@ -155,7 +155,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 
   public handleIncludeCheckboxClicked()
   {
-    this._set('isIncluded', !this.props.field.isIncluded);
+    this._proxy().set('isIncluded', !this.props.field.isIncluded);
   }
 
 }

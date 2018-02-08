@@ -102,7 +102,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
 
   public setLangSettings<K extends keyof ElasticFieldSettings>(key: K, value: ElasticFieldSettings[K])
   {
-    this._set('langSettings', this.props.field.langSettings.set(key, value));
+    this._proxy().set('langSettings', this.props.field.langSettings.set(key, value));
   }
 
   public renderAnalyzerSection()
@@ -206,7 +206,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
     { // if user changes type from nested to something else and there are children, then show a warning
       const deferredAction = () =>
       {
-        this._clearChildren();
+        this._proxy().clearChildren();
         this.setLangSettings('type', elasticTypeOptions.get(index));
       };
       act({
@@ -245,7 +245,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
         {
           const deferredAction = () =>
           {
-            this._clearChildren();
+            this._proxy().clearChildren();
             this.setLangSettings('arrayType', newArray);
           };
           act({
