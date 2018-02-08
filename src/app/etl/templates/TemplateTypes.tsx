@@ -70,6 +70,7 @@ class TemplateEditorStateC
   public isDirty: boolean = true;
   public modalRequests: List<ModalProps> = List([]);
   public documents: List<object> = List([]);
+  public transformedDocuments: List<object> = List([]);
   public previewIndex: number = -1;
   public settingsKeyPath: KeyPath = null;
   public settingsDisplayKeyPath: KeyPath = null;

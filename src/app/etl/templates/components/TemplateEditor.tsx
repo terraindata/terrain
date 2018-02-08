@@ -97,9 +97,13 @@ class ETLExportDisplay extends TerrainComponent<Props>
       rootField,
     });
 
+    // this.props.act({
+    //   actionType: 'loadTemplate',
+    //   template: testSerialization(template),
+    // });
     this.props.act({
       actionType: 'loadTemplate',
-      template: testSerialization(template),
+      template,
     });
 
     this.props.act({
@@ -130,6 +134,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
   {
     const { template, documents, previewIndex } = this.props.templateEditor;
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
+    const transformedPreviewDocument = template.transformationEngine.transform(previewDocument);
 
     if (!showEditor)
     {
@@ -159,7 +164,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
                 field={template.rootField}
                 canEdit={true}
                 noInteract={false}
-                preview={previewDocument}
+                preview={transformedPreviewDocument}
                 displayKeyPath={emptyList}
               />
             </div>

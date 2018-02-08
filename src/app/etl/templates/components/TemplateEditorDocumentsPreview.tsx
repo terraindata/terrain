@@ -87,6 +87,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
       borderColor(Colors().inactiveHover, Colors().inactiveHover) :
       borderColor('rgba(0,0,0,0)', Colors().activeHover);
     const previewDocument = index < documents.size && documents.size > 0 ? documents.get(index) : null;
+    const transformedPreviewDocument = template.transformationEngine.transform(previewDocument);
     const bgColor = Colors().bg3;
     return (
       <div
@@ -101,7 +102,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
             field={template.rootField}
             canEdit={false}
             noInteract={true}
-            preview={previewDocument}
+            preview={transformedPreviewDocument}
             displayKeyPath={emptyList}
           />
         </div>
