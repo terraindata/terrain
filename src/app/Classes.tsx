@@ -114,7 +114,7 @@ export function New<T>(
   const class_name = instance.__proto__.constructor.name;
   if (!AllRecordMap[class_name])
   {
-    TerrainLog.info('New Record ' + class_name);
+    TerrainLog.debug('New Record ' + String(class_name));
     AllRecordMap[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
     AllRecordNameArray.push(class_name);
     AllRecordArray.push(AllRecordMap[class_name]);

@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import {BuilderStore} from 'builder/data/BuilderStore';
-import BuilderStoreLogger from 'builder/data/BuilderStoreLogger';
+import { BuilderStore } from 'builder/data/BuilderStore';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { LogLevelDesc } from 'loglevel';
 import TerrainStore from 'store/TerrainStore';
+import TerrainStoreLogger from 'store/TerrainStoreLogger';
 
 // Log levels
 const LEVEL_TRACE = 'trace';
@@ -75,8 +75,8 @@ class TerrainTools
 {
   public static ANALYTICS = 'analytics';
 
-  public static builderStoreLogger = BuilderStoreLogger;
-  public static builderStore = BuilderStore;
+  public static terrainStoreLogger = TerrainStoreLogger;
+  public static terrainStore = TerrainStore;
 
   public static welcome()
   {

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
+
 import * as ip from 'ip';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
@@ -116,7 +118,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
   it('login', async () =>
   {
     page = await browser.newPage();
-    winston.info('Created a new page.')
+    winston.info('Created a new page.');
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
     await loginToBuilder(page, url);

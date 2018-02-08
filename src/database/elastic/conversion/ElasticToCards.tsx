@@ -61,7 +61,7 @@ import Blocks from '../blocks/ElasticBlocks';
 import ESBaseClause from '../../../../shared/database/elastic/parser/clauses/ESBaseClause';
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
-import {ESJSONParser} from '../../../../shared/database/elastic/parser/ESJSONParser';
+import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import { FilterUtils } from '../blocks/ElasticFilterCard';
 import ESCardParser from './ESCardParser';

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
+
 import * as commandLineArgs from 'command-line-args';
 import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';
@@ -58,7 +60,7 @@ const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-are
 
 const optionDefinitions = [
   { name: 'record', alias: 'r', type: Boolean },
-  { name: 'reply', alias: 'p', type: Boolean },
+  { name: 'replay', alias: 'p', type: Boolean },
   { name: 'help', alias: 'h' },
   { name: 'directory', alias: 'd', type: String },
   { name: 'url', alias: 'u', type: String },
@@ -110,8 +112,6 @@ async function loginToBuilder(page, url)
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('secret');
   await page.click(BUTTON_SELECTOR);
-  // await page.waitForSelector(CARDSTARTER_SELECTOR);
-  // await page.click(CARDSTARTER_SELECTOR);
 }
 
 async function recordBuilderActions(browser, url)
@@ -122,8 +122,8 @@ async function recordBuilderActions(browser, url)
   sleep.sleep(1);
   const records = await page.evaluate(() =>
   {
-    const recordList = window['TerrainTools'].builderStoreLogger.serializeAllRecordName();
-    window['TerrainTools'].builderStoreLogger.serializeAction = true;
+    const recordList = window['TerrainTools'].terrainStoreLogger.serializeAllRecordName();
+    window['TerrainTools'].terrainStoreLogger.serializeAction = true;
     return recordList;
   });
   while (true)
@@ -132,11 +132,11 @@ async function recordBuilderActions(browser, url)
     {
       await page.evaluate(() =>
       {
-        window['TerrainTools'].builderStoreLogger.serializeAction = false;
+        window['TerrainTools'].terrainStoreLogger.serializeAction = false;
       });
       const actions = await page.evaluate(() =>
       {
-        return window['TerrainTools'].builderStoreLogger.actionSerializationLog;
+        return window['TerrainTools'].terrainStoreLogger.actionSerializationLog;
       });
       await page.close();
       const timestamp = Date();
@@ -153,13 +153,8 @@ async function replayBuilderActions(browser, url, actions)
   const page = await browser.newPage();
   await page.setViewport({ width: 1600, height: 1200 });
   await page.goto(url);
-  //await loginToBuilder(page, url);
+  await loginToBuilder(page, url);
   sleep.sleep(3);
-
-  await page.waitForSelector(CARDSTARTER_SELECTOR);
-  await page.click(CARDSTARTER_SELECTOR);
-  sleep.sleep(1);
-  await page.screenshot({ path: 'screenshots/starter.png' });
   // replay the log
   for (let i = 0; i < actions.length; i = i + 1)
   {
@@ -170,9 +165,9 @@ async function replayBuilderActions(browser, url, actions)
       console.log('Ignoring hoverCard action');
       continue;
     }
-    await page.evaluate((action) =>
+    await page.evaluate((act) =>
     {
-      return window['TerrainTools'].builderStoreLogger.replayAction(window['TerrainTools'].builderStore, action);
+      return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);
     }, action);
     sleep.sleep(1);
   }
@@ -228,26 +223,20 @@ async function rr()
     {
       console.trace(e);
     }
+    while (true)
+    {
+      if (readlineSync.keyInYN('Do you want to stop the browser?'))
+      {
+        break;
+      } else
+      {
+        continue;
+      }
+    }
   }
 
   console.log('Closing thebrowser');
-  browser.close();
-  //await page.waitForNavigation({waitUntil: 'networkidle0'});
-  //await page.screenshot({path: 'page.png', fullPage: true});
-
-  // page.waitForSelector(PASSWORD_SELECTOR).then(() => page.click(PASSWORD_SELECTOR));
-  //page.waitForSelector(CARDSTARTER_SELECTOR).then(() => page.click(CARDSTARTER_SELECTOR));
-
-  //  await page.click(BUTTON_SELECTOR);
-  //sleep.sleep(1);
-  //  await page.click(CARDSTARTER_SELECTOR);
-  //  const result = await page.evaluate(() => {
-  //    return TerrainToo;
-  //  });
-  //  console.log(JSON.stringify(result));
-  //  sleep.sleep(5);
-  //await page.screenshot({path: 'screenshots/page.png'});
-
+  await browser.close();
 }
 
-rr();
+rr().catch((err) => console.log('Error when executing rr: ' + err ));
