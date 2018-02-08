@@ -191,9 +191,6 @@ export class Export
         writer.write('[');
       }
 
-      let errMsg: string = '';
-      let isFirstJSONObj: boolean = true;
-
       const originalMapping: object = {};
       // generate original mapping if there were any renames
       const allNames = Object.keys(exprt.columnTypes);
@@ -222,15 +219,13 @@ export class Export
       if (qryResponse === undefined || qryResponse.hasError())
       {
         writer.end();
-        errMsg = 'Nothing to export.';
-        return reject(errMsg);
+        return reject('Nothing to export.');
       }
       const resp = qryResponse.result;
       if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
       {
         writer.end();
-        errMsg = 'Nothing to export.';
-        return reject(errMsg);
+        return reject('Nothing to export.');
       }
 
       const newDocs: object[] = resp.hits.hits as object[];
@@ -239,22 +234,15 @@ export class Export
         writer.end();
         return resolve(writer);
       }
-      let returnDocs: object[] = [];
 
-      const fieldArrayDepths: object = {};
-      const extractTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
+      const extractTransformations = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
       exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
 
       const mergedDocs: object[] = [];
       for (const doc of newDocs)
       {
         // merge groupJoins with _source if necessary
-        const mergedDoc: object | string = await this._mergeGroupJoin(doc);
-        if (typeof mergedDoc === 'string')
-        {
-          return reject(mergedDoc as string);
-        }
-
+        const mergedDoc = this._mergeGroupJoin(doc);
         // extract field after doing all merge joins
         extractTransformations.forEach((transform) =>
         {
@@ -270,6 +258,8 @@ export class Export
         mergedDocs.push(mergedDoc);
       }
 
+      let returnDocs: object[] = [];
+      const fieldArrayDepths: object = {};
       for (const doc of mergedDocs)
       {
         // verify schema mapping with documents and fix documents accordingly
@@ -277,8 +267,7 @@ export class Export
         if (typeof newDoc === 'string')
         {
           writer.end();
-          errMsg = newDoc;
-          return reject(errMsg);
+          return reject(newDoc);
         }
         for (const field of Object.keys(newDoc))
         {
@@ -301,7 +290,7 @@ export class Export
       {
         if (fieldArrayDepths[field].size > 1)
         {
-          errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
+          const errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
           return reject(errMsg);
         }
       }
@@ -317,21 +306,20 @@ export class Export
           {
             if (doc['TERRAINRANK'] !== undefined)
             {
-              errMsg = 'Conflicting field: TERRAINRANK.';
-              return reject(errMsg);
+              return reject('Conflicting field: TERRAINRANK.');
             }
             doc['TERRAINRANK'] = rankCounter;
           }
           rankCounter++;
         }
-      } catch (e)
+      }
+      catch (e)
       {
         writer.end();
-        errMsg = e;
-        return reject(errMsg);
+        return reject(e);
       }
 
-      // export to csv
+      let isFirstJSONObj: boolean = true;
       for (const returnDoc of returnDocs)
       {
         if (exprt.filetype === 'csv')
@@ -470,12 +458,7 @@ export class Export
     {
       for (const doc of docs)
       {
-        const mergeDoc: object | string = await this._mergeGroupJoin(doc);
-        if (typeof mergeDoc === 'string')
-        {
-          winston.warn(mergeDoc as string);
-          break;
-        }
+        const mergeDoc = this._mergeGroupJoin(doc);
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
@@ -1045,38 +1028,34 @@ export class Export
     return true;
   }
 
-  private async _mergeGroupJoin(doc: object): Promise<object | string>
+  private _mergeGroupJoin(doc: object): object
   {
-    return new Promise<object | string>(async (resolve, reject) =>
+    if (doc['_source'] !== undefined)
     {
-      if (doc['_source'] !== undefined)
+      const sourceKeys = Object.keys(doc['_source']);
+      const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
+      if (rootKeys.length > 0) // there were group join objects
       {
-        const sourceKeys: string[] = Object.keys(doc['_source']);
-        let rootKeys: string[] = Object.keys(doc);
-        rootKeys = _.without(rootKeys, '_index', '_type', '_id', '_score', '_source');
-        if (rootKeys.length > 0) // there were group join objects
+        const duplicateRootKeys: string[] = [];
+        rootKeys.forEach((rootKey) =>
         {
-          const duplicateRootKeys: string[] = [];
-          rootKeys.forEach((rootKey) =>
+          if (sourceKeys.indexOf(rootKey) > -1)
           {
-            if (sourceKeys.indexOf(rootKey) > -1)
-            {
-              duplicateRootKeys.push(rootKey);
-            }
-          });
-          if (duplicateRootKeys.length !== 0)
-          {
-            return resolve('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+            duplicateRootKeys.push(rootKey);
           }
-          rootKeys.forEach((rootKey) =>
-          {
-            doc['_source'][rootKey] = doc[rootKey];
-            delete doc[rootKey];
-          });
+        });
+        if (duplicateRootKeys.length !== 0)
+        {
+          throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
         }
+        rootKeys.forEach((rootKey) =>
+        {
+          doc['_source'][rootKey] = doc[rootKey];
+          delete doc[rootKey];
+        });
       }
-      return resolve(doc);
-    });
+    }
+    return doc;
   }
 
   // recursively attempts to parse strings to dates
