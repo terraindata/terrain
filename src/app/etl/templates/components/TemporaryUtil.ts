@@ -47,7 +47,7 @@ THE SOFTWARE.
 import
 {
   _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, TemplateField,
+  ElasticFieldSettings, FieldTree, FieldTreeNode, TemplateField,
 } from 'etl/templates/FieldTypes';
 import
 {
@@ -73,12 +73,64 @@ export function enginePathToFieldPath(path: KeyPath)
   const emptyList = List([]);
 }
 
-export function createTreeFromEngine(engine: TransformationEngine): TemplateField
+export function createTreeFromEngine(engine: TransformationEngine, language = 'elastic'): TemplateField
 {
   const ids = engine.getAllFieldIDs();
-  const rootField = _TemplateField();
+  const tree = new FieldTree();
 
-  return _TemplateField({});
+  // const keyPaths = ids.map((v, i) => engine.getOtputKeyPath(v))
+  //   .sort((a, b) => a.size() - b.size());
+  // sort the paths to ensure we visit parents before children
+  const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size)
+  // there are engine paths and tree paths.
+  // engine paths look like ['foo', 'bar'] or ['cat', '*', 'dog']
+  // tree paths look like ['children', 1, 'children', 2]
+  // const engineKeyPathToId = {};
+
+  // const idToTreePath = {};
+
+  const enginePathToNode: {[kp: string]: FieldTreeNode} = {};
+  enginePathToNode[JSON.stringify([])] = tree.createRootNode();
+
+  function requiredChildKeyPaths(existingKeyPaths: List<KeyPath>)
+  {
+    const pathsToAdd = new Set();
+    const existingPaths = new Set(existingKeyPaths.map((value, index) => JSON.stringify(value)).toJS());
+    existingKeyPaths.forEach((value, index) => {
+      const path = value.toJS(); // path is ['foo', 'bar', 'baz']
+      for (let i = 0; i < path.length; i++)
+      {
+
+      }
+    });
+  }
+
+  sortedIds.forEach((id, index) => {
+    const enginePath = engine.getOutputKeyPath(id).toJS();
+    const parentPath = enginePath.slice(0, -1); // TODO update this when arrays become a thing
+    const parentNode: FieldTreeNode = enginePathToNode[JSON.stringify(parentPath)];
+
+    if (parentNode === undefined)
+    {
+      console.log(sortedIds.map((v, i) => engine.getOutputKeyPath(v)).toJS());
+    }
+
+    const newField = _TemplateField({
+      isIncluded: engine.getFieldEnabled(id),
+      langSettings: _ElasticFieldSettings({
+        langType: language,
+        type: jsToElastic(engine.getFieldType(id))
+      }),
+      fieldId: id,
+      name: enginePath[enginePath.length - 1]
+    });
+
+    parentNode.set('langSettings', parentNode.get('langSettings').set('type', ELASTIC_TYPES.NESTED));
+    const newNode = parentNode.makeChild(newField);
+    enginePathToNode[JSON.stringify(enginePath)] = newNode;
+  });
+
+  return tree.getRoot();
 }
 
 export function testSerialization(template: ETLTemplate): ETLTemplate

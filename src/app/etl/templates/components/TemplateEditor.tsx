@@ -88,8 +88,8 @@ class ETLExportDisplay extends TerrainComponent<Props>
     }
     const firstDoc = documents[0];
     const engine = new TransformationEngine(firstDoc);
-    // const rootField = createTreeFromEngine(engine);
-    const rootField = treeFromDocument(firstDoc);
+    const rootField = createTreeFromEngine(engine);
+    // const rootField = treeFromDocument(firstDoc);
 
     const template = _ExportTemplate({
       templateId: -1,

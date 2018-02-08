@@ -108,7 +108,7 @@ export class FieldTree
     return rootField.deleteIn(sourcePath);
   }
 
-  constructor(private root: TemplateField)
+  constructor(private root: TemplateField = _TemplateField())
   {
 
   }
@@ -128,8 +128,48 @@ export class FieldTree
     this.root = FieldTree.deleteField(this.root, sourcePath);
   }
 
-  public getRoot()
+  public getRoot(): TemplateField
   {
     return this.root;
+  }
+
+  public getField(path: KeyPath): TemplateField
+  {
+    return this.root.getIn(path);
+  }
+
+  public createRootNode(): FieldTreeNode
+  {
+    return new FieldTreeNode(this, List([]));
+  }
+}
+
+export class FieldTreeNode
+{
+  constructor(private tree: FieldTree, private path: KeyPath)
+  {
+
+  }
+
+  public me(): TemplateField
+  {
+    return this.tree.getField(this.path);
+  }
+
+  public makeChild(field: TemplateField): FieldTreeNode
+  {
+    this.tree.createField(this.path, field);
+    const childKeyPath = this.path.push(this.me().children.size - 1);
+    return new FieldTreeNode(this.tree, childKeyPath);
+  }
+
+  public set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
+  {
+    this.tree.updateField(this.path, key, value);
+  }
+
+  public get<K extends keyof TemplateField>(key: K): TemplateField[K]
+  {
+    return this.me().get(key);
   }
 }

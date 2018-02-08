@@ -64,11 +64,12 @@ export enum ELASTIC_TYPES
 }
 
 export const JS_TO_ES = {
+  array: ELASTIC_TYPES.ARRAY,
+  object: ELASTIC_TYPES.NESTED,
   string: ELASTIC_TYPES.TEXT,
   number: ELASTIC_TYPES.DOUBLE,
   boolean: ELASTIC_TYPES.BOOLEAN,
   null: ELASTIC_TYPES.TEXT,
-  object: ELASTIC_TYPES.TEXT,
   undefined: ELASTIC_TYPES.TEXT,
 };
 

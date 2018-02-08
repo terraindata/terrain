@@ -360,6 +360,7 @@ export class TransformationEngine
         }
       } else
       {
+        ids = ids.push(this.addField(currentKeyPath, 'object'));
         ids = ids.concat(this.generateInitialFieldMaps(obj[key], currentKeyPath.push(key))).toList();
       }
     }
