@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as ip from 'ip';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
-import * as syncRequest from 'sync-request';
+import * as request from 'then-request';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
@@ -86,11 +86,11 @@ async function loginToBuilder(page, url)
   winston.info('Compared the starting page.');
 }
 
-function getChromeDebugAddress()
+async function getChromeDebugAddress()
 {
   try
   {
-    const res = syncRequest('GET', 'http://localhost:9222/json');
+    const res = await request('GET', 'http://localhost:9222/json');
     const resBody = JSON.parse(res.getBody());
     const wsAddress = resBody[resBody.length - 1]['webSocketDebuggerUrl'];
     return wsAddress;
@@ -108,7 +108,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
 
   beforeAll(async () =>
   {
-    const wsAddress = getChromeDebugAddress();
+    const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     winston.info('Connected to the Chrome ' + wsAddress);
     // browser = await puppeteer.launch({headless: false});

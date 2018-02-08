@@ -185,7 +185,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "request": "^2.83.0",
-    "sync-request": "^4.1.0",
+    "then-request": "^5.0.0",
     "secure-random-string": "^1.1.0",
     "sha1": "^1.1.1",
     "sqlite3": "^3.1.13",

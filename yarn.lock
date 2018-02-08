@@ -45,6 +45,12 @@
   dependencies:
     commander "*"
 
+"@types/concat-stream@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@types/concat-stream/-/concat-stream-1.6.0.tgz#394dbe0bb5fee46b38d896735e8b68ef2390d00d"
+  dependencies:
+    "@types/node" "*"
+
 "@types/connect@*":
   version "3.4.31"
   resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.31.tgz#1f92d6b117ecc05076c49ecd024f7976e528bad9"
@@ -264,6 +270,12 @@
   dependencies:
     "@types/node" "*"
 
+"@types/form-data@0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@types/form-data/-/form-data-0.0.33.tgz#c9ac85b2a5fd18435b8c85d9ecb50e6d6c893ff8"
+  dependencies:
+    "@types/node" "*"
+
 "@types/geojson@*":
   version "7946.0.0"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.0.tgz#e8bc74e8183d966455f82023f0c72e1072a952d0"
@@ -381,9 +393,21 @@
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.3.0.tgz#3a129cda7c4e5df2409702626892cb4b96546dd5"
 
+"@types/node@^7.0.31":
+  version "7.0.53"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.53.tgz#3465ada7e6f0f762f761779fcb4f041e795755cd"
+
+"@types/node@^8.0.0":
+  version "8.9.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.9.0.tgz#99449266e9f023cc3ad5de304d759de787d18ea4"
+
 "@types/node@^8.5.5":
   version "8.5.8"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.8.tgz#92509422653f10e9c0ac18d87e0610b39f9821c7"
+
+"@types/node@^9.3.0":
+  version "9.4.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.2.tgz#b109a6c4f64147ccf9476d9e1a6fbf69a10faeb8"
 
 "@types/passport-local@^1.0.30":
   version "1.0.32"
@@ -426,6 +450,10 @@
   dependencies:
     "@types/events" "*"
     "@types/node" "*"
+
+"@types/qs@^6.2.31":
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.5.1.tgz#a38f69c62528d56ba7bd1f91335a8004988d72f7"
 
 "@types/react-day-picker@^5.3.0":
   version "5.3.0"
@@ -1995,10 +2023,6 @@ capture-stack-trace@^1.0.0:
   version "1.0.0"
   resolved "http://registry.npmjs.org/capture-stack-trace/-/capture-stack-trace-1.0.0.tgz#4a6fa07399c26bba47f0b2496b4d0fb408c5550d"
 
-caseless@~0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.11.0.tgz#715b96ea9841593cc33067923f5ec60ebda4f7d7"
-
 caseless@~0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
@@ -2253,10 +2277,6 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.5.tgz#938370a57b4a51dea2c77c15d5c5fdf895164009"
   dependencies:
     delayed-stream "~1.0.0"
-
-command-exists@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/command-exists/-/command-exists-1.2.2.tgz#12819c64faf95446ec0ae07fe6cafb6eb3708b22"
 
 command-line-args@^4.0.7:
   version "4.0.7"
@@ -3708,7 +3728,7 @@ fork-ts-checker-webpack-plugin@^0.2.10:
     lodash.startswith "^4.2.1"
     minimatch "^3.0.4"
 
-form-data@^2.3.1, form-data@~2.3.1:
+form-data@^2.2.0, form-data@^2.3.1, form-data@~2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.3.1.tgz#6fb94fbd71885306d73d15cc497fe4cc4ecd44bf"
   dependencies:
@@ -3826,10 +3846,6 @@ generate-object-property@^1.0.0:
 get-caller-file@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-1.0.2.tgz#f702e63127e7e231c160a80c1554acb70d5047e5"
-
-get-port@^3.1.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/get-port/-/get-port-3.2.0.tgz#dd7ce7de187c06c8bf353796ac71e099f0980ebc"
 
 get-stdin@^4.0.1:
   version "4.0.1"
@@ -4265,13 +4281,16 @@ http-assert@^1.1.0:
     deep-equal "~1.0.1"
     http-errors "~1.6.1"
 
-http-basic@^2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/http-basic/-/http-basic-2.5.1.tgz#8ce447bdb5b6c577f8a63e3fa78056ec4bb4dbfb"
+http-basic@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/http-basic/-/http-basic-6.0.0.tgz#1d63df8f891e1e25e0c2c84d7a2d94702d6ae229"
   dependencies:
-    caseless "~0.11.0"
+    "@types/concat-stream" "^1.6.0"
+    "@types/node" "^7.0.31"
+    caseless "~0.12.0"
     concat-stream "^1.4.6"
-    http-response-object "^1.0.0"
+    http-response-object "^3.0.1"
+    parse-cache-control "^1.0.1"
 
 http-deceiver@^1.2.7:
   version "1.2.7"
@@ -4314,9 +4333,11 @@ http-proxy@^1.16.2:
     eventemitter3 "1.x.x"
     requires-port "1.x.x"
 
-http-response-object@^1.0.0, http-response-object@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/http-response-object/-/http-response-object-1.1.0.tgz#a7c4e75aae82f3bb4904e4f43f615673b4d518c3"
+http-response-object@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/http-response-object/-/http-response-object-3.0.1.tgz#90174d44c27b5e797cf6efe51a043bc889ae64bf"
+  dependencies:
+    "@types/node" "^9.3.0"
 
 http-signature@~1.1.0:
   version "1.1.1"
@@ -6477,6 +6498,10 @@ parse-asn1@^5.0.0:
     evp_bytestokey "^1.0.0"
     pbkdf2 "^3.0.3"
 
+parse-cache-control@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/parse-cache-control/-/parse-cache-control-1.0.1.tgz#8eeab3e54fa56920fe16ba38f77fa21aacc2d74e"
+
 parse-glob@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/parse-glob/-/parse-glob-3.0.4.tgz#b2c376cfb11f35513badd173ef0bb6e3a388391c"
@@ -7035,6 +7060,12 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
+promise@^8.0.0:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/promise/-/promise-8.0.1.tgz#e45d68b00a17647b6da711bf85ed6ed47208f450"
+  dependencies:
+    asap "~2.0.3"
+
 prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0:
   version "15.6.0"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
@@ -7117,7 +7148,7 @@ q@^1.1.2:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
 
-qs@6.5.1, qs@^6.1.0, qs@^6.4.0, qs@^6.5.1, qs@~6.5.1:
+qs@6.5.1, qs@^6.4.0, qs@^6.5.1, qs@~6.5.1:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.1.tgz#349cdf6eef89ec45c12d7d5eb3fc0c870343a6d8"
 
@@ -8539,16 +8570,6 @@ symbol-tree@^3.2.1:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.2.tgz#ae27db38f660a7ae2e1c3b7d1bc290819b8519e6"
 
-sync-request@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/sync-request/-/sync-request-4.1.0.tgz#324b4e506fb994d2afd2a0021a455f800725f07a"
-  dependencies:
-    command-exists "^1.2.2"
-    concat-stream "^1.6.0"
-    get-port "^3.1.0"
-    http-response-object "^1.1.0"
-    then-request "^2.2.0"
-
 table-layout@^0.4.2:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/table-layout/-/table-layout-0.4.2.tgz#10e9043c142a1e2d155da7257e478f0ef4981786"
@@ -8625,16 +8646,21 @@ test-value@^2.1.0:
     array-back "^1.0.3"
     typical "^2.6.0"
 
-then-request@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/then-request/-/then-request-2.2.0.tgz#6678b32fa0ca218fe569981bbd8871b594060d81"
+then-request@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/then-request/-/then-request-5.0.0.tgz#7a23f616799597621de8cfebc77c61fd28c00d64"
   dependencies:
-    caseless "~0.11.0"
-    concat-stream "^1.4.7"
-    http-basic "^2.5.1"
-    http-response-object "^1.1.0"
-    promise "^7.1.1"
-    qs "^6.1.0"
+    "@types/concat-stream" "^1.6.0"
+    "@types/form-data" "0.0.33"
+    "@types/node" "^8.0.0"
+    "@types/qs" "^6.2.31"
+    caseless "~0.12.0"
+    concat-stream "^1.6.0"
+    form-data "^2.2.0"
+    http-basic "^6.0.0"
+    http-response-object "^3.0.1"
+    promise "^8.0.0"
+    qs "^6.4.0"
 
 thenify-all@^1.0.0:
   version "1.6.0"
