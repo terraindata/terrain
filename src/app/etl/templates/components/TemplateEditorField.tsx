@@ -57,7 +57,7 @@ const { List, Map } = Immutable;
 
 import
 {
-  _TemplateField, FieldTree, FieldTreeNode, TemplateField
+  _TemplateField, FieldNodeProxy, FieldTreeProxy, TemplateField,
 } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
@@ -85,24 +85,18 @@ export interface TemplateEditorFieldProps
 
 export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
 {
+  private onRootMutationBound: (f: TemplateField) => void;
+
   constructor(props)
   {
     super(props);
+    this.onRootMutationBound = this.onRootMutation.bind(this);
   }
 
-  protected _setField(field: TemplateField)
+  protected _proxy(): FieldNodeProxy
   {
-    const { act, keyPath } = this.props;
-    act({
-      actionType: 'setRoot',
-      rootField: FieldTree.setField(this._rootField(), keyPath, field)
-    });
-  }
-
-  protected _proxy(): FieldTreeNode
-  {
-    const tree = new FieldTree(this._rootField(), this.onRootMutation.bind(this));
-    return new FieldTreeNode(tree, this.props.keyPath);
+    const tree = new FieldTreeProxy(this._rootField(), this.onRootMutationBound);
+    return new FieldNodeProxy(tree, this.props.keyPath);
   }
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps

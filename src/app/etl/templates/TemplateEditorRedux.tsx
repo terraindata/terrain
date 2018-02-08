@@ -50,7 +50,7 @@ import * as _ from 'lodash';
 import
 {
   _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, FieldTree, TemplateField,
+  ElasticFieldSettings, TemplateField,
 } from 'etl/templates/FieldTypes';
 import
 {

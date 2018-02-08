@@ -47,7 +47,7 @@ THE SOFTWARE.
 import
 {
   _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, FieldTree, FieldTreeNode, TemplateField,
+  ElasticFieldSettings, FieldNodeProxy, FieldTreeProxy, TemplateField,
 } from 'etl/templates/FieldTypes';
 import
 {
@@ -61,16 +61,10 @@ import * as Immutable from 'immutable';
 import { ELASTIC_TYPES, JS_TO_ES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 const { List } = Immutable;
 
-// temporary stuff
 function jsToElastic(type): ELASTIC_TYPES
 {
   const eType = JS_TO_ES[type];
   return eType !== undefined ? eType : ELASTIC_TYPES.TEXT;
-}
-
-export function enginePathToFieldPath(path: KeyPath)
-{
-  const emptyList = List([]);
 }
 
 export function createTreeFromEngine(engine: TransformationEngine, language = 'elastic'): TemplateField
@@ -87,11 +81,11 @@ export function createTreeFromEngine(engine: TransformationEngine, language = 'e
     }),
     fieldId: rootId,
   });
-  const tree = new FieldTree(rootField);
-  const rootNode = tree.rootNode();
+  const tree = new FieldTreeProxy(rootField);
+  const rootNode = tree.getRootNode();
 
   const enginePathToNode: {
-    [kp: string]: FieldTreeNode,
+    [kp: string]: FieldNodeProxy,
   } = {
       [JSON.stringify([])]: rootNode,
     };
@@ -104,7 +98,7 @@ export function createTreeFromEngine(engine: TransformationEngine, language = 'e
       return;
     }
     const parentPath = enginePath.slice(0, -1); // TODO update this when arrays become a thing
-    const parentNode: FieldTreeNode = enginePathToNode[JSON.stringify(parentPath)];
+    const parentNode: FieldNodeProxy = enginePathToNode[JSON.stringify(parentPath)];
 
     const newField = _TemplateField({
       isIncluded: engine.getFieldEnabled(id),
@@ -121,7 +115,7 @@ export function createTreeFromEngine(engine: TransformationEngine, language = 'e
     enginePathToNode[JSON.stringify(enginePath)] = newNode;
   });
 
-  return tree.getRoot();
+  return tree.getRootField();
 }
 
 export function testSerialization(template: ETLTemplate): ETLTemplate

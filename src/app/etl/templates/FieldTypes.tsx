@@ -87,33 +87,8 @@ export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
 const doNothing = () => null;
 // has methods that abstract how the tree is mutated
 // can also be constructed to create a 'tree' that emulates a store
-export class FieldTree
+export class FieldTreeProxy
 {
-  public static createField(rootField: TemplateField, sourcePath: KeyPath,
-    field: TemplateField): TemplateField
-  {
-    const creatingField = rootField.getIn(sourcePath);
-    const nextIndex = creatingField.children.size;
-    return rootField.setIn(sourcePath.push('children', nextIndex), field);
-  }
-
-  public static setField(rootField: TemplateField, pathToField: KeyPath, field: TemplateField): TemplateField
-  {
-    return rootField.setIn(pathToField, field);
-  }
-
-  public static updateField(rootField: TemplateField, pathToField: KeyPath,
-    key: string | number, value: any): TemplateField
-  {
-    const keyPath = pathToField.push(key);
-    return rootField.setIn(keyPath, value);
-  }
-
-  public static deleteField(rootField: TemplateField, pathToField: KeyPath): TemplateField
-  {
-    return rootField.deleteIn(pathToField);
-  }
-
   private onMutate: (root: TemplateField) => void = doNothing;
 
   constructor(private root: TemplateField, onMutate?: (f: TemplateField) => void)
@@ -124,25 +99,30 @@ export class FieldTree
     }
   }
 
-  public createField(pathToField: KeyPath, field: TemplateField)
+  public createField(pathToField: KeyPath, field: TemplateField): FieldNodeProxy
   {
-    this.root = FieldTree.createField(this.root, pathToField, field);
+    const creatingField = this.root.getIn(pathToField);
+    const nextIndex = creatingField.children.size;
+    const pathToChildField = pathToField.push('children', nextIndex);
+    this.root = this.root.setIn(pathToChildField, field);
     this.onMutate(this.root);
+    return new FieldNodeProxy(this, pathToChildField);
   }
 
   public updateField(pathToField: KeyPath, key: string | number, value: any)
   {
-    this.root = FieldTree.updateField(this.root, pathToField, key, value);
+    const keyPath = pathToField.push(key);
+    this.root = this.root.setIn(keyPath, value);
     this.onMutate(this.root);
   }
 
   public deleteField(pathToField: KeyPath)
   {
-    this.root = FieldTree.deleteField(this.root, pathToField);
+    this.root = this.root.deleteIn(pathToField);
     this.onMutate(this.root);
   }
 
-  public getRoot(): TemplateField
+  public getRootField(): TemplateField
   {
     return this.root;
   }
@@ -152,37 +132,35 @@ export class FieldTree
     return this.root.getIn(path);
   }
 
-  public rootNode(): FieldTreeNode
+  public getRootNode(): FieldNodeProxy
   {
-    return new FieldTreeNode(this, List([]));
+    return new FieldNodeProxy(this, List([]));
   }
 }
 
-export class FieldTreeNode
+export class FieldNodeProxy
 {
-  constructor(private tree: FieldTree, private path: KeyPath)
+  constructor(private tree: FieldTreeProxy, private path: KeyPath)
   {
 
   }
 
   public exists()
   {
-    return this.tree.getRoot().hasIn(this.path);
+    return this.tree.getRootField().hasIn(this.path);
   }
 
-  public me(): TemplateField
+  public field(): TemplateField
   {
     return this.tree.getField(this.path);
   }
 
-  public makeChild(field: TemplateField): FieldTreeNode
+  public makeChild(field: TemplateField): FieldNodeProxy
   {
-    this.tree.createField(this.path, field);
-    const childKeyPath = this.path.push('children', this.me().children.size - 1);
-    return new FieldTreeNode(this.tree, childKeyPath);
+    return this.tree.createField(this.path, field);
   }
 
-  public set<K extends keyof TemplateField>(key: K, value: TemplateField[K]): FieldTreeNode
+  public set<K extends keyof TemplateField>(key: K, value: TemplateField[K]): FieldNodeProxy
   {
     this.tree.updateField(this.path, key, value);
     return this;
@@ -190,7 +168,7 @@ export class FieldTreeNode
 
   public get<K extends keyof TemplateField>(key: K): TemplateField[K]
   {
-    return this.me().get(key);
+    return this.field().get(key);
   }
 
   public deleteSelf()
