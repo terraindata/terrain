@@ -117,17 +117,11 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
 
   it('login', async () =>
   {
-    try
-    {
       page = await browser.newPage();
       winston.info('Created a new page.');
       await page.setViewport({width: 1600, height: 1200});
       const url = `http://${ip.address()}:3000`;
       await loginToBuilder(page, url);
-    } catch (e)
-    {
-      winston.info('Error: ' + e);
-    }
   }, 60000);
 
   afterAll(async () =>
