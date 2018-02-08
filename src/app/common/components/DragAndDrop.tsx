@@ -72,25 +72,9 @@ const grid = 8;
 
 class DragAndDrop extends TerrainComponent<Props>
 {
-  public state: {
-    items: any;
-  } = {
-      items: this.props.draggableItems,
-    };
-
   public constructor(props)
   {
     super(props);
-  }
-
-  public componentWillReceiveProps(nextProps)
-  {
-    if (nextProps.draggableItems !== this.props.draggableItems)
-    {
-      this.setState({
-        items: nextProps.draggableItems,
-      });
-    }
   }
 
   // Add styling got dragging items
@@ -123,9 +107,6 @@ class DragAndDrop extends TerrainComponent<Props>
       result.destination.index,
     );
 
-    this.setState({
-      items,
-    });
     if (this.props.onDrop !== undefined)
     {
       this.props.onDrop(items);
@@ -178,7 +159,7 @@ class DragAndDrop extends TerrainComponent<Props>
 
   public render()
   {
-    const draggableItems = this.props.draggableItems.map(i => Object.assign({}, i, { key: i.key.toString() }));
+    const draggableItems = this.props.draggableItems.map((i) => Object.assign({}, i, { key: i.key.toString() }));
 
     return (
       <div className={this.props.className}>
