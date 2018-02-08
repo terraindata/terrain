@@ -154,7 +154,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     this.setState({
       chartState,
     });
-    Periscope.create(el, chartState.toJS());
+    Periscope.create(el, chartState.toObject());
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -186,7 +186,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
   public update(overrideState?)
   {
     const el = ReactDOM.findDOMNode(this.refs.chart);
-    Periscope.update(el, this.getChartState(overrideState).toJS());
+    Periscope.update(el, this.getChartState(overrideState).toObject());
   }
 
   public handleDomainChangeStart(initialVal)
