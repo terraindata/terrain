@@ -263,12 +263,7 @@ export class Export
       for (const doc of mergedDocs)
       {
         // verify schema mapping with documents and fix documents accordingly
-        const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
-        if (typeof newDoc === 'string')
-        {
-          writer.end();
-          return reject(newDoc);
-        }
+        const newDoc: object = this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
         for (const field of Object.keys(newDoc))
         {
           if (newDoc[field] !== null && newDoc[field] !== undefined)
@@ -748,28 +743,25 @@ export class Export
     return typeObj['type'];
   }
 
-  private async _checkDocumentAgainstMapping(document: object, mapping: object): Promise<object | string>
+  private _checkDocumentAgainstMapping(document: object, mapping: object): object
   {
-    return new Promise<object | string>(async (resolve, reject) =>
+    const newDocument: object = document;
+    const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
+    for (const field of fieldsInMappingNotInDocument)
     {
-      const newDocument: object = document;
-      const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
-      for (const field of fieldsInMappingNotInDocument)
-      {
-        newDocument[field] = null;
-        // TODO: Case 740
-        // if (fields[field]['type'] === 'text')
-        // {
-        //   newDocument[field] = '';
-        // }
-      }
-      const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
-      for (const field of fieldsInDocumentNotMapping)
-      {
-        delete newDocument[field];
-      }
-      resolve(newDocument);
-    });
+      newDocument[field] = null;
+      // TODO: Case 740
+      // if (fields[field]['type'] === 'text')
+      // {
+      //   newDocument[field] = '';
+      // }
+    }
+    const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
+    for (const field of fieldsInDocumentNotMapping)
+    {
+      delete newDocument[field];
+    }
+    return newDocument;
   }
 
   /* checks whether obj has the fields and types specified by nameToType
