@@ -90,7 +90,7 @@ async function getChromeDebugAddress()
 {
   try
   {
-    const res = await request('GET', 'http://localhost:9222/json');
+    const res = await (request as any)('GET', 'http://localhost:9222/json');
     const resBody = JSON.parse(res.getBody());
     const wsAddress = resBody[resBody.length - 1]['webSocketDebuggerUrl'];
     return wsAddress;
