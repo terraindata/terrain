@@ -65,7 +65,7 @@ expect.extend({ toMatchImageSnapshot } as any);
 async function loginToBuilder(page, url)
 {
   await page.goto(url);
-  sleep.sleep(5);
+  sleep.sleep(10);
   winston.info('Goto the login page ' + url);
   let image = await page.screenshot();
   // login screen
