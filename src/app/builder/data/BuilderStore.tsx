@@ -179,6 +179,6 @@ export const BuilderStore: IStore<BuilderState> = createStore(
     }
     return state;
   }
-  , DefaultState, applyMiddleware(BuilderStoreLogger.reduxMiddleWare));
+  , DefaultState);
 
 export default BuilderStore;
