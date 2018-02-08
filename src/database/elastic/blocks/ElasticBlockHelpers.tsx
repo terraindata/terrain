@@ -47,8 +47,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 
-import { SchemaState } from 'schema/SchemaTypes';
 import { BuilderState } from 'builder/data/BuilderState';
+import { SchemaState } from 'schema/SchemaTypes';
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 

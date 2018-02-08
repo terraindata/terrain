@@ -49,10 +49,10 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import { BuilderState } from 'builder/data/BuilderState';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { SchemaState } from 'schema/SchemaTypes';
-import { BuilderState } from 'builder/data/BuilderState';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';

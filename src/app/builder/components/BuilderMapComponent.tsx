@@ -53,8 +53,8 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import { BuilderState } from '../data/BuilderState';
 import BuilderActions from '../data/BuilderActions';
+import { BuilderState } from '../data/BuilderState';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 

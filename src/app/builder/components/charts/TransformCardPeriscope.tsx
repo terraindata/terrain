@@ -53,9 +53,9 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import { BuilderState } from 'builder/data/BuilderState';
 import Autocomplete from 'common/components/Autocomplete';
 import { SchemaState } from 'schema/SchemaTypes';
-import { BuilderState } from 'builder/data/BuilderState';
 // import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
