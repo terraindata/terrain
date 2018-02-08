@@ -153,13 +153,10 @@ class DragAndDrop extends TerrainComponent<Props>
       return (
         <div
           ref={provided.innerRef}
-          style={this.getItemStyle(
-            provided.draggableStyle,
-            snapshot.isDragging)}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
         >
-          <div
-            {...provided.dragHandleProps}
-          >
+          <div {...provided.dragHandleProps}>
             {item.dragHandle}
           </div>
           {item.content}
@@ -181,6 +178,8 @@ class DragAndDrop extends TerrainComponent<Props>
 
   public render()
   {
+    const draggableItems = this.props.draggableItems.map(i => Object.assign({}, i, { key: i.key.toString() }));
+
     return (
       <div className={this.props.className}>
         <DragDropContext
@@ -192,11 +191,12 @@ class DragAndDrop extends TerrainComponent<Props>
               <div
                 ref={provided.innerRef}
               >
-                {this.props.draggableItems.map((item) => (
+                {draggableItems.map((item, index) => (
                   <Draggable
                     key={item.key}
                     draggableId={item.key}
                     isDragDisabled={!item.draggable}
+                    index={index}
                   >
                     {(provided2, snapshot2) => (
                       <div>
