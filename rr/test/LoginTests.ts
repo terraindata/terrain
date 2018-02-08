@@ -126,9 +126,9 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
       await loginToBuilder(page, url);
     } catch (e)
     {
-      console.log('Error: ' + e);
+      winston.info('Error: ' + e);
     }
-  }, 30000);
+  }, 60000);
 
   afterAll(async () =>
   {
