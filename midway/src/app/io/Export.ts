@@ -52,8 +52,10 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import ESParser from '../../../../shared/database/elastic/parser/ESParser';
 import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
+import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
@@ -62,8 +64,8 @@ import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
-import { ExportTemplates } from './templates/ExportTemplates';
-import { TemplateBase } from './templates/TemplateBase';
+import ExportTemplates from './templates/ExportTemplates';
+import TemplateBase from './templates/TemplateBase';
 
 const exportTemplates = new ExportTemplates();
 
@@ -93,6 +95,7 @@ export class Export
       {
         return reject('Database "' + exprt.dbid.toString() + '" not found.');
       }
+
       if (database.getType() !== 'ElasticController')
       {
         return reject('File export currently is only supported for Elastic databases.');
@@ -127,6 +130,7 @@ export class Export
           exprt[templateKey] = template[templateKey];
         }
       }
+
       if (exprt.columnTypes === undefined)
       {
         return reject('Must provide export template column types.');
@@ -144,7 +148,7 @@ export class Export
       }
       if (exprt.algorithmId !== undefined && exprt.query === undefined)
       {
-        qry = JSON.stringify(await this._getQueryFromAlgorithm(exprt.algorithmId));
+        qry = await this._getQueryFromAlgorithm(exprt.algorithmId);
       }
       else if (exprt.algorithmId === undefined && exprt.query !== undefined)
       {
@@ -164,18 +168,6 @@ export class Export
       {
         return reject(mapping);
       }
-
-      let qryObj: object;
-      try
-      {
-        qryObj = JSON.parse(qry);
-      }
-      catch (e)
-      {
-        return reject(e);
-      }
-
-      qryObj = this._shouldRandomSample(qryObj);
 
       let rankCounter: number = 1;
       let writer: any;
@@ -218,13 +210,14 @@ export class Export
         originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
       });
 
+      // TODO add transformation check for addcolumn and update mapping accordingly
       const qh: QueryHandler = database.getQueryHandler();
       const payload = {
         database: exprt.dbid,
         type: 'search',
         streaming: false,
         databasetype: 'elastic',
-        body: JSON.stringify(qryObj),
+        body: qry,
       };
 
       const qryResponse: any = await qh.handleQuery(payload);
@@ -251,7 +244,35 @@ export class Export
       let returnDocs: object[] = [];
 
       const fieldArrayDepths: object = {};
+      const extractTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
+      exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
+
+      const mergedDocs: object[] = [];
       for (const doc of newDocs)
+      {
+        // merge groupJoins with _source if necessary
+        const mergedDoc: object | string = await this._mergeGroupJoin(doc);
+        if (typeof mergedDoc === 'string')
+        {
+          return reject(mergedDoc as string);
+        }
+
+        // extract field after doing all merge joins
+        extractTransformations.forEach((transform) =>
+        {
+          const oldColName: string | undefined = transform['colName'];
+          const newColName: string | undefined = transform['args']['newName'];
+          const path: string | undefined = transform['args']['path'];
+          if (oldColName !== undefined && newColName !== undefined && path !== undefined)
+          {
+            mergedDoc['_source'][newColName] = _.get(mergedDoc['_source'], path);
+          }
+        });
+
+        mergedDocs.push(mergedDoc);
+      }
+
+      for (const doc of mergedDocs)
       {
         // verify schema mapping with documents and fix documents accordingly
         const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
@@ -339,21 +360,9 @@ export class Export
     });
   }
 
-  public async getNamesAndTypesFromQuery(dbid: number, qry: object | string): Promise<object | string>
+  public async getNamesAndTypesFromQuery(dbid: number, qry: string): Promise<object | string>
   {
-    if (typeof qry === 'string')
-    {
-      try
-      {
-        qry = JSON.parse(qry);
-      }
-      catch (e)
-      {
-        throw e;
-      }
-    }
-
-    qry = this._shouldRandomSample(qry as object);
+    qry = this._shouldRandomSample(qry);
     const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
     if (database === undefined)
     {
@@ -363,33 +372,28 @@ export class Export
     {
       throw new Error('File export currently is only supported for Elastic databases.');
     }
-
-    return this._getAllFieldsAndTypesFromQuery(database, qry as object);
+    return this._getAllFieldsAndTypesFromQuery(database, qry, dbid);
   }
 
-  public async getNamesAndTypesFromAlgorithm(dbid: number, algorithmId: number): Promise<object | string>
+  private _shouldRandomSample(qry: string): string
   {
-    const qry: object | string = await this._getQueryFromAlgorithm(algorithmId);
-    return this.getNamesAndTypesFromQuery(dbid, qry);
-  }
-
-  private _shouldRandomSample(qry: object): object
-  {
-    if (qry['body'] !== undefined && qry['body']['size'] !== undefined)
+    const parser = getParsedQuery(qry);
+    let query = parser.getValue();
+    if (query['size'] !== undefined)
     {
-      if (typeof qry['body']['size'] === 'number' && qry['body']['size'] > this.MAX_ROW_THRESHOLD)
+      if (typeof query['size'] === 'number' && qry['size'] > this.MAX_ROW_THRESHOLD)
       {
-        qry['body']['from'] = 0;
-        qry['body']['size'] = this.MAX_ROW_THRESHOLD;
-        qry['body']['query'] = { function_score: { random_score: {}, query: qry['body']['query'] } };
+        query['from'] = 0;
+        query['size'] = this.MAX_ROW_THRESHOLD;
+        query = { function_score: { random_score: {}, query } };
       }
     }
-    return qry;
+    return query;
   }
 
-  private async _getQueryFromAlgorithm(algorithmId: number): Promise<object | string>
+  private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
   {
-    return new Promise<object | string>(async (resolve, reject) =>
+    return new Promise<string>(async (resolve, reject) =>
     {
       const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
       if (algorithms.length === 0)
@@ -397,52 +401,36 @@ export class Export
         return reject('Algorithm not found.');
       }
 
-      let qry: object = {};
       try
       {
         if (algorithms[0].meta !== undefined)
         {
-          qry = JSON.parse(algorithms[0].meta as string)['query']['tql'];
+          return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
         }
       }
       catch (e)
       {
         return reject('Malformed algorithm');
       }
-      return resolve(qry);
     });
   }
 
-  private async _getAllFieldsAndTypesFromQuery(database: DatabaseController, qryObj: object, maxSize?: number): Promise<object | string>
+  private async _getAllFieldsAndTypesFromQuery(database: DatabaseController, qry: string,
+    dbid?: number, maxSize?: number): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
       const fieldObj: object = {};
       let fieldsAndTypes: object = {};
       let rankCounter = 1;
-      let qrySize: number = 0;
-      if (maxSize === undefined)
-      {
-        maxSize = this.MAX_ROW_THRESHOLD;
-      }
-      if (qryObj['body'] === undefined || (qryObj['body'] !== undefined && qryObj['body']['size'] === undefined))
-      {
-        qrySize = maxSize;
-      }
-      else
-      {
-        qrySize = Math.min(qryObj['body']['size'], maxSize);
-      }
-
       const qh: QueryHandler = database.getQueryHandler();
       const payload = {
-        database: database.getID(),
+        database: dbid as number,
         type: 'search',
-        streaming: false,
+        streaming: true,
         databasetype: 'elastic',
-        body: JSON.stringify(qryObj),
+        body: JSON.stringify(qry),
       };
-
       const qryResponse: any = await qh.handleQuery(payload);
       if (qryResponse === undefined || qryResponse.hasError())
       {
@@ -484,6 +472,12 @@ export class Export
     {
       for (const doc of docs)
       {
+        const mergeDoc: object | string = await this._mergeGroupJoin(doc);
+        if (typeof mergeDoc === 'string')
+        {
+          winston.warn(mergeDoc as string);
+          break;
+        }
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
@@ -1026,23 +1020,23 @@ export class Export
     return sha1(this._getObjectStructureStr(payload));
   }
 
-  /* manually checks types (rather than checking hashes) ; handles arrays recursively */
+  // manually checks types (rather than checking hashes) ; handles arrays recursively
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
-    const thisType: string = SharedUtil.getType(item);
-    if (thisType === 'null')
+    const type: string = SharedUtil.getType(item);
+    if (type === 'null')
     {
       return true;
     }
-    if (thisType === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
+    if (type === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
     {
       return true;
     }
-    if (typeObj['type'] !== thisType)
+    if (typeObj['type'] !== type)
     {
       return false;
     }
-    if (thisType === 'array')
+    if (type === 'array')
     {
       if (item[0] === undefined)
       {
@@ -1053,7 +1047,41 @@ export class Export
     return true;
   }
 
-  /* recursively attempts to parse strings to dates */
+  private async _mergeGroupJoin(doc: object): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      if (doc['_source'] !== undefined)
+      {
+        const sourceKeys: string[] = Object.keys(doc['_source']);
+        let rootKeys: string[] = Object.keys(doc);
+        rootKeys = _.without(rootKeys, '_index', '_type', '_id', '_score', '_source');
+        if (rootKeys.length > 0) // there were group join objects
+        {
+          const duplicateRootKeys: string[] = [];
+          rootKeys.forEach((rootKey) =>
+          {
+            if (sourceKeys.indexOf(rootKey) > -1)
+            {
+              duplicateRootKeys.push(rootKey);
+            }
+          });
+          if (duplicateRootKeys.length !== 0)
+          {
+            return resolve('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+          }
+          rootKeys.forEach((rootKey) =>
+          {
+            doc['_source'][rootKey] = doc[rootKey];
+            delete doc[rootKey];
+          });
+        }
+      }
+      return resolve(doc);
+    });
+  }
+
+  // recursively attempts to parse strings to dates
   private _parseDatesHelper(item: string | object, field: string)
   {
     if (Array.isArray(item[field]))
@@ -1075,7 +1103,7 @@ export class Export
     }
   }
 
-  /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
+  // asynchronously perform transformations on each item to upsert, and check against expected resultant types
   private async _transformAndCheck(allItems: object[], exprt: ExportConfig,
     dontCheck?: boolean): Promise<object[][]>
   {
@@ -1085,7 +1113,7 @@ export class Export
     {
       items = allItems.splice(0, this.BATCH_SIZE);
       promises.push(
-        new Promise<object[]>(async (thisResolve, thisReject) =>
+        new Promise<object[]>(async (resolve, reject) =>
         {
           const transformedItems: object[] = [];
           for (let item of items)
@@ -1093,11 +1121,13 @@ export class Export
             try
             {
               item = this._applyTransforms(item, exprt.transformations);
-            } catch (e)
-            {
-              return thisReject('Failed to apply transforms: ' + String(e));
             }
-            // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
+            catch (e)
+            {
+              return reject('Failed to apply transforms: ' + String(e));
+            }
+            // only include the specified columns
+            // NOTE: unclear if faster to copy everything over or delete the unused ones
             const trimmedItem: object = {};
             for (const name of Object.keys(exprt.columnTypes))
             {
@@ -1118,12 +1148,12 @@ export class Export
               const typeError: string = this._checkTypes(trimmedItem, exprt);
               if (typeError !== '')
               {
-                return thisReject(typeError);
+                return reject(typeError);
               }
             }
             transformedItems.push(trimmedItem);
           }
-          thisResolve(transformedItems);
+          resolve(transformedItems);
         }));
     }
     return Promise.all(promises);

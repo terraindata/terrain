@@ -101,6 +101,7 @@ class TransformArgsC
   public mergeName?: string = '';            // name of column to be merged
   public newName?: string | string[] = '';   // includes rename name, duplicate name, split names
   public text?: string = '';                 // text to append/prepend, text to split/merge on
+  public path?: string = '';                 // field path in the document for extracting fields from documents
 }
 
 const TransformArgs_Record = createRecordType(new TransformArgsC(), 'TransformArgsC');
@@ -239,18 +240,19 @@ export const TRANSFORM_TYPES =
       'prepend',
       'split',
       'merge',
+      'extract',
     ],
-    ['duplicate'],    // long
-    ['duplicate'],    // boolean
-    ['duplicate'],    // date
-    ['duplicate'],    // array
-    ['duplicate'],    // double
-    ['duplicate'],    // short
-    ['duplicate'],    // byte
-    ['duplicate'],    // integer
-    ['duplicate'],    // half_float
-    ['duplicate'],    // float
-    ['duplicate'],    // geopoint
+    ['duplicate', 'extract'],    // long
+    ['duplicate', 'extract'],    // boolean
+    ['duplicate', 'extract'],    // date
+    ['duplicate', 'extract'],    // array
+    ['duplicate', 'extract'],    // double
+    ['duplicate', 'extract'],    // short
+    ['duplicate', 'extract'],    // byte
+    ['duplicate', 'extract'],    // integer
+    ['duplicate', 'extract'],    // half_float
+    ['duplicate', 'extract'],    // float
+    ['duplicate', 'extract'],    // geopoint
   ];
 
 export const STEP_NAMES =
@@ -292,6 +294,7 @@ export const TRANSFORM_TEXT =
     PREPEND: 'Prepend text to every row in this column',
     SPLIT: 'Split this column\'s rows by a common delimiter',
     MERGE: 'Merge this column\'s rows with another column\'s rows',
+    EXTRACT: 'Extract a subfield from this column\'s rows as a new column',
   };
 
 export const enum Steps

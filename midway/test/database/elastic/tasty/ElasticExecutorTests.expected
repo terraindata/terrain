@@ -185,7 +185,7 @@
     {
       "_id" : "116797",
       "_index" : "movies",
-      "_score" : 0.5232858,
+      "_score" : 0.52337956,
       "_source" : {
         "@version" : "1",
         "backdroppath" : "/qcb6z1HpokTOKdjqDTsnjJk0Xvg.jpg",
@@ -211,7 +211,7 @@
     {
       "_id" : "110102",
       "_index" : "movies",
-      "_score" : 0.48006508,
+      "_score" : 0.4800826,
       "_source" : {
         "@version" : "1",
         "backdroppath" : "/4qfXT9BtxeFuamR4F49m2mpKQI1.jpg",
