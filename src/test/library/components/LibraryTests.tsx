@@ -47,13 +47,12 @@ import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import Library from 'library/components/Library';
-import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
-import { ItemType } from '../../../items/types/Item';
-import { connect } from '../../helpers';
+import { connect } from 'test-helpers/helpers';
+import LibraryHelper from 'test-helpers/LibraryHelper';
 
 describe('Library', () =>
 {
@@ -61,39 +60,12 @@ describe('Library', () =>
   const groupId = 2;
   const algorithmId = 3;
 
-  let library: LibraryState = _LibraryState({
-    categories: Immutable.Map<number, LibraryTypes.Category>(),
-    groups: Immutable.Map<number, LibraryTypes.Group>(),
-    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>(),
-  });
-
-  library = library.set('categories', library.categories.set(categoryId, LibraryTypes._Category({
-    type: ItemType.Category,
-    id: categoryId,
-    name: 'Category 1',
-    groupsOrder: Immutable.List<number>([2]),
-    lastEdited: '',
-    lastUserId: '',
-    userIds: Immutable.List([]),
-    defaultLanguage: 'elastic',
-    parent: 0,
-  })));
-
-  library = library.set('groups', library.groups.set(groupId, LibraryTypes._Group({
-    id: groupId,
-    name: 'Group 1',
-    algorithmsOrder: Immutable.List<number>([3]),
-    lastEdited: '',
-    lastUserId: '',
-    userIds: Immutable.List([]),
-    defaultLanguage: 'elastic',
-    parent: 0,
-  })));
-
-  library = library.set('algorithms', library.algorithms.set(algorithmId, LibraryTypes._Algorithm({
-    id: algorithmId,
-    name: 'Algorithm 1',
-  })));
+  const libraryStateMock = LibraryHelper.mockState();
+  const library = libraryStateMock
+    .addCategory(categoryId, 'Category 1')
+    .addGroup(categoryId, groupId, 'Group 1')
+    .addAlgorithm(groupId, algorithmId, 'Algorithm 1')
+    .getState();
 
   const analytics: AnalyticsState = _AnalyticsState({
     loaded: true,

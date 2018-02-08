@@ -126,12 +126,9 @@ export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, input
     const valueInfo: ESValueInfo = parser.getValueInfo();
     const params = toInputMap(inputs);
     const result = ESParameterFiller.generate(valueInfo, params);
-    return ESConverter.formatES(new ESJSONParser(result));
+    parser = new ESJSONParser(result);
   }
-  else
-  {
-    return ESConverter.formatES(parser);
-  }
+  return ESConverter.formatES(parser);
 }
 
 export function ESQueryToCode(queryObject: ESQueryObject, options?: Options, inputs?: List<Input>): string
