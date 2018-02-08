@@ -138,7 +138,7 @@ export class FieldTree
     return this.root.getIn(path);
   }
 
-  public createRootNode(): FieldTreeNode
+  public rootNode(): FieldTreeNode
   {
     return new FieldTreeNode(this, List([]));
   }
@@ -159,13 +159,14 @@ export class FieldTreeNode
   public makeChild(field: TemplateField): FieldTreeNode
   {
     this.tree.createField(this.path, field);
-    const childKeyPath = this.path.push(this.me().children.size - 1);
+    const childKeyPath = this.path.push('children', this.me().children.size - 1);
     return new FieldTreeNode(this.tree, childKeyPath);
   }
 
-  public set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
+  public set<K extends keyof TemplateField>(key: K, value: TemplateField[K]): FieldTreeNode
   {
     this.tree.updateField(this.path, key, value);
+    return this;
   }
 
   public get<K extends keyof TemplateField>(key: K): TemplateField[K]

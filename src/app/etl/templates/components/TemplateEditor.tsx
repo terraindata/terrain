@@ -64,8 +64,8 @@ import { _TemplateField, ElasticFieldSettings, TemplateField } from 'etl/templat
 import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
+import { createTreeFromEngine, NoArrayDocuments, testSerialization, treeFromDocument } from '../TemplateUtil';
 import './TemplateEditor.less';
-import { createTreeFromEngine, NoArrayDocuments, testSerialization, treeFromDocument } from './TemporaryUtil';
 
 const { List } = Immutable;
 
@@ -89,7 +89,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
     const firstDoc = documents[0];
     const engine = new TransformationEngine(firstDoc);
     const rootField = createTreeFromEngine(engine);
-    // const rootField = treeFromDocument(firstDoc);
 
     const template = _ExportTemplate({
       templateId: -1,

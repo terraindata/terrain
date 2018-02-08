@@ -76,53 +76,44 @@ export function enginePathToFieldPath(path: KeyPath)
 export function createTreeFromEngine(engine: TransformationEngine, language = 'elastic'): TemplateField
 {
   const ids = engine.getAllFieldIDs();
-  const tree = new FieldTree();
-
-  // const keyPaths = ids.map((v, i) => engine.getOtputKeyPath(v))
-  //   .sort((a, b) => a.size() - b.size());
   // sort the paths to ensure we visit parents before children
-  const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size)
-  // there are engine paths and tree paths.
-  // engine paths look like ['foo', 'bar'] or ['cat', '*', 'dog']
-  // tree paths look like ['children', 1, 'children', 2]
-  // const engineKeyPathToId = {};
+  const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
+  const rootId = sortedIds.get(0);
+  const rootField = _TemplateField({
+    isIncluded: engine.getFieldEnabled(rootId),
+    langSettings: _ElasticFieldSettings({
+      langType: language,
+      type: jsToElastic(engine.getFieldType(rootId)),
+    }),
+    fieldId: rootId,
+  });
+  const tree = new FieldTree(rootField);
+  const rootNode = tree.rootNode();
 
-  // const idToTreePath = {};
+  const enginePathToNode: {
+    [kp: string]: FieldTreeNode,
+  } = {
+      [JSON.stringify([])]: rootNode,
+    };
 
-  const enginePathToNode: {[kp: string]: FieldTreeNode} = {};
-  enginePathToNode[JSON.stringify([])] = tree.createRootNode();
-
-  function requiredChildKeyPaths(existingKeyPaths: List<KeyPath>)
+  sortedIds.forEach((id, index) =>
   {
-    const pathsToAdd = new Set();
-    const existingPaths = new Set(existingKeyPaths.map((value, index) => JSON.stringify(value)).toJS());
-    existingKeyPaths.forEach((value, index) => {
-      const path = value.toJS(); // path is ['foo', 'bar', 'baz']
-      for (let i = 0; i < path.length; i++)
-      {
-
-      }
-    });
-  }
-
-  sortedIds.forEach((id, index) => {
     const enginePath = engine.getOutputKeyPath(id).toJS();
+    if (enginePath.length === 0)
+    {
+      return;
+    }
     const parentPath = enginePath.slice(0, -1); // TODO update this when arrays become a thing
     const parentNode: FieldTreeNode = enginePathToNode[JSON.stringify(parentPath)];
-
-    if (parentNode === undefined)
-    {
-      console.log(sortedIds.map((v, i) => engine.getOutputKeyPath(v)).toJS());
-    }
 
     const newField = _TemplateField({
       isIncluded: engine.getFieldEnabled(id),
       langSettings: _ElasticFieldSettings({
         langType: language,
-        type: jsToElastic(engine.getFieldType(id))
+        type: jsToElastic(engine.getFieldType(id)),
       }),
       fieldId: id,
-      name: enginePath[enginePath.length - 1]
+      name: enginePath[enginePath.length - 1],
     });
 
     parentNode.set('langSettings', parentNode.get('langSettings').set('type', ELASTIC_TYPES.NESTED));
@@ -146,6 +137,9 @@ export const NoArrayDocuments = [
     'Meta': {
       'Date Added': '01/08/2018',
       'Views': 500,
+      'Even More Meta': {
+        'whoa :O': true,
+      },
     },
   },
   {
