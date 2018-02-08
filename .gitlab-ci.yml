@@ -80,6 +80,7 @@ build-frontend-prod:
 
 fullstack:
   script:
+    - rm -rf ./midway/src/assets/.cache || true;
     - MIDWAY_HOST=`hostname`:3000 yarn run build
     - yarn run test-fullstack-setup
     - killall node || true;
