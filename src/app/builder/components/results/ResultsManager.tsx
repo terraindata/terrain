@@ -434,7 +434,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
       if (query.tqlMode !== 'manual')
       {
-        eql = postprocessEQL(eql);
+        eql = this.postprocessEQL(eql);
       }
 
       this.setState({
