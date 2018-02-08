@@ -179,8 +179,6 @@ export class Export
       {
         writer = new stream.PassThrough();
       }
-      const pass = new stream.PassThrough();
-      writer.pipe(pass);
 
       if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
       {
@@ -239,7 +237,7 @@ export class Export
       if (newDocs.length === 0)
       {
         writer.end();
-        return resolve(pass);
+        return resolve(writer);
       }
       let returnDocs: object[] = [];
 
@@ -356,7 +354,7 @@ export class Export
         }
       }
       writer.end();
-      resolve(pass);
+      resolve(writer);
     });
   }
 
@@ -427,7 +425,7 @@ export class Export
       const payload = {
         database: dbid as number,
         type: 'search',
-        streaming: true,
+        streaming: false,
         databasetype: 'elastic',
         body: JSON.stringify(qry),
       };
