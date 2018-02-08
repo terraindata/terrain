@@ -53,6 +53,8 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
+import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -403,15 +405,14 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private postprocessEQL(eql: string): string
   {
-    let postprocessed: any = JSON.parse(eql);
+    const postprocessed: object = (new ESJSONParser(eql)).getValue();
 
-    // Prevent front-end from dispatching unreasonably large queries
-    if (postprocessed.hasOwnProperty('size'))
+    if (postprocessed.hasOwnProperty('size')
     {
       postprocessed['size'] = Math.min(postprocessed['size'], 10000);
     }
 
-    return JSON.stringify(postprocessed);
+    return ESConverter.formatES(new ESJSONParser(JSON.stringify(postprocessed));
   }
 
   private queryM2Results(query: Query, db: BackendInstance)
