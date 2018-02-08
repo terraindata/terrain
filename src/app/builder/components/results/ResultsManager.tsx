@@ -401,6 +401,19 @@ export class ResultsManager extends TerrainComponent<Props>
     }
   }
 
+  private postprocessEQL(eql: string): string
+  {
+    let postprocessed: any = JSON.parse(eql);
+
+    // Prevent front-end from dispatching unreasonably large queries
+    if (postprocessed.hasOwnProperty('size'))
+    {
+      postprocessed['size'] = Math.min(postprocessed['size'], 10000);
+    }
+
+    return JSON.stringify(postprocessed);
+  }
+
   private queryM2Results(query: Query, db: BackendInstance)
   {
     if (query.tqlMode !== 'manual')
@@ -412,12 +425,18 @@ export class ResultsManager extends TerrainComponent<Props>
     }
     if (query !== this.state.lastQuery)
     {
-      const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+      let eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
         {
           replaceInputs: true,
         },
       );
+
+      if (query.tqlMode !== 'manual')
+      {
+        eql = postprocessEQL(eql);
+      }
+
       this.setState({
         lastQuery: query,
         queriedTql: eql,
