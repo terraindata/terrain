@@ -53,6 +53,7 @@ import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import { Import } from './Import';
 import { ImportSourceConfig, Sources } from './sources/Sources';
+import * as Auth from './templates/Authenticate';
 import ImportTemplateRouter from './templates/ImportTemplateRouter';
 import { fieldTypes } from './templates/ImportTemplateRouter';
 
@@ -66,7 +67,7 @@ Router.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.all
 Router.post('/', async (ctx, next) =>
 {
   winston.info('importing to database');
-  const authStream: object = await Util.authenticateStream(ctx.req);
+  const authStream: object = await Auth.authenticateStream(ctx.req);
   if (authStream['user'] === null)
   {
     ctx.body = 'Unauthorized';
@@ -101,7 +102,7 @@ Router.post('/analyzers', passport.authenticate('access-token-local'), async (ct
 Router.post('/mysqlheadless', async (ctx, next) =>
 {
   winston.info('importing to database, from mysql formatted file and template id');
-  const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
+  const authStream: object = await Auth.authenticateStreamPersistentAccessToken(ctx.req);
   if (authStream['template'] === null)
   {
     ctx.body = 'Unauthorized';
@@ -116,11 +117,11 @@ Router.post('/mysqlheadless', async (ctx, next) =>
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
-  let authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
+  let authStream: object = await Auth.authenticateStreamPersistentAccessToken(ctx.req);
   if (authStream['template'] === null)
   {
     // may not be form data, attempt normal JSON format
-    authStream = await Util.authenticatePersistentAccessToken(ctx.request.body);
+    authStream = await Auth.authenticatePersistentAccessToken(ctx.request.body);
     if (authStream['template'] === null)
     {
       ctx.body = 'Unauthorized';
