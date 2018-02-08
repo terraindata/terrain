@@ -63,6 +63,15 @@ export enum ELASTIC_TYPES
   GEO_POINT = 'geo_point',
 }
 
+export const JS_TO_ES = {
+  string: ELASTIC_TYPES.TEXT,
+  number: ELASTIC_TYPES.DOUBLE,
+  boolean: ELASTIC_TYPES.BOOLEAN,
+  null: ELASTIC_TYPES.TEXT,
+  object: ELASTIC_TYPES.TEXT,
+  undefined: ELASTIC_TYPES.TEXT,
+};
+
 export enum TEMPLATE_TYPES
 {
   EXPORT = 'export',

@@ -83,3 +83,53 @@ export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
   },
   langSettings: _ElasticFieldSettings,
 });
+
+// has methods that abstract how the tree is mutated
+// can also be constructed to create a 'tree' that emulates a store
+export class FieldTree
+{
+  public static createField(rootField: TemplateField, sourcePath: KeyPath,
+    field: TemplateField): TemplateField
+  {
+    const creatingField = rootField.getIn(sourcePath);
+    const nextIndex = creatingField.children.size;
+    return rootField.setIn(sourcePath.push('children', nextIndex), field);
+  }
+
+  public static updateField(rootField: TemplateField, sourcePath: KeyPath,
+    key: string | number, value: any): TemplateField
+  {
+    const keyPath = sourcePath.push(key);
+    return rootField.setIn(keyPath, value);
+  }
+
+  public static deleteField(rootField: TemplateField, sourcePath: KeyPath): TemplateField
+  {
+    return rootField.deleteIn(sourcePath);
+  }
+
+  constructor(private root: TemplateField)
+  {
+
+  }
+
+  public createField(sourcePath: KeyPath, field: TemplateField)
+  {
+    this.root = FieldTree.createField(this.root, sourcePath, field);
+  }
+
+  public updateField(sourcePath: KeyPath, key: string | number, value: any)
+  {
+    this.root = FieldTree.updateField(this.root, sourcePath, key, value);
+  }
+
+  public deleteField(sourcePath: KeyPath)
+  {
+    this.root = FieldTree.deleteField(this.root, sourcePath);
+  }
+
+  public getRoot()
+  {
+    return this.root;
+  }
+}

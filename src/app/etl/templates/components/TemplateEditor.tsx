@@ -61,14 +61,11 @@ import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEdito
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
 import { _TemplateField, ElasticFieldSettings, TemplateField } from 'etl/templates/FieldTypes';
-import
-{
-  _ExportTemplate, destringifySavedTemplate,
-  ETLTemplate, TemplateEditorState, templateForSave,
-} from 'etl/templates/TemplateTypes';
-import './TemplateEditor.less';
+import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import { SampleDocuments, treeFromDocument } from './TemporaryUtil';
+import './TemplateEditor.less';
+import { createTreeFromEngine, NoArrayDocuments, testSerialization, treeFromDocument } from './TemporaryUtil';
 
 const { List } = Immutable;
 
@@ -82,30 +79,44 @@ export interface Props
 @Radium
 class ETLExportDisplay extends TerrainComponent<Props>
 {
-  public componentDidMount()
+
+  public initFromDocs(documents, name = 'No Title')
   {
-    let template = _ExportTemplate({
-      templateId: 1,
-      templateName: 'Test Template',
+    if (!Array.isArray(documents) || documents.length === 0)
+    {
+      return;
+    }
+    const firstDoc = documents[0];
+    const engine = new TransformationEngine(firstDoc);
+    // const rootField = createTreeFromEngine(engine);
+    const rootField = treeFromDocument(firstDoc);
+
+    const template = _ExportTemplate({
+      templateId: -1,
+      templateName: name,
+      transformationEngine: engine,
+      rootField,
     });
-
-    // testing turning record into serializable object and back again. todo: remove this
-    const rootField = treeFromDocument(SampleDocuments[0]);
-    const jsRootField = recordForSave(rootField);
-    const rebuiltRootField = _TemplateField(jsRootField, true);
-    template = template.set('rootField', rebuiltRootField);
-
-    template = _ExportTemplate(destringifySavedTemplate(templateForSave(template)), true);
 
     this.props.act({
       actionType: 'loadTemplate',
-      template,
+      template: testSerialization(template),
     });
 
     this.props.act({
       actionType: 'setDocuments',
-      documents: List(SampleDocuments),
+      documents: List(documents),
     });
+  }
+
+  public testInit()
+  {
+    this.initFromDocs(NoArrayDocuments);
+  }
+
+  public componentDidMount()
+  {
+    this.testInit();
   }
 
   public setModalRequests(requests)

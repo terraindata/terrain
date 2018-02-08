@@ -51,14 +51,61 @@ import
 } from 'etl/templates/FieldTypes';
 import
 {
-  _ExportTemplate,
-  ETLTemplate, TemplateEditorState,
+  _ExportTemplate, destringifySavedTemplate,
+  ETLTemplate, TemplateEditorState, templateForSave,
 } from 'etl/templates/TemplateTypes';
 
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
 import * as Immutable from 'immutable';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
+import { ELASTIC_TYPES, JS_TO_ES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 const { List } = Immutable;
 
+// temporary stuff
+function jsToElastic(type): ELASTIC_TYPES
+{
+  const eType = JS_TO_ES[type];
+  return eType !== undefined ? eType : ELASTIC_TYPES.TEXT;
+}
+
+export function enginePathToFieldPath(path: KeyPath)
+{
+  const emptyList = List([]);
+}
+
+export function createTreeFromEngine(engine: TransformationEngine): TemplateField
+{
+  const ids = engine.getAllFieldIDs();
+  const rootField = _TemplateField();
+
+  return _TemplateField({});
+}
+
+export function testSerialization(template: ETLTemplate): ETLTemplate
+{
+  return _ExportTemplate(destringifySavedTemplate(templateForSave(template)), true);
+}
+
+export const NoArrayDocuments = [
+  {
+    'Product Name': 'Food',
+    'Product ID': 123,
+    'Product Description': 'You can eat this to survive! It can be tasty. Or gross. Some examples of food: Tacos, Burgers, Pasta',
+    'Meta': {
+      'Date Added': '01/08/2018',
+      'Views': 500,
+    },
+  },
+  {
+    'Product Name': 'Cool stuff',
+    'Product ID': 5,
+    'Product Description': 'Not to be confused with boring things',
+    'Meta': {
+      'Date Added': '01/10/2018',
+      'Views': 515,
+    },
+  },
+];
 export const SampleDocuments = [
   {
     'Product Name': 'Food',

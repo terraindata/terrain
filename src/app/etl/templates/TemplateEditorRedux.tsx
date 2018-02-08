@@ -50,7 +50,7 @@ import * as _ from 'lodash';
 import
 {
   _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, TemplateField,
+  ElasticFieldSettings, FieldTree, TemplateField,
 } from 'etl/templates/FieldTypes';
 import
 {
@@ -72,20 +72,9 @@ export interface TemplateEditorActionTypes
     actionType: 'loadTemplate';
     template: ETLTemplate;
   };
-  createField: {
-    actionType: 'createField';
-    sourcePath: KeyPath;
-    field?: TemplateField;
-  };
-  updateField: {
-    actionType: 'updateField';
-    sourcePath: KeyPath;
-    key: string | number;
-    value: any;
-  };
-  deleteField: {
-    actionType: 'deleteField';
-    sourcePath: KeyPath;
+  setRoot: {
+    actionType: 'setRoot';
+    rootField: TemplateField;
   };
   addModalConfirmation: {
     actionType: 'addModalConfirmation';
@@ -111,12 +100,9 @@ export interface TemplateEditorActionTypes
   closeSettings: {
     actionType: 'closeSettings';
   };
-  dfsForEach: {
-    actionType: 'dfsForEach';
-    fn: (obj: TemplateFieldProxy<any>) => any;
-    act: typeof TemplateEditorActions;
-  };
 }
+
+const ROOT_PATH = List(['template', 'rootField']);
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
 {
@@ -127,27 +113,9 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         return state.set('isDirty', false).
           set('template', action.payload.template);
       },
-      createField: (state, action) =>
+      setRoot: (state, action) =>
       {
-        const fieldKeyPath = List<string | number>(['template', 'rootField'])
-          .push(...action.payload.sourcePath.toJS());
-        const creatingField: TemplateField = state.getIn(fieldKeyPath);
-        const nextIndex = creatingField.children.size;
-        return state.set('isDirty', true).
-          setIn(fieldKeyPath.push('children', nextIndex), action.payload.field); // TODO try updateIn
-      },
-      updateField: (state, action) =>
-      {
-        const keyPath = List<string | number>(['template', 'rootField'])
-          .push(...action.payload.sourcePath.toJS(), action.payload.key);
-        return state.set('isDirty', true).
-          setIn(keyPath, action.payload.value);
-      },
-      deleteField: (state, action) =>
-      {
-        const fieldKeyPath = List<string | number>(['template', 'rootField'])
-          .push(...action.payload.sourcePath.toJS());
-        return state.deleteIn(fieldKeyPath);
+        return state.set('isDirty', true).setIn(ROOT_PATH, action.payload.rootField);
       },
       addModalConfirmation: (state, action) =>
       {
@@ -173,17 +141,6 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       closeSettings: (state, action) =>
       {
         return state.set('settingsKeyPath', null).set('settingsDisplayKeyPath', null);
-      },
-      dfsForEach: (state, action) =>
-      {
-        const root = new TemplateFieldProxy({
-          keyPath: List([]),
-          field: state.template.rootField,
-          templateEditor: state,
-          act: action.payload.act,
-        });
-        root._dfs(action.payload.fn);
-        return state;
       },
     };
 }

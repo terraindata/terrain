@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires import-spacing
+
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
@@ -64,8 +66,7 @@ import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TemplateFieldProxy, TemplateFieldProxyProps } from './TemplateFieldProxy';
 /*
  *  This class defines a base class with useful functions that are used by components
- *  that handle UI for template editor fields. This abstract "component" is sort of an object-oriented representation
- *  of a template editor field.
+ *  that handle UI for template editor fields.
  */
 
 export interface TemplateEditorFieldProps extends TemplateFieldProxyProps

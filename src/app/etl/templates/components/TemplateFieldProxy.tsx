@@ -58,16 +58,16 @@ const { List, Map } = Immutable;
 import
 {
   _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, TemplateField,
+  ElasticFieldSettings, FieldTree, TemplateField,
 } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 
 /*
- *  This class defines a base class with useful functions that are used by components
- *  that handle UI for template editor fields. This abstract "component" is sort of an object-oriented representation
- *  of a template editor field.
+ *  This class defines a base class with useful functions that abstract how the store works.
+ *  Each instance of this class is a proxy for a field in the TemplateField tree.
+ *  They are also constructable.
  */
 
 export interface TemplateFieldProxyProps
@@ -86,6 +86,7 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
     super(props);
   }
 
+  // invokes operator on every field (represented as a TemplateFieldProxy) in the tree
   public _dfs(operator: (obj: TemplateFieldProxy<Props>) => void)
   {
     const { field, keyPath } = this.props;
@@ -108,10 +109,8 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
   {
     const { act, keyPath } = this.props;
     act({
-      actionType: 'updateField',
-      sourcePath: keyPath,
-      key,
-      value,
+      actionType: 'setRoot',
+      rootField: FieldTree.updateField(this._root(), keyPath, key, value),
     });
   }
 
@@ -119,20 +118,15 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
   {
     const { act, keyPath } = this.props;
     act({
-      actionType: 'deleteField',
-      sourcePath: keyPath,
+      actionType: 'setRoot',
+      rootField: FieldTree.deleteField(this._root(), keyPath),
     });
   }
 
   public _clearChildren()
   {
     const { act, keyPath } = this.props;
-    act({
-      actionType: 'updateField',
-      sourcePath: keyPath,
-      key: 'children',
-      value: List([]),
-    });
+    this._set('children', List([]));
   }
 
   // returns true if the field's type is nested or if the field's arrayType ends with nested
@@ -167,4 +161,10 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
   {
     return this.props.keyPath.size === 0;
   }
+
+  private _root()
+  {
+    return this.props.templateEditor.getIn(['template', 'rootField']);
+  }
+
 }
