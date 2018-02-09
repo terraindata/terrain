@@ -112,6 +112,12 @@ async function loginToBuilder(page, url?)
   await page.click(BUTTON_SELECTOR);
 }
 
+async function startBuilder(page)
+{
+  await page.waitForSelector(CARDSTARTER_SELECTOR);
+  await page.click(CARDSTARTER_SELECTOR);
+}
+
 async function loadPage(page, url)
 {
   if (url)
@@ -128,6 +134,7 @@ async function recordBuilderActions(browser, url)
   await page.setViewport({ width: 1600, height: 1200 });
   await loginToBuilder(page, url);
   sleep.sleep(1);
+  await startBuilder(page);
   const records = await page.evaluate(() =>
   {
     window['TerrainTools'].setLogLevel();
@@ -163,17 +170,18 @@ async function replayBuilderActions(browser, url, actions)
   await page.setViewport({ width: 1600, height: 1200 });
   await page.goto(url);
   await loginToBuilder(page, url);
+  sleep.sleep(1);
+  await startBuilder(page);
   await page.evaluate(() =>
   {
     window['TerrainTools'].setLogLevel();
-    window['TerrainTools'].terrainStoreLogger.printStateChange = true;
   });
   // replay the log
   for (let i = 0; i < actions.length; i = i + 1)
   {
     const action = actions[i];
     console.log('Replaying Action ' + typeof action + ':' + action);
-    if (action.startsWith('{"type":"hoverCard"'))
+    if (action.startsWith('{"type":"builderCards.hoverCard"'))
     {
       console.log('Ignoring hoverCard action');
       continue;
@@ -252,4 +260,4 @@ async function rr()
   await browser.close();
 }
 
-rr().catch((err) => console.log('Error when executing rr: ' + err ));
+rr().catch((err) => console.log('Error when executing rr: ' + err));
