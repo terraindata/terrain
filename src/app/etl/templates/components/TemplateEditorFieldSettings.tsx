@@ -96,7 +96,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
             Name
           </div>
           <Autocomplete
-            value={field.name}
+            value={field.getName()}
             onChange={this.handleNameChange}
             options={List([])}
           />

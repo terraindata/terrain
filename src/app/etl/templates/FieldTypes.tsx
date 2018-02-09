@@ -91,6 +91,23 @@ class TemplateFieldC
     return type === ELASTIC_TYPES.NESTED ||
       (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
   }
+
+  public getSubfields()
+  {
+    return this.children;
+  }
+
+  // TODO: make this do a keypath lookup
+  public getName(): string
+  {
+    return this.name;
+  }
+
+  // TODO: get rid of this
+  public isRoot(keyPath): boolean
+  {
+    return keyPath.size === 0;
+  }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
 export const _TemplateField = makeExtendedConstructor(TemplateFieldC, true, {
@@ -196,13 +213,5 @@ export class FieldNodeProxy
   public clearChildren()
   {
     this.tree.updateField(this.path, 'children', List([]));
-  }
-}
-
-export abstract class FieldUtil
-{
-  public static isRoot(keyPath: KeyPath): boolean
-  {
-    return keyPath.size === 0;
   }
 }

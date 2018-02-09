@@ -58,7 +58,7 @@ const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 
 import ExpandableView from 'common/components/ExpandableView';
-import { FieldUtil, TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -88,7 +88,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   public renderChildFields(preview: any, displayKeyPath: KeyPath)
   {
     const { field, keyPath, canEdit } = this.props;
-    return field.children.map((value, index) =>
+    return field.getSubfields().map((value, index) =>
     {
       const newKeyPath = keyPath.push('children', index);
       const childPreview = preview !== undefined && preview !== null ? preview[value.name] : null;
@@ -148,7 +148,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   {
     const { field, keyPath, canEdit, preview, displayKeyPath } = this.props;
 
-    if (FieldUtil.isRoot(keyPath))
+    if (field.isRoot(keyPath))
     {
       return (
         <div className='template-editor-children-container'>

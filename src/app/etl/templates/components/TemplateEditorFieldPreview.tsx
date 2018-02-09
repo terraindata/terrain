@@ -100,7 +100,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             })}
               onClick={this.handleLabelClicked}
             >
-              {field.name}
+              {field.getName()}
             </div>
           </div>
           {

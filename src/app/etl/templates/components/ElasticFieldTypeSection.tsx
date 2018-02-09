@@ -202,7 +202,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
       this.setLangSettings('type', elasticTypeOptions.get(index));
     }
     else if (isNested(currentType, field.langSettings.arrayType)
-      && !isNested(nextType, field.langSettings.arrayType) && field.children.size > 0)
+      && !isNested(nextType, field.langSettings.arrayType) && field.getSubfields().size > 0)
     { // if user changes type from nested to something else and there are children, then show a warning
       const deferredAction = () =>
       {
@@ -213,7 +213,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
         actionType: 'addModalConfirmation',
         props: {
           title: 'Confirm Action',
-          message: `Changing this type will remove ${field.children.size} nested fields. Would you like to continue?`,
+          message: `Changing this type will remove ${field.getSubfields().size} nested fields. Would you like to continue?`,
           onConfirm: deferredAction,
           confirm: true,
         },
@@ -241,7 +241,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
       {
         const { field, act } = this.props;
         const newArray = cleanArrayType(field.langSettings.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index)));
-        if (!isNested(field.langSettings.type, newArray) && field.children.size > 0)
+        if (!isNested(field.langSettings.type, newArray) && field.getSubfields().size > 0)
         {
           const deferredAction = () =>
           {
@@ -252,7 +252,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
             actionType: 'addModalConfirmation',
             props: {
               title: 'Confirm Action',
-              message: `Changing this type will remove ${field.children.size} nested fields. Would you like to continue?`,
+              message: `Changing this type will remove ${field.getSubfields().size} nested fields. Would you like to continue?`,
               onConfirm: deferredAction,
               confirm: true,
             },

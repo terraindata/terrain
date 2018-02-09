@@ -57,7 +57,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import ExpandableView from 'common/components/ExpandableView';
-import { FieldUtil, TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
