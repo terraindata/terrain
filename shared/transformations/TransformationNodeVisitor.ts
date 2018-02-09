@@ -47,7 +47,6 @@ THE SOFTWARE.
 // import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
-import { NodeOptionsType } from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
