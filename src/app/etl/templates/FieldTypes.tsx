@@ -50,6 +50,7 @@ const { List, Map } = Immutable;
 import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
 import { TransformationNode as TransformationNodeBase } from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 class ElasticFieldSettingsC
@@ -66,15 +67,14 @@ export const _ElasticFieldSettings = makeExtendedConstructor(ElasticFieldSetting
 });
 
 // recordized version of transformationNode
-class TransformationNodeC extends TransformationNodeBase
+class TransformationNodeC<T extends NodeTypes> extends TransformationNodeBase<T>
 {
-  public readonly meta: {};
   constructor()
   {
     super(0, TransformationNodeType.LoadNode, List([]), {});
   }
 }
-export type TransformationNode = WithIRecord<TransformationNodeC>;
+export type TransformationNode<T extends NodeTypes = 'default'> = WithIRecord<TransformationNodeC<T>>;
 export const _TransformationNode = makeConstructor(TransformationNodeC);
 
 // only put fields in here that are needed to track display-sensitive state

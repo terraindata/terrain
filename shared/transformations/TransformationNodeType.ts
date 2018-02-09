@@ -64,6 +64,7 @@ enum TransformationNodeType
 
 interface TransformationOptionTypes
 {
+  default: object;
   capitalize: {
 
   };
@@ -73,6 +74,7 @@ interface TransformationOptionTypes
   };
 }
 
-export type OptionsType<key extends keyof TransformationOptionTypes> = TransformationOptionTypes[key];
+export type NodeTypes = keyof TransformationOptionTypes;
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
 
 export default TransformationNodeType;
