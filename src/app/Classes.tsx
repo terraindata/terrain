@@ -100,17 +100,23 @@ export class BaseClass
 
 const records: { [class_name: string]: Immutable.Record.Class } = {};
 
-export function New<T>(
-  instance,
-  config: { [field: string]: any } = {},
-  extendId?: boolean | 'string', // if true, generate an ID on instantiation
-): T & IRecord<T>
+export function Constructor<T>(instance)
 {
   const class_name = instance.__proto__.constructor.name;
   if (!records[class_name])
   {
     records[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
   }
+  return records[class_name];
+}
+
+export function New<T>(
+  instance,
+  config: { [field: string]: any } = {},
+  extendId?: boolean | 'string', // if true, generate an ID on instantiation
+): T & IRecord<T>
+{
+  const constructor = Constructor<T>(instance);
 
   if (extendId)
   {
@@ -122,7 +128,7 @@ export function New<T>(
       instance[key] = value,
   );
 
-  return new records[class_name](instance) as any;
+  return new constructor(instance) as any;
 }
 
 // This converts the standard Record class format to a plain JS
@@ -188,26 +194,57 @@ type overrideMap<T> = {
   [key in keyof T]?: (config?: any, deep?: boolean) => T[key]
 };
 
+// iterates through instance's methods and adds them to the record prototype
+// note that if you have a name conflict (like getIn), then the Record's prototype will be overwritten
+// also note that this won't add inherited methods
+function injectInstanceMethods(constructor, instance)
+{
+  const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(instance));
+  for (const method of methods)
+  {
+    if (method !== 'constructor')
+    {
+      constructor.prototype[method] = instance.__proto__[method];
+    }
+  }
+}
+
 /**
- * You should use makeDeepConstructor instead of makeConstructor if the immutable record can be
- * rebuilt from a recordForSave. Any child immutable records that also contains immutable objects should use makeDeepConstructor
- * like makeConstructor, but takes a map of functions that overrides values inside config
+ * If injectMethods is true, then the resultant object creator will add the Type's instance methods to the object's prototype.
+ * You should use configOverride if the immutable record can be rebuilt from a recordForSave.
+ * Any child immutable records that also contains immutable objects should use makeRecordConstructor with a defined configOverride
  * the overrider is called if the resultant constructor is called with deep = true
  */
-export function makeDeepConstructor<T>(Type: { new(): T; }, override: overrideMap<T>)
+export function makeExtendedConstructor<T>(
+  Type: { new(): T; },
+  injectMethods: boolean = false,
+  configOverride?: overrideMap<T>,
+): (config?: any, deep?: boolean) => WithIRecord<T>
 {
-  const overrideKeys = Object.keys(override);
-  return (config?: { [key: string]: any }, deep?: boolean) =>
+  if (injectMethods)
   {
-    if (deep)
+    const instance = new Type();
+    injectInstanceMethods(Constructor(instance), instance);
+  }
+  if (configOverride)
+  {
+    return (config?: { [key: string]: any }, deep?: boolean) =>
     {
-      const overridenConfig = {};
-      for (const key of overrideKeys)
+      const overrideKeys = Object.keys(configOverride);
+      if (deep)
       {
-        overridenConfig[key] = override[key](config[key], true);
+        const overridenConfig = {};
+        for (const key of overrideKeys)
+        {
+          overridenConfig[key] = configOverride[key](config[key], true);
+        }
+        config = _.defaults(overridenConfig, config);
       }
-      config = _.defaults(overridenConfig, config);
-    }
-    return New<WithIRecord<T>>(new Type(), config);
-  };
+      return New<WithIRecord<T>>(new Type(), config);
+    };
+  }
+  else
+  {
+    return (config?: { [key: string]: any }) => New<WithIRecord<T>>(new Type(), config);
+  }
 }
