@@ -164,7 +164,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     winston.info('Connected to the Chrome ' + wsAddress);
-     //browser = await puppeteer.launch({headless: false});
+    // browser = await puppeteer.launch({headless: false});
     // page = await browser.newPage();
   });
 
