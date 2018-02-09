@@ -192,42 +192,51 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public handleGroupDrop(dropKeyPath, dragKeyPath)
   {
-    console.log('HANDLE GROUP DROP');
-    const droppedInto = this.state.bars.getIn(dropKeyPath);
-    const dropped = this.state.bars.getIn(dragKeyPath);
-    const oldIndex = dragKeyPath.first();
-    const newIndex = dropKeyPath.first();
-    if (newIndex === oldIndex)
+    if (dropKeyPath.equals(dragKeyPath))
     {
       return;
     }
+    const droppedInto = this.state.bars.getIn(dropKeyPath);
+    const dropped = this.state.bars.getIn(dragKeyPath);
+    // if you dropped into a group, just do a normal "Reordering" because a new group isn't being created
+    if (List.isList(droppedInto))
+    {
+      // act as if it was dropped into the last slot of droppedInto
+      this.handleDrop(dragKeyPath, dropKeyPath.push(droppedInto.size));
+      return;
+    }
+    // See if dropped was already in droppedInto, and if it was, remove it
     let group;
     if (typeof dropped === 'string' && typeof droppedInto === 'string')
     {
       group = List([droppedInto, dropped]);
     }
-    else if (typeof dropped === 'string')
-    {
-      group = droppedInto.push(dropped);
-    }
-    else if (typeof droppedInto === 'string')
+    else
     {
       group = dropped.insert(0, droppedInto);
     }
-    else
-    {
-      group = droppedInto.concat(dropped);
-    }
     let newBars;
-    if (newIndex < oldIndex)
-    {
-      newBars = this.state.bars.deleteIn(dragKeyPath).setIn(dropKeyPath, group);
-    }
-    else
+    if (this.movedDown(dragKeyPath, dropKeyPath))
     {
       newBars = this.state.bars.setIn(dropKeyPath, group).deleteIn(dragKeyPath);
+      const oldGroup = newBars.getIn(dragKeyPath.butLast());
+      if (oldGroup.size === 0)
+      {
+        newBars = newBars.removeIn(dragKeyPath.butLast());
+      }
     }
-    // remove empty lists
+    else
+    {
+      newBars = this.state.bars.deleteIn(dragKeyPath);
+      const oldGroup = newBars.getIn(dragKeyPath.butLast());
+      if (oldGroup.size === 0)
+      {
+        newBars = newBars.removeIn(dragKeyPath.butLast());
+      }
+      newBars = newBars.setIn(dropKeyPath, group);
+    }
+    // Look for the thing that you dropped, if it is somewhere other than keyPath, remove it
+
     this.setState({
       bars: newBars.asImmutable(),
     });
