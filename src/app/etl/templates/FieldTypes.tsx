@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
+import { ELASTIC_TYPES, jsToElastic } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
@@ -64,6 +64,7 @@ export const _ElasticFieldSettings = makeExtendedConstructor(ElasticFieldSetting
   arrayType: List,
 });
 
+// only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
 {
   public readonly isIncluded: boolean = true;
@@ -111,12 +112,37 @@ class TemplateFieldC
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
 export const _TemplateField = makeExtendedConstructor(TemplateFieldC, true, {
-  children: (config: object[] = []) =>
-  {
-    return List<TemplateField>(config.map((value: object, index) => _TemplateField(value, true)));
-  },
   langSettings: _ElasticFieldSettings,
 });
+
+export function createFieldFromEngine(
+  engine: TransformationEngine,
+  id: number,
+  language = 'elastic',
+): TemplateField
+{
+  const enginePath = engine.getOutputKeyPath(id).toJS();
+  return _TemplateField({
+    isIncluded: engine.getFieldEnabled(id),
+    langSettings: _ElasticFieldSettings({
+      langType: language,
+      type: jsToElastic(engine.getFieldType(id)),
+    }),
+    fieldId: id,
+    name: enginePath[enginePath.length - 1],
+  });
+}
+
+export function updateFieldFromEngine(
+  engine: TransformationEngine,
+  id: number,
+  oldField: TemplateField,
+  language = 'elastic',
+): TemplateField
+{
+  const updatedField = createFieldFromEngine(engine, id, language);
+  return updatedField.set('children', oldField.children);
+}
 
 const doNothing = () => null;
 // has methods that abstract how the tree is mutated
@@ -125,12 +151,19 @@ export class FieldTreeProxy
 {
   private onMutate: (root: TemplateField) => void = doNothing;
 
-  constructor(private root: TemplateField, onMutate?: (f: TemplateField) => void)
+  constructor(private root: TemplateField,
+    private engine: TransformationEngine,
+    onMutate?: (f: TemplateField) => void)
   {
     if (onMutate !== undefined)
     {
       this.onMutate = onMutate;
     }
+  }
+
+  public getEngine(): TransformationEngine
+  {
+    return this.engine;
   }
 
   public createField(pathToField: KeyPath, field: TemplateField): FieldNodeProxy
@@ -141,6 +174,12 @@ export class FieldTreeProxy
     this.root = this.root.setIn(pathToChildField, field);
     this.onMutate(this.root);
     return new FieldNodeProxy(this, pathToChildField);
+  }
+
+  public setField(pathToField: KeyPath, newField: TemplateField)
+  {
+    this.root = this.root.setIn(pathToField, newField);
+    this.onMutate(this.root);
   }
 
   public updateField(pathToField: KeyPath, key: string | number, value: any)
@@ -184,6 +223,11 @@ export class FieldNodeProxy
     return this.tree.getRootField().hasIn(this.path);
   }
 
+  public id(): number
+  {
+    return this.tree.getField(this.path).fieldId;
+  }
+
   public field(): TemplateField
   {
     return this.tree.getField(this.path);
@@ -198,6 +242,26 @@ export class FieldNodeProxy
   {
     this.tree.updateField(this.path, key, value);
     return this;
+  }
+
+  public setFieldEnabled(enabled: boolean): FieldNodeProxy
+  {
+    if (enabled)
+    {
+      this.tree.getEngine().enableField(this.id());
+    }
+    else
+    {
+      this.tree.getEngine().disableField(this.id());
+    }
+    this.syncWithEngine();
+    return this;
+  }
+
+  public syncWithEngine()
+  {
+    const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.id(), this.field());
+    this.tree.setField(this.path, updatedField);
   }
 
   public get<K extends keyof TemplateField>(key: K): TemplateField[K]

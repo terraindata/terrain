@@ -82,7 +82,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
 
   public renderDocument(document: object, index: number)
   {
-    const { previewIndex, documents, template } = this.props.templateEditor;
+    const { previewIndex, documents, template, rootField } = this.props.templateEditor;
     const border = index === previewIndex ?
       borderColor(Colors().inactiveHover, Colors().inactiveHover) :
       borderColor('rgba(0,0,0,0)', Colors().activeHover);
@@ -99,7 +99,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
         <div className='preview-document-spacer'>
           <TemplateEditorFieldNode
             keyPath={emptyList}
-            field={template.rootField}
+            field={rootField}
             canEdit={false}
             noInteract={true}
             preview={transformedPreviewDocument}

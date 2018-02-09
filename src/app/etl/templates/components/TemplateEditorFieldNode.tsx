@@ -147,7 +147,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   public render()
   {
     const { field, keyPath, canEdit, preview, displayKeyPath } = this.props;
-
     if (field.isRoot(keyPath))
     {
       return (
@@ -222,7 +221,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       actionType: 'closeSettings',
     });
   }
-
 }
 
 const TemplateEditorFieldNode = Util.createTypedContainer(

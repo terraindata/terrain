@@ -67,6 +67,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 class TemplateEditorStateC
 {
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
+  public rootField: TemplateField = _TemplateField();
   public isDirty: boolean = true;
   public modalRequests: List<ModalProps> = List([]);
   public documents: List<object> = List([]);
@@ -78,23 +79,12 @@ class TemplateEditorStateC
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
 
-function transformationEngineConstructor(config: object)
-{
-  return TransformationEngine.load(config);
-}
-
-interface RootFieldType // backend templates don't know about TemplateField type
-{
-  rootField: TemplateField;
-}
-
-class ExportTemplateC implements ExportTemplateBase, RootFieldType
+class ExportTemplateC implements ExportTemplateBase
 {
   public templateId = -1;
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.EXPORT;
   public filetype = FILE_TYPES.JSON;
-  public rootField = _TemplateField();
   public objectKey = '';
   public dbid = -1;
   public dbname = '';
@@ -104,17 +94,15 @@ class ExportTemplateC implements ExportTemplateBase, RootFieldType
 }
 export type ExportTemplate = WithIRecord<ExportTemplateC>;
 export const _ExportTemplate = makeExtendedConstructor(ExportTemplateC, false, {
-  rootField: _TemplateField,
   transformationEngine: TransformationEngine.load,
 });
 
-class ImportTemplateC implements ImportTemplateBase, RootFieldType
+class ImportTemplateC implements ImportTemplateBase
 {
   public templateId = -1;
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.IMPORT;
   public filetype = FILE_TYPES.JSON;
-  public rootField = _TemplateField();
   public objectKey = '';
   public dbid = -1;
   public dbname = '';
@@ -124,7 +112,6 @@ class ImportTemplateC implements ImportTemplateBase, RootFieldType
 }
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
 export const _ImportTemplate = makeExtendedConstructor(ImportTemplateC, false, {
-  rootField: _TemplateField,
   transformationEngine: TransformationEngine.load,
 });
 

@@ -94,7 +94,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: -1,
       templateName: name,
       transformationEngine: engine,
-      rootField,
     });
 
     // this.props.act({
@@ -104,6 +103,11 @@ class ETLExportDisplay extends TerrainComponent<Props>
     this.props.act({
       actionType: 'loadTemplate',
       template,
+    });
+
+    this.props.act({
+      actionType: 'setRoot',
+      rootField,
     });
 
     this.props.act({
@@ -132,7 +136,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public renderEditorSection(showEditor: boolean = true)
   {
-    const { template, documents, previewIndex } = this.props.templateEditor;
+    const { template, documents, previewIndex, rootField } = this.props.templateEditor;
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
     const transformedPreviewDocument = template.transformationEngine.transform(previewDocument);
     if (!showEditor)
@@ -160,7 +164,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
             <div className='template-editor-full-area'>
               <TemplateEditorFieldNode
                 keyPath={emptyList}
-                field={template.rootField}
+                field={rootField}
                 canEdit={true}
                 noInteract={false}
                 preview={transformedPreviewDocument}

@@ -100,7 +100,7 @@ export interface TemplateEditorActionTypes
   };
 }
 
-const ROOT_PATH = List(['template', 'rootField']);
+const ROOT_PATH = List(['rootField']);
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
 {

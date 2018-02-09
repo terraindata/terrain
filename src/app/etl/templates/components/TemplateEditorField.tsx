@@ -95,7 +95,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _proxy(): FieldNodeProxy
   {
-    const tree = new FieldTreeProxy(this._rootField(), this.onRootMutationBound);
+    const engine = this.props.templateEditor.template.transformationEngine;
+    const tree = new FieldTreeProxy(this._rootField(), engine, this.onRootMutationBound);
     return new FieldNodeProxy(tree, this.props.keyPath);
   }
 
@@ -131,7 +132,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _rootField()
   {
-    return this.props.templateEditor.getIn(['template', 'rootField']);
+    return this.props.templateEditor.rootField;
   }
 
   private onRootMutation(field: TemplateField)

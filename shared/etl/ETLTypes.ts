@@ -73,6 +73,12 @@ export const JS_TO_ES = {
   undefined: ELASTIC_TYPES.TEXT,
 };
 
+export function jsToElastic(type): ELASTIC_TYPES
+{
+  const eType = JS_TO_ES[type];
+  return eType !== undefined ? eType : ELASTIC_TYPES.TEXT;
+}
+
 export enum TEMPLATE_TYPES
 {
   EXPORT = 'export',
@@ -112,7 +118,7 @@ export interface ImportTemplateBase extends TemplateBase
 }
 
 // for the backend
-export type ExportTemplate = ExportTemplateBase & { rootField: any };
+export type ExportTemplate = ExportTemplateBase;
 
 // for the backend
-export type ImportTemplate = ImportTemplateBase & { rootField: any };
+export type ImportTemplate = ImportTemplateBase;

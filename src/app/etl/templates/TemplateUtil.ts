@@ -46,7 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import
 {
-  _ElasticFieldSettings, _TemplateField,
+  _ElasticFieldSettings, _TemplateField, createFieldFromEngine,
   ElasticFieldSettings, FieldNodeProxy, FieldTreeProxy, TemplateField,
 } from 'etl/templates/FieldTypes';
 import
@@ -58,30 +58,17 @@ import
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import * as Immutable from 'immutable';
-import { ELASTIC_TYPES, JS_TO_ES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
+import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
 const { List } = Immutable;
 
-function jsToElastic(type): ELASTIC_TYPES
-{
-  const eType = JS_TO_ES[type];
-  return eType !== undefined ? eType : ELASTIC_TYPES.TEXT;
-}
-
-export function createTreeFromEngine(engine: TransformationEngine, language = 'elastic'): TemplateField
+export function createTreeFromEngine(engine: TransformationEngine): TemplateField
 {
   const ids = engine.getAllFieldIDs();
   // sort the paths to ensure we visit parents before children
   const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
   const rootId = sortedIds.get(0);
-  const rootField = _TemplateField({
-    isIncluded: engine.getFieldEnabled(rootId),
-    langSettings: _ElasticFieldSettings({
-      langType: language,
-      type: jsToElastic(engine.getFieldType(rootId)),
-    }),
-    fieldId: rootId,
-  });
-  const tree = new FieldTreeProxy(rootField);
+  const rootField = createFieldFromEngine(engine, rootId);
+  const tree = new FieldTreeProxy(rootField, engine);
   const rootNode = tree.getRootNode();
 
   const enginePathToNode: {
@@ -99,18 +86,8 @@ export function createTreeFromEngine(engine: TransformationEngine, language = 'e
     }
     const parentPath = enginePath.slice(0, -1); // TODO update this when arrays become a thing
     const parentNode: FieldNodeProxy = enginePathToNode[JSON.stringify(parentPath)];
+    const newField = createFieldFromEngine(engine, id);
 
-    const newField = _TemplateField({
-      isIncluded: engine.getFieldEnabled(id),
-      langSettings: _ElasticFieldSettings({
-        langType: language,
-        type: jsToElastic(engine.getFieldType(id)),
-      }),
-      fieldId: id,
-      name: enginePath[enginePath.length - 1],
-    });
-
-    parentNode.set('langSettings', parentNode.get('langSettings').set('type', ELASTIC_TYPES.NESTED));
     const newNode = parentNode.makeChild(newField);
     enginePathToNode[JSON.stringify(enginePath)] = newNode;
   });
@@ -221,21 +198,6 @@ export const SampleDocuments = [
     'Product Name': 'This product does not conform',
     'Product ID': 6,
   },
-  // {
-  //   'Product Name': 'Scooter',
-  //   'Product ID': 10,
-  //   'Product Description': 'Do you like skateboards but want handlebars? Scooters are for you! Some are electric, others are not.',
-  //   'Meta': {
-  //     'Date Added': '01/18/2018',
-  //     'Views': 25,
-  //   },
-  //   'Here are some numbers': [
-  //     [1, 2, 3],
-  //     [3, 2, 1],
-  //     [1, 3, 2],
-  //     [2, 1, 3],
-  //   ],
-  // },
 ];
 
 // temporary helper for debugging. delete this

@@ -134,7 +134,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     );
   }
 
-  // TODO: put the logic here in TemplateFieldProxy
+  // TODO: put the logic here in FieldNodeProxy
   public handleNameChange(value)
   {
     const { field, templateEditor } = this.props;
@@ -155,7 +155,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 
   public handleIncludeCheckboxClicked()
   {
-    this._proxy().set('isIncluded', !this.props.field.isIncluded);
+    this._proxy().setFieldEnabled(!this.props.field.isIncluded);
   }
 
 }
