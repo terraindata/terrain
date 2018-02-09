@@ -79,6 +79,7 @@
       "^users/(.*)$": "<rootDir>/src/app/users/$1",
       "^util/(.*)$": "<rootDir>/src/app/util/$1",
       "^x/(.*)$": "<rootDir>/src/app/x/$1",
+      "^test-helpers/(.*)$": "<rootDir>/src/test/test-helpers/$1",
       "^.+\\.(css|less|scss)$": "ts-jest"
     },
     "globals": {
