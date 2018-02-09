@@ -54,8 +54,12 @@ import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { ELASTIC_TYPES, jsToElastic } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-// has methods that abstract how the tree is mutated
-// can also be constructed to create a 'tree' that emulates a store
+/*
+ *  In the MVC framework of the template editor, the proxy data structure acts as the controller
+ *  The proxy objects are generated synchronously and aren't meant to be persisted
+ *  (don't hold references to proxies across call contexts!)
+ */
+
 export class FieldTreeProxy
 {
   private onMutate: (root: TemplateField) => void = doNothing;

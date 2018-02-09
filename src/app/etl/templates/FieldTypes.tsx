@@ -48,7 +48,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
-import { makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { TransformationNode as TransformationNodeBase } from 'shared/transformations/TransformationNode';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 class ElasticFieldSettingsC
 {
@@ -63,6 +65,18 @@ export const _ElasticFieldSettings = makeExtendedConstructor(ElasticFieldSetting
   arrayType: List,
 });
 
+// recordized version of transformationNode
+class TransformationNodeC extends TransformationNodeBase
+{
+  public readonly meta: {};
+  constructor()
+  {
+    super(0, TransformationNodeType.LoadNode, List([]), {});
+  }
+}
+export type TransformationNode = WithIRecord<TransformationNodeC>;
+export const _TransformationNode = makeConstructor(TransformationNodeC);
+
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
 {
@@ -71,6 +85,7 @@ class TemplateFieldC
   public readonly fieldId: number = 0;
   public readonly name: string = '';
   public readonly children: List<TemplateField> = List([]);
+  public readonly transformations: List<TransformationNode> = List([]);
 
   public isArray(): boolean
   {

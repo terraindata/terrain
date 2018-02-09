@@ -47,6 +47,7 @@ THE SOFTWARE.
 // import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
+import { OptionsType } from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -85,9 +86,9 @@ class TransformationNodeVisitor
       case TransformationNodeType.AppendNode:
         return TransformationNodeVisitor.visitAppendNode(node, docCopy);
       case TransformationNodeType.CapitalizeNode:
-        return TransformationNodeVisitor.visitCapitalizeNode(node, docCopy);
+        return TransformationNodeVisitor.visitCapitalizeNode(node, docCopy as OptionsType<'capitalize'>);
       case TransformationNodeType.SubstringNode:
-        return TransformationNodeVisitor.visitSubstringNode(node, docCopy);
+        return TransformationNodeVisitor.visitSubstringNode(node, docCopy as OptionsType<'substring'>);
       default:
         return {
           errors: [
@@ -159,7 +160,7 @@ class TransformationNodeVisitor
     return {} as TransformationVisitResult;
   }
 
-  public static visitCapitalizeNode(node: TransformationNode, doc: object): TransformationVisitResult
+  public static visitCapitalizeNode(node: TransformationNode, doc: OptionsType<'capitalize'>): TransformationVisitResult
   {
     for (const fieldID of node.fieldIDs.toJS())
     {
@@ -181,7 +182,7 @@ class TransformationNodeVisitor
     } as TransformationVisitResult;
   }
 
-  public static visitSubstringNode(node: TransformationNode, doc: object): TransformationVisitResult
+  public static visitSubstringNode(node: TransformationNode, doc: OptionsType<'substring'>): TransformationVisitResult
   {
     for (const fieldID of node.fieldIDs.toJS())
     {
