@@ -111,7 +111,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
         if (request.streaming === true)
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), { body: query });
+          return new ElasticsearchScrollStream(client.getDelegate(), { body: query }, [], { objectMode: true });
         }
 
         return new Promise<QueryResponse>((resolve, reject) =>
@@ -140,7 +140,7 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  private async handleGroupJoin(parser: ESParser, query: object): Promise<QueryResponse>
+  private async handleGroupJoin(parser: ESParser, query: object): Promise<QueryResponse | Readable>
   {
     const childQuery = query['groupJoin'];
     query['groupJoin'] = undefined;

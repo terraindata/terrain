@@ -208,31 +208,24 @@ export class Export
       const payload = {
         database: exprt.dbid,
         type: 'search',
-        streaming: false,
+        streaming: true,
         databasetype: 'elastic',
         body: qry,
       };
 
       const qryResponse: any = await qh.handleQuery(payload);
-      if (qryResponse === undefined || qryResponse.hasError())
-      {
-        writer.end();
-        return reject('Nothing to export.');
-      }
-      const resp = qryResponse.result;
-      if (resp === undefined || resp.hits === undefined || resp.hits.total === 0 || resp.hits.hits.length === 0)
+      if (qryResponse === undefined || (qryResponse.hasError !== undefined && qryResponse.hasError()))
       {
         writer.end();
         return reject('Nothing to export.');
       }
 
-      const extractTransformations = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
-      exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
-
-      winston.info('Beginning export transformations.');
       try
       {
-        const docs: object[] = resp.hits.hits as object[];
+        const extractTransformations = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
+        exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
+
+        winston.info('Beginning export transformations.');
         const cfg = {
           extractTransformations,
           exprt,
@@ -242,37 +235,63 @@ export class Export
         };
 
         let isFirstJSONObj: boolean = true;
-        for (let doc of docs)
+        await new Promise(async (res, rej) =>
         {
-          doc = this._postProcessDoc(doc, cfg);
-          if (exprt.filetype === 'csv')
+          qryResponse.on('data', (doc) =>
           {
-            writer.write(doc);
-          }
-          else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-            writer.write(JSON.stringify(doc));
-          }
-
-          if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            writer.write(']');
-            if (exprt.filetype === 'json [type object]')
+            if (doc === undefined || doc === null)
             {
-              writer.write('}');
+              return res();
             }
-          }
-        }
+
+            try
+            {
+              doc = this._postProcessDoc(doc, cfg);
+              if (exprt.filetype === 'csv')
+              {
+                writer.write(doc);
+              }
+              else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+              {
+                isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+                writer.write(JSON.stringify(doc));
+              }
+
+              if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+              {
+                writer.write(']');
+                if (exprt.filetype === 'json [type object]')
+                {
+                  writer.write('}');
+                }
+              }
+            }
+            catch (e)
+            {
+              return rej(e);
+            }
+          });
+
+          qryResponse.on('end', () =>
+          {
+            return res();
+          });
+
+          qryResponse.on('error', (err) =>
+          {
+            winston.error(err);
+            return rej(err);
+          });
+        });
+
+        writer.end();
+        return resolve(writer);
       }
       catch (e)
       {
-        writer.end();
+        qryResponse.close();
         return reject(e);
       }
-
-      writer.end();
-      resolve(writer);
     });
   }
 
@@ -334,7 +353,7 @@ export class Export
     }
 
     doc = this._transformAndCheck(doc, cfg.exprt, false);
-    if (Boolean(cfg.exprt.rank))
+    if (cfg.exprt.rank === true)
     {
       if (doc['TERRAINRANK'] !== undefined)
       {
