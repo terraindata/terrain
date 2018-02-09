@@ -310,7 +310,7 @@ class FilterLineC extends LineC
 export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
 {
-  let filterLine = New<FilterLine>(new FilterLineC(config), config);
+  let filterLine = New<FilterLine>(new FilterLineC(Util.asJS(config)), Util.asJS(config));
   if (config && config.filterGroup !== null && config.filterGroup !== undefined)
   {
     filterLine = filterLine.set('filterGroup', _FilterGroup(config.filterGroup));
