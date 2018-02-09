@@ -47,11 +47,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import
-{
-  ELASTIC_TYPES, ExportTemplateBase,
-  ImportTemplateBase, TEMPLATE_TYPES,
-} from 'shared/etl/ETLTypes';
+import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { makeConstructor, makeDeepConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 class ElasticFieldSettingsC
