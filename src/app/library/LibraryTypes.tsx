@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import Ajax from 'util/Ajax';
 import Util from 'util/Util';
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
@@ -56,6 +57,7 @@ import { createRecordType } from '../Classes';
 
 class LibraryStateC
 {
+  public api = null;
   public loaded = false;
   public loading = true;
   public dbs: List<BackendInstance> = Immutable.List([]);
@@ -89,6 +91,18 @@ export const _LibraryState = (config?: any) =>
   {
     config['modelVersion'] = 3;
   }
+  if (config === undefined)
+  {
+    config = { api: Ajax };
+  }
+  else
+  {
+    if (config.ajax === undefined)
+    {
+      config.api = Ajax;
+    }
+  }
+
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 

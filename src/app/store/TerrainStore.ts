@@ -49,6 +49,8 @@ import * as Immutable from 'immutable';
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
 import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
 import { AuthReducers } from 'auth/data/AuthRedux';
+import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
+import BuilderReducers from 'builder/data/BuilderReducers';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
@@ -63,12 +65,14 @@ import { ColorsReducers } from '../colors/data/ColorsRedux';
 const reducers = {
   analytics: AnalyticsReducer,
   auth: AuthReducers,
+  builder: BuilderReducers,
   colors: ColorsReducers,
   library: LibraryReducer,
   roles: RolesReducer,
   schema: SchemaReducers,
   users: UserReducers,
   spotlights: SpotlightReducers,
+  builderCards: BuilderCardsReducers,
 };
 
 const rootReducer = combineReducers(reducers);

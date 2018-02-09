@@ -54,6 +54,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import BuilderActions from 'builder/data/BuilderActions';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
@@ -61,13 +62,13 @@ import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
-import Actions from '../../data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 
 import Radium = require('radium');
 
+import Util from 'util/Util';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
@@ -93,6 +94,7 @@ export interface Props
   allowSpotlights: boolean;
   onNavigationException: () => void;
   ignoreEmptyCards?: boolean;
+  builderActions?: typeof BuilderActions;
 }
 
 interface State
@@ -111,6 +113,7 @@ interface State
   mouseStartY?: number;
   mapMaxHeight?: number;
   spotlightHits?: Immutable.Map<string, any>;
+  builderActions?: typeof BuilderActions;
 }
 
 const MAP_MAX_HEIGHT = 300;
@@ -121,7 +124,7 @@ class HitsArea extends TerrainComponent<Props>
 {
   public static handleConfigChange(config: ResultsConfig)
   {
-    Actions.changeResultsConfig(config);
+    BuilderActions.changeResultsConfig(config);
   }
 
   public state: State = {
@@ -860,4 +863,8 @@ column if you have customized the results view.');
   }
 }
 
-export default HitsArea;
+export default Util.createContainer(
+  HitsArea,
+  [],
+  { builderActions: BuilderActions },
+);

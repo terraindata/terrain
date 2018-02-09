@@ -43,79 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import ActionTypes from './BuilderCardsActionTypes';
+import { _BuilderCardsState, BuilderCardsState } from './BuilderCardsState';
 
-// tslint:disable:strict-boolean-expressions
+const BuilderCardsReducers =
+  {
+    [ActionTypes.hoverCard]: (state, action) =>
+    {
+      if (state.hoveringCardId !== action.payload.cardId)
+      {
+        return state.set('hoveringCardId', action.payload.cardId);
+      }
 
-import { Card } from '../../blocks/types/Card';
-import { Input, InputPrefix } from '../../blocks/types/Input';
+      return state;
+    },
+    // if hovered over same card, will return original state object
+  };
 
-import * as Immutable from 'immutable';
-import { SchemaState } from 'schema/SchemaTypes';
-import { BuilderState } from './data/BuilderState';
-
-export function getTermsForKeyPath(
-  keyPath: KeyPath,
-  schemaState: SchemaState,
-  builderState: BuilderState,
-): List<string>
+const BuilderCardsReducersWrapper = (
+  state: BuilderCardsState = _BuilderCardsState(),
+  action: Action<{
+    keyPath: KeyPath;
+    notDirty: boolean;
+  }>,
+) =>
 {
-  const terms = getTermsForKeyPathHelper(keyPath, builderState, schemaState);
-
-  // TODO migrate inputs reduction to the Query class if we get a query class
-  const inputs = builderState.query && builderState.query.inputs;
-  if (inputs && inputs.size)
+  if (typeof BuilderCardsReducers[action.type] === 'function')
   {
-    const inputTerms = inputs.map(
-      (input: Input) => InputPrefix + input.key,
-    ).toList();
-    if (terms)
-    {
-      return inputTerms.concat(terms).toList();
-    }
-    return inputTerms;
+    state = (BuilderCardsReducers[action.type] as any)(state, action);
   }
 
-  return terms;
-}
+  return state;
+};
 
-function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState, schemaState: SchemaState): List<string>
-{
-  if (!keyPath.size)
-  {
-    return Immutable.List([]);
-  }
-
-  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state, schemaState);
-
-  const block = state.getIn(keyPath);
-
-  if (block && block._isCard)
-  {
-    const card = block as Card;
-
-    if (card.static.getChildTerms)
-    {
-      terms = terms.concat(card.static.getChildTerms(card, schemaState)).toList();
-    }
-
-    if (card.static.getNeighborTerms)
-    {
-      terms = terms.concat(card.static.getNeighborTerms(card, schemaState)).toList();
-    }
-
-    if (card['cards'])
-    {
-      card['cards'].map(
-        (childCard: Card) =>
-        {
-          if (childCard.static.getParentTerms)
-          {
-            terms = terms.concat(childCard.static.getParentTerms(childCard, schemaState, state)).toList();
-          }
-        },
-      );
-    }
-  }
-
-  return terms;
-}
+export default BuilderCardsReducersWrapper;

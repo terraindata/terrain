@@ -54,7 +54,7 @@ import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import BuilderActions from '../data/BuilderActions';
-import { BuilderState, BuilderStore } from '../data/BuilderStore';
+import { BuilderState } from '../data/BuilderState';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -80,21 +80,14 @@ class BuilderMapComponent extends TerrainComponent<Props>
       inputs: null,
     };
 
-  public constructor(props: Props)
+  public componentWillReceiveProps(nextProps)
   {
-    super(props);
-    this._subscribe(BuilderStore, {
-      stateKey: 'builderState',
-      updater: (builderState: BuilderState) =>
-      {
-        if (builderState.query && builderState.query.inputs !== this.state.inputs)
-        {
-          this.setState({
-            inputs: builderState.query.inputs,
-          });
-        }
-      },
-    });
+    if (nextProps.builder.query && nextProps.builder.query.inputs !== this.state.inputs)
+    {
+      this.setState({
+        inputs: nextProps.builder.query.inputs,
+      });
+    }
   }
 
   public handleChange(coordinates, inputValue)
@@ -148,6 +141,6 @@ class BuilderMapComponent extends TerrainComponent<Props>
 }
 export default Util.createTypedContainer(
   BuilderMapComponent,
-  ['spotlights'],
+  ['builder', 'spotlights'],
   {},
 );

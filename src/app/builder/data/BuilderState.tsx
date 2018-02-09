@@ -44,78 +44,61 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
-
-import { Card } from '../../blocks/types/Card';
-import { Input, InputPrefix } from '../../blocks/types/Input';
+// tslint:disable:no-var-requires strict-boolean-expressions variable-name
 
 import * as Immutable from 'immutable';
-import { SchemaState } from 'schema/SchemaTypes';
-import { BuilderState } from './data/BuilderState';
+import { List, Map } from 'immutable';
+import { applyMiddleware, createStore } from 'redux';
+import logger from 'redux-logger';
+import { _FileImportState, FileImportState } from '../../fileImport/FileImportTypes';
+import { CardItem } from '../components/cards/CardComponent';
+import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
+import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
-export function getTermsForKeyPath(
-  keyPath: KeyPath,
-  schemaState: SchemaState,
-  builderState: BuilderState,
-): List<string>
+import { Cards } from '../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../database/AllBackends';
+import BackendInstance from '../../../database/types/BackendInstance';
+import Query from '../../../items/types/Query';
+import { Template, Transform } from '../../fileImport/FileImportTypes';
+
+export class BuilderStateClass
 {
-  const terms = getTermsForKeyPathHelper(keyPath, builderState, schemaState);
+  public algorithmId: ID = '';
+  public query: Query = null;
 
-  // TODO migrate inputs reduction to the Query class if we get a query class
-  const inputs = builderState.query && builderState.query.inputs;
-  if (inputs && inputs.size)
-  {
-    const inputTerms = inputs.map(
-      (input: Input) => InputPrefix + input.key,
-    ).toList();
-    if (terms)
-    {
-      return inputTerms.concat(terms).toList();
-    }
-    return inputTerms;
-  }
+  // for undo/redo
+  public pastQueries: List<Query> = Immutable.List([]);
+  public nextQueries: List<Query> = Immutable.List([]);
+  public lastActionType: string = '';
+  public lastActionKeyPath: KeyPath = null;
+  public lastActionTime: number = 0;
 
-  return terms;
+  public loading: boolean = false;
+  public loadingXhr: XMLHttpRequest = null;
+  public loadingAlgorithmId: ID = '';
+
+  public selectedCardIds = Map<ID, boolean>({});
+
+  public db: BackendInstance = {} as any;
+
+  // TODO move
+  public manual = Map<ID, Cards>({});
+  // Card examples used in the manual are stored here.
+
+  public draggingCardItem: CardItem | null = null;
+  public draggingOverKeyPath: KeyPath = Immutable.List([]);
+  public draggingOverIndex: number = -1;
+
+  public isDirty: boolean = false;
+
+  public resultsState: ResultsState = _ResultsState();
+  public exportState: FileImportState = _FileImportState();
+
+  public modelVersion = 3;
 }
-
-function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState, schemaState: SchemaState): List<string>
+export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
+const BuilderState_Record = Immutable.Record(new BuilderStateClass());
+export const _BuilderState = (config?: any) =>
 {
-  if (!keyPath.size)
-  {
-    return Immutable.List([]);
-  }
-
-  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state, schemaState);
-
-  const block = state.getIn(keyPath);
-
-  if (block && block._isCard)
-  {
-    const card = block as Card;
-
-    if (card.static.getChildTerms)
-    {
-      terms = terms.concat(card.static.getChildTerms(card, schemaState)).toList();
-    }
-
-    if (card.static.getNeighborTerms)
-    {
-      terms = terms.concat(card.static.getNeighborTerms(card, schemaState)).toList();
-    }
-
-    if (card['cards'])
-    {
-      card['cards'].map(
-        (childCard: Card) =>
-        {
-          if (childCard.static.getParentTerms)
-          {
-            terms = terms.concat(childCard.static.getParentTerms(childCard, schemaState, state)).toList();
-          }
-        },
-      );
-    }
-  }
-
-  return terms;
-}
+  return new BuilderState_Record(config || {}) as any as BuilderState;
+};

@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { Card, CardString } from '../../../blocks/types/Card';
 
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import FadeInOut from 'common/components/FadeInOut';
 import * as React from 'react';
@@ -67,6 +68,7 @@ export interface Props
   display: Display;
   language: string;
   tuningMode?: boolean;
+  builderActions?: typeof BuilderActions;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>
@@ -114,6 +116,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
             index={null}
             display={this.props.display}
             tuningMode={this.props.tuningMode}
+            builderActions={this.props.builderActions}
           />
         </div>
       </FadeInOut>

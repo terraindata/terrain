@@ -91,11 +91,11 @@ const UNIT_MAPPINGS = {
   'nautical miles': 'nmi',
 };
 
-export function ElasticValueInfoToCards(rootValueInfo: ESValueInfo, currentCards: Cards)
+export function ElasticValueInfoToCards(rootValueInfo: ESValueInfo, currentCards: Cards, query: Query)
 {
   const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'body');
   const cards = BlockUtils.reconcileCards(currentCards, List([rootCard]));
-  return ESCardParser.parseAndUpdateCards(cards);
+  return ESCardParser.parseAndUpdateCards(cards, query);
 }
 
 export const ElasticCustomCards: { [type: string]: any } =
@@ -117,10 +117,8 @@ export default function ElasticToCards(
   {
     try
     {
-      const parser = new ESJSONParser(query.tql);
-      const interpreter = new ESInterpreter(parser);
-      const rootValueInfo = interpreter.parser.getValueInfo();
-      const cards = ElasticValueInfoToCards(rootValueInfo, query.cards);
+      const rootValueInfo = query.parseTree.parser.getValueInfo();
+      const cards = ElasticValueInfoToCards(rootValueInfo, query.cards, query);
       return query
         .set('cards', cards)
         .set('cardsAndCodeInSync', true);

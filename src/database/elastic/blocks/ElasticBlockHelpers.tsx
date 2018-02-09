@@ -46,8 +46,9 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
-import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
+import { BuilderState } from 'builder/data/BuilderState';
+import { SchemaState } from 'schema/SchemaTypes';
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
@@ -72,11 +73,11 @@ export const TransformableTypes =
   ];
 
 export const ElasticBlockHelpers = {
-  getColumnType(schemaState: any, column: string): string
+  getColumnType(schemaState: SchemaState, builderState: BuilderState, column: string): string
   {
-    const serverName = BuilderStore.getState().db.name;
-    const index = getIndex();
-    const type = getType();
+    const serverName = builderState.db.name;
+    const index = getIndex('', builderState);
+    const type = getType('', builderState);
 
     const key = serverName + '/' + String(index) + '.' + String(type) + '.c.' + column;
     if (schemaState.columns instanceof Map)
@@ -99,14 +100,13 @@ export const ElasticBlockHelpers = {
     }
   },
 
-  autocompleteMatches(schemaState, matchType: AutocompleteMatchType): List<string>
+  autocompleteMatches(schemaState, builderState, matchType: AutocompleteMatchType): List<string>
   {
     // 1. Need to get current index
 
-    const state = BuilderStore.getState();
-    const cards = state.query.cards;
-    const index = getIndex();
-    const server = BuilderStore.getState().db.name;
+    const cards = builderState.query.cards;
+    const index = getIndex('', builderState);
+    const server = builderState.db.name;
 
     if (matchType === AutocompleteMatchType.Index)
     {
@@ -125,7 +125,7 @@ export const ElasticBlockHelpers = {
 
     if (index !== null)
     {
-      const indexId = state.db.name + '/' + String(index);
+      const indexId = `${builderState.db.name}/${index}`;
 
       if (matchType === AutocompleteMatchType.Type)
       {
@@ -139,14 +139,14 @@ export const ElasticBlockHelpers = {
       // else we are in the Field or Transform case...
 
       // 2. Need to get current type
-      const type = getType();
+      const type = getType('', builderState);
 
       // 3. If Transform, return columns matching server/index/type that can be transformed
       if (matchType === AutocompleteMatchType.Transform)
       {
         if (type !== null)
         {
-          const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+          const typeId = `${builderState.db.name}/${index}.${type}`;
           const transformableFields = schemaState.columns.filter(
             (column) => column.serverId === String(server) &&
               column.databaseId === String(indexId) &&
@@ -162,7 +162,7 @@ export const ElasticBlockHelpers = {
 
       if (type !== null)
       {
-        const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+        const typeId = `${builderState.db.name}/${index}.${type}`;
 
         // 4. Return all columns matching this (server+)index+type
 
@@ -180,11 +180,10 @@ export const ElasticBlockHelpers = {
   },
 };
 
-export function findCardType(name: string): List<Block>
+export function findCardType(name: string, builderState: BuilderState): List<Block>
 {
-  const state = BuilderStore.getState();
   let theCards = List([]);
-  forAllCards(state.query.cards, (card) =>
+  forAllCards(builderState.query.cards, (card) =>
   {
     if (card.type === name)
     {
@@ -194,9 +193,9 @@ export function findCardType(name: string): List<Block>
   return theCards;
 }
 
-export function getIndex(notSetIndex: string = null): string | List<string> | null
+export function getIndex(notSetIndex: string = null, builderState: BuilderState): string | List<string> | null
 {
-  const cards = findCardType('elasticFilter');
+  const cards = findCardType('elasticFilter', builderState);
   if (cards.size === 0)
   {
     return notSetIndex;
@@ -223,9 +222,9 @@ export function getIndex(notSetIndex: string = null): string | List<string> | nu
   return (indexes.size === 0) ? notSetIndex : (indexes.size === 1) ? indexes.get(0) : indexes;
 }
 
-export function getType(notSetType: string = null): string | List<string> | null
+export function getType(notSetType: string = null, builderState: BuilderState): string | List<string> | null
 {
-  const cards = findCardType('elasticFilter');
+  const cards = findCardType('elasticFilter', builderState);
   if (cards.size === 0)
   {
     return notSetType;

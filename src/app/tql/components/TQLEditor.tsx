@@ -65,6 +65,7 @@ import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
+import { BuilderState } from 'builder/data/BuilderState';
 import { Doc, Editor } from 'codemirror';
 import * as CodeMirrorLib from 'codemirror';
 
@@ -108,6 +109,8 @@ export interface Props
   diffTql?: string;
 
   placeholder?: string;
+
+  builder?: BuilderState;
 
   onChange?(tql: string, noAction?: boolean, manualRequest?: boolean);
 
@@ -363,7 +366,7 @@ class TQLEditor extends TerrainComponent<Props>
   {
     if (this.props.language === 'elastic')
     {
-      ElasticHighlighter.highlightES(cmInstance);
+      ElasticHighlighter.highlightES(cmInstance, this.props.builder);
     }
   }
 
@@ -497,7 +500,7 @@ class TQLEditor extends TerrainComponent<Props>
 
     if (this.props.language === 'elastic') // make this a switch if there are more languages
     {
-      ElasticHighlighter.highlightES(cmInstance);
+      ElasticHighlighter.highlightES(cmInstance, this.props.builder);
     }
   }
 
@@ -505,7 +508,7 @@ class TQLEditor extends TerrainComponent<Props>
 
 export default Util.createContainer(
   TQLEditor,
-  [],
+  ['builder'],
   {
     colorsActions: ColorsActions,
   },
