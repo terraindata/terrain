@@ -49,7 +49,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { makeRecordConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 class ElasticFieldSettingsC
 {
@@ -60,7 +60,7 @@ class ElasticFieldSettingsC
   public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
 }
 export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
-export const _ElasticFieldSettings = makeRecordConstructor(ElasticFieldSettingsC, false, {
+export const _ElasticFieldSettings = makeExtendedConstructor(ElasticFieldSettingsC, false, {
   arrayType: List,
 });
 
@@ -93,7 +93,7 @@ class TemplateFieldC
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
-export const _TemplateField = makeRecordConstructor(TemplateFieldC, true, {
+export const _TemplateField = makeExtendedConstructor(TemplateFieldC, true, {
   children: (config: object[] = []) =>
   {
     return List<TemplateField>(config.map((value: object, index) => _TemplateField(value, true)));

@@ -50,7 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 import { FILE_TYPES } from 'shared/etl/ETLTypes';
-import { makeConstructor, makeRecordConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import
 {
@@ -103,7 +103,7 @@ class ExportTemplateC implements ExportTemplateBase, RootFieldType
   public transformationEngine = new TransformationEngine();
 }
 export type ExportTemplate = WithIRecord<ExportTemplateC>;
-export const _ExportTemplate = makeRecordConstructor(ExportTemplateC, false, {
+export const _ExportTemplate = makeExtendedConstructor(ExportTemplateC, false, {
   rootField: _TemplateField,
   transformationEngine: TransformationEngine.load,
 });
@@ -123,7 +123,7 @@ class ImportTemplateC implements ImportTemplateBase, RootFieldType
   public transformationEngine = new TransformationEngine();
 }
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
-export const _ImportTemplate = makeRecordConstructor(ImportTemplateC, false, {
+export const _ImportTemplate = makeExtendedConstructor(ImportTemplateC, false, {
   rootField: _TemplateField,
   transformationEngine: TransformationEngine.load,
 });

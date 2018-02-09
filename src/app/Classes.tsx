@@ -215,7 +215,7 @@ function injectInstanceMethods(constructor, instance)
  * Any child immutable records that also contains immutable objects should use makeRecordConstructor with a defined configOverride
  * the overrider is called if the resultant constructor is called with deep = true
  */
-export function makeRecordConstructor<T>(
+export function makeExtendedConstructor<T>(
   Type: { new(): T; },
   injectMethods: boolean = false,
   configOverride?: overrideMap<T>,
