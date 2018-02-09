@@ -49,7 +49,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { makeConstructor, makeDeepConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { makeRecordConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 class ElasticFieldSettingsC
 {
@@ -60,20 +60,40 @@ class ElasticFieldSettingsC
   public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
 }
 export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
-export const _ElasticFieldSettings = makeDeepConstructor(ElasticFieldSettingsC, {
+export const _ElasticFieldSettings = makeRecordConstructor(ElasticFieldSettingsC, false, {
   arrayType: List,
 });
 
 class TemplateFieldC
 {
-  public isIncluded: boolean = true;
-  public langSettings: ElasticFieldSettings = _ElasticFieldSettings();
-  public fieldId: number = 0;
-  public name: string = '';
-  public children: List<TemplateField> = List([]);
+  public readonly isIncluded: boolean = true;
+  public readonly langSettings: ElasticFieldSettings = _ElasticFieldSettings();
+  public readonly fieldId: number = 0;
+  public readonly name: string = '';
+  public readonly children: List<TemplateField> = List([]);
+
+  public isArray(): boolean
+  {
+    const type = this.langSettings.type;
+    return type === ELASTIC_TYPES.ARRAY;
+  }
+
+  // returns how deep the array type is. For example, if the field's type is array of array of text, then the depth is 2.
+  public arrayDepth(): number
+  {
+    const { arrayType } = this.langSettings;
+    return this.isArray() ? arrayType.size : 0;
+  }
+
+  public isNested(): boolean
+  {
+    const { type, arrayType } = this.langSettings;
+    return type === ELASTIC_TYPES.NESTED ||
+      (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
+  }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
-export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
+export const _TemplateField = makeRecordConstructor(TemplateFieldC, true, {
   children: (config: object[] = []) =>
   {
     return List<TemplateField>(config.map((value: object, index) => _TemplateField(value, true)));
@@ -181,26 +201,6 @@ export class FieldNodeProxy
 
 export abstract class FieldUtil
 {
-  public static isArray(field): boolean
-  {
-    const type = field.langSettings.type;
-    return type === ELASTIC_TYPES.ARRAY;
-  }
-
-  // returns how deep the array type is. For example, if the field's type is array of array of text, then the depth is 2.
-  public static arrayDepth(field): number
-  {
-    const { arrayType } = field.langSettings;
-    return FieldUtil.isArray(field) ? arrayType.size : 0;
-  }
-
-  public static isNested(field): boolean
-  {
-    const { type, arrayType } = field.langSettings;
-    return type === ELASTIC_TYPES.NESTED ||
-      (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
-  }
-
   public static isRoot(keyPath: KeyPath): boolean
   {
     return keyPath.size === 0;

@@ -143,9 +143,9 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
   {
     const { field, canEdit, preview, depth, label, displayKeyPath, injectedContent } = this.props;
     let content = null;
-    const simpleArrayDisplay: boolean = !FieldUtil.isNested(field) && depth + 1 === FieldUtil.arrayDepth(field);
+    const simpleArrayDisplay: boolean = !field.isNested() && depth + 1 === field.arrayDepth();
 
-    if (depth === FieldUtil.arrayDepth(field) && FieldUtil.isNested(field))
+    if (depth === field.arrayDepth() && field.isNested())
     {
       content = this.props.renderNestedFields(preview, displayKeyPath);
     }

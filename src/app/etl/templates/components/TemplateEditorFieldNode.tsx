@@ -161,7 +161,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     let content = null;
     const injectedContent = this.renderSettingsContainer();
 
-    if (FieldUtil.isArray(field))
+    if (field.isArray())
     {
       return (
         <TemplateEditorFieldArrayNode
@@ -172,7 +172,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
         />
       );
     }
-    else if (FieldUtil.isNested(field))
+    else if (field.isNested())
     {
       children = this.renderChildFields(preview, displayKeyPath);
       content = (

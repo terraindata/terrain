@@ -135,7 +135,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
     const { template, documents, previewIndex } = this.props.templateEditor;
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
     const transformedPreviewDocument = template.transformationEngine.transform(previewDocument);
-
     if (!showEditor)
     {
       return <div className='template-editor-column main-document-column-hidden' />;
