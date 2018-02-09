@@ -334,7 +334,7 @@ export class Export
       {
         if (cfg.fieldArrayDepths[field] !== undefined)
         {
-          cfg.fieldArrayDepths[field] = cfg.fieldArrayDepths[field] + this._getArrayDepth(doc[field]);
+          cfg.fieldArrayDepths[field] = Number(cfg.fieldArrayDepths[field]) + this._getArrayDepth(doc[field]);
           if (cfg.fieldArrayDepths[field] > 1)
           {
             throw new Error('Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.');
