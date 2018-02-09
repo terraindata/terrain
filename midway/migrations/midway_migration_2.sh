@@ -6,5 +6,6 @@ if [ -d ../../../PersistentVolumes/midway-postgres-data ]; then
     # do nothing
     echo "Target directory already exists, doing nothing...";
 else
+    mkdir ../../../PersistentVolumes
     sudo mv ../../postgres-data ../../../PersistentVolumes/midway-postgres-data
 fi
