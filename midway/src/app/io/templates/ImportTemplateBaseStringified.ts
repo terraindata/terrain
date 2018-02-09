@@ -49,4 +49,5 @@ import { TemplateBaseStringified } from './TemplateBaseStringified';
 export default class ImportTemplateBaseStringified extends TemplateBaseStringified
 {
   public name: string;
+  public requireJSONHaveAllFields: boolean;
 }

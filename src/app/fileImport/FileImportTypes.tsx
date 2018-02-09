@@ -142,6 +142,7 @@ class TemplateC
   public primaryKeyDelimiter: string = '-';
   public objectKey?: string = '';
   public persistentAccessToken?: string = '';
+  public requireJSONHaveAllFields: boolean = true;
   public dbid?: number = -1;
   public dbname?: string = '';
   public tablename?: string = '';
@@ -161,6 +162,7 @@ export const _Template =
     primaryKeyDelimiter: string;
     objectKey?: string;
     persistentAccessToken?: string;
+    requireJSONHaveAllFields: boolean;
     dbid?: number;
     dbname?: string;
     tablename?: string;

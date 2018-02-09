@@ -828,8 +828,8 @@ export const Ajax =
       update: boolean,
       hasCsvHeader: boolean,
       isNewlineSeparatedJSON: boolean,
-      requireJSONHaveAllFields: boolean,
       primaryKeyDelimiter: string,
+      requireJSONHaveAllFields: boolean,
       onLoad: (resp: any) => void,
       onError: (resp: any) => void,
     )
@@ -851,8 +851,8 @@ export const Ajax =
       formData.append('update', String(update));
       formData.append('hasCsvHeader', String(hasCsvHeader));
       formData.append('isNewlineSeparatedJSON', String(isNewlineSeparatedJSON));
-      formData.append('requireJSONHaveAllFields', String(requireJSONHaveAllFields));
       formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
+      formData.append('requireJSONHaveAllFields', String(requireJSONHaveAllFields));
 
       const xhr = new XMLHttpRequest();
       xhr.open('post', MIDWAY_HOST + '/midway/v1/import/');
@@ -933,6 +933,7 @@ export const Ajax =
       name: string,
       exporting: boolean,
       primaryKeyDelimiter: string,
+      requireJSONHaveAllFields: boolean,
       objectKey: string,
       rank: boolean,
       onLoad: (resp: object[]) => void,
@@ -950,6 +951,7 @@ export const Ajax =
         name,
         export: exporting,
         primaryKeyDelimiter,
+        requireJSONHaveAllFields,
         objectKey,
         rank,
       };
@@ -976,6 +978,7 @@ export const Ajax =
       transformations: List<object>,
       exporting: boolean,
       primaryKeyDelimiter: string,
+      requireJSONHaveAllFields: boolean,
       templateId: number,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
@@ -988,6 +991,7 @@ export const Ajax =
         transformations,
         export: exporting,
         primaryKeyDelimiter,
+        requireJSONHaveAllFields,
       };
       const onLoadHandler = (resp) =>
       {

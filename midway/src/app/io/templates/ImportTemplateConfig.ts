@@ -50,7 +50,7 @@ import { TemplateBase } from './TemplateBase';
 export class ImportTemplateConfig extends TemplateBase
 {
   public name: string = '';
-
+  public requireJSONHaveAllFields: boolean = true;
   constructor(props: object)
   {
     super(props);
