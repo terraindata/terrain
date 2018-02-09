@@ -55,10 +55,8 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import
-{
-  _TemplateField, FieldNodeProxy, FieldTreeProxy, TemplateField,
-} from 'etl/templates/FieldTypes';
+import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
+import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 

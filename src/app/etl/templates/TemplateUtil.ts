@@ -46,13 +46,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import
 {
-  _ElasticFieldSettings, _TemplateField, createFieldFromEngine,
-  ElasticFieldSettings, FieldNodeProxy, FieldTreeProxy, TemplateField,
-} from 'etl/templates/FieldTypes';
-import
-{
   _ExportTemplate, destringifySavedTemplate,
-  ETLTemplate, TemplateEditorState, templateForSave,
+  ETLTemplate, templateForSave,
 } from 'etl/templates/TemplateTypes';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -60,40 +55,6 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import * as Immutable from 'immutable';
 import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
 const { List } = Immutable;
-
-export function createTreeFromEngine(engine: TransformationEngine): TemplateField
-{
-  const ids = engine.getAllFieldIDs();
-  // sort the paths to ensure we visit parents before children
-  const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
-  const rootId = sortedIds.get(0);
-  const rootField = createFieldFromEngine(engine, rootId);
-  const tree = new FieldTreeProxy(rootField, engine);
-  const rootNode = tree.getRootNode();
-
-  const enginePathToNode: {
-    [kp: string]: FieldNodeProxy,
-  } = {
-      [JSON.stringify([])]: rootNode,
-    };
-
-  sortedIds.forEach((id, index) =>
-  {
-    const enginePath = engine.getOutputKeyPath(id).toJS();
-    if (enginePath.length === 0)
-    {
-      return;
-    }
-    const parentPath = enginePath.slice(0, -1); // TODO update this when arrays become a thing
-    const parentNode: FieldNodeProxy = enginePathToNode[JSON.stringify(parentPath)];
-    const newField = createFieldFromEngine(engine, id);
-
-    const newNode = parentNode.makeChild(newField);
-    enginePathToNode[JSON.stringify(enginePath)] = newNode;
-  });
-
-  return tree.getRootField();
-}
 
 export function testSerialization(template: ETLTemplate): ETLTemplate
 {
@@ -201,99 +162,99 @@ export const SampleDocuments = [
 ];
 
 // temporary helper for debugging. delete this
-export function treeFromDocument(document: object, name = '', fieldSettingsOverride?): TemplateField
-{
-  if (document === null)
-  {
-    return _TemplateField();
-  }
+// export function treeFromDocument(document: object, name = '', fieldSettingsOverride?): TemplateField
+// {
+//   if (document === null)
+//   {
+//     return _TemplateField();
+//   }
 
-  try
-  {
-    JSON.stringify(document);
-  }
-  catch (e)
-  {
-    return _TemplateField();
-  }
+//   try
+//   {
+//     JSON.stringify(document);
+//   }
+//   catch (e)
+//   {
+//     return _TemplateField();
+//   }
 
-  const children = [];
+//   const children = [];
 
-  for (const key of Object.keys(document))
-  {
-    const value = document[key];
+//   for (const key of Object.keys(document))
+//   {
+//     const value = document[key];
 
-    if (value !== Object(value))
-    {
-      if (typeof value === 'number')
-      {
-        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.FLOAT }) }));
-      }
-      else if (typeof value === 'boolean')
-      {
-        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.BOOLEAN }) }));
-      }
-      else // assume text
-      {
-        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.TEXT }) }));
-      }
-    }
-    else if (Array.isArray(value))
-    {
-      let arrayVal: any = Array.isArray(value) && value.length > 0 ? value[0] : '';
-      const arrayType = [];
+//     if (value !== Object(value))
+//     {
+//       if (typeof value === 'number')
+//       {
+//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.FLOAT }) }));
+//       }
+//       else if (typeof value === 'boolean')
+//       {
+//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.BOOLEAN }) }));
+//       }
+//       else // assume text
+//       {
+//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.TEXT }) }));
+//       }
+//     }
+//     else if (Array.isArray(value))
+//     {
+//       let arrayVal: any = Array.isArray(value) && value.length > 0 ? value[0] : '';
+//       const arrayType = [];
 
-      while (Array.isArray(arrayVal))
-      {
-        arrayType.push(ELASTIC_TYPES.ARRAY);
-        if (arrayVal.length > 0)
-        {
-          arrayVal = arrayVal[0];
-        }
-        else
-        {
-          arrayVal = '';
-        }
-      }
-      if (typeof arrayVal === 'object')
-      {
-        arrayType.push(ELASTIC_TYPES.NESTED);
-      }
-      else if (typeof arrayVal === 'number')
-      {
-        arrayType.push(ELASTIC_TYPES.FLOAT);
-      }
-      else if (typeof arrayVal === 'boolean')
-      {
-        arrayType.push(ELASTIC_TYPES.BOOLEAN);
-      }
-      else
-      {
-        arrayType.push(ELASTIC_TYPES.TEXT);
-      }
-      if (typeof arrayVal === 'object')
-      {
-        const override = _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) });
-        children.push(treeFromDocument(arrayVal, key, override));
-      }
-      else
-      {
-        children.push(_TemplateField(
-          {
-            name: key,
-            langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }),
-          }));
-      }
-    }
-    else // nested
-    {
-      children.push(treeFromDocument(value, key));
-    }
-  }
-  return _TemplateField(
-    {
-      name,
-      children: List(children),
-      langSettings: fieldSettingsOverride !== undefined ? fieldSettingsOverride : _ElasticFieldSettings({ type: ELASTIC_TYPES.NESTED }),
-    });
-}
+//       while (Array.isArray(arrayVal))
+//       {
+//         arrayType.push(ELASTIC_TYPES.ARRAY);
+//         if (arrayVal.length > 0)
+//         {
+//           arrayVal = arrayVal[0];
+//         }
+//         else
+//         {
+//           arrayVal = '';
+//         }
+//       }
+//       if (typeof arrayVal === 'object')
+//       {
+//         arrayType.push(ELASTIC_TYPES.NESTED);
+//       }
+//       else if (typeof arrayVal === 'number')
+//       {
+//         arrayType.push(ELASTIC_TYPES.FLOAT);
+//       }
+//       else if (typeof arrayVal === 'boolean')
+//       {
+//         arrayType.push(ELASTIC_TYPES.BOOLEAN);
+//       }
+//       else
+//       {
+//         arrayType.push(ELASTIC_TYPES.TEXT);
+//       }
+//       if (typeof arrayVal === 'object')
+//       {
+//         const override = _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) });
+//         children.push(treeFromDocument(arrayVal, key, override));
+//       }
+//       else
+//       {
+//         children.push(_TemplateField(
+//           {
+//             name: key,
+//             langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }),
+//           }));
+//       }
+//     }
+//     else // nested
+//     {
+//       children.push(treeFromDocument(value, key));
+//     }
+//   }
+//   return _TemplateField(
+//     {
+//       name,
+//       children: List(children),
+//       langSettings: fieldSettingsOverride !== undefined ? fieldSettingsOverride : _ElasticFieldSettings({ type: ELASTIC_TYPES.NESTED }),
+//     });
+// }

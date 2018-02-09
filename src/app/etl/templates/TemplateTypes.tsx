@@ -52,16 +52,8 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { FILE_TYPES } from 'shared/etl/ETLTypes';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import
-{
-  _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, TemplateField,
-} from 'etl/templates/FieldTypes';
-import
-{
-  ELASTIC_TYPES, ExportTemplateBase,
-  ImportTemplateBase, TEMPLATE_TYPES,
-} from 'shared/etl/ETLTypes';
+import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { ExportTemplateBase, ImportTemplateBase, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class TemplateEditorStateC
@@ -118,7 +110,6 @@ export const _ImportTemplate = makeExtendedConstructor(ImportTemplateC, false, {
 export function destringifySavedTemplate(obj: object): object
 {
   const newObj: any = _.extend({}, obj);
-  newObj.rootField = JSON.parse(newObj.rootField);
   newObj.transformationEngine = JSON.parse(newObj.transformationEngine);
   return newObj;
 }
@@ -126,7 +117,6 @@ export function destringifySavedTemplate(obj: object): object
 export function templateForSave(template: ImportTemplate | ExportTemplate): object
 {
   const obj = (template as any).toObject();
-  obj.rootField = JSON.stringify(recordForSave(obj.rootField));
   obj.transformationEngine = JSON.stringify(obj.transformationEngine.json());
   return obj;
 }

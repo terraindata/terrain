@@ -64,7 +64,9 @@ import { _TemplateField, ElasticFieldSettings, TemplateField } from 'etl/templat
 import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import { createTreeFromEngine, NoArrayDocuments, testSerialization, treeFromDocument } from '../TemplateUtil';
+import { createTreeFromEngine } from '../SyncUtil';
+import { NoArrayDocuments, testSerialization } from '../TemplateUtil';
+
 import './TemplateEditor.less';
 
 const { List } = Immutable;
