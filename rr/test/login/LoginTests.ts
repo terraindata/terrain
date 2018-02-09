@@ -55,22 +55,36 @@ const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
 import * as winston from 'winston';
 const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
+const CREATE_CATEGORY_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-1 > div.library-column-content > div > div.info-area-buttons-container > div';
+const CATEGORY_ITEM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-1 > div.library-column-content > div > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div';
+const CREATE_GROUP_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-2 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
+const CREATE_GROUP_BUTTON_SELECTOR = 'body > div.ReactModalPortal > div > div > div > div > div.modal-buttons > div.button.modal-confirm-button';
+const CREATE_ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
+const ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
-const CREATE_CATEGORY_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-1 > div.library-column-content > div > div.info-area-buttons-container';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 
 expect.extend({ toMatchImageSnapshot } as any);
+
+async function takeAndCompareScreenShot(page, options?)
+{
+  const localOption = {failureThreshold: '0.01', failureThresholdType: 'percent'};
+  if (options)
+  {
+    Object.assign(localOption, options);
+  }
+  const image = await page.screenshot();
+  (expect(image) as any).toMatchImageSnapshot(localOption);
+}
 
 async function loginToBuilder(page, url)
 {
   await page.goto(url);
   sleep.sleep(5);
   winston.info('Goto the login page ' + url);
-  let image = await page.screenshot();
-  // login screen
-  (expect(image) as any).toMatchImageSnapshot();
-  winston.info('Compared the login page ' + url);
+  await takeAndCompareScreenShot(page);
+
   await page.waitForSelector(USERNAME_SELECTOR);
   winston.info('Username selector is ready.');
   await page.click(USERNAME_SELECTOR);
@@ -78,12 +92,51 @@ async function loginToBuilder(page, url)
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('secret');
   await page.click(BUTTON_SELECTOR);
-  sleep.sleep(5);
+  sleep.sleep(1);
   winston.info('Goto the starting page.');
-  image = await page.screenshot();
-  // after login
-  (expect(image) as any).toMatchImageSnapshot();
-  winston.info('Compared the starting page.');
+  await takeAndCompareScreenShot(page);
+
+  await page.waitForSelector(CREATE_CATEGORY_SELECTOR);
+  await page.click(CREATE_CATEGORY_SELECTOR);
+  winston.info('Create category');
+  sleep.sleep(1);
+  await takeAndCompareScreenShot(page);
+
+  await page.waitForSelector(CATEGORY_ITEM_SELECTOR);
+  await page.click(CATEGORY_ITEM_SELECTOR);
+  winston.info('Select category');
+  sleep.sleep(1);
+  await takeAndCompareScreenShot(page);
+
+  await page.waitForSelector(CREATE_GROUP_SELECTOR);
+  await page.click(CREATE_GROUP_SELECTOR);
+  winston.info('Select group');
+  sleep.sleep(1);
+  await takeAndCompareScreenShot(page);
+
+  await page.waitForSelector(CREATE_GROUP_BUTTON_SELECTOR);
+  await page.click(CREATE_GROUP_BUTTON_SELECTOR);
+  winston.info('Create group');
+  sleep.sleep(1);
+  await takeAndCompareScreenShot(page);
+
+  await page.waitForSelector(CREATE_ALGORITHM_SELECTOR);
+  await page.click(CREATE_ALGORITHM_SELECTOR);
+  winston.info('Create algorithm');
+  sleep.sleep(1);
+  await takeAndCompareScreenShot(page);
+
+  await page.waitForSelector(ALGORITHM_SELECTOR);
+  await page.click(ALGORITHM_SELECTOR, {clickCount:2});
+  winston.info('Select algorithm');
+  sleep.sleep(1);
+  await takeAndCompareScreenShot(page);
+
+  await page.waitForSelector(CARDSTARTER_SELECTOR);
+  await page.click(CARDSTARTER_SELECTOR, {clickCOunt:2});
+  winston.info('Start builder');
+  sleep.sleep(1);
+  await takeAndCompareScreenShot(page);
 }
 
 async function getChromeDebugAddress()
@@ -111,7 +164,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     winston.info('Connected to the Chrome ' + wsAddress);
-    // browser = await puppeteer.launch({headless: false});
+     //browser = await puppeteer.launch({headless: false});
     // page = await browser.newPage();
   });
 

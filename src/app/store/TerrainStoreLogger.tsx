@@ -55,6 +55,7 @@ export default class TerrainStoreLogger
   public static actionLatencyLog: { [key: string]: hdr.Histogram } = {};
 
   public static recordingActionPercentileLatency = false;
+  public static printStateChange = false;
 
   public static actionSerializationLog = [];
   public static serializeAction = false;
@@ -65,6 +66,11 @@ export default class TerrainStoreLogger
       {
         const actionStart = performance.now();
         let result;
+        let stateBeforeAction;
+        if (TerrainStoreLogger.printStateChange === true)
+        {
+          stateBeforeAction = store.getState();
+        }
         try
         {
           result = next(action);
@@ -89,6 +95,11 @@ export default class TerrainStoreLogger
           TerrainStoreLogger.actionSerializationLog.push(RecordsSerializer.stringify(action));
         }
         TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + 'ms');
+        if (TerrainStoreLogger.printStateChange === true)
+        {
+          const stateAfterAction = store.getState();
+          TerrainLog.debug('State Before: ', stateBeforeAction, 'State After:', stateAfterAction);
+        }
         return result;
       }
 

@@ -102,16 +102,25 @@ const usageSections = [
   },
 ];
 
-async function loginToBuilder(page, url)
+async function loginToBuilder(page, url?)
 {
-  await page.goto(url);
-  sleep.sleep(3);
-  await page.waitForSelector(USERNAME_SELECTOR);
+  await loadPage(page, url);
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type('admin@terraindata.com');
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('secret');
   await page.click(BUTTON_SELECTOR);
+}
+
+
+async function loadPage(page, url)
+{
+  if (url)
+  {
+    await page.goto(url);
+    sleep.sleep(3);
+    await page.waitForSelector(USERNAME_SELECTOR);
+  }
 }
 
 async function recordBuilderActions(browser, url)
@@ -122,6 +131,7 @@ async function recordBuilderActions(browser, url)
   sleep.sleep(1);
   const records = await page.evaluate(() =>
   {
+    window['TerrainTools'].setLogLevel();
     const recordList = window['TerrainTools'].terrainStoreLogger.serializeAllRecordName();
     window['TerrainTools'].terrainStoreLogger.serializeAction = true;
     return recordList;
@@ -154,7 +164,11 @@ async function replayBuilderActions(browser, url, actions)
   await page.setViewport({ width: 1600, height: 1200 });
   await page.goto(url);
   await loginToBuilder(page, url);
-  sleep.sleep(3);
+  await page.evaluate(() =>
+  {
+    window['TerrainTools'].setLogLevel();
+    window['TerrainTools'].terrainStoreLogger.printStateChange = true;
+  });
   // replay the log
   for (let i = 0; i < actions.length; i = i + 1)
   {
@@ -184,7 +198,7 @@ async function rr()
   }
 
   // record
-  let url = 'http://localhost:8080';
+  let url = 'http://localhost:3000/builder/!3';
   if (options['url'] !== undefined)
   {
     url = options['url'];
