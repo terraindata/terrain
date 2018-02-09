@@ -138,19 +138,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   public handleNameChange(value)
   {
     const { field, templateEditor } = this.props;
-
-    if (value === '' || value === undefined || value === null)
-    {
-      // TODO: handle error
-      return;
-    }
-    value = value.toString();
-    this._proxy().set('name', value);
-
-    const engine = this.props.templateEditor.template.transformationEngine;
-    let outputPath = engine.getOutputKeyPath(field.fieldId);
-    outputPath = outputPath.set(outputPath.size - 1, value);
-    templateEditor.template.transformationEngine.setOutputKeyPath(field.fieldId, outputPath);
+    this._proxy().changeName(value);
   }
 
   public handleIncludeCheckboxClicked()

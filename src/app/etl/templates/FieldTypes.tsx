@@ -258,6 +258,23 @@ export class FieldNodeProxy
     return this;
   }
 
+  public changeName(value: string): FieldNodeProxy
+  {
+    if (value === '' || value === undefined || value === null)
+    {
+      // TODO: handle error
+      return this;
+    }
+    const field = this.field();
+    const engine = this.tree.getEngine();
+    value = value.toString();
+    let outputPath = engine.getOutputKeyPath(field.fieldId);
+    outputPath = outputPath.set(outputPath.size - 1, value);
+    engine.setOutputKeyPath(field.fieldId, outputPath);
+    this.syncWithEngine();
+    return this;
+  }
+
   public syncWithEngine()
   {
     const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.id(), this.field());
