@@ -100,10 +100,10 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
     return this._getTypeListIndex(this.props.field.langSettings.arrayType.get(arrayTypeIndex));
   }
 
-  public setLangSettings<K extends keyof ElasticFieldSettings>(key: K, value: ElasticFieldSettings[K])
-  {
-    this._proxy().set('langSettings', this.props.field.langSettings.set(key, value));
-  }
+  // public setLangSettings<K extends keyof ElasticFieldSettings>(key: K, value: ElasticFieldSettings[K])
+  // {
+  //   this._proxy().set('langSettings', this.props.field.langSettings.set(key, value));
+  // }
 
   public renderAnalyzerSection()
   {
@@ -189,40 +189,40 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
 
   public handleChangeDataType(index)
   {
-    if (index >= elasticTypeOptions.size || index < 0)
-    {
-      return;
-    }
-    const { field, act } = this.props;
-    const nextType = elasticTypeOptions.get(index);
-    const currentType = this.props.field.langSettings.type;
-    if (currentType === ELASTIC_TYPES.ARRAY && nextType !== ELASTIC_TYPES.ARRAY)
-    { // if user changes type from array, clear the array type
-      this.setLangSettings('arrayType', List([ELASTIC_TYPES.TEXT]));
-      this.setLangSettings('type', elasticTypeOptions.get(index));
-    }
-    else if (isNested(currentType, field.langSettings.arrayType)
-      && !isNested(nextType, field.langSettings.arrayType) && field.getSubfields().size > 0)
-    { // if user changes type from nested to something else and there are children, then show a warning
-      const deferredAction = () =>
-      {
-        this._proxy().clearChildren();
-        this.setLangSettings('type', elasticTypeOptions.get(index));
-      };
-      act({
-        actionType: 'addModalConfirmation',
-        props: {
-          title: 'Confirm Action',
-          message: `Changing this type will remove ${field.getSubfields().size} nested fields. Would you like to continue?`,
-          onConfirm: deferredAction,
-          confirm: true,
-        },
-      });
-    }
-    else
-    {
-      this.setLangSettings('type', elasticTypeOptions.get(index));
-    }
+    // if (index >= elasticTypeOptions.size || index < 0)
+    // {
+    //   return;
+    // }
+    // const { field, act } = this.props;
+    // const nextType = elasticTypeOptions.get(index);
+    // const currentType = this.props.field.langSettings.type;
+    // if (currentType === ELASTIC_TYPES.ARRAY && nextType !== ELASTIC_TYPES.ARRAY)
+    // { // if user changes type from array, clear the array type
+    //   this.setLangSettings('arrayType', List([ELASTIC_TYPES.TEXT]));
+    //   this.setLangSettings('type', elasticTypeOptions.get(index));
+    // }
+    // else if (isNested(currentType, field.langSettings.arrayType)
+    //   && !isNested(nextType, field.langSettings.arrayType) && field.getSubfields().size > 0)
+    // { // if user changes type from nested to something else and there are children, then show a warning
+    //   const deferredAction = () =>
+    //   {
+    //     this._proxy().clearChildren();
+    //     this.setLangSettings('type', elasticTypeOptions.get(index));
+    //   };
+    //   act({
+    //     actionType: 'addModalConfirmation',
+    //     props: {
+    //       title: 'Confirm Action',
+    //       message: `Changing this type will remove ${field.getSubfields().size} nested fields. Would you like to continue?`,
+    //       onConfirm: deferredAction,
+    //       confirm: true,
+    //     },
+    //   });
+    // }
+    // else
+    // {
+    //   this.setLangSettings('type', elasticTypeOptions.get(index));
+    // }
   }
 
   // memoized
@@ -230,45 +230,45 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
   {
     return (index: number) =>
     {
-      if (arrayTypeIndex >= this.props.field.langSettings.arrayType.size
-        || arrayTypeIndex < 0
-        || index >= elasticTypeOptions.size
-        || index < 0)
-      {
-        return;
-      }
-      else
-      {
-        const { field, act } = this.props;
-        const newArray = cleanArrayType(field.langSettings.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index)));
-        if (!isNested(field.langSettings.type, newArray) && field.getSubfields().size > 0)
-        {
-          const deferredAction = () =>
-          {
-            this._proxy().clearChildren();
-            this.setLangSettings('arrayType', newArray);
-          };
-          act({
-            actionType: 'addModalConfirmation',
-            props: {
-              title: 'Confirm Action',
-              message: `Changing this type will remove ${field.getSubfields().size} nested fields. Would you like to continue?`,
-              onConfirm: deferredAction,
-              confirm: true,
-            },
-          });
-        }
-        else
-        {
-          this.setLangSettings('arrayType', newArray);
-        }
-      }
+      // if (arrayTypeIndex >= this.props.field.langSettings.arrayType.size
+      //   || arrayTypeIndex < 0
+      //   || index >= elasticTypeOptions.size
+      //   || index < 0)
+      // {
+      //   return;
+      // }
+      // else
+      // {
+      //   const { field, act } = this.props;
+      //   const newArray = cleanArrayType(field.langSettings.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index)));
+      //   if (!isNested(field.langSettings.type, newArray) && field.getSubfields().size > 0)
+      //   {
+      //     const deferredAction = () =>
+      //     {
+      //       this._proxy().clearChildren();
+      //       this.setLangSettings('arrayType', newArray);
+      //     };
+      //     act({
+      //       actionType: 'addModalConfirmation',
+      //       props: {
+      //         title: 'Confirm Action',
+      //         message: `Changing this type will remove ${field.getSubfields().size} nested fields. Would you like to continue?`,
+      //         onConfirm: deferredAction,
+      //         confirm: true,
+      //       },
+      //     });
+      //   }
+      //   else
+      //   {
+      //     this.setLangSettings('arrayType', newArray);
+      //   }
+      // }
     };
   }
 
   public handleAnalyzedCheckboxClicked()
   {
-    this.setLangSettings('isAnalyzed', !this.props.field.langSettings.isAnalyzed);
+    // this.setLangSettings('isAnalyzed', !this.props.field.langSettings.isAnalyzed);
   }
 
 }

@@ -238,11 +238,11 @@ export class FieldNodeProxy
     return this.tree.createField(this.path, field);
   }
 
-  public set<K extends keyof TemplateField>(key: K, value: TemplateField[K]): FieldNodeProxy
-  {
-    this.tree.updateField(this.path, key, value);
-    return this;
-  }
+  // public set<K extends keyof TemplateField>(key: K, value: TemplateField[K]): FieldNodeProxy
+  // {
+  //   this.tree.updateField(this.path, key, value);
+  //   return this;
+  // }
 
   public setFieldEnabled(enabled: boolean): FieldNodeProxy
   {
@@ -281,10 +281,10 @@ export class FieldNodeProxy
     this.tree.setField(this.path, updatedField);
   }
 
-  public get<K extends keyof TemplateField>(key: K): TemplateField[K]
-  {
-    return this.field().get(key);
-  }
+  // public get<K extends keyof TemplateField>(key: K): TemplateField[K]
+  // {
+  //   return this.field().get(key);
+  // }
 
   public deleteSelf()
   {
