@@ -65,6 +65,8 @@ import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
 import Util from 'app/util/Util';
+import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
 export interface Props
 {
@@ -75,199 +77,413 @@ export interface Props
   onStepChange?: (oldStep: PathfinderSteps) => void;
 }
 
-interface IMoveState
-{
-  moving: boolean;
-  originalMouseY?: number;
-  originalElTop?: number;
-  originalElBottom?: number;
-  elHeight?: number;
-  dY?: number;
-  minDY?: number;
-  maxDY?: number;
-  midpoints?: number[];
-  tops?: number[];
-  movedTo?: number;
-  movingIndex?: number;
-  movingRef?: string;
-}
+const ItemTypes = {
+  BAR: 'bar',
+  GROUP: 'group',
+};
 
-const DefaultMoveState: IMoveState =
-  {
-    moving: false,
-    movedTo: null,
-  };
-
-
-@Radium
+// @Radium
 class PathfinderFilterSection extends TerrainComponent<Props>
 {
-  public state: IMoveState = DefaultMoveState;
-  public bars = List(['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink']);
 
-  public handleMouseDown(index: number, name: string, event: MEvent)
+  public keyPaths: IMMap<string, List<number>> = Map<string, List<number>>({});
+  public state:
   {
-    $('body').on('mousemove', this.handleMouseMove);
-    $('body').on('mouseup', this.handleMouseUp);
-    $('body').on('mouseleave', this.handleMouseUp);
-
-    const parent = this.refs['all'];
-
-    const cr = this.refs[name]['getBoundingClientRect']();
-    const parentCr = parent['getBoundingClientRect']();
-
-    const minDY = parentCr.top - cr.top;
-    const maxDY = parentCr.bottom - cr.bottom;
-
-    const siblings = Util.siblings(this.refs[name]);
-    const midpoints = [];
-    const tops = [];
-    _.range(0, siblings.length).map((i) =>
-    {
-      const sibCr = siblings[i]['getBoundingClientRect']();
-      midpoints.push((sibCr.top + sibCr.bottom) / 2); // - (i > this.props.index ? cr.height /**/ : 0));
-      tops.push(sibCr.top);
-    });
-
-    this.setState({
-      moving: true,
-      originalMouseY: event.pageY,
-      originalElTop: cr.top,
-      originalElBottom: cr.bottom,
-      elHeight: cr.height,
-      dY: 0,
-      minDY,
-      maxDY,
-      midpoints,
-      tops,
-      movingIndex: index,
-      movingRef: name,
-    });
+    bars: List<any>,
+  } =
+  {
+  //  bars: List(['red', 'orange', 'yellow', 'green', 'purple', 'pink']),
+     //bars: List([List(['red']), List(['orange']), List(['yellow'])]),
+      bars: List(['red', 'orange', List(['yellow', 'green', List(['blue'])]), List(['purple', 'pink'])]),
   }
 
-  public shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
+  public componentWillMount()
   {
-    const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
+    this.createKeyPaths(this.state.bars);
+  }
 
-    let index: number;
-
-    // TODO search from the bottom up if dragging downwards
-    if (dY < 0)
+  public createKeyPaths(bars: List<any>, currKeyPath?: List<number>)
+  {
+    bars.map((bar, index) =>
     {
-      // if dragged up, search from top down
-      for (
-        index = 0;
-        this.state.midpoints[index] < this.state.originalElTop + dY;
-        index++
-      )
+      const keyPath: List<number> = currKeyPath !== undefined ? currKeyPath.push(index) : List([index]);
+      if (typeof bar === 'string')
       {
-
-      }
-    }
-    else
-    {
-      for (
-        index = this.state.midpoints.length - 1;
-        this.state.midpoints[index] > this.state.originalElBottom + dY;
-        index--
-      )
-      {
-
-      }
-    }
-
-    const sibs = Util.siblings(this.refs[this.state.movingRef]);
-    _.range(0, sibs.length).map((i) =>
-    {
-      const el = sibs[i];
-      if (i === this.state.movingIndex)
-      {
-      //  $(el).removeClass('card-field-wrapper-moving');
-        return;
-      }
-
-      let shift = 0;
-      if (index < this.state.movingIndex)
-      {
-        // move things down
-        if (i < this.state.movingIndex && i >= index)
-        {
-          shift = 1;
-        }
+        this.keyPaths = this.keyPaths.set(bar, keyPath);
       }
       else
       {
-        // move up
-        if (i > this.state.movingIndex && i <= index)
-        {
-          shift = -1;
-        }
+        this.createKeyPaths(bar, keyPath);
       }
-      console.log('Shift is ', shift);
-      console.log('Height is', this.state.elHeight);
-      el['style'].top = shift * this.state.elHeight;
-     // $(el).addClass('card-field-wrapper-moving');
-    });
-    // console.log('Shift siblings', dY);
-    // console.log('Index ', index);
-    return {
-      dY,
-      index,
-    };
+    })
   }
 
-  public handleMouseMove(evt)
+  public insertIn(items, keyPath, item): List<any>
   {
-    const dY = this.shiftSiblings(evt, false).dY;
+    // If key path is just a single value, do a normal insert
+
+    if (keyPath.size === 1)
+    {
+      return items.insert(keyPath.get(0), item);
+    }
+    // get the sub-list that item will be inserted into
+    let listToInsert = items.getIn(keyPath.butLast());
+    // Insert the item int othe list at the position that is the last value of keypath
+    listToInsert = listToInsert.insert(keyPath.last(), item);
+
+    // Update the whole list of items to have the inserted list
+    return items.setIn(keyPath.butLast(), listToInsert);
+  }
+
+  public movedDown(oldKeyPath, newKeyPath): boolean
+  {
+
+    let i = 0;
+    while (i < oldKeyPath.size && i < newKeyPath.size)
+    {
+      if (oldKeyPath.get(i) < newKeyPath.get(i))
+      {
+        return true;
+      }
+      if (oldKeyPath.get(i) > newKeyPath.get(i))
+      {
+        return false;
+      }
+      i++;
+    }
+  }
+
+  public handleDrop(itemKeyPath, dropKeyPath)
+  {
+    // If the item did not move up or down, do nothing
+    if (itemKeyPath.equals(dropKeyPath))
+    {
+      return;
+    }
+    let bars = this.state.bars;
+    const item = bars.getIn(itemKeyPath);
+
+    // If the item moved down, insert it and then remove it
+    if (this.movedDown(itemKeyPath, dropKeyPath))
+    {
+      bars = this.insertIn(bars, dropKeyPath, item);
+      bars = bars.removeIn(itemKeyPath);
+      const oldGroup = bars.getIn(itemKeyPath.butLast());
+      if (oldGroup.size === 0)
+      {
+        bars = bars.removeIn(itemKeyPath.butLast());
+      }
+    }
+    // If it moved up, remove it and then insert it
+    else
+    {
+      bars = bars.removeIn(itemKeyPath);
+      const oldGroup = bars.getIn(itemKeyPath.butLast());
+      if (oldGroup.size === 0)
+      {
+        bars = bars.removeIn(itemKeyPath.butLast());
+      }
+      bars = this.insertIn(bars, dropKeyPath, item);
+    }
     this.setState({
-      dY,
+      bars,
     });
-    evt.preventDefault();
-    evt.stopPropagation();
   }
 
-  public move()
+  public handleGroupDrop(dropKeyPath, dragKeyPath)
   {
-    console.log('move');
-   // $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
-  }
-
-  public handleMouseUp(evt)
-  {
-    $('body').off('mousemove', this.handleMouseMove);
-    $('body').off('mouseup', this.handleMouseUp);
-    $('body').off('mouseleave', this.handleMouseUp);
-
-    const { index } = this.shiftSiblings(evt, true);
-
-    setTimeout(this.move, 150);
-
+    console.log('HANDLE GROUP DROP');
+    const droppedInto = this.state.bars.getIn(dropKeyPath);
+    const dropped = this.state.bars.getIn(dragKeyPath);
+    const oldIndex = dragKeyPath.first();
+    const newIndex = dropKeyPath.first();
+    if (newIndex === oldIndex)
+    {
+      return;
+    }
+    let group;
+    if (typeof dropped === 'string' && typeof droppedInto === 'string')
+    {
+      group = List([droppedInto, dropped]);
+    }
+    else if (typeof dropped === 'string')
+    {
+      group = droppedInto.push(dropped);
+    }
+    else if (typeof droppedInto === 'string')
+    {
+      group = dropped.insert(0, droppedInto);
+    }
+    else
+    {
+      group = droppedInto.concat(dropped);
+    }
+    let newBars;
+    if (newIndex < oldIndex)
+    {
+      newBars = this.state.bars.deleteIn(dragKeyPath).setIn(dropKeyPath, group);
+    }
+    else
+    {
+      newBars = this.state.bars.setIn(dropKeyPath, group).deleteIn(dragKeyPath);
+    }
+    // remove empty lists
     this.setState({
-      movedTo: index,
+      bars: newBars.asImmutable(),
     });
   }
 
   public render()
   {
+    const { bars} = this.state;
+    console.log(bars.toJS());
     return (
       <div
         className='pf-section'
         ref='all'
       >
+        <DropZone
+          keyPath={List([0])}
+          onDrop={this.handleDrop}
+        />
          {
-           this.bars.map((bar, i) =>
-              <div
-                style={[{height: 30,}, {width: 300}, {backgroundColor: bar}, {position: 'relative'}]}
-                ref={bar}
-                onMouseDown={this._fn(this.handleMouseDown, i, bar)}
-                key={bar}
-              >
+           bars.map((bar, i) =>
+            <div key={i}>
+              {
+                typeof bar === 'string' ?
+                <Bar
+                  data={bar}
+                  keyPath={List([i])}
+                  key={'bar' + String(i)}
+                  onDrop={this.handleGroupDrop}
+                  canDrop={true}
+               />
+               :
+               <Group
+                  bars={bar}
+                  onDrop={this.handleGroupDrop}
+                  key={'group' + String(i)}
+                  keyPath={List([i])}
+                  onReorder={this.handleDrop}
+               />
+                }
+                {
+                 (typeof bar === 'string' || bar.size > 0) &&
+                 <DropZone
+                   key={'drop' + String(i)}
+                   keyPath={List([i + 1])}
+                   onDrop={this.handleDrop}
+                 />
+                }
              </div>
-          )
+           )
          }
       </div>
     );
   }
 }
 
-export default PathfinderFilterSection;
+export default DragDropContext(HTML5Backend)(PathfinderFilterSection);
+
+interface GroupProps
+{
+  bars: List<any>;
+  onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
+  onReorder: (itemKeyPath: List<number>, dropKeyPath: List<number>) => void;
+  isDragging: boolean;
+  isOver: boolean;
+  connectDragSource: (El) => El;
+  connectDropTarget: (El) => El;
+  keyPath: List<number>;
+}
+
+const groupSource = {
+  beginDrag(props) {
+    return {keyPath: props.keyPath}
+  }
+};
+
+function groupDragCollect(connect, monitor)
+{
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging(),
+  }
+}
+
+const groupDropTarget = {
+  drop(props, monitor) {
+    // If the item was actually dropped on a child of the group, just return
+    if (monitor.didDrop())
+    {
+      return;
+    }
+    props.onDrop(props.keyPath, monitor.getItem().keyPath);
+  }
+};
+
+function groupDropCollect(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  };
+}
+
+class GroupComponent extends TerrainComponent<GroupProps>
+{
+  public renderGroup()
+  {
+    return (
+      <div
+        className='bar-group'
+        style={this.props.isOver ? {borderColor: 'lime'} : {}}
+      >
+        <DropZone
+          keyPath={this.props.keyPath.push(0)}
+          onDrop={this.props.onReorder}
+         />
+        {
+          this.props.bars.map((bar, i) =>
+            <div key={i}>
+             {
+               typeof bar === 'string' ?
+                <Bar
+                   data={bar}
+                   keyPath={this.props.keyPath.push(i)}
+                   onDrop={this.props.onDrop}
+                   canDrop={false} // filters nested in groups aren't droppable?
+                 />
+                 :
+                 <Group
+                   bars={bar}
+                   keyPath={this.props.keyPath.push(i)}
+                   onDrop={this.props.onDrop}
+                   onReorder={this.props.onReorder}
+                 />
+                }
+                <DropZone
+                  keyPath={this.props.keyPath.push(i + 1)}
+                  onDrop={this.props.onReorder}
+                />
+              </div>
+          )
+        }
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
+      this.props.connectDropTarget(
+        this.props.connectDragSource(
+         this.renderGroup()
+      )
+     )
+    );
+  }
+}
+
+const Group = DropTarget([ItemTypes.BAR, ItemTypes.GROUP], groupDropTarget, groupDropCollect)(
+              DragSource(ItemTypes.GROUP, groupSource, groupDragCollect)
+                (GroupComponent));
+
+interface BarProps
+{
+  data: string;
+  keyPath: List<number>;
+  connectDragSource: (El) => El;
+  isDragging: boolean;
+  isOver: boolean;
+  connectDropTarget: (El) => El;
+  onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
+  canDrop?: boolean;
+}
+
+const barSource = {
+  beginDrag(props) {
+    return {keyPath: props.keyPath};
+  }
+};
+
+function collect(connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging()
+  }
+}
+
+const barDropTarget = {
+  drop(props, monitor) {
+    props.onDrop(props.keyPath, monitor.getItem().keyPath);
+  }
+};
+
+function collect3(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  };
+}
+
+class BarComponent extends TerrainComponent<BarProps>
+{
+  public render()
+  {
+    const draggable = this.props.connectDragSource(
+      <div
+        style={_.extend({},
+          {backgroundColor: this.props.isOver ? 'gray' : this.props.data},
+          {opacity: this.props.isDragging ? 0.5 : 1})}
+        className='bar'
+       />
+    );
+    if (this.props.canDrop)
+    {
+      return this.props.connectDropTarget(draggable);
+    }
+    return draggable;
+    );
+  }
+}
+
+const Bar = DropTarget([ItemTypes.BAR, ItemTypes.GROUP], barDropTarget, collect3)(
+              DragSource(ItemTypes.BAR, barSource, collect)
+                (BarComponent));
+
+interface DropProps {
+  keyPath: List<number>;
+  isOver: boolean;
+  connectDropTarget: (El) => El;
+  onDrop: (keyPath: List<number>, dropKeyPath: List<number>) => void;
+}
+
+const dropTarget = {
+  drop(props, monitor) {
+    props.onDrop(monitor.getItem().keyPath, props.keyPath);
+  }
+};
+
+function collect2(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  };
+}
+
+class DropZoneComponent extends TerrainComponent<DropProps>
+{
+  public render()
+  {
+    return (
+      this.props.connectDropTarget(
+        <div
+          className='drop'
+          style={{backgroundColor: this.props.isOver ? 'gray' : 'white'}}
+        />
+      )
+    );
+  }
+}
+
+const DropZone = DropTarget([ItemTypes.BAR, ItemTypes.GROUP], dropTarget, collect2)(DropZoneComponent);
