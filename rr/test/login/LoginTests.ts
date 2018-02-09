@@ -127,13 +127,13 @@ async function loginToBuilder(page, url)
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(ALGORITHM_SELECTOR);
-  await page.click(ALGORITHM_SELECTOR, {clickCount:2});
+  await page.click(ALGORITHM_SELECTOR, {clickCount: 2});
   winston.info('Select algorithm');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(CARDSTARTER_SELECTOR);
-  await page.click(CARDSTARTER_SELECTOR, {clickCOunt:2});
+  await page.click(CARDSTARTER_SELECTOR, {clickCOunt: 2});
   winston.info('Start builder');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);

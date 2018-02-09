@@ -112,7 +112,6 @@ async function loginToBuilder(page, url?)
   await page.click(BUTTON_SELECTOR);
 }
 
-
 async function loadPage(page, url)
 {
   if (url)

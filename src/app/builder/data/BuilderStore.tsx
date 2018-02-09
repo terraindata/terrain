@@ -56,7 +56,6 @@ import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } f
 
 import { createRecordType } from '../../Classes';
 
-
 import { Cards } from '../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
