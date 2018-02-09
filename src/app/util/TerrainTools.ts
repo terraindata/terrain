@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { BuilderStore } from 'builder/data/BuilderStore';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { LogLevelDesc } from 'loglevel';
