@@ -81,7 +81,7 @@ async function takeAndCompareScreenShot(page, options?)
 async function loginToBuilder(page, url)
 {
   await page.goto(url);
-  sleep.sleep(20);
+  sleep.sleep(5);
   winston.info('Goto the login page ' + url);
   await takeAndCompareScreenShot(page);
 
