@@ -464,7 +464,7 @@ class MapComponent extends TerrainComponent<Props>
     return (
       <div className={this.props.className} >
         <Map
-          {...this.getMapProps(location) }
+          {...this.getMapProps(location)}
           zoom={this.state.zoom}
           onViewportChanged={this.setZoomLevel}
           maxBounds={[[85, -180], [-85, 180]]}
