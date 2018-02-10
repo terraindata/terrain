@@ -60,7 +60,7 @@ export interface Props
 {
   filterGroup: FilterGroup;
   canEdit: boolean;
-  depth: number;
+  depth?: number;
   keyPath: KeyPath;
   onChange(keyPath: KeyPath, filterGroup: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);

@@ -64,11 +64,13 @@ import './DragDropStyle.less';
 
 interface GroupProps
 {
+  data: any; // meta-data that the group itself contains
   items: List<any>;
   keyPath: KeyPath;
-  header?: string | El;
+  renderHeader: (data, keyPath?) => El; // render the group header, given it's info and keyPath
   isGroup: (item: any) => boolean; // function to distinguish items from groups
   keyPathStarter?: List<any>; // key path to get children in, and to append to any created key paths
+  renderChildren: (data, keyPath?) => El; // given data about the children, return the child elements
   // Injected drag drop props
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onReorder: (itemKeyPath: List<number>, dropKeyPath: List<number>) => void;
@@ -127,14 +129,14 @@ class GroupComponent extends TerrainComponent<GroupProps>
     // {
     //   return this.props.connectDragPreview(<div></div>);
     // }
-    const {header, items, keyPath, keyPathStarter, onReorder, onDrop, isGroup, isOver} = this.props;
+    const {data, renderHeader, items, keyPath, keyPathStarter, onReorder, onDrop, isGroup, isOver, renderChildren} = this.props;
     const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
     return (
       <div
         className='drag-drop-group'
         style={isOver ? {borderColor: 'lime'} : {}}
       >
-        <div>{header}</div>
+        <div>{renderHeader(data, newKeyPath.butLast())}</div>
         <DropZone
           keyPath={newKeyPath.push(0)}
           onDrop={onReorder}
@@ -145,20 +147,17 @@ class GroupComponent extends TerrainComponent<GroupProps>
              {
                !(this.props.isGroup(item)) ?
                 <DragDropItem
-                   children={<div>{item.field}</div>}
+                   children={renderChildren(item, newKeyPath.push(i))}
                    keyPath={newKeyPath.push(i)}
                    onDrop={onDrop}
                    canDrop={false}
                  />
                  :
                  <DragDropGroup
+                   {...this.props}
                    items={keyPathStarter ? item.getIn(keyPathStarter) : item}
-                   keyPath={newKeyPath.push(i) }
-                   onDrop={onDrop}
-                   onReorder={onReorder}
-                   isGroup={isGroup}
-                   header={"I'm a group woo!"}
-                   keyPathStarter={this.props.keyPathStarter}
+                   keyPath={newKeyPath.push(i)}
+                   data={keyPathStarter ? item.getIn(keyPathStarter.butLast()) : item}
                  />
                 }
                 <DropZone

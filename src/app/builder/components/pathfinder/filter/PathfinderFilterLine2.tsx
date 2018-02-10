@@ -71,7 +71,7 @@ export interface Props
 {
   filterLine: FilterLine;
   canEdit: boolean;
-  depth: number;
+  // depth: number;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);

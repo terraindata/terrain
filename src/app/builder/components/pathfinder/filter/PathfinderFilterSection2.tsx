@@ -156,6 +156,53 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
   }
 
+  public handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean)
+  {
+    BuilderActions.changePath(keyPath, filter, notDirty, fieldChange);
+  }
+
+  public handleFilterDelete(keyPath: KeyPath)
+  {
+    const parentKeyPath = keyPath.butLast().toList();
+    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
+    const index = keyPath.last();
+    BuilderActions.changePath(parentKeyPath, parent.splice(index, 1));
+    // TODO consider 'removeIn' instead
+  }
+
+  public renderFilterLine(filterLine, keyPath)
+  {
+    const {pathfinderContext} = this.props;
+    // make key path relative to entire Path object
+    keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
+    return (
+     <PathfinderFilterLine
+       filterLine={filterLine}
+       canEdit={pathfinderContext.canEdit}
+       keyPath={keyPath}
+       onChange={this.handleFilterChange}
+       onDelete={this.handleFilterDelete}
+       pathfinderContext={pathfinderContext}
+     />
+    );
+  }
+
+  public renderGroupHeader(group, keyPath)
+  {
+    const {pathfinderContext} = this.props;
+    // make key path relative to entire Path object
+    keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
+    return (
+      <PathfinderFilterGroup
+          filterGroup={group}
+          canEdit={pathfinderContext.canEdit}
+          keyPath={keyPath}
+          onChange={this.handleFilterChange}
+          onDelete={this.handleFilterDelete}
+      />
+    );
+  }
+
   public handleDrop(itemKeyPath, dropKeyPath)
   {
     // If the item did not move up or down, do nothing
@@ -250,11 +297,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     return item.filterGroup;
   }
 
-  public getGroupChildren(group)
-  {
-    return group.filterGroup.lines;
-  }
-
   public render()
   {
     const {filterGroup} = this.props;
@@ -272,7 +314,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
             {
               !this.isGroup(line) ?
               <DragDropItem
-                children={<div>{line.field}</div>}
+                children={this.renderFilterLine(line, List([i]))}
                 keyPath={List([i])}
                 onDrop={this.handleGroupDrop}
                 canDrop={true}
@@ -280,12 +322,14 @@ class PathfinderFilterSection extends TerrainComponent<Props>
               :
               <DragDropGroup
                 items={line.filterGroup.lines}
+                data={line.filterGroup}
                 onDrop={this.handleGroupDrop}
                 keyPath={List([i])}
-                header={"I'm a group woo!"}
                 onReorder={this.handleDrop}
                 isGroup={this.isGroup}
                 keyPathStarter={List(['filterGroup', 'lines'])}
+                renderChildren={this.renderFilterLine}
+                renderHeader={this.renderGroupHeader}
               />
             }
             <DropZone
@@ -297,57 +341,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       }
       </div>
     )
-  }
-
-  public render2()
-  {
-    const { bars} = this.state;
-    return (
-      <div
-        className='pf-section'
-        ref='all'
-      >
-        <DropZone
-          keyPath={List([0])}
-          onDrop={this.handleDrop}
-        />
-         {
-           bars.map((bar, i) =>
-            <div key={i}>
-              {
-                !this.isGroup(bar) ?
-                <DragDropItem
-                  children={bar}
-                  keyPath={List([i])}
-                  key={'bar' + String(i)}
-                  onDrop={this.handleGroupDrop}
-                  canDrop={true}
-               />
-               :
-               <DragDropGroup
-                  items={bar}
-                  onDrop={this.handleGroupDrop}
-                  key={'group' + String(i)}
-                  keyPath={List([i])}
-                  onReorder={this.handleDrop}
-                  isGroup={this.isGroup}
-                  getGroupChildren={this.getGroupChildren}
-                  header={"I'm a group woo!"}
-               />
-                }
-                {
-                 (typeof bar === 'string' || bar.size > 0) &&
-                 <DropZone
-                   key={'drop' + String(i)}
-                   keyPath={List([i + 1])}
-                   onDrop={this.handleDrop}
-                 />
-                }
-             </div>
-           )
-         }
-      </div>
-    );
   }
 }
 
