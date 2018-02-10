@@ -62,4 +62,19 @@ enum TransformationNodeType
   SubstringNode = 13,
 }
 
+interface TransformationOptionTypes
+{
+  default: object;
+  capitalize: {
+
+  };
+  substring: {
+    from: number;
+    length: number;
+  };
+}
+
+export type NodeTypes = keyof TransformationOptionTypes;
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
+
 export default TransformationNodeType;
