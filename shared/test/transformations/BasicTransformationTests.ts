@@ -101,11 +101,11 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new TransformationNode(0, 12, List<number>([0])),
+          value: new TransformationNode(0, TransformationNodeType.CapitalizeNode, List<number>([0])),
         },
         {
           v: '1',
-          value: new TransformationNode(1, 12, List<number>([2])),
+          value: new TransformationNode(1, TransformationNodeType.CapitalizeNode, List<number>([2])),
         },
       ],
       edges: [],
