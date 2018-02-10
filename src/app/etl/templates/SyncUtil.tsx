@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
-import { _ElasticFieldSettings, _TemplateField, ElasticFieldSettings, TemplateField }
+import { _ElasticFieldSettings, _TemplateField, _TransformationNode, ElasticFieldSettings, TemplateField, TransformationNode }
   from 'etl/templates/FieldTypes';
 import { ELASTIC_TYPES, jsToElastic } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -81,7 +81,7 @@ export function createTreeFromEngine(engine: TransformationEngine): TemplateFiel
     const parentNode: FieldNodeProxy = enginePathToNode[JSON.stringify(parentPath)];
     const newField = createFieldFromEngine(engine, id);
 
-    const newNode = parentNode.makeChild(newField);
+    const newNode = parentNode.discoverChild(newField);
     enginePathToNode[JSON.stringify(enginePath)] = newNode;
   });
 
@@ -95,6 +95,18 @@ export function createFieldFromEngine(
 ): TemplateField
 {
   const enginePath = engine.getOutputKeyPath(id).toJS();
+  const transformationIds = engine.getTransformations(id);
+
+  const transformations: List<TransformationNode> = transformationIds.map((transformationId, index) => {
+    const transformNode = engine.getTransformationInfo(transformationId);
+    return _TransformationNode({
+      id: transformNode.id,
+      typeCode: transformNode.typeCode,
+      fieldIDs: transformNode.fieldIDs,
+      meta: transformNode.meta,
+    });
+  }).toList();
+
   return _TemplateField({
     isIncluded: engine.getFieldEnabled(id),
     langSettings: _ElasticFieldSettings({
@@ -102,6 +114,7 @@ export function createFieldFromEngine(
       type: jsToElastic(engine.getFieldType(id)),
     }),
     fieldId: id,
+    transformations,
     name: enginePath[enginePath.length - 1],
   });
 }

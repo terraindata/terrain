@@ -66,17 +66,6 @@ export const _ElasticFieldSettings = makeExtendedConstructor(ElasticFieldSetting
   arrayType: List,
 });
 
-// recordized version of transformationNode
-class TransformationNodeC<T extends NodeTypes> extends TransformationNodeBase<T>
-{
-  constructor()
-  {
-    super(0, TransformationNodeType.LoadNode, List([]), {});
-  }
-}
-export type TransformationNode<T extends NodeTypes = 'default'> = WithIRecord<TransformationNodeC<T>>;
-export const _TransformationNode = makeConstructor(TransformationNodeC);
-
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
 {
@@ -107,18 +96,16 @@ class TemplateFieldC
       (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
   }
 
-  public getSubfields()
+  public getSubfields() // TODO: if nothing fancy needs to happen, just directly access children
   {
     return this.children;
   }
 
-  // TODO: make this do a keypath lookup
   public getName(): string
   {
     return this.name;
   }
 
-  // TODO: get rid of this
   public isRoot(keyPath): boolean
   {
     return keyPath.size === 0;
@@ -128,3 +115,14 @@ export type TemplateField = WithIRecord<TemplateFieldC>;
 export const _TemplateField = makeExtendedConstructor(TemplateFieldC, true, {
   langSettings: _ElasticFieldSettings,
 });
+
+// recordized version of transformationNode
+class TransformationNodeC extends TransformationNodeBase
+{
+  constructor()
+  {
+    super(0, TransformationNodeType.LoadNode, List([]), {});
+  }
+}
+export type TransformationNode = WithIRecord<TransformationNodeC>;
+export const _TransformationNode = makeConstructor(TransformationNodeC);

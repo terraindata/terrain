@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
 import * as classNames from 'classnames';
@@ -54,96 +54,23 @@ import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import FadeInOut from 'common/components/FadeInOut';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { tooltip } from 'common/components/tooltip/Tooltips';
-import { TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import TransformationsManifest from './TransformationsManifest';
 
-import './TemplateEditorField.less';
-
-export interface Props extends TemplateEditorFieldProps
+export interface TransformationViewProps
 {
-  hidePreviewValue?: boolean;
-  displayValueOverride?: any;
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
+
 }
 
 @Radium
-class TemplateEditorFieldPreview extends TemplateEditorField<Props>
+export class TransformationView extends TerrainComponent<TransformationViewProps>
 {
-
   public render()
   {
-    const { canEdit, field, keyPath, preview, hidePreviewValue, displayValueOverride } = this.props;
-    const settingsOpen = this._settingsAreOpen();
-    const labelStyle = settingsOpen ?
-      fontColor(Colors().active, Colors().active)
-      :
-      fontColor(Colors().text2, Colors().text1);
-
-    const previewText = preview === undefined || preview === null ? 'N/A' : preview.toString();
-    const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
-      previewText : displayValueOverride;
-
-    return (
-      <div className='template-editor-field-block'>
-        <div className='field-preview-row'>
-          <div className='field-preview-label-group' style={labelStyle}>
-            <div className={classNames({
-              'field-preview-label': true,
-            })}
-              onClick={this.handleLabelClicked}
-            >
-              {field.name}
-            </div>
-          </div>
-          {
-            !hidePreviewValue &&
-            <div
-              className={classNames({
-                'field-preview-value': true,
-                /*'field-preview-value-settings-open': settingsOpen,*/
-              })}
-              style={fontColor(Colors().text2)}
-            >
-              {previewContent}
-            </div>
-          }
-        </div>
-      </div>
-    );
-  }
-
-  public handleLabelClicked()
-  {
-    if (this._settingsAreOpen())
-    {
-      this.props.act({
-        actionType: 'closeSettings',
-      });
-    }
-    else
-    {
-      this.props.act({
-        actionType: 'setSettingsKeyPath',
-        keyPath: this.props.keyPath,
-        displayKeyPath: this.props.displayKeyPath,
-      });
-    }
-
+    return <div/>;
   }
 }
-
-const emptyOptions = List([]);
-
-export default Util.createTypedContainer(
-  TemplateEditorFieldPreview,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
-);

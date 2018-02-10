@@ -57,17 +57,21 @@ import Util from 'util/Util';
 import FadeInOut from 'common/components/FadeInOut';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-
+console.log('hi');
 import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
+import { TransformationView } from 'etl/templates/components/transformations/TransformationView';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
 import './TemplateEditorField.less';
 
 const EditIcon = require('images/icon_edit.svg');
@@ -121,7 +125,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
     return (
       <div className='transformation-row' key={index}>
         <div className='transformation-row-text' style={style.textStyle}>
-          {value}
+          {value.id}
         </div>
         <div className='edit-transformation-spacer'>
           <div
@@ -178,7 +182,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
   public render()
   {
     const { keyPath, field, canEdit, preview } = this.props;
-    const transformations = List(['Sample Transformation 1', 'Sample Transformation 2', 'Hey there bud']);
+    const transformations = field.transformations;
     return (
       <div className='template-editor-field-transformations'>
         <div className='transformations-list'>
@@ -210,6 +214,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
 
   public handleAddNewTransformation()
   {
+    this._proxy().addTransformation(TransformationNodeType.CapitalizeNode, List([this.props.field.fieldId]));
     this.setState({
       viewState: ViewState.CREATE_NEW,
     });

@@ -52,8 +52,8 @@ const { List, Map } = Immutable;
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { ELASTIC_TYPES, jsToElastic } from 'shared/etl/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
+import { KeyPath as EngineKeypath, TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 /*
  *  In the MVC framework of the template editor, the proxy data structure acts as the controller
  *  The proxy objects are generated synchronously and aren't meant to be persisted
@@ -146,12 +146,12 @@ export class FieldNodeProxy
     return this.tree.getField(this.path);
   }
 
-  public makeChild(field: TemplateField): FieldNodeProxy
+  public discoverChild(field: TemplateField): FieldNodeProxy
   {
     return this.tree.createField(this.path, field);
   }
 
-  public setFieldEnabled(enabled: boolean): FieldNodeProxy
+  public setFieldEnabled(enabled: boolean)
   {
     if (enabled)
     {
@@ -162,10 +162,9 @@ export class FieldNodeProxy
       this.tree.getEngine().disableField(this.id());
     }
     this.syncWithEngine();
-    return this;
   }
 
-  public changeName(value: string): FieldNodeProxy
+  public changeName(value: string)
   {
     if (value === '' || value === undefined || value === null)
     {
@@ -179,10 +178,16 @@ export class FieldNodeProxy
     outputPath = outputPath.set(outputPath.size - 1, value);
     engine.setOutputKeyPath(field.fieldId, outputPath);
     this.syncWithEngine();
-    return this;
   }
 
-  public syncWithEngine()
+  public addTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<EngineKeypath> | List<number>,
+    options?: object)
+  {
+    this.tree.getEngine().appendTransformation(nodeType, fieldNamesOrIDs, options);
+    this.syncWithEngine();
+  }
+
+  public syncWithEngine() // This function will mutate the field from which it was called
   {
     const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.id(), this.field());
     this.tree.setField(this.path, updatedField);
