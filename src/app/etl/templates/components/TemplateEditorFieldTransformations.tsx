@@ -57,7 +57,6 @@ import Util from 'util/Util';
 import FadeInOut from 'common/components/FadeInOut';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-console.log('hi');
 import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
@@ -71,6 +70,8 @@ import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TransformationView } from 'etl/templates/components/transformations/TransformationView';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
+import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
 import './TemplateEditorField.less';
 

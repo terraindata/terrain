@@ -97,7 +97,8 @@ export function createFieldFromEngine(
   const enginePath = engine.getOutputKeyPath(id).toJS();
   const transformationIds = engine.getTransformations(id);
 
-  const transformations: List<TransformationNode> = transformationIds.map((transformationId, index) => {
+  const transformations: List<TransformationNode> = transformationIds.map((transformationId, index) =>
+  {
     const transformNode = engine.getTransformationInfo(transformationId);
     return _TransformationNode({
       id: transformNode.id,

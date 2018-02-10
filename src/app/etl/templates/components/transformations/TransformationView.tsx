@@ -59,11 +59,11 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationsManifest from './TransformationsManifest';
+import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
 export interface TransformationViewProps
 {
-
+  placeholder?: any;
 }
 
 @Radium
@@ -71,6 +71,6 @@ export class TransformationView extends TerrainComponent<TransformationViewProps
 {
   public render()
   {
-    return <div/>;
+    return <div />;
   }
 }
