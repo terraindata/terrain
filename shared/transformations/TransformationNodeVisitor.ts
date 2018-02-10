@@ -160,7 +160,7 @@ class TransformationNodeVisitor
     return {} as TransformationVisitResult;
   }
 
-  public static visitCapitalizeNode(node: TransformationNode, doc): TransformationVisitResult
+  public static visitCapitalizeNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
     for (const fieldID of node.fieldIDs.toJS())
     {
@@ -182,7 +182,7 @@ class TransformationNodeVisitor
     } as TransformationVisitResult;
   }
 
-  public static visitSubstringNode(node: TransformationNode, doc): TransformationVisitResult
+  public static visitSubstringNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<'substring'>;
     for (const fieldID of node.fieldIDs.toJS())
