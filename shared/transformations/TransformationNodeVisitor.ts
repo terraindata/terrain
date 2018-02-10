@@ -47,6 +47,7 @@ THE SOFTWARE.
 // import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
+import { NodeOptionsType } from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -85,9 +86,9 @@ class TransformationNodeVisitor
       case TransformationNodeType.AppendNode:
         return TransformationNodeVisitor.visitAppendNode(node, docCopy);
       case TransformationNodeType.CapitalizeNode:
-        return TransformationNodeVisitor.visitCapitalizeNode(node as TransformationNode<'capitalize'>, docCopy);
+        return TransformationNodeVisitor.visitCapitalizeNode(node, docCopy);
       case TransformationNodeType.SubstringNode:
-        return TransformationNodeVisitor.visitSubstringNode(node as TransformationNode<'substring'>, docCopy);
+        return TransformationNodeVisitor.visitSubstringNode(node, docCopy);
       default:
         return {
           errors: [
@@ -159,7 +160,7 @@ class TransformationNodeVisitor
     return {} as TransformationVisitResult;
   }
 
-  public static visitCapitalizeNode(node: TransformationNode<'capitalize'>, doc): TransformationVisitResult
+  public static visitCapitalizeNode(node: TransformationNode, doc): TransformationVisitResult
   {
     for (const fieldID of node.fieldIDs.toJS())
     {
@@ -181,8 +182,9 @@ class TransformationNodeVisitor
     } as TransformationVisitResult;
   }
 
-  public static visitSubstringNode(node: TransformationNode<'substring'>, doc): TransformationVisitResult
+  public static visitSubstringNode(node: TransformationNode, doc): TransformationVisitResult
   {
+    const opts = node.meta as NodeOptionsType<'substring'>;
     for (const fieldID of node.fieldIDs.toJS())
     {
       if (typeof doc[fieldID] !== 'string')
@@ -195,7 +197,7 @@ class TransformationNodeVisitor
           ],
         } as TransformationVisitResult;
       }
-      if (!node.meta.hasOwnProperty('from') || node.meta['from'] < 0)
+      if (!opts.hasOwnProperty('from') || opts['from'] < 0)
       {
         return {
           errors: [
@@ -205,7 +207,7 @@ class TransformationNodeVisitor
           ],
         } as TransformationVisitResult;
       }
-      if (!node.meta.hasOwnProperty('length') || node.meta['length'] < 0)
+      if (!opts.hasOwnProperty('length') || opts['length'] < 0)
       {
         return {
           errors: [
@@ -216,7 +218,7 @@ class TransformationNodeVisitor
         } as TransformationVisitResult;
       }
       // Currently assumes a single from and length for all fieldIDs
-      doc[fieldID] = doc[fieldID].substr(node.meta['from'], node.meta['length']);
+      doc[fieldID] = doc[fieldID].substr(opts['from'], opts['length']);
     }
 
     return {

@@ -45,14 +45,13 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import TransformationNodeType from './TransformationNodeType';
-import { NodeOptionsType, NodeTypes } from './TransformationNodeType';
 
-export class TransformationNode<T extends NodeTypes = 'default'>
+export class TransformationNode
 {
   public id: number;
   public typeCode: TransformationNodeType;
   public fieldIDs: List<number>;
-  public meta: NodeOptionsType<T>;
+  public meta: object;
 
   constructor(id: number, typeCode: TransformationNodeType, fieldIDs: List<number>, options?: object)
   {
