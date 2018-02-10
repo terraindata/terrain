@@ -184,7 +184,7 @@ class TransformationNodeVisitor
 
   public static visitSubstringNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    const opts = node.meta as NodeOptionsType<'substring'>;
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
     for (const fieldID of node.fieldIDs.toJS())
     {
       if (typeof doc[fieldID] !== 'string')
