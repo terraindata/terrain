@@ -43,23 +43,60 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-
+// tslint:disable no-unused-expression
 enum TransformationNodeType
 {
-  LoadNode = 0,
-  StoreNode = 1,
-  PutNode = 2,
-  GetNode = 3,
-  SplitNode = 4,
-  JoinNode = 5,
-  FilterNode = 6,
-  DuplicateNode = 7,
-  RenameNode = 8,
-  PlusNode = 9,
-  PrependNode = 10,
-  AppendNode = 11,
-  CapitalizeNode = 12,
-  SubstringNode = 13,
+  LoadNode = 'LoadNode',
+  StoreNode = 'StoreNode',
+  PutNode = 'PutNode',
+  GetNode = 'GetNode',
+  SplitNode = 'SplitNode',
+  JoinNode = 'JoinNode',
+  FilterNode = 'FilterNode',
+  DuplicateNode = 'DuplicateNode',
+  RenameNode = 'RenameNode',
+  PlusNode = 'PlusNode',
+  PrependNode = 'PrependNode',
+  AppendNode = 'AppendNode',
+  CapitalizeNode = 'CapitalizeNode',
+  SubstringNode = 'SubstringNode',
 }
+
+// if this has errors, double check TransformationNodeType's keys are equal to its values
+type AssertEnumValuesEqualKeys = {
+  [K in keyof typeof TransformationNodeType]: K
+};
+TransformationNodeType as AssertEnumValuesEqualKeys;
+
+// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
+type AssertOptionTypesExhaustive = {
+  [K in TransformationNodeType]: TransformationOptionTypes[K]
+};
+
+interface TransformationOptionTypes
+{
+  LoadNode: any;
+  StoreNode: any;
+  PutNode: any;
+  GetNode: any;
+  SplitNode: any;
+  JoinNode: any;
+  FilterNode: any;
+  DuplicateNode: any;
+  RenameNode: any;
+  PlusNode: any;
+  PrependNode: any;
+  AppendNode: any;
+  CapitalizeNode: {
+
+  };
+  SubstringNode: {
+    from: number;
+    length: number;
+  };
+}
+
+export type NodeTypes = keyof TransformationOptionTypes;
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
 
 export default TransformationNodeType;

@@ -44,9 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as winston from 'winston';
+// import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
+import { NodeOptionsType } from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -183,6 +184,7 @@ class TransformationNodeVisitor
 
   public static visitSubstringNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
     for (const fieldID of node.fieldIDs.toJS())
     {
       if (typeof doc[fieldID] !== 'string')
@@ -195,7 +197,7 @@ class TransformationNodeVisitor
           ],
         } as TransformationVisitResult;
       }
-      if (!node.meta.hasOwnProperty('from') || node.meta['from'] < 0)
+      if (!opts.hasOwnProperty('from') || opts['from'] < 0)
       {
         return {
           errors: [
@@ -205,7 +207,7 @@ class TransformationNodeVisitor
           ],
         } as TransformationVisitResult;
       }
-      if (!node.meta.hasOwnProperty('length') || node.meta['length'] < 0)
+      if (!opts.hasOwnProperty('length') || opts['length'] < 0)
       {
         return {
           errors: [
@@ -216,7 +218,7 @@ class TransformationNodeVisitor
         } as TransformationVisitResult;
       }
       // Currently assumes a single from and length for all fieldIDs
-      doc[fieldID] = doc[fieldID].substr(node.meta['from'], node.meta['length']);
+      doc[fieldID] = doc[fieldID].substr(opts['from'], opts['length']);
     }
 
     return {
