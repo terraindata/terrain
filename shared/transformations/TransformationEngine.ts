@@ -132,7 +132,7 @@ export class TransformationEngine
   {
     if (doc !== undefined)
     {
-      this.doc = doc;
+      this.doc = Object.assign({}, doc);
       this.generateInitialFieldMaps(this.doc); // TODO can't return ID list here... disable this or what?
       // initial field nodes can be implicit, DAG should only represent actual transformations
     }
@@ -307,6 +307,16 @@ export class TransformationEngine
     return this.IDToFieldNameMap.get(fieldID);
   }
 
+  public getFieldType(fieldID: number): string
+  {
+    return this.fieldTypes.get(fieldID);
+  }
+
+  public getFieldEnabled(fieldID: number): boolean
+  {
+    return this.fieldEnabled.get(fieldID) === true;
+  }
+
   public getAllFieldIDs(): List<number>
   {
     return this.IDToFieldNameMap.keySeq().toList();
@@ -350,6 +360,7 @@ export class TransformationEngine
         }
       } else
       {
+        ids = ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
         ids = ids.concat(this.generateInitialFieldMaps(obj[key], currentKeyPath.push(key))).toList();
       }
     }
@@ -363,9 +374,18 @@ export class TransformationEngine
     {
       if (deepGet(obj, keyPath.toArray()) !== undefined)
       {
-        output[value] = deepGet(obj, keyPath.toArray());
-      }
-    });
+        const ref: any = deepGet(obj, keyPath.toArray());
+        if (isPrimitive(ref))
+        {
+          output[value] = ref;
+        } else if (Array.isArray(ref))
+        {
+          // TODO arrays
+        } else
+        {
+          output[value] = Object.assign({}, ref);
+        }
+      });
     return output;
   }
 
