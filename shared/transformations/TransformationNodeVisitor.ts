@@ -57,7 +57,7 @@ class TransformationNodeVisitor
 {
   public static visit(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    const docCopy = doc; // Preserve original doc in case of errors that would mangle it
+    const docCopy = Object.assign({}, doc); // Preserve original doc in case of errors that would mangle it
     switch (node.typeCode)
     {
       case TransformationNodeType.LoadNode:

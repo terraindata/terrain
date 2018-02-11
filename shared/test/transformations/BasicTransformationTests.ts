@@ -105,7 +105,7 @@ test('serialize to JSON', () =>
         },
         {
           v: '1',
-          value: new TransformationNode(1, 12, List<number>([2])),
+          value: new TransformationNode(1, 12, List<number>([3])),
         },
       ],
       edges: [],
@@ -117,27 +117,31 @@ test('serialize to JSON', () =>
         school: 'Stanford',
       },
     },
-    uidField: 3,
+    uidField: 4,
     uidNode: 2,
     fieldNameToIDMap: [
       [KeyPath(['name']), 0],
       [KeyPath(['age']), 1],
-      [KeyPath(['meta', 'school']), 2],
+      [KeyPath(['meta']), 2],
+      [KeyPath(['meta', 'school']), 3],
     ],
     IDToFieldNameMap: [
       [0, KeyPath(['name'])],
       [1, KeyPath(['age'])],
-      [2, KeyPath(['meta', 'school'])],
+      [2, KeyPath(['meta'])],
+      [3, KeyPath(['meta', 'school'])],
     ],
     fieldTypes: [
       [0, 'string'],
       [1, 'number'],
-      [2, 'string'],
+      [2, 'object'],
+      [3, 'string'],
     ],
     fieldEnabled: [
       [0, true],
       [1, true],
       [2, true],
+      [3, true],
     ],
   });
 });
