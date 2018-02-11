@@ -428,9 +428,8 @@ const TransformChart = {
     overlay.on('mouseover', this._overlayMouseoverFactory(el));
   },
 
-  _drawAxes(el, scales, width, height, inputKey, schema)
+  _drawAxes(el, scales, width, height, inputKey, isDate)
   {
-    const isDate = ElasticBlockHelpers.getColumnType(schema, inputKey) === 'date';
     const numSideTicks = height > 200 ? 10 : 5;
     let numBottomTicks = width > 500 ? 6 : 4;
     let bottomTickFormatFn = Util.formatNumber;
@@ -525,7 +524,7 @@ const TransformChart = {
     bar.exit().remove();
   },
 
-  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domainMin, domainMax)
+  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domainMin, domainMax, isDate)
   {
     const g = d3.select(el).selectAll('.spotlights');
 
@@ -546,7 +545,14 @@ const TransformChart = {
 
     const minX = scaleDomainMin(scales.realX);
     const maxX = scaleDomainMax(scales.realX);
-    const getSpotlightX = (d) => Util.valueMinMax(d['fields'][inputKey], minX, maxX);
+    const getSpotlightX = (d) =>
+    {
+      if (isDate)
+      {
+        return Util.valueMinMax(Date.parse(d['fields'][inputKey]), minX, maxX);
+      }
+      return Util.valueMinMax(d['fields'][inputKey], minX, maxX);
+    };
 
     const SPOTLIGHT_SIZE = 12;
     const SPOTLIGHT_PADDING = 6;
@@ -1707,7 +1713,8 @@ const TransformChart = {
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    this._drawAxes(el, scales, width, height, inputKey, schema);
+    const isDate = ElasticBlockHelpers.getColumnType(schema, inputKey) === 'date';
+    this._drawAxes(el, scales, width, height, inputKey, isDate);
     if (inputKey === '' || inputKey === undefined)
     {
       this._drawDisabledOverlay(el, scales);
@@ -1749,7 +1756,7 @@ const TransformChart = {
     {
       this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domain.x[0], domain.x[1]);
+    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domain.x[0], domain.x[1], isDate);
 
     if (mode === 'linear'
       || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)

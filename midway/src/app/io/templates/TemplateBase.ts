@@ -68,3 +68,5 @@ export class TemplateBase extends ConfigType
     ConfigType.initialize(this, props);
   }
 }
+
+export default TemplateBase;

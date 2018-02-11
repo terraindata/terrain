@@ -54,6 +54,7 @@ import * as Util from '../../Util';
 
 import UserConfig from '../../users/UserConfig';
 import { Import } from '../Import';
+import * as Auth from './Authenticate';
 import ImportTemplateConfig from './ImportTemplateConfig';
 import { ImportTemplates } from './ImportTemplates';
 
@@ -131,7 +132,7 @@ Router.post('/fieldTypes', passport.authenticate('access-token-local'), async (c
 
 Router.post('/fieldTypesFile', async (ctx, next) =>
 {
-  const authStream: object = await Util.authenticateStream(ctx.req);
+  const authStream: object = await Auth.authenticateStream(ctx.req);
   await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
 
   ctx.body = await fieldTypes.getFieldTypesFromMySQLFormatStream(authStream['files'], authStream['fields']);
@@ -139,7 +140,7 @@ Router.post('/fieldTypesFile', async (ctx, next) =>
 
 Router.post('/jsonify', async (ctx, next) =>
 {
-  const authStream: object = await Util.authenticateStream(ctx.req);
+  const authStream: object = await Auth.authenticateStream(ctx.req);
   await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
 
   ctx.body = await fieldTypes.getJSONFromMySQLFormatStream(authStream['files'], authStream['fields']);
