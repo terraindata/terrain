@@ -531,8 +531,8 @@ const TransformChart = {
 
     const spotlight = g.selectAll('.spotlight')
       .data(
-      spotlights.filter((d) => d['fields'][inputKey] !== undefined),
-      (d) => d['fields']['_id'],
+        spotlights.filter((d) => d['fields'][inputKey] !== undefined),
+        (d) => d['fields']['_id'],
     );
 
     const spotlightEnter = spotlight.enter()

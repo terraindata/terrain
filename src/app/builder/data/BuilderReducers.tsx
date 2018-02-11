@@ -373,8 +373,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       }>) =>
       state
         .update('query',
-        (query) =>
-          query.set('resultsConfig', action.payload.resultsConfig),
+          (query) =>
+            query.set('resultsConfig', action.payload.resultsConfig),
       ),
 
     [ActionTypes.save]: (state: BuilderState,

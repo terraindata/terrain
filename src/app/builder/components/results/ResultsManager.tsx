@@ -688,20 +688,20 @@ export class ResultsManager extends TerrainComponent<Props>
     this.props.onResultsStateChange(
       resultsState
         .set(
-        isAllFields ? 'hasAllFieldsError' : 'hasError',
-        true,
+          isAllFields ? 'hasAllFieldsError' : 'hasError',
+          true,
       )
         .set(
-        isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-        errorMessage,
+          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+          errorMessage,
       )
         .set(
-        isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-        true,
+          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+          true,
       )
         .set(
-        'loading',
-        false,
+          'loading',
+          false,
       ),
     );
   }
@@ -725,20 +725,20 @@ export class ResultsManager extends TerrainComponent<Props>
     this.props.onResultsStateChange(
       resultsState
         .set(
-        isAllFields ? 'hasAllFieldsError' : 'hasError',
-        true,
+          isAllFields ? 'hasAllFieldsError' : 'hasError',
+          true,
       )
         .set(
-        isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-        err.title,
+          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+          err.title,
       )
         .set(
-        isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-        true,
+          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+          true,
       )
         .set(
-        'loading',
-        false,
+          'loading',
+          false,
       ),
     );
   }
