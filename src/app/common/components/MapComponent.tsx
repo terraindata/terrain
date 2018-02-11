@@ -73,10 +73,10 @@ export interface Props
   onChange?: (coordinates, inputValue) => void;
   onMapClick?: (e) => void;
   canEdit: boolean;
-  markers?: List<LocationMarker>; // A list of additional markers to add to the map
+  markers?: List<LocationMarker> | List<{}>; // A list of additional markers to add to the map
   allowSearchByCoordinate?: boolean;
-  bounds?: [number, number];
-  boundingRectangles?: List<BoundingRectangle>;
+  bounds?: any[];
+  boundingRectangles?: List<BoundingRectangle> | List<{}>;
   // Show/Hide certain features
   hideZoomControl?: boolean;
   hideSearchBar?: boolean;
@@ -410,7 +410,7 @@ class MapComponent extends TerrainComponent<Props>
     }
     else if (this.props.markers !== undefined && this.props.markers.size > 0)
     {
-      let locations = this.props.markers.map((loc) => loc.coordinates).toList();
+      let locations = (this.props.markers as List<LocationMarker>).map((loc) => loc.coordinates).toList();
       if (location !== undefined)
       {
         locations = locations.push([location[1], location[0]]);

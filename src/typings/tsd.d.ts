@@ -127,5 +127,3 @@ declare interface IName
 declare const DEV: boolean;
 declare const MIDWAY_HOST: string;
 
-declare const escape: (s: string) => string;
-declare const unescape: (s: string) => string;
