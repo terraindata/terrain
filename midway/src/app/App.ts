@@ -58,18 +58,18 @@ import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
 import './auth/Passport';
-import { CmdLineArgs } from './CmdLineArgs';
+import {CmdLineArgs} from './CmdLineArgs';
 import * as Config from './Config';
-import { credentials } from './credentials/CredentialRouter';
-import { databases } from './database/DatabaseRouter';
-import { events } from './events/EventRouter';
+import {credentials} from './credentials/CredentialRouter';
+import {databases} from './database/DatabaseRouter';
+import {events} from './events/EventRouter';
 import './Logging';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
-import { scheduler } from './scheduler/SchedulerRouter';
+import {scheduler} from './scheduler/SchedulerRouter';
 import * as Schema from './Schema';
-import { users } from './users/UserRouter';
+import {users} from './users/UserRouter';
 
 const MAX_CONN_RETRIES = 5;
 const CONN_RETRY_TIMEOUT = 1000;
@@ -120,17 +120,35 @@ export class App
 
     this.app = new Koa();
     this.app.proxy = true;
-    this.app.keys = [srs({ length: 256 })];
-    this.app.use(async (ctx, next) =>
-    {
+    this.app.keys = [srs({length: 256})];
+    this.app.use(async (ctx, next) => {
       // tslint:disable-next-line:no-empty
       ctx.req.setTimeout(0, () => { });
       await next();
     });
+
+    let requestNumber = 0;
+    this.app.use(async (ctx, next) => {
+      const start = Date.now();
+      const info: string = JSON.stringify(
+        [
+          requestNumber++,
+          ctx.request.ip,
+          ctx.request.headers['X-Orig-IP'],
+          ctx.request.method,
+          ctx.request.type,
+          ctx.request.length,
+          ctx.request.href,
+        ]);
+      winston.info('begin handling route: ' + info);
+      await next();
+      const ms = Date.now() - start;
+      winston.info('done handling route (' + ms.toString() + 'ms): ' + info);
+    });
     this.app.use(cors());
     this.app.use(session(undefined, this.app));
 
-    this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
+    this.app.use(Middleware.bodyParser({jsonLimit: '10gb', formLimit: '10gb'}));
     this.app.use(Middleware.favicon(__dirname + '/../../../src/app/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
@@ -140,7 +158,7 @@ export class App
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
     this.app.use(MidwayRouter.routes());
-    this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
+    this.app.use(serve({rootDir: './midway/src/assets', rootPath: '/midway/v1/assets'}));
     this.app.use(NotFoundRouter.routes());
   }
 
@@ -148,7 +166,7 @@ export class App
   {
     const client: any = this.DB.getController().getClient();
     let isConnected = await client.isConnected();
-    for (let i = 1; i <= MAX_CONN_RETRIES && !isConnected; ++i)
+    for ( let i = 1; i <= MAX_CONN_RETRIES && !isConnected; ++i )
     {
       winston.warn('Failed to establish database connection');
 
@@ -182,7 +200,7 @@ export class App
 
     // connect to configured databases
     const dbs = await databases.select(['id'], {});
-    for (const db of dbs)
+    for ( const db of dbs )
     {
       await databases.connect({} as any, db.id);
 
