@@ -108,17 +108,20 @@ export default class ElasticQueryHandler extends QueryHandler
         {
           return this.handleGroupJoin(parser, query);
         }
-
-        if (request.streaming === true)
+        else
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), { body: query }, [], { objectMode: true });
+          if (request.streaming === true)
+          {
+            return new ElasticsearchScrollStream(client.getDelegate(), { body: query }, [], { objectMode: true });
+          }
+          else
+          {
+            return new Promise<QueryResponse>((resolve, reject) =>
+            {
+              client.search({ body: query } as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
+            });
+          }
         }
-
-        return new Promise<QueryResponse>((resolve, reject) =>
-        {
-          client.search({ body: query } as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
-        });
-
       case 'deleteTemplate':
       case 'getTemplate':
       case 'putTemplate':

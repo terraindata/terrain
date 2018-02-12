@@ -77,25 +77,17 @@ export const ElasticBlockHelpers = {
     const serverName = BuilderStore.getState().db.name;
     const index = getIndex();
     const type = getType();
-
     const key = serverName + '/' + String(index) + '.' + String(type) + '.c.' + column;
+
     if (schemaState.columns instanceof Map)
     {
       const col = schemaState.columns.get(key);
-      if (col === undefined)
-      {
-        return undefined;
-      }
-      return col.get('datatype');
+      return col && col.get('datatype');
     }
     else
     {
       const col = schemaState.columns[key];
-      if (col === undefined)
-      {
-        return undefined;
-      }
-      return col.datatype;
+      return col && col.datatype;
     }
   },
 

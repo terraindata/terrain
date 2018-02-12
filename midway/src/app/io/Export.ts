@@ -74,7 +74,6 @@ const typeParser: CSVTypeParser = new CSVTypeParser();
 
 export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 {
-  file: stream.Readable;
   filetype: string;
   update: boolean;      // false means replace (instead of update) ; default should be true
 }
@@ -213,8 +212,8 @@ export class Export
         body: qry,
       };
 
-      const qryResponse: any = await qh.handleQuery(payload);
-      if (qryResponse === undefined || (qryResponse.hasError !== undefined && qryResponse.hasError()))
+      const respStream: any = await qh.handleQuery(payload);
+      if (respStream === undefined || (respStream.hasError !== undefined && respStream.hasError()))
       {
         writer.end();
         return reject('Nothing to export.');
@@ -237,7 +236,7 @@ export class Export
         let isFirstJSONObj: boolean = true;
         await new Promise(async (res, rej) =>
         {
-          qryResponse.on('data', (doc) =>
+          respStream.on('data', (doc) =>
           {
             if (doc === undefined || doc === null)
             {
@@ -272,12 +271,12 @@ export class Export
             }
           });
 
-          qryResponse.on('end', () =>
+          respStream.on('end', () =>
           {
             return res();
           });
 
-          qryResponse.on('error', (err) =>
+          respStream.on('error', (err) =>
           {
             winston.error(err);
             return rej(err);
@@ -289,7 +288,7 @@ export class Export
       }
       catch (e)
       {
-        qryResponse.close();
+        respStream.close();
         return reject(e);
       }
     });
