@@ -143,6 +143,12 @@ test('serialize to JSON', () =>
       [2, true],
       [3, true],
     ],
+    fieldProps: [
+      [0, {}],
+      [1, {}],
+      [2, {}],
+      [3, {}],
+    ],
   });
 });
 
