@@ -43,49 +43,108 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 import * as Immutable from 'immutable';
-import Actions from 'library/data/LibraryActions';
-import ActionTypes from 'library/data/LibraryActionTypes';
-import { Ajax, createMockStore } from 'test-helpers/helpers';
-import LibraryHelper from 'test-helpers/LibraryHelper';
-
-const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
-
-const mockStore = createMockStore();
-
-describe('LibraryActions', () =>
+import
 {
-  describe('#categories.create', () =>
+  _Algorithm,
+  _Category,
+  _Group,
+  _LibraryState,
+  Algorithm,
+  Category,
+  Group,
+} from 'library/LibraryTypes';
+import { ItemType } from '../../items/types/Item';
+
+export default class LibraryHelper
+{
+  public static mockState()
   {
-    const categoryId = 1;
-    const categoryName = 'Test Category';
-    const libraryStateMock = LibraryHelper.mockState();
+    return new LibraryStateMock();
+  }
 
-    const library = libraryStateMock.getState();
-    const category = LibraryHelper.mockCategory();
+  public static mockCategory()
+  {
+    return _Category();
+  }
+}
 
-    it('should create a categories.create action after the new category has been created', (done) =>
-    {
-      Ajax.saveItem = (
-        item: any,
-        onLoad?: (resp: any) => void,
-        onError?: (ev: Event) => void,
-      ) => onLoad({ id: categoryId });
+class LibraryStateMock
+{
+  public state;
 
-      const expectedActions = [
-        {
-          type: ActionTypes.categories.create,
-          payload: { category: category.set('id', categoryId), versioning: true },
-        },
-      ];
-
-      const store = mockStore({ library });
-
-      store.dispatch(Actions.categories.create(category, (id) =>
-      {
-        expect(store.getActions()).toEqual(expectedActions);
-        done();
-      }));
+  public constructor()
+  {
+    this.state = _LibraryState({
+      categories: Immutable.Map<number, Category>({}),
+      groups: Immutable.Map<number, Group>({}),
+      algorithms: Immutable.Map<number, Algorithm>({}),
     });
-  });
-});
+  }
+
+  public addCategory(id: number, categoryName: string)
+  {
+    const category = _Category({
+      type: ItemType.Category,
+      id,
+      name: categoryName,
+      lastEdited: '',
+      lastUserId: '',
+      userIds: Immutable.List([]),
+      defaultLanguage: 'elastic',
+      parent: 0,
+    }));
+
+    this.state = this.state.set(
+      'categories',
+      this.state.categories.set(id, category),
+    );
+
+    return this;
+  }
+
+  public addGroup(categoryId: number, groupId: number, groupName: string)
+  {
+    const group = _Group({
+      id: groupId,
+      name: 'Group 1',
+      lastEdited: '',
+      lastUserId: '',
+      userIds: Immutable.List([]),
+      defaultLanguage: 'elastic',
+      parent: 0,
+    });
+
+    this.state = this.state
+      .setIn(['groups', groupId], group)
+      .setIn(
+        ['categories', categoryId, 'groupsOrder'],
+        this.state.categories.get(categoryId).groupsOrder.push(groupId),
+    );
+
+    return this;
+  }
+
+  public addAlgorithm(groupId: number, algorithmId: number, algorithmName: string)
+  {
+    const algorithm = _Algorithm({
+      id: algorithmId,
+      name: algorithmName,
+    });
+
+    this.state = this.state
+      .setIn(['algorithms', algorithmId], algorithm)
+      .setIn(
+        ['groups', groupId, 'algorithmsOrder'],
+        this.state.groups.get(groupId).algorithmsOrder.push(algorithmId),
+    );
+
+    return this;
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+}
