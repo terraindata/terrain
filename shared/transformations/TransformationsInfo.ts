@@ -164,4 +164,9 @@ export default abstract class TransformationsInfo
   {
     return TransformationNodeInfo[type].description;
   }
+
+  public static getInfo(type: TransformationNodeType)
+  {
+    return TransformationNodeInfo[type];
+  }
 }

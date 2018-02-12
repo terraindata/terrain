@@ -63,11 +63,11 @@ import Dropdown from 'common/components/Dropdown';
 import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 
-import { TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-import { TransformationView } from 'etl/templates/components/transformations/TransformationView';
+import { TransformationEditor } from 'etl/templates/components/transformations/TransformationEditor';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -119,14 +119,14 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
     return { textStyle, buttonStyle };
   }
 
-  public renderTransformationListItem(value, index)
+  public renderTransformationListItem(value: TransformationNode, index)
   {
     const style = this.transformationListItemStyle(index === this.state.currentIndex && this.state.viewState === ViewState.EDIT);
 
     return (
       <div className='transformation-row' key={index}>
         <div className='transformation-row-text' style={style.textStyle}>
-          {value.id}
+          {TransformationsInfo.getReadableName(value.typeCode)}
         </div>
         <div className='edit-transformation-spacer'>
           <div
@@ -144,11 +144,18 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
 
   public renderEditTransformationSection()
   {
-    return (
-      <div className='transformation-editor'>
-        I don't know what should go here yet. {this.state.currentIndex}
-      </div>
-    );
+    const { currentIndex } = this.state;
+    const { field } = this.props;
+
+    if (currentIndex >= 0 && currentIndex < field.transformations.size)
+    {
+      return (
+        <TransformationEditor
+          transformation={field.transformations.get(currentIndex)}
+          editTransformation={null}
+        />
+      );
+    }
   }
 
   public renderCreateTransformationSection()
@@ -162,6 +169,9 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
 
   public renderNewTransformationButton()
   {
+    const buttonText = this.props.field.transformations.size === 0 ?
+      'Add a Transformation' :
+      'Add Another Transformation';
     return (
       <div
         className='add-transformation-row'
@@ -173,11 +183,30 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
           <AddIcon />
         </div>
         <div className='transformation-row-text'>
-          Add Another Transformation
+          {buttonText}
         </div>
 
       </div>
     );
+  }
+
+  public renderTransformationsList()
+  {
+    const transformations = this.props.field.transformations;
+    if (transformations.size !== 0)
+    {
+      return transformations.map(this.renderTransformationListItem);
+    }
+    else
+    {
+      return (
+        <div className='transformation-row' key={'none'}>
+          <div className='transformation-row-text'>
+            This field has no transformations
+          </div>
+        </div>
+      );
+    }
   }
 
   public render()
@@ -187,7 +216,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
     return (
       <div className='template-editor-field-transformations'>
         <div className='transformations-list'>
-          {transformations.map(this.renderTransformationListItem)}
+          {this.renderTransformationsList()}
           {this.renderNewTransformationButton()}
         </div>
         <div className='transformation-fade-container'>

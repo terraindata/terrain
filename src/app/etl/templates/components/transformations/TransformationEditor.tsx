@@ -58,19 +58,46 @@ import FadeInOut from 'common/components/FadeInOut';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { TransformationNode } from 'etl/templates/FieldTypes';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
-export interface TransformationViewProps
+import './TransformationEditor.less';
+
+export interface Props
 {
-  placeholder?: any;
+  transformation: TransformationNode;
+  editTransformation: (transformationID, fieldNamesOrIDs?, options?) => void;
+  deleteTransformation?: () => void;
+}
+
+// visitor components must use this
+export interface TransformationEditorProps
+{
+  create: boolean; // whether or not the transformation is being created or edited
+  transformation: TransformationNode;
+  editTransformation: (transformationID, fieldNamesOrIDs?, options?) => void;
+  registerApplyEdit: (childFn: () => void) => void;
 }
 
 @Radium
-export class TransformationView extends TerrainComponent<TransformationViewProps>
+export class TransformationEditor extends TerrainComponent<Props>
 {
+  public getChildComponent(type: TransformationNodeType)
+  {
+    switch (type)
+    {
+      case TransformationNodeType.CapitalizeNode:
+        return CapitalizeNodeEditor;
+      case TransformationNodeType.SubstringNode:
+        return SubstringNodeEditor;
+      default:
+        return DefaultNodeEditor;
+    }
+  }
+
   public render()
   {
-    return <div />;
+    return <div className='transformation-editor'> Hello </div>;
   }
 }
