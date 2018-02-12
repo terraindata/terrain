@@ -127,6 +127,26 @@ export class App
       ctx.req.setTimeout(0, () => { });
       await next();
     });
+
+    let requestNumber = 0;
+    this.app.use(async (ctx, next) =>
+    {
+      const start = Date.now();
+      const info: string = JSON.stringify(
+        [
+          requestNumber++,
+          ctx.request.ip,
+          ctx.request.headers['X-Orig-IP'],
+          ctx.request.method,
+          ctx.request.type,
+          ctx.request.length,
+          ctx.request.href,
+        ]);
+      winston.info('begin handling route: ' + info);
+      await next();
+      const ms = Date.now() - start;
+      winston.info('done handling route (' + ms.toString() + 'ms): ' + info);
+    });
     this.app.use(cors());
     this.app.use(session(undefined, this.app));
 
