@@ -128,6 +128,7 @@ export const _Path = (config?: { [key: string]: any }) =>
 class FilterGroupC extends BaseClass
 {
   public minMatches: number | string = 'all';
+  public name: string = 'Group';
   public lines: List<FilterLine> = List<FilterLine>([]);
 }
 export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;

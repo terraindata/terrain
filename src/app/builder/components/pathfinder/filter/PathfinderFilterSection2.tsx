@@ -70,6 +70,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import DropZone from 'app/common/components/DropZone';
 import DragDropItem from 'app/common/components/DragDropItem';
 import DragDropGroup from 'app/common/components/DragDropGroup';
+import CustomDragLayer from 'app/common/components/CustomDragLayer';
 
 export interface Props
 {
@@ -304,6 +305,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       <div
         className='pf-section'
       >
+      <CustomDragLayer />
       <DropZone
         keyPath={List([ 0])}
         onDrop={this.handleDrop}

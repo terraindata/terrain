@@ -59,6 +59,7 @@ import Util from 'app/util/Util';
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
 import DropZone from 'app/common/components/DropZone';
 import DragDropItem from 'app/common/components/DragDropItem';
+import { getEmptyImage } from 'react-dnd-html5-backend'
 import './DragDropStyle.less';
 
 
@@ -78,7 +79,7 @@ interface GroupProps
   isOver: boolean;
   connectDragSource: (El) => El;
   connectDropTarget: (El) => El;
-  connectDragPreview: (El) => El;
+  connectDragPreview: (El, options?) => El;
 }
 
 const groupSource = {
@@ -118,9 +119,14 @@ function groupDropCollect(connect, monitor) {
 class GroupComponent extends TerrainComponent<GroupProps>
 {
 
-  public renderDragPreview()
-  {
-    return (<div>Dragging woo!</div>);
+  public componentDidMount() {
+    // Use empty image as a drag preview so browsers don't draw it
+    // and we can draw whatever we want on the custom drag layer instead.
+    this.props.connectDragPreview(getEmptyImage(), {
+      // IE fallback: specify that we'd rather screenshot the node
+      // when it already knows it's being dragged so we can hide it with CSS.
+      captureDraggingState: true,
+    })
   }
 
   public renderGroup()
