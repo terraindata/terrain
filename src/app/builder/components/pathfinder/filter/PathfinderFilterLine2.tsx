@@ -59,19 +59,20 @@ import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import DatePickerWrapper from 'app/common/components/DatePickerWrapper';
-import Dropdown from 'app/common/components/Dropdown';
+import SearchableDropdown from 'app/common/components/Dropdown';
 import MapComponent, { units } from 'app/common/components/MapComponent';
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import BuilderActions from 'app/builder/data/BuilderActions';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
 {
   filterLine: FilterLine;
   canEdit: boolean;
-  // depth: number;
+  depth?: number;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
@@ -103,23 +104,40 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
-
+    const fieldOptions = source.dataSource.getChoiceOptions({
+      type: 'fields',
+      source,
+      schemaState: pathfinderContext.schemaState,
+    }).map((x) => x.value).toList();
+    const comparisonOptions = source.dataSource.getChoiceOptions({
+      type: 'comparison',
+      field: filterLine.field,
+      fieldType: filterLine.fieldType,
+      source,
+      schemaState: pathfinderContext.schemaState,
+    }).map((x) => x.value).toList();
     return (
       <div
         className='pf-filter-line flex-container'
-        style={{
-          alignItems: 'flex-start',
-        }}
-      >
-        {
-          this.renderField()
-        }
-        {
-          this.renderValue()
-        }
-        {
-          this.renderBoost()
-        }
+        style={[{
+                  alignItems: 'flex-start',
+                }]}
+        >
+        <SearchableDropdown
+          selectedIndex={fieldOptions.indexOf(filterLine.field)}
+          keyPath={this.props.keyPath.push('field')}
+          action={BuilderActions.changePath}
+          canEdit={canEdit}
+          options={fieldOptions}
+        />
+        <SearchableDropdown
+          selectedIndex={comparisonOptions.indexOf(filterLine.comparison)}
+          keyPath={this.props.keyPath.push('comparison')}
+          action={BuilderActions.changePath}
+          canEdit={canEdit}
+          options={comparisonOptions}
+        />
+        {this.renderValue()}
         {
           <div
             className='close'
@@ -127,96 +145,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           >
             <RemoveIcon />
           </div>
-        }
-      </div>
-    );
-  }
-
-  private renderField()
-  {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
-    const { source } = pathfinderContext;
-
-    if (filterLine.field !== null)
-    {
-      return (
-        <div
-          style={pieceStyle}
-          onClick={this._fn(this.handleChange, 'field', null, true)}
-        >
-          {
-            filterLine.field
-          }
-        </div>
-      );
-    }
-
-    const options = source.dataSource.getChoiceOptions({
-      type: 'fields',
-      source,
-      schemaState: pathfinderContext.schemaState,
-    });
-
-    return (
-      <div>
-        {
-          options.map((choiceOption) =>
-            <div
-              style={pieceStyle}
-              onClick={this._fn(this.handleChange, 'field', choiceOption.value, choiceOption.meta && choiceOption.meta.fieldType)}
-              key={choiceOption.value}
-            >
-              {
-                choiceOption.displayName
-              }
-            </div>,
-          )
-        }
-      </div>
-    );
-  }
-
-  private renderMethod()
-  {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
-    const { source } = pathfinderContext;
-  }
-
-  private addBoost()
-  {
-    this.props.onChange(this.props.keyPath, this.props.filterLine.set('weightSet', true));
-  }
-
-  private handleBoostChange(e)
-  {
-    this.props.onChange(this.props.keyPath, this.props.filterLine.set('weight', e.target.value));
-  }
-
-  private renderBoost()
-  {
-    const { filterLine, pathfinderContext } = this.props;
-    if (filterLine.field === null || filterLine.fieldType === null || filterLine.comparison === null)
-    {
-      return null;
-    }
-    return (
-      <div>
-        {
-          !filterLine.weightSet ?
-            <div onClick={this.addBoost} className='pf-filter-add-boost'>
-              Add Boost
-          </div>
-            :
-            <div className='pf-filter-boost'>
-              <span>Boost:</span>
-              <input
-                value={filterLine.weight}
-                type='number'
-                min={0}
-                step={1}
-                onChange={this.handleBoostChange}
-              />
-            </div>
         }
       </div>
     );
@@ -252,24 +180,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               alignItems: 'flex-start',
             }}
           >
-            <div>
-              {
-                comparisonOptions.map((option) =>
-                  option.value === filterLine.comparison ||
-                    filterLine.comparison === null ?
-                    <div
-                      style={pieceStyle}
-                      onClick={this._fn(this.handleChange, 'comparison', option.value)}
-                      key={option.value}
-                    >
-                      {
-                        option.displayName
-                      }
-                    </div>
-                    : null,
-                )
-              }
-            </div>
             <Autocomplete
               options={pathfinderContext.source.dataSource.getChoiceOptions({
                 type: 'input',
@@ -288,24 +198,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             alignItems: 'flex-start',
           }}
         >
-          <div>
-            {
-              comparisonOptions.map((option) =>
-                option.value === filterLine.comparison ||
-                  filterLine.comparison === null ?
-                  <div
-                    style={pieceStyle}
-                    onClick={this._fn(this.handleChange, 'comparison', option.value)}
-                    key={option.value}
-                  >
-                    {
-                      option.displayName
-                    }
-                  </div>
-                  : null,
-              )
-            }
-          </div>
           <DatePickerWrapper
             date={String(filterLine.value)}
             onChange={this._fn(this.handleChange, 'value')}
@@ -330,24 +222,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               alignItems: 'flex-start',
             }}
           >
-            <div>
-              {
-                comparisonOptions.map((option) =>
-                  option.value === filterLine.comparison ||
-                    filterLine.comparison === null ?
-                    <div
-                      style={pieceStyle}
-                      onClick={this._fn(this.handleChange, 'comparison', option.value)}
-                      key={option.value}
-                    >
-                      {
-                        option.displayName
-                      }
-                    </div>
-                    : null,
-                )
-              }
-            </div>
             <div className='pf-filter-map-input-wrapper'>
               <BuilderTextbox
                 value={value.distance}

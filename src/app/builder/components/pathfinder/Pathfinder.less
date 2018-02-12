@@ -1,5 +1,22 @@
 @import "../../../common/Common.less";
 
+// STyling for DnD this should move
+.pf-filter-line {
+	padding-top: 6px;
+	padding-left: 6px;
+	.close {
+		opacity: 0;
+		margin-top: 8px !important;
+	}
+	&:hover {
+		.close {
+			opacity: 1;
+		}
+	}
+}
+
+
+
 .pathfinder-column {
 	padding: 0px @double-spacing;
 	padding-bottom: @double-spacing;
@@ -94,7 +111,7 @@
 		.flex-container
 		{
 			.autocomplete {
-				margin-top: 12px;
+				// margin-top: 12px;
 			}
 		}
 		.pf-filter-add-boost {
