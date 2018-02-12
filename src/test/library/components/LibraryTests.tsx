@@ -69,7 +69,7 @@ describe('Library', () =>
 
   const analytics: AnalyticsState = _AnalyticsState({
     loaded: true,
-    data: Immutable.Map(),
+    data: Immutable.Map({}),
     selectedMetric: 1,
   });
 

@@ -132,7 +132,7 @@ export class TransformationEngine
   {
     if (doc !== undefined)
     {
-      this.doc = doc;
+      this.doc = Object.assign({}, doc);
       this.generateInitialFieldMaps(this.doc); // TODO can't return ID list here... disable this or what?
       // initial field nodes can be implicit, DAG should only represent actual transformations
     }
@@ -346,7 +346,7 @@ export class TransformationEngine
 
   private generateInitialFieldMaps(obj: object, currentKeyPath: KeyPath = List<string>()): List<number>
   {
-    let ids: List<number> = List<number>([this.addField(currentKeyPath, 'object')]);
+    let ids: List<number> = List<number>();
     for (const key of Object.keys(obj))
     {
       if (isPrimitive(obj[key]))
@@ -360,6 +360,7 @@ export class TransformationEngine
         }
       } else
       {
+        ids = ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
         ids = ids.concat(this.generateInitialFieldMaps(obj[key], currentKeyPath.push(key))).toList();
       }
     }
@@ -373,9 +374,18 @@ export class TransformationEngine
     {
       if (deepGet(obj, keyPath.toArray()) !== undefined)
       {
-        output[value] = deepGet(obj, keyPath.toArray());
-      }
-    });
+        const ref: any = deepGet(obj, keyPath.toArray());
+        if (isPrimitive(ref))
+        {
+          output[value] = ref;
+        } else if (Array.isArray(ref))
+        {
+          // TODO arrays
+        } else
+        {
+          output[value] = Object.assign({}, ref);
+        }
+      });
     return output;
   }
 
