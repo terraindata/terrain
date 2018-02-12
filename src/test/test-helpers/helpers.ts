@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-const configureMockStore = require('redux-mock-store');
+import configureMockStore = require('redux-mock-store');
 import thunk from 'redux-thunk';
 
 export const Ajax: any = {};
