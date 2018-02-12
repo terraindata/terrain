@@ -53,6 +53,8 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
+import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -401,6 +403,18 @@ export class ResultsManager extends TerrainComponent<Props>
     }
   }
 
+  private postprocessEQL(eql: string): string
+  {
+    const postprocessed: object = (new ESJSONParser(eql)).getValue();
+
+    if (postprocessed.hasOwnProperty('size')
+    {
+      postprocessed['size'] = Math.min(postprocessed['size'], 10000);
+    }
+
+    return ESConverter.formatES(new ESJSONParser(JSON.stringify(postprocessed));
+  }
+
   private queryM2Results(query: Query, db: BackendInstance)
   {
     if (query.tqlMode !== 'manual')
@@ -412,12 +426,18 @@ export class ResultsManager extends TerrainComponent<Props>
     }
     if (query !== this.state.lastQuery)
     {
-      const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+      let eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
         {
           replaceInputs: true,
         },
       );
+
+      if (query.tqlMode !== 'manual')
+      {
+        eql = this.postprocessEQL(eql);
+      }
+
       this.setState({
         lastQuery: query,
         queriedTql: eql,
@@ -688,20 +708,20 @@ export class ResultsManager extends TerrainComponent<Props>
     this.props.onResultsStateChange(
       resultsState
         .set(
-        isAllFields ? 'hasAllFieldsError' : 'hasError',
-        true,
+          isAllFields ? 'hasAllFieldsError' : 'hasError',
+          true,
       )
         .set(
-        isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-        errorMessage,
+          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+          errorMessage,
       )
         .set(
-        isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-        true,
+          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+          true,
       )
         .set(
-        'loading',
-        false,
+          'loading',
+          false,
       ),
     );
   }
@@ -725,20 +745,20 @@ export class ResultsManager extends TerrainComponent<Props>
     this.props.onResultsStateChange(
       resultsState
         .set(
-        isAllFields ? 'hasAllFieldsError' : 'hasError',
-        true,
+          isAllFields ? 'hasAllFieldsError' : 'hasError',
+          true,
       )
         .set(
-        isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
-        err.title,
+          isAllFields ? 'allFieldsErrorMessage' : 'errorMessage',
+          err.title,
       )
         .set(
-        isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
-        true,
+          isAllFields ? 'hasLoadedResults' : 'hasLoadedAllFields',
+          true,
       )
         .set(
-        'loading',
-        false,
+          'loading',
+          false,
       ),
     );
   }
