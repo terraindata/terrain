@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
+// tslint:disable:no-var-requires import-spacing
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -54,7 +54,6 @@ import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import FadeInOut from 'common/components/FadeInOut';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
@@ -64,6 +63,8 @@ import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
 import './TransformationEditor.less';
 
+import { TestClass } from './TransformationEditorFactory';
+
 export interface Props
 {
   transformation: TransformationNode;
@@ -71,33 +72,33 @@ export interface Props
   deleteTransformation?: () => void;
 }
 
-// visitor components must use this
-export interface TransformationEditorProps
-{
-  create: boolean; // whether or not the transformation is being created or edited
-  transformation: TransformationNode;
-  editTransformation: (transformationID, fieldNamesOrIDs?, options?) => void;
-  registerApplyEdit: (childFn: () => void) => void;
-}
-
 @Radium
 export class TransformationEditor extends TerrainComponent<Props>
 {
   public getChildComponent(type: TransformationNodeType)
   {
-    switch (type)
-    {
-      case TransformationNodeType.CapitalizeNode:
-        return CapitalizeNodeEditor;
-      case TransformationNodeType.SubstringNode:
-        return SubstringNodeEditor;
-      default:
-        return DefaultNodeEditor;
-    }
+    // switch (type)
+    // {
+    //   case TransformationNodeType.CapitalizeNode:
+    //     return CapitalizeNodeEditor;
+    //   case TransformationNodeType.SubstringNode:
+    //     return SubstringNodeEditor;
+    //   default:
+    //     return DefaultNodeEditor;
+    // }
   }
 
   public render()
   {
-    return <div className='transformation-editor'> Hello </div>;
+    return (
+      <div className='transformation-editor'>
+        <TestClass
+          create={true}
+          transformation={this.props.transformation}
+          editTransformation={null}
+          registerConfirmHandler={() => null}
+        />
+      </div>
+    );
   }
 }

@@ -126,3 +126,8 @@ class TransformationNodeC extends TransformationNodeBase
 }
 export type TransformationNode = WithIRecord<TransformationNodeC>;
 export const _TransformationNode = makeConstructor(TransformationNodeC);
+
+// public id: number;
+// public typeCode: TransformationNodeType;
+// public fieldIDs: List<number>;
+// public meta: object;
