@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands no-console strict-boolean-expressions
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -62,7 +62,6 @@ const FileImportReducers = {};
 
 const applyTransform = (state: FileImportTypes.FileImportState, transform: Transform) =>
 {
-  console.log('applying transform');
   const transformCol: number = state.columnNames.indexOf(transform.colName);
 
   if (transform.name === 'rename')
@@ -157,7 +156,6 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
       try
       {
         const extractedFieldsFromColumn: string[] = [];
-        console.log(transformCol);
         state.previewColumns.get(transformCol).forEach((row: any) =>
         {
           let rowParsedAsObject: object | undefined;
