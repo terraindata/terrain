@@ -46,22 +46,22 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
-import * as Radium from 'radium';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import DragDropItem from 'app/common/components/DragDropItem';
+import DropZone from 'app/common/components/DropZone';
+import FadeInOut from 'app/common/components/FadeInOut';
 import Util from 'app/util/Util';
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
-import DropZone from 'app/common/components/DropZone';
-import DragDropItem from 'app/common/components/DragDropItem';
-import { getEmptyImage } from 'react-dnd-html5-backend'
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import './DragDropStyle.less';
-import FadeInOut from 'app/common/components/FadeInOut';
 
 interface GroupProps
 {
@@ -84,10 +84,11 @@ interface GroupProps
 }
 
 const groupSource = {
-  beginDrag(props) {
+  beginDrag(props)
+  {
     props.setCollapsed(props.keyPath, true);
-    return {keyPath: props.keyPath, title: props.data.name}
-  }
+    return { keyPath: props.keyPath, title: props.data.name };
+  },
 };
 
 function groupDragCollect(connect, monitor)
@@ -96,21 +97,23 @@ function groupDragCollect(connect, monitor)
     connectDragSource: connect.dragSource(),
     isDragging: monitor.isDragging(),
     connectDragPreview: connect.dragPreview(),
-  }
+  };
 }
 
 const groupDropTarget = {
-  drop(props, monitor) {
+  drop(props, monitor)
+  {
     // If the item was actually dropped on a child of the group, just return
     if (monitor.didDrop())
     {
       return;
     }
     props.onDrop(props.keyPath, monitor.getItem().keyPath);
-  }
+  },
 };
 
-function groupDropCollect(connect, monitor) {
+function groupDropCollect(connect, monitor)
+{
   return {
     connectDropTarget: connect.dropTarget(),
     // make sure it is over them, not their children
@@ -121,55 +124,56 @@ function groupDropCollect(connect, monitor) {
 class GroupComponent extends TerrainComponent<GroupProps>
 {
 
-  public componentDidMount() {
+  public componentDidMount()
+  {
     // Use empty image as a drag preview so browsers don't draw it
     // and we can draw whatever we want on the custom drag layer instead.
     this.props.connectDragPreview(getEmptyImage(), {
       captureDraggingState: true,
-    })
+    });
   }
 
   public renderGroupChildren(items, newKeyPath)
   {
-    const {keyPathStarter, onReorder, onDrop, isGroup, renderChildren} = this.props; 
+    const { keyPathStarter, onReorder, onDrop, isGroup, renderChildren } = this.props;
     return (
       <div>
         {
-          items.map((item, i) =>
+          items.map((item, i: number) =>
             <div key={i}>
-             {
-               !(isGroup(item)) ?
-                <DragDropItem
-                   children={renderChildren(item, newKeyPath.push(i))}
-                   keyPath={newKeyPath.push(i)}
-                   onDrop={onDrop}
-                   canDrop={false}
-                 />
-                 :
-                 <DragDropGroup
-                   {...this.props}
-                   items={keyPathStarter ? item.getIn(keyPathStarter) : item}
-                   keyPath={newKeyPath.push(i)}
-                   data={keyPathStarter ? item.getIn(keyPathStarter.butLast()) : item}
-                 />
-                }
-                <DropZone
-                  keyPath={newKeyPath.push(i + 1)}
-                  onDrop={onReorder}
-                />
-              </div>
+              {
+                !(isGroup(item)) ?
+                  <DragDropItem
+                    children={renderChildren(item, newKeyPath.push(i))}
+                    keyPath={newKeyPath.push(i)}
+                    onDrop={onDrop}
+                    canDrop={false}
+                  />
+                  :
+                  <DragDropGroup
+                    {...this.props}
+                    items={keyPathStarter ? item.getIn(keyPathStarter) : item}
+                    keyPath={newKeyPath.push(i)}
+                    data={keyPathStarter ? item.getIn(keyPathStarter.butLast()) : item}
+                  />
+              }
+              <DropZone
+                keyPath={newKeyPath.push(i + 1)}
+                onDrop={onReorder}
+              />
+            </div>,
           )
         }
       </div>
-    );    
+    );
   }
 
   public renderGroup()
   {
-    const {data, renderHeader, isDragging, items, keyPath, keyPathStarter, onReorder, onDrop, isGroup, isOver, renderChildren} = this.props;
+    const { data, renderHeader, isDragging, items, keyPath, keyPathStarter, onReorder, onDrop, isGroup, isOver, renderChildren } = this.props;
     const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
-    const draggingStyle = isDragging ? {opacity: 0.3, height: 30} : {};
-    const droppingStyle = isOver ? {borderColor: 'lime'} : {};
+    const draggingStyle = isDragging ? { opacity: 0.3, height: 30 } : {};
+    const droppingStyle = isOver ? { borderColor: 'lime' } : {};
     return (
       <div
         className='drag-drop-group'
@@ -185,11 +189,11 @@ class GroupComponent extends TerrainComponent<GroupProps>
         <DropZone
           keyPath={newKeyPath.push(0)}
           onDrop={onReorder}
-         />
-         <FadeInOut
-           children={this.renderGroupChildren(items, newKeyPath)}
-           open={!data.collapsed}
-         />
+        />
+        <FadeInOut
+          children={this.renderGroupChildren(items, newKeyPath)}
+          open={!data.collapsed}
+        />
       </div>
     );
   }
@@ -199,16 +203,15 @@ class GroupComponent extends TerrainComponent<GroupProps>
     return (
       this.props.connectDropTarget(
         this.props.connectDragSource(
-         this.renderGroup()
+          this.renderGroup(),
+        ),
       )
-     )
     );
   }
 }
 
 const DragDropGroup = DropTarget(['ITEM', 'GROUP'], groupDropTarget, groupDropCollect)(
-              DragSource('GROUP', groupSource, groupDragCollect)
-                (GroupComponent));
+  DragSource('GROUP', groupSource, groupDragCollect)
+    (GroupComponent));
 
 export default DragDropGroup;
-

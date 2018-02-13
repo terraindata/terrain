@@ -47,10 +47,10 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Radium from 'radium';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
@@ -58,19 +58,19 @@ const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderStore from 'app/builder/data/BuilderStore';
+import CustomDragLayer from 'app/common/components/CustomDragLayer';
 import DragAndDrop from 'app/common/components/DragAndDrop';
+import DragDropGroup from 'app/common/components/DragDropGroup';
+import DragDropItem from 'app/common/components/DragDropItem';
 import DragHandle from 'app/common/components/DragHandle';
-import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
-import PathfinderCreateLine from '../PathfinderCreateLine';
-import PathfinderFilterGroup from './PathfinderFilterGroup';
-import PathfinderFilterLine from './PathfinderFilterLine2';
+import DropZone from 'app/common/components/DropZone';
 import Util from 'app/util/Util';
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import DropZone from 'app/common/components/DropZone';
-import DragDropItem from 'app/common/components/DragDropItem';
-import DragDropGroup from 'app/common/components/DragDropGroup';
-import CustomDragLayer from 'app/common/components/CustomDragLayer';
+import PathfinderCreateLine from '../PathfinderCreateLine';
+import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
+import PathfinderFilterGroup from './PathfinderFilterGroup';
+import PathfinderFilterLine from './PathfinderFilterLine2';
 
 export interface Props
 {
@@ -146,33 +146,33 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public renderFilterLine(filterLine, keyPath)
   {
-    const {pathfinderContext} = this.props;
+    const { pathfinderContext } = this.props;
     // make key path relative to entire Path object
     keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
     return (
-     <PathfinderFilterLine
-       filterLine={filterLine}
-       canEdit={pathfinderContext.canEdit}
-       keyPath={keyPath}
-       onChange={this.handleFilterChange}
-       onDelete={this.handleFilterDelete}
-       pathfinderContext={pathfinderContext}
-     />
+      <PathfinderFilterLine
+        filterLine={filterLine}
+        canEdit={pathfinderContext.canEdit}
+        keyPath={keyPath}
+        onChange={this.handleFilterChange}
+        onDelete={this.handleFilterDelete}
+        pathfinderContext={pathfinderContext}
+      />
     );
   }
 
   public renderGroupHeader(group, keyPath)
   {
-    const {pathfinderContext} = this.props;
+    const { pathfinderContext } = this.props;
     // make key path relative to entire Path object
     keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
     return (
       <PathfinderFilterGroup
-          filterGroup={group}
-          canEdit={pathfinderContext.canEdit}
-          keyPath={keyPath}
-          onChange={this.handleFilterChange}
-          onDelete={this.handleFilterDelete}
+        filterGroup={group}
+        canEdit={pathfinderContext.canEdit}
+        keyPath={keyPath}
+        onChange={this.handleFilterChange}
+        onDelete={this.handleFilterDelete}
       />
     );
   }
@@ -191,18 +191,22 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public handleDrop(itemKeyPath, dropKeyPath, keepCollapse?)
   {
-    let lines = this.props.filterGroup.lines;
-    let item = lines.getIn(itemKeyPath);
-    if (this.isGroup(item) && !keepCollapse)
-    {
-      item = item.setIn(['filterGroup', 'collapsed'], false);
-    }
     // If the item did not move up or down, do nothing
     if (itemKeyPath.equals(dropKeyPath))
     {
       return;
     }
-
+    let lines = this.props.filterGroup.lines;
+    let item = lines.getIn(itemKeyPath);
+    // When dropping a group into another group, keep it collapsed
+    if (dropKeyPath.indexOf('filterGroup') !== undefined && this.isGroup(item))
+    {
+      item = item.setIn(['filterGroup', 'collapsed'], true);
+    }
+    else if (this.isGroup(item) && !keepCollapse)
+    {
+      item = item.setIn(['filterGroup', 'collapsed'], false);
+    }
     // If the item moved down, insert it and then remove it
     if (this.movedDown(itemKeyPath, dropKeyPath)) // This might not work...
     {
@@ -254,12 +258,14 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     let group;
     if (!this.isGroup(dropped) && !this.isGroup(droppedInto))
     {
-      group = _FilterGroup({lines: List([droppedInto, dropped])});
+      group = _FilterGroup({ lines: List([droppedInto, dropped]) });
     }
     else
     {
-      group = _FilterGroup({lines: dropped.filterGroup.lines.insert(0, droppedInto),
-        minMatches: dropped.filterGroup.minMatches})
+      group = _FilterGroup({        
+lines: dropped.filterGroup.lines.insert(0, droppedInto),
+        minMatches: dropped.filterGroup.minMatches      
+});
     }
     dropKeyPath = dropKeyPath.push('filterGroup');
     let newLines;
@@ -293,55 +299,55 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public render()
   {
-    const {filterGroup, pathfinderContext} = this.props;
+    const { filterGroup, pathfinderContext } = this.props;
     return (
       <div
         className='pf-section'
       >
-      <CustomDragLayer />
-      <DropZone
-        keyPath={List([ 0])}
-        onDrop={this.handleDrop}
-      />
-      {
-        filterGroup.lines.map((line, i) =>
-          <div key={i}>
-            {
-              !this.isGroup(line) ?
-              <DragDropItem
-                children={this.renderFilterLine(line, List([i]))}
-                keyPath={List([i])}
-                onDrop={this.handleGroupDrop}
-                canDrop={true}
+        <CustomDragLayer />
+        <DropZone
+          keyPath={List([0])}
+          onDrop={this.handleDrop}
+        />
+        {
+          filterGroup.lines.map((line, i) =>
+            <div key={i}>
+              {
+                !this.isGroup(line) ?
+                  <DragDropItem
+                    children={this.renderFilterLine(line, List([i]))}
+                    keyPath={List([i])}
+                    onDrop={this.handleGroupDrop}
+                    canDrop={true}
+                  />
+                  :
+                  <DragDropGroup
+                    items={line.filterGroup.lines}
+                    data={line.filterGroup}
+                    onDrop={this.handleGroupDrop}
+                    keyPath={List([i])}
+                    onReorder={this.handleDrop}
+                    isGroup={this.isGroup}
+                    keyPathStarter={List(['filterGroup', 'lines'])}
+                    renderChildren={this.renderFilterLine}
+                    renderHeader={this.renderGroupHeader}
+                    setCollapsed={this.changeCollapsed}
+                  />
+              }
+              <DropZone
+                keyPath={List([i + 1])}
+                onDrop={this.handleDrop}
               />
-              :
-              <DragDropGroup
-                items={line.filterGroup.lines}
-                data={line.filterGroup}
-                onDrop={this.handleGroupDrop}
-                keyPath={List([i])}
-                onReorder={this.handleDrop}
-                isGroup={this.isGroup}
-                keyPathStarter={List(['filterGroup', 'lines'])}
-                renderChildren={this.renderFilterLine}
-                renderHeader={this.renderGroupHeader}
-                setCollapsed={this.changeCollapsed}
-              />
-            }
-            <DropZone
-              keyPath={List([i + 1])}
-              onDrop={this.handleDrop}
-            />
-          </div>
-        )
-      }
-      <PathfinderCreateLine
-        canEdit={pathfinderContext.canEdit}
-        text={'Filter Condition'}
-        onCreate={this.handleAddFilter}
-      />
+            </div>,
+          )
+        }
+        <PathfinderCreateLine
+          canEdit={pathfinderContext.canEdit}
+          text={'Filter Condition'}
+          onCreate={this.handleAddFilter}
+        />
       </div>
-    )
+    );
   }
 }
 

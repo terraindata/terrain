@@ -46,20 +46,21 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
-import * as Radium from 'radium';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import Util from 'app/util/Util';
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
 import './DragDropStyle.less';
 
-interface DropProps {
+interface DropProps
+{
   keyPath: KeyPath;
   onDrop: (keyPath: List<number>, dropKeyPath: List<number>) => void;
   // injected props
@@ -68,28 +69,42 @@ interface DropProps {
 }
 
 const dropTarget = {
-  drop(props, monitor) {
+  drop(props, monitor)
+  {
     props.onDrop(monitor.getItem().keyPath, props.keyPath);
-  }
+  },
+  // hover(props, monitor, component) {
+  //   component.setState({height: 100});
+  // }
 };
 
-function collect(connect, monitor) {
+function collect(connect, monitor)
+{
   return {
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
+    isOver: monitor.isOver(),
   };
 }
-
+@Radium
 class DropZoneComponent extends TerrainComponent<DropProps>
 {
+  public state: {
+    height: number,
+  } = {
+      height: 15,
+    };
+
   public render()
   {
     return (
       this.props.connectDropTarget(
         <div
           className='drop'
-          style={{backgroundColor: this.props.isOver ? 'lightblue' : ''}}
-        />
+          style={[
+            borderColor(this.props.isOver ? Colors().active : ''),
+            { height: this.props.isOver ? 40 : 15 },
+          ]}
+        />,
       )
     );
   }
@@ -97,4 +112,3 @@ class DropZoneComponent extends TerrainComponent<DropProps>
 
 const DropZone = DropTarget(['ITEM', 'GROUP'], dropTarget, collect)(DropZoneComponent);
 export default DropZone;
-

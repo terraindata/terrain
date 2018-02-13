@@ -46,18 +46,18 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
-import * as classNames from 'classnames';
 import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import Colors, { getStyle } from 'app/colors/Colors';
+import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { PathfinderLine } from '../PathfinderLine';
 import { FilterGroup, FilterLine } from '../PathfinderTypes';
-import BuilderTextbox from 'app/common/components/BuilderTextbox';
-import Colors, {getStyle} from 'app/colors/Colors';
 const CarrotIcon = require('images/icon_carrot.svg?name=CarrotIcon');
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 export interface Props
@@ -81,7 +81,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
   public state: {
     editingName: boolean,
   } = {
-    editingName: false,
+      editingName: false,
     };
 
   public render()
@@ -92,37 +92,37 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
       <div className='pf-filter-group-header'>
         {
           this.state.editingName
-          ?
-          <BuilderTextbox
-            value={filterGroup.name}
-            keyPath={this.props.keyPath.push('name')}
-            canEdit={canEdit}
-            action={this.props.onChange}
-            onBlur={this._toggle('editingName')}
-            onKeyDown={this.handleKeyDown}
-            autoFocus={true}
-          />
-          :
-          <div className='pf-filter-group-name-wrapper'>
-            <div
-              onClick={this._toggle('editingName')}
-              className='pf-filter-group-name'
-            >
-              {filterGroup.name}
-            </div>
-            <CarrotIcon
-              className={classNames({
-                'pf-filter-group-carrot': true,
-                'pf-filter-group-carrot-open': !filterGroup.collapsed,
-              })}
-              onClick={this._fn(
-                this.props.onChange,
-                this.props.keyPath.push('collapsed'),
-                !filterGroup.collapsed)
-              }
-              style={getStyle('fill', Colors().iconColor)}
+            ?
+            <BuilderTextbox
+              value={filterGroup.name}
+              keyPath={this.props.keyPath.push('name')}
+              canEdit={canEdit}
+              action={this.props.onChange}
+              onBlur={this._toggle('editingName')}
+              onKeyDown={this.handleKeyDown}
+              autoFocus={true}
             />
-          </div>
+            :
+            <div className='pf-filter-group-name-wrapper'>
+              <div
+                onClick={this._toggle('editingName')}
+                className='pf-filter-group-name'
+              >
+                {filterGroup.name}
+              </div>
+              <CarrotIcon
+                className={classNames({
+                  'pf-filter-group-carrot': true,
+                  'pf-filter-group-carrot-open': !filterGroup.collapsed,
+                })}
+                onClick={this._fn(
+                  this.props.onChange,
+                  this.props.keyPath.push('collapsed'),
+                  !filterGroup.collapsed)
+                }
+                style={getStyle('fill', Colors().iconColor)}
+              />
+            </div>
         }
         {
           canEdit &&
@@ -150,7 +150,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
     {
       this.setState({
         editingName: false,
-      })
+      });
     }
   }
 

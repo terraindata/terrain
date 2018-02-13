@@ -55,18 +55,18 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import BuilderActions from 'app/builder/data/BuilderActions';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import DatePickerWrapper from 'app/common/components/DatePickerWrapper';
-import SearchableDropdown from 'app/common/components/SearchableDropdown';
 import Dropdown from 'app/common/components/Dropdown';
 import MapComponent, { units } from 'app/common/components/MapComponent';
+import SearchableDropdown from 'app/common/components/SearchableDropdown';
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
-import BuilderActions from 'app/builder/data/BuilderActions';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -121,9 +121,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       <div
         className='pf-filter-line flex-container'
         style={[{
-                  alignItems: 'flex-start',
-                }]}
-        >
+          alignItems: 'flex-start',
+        }]}
+      >
         <SearchableDropdown
           selectedIndex={fieldOptions.indexOf(filterLine.field)}
           keyPath={this.props.keyPath.push('field')}

@@ -46,20 +46,20 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
-import * as Radium from 'radium';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import DropZone from 'app/common/components/DropZone';
 import Util from 'app/util/Util';
 import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
-import DropZone from 'app/common/components/DropZone';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import './DragDropStyle.less';
-
 
 interface ItemProps
 {
@@ -72,51 +72,65 @@ interface ItemProps
   isDragging: boolean;
   isOver: boolean;
   connectDropTarget: (El) => El;
+  connectDragPreview: (El, options) => El;
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
 }
 
 const itemSource = {
-  beginDrag(props) {
-    return {keyPath: props.keyPath};
-  }
+  beginDrag(props)
+  {
+    return { keyPath: props.keyPath, children: props.children };
+  },
 };
 
-function itemDragCollect(connect, monitor) {
+function itemDragCollect(connect, monitor)
+{
   return {
     connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging()
-  }
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview(),
+  };
 }
 
 const itemDropTarget = {
-  drop(props, monitor) {
+  drop(props, monitor)
+  {
     props.onDrop(props.keyPath, monitor.getItem().keyPath);
-  }
+  },
 };
 
-function itemDropCollect(connect, monitor) {
+function itemDropCollect(connect, monitor)
+{
   return {
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
+    isOver: monitor.isOver(),
   };
 }
 
 class ItemComponent extends TerrainComponent<ItemProps>
 {
+  public componentDidMount()
+  {
+    // Use empty image as a drag preview so browsers don't draw it
+    // and we can draw whatever we want on the custom drag layer instead.
+    this.props.connectDragPreview(getEmptyImage(), {
+      captureDraggingState: true,
+    });
+  }
+
   public render()
   {
-    const {children, isDragging, isOver} = this.props;
+    const { children, isDragging, isOver } = this.props;
     const draggable = this.props.connectDragSource(
       <div
         style={_.extend({},
-          {opacity: isDragging ? 0.5 : 1},
-          {backgroundColor: children},
-          {borderColor: isOver ? 'lightblue' : ''})
+          { opacity: isDragging ? 0.5 : 1 },
+          { borderColor: isOver ? 'lightblue' : '' })
         }
         className='drag-drop-item'
-       >
-         {children}
-       </div>
+      >
+        {children}
+      </div>,
     );
     if (this.props.canDrop)
     {
@@ -127,7 +141,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
 }
 
 const DragDropItem = DropTarget(['ITEM', 'GROUP'], itemDropTarget, itemDropCollect)(
-              DragSource('ITEM', itemSource, itemDragCollect)
-                (ItemComponent));
+  DragSource('ITEM', itemSource, itemDragCollect)
+    (ItemComponent));
 
 export default DragDropItem;

@@ -43,16 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-import PerformantDragLayer from './DragLayer'
-import {DragLayer} from 'react-dnd';
-import * as React from 'react'
+import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
-import Colors, {backgroundColor, borderColor} from 'app/colors/Colors';
+import * as _ from 'lodash';
+import * as React from 'react';
+import { DragLayer } from 'react-dnd';
+import PerformantDragLayer from './DragLayer';
 
-interface Props {
-  item: any,
-  itemType: string,
+interface Props
+{
+  item: any;
+  itemType: string;
 }
 
 function collect(monitor)
@@ -60,19 +61,21 @@ function collect(monitor)
   return {
     item: monitor.getItem(),
     itemType: monitor.getItemType(),
-  }
+  };
 }
 
 class CustomDragLayerRaw extends TerrainComponent<Props> {
 
-  public render() {
-    const {item, itemType} = this.props
+  public render()
+  {
+    const { item, itemType } = this.props;
     switch (itemType)
     {
       case 'GROUP':
         const style = _.extend({},
           backgroundColor(Colors().blockBg),
-          borderColor(Colors().blockOutline));
+          borderColor(Colors().blockOutline),
+        );
         return (
           <div
             className='drag-drop-group-preview'
@@ -82,7 +85,14 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
           </div>
         );
       default:
-        return null
+        return (
+          <div
+            className='drag-drop-item-preview'
+            style={backgroundColor(Colors().sidebarBg)}
+          >
+            {item.children}
+          </div>
+        );
     }
   }
 }
