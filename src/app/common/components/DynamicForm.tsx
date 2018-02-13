@@ -60,11 +60,6 @@ import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 
-export interface InputInfo
-{
-  type: 'string'
-}
-
 export interface Props<FState>
 {
   inputMap: any;
@@ -93,19 +88,8 @@ export enum DisplayType
   NumberRange = 'NumberRange',
 }
 
-type DisplayTypeKeys = keyof typeof DisplayType;
-
-type AssertEnumValuesEqualKeys = {
-  [K in DisplayTypeKeys]: K
-};
-DisplayType as AssertEnumValuesEqualKeys;
-
-type AssertOptionTypesExhaustive = {
-  [K in DisplayType]: InputDeclarationOptionTypes[K]
-}
-
 // important
-interface InputDeclarationOptionTypes
+export interface InputDeclarationOptionTypes
 {
   TextBox: {
     __acceptedTypes?: string;
@@ -121,7 +105,6 @@ interface InputDeclarationOptionTypes
   };
   CheckBox: {
     __acceptedTypes?: boolean;
-
   };
 }
 
@@ -132,7 +115,28 @@ export interface AllowableState
 }
 
 // important
-interface InputDeclarationHelper<K extends DisplayTypeKeys, TypeInState extends GetHiddenType<K>>
+export interface InputDeclarationType<S = any>
+{
+  type: string;
+  options: any; // one of InputDeclarationOptionTypes
+  group?: string; // inputs with the same group value will show in a row
+  displayName?: string; // defaults to type
+  shouldShow?: (state: S) => DisplayState;
+}
+
+/*** TYPE SORCERY! ***/
+type DisplayTypeKeys = keyof typeof DisplayType;
+
+type AssertEnumValuesEqualKeys = {
+  [K in DisplayTypeKeys]: K
+};
+DisplayType as AssertEnumValuesEqualKeys;
+
+type AssertOptionTypesExhaustive = {
+  [K in DisplayType]: InputDeclarationOptionTypes[K]
+}
+
+interface InputDeclarationHelper<K extends DisplayTypeKeys, TypeInState extends GetHiddenType<K>> extends InputDeclarationType
 {
   type: K;
   options: InputDeclarationOptionTypes[K];
@@ -141,7 +145,7 @@ interface InputDeclarationHelper<K extends DisplayTypeKeys, TypeInState extends 
 type PossibleTypes = GetHiddenType<keyof InputDeclarationOptionTypes>;
 
 type GetHiddenType<K extends keyof InputDeclarationOptionTypes> =
-  InputDeclarationOptionTypes[K]['__acceptedTypes']
+  InputDeclarationOptionTypes[K]['__acceptedTypes'];
 
 type DeclarationOptionTypeUnion = InputDeclarationOptionTypes[DisplayTypeKeys];
 
@@ -157,6 +161,7 @@ type InputDeclarationBundle<TypeInState extends PossibleTypes> = {
 type InputDeclaration<TypeInState extends PossibleTypes> = InputDeclarationBundle<TypeInState>[keyof InputDeclarationBundle<TypeInState>];
 
 type InputDeclarationOptionType<K extends keyof InputDeclarationOptionTypes> = InputDeclarationOptionTypes[K];
+/*** Type Sorcery ***/
 
 interface FormState extends AllowableState
 {
