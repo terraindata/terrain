@@ -65,15 +65,15 @@ export interface InputInfo
   type: 'string'
 }
 
-export interface Props<FormState>
+export interface Props<FState>
 {
   inputMap: any;
-  inputState: FormState;
-  onStateChange: (newState: FormState) => void;
+  inputState: FState;
+  onStateChange: (newState: FState) => void;
   handleConfirm: () => void;
 }
 
-export default class DynamicForm<FormState> extends TerrainComponent<Props<FormState>>
+export default class DynamicForm<FState> extends TerrainComponent<Props<FState>>
 {
 
 }
@@ -104,53 +104,107 @@ type AssertOptionTypesExhaustive = {
   [K in DisplayType]: InputDeclarationOptionTypes[K]
 }
 
+// important
 interface InputDeclarationOptionTypes
 {
   TextBox: {
+    __acceptedTypes?: string;
     randomThing: string;
   };
   NumberBox: {
-
+    __acceptedTypes?: number;
   };
   NumberRange: {
+    __acceptedTypes?: number;
     from: number;
     to: number;
   };
   CheckBox: {
+    __acceptedTypes?: boolean;
 
   };
 }
 
-type DeclarationOptionTypeUnion = InputDeclarationOptionTypes[DisplayTypeKeys];
-
-type InputDeclarationMap<State> =
+// important
+export interface AllowableState
 {
-  [key in keyof State]: InputDeclaration;
+  [k: string]: PossibleTypes;
 }
 
-type InputDeclarationBundle = {
-  [K in DisplayTypeKeys]: InputDeclarationHelper<K>
-}
-
-type InputDeclaration = InputDeclarationBundle[keyof InputDeclarationBundle];
-
-const x: InputDeclaration = {
-  type: DisplayType.TextBox,
-  options: {
-    randomThing: 'hi'
-  }
-}
-// type z = {
-//   [K in keyof InputDeclarationHelper<DisplayType.TextBox>]: InputDeclarationHelper<DisplayType.TextBox>[K]
-// }
-interface InputDeclarationHelper<K extends DisplayTypeKeys>
+// important
+interface InputDeclarationHelper<K extends DisplayTypeKeys, TypeInState extends GetHiddenType<K>>
 {
   type: K;
   options: InputDeclarationOptionTypes[K];
 }
 
+type PossibleTypes = GetHiddenType<keyof InputDeclarationOptionTypes>;
+
+type GetHiddenType<K extends keyof InputDeclarationOptionTypes> =
+  InputDeclarationOptionTypes[K]['__acceptedTypes']
+
+type DeclarationOptionTypeUnion = InputDeclarationOptionTypes[DisplayTypeKeys];
+
+type InputDeclarationMap<State extends {[k: string]: PossibleTypes}> =
+{
+  [key in keyof State]: InputDeclaration<State[key]>;
+}
+
+type InputDeclarationBundle<TypeInState extends PossibleTypes> = {
+  [K in DisplayTypeKeys]: InputDeclarationHelper<K, TypeInState>
+}
+
+type InputDeclaration<TypeInState extends PossibleTypes> = InputDeclarationBundle<TypeInState>[keyof InputDeclarationBundle<TypeInState>];
+
 type InputDeclarationOptionType<K extends keyof InputDeclarationOptionTypes> = InputDeclarationOptionTypes[K];
 
+interface FormState extends AllowableState
+{
+  from: number;
+  length: number;
+  textField: string;
+  flag: boolean;
+}
+
+const DeclarationMap: InputDeclarationMap<FormState> =
+{
+  from: {
+    type: DisplayType.NumberBox,
+    options: {}
+  },
+  length: {
+    type: DisplayType.NumberRange,
+    options: {
+      from: 0,
+      to: -1,
+    }
+  },
+  textField: {
+    type: DisplayType.TextBox,
+    options: {
+      randomThing: 'test',
+    }
+  },
+  flag: {
+    type: DisplayType.CheckBox,
+    options: {}
+  }
+}
+
+// const x: InputDeclaration<string> = {
+//   type: DisplayType.TextBox,
+//   options: {
+//     randomThing: 'hi'
+//   }
+// }
+
+// interface TestState
+// {
+//   Foo: string;
+// }
+// type z = {
+//   [K in keyof InputDeclarationHelper<DisplayType.TextBox, TestState>]: InputDeclarationHelper<DisplayType.TextBox>[K]
+// }
 
 // interface InputDeclaration<FormState> {
 //   type: DisplayType;
