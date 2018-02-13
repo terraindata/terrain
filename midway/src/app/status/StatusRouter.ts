@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
-import currentApp from '../App';
+import { App, currentApp } from '../App';
 
 const Router = new KoaRouter();
 
@@ -58,7 +58,7 @@ Router.get('/', async (ctx, next) =>
     currentTime: new Date(),
   });
 
-  if (currentApp !== null)
+  if (currentApp instanceof App)
   {
     ctx.body.startTime = currentApp.getStartTime();
     ctx.body.requestCounts = currentApp.getRequestCounts();
