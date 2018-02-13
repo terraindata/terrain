@@ -108,7 +108,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      persistentAccessToken text NOT NULL,
      primaryKeyDelimiter text,
      primaryKeys text NOT NULL,
-     requireJSONHaveAllFields text NOT NULL,
+     requireJSONHaveAllFields bool NOT NULL DEFAULT true,
      transformations text NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS schedules
     (id ` + primaryKeyType + ` PRIMARY KEY,
