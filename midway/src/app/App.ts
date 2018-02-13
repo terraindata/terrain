@@ -70,6 +70,7 @@ import MidwayRouter from './Router';
 import { scheduler } from './scheduler/SchedulerRouter';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
+import any = jasmine.any;
 
 const MAX_CONN_RETRIES = 5;
 const CONN_RETRY_TIMEOUT = 1000;
@@ -77,6 +78,8 @@ const CONN_RETRY_TIMEOUT = 1000;
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
+
+export let currentApp: App = null;
 
 export class App
 {
@@ -103,9 +106,19 @@ export class App
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
+  private numRequests: number;
+  private numRequestsThatThrew: number;
+  private numRequestsCompleted: number;
+  private startTime: Date;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
+    this.startTime = new Date();
+    this.numRequests = 0;
+    this.numRequestsThatThrew = 0;
+    this.numRequestsCompleted = 0;
+    currentApp = this;
+
     process.on('uncaughtException', App.uncaughtExceptionHandler);
     process.on('unhandledRejection', App.unhandledRejectionHandler);
 
@@ -128,13 +141,14 @@ export class App
       await next();
     });
 
-    let requestNumber = 0;
     this.app.use(async (ctx, next) =>
     {
+      const requestNumber: number = ++this.numRequests;
+      const logPrefix: string = 'Request #' + requestNumber.toString() + ': ';
+
       const start = Date.now();
       const info: string = JSON.stringify(
         [
-          requestNumber++,
           ctx.request.ip,
           ctx.request.headers['X-Orig-IP'],
           ctx.request.method,
@@ -142,11 +156,30 @@ export class App
           ctx.request.length,
           ctx.request.href,
         ]);
-      winston.info('begin handling route: ' + info);
-      await next();
+      winston.info(logPrefix + JSON.stringify(this.getRequestCounts()) + ': BEGIN : ' + info);
+
+      let err: any = null;
+      try
+      {
+        await next();
+      } catch (e)
+      {
+        err = e;
+        this.numRequestsThatThrew++;
+        winston.info(logPrefix + JSON.stringify(this.getRequestCounts()) + ': ERROR : ' + info);
+      }
+
+      this.numRequestsCompleted++;
       const ms = Date.now() - start;
-      winston.info('done handling route (' + ms.toString() + 'ms): ' + info);
+      winston.info(logPrefix + JSON.stringify(this.getRequestCounts()) + ': END (' + ms.toString() + 'ms): ' + info);
+
+      if (err !== null)
+      {
+        throw err;
+      }
+
     });
+
     this.app.use(cors());
     this.app.use(session(undefined, this.app));
 
@@ -229,6 +262,16 @@ export class App
   public getConfig(): Config.Config
   {
     return this.config;
+  }
+
+  public getRequestCounts(): number[]
+  {
+    return [this.numRequests, this.numRequests - this.numRequestsCompleted, this.numRequestsThatThrew];
+  }
+
+  public getStartTime(): Date
+  {
+    return this.startTime;
   }
 }
 

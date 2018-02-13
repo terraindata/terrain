@@ -152,10 +152,7 @@ const Periscope = {
     const isDate = ElasticBlockHelpers.getColumnType(schema, inputKey) === 'date';
     const numTicks = isDate ? 3 : 6;
     const tickFormatFn = isDate ?
-      (n: number): string =>
-      {
-        return moment(new Date(n)).format('YYYY-MM-DD');
-      } : Util.formatNumber;
+      ((n: number): string => moment(new Date(n)).format('YYYY-MM-DD')) : Util.formatNumber;
 
     const bottomAxis = d3.svg.axis()
       .scale(scales.x)
