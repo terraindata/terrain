@@ -263,7 +263,7 @@ const Actions =
                 .set('groupId', groupId)
                 .set('categoryId', categoryId)
                 .set('name', name)
-                .set('status', ItemStatus.Build)
+                .set('status', algorithm.status === ItemStatus.Archive ? ItemStatus.Archive : ItemStatus.Build)
                 .set('db', db)
                 .set('deployedName', '')
                 .set('language', group.language);
