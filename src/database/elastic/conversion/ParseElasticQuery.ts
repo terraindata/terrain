@@ -68,6 +68,58 @@ export interface ESQueryObject
   [key: string]: any;
 }
 
+export function stringifyWithParameters(
+  obj: object | number | boolean | string | null,
+  isInputFn: (string) => boolean)
+{
+  if (typeof obj === 'number' || typeof obj === 'boolean' || obj === null)
+  {
+    return '' + obj;
+  }
+  else if (typeof obj === 'string')
+  {
+    if (isInputFn(obj))
+    {
+      return obj;
+    }
+    return '"' + obj + '"';
+  }
+  else if (Array.isArray(obj))
+  {
+    let str = '[';
+    for (let i = 0; i < obj.length; i++)
+    {
+      str += stringifyWithParameters(obj[i], isInputFn);
+      if (i < obj.length - 1)
+      {
+        str += ',';
+      }
+    }
+    str += ']';
+    return str;
+  }
+  else if (typeof obj === 'object')
+  {
+    let str = '{';
+    const keys = Object.keys(obj);
+    for (let i = 0; i < keys.length; i++)
+    {
+      str += '"' + keys[i] + '": ';
+      str += stringifyWithParameters(obj[keys[i]], isInputFn);
+      if (i < keys.length - 1)
+      {
+        str += ',';
+      }
+    }
+    str += '}';
+    return str;
+  }
+  else
+  {
+    return '';
+  }
+}
+
 export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, inputs?: List<Input>): string
 {
   if (options && options.replaceInputs)
@@ -82,7 +134,7 @@ export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, input
 
 export function ESQueryToCode(queryObject: ESQueryObject, options?: Options, inputs?: List<Input>): string
 {
-  const text: string = SharedUtil.stringifyWithParameters(queryObject, (name) => isInput(name, inputs));
+  const text: string = stringifyWithParameters(queryObject, (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, options);
 }

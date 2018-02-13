@@ -141,7 +141,7 @@ export class ElasticStream extends Stream.Readable
       response = await this.transform(error, response);
     }
 
-    this.push(response.hits.hits);
+    this.push(hits);
 
     if (
       (length > 0) &&

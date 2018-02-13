@@ -52,9 +52,13 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
+import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
+import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../../shared/database/elastic/parser/ESParser';
 import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
+
 import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -370,19 +374,24 @@ export class Export
 
   private _shouldRandomSample(qry: string): string
   {
-    const parser = getParsedQuery(qry);
-    let query: object = parser.getValue();
+    let parser = getParsedQuery(qry);
+    const query = parser.getValue();
     if (query['size'] !== undefined)
     {
-      if (typeof query['size'] === 'number' && qry['size'] > this.MAX_ROW_THRESHOLD)
+      if (typeof query['size'] === 'number' && query['size'] > this.MAX_ROW_THRESHOLD)
       {
-        query['from'] = 0;
         query['size'] = this.MAX_ROW_THRESHOLD;
-        query = { function_score: { random_score: {}, query } };
       }
     }
-    // TODO: return SharedUtil.stringifyWithParameters(query);
-    return JSON.stringify(query);
+
+    query.query = {
+      function_score: {
+        random_score: {},
+        query: query.query,
+      },
+    };
+    parser = new ESJSONParser(JSON.stringify(query), true);
+    return ESConverter.formatES(parser as ESJSONParser);
   }
 
   private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
