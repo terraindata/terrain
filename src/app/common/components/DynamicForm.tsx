@@ -75,9 +75,9 @@ export default class DynamicForm<FState> extends TerrainComponent<Props<FState>>
 
 export enum DisplayState
 {
-  ACTIVE,
-  INACTIVE,
-  HIDDEN,
+  Active,
+  Inactive,
+  Hidden,
 }
 
 export enum DisplayType
@@ -109,12 +109,6 @@ export interface InputDeclarationOptionTypes
 }
 
 // important
-export interface AllowableState
-{
-  [k: string]: PossibleTypes;
-}
-
-// important
 export interface InputDeclarationType<S = any>
 {
   type: string;
@@ -136,34 +130,27 @@ type AssertOptionTypesExhaustive = {
   [K in DisplayType]: InputDeclarationOptionTypes[K]
 }
 
-interface InputDeclarationHelper<K extends DisplayTypeKeys, TypeInState extends GetHiddenType<K>> extends InputDeclarationType
+interface InputDeclarationHelper<K extends DisplayTypeKeys, State> extends InputDeclarationType<State>
 {
   type: K;
   options: InputDeclarationOptionTypes[K];
 }
 
-type PossibleTypes = GetHiddenType<keyof InputDeclarationOptionTypes>;
-
-type GetHiddenType<K extends keyof InputDeclarationOptionTypes> =
-  InputDeclarationOptionTypes[K]['__acceptedTypes'];
-
-type DeclarationOptionTypeUnion = InputDeclarationOptionTypes[DisplayTypeKeys];
-
-type InputDeclarationMap<State extends {[k: string]: PossibleTypes}> =
+type InputDeclarationMap<State extends {[k: string]: any}> =
 {
-  [key in keyof State]: InputDeclaration<State[key]>;
+  [key in keyof State]: InputDeclaration<State>;
 }
 
-type InputDeclarationBundle<TypeInState extends PossibleTypes> = {
-  [K in DisplayTypeKeys]: InputDeclarationHelper<K, TypeInState>
+type InputDeclarationBundle<State> = {
+  [K in DisplayTypeKeys]: InputDeclarationHelper<K, State>
 }
 
-type InputDeclaration<TypeInState extends PossibleTypes> = InputDeclarationBundle<TypeInState>[keyof InputDeclarationBundle<TypeInState>];
+type InputDeclaration<State> = InputDeclarationBundle<State>[keyof InputDeclarationBundle<State>];
 
 type InputDeclarationOptionType<K extends keyof InputDeclarationOptionTypes> = InputDeclarationOptionTypes[K];
 /*** Type Sorcery ***/
 
-interface FormState extends AllowableState
+interface FormState
 {
   from: number;
   length: number;
@@ -171,11 +158,14 @@ interface FormState extends AllowableState
   flag: boolean;
 }
 
+// should succeed
 const DeclarationMap: InputDeclarationMap<FormState> =
 {
   from: {
     type: DisplayType.NumberBox,
-    options: {}
+    options: {
+
+    }
   },
   length: {
     type: DisplayType.NumberRange,
@@ -195,52 +185,3 @@ const DeclarationMap: InputDeclarationMap<FormState> =
     options: {}
   }
 }
-
-// const x: InputDeclaration<string> = {
-//   type: DisplayType.TextBox,
-//   options: {
-//     randomThing: 'hi'
-//   }
-// }
-
-// interface TestState
-// {
-//   Foo: string;
-// }
-// type z = {
-//   [K in keyof InputDeclarationHelper<DisplayType.TextBox, TestState>]: InputDeclarationHelper<DisplayType.TextBox>[K]
-// }
-
-// interface InputDeclaration<FormState> {
-//   type: DisplayType;
-//   group?: string | number;
-//   displayName?: string;
-//   shouldShow?: (state: FormState) => DisplayState;
-// }
-
-// interface TestFormState
-// {
-//   from: number;
-//   length: number;
-//   textField: string;
-//   flag: boolean;
-// }
-
-// const TestDeclarationMap: InputDeclarationMap<TestFormState> = {
-//   from: {
-//     displayName: 'From Position',
-//     type: DisplayType.NUMBER,
-//   },
-//   length: {
-//     displayName: 'Length',
-//     type: DisplayType.Textbox,
-//   },
-//   textField: {
-//     displayName: '',
-//     type: DisplayType.Textbox,
-//   },
-//   flag: {
-//     displayName: 'Would you like to do a thing?',
-//     type: DisplayType.BOOLEAN,
-//   }
-// };
