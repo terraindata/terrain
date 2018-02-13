@@ -407,7 +407,7 @@ export class ResultsManager extends TerrainComponent<Props>
   {
     const postprocessed: object = (new ESJSONParser(eql)).getValue();
 
-    if (postprocessed.hasOwnProperty('size')
+    if (postprocessed.hasOwnProperty('size'))
     {
       postprocessed['size'] = Math.min(postprocessed['size'], 10000);
     }
