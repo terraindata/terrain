@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
+import { List } from 'immutable';
 import * as _ from 'lodash';
 
 const BAD_DELIMITERS =
@@ -668,5 +669,57 @@ export function getRootFieldFromDocPath(path: string): string | undefined
   catch (e)
   {
     return undefined;
+  }
+}
+
+export function stringifyWithParameters(
+  obj: object | number | boolean | string | null,
+  isInputFn: (string) => boolean)
+{
+  if (typeof obj === 'number' || typeof obj === 'boolean' || obj === null)
+  {
+    return '' + obj;
+  }
+  else if (typeof obj === 'string')
+  {
+    if (isInputFn(obj))
+    {
+      return obj;
+    }
+    return '"' + obj + '"';
+  }
+  else if (Array.isArray(obj))
+  {
+    let str = '[';
+    for (let i = 0; i < obj.length; i++)
+    {
+      str += stringifyWithParameters(obj[i], isInputFn);
+      if (i < obj.length - 1)
+      {
+        str += ',';
+      }
+    }
+    str += ']';
+    return str;
+  }
+  else if (typeof obj === 'object')
+  {
+    let str = '{';
+    const keys = Object.keys(obj);
+    for (let i = 0; i < keys.length; i++)
+    {
+      str += '"' + keys[i] + '": ';
+      str += stringifyWithParameters(obj[keys[i]], isInputFn);
+      if (i < keys.length - 1)
+      {
+        str += ',';
+      }
+    }
+    str += '}';
+    return str;
+  }
+  else
+  {
+    return '';
   }
 }

@@ -157,12 +157,15 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
       try
       {
         const extractedFieldsFromColumn: string[] = [];
-        state.previewColumns.get(transformCol).forEach((row) =>
+        console.log(transformCol);
+        state.previewColumns.get(transformCol).forEach((row: any) =>
         {
           let rowParsedAsObject: object | undefined;
           try
           {
-            rowParsedAsObject = JSON.parse(row);
+            rowParsedAsObject = {
+              [transform.colName]: row.toJS(),
+            };
           }
           catch (e)
           {
@@ -173,7 +176,7 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
         return state
           .set('isDirty', true)
           .set('columnsToInclude', state.columnsToInclude.push(true))
-          .set('columnTypes', state.columnTypes.push(state.columnTypes.get(transformCol)))
+          .set('columnTypes', state.columnTypes.push(FileImportTypes._ColumnTypesTree()))
           .set('columnNames', state.columnNames.push(transform.args.newName as string))
           .set('previewColumns', state.previewColumns.push(List(extractedFieldsFromColumn)));
       }
@@ -347,10 +350,9 @@ FileImportReducers[ActionTypes.setColumnNamesAndTypes] =
   (state, action) =>
   {
     const { previewColumns, columnNames } = state;
-    const newColumnNames: string[] = Object.keys(action.payload.newColumnNamesAndTypes);
     return state
-      .set('columnNames', List(newColumnNames))
-      .set('columnTypes', List(newColumnNames.map((colName) =>
+      .set('columnNames', List(columnNames))
+      .set('columnTypes', List(columnNames.map((colName) =>
         action.payload.newColumnNamesAndTypes[colName] ?
           FileImportTypes._ColumnTypesTree(action.payload.newColumnNamesAndTypes[colName])
           :

@@ -54,59 +54,8 @@ import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLPar
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import * as SharedUtil from '../../../../shared/Util';
 import { Input, isInput, toInputMap } from '../../../blocks/types/Input';
-
-export function stringifyWithParameters(
-  obj: object | number | boolean | string | null,
-  inputs?: Immutable.List<Input>): string | null
-{
-  if (typeof obj === 'number' || typeof obj === 'boolean' || obj === null)
-  {
-    return '' + obj;
-  }
-  else if (typeof obj === 'string')
-  {
-    if (isInput(obj, inputs))
-    {
-      return obj;
-    }
-    return '"' + obj + '"';
-  }
-  else if (Array.isArray(obj))
-  {
-    let str = '[';
-    for (let i = 0; i < obj.length; i++)
-    {
-      str += stringifyWithParameters(obj[i], inputs);
-      if (i < obj.length - 1)
-      {
-        str += ',';
-      }
-    }
-    str += ']';
-    return str;
-  }
-  else if (typeof obj === 'object')
-  {
-    let str = '{';
-    const keys = Object.keys(obj);
-    for (let i = 0; i < keys.length; i++)
-    {
-      str += '"' + keys[i] + '": ';
-      str += stringifyWithParameters(obj[keys[i]], inputs);
-      if (i < keys.length - 1)
-      {
-        str += ',';
-      }
-    }
-    str += '}';
-    return str;
-  }
-  else
-  {
-    return '';
-  }
-}
 
 export interface ESQueryObject
 {
@@ -133,7 +82,7 @@ export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, input
 
 export function ESQueryToCode(queryObject: ESQueryObject, options?: Options, inputs?: List<Input>): string
 {
-  const text: string = stringifyWithParameters(queryObject, inputs);
+  const text: string = SharedUtil.stringifyWithParameters(queryObject, (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, options);
 }

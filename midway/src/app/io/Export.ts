@@ -371,7 +371,7 @@ export class Export
   private _shouldRandomSample(qry: string): string
   {
     const parser = getParsedQuery(qry);
-    let query = parser.getValue();
+    let query: object = parser.getValue();
     if (query['size'] !== undefined)
     {
       if (typeof query['size'] === 'number' && qry['size'] > this.MAX_ROW_THRESHOLD)
@@ -381,7 +381,8 @@ export class Export
         query = { function_score: { random_score: {}, query } };
       }
     }
-    return query;
+    // TODO: return SharedUtil.stringifyWithParameters(query);
+    return JSON.stringify(query);
   }
 
   private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
@@ -422,7 +423,7 @@ export class Export
         type: 'search',
         streaming: false,
         databasetype: 'elastic',
-        body: JSON.stringify(qry),
+        body: qry,
       };
       const qryResponse: any = await qh.handleQuery(payload);
       if (qryResponse === undefined || qryResponse.hasError())
