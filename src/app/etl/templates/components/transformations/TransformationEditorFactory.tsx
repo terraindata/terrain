@@ -78,13 +78,16 @@ export interface TransformationEditorProps
 type EditSignature = (transformationID, fieldNamesOrIDs?, options?) => void;
 
 export type InputDeclarationType<keys extends string = string> =
+  {
+    [stateName in keys]: InputInfo
+  };
+
+interface InputInfo
 {
-  [stateName in keys]: {
-    type: 'string' | 'number' | 'boolean';
-    group?: string | number;
-    displayName?: string;
-    shouldShow?: (state) => boolean;
-  }
+  type: 'string' | 'number' | 'boolean';
+  group?: string | number;
+  displayName?: string;
+  shouldShow?: (state) => boolean;
 }
 
 export type StateType<T extends InputDeclarationType<keyof T>> = {
@@ -92,28 +95,30 @@ export type StateType<T extends InputDeclarationType<keyof T>> = {
 }; // I can't figure out how to narrow the type from the union
 
 const emptyList = List([]);
-function UNBOUND_renderInputElement(stateName, displayName, type) // need to be careful to always bind this
+function UNBOUND_renderInputElement(info: InputInfo, stateName: string, key) // need to be careful to always bind this
 {
-  if (type === 'boolean')
+  if (info.type === 'boolean')
   {
     return (
-      <div className='te-checkbox-row'>
+      <div
+        className='te-checkbox-row'
+        key={key}
+        onClick={() => this.setState({ [stateName]: !this.state[stateName] })}
+      >
         <CheckBox
           className='te-checkbox'
           checked={this.state[stateName]}
-          onChange={() => this.setState({
-            [stateName]: !this.state[stateName]
-          })}
+          onChange={() => null}
         />
-        <div className='te-label'> { displayName } </div>
+        <div className='te-label'> {info.displayName} </div>
       </div>
     );
   }
   else
   {
     return (
-      <div className='te-autocomplete-block'>
-        <div className='te-label'> { displayName } </div>
+      <div className='te-autocomplete-block' key={key}>
+        <div className='te-label' style={fontColor(Colors().text2)}> {info.displayName} </div>
         <Autocomplete
           className='te-autocomplete'
           value={this.state[stateName]}
@@ -125,25 +130,24 @@ function UNBOUND_renderInputElement(stateName, displayName, type) // need to be 
   }
 }
 function renderItemHOC<T extends InputDeclarationType>(
-    stateName: string,
-    type: 'string' | 'number' | 'boolean',
-    displayName: string,
-    shouldShow: (state: StateType<T>) => boolean
-  ): (state: StateType<T>, context) => any
+  info: InputInfo,
+  stateName: string,
+): (state: StateType<T>, index) => any
 {
-  function unboundFunction(state: StateType<T>) { // anonymous functions don't accept 'this'
-    const boundRenderInputElement = UNBOUND_renderInputElement.bind(this);
-    if (!shouldShow(state))
+  function unboundRenderItem(state: StateType<T>, index)
+  {
+    const boundRenderInputElement: typeof UNBOUND_renderInputElement = UNBOUND_renderInputElement.bind(this);
+    if (!info.shouldShow(state))
     {
       return null;
     }
-    const inputComponent = boundRenderInputElement(stateName, displayName, type);
+    const inputComponent = boundRenderInputElement(info, stateName, index);
     return (inputComponent);
   }
-  return unboundFunction;
+  return unboundRenderItem;
 }
 
-type RenderMatrix = List<List<(state) => any>>;
+type RenderMatrix = List<List<(state, key) => any>>;
 
 function computeRenderMatrix<T extends InputDeclarationType>(inputMap: T)
 {
@@ -151,13 +155,8 @@ function computeRenderMatrix<T extends InputDeclarationType>(inputMap: T)
   const groupToIndex = {};
   for (const stateName of Object.keys(inputMap))
   {
-    const {
-      type,
-      group,
-      displayName = stateName,
-      shouldShow = () => true
-    } = inputMap[stateName];
-
+    const { group } = inputMap[stateName];
+    const inputInfo = _.defaults(inputMap[stateName], { displayName: stateName, shouldShow: () => true });
     let useIndex = renderMatrix.size;
     if (group !== undefined)
     {
@@ -170,8 +169,9 @@ function computeRenderMatrix<T extends InputDeclarationType>(inputMap: T)
         useIndex = groupToIndex[group];
       }
     }
-    renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) => {
-      return value.push(renderItemHOC<T>(stateName, type, displayName, shouldShow));
+    renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) =>
+    {
+      return value.push(renderItemHOC<T>(inputInfo, stateName));
     });
   }
   return renderMatrix;
@@ -180,7 +180,8 @@ function computeRenderMatrix<T extends InputDeclarationType>(inputMap: T)
 function defaultObject(inputMap: InputDeclarationType)
 {
   const defaultObj = {};
-  _.forOwn(inputMap, (value, key) => {
+  _.forOwn(inputMap, (value, key) =>
+  {
     switch (value.type)
     {
       case 'number':
@@ -210,16 +211,16 @@ function computeDefaultStateFromNodeFactory(inputMap, defaultState): (node?: Tra
       const extractedFromNodeMeta = _.pick(node.meta, Object.keys(inputMap));
       return _.defaults(extractedFromNodeMeta, defaultState);
     }
-  }
+  };
 }
 
 export function TransformationEditorFactory<T extends InputDeclarationType>(
-    inputMap: T,
-    onConfirm?: (state: StateType<T>, editTransformation: EditSignature) => void,
-    defaultFromNodeFn?: (node?: TransformationNode) => object,
-    validateOptions?: (state: StateType<T>) => {error: string},
-    dynamicPreview?: (state: StateType<T>, value) => any,
-  )
+  inputMap: T,
+  onConfirm?: (state: StateType<T>, editTransformation: EditSignature) => void,
+  defaultFromNodeFn?: (node?: TransformationNode) => object,
+  validateOptions?: (state: StateType<T>) => { error: string },
+  dynamicPreview?: (state: StateType<T>, value) => any,
+)
 {
   // tslint:disable-next-line:variable-name
   const UNBOUND_RenderMatrix = computeRenderMatrix<T>(inputMap);
@@ -247,8 +248,10 @@ export function TransformationEditorFactory<T extends InputDeclarationType>(
 
     public bindRenderMatrix(matrix: RenderMatrix): RenderMatrix
     {
-      return matrix.map((row, i) => {
-        return row.map((fn, j) => {
+      return matrix.map((row, i) =>
+      {
+        return row.map((fn, j) =>
+        {
           return fn.bind(this);
         }).toList();
       }).toList();
@@ -267,16 +270,12 @@ export function TransformationEditorFactory<T extends InputDeclarationType>(
     public renderMatrixRow(row, i)
     {
       return (
-        <div key={i}>
+        <div key={i} className='te-matrix-row'>
           {
-            row.map((fn, j) =>
-              <div key={j}>
-                {fn(this.state)}
-              </div>
-            )
+            row.map((fn, j) => fn(this.state, j)) // ultimately calls unboundRenderItem
           }
         </div>
-      )
+      );
     }
 
     public render()
@@ -295,18 +294,23 @@ export function TransformationEditorFactory<T extends InputDeclarationType>(
 
 const TestMap: InputDeclarationType = {
   from: {
-    displayName: 'from position',
+    displayName: 'From Position',
     type: 'number',
   },
   length: {
+    displayName: 'Length',
     type: 'number',
+    group: 1,
   },
   test: {
+    displayName: 'Do you want to do something?',
     type: 'boolean',
+    group: 1,
   },
   otherTest: {
+    displayName: 'Test String',
     type: 'string',
-  }
-}
+  },
+};
 
 export const TestClass = TransformationEditorFactory(TestMap);

@@ -97,7 +97,7 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
           {...this._passProps({
             preview: null,
             displayKeyPath: displayKeyPath.push(0),
-          }) }
+          })}
           renderNestedFields={this.props.renderNestedFields}
           depth={depth + 1}
           label={`N/A`}
@@ -111,7 +111,7 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
           {...this._passProps({
             preview: null,
             displayKeyPath: displayKeyPath.push(0),
-          }) }
+          })}
           renderNestedFields={this.props.renderNestedFields}
           depth={depth + 1}
           label={`List Empty`}
@@ -128,7 +128,7 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
             {...this._passProps({
               preview: value,
               displayKeyPath: displayKeyPath.push(index),
-            }) }
+            })}
             key={index}
             renderNestedFields={this.props.renderNestedFields}
             depth={depth + 1}
@@ -178,7 +178,7 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
         <TemplateEditorFieldPreview
           hidePreviewValue={!simpleArrayDisplay}
           displayValueOverride={simpleArrayDisplay ? content : null}
-          {...this._passProps() }
+          {...this._passProps()}
         />
       );
       const childrenStyle = (canEdit === true && field.isIncluded === false) ?

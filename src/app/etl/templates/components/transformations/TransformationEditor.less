@@ -3,9 +3,18 @@
 .transformation-editor {
   padding: @spacing;
 
+  .te-matrix-row {
+    display: flex;
+    align-items: flex-end;
+    padding: @quarter-spacing;
+  }
+
   .te-checkbox-row {
+    margin-right: @spacing;
+    padding-bottom: @half-spacing;
     display: flex;
     align-items: center;
+    cursor: pointer;
     .te-checkbox {
       margin-bottom: 1px;
     }
@@ -16,10 +25,12 @@
   }
 
   .te-autocomplete-block {
+    margin-right: @spacing;
     display: flex;
     flex-direction: column;
 
     .te-label {
+      .normal-text;
     }
   }
 

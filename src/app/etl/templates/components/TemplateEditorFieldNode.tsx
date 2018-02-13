@@ -100,7 +100,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
             canEdit: field.isIncluded && canEdit,
             preview: childPreview,
             displayKeyPath: displayKeyPath.push(index),
-          }) }
+          })}
           key={index}
         />
       );
@@ -134,7 +134,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
           {showSettings ?
             <div className='injected-content-content' style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}>
               <TemplateEditorFieldSettings
-                {...this._passProps() }
+                {...this._passProps()}
               />
               {this.renderCloseLine()}
             </div> : null
@@ -167,7 +167,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
           depth={0}
           renderNestedFields={this.renderChildFields}
           injectedContent={injectedContent}
-          {...this._passProps() }
+          {...this._passProps()}
         />
       );
     }
@@ -177,7 +177,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       content = (
         <TemplateEditorFieldPreview
           hidePreviewValue={true}
-          {...this._passProps() }
+          {...this._passProps()}
         />
       );
     }
@@ -185,7 +185,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     {
       content = (
         <TemplateEditorFieldPreview
-          {...this._passProps() }
+          {...this._passProps()}
         />
       );
     }

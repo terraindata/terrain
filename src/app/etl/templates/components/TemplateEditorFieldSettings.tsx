@@ -125,10 +125,10 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
       <div className='template-editor-field-settings' style={fontColor(Colors().text2)}>
         {this.renderGeneralSettings()}
         <ElasticFieldTypeSection
-          {...this._passProps() }
+          {...this._passProps()}
         />
         <TemplateEditorFieldTransformations
-          {...this._passProps() }
+          {...this._passProps()}
         />
       </div>
     );
