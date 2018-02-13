@@ -123,7 +123,7 @@ export function New<T>(
     config = Util.extendId(config, extendId === 'string');
   }
   _.forOwn(config,
-    (value, key) => { instance[key] = value },
+    (value, key) => { instance[key] = value; },
   );
 
   return new constructor(instance) as any;
