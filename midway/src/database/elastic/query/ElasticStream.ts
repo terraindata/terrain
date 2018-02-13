@@ -85,12 +85,7 @@ export class ElasticStream extends Stream.Readable
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
   }
 
-  public close()
-  {
-    this.forceClose = true;
-  }
-
-  private async _read()
+  public async _read()
   {
     if (this.isReading)
     {
@@ -117,6 +112,11 @@ export class ElasticStream extends Stream.Readable
     {
       return this.emit('error', e);
     }
+  }
+
+  public close()
+  {
+    this.forceClose = true;
   }
 
   private async getMoreUntilDone(error, response)
