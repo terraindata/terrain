@@ -170,10 +170,11 @@ class GroupComponent extends TerrainComponent<GroupProps>
 
   public renderGroup()
   {
-    const { data, renderHeader, isDragging, items, keyPath, keyPathStarter, onReorder, onDrop, isGroup, isOver, renderChildren } = this.props;
+    const { data, renderHeader, isDragging, items, keyPath, keyPathStarter,
+      onReorder, onDrop, isGroup, isOver, renderChildren } = this.props;
     const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
     const draggingStyle = isDragging ? { opacity: 0.3, height: 30 } : {};
-    const droppingStyle = isOver ? { borderColor: 'lime' } : {};
+    const droppingStyle = isOver ? { borderColor: Colors().active } : {};
     return (
       <div
         className='drag-drop-group'

@@ -254,18 +254,19 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         dropKeyPath.concat(List(['filterGroup', 'lines', lineSize]).toList()), true);
       return;
     }
-    // See if dropped was already in droppedInto, and if it was, remove it
     let group;
+    // If they were both single filters, create a new group
     if (!this.isGroup(dropped) && !this.isGroup(droppedInto))
     {
       group = _FilterGroup({ lines: List([droppedInto, dropped]) });
     }
     else
     {
-      group = _FilterGroup({        
-lines: dropped.filterGroup.lines.insert(0, droppedInto),
-        minMatches: dropped.filterGroup.minMatches      
-});
+      group = _FilterGroup({
+        lines: dropped.filterGroup.lines.insert(0, droppedInto),
+        minMatches: dropped.filterGroup.minMatches,
+        name: dropped.filterGroup.name,
+      });
     }
     dropKeyPath = dropKeyPath.push('filterGroup');
     let newLines;
@@ -351,4 +352,5 @@ lines: dropped.filterGroup.lines.insert(0, droppedInto),
   }
 }
 
-export default DragDropContext(HTML5Backend)(PathfinderFilterSection);
+export default PathfinderFilterSection;
+// export default DragDropContext(HTML5Backend)(PathfinderFilterSection);

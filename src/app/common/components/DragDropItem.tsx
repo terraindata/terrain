@@ -125,7 +125,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
       <div
         style={_.extend({},
           { opacity: isDragging ? 0.5 : 1 },
-          { borderColor: isOver ? 'lightblue' : '' })
+          { borderColor: isOver ? Colors().active : '' })
         }
         className='drag-drop-item'
       >

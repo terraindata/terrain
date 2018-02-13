@@ -99,12 +99,21 @@ class DropZoneComponent extends TerrainComponent<DropProps>
     return (
       this.props.connectDropTarget(
         <div
-          className='drop'
+          className='drop-wrapper'
           style={[
-            borderColor(this.props.isOver ? Colors().active : ''),
+            { marginBottom: this.props.isOver ? 2 : -5 },
+            { marginTop: this.props.isOver ? 2 : -5 },
             { height: this.props.isOver ? 40 : 15 },
           ]}
-        />,
+        >
+          <div
+            className='drop'
+            style={[
+              borderColor(this.props.isOver ? Colors().active : ''),
+              { height: this.props.isOver ? 40 : 15 },
+            ]}
+          />
+        </div>,
       )
     );
   }

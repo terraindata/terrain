@@ -7,19 +7,32 @@
 	border: 1px solid transparent;
 	padding: 1px;
 	&:hover {
-		border-color: #1eb4fa;
+		border-color: lightgray;
 	}
 }
-.drop {
-	width: 500px;
-	position: relative;
-	margin-top: -4px;
-	margin-bottom: -4px;
-	// z-index: 1000;
-	border-radius: 5px;
-	border: 1px solid transparent;
-	transition: all 0.15s ease-in-out;
+
+.drop-wrapper
+{
+	height: 25px;
+    margin-top: -5px;
+    width: 700;
+    position: relative;
+    left: -20px;
+    margin-bottom: -5px;
+    transition: all 0.2s ease-in-out;
+	.drop {
+		width: 500px;
+	    position: relative;
+	    margin-top: -4px;
+	    margin-bottom: -4px;
+	    border-radius: 5px;
+	    border: 1px solid transparent;
+    	transition: all 0.2s ease-in-out;
+	    top: 4px;
+	    left: 20px;
+	}
 }
+
 .drag-drop-group {
 	width: 500px;
 	padding: 5px;
@@ -35,7 +48,6 @@
 .drag-drop-group-preview, .drag-drop-item-preview
 {
 	width: 500px;
-
 	border-radius: 3px;
 	box-shadow: 1px 3px 12px;
 	z-index: 2000;
@@ -48,7 +60,8 @@
 }
 
 .drag-drop-group-preview {
-	padding-left: 6px;
-	padding-top: 10px;
-	height: 35px;
+	padding: 12px 3px 3px 15px;
+	height: 21px;
+	font-size: 12px;
+	text-transform: uppercase;
 }

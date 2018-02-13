@@ -187,6 +187,7 @@ class LinearSelector extends TerrainComponent<Props>
         onClick={this._fn(this.selectOption, option, false)}
         key={i}
         ref={String(option)}
+        style={fontColor(this.props.selected === option ? Colors().fontWhite : Colors().fontColor)}
       >
         {option}
       </div>

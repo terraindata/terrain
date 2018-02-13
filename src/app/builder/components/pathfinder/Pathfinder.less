@@ -84,28 +84,32 @@
 		&:hover {
 			text-decoration: underline;
 		}
+		z-index: 9999;
+		position: relative;
 	}
 	.pf-filter-group-header
 	{
-		height: 32px;
+		height: 15px;
 		padding-top: 6px;
+		font-size: 12px;
+		text-transform: uppercase;
 		.builder-tb {
 			max-width: 200px;
 			display: inline-flex;
 		}
 		.pf-filter-group-name-wrapper {
 			display: inline-flex;
-			margin-right: 6px;
+			margin-left: 15px;
 			.pf-filter-group-name {
 				cursor: text;
 			}
 			.pf-filter-group-carrot {
-				height: 12px;
-				width: 12px;
+				height: 9px;
+				width: 9px;
 				margin-left: 6px;
 				.transition;
 				position: relative;
-				top: 5px;
+				top: 2px;
 				cursor: pointer;
 				&.pf-filter-group-carrot-open {
 					.rotate(90deg);
@@ -114,6 +118,12 @@
 		}
 		.linear-selector-wrapper {
 			float: right;
+			.linear-selector-option {
+				font-size: 10px;
+			}
+			.linear-selector-selected-marker {
+				height: 15px !important;
+			}
 		}
 		.close {
 			float: right;
