@@ -79,6 +79,8 @@ export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
 
+export let currentApp: App = null;
+
 export class App
 {
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
@@ -115,6 +117,7 @@ export class App
     this.numRequests = 0;
     this.numRequestsThatThrew = 0;
     this.numRequestsCompleted = 0;
+    app = this;
 
     process.on('uncaughtException', App.uncaughtExceptionHandler);
     process.on('unhandledRejection', App.unhandledRejectionHandler);

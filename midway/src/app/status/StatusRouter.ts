@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
-import app from '../../Midway';
+import currentApp from '../App';
 
 const Router = new KoaRouter();
 
@@ -55,9 +55,9 @@ Router.get('/', async (ctx, next) =>
 {
   ctx.body = JSON.stringify({
     status: 'ok',
-    startTime: app.getStartTime(),
+    startTime: currentApp.getStartTime(),
     currentTime: new Date(),
-    requestCounts: app.getRequestCounts(),
+    requestCounts: currentApp.getRequestCounts(),
   });
   winston.info('status root');
 });
