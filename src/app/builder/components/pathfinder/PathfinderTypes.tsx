@@ -129,6 +129,7 @@ class FilterGroupC extends BaseClass
 {
   public minMatches: number | string = 'all';
   public name: string = 'Group';
+  public collapsed: boolean = false;
   public lines: List<FilterLine> = List<FilterLine>([]);
 }
 export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;

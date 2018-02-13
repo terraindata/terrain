@@ -61,7 +61,7 @@ import DropZone from 'app/common/components/DropZone';
 import DragDropItem from 'app/common/components/DragDropItem';
 import { getEmptyImage } from 'react-dnd-html5-backend'
 import './DragDropStyle.less';
-
+import FadeInOut from 'app/common/components/FadeInOut';
 
 interface GroupProps
 {
@@ -72,6 +72,7 @@ interface GroupProps
   isGroup: (item: any) => boolean; // function to distinguish items from groups
   keyPathStarter?: List<any>; // key path to get children in, and to append to any created key paths
   renderChildren: (data, keyPath?) => El; // given data about the children, return the child elements
+  setCollapsed: (keyPath, value: boolean) => void; // set something as collapsed, or not
   // Injected drag drop props
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onReorder: (itemKeyPath: List<number>, dropKeyPath: List<number>) => void;
@@ -84,7 +85,8 @@ interface GroupProps
 
 const groupSource = {
   beginDrag(props) {
-    return {keyPath: props.keyPath}
+    props.setCollapsed(props.keyPath, true);
+    return {keyPath: props.keyPath, data: props.data, renderFn: props.renderHeader}
   }
 };
 
@@ -123,35 +125,20 @@ class GroupComponent extends TerrainComponent<GroupProps>
     // Use empty image as a drag preview so browsers don't draw it
     // and we can draw whatever we want on the custom drag layer instead.
     this.props.connectDragPreview(getEmptyImage(), {
-      // IE fallback: specify that we'd rather screenshot the node
-      // when it already knows it's being dragged so we can hide it with CSS.
       captureDraggingState: true,
     })
   }
 
-  public renderGroup()
+  public renderGroupChildren(items, newKeyPath)
   {
-    // if (this.props.isDragging)
-    // {
-    //   return this.props.connectDragPreview(<div></div>);
-    // }
-    const {data, renderHeader, items, keyPath, keyPathStarter, onReorder, onDrop, isGroup, isOver, renderChildren} = this.props;
-    const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
+    const {keyPathStarter, onReorder, onDrop, isGroup, renderChildren} = this.props;    
     return (
-      <div
-        className='drag-drop-group'
-        style={isOver ? {borderColor: 'lime'} : {}}
-      >
-        <div>{renderHeader(data, newKeyPath.butLast())}</div>
-        <DropZone
-          keyPath={newKeyPath.push(0)}
-          onDrop={onReorder}
-         />
-        {
+      <div>
+        { 
           items.map((item, i) =>
             <div key={i}>
              {
-               !(this.props.isGroup(item)) ?
+               !(isGroup(item)) ?
                 <DragDropItem
                    children={renderChildren(item, newKeyPath.push(i))}
                    keyPath={newKeyPath.push(i)}
@@ -173,6 +160,30 @@ class GroupComponent extends TerrainComponent<GroupProps>
               </div>
           )
         }
+      </div>
+    );    
+  }
+
+  public renderGroup()
+  {
+    const {data, renderHeader, isDragging, items, keyPath, keyPathStarter, onReorder, onDrop, isGroup, isOver, renderChildren} = this.props;
+    const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
+    const draggingStyle = isDragging ? {opacity: 0.3, height: 30} : {};
+    const droppingStyle = isOver ? {borderColor: 'lime'} : {};
+    return (
+      <div
+        className='drag-drop-group'
+        style={_.extend({}, draggingStyle, droppingStyle)}
+      >
+        <div>{renderHeader(data, newKeyPath.butLast())}</div>
+        <DropZone
+          keyPath={newKeyPath.push(0)}
+          onDrop={onReorder}
+         />
+         <FadeInOut
+           children={this.renderGroupChildren(items, newKeyPath)}
+           open={!data.collapsed}
+         />
       </div>
     );
   }

@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import PerformantDragLayer from './DragLayer'
 import {DragLayer} from 'react-dnd';
 import * as React from 'react'
@@ -66,9 +68,9 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
     const {item, itemType} = this.props
     return (
       <div
-        style={{height: 30, width: 500, backgroundColor: 'yellow'}}
+        style={{height: 30, width: 500, backgroundColor: 'lightgray'}}
       >
-      {item.title}
+        {item.renderFn && item.renderFn(item.data, item.keyPath)}
       </div>);
   }
 }

@@ -55,6 +55,8 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { PathfinderLine } from '../PathfinderLine';
 import { FilterGroup, FilterLine } from '../PathfinderTypes';
+import BuilderTextbox from 'app/common/components/BuilderTextbox';
+const CarrotIcon = require('images/icon_carrot.svg?name=CarrotIcon');
 
 export interface Props
 {
@@ -70,18 +72,14 @@ const filterDropdownOptions = List(
   [
     'all',
     'any',
-    2,
-    3,
-    4,
-    5,
   ]);
 
 class PathfinderFilterGroup extends TerrainComponent<Props>
 {
   public state: {
-
+    editingName: boolean,
   } = {
-
+    editingName: false,
     };
 
   public render()
@@ -96,11 +94,31 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
         onDelete={this.handleDelete}
         depth={depth}
         pieces={List([
+          this.state.editingName ?
+          <BuilderTextbox
+            value={filterGroup.name}
+            keyPath={this.props.keyPath.push('name')}
+            canEdit={canEdit}
+            action={this.props.onChange}
+            onBlur={this._toggle('editingName')}
+            onKeyDown={this.handleKeyDown}
+            autoFocus={true}
+          />
+          :
+          <div style={{display: 'inline-flex'}}>
+            <div onClick={this._toggle('editingName')}>
+              {filterGroup.name}
+            </div>
+            <CarrotIcon
+              onClick={this._fn(this.props.onChange, this.props.keyPath.push('collapsed'), !filterGroup.collapsed)}
+              style={{height: 12, width: 12}}
+            />
+          </div>,
           <LinearSelector
             options={filterDropdownOptions}
             keyPath={this.props.keyPath.push('minMatches')}
             selected={this.props.filterGroup.minMatches}
-            allowCustomInput={true}
+            allowCustomInput={false}
             canEdit={canEdit}
             action={this.props.onChange}
           />
@@ -108,6 +126,16 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
         ])}
       />
     );
+  }
+
+  private handleKeyDown(e)
+  {
+    if (e.keyCode === 13 || e.keyCode === 9 || e.keyCode === 27)
+    {
+      this.setState({
+        editingName: false,
+      })
+    }
   }
 
   // have to trim off the `filterGroup` key for onDelete to work

@@ -204,15 +204,31 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     );
   }
 
-  public handleDrop(itemKeyPath, dropKeyPath)
+  public changeCollapsed(keyPath, value)
   {
+    const kp = this.props.keyPath
+      .push('lines')
+      .concat(keyPath).toList()
+      .push('filterGroup')
+      .push('collapsed');
+    BuilderActions.changePath(
+      kp,
+      value);
+  }
+
+  public handleDrop(itemKeyPath, dropKeyPath, keepCollapse?)
+  {
+    let lines = this.props.filterGroup.lines;
+    let item = lines.getIn(itemKeyPath);
+    if (this.isGroup(item) && !keepCollapse)
+    {
+      item = item.setIn(['filterGroup', 'collapsed'], false);
+    }
     // If the item did not move up or down, do nothing
     if (itemKeyPath.equals(dropKeyPath))
     {
       return;
     }
-    let lines = this.props.filterGroup.lines;
-    const item = lines.getIn(itemKeyPath);
 
     // If the item moved down, insert it and then remove it
     if (this.movedDown(itemKeyPath, dropKeyPath)) // This might not work...
@@ -247,14 +263,18 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
     const lines = this.props.filterGroup.lines;
     const droppedInto = lines.getIn(dropKeyPath);
-    const dropped = lines.getIn(dragKeyPath);
+    let dropped = lines.getIn(dragKeyPath);
+    if (this.isGroup(dropped))
+    {
+      dropped = dropped.setIn(['filterGroup', 'collapsed'], true);
+    }
     // if you dropped into a group, just do a normal "Reordering" because a new group isn't being created
     if (this.isGroup(droppedInto))
     {
       // act as if it was dropped into the last slot of droppedInto
       const lineSize = droppedInto.filterGroup.lines.size;
       this.handleDrop(dragKeyPath,
-        dropKeyPath.concat(List(['filterGroup', 'lines', lineSize]).toList()));
+        dropKeyPath.concat(List(['filterGroup', 'lines', lineSize]).toList()), true);
       return;
     }
     // See if dropped was already in droppedInto, and if it was, remove it
@@ -301,6 +321,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public render()
   {
     const {filterGroup} = this.props;
+    console.log('render ', filterGroup.toJS());
     return (
       <div
         className='pf-section'
@@ -332,6 +353,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                 keyPathStarter={List(['filterGroup', 'lines'])}
                 renderChildren={this.renderFilterLine}
                 renderHeader={this.renderGroupHeader}
+                setCollapsed={this.changeCollapsed}
               />
             }
             <DropZone
