@@ -1107,7 +1107,7 @@ export const Ajax =
 
     getTypesFromQuery(
       connectionId: number,
-      query: object,
+      query: string,
       onLoad: (templates: object) => void,
     )
     {
