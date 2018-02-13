@@ -79,7 +79,52 @@
 	.pf-create {
 		.transition;
 		cursor: pointer;
-		font-size: @font-size;
+		text-transform: uppercase;
+		font-size: @small-font-size;
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+	.pf-filter-group-header
+	{
+		height: 32px;
+		padding-top: 6px;
+		.builder-tb {
+			max-width: 200px;
+			display: inline-flex;
+		}
+		.pf-filter-group-name-wrapper {
+			display: inline-flex;
+			margin-right: 6px;
+			.pf-filter-group-name {
+				cursor: text;
+			}
+			.pf-filter-group-carrot {
+				height: 12px;
+				width: 12px;
+				margin-left: 6px;
+				.transition;
+				position: relative;
+				top: 5px;
+				cursor: pointer;
+				&.pf-filter-group-carrot-open {
+					.rotate(90deg);
+				}
+			}
+		}
+		.linear-selector-wrapper {
+			float: right;
+		}
+		.close {
+			float: right;
+			opacity: 0;
+			.transition;
+		}
+		&:hover {
+			.close {
+				opacity: 1;
+			}
+		}
 	}
 	.pf-filter-line
 	{

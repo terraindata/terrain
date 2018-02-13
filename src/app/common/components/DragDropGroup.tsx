@@ -86,7 +86,7 @@ interface GroupProps
 const groupSource = {
   beginDrag(props) {
     props.setCollapsed(props.keyPath, true);
-    return {keyPath: props.keyPath, data: props.data, renderFn: props.renderHeader}
+    return {keyPath: props.keyPath, title: props.data.name}
   }
 };
 
@@ -131,10 +131,10 @@ class GroupComponent extends TerrainComponent<GroupProps>
 
   public renderGroupChildren(items, newKeyPath)
   {
-    const {keyPathStarter, onReorder, onDrop, isGroup, renderChildren} = this.props;    
+    const {keyPathStarter, onReorder, onDrop, isGroup, renderChildren} = this.props; 
     return (
       <div>
-        { 
+        {
           items.map((item, i) =>
             <div key={i}>
              {
@@ -173,7 +173,13 @@ class GroupComponent extends TerrainComponent<GroupProps>
     return (
       <div
         className='drag-drop-group'
-        style={_.extend({}, draggingStyle, droppingStyle)}
+        style={_.extend(
+          {},
+          backgroundColor(Colors().blockBg),
+          draggingStyle,
+          droppingStyle,
+          // borderColor(Colors().blockOutline)
+        )}
       >
         <div>{renderHeader(data, newKeyPath.butLast())}</div>
         <DropZone

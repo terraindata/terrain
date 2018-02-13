@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as classNames from 'classnames';
 import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
@@ -56,8 +57,9 @@ import LinearSelector from 'app/common/components/LinearSelector';
 import { PathfinderLine } from '../PathfinderLine';
 import { FilterGroup, FilterLine } from '../PathfinderTypes';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
+import Colors, {getStyle} from 'app/colors/Colors';
 const CarrotIcon = require('images/icon_carrot.svg?name=CarrotIcon');
-
+const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 export interface Props
 {
   filterGroup: FilterGroup;
@@ -87,14 +89,10 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
     const { filterGroup, canEdit, depth } = this.props;
 
     return (
-      <PathfinderLine
-        canEdit={canEdit}
-        canDrag={depth !== 0}
-        canDelete={depth !== 0}
-        onDelete={this.handleDelete}
-        depth={depth}
-        pieces={List([
-          this.state.editingName ?
+      <div className='pf-filter-group-header'>
+        {
+          this.state.editingName
+          ?
           <BuilderTextbox
             value={filterGroup.name}
             keyPath={this.props.keyPath.push('name')}
@@ -105,26 +103,44 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             autoFocus={true}
           />
           :
-          <div style={{display: 'inline-flex'}}>
-            <div onClick={this._toggle('editingName')}>
+          <div className='pf-filter-group-name-wrapper'>
+            <div
+              onClick={this._toggle('editingName')}
+              className='pf-filter-group-name'
+            >
               {filterGroup.name}
             </div>
             <CarrotIcon
-              onClick={this._fn(this.props.onChange, this.props.keyPath.push('collapsed'), !filterGroup.collapsed)}
-              style={{height: 12, width: 12}}
+              className={classNames({
+                'pf-filter-group-carrot': true,
+                'pf-filter-group-carrot-open': !filterGroup.collapsed,
+              })}
+              onClick={this._fn(
+                this.props.onChange,
+                this.props.keyPath.push('collapsed'),
+                !filterGroup.collapsed)
+              }
+              style={getStyle('fill', Colors().iconColor)}
             />
-          </div>,
-          <LinearSelector
-            options={filterDropdownOptions}
-            keyPath={this.props.keyPath.push('minMatches')}
-            selected={this.props.filterGroup.minMatches}
-            allowCustomInput={false}
-            canEdit={canEdit}
-            action={this.props.onChange}
+          </div>
+        }
+        {
+          canEdit &&
+          <CloseIcon
+            className='close'
+            onClick={this.handleDelete}
           />
-          ,
-        ])}
-      />
+        }
+        <LinearSelector
+          options={filterDropdownOptions}
+          keyPath={this.props.keyPath.push('minMatches')}
+          selected={this.props.filterGroup.minMatches}
+          allowCustomInput={false}
+          canEdit={canEdit}
+          action={this.props.onChange}
+        />
+      </div>
+
     );
   }
 

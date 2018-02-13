@@ -59,7 +59,8 @@ import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import DatePickerWrapper from 'app/common/components/DatePickerWrapper';
-import SearchableDropdown from 'app/common/components/Dropdown';
+import SearchableDropdown from 'app/common/components/SearchableDropdown';
+import Dropdown from 'app/common/components/Dropdown';
 import MapComponent, { units } from 'app/common/components/MapComponent';
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
@@ -154,8 +155,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-
-    if (filterLine.field === null || filterLine.fieldType === null)
+    if (filterLine.field === null)
     {
       // console.log('null');
       return null;
@@ -172,6 +172,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       case FieldType.Numerical:
       case FieldType.Text:
+      case null:
       case FieldType.Any:
         return (
           <div

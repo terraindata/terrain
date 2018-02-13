@@ -77,6 +77,7 @@ export interface Props
   openDown?: boolean;
   placeholder?: string;
   action?: (keyPath, value) => void;
+  floatingLabel?: string;
 }
 
 @Radium

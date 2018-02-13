@@ -60,8 +60,8 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderStore from 'app/builder/data/BuilderStore';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
-import { _FilterGroup, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
-import PathfinderFilterCreate from './PathfinderFilterCreate';
+import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
+import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
 import Util from 'app/util/Util';
@@ -90,37 +90,10 @@ const ItemTypes = {
 class PathfinderFilterSection extends TerrainComponent<Props>
 {
 
-  public keyPaths: IMMap<string, List<number>> = Map<string, List<number>>({});
-  public state:
+  public handleAddFilter()
   {
-    bars: List<any>,
-  } =
-  {
-    bars: List(['red', 'orange', 'yellow', 'green', 'purple', 'pink',
-      'red', 'orange', 'yellow', 'green', 'purple', 'pink']),
-     //bars: List([List(['red']), List(['orange']), List(['yellow'])]),
-  //    bars: List(['red', 'orange', List(['yellow', 'green', List(['blue'])]), List(['purple', 'pink'])]),
-  }
-
-  public componentWillMount()
-  {
-    this.createKeyPaths(this.state.bars);
-  }
-
-  public createKeyPaths(bars: List<any>, currKeyPath?: List<number>)
-  {
-    bars.map((bar, index) =>
-    {
-      const keyPath: List<number> = currKeyPath !== undefined ? currKeyPath.push(index) : List([index]);
-      if (typeof bar === 'string')
-      {
-        this.keyPaths = this.keyPaths.set(bar, keyPath);
-      }
-      else
-      {
-        this.createKeyPaths(bar, keyPath);
-      }
-    })
+    const newLines = this.props.filterGroup.lines.push(_FilterLine());
+    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public insertIn(items, keyPath, item): List<any>
@@ -320,8 +293,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public render()
   {
-    const {filterGroup} = this.props;
-    console.log('render ', filterGroup.toJS());
+    const {filterGroup, pathfinderContext} = this.props;
     return (
       <div
         className='pf-section'
@@ -363,6 +335,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           </div>
         )
       }
+      <PathfinderCreateLine
+        canEdit={pathfinderContext.canEdit}
+        text={'Filter Condition'}
+        onCreate={this.handleAddFilter}
+      />
       </div>
     )
   }

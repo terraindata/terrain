@@ -48,6 +48,7 @@ import PerformantDragLayer from './DragLayer'
 import {DragLayer} from 'react-dnd';
 import * as React from 'react'
 import TerrainComponent from 'app/common/components/TerrainComponent';
+import Colors, {backgroundColor, borderColor} from 'app/colors/Colors';
 
 interface Props {
   item: any,
@@ -66,12 +67,23 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
 
   public render() {
     const {item, itemType} = this.props
-    return (
-      <div
-        style={{height: 30, width: 500, backgroundColor: 'lightgray'}}
-      >
-        {item.renderFn && item.renderFn(item.data, item.keyPath)}
-      </div>);
+    switch (itemType)
+    {
+      case 'GROUP':
+        const style = _.extend({},
+          backgroundColor(Colors().blockBg),
+          borderColor(Colors().blockOutline));
+        return (
+          <div
+            className='drag-drop-group-preview'
+            style={style}
+          >
+            {item.title}
+          </div>
+        );
+      default:
+        return null
+    }
   }
 }
 
