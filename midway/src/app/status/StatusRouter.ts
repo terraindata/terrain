@@ -55,10 +55,14 @@ Router.get('/', async (ctx, next) =>
 {
   ctx.body = JSON.stringify({
     status: 'ok',
-    startTime: currentApp.getStartTime(),
     currentTime: new Date(),
-    requestCounts: currentApp.getRequestCounts(),
   });
+
+  if (currentApp !== null)
+  {
+    ctx.body.startTime = currentApp.getStartTime();
+    ctx.body.requestCounts = currentApp.getRequestCounts();
+  }
   winston.info('status root');
 });
 

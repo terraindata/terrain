@@ -117,7 +117,7 @@ export class App
     this.numRequests = 0;
     this.numRequestsThatThrew = 0;
     this.numRequestsCompleted = 0;
-    app = this;
+    currentApp = this;
 
     process.on('uncaughtException', App.uncaughtExceptionHandler);
     process.on('unhandledRejection', App.unhandledRejectionHandler);
