@@ -54,7 +54,6 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 
 import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
-import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';

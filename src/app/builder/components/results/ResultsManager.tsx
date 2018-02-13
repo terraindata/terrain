@@ -52,7 +52,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import MidwayError from '../../../../../shared/error/MidwayError';
