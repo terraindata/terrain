@@ -98,6 +98,8 @@ export interface Card extends IRecord<Card>
   errors: List<string>;
   keyDisplayType: DisplayType;
   hidden: boolean;
+  // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
+  mapZoomValue?: number;
 
   // the following fields are excluded from the server save
   static: {
@@ -120,9 +122,6 @@ export interface Card extends IRecord<Card>
     updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     tqlGlue?: string;
     topTql?: string;
-
-    // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
-    //    mapInputValue?: string;
 
     anythingAccepts?: boolean;
 
@@ -210,6 +209,7 @@ export const _card = (config: CardConfig) =>
     disabled: false,
     tuning: false,
     tuningClosed: false,
+    mapZoomValue: 15,
   });
 
   if (config.static.metaFields)
