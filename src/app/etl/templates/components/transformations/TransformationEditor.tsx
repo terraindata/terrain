@@ -67,7 +67,7 @@ import { TestClass } from './TransformationEditorFactory';
 
 export interface Props
 {
-  transformation: TransformationNode;
+  transformation?: TransformationNode;
   editTransformation: (transformationID, fieldNamesOrIDs?, options?) => void;
   deleteTransformation?: () => void;
 }

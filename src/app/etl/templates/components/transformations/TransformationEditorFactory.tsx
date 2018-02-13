@@ -100,7 +100,7 @@ function UNBOUND_renderInputElement(stateName, displayName, type) // need to be 
       <div>
         <CheckBox
           checked={this.state[stateName]}
-          onChange={this.setState({
+          onChange={() => this.setState({
             [stateName]: !this.state[stateName]
           })}
         />
@@ -179,15 +179,56 @@ function computeRenderMatrix<T extends InputDeclarationType>(inputMap: T)
   return renderMatrix;
 }
 
+function defaultObject(inputMap: InputDeclarationType)
+{
+  const defaultObj = {};
+  _.forOwn(inputMap, (value, key) => {
+    switch (value.type)
+    {
+      case 'number':
+        defaultObj[key] = 0;
+        break;
+      case 'boolean':
+        defaultObj[key] = true;
+        break;
+      case 'string':
+      default:
+        defaultObj[key] = '';
+    }
+  });
+  return defaultObj;
+}
+
+function computeDefaultStateFromNodeFactory(inputMap, defaultState): (node?: TransformationNode) => object
+{
+  return (node?: TransformationNode): object =>
+  {
+    if (node == null || node.meta == null)
+    {
+      return defaultState;
+    }
+    else
+    {
+      const extractedFromNodeMeta = _.pick(node.meta, Object.keys(inputMap));
+      return _.defaults(extractedFromNodeMeta, defaultState);
+    }
+  }
+}
+
 export function TransformationEditorFactory<T extends InputDeclarationType>(
     inputMap: T,
     onConfirm?: (state: StateType<T>, editTransformation: EditSignature) => void,
+    defaultFromNodeFn?: (node?: TransformationNode) => object,
     validateOptions?: (state: StateType<T>) => {error: string},
     dynamicPreview?: (state: StateType<T>, value) => any,
   )
 {
   // tslint:disable-next-line:variable-name
   const UNBOUND_RenderMatrix = computeRenderMatrix<T>(inputMap);
+
+  const defaultState = defaultObject(inputMap);
+  const defaultFromNode = defaultFromNodeFn !== undefined ?
+    defaultFromNodeFn : computeDefaultStateFromNodeFactory(inputMap, defaultState);
 
   @Radium
   class NodeEditor extends TerrainComponent<TransformationEditorProps>
@@ -198,6 +239,12 @@ export function TransformationEditorFactory<T extends InputDeclarationType>(
     {
       super(props);
       this.renderMatrix = this.bindRenderMatrix(UNBOUND_RenderMatrix);
+      this.state = this.getInitialState();
+    }
+
+    public getInitialState()
+    {
+      return defaultFromNode(this.props.transformation);
     }
 
     public bindRenderMatrix(matrix: RenderMatrix): RenderMatrix
@@ -254,8 +301,13 @@ const TestMap: InputDeclarationType = {
     type: 'number',
   },
   length: {
-    displayName: 'substring length',
-    type: 'number'
+    type: 'number',
+  },
+  test: {
+    type: 'boolean',
+  },
+  otherTest: {
+    type: 'string',
   }
 }
 
