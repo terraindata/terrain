@@ -57,6 +57,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import DynamicForm from 'common/components/DynamicForm';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationsInfo from 'shared/transformations/TransformationsInfo';
@@ -74,6 +75,8 @@ export interface TransformationEditorProps
   editTransformation: EditSignature;
   registerConfirmHandler: (childFn: () => void) => void;
 }
+
+const test = new (DynamicForm as any)();
 
 type EditSignature = (transformationID, fieldNamesOrIDs?, options?) => void;
 
@@ -311,6 +314,10 @@ const TestMap: InputDeclarationType = {
     displayName: 'Test String',
     type: 'string',
   },
+  randomFlag: {
+    displayName: 'How about this?',
+    type: 'boolean',
+  }
 };
 
 export const TestClass = TransformationEditorFactory(TestMap);
