@@ -73,6 +73,7 @@ interface GroupProps
   keyPathStarter?: List<any>; // key path to get children in, and to append to any created key paths
   renderChildren: (data, keyPath?) => El; // given data about the children, return the child elements
   setCollapsed: (keyPath, value: boolean) => void; // set something as collapsed, or not
+  depth?: number;
   // Injected drag drop props
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onReorder: (itemKeyPath: List<number>, dropKeyPath: List<number>) => void;
@@ -135,7 +136,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
 
   public renderGroupChildren(items, newKeyPath)
   {
-    const { keyPathStarter, onReorder, onDrop, isGroup, renderChildren } = this.props;
+    const { keyPathStarter, onReorder, onDrop, isGroup, renderChildren, depth } = this.props;
     return (
       <div>
         {
@@ -155,6 +156,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
                     items={keyPathStarter ? item.getIn(keyPathStarter) : item}
                     keyPath={newKeyPath.push(i)}
                     data={keyPathStarter ? item.getIn(keyPathStarter.butLast()) : item}
+                    depth={depth !== undefined ? depth + 1 : 1 }
                   />
               }
               <DropZone
@@ -170,8 +172,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
 
   public renderGroup()
   {
-    const { data, renderHeader, isDragging, items, keyPath, keyPathStarter,
-      onReorder, onDrop, isGroup, isOver, renderChildren } = this.props;
+    const { data, renderHeader, isDragging, items, keyPath, keyPathStarter, onReorder, isOver, depth } = this.props;
     const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
     const draggingStyle = isDragging ? { opacity: 0.3, height: 30 } : {};
     const droppingStyle = isOver ? { borderColor: Colors().active } : {};
@@ -183,7 +184,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
           backgroundColor(Colors().blockBg),
           draggingStyle,
           droppingStyle,
-          // borderColor(Colors().blockOutline)
+          {width: depth !== undefined ? 500 - 12 * depth : 500}
         )}
       >
         <div>{renderHeader(data, newKeyPath.butLast())}</div>
