@@ -151,6 +151,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
     {
       return (
         <TransformationEditor
+          key={currentIndex}
           transformation={field.transformations.get(currentIndex)}
           editTransformation={null}
         />
