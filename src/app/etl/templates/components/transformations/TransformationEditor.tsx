@@ -91,14 +91,12 @@ export class TransformationEditor extends TerrainComponent<Props>
   public render()
   {
     return (
-      <div className='transformation-editor'>
-        <TestClass
-          create={true}
-          transformation={this.props.transformation}
-          editTransformation={null}
-          registerConfirmHandler={() => null}
-        />
-      </div>
+      <TestClass
+        create={true}
+        transformation={this.props.transformation}
+        editTransformation={null}
+        registerConfirmHandler={() => null}
+      />
     );
   }
 }

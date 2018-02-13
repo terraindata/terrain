@@ -97,23 +97,25 @@ function UNBOUND_renderInputElement(stateName, displayName, type) // need to be 
   if (type === 'boolean')
   {
     return (
-      <div>
+      <div className='te-checkbox-row'>
         <CheckBox
+          className='te-checkbox'
           checked={this.state[stateName]}
           onChange={() => this.setState({
             [stateName]: !this.state[stateName]
           })}
         />
-        <div> { displayName } </div>
+        <div className='te-label'> { displayName } </div>
       </div>
     );
   }
   else
   {
     return (
-      <div>
-        <div> { displayName } </div>
+      <div className='te-autocomplete-block'>
+        <div className='te-label'> { displayName } </div>
         <Autocomplete
+          className='te-autocomplete'
           value={this.state[stateName]}
           onChange={this._setStateWrapper(stateName)}
           options={emptyList}
@@ -129,18 +131,14 @@ function renderItemHOC<T extends InputDeclarationType>(
     shouldShow: (state: StateType<T>) => boolean
   ): (state: StateType<T>, context) => any
 {
-  function unboundFunction(state: StateType<T>) {
+  function unboundFunction(state: StateType<T>) { // anonymous functions don't accept 'this'
     const boundRenderInputElement = UNBOUND_renderInputElement.bind(this);
     if (!shouldShow(state))
     {
       return null;
     }
     const inputComponent = boundRenderInputElement(stateName, displayName, type);
-    return (
-      <div>
-        {inputComponent}
-      </div>
-    );
+    return (inputComponent);
   }
   return unboundFunction;
 }
@@ -284,7 +282,7 @@ export function TransformationEditorFactory<T extends InputDeclarationType>(
     public render()
     {
       return (
-        <div>
+        <div className='transformation-editor'>
           {
             this.renderMatrix.map(this.renderMatrixRow)
           }

@@ -107,6 +107,16 @@ export function createFieldFromEngine(
       meta: transformNode.meta,
     });
   }).toList();
+  const result = _TemplateField({
+    isIncluded: engine.getFieldEnabled(id),
+    langSettings: _ElasticFieldSettings({
+      langType: language,
+      type: jsToElastic(engine.getFieldType(id)),
+    }),
+    fieldId: id,
+    transformations,
+    name: enginePath[enginePath.length - 1],
+  });
 
   return _TemplateField({
     isIncluded: engine.getFieldEnabled(id),
