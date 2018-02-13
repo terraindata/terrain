@@ -979,6 +979,7 @@ export const Ajax =
       exporting: boolean,
       primaryKeyDelimiter: string,
       requireJSONHaveAllFields: boolean,
+      rank: boolean,
       templateId: number,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
@@ -992,6 +993,7 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
         requireJSONHaveAllFields,
+        rank,
       };
       const onLoadHandler = (resp) =>
       {

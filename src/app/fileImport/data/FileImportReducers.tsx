@@ -571,6 +571,7 @@ FileImportReducers[ActionTypes.updateTemplate] =
       action.payload.exporting,
       state.primaryKeyDelimiter,
       state.requireJSONHaveAllFields,
+      state.exportRank,
       action.payload.templateId,
       () =>
       {
