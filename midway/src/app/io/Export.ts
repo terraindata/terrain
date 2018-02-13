@@ -236,32 +236,35 @@ export class Export
         let isFirstJSONObj: boolean = true;
         await new Promise(async (res, rej) =>
         {
-          respStream.on('data', (doc) =>
+          respStream.on('data', (docs) =>
           {
-            if (doc === undefined || doc === null)
+            if (docs === undefined || docs === null)
             {
               return res();
             }
 
             try
             {
-              doc = this._postProcessDoc(doc, cfg);
-              if (exprt.filetype === 'csv')
+              for (let doc of docs)
               {
-                writer.write(doc);
-              }
-              else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-              {
-                isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-                writer.write(JSON.stringify(doc));
-              }
-
-              if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-              {
-                writer.write(']');
-                if (exprt.filetype === 'json [type object]')
+                doc = this._postProcessDoc(doc, cfg);
+                if (exprt.filetype === 'csv')
                 {
-                  writer.write('}');
+                  writer.write(doc);
+                }
+                else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+                {
+                  isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+                  writer.write(JSON.stringify(doc));
+                }
+
+                if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+                {
+                  writer.write(']');
+                  if (exprt.filetype === 'json [type object]')
+                  {
+                    writer.write('}');
+                  }
                 }
               }
             }
@@ -313,6 +316,7 @@ export class Export
   {
     // merge groupJoins with _source if necessary
     doc = this._mergeGroupJoin(doc);
+
     // extract field after doing all merge joins
     cfg.extractTransformations.forEach((transform) =>
     {
