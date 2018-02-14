@@ -83,6 +83,7 @@ export class TransformationEngine
     e.IDToFieldNameMap = Map<number, KeyPath>(parsedJSON['IDToFieldNameMap']);
     e.fieldTypes = Map<number, string>(parsedJSON['fieldTypes']);
     e.fieldEnabled = Map<number, boolean>(parsedJSON['fieldEnabled']);
+    e.fieldProps = Map<number, object>(parsedJSON['fieldProps']);
     return e;
   }
 
@@ -127,6 +128,7 @@ export class TransformationEngine
   private IDToFieldNameMap: Map<number, KeyPath> = Map<number, KeyPath>();
   private fieldTypes: Map<number, string> = Map<number, string>();
   private fieldEnabled: Map<number, boolean> = Map<number, boolean>();
+  private fieldProps: Map<number, object> = Map<number, object>();
 
   constructor(doc?: object)
   {
@@ -152,7 +154,9 @@ export class TransformationEngine
       && JSON.stringify(this.fieldTypes.map((v: string, k: number) => [k, v]).toArray()) ===
       JSON.stringify(other.fieldTypes.map((v: string, k: number) => [k, v]).toArray())
       && JSON.stringify(this.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray()) ===
-      JSON.stringify(other.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray());
+      JSON.stringify(other.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray())
+      && JSON.stringify(this.fieldProps.map((v: object, k: number) => [k, v]).toArray()) ===
+      JSON.stringify(other.fieldProps.map((v: object, k: number) => [k, v]).toArray());
   }
 
   public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<KeyPath> | List<number>,
@@ -200,6 +204,7 @@ export class TransformationEngine
       IDToFieldNameMap: this.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray(),
       fieldTypes: this.fieldTypes.map((v: string, k: number) => [k, v]).toArray(),
       fieldEnabled: this.fieldEnabled.map((v: boolean, k: number) => [k, v]).toArray(),
+      fieldProps: this.fieldProps.map((v: object, k: number) => [k, v]).toArray(),
     };
   }
 
@@ -209,6 +214,7 @@ export class TransformationEngine
     this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
     this.fieldTypes = this.fieldTypes.set(this.uidField, typeName);
     this.fieldEnabled = this.fieldEnabled.set(this.uidField, true);
+    this.fieldProps = this.fieldProps.set(this.uidField, {});
 
     this.uidField++;
     return this.uidField - 1;
@@ -317,6 +323,28 @@ export class TransformationEngine
     return this.fieldEnabled.get(fieldID) === true;
   }
 
+  public getFieldProp(fieldID: number, prop: KeyPath): any
+  {
+    return deepGet(this.fieldProps.get(fieldID), prop.toArray());
+  }
+
+  public getFieldProps(fieldID: number): object
+  {
+    return this.fieldProps.get(fieldID);
+  }
+
+  public setFieldProps(fieldID: number, props: object): void
+  {
+    this.fieldProps = this.fieldProps.set(fieldID, props);
+  }
+
+  public setFieldProp(fieldID: number, prop: KeyPath, value: any): void
+  {
+    const newProps: object = this.fieldProps.get(fieldID);
+    deepSet(newProps, prop.toArray(), value, { create: true });
+    this.fieldProps = this.fieldProps.set(fieldID, newProps);
+  }
+
   public getAllFieldIDs(): List<number>
   {
     return this.IDToFieldNameMap.keySeq().toList();
@@ -385,7 +413,8 @@ export class TransformationEngine
         {
           output[value] = Object.assign({}, ref);
         }
-      });
+      }
+    });
     return output;
   }
 
