@@ -58,8 +58,8 @@ import Actions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
-import FadeInOut from './FadeInOut';
 import BuilderTextbox from './BuilderTextbox';
+import FadeInOut from './FadeInOut';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
@@ -153,10 +153,10 @@ class MapComponent extends TerrainComponent<Props>
     zoom: number;
     coordinateSearch: boolean;
   } = {
-    mapExpanded: false,
-    zoom: 15,
-    coordinateSearch: false,
-  };
+      mapExpanded: false,
+      zoom: 15,
+      coordinateSearch: false,
+    };
 
   public geoCache = {};
   public reverseGeoCache = {};
@@ -587,14 +587,14 @@ class MapComponent extends TerrainComponent<Props>
       >
         {
           this.props.allowSearchByCoordinate && this.state.coordinateSearch ?
-          this.renderCoordinateInputs(this.props.coordinates) :
-          <PlacesAutocomplete
-            inputProps={inputProps}
-            onSelect={this.geocode}
-            styles={{ input: inputStyle }}
-            geocoder={this.props.geocoder}
-            classNames={{ root: 'map-component-address-input' }}
-          />
+            this.renderCoordinateInputs(this.props.coordinates) :
+            <PlacesAutocomplete
+              inputProps={inputProps}
+              onSelect={this.geocode}
+              styles={{ input: inputStyle }}
+              geocoder={this.props.geocoder}
+              classNames={{ root: 'map-component-address-input' }}
+            />
         }
         {
           this.props.allowSearchByCoordinate ?

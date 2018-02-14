@@ -52,7 +52,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import { default as styled } from 'styled-components';
+import styled, { StyledFunction } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -130,19 +130,38 @@ const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : FONT_SIZE;
 
 // duplication of code because the functions don't work if you put them
 //  in inputStyle
-const Input = styled.input`
+const InputC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = styled.input;
+const Input = InputC`
+  ${inputStyle}
   padding-left: ${LEFT};
   padding-right: ${LEFT};
-  ${inputStyle}
   font-size: ${fontSizeFn};
 `;
-const InputDiv = styled.div`
+
+const InputDivC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
+const InputDiv = InputDivC`
   ${inputStyle}
   padding-left: ${LEFT};
   padding-right: ${LEFT};
   font-size: ${fontSizeFn};
   cursor: pointer;
 `;
+
+interface InputProps
+{
+  noBorder: boolean;
+  id: string;
+  onChange: (value) => void;
+  onFocus: () => void;
+  onBlur: () => void;
+  value: any;
+}
+
+interface InputDivProps
+{
+  noBorder: boolean;
+  onClick: () => void;
+}
 
 export interface Props
 {
@@ -160,8 +179,8 @@ export interface Props
   forceFloat?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   autoFocus?: boolean;
-  
   getValueRef?: (ref) => void;
+  className?: string;
 }
 
 export class FloatingInput extends TerrainComponent<Props>
@@ -194,6 +213,7 @@ export class FloatingInput extends TerrainComponent<Props>
         large={props.large}
         noBorder={props.noBorder}
         onClick={props.onClick}
+        className={props.className}
       >
         {
           this.renderValue()
@@ -254,6 +274,7 @@ export class FloatingInput extends TerrainComponent<Props>
           ref={this.getValueRef}
           onKeyDown={this.handleKeyDown}
           autoFocus={props.autoFocus}
+          noBorder={props.noBorder}
         />
       );
     }
@@ -264,6 +285,7 @@ export class FloatingInput extends TerrainComponent<Props>
         {...props as any}
         ref={props.getValueRef}
         onClick={this.handleClick}
+        noBorder={props.noBorder}
       >
         {
           value

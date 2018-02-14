@@ -404,7 +404,7 @@ export class ResultsManager extends TerrainComponent<Props>
   }
 
   private queryM2Results(query: Query, db: BackendInstance)
- {
+  {
     //
     // if (query.parseTree === null || query.parseTree.hasError())
     // {
