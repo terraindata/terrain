@@ -2,11 +2,17 @@
 
 .dynamic-form {
   padding: @spacing;
+  display: flex;
+  flex-direction: column;
 
   .dynamic-form-matrix-row {
     display: flex;
     align-items: flex-end;
     padding: @quarter-spacing;
+  }
+
+  .dynamic-form-input-element {
+    flex: 1;
   }
 
   .dynamic-form-checkbox-row {
@@ -32,6 +38,29 @@
 
     .dynamic-form-label {
       .normal-text;
+    }
+  }
+
+  .dynamic-form-confirm-bar {
+    display: flex;
+    flex-grow: 1;
+    margin-top: @half-spacing;
+    padding: @half-spacing @quarter-spacing;
+    justify-content: flex-end;
+    align-items: flex-end;
+
+    .dynamic-form-button {
+      .transition;
+      cursor: pointer;
+      padding: @half-spacing @spacing;
+      border-radius: 3px;
+      margin: 0px @half-spacing;
+      &.dynamic-form-button-active {
+
+      }
+      &.dynamic-form-button-disabled {
+        cursor: default;
+      }
     }
   }
 

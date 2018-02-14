@@ -45,6 +45,7 @@
   padding: @spacing @half-spacing;
   display: flex;
   flex-direction: column;
+  flex: 1;
 
   .field-settings-row {
     display: flex;
@@ -82,6 +83,7 @@
 // TemplateEditorFieldTransformations
 .template-editor-field-transformations {
   display: flex;
+  flex: 1;
 
   .transformations-list {
     padding: @half-spacing @spacing;
@@ -143,7 +145,13 @@
   }
 
   .transformation-fade-container {
+    display: flex;
+    flex-grow: 1;
+    position: relative;
 
+    .transformation-inner-container {
+      display: block;
+    }
   }
 
   .transformation-creator {

@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires no-unused-expression strict-boolean-expressions
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -54,6 +54,9 @@ import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { DisplayState, DisplayType, InputDeclarationMap, InputDeclarationType, OptionType } from './DynamicFormTypes';
+
+const Color = require('color');
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import Autocomplete from 'common/components/Autocomplete';
@@ -63,67 +66,34 @@ import FadeInOut from 'common/components/FadeInOut';
 
 import './DynamicForm.less';
 
-// DynamicForm associated Types
-export enum DisplayState
+export interface ButtonOptions
 {
-  Active,
-  Inactive,
-  Hidden,
+  name: string;
+  onClicked: () => void;
+  disabled?: boolean; // if true, button is unclickable.
+  isActive?: boolean; // if true, button has active styling. If undefined, takes default.
 }
-
-export enum DisplayType
-{
-  TextBox = 'TextBox',
-  NumberBox = 'NumberBox',
-  CheckBox = 'CheckBox',
-}
-
-export interface InputDeclarationOptionTypes
-{
-  TextBox: {
-    acOptions?: List<string>;
-  };
-  NumberBox: {
-    acOptions?: List<string>;
-    integerOnly?: boolean; // not implemented yet, just an example
-  };
-  CheckBox: {
-    large?: boolean;
-  };
-}
-export type OptionType<K extends keyof InputDeclarationOptionTypes> = InputDeclarationOptionTypes[K];
-
-export interface InputDeclarationType<S>
-{
-  type: string;
-  options: any; // one of InputDeclarationOptionTypes
-  group?: string; // inputs with the same group value will show in a row
-  displayName?: string; // defaults to type
-  shouldShow?: (state: S) => DisplayState;
-}
-
-export type InputDeclarationMap<State extends {[k: string]: any}> =
-{
-  [key in keyof State]: InputDeclaration<State>; // is an inputDeclaration
-};
-
+// Other types
 export interface Props<FState>
 {
   inputMap: InputDeclarationMap<FState>; // inputMap is memoized, so be careful about changing its properties!
   inputState: FState;
   onStateChange: (newState: FState) => void;
-  onConfirm: () => void; // called when confirm is hit
+  mainButton: ButtonOptions; // active styling by default
+  secondButton?: ButtonOptions; // buttons are rendered from right to left
+  thirdButton?: ButtonOptions;
 }
 
+@Radium
 export class DynamicForm<S> extends TerrainComponent<Props<S>>
 {
   public renderFnLookup:
     {[K in DisplayType]: renderSignature<S>} =
-  {
-    [DisplayType.CheckBox]: this.renderCheckBox,
-    [DisplayType.NumberBox]: this.renderNumberBox,
-    [DisplayType.TextBox]: this.renderTextBox,
-  };
+    {
+      [DisplayType.CheckBox]: this.renderCheckBox,
+      [DisplayType.NumberBox]: this.renderNumberBox,
+      [DisplayType.TextBox]: this.renderTextBox,
+    };
 
   constructor(props)
   {
@@ -175,8 +145,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         className='dynamic-form-checkbox-row'
         key={index}
         onClick={noop(disabled,
-            this.setStateWithTransformHOC(stateName, (value, inputState) => !inputState[stateName] ),
-          )}
+          this.setStateWithTransformHOC(stateName, (value, inputState) => !inputState[stateName]),
+        )}
       >
         <CheckBox
           className='dynamic-form-checkbox'
@@ -200,7 +170,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         open={displayState !== DisplayState.Hidden}
       >
         <div>
-          { renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive) }
+          {renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive)}
         </div>
       </FadeInOut>
     );
@@ -222,12 +192,51 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     );
   }
 
+  public renderButton(buttonOptions: ButtonOptions, defaults: Partial<ButtonOptions>, key)
+  {
+    const options: ButtonOptions = _.defaults({}, buttonOptions, defaults);
+    const buttonStyle = getButtonStyle(options.isActive, options.disabled);
+    return (
+      <div
+        className={classNames({
+          'dynamic-form-button': true,
+          'dynamic-form-button-active': options.isActive,
+          'dynamic-form-button-disabled': options.disabled,
+        })}
+        style={buttonStyle}
+        onClick={!options.disabled && options.onClicked}
+        key={key}
+      >
+        {options.name}
+      </div>
+    );
+  }
+
+  public renderConfirmBar()
+  {
+    const mainButton = this.props.mainButton === undefined ? null :
+      this.renderButton(this.props.mainButton, { isActive: true, disabled: false }, 'main');
+    const secondButton = this.props.secondButton === undefined ? null :
+      this.renderButton(this.props.secondButton, { isActive: false, disabled: false }, 'second');
+    const thirdButton = this.props.thirdButton === undefined ? null :
+      this.renderButton(this.props.thirdButton, { isActive: false, disabled: false }, 'third');
+
+    return (
+      <div className='dynamic-form-confirm-bar'>
+        {thirdButton}
+        {secondButton}
+        {mainButton}
+      </div>
+    );
+  }
+
   public render()
   {
     const renderMatrix: MatrixType<S> = this.computeRenderMatrix(this.props.inputMap);
     return (
       <div className='dynamic-form'>
-        { renderMatrix.map(this.renderMatrixRow) }
+        {renderMatrix.map(this.renderMatrixRow)}
+        {this.renderConfirmBar()}
       </div>
     );
   }
@@ -258,7 +267,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   // optional transformValue can change the value based on the state. This function is not transformed
   public setStateWithTransformHOC(stateName, transformValue: (value, state?: S) => any = (value) => value)
   {
-    return (value) => {
+    return (value) =>
+    {
       const shallowCopy = _.clone(this.props.inputState);
       const newValue = transformValue(value, this.props.inputState);
       shallowCopy[stateName] = newValue;
@@ -269,7 +279,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   // This function is memoized
   public setStateHOC(stateName)
   {
-    return (value) => {
+    return (value) =>
+    {
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
       this.props.onStateChange(shallowCopy);
@@ -287,31 +298,36 @@ function noop(disabled: boolean, fn)
   return disabled ? () => null : fn;
 }
 
-/*** Dynamic Form TYPE SORCERY! ***/
-type DisplayTypeKeys = keyof typeof DisplayType;
-
-// make sure that the DisplayType enum has keys equal to its values
-type AssertEnumValuesEqualKeys = {
-  [K in DisplayTypeKeys]: K
-};
-DisplayType as AssertEnumValuesEqualKeys; // if this is giving errors, double check that
-// DisplayTypeKeys are equal to its values
-
-// make sure that for every item in the DisplayType enum there's an associated InputDeclaration
-type AssertOptionTypesExhaustive = {
-  [K in DisplayType]: InputDeclarationOptionTypes[K]
-};
-
-// below are types that do some magic to add type checking to InputDeclarationMap
-interface InputDeclarationHelper<K extends DisplayTypeKeys, State> extends InputDeclarationType<State>
+// memoized
+let getButtonStyle = (active: boolean, disabled: boolean)
 {
-  type: K;
-  options: InputDeclarationOptionTypes[K];
-}
-
-type InputDeclarationBundle<State> = {
-  [K in DisplayTypeKeys]: InputDeclarationHelper<K, State>
+  if (active)
+  {
+    return disabled ? [
+      fontColor(Colors().activeText),
+      backgroundColor(Colors().activeHover, Colors().activeHover),
+      borderColor(Colors().altBg2),
+    ] : [
+        backgroundColor(Colors().active, Colors().activeHover),
+        borderColor(Colors().active, Colors().activeHover),
+        fontColor(Colors().activeText),
+      ];
+  }
+  else
+  {
+    return disabled ? [
+      fontColor(Colors().text3, Colors().text3),
+      backgroundColor(Color(Colors().bg2).alpha(0.5).toString(), Color(Colors().bg2).alpha(0.5).toString()),
+      borderColor(Colors().bg2),
+    ] : [
+        fontColor(Colors().text2, Colors().text3),
+        backgroundColor(Colors().bg2, Color(Colors().bg2).alpha(0.5).toString()),
+        borderColor(Colors().bg1),
+      ];
+  }
 };
-
-type InputDeclaration<State> = InputDeclarationBundle<State>[keyof InputDeclarationBundle<State>];
-/*** End of Type Sorcery ***/
+function resolveBooleans(a, b)
+{
+  return a ? (b ? 'tt' : 'tf') : (b ? 'ft' : 'ff');
+}
+getButtonStyle = _.memoize(getButtonStyle, resolveBooleans);

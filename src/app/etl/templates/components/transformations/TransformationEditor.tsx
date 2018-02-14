@@ -57,7 +57,8 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { DisplayState, DisplayType, DynamicForm, InputDeclarationMap } from 'common/components/DynamicForm';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationsInfo from 'shared/transformations/TransformationsInfo';
@@ -79,13 +80,13 @@ export class TransformationEditor extends TerrainComponent<Props>
   public state: {
     formState: TestFormState,
   } = {
-    formState: {
-      from: 0,
-      to: 5,
-      flag: true,
-      text: 'once upon a time...',
-    },
-  };
+      formState: {
+        from: 0,
+        to: 5,
+        flag: true,
+        text: 'once upon a time...',
+      },
+    };
 
   public getChildComponent(type: TransformationNodeType)
   {
@@ -107,7 +108,14 @@ export class TransformationEditor extends TerrainComponent<Props>
         inputMap={TestMap}
         inputState={this.state.formState}
         onStateChange={this._setStateWrapper('formState')}
-        onConfirm={() => null}
+        mainButton={{
+          name: 'Save',
+          onClicked: () => null,
+        }}
+        secondButton={{
+          name: 'Cancel',
+          onClicked: () => null,
+        }}
       />
     );
   }
@@ -122,27 +130,29 @@ interface TestFormState
 }
 
 const TestMap: InputDeclarationMap<TestFormState> =
-{
-  from: {
-    type: DisplayType.NumberBox,
-    displayName: 'From position',
-    group: 'numberRow',
-    options: {},
-  },
-  to: {
-    type: DisplayType.NumberBox,
-    displayName: 'To Position',
-    group: 'numberRow',
-    options: {},
-  },
-  flag: {
-    type: DisplayType.CheckBox,
-    displayName: 'Would you like Fries?',
-    options: {},
-  },
-  text: {
-    type: DisplayType.TextBox,
-    displayName: 'Tell us a story',
-    options: {},
-  },
-};
+  {
+    from: {
+      type: DisplayType.NumberBox,
+      displayName: 'From position',
+      group: 'numberRow',
+      options: {},
+    },
+    text: {
+      type: DisplayType.TextBox,
+      displayName: 'Tell us a story',
+      group: 'nextRow',
+      options: {},
+    },
+    to: {
+      type: DisplayType.NumberBox,
+      displayName: 'To Position',
+      group: 'numberRow',
+      options: {},
+    },
+    flag: {
+      type: DisplayType.CheckBox,
+      displayName: 'Would you like Fries?',
+      group: 'nextRow',
+      options: {},
+    },
+  };

@@ -221,11 +221,11 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
           {this.renderNewTransformationButton()}
         </div>
         <div className='transformation-fade-container'>
-          <FadeInOut open={this.state.viewState === ViewState.EDIT}>
-            {this.renderEditTransformationSection()}
-          </FadeInOut>
-          <FadeInOut open={this.state.viewState === ViewState.CREATE_NEW}>
-            {this.renderCreateTransformationSection()}
+          <FadeInOut open={this.state.viewState === ViewState.EDIT || this.state.viewState === ViewState.CREATE_NEW}>
+            <div className='transformation-inner-container'>
+              {this.state.viewState === ViewState.EDIT && this.renderEditTransformationSection()}
+              {this.state.viewState === ViewState.CREATE_NEW && this.renderCreateTransformationSection()}
+            </div>
           </FadeInOut>
         </div>
       </div>
