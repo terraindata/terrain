@@ -43,108 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-import * as Immutable from 'immutable';
-import
-{
-  _Algorithm,
-  _Category,
-  _Group,
-  _LibraryState,
-  Algorithm,
-  Category,
-  Group,
-} from 'library/LibraryTypes';
-import { ItemType } from '../../items/types/Item';
 
-export default class LibraryHelper
-{
-  public static mockState()
-  {
-    return new LibraryStateMock();
-  }
+import csvWriter = require('csv-write-stream');
 
-  public static mockCategory()
+import * as _ from 'lodash';
+import * as stream from 'stream';
+import * as winston from 'winston';
+
+import CredentialConfig from '../../credentials/CredentialConfig';
+import Credentials from '../../credentials/Credentials';
+
+export const credentials: Credentials = new Credentials();
+
+export interface MailchimpConfig
+{
+  id: string;
+  name: string;
+  range: string;
+}
+
+export class Mailchimp
+{
+  private storedEmail: string;
+  private storedKeyFilePath: string;
+
+  private async _getStoredGoogleAPICredentials()
   {
-    return _Category();
+    const creds: string[] = await credentials.getByType('googleapi');
+    if (creds.length === 0)
+    {
+      winston.info('No credential found for type googleapi.');
+    }
+    else
+    {
+      const cred: object = JSON.parse(creds[0]);
+      this.storedEmail = cred['storedEmail'];
+      this.storedKeyFilePath = cred['storedKeyFilePath'];
+    }
   }
 }
 
-class LibraryStateMock
-{
-  public state;
-
-  public constructor()
-  {
-    this.state = _LibraryState({
-      categories: Immutable.Map<number, Category>({}),
-      groups: Immutable.Map<number, Group>({}),
-      algorithms: Immutable.Map<number, Algorithm>({}),
-    });
-  }
-
-  public addCategory(id: number, categoryName: string)
-  {
-    const category = _Category({
-      type: ItemType.Category,
-      id,
-      name: categoryName,
-      lastEdited: '',
-      lastUserId: '',
-      userIds: Immutable.List([]),
-      defaultLanguage: 'elastic',
-      parent: 0,
-    }));
-
-    this.state = this.state.set(
-      'categories',
-      this.state.categories.set(id, category),
-    );
-
-    return this;
-  }
-
-  public addGroup(categoryId: number, groupId: number, groupName: string)
-  {
-    const group = _Group({
-      id: groupId,
-      name: 'Group 1',
-      lastEdited: '',
-      lastUserId: '',
-      userIds: Immutable.List([]),
-      defaultLanguage: 'elastic',
-      parent: 0,
-    });
-
-    this.state = this.state
-      .setIn(['groups', groupId], group)
-      .setIn(
-        ['categories', categoryId, 'groupsOrder'],
-        this.state.categories.get(categoryId).groupsOrder.push(groupId),
-    );
-
-    return this;
-  }
-
-  public addAlgorithm(groupId: number, algorithmId: number, algorithmName: string)
-  {
-    const algorithm = _Algorithm({
-      id: algorithmId,
-      name: algorithmName,
-    });
-
-    this.state = this.state
-      .setIn(['algorithms', algorithmId], algorithm)
-      .setIn(
-        ['groups', groupId, 'algorithmsOrder'],
-        this.state.groups.get(groupId).algorithmsOrder.push(algorithmId),
-    );
-
-    return this;
-  }
-
-  public getState()
-  {
-    return this.state;
-  }
-}
+export default Mailchimp;

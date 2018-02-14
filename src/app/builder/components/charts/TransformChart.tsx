@@ -437,10 +437,7 @@ const TransformChart = {
     if (isDate)
     {
       numBottomTicks = 3;
-      bottomTickFormatFn = (n: number): string =>
-      {
-        return moment(new Date(n)).format('YYYY-MM-DD');
-      };
+      bottomTickFormatFn = (n: number): string => moment(new Date(n)).format('YYYY-MM-DD');
     }
 
     const yLeftAxis = d3.svg.axis()
@@ -530,8 +527,8 @@ const TransformChart = {
 
     const spotlight = g.selectAll('.spotlight')
       .data(
-      spotlights.filter((d) => d['fields'][inputKey] !== undefined),
-      (d) => d['fields']['_id'],
+        spotlights.filter((d) => d['fields'][inputKey] !== undefined),
+        (d) => d['fields']['_id'],
     );
 
     const spotlightEnter = spotlight.enter()
