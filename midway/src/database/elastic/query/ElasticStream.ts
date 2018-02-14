@@ -65,7 +65,7 @@ export class ElasticStream extends Stream.Readable
 
   private MAX_SEARCH_SIZE = 10000;
   private DEFAULT_SEARCH_SIZE = 10;
-  private DEFAULT_SCROLL_TIMEOUT = '1m';
+  private DEFAULT_SCROLL_TIMEOUT = '5m';
 
   constructor(client: ElasticClient, query: any, opts?: Stream.ReadableOptions, transform?: StreamTransformer)
   {
