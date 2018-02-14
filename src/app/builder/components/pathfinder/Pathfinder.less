@@ -84,8 +84,13 @@
 		&:hover {
 			text-decoration: underline;
 		}
-		z-index: 9999;
 		position: relative;
+	}
+	.pf-filter-section {
+		margin-bottom: 45px;
+		.pf-create {
+			margin-top: 12px;
+		}
 	}
 	.pf-filter-group-header
 	{
@@ -96,6 +101,9 @@
 		.builder-tb {
 			max-width: 200px;
 			display: inline-flex;
+			top: -5px;
+			left: 7px;
+			height: 28px;
 		}
 		.pf-filter-group-name-wrapper {
 			display: inline-flex;
@@ -113,6 +121,7 @@
 				cursor: pointer;
 				&.pf-filter-group-carrot-open {
 					.rotate(90deg);
+					top: 0px;
 				}
 			}
 		}

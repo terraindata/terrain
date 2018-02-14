@@ -73,6 +73,14 @@ const dropTarget = {
   {
     props.onDrop(monitor.getItem().keyPath, props.keyPath);
   },
+  canDrop(props, monitor)
+  {
+    // don't show adjacent drop zones
+    const adjacent = props.keyPath.equals(monitor.getItem().keyPath) ||
+      props.keyPath.set(props.keyPath.size - 1, props.keyPath.last() - 1)
+        .equals(monitor.getItem().keyPath);
+    return !adjacent;
+  },
   // hover(props, monitor, component) {
   //   component.setState({height: 100});
   // }
@@ -82,7 +90,7 @@ function collect(connect, monitor)
 {
   return {
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
+    isOver: monitor.isOver() && monitor.canDrop(),
   };
 }
 @Radium
@@ -99,24 +107,40 @@ class DropZoneComponent extends TerrainComponent<DropProps>
     return (
       this.props.connectDropTarget(
         <div
-          className='drop-wrapper'
+          className='drop'
           style={[
-            { marginBottom: this.props.isOver ? 2 : -5 },
-            { marginTop: this.props.isOver ? 2 : -5 },
+            borderColor(this.props.isOver ? Colors().active : ''),
             { height: this.props.isOver ? 40 : 15 },
           ]}
-        >
-          <div
-            className='drop'
-            style={[
-              borderColor(this.props.isOver ? Colors().active : ''),
-              { height: this.props.isOver ? 40 : 15 },
-            ]}
-          />
-        </div>,
+        />
+        ,
       )
     );
   }
+
+  // public render()
+  // {
+  //   return (
+  //     this.props.connectDropTarget(
+  //       <div
+  //         className='drop-wrapper'
+  //         style={[
+  //           { marginBottom: this.props.isOver ? 2 : -12 },
+  //           { marginTop: this.props.isOver ? 2 : -12 },
+  //           { height: this.props.isOver ? 40 : 25 },
+  //         ]}
+  //       >
+  //         <div
+  //           className='drop'
+  //           style={[
+  //             borderColor(this.props.isOver ? Colors().active : ''),
+  //             { height: this.props.isOver ? 40 : 15 },
+  //           ]}
+  //         />
+  //       </div>,
+  //     )
+  //   );
+  // }
 }
 
 const DropZone = DropTarget(['ITEM', 'GROUP'], dropTarget, collect)(DropZoneComponent);

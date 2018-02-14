@@ -85,10 +85,12 @@ interface GroupProps
 }
 
 const groupSource = {
-  beginDrag(props)
+  beginDrag(props, monitor, component)
   {
     props.setCollapsed(props.keyPath, true);
-    return { keyPath: props.keyPath, title: props.data.name };
+    // need to figure out what the width is
+    const boundingRect = component.refs['group']['getBoundingClientRect']();
+    return { keyPath: props.keyPath, title: props.data.name, width: boundingRect.width };
   },
 };
 
@@ -156,7 +158,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
                     items={keyPathStarter ? item.getIn(keyPathStarter) : item}
                     keyPath={newKeyPath.push(i)}
                     data={keyPathStarter ? item.getIn(keyPathStarter.butLast()) : item}
-                    depth={depth !== undefined ? depth + 1 : 1 }
+                    depth={depth !== undefined ? depth + 1 : 1}
                   />
               }
               <DropZone
@@ -184,18 +186,22 @@ class GroupComponent extends TerrainComponent<GroupProps>
           backgroundColor(Colors().blockBg),
           draggingStyle,
           droppingStyle,
-          {width: depth !== undefined ? 500 - 12 * depth : 500}
+          { width: depth !== undefined ? `calc(100% - 12px)` : '100%' },
         )}
       >
-        <div>{renderHeader(data, newKeyPath.butLast())}</div>
-        <DropZone
-          keyPath={newKeyPath.push(0)}
-          onDrop={onReorder}
-        />
-        <FadeInOut
-          children={this.renderGroupChildren(items, newKeyPath)}
-          open={!data.collapsed}
-        />
+        <div
+          ref='group'
+        >
+          <div>{renderHeader(data, newKeyPath.butLast())}</div>
+          <DropZone
+            keyPath={newKeyPath.push(0)}
+            onDrop={onReorder}
+          />
+          <FadeInOut
+            children={this.renderGroupChildren(items, newKeyPath)}
+            open={!data.collapsed}
+          />
+        </div>
       </div>
     );
   }

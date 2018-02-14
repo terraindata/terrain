@@ -303,7 +303,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const { filterGroup, pathfinderContext } = this.props;
     return (
       <div
-        className='pf-section'
+        className='pf-section pf-filter-section'
       >
         <CustomDragLayer />
         <DropZone

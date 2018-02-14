@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
@@ -56,6 +57,7 @@ const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
+import withScrolling from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection2';
@@ -64,6 +66,7 @@ import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
+const ScrollingComponent = withScrolling('div');
 
 export interface Props
 {
@@ -74,7 +77,6 @@ export interface Props
   colors: ColorsState;
 }
 
-@Radium
 class PathfinderColumn extends TerrainComponent<Props>
 {
   public state = {
@@ -131,13 +133,11 @@ class PathfinderColumn extends TerrainComponent<Props>
     const { path } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
+    const style = _.extend({}, backgroundColor(Colors().bg3), fontColor(Colors().text3);
     return (
-      <div
+      <ScrollingComponent
         className='pathfinder-column'
-        style={[
-          backgroundColor(Colors().bg3),
-          fontColor(Colors().text3),
-        ]}
+        style={style}
       >
         <PathfinderSourceSection
           pathfinderContext={pathfinderContext}
@@ -178,7 +178,7 @@ class PathfinderColumn extends TerrainComponent<Props>
             />
             : null
         }
-      </div>
+      </ScrollingComponent>
     );
   }
 }

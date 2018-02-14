@@ -77,9 +77,10 @@ interface ItemProps
 }
 
 const itemSource = {
-  beginDrag(props)
+  beginDrag(props, monitor, component)
   {
-    return { keyPath: props.keyPath, children: props.children };
+    const boundingRect = component.refs['item']['getBoundingClientRect']();
+    return { keyPath: props.keyPath, children: props.children, width: boundingRect.width };
   },
 };
 
@@ -109,14 +110,6 @@ function itemDropCollect(connect, monitor)
 
 class ItemComponent extends TerrainComponent<ItemProps>
 {
-  public componentDidMount()
-  {
-    // Use empty image as a drag preview so browsers don't draw it
-    // and we can draw whatever we want on the custom drag layer instead.
-    this.props.connectDragPreview(getEmptyImage(), {
-      captureDraggingState: true,
-    });
-  }
 
   public render()
   {
@@ -124,12 +117,15 @@ class ItemComponent extends TerrainComponent<ItemProps>
     const draggable = this.props.connectDragSource(
       <div
         style={_.extend({},
-          { opacity: isDragging ? 0.5 : 1 },
-          { borderColor: isOver ? Colors().active : '' })
-        }
-        className='drag-drop-item'
-      >
-        {children}
+          { opacity: isDragging ? 0.3 : 1 },
+          { borderColor: isOver ? Colors().active : '' },
+        )}
+        className='drag-drop-item'>
+        <div
+          ref='item'
+        >
+          {children}
+        </div>
       </div>,
     );
     if (this.props.canDrop)
