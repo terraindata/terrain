@@ -83,6 +83,7 @@ export interface Props
   allowSpotlights: boolean;
   onSpotlightAdded: (id, spotlightData) => void;
   onSpotlightRemoved: (id) => void;
+  hitSize?: 'large' | 'small';
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -253,7 +254,7 @@ class HitComponent extends TerrainComponent<Props> {
 
   public render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, hit } = this.props;
+    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, hit, hitSize } = this.props;
 
     const classes = classNames({
       'result': true,
@@ -314,21 +315,39 @@ class HitComponent extends TerrainComponent<Props> {
         onDoubleClick={this.expand}
       >
         <div
-          className='result-inner'
+          className={classNames({
+            'result-inner': true,
+            'results-are-small': hitSize === 'small',
+          })}
           style={[
             borderColor(Colors().resultLine),
             backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
           {thumbnail !== null ? (
-            <div className='result-thumbnail-wrapper'>
+            <div 
+              className={classNames({
+                'result-thumbnail-wrapper': true,
+                'results-are-small': hitSize === 'small',
+              })}
+            >
               <div className='result-thumbnail'>
                 {thumbnail}
               </div>
             </div>
           ) : null}
-          <div className='result-details-wrapper'>
-            <div className='result-name'>
+          <div 
+            className={classNames({
+              'result-details-wrapper': true,
+              'results-are-small': hitSize === 'small',
+            })}
+          >
+            <div 
+              className={classNames({
+                'result-name': true,
+                'results-are-small': hitSize === 'small',
+              })}
+            >
               <div
                 className='result-name-inner'
                 style={fontColor(Colors().text.baseLight)}
@@ -351,7 +370,12 @@ class HitComponent extends TerrainComponent<Props> {
                 }
               </div>
             </div>
-            <div className='result-fields-wrapper'>
+            <div
+              className={classNames({
+                'result-fields-wrapper': true,
+                'results-are-small': hitSize === 'small',
+              })}
+            >
               {score}
               {
                 _.map(fields, this.renderField)
