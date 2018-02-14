@@ -57,13 +57,14 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { DisplayState, DisplayType, DynamicForm, InputDeclarationMap } from 'common/components/DynamicForm';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
 import './TransformationEditor.less';
 
-import { TestClass } from './TransformationEditorFactory';
+// import { TestClass } from './TransformationEditorFactory';
 
 export interface Props
 {
@@ -75,6 +76,17 @@ export interface Props
 @Radium
 export class TransformationEditor extends TerrainComponent<Props>
 {
+  public state: {
+    formState: TestFormState
+  } = {
+    formState: {
+      from: 0,
+      to: 5,
+      flag: true,
+      text: 'once upon a time...',
+    }
+  }
+
   public getChildComponent(type: TransformationNodeType)
   {
     // switch (type)
@@ -91,12 +103,46 @@ export class TransformationEditor extends TerrainComponent<Props>
   public render()
   {
     return (
-      <TestClass
-        create={true}
-        transformation={this.props.transformation}
-        editTransformation={null}
-        registerConfirmHandler={() => null}
+      <DynamicForm
+        inputMap={TestMap}
+        inputState={this.state.formState}
+        onStateChange={this._setStateWrapper('formState')}
+        onConfirm={() => null}
       />
-    );
+    )
+  }
+}
+
+interface TestFormState
+{
+  from: number;
+  to: number;
+  flag: boolean;
+  text: string;
+}
+
+const TestMap: InputDeclarationMap<TestFormState> =
+{
+  from: {
+    type: DisplayType.NumberBox,
+    displayName: 'From position',
+    group: 'numberRow',
+    options: {},
+  },
+  to: {
+    type: DisplayType.NumberBox,
+    displayName: 'To Position',
+    group: 'numberRow',
+    options: {},
+  },
+  flag: {
+    type: DisplayType.CheckBox,
+    displayName: 'Would you like Fries?',
+    options: {},
+  },
+  text: {
+    type: DisplayType.TextBox,
+    displayName: 'Tell us a story',
+    options: {},
   }
 }

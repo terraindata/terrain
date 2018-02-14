@@ -110,19 +110,13 @@ export interface Props<FState>
   inputMap: InputDeclarationMap<FState>; // inputMap is memoized, so be careful about changing its properties!
   inputState: FState;
   onStateChange: (newState: FState) => void;
-  handleConfirm: () => void;
+  onConfirm: () => void; // called when confirm is hit
 }
 
-// DynamicForm component types
-
-type MatrixType<S> = List<MatrixRowType<S>>; // list of list of functions
-type MatrixRowType<S> = List<MatrixCellFn<S>>;
-type MatrixCellFn<S> = (state: S, key) => any;
-
-export default class DynamicForm<S> extends TerrainComponent<Props<S>>
+export class DynamicForm<S> extends TerrainComponent<Props<S>>
 {
   public renderFnLookup:
-    {[K in DisplayType]: (inputInfo, stateName, state, index, disabled) => any} =
+    {[K in DisplayType]: renderSignature<S>} =
   {
     [DisplayType.CheckBox]: this.renderCheckBox,
     [DisplayType.NumberBox]: this.renderNumberBox,
@@ -197,42 +191,20 @@ export default class DynamicForm<S> extends TerrainComponent<Props<S>>
   public renderInputElement(inputInfo: InputDeclarationType<S>, stateName, state: S, index): any
   {
     const displayState = inputInfo.shouldShow(state);
-    const renderFn = this.renderFnLookup[inputInfo.type];
+    const renderFn: renderSignature<S> = this.renderFnLookup[inputInfo.type];
     return (
       <FadeInOut
-        open={displayState === DisplayState.Hidden}
+        key={index}
+        open={displayState !== DisplayState.Hidden}
       >
-        { renderFn(inputInfo, stateName, state, index, displayState) }
+        { renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive) }
       </FadeInOut>
     );
   }
 
-  public computeRenderMatrix(inputMap: InputDeclarationMap<S>)
-  {
-    let renderMatrix: MatrixType<S> = List([]);
-    const groupToIndex = {};
-    for (const stateName of Object.keys(inputMap))
-    {
-      const { group } = inputMap[stateName];
-      const inputInfo: InputDeclarationType<S> = _.defaults({}, inputMap[stateName],
-        { displayName: stateName, shouldShow: () => true }
-      );
-      let useIndex = renderMatrix.size;
-      if (group !== undefined)
-      {
-        useIndex = _.defaults(groupToIndex, { group: useIndex })[group];
-      }
-      renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) =>
-      {
-        return (state, index) => this.renderInputElement(inputInfo, stateName, state, index);
-      });
-    }
-    return renderMatrix;
-  }
-
   public renderMatrixCell(cellFn: MatrixCellFn<S>, index)
   {
-    return cellFn(this.props.inputState, index);
+    return cellFn(this.props.inputState, index); // is essentially renderinputElement(...)
   }
 
   public renderMatrixRow(row: MatrixRowType<S>, index)
@@ -256,6 +228,29 @@ export default class DynamicForm<S> extends TerrainComponent<Props<S>>
     );
   }
 
+  public computeRenderMatrix(inputMap: InputDeclarationMap<S>)
+  {
+    let renderMatrix: MatrixType<S> = List([]);
+    const groupToIndex = {};
+    for (const stateName of Object.keys(inputMap))
+    {
+      const { group } = inputMap[stateName];
+      const inputInfo: InputDeclarationType<S> = _.defaults({}, inputMap[stateName],
+        { displayName: stateName, shouldShow: () => true }
+      );
+      let useIndex = renderMatrix.size;
+      if (group !== undefined)
+      {
+        groupToIndex[group] = _.get(groupToIndex, group, useIndex);
+        useIndex = groupToIndex[group];
+      }
+      renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) => value.push(
+        (state, index) => this.renderInputElement(inputInfo, stateName, state, index)
+      ));
+    }
+    return renderMatrix;
+  }
+
   // optional transformValue can change the value based on the state. This function is not transformed
   public setStateWithTransformHOC(stateName, transformValue: (value, state?: S) => any = (value) => value)
   {
@@ -277,6 +272,11 @@ export default class DynamicForm<S> extends TerrainComponent<Props<S>>
     }
   }
 }
+
+type MatrixType<S> = List<MatrixRowType<S>>; // list of list of functions
+type MatrixRowType<S> = List<MatrixCellFn<S>>;
+type MatrixCellFn<S> = (state: S, key) => any;
+type renderSignature<S> = (inputInfo: InputDeclarationType<S>, stateName: string, state: S, index: number, disabled: boolean) => any
 
 function noop(disabled: boolean, fn)
 {
