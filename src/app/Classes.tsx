@@ -105,7 +105,7 @@ let AllRecordArray = [];
 export const AllRecordNameArray = [];
 export let RecordsSerializer = Serialize.immutable(Immutable, []);
 
-function addNewRecord(rec: Record, name: string)
+function addNewRecord(rec: Immutable.Record.Class, name: string)
 {
   AllRecordMap[name] = rec;
   AllRecordNameArray.push(name);
