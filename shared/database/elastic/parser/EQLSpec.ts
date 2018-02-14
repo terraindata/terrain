@@ -329,10 +329,10 @@ const EQLSpec: ESClause[] =
         path: ['groupjoin'],
         desc: 'Alias to refer to the parent query.',
       }),
-    new ESBooleanClause('ignoreEmpty',
+    new ESNumberClause('dropIfLessThan',
       {
         path: ['groupjoin'],
-        desc: 'Whether groupJoin should ignore subqueries with empty results.',
+        desc: 'Whether groupJoin should ignore documents with less than a given number of results.',
       }),
     new ESMapClause('groupjoin_clause',
       'groupjoin_name',
@@ -352,7 +352,7 @@ const EQLSpec: ESClause[] =
     new ESVariantClause('groupjoin_body',
       {
         string: 'parentAlias',
-        boolean: 'ignoreEmpty',
+        number: 'dropIfLessThan',
         object: 'body',
       },
       {
