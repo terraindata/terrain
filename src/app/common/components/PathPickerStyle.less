@@ -3,14 +3,21 @@
 @br: 6px;
 @option-max-height: 350px;
 @option-max-width: calc(~"50% - 16px");
+@close-width: 35px;
+@picker-height: 450px;
 
 .pathpicker {
 	min-width: 125px; // arbitrary, can change
 	width: 100%;
 	
 	.pathpicker-box-value {
+		border-bottom: 1px solid #eee;
+		
 		position: relative;
-    z-index: 1;
+		&.pathpicker-box-value-open {
+	    z-index: 1;
+		}
+		
     .transition;
     
     background: #fff;
@@ -18,40 +25,40 @@
     display: flex;
     align-items: center;
     
-    .pathpicker-close {
-    	flex-shrink: 1;
-    	font-size: 12px;
-    	color: #ddd;
-    	.transition;
-    	opacity: 0;
-    	margin: 12px;
-    }
     
     &.pathpicker-box-value-open:not(.pathpicker-box-value-force-open) {
     	border-top-left-radius: @br;
     	border-top-right-radius: @br;
-    	
-	    .pathpicker-close {
-	    }
     }
     &:hover {
     	&:not(.pathpicker-box-value-open) {
 	    	background: #f5f5f5;
     	}
-    	
-    	&.pathpicker-box-value-open:not(.pathpicker-box-value-force-open) {
-	    	.pathpicker-close {
-	    		color: #1eb4f7;
-	    		opacity: 1;
-	    	}
-    	}
     }
-    
 	}
+	
+	.pathpicker-close {
+  	flex-shrink: 1;
+  	font-size: 12px;
+  	color: #ddd;
+  	.transition;
+  	opacity: 0;
+  	margin: 12px;
+  	width: @close-width;
+  }
+  
+	.pathpicker-box-values-open:not(.pathpicker-box-values-force-open),
+	.pathpicker-box-value-open:not(.pathpicker-box-value-force-open) {
+  	.pathpicker-close {
+  		color: #1eb4f7;
+  		opacity: 1;
+  	}
+	}
+    
 	
 	.pathpicker-picker {
 		position: absolute;
-		@LEFT: 24px;
+		@LEFT: 0px;
 		left: @LEFT;
 		width: calc(~"100% - 2 * @{LEFT}");
 		box-sizing: border-box;
@@ -66,50 +73,94 @@
 		z-index: 1;
 		opacity: 1;
 		
-		max-height: 450px;
+		max-height: @picker-height;
 		overflow: auto;
 		
 		.transition;
 		
 		.pathpicker-picker-inner {
 			opacity: 1;
+	    height: 100%;
+	    max-height: @picker-height;
 		}
 		
 		.pathpicker-multi-picker-inner {
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: top;
+			padding-right: @close-width;
+		}
+		
+		&.pathpicker-multi-picker {
+			padding: 0px;
 		}
 		
 		.pathpicker-header {
 			margin: 6px;
-			font-size: 24px;
+			font-size: 16px;
+		}
+		
+		.pathpicker-option-set {
+	    flex-grow: 1;
+	    flex-basis: 0px;
+      display: flex;
+	    flex-direction: column;
+	    flex-wrap: nowrap;
+	    height: 100%;
+	    max-height: @picker-height;
+		}
+		
+		.pathpicker-util-row {
+			min-height: 48px;
 		}
 		
 		.pathpicker-options {
 			display: flex;
 			flex-wrap: wrap;
+			flex-grow: 1;
+	    overflow: auto;
 			
 			&.pathpicker-options-column {
 				flex-direction: column;
+				padding-left: 16px; // make space for arrow
+				flex-wrap: nowrap;
 			}
 			
 			.pathpicker-option {
 				flex-grow: 1;
 		    flex-basis: 30%;
 		    min-width: 200px;
-		    max-width: @option-max-width;
 				max-height: @option-max-height;
-				margin: 6px;
-				border: 2px solid #eee;
-				border-radius: 6px;
+				border-bottom: 1px solid #eee;
+				padding: 6px;
+				
+				// used in original, may still be needed for Sources
+		    //  max-width: @option-max-width;
+				// margin: 6px;
+				// border: 2px solid #eee;
+				
 				cursor: pointer;
+				position: relative;
 				
 				display: flex;
 				flex-direction: column;
 				
 				&:hover {
 					border-color: #1eb4fa;
+				}
+				
+				&.pathpicker-option-focused {
+					&:before {
+						content: "";
+						display: block;
+						border: 10px solid transparent;
+						border-left-color: #ccc;
+						
+						position: absolute;
+				    left: -16px;
+				    top: 50%;
+				    transform: translateY(-50%);
+					}
 				}
 				
 				&.pathpicker-option-selected {
@@ -165,11 +216,39 @@
 		}
 	}
 	
+
+	&.pathpicker-large {
+		.pathpicker-header {
+			font-size: 24px;
+		}
+		
+		.pathpicker-option-name {
+			padding: 12px 24px;
+			font-size: 42px;
+			display: flex;
+			align-items: center;
+			
+			.pathpicker-option-icon {
+				margin-right: 12px;
+				text-align: right;
+				width: 20px;
+				
+				svg {
+					max-width: 20px;
+					max-height: 20px;
+				}
+			}
+			
+			.pathpicker-option-name-inner {
+				flex-grow: 1;
+			}
+		}
+	}
 }
 
 .pathpicker-option-name {
-	padding: 12px 24px;
-	font-size: 42px;
+	padding: 6px 12px;
+	font-size: 24px;
 	max-width: 100%;
   // overflow: hidden; // TODO figure out how to make this work without making the name smaller
   //  current turning this on will clip the name
@@ -276,10 +355,36 @@
 }
 
 .pathpicker-box-values {
+	position: relative;
+  &.pathpicker-box-value-open {
+    z-index: 1;
+	}
+		
+  .transition;
+    
 	display: flex;
 	width: 100%;
+	background: #fff;
+	
+	border-bottom: 1px solid #eee;
+	
+	cursor: pointer;
 	
 	.pathpicker-box-value {
 		flex-grow: 1;
+		border-bottom: none;
+	}
+	
+	&:hover:not(.pathpicker-box-values-open) {
+		background: #f5f5f5;
+	}
+	
+	.pathpicker-box-value,
+	.pathpicker-box-value:hover {
+		background: none;
+	}
+	
+	.pathpicker-box-value {
+		border-radius: 0px;
 	}
 }

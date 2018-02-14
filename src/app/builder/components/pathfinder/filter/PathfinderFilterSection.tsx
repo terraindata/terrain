@@ -141,11 +141,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   private buildFilterTree(filterGroup: FilterGroup, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
   {
 
-    entries.push({
-      filterGroup,
-      depth,
-      keyPath,
-    });
+    if (depth > 0)
+    {
+      // no group UI for first depth
+      entries.push({
+        filterGroup,
+        depth,
+        keyPath,
+      });
+    }
 
     keyPath = keyPath.push('lines');
     filterGroup.lines.map((filterLine, index) =>

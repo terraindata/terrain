@@ -86,6 +86,7 @@ import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
 import BuilderStore from 'app/builder/data/BuilderStore';
 import Util from 'app/util/Util';
+// import TerrainTools from 'util/TerrainTools';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
@@ -474,7 +475,6 @@ class ElasticDataSourceC extends DataSource
     const server = BuilderStore.getState().db.name;
     if (context.type === 'source')
     {
-      console.log(context.schemaState.databases.toList().toJS());
       // we need to make it clear what parts of Source are tracked
       const sources = context.schemaState.databases.toList().filter(
         (db) => db.serverId === server,
@@ -583,6 +583,7 @@ class ElasticDataSourceC extends DataSource
           displayName: option,
           value: option,
           sampleData: List([]),
+          icon: fieldTypeToIcon[FieldType.Any], // TODO
         });
       }));
       const { dataSource } = context.source;
@@ -594,12 +595,14 @@ class ElasticDataSourceC extends DataSource
             column.databaseId === String(index));
         let fields = cols.map((col) =>
         {
+          const fieldType = dataSource.dataTypeToFieldType(col.datatype);
           return _ChoiceOption({
             displayName: col.name,
             value: col.name,
             sampleData: col.sampleData,
+            icon: fieldTypeToIcon[fieldType],
             meta: {
-              fieldType: dataSource.dataTypeToFieldType(col.datatype),
+              fieldType,
             },
           });
         }).toList();
@@ -651,11 +654,11 @@ export const _ElasticDataSource = (config?: { [key: string]: any }) =>
   elasticSource = elasticSource.set('types', List(elasticSource['types']));
   return elasticSource;
 };
-
+≈
 const ElasticComparisons = [
   {
     value: 'equal',
-    displayName: 'equals',
+    displayName: '=', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
     fieldTypes: List([FieldType.Numerical, FieldType.Text]),
   },
   {
@@ -665,7 +668,7 @@ const ElasticComparisons = [
   },
   {
     value: 'notequal',
-    displayName: 'does not equal',
+    displayName: '≠', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
     fieldTypes: List([FieldType.Text, FieldType.Numerical]),
   },
   {
@@ -675,22 +678,22 @@ const ElasticComparisons = [
   },
   {
     value: 'greater',
-    displayName: 'is greater than',
+    displayName: '>', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than' : '>',
     fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'less',
-    displayName: 'is less than',
+    displayName: '<', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than' : '<',
     fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'greaterequal',
-    displayName: 'is greater than or equal to',
+    displayName: '≥', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than or equal to' : '≥',
     fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'lessequal',
-    displayName: 'is less than or equal to',
+    displayName: '≤', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than or equal to' : '≤',
     fieldTypes: List([FieldType.Numerical]),
   },
   {
@@ -892,3 +895,19 @@ export const AggregationTypes = Map<string, AggregationData>({
       }),
     },
 });
+
+
+const TextIcon = require('./../../../../images/icon_textDropdown.svg');
+const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
+const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
+// TODO need more icons
+
+const fieldTypeToIcon = 
+{
+  [FieldType.Any]: TextIcon, // TODO
+  [FieldType.Date]: DateIcon,
+  [FieldType.Geopoint]: TextIcon, // TODO
+  [FieldType.Ip]: TextIcon,
+  [FieldType.Numerical]: NumberIcon,
+  [FieldType.Text]: TextIcon,
+}

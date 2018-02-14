@@ -170,7 +170,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         },
       }) =>
     {
-      // When it is a field that has changed, update it's count in midway
+      // When it is a field that has changed, update its count in midway
       if (action.payload.fieldChange)
       {
         if (state.query.path.source && state.query.path.source.dataSource)

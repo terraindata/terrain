@@ -50,6 +50,7 @@ import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
+import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import { default as styled } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
@@ -152,10 +153,13 @@ export interface Props
   id?: any; // a unique identifier, pass to props handlers
   onChange?: (value: any, id: any) => void;
   onClick?: (id: any) => void;
+  onFocus?: (id: any) => void;
   canEdit?: boolean;
   noBorder?: boolean;
   large?: boolean;
   forceFloat?: boolean;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  autoFocus?: boolean;
   
   getValueRef?: (ref) => void;
 }
@@ -165,6 +169,7 @@ export class FloatingInput extends TerrainComponent<Props>
   state = {
     isFocused: false,
     myId: String(Math.random()) + '-floatinginput',
+    valueRef: null,
   };
 
   componentWillReceiveProps(nextProps: Props)
@@ -186,13 +191,16 @@ export class FloatingInput extends TerrainComponent<Props>
 
     return (
       <Container
-        {...props as any}
+        large={props.large}
+        noBorder={props.noBorder}
+        onClick={props.onClick}
       >
         {
           this.renderValue()
         }
         <Label
-          {...props as any}
+          large={props.large}
+          noBorder={props.noBorder}
           isFloating={isFloating}
           htmlFor={state.myId}
           style={isFloating ? floatingLabelStyle : undefined}
@@ -213,12 +221,12 @@ export class FloatingInput extends TerrainComponent<Props>
     {
       return true;
     }
-
+    
     if (value === undefined || value === null)
     {
       return false;
     }
-
+    
     if (('' + value).length > 0)
     {
       return true;
@@ -237,13 +245,15 @@ export class FloatingInput extends TerrainComponent<Props>
       // Return a text input
       return (
         <Input
-          {...props as any}
-          value={value}
+          large={props.large}
+          value={value === null ? '' : value}
           id={state.myId}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
-          ref={props.getValueRef}
+          ref={this.getValueRef}
+          onKeyDown={this.handleKeyDown}
+          autoFocus={props.autoFocus}
         />
       );
     }
@@ -277,6 +287,9 @@ export class FloatingInput extends TerrainComponent<Props>
     this.setState({
       isFocused: true,
     });
+    
+    const { props } = this;
+    props.onFocus && props.onFocus(props.id);
   }
 
   private handleBlur()
@@ -285,7 +298,28 @@ export class FloatingInput extends TerrainComponent<Props>
       isFocused: false,
     });
   }
+  
+  private getValueRef(ref)
+  {
+    this.setState({
+      valueRef: ref,
+    });
+    
+    this.props.getValueRef && this.props.getValueRef(ref);
+  }
 
+  private handleKeyDown(e)
+  {
+    switch (e.keyCode)
+    {
+      case 9: // tab
+      case 13: // enter
+        ReactDOM.findDOMNode(this.state.valueRef)['blur']();
+        break;
+    }
+    
+    this.props.onKeyDown && this.props.onKeyDown(e);
+  }
 }
 
 export default FloatingInput;

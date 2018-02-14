@@ -65,7 +65,7 @@ import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
-import { MultiPathPicker, PathPickerOptionSet } from 'app/common/components/MultiPathPicker';
+import { MultiPathPicker, PathPickerOptionSet, PathPickerOption } from 'app/common/components/MultiPathPicker';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -124,7 +124,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         {
           this.renderValue()
         }*/}
-        {
+        {/*{
           this.renderBoost()
         }
         {
@@ -134,7 +134,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           >
             <RemoveIcon />
           </div>
-        }
+        }*/}
       </div>
     );
   }
@@ -158,66 +158,85 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         values={values}
         onChange={this.handleFilterPickerChange}
         canEdit={props.canEdit}
+        defaultOpen={fieldValue === null}
       />
     );
   }
   
-  private getOptionSets()
+  private getOptionSets(): List<PathPickerOptionSet>
   {
     
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
 
+    // TODO save to state for better runtime?
     const fieldOptions = source.dataSource.getChoiceOptions({
       type: 'fields',
       source,
       schemaState: pathfinderContext.schemaState,
     });
     
-    const fieldSet = {
+    const fieldSet: PathPickerOptionSet = {
       key: 'field',
       options: fieldOptions,
-      shortNameText: 'Field',
-      headerText: 'Choose on which field to impose a condition',
+      shortNameText: 'Data Field',
+      headerText: '', // 'Choose on which field to impose a condition',
       column: true,
       hideSampleData: true,
+      hasSearch: true,
       // hasOther: false,
     };
     
+    let comparisonOptions = List<PathPickerOption>();
+    let comparisonHeader = 'Choose a data field first';
+    if (filterLine.field)
+    {
+      comparisonOptions = source.dataSource.getChoiceOptions({
+        type: 'comparison',
+        field: filterLine.field,
+        fieldType: filterLine.fieldType,
+        source,
+        schemaState: pathfinderContext.schemaState,
+      });
+      comparisonHeader = '';
+    }
     
-    const comparisonOptions = source.dataSource.getChoiceOptions({
-      type: 'comparison',
-      field: filterLine.field,
-      fieldType: filterLine.fieldType,
-      source,
-      schemaState: pathfinderContext.schemaState,
-    });
-    
-    const comparisonSet = {
+    const comparisonSet: PathPickerOptionSet = {
       key: 'comparison',
       options: comparisonOptions,
-      shortNameText: 'Compare',
-      headerText: 'Choose how to compare your field to a value',
+      shortNameText: 'Condition',
+      headerText: comparisonHeader,
       column: true,
       hideSampleData: true,
       // hasOther: false,
     };
     
     
-    // TODO add more value options
-    // TODO add value component selector for Other
-    const valueOptions = pathfinderContext.source.dataSource.getChoiceOptions({
-      type: 'input',
-    });
+    let valueOptions = List<PathPickerOption>();
+    let valueHeader = '';
+    const shouldShowValue = filterLine.field && filterLine.comparison;
+    if (shouldShowValue)
+    {
+      // TODO add more value options
+      // TODO add value component selector for Other
+      valueOptions = pathfinderContext.source.dataSource.getChoiceOptions({
+        type: 'input',
+      });
+    }
+    else if(filterLine.field && !filterLine.comparison)
+    {
+      valueHeader = 'Choose a method next';
+    }
     
-    const valueSet = {
+    const valueSet: PathPickerOptionSet = {
       key: 'value',
       options: valueOptions,
       shortNameText: 'Value',
-      headerText: 'The value to use in the condition',
+      headerText: valueHeader,
       column: true,
       hideSampleData: true,
-      // hasOther: true,
+      hasOther: shouldShowValue ? true : false, // for now, hide other manually
+      focusOtherByDefault: true,
       // otherComponent: TODO,
     };
     
@@ -232,8 +251,32 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   
   private handleFilterPickerChange(optionSetIndex: number, value: any)
   {
-    console.log(optionSetIndex, value);
-    // , 'field', choiceOption.value, choiceOption.meta && choiceOption.meta.fieldType)
+    const { props } = this;
+    const { source } = props.pathfinderContext;
+    
+    switch (optionSetIndex)
+    {
+      case 0:
+        // TODO get from state?
+        const fieldOptions = source.dataSource.getChoiceOptions({
+          type: 'fields',
+          source,
+          schemaState: props.pathfinderContext.schemaState,
+        });
+        const fieldChoice = fieldOptions.find((option) => option.value === value);
+        this.handleChange('field', value, fieldChoice.meta.fieldType, true);
+        return;
+        
+      case 1:
+        this.handleChange('comparison', value);
+        return;
+        
+      case 2:
+        this.handleChange('value', value);
+        return;
+    }
+    
+    throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
   }
 
   // private renderField()
@@ -257,15 +300,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   //       headerText={'Pick the field on which you want to impose some condition'}
   //       hasOther={false}
   //     />
-  //   );
-  // }
-
-  // private renderMethod()
-  // {
-  //   const { filterLine, canEdit, pathfinderContext, depth } = this.props;
-  //   const { source } = pathfinderContext;
-    
-  //   return ( null
   //   );
   // }
 
@@ -316,7 +350,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
     if (filterLine.field === null || filterLine.fieldType === null)
     {
-      // console.log('null');
       return null;
     }
 
@@ -495,8 +528,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     if (key === 'field')
     {
       filterLine = filterLine.set('fieldType', fieldType);
-      // this code picks a default method to use
-      // console.log(fieldType);
+      // this code picks a default comparison to use
       const comparisonOptions = source.dataSource.getChoiceOptions({
         type: 'comparison',
         field: filterLine.field,

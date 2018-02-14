@@ -68,6 +68,7 @@ const FEATURE_KEY_PREFIX = 'toggle-feature-'; // prefix for the localStorage key
 class TerrainTools
 {
   public static ANALYTICS = 'analytics';
+  public static OPERATORS = 'operators';
 
   public static welcome()
   {
