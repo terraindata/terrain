@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import { BuilderState } from 'builder/data/BuilderState';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { SchemaState } from 'schema/SchemaTypes';
@@ -90,6 +91,7 @@ export interface Props
   spotlights: any; // TODO spawtlights
   mode: string;
   schema?: SchemaState;
+  builder?: BuilderState;
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -121,7 +123,7 @@ export class TransformCardChart extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    this.debouncedUpdatePoints = _.debounce(this.debouncedUpdatePoints, 300);
+    this.debouncedUpdatePoints = _.debounce(this.debouncedUpdatePoints, 3000);
   }
 
   public componentDidMount()
@@ -309,7 +311,11 @@ export class TransformCardChart extends TerrainComponent<Props>
       });
     }
 
-    const isConcrete = this.state.moveSeed !== this.state.movedSeed;
+    // This logic was used to dispatch an action when the drag starts.
+    // However, we are not sure why that was necessary.
+    // It's now disabled, so that actions are only dispatched when the point is released,
+    //  to help with performance concerns.
+    const isConcrete = false; // this.state.moveSeed !== this.state.movedSeed;
     this.setState({
       movedSeed: this.state.moveSeed,
     });
@@ -594,6 +600,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       contextOptions: this.getContextOptions(),
       mode,
       schema: this.props.schema,
+      builder: this.props.builder,
     };
   }
 

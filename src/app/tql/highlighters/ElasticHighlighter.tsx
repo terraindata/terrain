@@ -62,7 +62,6 @@ import { MarkerAnnotation } from 'tql/components/TQLEditor';
 import { ESParserTokenizer, FlaggedToken } from '../../../../shared/database/elastic/formatter/ESParserTokenizer';
 import SyntaxHighlighter from './SyntaxHighlighter';
 
-import { BuilderStore } from 'builder/data/BuilderStore';
 import { toInputMap } from '../../../blocks/types/Input';
 
 /*
@@ -81,22 +80,22 @@ function assertUnreachable(param: never): never
  */
 class ElasticHighlighter extends SyntaxHighlighter
 {
-  public static highlightES(instance)
+  public static highlightES(instance, builderState)
   {
     const highlighter = new ElasticHighlighter();
-    highlighter.handleChanges(instance, []);
+    highlighter.handleChanges(instance, [], builderState);
   }
 
-  public initialHighlight(instance): void
+  public initialHighlight(instance, builderState): void
   {
-    this.handleChanges(instance, []);
+    this.handleChanges(instance, [], builderState);
   }
 
-  public handleChanges(instance, changes: object[]): void
+  public handleChanges(instance, changes: object[], builderState): void
   {
     this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
-    const state = BuilderStore.getState();
+    const state = builderState;
     let inputs = state.query && state.query.inputs;
     if (inputs === null)
     {

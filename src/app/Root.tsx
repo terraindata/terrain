@@ -49,7 +49,6 @@ import { Provider } from 'react-redux';
 import Ajax from 'util/Ajax';
 import TerrainTools from 'util/TerrainTools';
 import AppRouter from './AppRouter';
-import BuilderStore from './builder/data/BuilderStore'; // for error reporting
 import TerrainStore from './store/TerrainStore';
 
 declare global
@@ -69,7 +68,7 @@ if (!DEV)
     const user = store.get('users').currentUser;
     const userId = user && user.id;
     const libraryState = JSON.stringify(store.get('library').toJS());
-    const builderState = JSON.stringify(BuilderStore.getState().toJS());
+    const builderState = JSON.stringify(store.get('builder').toJS());
     const location = JSON.stringify(window.location);
     const colorsState = store.get('colors').toJS();
     const msg = `${errorMsg} by ${userId}

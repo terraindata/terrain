@@ -172,7 +172,7 @@ const TransformChart = {
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
-      state.canEdit, state.domain, state.mode, state.colors, state.schema);
+      state.canEdit, state.domain, state.mode, state.colors, state.schema, state.builder);
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
@@ -1703,14 +1703,14 @@ const TransformChart = {
     point.exit().remove();
   },
 
-  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, domain, mode, colors, schema)
+  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, domain, mode, colors, schema, builder)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    const isDate = ElasticBlockHelpers.getColumnType(schema, inputKey) === 'date';
+    const isDate = ElasticBlockHelpers.getColumnType(schema, builder, inputKey) === 'date';
     this._drawAxes(el, scales, width, height, inputKey, isDate);
     if (inputKey === '' || inputKey === undefined)
     {

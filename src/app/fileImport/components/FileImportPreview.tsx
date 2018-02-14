@@ -53,8 +53,10 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
+import { BuilderState } from 'builder/data/BuilderState';
 import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
 import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
+import Util from 'util/Util';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -118,6 +120,8 @@ export interface Props
 
   // export only
   algorithmName?: string;
+
+  builder?: BuilderState;
 }
 @Radium
 class FileImportPreview extends TerrainComponent<Props>
@@ -221,8 +225,8 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      const dbName = getIndex('');
-      const tableName = getType('');
+      const dbName = getIndex('', this.props.builder);
+      const tableName = getType('', this.props.builder);
       Actions.setServerDbTable(this.props.serverId, '',
         typeof dbName === 'string' ? dbName : dbName.get(0),
         typeof tableName === 'string' ? tableName : tableName.get(0));
@@ -452,8 +456,8 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     if (this.props.exporting)
     {
-      const dbName = getIndex('');
-      const tableName = getType('');
+      const dbName = getIndex('', this.props.builder);
+      const tableName = getType('', this.props.builder);
       Actions.saveTemplate(
         this.state.saveTemplateName,
         this.props.exporting,
@@ -1441,4 +1445,8 @@ class FileImportPreview extends TerrainComponent<Props>
   }
 }
 
-export default FileImportPreview;
+export default Util.createTypedContainer(
+  FileImportPreview,
+  ['builder'],
+  {},
+);

@@ -52,11 +52,12 @@ import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';
+import Util from 'util/Util';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
 import './AggregationsArea.less';
 import { ResultsState } from './ResultTypes';
@@ -68,6 +69,7 @@ export interface Props
   resultsState: ResultsState;
   db: BackendInstance;
   query: Query;
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -82,7 +84,7 @@ class AggregationsArea extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    Actions.change(List(this._keyPath('query', 'aggregationList')),
+    this.props.builderActions.change(List(this._keyPath('query', 'aggregationList')),
       this.parseAggs(this.props.resultsState.aggregations, this.props.query), true);
   }
 
@@ -100,7 +102,7 @@ class AggregationsArea extends TerrainComponent<Props>
       const newAggInfo = this.parseAggs(nextProps.resultsState.aggregations, nextProps.query);
       if (newAggInfo !== this.props.query.aggregationList)
       {
-        Actions.change(List(this._keyPath('query', 'aggregationList')),
+        this.props.builderActions.change(List(this._keyPath('query', 'aggregationList')),
           newAggInfo, true);
       }
     }
@@ -225,4 +227,8 @@ class AggregationsArea extends TerrainComponent<Props>
   }
 }
 
-export default AggregationsArea;
+export default Util.createTypedContainer(
+  AggregationsArea,
+  [],
+  { builderActions: BuilderActions },
+);

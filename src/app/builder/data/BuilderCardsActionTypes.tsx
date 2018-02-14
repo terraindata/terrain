@@ -44,78 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
+// tslint:disable:forin restrict-plus-operands
 
-import { Card } from '../../blocks/types/Card';
-import { Input, InputPrefix } from '../../blocks/types/Input';
+// Defining our object like this gives us compile-time TypeScript support for ActionTypes
+//  and prevents us from defining duplicate action types.
+// The keys are the action types.
+// The values are initially the empty string (for coding expediency) but a function at the end
+//  of this file sets all of the values equal to the keys.
+// So you end up with ActionTypes.cards.move === 'cards.move'
 
-import * as Immutable from 'immutable';
-import { SchemaState } from 'schema/SchemaTypes';
-import { BuilderState } from './data/BuilderState';
+export let BuilderCardsActionTypes =
+  {
+    hoverCard: '',
+  };
 
-export function getTermsForKeyPath(
-  keyPath: KeyPath,
-  schemaState: SchemaState,
-  builderState: BuilderState,
-): List<string>
+// I tried using this type to correclty classify this function,
+//  but because of how object literals work in TypeScript,
+//  it wasn't useful.
+// Reference: http://stackoverflow.com/questions/22077023/why-cant-i-indirectly-return-an-object-literal-to-satisfy-an-index-signature-re
+// type ObjectOfStrings = { [s: string]: ObjectOfStrings | string };
+
+const setValuesToKeys = (obj: any, prefix: string) =>
 {
-  const terms = getTermsForKeyPathHelper(keyPath, builderState, schemaState);
-
-  // TODO migrate inputs reduction to the Query class if we get a query class
-  const inputs = builderState.query && builderState.query.inputs;
-  if (inputs && inputs.size)
+  prefix = prefix + (prefix.length > 0 ? '.' : '');
+  for (const key in obj)
   {
-    const inputTerms = inputs.map(
-      (input: Input) => InputPrefix + input.key,
-    ).toList();
-    if (terms)
+    const value = prefix + key;
+    if (typeof obj[key] === 'string')
     {
-      return inputTerms.concat(terms).toList();
+      obj[key] = value;
     }
-    return inputTerms;
-  }
-
-  return terms;
-}
-
-function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState, schemaState: SchemaState): List<string>
-{
-  if (!keyPath.size)
-  {
-    return Immutable.List([]);
-  }
-
-  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state, schemaState);
-
-  const block = state.getIn(keyPath);
-
-  if (block && block._isCard)
-  {
-    const card = block as Card;
-
-    if (card.static.getChildTerms)
+    else if (typeof obj[key] === 'object')
     {
-      terms = terms.concat(card.static.getChildTerms(card, schemaState)).toList();
+      setValuesToKeys(obj[key], value);
     }
-
-    if (card.static.getNeighborTerms)
+    else
     {
-      terms = terms.concat(card.static.getNeighborTerms(card, schemaState)).toList();
-    }
-
-    if (card['cards'])
-    {
-      card['cards'].map(
-        (childCard: Card) =>
-        {
-          if (childCard.static.getParentTerms)
-          {
-            terms = terms.concat(childCard.static.getParentTerms(childCard, schemaState, state)).toList();
-          }
-        },
-      );
+      throw new Error('Value found in ActionTypes that is neither string or object of strings: key: ' + key + ', value: ' + obj[key]);
     }
   }
+};
 
-  return terms;
-}
+setValuesToKeys(BuilderCardsActionTypes, 'builderCards');
+
+export default BuilderCardsActionTypes;

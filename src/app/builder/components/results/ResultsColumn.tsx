@@ -50,18 +50,19 @@ import './ResultsColumnStyle.less';
 
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';
 import TQLEditor from 'tql/components/TQLEditor';
+import Util from 'util/Util';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
-import Actions from '../../data/BuilderActions';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import { MAX_HITS, ResultsState } from './ResultTypes';
@@ -81,6 +82,7 @@ export interface Props
   showCustomizeView: boolean;
   allowSpotlights: boolean;
   onNavigationException: () => void;
+  builderActions?: typeof BuilderActions;
 }
 
 const TAB_NAMES = ['Hits', 'Aggregations', 'Raw'];
@@ -130,7 +132,7 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public setSelectedTab(name, index)
   {
-    Actions.change(List(this._keyPath('query', 'resultsViewMode')), name);
+    this.props.builderActions.change(List(this._keyPath('query', 'resultsViewMode')), name);
     this.setState({
       selectedTab: index,
       highlightedTabs: this.state.highlightedTabs.set(name.toLowerCase(), false),
@@ -279,4 +281,8 @@ const ACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor('#fff'), backgroundColor(
 const INACTIVE_TAB_NUMBER_STYLE = _.extend({},
   fontColor(Colors().altText1), backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().altBg1 : Colors().bg1));
 
-export default ResultsColumn;
+export default Util.createTypedContainer(
+  ResultsColumn,
+  [],
+  { builderActions: BuilderActions },
+);
