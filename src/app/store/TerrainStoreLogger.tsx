@@ -44,11 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as hdr from 'hdr-histogram-js';
-import * as Immutable from 'immutable';
 import * as TerrainLog from 'loglevel';
-import * as Serialize from 'remotedev-serialize';
-import { Block } from '../../blocks/types/Block';
-import { AllRecordNameArray, RecordsSerializer } from '../Classes';
+import { AllRecordNameArray, RecordsSerializer, resetRecordNameArray } from '../Classes';
 
 export default class TerrainStoreLogger
 {
@@ -125,5 +122,23 @@ export default class TerrainStoreLogger
   public static serializeAllRecordName()
   {
     return AllRecordNameArray;
+  }
+
+  /**
+   *
+   * @param recordNames: the array of Record type name (the order is important)
+   * @returns {boolean}: true if successfully reset the serializer
+   */
+  public static resetSerializeRecordArray(recordNames: string[]): boolean
+  {
+    const resetResult = resetRecordNameArray(recordNames);
+    if (resetResult === false)
+    {
+      // resetting failed
+      TerrainLog.error('DeSerialization Record Name is not as same as serialization Record name: (DeSer)'
+        + String(recordNames) + ': (Ser)' + String(AllRecordNameArray));
+      return false;
+    }
+    return true;
   }
 }

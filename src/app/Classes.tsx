@@ -101,9 +101,52 @@ export class BaseClass
 }
 
 const AllRecordMap: { [class_name: string]: Immutable.Record.Class } = {};
-const AllRecordArray = [];
+let AllRecordArray = [];
 export const AllRecordNameArray = [];
 export let RecordsSerializer = Serialize.immutable(Immutable, []);
+
+export function resetRecordNameArray(recordName: string[]): boolean
+{
+  // fast-path checking
+  let alreadySame = false;
+  for (const i in recordName)
+  {
+    if (recordName[i] !== AllRecordArray[i])
+    {
+      alreadySame = true;
+    }
+  }
+  if (alreadySame === true)
+  {
+    return true;
+  }
+
+  // we have to try to reset the serializer record type array
+  const newRecordArray = [];
+  for (let newPos = 0; newPos < recordName.length; newPos = newPos + 1)
+  {
+    const name = recordName[newPos];
+    let matchedRecord;
+    // searching the matched Record class
+    for (let i = 0; i < AllRecordNameArray.length; i = i + 1)
+    {
+      if (name === AllRecordNameArray[i])
+      {
+        matchedRecord = AllRecordArray[i];
+      }
+    }
+    if (matchedRecord !== undefined)
+    {
+      newRecordArray.push(matchedRecord);
+    } else
+    {
+      return false;
+    }
+  }
+  AllRecordArray = newRecordArray;
+  RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
+  return true;
+}
 
 export function New<T>(
   instance,

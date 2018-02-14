@@ -164,7 +164,7 @@ async function recordBuilderActions(browser, url)
   }
 }
 
-async function replayBuilderActions(browser, url, actions)
+async function replayBuilderActions(browser, url, actions, records)
 {
   const page = await browser.newPage();
   await page.setViewport({ width: 1600, height: 1200 });
@@ -172,11 +172,17 @@ async function replayBuilderActions(browser, url, actions)
   await loginToBuilder(page, url);
   sleep.sleep(1);
   await startBuilder(page);
-  await page.evaluate(() =>
+  const loadRecords = await page.evaluate((recordNames) =>
   {
-    window['TerrainTools'].setLogLevel();
-  });
-  // replay the log
+    // window['TerrainTools'].setLogLevel();
+    return window['TerrainTools'].terrainStoreLogger.resetSerializeRecordArray(recordNames);
+  }, records);
+  if (loadRecords === false)
+  {
+    console.log('Failed to load the serialization records: ' + records);
+    return;
+  }
+  // replay the loge
   for (let i = 0; i < actions.length; i = i + 1)
   {
     const action = actions[i];
@@ -236,10 +242,11 @@ async function rr()
     // loading from options['directory']/actions.json
     const actionFileData = jsonfile.readFileSync(actionFileName);
     const actions = actionFileData['actions'];
+    const serializeRecords = actionFileData['records'];
     try
     {
       console.log('Replaying ' + actions.length + ' actions.');
-      await replayBuilderActions(browser, url, actions);
+      await replayBuilderActions(browser, url, actions, serializeRecords);
     } catch (e)
     {
       console.trace(e);
