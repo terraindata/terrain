@@ -53,16 +53,17 @@ const Router = new KoaRouter();
 
 Router.get('/', async (ctx, next) =>
 {
-  ctx.body = JSON.stringify({
+  const response = {
     status: 'ok',
     currentTime: new Date(),
-  });
+  };
 
   if (currentApp instanceof App)
   {
-    ctx.body.startTime = currentApp.getStartTime();
-    ctx.body.requestCounts = currentApp.getRequestCounts();
+    response['startTime'] = currentApp.getStartTime();
+    response['requestCounts'] = currentApp.getRequestCounts();
   }
+  ctx.body = JSON.stringify(response);
   winston.info('status root');
 });
 
