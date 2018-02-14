@@ -67,7 +67,7 @@ export interface InputDeclarationOptionTypes
   };
   NumberBox: {
     acOptions?: List<string>;
-    integerOnly?: boolean; // not implemented yet, just an example
+    integerOnly?: boolean; // TODO not implemented yet, just an example
   };
   CheckBox: {
     large?: boolean;
@@ -78,8 +78,10 @@ export interface InputDeclarationType<S>
 {
   type: string;
   options: any; // one of InputDeclarationOptionTypes
+  displayName?: string; // defaults to the state name
   group?: string; // inputs with the same group value will show in a row
-  displayName?: string; // defaults to type
+  style?: any; // applied to the wrapper around the input element
+  className?: string; // applied to the wrapper around the input element
   shouldShow?: (state: S) => DisplayState;
 }
 

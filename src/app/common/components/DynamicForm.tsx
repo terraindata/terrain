@@ -82,7 +82,10 @@ export interface Props<FState>
   mainButton: ButtonOptions; // active styling by default
   secondButton?: ButtonOptions; // buttons are rendered from right to left
   thirdButton?: ButtonOptions;
+  style?: any; // gets applied to root container
+  children?: any; // children get rendered between the buttons and the form components
 }
+// if we want to allow immutable state objects, add an optional state mutator to each input declaration type
 
 @Radium
 export class DynamicForm<S> extends TerrainComponent<Props<S>>
@@ -169,7 +172,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         key={index}
         open={displayState !== DisplayState.Hidden}
       >
-        <div>
+        <div className={inputInfo.className} style={inputInfo.style}>
           {renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive)}
         </div>
       </FadeInOut>
@@ -234,8 +237,9 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const renderMatrix: MatrixType<S> = this.computeRenderMatrix(this.props.inputMap);
     return (
-      <div className='dynamic-form'>
+      <div className='dynamic-form' style={this.props.style}>
         {renderMatrix.map(this.renderMatrixRow)}
+        {this.props.children !== undefined ? this.props.children : null}
         {this.renderConfirmBar()}
       </div>
     );
