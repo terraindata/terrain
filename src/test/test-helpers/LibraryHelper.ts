@@ -119,8 +119,8 @@ class LibraryStateMock
     this.state = this.state
       .setIn(['groups', groupId], group)
       .setIn(
-        ['categories', categoryId, 'groupsOrder'],
-        this.state.categories.get(categoryId).groupsOrder.push(groupId),
+      ['categories', categoryId, 'groupsOrder'],
+      this.state.categories.get(categoryId).groupsOrder.push(groupId),
     );
 
     return this;
@@ -136,8 +136,8 @@ class LibraryStateMock
     this.state = this.state
       .setIn(['algorithms', algorithmId], algorithm)
       .setIn(
-        ['groups', groupId, 'algorithmsOrder'],
-        this.state.groups.get(groupId).algorithmsOrder.push(algorithmId),
+      ['groups', groupId, 'algorithmsOrder'],
+      this.state.groups.get(groupId).algorithmsOrder.push(algorithmId),
     );
 
     return this;

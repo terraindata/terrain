@@ -381,8 +381,8 @@ const BuilderReducers =
       }>) =>
       state
         .update('query',
-          (query) =>
-            query.set('resultsConfig', action.payload.resultsConfig),
+        (query) =>
+          query.set('resultsConfig', action.payload.resultsConfig),
       ),
 
     [ActionTypes.save]: (state: BuilderState,
