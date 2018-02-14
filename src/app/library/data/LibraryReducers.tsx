@@ -69,7 +69,7 @@ const addItem = (state: LibraryState, item, parentKeyPath: Array<string | ID>, t
 {
   state = state.setIn([type, item.id], item)
     .updateIn(parentKeyPath.concat([type + 'Order']),
-    (order) => order.splice(index === undefined ? order.size : index, 0, item.id));
+      (order) => order.splice(index === undefined ? order.size : index, 0, item.id));
   return state;
 };
 
@@ -202,8 +202,8 @@ LibraryReducers[ActionTypes.algorithms.status] =
 
     return state
       .updateIn(
-      ['algorithms', algorithm.id],
-      (v) => v.set('status', status),
+        ['algorithms', algorithm.id],
+        (v) => v.set('status', status),
     )
       .set('changingStatus', false);
   };

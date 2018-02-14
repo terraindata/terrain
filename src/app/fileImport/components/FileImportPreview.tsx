@@ -232,8 +232,7 @@ class FileImportPreview extends TerrainComponent<Props>
         typeof tableName === 'string' ? tableName : tableName.get(0));
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const parsedQuery = addBodyToQuery(stringQuery);
-      Actions.fetchTypesFromQuery(this.props.serverId, parsedQuery);
+      Actions.fetchTypesFromQuery(this.props.serverId, stringQuery);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
     Actions.fetchColumnAnalyzers();

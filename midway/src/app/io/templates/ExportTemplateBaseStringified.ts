@@ -44,10 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ConfigType from '../../ConfigType';
+import { TemplateBase } from './TemplateBase';
 import { TemplateBaseStringified } from './TemplateBaseStringified';
 
 export default class ExportTemplateBaseStringified extends TemplateBaseStringified
 {
-  public objectKey?: string;
-  public rank?: boolean;
+  public objectKey?: string = '';
+  public rank?: boolean = false;
+
+  constructor(props: object)
+  {
+    super(props as TemplateBase);
+    ConfigType.initialize(this, props);
+  }
 }

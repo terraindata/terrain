@@ -43,19 +43,18 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import configureMockStore = require('redux-mock-store');
+import thunk from 'redux-thunk';
 
-import ConfigType from '../../ConfigType';
-import { TemplateBase } from './TemplateBase';
+export const Ajax: any = {};
 
-export class ImportTemplateConfig extends TemplateBase
+export function createMockStore()
 {
-  public name: string = '';
-  public requireJSONHaveAllFields: boolean = true;
-  constructor(props: object)
-  {
-    super(props);
-    ConfigType.initialize(this, props);
-  }
+  const middlewares = [thunk.withExtraArgument(Ajax)];
+  return configureMockStore(middlewares);
 }
 
-export default ImportTemplateConfig;
+export function connect(componentName)
+{
+  return `Connect(${componentName})`;
+}

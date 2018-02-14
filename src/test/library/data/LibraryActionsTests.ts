@@ -46,9 +46,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import Actions from 'library/data/LibraryActions';
 import ActionTypes from 'library/data/LibraryActionTypes';
-import { _LibraryState, LibraryState } from 'library/LibraryTypes';
-import * as LibraryTypes from 'library/LibraryTypes';
-import { Ajax, createMockStore } from '../../helpers';
+import { Ajax, createMockStore } from 'test-helpers/helpers';
+import LibraryHelper from 'test-helpers/LibraryHelper';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
@@ -58,15 +57,12 @@ describe('LibraryActions', () =>
 {
   describe('#categories.create', () =>
   {
-    const library: LibraryState = _LibraryState({
-      categories: Immutable.Map<number, LibraryTypes.Category>({}),
-      algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({}),
-    });
-
-    const category = LibraryTypes._Category();
     const categoryId = 1;
     const categoryName = 'Test Category';
-    category.set('name', categoryName);
+    const libraryStateMock = LibraryHelper.mockState();
+
+    const library = libraryStateMock.getState();
+    const category = LibraryHelper.mockCategory();
 
     it('should create a categories.create action after the new category has been created', (done) =>
     {

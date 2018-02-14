@@ -52,6 +52,7 @@ import * as stream from 'stream';
 import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
 import { Export, ExportConfig } from './Export';
+import { Sources } from './sources/Sources';
 import * as Auth from './templates/Authenticate';
 import ExportTemplateRouter from './templates/ExportTemplateRouter';
 
