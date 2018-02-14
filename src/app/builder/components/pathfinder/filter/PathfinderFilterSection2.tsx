@@ -258,7 +258,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     // If they were both single filters, create a new group
     if (!this.isGroup(dropped) && !this.isGroup(droppedInto))
     {
-      group = _FilterGroup({ lines: List([droppedInto, dropped]) });
+      const {groupCount} = this.props.filterGroup;
+      const groupNumber = groupCount < 10 ? '0' + String(groupCount) : groupCount;
+      group = _FilterGroup({
+        lines: List([droppedInto, dropped]),
+        name: 'Group ' + groupNumber,
+      });
+      BuilderActions.changePath(this.props.keyPath.push('groupCount'), groupCount + 1, true);
     }
     else
     {
@@ -296,6 +302,14 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public isGroup(item)
   {
     return item.filterGroup;
+  }
+
+  public handleStepChange()
+  {
+    if (this.props.step === PathfinderSteps.Filter)
+    {
+      this.props.onStepChange(this.props.step);
+    }
   }
 
   public render()
@@ -348,6 +362,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           text={'Filter Condition'}
           onCreate={this.handleAddFilter}
         />
+        {
+          this.props.step === PathfinderSteps.Filter &&
+          <div
+            onClick={this.handleStepChange}
+            className='pf-step-button'
+          >
+            Filters look good for now
+          </div>
+        }
       </div>
     );
   }

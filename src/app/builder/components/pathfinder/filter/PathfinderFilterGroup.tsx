@@ -138,6 +138,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
           allowCustomInput={false}
           canEdit={canEdit}
           action={this.props.onChange}
+          hideOptions={true}
         />
       </div>
 
