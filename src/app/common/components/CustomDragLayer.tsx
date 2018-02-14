@@ -64,11 +64,19 @@ function collect(monitor)
   };
 }
 
+/*
+  This file creates custom drag layers for different drag items. It is important for
+  the drag layers to be "dumb" so that performance remains good
+  For example, instead of rendering a filter line for the item preview, just render basic
+  text divs that look like the filter line but that are static.
+  It uses a custom implementation of DragLayer (stored in DragLayer.js) instead of the
+  React-dnd DragLayer for performance optimization.
+*/
 class CustomDragLayerRaw extends TerrainComponent<Props> {
-
   public render()
   {
     const { item, itemType } = this.props;
+    const { data } = item;
     switch (itemType)
     {
       case 'GROUP':
@@ -82,7 +90,7 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
             className='drag-drop-group-preview'
             style={groupStyle}
           >
-            {item.title}
+            {data.name}
           </div>
         );
       case 'ITEM':
@@ -90,7 +98,6 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
           backgroundColor(Colors().sidebarBg),
           { width: item.width },
         );
-        const { data } = item;
         return (
           <div
             className='drag-drop-item-preview'
@@ -107,5 +114,4 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
   }
 }
 
-// export default DragLayer(collect)(CustomDragLayerRaw);
 export default PerformantDragLayer(collect)(CustomDragLayerRaw);

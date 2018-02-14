@@ -1,6 +1,5 @@
 @import "../../../common/Common.less";
 
-// STyling for DnD this should move
 .pf-filter-line {
 	padding-top: 6px;
 	padding-left: 6px;
@@ -147,6 +146,10 @@
 	}
 	.pf-filter-line
 	{
+		padding-top: 6px;
+		padding-left: 6px;
+
+
 		.map-component-search-bar {
 	    	margin-bottom: -18px;
 	    	width: calc(~"100% + 2px");
@@ -169,8 +172,15 @@
 		    }
 		}	
 		.close {
-			margin-top: 19px;
+			margin-top: 8px;
     		margin-left: 3px;
+    		opacity: 0
+    		.transition;
+		}
+		&:hover {
+			.close {
+				opacity: 1;
+			}
 		}
 		.flex-container
 		{

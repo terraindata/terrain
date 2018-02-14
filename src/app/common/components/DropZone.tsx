@@ -46,17 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import { borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
 const { List, Map } = Immutable;
-import Util from 'app/util/Util';
-import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
+import {  DropTarget } from 'react-dnd';
 import './DragDropStyle.less';
 
 interface DropProps
@@ -93,7 +90,7 @@ function collect(connect, monitor)
     isOver: monitor.isOver() && monitor.canDrop(),
   };
 }
-@Radium
+
 class DropZoneComponent extends TerrainComponent<DropProps>
 {
   public state: {
@@ -104,43 +101,22 @@ class DropZoneComponent extends TerrainComponent<DropProps>
 
   public render()
   {
+    const style = _.extend({},
+      {
+        height: this.props.isOver ? 40 : 15
+      },
+      borderColor(this.props.isOver ? Colors().active : '')
+    );
     return (
       this.props.connectDropTarget(
         <div
           className='drop'
-          style={[
-            borderColor(this.props.isOver ? Colors().active : ''),
-            { height: this.props.isOver ? 40 : 15 },
-          ]}
+          style={style}
         />
         ,
       )
     );
   }
-
-  // public render()
-  // {
-  //   return (
-  //     this.props.connectDropTarget(
-  //       <div
-  //         className='drop-wrapper'
-  //         style={[
-  //           { marginBottom: this.props.isOver ? 2 : -12 },
-  //           { marginTop: this.props.isOver ? 2 : -12 },
-  //           { height: this.props.isOver ? 40 : 25 },
-  //         ]}
-  //       >
-  //         <div
-  //           className='drop'
-  //           style={[
-  //             borderColor(this.props.isOver ? Colors().active : ''),
-  //             { height: this.props.isOver ? 40 : 15 },
-  //           ]}
-  //         />
-  //       </div>,
-  //     )
-  //   );
-  // }
 }
 
 const DropZone = DropTarget(['ITEM', 'GROUP'], dropTarget, collect)(DropZoneComponent);

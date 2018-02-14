@@ -46,27 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
-import BuilderStore from 'app/builder/data/BuilderStore';
 import CustomDragLayer from 'app/common/components/CustomDragLayer';
-import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragDropGroup from 'app/common/components/DragDropGroup';
 import DragDropItem from 'app/common/components/DragDropItem';
-import DragHandle from 'app/common/components/DragHandle';
 import DropZone from 'app/common/components/DropZone';
-import Util from 'app/util/Util';
-import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
@@ -81,12 +69,6 @@ export interface Props
   onStepChange?: (oldStep: PathfinderSteps) => void;
 }
 
-const ItemTypes = {
-  BAR: 'bar',
-  GROUP: 'group',
-};
-
-// @Radium
 class PathfinderFilterSection extends TerrainComponent<Props>
 {
 
@@ -105,16 +87,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
     // get the sub-list that item will be inserted into
     let listToInsert = items.getIn(keyPath.butLast());
-    // Insert the item int othe list at the position that is the last value of keypath
+    // Insert the item into the list at the position that is the last value of keypath
     listToInsert = listToInsert.insert(keyPath.last(), item);
-
     // Update the whole list of items to have the inserted list
     return items.setIn(keyPath.butLast(), listToInsert);
   }
 
+  // Check if something in a nested list moved "down" (visually moved to a lower position on the screen)
   public movedDown(oldKeyPath, newKeyPath): boolean
   {
-
     let i = 0;
     while (i < oldKeyPath.size && i < newKeyPath.size)
     {
@@ -130,7 +111,12 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
   }
 
-  public handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean)
+  public handleFilterChange(
+    keyPath: KeyPath,
+    filter: FilterGroup | FilterLine,
+    notDirty?: boolean,
+    fieldChange?: boolean
+  )
   {
     BuilderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
@@ -189,6 +175,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       value);
   }
 
+  // When something is dropped into a drop zone (to reorder)
   public handleDrop(itemKeyPath, dropKeyPath, keepCollapse?)
   {
     // If the item did not move up or down, do nothing
@@ -207,38 +194,19 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     {
       item = item.setIn(['filterGroup', 'collapsed'], false);
     }
-    // If the item moved down, insert it and then remove it
-    if (this.movedDown(itemKeyPath, dropKeyPath)) // This might not work...
-    {
-      lines = this.insertIn(lines, dropKeyPath, item);
-      lines = lines.removeIn(itemKeyPath);
-      const oldGroup = lines.getIn(itemKeyPath.butLast());
-      if (oldGroup.size === 0)
-      {
-        lines = lines.removeIn(itemKeyPath.slice(0, -3));
-      }
-    }
-    // If it moved up, remove it and then insert it
-    else
-    {
-      lines = lines.removeIn(itemKeyPath);
-      const oldGroup = lines.getIn(itemKeyPath.butLast());
-      if (oldGroup.size === 0)
-      {
-        lines = lines.removeIn(itemKeyPath.slice(0, -3));
-      }
-      lines = this.insertIn(lines, dropKeyPath, item);
-    }
+    lines = this.updateLines(lines, itemKeyPath, dropKeyPath, item, true);
+    // Update the lines
     BuilderActions.changePath(this.props.keyPath.push('lines'), lines);
   }
 
+  // When something is dropped into a group
   public handleGroupDrop(dropKeyPath, dragKeyPath)
   {
     if (dropKeyPath.equals(dragKeyPath))
     {
       return;
     }
-    const lines = this.props.filterGroup.lines;
+    let lines = this.props.filterGroup.lines;
     const droppedInto = lines.getIn(dropKeyPath);
     let dropped = lines.getIn(dragKeyPath);
     if (this.isGroup(dropped))
@@ -266,6 +234,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       });
       BuilderActions.changePath(this.props.keyPath.push('groupCount'), groupCount + 1, true);
     }
+    // If the dropped item was already a group, keep it's name and minMatches and append the line it was dropped onto
     else
     {
       group = _FilterGroup({
@@ -275,28 +244,53 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       });
     }
     dropKeyPath = dropKeyPath.push('filterGroup');
-    let newLines;
+    lines = this.updateLines(lines, dragKeyPath, dropKeyPath, group);
+    // Look for the thing that you dropped, if it is somewhere other than keyPath, remove it
+    BuilderActions.changePath(this.props.keyPath.push('lines'), lines);
+  }
+
+  // Given the lines and the new item, move the item from the dragKeyPath to the dropKeyPath
+  public updateLines(lines, dragKeyPath, dropKeyPath, item, insert?)
+  {
+   // If the item moved down, insert it and then remove it
     if (this.movedDown(dragKeyPath, dropKeyPath))
     {
-      newLines = lines.setIn(dropKeyPath, group).deleteIn(dragKeyPath);
-      const oldGroup = newLines.getIn(dragKeyPath.butLast());
+      // If the group that the item left is now empty, remove it too
+      if (insert)
+      {
+        lines = this.insertIn(lines, dropKeyPath, item);
+      }
+      else
+      {
+        lines = lines.setIn(dropKeyPath, item)
+      }
+      lines = lines.deleteIn(dragKeyPath);
+      const oldGroup = lines.getIn(dragKeyPath.butLast());
       if (oldGroup.size === 0)
       {
-        newLines = newLines.removeIn(dragKeyPath.slice(0, -3));
+        lines = lines.removeIn(dragKeyPath.slice(0, -3));
       }
     }
+    // If it moved up, remove it and then insert it
     else
     {
-      newLines = lines.deleteIn(dragKeyPath);
-      const oldGroup = newLines.getIn(dragKeyPath.butLast());
+      lines = lines.deleteIn(dragKeyPath);
+      const oldGroup = lines.getIn(dragKeyPath.butLast());
+      // If the group that the item left is now empty, remove it too
       if (oldGroup.size === 0)
       {
-        newLines = newLines.removeIn(dragKeyPath.slice(0, -3));
+        lines = lines.removeIn(dragKeyPath.slice(0, -3));
       }
-      newLines = newLines.setIn(dropKeyPath, group);
+      if (insert)
+      {
+        lines = this.insertIn(lines, dropKeyPath, item);
+      }
+      else
+      {
+        lines = lines.setIn(dropKeyPath, item)
+      }
     }
-    // Look for the thing that you dropped, if it is somewhere other than keyPath, remove it
-    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    return lines;
   }
 
   public isGroup(item)
@@ -377,4 +371,3 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 }
 
 export default PathfinderFilterSection;
-// export default DragDropContext(HTML5Backend)(PathfinderFilterSection);

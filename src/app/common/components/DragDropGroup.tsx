@@ -46,20 +46,16 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
 const { List, Map } = Immutable;
 import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
 import FadeInOut from 'app/common/components/FadeInOut';
-import Util from 'app/util/Util';
-import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
+import { DragSource, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import './DragDropStyle.less';
 
@@ -88,9 +84,9 @@ const groupSource = {
   beginDrag(props, monitor, component)
   {
     props.setCollapsed(props.keyPath, true);
-    // need to figure out what the width is
+    // need to figure out what the width is for the custom drag layer
     const boundingRect = component.refs['group']['getBoundingClientRect']();
-    return { keyPath: props.keyPath, title: props.data.name, width: boundingRect.width };
+    return { keyPath: props.keyPath, data: props.data, width: boundingRect.width };
   },
 };
 
@@ -177,8 +173,9 @@ class GroupComponent extends TerrainComponent<GroupProps>
   {
     const { data, renderHeader, isDragging, items, keyPath, keyPathStarter, onReorder, isOver, depth } = this.props;
     const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
+    // Note: Radium causes issues when combined with drag drop library, which is why we don't use it here for styling
     const draggingStyle = isDragging ? { opacity: 0.3, height: 30 } : {};
-    const droppingStyle = isOver ? { borderColor: Colors().active } : {};
+    const droppingStyle = isOver ? borderColor(Colors().active) : {};
     return (
       <div
         className='drag-drop-group'

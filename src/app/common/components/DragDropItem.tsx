@@ -46,18 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import {  borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 const { List, Map } = Immutable;
-import DropZone from 'app/common/components/DropZone';
-import Util from 'app/util/Util';
-import { DragDropContext, DragSource, DropTarget } from 'react-dnd';
+import { DragSource, DropTarget } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import './DragDropStyle.less';
 
@@ -68,13 +64,13 @@ interface ItemProps
   canDrop?: boolean;
   children?: El | string;
   data?: any;
+  onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   // injected props
   connectDragSource: (El) => El;
   isDragging: boolean;
   isOver: boolean;
   connectDropTarget: (El) => El;
   connectDragPreview: (El, options) => El;
-  onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
 }
 
 const itemSource = {
@@ -127,7 +123,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
       <div
         style={_.extend({},
           { opacity: isDragging ? 0.3 : 1 },
-          { borderColor: isOver ? Colors().active : '' },
+          borderColor(isOver ? Colors().active : 'transparent'),
         )}
         className='drag-drop-item'>
         <div
