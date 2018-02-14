@@ -51,6 +51,12 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
+import Slider, { Range } from 'rc-slider';
+// We can just import Slider or Range to reduce bundle size
+// import Slider from 'rc-slider/lib/Slider';
+// import Range from 'rc-slider/lib/Range';
+import 'rc-slider/assets/index.css';
+
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
@@ -119,6 +125,8 @@ class ScoreBar extends TerrainComponent<{
           />
         </div>
         <div className='weight-graph-line' />
+        <Slider />
+        <Range />
       </div>
     );
   }
