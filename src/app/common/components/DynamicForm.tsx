@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing max-classes-per-file no-invalid-this no-unused-expression
+// tslint:disable:no-var-requires no-unused-expression strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -60,6 +60,8 @@ import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import FadeInOut from 'common/components/FadeInOut';
+
+import './DynamicForm.less';
 
 // DynamicForm associated Types
 export enum DisplayState
@@ -103,7 +105,7 @@ export interface InputDeclarationType<S>
 export type InputDeclarationMap<State extends {[k: string]: any}> =
 {
   [key in keyof State]: InputDeclaration<State>; // is an inputDeclaration
-}
+};
 
 export interface Props<FState>
 {
@@ -121,7 +123,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     [DisplayType.CheckBox]: this.renderCheckBox,
     [DisplayType.NumberBox]: this.renderNumberBox,
     [DisplayType.TextBox]: this.renderTextBox,
-  }
+  };
 
   constructor(props)
   {
@@ -134,10 +136,10 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const options = inputInfo.options as OptionType<DisplayType.TextBox> || {};
     return (
-      <div className='te-autocomplete-block' key={index}>
-        <div className='te-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
+      <div className='dynamic-form-autocomplete-block' key={index}>
+        <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
         <Autocomplete
-          className='te-autocomplete'
+          className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
           onChange={this.setStateHOC(stateName)}
           options={options.acOptions}
@@ -152,10 +154,10 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const options = inputInfo.options as OptionType<DisplayType.TextBox> || {};
     return (
-      <div className='te-autocomplete-block' key={index}>
-        <div className='te-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
+      <div className='dynamic-form-autocomplete-block' key={index}>
+        <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
         <Autocomplete
-          className='te-autocomplete'
+          className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
           onChange={this.setStateHOC(stateName)}
           options={options.acOptions}
@@ -169,21 +171,21 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const options = inputInfo.options as OptionType<DisplayType.CheckBox> || {};
     return (
-     <div
-        className='te-checkbox-row'
+      <div
+        className='dynamic-form-checkbox-row'
         key={index}
         onClick={noop(disabled,
-            this.setStateWithTransformHOC(stateName, (value, inputState) => !inputState[stateName] )
+            this.setStateWithTransformHOC(stateName, (value, inputState) => !inputState[stateName] ),
           )}
       >
         <CheckBox
-          className='te-checkbox'
+          className='dynamic-form-checkbox'
           disabled={disabled}
           checked={this.props.inputState[stateName]}
           onChange={() => null}
           large={options.large}
         />
-        <div className='te-label'> {inputInfo.displayName} </div>
+        <div className='dynamic-form-label'> {inputInfo.displayName} </div>
       </div>
     );
   }
@@ -197,7 +199,9 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         key={index}
         open={displayState !== DisplayState.Hidden}
       >
-        { renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive) }
+        <div>
+          { renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive) }
+        </div>
       </FadeInOut>
     );
   }
@@ -210,7 +214,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   public renderMatrixRow(row: MatrixRowType<S>, index)
   {
     return (
-      <div key={index}>
+      <div key={index} className='dynamic-form-matrix-row'>
         {
           row.map(this.renderMatrixCell)
         }
@@ -222,7 +226,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const renderMatrix: MatrixType<S> = this.computeRenderMatrix(this.props.inputMap);
     return (
-      <div>
+      <div className='dynamic-form'>
         { renderMatrix.map(this.renderMatrixRow) }
       </div>
     );
@@ -236,7 +240,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const { group } = inputMap[stateName];
       const inputInfo: InputDeclarationType<S> = _.defaults({}, inputMap[stateName],
-        { displayName: stateName, shouldShow: () => true }
+        { displayName: stateName, shouldShow: () => true },
       );
       let useIndex = renderMatrix.size;
       if (group !== undefined)
@@ -245,7 +249,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         useIndex = groupToIndex[group];
       }
       renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) => value.push(
-        (state, index) => this.renderInputElement(inputInfo, stateName, state, index)
+        (state, index) => this.renderInputElement(inputInfo, stateName, state, index),
       ));
     }
     return renderMatrix;
@@ -259,7 +263,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       const newValue = transformValue(value, this.props.inputState);
       shallowCopy[stateName] = newValue;
       this.props.onStateChange(shallowCopy);
-    }
+    };
   }
 
   // This function is memoized
@@ -269,14 +273,14 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
       this.props.onStateChange(shallowCopy);
-    }
+    };
   }
 }
 
 type MatrixType<S> = List<MatrixRowType<S>>; // list of list of functions
 type MatrixRowType<S> = List<MatrixCellFn<S>>;
 type MatrixCellFn<S> = (state: S, key) => any;
-type renderSignature<S> = (inputInfo: InputDeclarationType<S>, stateName: string, state: S, index: number, disabled: boolean) => any
+type renderSignature<S> = (inputInfo: InputDeclarationType<S>, stateName: string, state: S, index: number, disabled: boolean) => any;
 
 function noop(disabled: boolean, fn)
 {
@@ -296,7 +300,7 @@ DisplayType as AssertEnumValuesEqualKeys; // if this is giving errors, double ch
 // make sure that for every item in the DisplayType enum there's an associated InputDeclaration
 type AssertOptionTypesExhaustive = {
   [K in DisplayType]: InputDeclarationOptionTypes[K]
-}
+};
 
 // below are types that do some magic to add type checking to InputDeclarationMap
 interface InputDeclarationHelper<K extends DisplayTypeKeys, State> extends InputDeclarationType<State>
@@ -307,43 +311,7 @@ interface InputDeclarationHelper<K extends DisplayTypeKeys, State> extends Input
 
 type InputDeclarationBundle<State> = {
   [K in DisplayTypeKeys]: InputDeclarationHelper<K, State>
-}
+};
 
 type InputDeclaration<State> = InputDeclarationBundle<State>[keyof InputDeclarationBundle<State>];
 /*** End of Type Sorcery ***/
-
-// interface FormState
-// {
-//   from: number;
-//   length: number;
-//   textField: string;
-//   flag: boolean;
-// }
-
-// // should succeed
-// const DeclarationMap: InputDeclarationMap<FormState> =
-// {
-//   from: {
-//     type: DisplayType.NumberBox,
-//     options: {
-
-//     }
-//   },
-//   length: {
-//     type: DisplayType.NumberRange,
-//     options: {
-//       from: 0,
-//       to: -1,
-//     }
-//   },
-//   textField: {
-//     type: DisplayType.TextBox,
-//     options: {
-//       randomThing: 'test',
-//     }
-//   },
-//   flag: {
-//     type: DisplayType.CheckBox,
-//     options: {}
-//   }
-// }

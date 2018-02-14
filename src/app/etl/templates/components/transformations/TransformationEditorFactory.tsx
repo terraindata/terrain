@@ -314,7 +314,7 @@ const TestMap: InputDeclarationType = {
   randomFlag: {
     displayName: 'How about this?',
     type: 'boolean',
-  }
+  },
 };
 
 export const TestClass = TransformationEditorFactory(TestMap);

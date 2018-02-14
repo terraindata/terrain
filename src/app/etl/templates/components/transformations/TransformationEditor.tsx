@@ -77,15 +77,15 @@ export interface Props
 export class TransformationEditor extends TerrainComponent<Props>
 {
   public state: {
-    formState: TestFormState
+    formState: TestFormState,
   } = {
     formState: {
       from: 0,
       to: 5,
       flag: true,
       text: 'once upon a time...',
-    }
-  }
+    },
+  };
 
   public getChildComponent(type: TransformationNodeType)
   {
@@ -109,7 +109,7 @@ export class TransformationEditor extends TerrainComponent<Props>
         onStateChange={this._setStateWrapper('formState')}
         onConfirm={() => null}
       />
-    )
+    );
   }
 }
 
@@ -144,5 +144,5 @@ const TestMap: InputDeclarationMap<TestFormState> =
     type: DisplayType.TextBox,
     displayName: 'Tell us a story',
     options: {},
-  }
-}
+  },
+};

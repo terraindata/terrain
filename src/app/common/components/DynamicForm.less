@@ -1,0 +1,38 @@
+@import "../Common.less";
+
+.dynamic-form {
+  padding: @spacing;
+
+  .dynamic-form-matrix-row {
+    display: flex;
+    align-items: flex-end;
+    padding: @quarter-spacing;
+  }
+
+  .dynamic-form-checkbox-row {
+    margin-right: @spacing;
+    padding-bottom: @half-spacing;
+    padding-top: @quarter-spacing;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    .dynamic-form-checkbox {
+      margin-bottom: 1px;
+    }
+
+    .dynamic-form-label {
+
+    }
+  }
+
+  .dynamic-form-autocomplete-block {
+    margin-right: @spacing;
+    display: flex;
+    flex-direction: column;
+
+    .dynamic-form-label {
+      .normal-text;
+    }
+  }
+
+}
