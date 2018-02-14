@@ -115,7 +115,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     keyPath: KeyPath,
     filter: FilterGroup | FilterLine,
     notDirty?: boolean,
-    fieldChange?: boolean
+    fieldChange?: boolean,
   )
   {
     BuilderActions.changePath(keyPath, filter, notDirty, fieldChange);
@@ -252,7 +252,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   // Given the lines and the new item, move the item from the dragKeyPath to the dropKeyPath
   public updateLines(lines, dragKeyPath, dropKeyPath, item, insert?)
   {
-   // If the item moved down, insert it and then remove it
+    // If the item moved down, insert it and then remove it
     if (this.movedDown(dragKeyPath, dropKeyPath))
     {
       // If the group that the item left is now empty, remove it too
@@ -262,7 +262,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       }
       else
       {
-        lines = lines.setIn(dropKeyPath, item)
+        lines = lines.setIn(dropKeyPath, item);
       }
       lines = lines.deleteIn(dragKeyPath);
       const oldGroup = lines.getIn(dragKeyPath.butLast());
@@ -287,7 +287,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       }
       else
       {
-        lines = lines.setIn(dropKeyPath, item)
+        lines = lines.setIn(dropKeyPath, item);
       }
     }
     return lines;

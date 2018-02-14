@@ -127,7 +127,7 @@ export const _Path = (config?: { [key: string]: any }) =>
 
 class FilterGroupC extends BaseClass
 {
-  public minMatches: number | string = 'any';
+  public minMatches: number | string = 'all';
   public name: string = 'Group';
   public collapsed: boolean = false;
   // Only maintained on the top-level group, keeps track of what number group we are on to create names

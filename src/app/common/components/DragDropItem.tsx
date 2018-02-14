@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import {  borderColor, Colors } from 'app/colors/Colors';
+import { borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -119,11 +119,12 @@ class ItemComponent extends TerrainComponent<ItemProps>
   public render()
   {
     const { children, isDragging, isOver } = this.props;
+
     const draggable = this.props.connectDragSource(
       <div
         style={_.extend({},
           { opacity: isDragging ? 0.3 : 1 },
-          borderColor(isOver ? Colors().active : 'transparent'),
+          isOver ? { borderColor: Colors().active } : {},
         )}
         className='drag-drop-item'>
         <div

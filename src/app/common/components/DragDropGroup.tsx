@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -137,6 +138,10 @@ class GroupComponent extends TerrainComponent<GroupProps>
     const { keyPathStarter, onReorder, onDrop, isGroup, renderChildren, depth } = this.props;
     return (
       <div>
+        <DropZone
+          keyPath={newKeyPath.push(0)}
+          onDrop={onReorder}
+        />
         {
           items.map((item, i: number) =>
             <div key={i}>
@@ -146,7 +151,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
                     children={renderChildren(item, newKeyPath.push(i))}
                     keyPath={newKeyPath.push(i)}
                     onDrop={onDrop}
-                    canDrop={false}
+                    canDrop={true}
                     data={item}
                   />
                   :
@@ -178,7 +183,10 @@ class GroupComponent extends TerrainComponent<GroupProps>
     const droppingStyle = isOver ? borderColor(Colors().active) : {};
     return (
       <div
-        className='drag-drop-group'
+        className={classNames({
+          'drag-drop-group': true,
+          'drag-drop-group-collapsed': data.collapsed,
+        })}
         style={_.extend(
           {},
           backgroundColor(Colors().blockBg),
@@ -191,14 +199,11 @@ class GroupComponent extends TerrainComponent<GroupProps>
           ref='group'
         >
           <div>{renderHeader(data, newKeyPath.butLast())}</div>
-          <DropZone
-            keyPath={newKeyPath.push(0)}
-            onDrop={onReorder}
-          />
           <FadeInOut
-            children={this.renderGroupChildren(items, newKeyPath)}
             open={!data.collapsed}
-          />
+          >
+            {this.renderGroupChildren(items, newKeyPath)}
+          </FadeInOut>
         </div>
       </div>
     );

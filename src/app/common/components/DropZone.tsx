@@ -48,12 +48,13 @@ THE SOFTWARE.
 
 import { borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 const { List, Map } = Immutable;
-import {  DropTarget } from 'react-dnd';
+import { DropTarget } from 'react-dnd';
 import './DragDropStyle.less';
 
 interface DropProps
@@ -103,16 +104,24 @@ class DropZoneComponent extends TerrainComponent<DropProps>
   {
     const style = _.extend({},
       {
-        height: this.props.isOver ? 40 : 15
+        height: this.props.isOver ? 36 : 15,
       },
-      borderColor(this.props.isOver ? Colors().active : '')
+      borderColor(this.props.isOver ? Colors().active : ''),
     );
     return (
       this.props.connectDropTarget(
         <div
           className='drop'
-          style={style}
-        />
+          style={{
+            height: this.props.isOver ? 44 : 15,
+          }}
+        >
+          <div
+            style={style}
+            className='drop-area'
+          >
+          </div>
+        </div>
         ,
       )
     );

@@ -6,6 +6,8 @@
 	border-radius: 3px;
 	border: 1px solid transparent;
 	padding: 1px;
+	cursor: pointer;
+	max-width: 500px;
 	&:hover {
 		border-color: lightgray;
 	}
@@ -16,9 +18,14 @@
     position: relative;
     margin-top: -4px;
     margin-bottom: -4px;
-    border-radius: 5px;
-    border: 1px solid transparent;
+	max-width: 500px;
 	transition: all 0.2s ease-in-out;
+	.drop-area {
+    	border: 1px solid transparent;
+		position: relative;
+    	border-radius: 3px;
+		top: 0px
+	}
 }
 
 .drag-drop-group {
@@ -29,13 +36,16 @@
 	border: 1px solid transparent;
 	cursor: pointer;
 	border-color: #e3e3e3;
+	max-width: 500px;
 	&:hover {
 		border-color: #1eb4fa;
+	}
+	&.drag-drop-group-collapsed {
+		padding-bottom: 9px;
 	}
 }
 .drag-drop-group-preview, .drag-drop-item-preview
 {
-//	width: 100%;
 	border-radius: 3px;
 	box-shadow: 1px 3px 12px #606262;
 	z-index: 2000;
@@ -44,18 +54,19 @@
 }
 
 .drag-drop-item-preview {
-	height: 29px;
+	height: 42px;
 	display: inline-flex;
 	font-size: 16px;
 	color: black;
-	padding-top: 13px;
 	.drag-drop-item-field {
-		margin-right: 23%;
-		position: relative;
 		left: 16px;
 	}
-	.drag-drop-item-comparison {
-		margin-right: 25%;
+	.drag-drop-item-field, .drag-drop-item-comparison, .drag-drop-item-value {
+		border-radius: 6px;
+		padding: 3px;
+		top: 6px;
+		position: relative;
+		flex-grow: 1;
 	}
 }
 
