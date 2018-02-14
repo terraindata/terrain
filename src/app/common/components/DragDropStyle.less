@@ -33,14 +33,33 @@
 		border-color: #1eb4fa;
 	}
 }
-.drag-drop-group-preview
+.drag-drop-group-preview, .drag-drop-item-preview
 {
 //	width: 100%;
 	border-radius: 3px;
-	box-shadow: 1px 3px 12px;
+	box-shadow: 1px 3px 12px #606262;
 	z-index: 2000;
 	opacity: 1;
 	position: relative;
+}
+
+.drag-drop-item-preview {
+	height: 29px;
+	display: inline-flex;
+	font-size: 16px;
+	color: black;
+	padding-top: 13px;
+	.drag-drop-item-field {
+		margin-right: 23%;
+		position: relative;
+		left: 16px;
+	}
+	.drag-drop-item-comparison {
+		margin-right: 25%;
+	}
+}
+
+.drag-drop-group-preview {
 	padding: 12px 3px 3px 15px;
 	height: 21px;
 	font-size: 12px;

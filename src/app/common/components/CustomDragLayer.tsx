@@ -75,7 +75,7 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
         const groupStyle = _.extend({},
           backgroundColor(Colors().blockBg),
           borderColor(Colors().blockOutline),
-          { width: item.width },
+          {width: item.width}
         );
         return (
           <div
@@ -83,6 +83,22 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
             style={groupStyle}
           >
             {item.title}
+          </div>
+        );
+      case 'ITEM':
+        const itemStyle = _.extend({},
+          backgroundColor(Colors().sidebarBg),
+          {width: item.width}
+        );
+        const {data} = item;
+        return (
+          <div
+            className='drag-drop-item-preview'
+            style={itemStyle}
+          >
+            <div className='drag-drop-item-field'>{data.field}</div>
+            <div className='drag-drop-item-comparison'>{data.comparison}</div>
+            <div className='drag-drop-item-value'>{data.value}</div>
           </div>
         );
       default:

@@ -151,6 +151,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
                     keyPath={newKeyPath.push(i)}
                     onDrop={onDrop}
                     canDrop={false}
+                    data={item}
                   />
                   :
                   <DragDropGroup

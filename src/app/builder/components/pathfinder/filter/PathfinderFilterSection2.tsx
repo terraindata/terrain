@@ -320,6 +320,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                     keyPath={List([i])}
                     onDrop={this.handleGroupDrop}
                     canDrop={true}
+                    data={line}
                   />
                   :
                   <DragDropGroup
