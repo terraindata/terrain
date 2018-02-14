@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
 import { _Server } from 'schema/SchemaTypes';
-import { connect } from '../../helpers';
+import { connect } from 'test-helpers/helpers';
 
 describe('AnalyticsSelector', () =>
 {

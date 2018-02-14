@@ -67,6 +67,7 @@ export interface Props
   parentKeyPath: KeyPath;
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
+  builderActions?: typeof BuilderActions;
 }
 
 class BuilderMapComponent extends TerrainComponent<Props>
@@ -94,13 +95,13 @@ class BuilderMapComponent extends TerrainComponent<Props>
   {
     if (coordinates !== undefined)
     {
-      BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), coordinates);
+      this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), coordinates);
     }
     else
     {
-      BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), inputValue);
+      this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), inputValue);
     }
-    BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapInputValue'), inputValue);
+    this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapInputValue'), inputValue);
   }
 
   public spotlightsToMarkers()
@@ -142,5 +143,5 @@ class BuilderMapComponent extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   BuilderMapComponent,
   ['builder', 'spotlights'],
-  {},
+  { builderActions: BuilderActions },
 );

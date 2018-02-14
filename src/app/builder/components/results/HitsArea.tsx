@@ -54,7 +54,6 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import BuilderActions from 'builder/data/BuilderActions';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
@@ -94,7 +93,6 @@ export interface Props
   allowSpotlights: boolean;
   onNavigationException: () => void;
   ignoreEmptyCards?: boolean;
-  builderActions?: typeof BuilderActions;
 }
 
 interface State
@@ -113,7 +111,6 @@ interface State
   mouseStartY?: number;
   mapMaxHeight?: number;
   spotlightHits?: Immutable.Map<string, any>;
-  builderActions?: typeof BuilderActions;
 }
 
 const MAP_MAX_HEIGHT = 300;
@@ -122,9 +119,9 @@ const MAP_MIN_HEIGHT = 25; // height of top bar on map
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
-  public static handleConfigChange(config: ResultsConfig)
+  public static handleConfigChange(config: ResultsConfig, builderActions)
   {
-    BuilderActions.changeResultsConfig(config);
+    builderActions.changeResultsConfig(config);
   }
 
   public state: State = {
@@ -863,8 +860,4 @@ column if you have customized the results view.');
   }
 }
 
-export default Util.createContainer(
-  HitsArea,
-  [],
-  { builderActions: BuilderActions },
-);
+export default HitsArea;

@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// tslint:disable:strict-boolean-expressions
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 
@@ -75,9 +75,9 @@ export const TransformableTypes =
 export const ElasticBlockHelpers = {
   getColumnType(schemaState: SchemaState, builderState: BuilderState, column: string): string
   {
-    const serverName = BuilderStore.getState().db.name;
-    const index = getIndex();
-    const type = getType();
+    const serverName = builderState.db.name;
+    const index = getIndex('', builderState);
+    const type = getType('', builderState);
 
     const key = serverName + '/' + String(index) + '.' + String(type) + '.c.' + column;
 
