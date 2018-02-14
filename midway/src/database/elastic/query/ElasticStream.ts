@@ -126,12 +126,11 @@ export class ElasticStream extends Stream.Readable
       throw error;
     }
 
-    let hits = response.hits.hits;
     let length: number = response.hits.hits.length;
     if (this.rowsProcessed + length > this.size)
     {
       length = this.size - this.rowsProcessed;
-      hits = response.hits.hits.slice(0, length);
+      response.hits.hits = response.hits.hits.slice(0, length);
     }
 
     this.rowsProcessed += length;
@@ -140,8 +139,7 @@ export class ElasticStream extends Stream.Readable
     {
       response = await this.transform(error, response);
     }
-
-    this.push(hits);
+    this.push(response.hits.hits);
 
     if (
       (length > 0) &&
