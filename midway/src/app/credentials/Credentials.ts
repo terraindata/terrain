@@ -102,6 +102,18 @@ export class Credentials
     });
   }
 
+  public async getAsStrings(id?: number, type?: string): Promise<string[]>
+  {
+    return new Promise<string[]>(async (resolve, reject) =>
+    {
+      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { id, type }) as CredentialConfig[];
+      return resolve(await Promise.all(creds.map(async (cred) =>
+      {
+        return this._decrypt(cred.meta);
+      })));
+    });
+  }
+
   // returns a string of credentials that match given type
   public async getByType(type?: string): Promise<string[]>
   {

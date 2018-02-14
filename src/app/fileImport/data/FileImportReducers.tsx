@@ -440,6 +440,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('filesize', action.payload.filesize)
       .set('primaryKeys', List([]))
       .set('primaryKeyDelimiter', '-')
+      .set('requireJSONHaveAllFields', true)
       .set('previewColumns', action.payload.preview)
       .set('originalNames', action.payload.originalNames)
       .set('columnNames', action.payload.originalNames)
@@ -471,8 +472,8 @@ FileImportReducers[ActionTypes.importFile] =
       state.elasticUpdate,
       state.hasCsvHeader,
       state.isNewlineSeparatedJSON,
-      state.requireJSONHaveAllFields,
       state.primaryKeyDelimiter,
+      state.requireJSONHaveAllFields,
       () =>
       {
         action.payload.handleFileImportSuccess();
@@ -541,6 +542,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       action.payload.templateName,
       action.payload.exporting,
       state.primaryKeyDelimiter,
+      state.requireJSONHaveAllFields,
       state.objectKey,
       state.exportRank,
       () =>
@@ -568,6 +570,8 @@ FileImportReducers[ActionTypes.updateTemplate] =
       state.transforms,
       action.payload.exporting,
       state.primaryKeyDelimiter,
+      state.requireJSONHaveAllFields,
+      state.exportRank,
       action.payload.templateId,
       () =>
       {
@@ -621,6 +625,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
             transformations: template['transformations'],
             primaryKeys: template['primaryKeys'],
             primaryKeyDelimiter: template['primaryKeyDelimiter'],
+            requireJSONHaveAllFields: template['requireJSONHaveAllFields'],
           }),
         ));
         action.payload.setTemplates(templates);
@@ -657,6 +662,7 @@ FileImportReducers[ActionTypes.applyTemplate] =
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewColumns', previewColumns)
       .set('primaryKeyDelimiter', template.primaryKeyDelimiter)
+      .set('requireJSONHaveAllFields', template.requireJSONHaveAllFields)
       .set('isDirty', false);
   };
 

@@ -44,18 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../../ConfigType';
-import { TemplateBase } from './TemplateBase';
+import csvWriter = require('csv-write-stream');
 
-export class ImportTemplateConfig extends TemplateBase
+import * as _ from 'lodash';
+import * as stream from 'stream';
+import * as winston from 'winston';
+
+import CredentialConfig from '../../credentials/CredentialConfig';
+import Credentials from '../../credentials/Credentials';
+
+export const credentials: Credentials = new Credentials();
+
+export interface MailchimpConfig
 {
-  public name: string = '';
-  public requireJSONHaveAllFields: boolean = true;
-  constructor(props: object)
+  id: string;
+  name: string;
+  range: string;
+}
+
+export class Mailchimp
+{
+  private storedEmail: string;
+  private storedKeyFilePath: string;
+
+  private async _getStoredGoogleAPICredentials()
   {
-    super(props);
-    ConfigType.initialize(this, props);
+    const creds: string[] = await credentials.getByType('googleapi');
+    if (creds.length === 0)
+    {
+      winston.info('No credential found for type googleapi.');
+    }
+    else
+    {
+      const cred: object = JSON.parse(creds[0]);
+      this.storedEmail = cred['storedEmail'];
+      this.storedKeyFilePath = cred['storedKeyFilePath'];
+    }
   }
 }
 
-export default ImportTemplateConfig;
+export default Mailchimp;
