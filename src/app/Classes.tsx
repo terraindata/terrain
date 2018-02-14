@@ -105,6 +105,14 @@ let AllRecordArray = [];
 export const AllRecordNameArray = [];
 export let RecordsSerializer = Serialize.immutable(Immutable, []);
 
+function addNewRecord(rec: Record, name: string)
+{
+  AllRecordMap[name] = rec;
+  AllRecordNameArray.push(name);
+  AllRecordArray.push(rec);
+  RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
+}
+
 export function resetRecordNameArray(recordName: string[]): boolean
 {
   // fast-path checking
@@ -158,10 +166,8 @@ export function New<T>(
   if (!AllRecordMap[class_name])
   {
     TerrainLog.debug('New Record ' + String(class_name));
-    AllRecordMap[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
-    AllRecordNameArray.push(class_name);
-    AllRecordArray.push(AllRecordMap[class_name]);
-    RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
+    const newRecord = Immutable.Record(new instance.__proto__.constructor({}));
+    addNewRecord(newRecord, class_name);
   }
 
   if (extendId)
@@ -177,15 +183,15 @@ export function New<T>(
   return new AllRecordMap[class_name](instance) as any;
 }
 
-export function createRecordType(obj, name)
+export function createRecordType(obj, name: string)
 {
   if (!AllRecordMap[name])
   {
-    AllRecordMap[name] = Immutable.Record(obj);
+    addNewRecord(Immutable.Record(obj), name);
+  } else
+  {
+    TerrainLog.debug('WARNING: The record type ' + name + ' has already been created!');
   }
-  AllRecordNameArray.push(name);
-  AllRecordArray.push(AllRecordMap[name]);
-  RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
   return AllRecordMap[name];
 }
 
