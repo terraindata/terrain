@@ -62,15 +62,51 @@ import Dropdown from 'common/components/Dropdown';
 
 export interface Props<FState>
 {
-  inputMap: any;
+  inputMap: InputDeclarationMap<FState>;
   inputState: FState;
   onStateChange: (newState: FState) => void;
   handleConfirm: () => void;
 }
 
-export default class DynamicForm<FState> extends TerrainComponent<Props<FState>>
-{
+type MatrixType<S> = List<MatrixRowType<S>>; // list of list of functions
+type MatrixRowType<S> = List<MatrixCellFn<S>>;
+type MatrixCellFn<S> = (state: S, key) => any;
 
+export default class DynamicForm<S> extends TerrainComponent<Props<S>>
+{
+  public renderMatrix: MatrixType<S>
+
+  constructor(props)
+  {
+    super(props);
+  }
+
+  public renderMatrixCell(cellFn: MatrixCellFn<S>, index)
+  {
+
+  }
+
+  public renderMatrixRow(row: MatrixRowType<S>, index)
+  {
+    return (
+      <div key={index}>
+        {
+          row.map(this.renderMatrixCell)
+        }
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
+      <div>
+        {
+          this.renderMatrix.map(this.renderMatrixRow)
+        }
+      </div>
+    );
+  }
 }
 
 export enum DisplayState
