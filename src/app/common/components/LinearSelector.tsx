@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
-import * as Radium from 'radium';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
@@ -143,8 +143,8 @@ class LinearSelector extends TerrainComponent<Props>
   public renderOption(option, i)
   {
     const onClickFn = this.state.showAllOptions ?
-            this._fn(this.selectOption, option, false) :
-            this._toggle('showAllOptions');
+      this._fn(this.selectOption, option, false) :
+      this._toggle('showAllOptions');
     const selected = this.props.selected === option;
     return (
       <div

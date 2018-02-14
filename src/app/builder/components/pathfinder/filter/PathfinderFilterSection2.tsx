@@ -258,8 +258,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     // If they were both single filters, create a new group
     if (!this.isGroup(dropped) && !this.isGroup(droppedInto))
     {
-      const {groupCount} = this.props.filterGroup;
-      const groupNumber = groupCount < 10 ? '0' + String(groupCount) : groupCount;
+      const { groupCount } = this.props.filterGroup;
+      const groupNumber: string = groupCount < 10 ? '0' + String(groupCount) : String(groupCount);
       group = _FilterGroup({
         lines: List([droppedInto, dropped]),
         name: 'Group ' + groupNumber,

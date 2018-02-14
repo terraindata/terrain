@@ -126,10 +126,10 @@ class ItemComponent extends TerrainComponent<ItemProps>
     const draggable = this.props.connectDragSource(
       <div
         style={_.extend({},
-            { opacity: isDragging ? 0.3 : 1 },
-            { borderColor: isOver ? Colors().active : '' },
-          )}
-          className='drag-drop-item'>
+          { opacity: isDragging ? 0.3 : 1 },
+          { borderColor: isOver ? Colors().active : '' },
+        )}
+        className='drag-drop-item'>
         <div
           ref='item'
         >

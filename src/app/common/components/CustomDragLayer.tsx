@@ -75,7 +75,7 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
         const groupStyle = _.extend({},
           backgroundColor(Colors().blockBg),
           borderColor(Colors().blockOutline),
-          {width: item.width}
+          { width: item.width },
         );
         return (
           <div
@@ -88,9 +88,9 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
       case 'ITEM':
         const itemStyle = _.extend({},
           backgroundColor(Colors().sidebarBg),
-          {width: item.width}
+          { width: item.width },
         );
-        const {data} = item;
+        const { data } = item;
         return (
           <div
             className='drag-drop-item-preview'
