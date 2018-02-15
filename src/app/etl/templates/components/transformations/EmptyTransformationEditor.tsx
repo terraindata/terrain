@@ -51,48 +51,22 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
-import { getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
-import { TransformationNode } from 'etl/templates/FieldTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationsInfo from 'shared/transformations/TransformationsInfo';
-
-import './TransformationEditor.less';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 
 export interface Props
 {
-  transformation?: TransformationNode;
-  onTransformationChange: (structuralChanges: boolean) => void;
-  deleteTransformation?: () => void;
-  engine: TransformationEngine;
-  fieldID: number;
+  [k: string]: any;
 }
 
-@Radium
-export class TransformationEditor extends TerrainComponent<Props>
+export class EmptyTransformationEditor extends TerrainComponent<Props>
 {
-
   public render()
   {
-    const CompClass = getTransformationForm(this.props.transformation.typeCode);
-    if (CompClass == null)
-    {
-      return <div> Error. Transformation Type not Implemented </div>;
-    }
     return (
-      <CompClass
-        isCreate={false}
-        engine={this.props.engine}
-        fieldID={this.props.fieldID}
-        onEditOrCreate={this.props.onTransformationChange}
-        transformation={this.props.transformation}
-      />
+      <div>
+        This Transformation has no configuration options
+      </div>
     );
   }
 }

@@ -43,56 +43,59 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
+// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
 
-import * as classNames from 'classnames';
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
-
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
-import { getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationsInfo from 'shared/transformations/TransformationsInfo';
+import { EmptyTransformationEditor } from './EmptyTransformationEditor';
+import { FactoryArgs, transformationFormFactory, TransformationFormProps } from './TransformationFormFactory';
 
-import './TransformationEditor.less';
-
-export interface Props
+export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
 {
-  transformation?: TransformationNode;
-  onTransformationChange: (structuralChanges: boolean) => void;
-  deleteTransformation?: () => void;
-  engine: TransformationEngine;
-  fieldID: number;
-}
-
-@Radium
-export class TransformationEditor extends TerrainComponent<Props>
-{
-
-  public render()
+  switch (type)
   {
-    const CompClass = getTransformationForm(this.props.transformation.typeCode);
-    if (CompClass == null)
-    {
-      return <div> Error. Transformation Type not Implemented </div>;
-    }
-    return (
-      <CompClass
-        isCreate={false}
-        engine={this.props.engine}
-        fieldID={this.props.fieldID}
-        onEditOrCreate={this.props.onTransformationChange}
-        transformation={this.props.transformation}
-      />
-    );
+    case TransformationNodeType.CapitalizeNode:
+      return CapitalizeClass as any;
+    case TransformationNodeType.SubstringNode:
+      return SubstringComponent;
+    default:
+      return null;
   }
 }
+
+// capitalize
+const CapitalizeClass = EmptyTransformationEditor;
+
+// substring
+interface SubstringState
+{
+  from: number;
+  length: number;
+}
+
+const substringInputMap: InputDeclarationMap<SubstringState> = {
+  from: {
+    type: DisplayType.NumberBox,
+    displayName: 'From Position',
+    group: 'main',
+  },
+  length: {
+    type: DisplayType.NumberBox,
+    displayName: 'Substring Length',
+    group: 'main',
+  },
+};
+
+const substringArgs: FactoryArgs<SubstringState, TransformationNodeType.SubstringNode> = {
+  inputMap: substringInputMap,
+  type: TransformationNodeType.SubstringNode,
+  initialState: {
+    from: 0,
+    length: 3,
+  },
+};
+
+const SubstringComponent =
+  transformationFormFactory<SubstringState, TransformationNodeType.SubstringNode>(substringArgs);

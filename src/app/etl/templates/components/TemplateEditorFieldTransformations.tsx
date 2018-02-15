@@ -67,6 +67,7 @@ import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
+import { TransformationCreator } from 'etl/templates/components/transformations/TransformationCreator';
 import { TransformationEditor } from 'etl/templates/components/transformations/TransformationEditor';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -164,9 +165,11 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
   public renderCreateTransformationSection()
   {
     return (
-      <div className='transformation-creator'>
-        I also don't know what to put here...
-      </div>
+      <TransformationCreator
+        engine={this.props.templateEditor.template.transformationEngine}
+        fieldID={this.props.field.fieldId}
+        onTransformationCreated={this.handleTransformationChange}
+      />
     );
   }
 
@@ -252,12 +255,12 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
 
   public handleAddNewTransformation()
   {
-    this._proxy().addTransformation(TransformationNodeType.CapitalizeNode, List([this.props.field.fieldId]));
+    this._proxy().addTransformation(TransformationNodeType.SubstringNode,
+      List([this.props.field.fieldId]), { from: 1, length: 5 });
     this.setState({
-      viewState: ViewState.CREATE_NEW,
+      viewState: ViewState.LIST_ALL,
     });
   }
-
 }
 
 export default Util.createTypedContainer(

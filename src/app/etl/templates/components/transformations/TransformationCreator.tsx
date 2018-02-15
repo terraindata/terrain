@@ -67,32 +67,27 @@ import './TransformationEditor.less';
 
 export interface Props
 {
-  transformation?: TransformationNode;
-  onTransformationChange: (structuralChanges: boolean) => void;
+  onTransformationCreated: (structuralChanges: boolean) => void;
   deleteTransformation?: () => void;
   engine: TransformationEngine;
   fieldID: number;
 }
 
 @Radium
-export class TransformationEditor extends TerrainComponent<Props>
+export class TransformationCreator extends TerrainComponent<Props>
 {
-
   public render()
   {
-    const CompClass = getTransformationForm(this.props.transformation.typeCode);
-    if (CompClass == null)
-    {
-      return <div> Error. Transformation Type not Implemented </div>;
-    }
-    return (
-      <CompClass
-        isCreate={false}
-        engine={this.props.engine}
-        fieldID={this.props.fieldID}
-        onEditOrCreate={this.props.onTransformationChange}
-        transformation={this.props.transformation}
-      />
-    );
+    return null;
   }
 }
+
+// return (
+//   <CompClass
+//     isCreate={true}
+//     engine={this.props.engine}
+//     fieldID={this.props.fieldID}
+//     onEditOrCreate={this.props.onTransformationCreated}
+
+//   />
+// );

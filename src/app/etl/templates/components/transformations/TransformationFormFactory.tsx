@@ -68,7 +68,7 @@ import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
 // visitor components must use this
-export interface TransformationEditorProps
+export interface TransformationFormProps
 {
   isCreate: boolean; // whether or not the transformation is being created or edited
   transformation?: TransformationNode; // must be supplied if isCreate is false
@@ -92,28 +92,30 @@ export interface FactoryArgs<State extends object, Type extends TransformationNo
 
   getStateFromNode?: (node: TransformationNode, engine: TransformationEngine, fieldID: number)
     => State;
-    // if not specified, then the default is to pick names from node.meta (using initialState to pick keys)
-    // the factory is not responsible for making sure that node.meta and State are similar types
+  // if not specified, then the default is to pick names from node.meta (using initialState to pick keys)
+  // the factory is not responsible for making sure that node.meta and State are similar types
 
   computeNewParams?: (state: State, engine: TransformationEngine, fieldID: number)
-    => ArgsPayload<Type>,
-    // if not specified, then the default is to pass State as the options.
-    // again, the factory is not responsible for making sure that the expected meta object and State are similar types
+    => ArgsPayload<Type>;
+  // if not specified, then the default is to pass State as the options.
+  // again, the factory is not responsible for making sure that the expected meta object and State are similar types
 
   computeEditParams?: (state: State, engine: TransformationEngine, fieldID: number, transformationID: number)
-    => ArgsPayload<Type> // defaults to computeNewParams
+    => ArgsPayload<Type>; // defaults to computeNewParams
 
   validateState?: (state: State, engine: TransformationEngine, fieldID: number) =>
     {
       valid: boolean;
       message: string;
     };
-    // check if state is valid and provide an error or warning message (TODO not implemented)
+  // check if state is valid and provide an error or warning message (TODO not implemented)
 }
 
-export function transformationEditorFactory<State extends object, Type extends TransformationNodeType>(args: FactoryArgs<State, Type>)
+export function transformationFormFactory<State extends object, Type extends TransformationNodeType>(
+  args: FactoryArgs<State, Type>,
+): React.ComponentClass<TransformationFormProps>
 {
-  class TransformationForm extends TerrainComponent<TransformationEditorProps>
+  class TransformationForm extends TerrainComponent<TransformationFormProps>
   {
     public state: State = args.initialState;
 
@@ -173,7 +175,7 @@ export function transformationEditorFactory<State extends object, Type extends T
       return {
         options: state,
         fieldNamesOrIDs: fieldIDs,
-      }
+      };
     }
 
     public handleStateChange(newState: State)
@@ -192,8 +194,12 @@ export function transformationEditorFactory<State extends object, Type extends T
       else if (!this.props.isCreate && args.computeEditParams !== undefined)
       {
         fnToUse = args.computeEditParams;
+      }
+      if (!this.props.isCreate)
+      {
         transformID = this.props.transformation.id;
       }
+
       const payload = fnToUse(this.state, this.props.engine, this.props.fieldID, transformID);
       if (this.props.isCreate)
       {

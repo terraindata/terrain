@@ -131,9 +131,9 @@ export const _TransformationNode = makeConstructor(TransformationNodeC);
 // Ignore these types; they are to make sure that TransformationNodeC is the same as TransformationNodeBase
 type AssertNodeC = {
   [K in keyof TransformationNodeC]: TransformationNodeC[K]
-}
+};
 type AssertNodeBase = {
   [K in keyof TransformationNodeBase]: TransformationNodeBase[K]
-}
+};
 type AssertCIsBase<T extends AssertNodeC> = T;
-type AssertBaseIsC<T extends AssertNodeBase> = AssertCIsBase<T>
+type AssertBaseIsC<T extends AssertNodeBase> = AssertCIsBase<T>;

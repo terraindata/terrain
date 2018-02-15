@@ -77,7 +77,7 @@ export interface InputDeclarationOptionTypes
 export interface InputDeclarationType<S>
 {
   type: string;
-  options: any; // one of InputDeclarationOptionTypes
+  options?: any; // one of InputDeclarationOptionTypes
   displayName?: string; // defaults to the state name
   group?: string; // inputs with the same group value will show in a row
   style?: any; // applied to the wrapper around the input element
@@ -112,7 +112,7 @@ type AssertOptionTypesExhaustive = {
 interface InputDeclarationHelper<K extends DisplayTypeKeys, State> extends InputDeclarationType<State>
 {
   type: K;
-  options: InputDeclarationOptionTypes[K];
+  options?: InputDeclarationOptionTypes[K];
 }
 
 type InputDeclarationBundle<State> = {
