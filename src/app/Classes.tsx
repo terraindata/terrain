@@ -165,7 +165,7 @@ export function Constructor<T>(instance)
     const newRecord = Immutable.Record(new instance.__proto__.constructor({}));
     addNewRecord(newRecord, class_name);
   }
-  return records[class_name];
+  return AllRecordMap[class_name];
 }
 
 export function New<T>(
@@ -183,7 +183,7 @@ export function New<T>(
   _.forOwn(config,
     (value, key) => { instance[key] = value; },
   );
-  return new AllRecordMap[class_name](instance) as any;
+  return new constructor(instance) as any;
 }
 
 export function createRecordType(obj, name: string)
