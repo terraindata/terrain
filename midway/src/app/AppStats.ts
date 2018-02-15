@@ -44,80 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as os from 'os';
-import * as process from 'process';
-import * as v8 from 'v8';
-import * as winston from 'winston';
-import appStats from '../AppStats';
-
-const Router = new KoaRouter();
-
-/**
- * Simple ping style status check
- */
-Router.get('/', async (ctx, next) =>
+class AppStats
 {
-  ctx.body = { status: 'ok' };
-});
+  public numRequests: number = 0;
+  public numRequestsThatThrew: number = 0;
+  public numRequestsCompleted: number = 0;
+  public startTime: Date = new Date();
 
-/**
- * returns some basic stats about the server process
- */
-Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body = {
-    startTime: appStats.startTime,
-    currentTime: new Date(),
-    uptime: Date.now() - appStats.startTime.valueOf(),
+  public getRequestCounts(): number[]
+  {
+    return [this.numRequests, this.numRequests - this.numRequestsCompleted, this.numRequestsThatThrew];
+  }
+}
 
-    numRequests: appStats.numRequests,
-    numRequestsCompleted: appStats.numRequestsCompleted,
-    numRequestsThatThrew: appStats.numRequestsThatThrew,
-    numRequestsPending: appStats.numRequests - appStats.numRequestsCompleted,
+const appStats: AppStats = new AppStats();
 
-    v8: {
-      // cachedDataVersionTag: v8.cachedDataVersionTag(),
-      heapStatistics: v8.getHeapStatistics(),
-      // heapSpaceStatistics: v8.getHeapSpaceStatistics(),
-    },
-
-    os:
-      {
-        arch: os.arch(),
-        // constants:         os.constants,
-        numCPUs: os.cpus().length,
-        // endianness: os.endianness(),
-        freemem: os.freemem(),
-        // homedir: os.homedir(),
-        // hostname: os.hostname(),
-        loadavg: os.loadavg(),
-        // networkInterfaces: os.networkInterfaces(),
-        // platform: os.platform(),
-        // release: os.release(),
-        // tmpdir: os.tmpdir(),
-        totalmem: os.totalmem(),
-        uptime: os.uptime(),
-      },
-
-    process:
-      {
-        pid: process.pid,
-        // ppid: process.ppid,
-      },
-  };
-});
-
-/**
- * to check if you are correctly logged in
- */
-Router.post('/loggedin', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body =
-    {
-      loggedIn: true,
-    };
-});
-
-export default Router;
+export default appStats;
