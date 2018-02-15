@@ -60,65 +60,36 @@ const { List, Map } = Immutable;
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
 import './TransformationEditor.less';
 
-import { transformationEditorFactory } from './TransformationEditorFactory';
-console.log(transformationEditorFactory);
+import { FactoryArgs, transformationEditorFactory } from './TransformationEditorFactory';
 
 export interface Props
 {
   transformation?: TransformationNode;
-  editTransformation: (transformationID, fieldNamesOrIDs?, options?) => void;
+  onTransformationChange: (structuralChanges: boolean) => void;
   deleteTransformation?: () => void;
+  engine: TransformationEngine;
+  fieldID: number;
 }
 
 @Radium
 export class TransformationEditor extends TerrainComponent<Props>
 {
-  public state: {
-    formState: TestFormState,
-  } = {
-      formState: {
-        from: 0,
-        to: 5,
-        flag: true,
-        text: 'once upon a time...',
-      },
-    };
-
-  public getChildComponent(type: TransformationNodeType)
-  {
-    // switch (type)
-    // {
-    //   case TransformationNodeType.CapitalizeNode:
-    //     return CapitalizeNodeEditor;
-    //   case TransformationNodeType.SubstringNode:
-    //     return SubstringNodeEditor;
-    //   default:
-    //     return DefaultNodeEditor;
-    // }
-  }
 
   public render()
   {
     return (
-      null
-      // <DynamicForm
-      //   inputMap={TestMap}
-      //   inputState={this.state.formState}
-      //   onStateChange={this._setStateWrapper('formState')}
-      //   mainButton={{
-      //     name: 'Save',
-      //     onClicked: () => null,
-      //   }}
-      //   secondButton={{
-      //     name: 'Cancel',
-      //     onClicked: () => null,
-      //   }}
-      // />
+      <TestComponent
+        isCreate={true}
+        engine={this.props.engine}
+        fieldID={this.props.fieldID}
+        onEditOrCreate={this.props.onTransformationChange}
+      />
     );
   }
 }
@@ -126,12 +97,11 @@ export class TransformationEditor extends TerrainComponent<Props>
 interface TestFormState
 {
   from: number;
-  to: number;
-  flag: boolean;
-  text: string;
+  length: number;
+  testFlag: boolean;
 }
 
-const TestMap: InputDeclarationMap<TestFormState> =
+const testMap: InputDeclarationMap<TestFormState> =
   {
     from: {
       type: DisplayType.NumberBox,
@@ -139,22 +109,27 @@ const TestMap: InputDeclarationMap<TestFormState> =
       group: 'numberRow',
       options: {},
     },
-    text: {
-      type: DisplayType.TextBox,
-      displayName: 'Tell us a story',
-      group: 'nextRow',
-      options: {},
-    },
-    to: {
+    length: {
       type: DisplayType.NumberBox,
       displayName: 'To Position',
       group: 'numberRow',
       options: {},
     },
-    flag: {
+    testFlag: {
       type: DisplayType.CheckBox,
       displayName: 'Would you like Fries?',
-      group: 'nextRow',
       options: {},
     },
   };
+
+const testArgs: FactoryArgs<TestFormState, TransformationNodeType.SubstringNode> = {
+  inputMap: testMap,
+  type: TransformationNodeType.SubstringNode,
+  initialState: {
+    from: 0,
+    length: 3,
+    testFlag: true,
+  }
+}
+
+const TestComponent = transformationEditorFactory<TestFormState, TransformationNodeType.SubstringNode>(testArgs);

@@ -84,7 +84,7 @@ interface ArgsPayload<Type extends TransformationNodeType>
   fieldNamesOrIDs: List<number>;
 }
 
-interface FactoryArgs<State extends object, Type extends TransformationNodeType>
+export interface FactoryArgs<State extends object, Type extends TransformationNodeType>
 {
   inputMap: InputDeclarationMap<State>;
   type: Type;
@@ -102,6 +102,13 @@ interface FactoryArgs<State extends object, Type extends TransformationNodeType>
 
   computeEditParams?: (state: State, engine: TransformationEngine, fieldID: number, transformationID: number)
     => ArgsPayload<Type> // defaults to computeNewParams
+
+  validateState?: (state: State, engine: TransformationEngine, fieldID: number) =>
+    {
+      valid: boolean;
+      message: string;
+    };
+    // check if state is valid and provide an error or warning message (TODO not implemented)
 }
 
 export function transformationEditorFactory<State extends object, Type extends TransformationNodeType>(args: FactoryArgs<State, Type>)
@@ -134,7 +141,7 @@ export function transformationEditorFactory<State extends object, Type extends T
         <DynamicForm
           inputMap={args.inputMap}
           inputState={this.state}
-          onStateChange={this.setState}
+          onStateChange={this.handleStateChange}
           mainButton={{
             name: isCreate ? 'Create' : 'Save',
             onClicked: this.handleMainAction,
@@ -167,6 +174,11 @@ export function transformationEditorFactory<State extends object, Type extends T
         options: state,
         fieldNamesOrIDs: fieldIDs,
       }
+    }
+
+    public handleStateChange(newState: State)
+    {
+      this.setState(newState);
     }
 
     public handleMainAction()

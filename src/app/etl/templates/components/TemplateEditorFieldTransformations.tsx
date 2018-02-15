@@ -153,7 +153,9 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
         <TransformationEditor
           key={currentIndex}
           transformation={field.transformations.get(currentIndex)}
-          editTransformation={null}
+          engine={this.props.templateEditor.template.transformationEngine}
+          fieldID={this.props.field.fieldId}
+          onTransformationChange={this.handleTransformationChange}
         />
       );
     }
@@ -230,6 +232,11 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
         </div>
       </div>
     );
+  }
+
+  public handleTransformationChange(structuralChanges: boolean)
+  {
+    this._proxy().syncWithEngine();
   }
 
   public handleEditTransformationFactory(index: number)
