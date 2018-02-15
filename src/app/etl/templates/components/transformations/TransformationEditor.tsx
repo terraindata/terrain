@@ -61,7 +61,7 @@ import { getTransformationForm } from 'etl/templates/components/transformations/
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationsInfo from 'shared/transformations/TransformationsInfo';
+import { TransformationsInfo } from 'shared/transformations/TransformationsInfo';
 
 import './TransformationEditor.less';
 
@@ -69,7 +69,7 @@ export interface Props
 {
   transformation?: TransformationNode;
   onTransformationChange: (structuralChanges: boolean) => void;
-  deleteTransformation?: () => void;
+  onClose: () => void;
   engine: TransformationEngine;
   fieldID: number;
 }
@@ -77,20 +77,16 @@ export interface Props
 @Radium
 export class TransformationEditor extends TerrainComponent<Props>
 {
-
   public render()
   {
     const CompClass = getTransformationForm(this.props.transformation.typeCode);
-    if (CompClass == null)
-    {
-      return <div> Error. Transformation Type not Implemented </div>;
-    }
     return (
       <CompClass
         isCreate={false}
         engine={this.props.engine}
         fieldID={this.props.fieldID}
         onEditOrCreate={this.props.onTransformationChange}
+        onClose={this.props.onClose}
         transformation={this.props.transformation}
       />
     );

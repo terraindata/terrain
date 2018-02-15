@@ -47,18 +47,21 @@ THE SOFTWARE.
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 
-type NodeInfoType =
+type AllNodeInfoType =
   {
-    [K in TransformationNodeType]: {
-      humanName: string; // something we can read
-      editable?: boolean; // is it editable after creation
-      creatable?: boolean; // can it created by the user?
-      description?: string; // description of what the transformation does
-      isAvailable?: (engine: TransformationEngine, fieldId: number) => boolean; // is this useful?
-    }
+    [K in TransformationNodeType]: InfoType
   };
 
-const TransformationNodeInfo: NodeInfoType =
+export interface InfoType
+{
+  humanName: string; // something we can read
+  editable?: boolean; // is it editable after creation
+  creatable?: boolean; // can it created by the user?
+  description?: string; // description of what the transformation does
+  isAvailable?: (engine: TransformationEngine, fieldId: number) => boolean;
+}
+
+const TransformationNodeInfo: AllNodeInfoType =
   {
     [TransformationNodeType.LoadNode]:
       {
@@ -153,7 +156,7 @@ const TransformationNodeInfo: NodeInfoType =
       },
   };
 
-export default abstract class TransformationsInfo
+export abstract class TransformationsInfo
 {
   public static getReadableName(type: TransformationNodeType)
   {
@@ -165,7 +168,7 @@ export default abstract class TransformationsInfo
     return TransformationNodeInfo[type].description;
   }
 
-  public static getInfo(type: TransformationNodeType)
+  public static getInfo(type: TransformationNodeType): InfoType // get the whole info object
   {
     return TransformationNodeInfo[type];
   }

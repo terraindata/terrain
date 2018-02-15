@@ -65,7 +65,7 @@ import { KeyPath as EngineKeypath, TransformationEngine } from 'shared/transform
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
-import TransformationsInfo from 'shared/transformations/TransformationsInfo';
+import { TransformationsInfo } from 'shared/transformations/TransformationsInfo';
 
 // visitor components must use this
 export interface TransformationFormProps
@@ -75,6 +75,7 @@ export interface TransformationFormProps
   engine: TransformationEngine;
   fieldID: number;
   onEditOrCreate: (structural: boolean) => void;
+  onClose: () => void;
   // calls handler with a bool indicating if transform results in structural changes to the document
 }
 
@@ -144,9 +145,13 @@ export function transformationFormFactory<State extends object, Type extends Tra
           inputMap={args.inputMap}
           inputState={this.state}
           onStateChange={this.handleStateChange}
-          mainButton={{
+          mainButton={{ // TODO if there are no config options available change the buttons to match
             name: isCreate ? 'Create' : 'Save',
             onClicked: this.handleMainAction,
+          }}
+          secondButton={{
+            name: 'Cancel',
+            onClicked: this.props.onClose,
           }}
         />
       );
@@ -204,12 +209,13 @@ export function transformationFormFactory<State extends object, Type extends Tra
       if (this.props.isCreate)
       {
         this.props.engine.appendTransformation(args.type, payload.fieldNamesOrIDs, payload.options);
-        this.props.onEditOrCreate(false);
+        this.props.onEditOrCreate(false); // TODO figure out if structural changes happen
+        this.props.onClose();
       }
       else
       {
         this.props.engine.editTransformation(transformID, payload.fieldNamesOrIDs, payload.options);
-        this.props.onEditOrCreate(false);
+        this.props.onEditOrCreate(false); // TODO figure out if structural changes happen
       }
     }
   }

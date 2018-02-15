@@ -57,18 +57,18 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
+import { availableTransformations, getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationsInfo from 'shared/transformations/TransformationsInfo';
+import { InfoType, TransformationsInfo } from 'shared/transformations/TransformationsInfo';
 
 import './TransformationEditor.less';
 
 export interface Props
 {
   onTransformationCreated: (structuralChanges: boolean) => void;
-  deleteTransformation?: () => void;
+  onClose: () => void;
   engine: TransformationEngine;
   fieldID: number;
 }
@@ -76,18 +76,79 @@ export interface Props
 @Radium
 export class TransformationCreator extends TerrainComponent<Props>
 {
+  public state: {
+    creatingType: TransformationNodeType | null,
+  } = {
+      creatingType: null,
+    };
+
+  constructor(props)
+  {
+    super(props);
+    this.handleOptionClickedFactory = _.memoize(this.handleOptionClickedFactory);
+  }
+
+  public renderCreateTransformation()
+  {
+    const CompClass = getTransformationForm(this.state.creatingType);
+
+    return (
+      <CompClass
+        isCreate={true}
+        engine={this.props.engine}
+        fieldID={this.props.fieldID}
+        onEditOrCreate={this.props.onTransformationCreated}
+        onClose={this.props.onClose}
+      />
+    );
+  }
+
+  public renderTransformOption(type: TransformationNodeType, index)
+  {
+    return (
+      <div
+        className='transformation-option'
+        key={index}
+        onClick={this.handleOptionClickedFactory(type)}
+      >
+        {TransformationsInfo.getReadableName(type)}
+      </div>
+    );
+  }
+
+  public renderAvailableTransformations()
+  {
+    const transformOptions = availableTransformations.filter((type, index) =>
+      TransformationsInfo.getInfo(type).isAvailable(this.props.engine, this.props.fieldID),
+    );
+    return (
+      <div className='available-transformations-list'>
+        {
+          transformOptions.size === 0 ? 'This Field Cannot be Transformed' :
+            transformOptions.map(this.renderTransformOption)
+        }
+      </div>
+    );
+  }
+
   public render()
   {
-    return null;
+    return (
+      <div className='transformation-editor'>
+        <div className='transformation-editor-title'> Transform this Field </div>
+        {this.state.creatingType === null ? this.renderAvailableTransformations() : null}
+        {this.state.creatingType !== null ? this.renderCreateTransformation() : null}
+      </div>
+    );
+  }
+
+  public handleOptionClickedFactory(type: TransformationNodeType)
+  {
+    return () =>
+    {
+      this.setState({
+        creatingType: type,
+      });
+    };
   }
 }
-
-// return (
-//   <CompClass
-//     isCreate={true}
-//     engine={this.props.engine}
-//     fieldID={this.props.fieldID}
-//     onEditOrCreate={this.props.onTransformationCreated}
-
-//   />
-// );

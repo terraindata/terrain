@@ -72,9 +72,9 @@ import { TransformationEditor } from 'etl/templates/components/transformations/T
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
-import TransformationsInfo from 'shared/transformations/TransformationsInfo';
+import { TransformationsInfo } from 'shared/transformations/TransformationsInfo';
 
-import './TemplateEditorField.less';
+import './transformations/TransformationEditor.less';
 
 const EditIcon = require('images/icon_edit.svg');
 const AddIcon = require('images/icon_add.svg');
@@ -157,6 +157,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
           engine={this.props.templateEditor.template.transformationEngine}
           fieldID={this.props.field.fieldId}
           onTransformationChange={this.handleTransformationChange}
+          onClose={this.handleUIClose}
         />
       );
     }
@@ -169,6 +170,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
         engine={this.props.templateEditor.template.transformationEngine}
         fieldID={this.props.field.fieldId}
         onTransformationCreated={this.handleTransformationChange}
+        onClose={this.handleUIClose}
       />
     );
   }
@@ -253,12 +255,17 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
     };
   }
 
-  public handleAddNewTransformation()
+  public handleUIClose()
   {
-    this._proxy().addTransformation(TransformationNodeType.SubstringNode,
-      List([this.props.field.fieldId]), { from: 1, length: 5 });
     this.setState({
       viewState: ViewState.LIST_ALL,
+    });
+  }
+
+  public handleAddNewTransformation()
+  {
+    this.setState({
+      viewState: ViewState.CREATE_NEW,
     });
   }
 }

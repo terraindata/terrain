@@ -49,8 +49,10 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { EmptyTransformationEditor } from './EmptyTransformationEditor';
 import { FactoryArgs, transformationFormFactory, TransformationFormProps } from './TransformationFormFactory';
+
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
 export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
 {
@@ -65,8 +67,39 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
   }
 }
 
+export const availableTransformations: List<TransformationNodeType> = determineAvailableTransformations();
+
+function determineAvailableTransformations(): List<TransformationNodeType>
+{
+  let typeList = List([]);
+  for (const type in TransformationNodeType)
+  {
+    if (getTransformationForm(type as TransformationNodeType) !== null)
+    {
+      typeList = typeList.push(type);
+    }
+  }
+  return typeList;
+}
+
 // capitalize
-const CapitalizeClass = EmptyTransformationEditor;
+interface CapitalizeState
+{
+
+}
+
+const capitalizeInputMap = {
+
+};
+
+const capitalizeArgs: FactoryArgs<CapitalizeState, TransformationNodeType.CapitalizeNode> = {
+  inputMap: capitalizeInputMap,
+  type: TransformationNodeType.CapitalizeNode,
+  initialState: {},
+};
+
+const CapitalizeClass =
+  transformationFormFactory<CapitalizeState, TransformationNodeType.CapitalizeNode>(capitalizeArgs);
 
 // substring
 interface SubstringState
