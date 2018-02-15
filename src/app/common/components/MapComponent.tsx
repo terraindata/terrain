@@ -53,7 +53,6 @@ import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, Rectangle, TileLayer } from 'react-leaflet';
 
 import Switch from 'common/components/Switch';
-import Actions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';

@@ -56,7 +56,7 @@ import Dropdown from '../../../common/components/Dropdown';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
 
@@ -77,6 +77,7 @@ interface Props
   canEdit: boolean;
   onCreateInput: (index: number) => void;
   language: string;
+  builderActions?: typeof BuilderActions;
 }
 
 const TYPE_OPTIONS =
@@ -133,7 +134,7 @@ class InputComponent extends TerrainComponent<Props>
 
   public handleInputTypeChange(inputType: number)
   {
-    Actions.change(this.getKeyPath('inputType'), inputType);
+    this.props.builderActions.change(this.getKeyPath('inputType'), inputType);
 
     if (inputType === InputType.DATE)
     {
@@ -143,7 +144,7 @@ class InputComponent extends TerrainComponent<Props>
         date = new Date();
       }
       const value = Util.formatInputDate(date, this.props.language);
-      Actions.change(this.getKeyPath('value'), value);
+      this.props.builderActions.change(this.getKeyPath('value'), value);
     }
   }
 
@@ -152,7 +153,7 @@ class InputComponent extends TerrainComponent<Props>
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() =>
     {
-      Actions.remove(this.getKeyPath(), this.props.index);
+      this.props.builderActions.remove(this.getKeyPath(), this.props.index);
     }, 250);
   }
 
@@ -163,10 +164,10 @@ class InputComponent extends TerrainComponent<Props>
 
   public changeValue(value, meta?)
   {
-    Actions.change(this.getKeyPath('value'), value);
+    this.props.builderActions.change(this.getKeyPath('value'), value);
     if (meta !== undefined)
     {
-      Actions.change(this.getKeyPath('meta'), meta);
+      this.props.builderActions.change(this.getKeyPath('meta'), meta);
     }
   }
 
@@ -313,4 +314,8 @@ class InputComponent extends TerrainComponent<Props>
   }
 }
 
-export default InputComponent;
+export default Util.createTypedContainer(
+  InputComponent,
+  [],
+  { builderActions: BuilderActions },
+);
