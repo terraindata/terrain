@@ -66,6 +66,7 @@ export const _Format = (config?: any) =>
 
 export class ResultsConfig
 {
+  thumbnail: string = '';
   name: string = '';
   score: string = '_score';
   fields: List<string> = List([]);

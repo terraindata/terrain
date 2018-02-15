@@ -595,7 +595,6 @@ class HitsArea extends TerrainComponent<Props>
     return (
       <div
         className='results-area-results-wrapper'
-        style={{ height: `calc(100% - ${mapHeight}px - 60px)` }}
       >
         {
           hitsContent
@@ -845,7 +844,6 @@ column if you have customized the results view.');
         })}
         ref='resultsarea'
       >
-        {this.renderTopbar()}
         {this.renderHits()}
         {this.renderHitsMap()}
         {this.renderExpandedHit()}

@@ -107,23 +107,6 @@ class HitComponent extends TerrainComponent<Props> {
       // spotlights: SpotlightStore.getState().spotlights,
     };
 
-  public menuOptions =
-    [
-      List([
-        {
-          text: 'Spotlight',
-          onClick: this.spotlight,
-        },
-      ]),
-
-      List([
-        {
-          text: 'Un-Spotlight',
-          onClick: this.unspotlight,
-        },
-      ]),
-    ];
-
   public constructor(props: Props)
   {
     super(props);
@@ -180,13 +163,11 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className='result-field'
         key={field}
-        style={borderColor(Colors().resultLine)}
       >
         {
           showField &&
           <div
             className='result-field-name'
-            style={fontColor(Colors().text.thirdLight)}
           >
             {
               field
@@ -209,7 +190,7 @@ class HitComponent extends TerrainComponent<Props> {
     );
   }
 
-  public spotlight(overrideId?, overrideColor?)
+  public spotlight(e, overrideId?, overrideColor?)
   {
     const id = overrideId || this.props.primaryKey;
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
@@ -242,6 +223,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlight = spotlights.get(this.props.primaryKey);
     return (
       <div
+        onClick={spotlight !== undefined ? this.unspotlight : this.spotlight}
         className={classNames({
           'result-spotlight': true,
           'result-spotlight-lit': spotlight !== undefined,
@@ -258,7 +240,7 @@ class HitComponent extends TerrainComponent<Props> {
             'result-spotlight-text-large': this.props.index + 1 < 10,
           })}
         >
-          {this.props.index + 1}
+          {_.padStart((this.props.index + 1).toString(), 2, '0')}
         </div>
       </div>
     );
@@ -280,21 +262,19 @@ class HitComponent extends TerrainComponent<Props> {
       'result-drag-over': isOver,
     });
 
-    let scoreArea: any;
+    let score: any = null;
 
     if (resultsConfig && resultsConfig.score && resultsConfig.enabled)
     {
-      scoreArea = (
-        <div className='result-score'>
-          {
-            this.renderField(resultsConfig.score)
-          }
-        </div>
-      );
+      score = this.renderField(resultsConfig.score);
     }
+
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
+    const thumbnail = resultsConfig.thumbnail !== null ?
+      getResultThumbnail(hit, resultsConfig, this.props.expanded) :
+      null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
@@ -340,53 +320,49 @@ class HitComponent extends TerrainComponent<Props> {
             backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
-          <div className='result-name'>
-            <div
-              className='result-name-inner'
-              style={fontColor(Colors().text.baseLight)}
-            >
-              {
-                this.renderSpotlight()
-              }
-              <div className='result-pin-icon'>
-                <PinIcon />
+          {thumbnail !== null ? (
+            <div className='result-thumbnail-wrapper'>
+              <div className='result-thumbnail'>
+                {thumbnail}
               </div>
+            </div>
+          ) : null}
+          <div className='result-details-wrapper'>
+            <div className='result-name'>
+              <div
+                className='result-name-inner'
+                style={fontColor(Colors().text.baseLight)}
+              >
+                {
+                  this.renderSpotlight()
+                }
+                <div className='result-pin-icon'>
+                  <PinIcon />
+                </div>
+                <span className='result-name-label'>{name}</span>
+                {
+                  this.props.expanded &&
+                  <div
+                    onClick={this.expand}
+                    className='result-expanded-close-button'
+                  >
+                    <CloseIcon className='close close-icon' />
+                  </div>
+                }
+              </div>
+            </div>
+            <div className='result-fields-wrapper'>
+              {score}
               {
-                name
+                _.map(fields, this.renderField)
               }
               {
-                this.props.expanded &&
-                <div
-                  onClick={this.expand}
-                  className='result-expanded-close-button'
-                >
-                  <CloseIcon className='close close-icon' />
-                </div>
+                bottomContent
+              }
+              {
+                expandedContent
               }
             </div>
-          </div>
-          {
-            this.props.allowSpotlights &&
-            <Menu
-              options={
-                this.menuOptions[spotlight ? 1 : 0]
-              }
-            />
-          }
-          {
-            scoreArea
-          }
-
-          <div className='result-fields-wrapper'>
-            {
-              _.map(fields, this.renderField)
-            }
-            {
-              bottomContent
-            }
-            {
-              expandedContent
-            }
           </div>
         </div>
       </div>
@@ -424,6 +400,22 @@ export function getResultFields(hit: Hit, config: ResultsConfig): string[]
   }
 
   return fields;
+}
+
+export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
+{
+  let thumbnailField: string;
+
+  if (config && config.thumbnail && config.enabled)
+  {
+    thumbnailField = config.thumbnail;
+  }
+  else
+  {
+    thumbnailField = _.first(getResultFields(hit, config));
+  }
+
+  return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color);
 }
 
 export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)

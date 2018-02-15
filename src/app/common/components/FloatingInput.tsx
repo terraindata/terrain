@@ -51,7 +51,7 @@ import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { StyledFunction } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -96,15 +96,34 @@ const inputStyle = `
 `;
 const noBorderFn = (props) => props.noBorder && 'border: none !important;';
 
-const Input = styled.input`
+const InputC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = styled.input;
+const Input = InputC`
   ${inputStyle}
   ${noBorderFn}
 `;
-const InputDiv = styled.div`
+
+const InputDivC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
+const InputDiv = InputDivC`
   ${inputStyle}
   ${noBorderFn}
   cursor: pointer;
 `;
+
+interface InputProps
+{
+  noBorder: boolean;
+  id: string;
+  onChange: (value) => void;
+  onFocus: () => void;
+  onBlur: () => void;
+  value: any;
+}
+
+interface InputDivProps
+{
+  noBorder: boolean;
+  onClick: () => void;
+}
 
 export interface Props
 {
@@ -117,6 +136,7 @@ export interface Props
   onClick?: (id: any) => void;
   canEdit?: boolean;
   noBorder?: boolean;
+  className?: string;
 }
 
 class FloatingInput extends TerrainComponent<Props>
@@ -144,7 +164,7 @@ class FloatingInput extends TerrainComponent<Props>
     const isFloating = this.isFloating();
 
     return (
-      <Container>
+      <Container className={this.props.className}>
         {
           this.renderValue()
         }
@@ -197,7 +217,7 @@ class FloatingInput extends TerrainComponent<Props>
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
-        // noBorder={props.noBorder}
+          noBorder={props.noBorder}
         />
       );
     }
@@ -206,7 +226,7 @@ class FloatingInput extends TerrainComponent<Props>
     return (
       <InputDiv
         onClick={this.handleClick}
-      // noBorder={props.noBorder}
+        noBorder={props.noBorder}
       >
         {
           value
