@@ -43,6 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+import * as _ from 'lodash';
+
 import { _AuthState, AuthState } from 'auth/AuthTypes';
 import
 {
@@ -82,11 +85,9 @@ class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
 
       logout: (state, action) =>
       {
-        Ajax.logout((success) =>
-        {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('id');
-        });
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('id');
+        Ajax.logout(_.noop);
         return state.set('accessToken', null).set('id', null);
       },
     };
