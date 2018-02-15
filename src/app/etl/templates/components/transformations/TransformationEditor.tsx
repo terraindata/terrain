@@ -65,7 +65,8 @@ import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
 import './TransformationEditor.less';
 
-// import { TestClass } from './TransformationEditorFactory';
+import { transformationEditorFactory } from './TransformationEditorFactory';
+console.log(transformationEditorFactory);
 
 export interface Props
 {
@@ -104,19 +105,20 @@ export class TransformationEditor extends TerrainComponent<Props>
   public render()
   {
     return (
-      <DynamicForm
-        inputMap={TestMap}
-        inputState={this.state.formState}
-        onStateChange={this._setStateWrapper('formState')}
-        mainButton={{
-          name: 'Save',
-          onClicked: () => null,
-        }}
-        secondButton={{
-          name: 'Cancel',
-          onClicked: () => null,
-        }}
-      />
+      null
+      // <DynamicForm
+      //   inputMap={TestMap}
+      //   inputState={this.state.formState}
+      //   onStateChange={this._setStateWrapper('formState')}
+      //   mainButton={{
+      //     name: 'Save',
+      //     onClicked: () => null,
+      //   }}
+      //   secondButton={{
+      //     name: 'Cancel',
+      //     onClicked: () => null,
+      //   }}
+      // />
     );
   }
 }

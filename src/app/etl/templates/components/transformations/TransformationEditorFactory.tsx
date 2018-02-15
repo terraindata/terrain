@@ -57,264 +57,143 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { TransformationNode } from 'etl/templates/FieldTypes';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationsInfo from 'shared/transformations/TransformationsInfo';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
-import Autocomplete from 'common/components/Autocomplete';
-import CheckBox from 'common/components/CheckBox';
-import Dropdown from 'common/components/Dropdown';
-import FadeInOut from 'common/components/FadeInOut';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { KeyPath as EngineKeypath, TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+
+import TransformationsInfo from 'shared/transformations/TransformationsInfo';
 
 // visitor components must use this
 export interface TransformationEditorProps
 {
-  create: boolean; // whether or not the transformation is being created or edited
-  transformation: TransformationNode;
-  editTransformation: EditSignature;
-  registerConfirmHandler: (childFn: () => void) => void;
+  isCreate: boolean; // whether or not the transformation is being created or edited
+  transformation?: TransformationNode; // must be supplied if isCreate is false
+  engine: TransformationEngine;
+  fieldID: number;
+  onEditOrCreate: (structural: boolean) => void;
+  // calls handler with a bool indicating if transform results in structural changes to the document
 }
 
-type EditSignature = (transformationID, fieldNamesOrIDs?, options?) => void;
-
-export type InputDeclarationType<keys extends string = string> =
-  {
-    [stateName in keys]: InputInfo
-  };
-
-interface InputInfo
+interface ArgsPayload<Type extends TransformationNodeType>
 {
-  type: 'string' | 'number' | 'boolean';
-  group?: string | number;
-  displayName?: string;
-  shouldShow?: (state) => boolean;
+  options: NodeOptionsType<Type>;
+  fieldNamesOrIDs: List<number>;
 }
 
-export type StateType<T extends InputDeclarationType<keyof T>> = {
-  [st1 in keyof T]: string | number | boolean;
-}; // I can't figure out how to narrow the type from the union
+interface FactoryArgs<State extends object, Type extends TransformationNodeType>
+{
+  inputMap: InputDeclarationMap<State>;
+  type: Type;
+  initialState: State;
 
-const emptyList = List([]);
-function UNBOUND_renderInputElement(info: InputInfo, stateName: string, key) // need to be careful to always bind this
-{
-  if (info.type === 'boolean')
-  {
-    return (
-      <div
-        className='te-checkbox-row'
-        key={key}
-        onClick={() => this.setState({ [stateName]: !this.state[stateName] })}
-      >
-        <CheckBox
-          className='te-checkbox'
-          checked={this.state[stateName]}
-          onChange={() => null}
-        />
-        <div className='te-label'> {info.displayName} </div>
-      </div>
-    );
-  }
-  else
-  {
-    return (
-      <div className='te-autocomplete-block' key={key}>
-        <div className='te-label' style={fontColor(Colors().text2)}> {info.displayName} </div>
-        <Autocomplete
-          className='te-autocomplete'
-          value={this.state[stateName]}
-          onChange={this._setStateWrapper(stateName)}
-          options={emptyList}
-        />
-      </div>
-    );
-  }
-}
-function renderItemHOC<T extends InputDeclarationType>(
-  info: InputInfo,
-  stateName: string,
-): (state: StateType<T>, index) => any
-{
-  function unboundRenderItem(state: StateType<T>, index)
-  {
-    const boundRenderInputElement: typeof UNBOUND_renderInputElement = UNBOUND_renderInputElement.bind(this);
-    if (!info.shouldShow(state))
-    {
-      return null;
-    }
-    const inputComponent = boundRenderInputElement(info, stateName, index);
-    return (inputComponent);
-  }
-  return unboundRenderItem;
+  getStateFromNode?: (node: TransformationNode, engine: TransformationEngine, fieldID: number)
+    => State;
+    // if not specified, then the default is to pick names from node.meta (using initialState to pick keys)
+    // the factory is not responsible for making sure that node.meta and State are similar types
+
+  computeNewParams?: (state: State, engine: TransformationEngine, fieldID: number)
+    => ArgsPayload<Type>,
+    // if not specified, then the default is to pass State as the options.
+    // again, the factory is not responsible for making sure that the expected meta object and State are similar types
+
+  computeEditParams?: (state: State, engine: TransformationEngine, fieldID: number, transformationID: number)
+    => ArgsPayload<Type> // defaults to computeNewParams
 }
 
-type RenderMatrix = List<List<(state, key) => any>>;
-
-function computeRenderMatrix<T extends InputDeclarationType>(inputMap: T)
+export function transformationEditorFactory<State extends object, Type extends TransformationNodeType>(args: FactoryArgs<State, Type>)
 {
-  let renderMatrix: RenderMatrix = List([]);
-  const groupToIndex = {};
-  for (const stateName of Object.keys(inputMap))
+  class TransformationForm extends TerrainComponent<TransformationEditorProps>
   {
-    const { group } = inputMap[stateName];
-    const inputInfo = _.defaults(inputMap[stateName], { displayName: stateName, shouldShow: () => true });
-    let useIndex = renderMatrix.size;
-    if (group !== undefined)
-    {
-      if (groupToIndex[group] === undefined)
-      {
-        groupToIndex[group] = useIndex;
-      }
-      else
-      {
-        useIndex = groupToIndex[group];
-      }
-    }
-    renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) =>
-    {
-      return value.push(renderItemHOC<T>(inputInfo, stateName));
-    });
-  }
-  return renderMatrix;
-}
-
-function defaultObject(inputMap: InputDeclarationType)
-{
-  const defaultObj = {};
-  _.forOwn(inputMap, (value, key) =>
-  {
-    switch (value.type)
-    {
-      case 'number':
-        defaultObj[key] = 0;
-        break;
-      case 'boolean':
-        defaultObj[key] = true;
-        break;
-      case 'string':
-      default:
-        defaultObj[key] = '';
-    }
-  });
-  return defaultObj;
-}
-
-function computeDefaultStateFromNodeFactory(inputMap, defaultState): (node?: TransformationNode) => object
-{
-  return (node?: TransformationNode): object =>
-  {
-    if (node == null || node.meta == null)
-    {
-      return defaultState;
-    }
-    else
-    {
-      const extractedFromNodeMeta = _.pick(node.meta, Object.keys(inputMap));
-      return _.defaults(extractedFromNodeMeta, defaultState);
-    }
-  };
-}
-
-export function TransformationEditorFactory<T extends InputDeclarationType>(
-  inputMap: T,
-  onConfirm?: (state: StateType<T>, editTransformation: EditSignature) => void,
-  defaultFromNodeFn?: (node?: TransformationNode) => object,
-  validateOptions?: (state: StateType<T>) => { error: string },
-  dynamicPreview?: (state: StateType<T>, value) => any,
-)
-{
-  // tslint:disable-next-line:variable-name
-  const UNBOUND_RenderMatrix = computeRenderMatrix<T>(inputMap);
-
-  const defaultState = defaultObject(inputMap);
-  const defaultFromNode = defaultFromNodeFn !== undefined ?
-    defaultFromNodeFn : computeDefaultStateFromNodeFactory(inputMap, defaultState);
-
-  @Radium
-  class NodeEditor extends TerrainComponent<TransformationEditorProps>
-  {
-    public renderMatrix: RenderMatrix = null;
+    public state: State = args.initialState;
 
     constructor(props)
     {
       super(props);
-      this.renderMatrix = this.bindRenderMatrix(UNBOUND_RenderMatrix);
-      this.state = this.getInitialState();
-    }
-
-    public getInitialState()
-    {
-      return defaultFromNode(this.props.transformation);
-    }
-
-    public bindRenderMatrix(matrix: RenderMatrix): RenderMatrix
-    {
-      return matrix.map((row, i) =>
+      if (this.props.transformation != null && !this.props.isCreate)
       {
-        return row.map((fn, j) =>
-        {
-          return fn.bind(this);
-        }).toList();
-      }).toList();
+        this.state = this.getStateFromNode(this.props.transformation);
+      }
     }
 
-    public confirmHandler()
+    public componentWillReceiveProps(nextProps)
     {
-      // do nothing
-    }
-
-    public componentDidMount()
-    {
-      this.props.registerConfirmHandler(this.confirmHandler);
-    }
-
-    public renderMatrixRow(row, i)
-    {
-      return (
-        <div key={i} className='te-matrix-row'>
-          {
-            row.map((fn, j) => fn(this.state, j)) // ultimately calls unboundRenderItem
-          }
-        </div>
-      );
+      if (nextProps.transformation !== undefined && nextProps.transformation !== this.props.transformation)
+      {
+        this.setState(this.getStateFromNode(nextProps.transformation));
+      }
     }
 
     public render()
     {
+      const { isCreate } = this.props;
       return (
-        <div className='transformation-editor'>
-          {
-            this.renderMatrix.map(this.renderMatrixRow)
-          }
-        </div>
+        <DynamicForm
+          inputMap={args.inputMap}
+          inputState={this.state}
+          onStateChange={this.setState}
+          mainButton={{
+            name: isCreate ? 'Create' : 'Save',
+            onClicked: this.handleMainAction,
+          }}
+        />
       );
     }
+
+    public getStateFromNode(transformation: TransformationNode): State
+    {
+      const { engine, fieldID } = this.props;
+      if (args.getStateFromNode === undefined)
+      {
+        return _.pick(transformation.meta, Object.keys(args.initialState)) as State;
+      }
+      else
+      {
+        return args.getStateFromNode(transformation, engine, fieldID);
+      }
+    }
+
+    public defaultComputeParams(state: State, engine: TransformationEngine, fieldID: number, transformID?): ArgsPayload<Type>
+    {
+      const { transformation } = this.props;
+      const fieldIDs = (transformation === undefined || transformation.fieldIDs === undefined) ?
+        List([this.props.fieldID]) :
+        transformation.fieldIDs;
+
+      return {
+        options: state,
+        fieldNamesOrIDs: fieldIDs,
+      }
+    }
+
+    public handleMainAction()
+    {
+      let fnToUse = this.defaultComputeParams;
+      let transformID;
+      if (this.props.isCreate && args.computeNewParams !== undefined)
+      {
+        fnToUse = args.computeNewParams;
+      }
+      else if (!this.props.isCreate && args.computeEditParams !== undefined)
+      {
+        fnToUse = args.computeEditParams;
+        transformID = this.props.transformation.id;
+      }
+      const payload = fnToUse(this.state, this.props.engine, this.props.fieldID, transformID);
+      if (this.props.isCreate)
+      {
+        this.props.engine.appendTransformation(args.type, payload.fieldNamesOrIDs, payload.options);
+        this.props.onEditOrCreate(false);
+      }
+      else
+      {
+        this.props.engine.editTransformation(transformID, payload.fieldNamesOrIDs, payload.options);
+        this.props.onEditOrCreate(false);
+      }
+    }
   }
-  return NodeEditor;
+  return TransformationForm;
 }
-
-const TestMap: InputDeclarationType = {
-  from: {
-    displayName: 'From Position',
-    type: 'number',
-  },
-  length: {
-    displayName: 'Length',
-    type: 'number',
-    group: 1,
-  },
-  test: {
-    displayName: 'Do you want to do something?',
-    type: 'boolean',
-    group: 1,
-  },
-  otherTest: {
-    displayName: 'Test String',
-    type: 'string',
-  },
-  randomFlag: {
-    displayName: 'How about this?',
-    type: 'boolean',
-  },
-};
-
-export const TestClass = TransformationEditorFactory(TestMap);

@@ -116,18 +116,24 @@ export const _TemplateField = makeExtendedConstructor(TemplateFieldC, true, {
   langSettings: _ElasticFieldSettings,
 });
 
-// recordized version of transformationNode
-class TransformationNodeC extends TransformationNodeBase
+// recordized version of transformationNode.
+// This had to be copied due to how Typescript treats inherited members
+class TransformationNodeC
 {
-  constructor()
-  {
-    super(0, TransformationNodeType.LoadNode, List([]), {});
-  }
+  public id: number = 0;
+  public typeCode: TransformationNodeType = TransformationNodeType.LoadNode;
+  public fieldIDs: List<number> = List([]);
+  public meta: object = {};
 }
 export type TransformationNode = WithIRecord<TransformationNodeC>;
 export const _TransformationNode = makeConstructor(TransformationNodeC);
 
-// public id: number;
-// public typeCode: TransformationNodeType;
-// public fieldIDs: List<number>;
-// public meta: object;
+// Ignore these types; they are to make sure that TransformationNodeC is the same as TransformationNodeBase
+type AssertNodeC = {
+  [K in keyof TransformationNodeC]: TransformationNodeC[K]
+}
+type AssertNodeBase = {
+  [K in keyof TransformationNodeBase]: TransformationNodeBase[K]
+}
+type AssertCIsBase<T extends AssertNodeC> = T;
+type AssertBaseIsC<T extends AssertNodeBase> = AssertCIsBase<T>
