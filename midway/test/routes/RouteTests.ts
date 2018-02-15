@@ -268,15 +268,11 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(response.text);
-        expect(respData.length).toBeGreaterThan(0);
-        expect(respData[0])
-          .toMatchObject({ accessToken: '', email: 'test@terraindata.com', id });
+        expect(response.text).toBe('Success');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/logout request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/logout request number 1 returned an error: ' + String(error));
       });
 
     await request(server)
@@ -285,14 +281,14 @@ describe('User and auth route tests', () =>
         id,
         accessToken,
       })
-      .expect(401)
+      .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Unauthorized');
+        expect(response.text).not.toBe('Unauthorized');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/logout request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/logout request number 2 returned an error: ' + String(error));
       });
   });
 });
