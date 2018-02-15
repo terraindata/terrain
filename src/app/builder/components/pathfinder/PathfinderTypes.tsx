@@ -107,22 +107,19 @@ class PathC extends BaseClass
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
+  public nested: List<Path> = List([]);
+  public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
 {
-  if (config)
-  {
-    config =
-      {
-        source: _Source(config['source']),
-        score: _Score(config['score']),
-        filterGroup: _FilterGroup(config['filterGroup']),
-        more: _More(config['more']),
-        step: config['step'] as PathfinderSteps,
-      };
-  }
-  return New<Path>(new PathC(config || {}), config);
+  let path = New<Path>(new PathC(config || {}), config);
+  path = path.set('source', _Source(path.source));
+  path = path.set('filterGroup', _FilterGroup(path.filterGroup));
+  path = path.set('score', _Score(path.score));
+  path = path.set('more', _More(path.more));
+  path = path.set('nested', List(path.nested.map((n) => _Path(n))));
+  return path;
 };
 
 class FilterGroupC extends BaseClass
@@ -218,6 +215,7 @@ export const _ScorePoint = (config?: { [key: string]: any }) =>
 class MoreC extends BaseClass
 {
   public aggregations: List<AggregationLine> = List([]);
+  public references: List<string> = List([]); // What should this query be referred to in other queries (@parent in US query)
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -225,7 +223,9 @@ export const _More = (config?: { [key: string]: any }) =>
 {
   let more = New<More>(new MoreC(config || {}), config);
   more = more
-    .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))));
+    .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
+    .set('references', List(more['references']));
+
   return more;
 };
 
@@ -324,8 +324,8 @@ export const _FilterLine = (config?: { [key: string]: any }) =>
 
 class DistanceValueC extends BaseClass
 {
-  public location: [number, number] = [37.7749295, -122.41941550000001];
-  public address: string = 'San Francisco';
+  public location: [number, number] = [0, 0];
+  public address: string = '';
   public distance?: number = 10;
   public units?: string = 'mi';
 }
@@ -392,12 +392,9 @@ class SourceC extends BaseClass
 export type Source = SourceC & IRecord<SourceC>;
 export const _Source = (config?: { [key: string]: any }) =>
 {
-  if (config)
-  {
-    config.dataSource = _ElasticDataSource(config.dataSource);
-  }
-
-  return New<Source>(new SourceC(config), config);
+  let source = New<Source>(new SourceC(config), config);
+  source = source.set('dataSource', _ElasticDataSource(source.dataSource));
+  return source;
 };
 
 abstract class DataSource extends BaseClass
@@ -610,7 +607,6 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'comparison')
     {
       const { field, fieldType, schemaState, source } = context;
-
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)
       {
@@ -648,6 +644,16 @@ export const _ElasticDataSource = (config?: { [key: string]: any }) =>
 };
 
 const ElasticComparisons = [
+  {
+    value: 'exists',
+    displayName: 'exists',
+    fieldTypes: List(
+      [FieldType.Numerical,
+      FieldType.Text,
+      FieldType.Date,
+      FieldType.Geopoint,
+      FieldType.Ip]),
+  },
   {
     value: 'equal',
     displayName: 'equals',

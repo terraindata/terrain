@@ -65,6 +65,7 @@ import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
+import './PathfinderScoreStyle.less';
 
 export interface Props
 {
@@ -185,7 +186,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             canDelete={canEdit}
             onDelete={this.handleDeleteLine}
           />,
-          key: index,
+          key: String(index),
           draggable: true,
           dragHandle: <DragHandle />,
           dragHandleStyle: { 'padding-top': '8px' },
@@ -214,7 +215,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
         return (
           {
             content: <PathfinderScoreLine
-              key={index}
+              key={String(index)}
               line={line}
               step={step}
               onDelete={this.handleDeleteLine}
@@ -227,7 +228,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
               onAnimateScoreBars={this.handleAnimateScoreBars}
               pathfinderContext={this.props.pathfinderContext}
             />,
-            key: index,
+            key: String(index),
             draggable: true,
             dragHandle: <DragHandle />,
             dragHandleStyle: { 'padding-top': '8px' },

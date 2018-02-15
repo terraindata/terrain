@@ -56,38 +56,26 @@ const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
+import Util from 'app/util/Util';
 import { SchemaState } from 'schema/SchemaTypes';
-import Util from 'util/Util';
-import PathfinderFilterSection from './filter/PathfinderFilterSection';
-import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
+import PathfinderArea from './PathfinderArea';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
-import PathfinderScoreSection from './score/PathfinderScoreSection';
-import PathfinderSourceSection from './source/PathfinderSourceSection';
 
 export interface Props
 {
   path: Path;
   canEdit: boolean;
   schema: SchemaState;
+  keyPath?: KeyPath;
   colorsActions: typeof ColorsActions;
   colors: ColorsState;
+  toSkip?: number;
 }
 
 @Radium
 class PathfinderColumn extends TerrainComponent<Props>
 {
-  public state = {
-    pathfinderContext: _PathfinderContext(this.getPathfinderContext(this.props)),
-  };
-
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    this.setState({
-      pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
-        this.getPathfinderContext(nextProps)),
-    });
-  }
 
   public componentWillMount()
   {
@@ -103,81 +91,20 @@ class PathfinderColumn extends TerrainComponent<Props>
     });
   }
 
-  public getPathfinderContext(props: Props)
-  {
-    return {
-      canEdit: props.canEdit,
-      source: props.path.source,
-      step: props.path.step,
-      schemaState: props.schema,
-    };
-  }
-
-  public incrementStep(oldStep)
-  {
-    if (oldStep < PathfinderSteps.More)
-    {
-      BuilderActions.changePath(this.getKeyPath().push('step'), this.props.path.step + 1);
-    }
-  }
-
-  public getKeyPath()
-  {
-    return List(['query', 'path']);
-  }
-
   public render()
   {
-    const { path } = this.props;
-    const keyPath = this.getKeyPath();
-    const { pathfinderContext } = this.state;
     return (
       <div
-        className='pathfinder-column'
+        className='pathfinder-column-wrapper'
         style={[
           backgroundColor(Colors().bg3),
           fontColor(Colors().text3),
         ]}
       >
-        <PathfinderSourceSection
-          pathfinderContext={pathfinderContext}
-          keyPath={keyPath.push('source')}
-          onStepChange={this.incrementStep}
-          step={path.step}
-          source={path.source}
+        <PathfinderArea
+          {...this.props}
+          keyPath={List(['query', 'path'])}
         />
-        {
-          path.step >= PathfinderSteps.Filter ?
-            <PathfinderFilterSection
-              pathfinderContext={pathfinderContext}
-              filterGroup={path.filterGroup}
-              keyPath={keyPath.push('filterGroup')}
-              onStepChange={this.incrementStep}
-              step={path.step}
-            />
-            : null
-        }
-        {
-          path.step >= PathfinderSteps.Score ?
-            <PathfinderScoreSection
-              pathfinderContext={pathfinderContext}
-              score={path.score}
-              keyPath={keyPath.push('score')}
-              step={path.step}
-              onStepChange={this.incrementStep}
-
-            />
-            : null
-        }
-        {
-          path.step >= PathfinderSteps.More ?
-            <PathfinderMoreSection
-              pathfinderContext={pathfinderContext}
-              more={path.more}
-              keyPath={keyPath.push('more')}
-            />
-            : null
-        }
       </div>
     );
   }

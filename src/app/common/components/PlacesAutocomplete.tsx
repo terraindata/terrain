@@ -194,7 +194,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
   public fetchPredictions()
   {
     const value = this.props.inputProps.value;
-    if (value.length > 0)
+    if (value && value.length > 0)
     {
       if (this.props.geocoder === 'google')
       {
@@ -286,10 +286,10 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     const activeItem = this.getActiveItem();
     if (activeItem === undefined)
     {
+      this.clearAutocomplete();
       if (this.props.onEnterKeyDown !== undefined)
       {
         this.props.onEnterKeyDown(this.props.inputProps.value);
-        this.clearAutocomplete();
       } else
       {
         return;

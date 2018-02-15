@@ -115,15 +115,18 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     });
     const sourceOptions = this.state.dataSourceOptions.map((option) =>
     {
+      const values = option.sampleData.size > 0 ?
+        _.keys(option.sampleData.get(0)._source).map((key) =>
+          `${key}: ${option.sampleData.get(0)._source[key]}`,
+        ) : List([]);
       return {
         title: String(option.displayName),
         key: option.value,
         subtitle: 'Sample Values',
-        values: _.keys(option.sampleData.get(0)._source).map((key) =>
-          `${key}: ${option.sampleData.get(0)._source[key]}`,
-        ),
+        values,
       };
     }).toList();
+
     return (
       <div
         className='pf-section'
@@ -155,6 +158,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
             selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
             canEdit={canEdit}
             onChange={this.handleSourceChange}
+            floatingLabel={'Data'}
           />
         </div>
       </div>

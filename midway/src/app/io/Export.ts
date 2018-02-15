@@ -218,6 +218,8 @@ export class Export
         originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
       });
 
+      // TODO add transformation check for addcolumn and update mapping accordingly
+
       const qh: QueryHandler = database.getQueryHandler();
       const payload = {
         database: exprt.dbid,
@@ -251,8 +253,36 @@ export class Export
       let returnDocs: object[] = [];
 
       const fieldArrayDepths: object = {};
+      const extractTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
+      exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
+
+      const mergedDocs: object[] = [];
       for (const doc of newDocs)
       {
+        // merge groupJoins with _source if necessary
+        const mergedDoc: object | string = await this._mergeGroupJoin(doc);
+        if (typeof mergedDoc === 'string')
+        {
+          return reject(mergedDoc as string);
+        }
+
+        // extract field after doing all merge joins
+        extractTransformations.forEach((transform) =>
+        {
+          const oldColName: string | undefined = transform['colName'];
+          const newColName: string | undefined = transform['args']['newName'];
+          const path: string | undefined = transform['args']['path'];
+          if (oldColName !== undefined && newColName !== undefined && path !== undefined)
+          {
+            mergedDoc['_source'][newColName] = _.get(mergedDoc['_source'], path);
+          }
+        });
+
+        mergedDocs.push(mergedDoc);
+      }
+      for (const doc of mergedDocs)
+      {
+
         // verify schema mapping with documents and fix documents accordingly
         const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
         if (typeof newDoc === 'string')
@@ -363,8 +393,7 @@ export class Export
     {
       throw new Error('File export currently is only supported for Elastic databases.');
     }
-
-    return this._getAllFieldsAndTypesFromQuery(database, qry as object);
+    return this._getAllFieldsAndTypesFromQuery(database, qry as object, dbid);
   }
 
   public async getNamesAndTypesFromAlgorithm(dbid: number, algorithmId: number): Promise<object | string>
@@ -413,7 +442,8 @@ export class Export
     });
   }
 
-  private async _getAllFieldsAndTypesFromQuery(database: DatabaseController, qryObj: object, maxSize?: number): Promise<object | string>
+  private async _getAllFieldsAndTypesFromQuery(database: DatabaseController, qryObj: object,
+    dbid?: number, maxSize?: number): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
@@ -433,16 +463,14 @@ export class Export
       {
         qrySize = Math.min(qryObj['body']['size'], maxSize);
       }
-
       const qh: QueryHandler = database.getQueryHandler();
       const payload = {
-        database: database.getID(),
+        database: dbid as number,
         type: 'search',
         streaming: false,
         databasetype: 'elastic',
-        body: JSON.stringify(qryObj),
+        body: JSON.stringify(qryObj['body']),
       };
-
       const qryResponse: any = await qh.handleQuery(payload);
       if (qryResponse === undefined || qryResponse.hasError())
       {
@@ -484,6 +512,12 @@ export class Export
     {
       for (const doc of docs)
       {
+        const mergeDoc: object | string = await this._mergeGroupJoin(doc);
+        if (typeof mergeDoc === 'string')
+        {
+          winston.warn(mergeDoc as string);
+          break;
+        }
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
@@ -1051,6 +1085,40 @@ export class Export
       return this._jsonCheckTypesHelper(item[0], typeObj['innerType']);
     }
     return true;
+  }
+
+  private async _mergeGroupJoin(doc: object): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      if (doc['_source'] !== undefined)
+      {
+        const sourceKeys: string[] = Object.keys(doc['_source']);
+        let rootKeys: string[] = Object.keys(doc);
+        rootKeys = _.without(rootKeys, '_index', '_type', '_id', '_score', '_source');
+        if (rootKeys.length > 0) // there were group join objects
+        {
+          const duplicateRootKeys: string[] = [];
+          rootKeys.forEach((rootKey) =>
+          {
+            if (sourceKeys.indexOf(rootKey) > -1)
+            {
+              duplicateRootKeys.push(rootKey);
+            }
+          });
+          if (duplicateRootKeys.length !== 0)
+          {
+            return resolve('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+          }
+          rootKeys.forEach((rootKey) =>
+          {
+            doc['_source'][rootKey] = doc[rootKey];
+            delete doc[rootKey];
+          });
+        }
+      }
+      return resolve(doc);
+    });
   }
 
   /* recursively attempts to parse strings to dates */

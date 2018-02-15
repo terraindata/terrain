@@ -160,11 +160,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return (
       <div>
         {
-          options.map((choiceOption) =>
+          options.map((choiceOption, index) =>
             <div
               style={pieceStyle}
               onClick={this._fn(this.handleChange, 'field', choiceOption.value, choiceOption.meta && choiceOption.meta.fieldType)}
-              key={choiceOption.value}
+              key={index}
             >
               {
                 choiceOption.displayName
@@ -254,13 +254,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           >
             <div>
               {
-                comparisonOptions.map((option) =>
+                comparisonOptions.map((option, index) =>
                   option.value === filterLine.comparison ||
                     filterLine.comparison === null ?
                     <div
                       style={pieceStyle}
                       onClick={this._fn(this.handleChange, 'comparison', option.value)}
-                      key={option.value}
+                      key={index}
                     >
                       {
                         option.displayName
@@ -270,14 +270,17 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 )
               }
             </div>
-            <Autocomplete
-              options={pathfinderContext.source.dataSource.getChoiceOptions({
-                type: 'input',
-              }).map((c) => c.value).toList()}
-              value={filterLine.value as string | number}
-              onChange={this._fn(this.handleChange, 'value')}
-              disabled={!pathfinderContext.canEdit}
-            />
+            {
+              filterLine.comparison !== 'exists' &&
+              <Autocomplete
+                options={pathfinderContext.source.dataSource.getChoiceOptions({
+                  type: 'input',
+                }).map((c) => c.value).toList()}
+                value={filterLine.value as string | number}
+                onChange={this._fn(this.handleChange, 'value')}
+                disabled={!pathfinderContext.canEdit}
+              />
+            }
           </div>
         );
 
@@ -306,13 +309,16 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               )
             }
           </div>
-          <DatePickerWrapper
-            date={String(filterLine.value)}
-            onChange={this._fn(this.handleChange, 'value')}
-            canEdit={pathfinderContext.canEdit}
-            language={'elastic'}
-            format='MM/DD/YYYY h:mma'
-          />
+          {
+            filterLine.comparison !== 'exists' &&
+            <DatePickerWrapper
+              date={String(filterLine.value)}
+              onChange={this._fn(this.handleChange, 'value')}
+              canEdit={pathfinderContext.canEdit}
+              language={'elastic'}
+              format='MM/DD/YYYY h:mma'
+            />
+          }
         </div>
         );
 
@@ -348,40 +354,36 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 )
               }
             </div>
-            <div className='pf-filter-map-input-wrapper'>
-              <BuilderTextbox
-                value={value.distance}
-                canEdit={pathfinderContext.canEdit}
-                keyPath={this.props.keyPath.push('value').push('distance')}
-                action={this.props.onChange}
-              />
-              <Dropdown
-                options={List(_.keys(units))}
-                selectedIndex={_.keys(units).indexOf(value.units)}
-                canEdit={pathfinderContext.canEdit}
-                optionsDisplayName={Map(units)}
-                keyPath={this.props.keyPath.push('value').push('units')}
-                action={this.props.onChange}
-              />
-              <MapComponent
-                address={value.address}
-                location={value.location}
-                markLocation={true}
-                showSearchBar={true}
-                zoomControl={true}
-                keepAddressInSync={false}
-                geocoder='google'
-                keyPath={this.props.keyPath.push('value').push('location')}
-                textKeyPath={this.props.keyPath.push('value').push('address')}
-                hideSearchSettings={true}
-                showDistanceCircle={true}
-                distance={value.distance}
-                distanceUnit={value.units}
-                wrapperClassName={'pf-filter-map-component-wrapper'}
-                fadeInOut={true}
-                action={this.props.onChange}
-              />
-            </div>
+            {
+              filterLine.comparison !== 'exists' &&
+              <div className='pf-filter-map-input-wrapper'>
+                <BuilderTextbox
+                  value={value.distance}
+                  canEdit={pathfinderContext.canEdit}
+                  keyPath={this.props.keyPath.push('value').push('distance')}
+                  action={this.props.onChange}
+                />
+                <Dropdown
+                  options={List(_.keys(units))}
+                  selectedIndex={_.keys(units).indexOf(value.units)}
+                  canEdit={pathfinderContext.canEdit}
+                  optionsDisplayName={Map(units)}
+                  keyPath={this.props.keyPath.push('value').push('units')}
+                  action={this.props.onChange}
+                />
+                <MapComponent
+                  geocoder='photon'
+                  inputValue={value.address}
+                  coordinates={value.location !== undefined ? value.location : [0, 0]}
+                  distance={value.distance}
+                  distanceUnit={value.units}
+                  wrapperClassName={'pf-filter-map-component-wrapper'}
+                  fadeInOut={true}
+                  onChange={this.handleMapChange}
+                  canEdit={pathfinderContext.canEdit}
+                />
+              </div>
+            }
           </div>
         );
 
@@ -398,6 +400,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       default:
         throw new Error('No value type handler for ' + filterLine.valueType);
     }
+  }
+
+  private handleMapChange(coordinates, inputValue)
+  {
+    const filterLine = this.props.filterLine
+      .setIn(List(['value', 'location']), coordinates)
+      .setIn(List(['value', 'address']), inputValue);
+    this.props.onChange(this.props.keyPath, filterLine, false, false);
   }
 
   private handleChange(key, value, fieldType?, fieldChange?)

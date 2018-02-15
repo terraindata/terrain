@@ -64,6 +64,7 @@ export const PathfinderText = {
   createFilterGroup: 'group of filter conditions',
   createScoreLine: 'score factor',
   createAggregationLine: 'metadata',
+  createNestedLine: 'nested algorithm',
 
   // Score section
   scoreSectionTitle: 'Score',
@@ -98,6 +99,8 @@ export const PathfinderText = {
   moreSectionSubtitle: `
   Look at the metadata for your data and add facets to better understand your data.
   `,
+  referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',
+  nestedExplanation: 'Add another algorithm that uses the results of this one as input',
 
   aggregation:
     {

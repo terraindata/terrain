@@ -57,7 +57,7 @@ import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 
-export function parsePath(path: Path, inputs): string
+export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
   let baseQuery = Map({
     query: Map({
@@ -91,19 +91,29 @@ export function parsePath(path: Path, inputs): string
   baseQuery = baseQuery.set('query', filterObj);
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
-    const sortObj = parseScore(path.score);
+    let sortObj = parseScore(path.score);
     if (path.score.type !== 'random')
     {
       baseQuery = baseQuery.set('sort', sortObj);
     }
     else
     {
-      baseQuery = baseQuery.setIn(['query', 'bool', 'filter'],
-        baseQuery.getIn(['query', 'bool', 'filter']).push(sortObj));
+      sortObj = sortObj.setIn(['function_score', 'query'], baseQuery.get('query'));
+      baseQuery = baseQuery.set('query', sortObj);
+      baseQuery = baseQuery.delete('sort');
     }
   }
-  const moreObj = parseMore(path.more);
+  const moreObj = parseAggregations(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
+  const groupJoin = parseNested(path.more, path.nested, inputs);
+  if (groupJoin)
+  {
+    baseQuery = baseQuery.set('groupJoin', groupJoin);
+  }
+  if (ignoreInputs)
+  {
+    return baseQuery;
+  }
   const text = stringifyWithParameters(baseQuery.toJS(), inputs);
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
@@ -111,9 +121,10 @@ export function parsePath(path: Path, inputs): string
 
 function parseSource(source: Source): any
 {
+  const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: typeof source.count !== 'string' ? source.count : 1000,
+    size: !isNaN(count) ? count : 1000, // if it is all results, just default to 1000 ? change...
     index: (source.dataSource as any).index,
   };
 }
@@ -129,14 +140,14 @@ function parseScore(score: Score): any
     case 'elastic':
       return { _score: { order: 'asc' } };
     case 'random':
-      return {
-        function_score: {
+      return Map({
+        function_score: Map({
           random_score: {
             seed: 10,
           },
           query: {},
-        },
-      };
+        }),
+      });
     case 'none':
     default:
       return {};
@@ -270,7 +281,7 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
       {
         mustNot = mustNot.push(lineInfo);
       }
-      else if (line.comparison === 'located') // TODO MAYBE ADD NON-TEXT FILTERS HERE AS WELL
+      else if (line.comparison === 'located' || line.comparison === 'exists') // TODO MAYBE ADD NON-TEXT FILTERS HERE AS WELL
       {
         filter = filter.push(lineInfo);
       }
@@ -287,7 +298,8 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
   });
   if (useShould)
   {
-    filterObj = filterObj.setIn(['bool', 'minimum_should_match'], filterGroup.minMatches === 'any' ? 1 : filterGroup.minMatches);
+    filterObj = filterObj.setIn(['bool', 'minimum_should_match'],
+      filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches)));
   }
   filterObj = filterObj.setIn(['bool', 'must'], must);
   filterObj = filterObj.setIn(['bool', 'must_not'], mustNot);
@@ -303,6 +315,12 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
   const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight;
   switch (line.comparison)
   {
+    case 'exists':
+      return Map({
+        exists: Map({
+          field: line.field,
+        }),
+      });
     case 'equal':
       return Map({
         term: Map({
@@ -429,13 +447,13 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
         }),
       });
     case 'located':
-      const distanceObj = line.value as DistanceValue;
-      return Map({
-        geo_distance: Map({
-          distance: String(distanceObj.distance) + distanceObj.units,
-          [line.field]: [distanceObj.location[1], distanceObj.location[0]],
-        }),
-      });
+    // const distanceObj = line.value as DistanceValue;
+    // return Map({
+    //   geo_distance: Map({
+    //     distance: String(distanceObj.distance) + distanceObj.units,
+    //     [line.field]: [distanceObj.location[1], distanceObj.location[0]],
+    //   }),
+    // });
     default:
       return Map({});
   }
@@ -455,7 +473,7 @@ const unusedKeys = [
   'max',
   'sortField',
 ];
-function parseMore(more: More): {}
+function parseAggregations(more: More): {}
 {
   const moreObj = {};
   more.aggregations.forEach((agg) =>
@@ -523,4 +541,22 @@ function parseMore(more: More): {}
     }
   });
   return moreObj;
+}
+
+// Put a nested path inside of a groupJoin
+function parseNested(more: More, nested: List<Path>, inputs)
+{
+  if (nested.size === 0)
+  {
+    return undefined;
+  }
+  let groupJoins = Map({});
+  nested.forEach((n) =>
+  {
+    if (n)
+    {
+      groupJoins = groupJoins.set(n.name, parsePath(n, inputs, true));
+    }
+  });
+  return groupJoins;
 }

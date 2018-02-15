@@ -53,23 +53,30 @@ import { Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
+import FloatingInput from 'app/common/components/FloatingInput';
+import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import Util from 'app/util/Util';
 import BuilderActions from '../../../data/BuilderActions';
+import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
-import { _AggregationLine, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import { _AggregationLine, _Path, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
+import './PathfinderMoreStyle.less';
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
 {
   pathfinderContext: PathfinderContext;
+  path: Path;
   more: More;
   keyPath: KeyPath;
   hideTitle?: boolean;
   colorsActions?: typeof ColorsActions;
+  toSkip?: number;
 }
 
 class PathfinderMoreSection extends TerrainComponent<Props>
@@ -91,6 +98,35 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       selector: '.pf-aggregation-arrow-advanced',
       style: getStyle('fill', Colors().iconColor),
     });
+  }
+
+  public handleReferenceChange(i, value)
+  {
+    BuilderActions.changePath(this.props.keyPath.push('references').push(i), value);
+    if (this.props.path.nested.get(i) === undefined)
+    {
+      const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
+      BuilderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
+    }
+  }
+
+  public handleAddNested()
+  {
+    BuilderActions.changePath(this.props.keyPath.push('references'), this.props.more.references.push(''));
+    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested');
+    BuilderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
+  }
+
+  public handleDeleteNested(i)
+  {
+    BuilderActions.changePath(
+      this.props.keyPath.push('references'),
+      this.props.more.references.splice(i, 1),
+    );
+    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested');
+    BuilderActions.changePath(
+      nestedKeyPath,
+      this.props.path.nested.splice(i, 1), true);
   }
 
   public handleAddLine()
@@ -136,6 +172,70 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     return lines;
   }
 
+  public renderPath(path: Path, i: number)
+  {
+    return (
+      <PathfinderArea
+        path={path}
+        canEdit={this.props.pathfinderContext.canEdit}
+        schema={this.props.pathfinderContext.schemaState}
+        keyPath={this.props.keyPath.butLast().toList().push('nested').push(i)}
+        toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
+      />
+    );
+  }
+
+  public renderNestedPaths()
+  {
+    const { references } = this.props.more;
+    const { nested } = this.props.path;
+    const { canEdit } = this.props.pathfinderContext;
+    return (
+      <div>
+        {
+          references.map((ref, i) =>
+          {
+            return (
+              <div
+                className='pf-more-nested'
+                key={i}
+              >
+                {
+                  nested.get(i) !== undefined &&
+                  <div className={'pf-nested-line'}>
+                    <div className={'pf-nested-line-inner'} />
+                  </div>
+                }
+                <div className='pf-more-nested-reference'>
+                  {
+                    tooltip(
+                      <FloatingInput
+                        label={'Reference'}
+                        isTextInput={true}
+                        value={ref}
+                        onChange={this._fn(this.handleReferenceChange, i)}
+                        canEdit={canEdit}
+                        className='pf-more-nested-reference-input'
+                      />,
+                      PathfinderText.referenceExplanation,
+                    )
+                  }
+                  <RemoveIcon
+                    onClick={this._fn(this.handleDeleteNested, i)}
+                    className='pf-more-nested-remove close'
+                  />
+                </div>
+                {
+                  nested.get(i) !== undefined && this.renderPath(nested.get(i), i)
+                }
+              </div>
+            );
+          })
+        }
+      </div>
+    );
+  }
+
   public render()
   {
     const { canEdit } = this.props.pathfinderContext;
@@ -159,6 +259,20 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           onCreate={this.handleAddLine}
           text={PathfinderText.createAggregationLine}
         />
+        <div>
+          {this.renderNestedPaths()}
+          {
+            tooltip(
+              <PathfinderCreateLine
+                canEdit={canEdit}
+                onCreate={this.handleAddNested}
+                text={PathfinderText.createNestedLine}
+                style={{ marginTop: 12 }}
+              />,
+              PathfinderText.nestedExplanation,
+            )
+          }
+        </div>
       </div>
     );
   }

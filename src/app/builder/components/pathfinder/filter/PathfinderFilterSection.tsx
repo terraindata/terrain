@@ -62,6 +62,7 @@ import { FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Sour
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
+import './PathfinderFilterStyle.less';
 
 export interface Props
 {
@@ -70,6 +71,7 @@ export interface Props
   keyPath: KeyPath;
   step?: PathfinderSteps;
   onStepChange?: (oldStep: PathfinderSteps) => void;
+  toSkip?: number; // how many keys in key path to skip (sometimes paths may be nested)
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -123,14 +125,16 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   private handleAddFilter(keyPath, filter: FilterGroup | FilterLine)
   {
-    const oldLines = this.props.filterGroup.getIn(keyPath.skip(3).toList());
+    const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
+    const oldLines = this.props.filterGroup.getIn(keyPath.skip(skip).toList());
     BuilderActions.changePath(keyPath, oldLines.push(filter));
   }
 
   private handleFilterDelete(keyPath: KeyPath)
   {
+    const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
     const parentKeyPath = keyPath.butLast().toList();
-    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
+    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(skip).toList());
     const index = keyPath.last();
     BuilderActions.changePath(parentKeyPath, parent.splice(index, 1));
     // TODO consider 'removeIn' instead

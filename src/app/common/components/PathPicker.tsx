@@ -88,10 +88,12 @@ class PathPicker extends TerrainComponent<Props>
 
   componentWillReceiveProps(nextProps: Props)
   {
+    //
   }
 
   public componentDidUpdate(prevProps: Props, prevState)
   {
+    //
   }
 
   public render()
@@ -173,7 +175,7 @@ class PathPicker extends TerrainComponent<Props>
 
   private handleBoxValueClick()
   {
-
+    //
   }
 
   private getCurrentIndex(): number

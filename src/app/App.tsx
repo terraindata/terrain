@@ -69,7 +69,6 @@ window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.
 import { generateThemeStyles } from 'common/components/tooltip/Tooltips';
 import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
-import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
@@ -101,7 +100,6 @@ import TerrainStore from './store/TerrainStore';
 import { UserActions } from './users/data/UserRedux';
 
 // Icons
-const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
 const BuilderIcon = require('./../images/icon_bldr-3.svg');
@@ -111,6 +109,7 @@ const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
 const ControlIcon = require('./../images/icon_gear.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
+const BackgroundImage = require('./../images/background.png');
 
 const links =
   [
@@ -189,7 +188,7 @@ class App extends TerrainComponent<Props>
   public state = {
     selectedPage: 3,
     loggedIn: false,
-    sidebarExpanded: false,
+    sidebarExpanded: true,
     loggedInAndLoaded: false,
 
     schemaLoaded: false,
@@ -306,7 +305,7 @@ class App extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before',
-      style: { 'border-top': '7px solid ' + Colors().activeText },
+      style: { 'border-top': '7px solid ' + Colors().active },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
@@ -407,9 +406,11 @@ class App extends TerrainComponent<Props>
       );
     }
 
-    const sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
+    const sidebarWidth = this.state.sidebarExpanded ? 150 : 36;
     const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
-
+    const style = {
+      backgroundImage: `url(${BackgroundImage})`,
+    };
     const layout =
       {
         fullHeight: true,
@@ -430,6 +431,7 @@ class App extends TerrainComponent<Props>
               content:
                 <div
                   className='app-inner'
+                  style={style}
                 >
                   {
                     this.props.children
@@ -466,19 +468,6 @@ class App extends TerrainComponent<Props>
         key='app'
         style={APP_STYLE}
       >
-        {
-          this.state.loggedInAndLoaded &&
-          <div
-            className='app-top-bar'
-            style={backgroundColor(Colors().bg2)}
-          >
-            <img
-              src={TerrainIcon}
-              className='app-top-bar-icon'
-            />
-            <AccountDropdown />
-          </div>
-        }
         <div
           className='app-wrapper'
         >
