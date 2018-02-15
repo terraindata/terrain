@@ -71,7 +71,7 @@ export default class ESParameterSubstituter
     this.convert(source);
   }
 
-  public convert(source: ESValueInfo): void
+  public convert(source: ESValueInfo, alias?: string): void
   {
     let i: number = 0;
 
@@ -86,7 +86,7 @@ export default class ESParameterSubstituter
       case ESJSONType.string:
         if (source.parameter !== undefined)
         {
-          this.appendParameter(source.parameter);
+          this.appendParameter(source.parameter, alias);
           break;
         }
 
@@ -94,7 +94,7 @@ export default class ESParameterSubstituter
         break;
 
       case ESJSONType.parameter:
-        this.appendParameter(source.parameter as string);
+        this.appendParameter(source.parameter as string, alias);
         break;
 
       case ESJSONType.array:
@@ -123,7 +123,16 @@ export default class ESParameterSubstituter
               this.result += ',';
             }
 
-            this.convert(property.propertyName);
+            if (property.propertyName.value === 'groupJoin' && property.propertyValue !== null)
+            {
+              const parentAlias = property.propertyValue.objectChildren['parentAlias'];
+              if (parentAlias !== undefined && parentAlias.propertyValue !== null)
+              {
+                alias = parentAlias.propertyValue.value;
+              }
+            }
+
+            this.convert(property.propertyName, alias);
             this.result += ':';
 
             if (property.propertyValue !== null)
@@ -140,9 +149,9 @@ export default class ESParameterSubstituter
     }
   }
 
-  private appendParameter(param: string): void
+  private appendParameter(param: string, alias?: string): void
   {
-    this.result += this.substitutionFunction(param);
+    this.result += this.substitutionFunction(param, alias);
   }
 
   private appendJSON(value: any): void
