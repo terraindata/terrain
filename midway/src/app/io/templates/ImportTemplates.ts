@@ -75,6 +75,7 @@ export class ImportTemplates
         'persistentAccessToken',
         'primaryKeyDelimiter',
         'primaryKeys',
+        'requireJSONHaveAllFields',
         'tablename',
         'transformations',
       ],
@@ -199,6 +200,7 @@ export class ImportTemplates
         originalNames: JSON.parse(stringified['originalNames']),
         primaryKeyDelimiter: stringified['primaryKeyDelimiter'],
         primaryKeys: JSON.parse(stringified['primaryKeys']),
+        requireJSONHaveAllFields: stringified['requireJSONHaveAllFields'] !== undefined ? stringified['requireJSONHaveAllFields'] : false,
         tablename: stringified['tablename'],
         transformations: JSON.parse(stringified['transformations']),
       };
@@ -213,10 +215,12 @@ export class ImportTemplates
         columnTypes: JSON.stringify(template['columnTypes']),
         dbid: template['dbid'],
         dbname: template['dbname'],
+        id: template['id'],
         name: template['name'],
         originalNames: JSON.stringify(template['originalNames']),
         primaryKeyDelimiter: (template['primaryKeyDelimiter'] === undefined ? '-' : template['primaryKeyDelimiter']) as string,
         primaryKeys: JSON.stringify(template['primaryKeys']),
+        requireJSONHaveAllFields: template['requireJSONHaveAllFields'] !== undefined ? template['requireJSONHaveAllFields'] : false,
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };

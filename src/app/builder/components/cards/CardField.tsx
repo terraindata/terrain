@@ -50,6 +50,8 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import BuilderActions from 'builder/data/BuilderActions';
+import { BuilderState } from 'builder/data/BuilderState';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
@@ -98,6 +100,8 @@ export interface Props
   tuningMode?: boolean;
 
   colorsActions: typeof ColorsActions;
+  builder?: BuilderState;
+  builderActions?: typeof BuilderActions;
 }
 
 interface IMoveState
@@ -401,6 +405,8 @@ class CardField extends TerrainComponent<Props>
                   accepts={(this.props.row.inner as Display).accepts}
                   language={this.props.language}
                   handleCardDrop={this.props.handleCardDrop}
+                  builder={this.props.builder}
+                  builderActions={this.props.builderActions}
                 />
               </div>,
               'Add another',
@@ -536,8 +542,9 @@ const CARD_FIELD_MOVING_STYLE = _.extend({},
 
 export default Util.createContainer(
   CardField,
-  [],
+  ['builder'],
   {
     colorsActions: ColorsActions,
+    builderActions: BuilderActions,
   },
 );

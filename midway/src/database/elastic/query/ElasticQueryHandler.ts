@@ -60,6 +60,7 @@ import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
+import ElasticStream from './ElasticStream';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -106,19 +107,22 @@ export default class ElasticQueryHandler extends QueryHandler
         const query = parser.getValue();
         if (query['groupJoin'] !== undefined)
         {
-          return this.handleGroupJoin(parser, query);
+          return this.handleGroupJoin(request, parser, query);
         }
-
-        if (request.streaming === true)
+        else
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), { body: query });
+          if (request.streaming === true)
+          {
+            return new ElasticStream(client, query, { objectMode: true });
+          }
+          else
+          {
+            return new Promise<QueryResponse>((resolve, reject) =>
+            {
+              client.search({ body: query } as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
+            });
+          }
         }
-
-        return new Promise<QueryResponse>((resolve, reject) =>
-        {
-          client.search({ body: query } as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
-        });
-
       case 'deleteTemplate':
       case 'getTemplate':
       case 'putTemplate':
@@ -140,15 +144,15 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  private async handleGroupJoin(parser: ESParser, query: object): Promise<QueryResponse>
+  private async handleGroupJoin(request: QueryRequest, parser: ESParser, query: object): Promise<QueryResponse | Readable>
   {
     // get the child (groupJoin) query
     const childQuery = query['groupJoin'];
     query['groupJoin'] = undefined;
 
     // determine other groupJoin settings from the query
-    const ignoreEmpty = (childQuery['ignoreEmpty'] !== undefined) ? childQuery['ignoreEmpty'] : false;
-    delete childQuery['ignoreEmpty'];
+    const dropIfLessThan = (childQuery['dropIfLessThan'] !== undefined) ? childQuery['dropIfLessThan'] : 0;
+    delete childQuery['dropIfLessThan'];
 
     const parentAlias = (childQuery['parentAlias'] !== undefined) ? childQuery['parentAlias'] : 'parent';
     delete childQuery['parentAlias'];
@@ -165,99 +169,53 @@ export default class ElasticQueryHandler extends QueryHandler
       throw new Error('Error finding groupJoin clause in the query');
     }
 
-    return new Promise<QueryResponse>(async (resolve, reject) =>
+    const handleSubQueries = async (error, response) =>
     {
-      const client: ElasticClient = this.controller.getClient();
-      const parentResults = await new Promise<QueryResponse>((res, rej) =>
+      try
       {
-        let allResponse: any | null = null;
-        let rowsProcessed: number = 0;
-        const originalSize: number = (parentQuery['size'] !== undefined) ? parentQuery['size'] as number : this.GROUPJOIN_DEFAULT_SIZE;
-        const originalScroll = (parentQuery['scroll'] !== undefined) ? parentQuery['scroll'] : this.GROUPJOIN_SCROLL_TIMEOUT;
-        let size;
-        let scroll;
-
-        if (originalSize > this.GROUPJOIN_SEARCH_MAX_SIZE)
-        {
-          size = this.GROUPJOIN_SEARCH_MAX_SIZE;
-          scroll = originalScroll;
-        }
-
-        const getMoreUntilDone = async (error: any, response: any) =>
-        {
-          if (error !== null && error !== undefined)
-          {
-            return this.makeQueryCallback(res, rej)(error, allResponse);
-          }
-
-          // winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(response, null, 2));
-          try
-          {
-            await this.handleGroupJoinSubQueries(valueInfo, childQuery, response, parentAlias);
-          }
-          catch (e)
-          {
-            return this.makeQueryCallback(res, rej)(e, allResponse);
-          }
-
-          rowsProcessed += response.hits.hits.length;
-          if (ignoreEmpty)
-          {
-            const subQueries = Object.keys(childQuery);
-            response.hits.hits = response.hits.hits.filter((r) =>
-            {
-              return subQueries.reduce((count, subQuery) =>
-              {
-                if (r[subQuery] !== undefined && Array.isArray(r[subQuery]))
-                {
-                  count += r[subQuery].length;
-                }
-                return count;
-              }, 0);
-            });
-          }
-
-          if (allResponse === null)
-          {
-            allResponse = response;
-          }
-          else
-          {
-            allResponse.hits.hits = allResponse.hits.hits.concat(response.hits.hits);
-          }
-
-          if (response.hits.hits.length > 0 && Math.min(response.hits.total, originalSize) > rowsProcessed)
-          {
-            scroll = originalScroll;
-            client.scroll({
-              scrollId: response._scroll_id,
-              scroll,
-            } as Elastic.ScrollParams, getMoreUntilDone);
-          }
-          else
-          {
-            client.clearScroll({
-              scrollId: response._scroll_id,
-            }, (_err, _resp) => { return; });
-            return this.makeQueryCallback(res, rej)(error, allResponse);
-          }
-        };
-
-        client.search({
-          body: parentQuery,
-          scroll,
-          size,
-        }, getMoreUntilDone);
-      });
-
-      if (parentResults.hasError())
+        await this.handleGroupJoinSubQueries(valueInfo, childQuery, response, parentAlias);
+      }
+      catch (e)
       {
-        return reject(parentResults);
+        throw e;
       }
 
-      // winston.debug('parentResults (annotated with subQueryResults): ' + JSON.stringify(parentResults.result, null, 2));
-      resolve(parentResults);
-    });
+      if (dropIfLessThan > 0)
+      {
+        const subQueries = Object.keys(childQuery);
+        response.hits.hits = response.hits.hits.filter((r) =>
+        {
+          return (subQueries.reduce((count, subQuery) =>
+          {
+            if (r[subQuery] !== undefined && Array.isArray(r[subQuery]))
+            {
+              count += r[subQuery].length;
+            }
+            return count;
+          }, 0) >= dropIfLessThan);
+        });
+      }
+      return response;
+    };
+
+    const client: ElasticClient = this.controller.getClient();
+
+    if (request.streaming === true)
+    {
+      return new ElasticStream(client, parentQuery, { objectMode: true }, handleSubQueries);
+    }
+    else
+    {
+      return new Promise<QueryResponse>((resolve, reject) =>
+      {
+        client.search({ body: parentQuery } as Elastic.SearchParams,
+          async (error, response) =>
+          {
+            const r = await handleSubQueries(null, response);
+            this.makeQueryCallback(resolve, reject)(error, r);
+          });
+      });
+    }
   }
 
   private async handleGroupJoinSubQueries(parentValueInfo: ESValueInfo, query: object, results: object, parentAlias: string)

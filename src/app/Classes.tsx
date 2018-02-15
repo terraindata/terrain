@@ -100,29 +100,33 @@ export class BaseClass
 
 const records: { [class_name: string]: Immutable.Record.Class } = {};
 
-export function New<T>(
-  instance,
-  config: { [field: string]: any } = {},
-  extendId?: boolean | 'string', // if true, generate an ID on instantiation
-): T & IRecord<T>
+export function Constructor<T>(instance)
 {
   const class_name = instance.__proto__.constructor.name;
   if (!records[class_name])
   {
     records[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
   }
+  return records[class_name];
+}
+
+export function New<T>(
+  instance,
+  config: { [field: string]: any } = {},
+  extendId?: boolean | 'string', // if true, generate an ID on instantiation
+): T & IRecord<T>
+{
+  const constructor = Constructor<T>(instance);
 
   if (extendId)
   {
     config = Util.extendId(config, extendId === 'string');
   }
-
-  _.map(config,
-    (value, key) =>
-      instance[key] = value,
+  _.forOwn(config,
+    (value, key) => { instance[key] = value; },
   );
 
-  return new records[class_name](instance) as any;
+  return new constructor(instance) as any;
 }
 
 // This converts the standard Record class format to a plain JS
@@ -183,3 +187,154 @@ export function makeConstructor<T>(Type: { new(): T; })
   return (config?: { [key: string]: any }) =>
     New<WithIRecord<T>>(new Type(), config);
 }
+
+type overrideMap<T> = {
+  [key in keyof T]?: (config?: any, deep?: boolean) => T[key]
+};
+
+// iterates through instance's methods and adds them to the record prototype
+// note that if you have a name conflict (like getIn), then the Record's prototype will be overwritten
+// also note that this won't add inherited methods
+function injectInstanceMethods(constructor, instance)
+{
+  const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(instance));
+  for (const method of methods)
+  {
+    if (method !== 'constructor')
+    {
+      constructor.prototype[method] = instance.__proto__[method];
+    }
+  }
+}
+
+/**
+ * If injectMethods is true, then the resultant object creator will add the Type's instance methods to the object's prototype.
+ * You should use configOverride if the immutable record can be rebuilt from a pure js object (e.g. an object returned by recordForSave)
+ * the overrider is called if the resultant constructor is called with deep = true
+ */
+export function makeExtendedConstructor<T>(
+  Type: { new(): T; },
+  injectMethods: boolean = false,
+  configOverride?: overrideMap<T>,
+): (config?: any, deep?: boolean) => WithIRecord<T>
+{
+  if (injectMethods)
+  {
+    const instance = new Type();
+    injectInstanceMethods(Constructor(instance), instance);
+  }
+  if (configOverride)
+  {
+    return (config?: { [key: string]: any }, deep?: boolean) =>
+    {
+      const overrideKeys = Object.keys(configOverride);
+      if (deep)
+      {
+        const overridenConfig = {};
+        for (const key of overrideKeys)
+        {
+          overridenConfig[key] = configOverride[key](config[key], true);
+        }
+        config = _.defaults(overridenConfig, config);
+      }
+      return New<WithIRecord<T>>(new Type(), config);
+    };
+  }
+  else
+  {
+    return (config?: { [key: string]: any }) => New<WithIRecord<T>>(new Type(), config);
+  }
+}
+
+/*** Example Usage ***/
+/***
+  import { List } from 'immutable';
+  import { makeExtendedConstructor, WithIRecord } from 'src/app/Classes';
+
+  // lets make a basic Rectangle class that has instance methods
+
+  class RectangleC
+  {
+    public readonly length: number = 1;
+    public readonly width: number = 1;
+    public  getArea()
+    {
+      return this.length * this.width;
+    }
+    public isSquare()
+    {
+      return this.length === this.width;
+    }
+  }
+  export type Rectangle = WithIRecord<RectangleC>;
+  export const _Rectangle = makeExtendedConstructor(RectangleC, true);
+
+  // by setting true, we tell makeExtendedConstructor that we want to inject RectangleC's instance methods onto created Records.
+
+  const rect1 = _Rectangle({length: 4, width: 3});
+  console.log(rect1.set('length', 5).getArea()); // 15
+
+  // so far so good, constructing rectangles is easy by providing an optional object that specifies length and width
+  // here's a slightly more complicated record; one that has nested immutable records
+
+  class ShapesC
+  {
+    public readonly rectangles: List<Rectangle> = List([]);
+    public readonly lines: List<number> = List([]);
+
+    public getTotalArea()
+    {
+      return this.rectangles
+        .map((val) => val.getArea())
+        .reduce((a: number, b: number) => a + b);
+    }
+
+    public getLongestLine()
+    {
+      return this.lines.max();
+    }
+  }
+  export type Shapes = WithIRecord<ShapesC>;
+  export const _Shapes = makeExtendedConstructor(ShapesC, true);
+
+  const shapes1 = _Shapes({
+    rectangles: List([rect1]),
+    lines: List([0, 1, 2, 3]),
+  });
+  console.log(shapes1.getLongestLine()); // 3
+
+  // Cool, still works! What's the problem?
+  // Say we save a Shape to a database... it will get serialized to something like this:
+
+  const plainShape = {
+      rectangles: [
+        {length: 5, width: 6},
+        {length: 3, width: 4},
+      ],
+      lines: [5, 6, 7],
+    };
+
+  // rectangles is now a plain js array of plain js object, and lines is also a plain array.
+  // if we try to cosntruct a shape from this, we'll get some problems
+
+  const shapesTest = _Shapes(plainShape);
+  console.log(shapesTest.getTotalArea()); // Uncaught TypeError: val.getArea is not a function
+
+  // Yikes. There's no way for the _Shapes constructor to know what to do with plainShape.rectangles;
+  // for all it knows, it's an immutable list of immutable rectangles.
+  // To fix this we need give makeExtendedConstructor some hints on how to deal with the plain js object
+  // makeExtendedConstructor takes a 3rd argument that accepts an object mapping keys to functions
+
+  export const _ShapesDeep = makeExtendedConstructor(ShapesC, true, {
+      rectangles: (rects: object[]) => List(rects).map((val) => _Rectangle(val)).toList(),
+      lines: (lines: number[]) => List(lines),
+    });
+  const shapes2 = _ShapesDeep(plainShape, true);
+
+  // the returned constructor, _ShapesDeep in this case, takes an optional 2nd argument.
+  // If it's true, then makeExtendedConstructor knows that it's taking in a plain js object.
+  // It now takes the provided functions and converts the config values. e.g. [5, 6, 7] into List([5, 6, 7]);
+
+  console.log(shapes2.getTotalArea()); // 42
+  // Voila!
+***/

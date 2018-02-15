@@ -77,18 +77,16 @@ export class BuilderStateClass
   public loadingXhr: XMLHttpRequest = null;
   public loadingAlgorithmId: ID = '';
 
-  public hoveringCardId: ID = '';
-
-  public selectedCardIds = Map<ID, boolean>();
+  public selectedCardIds = Map<ID, boolean>({});
 
   public db: BackendInstance = {} as any;
 
   // TODO move
-  public manual = Map<ID, Cards>();
+  public manual = Map<ID, Cards>({});
   // Card examples used in the manual are stored here.
 
   public draggingCardItem: CardItem | null = null;
-  public draggingOverKeyPath: KeyPath = Immutable.List();
+  public draggingOverKeyPath: KeyPath = Immutable.List([]);
   public draggingOverIndex: number = -1;
 
   public isDirty: boolean = false;
@@ -100,81 +98,7 @@ export class BuilderStateClass
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());
-const _BuilderState = (config?: any) =>
+export const _BuilderState = (config?: any) =>
 {
   return new BuilderState_Record(config || {}) as any as BuilderState;
 };
-
-const DefaultState = _BuilderState();
-
-import BuilderReducers from './BuilderReducers';
-
-import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
-
-export const BuilderStore: IStore<BuilderState> = createStore(
-  (
-    state: BuilderState = DefaultState,
-    action: Action<{
-      keyPath: KeyPath;
-      notDirty: boolean;
-    }>,
-  ) =>
-  {
-    if (BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
-    {
-      state = state
-        .set('isDirty', true);
-
-      // back up for undo, check time to prevent overloading the undo stack
-      const time = (new Date()).getTime();
-      if (
-        action.type !== BuilderActionTypes.change
-        || action.type !== state.lastActionType
-        || action.payload.keyPath !== state.lastActionKeyPath
-        || time - state.lastActionTime > 1500
-      )
-      {
-        state = state
-          .set('lastActionType', action.type)
-          .set('lastActionTime', time)
-          .set('lastActionKeyPath', action.payload.keyPath)
-          .set('pastQueries', state.pastQueries.unshift(state.query));
-      }
-
-      if (state.nextQueries.size)
-      {
-        state = state.set('nextQueries', Immutable.List([]));
-      }
-    }
-
-    if (typeof BuilderReducers[action.type] === 'function')
-    {
-      state = (BuilderReducers[action.type] as any)(state, action);
-    }
-
-    if (BuilderCardActionTypes[action.type])
-    {
-      // a card changed and we need to re-translate the tql
-      //  needs to be after the card change has affected the state
-      const newCards = ESCardParser.parseAndUpdateCards(state.query.cards);
-      state = state.setIn(['query', 'cards'], newCards);
-      state = state
-        .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
-      state = state
-        .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
-        .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
-        .setIn(['query', 'cardsAndCodeInSync'], true);
-    }
-
-    if (!state.modelVersion || state.modelVersion < 3)
-    {
-      state = state.set('modelVersion', 3);
-      state = state.set('algorithmId', (state as any).variantId);
-      state = state.set('loadingAlgorithmId', (state as any).loadingVariantId);
-    }
-
-    return state;
-  }
-  , DefaultState);
-
-export default BuilderStore;
