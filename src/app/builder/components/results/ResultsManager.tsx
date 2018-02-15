@@ -408,10 +408,10 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (postprocessed.hasOwnProperty('size'))
     {
-      postprocessed['size'] = Math.min(postprocessed['size'], 10000);
+      postprocessed['size'] = Math.min(postprocessed['size'], 200);
     }
 
-    return ESConverter.formatES(new ESJSONParser(JSON.stringify(postprocessed));
+    return ESConverter.formatES(new ESJSONParser(JSON.stringify(postprocessed)));
   }
 
   private queryM2Results(query: Query, db: BackendInstance)

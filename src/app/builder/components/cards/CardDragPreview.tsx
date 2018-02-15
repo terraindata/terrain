@@ -52,9 +52,9 @@ import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDragPreview.less';
 const classNames = require('classnames');
+import Util from 'util/Util';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import Store from '../../data/BuilderStore';
 import { CardItem } from './CardComponent';
 import { cardWillWrap, onCardDrop } from './CardDropArea';
 
@@ -84,22 +84,11 @@ class CardDragPreview extends TerrainComponent<CDPProps>
 
   public state: {
     justDropped: boolean;
-    language: string;
   } = {
       justDropped: false,
-      language: Store.getState().query.language,
     };
 
   public timeout: any;
-
-  public componentDidMount()
-  {
-    this._subscribe(Store,
-      {
-        stateKey: 'language',
-        storeKeyPath: ['query', 'language'],
-      });
-  }
 
   public componentWillReceiveProps(nextProps: CDPProps)
   {
@@ -120,12 +109,13 @@ class CardDragPreview extends TerrainComponent<CDPProps>
 
   public render()
   {
-    const item = this.props.cardItem;
+    const { props } = this;
+    const item = props.cardItem;
     let colors: string[];
     let title: string;
     let preview: string;
 
-    const Blocks = AllBackendsMap[this.state.language].blocks;
+    const Blocks = AllBackendsMap[props.language].blocks;
 
     if (!item)
     {
@@ -153,29 +143,29 @@ class CardDragPreview extends TerrainComponent<CDPProps>
       title = 'None';
     }
 
-    let { visible, cardItem } = this.props;
+    let { visible, cardItem } = props;
 
     if (visible && cardItem.props
-      && cardItem.props.keyPath === this.props.keyPath)
+      && cardItem.props.keyPath === props.keyPath)
     {
-      if (cardItem.props.index === this.props.index || cardItem.props.index === this.props.index - 1)
+      if (cardItem.props.index === props.index || cardItem.props.index === props.index - 1)
       {
         visible = false;
       }
     }
 
-    const willWrap = this.props.cardItem
-      && cardWillWrap(this.props, this.props.cardItem.type);
+    const willWrap = props.cardItem
+      && cardWillWrap(props, props.cardItem.type);
 
     return this.props.connectDropTarget(
       <div
         className={classNames({
           'card-drag-preview': true,
           'card-drag-preview-visible': visible,
-          'card-drag-preview-in-list': this.props.isInList,
+          'card-drag-preview-in-list': props.isInList,
           'card-drag-preview-dropped': this.state.justDropped,
           'card-drag-preview-wrap': willWrap,
-          'card-drag-preview-wrap-up': willWrap && this.props.wrapUp,
+          'card-drag-preview-wrap-up': willWrap && props.wrapUp,
         })}
 
         style={{

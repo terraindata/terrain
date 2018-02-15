@@ -61,13 +61,13 @@ import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
-import Actions from '../../data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 
 import Radium = require('radium');
 
+import Util from 'util/Util';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
@@ -119,9 +119,9 @@ const MAP_MIN_HEIGHT = 25; // height of top bar on map
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
-  public static handleConfigChange(config: ResultsConfig)
+  public static handleConfigChange(config: ResultsConfig, builderActions)
   {
-    Actions.changeResultsConfig(config);
+    builderActions.changeResultsConfig(config);
   }
 
   public state: State = {

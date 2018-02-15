@@ -69,8 +69,7 @@ export default class ElasticQueryHandler extends QueryHandler
 {
   private controller: ElasticController;
 
-  private GROUPJOIN_SEARCH_MAX_SIZE = 10000;
-  private GROUPJOIN_MSEARCH_BATCH_SIZE = 1000;
+  private GROUPJOIN_MSEARCH_BATCH_SIZE = 100;
   private GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES = 1;
   private GROUPJOIN_DEFAULT_SIZE = 10;
   private GROUPJOIN_SCROLL_TIMEOUT = '1m';
@@ -151,8 +150,8 @@ export default class ElasticQueryHandler extends QueryHandler
     query['groupJoin'] = undefined;
 
     // determine other groupJoin settings from the query
-    const ignoreEmpty = (childQuery['ignoreEmpty'] !== undefined) ? childQuery['ignoreEmpty'] : false;
-    delete childQuery['ignoreEmpty'];
+    const dropIfLessThan = (childQuery['dropIfLessThan'] !== undefined) ? childQuery['dropIfLessThan'] : 0;
+    delete childQuery['dropIfLessThan'];
 
     const parentAlias = (childQuery['parentAlias'] !== undefined) ? childQuery['parentAlias'] : 'parent';
     delete childQuery['parentAlias'];
@@ -180,19 +179,19 @@ export default class ElasticQueryHandler extends QueryHandler
         throw e;
       }
 
-      if (ignoreEmpty)
+      if (dropIfLessThan > 0)
       {
         const subQueries = Object.keys(childQuery);
         response.hits.hits = response.hits.hits.filter((r) =>
         {
-          return subQueries.reduce((count, subQuery) =>
+          return (subQueries.reduce((count, subQuery) =>
           {
             if (r[subQuery] !== undefined && Array.isArray(r[subQuery]))
             {
               count += r[subQuery].length;
             }
             return count;
-          }, 0);
+          }, 0) >= dropIfLessThan);
         });
       }
       return response;

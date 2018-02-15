@@ -69,8 +69,6 @@ export let BuilderActionTypes =
     dragCardOver: '',
     dropCard: '',
 
-    hoverCard: '',
-
     selectCard: '',
 
     // Change the hand-writen TQL
@@ -117,7 +115,7 @@ const setValuesToKeys = (obj: any, prefix: string) =>
   }
 };
 
-setValuesToKeys(BuilderActionTypes, '');
+setValuesToKeys(BuilderActionTypes, 'builder');
 
 // which actions dirty the state?
 export let BuilderDirtyActionTypes = {};

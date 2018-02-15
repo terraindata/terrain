@@ -166,9 +166,9 @@ export const elasticDistance = _card({
           key: 'field',
           placeholder: 'Field',
           className: 'builder-comp-list-item-margin-bottom',
-          getAutoTerms: (schemaState): List<string> =>
+          getAutoTerms: (schemaState, builderState): List<string> =>
           {
-            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Field);
           },
         },
         {

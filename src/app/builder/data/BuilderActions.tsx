@@ -49,15 +49,19 @@ import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import { CardItem } from '../components/cards/CardComponent';
 import ActionTypes from './BuilderActionTypes';
-import Store from './BuilderStore';
+import BuilderCardsActionTypes from './BuilderCardsActionTypes';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+const $ = (type: string, payload: any) =>
+{
+  return { type, payload };
+};
 
 const BuilderActions =
   {
     change: // reserved for cards only
       (keyPath: KeyPath, value: any, notDirty = false) =>
-        $(ActionTypes.change, { keyPath, value, notDirty }),
+        (dispatch) =>
+          dispatch($(ActionTypes.change, { keyPath, value, notDirty })),
 
     changeQuery:
       (query: Query) =>
@@ -93,11 +97,11 @@ const BuilderActions =
 
     changeTQL:
       (tql: string, tqlMode: string) =>
-        $(ActionTypes.changeTQL, { tql, tqlMode }),
+        $(ActionTypes.changeTQL, { tql, tqlMode, changeQuery: BuilderActions.changeQuery }),
 
     hoverCard:
       (cardId: ID) =>
-        $(ActionTypes.hoverCard, { cardId }),
+        $(BuilderCardsActionTypes.hoverCard, { cardId }),
 
     selectCard:
       (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
@@ -110,12 +114,21 @@ const BuilderActions =
     // fetches the query from the server
     fetchQuery:
       (algorithmId: ID, handleNoAlgorithm: (algorithmId: ID) => void, db: BackendInstance) =>
-        $(ActionTypes.fetchQuery, { algorithmId, handleNoAlgorithm, db }),
+        (dispatch) =>
+          dispatch($(ActionTypes.fetchQuery, {
+            algorithmId,
+            handleNoAlgorithm,
+            db,
+            dispatch,
+            onRequestDone: (query, xhr, database) => dispatch(BuilderActions.queryLoaded(query, xhr, database)),
+            changeQuery: BuilderActions.changeQuery,
+          })),
 
     // load query from server into state
     queryLoaded:
       (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
-        $(ActionTypes.queryLoaded, { query, xhr, db }),
+        (dispatch) =>
+          dispatch($(ActionTypes.queryLoaded, { query, xhr, db, dispatch })),
 
     save:
       (failed?: boolean) =>
@@ -152,16 +165,5 @@ const BuilderActions =
           resultsState,
         }),
   };
-
-_.map(ActionTypes,
-  (type: string) =>
-  {
-    if (!BuilderActions[type])
-    {
-      const error = 'Missing Builder Action for Builder Action Type ' + type;
-      throw new Error(error);
-    }
-  },
-);
 
 export default BuilderActions;

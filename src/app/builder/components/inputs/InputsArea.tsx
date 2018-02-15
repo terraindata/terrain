@@ -48,12 +48,13 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import Util from 'util/Util';
 import { Input } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import InputComponent from '../inputs/InputComponent';
 
 export interface Props
@@ -61,6 +62,7 @@ export interface Props
   inputs: List<Input>;
   canEdit: boolean;
   language: string;
+  builderActions?: typeof BuilderActions;
 }
 
 class InputsArea extends TerrainComponent<Props>
@@ -72,7 +74,7 @@ class InputsArea extends TerrainComponent<Props>
       index = -1;
     }
 
-    Actions.create(
+    this.props.builderActions.create(
       Immutable.List(['query', 'inputs']), index,
       AllBackendsMap[this.props.language].inputType,
     );
@@ -125,4 +127,8 @@ class InputsArea extends TerrainComponent<Props>
   }
 }
 
-export default InputsArea;
+export default Util.createTypedContainer(
+  InputsArea,
+  [],
+  { builderActions: BuilderActions },
+);

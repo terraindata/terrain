@@ -133,9 +133,9 @@ export const elasticTransform = _card(
               key: 'input',
               placeholder: 'Input field',
               showWhenCards: true,
-              getAutoTerms: (schemaState): List<string> =>
+              getAutoTerms: (schemaState, builderState): List<string> =>
               {
-                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Transform);
+                return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Transform);
               },
               style: {
                 marginLeft: -16,
