@@ -149,7 +149,7 @@ class HitComponent extends TerrainComponent<Props> {
 
   public renderField(field, index?, fields?, overrideFormat?)
   {
-    if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS)
+    if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
     {
       return null;
     }
@@ -162,7 +162,10 @@ class HitComponent extends TerrainComponent<Props> {
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div
-        className='result-field'
+        className={classNames({
+          'result-field': true,
+          'results-are-small': this.props.hitSize === 'small',
+        })}
         key={field}
       >
         {
@@ -254,7 +257,7 @@ class HitComponent extends TerrainComponent<Props> {
 
   public render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, hit, hitSize } = this.props;
+    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, hit, hitSize, expanded } = this.props;
 
     const classes = classNames({
       'result': true,
@@ -276,13 +279,14 @@ class HitComponent extends TerrainComponent<Props> {
     const thumbnail = resultsConfig.thumbnail !== null ?
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;
+    console.log(thumbnail);
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
     let bottomContent: any;
 
-    if (!configHasFields && fields.length > 4 && !this.props.expanded)
+    if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
     {
       bottomContent = (
         <div className='result-bottom' onClick={this.expand}>
@@ -330,10 +334,13 @@ class HitComponent extends TerrainComponent<Props> {
                 'result-thumbnail-wrapper': true,
                 'results-are-small': hitSize === 'small',
               })}
+              style={{
+                backgroundImage: `url(${thumbnail})`,
+              }}
             >
-              <div className='result-thumbnail'>
+              {/*<div className='result-thumbnail'>
                 {thumbnail}
-              </div>
+              </div>*/}
             </div>
           ) : null}
           <div 
@@ -395,14 +402,14 @@ class HitComponent extends TerrainComponent<Props> {
 }
 
 export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean, expanded: boolean,
-  overrideFormat?: any, locations?: { [field: string]: any }, color?: string)
+  overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false)
 {
   let value: any;
   if (hit)
   {
     value = hit.fields.get(field);
   }
-  return ResultFormatValue(field, value, config, isTitle, expanded, overrideFormat, locations, color);
+  return ResultFormatValue(field, value, config, isTitle, expanded, overrideFormat, locations, color, bgUrlOnly);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -439,7 +446,7 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
     thumbnailField = _.first(getResultFields(hit, config));
   }
 
-  return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color);
+  return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color, true);
 }
 
 export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
@@ -459,7 +466,7 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
 }
 
 export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean, expanded: boolean,
-  overrideFormat?: any, locations?: { [field: string]: any }, color?: string): any
+  overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -508,6 +515,11 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     {
       case 'image':
         const url = format.template.replace(/\[value\]/g, value as string);
+        if(bgUrlOnly)
+        {
+          return url;
+        }
+        
         return (
           <div
             className='result-field-value-image-wrapper'
@@ -520,7 +532,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
                 // but also include the <img> tag below (with opacity 0) so that right-click options still work
               }}
             >
-              <img src={url} />
+              {/*<img src={url} />*/}
             </div>
             <div className='result-field-value'>
               {

@@ -65,9 +65,13 @@
     box-sizing: border-box;
     position: relative;
     display: flex;
+    margin-bottom: 6px;
     
     &.results-are-small {
-      max-width: 50%;
+      width: 200px;
+      min-width: 200px;
+      height: auto;
+      margin-bottom: 0px;
     }
 
     .transition;
@@ -97,19 +101,32 @@
     position: relative;
     border-radius: 4px;
     display: flex;
-    height: 125px;
+    overflow: hidden;
+    
+    min-height: 200px;
+    height: auto;
+    
     &.results-are-small {
       height: @small-result-height;
+      min-height: @small-result-height;
     }
 
     .transition;
 
     .result-thumbnail-wrapper {
       min-width: 40%;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      // height: 100%;
+      
+      // .result-thumbnail {
+      //   // height: 100%;
+      // }
       
       &.results-are-small {
         width: @small-result-height;
-        min-width: auto;
+        min-width: @small-result-height;
       }
     }
 
@@ -123,6 +140,7 @@
       &.results-are-small {
         padding: 6px;
         flex-direction: row;
+        align-items: center;
       }
     }
 
@@ -140,22 +158,31 @@
       
       &.results-are-small {
         flex-wrap: nowrap;
+        height: 43px;
       }
     }
 
     .result-field:nth-child(1),
     .result-field:nth-child(2) {
-      border-top: 1px solid @light-black;
+      &:not(.results-are-small) {
+        border-top: 1px solid @light-black;
+      }
     }
     .result-field {
-      border-bottom: 1px solid @light-black;
+      &:not(.results-are-small) {
+        border-bottom: 1px solid @light-black;
+      }
       padding: 2px 1%;
       width: 46%;
 
       .result-field-name {
         font-size: 10px;
         display: inline-block;
-        word-break: break-all;
+        // word-break: break-all;
+        white-space: nowrap;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
         text-transform: uppercase;
         padding: 4px 0;
         color: @light-black;
@@ -263,10 +290,18 @@
 .result-field-value-image-wrapper {
   display: inline-block;
   width: 100%;
+  // height: 100%;
+  
   .result-field-value-image {
     display: inline-block;
     width: 100%;
-    height: 100%;
+    
+    // height: 100%;
+    // min-height: 125px;
+    // height: auto;
+    // max-height: 25%;
+    // overflow: hidden;
+    
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -275,7 +310,7 @@
 
     img {
       width: 100%;
-      height: 100%;
+      // height: 100%;
       opacity: 0;
     }
   }
