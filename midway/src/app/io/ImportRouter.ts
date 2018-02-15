@@ -129,7 +129,7 @@ Router.post('/headless', async (ctx, next) =>
       return;
     }
     Util.verifyParameters(ctx.request.body.body, ['source', 'filetype']);
-    const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateSource(ctx.request.body);
+    const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateImportSource(ctx.request.body);
     if (typeof imprtSourceConfig === 'string')
     {
       ctx.body = imprtSourceConfig as string;

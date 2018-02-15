@@ -154,7 +154,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
         getChildTerms?: (card: Card, schemaState) => List<string>;
         getNeighborTerms?: (card: Card, schemaState) => List<string>;
-        getParentTerms?: (card: Card, schemaState) => List<string>;
+        getParentTerms?: (card: Card, schemaState, builderState) => List<string>;
 
         metaFields?: string[];
         init?: InitFn;
@@ -469,9 +469,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
-          getAutoTerms: (schemaState): List<string> =>
+          getAutoTerms: (schemaState, builderState): List<string> =>
           {
-            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Field);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -493,9 +493,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
-          getAutoTerms: (schemaState): List<string> =>
+          getAutoTerms: (schemaState, builderState): List<string> =>
           {
-            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Index);
           },
         },
         tql: (stringBlock) => stringBlock['value'],
@@ -903,9 +903,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
-          getAutoTerms: (schemaState): List<string> =>
+          getAutoTerms: (schemaState, builderState): List<string> =>
           {
-            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Type);
           },
         },
         tql: (stringBlock) => stringBlock['value'],

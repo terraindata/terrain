@@ -43,19 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import ActionTypes from './BuilderCardsActionTypes';
+import { _BuilderCardsState, BuilderCardsState } from './BuilderCardsState';
 
-import ConfigType from '../../ConfigType';
-import { TemplateBase } from './TemplateBase';
-
-export class ImportTemplateConfig extends TemplateBase
-{
-  public name: string = '';
-  public requireJSONHaveAllFields: boolean = true;
-  constructor(props: object)
+const BuilderCardsReducers =
   {
-    super(props);
-    ConfigType.initialize(this, props);
-  }
-}
+    [ActionTypes.hoverCard]: (state, action) =>
+    {
+      if (state.hoveringCardId !== action.payload.cardId)
+      {
+        return state.set('hoveringCardId', action.payload.cardId);
+      }
 
-export default ImportTemplateConfig;
+      return state;
+    },
+    // if hovered over same card, will return original state object
+  };
+
+const BuilderCardsReducersWrapper = (
+  state: BuilderCardsState = _BuilderCardsState(),
+  action: Action<{
+    keyPath: KeyPath;
+    notDirty: boolean;
+  }>,
+) =>
+{
+  if (typeof BuilderCardsReducers[action.type] === 'function')
+  {
+    state = (BuilderCardsReducers[action.type] as any)(state, action);
+  }
+
+  return state;
+};
+
+export default BuilderCardsReducersWrapper;

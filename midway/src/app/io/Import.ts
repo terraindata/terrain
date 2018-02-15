@@ -132,12 +132,6 @@ export class Import
         return reject(isNewlineSeparatedJSON);
       }
 
-      const requireJSONHaveAllFields: boolean | string = this._parseBooleanField(fields, 'requireJSONHaveAllFields', true);
-      if (typeof requireJSONHaveAllFields === 'string')
-      {
-        return reject(requireJSONHaveAllFields);
-      }
-
       let file: stream.Readable | null = null;
       if (Array.isArray(files))
       {
@@ -166,6 +160,13 @@ export class Import
       let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
       let jsonBracketRemoved: boolean = !(fields['filetype'] === 'json' && !isNewlineSeparatedJSON);
 
+      const requireJSONHaveAllFieldsDefault: boolean | string = this._parseBooleanField(fields, 'requireJSONHaveAllFields', true);
+
+      if (typeof requireJSONHaveAllFieldsDefault === 'string')
+      {
+        return reject(requireJSONHaveAllFieldsDefault);
+      }
+
       let imprtConf: ImportConfig;
       if (headless)
       {
@@ -186,7 +187,7 @@ export class Import
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
-          requireJSONHaveAllFields,
+          requireJSONHaveAllFields: template['requireJSONHaveAllFields'],
           tablename: template['tablename'],
           transformations: template['transformations'],
           update,
@@ -212,7 +213,8 @@ export class Import
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
-            requireJSONHaveAllFields,
+            requireJSONHaveAllFields: fields['requireJSONHaveAllFields'] === undefined
+              ? requireJSONHaveAllFieldsDefault : JSON.parse(fields['requireJSONHaveAllFields']),
             tablename: fields['tablename'],
             transformations,
             update,
@@ -996,6 +998,17 @@ export class Import
     {
       return true;
     }
+    try
+    {
+      if (typeof JSON.parse(item as any) === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
+      {
+        return true;
+      }
+    }
+    catch (e)
+    {
+      // do nothing
+    }
     if (typeObj['type'] !== thisType)
     {
       return false;
@@ -1073,7 +1086,7 @@ export class Import
           }
         }
 
-        if (imprt.requireJSONHaveAllFields !== false)
+        if (imprt['requireJSONHaveAllFields'] !== false)
         {
           const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
           for (const obj of items)

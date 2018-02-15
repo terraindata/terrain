@@ -44,18 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../../ConfigType';
-import { TemplateBase } from './TemplateBase';
+// tslint:disable:forin restrict-plus-operands
 
-export class ImportTemplateConfig extends TemplateBase
-{
-  public name: string = '';
-  public requireJSONHaveAllFields: boolean = true;
-  constructor(props: object)
+// Defining our object like this gives us compile-time TypeScript support for ActionTypes
+//  and prevents us from defining duplicate action types.
+// The keys are the action types.
+// The values are initially the empty string (for coding expediency) but a function at the end
+//  of this file sets all of the values equal to the keys.
+// So you end up with ActionTypes.cards.move === 'cards.move'
+
+export let BuilderCardsActionTypes =
   {
-    super(props);
-    ConfigType.initialize(this, props);
-  }
-}
+    hoverCard: '',
+  };
 
-export default ImportTemplateConfig;
+// I tried using this type to correclty classify this function,
+//  but because of how object literals work in TypeScript,
+//  it wasn't useful.
+// Reference: http://stackoverflow.com/questions/22077023/why-cant-i-indirectly-return-an-object-literal-to-satisfy-an-index-signature-re
+// type ObjectOfStrings = { [s: string]: ObjectOfStrings | string };
+
+const setValuesToKeys = (obj: any, prefix: string) =>
+{
+  prefix = prefix + (prefix.length > 0 ? '.' : '');
+  for (const key in obj)
+  {
+    const value = prefix + key;
+    if (typeof obj[key] === 'string')
+    {
+      obj[key] = value;
+    }
+    else if (typeof obj[key] === 'object')
+    {
+      setValuesToKeys(obj[key], value);
+    }
+    else
+    {
+      throw new Error('Value found in ActionTypes that is neither string or object of strings: key: ' + key + ', value: ' + obj[key]);
+    }
+  }
+};
+
+setValuesToKeys(BuilderCardsActionTypes, 'builderCards');
+
+export default BuilderCardsActionTypes;

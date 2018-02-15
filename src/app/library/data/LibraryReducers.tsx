@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
 import { ItemStatus } from '../../../items/types/Item';
 import { _LibraryState, LibraryState } from '../LibraryTypes';
 import * as LibraryTypes from './../LibraryTypes';
@@ -267,7 +266,7 @@ LibraryReducers[ActionTypes.algorithms.unselect] =
     return state.set('selectedAlgorithm', null);
   };
 
-function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
+function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>, api)
 {
   if (current !== previous && current !== null && previous !== null)
   {
@@ -277,13 +276,13 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
       if (curItem !== prevItem)
       {
         // should save
-        Ajax.saveItem(curItem);
+        api.saveItem(curItem);
       }
     });
   }
 }
 
-const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =>
+const LibraryReducersWrapper = (state: LibraryState = LibraryTypes._LibraryState(), action) =>
 {
   const versioning = action.payload !== undefined ? action.payload.versioning : false;
   let nextState = state;
@@ -295,9 +294,9 @@ const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =
   if (versioning === true && CleanLibraryActionTypes.indexOf(action.type) === -1)
   {
     // save the new state
-    saveStateOf(nextState.categories, nextState.prevCategories);
-    saveStateOf(nextState.groups, nextState.prevGroups);
-    saveStateOf(nextState.algorithms, nextState.prevAlgorithms);
+    saveStateOf(nextState.categories, nextState.prevCategories, state.api);
+    saveStateOf(nextState.groups, nextState.prevGroups, state.api);
+    saveStateOf(nextState.algorithms, nextState.prevAlgorithms, state.api);
   }
   nextState = nextState
     .set('prevCategories', nextState.categories)

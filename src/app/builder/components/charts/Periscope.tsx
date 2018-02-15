@@ -127,7 +127,7 @@ const Periscope = {
     state.numBars = 10;
     const scales = this._scales(el, state.maxDomain, state.domain, state.barsData, state.width, state.height);
     this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart, state.colors,
-      state.inputKey, state.schema);
+      state.inputKey, state.schema, state.builder);
   },
 
   destroy(el)
@@ -147,15 +147,12 @@ const Periscope = {
       .attr('fill', Colors().transformChartBg);
   },
 
-  _drawAxes(el, scales, inputKey, schema)
+  _drawAxes(el, scales, inputKey, schema, builder)
   {
-    const isDate = ElasticBlockHelpers.getColumnType(schema, inputKey) === 'date';
+    const isDate = ElasticBlockHelpers.getColumnType(schema, builder, inputKey) === 'date';
     const numTicks = isDate ? 3 : 6;
     const tickFormatFn = isDate ?
-      (n: number): string =>
-      {
-        return moment(new Date(n)).format('YYYY-MM-DD');
-      } : Util.formatNumber;
+      ((n: number): string => moment(new Date(n)).format('YYYY-MM-DD')) : Util.formatNumber;
 
     const bottomAxis = d3.svg.axis()
       .scale(scales.x)
@@ -277,14 +274,14 @@ const Periscope = {
     handle.exit().remove();
   },
 
-  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors, inputKey, schema)
+  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors, inputKey, schema, builder)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    this._drawAxes(el, scales, inputKey, schema);
+    this._drawAxes(el, scales, inputKey, schema, builder);
     this._drawBars(el, scales, barsData, colors);
     this._drawLine(el, scales, domain);
     this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);
