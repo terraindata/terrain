@@ -77,7 +77,7 @@ Router.post('/logout', async (ctx, next) =>
     return;
   }
   winston.info('Logging out user ' + String((logoutStatus as UserConfig).email));
-  ctx.body = logoutStatus;
+  ctx.body = 'Success';
 });
 
 export default Router;
