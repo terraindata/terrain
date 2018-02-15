@@ -57,8 +57,6 @@ const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
-<<<<<<< HEAD
-import withScrolling from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection2';
@@ -78,6 +76,7 @@ export interface Props
   toSkip?: number;
 }
 
+@Radium
 class PathfinderColumn extends TerrainComponent<Props>
 {
 

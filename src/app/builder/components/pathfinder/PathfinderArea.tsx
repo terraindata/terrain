@@ -60,12 +60,14 @@ import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
-import PathfinderFilterSection from './filter/PathfinderFilterSection';
+import PathfinderFilterSection from './filter/PathfinderFilterSection2';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
+import withScrolling from 'react-dnd-scrollzone';
+
 const ScrollingComponent = withScrolling('div');
 
 export interface Props
@@ -129,7 +131,7 @@ class PathfinderArea extends TerrainComponent<Props>
     const { pathfinderContext } = this.state;
     return (
       <ScrollingComponent
-        className='pathfinder-area'
+        className='pf-area'
       >
         <FadeInOut
           open={path.name !== undefined}
