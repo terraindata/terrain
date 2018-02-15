@@ -68,7 +68,7 @@ export default class ESParameterFiller
     params: { [name: string]: any }): string
   {
     return ESParameterSubstituter.generate(source,
-      (param: string, valueInfo: ESValueInfo): string =>
+      (param: string): string =>
       {
         const ps = param.split('.');
         if (ps[0] === 'parent' && params['parent'] === undefined)
@@ -80,12 +80,6 @@ export default class ESParameterFiller
         for (const p of ps)
         {
           value = value[p];
-        }
-
-        if (value === null && valueInfo)
-        {
-          console.log(valueInfo);
-          return JSON.stringify([]);
         }
 
         if (value === undefined)
