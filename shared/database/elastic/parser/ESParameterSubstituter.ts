@@ -55,16 +55,16 @@ import ESValueInfo from './ESValueInfo';
 export default class ESParameterSubstituter
 {
   public static generate(source: ESValueInfo,
-    substitutionFunction: (param: string) => string): string
+    substitutionFunction: (param: string, valueInfo: ESValueInfo) => string): string
   {
     return (new ESParameterSubstituter(source, substitutionFunction)).result;
   }
 
-  private substitutionFunction: (param: string) => string;
+  private substitutionFunction: (param: string, valueInfo: ESValueInfo) => string;
   private result: string;
 
   public constructor(source: ESValueInfo,
-    substitutionFunction: (param: string) => string)
+    substitutionFunction: (param: string, valueInfo: ESValueInfo) => string)
   {
     this.substitutionFunction = substitutionFunction;
     this.result = '';
@@ -86,7 +86,7 @@ export default class ESParameterSubstituter
       case ESJSONType.string:
         if (source.parameter !== undefined)
         {
-          this.appendParameter(source.parameter);
+          this.appendParameter(source.parameter, source);
           break;
         }
 
@@ -94,7 +94,7 @@ export default class ESParameterSubstituter
         break;
 
       case ESJSONType.parameter:
-        this.appendParameter(source.parameter as string);
+        this.appendParameter(source.parameter as string, source);
         break;
 
       case ESJSONType.array:
@@ -140,9 +140,9 @@ export default class ESParameterSubstituter
     }
   }
 
-  private appendParameter(param: string): void
+  private appendParameter(param: string, valueInfo: ESValueInfo): void
   {
-    this.result += this.substitutionFunction(param);
+    this.result += this.substitutionFunction(param, valueInfo);
   }
 
   private appendJSON(value: any): void
