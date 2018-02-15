@@ -33,7 +33,8 @@
     "fix": "yarn style && yarn lint-parallel;",
     "diff-style": "git ls-files -m  \\*.ts\\* | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
     "rr": "./node_modules/.bin/ts-node ./rr/RecordReplay.ts --",
-    "test-rr": "jest ./rr --forceExit"
+    "test-rr": "jest ./rr --forceExit",
+    "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
   },
   "repository": {
     "type": "git",
