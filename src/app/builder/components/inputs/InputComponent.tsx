@@ -56,7 +56,7 @@ import Dropdown from '../../../common/components/Dropdown';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
 
@@ -77,7 +77,9 @@ interface Props
   canEdit: boolean;
   onCreateInput: (index: number) => void;
   language: string;
+
   action: (keyPath, value) => void; // Need to use to keep track of whether path or cards is used (should change with Xi's parser)
+  builderActions?: typeof BuilderActions;
 }
 
 const TYPE_OPTIONS =
@@ -144,6 +146,7 @@ class InputComponent extends TerrainComponent<Props>
         date = new Date();
       }
       const value = Util.formatInputDate(date, this.props.language);
+
       this.props.action(this.getKeyPath('value'), value);
     }
   }
@@ -153,7 +156,7 @@ class InputComponent extends TerrainComponent<Props>
     Util.animateToHeight(this.refs.input, 0);
     setTimeout(() =>
     {
-      Actions.remove(this.getKeyPath(), this.props.index);
+      this.props.builderActions.remove(this.getKeyPath(), this.props.index);
     }, 250);
   }
 
@@ -309,4 +312,8 @@ class InputComponent extends TerrainComponent<Props>
   }
 }
 
-export default InputComponent;
+export default Util.createTypedContainer(
+  InputComponent,
+  [],
+  { builderActions: BuilderActions },
+);

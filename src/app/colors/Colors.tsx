@@ -1112,6 +1112,7 @@ const curTheme = 'LIGHT';
 //  for theme changes to take effect
 if (localStorage.getItem('theme') === null)
 {
+<<<<<<< HEAD
   localStorage.setItem('theme', 'LIGHT');
 }
 
@@ -1126,6 +1127,13 @@ const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme);
 export function Colors(): Theme & OldTheme
 {
   return themeMash;
+=======
+  if (localStorage.getItem('theme') === null)
+  {
+    localStorage.setItem('theme', 'LIGHT');
+  }
+  return Themes[localStorage.getItem('theme')];
+>>>>>>> master
 }
 
 const dynamicMap: any = {

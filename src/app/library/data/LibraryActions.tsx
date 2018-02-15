@@ -263,7 +263,7 @@ const Actions =
                 .set('groupId', groupId)
                 .set('categoryId', categoryId)
                 .set('name', name)
-                .set('status', ItemStatus.Build)
+                .set('status', algorithm.status === ItemStatus.Archive ? ItemStatus.Archive : ItemStatus.Build)
                 .set('db', db)
                 .set('deployedName', '')
                 .set('language', group.language);
@@ -317,6 +317,7 @@ const Actions =
         fetchVersion:
           (algorithmId: string, onNoVersion: (algorithmId: string) => void) =>
           {
+            return { type: 'noop' };
             // TODO
             // Ajax.getAlgorithmVersion(algorithmId, (algorithmVersion: LibraryTypes.Algorithm) =>
             // {

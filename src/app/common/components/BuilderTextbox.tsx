@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import './BuilderTextbox.less';
 
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
@@ -63,9 +64,7 @@ import { isInput, isRuntimeInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
-import Actions from '../../builder/data/BuilderActions';
-import { BuilderStore } from '../../builder/data/BuilderStore';
-import Store from '../../builder/data/BuilderStore';
+
 import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
@@ -102,7 +101,7 @@ export interface Props
   parentId?: string;
 
   autoDisabled?: boolean;
-  getAutoTerms?: (schemaState) => List<string>;
+  getAutoTerms?: (schemaState, builderState) => List<string>;
 
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
@@ -125,6 +124,9 @@ export interface Props
   autoFocus?: boolean;
 
   action?: (keyPath, value) => void;
+
+  builder?: any;
+  builderActions?: typeof BuilderActions;
 }
 
 interface State
@@ -261,7 +263,7 @@ class BuilderTextbox extends TerrainComponent<Props>
       }
       else
       {
-        Actions.change(this.props.keyPath, value);
+        this.props.builderActions.change(this.props.keyPath, value);
       }
     }
     this.props.onChange && this.props.onChange(value);
@@ -370,30 +372,32 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public toggleClosed()
   {
+    const { builder } = this.props;
     const card: Card = this.props.value as Card;
     const key = this.props.tuningMode ? 'tuningClosed' : 'closed';
     let keyPath = this.props.keyPath;
     if (this.props.tuningMode)
     {
-      const keyPaths = Map(Store.getState().query.cardKeyPaths);
+      const keyPaths = Map(builder.query.cardKeyPaths);
       if (keyPaths.get(card.id) !== undefined)
       {
         keyPath = List(keyPaths.get(card.id));
       }
     }
+
     if (this.props.action)
     {
       this.props.action(keyPath.push(key), !this.props.value[key]);
     }
     else
     {
-      Actions.change(keyPath.push(key), !this.props.value[key]);
+      this.props.builderActions.change(keyPath.push(key), !this.props.value[key]);
     }
   }
 
   public computeOptions()
   {
-    const { schema, autoDisabled } = this.props;
+    const { schema, autoDisabled, builder } = this.props;
 
     if (autoDisabled)
     {
@@ -404,11 +408,11 @@ class BuilderTextbox extends TerrainComponent<Props>
 
     if (this.props.getAutoTerms)
     {
-      options = this.props.getAutoTerms(schema);
+      options = this.props.getAutoTerms(schema, builder);
     }
     else if (this.props.keyPath)
     {
-      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema);
+      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema, builder);
     }
 
     if (options && !options.equals(this.state.options))
@@ -498,6 +502,8 @@ class BuilderTextbox extends TerrainComponent<Props>
               renderPreview={true}
               afterDrop={this.handleCardDrop}
               language={this.props.language}
+              builder={this.props.builder}
+              builderActions={this.props.builderActions}
             />
           }
         </div>
@@ -569,8 +575,10 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   private valueIsInput(props: Props, value): boolean
   {
+    const { builder } = this.props;
+
     if (typeof value === 'string' &&
-      (isInput(value as string, BuilderStore.getState().query.inputs) || isRuntimeInput(value as string)))
+      (isInput(value as string, builder.query.inputs) || isRuntimeInput(value as string)))
     {
       return true;
     }
@@ -600,11 +608,11 @@ class BuilderTextbox extends TerrainComponent<Props>
 //     return props.acceptsCards && props.display
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
 //   },
-
 export default Util.createContainer(
   BuilderTextbox,
-  ['schema'],
+  ['builder', 'schema'],
   {
     colorsActions: ColorsActions,
+    builderActions: BuilderActions,
   },
 );

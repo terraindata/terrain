@@ -48,12 +48,13 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import Util from 'util/Util';
 import { Input } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import CreateLine from '../../../common/components/CreateLine';
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import InputComponent from '../inputs/InputComponent';
 
 export interface Props
@@ -62,6 +63,7 @@ export interface Props
   canEdit: boolean;
   language: string;
   action: (keyPath, value) => void; // Need to use to keep track of whether path or cards is used (should change with Xi's parser)
+  builderActions?: typeof BuilderActions;
 }
 
 class InputsArea extends TerrainComponent<Props>
@@ -72,7 +74,8 @@ class InputsArea extends TerrainComponent<Props>
     {
       index = -1;
     }
-    Actions.createInput(
+
+    this.props.builderActions.createInput(
       Immutable.List(['query', 'inputs']), index,
       AllBackendsMap[this.props.language].inputType,
     );
@@ -126,4 +129,8 @@ class InputsArea extends TerrainComponent<Props>
   }
 }
 
-export default InputsArea;
+export default Util.createTypedContainer(
+  InputsArea,
+  [],
+  { builderActions: BuilderActions },
+);

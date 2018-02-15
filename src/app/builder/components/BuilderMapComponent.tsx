@@ -54,7 +54,7 @@ import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import BuilderActions from '../data/BuilderActions';
-import { BuilderState, BuilderStore } from '../data/BuilderStore';
+import { BuilderState } from '../data/BuilderState';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -67,6 +67,7 @@ export interface Props
   parentKeyPath: KeyPath;
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
+  builderActions?: typeof BuilderActions;
 }
 
 class BuilderMapComponent extends TerrainComponent<Props>
@@ -80,34 +81,27 @@ class BuilderMapComponent extends TerrainComponent<Props>
       inputs: null,
     };
 
-  public constructor(props: Props)
+  public componentWillReceiveProps(nextProps)
   {
-    super(props);
-    this._subscribe(BuilderStore, {
-      stateKey: 'builderState',
-      updater: (builderState: BuilderState) =>
-      {
-        if (builderState.query && builderState.query.inputs !== this.state.inputs)
-        {
-          this.setState({
-            inputs: builderState.query.inputs,
-          });
-        }
-      },
-    });
+    if (nextProps.builder.query && nextProps.builder.query.inputs !== this.state.inputs)
+    {
+      this.setState({
+        inputs: nextProps.builder.query.inputs,
+      });
+    }
   }
 
   public handleChange(coordinates, inputValue)
   {
     if (coordinates !== undefined)
     {
-      BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), coordinates);
+      this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), coordinates);
     }
     else
     {
-      BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), inputValue);
+      this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), inputValue);
     }
-    BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapInputValue'), inputValue);
+    this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapInputValue'), inputValue);
   }
 
   public spotlightsToMarkers()
@@ -148,6 +142,6 @@ class BuilderMapComponent extends TerrainComponent<Props>
 }
 export default Util.createTypedContainer(
   BuilderMapComponent,
-  ['spotlights'],
-  {},
+  ['builder', 'spotlights'],
+  { builderActions: BuilderActions },
 );
