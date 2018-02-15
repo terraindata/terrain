@@ -62,6 +62,7 @@ import { FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Sour
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
+import './PathfinderFilterStyle.less';
 
 export interface Props
 {
