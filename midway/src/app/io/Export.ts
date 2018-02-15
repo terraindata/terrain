@@ -52,9 +52,13 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
+import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
+import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../../shared/database/elastic/parser/ESParser';
 import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
+
 import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -74,14 +78,12 @@ const typeParser: CSVTypeParser = new CSVTypeParser();
 
 export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 {
-  file: stream.Readable;
   filetype: string;
   update: boolean;      // false means replace (instead of update) ; default should be true
 }
 
 export class Export
 {
-  private BATCH_SIZE: number = 5000;
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
   private SCROLL_TIMEOUT: string = '60s';
   private MAX_ROW_THRESHOLD: number = 2000;
@@ -169,7 +171,6 @@ export class Export
         return reject(mapping);
       }
 
-      let rankCounter: number = 1;
       let writer: any;
       if (exprt.filetype === 'csv')
       {
@@ -179,8 +180,6 @@ export class Export
       {
         writer = new stream.PassThrough();
       }
-      const pass = new stream.PassThrough();
-      writer.pipe(pass);
 
       if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
       {
@@ -192,9 +191,6 @@ export class Export
         }
         writer.write('[');
       }
-
-      let errMsg: string = '';
-      let isFirstJSONObj: boolean = true;
 
       const originalMapping: object = {};
       // generate original mapping if there were any renames
@@ -215,148 +211,93 @@ export class Export
       const payload = {
         database: exprt.dbid,
         type: 'search',
-        streaming: false,
+        streaming: true,
         databasetype: 'elastic',
         body: qry,
       };
 
-      const qryResponse: any = await qh.handleQuery(payload);
-      if (qryResponse === undefined || qryResponse.hasError())
+      const respStream: any = await qh.handleQuery(payload);
+      if (respStream === undefined || (respStream.hasError !== undefined && respStream.hasError()))
       {
         writer.end();
-        errMsg = 'Nothing to export.';
-        return reject(errMsg);
-      }
-      const resp = qryResponse.result;
-      if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
-      {
-        writer.end();
-        errMsg = 'Nothing to export.';
-        return reject(errMsg);
+        return reject('Nothing to export.');
       }
 
-      const newDocs: object[] = resp.hits.hits as object[];
-      if (newDocs.length === 0)
-      {
-        writer.end();
-        return resolve(pass);
-      }
-      let returnDocs: object[] = [];
-
-      const fieldArrayDepths: object = {};
-      const extractTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
-      exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
-
-      const mergedDocs: object[] = [];
-      for (const doc of newDocs)
-      {
-        // merge groupJoins with _source if necessary
-        const mergedDoc: object | string = await this._mergeGroupJoin(doc);
-        if (typeof mergedDoc === 'string')
-        {
-          return reject(mergedDoc as string);
-        }
-
-        // extract field after doing all merge joins
-        extractTransformations.forEach((transform) =>
-        {
-          const oldColName: string | undefined = transform['colName'];
-          const newColName: string | undefined = transform['args']['newName'];
-          const path: string | undefined = transform['args']['path'];
-          if (oldColName !== undefined && newColName !== undefined && path !== undefined)
-          {
-            mergedDoc['_source'][newColName] = _.get(mergedDoc['_source'], path);
-          }
-        });
-
-        mergedDocs.push(mergedDoc);
-      }
-
-      for (const doc of mergedDocs)
-      {
-        // verify schema mapping with documents and fix documents accordingly
-        const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
-        if (typeof newDoc === 'string')
-        {
-          writer.end();
-          errMsg = newDoc;
-          return reject(errMsg);
-        }
-        for (const field of Object.keys(newDoc))
-        {
-          if (newDoc[field] !== null && newDoc[field] !== undefined)
-          {
-            if (fieldArrayDepths[field] === undefined)
-            {
-              fieldArrayDepths[field] = new Set<number>();
-            }
-            fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
-          }
-          if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
-          {
-            newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
-          }
-        }
-        returnDocs.push(newDoc as object);
-      }
-      for (const field of Object.keys(fieldArrayDepths))
-      {
-        if (fieldArrayDepths[field].size > 1)
-        {
-          errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
-          return reject(errMsg);
-        }
-      }
-
-      winston.info('Beginning export transformations.');
-      // transform documents with template
       try
       {
-        returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
-        for (const doc of returnDocs)
+        const extractTransformations = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
+        exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
+
+        winston.info('Beginning export transformations.');
+        const cfg = {
+          extractTransformations,
+          exprt,
+          fieldArrayDepths: {},
+          id: 1,
+          mapping: originalMapping,
+        };
+
+        let isFirstJSONObj: boolean = true;
+        await new Promise(async (res, rej) =>
         {
-          if (Boolean(exprt.rank))
+          respStream.on('data', (docs) =>
           {
-            if (doc['TERRAINRANK'] !== undefined)
+            if (docs === undefined || docs === null)
             {
-              errMsg = 'Conflicting field: TERRAINRANK.';
-              return reject(errMsg);
+              return res();
             }
-            doc['TERRAINRANK'] = rankCounter;
-          }
-          rankCounter++;
-        }
-      } catch (e)
-      {
+
+            try
+            {
+              for (let doc of docs)
+              {
+                doc = this._postProcessDoc(doc, cfg);
+                if (exprt.filetype === 'csv')
+                {
+                  writer.write(doc);
+                }
+                else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+                {
+                  isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+                  writer.write(JSON.stringify(doc));
+                }
+
+                if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+                {
+                  writer.write(']');
+                  if (exprt.filetype === 'json [type object]')
+                  {
+                    writer.write('}');
+                  }
+                }
+              }
+            }
+            catch (e)
+            {
+              return rej(e);
+            }
+          });
+
+          respStream.on('end', () =>
+          {
+            return res();
+          });
+
+          respStream.on('error', (err) =>
+          {
+            winston.error(err);
+            return rej(err);
+          });
+        });
+
         writer.end();
-        errMsg = e;
-        return reject(errMsg);
+        return resolve(writer);
       }
-
-      // export to csv
-      for (const returnDoc of returnDocs)
+      catch (e)
       {
-        if (exprt.filetype === 'csv')
-        {
-          writer.write(returnDoc);
-        }
-        else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-        {
-          isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-          writer.write(JSON.stringify(returnDoc));
-        }
+        respStream.close();
+        return reject(e);
       }
-
-      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        writer.write(']');
-        if (exprt.filetype === 'json [type object]')
-        {
-          writer.write('}');
-        }
-      }
-      writer.end();
-      resolve(pass);
     });
   }
 
@@ -375,20 +316,82 @@ export class Export
     return this._getAllFieldsAndTypesFromQuery(database, qry, dbid);
   }
 
-  private _shouldRandomSample(qry: string): string
+  private _postProcessDoc(doc: object, cfg: any): object
   {
-    const parser = getParsedQuery(qry);
-    let query = parser.getValue();
-    if (query['size'] !== undefined)
+    // merge groupJoins with _source if necessary
+    doc = this._mergeGroupJoin(doc);
+
+    // extract field after doing all merge joins
+    cfg.extractTransformations.forEach((transform) =>
     {
-      if (typeof query['size'] === 'number' && qry['size'] > this.MAX_ROW_THRESHOLD)
+      const oldColName: string | undefined = transform['colName'];
+      const newColName: string | undefined = transform['args']['newName'];
+      const path: string | undefined = transform['args']['path'];
+      if (oldColName !== undefined && newColName !== undefined && path !== undefined)
       {
-        query['from'] = 0;
-        query['size'] = this.MAX_ROW_THRESHOLD;
-        query = { function_score: { random_score: {}, query } };
+        doc['_source'][newColName] = _.get(doc['_source'], path);
+      }
+    });
+
+    // verify schema mapping with documents and fix documents accordingly
+    doc = this._checkDocumentAgainstMapping(doc['_source'], cfg.mapping);
+    for (const field of Object.keys(doc))
+    {
+      if (doc[field] !== null && doc[field] !== undefined)
+      {
+        if (cfg.fieldArrayDepths[field] !== undefined)
+        {
+          cfg.fieldArrayDepths[field] = Number(cfg.fieldArrayDepths[field]) + this._getArrayDepth(doc[field]);
+          if (cfg.fieldArrayDepths[field] > 1)
+          {
+            throw new Error('Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.');
+          }
+        }
+        else
+        {
+          cfg.fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
+        }
+
+        if (Array.isArray(doc[field]) && cfg.exprt.filetype === 'csv')
+        {
+          doc[field] = this._convertArrayToCSVArray(doc[field]);
+        }
       }
     }
-    return query;
+
+    doc = this._transformAndCheck(doc, cfg.exprt, false);
+    if (cfg.exprt.rank === true)
+    {
+      if (doc['TERRAINRANK'] !== undefined)
+      {
+        throw new Error('Conflicting field: TERRAINRANK.');
+      }
+      doc['TERRAINRANK'] = cfg.id;
+      cfg.id++;
+    }
+    return doc;
+  }
+
+  private _shouldRandomSample(qry: string): string
+  {
+    let parser = getParsedQuery(qry);
+    const query = parser.getValue();
+    if (query['size'] !== undefined)
+    {
+      if (typeof query['size'] === 'number' && query['size'] > this.MAX_ROW_THRESHOLD)
+      {
+        query['size'] = this.MAX_ROW_THRESHOLD;
+      }
+    }
+
+    query.query = {
+      function_score: {
+        random_score: {},
+        query: query.query,
+      },
+    };
+    parser = new ESJSONParser(JSON.stringify(query), true);
+    return ESConverter.formatES(parser as ESJSONParser);
   }
 
   private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
@@ -427,9 +430,9 @@ export class Export
       const payload = {
         database: dbid as number,
         type: 'search',
-        streaming: true,
+        streaming: false,
         databasetype: 'elastic',
-        body: JSON.stringify(qry),
+        body: qry,
       };
       const qryResponse: any = await qh.handleQuery(payload);
       if (qryResponse === undefined || qryResponse.hasError())
@@ -472,12 +475,7 @@ export class Export
     {
       for (const doc of docs)
       {
-        const mergeDoc: object | string = await this._mergeGroupJoin(doc);
-        if (typeof mergeDoc === 'string')
-        {
-          winston.warn(mergeDoc as string);
-          break;
-        }
+        const mergeDoc = this._mergeGroupJoin(doc);
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
@@ -767,34 +765,31 @@ export class Export
     return typeObj['type'];
   }
 
-  private async _checkDocumentAgainstMapping(document: object, mapping: object): Promise<object | string>
+  private _checkDocumentAgainstMapping(document: object, mapping: object): object
   {
-    return new Promise<object | string>(async (resolve, reject) =>
+    const newDocument: object = document;
+    const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
+    for (const field of fieldsInMappingNotInDocument)
     {
-      const newDocument: object = document;
-      const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
-      for (const field of fieldsInMappingNotInDocument)
-      {
-        newDocument[field] = null;
-        // TODO: Case 740
-        // if (fields[field]['type'] === 'text')
-        // {
-        //   newDocument[field] = '';
-        // }
-      }
-      const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
-      for (const field of fieldsInDocumentNotMapping)
-      {
-        delete newDocument[field];
-      }
-      resolve(newDocument);
-    });
+      newDocument[field] = null;
+      // TODO: Case 740
+      // if (fields[field]['type'] === 'text')
+      // {
+      //   newDocument[field] = '';
+      // }
+    }
+    const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
+    for (const field of fieldsInDocumentNotMapping)
+    {
+      delete newDocument[field];
+    }
+    return newDocument;
   }
 
   /* checks whether obj has the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _checkTypes(obj: object, exprt: ExportConfig): string
+  private _checkTypes(obj: object, exprt: ExportConfig): void
   {
     const targetHash: string = this._buildDesiredHash(exprt.columnTypes);
     const targetKeys: string = JSON.stringify(Object.keys(exprt.columnTypes).sort());
@@ -820,7 +815,7 @@ export class Export
     {
       if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
       {
-        return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
+        throw new Error('Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj));
       }
       for (const key of Object.keys(obj))
       {
@@ -828,8 +823,8 @@ export class Export
         {
           if (!this._jsonCheckTypesHelper(obj[key], exprt.columnTypes[key]))
           {
-            return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
-              JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
+            throw new Error('Encountered an object whose field "' + key + '"does not match the specified type (' +
+              JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj));
           }
         }
       }
@@ -842,12 +837,10 @@ export class Export
       {
         if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
         {
-          return 'Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj);
+          throw new Error('Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj));
         }
       }
     }
-
-    return '';
   }
 
   private _convertArrayToCSVArray(arr: any[]): string
@@ -1032,6 +1025,17 @@ export class Export
     {
       return true;
     }
+    try
+    {
+      if (typeof JSON.parse(item as any) === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
+      {
+        return true;
+      }
+    }
+    catch (e)
+    {
+      // do nothing
+    }
     if (typeObj['type'] !== type)
     {
       return false;
@@ -1047,38 +1051,34 @@ export class Export
     return true;
   }
 
-  private async _mergeGroupJoin(doc: object): Promise<object | string>
+  private _mergeGroupJoin(doc: object): object
   {
-    return new Promise<object | string>(async (resolve, reject) =>
+    if (doc['_source'] !== undefined)
     {
-      if (doc['_source'] !== undefined)
+      const sourceKeys = Object.keys(doc['_source']);
+      const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
+      if (rootKeys.length > 0) // there were group join objects
       {
-        const sourceKeys: string[] = Object.keys(doc['_source']);
-        let rootKeys: string[] = Object.keys(doc);
-        rootKeys = _.without(rootKeys, '_index', '_type', '_id', '_score', '_source');
-        if (rootKeys.length > 0) // there were group join objects
+        const duplicateRootKeys: string[] = [];
+        rootKeys.forEach((rootKey) =>
         {
-          const duplicateRootKeys: string[] = [];
-          rootKeys.forEach((rootKey) =>
+          if (sourceKeys.indexOf(rootKey) > -1)
           {
-            if (sourceKeys.indexOf(rootKey) > -1)
-            {
-              duplicateRootKeys.push(rootKey);
-            }
-          });
-          if (duplicateRootKeys.length !== 0)
-          {
-            return resolve('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+            duplicateRootKeys.push(rootKey);
           }
-          rootKeys.forEach((rootKey) =>
-          {
-            doc['_source'][rootKey] = doc[rootKey];
-            delete doc[rootKey];
-          });
+        });
+        if (duplicateRootKeys.length !== 0)
+        {
+          throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
         }
+        rootKeys.forEach((rootKey) =>
+        {
+          doc['_source'][rootKey] = doc[rootKey];
+          delete doc[rootKey];
+        });
       }
-      return resolve(doc);
-    });
+    }
+    return doc;
   }
 
   // recursively attempts to parse strings to dates
@@ -1104,59 +1104,45 @@ export class Export
   }
 
   // asynchronously perform transformations on each item to upsert, and check against expected resultant types
-  private async _transformAndCheck(allItems: object[], exprt: ExportConfig,
-    dontCheck?: boolean): Promise<object[][]>
+  private _transformAndCheck(doc: object, exprt: ExportConfig, dontCheck?: boolean): object
   {
-    const promises: Array<Promise<object[]>> = [];
-    let items: object[];
-    while (allItems.length > 0)
+    try
     {
-      items = allItems.splice(0, this.BATCH_SIZE);
-      promises.push(
-        new Promise<object[]>(async (resolve, reject) =>
-        {
-          const transformedItems: object[] = [];
-          for (let item of items)
-          {
-            try
-            {
-              item = this._applyTransforms(item, exprt.transformations);
-            }
-            catch (e)
-            {
-              return reject('Failed to apply transforms: ' + String(e));
-            }
-            // only include the specified columns
-            // NOTE: unclear if faster to copy everything over or delete the unused ones
-            const trimmedItem: object = {};
-            for (const name of Object.keys(exprt.columnTypes))
-            {
-              if (exprt.columnTypes.hasOwnProperty(name))
-              {
-                if (typeof item[name] === 'string')
-                {
-                  trimmedItem[name] = item[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-                }
-                else
-                {
-                  trimmedItem[name] = item[name];
-                }
-              }
-            }
-            if (dontCheck !== true)
-            {
-              const typeError: string = this._checkTypes(trimmedItem, exprt);
-              if (typeError !== '')
-              {
-                return reject(typeError);
-              }
-            }
-            transformedItems.push(trimmedItem);
-          }
-          resolve(transformedItems);
-        }));
+      doc = this._applyTransforms(doc, exprt.transformations);
     }
-    return Promise.all(promises);
+    catch (e)
+    {
+      throw new Error('Failed to apply transforms: ' + String(e));
+    }
+    // only include the specified columns
+    // NOTE: unclear if faster to copy everything over or delete the unused ones
+    const trimmedDoc: object = {};
+    for (const name of Object.keys(exprt.columnTypes))
+    {
+      if (exprt.columnTypes.hasOwnProperty(name))
+      {
+        if (typeof doc[name] === 'string')
+        {
+          trimmedDoc[name] = doc[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        }
+        else
+        {
+          trimmedDoc[name] = doc[name];
+        }
+      }
+    }
+    if (dontCheck !== true)
+    {
+      try
+      {
+        this._checkTypes(trimmedDoc, exprt);
+      }
+      catch (e)
+      {
+        throw e;
+      }
+    }
+    return trimmedDoc;
   }
 }
 

@@ -44,18 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../../ConfigType';
-import { TemplateBase } from './TemplateBase';
+// tslint:disable:no-var-requires strict-boolean-expressions variable-name
 
-export class ImportTemplateConfig extends TemplateBase
+import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
+
+export class BuilderCardsStateClass
 {
-  public name: string = '';
-  public requireJSONHaveAllFields: boolean = true;
-  constructor(props: object)
-  {
-    super(props);
-    ConfigType.initialize(this, props);
-  }
+  public hoveringCardId: ID = '';
 }
 
-export default ImportTemplateConfig;
+export interface BuilderCardsState extends BuilderCardsStateClass, IMap<BuilderCardsState> { }
+const BuilderCardsState_Record = Immutable.Record(new BuilderCardsStateClass());
+export const _BuilderCardsState = (config?: any) =>
+{
+  return new BuilderCardsState_Record(config || {}) as any as BuilderCardsState;
+};

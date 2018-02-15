@@ -51,9 +51,10 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import Util from 'util/Util';
 import { Card } from '../../../../blocks/types/Card';
 import { backgroundColor, cardStyle, Colors } from '../../../colors/Colors';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsDeck.less';
 
@@ -67,6 +68,8 @@ export interface Props
 {
   open: boolean;
   language: string;
+
+  builderActions?: typeof BuilderActions;
 }
 
 class CardsDeck extends TerrainComponent<Props>
@@ -133,6 +136,7 @@ class CardsDeck extends TerrainComponent<Props>
                       search={this.state.search}
                       key={cardType}
                       type={cardType}
+                      builderActions={this.props.builderActions}
                     />,
                   )
                 }
@@ -154,6 +158,8 @@ interface CardProps
   isDragging?: boolean;
   connectDragPreview?: (a?: any) => void;
   connectDragSource?: (el: El) => El;
+
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -204,15 +210,15 @@ const cardSource =
         new: true,
       };
 
-      Actions.dragCard(item);
+      props.builderActions.dragCard(item);
 
       return item;
     },
 
-    endDrag: () =>
+    endDrag: (props) =>
     {
       $('body').removeClass('body-card-is-dragging');
-      Actions.dragCard(null);
+      props.builderActions.dragCard(null);
     },
   };
 
@@ -225,4 +231,8 @@ const dragCollect = (connect, monitor) =>
 
 const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(CardDeckCardComponent);
 
-export default CardsDeck;
+export default Util.createTypedContainer(
+  CardsDeck,
+  [],
+  { builderActions: BuilderActions },
+);

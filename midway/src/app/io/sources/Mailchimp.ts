@@ -44,69 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
+import csvWriter = require('csv-write-stream');
+
+import * as _ from 'lodash';
+import * as stream from 'stream';
 import * as winston from 'winston';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import { makePromiseCallback } from '../../Utils';
 
-// make sure importing ESCardParser before importing ElasticToCards
-import ESCardParser from 'src/database/elastic/conversion/ESCardParser';
+import CredentialConfig from '../../credentials/CredentialConfig';
+import Credentials from '../../credentials/Credentials';
 
-import { ElasticValueInfoToCards, parseCardFromValueInfo } from 'src/database/elastic/conversion/ElasticToCards';
+export const credentials: Credentials = new Credentials();
 
-import * as Immutable from 'immutable';
-import ESParserError from 'shared/database/elastic/parser/ESParserError';
-import CardsToElastic from 'src/database/elastic/conversion/CardsToElastic';
-
-function getExpectedFile(): string
+export interface MailchimpConfig
 {
-  return __filename.split('.')[0] + '.expected';
+  id: string;
+  name: string;
+  range: string;
 }
 
-let expected;
-
-beforeAll(async (done) =>
+export class Mailchimp
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  private storedEmail: string;
+  private storedKeyFilePath: string;
 
-  const contents: any = await new Promise((resolve, reject) =>
+  private async _getStoredGoogleAPICredentials()
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(contents);
-  done();
-});
-
-function testCardParse(testName: string,
-  testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing "' + testName + '": "' + testString + '"');
-  const emptyCards = Immutable.List([]);
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
-  const rootValueInfo = parser.getValueInfo();
-  const rootCards = ElasticValueInfoToCards(rootValueInfo, Immutable.List([]));
-  // parse the card
-  const rootCard = rootCards.get(0);
-  expect(rootCard['type']).toEqual('eqlbody');
-  const cardParser = new ESCardParser(rootCard);
-  // interpreting the parsed card
-  const cardInterpreter = new ESInterpreter(cardParser);
-  expect(cardInterpreter.errors).toEqual(expectedErrors);
-  expect(CardsToElastic.blockToElastic(rootCard)).toEqual(expectedValue);
+    const creds: string[] = await credentials.getByType('googleapi');
+    if (creds.length === 0)
+    {
+      winston.info('No credential found for type googleapi.');
+    }
+    else
+    {
+      const cred: object = JSON.parse(creds[0]);
+      this.storedEmail = cred['storedEmail'];
+      this.storedKeyFilePath = cred['storedKeyFilePath'];
+    }
+  }
 }
 
-test('parse card', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
-    {
-      const testValue: any = expected[testName];
-      testCardParse('test', JSON.stringify(testValue), testValue);
-    });
-});
+export default Mailchimp;

@@ -101,7 +101,7 @@ export interface Display
   defaultValue?: string;
   // for textboxes with cards
   top?: boolean;
-  getAutoTerms?: (schemaState) => List<string>; // overrides standard terms
+  getAutoTerms?: (schemaState, builderState) => List<string>; // overrides standard terms
   autoDisabled?: boolean;
   showWhenCards?: boolean;
   onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
