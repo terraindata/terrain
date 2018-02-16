@@ -114,7 +114,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   {
     return baseQuery;
   }
-  const text = stringifyWithParameters(baseQuery.toJS(), inputs);
+  const text = stringifyWithParameters(baseQuery.toJS(), (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
 }

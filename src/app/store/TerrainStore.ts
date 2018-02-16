@@ -61,6 +61,7 @@ import TerrainStoreLogger from 'store/TerrainStoreLogger';
 import { UserReducers } from 'users/data/UserRedux';
 import Ajax from 'util/Ajax';
 import { ColorsReducers } from '../colors/data/ColorsRedux';
+import logger from 'redux-logger';
 
 const reducers = {
   analytics: AnalyticsReducer,
@@ -79,7 +80,7 @@ const rootReducer = combineReducers(reducers);
 const initialState = Immutable.Map();
 
 const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
+  applyMiddleware(logger, thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
   window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
 ));
 

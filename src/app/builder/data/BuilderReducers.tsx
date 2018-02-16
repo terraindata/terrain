@@ -58,10 +58,11 @@ import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
-import
-{
+import {
+  BuilderActionTypes,
   BuilderCardActionTypes,
   BuilderDirtyActionTypes,
+  BuilderPathActionTypes
 } from './BuilderActionTypes';
 import ActionTypes from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
@@ -558,6 +559,12 @@ const BuilderReducersWrapper = (
   if (typeof BuilderReducers[action.type] === 'function')
   {
     state = (BuilderReducers[action.type] as any)(state, action);
+  }
+
+  if (BuilderPathActionTypes[action.type])
+  {
+    const path = state.query.path;
+    state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
   }
 
   if (BuilderCardActionTypes[action.type])
