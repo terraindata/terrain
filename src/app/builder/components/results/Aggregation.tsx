@@ -202,7 +202,6 @@ class AggregationComponent extends TerrainComponent<Props> {
     if (displayType !== currentAgg.displayType)
     {
       currentAgg.displayType = displayType;
-
       this.props.builderActions.changeQuery(this.props.query.setIn(['aggregationList', name], currentAgg));
     }
   }
@@ -251,7 +250,6 @@ class AggregationComponent extends TerrainComponent<Props> {
     currAgg.expanded = !this.state.expanded;
 
     this.props.builderActions.changeQuery(this.props.query.setIn(['aggregationList', this.props.name], currAgg));
-
     this.setState({
       expanded: !this.state.expanded,
     });

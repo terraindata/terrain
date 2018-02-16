@@ -62,6 +62,7 @@ export interface Props
   inputs: List<Input>;
   canEdit: boolean;
   language: string;
+
   action: (keyPath, value) => void; // Need to use to keep track of whether path or cards is used (should change with Xi's parser)
   builderActions?: typeof BuilderActions;
 }

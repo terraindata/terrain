@@ -93,7 +93,19 @@ body {
       }
     }
   }
+}
 
+@top-bar-height: 36px;
+@icon-height: 24px;
+@icon-padding: calc((@top-bar-height - @icon-height) / 2);
+
+.app-top-bar {
+  height: @top-bar-height;
+  background: #3e3c3c;
+  position: relative;
+  z-index: 999999999;
+
+  .slide-down;
 }
 
 .app-wrapper {

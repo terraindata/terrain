@@ -89,9 +89,7 @@ class Login extends TerrainComponent<Props>
   public componentDidMount()
   {
     $('body').on('keydown', this.handleBodyKeyDown);
-console.error('login')
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('id');
+
     setTimeout(() =>
       this.setState({
         showingLogo: true,

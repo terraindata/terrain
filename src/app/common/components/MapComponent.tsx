@@ -78,6 +78,8 @@ export interface Props
   allowSearchByCoordinate?: boolean;
   bounds?: any[];
   boundingRectangles?: List<BoundingRectangle> | List<{}>;
+  onZoomChange?: (zoom) => void;
+  zoom?: number;
   // Show/Hide certain features
   hideZoomControl?: boolean;
   hideSearchBar?: boolean;
@@ -402,6 +404,10 @@ class MapComponent extends TerrainComponent<Props>
       this.setState({
         zoom: viewport.zoom,
       });
+      if (this.props.onZoomChange !== undefined)
+      {
+        this.props.onZoomChange(viewport.zoom);
+      }
     }
   }
 
@@ -417,6 +423,7 @@ class MapComponent extends TerrainComponent<Props>
     return null;
   }
 
+  // returns correct center / bounds based on the location and props
   public getMapProps(location)
   {
     const center = location;
@@ -477,13 +484,13 @@ class MapComponent extends TerrainComponent<Props>
 
   public renderMap()
   {
-    const { coordinates, inputValue } = this.props;
+    const { coordinates, inputValue, zoom } = this.props;
     const location = this.parseLocation(coordinates, inputValue);
     return (
       <div className={this.props.className} >
         <Map
           {...this.getMapProps(location)}
-          zoom={this.state.zoom}
+          zoom={zoom !== undefined ? zoom : this.state.zoom}
           onViewportChanged={this.setZoomLevel}
           maxBounds={[[85, -180], [-85, 180]]}
           minZoom={1}

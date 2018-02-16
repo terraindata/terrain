@@ -57,6 +57,8 @@ import v8 = require('v8');
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
+import any = jasmine.any;
+import appStats from './AppStats';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
@@ -70,7 +72,6 @@ import MidwayRouter from './Router';
 import { scheduler } from './scheduler/SchedulerRouter';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
-import any = jasmine.any;
 
 const MAX_CONN_RETRIES = 5;
 const CONN_RETRY_TIMEOUT = 1000;
@@ -143,7 +144,8 @@ export class App
 
     this.app.use(async (ctx, next) =>
     {
-      const requestNumber: number = ++this.numRequests;
+      const requestNumber: number = ++appStats.numRequests;
+
       const logPrefix: string = 'Request #' + requestNumber.toString() + ': ';
 
       const start = Date.now();
@@ -156,7 +158,8 @@ export class App
           ctx.request.length,
           ctx.request.href,
         ]);
-      winston.info(logPrefix + JSON.stringify(this.getRequestCounts()) + ': BEGIN : ' + info);
+
+      winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': BEGIN : ' + info);
 
       let err: any = null;
       try
@@ -165,13 +168,13 @@ export class App
       } catch (e)
       {
         err = e;
-        this.numRequestsThatThrew++;
-        winston.info(logPrefix + JSON.stringify(this.getRequestCounts()) + ': ERROR : ' + info);
+        appStats.numRequestsThatThrew++;
+        winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': ERROR : ' + info);
       }
 
-      this.numRequestsCompleted++;
+      appStats.numRequestsCompleted++;
       const ms = Date.now() - start;
-      winston.info(logPrefix + JSON.stringify(this.getRequestCounts()) + ': END (' + ms.toString() + 'ms): ' + info);
+      winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': END (' + ms.toString() + 'ms): ' + info);
 
       if (err !== null)
       {
