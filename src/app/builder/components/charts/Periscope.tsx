@@ -92,7 +92,8 @@ const Periscope = {
 
     svg.append('rect')
       .attr('class', 'line')
-      .attr('fill', state.colors[0]);
+      .attr('fill', state.colors[0])
+      .attr('opacity', 0.3);
     svg.append('g')
       .attr('class', 'handles');
 
@@ -106,7 +107,7 @@ const Periscope = {
       fill: ${Colors().text2} !important;
     }
     .periscope .handle {
-      stroke: ${Colors().altHighlight} !important;
+      stroke: ${Colors().active} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -140,7 +141,7 @@ const Periscope = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', Colors().transformChartBg);
+      .attr('fill', Colors().blockBg);
   },
 
   _drawAxes(el, scales)
@@ -192,16 +193,11 @@ const Periscope = {
 
   _drawLine(el, scales, domain)
   {
-    const lineFunction = d3.svg.line()
-      .x((d) => scales.x(d))
-      .y((d) => scaleMin(scales.barY));
-
-    const height = 4;
     d3.select(el).select('.line')
       .attr('x', scales.x(domain.x[0]))
       .attr('width', scales.x(domain.x[1]) - scales.x(domain.x[0]))
-      .attr('y', scaleMin(scales.barY)) // - height / 2) // don't center, actually, so that it doesn't cover up the histogram
-      .attr('height', height);
+      .attr('y', 0) // - height / 2) // don't center, actually, so that it doesn't cover up the histogram
+      .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
   },
 
   // needs to be "function" for d3.mouse(this)
@@ -245,16 +241,14 @@ const Periscope = {
     handle.enter()
       .append('circle')
       .attr('class', 'handle')
-      .attr('style', 'stroke: ' + Colors().altHighlight)
       .attr('fill', Colors().transformChartBg);
 
     handle
       .attr('cx', (d) => scales.x(d))
-      .attr('cy', scaleMin(scales.barY))
+      .attr('cy', scaleMin(scales.barY) / 2)
       .attr('fill', Colors().transformChartBg)
-      .attr('style', 'stroke: ' + Colors().altHighlight)
-      .attr('stroke-width', '3px')
-      .attr('r', 10);
+      .attr('stroke-width', '2px')
+      .attr('r', 20);
 
     handle
       .attr('_id', (d, i) => i);

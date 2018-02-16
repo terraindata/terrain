@@ -256,7 +256,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
       onDomainChange: this.handleDomainChange,
       onDomainChangeStart: this.handleDomainChangeStart,
       width: (overrideState && overrideState['width']) || this.props.width,
-      height: 40,
+      height: 70,
       colors: this.props.colors,
     });
 
