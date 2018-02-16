@@ -72,6 +72,7 @@ import { SpotlightActions } from '../../data/SpotlightRedux';
 import * as SpotlightTypes from '../../data/SpotlightTypes';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
+import { isInput } from '../../../../blocks/types/Input';
 
 export interface Props
 {
@@ -434,7 +435,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       try
       {
-        eql = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, inputs));
+        eql = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
       }
       catch (e)
       {
@@ -454,6 +455,7 @@ export class ResultsManager extends TerrainComponent<Props>
       {
         eql = this.postprocessEQL(eql);
       }
+    }
 
       this.setState({
         lastQuery: query,
