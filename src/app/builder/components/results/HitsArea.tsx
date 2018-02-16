@@ -137,7 +137,7 @@ class HitsArea extends TerrainComponent<Props>
     mouseStartY: 0,
     mapMaxHeight: undefined,
     spotlightHits: Immutable.Map<string, any>({}),
-    hitSize: 'small', // 'large',
+    hitSize: 'large',
   };
 
   public hitsFodderRange = _.range(0, 25);
