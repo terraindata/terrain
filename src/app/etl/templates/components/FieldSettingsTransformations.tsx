@@ -94,7 +94,7 @@ const enum ViewState
 }
 
 @Radium
-class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
+class FieldSettingsTransformations extends TemplateEditorField<Props>
 {
   public state: {
     viewState: ViewState,
@@ -271,7 +271,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
 }
 
 export default Util.createTypedContainer(
-  TemplateEditorFieldTransformations,
+  FieldSettingsTransformations,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );

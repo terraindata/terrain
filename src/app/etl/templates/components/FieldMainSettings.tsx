@@ -57,13 +57,16 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import
+{
+  _ElasticFieldSettings, _TemplateField,
+  ElasticFieldSettings, TemplateField,
+} from 'etl/templates/FieldTypes';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-
-import FieldMainSettings from './FieldMainSettings';
-import FieldSettingsTransformations from './FieldSettingsTransformations';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
@@ -75,114 +78,75 @@ export interface Props extends TemplateEditorFieldProps
   act?: typeof TemplateEditorActions;
 }
 
-const CloseIcon = require('images/icon_close.svg');
-
-enum ViewCategory
-{
-  SETTINGS,
-  TRANSFORMATIONS,
-  ADVANCED,
-}
-
 @Radium
-class TemplateEditorFieldSettings extends TemplateEditorField<Props>
+class FieldMainSettings extends TemplateEditorField<Props>
 {
   public state: {
-    currentCategory: ViewCategory
-  } = {
-    currentCategory: ViewCategory.SETTINGS,
-  }
+    formState: SettingsState,
+  };
 
   constructor(props)
   {
     super(props);
-    this.changeViewFactory = _.memoize(this.changeViewFactory);
+    this.state = {
+      formState: this.getFormStateFromField(props),
+    };
   }
 
-  public renderTitleBar()
+  public componentWillReceiveProps(nextProps)
   {
-    const activeStyle = fontColor(Colors().active, Colors().active);
-    const inactiveStyle = fontColor(Colors().text2, Colors().inactiveHover);
-    return (
-      <div
-        className='field-settings-title-bar'
-        style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}
-      >
-        <div
-          className='field-settings-category'
-          key='settings'
-          style={this.state.currentCategory === ViewCategory.SETTINGS ? activeStyle : inactiveStyle}
-          onClick={this.changeViewFactory(ViewCategory.SETTINGS)}
-        >
-          Settings
-        </div>
-        <div
-          className='field-settings-category'
-          key='transforms'
-          style={this.state.currentCategory === ViewCategory.TRANSFORMATIONS ? activeStyle : inactiveStyle}
-          onClick={this.changeViewFactory(ViewCategory.TRANSFORMATIONS)}
-        >
-          Transform
-        </div>
-        {
-        /*<div
-          className='field-settings-category'
-          key='advanced'
-          style={this.state.currentCategory === ViewCategory.ADVANCED ? activeStyle : inactiveStyle}
-          onClick={this.changeViewFactory(ViewCategory.ADVANCED)}
-        >
-          Advanced
-        </div>*/
-        }
-        <div className='field-settings-title-filler' />
-        <div
-          className='field-settings-close-button'
-          style={fontColor(Colors().text3, Colors().text2)}
-          key='close'
-          onClick={this.handleCloseSettings}
-        >
-          <CloseIcon width='12px' height='12px' />
-        </div>
-      </div>
-    );
+    if (nextProps.field.isIncluded !== this.props.field.isIncluded || nextProps.field.name !== this.props.field.name)
+    {
+      this.setState({
+        formState: this.getFormStateFromField(nextProps),
+      });
+    }
+  }
+
+  public getFormStateFromField(props)
+  {
+    const { field } = props;
+    return {
+      fieldName: field.name,
+      isIncluded: field.isIncluded,
+    };
   }
 
   public render()
   {
     return (
-      <div className='template-editor-field-settings' style={fontColor(Colors().text2)}>
-        {this.renderTitleBar()}
-        <div className='field-settings-section'>
-          {
-            this.state.currentCategory === ViewCategory.SETTINGS ?
-              <FieldMainSettings
-                {...this._passProps()}
-              />
-               : null
-          }
-          {
-            this.state.currentCategory === ViewCategory.TRANSFORMATIONS ?
-              <FieldSettingsTransformations
-                {...this._passProps()}
-              /> : null
-          }
-          { // todo, re-add advanced settings
-            this.state.currentCategory === ViewCategory.ADVANCED ?
-              'nothing here' : null
-          }
-        </div>
-      </div>
+      <DynamicForm
+        inputMap={settingsInputMap}
+        inputState={this.state.formState}
+        onStateChange={this._setStateWrapper('formState')}
+        mainButton={{
+          name: 'Apply',
+          onClicked: this.handleSettingsApplied,
+        }}
+        secondButton={{
+          name: 'Close',
+          onClicked: this.handleCloseSettings,
+        }}
+        style={getStyle('flexGrow', '1')}
+      />
     );
   }
 
-  public changeViewFactory(category: ViewCategory)
+  public handleSettingsApplied()
   {
-    return () =>
+    const { field } = this.props;
+    const { formState } = this.state;
+    this._proxy().withEngineMutations((proxy) =>
     {
-      this.setState({
-        currentCategory: category,
-      });
-    };
+      if (field.isIncluded !== formState.isIncluded)
+      {
+        proxy.setFieldEnabled(formState.isIncluded);
+      }
+      if (field.name !== formState.fieldName)
+      {
+        proxy.changeName(formState.fieldName);
+      }
+    });
   }
 
   public handleCloseSettings()
@@ -193,8 +157,27 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   }
 }
 
+interface SettingsState
+{
+  fieldName: string;
+  isIncluded: boolean;
+}
+
+const settingsInputMap: InputDeclarationMap<SettingsState> = {
+  fieldName: {
+    type: DisplayType.TextBox,
+    displayName: 'Name',
+    group: 'row'
+  },
+  isIncluded: {
+    type: DisplayType.CheckBox,
+    displayName: 'Include this field',
+    group: 'row',
+  },
+};
+
 export default Util.createTypedContainer(
-  TemplateEditorFieldSettings,
+  FieldMainSettings,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
