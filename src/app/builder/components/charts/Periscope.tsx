@@ -97,6 +97,10 @@ const Periscope = {
     svg.append('g')
       .attr('class', 'handles');
 
+    d3.select(el)
+      .append('div')
+      .attr('class', 'inputs');
+
     this.update(el, state);
 
     const styleCSS = `
@@ -142,20 +146,6 @@ const Periscope = {
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
       .attr('fill', Colors().blockBg);
-  },
-
-  _drawAxes(el, scales)
-  {
-    const bottomAxis = d3.svg.axis()
-      .scale(scales.x)
-      .ticks(6)
-      .tickSize(10)
-      .tickFormat(Util.formatNumber)
-      .orient('bottom');
-    d3.select(el).select('.bottomAxis')
-      .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
-      .attr('style', 'stroke: ' + Colors().transformChartBg)
-      .call(bottomAxis);
   },
 
   _drawBars(el, scales, barsData, colors)
@@ -241,7 +231,8 @@ const Periscope = {
     handle.enter()
       .append('circle')
       .attr('class', 'handle')
-      .attr('fill', Colors().transformChartBg);
+      .attr('fill', Colors().transformChartBg)
+      ;
 
     handle
       .attr('cx', (d) => scales.x(d))
@@ -259,6 +250,22 @@ const Periscope = {
     handle.exit().remove();
   },
 
+  _drawHandleInputs(el, scales, domain, onDomainChange)
+  {
+    d3.select(el).selectAll('.domain-input').remove();
+    const div = d3.select(el).selectAll('.inputs');
+    // Get the first handle to find the position where the input should go
+    const handle1 = d3.select(el).selectAll('.handle')[0][0]['getBoundingClientRect']();
+    console.log(handle1);
+    div.append('input')
+      .data(domain.x, (d, i) => '' + i)
+      .attr('class', 'domain-input')
+      .attr('width', 40)
+      .attr('_id', (d, i) => i)
+      .attr('value', (d) => d)
+      ;
+  },
+
   _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors)
   {
     d3.select(el).select('.inner-svg')
@@ -266,10 +273,10 @@ const Periscope = {
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    this._drawAxes(el, scales);
     this._drawBars(el, scales, barsData, colors);
     this._drawLine(el, scales, domain);
     this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);
+    this._drawHandleInputs(el, scales, domain, onDomainChange);
   },
 
   _scales(el, maxDomain, domainAndRange, barsData, stateWidth, stateHeight)

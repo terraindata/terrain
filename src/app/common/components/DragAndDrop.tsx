@@ -129,10 +129,8 @@ class DragAndDrop extends TerrainComponent<Props>
 
   public renderItem(item: DraggableItem, provided, snapshot)
   {
-    console.log('rendering draggable item');
     if (item.dragHandle !== undefined)
     {
-      console.log('has a drag handle');
       return (
         <div
           ref={provided.innerRef}

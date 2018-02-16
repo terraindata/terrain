@@ -274,26 +274,6 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     return (
       <div className='transform-periscope-wrapper'>
         <div ref='chart' />
-
-        <div className='tp-text-wrapper'>
-          <div className='tp-tb-left'>
-            <Autocomplete
-              value={this.state.maxDomainLow.toString()}
-              options={EMPTY_OPTIONS}
-              disabled={!this.props.canEdit}
-              onChange={this.handleDomainLowChange}
-            />
-          </div>
-          <div className='tp-tb-right'>
-            <Autocomplete
-              value={this.state.maxDomainHigh.toString()}
-              options={EMPTY_OPTIONS}
-              disabled={!this.props.canEdit}
-              onChange={this.handleDomainHighChange}
-            />
-          </div>
-        </div>
-
       </div>
     );
   }
