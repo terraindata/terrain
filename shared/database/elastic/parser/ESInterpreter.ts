@@ -113,20 +113,10 @@ export default class ESInterpreter
         root.clause = this.config.getClause('body');
       }
 
-      const alias = 'parent';
+      let alias = 'parent';
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
-
-          // if (info.value === 'groupJoin' && info.propertyValue !== null)
-          // {
-          //   const parentAlias = property.propertyValue.objectChildren['parentAlias'];
-          //   if (parentAlias !== undefined && parentAlias.propertyValue !== null)
-          //   {
-          //     alias = parentAlias.propertyValue.value;
-          //   }
-          // }
-
           if (info.parameter !== undefined)
           {
             const ps = info.parameter.split('.');
@@ -137,15 +127,16 @@ export default class ESInterpreter
             }
             else
             {
-              let value;
+              let value: any = this.params;
               for (const p of ps)
               {
                 value = value[p];
-              }
 
-              if (value === undefined)
-              {
-                this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
+                if (value === undefined)
+                {
+                  this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
+                  return true;
+                }
               }
 
               info.parameterValue = new ESJSONParser(JSON.stringify(value));
@@ -165,9 +156,9 @@ export default class ESInterpreter
         },
         (info: ESValueInfo): boolean =>
         {
-          if (info.value === 'groupJoin')
+          if (info.clause !== undefined && info.clause.type === 'parentAlias')
           {
-            console.log(info);
+            alias = info.value;
           }
           return true;
         },

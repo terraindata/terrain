@@ -107,7 +107,7 @@ export default class ESParameterSubstituter
               this.result += ',';
             }
 
-            this.convert(child);
+            this.convert(child, alias);
           });
         this.result += ']';
         break;
@@ -137,7 +137,7 @@ export default class ESParameterSubstituter
 
             if (property.propertyValue !== null)
             {
-              this.convert(property.propertyValue);
+              this.convert(property.propertyValue, alias);
             }
           });
 
