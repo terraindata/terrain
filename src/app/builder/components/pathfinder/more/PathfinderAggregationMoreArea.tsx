@@ -68,6 +68,7 @@ import Dropdown from 'app/common/components/Dropdown';
 import FadeInOut from 'app/common/components/FadeInOut';
 import Menu from 'app/common/components/Menu';
 import RadioButtons from 'app/common/components/RadioButtons';
+import Util from 'util/Util';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
@@ -78,6 +79,8 @@ export interface Props
   aggregation: AggregationLine;
   keyPath: KeyPath;
   fields: List<string>;
+
+  builderActions?: typeof BuilderActions;
 }
 
 export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
@@ -85,22 +88,22 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
 
   public addSampler(index, id)
   {
-    BuilderActions.changePath(this.props.keyPath.push('sampler'), _Sample());
+    this.props.builderActions.changePath(this.props.keyPath.push('sampler'), _Sample());
   }
 
   public addFilters()
   {
-    BuilderActions.changePath(this.props.keyPath.push('filters'), _FilterGroup());
+    this.props.builderActions.changePath(this.props.keyPath.push('filters'), _FilterGroup());
   }
 
   public addNested()
   {
-    BuilderActions.changePath(this.props.keyPath.push('nested'), List([]));
+    this.props.builderActions.changePath(this.props.keyPath.push('nested'), List([]));
   }
 
   public addScripts()
   {
-    BuilderActions.changePath(this.props.keyPath.push('scripts'), List([]));
+    this.props.builderActions.changePath(this.props.keyPath.push('scripts'), List([]));
   }
 
   public renderSampleSection()
@@ -114,7 +117,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
           selected={sampleType}
           radioKey={'sampleType'}
           keyPath={this.props.keyPath.push('sampler').push('sampleType')}
-          action={BuilderActions.changePath}
+          action={this.props.builderActions.changePath}
           options={List([
             {
               key: 'global',
@@ -129,7 +132,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                     value={this.props.aggregation.sampler.numSamples}
                     keyPath={this.props.keyPath.push('sampler').push('numSamples')}
                     canEdit={canEdit && sampleType === 'sampler'}
-                    action={BuilderActions.changePath}
+                    action={this.props.builderActions.changePath}
                   />
                   <span>hits</span>
                 </div>,
@@ -143,7 +146,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                     value={this.props.aggregation.sampler.numSamples}
                     keyPath={this.props.keyPath.push('sampler').push('numSamples')}
                     canEdit={canEdit && sampleType === 'diversified_sampler'}
-                    action={BuilderActions.changePath}
+                    action={this.props.builderActions.changePath}
                   />
                   <span>hits with unique</span>
                   <Dropdown
@@ -151,7 +154,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                     options={fields}
                     keyPath={this.props.keyPath.push('sampler').push('diverseField')}
                     canEdit={canEdit && sampleType === 'diversified_sampler'}
-                    action={BuilderActions.changePath}
+                    action={this.props.builderActions.changePath}
                   />
                 </div>,
             },
@@ -174,12 +177,12 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
 
   public handleDeleteNestedLine(index)
   {
-    BuilderActions.changePath(this.props.keyPath.push('nested'), this.props.aggregation.nested.delete(index));
+    this.props.builderActions.changePath(this.props.keyPath.push('nested'), this.props.aggregation.nested.delete(index));
   }
 
   public handleAddLine()
   {
-    BuilderActions.changePath(this.props.keyPath.push('nested'), this.props.aggregation.nested.push(_AggregationLine()));
+    this.props.builderActions.changePath(this.props.keyPath.push('nested'), this.props.aggregation.nested.push(_AggregationLine()));
   }
 
   public renderNestedAggregations()
@@ -211,7 +214,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
 
   public handleAddScript()
   {
-    BuilderActions.changePath(this.props.keyPath.push('scripts'),
+    this.props.builderActions.changePath(this.props.keyPath.push('scripts'),
       this.props.aggregation.scripts.push(_Script()));
   }
 
@@ -231,7 +234,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                     canEdit={this.props.pathfinderContext.canEdit}
                     keyPath={this.props.keyPath.push('scripts').push(i).push('id')}
                     placeholder={'Script Name'}
-                    action={BuilderActions.changePath}
+                    action={this.props.builderActions.changePath}
                   />
                 </div>
                 <BuilderTextbox
@@ -239,7 +242,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                   keyPath={this.props.keyPath.push('scripts').push(i).push('script')}
                   canEdit={this.props.pathfinderContext.canEdit}
                   textarea={true}
-                  action={BuilderActions.changePath}
+                  action={this.props.builderActions.changePath}
                 />
               </div>
             );
@@ -349,4 +352,8 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderAggregationMoreArea;
+export default Util.createTypedContainer(
+  PathfinderAggregationMoreArea,
+  [],
+  { builderActions: BuilderActions }
+);

@@ -83,7 +83,7 @@ class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
       logout: (state, action) =>
       {
         Ajax.logout((success) =>
-        {
+        {console.error('logout')
           localStorage.removeItem('accessToken');
           localStorage.removeItem('id');
         });

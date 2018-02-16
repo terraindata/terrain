@@ -174,14 +174,13 @@ export const ElasticBlockHelpers = {
     return List(metaFields);
   },
 
-  getFieldsOfType(schemaState, fieldType, dataSource?): List<string>
+  getFieldsOfType(schemaState, builderState, fieldType, dataSource?): List<string>
   {
-    const state = BuilderStore.getState();
-    const index = dataSource && dataSource.index.split('/')[1] || getIndex();
-    const server = BuilderStore.getState().db.name;
+    const index = dataSource && dataSource.index.split('/')[1] || getIndex('', builderState);
+    const server = builderState.db.name;
     if (index !== null)
     {
-      const indexId = state.db.name + '/' + String(index);
+      const indexId = builderState.db.name + '/' + String(index);
       // 2. Need to get current type
       const fields = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
@@ -209,7 +208,7 @@ export const ElasticBlockHelpers = {
 
   // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
   // If the field is a metaField, return string / number accrodingly
-  getTypeOfField(schemaState, field, dataSource): FieldType
+  getTypeOfField(schemaState, builderState, field, dataSource): FieldType
   {
     if (metaFields.indexOf(field) !== -1)
     {
@@ -219,13 +218,13 @@ export const ElasticBlockHelpers = {
       }
       return FieldType.Text;
     }
-    const state = BuilderStore.getState();
-    const index = dataSource && dataSource.index.split('/')[1] || getIndex();
-    const server = BuilderStore.getState().db.name;
+
+    const index = dataSource && dataSource.index.split('/')[1] || getIndex('', builderState);
+    const server = builderState.db.name;
 
     if (index !== null)
     {
-      const indexId = state.db.name + '/' + String(index);
+      const indexId = builderState.db.name + '/' + String(index);
       const fields = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
           column.databaseId === String(indexId),

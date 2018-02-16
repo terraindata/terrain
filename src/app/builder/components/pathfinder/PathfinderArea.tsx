@@ -59,6 +59,7 @@ import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { SchemaState } from 'schema/SchemaTypes';
+import { BuilderState } from 'builder/data/BuilderState';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
@@ -76,6 +77,8 @@ export interface Props
   colorsActions: typeof ColorsActions;
   colors: ColorsState;
   toSkip?: number;
+  builder: BuilderState,
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -100,6 +103,7 @@ class PathfinderArea extends TerrainComponent<Props>
       source: props.path.source,
       step: props.path.step,
       schemaState: props.schema,
+      builderState: props.builder,
     };
   }
 
@@ -107,7 +111,7 @@ class PathfinderArea extends TerrainComponent<Props>
   {
     if (oldStep < PathfinderSteps.More)
     {
-      BuilderActions.changePath(this.getKeyPath().push('step'), this.props.path.step + 1);
+      this.props.builderActions.changePath(this.getKeyPath().push('step'), this.props.path.step + 1);
     }
   }
 
@@ -118,7 +122,7 @@ class PathfinderArea extends TerrainComponent<Props>
 
   public changePathName(value)
   {
-    BuilderActions.changePath(this.getKeyPath().push('name'), value);
+    this.props.builderActions.changePath(this.getKeyPath().push('name'), value);
   }
 
   public render()
@@ -202,8 +206,9 @@ class PathfinderArea extends TerrainComponent<Props>
 
 export default Util.createContainer(
   PathfinderArea,
-  ['schema', 'colors'],
+  ['builder', 'schema', 'colors'],
   {
     colorsActions: ColorsActions,
+    builderActions: BuilderActions,
   },
 );

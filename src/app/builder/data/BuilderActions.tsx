@@ -128,7 +128,7 @@ const BuilderActions =
             handleNoAlgorithm,
             db,
             dispatch,
-            onRequestDone: (query, xhr, database) => dispatch(BuilderActions.queryLoaded(query, xhr, database)),
+            onRequestDone: (query, xhr, database) => dispatch(BuilderActions.queryLoaded(query, algorithmId, xhr, database)),
             changeQuery: BuilderActions.changeQuery,
           })),
 

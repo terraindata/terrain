@@ -56,10 +56,11 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import onClickOutside from 'react-onclickoutside';
-import Actions from '../../builder/data/BuilderActions';
+import BuilderActions from '../../builder/data/BuilderActions';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import Util from 'util/Util';
 import './Dropdown.less';
 
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
@@ -77,6 +78,7 @@ export interface Props
   openDown?: boolean;
   placeholder?: string;
   action?: (keyPath, value) => void;
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -184,7 +186,7 @@ class SearchableDropdown extends TerrainComponent<Props>
       }
       else
       {
-        Actions.change(this.props.keyPath, value);
+        this.props.builderActions.change(this.props.keyPath, value);
       }
     }
     if (this.props.onChange !== undefined)
@@ -529,4 +531,10 @@ class SearchableDropdown extends TerrainComponent<Props>
   }
 }
 
-export default onClickOutside(SearchableDropdown);
+export default onClickOutside(
+  Util.createTypedContainer(
+    SearchableDropdown,
+    [],
+    { builderActions: BuilderActions }
+  )
+);

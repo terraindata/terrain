@@ -105,7 +105,7 @@ const BuilderReducers =
         {
           if (query)
           {
-            onRequestDone(query, algorithmId, xhr, action.payload.db);
+            onRequestDone(query, xhr, action.payload.db);
           }
           else
           {
@@ -142,6 +142,7 @@ const BuilderReducers =
       if (state.loadingXhr !== action.payload.xhr)
       {
         // wrong XHR
+        console.error('wrong XHR')
         return state;
       }
 

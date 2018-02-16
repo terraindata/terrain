@@ -55,6 +55,7 @@ import * as React from 'react';
 const { List, Map } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import FadeInOut from 'app/common/components/FadeInOut';
+import Util from 'util/Util';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
@@ -65,6 +66,8 @@ export interface Props
   title: string;
   content: string | El;
   keyPath: KeyPath;
+
+  builderActions?: typeof BuilderActions;
 }
 
 export class PathfinderAggregationMoreSection extends TerrainComponent<Props>
@@ -77,7 +80,7 @@ export class PathfinderAggregationMoreSection extends TerrainComponent<Props>
 
   public handleDelete()
   {
-    BuilderActions.changePath(this.props.keyPath, undefined);
+    this.props.builderActions.changePath(this.props.keyPath, undefined);
   }
 
   public render()
@@ -120,4 +123,8 @@ export class PathfinderAggregationMoreSection extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderAggregationMoreSection;
+export default Util.createTypedContainer(
+  PathfinderAggregationMoreSection,
+  [],
+  { builderActions: BuilderActions }
+);
