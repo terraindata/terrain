@@ -71,7 +71,7 @@ export default class ESParameterSubstituter
     this.convert(source);
   }
 
-  public convert(source: ESValueInfo, alias: string = 'parent'): void
+  public convert(source: ESValueInfo, inShould: boolean = false, inTerms: boolean = false, alias: string = 'parent'): void
   {
     let i: number = 0;
 
@@ -86,7 +86,7 @@ export default class ESParameterSubstituter
       case ESJSONType.string:
         if (source.parameter !== undefined)
         {
-          this.appendParameter(source.parameter, alias);
+          this.appendParameter(source.parameter, inShould && inTerms, alias);
           break;
         }
 
@@ -94,7 +94,7 @@ export default class ESParameterSubstituter
         break;
 
       case ESJSONType.parameter:
-        this.appendParameter(source.parameter as string, alias);
+        this.appendParameter(source.parameter as string, inShould && inTerms, alias);
         break;
 
       case ESJSONType.array:
@@ -107,7 +107,7 @@ export default class ESParameterSubstituter
               this.result += ',';
             }
 
-            this.convert(child, alias);
+            this.convert(child, inShould, inTerms, alias);
           });
         this.result += ']';
         break;
@@ -132,14 +132,34 @@ export default class ESParameterSubstituter
               }
             }
 
-            this.convert(property.propertyName, alias);
+            if (property.propertyName.value === 'should')
+            {
+              inShould = true;
+            }
+
+            if (inShould && property.propertyName.value === 'terms')
+            {
+              inTerms = true;
+            }
+
+            this.convert(property.propertyName, inShould, inTerms, alias);
             this.result += ':';
 
             if (property.propertyValue !== null)
             {
-              this.convert(property.propertyValue, alias);
+              this.convert(property.propertyValue, inShould, inTerms, alias);
             }
           });
+
+        if (inShould && !inTerms)
+        {
+          inShould = false;
+        }
+
+        if (inShould && inTerms)
+        {
+          inTerms = false;
+        }
 
         this.result += ' } '; // extra spaces to avoid confusion with mustache tags
         break;
@@ -149,9 +169,14 @@ export default class ESParameterSubstituter
     }
   }
 
-  private appendParameter(param: string, alias?: string): void
+  private appendParameter(param: string, replaceNullWithEmptyArray: boolean, alias?: string): void
   {
-    this.result += this.substitutionFunction(param, alias);
+    let subst = this.substitutionFunction(param, alias);
+    if (replaceNullWithEmptyArray && subst === 'null')
+    {
+      subst = '[]';
+    }
+    this.result += subst;
   }
 
   private appendJSON(value: any): void

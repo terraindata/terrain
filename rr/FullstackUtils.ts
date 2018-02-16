@@ -44,80 +44,69 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as os from 'os';
-import * as process from 'process';
-import * as v8 from 'v8';
-import * as winston from 'winston';
-import appStats from '../AppStats';
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
 
-const Router = new KoaRouter();
+import readline from 'readline-promise';
+import * as sleep from 'sleep';
 
-/**
- * Simple ping style status check
- */
-Router.get('/', async (ctx, next) =>
+function ignoreBuilderAction(action: string): boolean
 {
-  ctx.body = { status: 'ok' };
-});
+  if (action.startsWith('{"type":"builderCards.hoverCard"') || action.startsWith('{"type":"colors.setStyle"')
+    || action.startsWith('{"type":"builder.results"'))
+  {
+    return true;
+  }
+  return false;
+}
 
-/**
- * returns some basic stats about the server process
- */
-Router.get('/stats', passport.authenticate('access-token-local'), async (ctx, next) =>
+export async function waitForInput(msg: string)
 {
-  ctx.body = {
-    startTime: appStats.startTime,
-    currentTime: new Date(),
-    uptime: Date.now() - appStats.startTime.valueOf(),
-
-    numRequests: appStats.numRequests,
-    numRequestsCompleted: appStats.numRequestsCompleted,
-    numRequestsThatThrew: appStats.numRequestsThatThrew,
-    numRequestsPending: appStats.numRequests - appStats.numRequestsCompleted,
-
-    v8: {
-      // cachedDataVersionTag: v8.cachedDataVersionTag(),
-      heapStatistics: v8.getHeapStatistics(),
-      // heapSpaceStatistics: v8.getHeapSpaceStatistics(),
-    },
-
-    os:
-      {
-        arch: os.arch(),
-        // constants:         os.constants,
-        numCPUs: os.cpus().length,
-        // endianness: os.endianness(),
-        freemem: os.freemem(),
-        // homedir: os.homedir(),
-        // hostname: os.hostname(),
-        loadavg: os.loadavg(),
-        // networkInterfaces: os.networkInterfaces(),
-        // platform: os.platform(),
-        // release: os.release(),
-        // tmpdir: os.tmpdir(),
-        totalmem: os.totalmem(),
-        uptime: os.uptime(),
-      },
-
-    process:
-      {
-        pid: process.pid,
-        // ppid: process.ppid,
-      },
-  };
-});
-
-/**
- * to check if you are correctly logged in
- */
-Router.post('/loggedin', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body =
+  const rl = readline.createInterface(
     {
-      loggedIn: true,
-    };
-});
+      input: process.stdin,
+      output: process.stdout,
+      terminal: true,
+    });
+  const answer = await rl.questionAsync(msg);
+  rl.close();
+}
 
-export default Router;
+export async function replayBuilderActions(page, url, actions, records, actionCallBack?)
+{
+  const loadRecords = await page.evaluate((recordNames) =>
+  {
+    // window['TerrainTools'].setLogLevel();
+    return window['TerrainTools'].terrainStoreLogger.resetSerializeRecordArray(recordNames);
+  }, records);
+  if (loadRecords === false)
+  {
+    console.log('Failed to load the serialization records: ' + records);
+    return;
+  }
+  // replay the log
+  for (let i = 0; i < actions.length; i = i + 1)
+  {
+    const action = actions[i];
+    console.log('Replaying Action ' + typeof action + ':' + action);
+
+    if (ignoreBuilderAction(action))
+    {
+      console.log('Ignoring action: ' + String(action));
+      continue;
+    }
+    await page.evaluate((act) =>
+    {
+      return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);
+    }, action);
+    sleep.sleep(1);
+    if (actionCallBack)
+    {
+      await actionCallBack();
+    }
+  }
+}
+
+export function filteringRecordBuilderActions(actions: string[])
+{
+  return actions.filter((action) => ignoreBuilderAction(action) === false);
+}
