@@ -60,6 +60,11 @@ const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-are
 
 expect.extend({ toMatchImageSnapshot } as any);
 
+function getExpectedActionFile(): string
+{
+  return __dirname + '/actions.json';
+}
+
 async function takeAndCompareScreenShot(page, options?)
 {
   const localOption = { failureThreshold: '0.01', failureThresholdType: 'percent' };
@@ -112,7 +117,7 @@ describe('Replay a builder action', () =>
     const wsAddress = await getChromeDebugAddress();
     browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
     winston.info('Connected to the Chrome ' + wsAddress);
-    actionFileData = jsonfile.readFileSync('./actions.json');
+    actionFileData = jsonfile.readFileSync(getExpectedActionFile());
     // loading from options['directory']/actions.json
   });
 
