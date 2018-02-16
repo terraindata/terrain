@@ -431,7 +431,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       return;
     }
-    if (query.parseTree === null && query.path)
+    if (query.path !== undefined)
     {
       try
       {
