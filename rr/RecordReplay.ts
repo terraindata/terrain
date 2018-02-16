@@ -50,8 +50,8 @@ import * as commandLineArgs from 'command-line-args';
 import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
-import * as readlineSync from 'readline-sync';
 import * as sleep from 'sleep';
+import { filteringRecordBuilderActions, replayBuilderActions, waitForInput } from './FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
@@ -102,7 +102,7 @@ const usageSections = [
   },
 ];
 
-async function loginToBuilder(page, url?)
+export async function loginToBuilder(page, url?)
 {
   await loadPage(page, url);
   await page.click(USERNAME_SELECTOR);
@@ -142,62 +142,21 @@ async function recordBuilderActions(browser, url)
     window['TerrainTools'].terrainStoreLogger.serializeAction = true;
     return recordList;
   });
-  while (true)
-  {
-    if (readlineSync.keyInYN('Do you want to stop recording?'))
-    {
-      await page.evaluate(() =>
-      {
-        window['TerrainTools'].terrainStoreLogger.serializeAction = false;
-      });
-      const actions = await page.evaluate(() =>
-      {
-        return window['TerrainTools'].terrainStoreLogger.actionSerializationLog;
-      });
-      await page.close();
-      const timestamp = Date();
-      return { timestamp, records, actions };
-    } else
-    {
-      continue;
-    }
-  }
-}
+  await waitForInput('Typing to stop the recording.');
+  console.log('stopping');
 
-async function replayBuilderActions(browser, url, actions, records)
-{
-  const page = await browser.newPage();
-  await page.setViewport({ width: 1600, height: 1200 });
-  await page.goto(url);
-  await loginToBuilder(page, url);
-  sleep.sleep(1);
-  await startBuilder(page);
-  const loadRecords = await page.evaluate((recordNames) =>
+  await page.evaluate(() =>
   {
-    // window['TerrainTools'].setLogLevel();
-    return window['TerrainTools'].terrainStoreLogger.resetSerializeRecordArray(recordNames);
-  }, records);
-  if (loadRecords === false)
+    window['TerrainTools'].terrainStoreLogger.serializeAction = false;
+  });
+  let actions = await page.evaluate(() =>
   {
-    console.log('Failed to load the serialization records: ' + records);
-    return;
-  }
-  // replay the loge
-  for (let i = 0; i < actions.length; i = i + 1)
-  {
-    const action = actions[i];
-    console.log('Replaying Action ' + typeof action + ':' + action);
-    if (action.startsWith('{"type":"builderCards.hoverCard"'))
-    {
-      console.log('Ignoring hoverCard action');
-      continue;
-    }
-    await page.evaluate((act) =>
-    {
-      return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);
-    }, action);
-    sleep.sleep(1);
-  }
+    return window['TerrainTools'].terrainStoreLogger.actionSerializationLog;
+  });
+  actions = filteringRecordBuilderActions(actions);
+  await page.close();
+  const timestamp = Date();
+  return { timestamp, records, actions };
 }
 
 async function rr()
@@ -246,25 +205,23 @@ async function rr()
     try
     {
       console.log('Replaying ' + actions.length + ' actions.');
-      await replayBuilderActions(browser, url, actions, serializeRecords);
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1600, height: 1200 });
+      await page.goto(url);
+      await loginToBuilder(page, url);
+      sleep.sleep(1);
+      await startBuilder(page);
+      await replayBuilderActions(page, url, actions, serializeRecords);
     } catch (e)
     {
       console.trace(e);
     }
-    while (true)
-    {
-      if (readlineSync.keyInYN('Do you want to stop the browser?'))
-      {
-        break;
-      } else
-      {
-        continue;
-      }
-    }
+    await waitForInput('Typing to stop the replay');
   }
 
   console.log('Closing thebrowser');
   await browser.close();
+  console.log('The browser is closed.');
 }
 
 rr().catch((err) => console.log('Error when executing rr: ' + err));
