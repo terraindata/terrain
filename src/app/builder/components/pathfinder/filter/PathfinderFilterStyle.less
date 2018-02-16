@@ -1,0 +1,117 @@
+@import "../../../../common/Common.less";
+
+.pf-filter-section
+{
+	margin-bottom: 45px;
+	.pf-create {
+		margin-top: 12px;
+	}
+	.pf-filter-line {
+		padding-top: 6px;
+		padding-left: 6px;
+	}
+	.close {
+		margin-top: 8px;
+		margin-left: 3px;
+		opacity: 0
+		.transition;
+	}
+	&:hover {
+		.close {
+			opacity: 1;
+		}
+	}
+	.pf-filter-group-header
+	{
+		height: 15px;
+		padding-top: 6px;
+		font-size: 12px;
+		text-transform: uppercase;
+		.builder-tb {
+			max-width: 200px;
+			display: inline-flex;
+			top: -5px;
+			left: 7px;
+			height: 28px;
+		}
+		.pf-filter-group-name-wrapper {
+			display: inline-flex;
+			margin-left: 15px;
+			.pf-filter-group-name {
+				cursor: text;
+			}
+			.pf-filter-group-carrot {
+				height: 9px;
+				width: 9px;
+				margin-left: 6px;
+				.transition;
+				position: relative;
+				top: 2px;
+				cursor: pointer;
+				&.pf-filter-group-carrot-open {
+					.rotate(90deg);
+					top: 0px;
+				}
+			}
+		}
+		.linear-selector-wrapper {
+			float: right;
+			position: relative;
+		    top: -2;
+		    margin-right: 3px;
+			.linear-selector-option {
+				font-size: 10px;
+			}
+		}
+		.close {
+			float: right;
+			opacity: 0;
+			.transition;
+		}
+		&:hover {
+			.close {
+				opacity: 1;
+			}
+		}
+	}
+	.pf-filter-map-input-wrapper {
+	    position: relative;
+	    display: inline-flex;
+	    .builder-tb {
+	    	flex-grow: 0;
+	    	flex-basis: 60px;
+	    	margin-right: 6px;
+	    	margin-top: 5px;
+	    	margin-left: -6px;
+	    }
+	    .dropdown-wrapper {
+	    	margin-top: 5px;
+	    	flex-grow: 0;
+	    	margin-right: 6px;
+	    }
+	    .map-component-search-bar {
+	    	margin-bottom: -18px;
+	    	width: calc(~"100% + 2px");
+	    }
+	    .pf-filter-map-component-wrapper {
+	    	flex-grow: 1;
+	    	.leaflet-container {
+		    	position: absolute;
+				width: 100%;
+		    	min-height: 250px;
+			    border-bottom-left-radius: 6px;
+			    border-bottom-right-radius: 6px;
+		    }
+		    .map-component-fade-in-out {
+		    	position: relative;
+		    	width: 100%;
+		    }
+		    #PlacesAutocomplete__autocomplete-container {
+		    	font-size: @font-size;
+		    }
+		}	
+	}
+}
+
+
+

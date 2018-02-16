@@ -65,6 +65,7 @@ import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
+import './PathfinderScoreStyle.less';
 
 export interface Props
 {
