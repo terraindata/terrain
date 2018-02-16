@@ -700,6 +700,8 @@ export class Scheduler
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
+        let successMsg: string = '';
+        let errMsg: string = '';
         try
         {
           await this.setJobStatus(scheduleID, 1);
@@ -718,11 +720,15 @@ export class Scheduler
                   JSON.parse(transport['filename']),
               };
             const result = await sources.handleTemplateSourceExport(magentoArgs, jsonStream as stream.Readable);
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to magento.';
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
           }
         }
         catch (e)
         {
-          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string);
+          winston.info(errMsg);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
           await this.setJobStatus(scheduleID, 0);
           return rejectJob(e.toString());
         }
