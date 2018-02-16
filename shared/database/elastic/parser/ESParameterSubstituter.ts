@@ -55,23 +55,23 @@ import ESValueInfo from './ESValueInfo';
 export default class ESParameterSubstituter
 {
   public static generate(source: ESValueInfo,
-    substitutionFunction: (param: string) => string): string
+    substitutionFunction: (param: string, runtimeParam?: string) => string): string
   {
     return (new ESParameterSubstituter(source, substitutionFunction)).result;
   }
 
-  private substitutionFunction: (param: string) => string;
+  private substitutionFunction: (param: string, runtimeParam?: string) => string;
   private result: string;
 
   public constructor(source: ESValueInfo,
-    substitutionFunction: (param: string) => string)
+    substitutionFunction: (param: string, runtimeParam?: string) => string)
   {
     this.substitutionFunction = substitutionFunction;
     this.result = '';
     this.convert(source);
   }
 
-  public convert(source: ESValueInfo, alias?: string): void
+  public convert(source: ESValueInfo, alias: string = 'parent'): void
   {
     let i: number = 0;
 

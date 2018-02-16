@@ -113,23 +113,41 @@ export default class ESInterpreter
         root.clause = this.config.getClause('body');
       }
 
+      const alias = 'parent';
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
+
+          // if (info.value === 'groupJoin' && info.propertyValue !== null)
+          // {
+          //   const parentAlias = property.propertyValue.objectChildren['parentAlias'];
+          //   if (parentAlias !== undefined && parentAlias.propertyValue !== null)
+          //   {
+          //     alias = parentAlias.propertyValue.value;
+          //   }
+          // }
+
           if (info.parameter !== undefined)
           {
-            if (info.parameter.split('.')[0] === 'parent')
+            const ps = info.parameter.split('.');
+            if (ps[0] === alias)
             {
               // give a special value to parameterValue
               info.parameterValue = new ESJSONParser(info.value);
             }
             else
             {
-              const value: null | any = this.params[info.parameter];
+              let value;
+              for (const p of ps)
+              {
+                value = value[p];
+              }
+
               if (value === undefined)
               {
                 this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
               }
+
               info.parameterValue = new ESJSONParser(JSON.stringify(value));
               if (info.parameterValue.hasError())
               {
@@ -144,7 +162,16 @@ export default class ESInterpreter
           }
 
           return true;
-        });
+        },
+        (info: ESValueInfo): boolean =>
+        {
+          if (info.value === 'groupJoin')
+          {
+            console.log(info);
+          }
+          return true;
+        },
+      );
     } catch (e)
     {
       this.accumulateError(this.rootValueInfo, 'Failed to mark the json object ' + String(e.message));
