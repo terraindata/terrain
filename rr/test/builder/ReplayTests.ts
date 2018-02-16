@@ -54,7 +54,7 @@ import * as request from 'then-request';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import * as winston from 'winston';
-import {replayBuilderActions} from '../../FullstackUtils';
+import { replayBuilderActions } from '../../FullstackUtils';
 
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 
@@ -62,7 +62,7 @@ expect.extend({ toMatchImageSnapshot } as any);
 
 async function takeAndCompareScreenShot(page, options?)
 {
-  const localOption = {failureThreshold: '0.01', failureThresholdType: 'percent'};
+  const localOption = { failureThreshold: '0.01', failureThresholdType: 'percent' };
   if (options)
   {
     Object.assign(localOption, options);
@@ -116,7 +116,7 @@ describe('Replay a builder action', () =>
     // loading from options['directory']/actions.json
   });
 
-  it ('builder-replay', async () =>
+  it('builder-replay', async () =>
   {
     page = await browser.newPage();
     await page.setViewport({ width: 1600, height: 1200 });
@@ -126,10 +126,11 @@ describe('Replay a builder action', () =>
     const actions = actionFileData['actions'];
     const serializeRecords = actionFileData['records'];
     console.log('Replaying ' + actions.length + ' actions.');
-    await replayBuilderActions(page, url, actions, serializeRecords, async () => {
+    await replayBuilderActions(page, url, actions, serializeRecords, async () =>
+    {
       await takeBuilderActionScreenshot(page);
     });
-  }, 3000000);
+  }, 300000);
 
   afterAll(async () =>
   {

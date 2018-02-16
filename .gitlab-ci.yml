@@ -87,6 +87,7 @@ fullstack:
     - NODE_ENV=production yarn run start-midway > ./midwayConsole.log 2>&1&
     - sleep 20
     - yarn run test-fullstack-login
+    - yarn run test-rr-builder
     - killall node || true;
     - yarn run test-fullstack-teardown
   stage: fullstack

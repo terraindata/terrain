@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
 
+import readline from 'readline-promise';
 import * as sleep from 'sleep';
 
 function ignoreBuilderAction(action: string): boolean
@@ -56,6 +57,18 @@ function ignoreBuilderAction(action: string): boolean
     return true;
   }
   return false;
+}
+
+export async function waitForInput(msg: string)
+{
+  const rl = readline.createInterface(
+    {
+      input: process.stdin,
+      output: process.stdout,
+      terminal: true,
+    });
+  const answer = await rl.questionAsync(msg);
+  rl.close();
 }
 
 export async function replayBuilderActions(page, url, actions, records, actionCallBack?)

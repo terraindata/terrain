@@ -50,9 +50,8 @@ import * as commandLineArgs from 'command-line-args';
 import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
-import * as readlineSync from 'readline-sync';
 import * as sleep from 'sleep';
-import { filteringRecordBuilderActions, replayBuilderActions } from './FullstackUtils';
+import { filteringRecordBuilderActions, replayBuilderActions, waitForInput } from './FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
@@ -143,27 +142,21 @@ async function recordBuilderActions(browser, url)
     window['TerrainTools'].terrainStoreLogger.serializeAction = true;
     return recordList;
   });
-  while (true)
+  await waitForInput('Typing to stop the recording.');
+  console.log('stopping');
+
+  await page.evaluate(() =>
   {
-    if (readlineSync.keyInYN('Do you want to stop recording?'))
-    {
-      await page.evaluate(() =>
-      {
-        window['TerrainTools'].terrainStoreLogger.serializeAction = false;
-      });
-      let actions = await page.evaluate(() =>
-      {
-        return window['TerrainTools'].terrainStoreLogger.actionSerializationLog;
-      });
-      actions = filteringRecordBuilderActions(actions);
-      await page.close();
-      const timestamp = Date();
-      return { timestamp, records, actions };
-    } else
-    {
-      continue;
-    }
-  }
+    window['TerrainTools'].terrainStoreLogger.serializeAction = false;
+  });
+  let actions = await page.evaluate(() =>
+  {
+    return window['TerrainTools'].terrainStoreLogger.actionSerializationLog;
+  });
+  actions = filteringRecordBuilderActions(actions);
+  await page.close();
+  const timestamp = Date();
+  return { timestamp, records, actions };
 }
 
 async function rr()
@@ -223,20 +216,12 @@ async function rr()
     {
       console.trace(e);
     }
-    while (true)
-    {
-      if (readlineSync.keyInYN('Do you want to stop the browser?'))
-      {
-        break;
-      } else
-      {
-        continue;
-      }
-    }
+    await waitForInput('Typing to stop the replay');
   }
 
   console.log('Closing thebrowser');
   await browser.close();
+  console.log('The browser is closed.');
 }
 
 rr().catch((err) => console.log('Error when executing rr: ' + err));
