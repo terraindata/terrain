@@ -122,7 +122,7 @@ export interface Card extends IRecord<Card>
     topTql?: string;
 
     // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
-    map_text?: string;
+    //    mapInputValue?: string;
 
     anythingAccepts?: boolean;
 
@@ -137,7 +137,7 @@ export interface Card extends IRecord<Card>
     // TODO schemaState type is : SchemaTypes.SchemaState
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
-    getParentTerms?: (card: Card, schemaState) => List<string>;
+    getParentTerms?: (card: Card, schemaState, builderState) => List<string>;
     // returns terms for its parent and its neighbors (but not its parent's neighbors)
 
     preview: string | ((c: Card) => string);
@@ -181,7 +181,7 @@ export interface CardConfig
 
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
-    getParentTerms?: (card: Card, schemaState) => List<string>;
+    getParentTerms?: (card: Card, schemaState, builderState) => List<string>;
 
     description?: string;
 
@@ -192,7 +192,7 @@ export interface CardConfig
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['disabled', 'closed', 'tuning', 'tuningClosed', 'map_text']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['disabled', 'closed', 'tuning', 'tuningClosed']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
@@ -210,7 +210,6 @@ export const _card = (config: CardConfig) =>
     disabled: false,
     tuning: false,
     tuningClosed: false,
-    map_text: '',
   });
 
   if (config.static.metaFields)

@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import { List, Map, Record } from 'immutable';
-import { BaseClass, New } from '../Classes';
+import { BaseClass, createRecordType, New } from '../Classes';
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
@@ -101,9 +101,10 @@ class TransformArgsC
   public mergeName?: string = '';            // name of column to be merged
   public newName?: string | string[] = '';   // includes rename name, duplicate name, split names
   public text?: string = '';                 // text to append/prepend, text to split/merge on
+  public path?: string = '';                 // field path in the document for extracting fields from documents
 }
 
-const TransformArgs_Record = Record(new TransformArgsC());
+const TransformArgs_Record = createRecordType(new TransformArgsC(), 'TransformArgsC');
 export interface TransformArgs extends TransformArgsC, IRecord<TransformArgs> { }
 export const _TransformArgs = (config?: any) =>
 {
@@ -117,7 +118,7 @@ class TransformC
   public args: TransformArgs = _TransformArgs();
 }
 
-const Transform_Record = Record(new TransformC());
+const Transform_Record = createRecordType(new TransformC(), 'TransformC');
 export interface Transform extends TransformC, IRecord<Transform> { }
 export const _Transform =
   (config: {
@@ -141,12 +142,14 @@ class TemplateC
   public primaryKeyDelimiter: string = '-';
   public objectKey?: string = '';
   public persistentAccessToken?: string = '';
+  public requireJSONHaveAllFields: boolean = true;
   public dbid?: number = -1;
   public dbname?: string = '';
   public tablename?: string = '';
 }
 
-const Template_Record = Record(new TemplateC());
+// const Template_Record = Record(new TemplateC());
+const Template_Record = createRecordType(new TemplateC(), 'TemplateC');
 export interface Template extends TemplateC, IRecord<Template> { }
 export const _Template =
   (config: {
@@ -160,6 +163,7 @@ export const _Template =
     primaryKeyDelimiter: string;
     objectKey?: string;
     persistentAccessToken?: string;
+    requireJSONHaveAllFields: boolean;
     dbid?: number;
     dbname?: string;
     tablename?: string;
@@ -177,7 +181,7 @@ class ColumnTypesTreeC
   public innerType?: ColumnTypesTree = null;
 }
 
-const ColumnTypesTree_Record = Record(new ColumnTypesTreeC());
+const ColumnTypesTree_Record = createRecordType(new ColumnTypesTreeC(), 'ColumnTypesTreeC');
 export interface ColumnTypesTree extends ColumnTypesTreeC, IRecord<ColumnTypesTree> { }
 export const _ColumnTypesTree = (config?: any) =>
 {
@@ -238,18 +242,19 @@ export const TRANSFORM_TYPES =
       'prepend',
       'split',
       'merge',
+      'extract',
     ],
-    ['duplicate'],    // long
-    ['duplicate'],    // boolean
-    ['duplicate'],    // date
-    ['duplicate'],    // array
-    ['duplicate'],    // double
-    ['duplicate'],    // short
-    ['duplicate'],    // byte
-    ['duplicate'],    // integer
-    ['duplicate'],    // half_float
-    ['duplicate'],    // float
-    ['duplicate'],    // geopoint
+    ['duplicate', 'extract'],    // long
+    ['duplicate', 'extract'],    // boolean
+    ['duplicate', 'extract'],    // date
+    ['duplicate', 'extract'],    // array
+    ['duplicate', 'extract'],    // double
+    ['duplicate', 'extract'],    // short
+    ['duplicate', 'extract'],    // byte
+    ['duplicate', 'extract'],    // integer
+    ['duplicate', 'extract'],    // half_float
+    ['duplicate', 'extract'],    // float
+    ['duplicate', 'extract'],    // geopoint
   ];
 
 export const STEP_NAMES =
@@ -291,6 +296,7 @@ export const TRANSFORM_TEXT =
     PREPEND: 'Prepend text to every row in this column',
     SPLIT: 'Split this column\'s rows by a common delimiter',
     MERGE: 'Merge this column\'s rows with another column\'s rows',
+    EXTRACT: 'Extract a subfield from this column\'s rows as a new column',
   };
 
 export const enum Steps

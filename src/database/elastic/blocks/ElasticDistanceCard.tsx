@@ -80,8 +80,8 @@ export const elasticDistance = _card({
   field: '',
   distanceUnit: 'mi',
   distanceType: 'arc',
-  geopoint: [0, 0],
-  map_text: '',
+  locationValue: {},
+  mapInputValue: '',
 
   static: {
     language: 'elastic',
@@ -92,14 +92,11 @@ export const elasticDistance = _card({
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      const point = block['geopoint'].toJS !== undefined ? block['geopoint'].toJS() : block['geopoint'];
+      const locationValue = block['locationValue'].toJS !== undefined ? block['locationValue'].toJS() : block['locationValue'];
       return {
         distance: (block['distance']).toString() + block['distanceUnit'],
         distance_type: block['distanceType'],
-        [block['field']]: {
-          lat: point[0],
-          lon: point[1],
-        },
+        [block['field']]: locationValue,
       };
     },
 
@@ -169,9 +166,9 @@ export const elasticDistance = _card({
           key: 'field',
           placeholder: 'Field',
           className: 'builder-comp-list-item-margin-bottom',
-          getAutoTerms: (schemaState): List<string> =>
+          getAutoTerms: (schemaState, builderState): List<string> =>
           {
-            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Field);
           },
         },
         {

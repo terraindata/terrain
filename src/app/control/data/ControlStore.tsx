@@ -54,6 +54,7 @@ import thunk from 'redux-thunk';
 import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import Util from 'util/Util';
+import { createRecordType } from '../../Classes';
 import ControlReducers from './ControlReducers';
 
 type Template = FileImportTypes.Template;
@@ -66,7 +67,7 @@ class ControlStateC
   public importExportCredentials: List<CredentialConfig> = List([]);
 }
 
-const ControlState_Record = Record(new ControlStateC());
+const ControlState_Record = createRecordType(new ControlStateC(), 'ControlStateC');
 export interface ControlState extends ControlStateC, IRecord<ControlState> { }
 export const _ControlState = (config?: any) =>
 {

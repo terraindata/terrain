@@ -51,7 +51,8 @@ import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import Actions from 'builder/data/BuilderActions';
+import BuilderActions from 'builder/data/BuilderActions';
+import { BuilderState } from 'builder/data/BuilderState';
 import CreateLine from 'common/components/CreateLine';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as BlockUtils from 'src/blocks/BlockUtils';
@@ -93,6 +94,9 @@ export interface Props
   overrideClick?: (index: number) => void; // override the click handler
 
   handleCardDrop?: (cardType: string) => any;
+
+  builder?: BuilderState;
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -132,14 +136,14 @@ class CreateCardTool extends TerrainComponent<Props>
 
     if (this.props.index === null)
     {
-      Actions.change(
+      this.props.builderActions.change(
         this.props.keyPath,
         BlockUtils.make(AllBackendsMap[this.props.language].blocks, type),
       );
     }
     else
     {
-      Actions.create(this.props.keyPath, this.props.index, type);
+      this.props.builderActions.create(this.props.keyPath, this.props.index, type);
     }
 
     this.props.onToggle && this.props.onToggle();
@@ -241,9 +245,15 @@ class CreateCardTool extends TerrainComponent<Props>
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
           handleCardDrop={this.props.handleCardDrop}
+          builder={this.props.builder}
+          builderActions={this.props.builderActions}
         />
       </div>
     );
   }
 }
-export default CreateCardTool;
+export default Util.createTypedContainer(
+  CreateCardTool,
+  ['builder'],
+  { builderActions: BuilderActions },
+);

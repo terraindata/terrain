@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -74,9 +75,10 @@ export interface Props
 {
   fields: List<string>;
   config: ResultsConfig;
-  onConfigChange: (config: ResultsConfig) => void;
+  onConfigChange: (config: ResultsConfig, builderActions: typeof BuilderActions) => void;
   onClose: () => void;
   colorsActions: typeof ColorsActions;
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -229,7 +231,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
 
   public handleClose()
   {
-    this.props.onConfigChange(this.state.config);
+    this.props.onConfigChange(this.state.config, this.props.builderActions);
     this.props.onClose();
   }
 
@@ -617,13 +619,16 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             >
               <ImageIcon /> Image
             </div>
-            <div className='results-config-map-btn'
-              key={'map-btn-' + this.props.field}
-              onClick={this.changeToMap}
-              style={map ? activeBtnStyle : inactiveBtnStyle}
-            >
-              <MarkerIcon /> Map
-            </div>
+            {
+              // Disallow option of having each result have their own map
+              // <div className='results-config-map-btn'
+              // key={'map-btn-' + this.props.field}
+              // onClick={this.changeToMap}
+              // style={map ? activeBtnStyle : inactiveBtnStyle}
+              // >
+              //   <MarkerIcon /> Map
+              // </div>
+            }
           </div>
 
           <div className='results-config-image'>
@@ -784,5 +789,6 @@ export default Util.createContainer(
   [],
   {
     colorsActions: ColorsActions,
+    builderActions: BuilderActions,
   },
 );

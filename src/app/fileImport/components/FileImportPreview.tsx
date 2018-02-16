@@ -53,8 +53,10 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
+import { BuilderState } from 'builder/data/BuilderState';
 import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
 import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
+import Util from 'util/Util';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -68,6 +70,7 @@ import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { tooltip } from './../../common/components/tooltip/Tooltips';
+import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
@@ -76,6 +79,7 @@ import FileImportPreviewColumn from './FileImportPreviewColumn';
 import TransformModal from './TransformModal';
 
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import { getRootFieldFromDocPath } from '../../../../shared/Util';
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
@@ -116,6 +120,8 @@ export interface Props
 
   // export only
   algorithmName?: string;
+
+  builder?: BuilderState;
 }
 @Radium
 class FileImportPreview extends TerrainComponent<Props>
@@ -151,6 +157,12 @@ class FileImportPreview extends TerrainComponent<Props>
     analyzers: List<string>,
     exportColumnNames: List<string>,
     exportColumnTypes: List<object>,
+
+    addExportColumnPath: string,
+    addExportColumnName: string,
+    addExportColumnType: ColumnTypesTree,
+    addExportColumnAnalyzer: string,
+    showingAddExportColumn: boolean,
   } = {
       templateOptions: List([]),
       appliedTemplateName: '',
@@ -182,6 +194,12 @@ class FileImportPreview extends TerrainComponent<Props>
       analyzers: List([]),
       exportColumnNames: List([]),
       exportColumnTypes: List([]),
+
+      addExportColumnPath: '',
+      addExportColumnName: '',
+      showingAddExportColumn: false,
+      addExportColumnType: null,
+      addExportColumnAnalyzer: '',
     };
 
   public confirmedLeave: boolean = false;
@@ -207,13 +225,14 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      const dbName = getIndex('');
-      const tableName = getType('');
-      Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+      const dbName = getIndex('', this.props.builder);
+      const tableName = getType('', this.props.builder);
+      Actions.setServerDbTable(this.props.serverId, '',
+        typeof dbName === 'string' ? dbName : dbName.get(0),
+        typeof tableName === 'string' ? tableName : tableName.get(0));
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const parsedQuery = addBodyToQuery(stringQuery);
-      Actions.fetchTypesFromQuery(this.props.serverId, parsedQuery);
+      Actions.fetchTypesFromQuery(this.props.serverId, stringQuery);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
     Actions.fetchColumnAnalyzers();
@@ -389,10 +408,24 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public showAddExportColumn()
+  {
+    this.setState({
+      showingAddExportColumn: true,
+    });
+  }
+
   public hideAddColumn()
   {
     this.setState({
       showingAddColumn: false,
+    });
+  }
+
+  public hideAddExportColumn()
+  {
+    this.setState({
+      showingAddExportColumn: false,
     });
   }
 
@@ -423,10 +456,15 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     if (this.props.exporting)
     {
-      const dbName = getIndex('');
-      const tableName = getType('');
-      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess,
-        this.props.serverId, dbName, tableName);
+      const dbName = getIndex('', this.props.builder);
+      const tableName = getType('', this.props.builder);
+      Actions.saveTemplate(
+        this.state.saveTemplateName,
+        this.props.exporting,
+        this.handleTemplateSaveSuccess,
+        this.props.serverId,
+        typeof dbName === 'string' ? dbName : dbName.get(0),
+        typeof tableName === 'string' ? tableName : tableName.get(0));
     }
     else
     {
@@ -708,6 +746,40 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleAddExportPreviewColumn()
+  {
+    if (!this.state.addExportColumnName)
+    {
+      this.setPreviewErrorMsg('Please enter a new column name');
+      return;
+    }
+    if (this.props.columnNames.includes(this.state.addExportColumnName))
+    {
+      this.setPreviewErrorMsg('Column name already in use');
+      return;
+    }
+    const transform: Transform = FileImportTypes._Transform(
+      {
+        name: 'extract',
+        colName: getRootFieldFromDocPath(this.state.addExportColumnPath),
+        args: FileImportTypes._TransformArgs({
+          newName: this.state.addExportColumnName,
+          path: this.state.addExportColumnPath,
+        }),
+      });
+    Actions.addTransform(transform);
+    Actions.updatePreviewColumns(transform);
+    this.setState({
+      showingAddExportColumn: false,
+    });
+  }
+
+  // public handleExportTypeChange(typeIndex: number)
+  // {
+  //   const type = FileImportTypes.ELASTIC_TYPES[typeIndex];
+  //   Actions.setColumnType(this.props.columnId, this.props.recursionDepth, type);
+  // }
+
   public handleExportFiletypeChange(typeIndex: number)
   {
     const type = FileImportTypes.FILE_TYPES[typeIndex];
@@ -893,6 +965,34 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderAddExportColumn()
+  {
+    return (
+      <Modal
+        open={this.state.showingAddExportColumn}
+        onClose={this.hideAddExportColumn}
+        title={'Extract Nested Field As New Column'}
+        confirm={true}
+        confirmButtonText={'OK'}
+        onConfirm={this.handleAddExportPreviewColumn}
+        closeOnConfirm={true}
+      >
+        <Autocomplete
+          value={this.state.addExportColumnPath}
+          onChange={this._setStateWrapper('addExportColumnPath')}
+          placeholder={'Path Name'}
+          options={List([])}
+        />
+        <Autocomplete
+          value={this.state.addExportColumnName}
+          onChange={this._setStateWrapper('addExportColumnName')}
+          placeholder={'Column Name'}
+          options={List([])}
+        />
+      </Modal>
+    );
+  }
+
   public renderTemplate()
   {
     return (
@@ -1075,6 +1175,20 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
 
         </div>, 'Add Column')));
+    }
+    else if (this.props.exporting/* && this.props.allowAddingNewColumns TODO fix this*/)
+    {
+      previewColumns.push(
+        (tooltip(<div
+          className='fi-preview-column fi-preview-add-column-button'
+          onClick={this.showAddExportColumn}
+          style={buttonColors()}
+        >
+          <div className='fi-preview-add-column-content'>
+            {'+'}
+          </div>
+
+        </div>, { key: previewColumns.length, title: 'Add Column' })));
     }
 
     return (
@@ -1325,9 +1439,14 @@ class FileImportPreview extends TerrainComponent<Props>
           thirdButtonText="Don't Save"
           onThirdButton={this.handleModalDontSave}
         />
+        {this.renderAddExportColumn()}
       </div>
     );
   }
 }
 
-export default FileImportPreview;
+export default Util.createTypedContainer(
+  FileImportPreview,
+  ['builder'],
+  {},
+);

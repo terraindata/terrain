@@ -62,6 +62,7 @@ export interface Input extends IRecord<Input>
   key: string;
   value: string;
   inputType: InputType;
+  meta?: any; // Meta data (this is used for the map component, related to value but does not go in elastic query)
 }
 
 export function isRuntimeInput(name: string)
@@ -70,7 +71,7 @@ export function isRuntimeInput(name: string)
     name.substring(1).split('.')[0] === 'parent';
 }
 
-export function isInput(name: string, inputs: Immutable.List<Input>)
+export function isInput(name: string, inputs: Immutable.List<Input>): boolean
 {
   return inputs && name && name.charAt(0) === InputPrefix &&
     (inputs.findIndex((input: Input) => (name.substring(1) === input.key)) > -1);

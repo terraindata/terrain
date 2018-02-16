@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands no-console strict-boolean-expressions
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -137,6 +137,52 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
         )))
         .delete(mergeCol),
     );
+  }
+  else if (transform.name === 'extract')
+  {
+    /*
+    {
+      name: 'extract',
+      colName: getRootFieldFromDocPath(this.state.addExportColumnPath),
+      args: FileImportTypes._TransformArgs({
+        newName: this.state.addExportColumnName,
+        path: this.state.addExportColumnPath,
+      }),
+    }
+    */
+    if (transform.colName !== undefined && transform.args !== undefined
+      && transform.args.newName !== undefined && transform.args.path !== undefined)
+    {
+      try
+      {
+        const extractedFieldsFromColumn: string[] = [];
+        state.previewColumns.get(transformCol).forEach((row: any) =>
+        {
+          let rowParsedAsObject: object | undefined;
+          try
+          {
+            rowParsedAsObject = {
+              [transform.colName]: row.toJS(),
+            };
+          }
+          catch (e)
+          {
+            rowParsedAsObject = undefined;
+          }
+          extractedFieldsFromColumn.push(_.get(rowParsedAsObject, transform.args.path));
+        });
+        return state
+          .set('isDirty', true)
+          .set('columnsToInclude', state.columnsToInclude.push(true))
+          .set('columnTypes', state.columnTypes.push(FileImportTypes._ColumnTypesTree()))
+          .set('columnNames', state.columnNames.push(transform.args.newName as string))
+          .set('previewColumns', state.previewColumns.push(List(extractedFieldsFromColumn)));
+      }
+      catch (e)
+      {
+        // do nothing, state does not change
+      }
+    }
   }
   return state;
 };
@@ -298,14 +344,15 @@ FileImportReducers[ActionTypes.setColumnType] =
       .setIn(keyPath, action.payload.type);
   };
 
-FileImportReducers[ActionTypes.setColumnTypes] =
+FileImportReducers[ActionTypes.setColumnNamesAndTypes] =
   (state, action) =>
   {
     const { previewColumns, columnNames } = state;
     return state
+      .set('columnNames', List(columnNames))
       .set('columnTypes', List(columnNames.map((colName) =>
-        action.payload.newColumnTypes[colName] ?
-          FileImportTypes._ColumnTypesTree(action.payload.newColumnTypes[colName])
+        action.payload.newColumnNamesAndTypes[colName] ?
+          FileImportTypes._ColumnTypesTree(action.payload.newColumnNamesAndTypes[colName])
           :
           FileImportTypes._ColumnTypesTree())));
   };
@@ -318,7 +365,7 @@ FileImportReducers[ActionTypes.fetchTypesFromQuery] =
       action.payload.query,
       (namesAndTypes) =>
       {
-        action.payload.setColumnTypes(namesAndTypes);
+        action.payload.setColumnNamesAndTypes(namesAndTypes);
       });
     return state;
   };
@@ -393,6 +440,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('filesize', action.payload.filesize)
       .set('primaryKeys', List([]))
       .set('primaryKeyDelimiter', '-')
+      .set('requireJSONHaveAllFields', true)
       .set('previewColumns', action.payload.preview)
       .set('originalNames', action.payload.originalNames)
       .set('columnNames', action.payload.originalNames)
@@ -424,8 +472,8 @@ FileImportReducers[ActionTypes.importFile] =
       state.elasticUpdate,
       state.hasCsvHeader,
       state.isNewlineSeparatedJSON,
-      state.requireJSONHaveAllFields,
       state.primaryKeyDelimiter,
+      state.requireJSONHaveAllFields,
       () =>
       {
         action.payload.handleFileImportSuccess();
@@ -494,6 +542,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       action.payload.templateName,
       action.payload.exporting,
       state.primaryKeyDelimiter,
+      state.requireJSONHaveAllFields,
       state.objectKey,
       state.exportRank,
       () =>
@@ -521,6 +570,8 @@ FileImportReducers[ActionTypes.updateTemplate] =
       state.transforms,
       action.payload.exporting,
       state.primaryKeyDelimiter,
+      state.requireJSONHaveAllFields,
+      state.exportRank,
       action.payload.templateId,
       () =>
       {
@@ -574,6 +625,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
             transformations: template['transformations'],
             primaryKeys: template['primaryKeys'],
             primaryKeyDelimiter: template['primaryKeyDelimiter'],
+            requireJSONHaveAllFields: template['requireJSONHaveAllFields'],
           }),
         ));
         action.payload.setTemplates(templates);
@@ -610,6 +662,7 @@ FileImportReducers[ActionTypes.applyTemplate] =
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewColumns', previewColumns)
       .set('primaryKeyDelimiter', template.primaryKeyDelimiter)
+      .set('requireJSONHaveAllFields', template.requireJSONHaveAllFields)
       .set('isDirty', false);
   };
 

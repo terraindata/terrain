@@ -48,6 +48,7 @@ import * as fs from 'fs';
 import * as request from 'supertest';
 import * as winston from 'winston';
 
+// import { App, Credentials, DB, Scheduler } from '../../src/app/App';
 import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
@@ -57,6 +58,14 @@ import { readFile } from '../Utils';
 
 let elasticDB: ElasticDB;
 let server;
+
+let exportTemplateID: number = -1;
+let persistentExportAccessToken: string = '';
+
+let mySQLImportTemplateID: number = -1;
+let persistentImportMySQLAccessToken: string = '';
+
+let schedulerExportId = -1;
 
 // tslint:disable:max-line-length
 
@@ -92,6 +101,11 @@ beforeAll(async (done) =>
 
     const app = new App(options);
     server = await app.start();
+
+    // await Credentials.initializeLocalFilesystemCredential();
+
+    // await Scheduler.initializeJobs();
+    // await Scheduler.initializeSchedules();
 
     const config: ElasticConfig = {
       hosts: ['http://localhost:9200'],
@@ -185,6 +199,15 @@ beforeAll(async (done) =>
     {
       done();
     });
+
+  try
+  {
+    fs.unlinkSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json');
+  }
+  catch (e)
+  {
+    // do nothing
+  }
 });
 
 describe('User and auth route tests', () =>
@@ -245,15 +268,11 @@ describe('User and auth route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(response.text);
-        expect(respData.length).toBeGreaterThan(0);
-        expect(respData[0])
-          .toMatchObject({ accessToken: '', email: 'test@terraindata.com', id });
+        expect(response.text).toBe('Success');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/logout request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/logout request number 1 returned an error: ' + String(error));
       });
 
     await request(server)
@@ -262,14 +281,14 @@ describe('User and auth route tests', () =>
         id,
         accessToken,
       })
-      .expect(401)
+      .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('Unauthorized');
+        expect(response.text).not.toBe('Unauthorized');
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/auth/logout request returned an error: ' + String(error));
+        fail('POST /midway/v1/auth/logout request number 2 returned an error: ' + String(error));
       });
   });
 });
@@ -535,7 +554,6 @@ describe('Query route tests', () =>
           body: JSON.stringify({
             from: 0,
             size: 0,
-            query: {},
           }),
         },
       })
@@ -571,7 +589,6 @@ describe('Query route tests', () =>
           body: {
             from: 0,
             size: 0,
-            query: {},
           },
         },
       })
@@ -600,17 +617,17 @@ describe('Query route tests', () =>
     async () =>
     {
       const template: string = `{
-                   "from" : 0,
-                   "size" : {{#toJson}}size{{/toJson}},
-                   "query" : {
-                      "bool" : {
-                        "must" : [
-                          {"match" : {"_index" : "movies"}},
-                          {"match" : {"_type" : "data"}}
-                        ]
-                      }
-                   }
-                }`;
+          "from" : 0,
+          "size" : {{#toJson}}size{{/toJson}},
+          "query" : {
+            "bool" : {
+              "must" : [
+                {"match" : {"_index" : "movies"}},
+                {"match" : {"_type" : "data"}}
+              ]
+            }
+          }
+      }`;
 
       await request(server)
         .post('/midway/v1/query/')
@@ -622,9 +639,7 @@ describe('Query route tests', () =>
             type: 'putTemplate',
             body: {
               id: 'testTemplateQuery',
-              body: {
-                template,
-              },
+              body: template,
             },
           },
         }).expect(200).then((response) =>
@@ -654,9 +669,11 @@ describe('Query route tests', () =>
             {
               result: {
                 _id: 'testTemplateQuery',
-                lang: 'mustache',
                 found: true,
-                template,
+                script: {
+                  lang: 'mustache',
+                  source: template,
+                },
               }, errors: [], request: { database: 1, type: 'getTemplate', body: { id: 'testTemplateQuery' } },
             });
         }).catch((error) =>
@@ -699,11 +716,15 @@ describe('Query route tests', () =>
           expect(JSON.parse(response.text)).toMatchObject(
             {
               errors: [
-                {
-                  status: 404,
-                  title: 'Not Found',
-                },
+                // {
+                //   status: 404,
+                //   title: 'Not Found',
+                // },
               ],
+              result: {
+                _id: 'testTemplateQuery',
+                found: false,
+              },
             });
         }).catch((error) =>
         {
@@ -829,7 +850,6 @@ describe('File import route tests', () =>
               index: 'test_elastic_db',
               type: 'fileImportTestTable',
               body: {
-                query: {},
                 sort: [{ pkey: 'asc' }],
               },
             },
@@ -904,7 +924,6 @@ describe('File import route tests', () =>
               index: 'test_elastic_db',
               type: 'fileImportTestTable',
               body: {
-                query: {},
                 sort: [{ pkey: 'desc' }],
               },
             },
@@ -979,8 +998,6 @@ describe('File import route tests', () =>
 
 describe('File io templates route tests', () =>
 {
-  let persistentImportMySQLAccessToken: string = '';
-  let mySQLImportTemplateID: string = '';
   test('Create import template for MySQL: POST /midway/v1/import/templates/create', async () =>
   {
     await request(server)
@@ -1065,8 +1082,6 @@ describe('File io templates route tests', () =>
       });
   });
 
-  let persistentExportAccessToken: string = '';
-  let exportTemplateID: string = '';
   test('Create export template: POST /midway/v1/export/templates/create', async () =>
   {
     await request(server)
@@ -1205,7 +1220,8 @@ describe('File io templates route tests', () =>
           },
           filetype: 'csv',
         },
-      }).expect(200)
+      })
+      .expect(200)
       .then(async (response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
@@ -1217,7 +1233,6 @@ describe('File io templates route tests', () =>
               index: 'mysqlimport',
               type: 'data',
               body: {
-                query: {},
                 sort: [{ movieid: 'asc' }],
               },
             },
@@ -1273,7 +1288,8 @@ describe('File io templates route tests', () =>
           },
           filetype: 'csv',
         },
-      }).expect(400)
+      })
+      .expect(400)
       .then((response) =>
       {
         expect(response.text).not.toBe('Unauthorized');
@@ -1389,6 +1405,126 @@ describe('Credentials tests', () =>
   });
 });
 
+describe('Scheduler tests', () =>
+{
+  test('POST /midway/v1/scheduler/create scheduled export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/create')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          jobType: 'export',
+          schedule: '* * * * *', // next run on some leap year date
+          sort: 'asc',
+          transport:
+            {
+              type: 'local',
+              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
+            },
+          name: 'Test Local Export',
+          paramsJob:
+            {
+              dbid: 1,
+              dbname: 'movies',
+              templateId: exportTemplateID,
+              filetype: 'csv',
+              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
+            },
+          filetype: 'json',
+        },
+      })
+      .expect(200)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/create request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Object.keys(result).lastIndexOf('errors')).toEqual(-1);
+        schedulerExportId = result['id'];
+        expect(await new Promise<boolean>(async (resolve, reject) =>
+        {
+          function verifyFileWritten()
+          {
+            resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
+          }
+          setTimeout(verifyFileWritten, (60 - (Math.floor(Date.now() / 1000) % 60) + 3) * 1000);
+        })).toBe(true);
+      });
+  }, 70000);
+
+  test('POST /midway/v1/scheduler/run/<scheduled export ID> run now', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+        },
+      })
+      .expect(200)
+      .then(async (responseRun) =>
+      {
+        expect(await new Promise<boolean>(async (resolve, reject) =>
+        {
+          function verifyFileWritten()
+          {
+            resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
+          }
+          setTimeout(verifyFileWritten, 3000);
+        })).toBe(true);
+      });
+  });
+
+  test('POST /midway/v1/scheduler/create INVALID scheduled export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/create')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          jobTypeInvalidParam: 'export',
+          schedule: '* * * * *', // next run on some leap year date
+          sort: 'asc',
+          transport:
+            {
+              type: 'local',
+              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
+            },
+          name: 'Test Local Export',
+          paramsJob:
+            {
+              dbid: 1,
+              dbname: 'movies',
+              templateId: exportTemplateID,
+              filetype: 'csv',
+              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
+            },
+          filetype: 'json',
+        },
+      })
+      .expect(400)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/create request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Object.keys(result).lastIndexOf('errors')).not.toEqual(-1);
+      });
+  });
+});
+
 describe('Analytics events route tests', () =>
 {
   test('GET /midway/v1/events/agg (distinct)', async () =>
@@ -1426,8 +1562,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 7, 36, 4),
+        start: new Date(2018, 1, 16, 7, 24, 4),
+        end: new Date(2018, 1, 16, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'terrain_5',
         agg: 'select',
@@ -1441,7 +1577,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(2);
+        expect(respData['terrain_5'].length).toEqual(3);
       });
   });
 
@@ -1453,8 +1589,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 7, 36, 4),
+        start: new Date(2018, 1, 16, 7, 24, 4),
+        end: new Date(2018, 1, 16, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'terrain_5',
         agg: 'histogram',
@@ -1469,7 +1605,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(2);
+        expect(respData['terrain_5'].length).toEqual(5);
       });
   });
 
@@ -1481,8 +1617,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 10, 24, 4),
+        start: new Date(2018, 1, 31, 7, 24, 4),
+        end: new Date(2018, 1, 31, 10, 24, 4),
         eventname: 'click,impression',
         algorithmid: 'terrain_5',
         agg: 'rate',
