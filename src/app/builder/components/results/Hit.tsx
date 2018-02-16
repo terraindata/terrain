@@ -279,7 +279,6 @@ class HitComponent extends TerrainComponent<Props> {
     const thumbnail = resultsConfig.thumbnail !== null ?
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;
-    console.log(thumbnail);
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
@@ -388,12 +387,12 @@ class HitComponent extends TerrainComponent<Props> {
                 _.map(fields, this.renderField)
               }
               {
-                bottomContent
-              }
-              {
                 expandedContent
               }
             </div>
+            {
+              bottomContent
+            }
           </div>
         </div>
       </div>

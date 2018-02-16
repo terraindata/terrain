@@ -94,6 +94,7 @@ const Label = styled.label`
   transition: all 0.15s;
   color: ${Colors().text3};
   cursor: pointer;
+  text-transform: uppercase;
   
   font-size: ${(props) => 
     {
@@ -115,6 +116,7 @@ const inputStyle = `
   padding-bottom: 4px;
   border-radius: 3px;
   width: 100%;
+  box-sizing: border-box;
   border: none;
   outline: none;
   color: ${Colors().text1};

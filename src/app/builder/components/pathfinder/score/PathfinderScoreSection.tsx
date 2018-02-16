@@ -276,10 +276,10 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       <div
         className='pf-section'
       >
-        <PathfinderSectionTitle
+        {/*<PathfinderSectionTitle
           title={PathfinderText.scoreSectionTitle}
           text={PathfinderText.scoreSectionSubtitle}
-        />
+        />*/}
         <div className='pf-score-section-type'>
           Score Type:
           <Dropdown

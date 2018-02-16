@@ -79,11 +79,11 @@ class PathfinderFilterCreate extends TerrainComponent<Props>
             onCreate={this.handleCreateFilterLine}
             text={PathfinderText.createFilterLine}
           />
-          <PathfinderCreateLine
+          {/*<PathfinderCreateLine
             canEdit={canEdit}
             onCreate={this.handleCreateFilterGroup}
             text={PathfinderText.createFilterGroup}
-          />
+          />*/}
         </div>
       </PathfinderLine>
     );
