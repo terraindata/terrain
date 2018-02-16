@@ -443,9 +443,9 @@
   dependencies:
     moment ">=2.14.0"
 
-"@types/pg@^7.4.2":
-  version "7.4.4"
-  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-7.4.4.tgz#f8e9e0b447d69be63916e14bf97722de53ec4996"
+"@types/pg@7.4.2":
+  version "7.4.2"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-7.4.2.tgz#f39f184e5eed76c80a32c6229198903dfc2c8260"
   dependencies:
     "@types/events" "*"
     "@types/node" "*"
@@ -474,11 +474,12 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-dom@^15.5.6":
-  version "15.5.7"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-15.5.7.tgz#a5c1c8b315e925d84d59db5ee88ca7e31c5030f9"
+"@types/react-dom@^16.0.4":
+  version "16.0.4"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.0.4.tgz#2e8fd45f5443780ed49bf2cdd9809e6091177a7d"
   dependencies:
-    "@types/react" "^15"
+    "@types/node" "*"
+    "@types/react" "*"
 
 "@types/react-modal@^1.6.6":
   version "1.6.8"
@@ -493,13 +494,9 @@
     "@types/history" "*"
     "@types/react" "*"
 
-"@types/react@*":
+"@types/react@*", "@types/react@^16.0.38":
   version "16.0.38"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.0.38.tgz#76617433ea10274505f60bb86eddfdd0476ffdc2"
-
-"@types/react@^15", "@types/react@^15.6.11":
-  version "15.6.14"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.6.14.tgz#fe176209b9de3514f9782fa41a239bffd26a3b56"
 
 "@types/redux-actions@^1.2.3":
   version "1.2.8"
@@ -1725,8 +1722,8 @@ balanced-match@^1.0.0:
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
 
 base64-js@^1.0.2, base64-js@^1.2.0:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.1.tgz#a91947da1f4a516ea38e5b4ec0ec3773675e0886"
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.3.tgz#fb13668233d9614cf5fb4bce95a9ba4096cdf801"
 
 base@^0.11.1:
   version "0.11.2"
@@ -2159,7 +2156,7 @@ chokidar@^1.6.0, chokidar@^1.6.1, chokidar@^1.7.0:
   optionalDependencies:
     fsevents "^1.0.0"
 
-chokidar@^2.0.0:
+chokidar@^2.0.0, chokidar@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.0.2.tgz#4dc65139eeb2714977735b6a35d06e97b494dfd7"
   dependencies:
@@ -6291,10 +6288,10 @@ node-status-codes@^1.0.0:
   resolved "https://registry.yarnpkg.com/node-status-codes/-/node-status-codes-1.0.0.tgz#5ae5541d024645d32a58fcddc9ceecea7ae3ac2f"
 
 nodemon@^1.14.12:
-  version "1.14.12"
-  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-1.14.12.tgz#fe059424b15ebdb107696287a558d9cf53a63999"
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-1.15.0.tgz#ddec01eeb9c33d53dfbf7eddb2fa32f723474c1e"
   dependencies:
-    chokidar "^2.0.0"
+    chokidar "^2.0.2"
     debug "^3.1.0"
     ignore-by-default "^1.0.1"
     minimatch "^3.0.4"
@@ -6580,8 +6577,8 @@ os-tmpdir@^1.0.0, os-tmpdir@^1.0.1, os-tmpdir@~1.0.1:
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
 
 osenv@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/osenv/-/osenv-0.1.4.tgz#42fe6d5953df06c8064be6f176c3d05aaaa34644"
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/osenv/-/osenv-0.1.5.tgz#85cdfafaeb28e8677f416e287592b5f3f49ea410"
   dependencies:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
@@ -6851,9 +6848,9 @@ pg-types@~1.12.1:
     postgres-date "~1.0.0"
     postgres-interval "^1.1.0"
 
-pg@^7.4.0:
-  version "7.4.1"
-  resolved "https://registry.yarnpkg.com/pg/-/pg-7.4.1.tgz#f3411c8ddf9f692322fe05e7017a1888e47f78f1"
+pg@7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/pg/-/pg-7.4.0.tgz#e256061d2c52723c3c858defb97f1159ca660f83"
   dependencies:
     buffer-writer "1.0.1"
     js-string-escape "1.0.1"
