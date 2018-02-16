@@ -83,6 +83,7 @@ export interface Props<FState>
   secondButton?: ButtonOptions; // buttons are rendered from right to left
   thirdButton?: ButtonOptions;
   style?: any; // gets applied to root container
+  actionBarStyle?: any; // gets applied to the bottom container style
   children?: any; // children get rendered between the buttons and the form components
 }
 // if we want to allow immutable state objects, add an optional state mutator to each input declaration type
@@ -225,7 +226,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       this.renderButton(this.props.thirdButton, { isActive: false, disabled: false }, 'third');
 
     return (
-      <div className='dynamic-form-confirm-bar'>
+      <div className='dynamic-form-confirm-bar' style={this.props.actionBarStyle}>
         {thirdButton}
         {secondButton}
         {mainButton}

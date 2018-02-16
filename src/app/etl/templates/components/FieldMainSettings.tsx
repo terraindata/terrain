@@ -115,20 +115,28 @@ class FieldMainSettings extends TemplateEditorField<Props>
   public render()
   {
     return (
-      <DynamicForm
-        inputMap={settingsInputMap}
-        inputState={this.state.formState}
-        onStateChange={this._setStateWrapper('formState')}
-        mainButton={{
-          name: 'Apply',
-          onClicked: this.handleSettingsApplied,
-        }}
-        secondButton={{
-          name: 'Close',
-          onClicked: this.handleCloseSettings,
-        }}
-        style={getStyle('flexGrow', '1')}
-      />
+      <div className='field-main-settings'>
+        <DynamicForm
+          inputMap={settingsInputMap}
+          inputState={this.state.formState}
+          onStateChange={this._setStateWrapper('formState')}
+          mainButton={{
+            name: 'Apply',
+            onClicked: this.handleSettingsApplied,
+          }}
+          secondButton={{
+            name: 'Close',
+            onClicked: this.handleCloseSettings,
+          }}
+          style={{
+            flexGrow: 1,
+            padding: '12px',
+          }}
+          actionBarStyle={{
+            justifyContent: 'center',
+          }}
+        />
+      </div>
     );
   }
 
@@ -167,7 +175,7 @@ const settingsInputMap: InputDeclarationMap<SettingsState> = {
   fieldName: {
     type: DisplayType.TextBox,
     displayName: 'Name',
-    group: 'row'
+    group: 'row',
   },
   isIncluded: {
     type: DisplayType.CheckBox,

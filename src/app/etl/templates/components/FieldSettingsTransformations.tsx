@@ -111,38 +111,6 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     this.handleEditTransformationFactory = _.memoize(this.handleEditTransformationFactory);
   }
 
-  public transformationListItemStyle(isActive: boolean): { textStyle: object, buttonStyle: object }
-  {
-    const textStyle = fontColor(isActive ? Colors().active : Colors().text2);
-    const buttonStyle = isActive ?
-      [fontColor(Colors().altBg1, Colors().altBg1), backgroundColor(Colors().active, Colors().activeHover)] :
-      [fontColor(Colors().text3, Colors().altBg1), backgroundColor('rgba(0,0,0,0)', Colors().inactiveHover)];
-    return { textStyle, buttonStyle };
-  }
-
-  public renderTransformationListItem(value: TransformationNode, index)
-  {
-    const style = this.transformationListItemStyle(index === this.state.currentIndex && this.state.viewState === ViewState.EDIT);
-
-    return (
-      <div className='transformation-row' key={index}>
-        <div className='transformation-row-text' style={style.textStyle}>
-          {TransformationsInfo.getReadableName(value.typeCode)}
-        </div>
-        <div className='edit-transformation-spacer'>
-          <div
-            className='edit-transformation-button'
-            key={`edit ${index}`}
-            style={style.buttonStyle}
-            onClick={this.handleEditTransformationFactory(index)}
-          >
-            <EditIcon />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   public renderEditTransformationSection()
   {
     const { currentIndex } = this.state;
@@ -175,21 +143,53 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     );
   }
 
+  public transformationListItemStyle(isActive: boolean): { textStyle: object, buttonStyle: object }
+  {
+    const textStyle = fontColor(isActive ? Colors().active : Colors().text2);
+    const buttonStyle = isActive ?
+      [fontColor(Colors().altBg1, Colors().altBg1), backgroundColor(Colors().active, Colors().activeHover)] :
+      [fontColor(Colors().text3, Colors().altBg1), backgroundColor('rgba(0,0,0,0)', Colors().inactiveHover)];
+    return { textStyle, buttonStyle };
+  }
+
+  public renderTransformationListItem(value: TransformationNode, index)
+  {
+    const style = this.transformationListItemStyle(index === this.state.currentIndex && this.state.viewState === ViewState.EDIT);
+
+    return (
+      <div className='transformation-row' key={index}>
+        <div className='transformation-row-text' style={style.textStyle}>
+          {TransformationsInfo.getReadableName(value.typeCode)}
+        </div>
+        <div className='edit-transformation-spacer'>
+          <div
+            className='edit-transformation-button'
+            key={`edit ${index}`}
+            style={style.buttonStyle}
+            onClick={this.handleEditTransformationFactory(index)}
+          >
+            <EditIcon />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   public renderNewTransformationButton()
   {
     const buttonText = this.props.field.transformations.size === 0 ?
       'Add a Transformation' :
       'Add Another Transformation';
+    const buttonStyle = this.props.field.transformations.size === 0 ?
+      [fontColor(Colors().activeText, Colors().activeText), backgroundColor(Colors().active, Colors().activeHover)] :
+      [fontColor(Colors().text3, Colors().active)];
     return (
       <div
         className='add-transformation-row'
         key='new-button'
-        style={fontColor(Colors().text3, Colors().active)}
+        style={buttonStyle}
         onClick={this.handleAddNewTransformation}
       >
-        <div className='add-transformation-button' >
-          <AddIcon />
-        </div>
         <div className='transformation-row-text'>
           {buttonText}
         </div>
@@ -210,11 +210,29 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
       return (
         <div className='transformation-row' key={'none'}>
           <div className='transformation-row-text'>
-            This field has no transformations
+            This Field Has No Transformations
           </div>
         </div>
       );
     }
+  }
+
+  public renderTransformations()
+  {
+
+    return (
+      <div
+        className={classNames({
+          'transformations-list-column': true,
+          'side-column-active': this.state.viewState !== ViewState.LIST_ALL,
+        })}
+      >
+        <div className='transformations-list'>
+          {this.renderTransformationsList()}
+          {this.renderNewTransformationButton()}
+        </div>
+      </div>
+    );
   }
 
   public render()
@@ -223,17 +241,23 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     const transformations = field.transformations;
     return (
       <div className='template-editor-field-transformations'>
-        <div className='transformations-list'>
-          {this.renderTransformationsList()}
-          {this.renderNewTransformationButton()}
-        </div>
-        <div className='transformation-fade-container'>
-          <FadeInOut open={this.state.viewState === ViewState.EDIT || this.state.viewState === ViewState.CREATE_NEW}>
-            <div className='transformation-inner-container'>
-              {this.state.viewState === ViewState.EDIT && this.renderEditTransformationSection()}
-              {this.state.viewState === ViewState.CREATE_NEW && this.renderCreateTransformationSection()}
-            </div>
-          </FadeInOut>
+        {
+          this.renderTransformations()
+        }
+        <div
+          className={classNames({
+            'transformations-side-column': true,
+            'side-column-active': this.state.viewState !== ViewState.LIST_ALL,
+          })}
+        >
+          {
+            this.state.viewState === ViewState.CREATE_NEW ?
+              this.renderCreateTransformationSection() : null
+          }
+          {
+            this.state.viewState === ViewState.EDIT ?
+              this.renderEditTransformationSection() : null
+          }
         </div>
       </div>
     );

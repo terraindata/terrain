@@ -88,10 +88,10 @@ enum ViewCategory
 class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 {
   public state: {
-    currentCategory: ViewCategory
+    currentCategory: ViewCategory,
   } = {
-    currentCategory: ViewCategory.SETTINGS,
-  }
+      currentCategory: ViewCategory.SETTINGS,
+    };
 
   constructor(props)
   {
@@ -108,6 +108,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         className='field-settings-title-bar'
         style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}
       >
+        <div className='field-settings-title-filler' />
         <div
           className='field-settings-category'
           key='settings'
@@ -125,14 +126,14 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
           Transform
         </div>
         {
-        /*<div
-          className='field-settings-category'
-          key='advanced'
-          style={this.state.currentCategory === ViewCategory.ADVANCED ? activeStyle : inactiveStyle}
-          onClick={this.changeViewFactory(ViewCategory.ADVANCED)}
-        >
-          Advanced
-        </div>*/
+          /*<div
+            className='field-settings-category'
+            key='advanced'
+            style={this.state.currentCategory === ViewCategory.ADVANCED ? activeStyle : inactiveStyle}
+            onClick={this.changeViewFactory(ViewCategory.ADVANCED)}
+          >
+            Advanced
+          </div>*/
         }
         <div className='field-settings-title-filler' />
         <div
@@ -158,7 +159,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
               <FieldMainSettings
                 {...this._passProps()}
               />
-               : null
+              : null
           }
           {
             this.state.currentCategory === ViewCategory.TRANSFORMATIONS ?

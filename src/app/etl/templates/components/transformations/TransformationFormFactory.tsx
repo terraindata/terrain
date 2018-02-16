@@ -145,6 +145,9 @@ export function transformationFormFactory<State extends object, Type extends Tra
           inputMap={args.inputMap}
           inputState={this.state}
           onStateChange={this.handleStateChange}
+          style={{
+            flexGrow: '1',
+          }}
           mainButton={{ // TODO if there are no config options available change the buttons to match
             name: isCreate ? 'Create' : 'Save',
             onClicked: this.handleMainAction,
@@ -152,6 +155,9 @@ export function transformationFormFactory<State extends object, Type extends Tra
           secondButton={{
             name: 'Cancel',
             onClicked: this.props.onClose,
+          }}
+          actionBarStyle={{
+            justifyContent: 'center',
           }}
         />
       );

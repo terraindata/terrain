@@ -6,7 +6,7 @@
 
   .dynamic-form-matrix-row {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     padding: @quarter-spacing;
   }
 
@@ -16,7 +16,6 @@
 
   .dynamic-form-checkbox-row {
     margin-right: @spacing;
-    padding-bottom: @half-spacing;
     padding-top: @quarter-spacing;
     display: flex;
     align-items: center;
@@ -31,7 +30,8 @@
   }
 
   .dynamic-form-autocomplete-block {
-    margin-right: @spacing;
+    margin-right: @half-spacing;
+    margin-left: @half-spacing;
     display: flex;
     flex-direction: column;
 
@@ -53,7 +53,9 @@
       cursor: pointer;
       padding: @half-spacing @spacing;
       border-radius: 3px;
-      margin-left: @spacing;
+      &:not(:first-child) {
+        margin-left: @spacing;
+      }
       &.dynamic-form-button-active {
 
       }

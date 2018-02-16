@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { getStyle } from 'src/app/colors/Colors';
+import { borderColor, Colors, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
@@ -93,13 +93,21 @@ export class TransformationCreator extends TerrainComponent<Props>
     const CompClass = getTransformationForm(this.state.creatingType);
 
     return (
-      <CompClass
-        isCreate={true}
-        engine={this.props.engine}
-        fieldID={this.props.fieldID}
-        onEditOrCreate={this.props.onTransformationCreated}
-        onClose={this.props.onClose}
-      />
+      <div className='create-transformation-container'>
+        <div className='create-transformation-title' style={borderColor(Colors().border1)}>
+          Create a {TransformationsInfo.getReadableName(this.state.creatingType)} Transformation
+        </div>
+        <div className='create-transformation-component'>
+          <CompClass
+            isCreate={true}
+            engine={this.props.engine}
+            fieldID={this.props.fieldID}
+            onEditOrCreate={this.props.onTransformationCreated}
+            onClose={this.props.onClose}
+          />
+        </div>
+      </div>
+
     );
   }
 
@@ -135,7 +143,7 @@ export class TransformationCreator extends TerrainComponent<Props>
   {
     return (
       <div className='transformation-editor'>
-        <div className='transformation-editor-title'> Transform this Field </div>
+        {this.state.creatingType === null ? <div className='transformation-editor-title'> Choose a Transformation </div> : null}
         {this.state.creatingType === null ? this.renderAvailableTransformations() : null}
         {this.state.creatingType !== null ? this.renderCreateTransformation() : null}
       </div>

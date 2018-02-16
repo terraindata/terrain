@@ -2,14 +2,36 @@
 
 // TemplateEditorFieldTransformations
 .template-editor-field-transformations {
+  padding: @half-spacing;
   display: flex;
   flex: 1;
+  justify-content: center;
 
-  .transformations-list {
-    padding: @half-spacing @spacing;
+  .transformations-list-column {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    flex: 0 1 100%;
+    overflow-x: hidden;
+    .transition;
+    &.side-column-active {
+      flex: 0 1 0%;
+    }
+  }
+
+  .transformations-side-column {
+    .transition;
+    display: flex;
+    justify-content: center;
+    flex: 0 1 0px;
+    &.side-column-active {
+      flex: 1 1 250px;
+    }
+  }
+
+  .transformations-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     .transformation-row {
       align-items: stretch;
@@ -20,7 +42,7 @@
 
     .transformation-row-text {
       .transition;
-      padding: @half-spacing;
+      padding: @quarter-spacing;
       display: flex;
       align-items: center;
     }
@@ -45,9 +67,12 @@
     }
 
     .add-transformation-row {
+      margin-top: @double-spacing;
       cursor: pointer;
-      align-items: stretch;
       display: flex;
+      border-radius: 3px;
+      padding: @half-spacing;
+      justify-content: center;
     }
 
     .add-transformation-button {
@@ -75,6 +100,7 @@
   }
 }
 
+// transformation creator and transformation editor
 .transformation-editor {
   padding: @half-spacing;
   display: flex;
@@ -91,6 +117,27 @@
     .transformation-option {
       padding: @half-spacing;
       border: 1px solid;
+      margin: @quarter-spacing;
+      border-radius: 3px;
+    }
+  }
+
+  .create-transformation-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 100px;
+
+    .create-transformation-title {
+      display: flex;
+      padding: @half-spacing;
+      border-bottom: 1px solid;
+      justify-content: center;
+    }
+
+    .create-transformation-component {
+      display: flex;
+      padding: @half-spacing;
+      flex: 1 0 100px;
     }
   }
 }

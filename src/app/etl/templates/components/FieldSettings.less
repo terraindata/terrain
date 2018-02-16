@@ -1,17 +1,17 @@
 @import "../../../common/Common.less";
 
+@title-bar-height: 40px;
 // TemplateEditorFieldSettings
 .template-editor-field-settings {
   padding: 0px;
-  display: flex;
-  flex-direction: column;
   flex: 1;
 
   .field-settings-title-bar {
-    height: 40px;
+    height: @title-bar-height;
     display: flex;
     position: relative;
     border-bottom: 1px solid;
+    box-sizing: border-box;
 
     .field-settings-category {
       .transition;
@@ -48,9 +48,9 @@
   .field-settings-section {
     display: flex;
     flex-grow: 1;
-    padding: @spacing;
-    padding-bottom: @quarter-spacing;
-    padding-left: @spacing + @half-spacing;
+    position: relative;
+    justify-content: center;
+    height: ~"calc(100% - @{title-bar-height})";
   }
 
   .field-settings-row {
@@ -84,6 +84,11 @@
       padding-left: 0px;
     }
   }
+}
+
+.field-main-settings {
+  min-width: 200px;
+  display: flex;
 }
 
 // shared
