@@ -67,8 +67,6 @@ import TemplateEditorFieldArrayNode from './TemplateEditorFieldArrayNode';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
-const CloseIcon = require('images/icon_carrot.svg');
-
 export interface Props extends TemplateEditorFieldProps
 {
   // below from container
@@ -107,24 +105,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
-  public renderCloseLine()
-  {
-    return (
-      <div
-        className='template-editor-close-row'
-        style={[borderColor(Colors().text3, Colors().text2), fontColor(Colors().text3, Colors().text2)]}
-        onClick={this.handleCloseDrawer}
-      >
-        <div className='settings-drawer-close-line' style={getStyle('marginRight', '12px')} />
-        <CloseIcon
-          className='settings-drawer-close-icon'
-          width='16px' height='16px'
-        />
-        <div className='settings-drawer-close-line' style={getStyle('marginLeft', '12px')} />
-      </div>
-    );
-  }
-
   public renderSettingsContainer()
   {
     const showSettings = this._settingsAreOpen();
@@ -136,7 +116,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
               <TemplateEditorFieldSettings
                 {...this._passProps()}
               />
-              {this.renderCloseLine()}
             </div> : null
           }
         </div>
@@ -212,13 +191,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   {
     this.setState({
       expandableViewOpen: !this.state.expandableViewOpen,
-    });
-  }
-
-  public handleCloseDrawer()
-  {
-    this.props.act({
-      actionType: 'closeSettings',
     });
   }
 }

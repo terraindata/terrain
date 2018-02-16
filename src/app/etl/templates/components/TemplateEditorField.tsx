@@ -73,7 +73,7 @@ export interface TemplateEditorFieldProps
   field: TemplateField;
 
   canEdit: boolean;
-  noInteract: boolean;
+  noInteract: boolean; // determines if the template editor is not interactable (e.g. the side preview)
   preview: any;
   displayKeyPath: KeyPath; // not the key path in the store, but the key path in virtual DOM
 

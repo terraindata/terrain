@@ -26,7 +26,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    font-weight: 500;
+    font-size: 18px;
   }
 
   .field-preview-value {
@@ -37,46 +37,6 @@
   .field-preview-row {
     display: flex;
     min-width: 0;
-  }
-}
-
-// TemplateEditorFieldSettings
-.template-editor-field-settings {
-  padding: @spacing @half-spacing;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-
-  .field-settings-row {
-    display: flex;
-    padding: @half-spacing;
-    align-items: center;
-  }
-
-  .field-settings-label {
-    padding-right: @spacing;
-    padding-left: @half-spacing;
-  }
-}
-
-// TemplateEditorFieldTypeSection
-.template-editor-type-section {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  padding: @quarter-spacing @half-spacing;
-
-
-  .type-dropdown-spacer {
-    padding-bottom: @quarter-spacing;
-    padding-top: @quarter-spacing;
-  }
-
-  .type-section-label {
-    padding: @quarter-spacing + @half-spacing @half-spacing;
-    &.label-right {
-      padding-left: 0px;
-    }
   }
 }
 
@@ -98,32 +58,9 @@
   }
 }
 
-// shared
-.tef-checkbox-section {
-  padding-left: @half-spacing;
-  display: flex;
-  cursor: pointer;
-  .transition;
-}
-
-.tef-checkbox-label {
-  padding: @quarter-spacing + @half-spacing @half-spacing;
-  padding-left: 0px;
-}
-
-.tef-checkbox-spacer {
-  margin-top: 2px;
-  padding: @half-spacing;
-  padding-right: 0px;
-  margin-right: -3px;
-  display: flex;
-  align-items: center;
-  position: relative;
-  bottom: 1px;
-}
-
 @settings-height: 340px;
-@settings-extra-space: 2 * @double-spacing;
+@settings-margin-size: 2 * @double-spacing - 4px;
+@settings-extra-space: 2 * @settings-margin-size;
 .injected-content-container {
   width: 100%;
   height: @settings-height + @spacing;
@@ -135,7 +72,7 @@
     justify-content: space-between;
     height: @settings-height;
     width: ~"calc(100% - @{settings-extra-space})";
-    left: @double-spacing - 3px;
+    left: @settings-margin-size;
     box-shadow: 2px 3px 10px rgba(0,0,0,0.25);
     position: absolute;
   }

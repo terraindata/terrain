@@ -126,6 +126,9 @@ export class FieldTreeProxy
 
 export class FieldNodeProxy
 {
+  private pauseSync = false;
+  private shouldSync = false;
+
   constructor(private tree: FieldTreeProxy, private path: KeyPath)
   {
 
@@ -189,8 +192,28 @@ export class FieldNodeProxy
 
   public syncWithEngine() // This function will mutate the field from which it was called
   {
-    const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.id(), this.field());
-    this.tree.setField(this.path, updatedField);
+    if (this.pauseSync === false)
+    {
+      const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.id(), this.field());
+      this.tree.setField(this.path, updatedField);
+      this.shouldSync = false;
+    }
+    else
+    {
+      this.shouldSync = true;
+    }
+  }
+
+  public withEngineMutations(fn: (proxy: FieldNodeProxy) => void) // sort of like immutable withMutations
+  {
+    this.pauseSync = true;
+    this.shouldSync = false;
+    fn(this);
+    this.pauseSync = false;
+    if (this.shouldSync)
+    {
+      this.syncWithEngine();
+    }
   }
 
   public deleteSelf()

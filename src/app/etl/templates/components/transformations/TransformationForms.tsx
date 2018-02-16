@@ -54,6 +54,12 @@ import { FactoryArgs, transformationFormFactory, TransformationFormProps } from 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+/*
+ *  How to add a transformations to the UI:
+ *  1: See 'SUBSTRING' for an example of how to declare the transformation UI config.
+ *  2: Add the transformation class to the getTransformationForm switch statement
+ */
+
 export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
 {
   switch (type)
@@ -61,13 +67,14 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
     case TransformationNodeType.CapitalizeNode:
       return CapitalizeClass as any;
     case TransformationNodeType.SubstringNode:
-      return SubstringComponent;
+      return SubstringClass;
     default:
       return null;
   }
 }
 
 export const availableTransformations: List<TransformationNodeType> = determineAvailableTransformations();
+// all transformation types for which getTransformationForm does not return null
 
 function determineAvailableTransformations(): List<TransformationNodeType>
 {
@@ -82,7 +89,7 @@ function determineAvailableTransformations(): List<TransformationNodeType>
   return typeList;
 }
 
-// capitalize
+// CAPITALIZE
 interface CapitalizeState
 {
 
@@ -101,7 +108,7 @@ const capitalizeArgs: FactoryArgs<CapitalizeState, TransformationNodeType.Capita
 const CapitalizeClass =
   transformationFormFactory<CapitalizeState, TransformationNodeType.CapitalizeNode>(capitalizeArgs);
 
-// substring
+// SUBSTRING
 interface SubstringState
 {
   from: number;
@@ -130,5 +137,5 @@ const substringArgs: FactoryArgs<SubstringState, TransformationNodeType.Substrin
   },
 };
 
-const SubstringComponent =
+const SubstringClass =
   transformationFormFactory<SubstringState, TransformationNodeType.SubstringNode>(substringArgs);
