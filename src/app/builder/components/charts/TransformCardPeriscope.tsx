@@ -196,7 +196,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     let domain =
       this.state.initialDomain.set(handleIndex,
         this.state.initialDomain.get(handleIndex) + newVal - this.state.initialVal,
-      );
+    );
 
     const { maxDomain } = this.props;
     const buffer = (maxDomain.get(1) - maxDomain.get(0)) * 0.01;
@@ -221,6 +221,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
 
   public handleDomainLowChange(value)
   {
+    console.log('handle domain low change ', value);
     this.setState({
       maxDomainLow: value,
     });
@@ -258,6 +259,8 @@ class TransformCardPeriscope extends TerrainComponent<Props>
       width: (overrideState && overrideState['width']) || this.props.width,
       height: 70,
       colors: this.props.colors,
+      onDomainLowChange: this.handleDomainLowChange,
+      onDomainHighChange: this.handleDomainHighChange,
     });
 
     return chartState;
