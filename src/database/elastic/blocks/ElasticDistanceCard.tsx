@@ -82,6 +82,7 @@ export const elasticDistance = _card({
   distanceType: 'arc',
   locationValue: {},
   mapInputValue: '',
+  mapZoomValue: 15,
 
   static: {
     language: 'elastic',
