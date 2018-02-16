@@ -45,41 +45,123 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import csvWriter = require('csv-write-stream');
+import jsonStream = require('JSONStream');
+import soap = require('strong-soap');
 
 import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import CredentialConfig from '../../credentials/CredentialConfig';
-import Credentials from '../../credentials/Credentials';
+import { CredentialConfig } from '../../credentials/CredentialConfig';
+import { Credentials } from '../../credentials/Credentials';
+import { ExportSourceConfig } from './Sources';
 
 export const credentials: Credentials = new Credentials();
 
-export interface MailchimpConfig
+export interface MailchimpJSONConfig
 {
-  id: string;
-  name: string;
-  range: string;
+  data: object[];
+}
+
+export interface MailchimpSourceConfig
+{
+  data: object[];
+  key: string;
+  host: string;
 }
 
 export class Mailchimp
 {
-  private storedEmail: string;
-  private storedKeyFilePath: string;
 
-  private async _getStoredGoogleAPICredentials()
+  public async getJSONStreamAsMailchimpSourceConfig(exportSourceConfig: ExportSourceConfig): Promise<string>
   {
-    const creds: string[] = await credentials.getByType('googleapi');
-    if (creds.length === 0)
+    return new Promise<string>(async (resolve, reject) =>
     {
-      winston.info('No credential found for type googleapi.');
-    }
-    else
-    {
-      const cred: object = JSON.parse(creds[0]);
-      this.storedEmail = cred['storedEmail'];
-      this.storedKeyFilePath = cred['storedKeyFilePath'];
-    }
+      try {
+        // TODO: parse JSON stream as JSON objects
+        let results: object[] = [];
+        const jsonParser = jsonStream.parse();
+        exportSourceConfig.stream.pipe(jsonParser);
+        jsonParser.on('data', console.log);/* (data) => {
+          results = data;
+          const mailchimpSourceConfig: MailchimpSourceConfig =
+            {
+              data: results,
+              key: exportSourceConfig.params['key'],
+              host: exportSourceConfig.params['host'],
+            };
+          console.log('mailchimpSourceConfig = ');
+          //console.log(JSON.stringify(mailchimpSourceConfig));
+          console.log('happy');
+          resolve(JSON.stringify({}));
+        });*/
+        resolve(JSON.stringify({}));
+      } catch (e) {
+        console.log('esagegg');
+        console.log(e);
+      }
+    });
+  }
+
+  public async runQuery(mailchimpSourceConfig: MailchimpSourceConfig): Promise<string> {
+    return new Promise<string>(async (resolve, reject) => {
+      try {
+        const resultArr: Array<Promise<object>> = [];
+
+        console.log('here5555');
+
+        mailchimpSourceConfig.data.forEach(async (row) => {
+          try {
+            console.log('processing row =');
+            console.log(row);
+            //thisResolve({ args: {}, status: 'true' });
+            /*const requestArgs: object = {};
+            Object.keys(mailchimpSourceConfig.updateParams).forEach((key) =>
+            {
+              requestArgs[key] = mailchimpSourceConfig.updateParams[key];
+            });
+            Object.keys(mailchimpSourceConfig.mappedParams).forEach((key) =>
+            {
+              requestArgs[key] = row[mailchimpSourceConfig.mappedParams[key]];
+            });
+            const sanitizedRequestArgs = _.cloneDeep(requestArgs);
+            resultArr.push(new Promise<object>((thisResolve, thisReject) =>
+            {
+              method(requestArgs, (error, result, envelope, soapHeader) =>
+              {
+                if (error)
+                {
+                  thisResolve({
+                    args: sanitizedRequestArgs, status: 'false',
+                    error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
+                  });
+                }
+                else
+                {
+                  if (result && result['result'] !== undefined)
+                  {
+                    thisResolve({ args: sanitizedRequestArgs, status: result['result']['$value'] });
+                  }
+                  else
+                  {
+                    thisResolve({ args: sanitizedRequestArgs, status: 'true' });
+                  }
+                }
+              });
+            }));*/
+          }
+          catch (e) {
+            resolve((e as any).toString());
+          }
+        });
+        const resultAsString: string = JSON.stringify(await Promise.all(resultArr));
+        winston.info('Result of Mailchimp request: ' + resultAsString);
+        resolve(resultAsString);
+      }
+      catch (e) {
+        resolve((e as any).toString());
+      }
+    });
   }
 }
 

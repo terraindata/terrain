@@ -222,6 +222,11 @@ export class Scheduler
         jobId = 7;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'mailchimp')
+      {
+        jobId = 8;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
 
       req.active = true;
       req.archived = false;
@@ -298,6 +303,7 @@ export class Scheduler
     // 5: export via local filesystem
     // 6: import via magento (not implemented yet)
     // 7: export via magento
+    // 8: export via mailchimp
     await this.createJob(async (scheduleID: number, fields: object, // 0
       transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
@@ -653,6 +659,65 @@ export class Scheduler
                   JSON.parse(transport['filename']),
               };
             const result = await sources.handleTemplateSourceExport(magentoArgs, jsonStream as stream.Readable);
+          }
+        }
+        catch (e)
+        {
+          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob(e.toString());
+        }
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 8
+                                sort: string, encoding?: string | null) => // export to mailchimp
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        console.log('\n\nABACADABRA 0000000000000000000\\n\n');
+        try
+        {
+          let mailchimpConfig: object = {};
+          const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
+          if (creds.length === 0)
+          {
+            return rejectJob('No Mailchimp credentials matched parameters.');
+          }
+          try
+          {
+            mailchimpConfig = JSON.parse(creds[0].meta);
+          }
+          catch (e)
+          {
+            return rejectJob(e.message);
+          }
+          await this.setJobStatus(scheduleID, 1);
+          fields['filetype'] = 'json';
+          console.log('\n\nABACADABRA 01\\n\n');
+          const jsonStream: stream.Readable | string = await exprt.export(fields as ExportConfig, true);
+          console.log('\n\nABACADABRA 02\\n\n');
+          //winston.info(typeof jsonStream === 'string' ? jsonStream as string : JSON.stringify(jsonStream));
+          if (typeof jsonStream === 'string')
+          {
+            winston.info(jsonStream as string);
+          }
+          else
+          {
+            console.log(mailchimpConfig);
+            const mailchimpArgs =
+              {
+                body: {
+                  source: {
+                    type: 'mailchimp',
+                    params: {
+                      ...mailchimpConfig,
+                    },
+                  },
+                },
+              };
+            console.log(mailchimpArgs);
+            const result = await sources.handleTemplateSourceExport(mailchimpArgs, jsonStream as stream.Readable);
           }
         }
         catch (e)

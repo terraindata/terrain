@@ -49,10 +49,12 @@ import * as winston from 'winston';
 
 import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
 import { Magento, MagentoSourceConfig } from './Magento';
+import { Mailchimp, MailchimpSourceConfig } from './Mailchimp';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
 export const magento: Magento = new Magento();
+export const mailchimp: Mailchimp = new Mailchimp();
 export const mySQL: MySQL = new MySQL();
 
 export interface SourceConfig
@@ -81,18 +83,25 @@ export class Sources
   {
     return new Promise<string>(async (resolve, reject) =>
     {
+      console.log('\n\nABACADABRA 1\\n\n');
       let result = '';
       const exprtSourceConfig: ExportSourceConfig | string =
         {
           params: {},
           stream: readStream,
         };
+      console.log('\n\nABACADABRA 2\\n\n');
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
+      console.log('\n\nABACADABRA 3\\n\n');
       exprtSourceConfig.params = sourceConfig.params;
       switch (sourceConfig.type)
       {
         case 'magento':
           result = await this._putJSONStreamIntoMagento(exprtSourceConfig);
+          break;
+        case 'mailchimp':
+          console.log('\n\nABACADABRA 4\\n\n');
+          result = await this._putJSONStreamIntoMailchimp(exprtSourceConfig);
           break;
         default:
           break;
@@ -190,6 +199,24 @@ export class Sources
     return new Promise<string>(async (resolve, reject) =>
     {
       resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(exprtSourceConfig)));
+    });
+  }
+
+  private async _putJSONStreamIntoMailchimp(exprtSourceConfig: ExportSourceConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      console.log('inside 1!');
+      //resolve('hi');
+      try {
+        const cfgs: string = await mailchimp.getJSONStreamAsMailchimpSourceConfig(exprtSourceConfig);
+        const cfg: MailchimpSourceConfig = {data: [], key: 'f', host: 's'};
+        console.log('hgawegwg');
+        resolve(await mailchimp.runQuery(cfg));
+      }catch(e){
+        console.log('e in here');
+        console.log(e);
+      }
     });
   }
 }
