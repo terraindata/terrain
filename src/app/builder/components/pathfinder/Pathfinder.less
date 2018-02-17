@@ -2,6 +2,8 @@
 
 .pathfinder-column-wrapper {
 	position: relative;
+	border-radius: 6px;
+  overflow: hidden;
 
 	.pf-area {
 		font-size: @pretty-large-font-size;
@@ -30,7 +32,6 @@
 			padding-bottom: 60px;
 			
 			.pf-section {
-				margin-bottom: 2 * @spacing;
 				
 				.pf-section-title {
 					padding: @spacing;
@@ -63,10 +64,31 @@
 					cursor: pointer;
 					text-transform: uppercase;
 					font-size: @small-font-size;
-					&:hover {
-						text-decoration: underline;
-					}
 					position: relative;
+					fill: currentColor;
+					padding: 12px;
+					
+					@svg-width: 14px;
+					@svg-left: 12px;
+					
+					padding-left: @svg-width + @svg-left + 12px;
+					
+					svg {
+						width: @svg-width;
+						position: absolute;
+						top: calc(~"50% - @{svg-width} / 2");
+						left: @svg-left;
+						.transition;
+					}
+					
+					&:hover {
+						svg {
+							@svg-big: 18px;
+							width: @svg-big;
+							left: @svg-left - (@svg-big - @svg-width) / 2;
+							top: calc(~"50% - @{svg-big} / 2");
+						}
+					}
 				}
 				
 				.pf-line {

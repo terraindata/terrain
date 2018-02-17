@@ -65,9 +65,14 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
 import { Hit } from './ResultTypes';
+import Draggable from 'react-draggable';
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
+
+// TODO REMOVE
+import Actions from '../../data/BuilderActions';
+
 
 const MAX_DEFAULT_FIELDS = 4;
 
@@ -311,6 +316,9 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       );
     }
+    
+    const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
+      resultsConfig.thumbnailWidth;
 
     return ((
       <div
@@ -327,21 +335,35 @@ class HitComponent extends TerrainComponent<Props> {
             backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
-          {thumbnail !== null ? (
-            <div 
-              className={classNames({
-                'result-thumbnail-wrapper': true,
-                'results-are-small': hitSize === 'small',
-              })}
-              style={{
-                backgroundImage: `url(${thumbnail})`,
+          {thumbnail !== null ?
+            [
+              <div 
+                className={classNames({
+                  'result-thumbnail-wrapper': true,
+                  'results-are-small': hitSize === 'small',
+                })}
+                style={{
+                  backgroundImage: `url(${thumbnail})`,
+                  width: thumbnailWidth,
+                  minWidth: thumbnailWidth,
+                }}
+              >
+              </div>
+            ,
+            <Draggable
+              axis='x'
+              bounds='parent'
+              position={{
+                x: thumbnailWidth - 15,
+                y: 0,
               }}
+              onDrag={this.handleThumbnailResize}
             >
-              {/*<div className='result-thumbnail'>
-                {thumbnail}
-              </div>*/}
-            </div>
-          ) : null}
+              <div
+                className='result-thumbnail-resizer'
+              />
+            </Draggable>
+          ] : null}
           <div 
             className={classNames({
               'result-details-wrapper': true,
@@ -397,6 +419,21 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       </div>
     ));
+  }
+  
+  private handleThumbnailResize(e, data: { 
+    x: number, y: number,
+    deltaX: number, deltaY: number,
+  })
+  {
+    const {x, y} = data;
+    console.log(x, y, data.deltaX);
+    
+    let config = this.props.resultsConfig;
+    const key = this.props.hitSize === 'small' ? 'smallThumbnailWidth' : 'thumbnailWidth';
+    config = config.set(key, Math.max(config[key] + data.deltaX, 15));
+    
+    Actions.changeResultsConfig(config);
   }
 }
 

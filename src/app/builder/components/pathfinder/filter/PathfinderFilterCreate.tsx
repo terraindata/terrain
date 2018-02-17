@@ -73,7 +73,7 @@ class PathfinderFilterCreate extends TerrainComponent<Props>
         canEdit={canEdit}
         depth={this.props.depth}
       >
-        <div>
+        <div className="flex-grow">
           <PathfinderCreateLine
             canEdit={canEdit}
             onCreate={this.handleCreateFilterLine}

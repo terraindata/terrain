@@ -6,9 +6,14 @@
 @close-width: 35px;
 @picker-height: 450px;
 
+.pathpicker-wrapper {
+	width: 100%;
+}
+
 .pathpicker {
 	min-width: 125px; // arbitrary, can change
 	width: 100%;
+	position: relative;
 	
 	.pathpicker-box-value {
 		border-bottom: 1px solid #eee;
@@ -264,6 +269,11 @@
 	top: 0px;
 	height: 100%;
 	width: 100%;
+	
+	// left: -5000px;
+	// top: -5000px;
+	// height: 10000px;
+	// width: 10000px;
 }
 
 .pathpicker-veil-open {
@@ -368,6 +378,8 @@
 	display: flex;
 	width: 100%;
 	background: #fff;
+	
+	padding-right: 24px;
 	
 	border-bottom: 1px solid #eee;
 	

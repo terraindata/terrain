@@ -112,6 +112,8 @@ export class MultiPathPicker extends TerrainComponent<Props>
     focusedSetIndex: this.props.defaultOpen ? 0 : -1,
     focusedOptionIndex: 0,
     
+    columnRefs: Map<number, any>({}),
+    optionRefs: Map({}),
     
     // TODO re-add animation / picked logic
     // picked: false,
@@ -136,21 +138,25 @@ export class MultiPathPicker extends TerrainComponent<Props>
 
     return (
       <div
-        className={classNames({
-          'pathpicker': true,
-          'pathpicker-large': props.large,
-          // 'pathpicker-picked': state.picked,
-        })}
+        className='pathpicker-wrapper'
       >
         {
           this.renderVeil()
         }
-        {
-          this.renderBoxValue()
-        }
-        {
-          this.renderPicker()
-        }
+        <div
+          className={classNames({
+            'pathpicker': true,
+            'pathpicker-large': props.large,
+            // 'pathpicker-picked': state.picked,
+          })}
+        >
+          {
+            this.renderBoxValue()
+          }
+          {
+            this.renderPicker()
+          }
+        </div>
       </div>
     );
   }
@@ -183,6 +189,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
               })}
               key={index}
               onClick={this._fn(this.handleSingleBoxValueClick, index)}
+              style={getStyle('width', (100 / props.optionSets.size) + '%')}
             >
               <FloatingInput
                 label={optionSet.shortNameText}
@@ -313,6 +320,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
       <div
         className='pathpicker-option-set'
         key={index}
+        style={getStyle('width', (100 / props.optionSets.size) + '%')}
       >
         <div
           className='pathpicker-header'
@@ -357,6 +365,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
             'pathpicker-options': true,
             'pathpicker-options-column': optionSet.column,
           })}
+          ref={this._fn(this.attachColumnRef, index)}
         >
           {
             optionSet.options.map(this._fn(this.renderOption, index, visibleOptionCounter, incrementVisibleOptions))
@@ -514,6 +523,36 @@ export class MultiPathPicker extends TerrainComponent<Props>
       focusedSetIndex,
       focusedOptionIndex,
     });
+    
+    // TODO make this more declarative, to avoid forced reflow
+    setTimeout(() =>
+    {
+      const el = document.getElementsByClassName('pathpicker-option-focused')[0];
+      
+      if(el)
+      {
+        console.log('el');
+        el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        });
+      }
+      
+      // const columnEl = ReactDOM.findDOMNode(this.state.columnRefs.get(focusedSetIndex));
+      // console.log(this.state.columnRefs.get(focusedSetIndex), focusedSetIndex, this.state.columnRefs);
+      //   console.log('1');
+      // if (columnEl)
+      // {
+      //   console.log('2');
+      //   const focusedOptionEl = columnEl.getElementsByClassName('pathpicker-option-focused')[0];
+      //   if (focusedOptionEl)
+      //   {
+      //   console.log('3');
+          
+      //   }
+      // }
+    }, 100);
   }
   
   private renderOption(optionSetIndex: number, visibleOptionCounter: { count: number }, incrementVisibleOptions: () => void,
@@ -547,6 +586,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
             // 'pathpicker-option-picked': this.state.pickedIndex === index, // when it's just been picked
           })}
           onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
+          
         >
           <div
             className='pathpicker-option-name'
@@ -789,6 +829,28 @@ export class MultiPathPicker extends TerrainComponent<Props>
   {
     this.setState({
       valueRef,
+    });
+  }
+  
+  private attachColumnRef(optionSetIndex, columnRef)
+  {
+    console.log(optionSetIndex, columnRef);
+    this.setState({
+      columnRefs: this.state.columnRefs.set(optionSetIndex, columnRef),
+    });
+  }
+  
+  private attachOptionRef(setIndex, optionIndex, optionRef)
+  {
+    let { optionRefs } = this.state;
+    
+    if (!optionRefs.get(setIndex))
+    {
+      optionRefs = optionRefs.set(setIndex, Map({}));
+    }
+    
+    this.setState({
+      columnRefs: optionRefs.setIn([setIndex, optionIndex], optionRef),
     });
   }
 }
