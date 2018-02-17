@@ -171,7 +171,6 @@ const Periscope = {
 
     const barColor = (d) =>
     {
-      console.log('get bar color');
       if (d['range']['min'] > domain.x[0] && d['range']['max'] < domain.x[1])
       {
         return Colors().active;

@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
+import {List, Map} from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -61,6 +62,7 @@ import './LinearSelector.less';
 export interface Props
 {
   options: List<string | number>;
+  displayNames?: Map<string | number, string>
   selected: string | number;
   keyPath?: KeyPath;
   onChange?: (value: string | number) => void;
@@ -188,7 +190,7 @@ class LinearSelector extends TerrainComponent<Props>
         key={i}
         ref={String(option)}
       >
-        {option}
+        {this.props.displayNames ? this.props.displayNames.get(option) : option}
       </div>
     );
   }

@@ -62,7 +62,7 @@ import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
-import Menu from './../../../../common/components/Menu';
+import LinearSelector from 'app/common/components/LinearSelector';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
@@ -131,62 +131,37 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public renderTransformChart()
   {
+    const {line, pathfinderContext} = this.props;
     const data = {
-      input: this.props.line.field,
-      domain: this.props.line.transformData.domain,
+      input: line.field,
+      domain: line.transformData.domain,
       hasCustomDomain: false,
-      scorePoints: this.props.line.transformData.scorePoints,
+      scorePoints: line.transformData.scorePoints,
       static: {
         colors: [Colors().builder.cards.categories.score, Colors().bg3],
       },
-      mode: this.props.line.transformData.mode,
-      dataDomain: this.props.line.transformData.dataDomain,
+      mode: line.transformData.mode,
+      dataDomain: line.transformData.dataDomain,
     };
 
     return (
       <div className='pf-score-line-transform'>
-        <Menu
-          options={List([
-            {
-              text: 'freeform',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'linear',
-              icon: <LinearIcon />,
-              iconColor: Colors().active,
-            },
-            {
-              text: 'logarithmic',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'logarithmic',
-              icon: <LogarithmicIcon />,
-              iconColor: Colors().active,
-            },
-            {
-              text: 'exponential',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'exponential',
-              icon: <ExponentialIcon />,
-              iconColor: Colors().active,
-            },
-            {
-              text: 'bell-curve',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'normal',
-              icon: <NormalIcon />,
-              iconColor: Colors().active,
-            },
-            {
-              text: 's-curve',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'sigmoid',
-              icon: <SigmoidIcon />,
-              iconColor: Colors().active,
-            },
-          ])}
+        <LinearSelector
+          options={List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'])}
+          selected={line.transformData.mode}
+          keyPath={this.props.keyPath.push('transformData').push('mode')}
+          action={BuilderActions.changePath}
+          canEdit={pathfinderContext.canEdit}
+          displayNames={Map({linear: 'Linear',
+                            logarithmic: 'Logarithmic',
+                            exponential: 'Exponential',
+                            normal: 'Bell-Curve',
+                            sigmoid: 'S-Curve',
+                        })}
         />
         <TransformCard
           builderState={BuilderStore.getState()}
-          canEdit={this.props.pathfinderContext.canEdit}
+          canEdit={pathfinderContext.canEdit}
           className={'builder-comp-list-item'}
           data={data}
           handleCardDrop={undefined}
@@ -195,7 +170,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           language={'elastic'}
           onChange={BuilderActions.changePath}
           parentData={undefined}
-          index={this.props.pathfinderContext.source.dataSource.name}
+          index={pathfinderContext.source.dataSource.name}
         />
       </div>);
   }

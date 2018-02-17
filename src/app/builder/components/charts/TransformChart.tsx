@@ -83,7 +83,7 @@ const TransformChart = {
 
     svg.append('rect')
       .attr('class', 'bg')
-      .attr('fill', Colors().transformChartBg);
+      .attr('fill', Colors().blockBg);
 
     svg.append('g')
       .attr('class', 'yLeftAxis');
@@ -132,10 +132,10 @@ const TransformChart = {
 
     const styleCSS = `
     .transform-chart .tick {
-      stroke: ${Colors().altHighlight};
+      stroke: ${Colors().blockOutline};
     }
     .transform-chart .tick text {
-      fill: ${Colors().text2} !important;
+      fill: ${Colors().fontColorLightest} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -454,7 +454,6 @@ const TransformChart = {
       .ticks(width > 500 ? 6 : 4)
       .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
       .tickFormat(Util.formatNumber)
-      // .tickFormat(d3.format(".3g"))
       .orient('bottom');
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
@@ -481,7 +480,7 @@ const TransformChart = {
       .attr('class', 'bottom-title')
       .attr('text-anchor', 'middle')
       .attr('transform', 'translate(' + width / 2 + ',80)')
-      .style('fill', Colors().text1)
+      .style('fill', Colors().fontColorLightest)
       .text(inputKey);
 
     d3.select(el).select('.yLeftAxis')
@@ -489,9 +488,25 @@ const TransformChart = {
       .attr('class', 'left-title')
       .attr('text-anchor', 'middle')
       .attr('transform', 'translate(-30,' + height / 2 + ')rotate(-90)')
-      .style('fill', Colors().text1)
+      .style('fill', Colors().fontColorLightest)
       .text('Score');
 
+  },
+
+  _roundedRect(x, y, w, h, r)
+  {
+    let retval;
+    retval  = "M" + (x + r) + "," + y;
+    retval += "h" + (w - 2 * r);
+    retval += "a" + r + "," + r + " 0 0 1 " + r + "," + r;
+    retval += "v" + (h - 2 * r);
+    retval += "v" + r; retval += "h" + -r;
+    retval += "h" + (2 * r - w);
+    retval += "h" + -r; retval += "v" + -r;
+    retval += "v" + (2 * r - h);
+    retval += "a" + r + "," + r + " 0 0 1 " + r + "," + -r;
+    retval += "z";
+    return retval;
   },
 
   _drawBars(el, scales, barsData, colors)
@@ -512,17 +527,20 @@ const TransformChart = {
       }
       return width;
     };
-
+    const radius = 3;
     bar.enter()
-      .append('rect')
+      .append('path')
+      .attr("d", function(d) {
+      return TransformChart._roundedRect
+        (scales.realX(d['range']['min']) + xPadding,
+         scales.realBarY(d['percentage']),
+         Math.max(1, scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding),
+         scaleMin(scales.realBarY) - scales.realBarY(d['percentage']),
+         radius);
+      })
       .attr('class', 'bar')
-      .attr('fill', colors[0]);
-
-    bar
-      .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
-      .attr('width', barWidth)
-      .attr('y', (d) => scales.realBarY(d['percentage']))
-      .attr('height', (d) => scaleMin(scales.realBarY) - scales.realBarY(d['percentage']));
+      .attr('fill', colors[0])
+    ;
 
     bar.exit().remove();
   },
