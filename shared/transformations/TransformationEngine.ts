@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as arrayTypeOfValues from 'array-typeof-values';
 import GraphLib = require('graphlib');
 import { List, Map } from 'immutable';
-import * as arrayTypeOfValues from 'array-typeof-values';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import nestedProperty = require('nested-property');
