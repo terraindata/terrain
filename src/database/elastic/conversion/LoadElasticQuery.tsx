@@ -108,7 +108,7 @@ export default class LoadElasticQuery
       }
     } else
     {
-      const parsedCards = ESCardParser.parseAndUpdateCards(query.cards);
+      const parsedCards = ESCardParser.parseAndUpdateCards(query.cards, query);
       query = query.set('cards', parsedCards);
     }
 

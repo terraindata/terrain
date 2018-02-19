@@ -84,7 +84,7 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
     const password: string = q1[1];
     const host: string = q2[0];
     const port: number = parseInt(q2[1], 10);
-    const database: string = (h2 !== undefined && h2 !== '') ? h2 : 'terrain_midway';
+    const database: string = (h2 !== undefined && h2 !== '') ? h2 : 'midway';
 
     return {
       user,
@@ -110,6 +110,7 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
 
 export function makeDatabaseController(
   type: string,
+  id: number,
   dsnString: string,
   analyticsIndex?: string,
   analyticsType?: string): SQLiteController | MySQLController | ElasticController | PostgreSQLController
@@ -118,22 +119,22 @@ export function makeDatabaseController(
   if (type === 'sqlite')
   {
     const config = DSNToConfig(type, dsnString) as SQLiteConfig;
-    return new SQLiteController(config, 0, 'SQLite');
+    return new SQLiteController(config, id, 'SQLite');
   }
   else if (type === 'mysql')
   {
     const config = DSNToConfig(type, dsnString) as MySQLConfig;
-    return new MySQLController(config, 0, 'MySQL');
+    return new MySQLController(config, id, 'MySQL');
   }
   else if (type === 'postgres')
   {
     const config = DSNToConfig(type, dsnString) as PostgreSQLConfig;
-    return new PostgreSQLController(config, 0, 'PostgreSQL');
+    return new PostgreSQLController(config, id, 'PostgreSQL');
   }
   else if (type === 'elasticsearch' || type === 'elastic')
   {
     const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, 0, 'Elastic', analyticsIndex, analyticsType);
+    return new ElasticController(config, id, 'Elastic', analyticsIndex, analyticsType);
   }
   else
   {

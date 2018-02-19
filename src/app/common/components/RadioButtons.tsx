@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
+import Util from 'util/Util';
 import BuilderActions from './../../builder/data/BuilderActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RadioButtons.less';
@@ -63,6 +64,7 @@ export interface Props
   keyPath?: KeyPath;
   radioKey?: string;
   action?: (keyPath, value) => void;
+  builderActions?: typeof BuilderActions;
 }
 
 class RadioButtons extends TerrainComponent<Props>
@@ -82,7 +84,7 @@ class RadioButtons extends TerrainComponent<Props>
       }
       else
       {
-        BuilderActions.change(this.props.keyPath, option);
+        this.props.builderActions.change(this.props.keyPath, option);
       }
     }
   }
@@ -115,4 +117,8 @@ class RadioButtons extends TerrainComponent<Props>
   }
 }
 
-export default RadioButtons;
+export default Util.createTypedContainer(
+  RadioButtons,
+  [],
+  { builderActions: BuilderActions },
+);

@@ -176,6 +176,7 @@ interface Props
   authActions?: typeof AuthActions;
   library?: LibraryState;
   libraryActions?: typeof LibraryActions;
+  builderActions?: typeof BuilderActions;
 }
 
 const APP_STYLE = _.extend({},
@@ -447,7 +448,7 @@ class App extends TerrainComponent<Props>
 
   public handleMouseMove(e: MEvent)
   {
-    BuilderActions.hoverCard(null);
+    this.props.builderActions.hoverCard(null);
   }
 
   public render()
@@ -498,5 +499,6 @@ export default Util.createContainer(
     userActions: UserActions,
     colorsActions: ColorsActions,
     libraryActions: LibraryActions,
+    builderActions: BuilderActions,
   },
 );

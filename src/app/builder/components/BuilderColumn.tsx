@@ -68,7 +68,7 @@ import { ColorsActions } from '../../colors/data/ColorsRedux';
 import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
-import Actions from '../data/BuilderActions';
+import BuilderActions from '../data/BuilderActions';
 import CardsColumn from './cards/CardsColumn';
 import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
@@ -260,7 +260,10 @@ const BuilderColumn = createReactClass<any, any>(
             inputs={query.inputs}
             canEdit={canEdit}
             language={query.language}
-            action={query.path !== undefined ? Actions.changePath : Actions.change}
+            action={query.path !== undefined ?
+              this.props.builderActions.changePath :
+              this.props.builderActions.change
+            }
           />;
 
         case COLUMNS.Results:
@@ -497,5 +500,6 @@ export default Util.createTypedContainer(
   ['auth'],
   {
     colorsActions: ColorsActions,
+    builderActions: BuilderActions,
   },
 );

@@ -112,6 +112,7 @@ export default class ESInterpreter
       {
         root.clause = this.config.getClause('body');
       }
+
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
@@ -121,7 +122,8 @@ export default class ESInterpreter
             {
               // give a special value to parameterValue
               info.parameterValue = new ESJSONParser(info.value);
-            } else
+            }
+            else
             {
               const value: null | any = this.params[info.parameter];
               if (value === undefined)

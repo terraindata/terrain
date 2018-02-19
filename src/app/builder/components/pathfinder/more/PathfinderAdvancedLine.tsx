@@ -77,6 +77,7 @@ export interface Props
   // When a radioKey is changed, call this function to update elasticType of parent aggregeation
   onRadioChange?: (key: string, radioKey?: string) => void;
   fields: List<string>;
+  builderActions?: typeof BuilderActions;
 }
 
 export class PathfinderAdvancedLine extends TerrainComponent<Props>
@@ -92,12 +93,12 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
     // ignore missing items
     if (index === 0)
     {
-      BuilderActions.changePath(this.props.keyPath, this.props.advancedData.delete('missing'));
+      this.props.builderActions.changePath(this.props.keyPath, this.props.advancedData.delete('missing'));
     }
     // replace missing items
     else if (index === 1)
     {
-      BuilderActions.changePath(this.props.keyPath, this.props.advancedData.set('missing', 0));
+      this.props.builderActions.changePath(this.props.keyPath, this.props.advancedData.set('missing', 0));
     }
   }
 
@@ -122,7 +123,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
             keyPath={this.props.keyPath.push(item.key)}
             language='elastic'
             placeholder={item.placeholder}
-            action={BuilderActions.changePath}
+            action={this.props.builderActions.changePath}
           />;
         break;
       case 'multi':
@@ -130,7 +131,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           <MultiInput
             items={this.props.advancedData.get(item.key)}
             keyPath={this.props.keyPath.push(item.key)}
-            action={BuilderActions.changePath}
+            action={this.props.builderActions.changePath}
             isNumber={item.isNumber}
             canEdit={this.props.canEdit && !disabled}
           />;
@@ -140,7 +141,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           <RangesInput
             ranges={this.props.advancedData.get(item.key)}
             keyPath={this.props.keyPath.push(item.key)}
-            action={BuilderActions.changePath}
+            action={this.props.builderActions.changePath}
             canEdit={this.props.canEdit && !disabled}
           />;
         break;
@@ -153,7 +154,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
             options={options}
             selectedIndex={options.indexOf(this.props.advancedData.get(item.key))}
             optionsDisplayName={item.optionDisplayNames}
-            action={BuilderActions.changePath}
+            action={this.props.builderActions.changePath}
           />;
         break;
       case 'map':
@@ -170,7 +171,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
               keyPath={this.props.keyPath.push(item.key)}
               textKeyPath={this.props.keyPath.push(item.textKey)}
               hideSearchSettings={true}
-              action={BuilderActions.changePath}
+              action={this.props.builderActions.changePath}
             />
           </div>;
         break;
@@ -210,7 +211,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           keyPath={this.props.keyPath.push(radioKey)}
           onSelectOption={this.props.onRadioChange}
           radioKey={radioKey}
-          action={BuilderActions.changePath}
+          action={this.props.builderActions.changePath}
         />
       );
     }
@@ -261,4 +262,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderAdvancedLine;
+export default Util.createTypedContainer(
+  PathfinderAdvancedLine,
+  [],
+  { builderActions: BuilderActions },
+);

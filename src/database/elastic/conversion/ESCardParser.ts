@@ -58,8 +58,6 @@ import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo'
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
-import { BuilderStore } from 'builder/data/BuilderStore';
-
 import { toInputMap } from '../../../blocks/types/Input';
 
 import { KEY_DISPLAY, STATIC_KEY_DISPLAY } from 'builder/getCard/GetCardVisitor';
@@ -73,7 +71,7 @@ import Util from 'util/Util';
 
 export default class ESCardParser extends ESParser
 {
-  public static parseAndUpdateCards(cards: List<Card>): List<Card>
+  public static parseAndUpdateCards(cards: List<Card>, query): List<Card>
   {
     if (cards.size === 0)
     {
@@ -91,8 +89,7 @@ export default class ESCardParser extends ESParser
     // parsing
     const parsedCard = new ESCardParser(updatedRootCard);
     // interpreting
-    const state = BuilderStore.getState();
-    let inputs = state.query && state.query.inputs;
+    let inputs = query && query.inputs;
     if (inputs === null)
     {
       inputs = Immutable.List([]);
