@@ -389,23 +389,6 @@ const BuilderColumn = createReactClass<any, any>(
             style={borderColor(Colors().fontColorLightest)}
           >
             {
-              this.props.index === 0 ? null : (
-                <div
-                  className='builder-resize-handle'
-                  ref='resize-handle'
-                >
-                  <div
-                    className='builder-resize-handle-line'
-                    style={borderColor(Colors().stroke)}
-                  ></div>
-                  <div
-                    className='builder-resize-handle-line'
-                    style={borderColor(Colors().stroke)}
-                  ></div>
-                </div>
-              )
-            }
-            {
               //  <div ref='handle' className='builder-title-bar-drag-handle'>
               //               <DragHandle
               //                 key={'builder-column-handle-' + this.props.index}
@@ -476,6 +459,23 @@ const BuilderColumn = createReactClass<any, any>(
               }
             </div>
           </div>
+         {
+            this.props.index === 0 ? null : (
+              <div
+                className='builder-resize-handle'
+                ref='resize-handle'
+              >
+                <div
+                  className='builder-resize-handle-line'
+                  style={borderColor(Colors().stroke)}
+                ></div>
+                <div
+                  className='builder-resize-handle-line'
+                  style={borderColor(Colors().stroke)}
+                ></div>
+              </div>
+            )
+          }
           <div
             className={classNames({
               'builder-column-content': true,

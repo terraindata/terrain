@@ -50,6 +50,7 @@ import { borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 const { List, Map } = Immutable;
@@ -62,6 +63,7 @@ interface ItemProps
   // data: string;
   keyPath: KeyPath;
   canDrop?: boolean;
+  hoverHeader?: El;
   children?: El | string;
   data?: any;
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
@@ -95,13 +97,17 @@ const itemDropTarget = {
   {
     props.onDrop(props.keyPath, monitor.getItem().keyPath);
   },
+  canDrop(props, monitor)
+  {
+    return props.keyPath !== monitor.getItem().keyPath
+  }
 };
 
 function itemDropCollect(connect, monitor)
 {
   return {
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
+    isOver: monitor.isOver() && monitor.canDrop()
   };
 }
 
@@ -118,18 +124,31 @@ class ItemComponent extends TerrainComponent<ItemProps>
 
   public render()
   {
-    const { children, isDragging, isOver } = this.props;
-
+    const { children, isDragging, isOver, hoverHeader } = this.props;
     const draggable = this.props.connectDragSource(
       <div
         style={_.extend({},
           { opacity: isDragging ? 0.3 : 1 },
           isOver ? { borderColor: Colors().active } : {},
         )}
-        className='drag-drop-item'>
+        className={classNames({
+          'drag-drop-item': true,
+          'drag-drop-item-is-over': isOver
+        })}>
         <div
           ref='item'
         >
+         {
+           hoverHeader !== undefined &&
+           <div
+             className={classNames({
+               'drag-drop-item-header': true,
+               'drag-drop-item-header-visible': isOver,
+             })}
+           >
+             {hoverHeader}
+           </div>
+          }
           {children}
         </div>
       </div>,

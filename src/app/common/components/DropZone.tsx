@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import { borderColor, Colors } from 'app/colors/Colors';
+import { backgroundColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -106,14 +106,14 @@ class DropZoneComponent extends TerrainComponent<DropProps>
       {
         height: this.props.isOver ? 36 : 15,
       },
-      borderColor(this.props.isOver ? Colors().active : ''),
+      backgroundColor(this.props.isOver ? Colors().blockOutline : ''),
     );
     return (
       this.props.connectDropTarget(
         <div
           className='drop'
           style={{
-            height: this.props.isOver ? 44 : 15,
+            height: this.props.isOver ? 48 : 15,
           }}
         >
           <div

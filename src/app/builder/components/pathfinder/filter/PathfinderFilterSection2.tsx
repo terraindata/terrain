@@ -60,6 +60,8 @@ import PathfinderCreateLine from '../PathfinderCreateLine';
 import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
+import {ColorsActions} from 'app/colors/data/ColorsRedux';
+import Colors from 'app/colors/Colors';
 
 export interface Props
 {
@@ -68,12 +70,33 @@ export interface Props
   keyPath: KeyPath;
   step?: PathfinderSteps;
   onStepChange?: (oldStep: PathfinderSteps) => void;
+  toSkip?: number;
 
   builderActions?: typeof BuilderActions;
+  colorsActions?: typeof ColorsActions;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
 {
+
+  public componentWillMount()
+  {
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-drop-item-header .pf-filter-group-header',
+      style: {background: Colors().blockBg, border: 'none'},
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-drop-item-header .pf-filter-group-header .close',
+      style: {display: 'none'},
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-drop-item-is-over',
+      style: {background: Colors().blockBg}
+    });
+  }
 
   public handleAddFilter()
   {
@@ -126,8 +149,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public handleFilterDelete(keyPath: KeyPath)
   {
+    const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
     const parentKeyPath = keyPath.butLast().toList();
-    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
+    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(skip).toList());
     const index = keyPath.last();
     this.props.builderActions.changePath(parentKeyPath, parent.splice(index, 1));
     // TODO consider 'removeIn' instead
@@ -332,6 +356,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                     onDrop={this.handleGroupDrop}
                     canDrop={true}
                     data={line}
+                    hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
                   />
                   :
                   <DragDropGroup
@@ -345,6 +370,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                     renderChildren={this.renderFilterLine}
                     renderHeader={this.renderGroupHeader}
                     setCollapsed={this.changeCollapsed}
+                    hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
                   />
               }
               <DropZone
@@ -376,5 +402,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderFilterSection,
   [],
-  { builderActions: BuilderActions },
+  { builderActions: BuilderActions,
+    colorsActions: ColorsActions
+  },
 );

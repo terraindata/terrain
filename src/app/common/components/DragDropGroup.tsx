@@ -71,6 +71,7 @@ interface GroupProps
   renderChildren: (data, keyPath?) => El; // given data about the children, return the child elements
   setCollapsed: (keyPath, value: boolean) => void; // set something as collapsed, or not
   depth?: number;
+  hoverHeader?: El;
   // Injected drag drop props
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onReorder: (itemKeyPath: List<number>, dropKeyPath: List<number>) => void;
@@ -153,6 +154,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
                     onDrop={onDrop}
                     canDrop={true}
                     data={item}
+                    hoverHeader={this.props.hoverHeader}
                   />
                   :
                   <DragDropGroup

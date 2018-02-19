@@ -7,24 +7,35 @@
 	border: 1px solid transparent;
 	padding: 1px;
 	cursor: pointer;
-	max-width: 500px;
+	transition: all .3s linear .5s;
 	&:hover {
 		border-color: lightgray;
+	}
+	&.drag-drop-item-is-over {
+		height: 67px;
+	}
+	.drag-drop-item-header {
+		overflow: hidden;
+		transition: height .3s linear .5s;
+		height: 0px;
+		&.drag-drop-item-header-visible {
+			height: 22px;
+		}
 	}
 }
 
 .drop {
 	width: 100%;
     position: relative;
-    margin-top: -4px;
-    margin-bottom: -4px;
-	max-width: 500px;
+    margin-top: -6px;
+    margin-bottom: -6x;
 	transition: all 0.2s ease-in-out;
 	.drop-area {
-    	border: 1px solid transparent;
+    	// border: 1px solid transparent;
 		position: relative;
     	border-radius: 3px;
-		top: 0px
+		top: 6px;
+		opacity: 0.3;
 	}
 }
 
@@ -36,7 +47,6 @@
 	border: 1px solid transparent;
 	cursor: pointer;
 	border-color: #e3e3e3;
-	max-width: 500px;
 	&:hover {
 		border-color: #1eb4fa;
 	}
