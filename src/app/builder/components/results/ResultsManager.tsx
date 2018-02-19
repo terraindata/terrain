@@ -58,6 +58,7 @@ import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONPa
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { isInput } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import BackendInstance from '../../../../database/types/BackendInstance';
@@ -72,7 +73,6 @@ import { SpotlightActions } from '../../data/SpotlightRedux';
 import * as SpotlightTypes from '../../data/SpotlightTypes';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
-import { isInput } from '../../../../blocks/types/Input';
 
 export interface Props
 {
@@ -457,22 +457,22 @@ export class ResultsManager extends TerrainComponent<Props>
       }
     }
 
-      this.setState({
-        lastQuery: query,
-        queriedTql: eql,
-        query: Ajax.query(
-          eql,
-          db,
-          (resp) =>
-          {
-            this.handleM2QueryResponse(resp, false);
-          },
-          (err) =>
-          {
-            this.handleM2RouteError(err, false);
-          },
-        ),
-      });
+    this.setState({
+      lastQuery: query,
+      queriedTql: eql,
+      query: Ajax.query(
+        eql,
+        db,
+        (resp) =>
+        {
+          this.handleM2QueryResponse(resp, false);
+        },
+        (err) =>
+        {
+          this.handleM2RouteError(err, false);
+        },
+      ),
+    });
 
     this.changeResults({
       loading: true,

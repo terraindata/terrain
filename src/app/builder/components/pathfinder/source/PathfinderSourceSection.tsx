@@ -210,5 +210,5 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderSourceSection,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

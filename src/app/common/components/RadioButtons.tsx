@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
+import Util from 'util/Util';
 import BuilderActions from './../../builder/data/BuilderActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Util from 'util/Util';
 import './RadioButtons.less';
 
 export interface RadioButtonOption
@@ -120,5 +120,5 @@ class RadioButtons extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   RadioButtons,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

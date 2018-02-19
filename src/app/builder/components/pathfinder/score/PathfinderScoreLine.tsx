@@ -54,6 +54,8 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import { BuilderState } from 'builder/data/BuilderState';
+import Util from 'util/Util';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
 import SearchableDropdown from '../../../../common/components/SearchableDropdown';
@@ -64,8 +66,6 @@ import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
 import Menu from './../../../../common/components/Menu';
 import BuilderActions from './../../../data/BuilderActions';
-import Util from 'util/Util';
-import { BuilderState } from 'builder/data/BuilderState';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
 const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
@@ -308,5 +308,5 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderScoreLine,
   ['builder'],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

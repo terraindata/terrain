@@ -58,8 +58,8 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
-import { SchemaState } from 'schema/SchemaTypes';
 import { BuilderState } from 'builder/data/BuilderState';
+import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
@@ -77,7 +77,7 @@ export interface Props
   colorsActions: typeof ColorsActions;
   colors: ColorsState;
   toSkip?: number;
-  builder: BuilderState,
+  builder: BuilderState;
   builderActions?: typeof BuilderActions;
 }
 

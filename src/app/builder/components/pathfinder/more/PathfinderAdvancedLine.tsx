@@ -265,5 +265,5 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderAdvancedLine,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

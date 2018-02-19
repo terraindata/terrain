@@ -58,11 +58,12 @@ import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
-import {
+import
+{
   BuilderActionTypes,
   BuilderCardActionTypes,
   BuilderDirtyActionTypes,
-  BuilderPathActionTypes
+  BuilderPathActionTypes,
 } from './BuilderActionTypes';
 import ActionTypes from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
@@ -143,7 +144,6 @@ const BuilderReducers =
       if (state.loadingXhr !== action.payload.xhr)
       {
         // wrong XHR
-        console.error('wrong XHR')
         return state;
       }
 

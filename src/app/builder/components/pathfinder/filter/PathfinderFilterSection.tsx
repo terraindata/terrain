@@ -57,12 +57,12 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
+import Util from 'util/Util';
 import { FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
 import './PathfinderFilterStyle.less';
-import Util from 'util/Util';
 
 export interface Props
 {
@@ -239,5 +239,5 @@ interface FilterEntry
 export default Util.createTypedContainer(
   PathfinderFilterSection,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

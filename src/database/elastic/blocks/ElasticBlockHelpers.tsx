@@ -48,9 +48,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { Map, List } = Immutable;
 
-import { FieldType, FieldTypeMapping } from '../../../../shared/builder/FieldTypes';
 import { BuilderState } from 'builder/data/BuilderState';
 import { SchemaState } from 'schema/SchemaTypes';
+import { FieldType, FieldTypeMapping } from '../../../../shared/builder/FieldTypes';
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
@@ -180,7 +180,7 @@ export const ElasticBlockHelpers = {
     const server = builderState.db.name;
     if (index !== null)
     {
-      const indexId = builderState.db.name + '/' + String(index);
+      const indexId = `${builderState.db.name}/${String(index)}`;
       // 2. Need to get current type
       const fields = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
@@ -224,7 +224,7 @@ export const ElasticBlockHelpers = {
 
     if (index !== null)
     {
-      const indexId = builderState.db.name + '/' + String(index);
+      const indexId = `${builderState.db.name}/${String(index)}`;
       const fields = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
           column.databaseId === String(indexId),

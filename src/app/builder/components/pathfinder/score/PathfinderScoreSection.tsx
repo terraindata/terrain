@@ -337,5 +337,5 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderScoreSection,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

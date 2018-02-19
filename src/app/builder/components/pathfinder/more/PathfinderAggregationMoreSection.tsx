@@ -126,5 +126,5 @@ export class PathfinderAggregationMoreSection extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderAggregationMoreSection,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

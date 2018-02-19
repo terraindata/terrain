@@ -53,6 +53,7 @@ import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
 import Select from 'react-select';
+import Util from 'util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import ElasticBlockHelpers from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
@@ -66,7 +67,6 @@ import { ADVANCED_MAPPINGS, AggregationLine, AggregationTypes, PathfinderContext
 import BuilderActions from './../../../data/BuilderActions';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';
 import PathfinderAggregationMoreArea from './PathfinderAggregationMoreArea';
-import Util from 'util/Util';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -361,8 +361,8 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           schemaState,
           builderState,
           fieldType,
-          source.dataSource
-        ).toSet()
+          source.dataSource,
+        ).toSet(),
       );
     });
     return filteredOptions.toList();
@@ -492,5 +492,5 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderAggregationLine,
   [['builder', 'db']],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

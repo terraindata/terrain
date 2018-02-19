@@ -85,12 +85,12 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
 import Util from 'app/util/Util';
+import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
-import { BuilderState } from 'builder/data/BuilderState';
 
 export enum PathfinderSteps
 {
