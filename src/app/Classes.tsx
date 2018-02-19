@@ -86,6 +86,8 @@ export const _TestClass = (config?: {[key:string]: any}) =>
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import * as TerrainLog from 'loglevel';
+import * as Serialize from 'remotedev-serialize';
 import Util from './util/Util';
 
 export class BaseClass
@@ -98,16 +100,72 @@ export class BaseClass
   }
 }
 
-const records: { [class_name: string]: Immutable.Record.Class } = {};
+const AllRecordMap: { [class_name: string]: Immutable.Record.Class } = {};
+let AllRecordArray = [];
+export const AllRecordNameArray = [];
+export let RecordsSerializer = Serialize.immutable(Immutable, []);
+
+function addNewRecord(rec: Immutable.Record.Class, name: string)
+{
+  AllRecordMap[name] = rec;
+  AllRecordNameArray.push(name);
+  AllRecordArray.push(rec);
+  RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
+}
+
+export function resetRecordNameArray(recordName: string[]): boolean
+{
+  // fast-path checking
+  let alreadySame = false;
+  for (const i in recordName)
+  {
+    if (recordName[i] !== AllRecordArray[i])
+    {
+      alreadySame = true;
+    }
+  }
+  if (alreadySame === true)
+  {
+    return true;
+  }
+
+  // we have to try to reset the serializer record type array
+  const newRecordArray = [];
+  for (let newPos = 0; newPos < recordName.length; newPos = newPos + 1)
+  {
+    const name = recordName[newPos];
+    let matchedRecord;
+    // searching the matched Record class
+    for (let i = 0; i < AllRecordNameArray.length; i = i + 1)
+    {
+      if (name === AllRecordNameArray[i])
+      {
+        matchedRecord = AllRecordArray[i];
+      }
+    }
+    if (matchedRecord !== undefined)
+    {
+      newRecordArray.push(matchedRecord);
+    } else
+    {
+      return false;
+    }
+  }
+  AllRecordArray = newRecordArray;
+  RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
+  return true;
+}
 
 export function Constructor<T>(instance)
 {
   const class_name = instance.__proto__.constructor.name;
-  if (!records[class_name])
+  if (!AllRecordMap[class_name])
   {
-    records[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
+    TerrainLog.debug('New Record ' + String(class_name));
+    const newRecord = Immutable.Record(new instance.__proto__.constructor({}));
+    addNewRecord(newRecord, class_name);
   }
-  return records[class_name];
+  return AllRecordMap[class_name];
 }
 
 export function New<T>(
@@ -125,8 +183,19 @@ export function New<T>(
   _.forOwn(config,
     (value, key) => { instance[key] = value; },
   );
-
   return new constructor(instance) as any;
+}
+
+export function createRecordType(obj, name: string)
+{
+  if (!AllRecordMap[name])
+  {
+    addNewRecord(Immutable.Record(obj), name);
+  } else
+  {
+    TerrainLog.debug('WARNING: The record type ' + name + ' has already been created!');
+  }
+  return AllRecordMap[name];
 }
 
 // This converts the standard Record class format to a plain JS
