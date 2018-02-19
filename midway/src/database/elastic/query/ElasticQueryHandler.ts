@@ -72,7 +72,6 @@ export default class ElasticQueryHandler extends QueryHandler
   private GROUPJOIN_MSEARCH_BATCH_SIZE = 100;
   private GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES = 1;
   private GROUPJOIN_DEFAULT_SIZE = 10;
-  private GROUPJOIN_SCROLL_TIMEOUT = '1m';
 
   constructor(controller: ElasticController)
   {
