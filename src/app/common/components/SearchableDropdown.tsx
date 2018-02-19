@@ -56,7 +56,8 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import onClickOutside from 'react-onclickoutside';
-import Actions from '../../builder/data/BuilderActions';
+import Util from 'util/Util';
+import BuilderActions from '../../builder/data/BuilderActions';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -76,8 +77,9 @@ export interface Props
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
   openDown?: boolean;
   placeholder?: string;
-  action?: (keyPath, value) => void;
+  action?: (keyPath, value) => void | string;
   floatingLabel?: string;
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -187,11 +189,19 @@ class SearchableDropdown extends TerrainComponent<Props>
     {
       if (this.props.action)
       {
-        this.props.action(this.props.keyPath, value);
+        const {action} = this.props;
+        if (typeof action === 'string')
+        {
+          this.props.builderActions[action](this.props.keyPath, value);
+        }
+        else
+        {
+          action(this.props.keyPath, value);
+        }
       }
       else
       {
-        Actions.change(this.props.keyPath, value);
+        this.props.builderActions.change(this.props.keyPath, value);
       }
     }
     if (this.props.onChange !== undefined)
@@ -536,4 +546,8 @@ class SearchableDropdown extends TerrainComponent<Props>
   }
 }
 
-export default onClickOutside(SearchableDropdown);
+export default Util.createTypedContainer(
+  onClickOutside(SearchableDropdown),
+  [],
+  { builderActions: BuilderActions},
+);

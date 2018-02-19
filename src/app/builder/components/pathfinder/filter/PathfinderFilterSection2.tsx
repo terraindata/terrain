@@ -55,6 +55,7 @@ import CustomDragLayer from 'app/common/components/CustomDragLayer';
 import DragDropGroup from 'app/common/components/DragDropGroup';
 import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
+import Util from 'app/util/Util';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
@@ -67,6 +68,8 @@ export interface Props
   keyPath: KeyPath;
   step?: PathfinderSteps;
   onStepChange?: (oldStep: PathfinderSteps) => void;
+
+  builderActions?: typeof BuilderActions;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -75,7 +78,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public handleAddFilter()
   {
     const newLines = this.props.filterGroup.lines.push(_FilterLine());
-    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public insertIn(items, keyPath, item): List<any>
@@ -118,7 +121,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     fieldChange?: boolean,
   )
   {
-    BuilderActions.changePath(keyPath, filter, notDirty, fieldChange);
+    this.props.builderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
 
   public handleFilterDelete(keyPath: KeyPath)
@@ -126,7 +129,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
     const index = keyPath.last();
-    BuilderActions.changePath(parentKeyPath, parent.splice(index, 1));
+    this.props.builderActions.changePath(parentKeyPath, parent.splice(index, 1));
     // TODO consider 'removeIn' instead
   }
 
@@ -170,7 +173,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       .concat(keyPath).toList()
       .push('filterGroup')
       .push('collapsed');
-    BuilderActions.changePath(
+    this.props.builderActions.changePath(
       kp,
       value);
   }
@@ -196,7 +199,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
     lines = this.updateLines(lines, itemKeyPath, dropKeyPath, item, true);
     // Update the lines
-    BuilderActions.changePath(this.props.keyPath.push('lines'), lines);
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), lines);
   }
 
   // When something is dropped into a group
@@ -232,7 +235,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         lines: List([droppedInto, dropped]),
         name: 'Group ' + groupNumber,
       });
-      BuilderActions.changePath(this.props.keyPath.push('groupCount'), groupCount + 1, true);
+      this.props.builderActions.changePath(this.props.keyPath.push('groupCount'), groupCount + 1, true);
     }
     // If the dropped item was already a group, keep it's name and minMatches and append the line it was dropped onto
     else
@@ -246,7 +249,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     dropKeyPath = dropKeyPath.push('filterGroup');
     lines = this.updateLines(lines, dragKeyPath, dropKeyPath, group);
     // Look for the thing that you dropped, if it is somewhere other than keyPath, remove it
-    BuilderActions.changePath(this.props.keyPath.push('lines'), lines);
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), lines);
   }
 
   // Given the lines and the new item, move the item from the dragKeyPath to the dropKeyPath
@@ -370,4 +373,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderFilterSection;
+export default Util.createTypedContainer(
+  PathfinderFilterSection,
+  [],
+  { builderActions: BuilderActions },
+);

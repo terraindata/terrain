@@ -52,7 +52,8 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Actions from '../../builder/data/BuilderActions';
+import Util from 'util/Util';
+import BuilderActions from '../../builder/data/BuilderActions';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import BuilderTextbox from './BuilderTextbox';
@@ -72,6 +73,7 @@ export interface Props
   allowCustomInput?: boolean;
   action?: (keyPath, value) => void;
   hideOptions?: boolean; // hide the unchosen options, show again on click
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -127,7 +129,7 @@ class LinearSelector extends TerrainComponent<Props>
       }
       else
       {
-        Actions.change(this.props.keyPath, option);
+        this.props.builderActions.change(this.props.keyPath, option);
       }
     }
     if (this.props.onChange)
@@ -243,4 +245,8 @@ class LinearSelector extends TerrainComponent<Props>
   }
 }
 
-export default LinearSelector;
+export default Util.createTypedContainer(
+  LinearSelector,
+  [],
+  { builderActions: BuilderActions },
+);

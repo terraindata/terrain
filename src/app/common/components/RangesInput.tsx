@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires
-import BuilderActions from 'app/builder/data/BuilderActions';
 import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import * as classNames from 'classnames';

@@ -84,8 +84,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
-import BuilderStore from 'app/builder/data/BuilderStore';
 import Util from 'app/util/Util';
+import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
@@ -423,6 +423,7 @@ class PathfinderContextC extends BaseClass
   public step: string = null;
   public canEdit: boolean = null;
   public schemaState: SchemaState = null;
+  public builderState: BuilderState = null;
 }
 export type PathfinderContext = PathfinderContextC & IRecord<PathfinderContextC>;
 export const _PathfinderContext = (config?: { [key: string]: any }) =>
@@ -435,28 +436,34 @@ export const _PathfinderContext = (config?: { [key: string]: any }) =>
 type ChoiceContext = {
   type: 'source',
   schemaState: SchemaState,
+  builderState: BuilderState,
 } | {
     type: 'transformFields',
     source: Source,
     schemaState: SchemaState,
+    builderState: BuilderState,
   } | {
     type: 'fields',
     source: Source,
     schemaState: SchemaState,
+    builderState: BuilderState,
   } | {
     type: 'comparison',
     source: Source,
     schemaState: SchemaState,
+    builderState: BuilderState,
     field: string,
     fieldType?: FieldType,
   } | {
     type: 'valueType',
     source: Source,
     schemaState: SchemaState,
+    builderState: BuilderState,
     field: string,
     comparison: string,
   } | {
     type: 'input',
+    builderState: BuilderState,
     // TODO builder state
   };
 
@@ -466,7 +473,7 @@ class ElasticDataSourceC extends DataSource
   public types: List<string> = List([]);
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
-    const server = BuilderStore.getState().db.name;
+    const server = context.builderState.db.name;
     if (context.type === 'source')
     {
       const sources = context.schemaState.databases.toList().filter(
@@ -622,7 +629,7 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'input')
     {
       // TODO use current builder state
-      const inputs = BuilderStore.getState().query.inputs;
+      const inputs = context.builderState.query.inputs;
       return inputs.map((input) =>
         _ChoiceOption({
           displayName: '@' + String(input.key),

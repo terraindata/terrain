@@ -54,6 +54,8 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import { BuilderState } from 'builder/data/BuilderState';
+import Util from 'util/Util';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
 import SearchableDropdown from '../../../../common/components/SearchableDropdown';
@@ -64,7 +66,6 @@ import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
 import Menu from './../../../../common/components/Menu';
 import BuilderActions from './../../../data/BuilderActions';
-import { BuilderStore } from './../../../data/BuilderStore';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
 const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
@@ -86,6 +87,9 @@ export interface Props
   onAnimateScoreBars?: () => void;
   dropdownOptions: List<ChoiceOption>;
   pathfinderContext: PathfinderContext;
+
+  builder?: BuilderState;
+  builderActions?: typeof BuilderActions;
 }
 
 class PathfinderScoreLine extends TerrainComponent<Props>
@@ -120,13 +124,13 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public handleTransformModeChange(index)
   {
     const options = ['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'];
-    BuilderActions.changePath(this.props.keyPath.push('transformData').push('mode'), options[index]);
+    this.props.builderActions.changePath(this.props.keyPath.push('transformData').push('mode'), options[index]);
   }
 
   public handleFieldChange(index)
   {
     const value = this.props.dropdownOptions.map((v) => v.displayName).toList().get(index);
-    BuilderActions.changePath(this.props.keyPath.push('field'), value, false, true);
+    this.props.builderActions.changePath(this.props.keyPath.push('field'), value, false, true);
   }
 
   public renderTransformChart()
@@ -185,7 +189,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           ])}
         />
         <TransformCard
-          builderState={BuilderStore.getState()}
+          builderState={this.props.builder}
           canEdit={this.props.pathfinderContext.canEdit}
           className={'builder-comp-list-item'}
           data={data}
@@ -193,7 +197,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           helpOn={undefined}
           keyPath={this.props.keyPath.push('transformData')}
           language={'elastic'}
-          onChange={BuilderActions.changePath}
+          onChange={this.props.builderActions.changePath}
           parentData={undefined}
           index={this.props.pathfinderContext.source.dataSource.name}
         />
@@ -237,7 +241,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           isNumber={true}
           autoDisabled={true}
           onChange={this.props.onAnimateScoreBars}
-          action={BuilderActions.changePath}
+          action={this.props.builderActions.changePath}
         />
         <span className='pf-score-line-text'>times</span>
         <SearchableDropdown
@@ -301,4 +305,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderScoreLine;
+export default Util.createTypedContainer(
+  PathfinderScoreLine,
+  ['builder'],
+  { builderActions: BuilderActions },
+);

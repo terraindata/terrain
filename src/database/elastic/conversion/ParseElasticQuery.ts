@@ -54,11 +54,23 @@ import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLPar
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import * as SharedUtil from '../../../../shared/Util';
 import { Input, isInput, toInputMap } from '../../../blocks/types/Input';
+
+export interface ESQueryObject
+{
+  index?: string;
+  type?: string;
+  body?: {
+    _source: object;
+  };
+
+  [key: string]: any;
+}
 
 export function stringifyWithParameters(
   obj: object | number | boolean | string | null,
-  inputs?: Immutable.List<Input>): string | null
+  isInputFn: (string) => boolean)
 {
   if (typeof obj === 'number' || typeof obj === 'boolean' || obj === null)
   {
@@ -66,7 +78,7 @@ export function stringifyWithParameters(
   }
   else if (typeof obj === 'string')
   {
-    if (isInput(obj, inputs))
+    if (isInputFn(obj))
     {
       return obj;
     }
@@ -77,7 +89,7 @@ export function stringifyWithParameters(
     let str = '[';
     for (let i = 0; i < obj.length; i++)
     {
-      str += stringifyWithParameters(obj[i], inputs);
+      str += stringifyWithParameters(obj[i], isInputFn);
       if (i < obj.length - 1)
       {
         str += ',';
@@ -93,7 +105,7 @@ export function stringifyWithParameters(
     for (let i = 0; i < keys.length; i++)
     {
       str += '"' + keys[i] + '": ';
-      str += stringifyWithParameters(obj[keys[i]], inputs);
+      str += stringifyWithParameters(obj[keys[i]], isInputFn);
       if (i < keys.length - 1)
       {
         str += ',';
@@ -108,17 +120,6 @@ export function stringifyWithParameters(
   }
 }
 
-export interface ESQueryObject
-{
-  index?: string;
-  type?: string;
-  body?: {
-    _source: object;
-  };
-
-  [key: string]: any;
-}
-
 export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, inputs?: List<Input>): string
 {
   if (options && options.replaceInputs)
@@ -126,17 +127,14 @@ export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, input
     const valueInfo: ESValueInfo = parser.getValueInfo();
     const params = toInputMap(inputs);
     const result = ESParameterFiller.generate(valueInfo, params);
-    return ESConverter.formatES(new ESJSONParser(result));
+    parser = new ESJSONParser(result);
   }
-  else
-  {
-    return ESConverter.formatES(parser);
-  }
+  return ESConverter.formatES(parser);
 }
 
 export function ESQueryToCode(queryObject: ESQueryObject, options?: Options, inputs?: List<Input>): string
 {
-  const text: string = stringifyWithParameters(queryObject, inputs);
+  const text: string = stringifyWithParameters(queryObject, (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, options);
 }

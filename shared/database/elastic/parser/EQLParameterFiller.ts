@@ -84,7 +84,7 @@ export default class ESParameterFiller
 
         if (value === undefined)
         {
-          throw new Error('Undefined parameter ' + param + '.');
+          throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
         }
 
         return JSON.stringify(value);

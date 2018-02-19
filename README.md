@@ -77,10 +77,11 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * For Linux:
   * Make sure package lists are up to date: `sudo apt-get update`
   * Install parallel, bash, curl: `sudo apt-get install -y parallel bash curl`
-  * Install nodejs v7  repo: `sudo curl -sL https://deb.nodesource.com/setup_7.x | bash -`
-  * Update package lists again: `sudo apt-get update`
-  * Install nodejs: `sudo apt-get install -y nodejs`
-  * Install yarn: `sudo npm -g install yarn`
+  * Install build tools: `sudo apt-get install build-essential gcc g++`
+  * Install docker: https://docs.docker.com/
+  * Install docker-compose, at lease 1.18.0: https://docs.docker.com/compose/install/
+  * Install node 8.x repo: `sudo curl -sL https://deb.nodesource.com/setup_8.x | bash -` [url](https://yarnpkg.com/lang/en/docs/install/)
+  * Install yarn: https://yarnpkg.com/lang/en/docs/install/
 * Generate ssh keys for your computer (if you don't already have them)
     * https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 * Add these keys to your gitlab key set: https://git.terrain.int/profile/keys
@@ -225,7 +226,7 @@ Contains the TastyORM, a simple ORM used to abstract database queries from the s
 
 ### midway/test
 
-Contains unit tests for Midway. test's directory structure mirrors that of midway/src. Unit tests for a particular file in midway/src will be found in the same location in midway/test. Test files must be suffixed with 'Tests' in order to be run by jest. 
+Contains unit tests for Midway. test's directory structure mirrors that of midway/src. Unit tests for a particular file in midway/src will be found in the same location in midway/test. Test files must be suffixed with 'Tests' in order to be run by jest.
 
 
 ## Packages and Imports
@@ -241,7 +242,7 @@ You will then need to try to install any Typescript types that are available for
 `yarn add @types/[package-name] --dev` (`--dev` marks that this is a development dependency, not a production one).
 
 If this succeeds, Typescript types are available and you can import this
-package with `import * as PackageName from 'package-name';` or `import { ThingOne, ThingTwo } from 'package-name';` syntax. 
+package with `import * as PackageName from 'package-name';` or `import { ThingOne, ThingTwo } from 'package-name';` syntax.
 
 If this does not succeed, then there are no publicly
 available types, and you have to use `import Package = require('package');`.
@@ -262,16 +263,16 @@ To include another `.tsx` file from within the Terraformer codebase (`/src`), us
 `import NapoleonDynamite from '../../movies/NapoleonDynamite';`
 
 To include any file that's not a `.tsx` from within the Terraformer codebase, use
-`const [ClassName] = require('[relative path]')` 
-e.g.  
-`require('./Pay.less');`  
-`import FreddyAnd = require('../../data/FreddyAnd.json');`  
-`import CarrieMathison = require('./CarrieMathison.js');` (again, don't forget `./`)  
+`const [ClassName] = require('[relative path]')`
+e.g.
+`require('./Pay.less');`
+`import FreddyAnd = require('../../data/FreddyAnd.json');`
+`import CarrieMathison = require('./CarrieMathison.js');` (again, don't forget `./`)
 
 To include a package from `node_modules`, use `import * as [ClassName] from '[package_name]';` if there are typings
 available, and `import [ClassName] = require('[package_name]');` if not. e.g.
-`import * as TheForce from 'the-force';`  
-`import UnpopularLibrary = require('unpopular-library');`  
+`import * as TheForce from 'the-force';`
+`import UnpopularLibrary = require('unpopular-library');`
 
 ## Testing
 
@@ -423,9 +424,9 @@ if(isJoey)
 {
   var catchphrase = "How you doin'?";
 }
-console.log(catchphrase); // either the string or undefined```  
+console.log(catchphrase); // either the string or undefined```
 
-Versus:  
+Versus:
 
 if(isPhoebe)
 {

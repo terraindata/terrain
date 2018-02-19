@@ -54,7 +54,6 @@ import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, Zo
 import onClickOutside from 'react-onclickoutside';
 
 import Switch from 'common/components/Switch';
-import Actions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
@@ -75,10 +74,12 @@ export interface Props
   onChange?: (coordinates, inputValue) => void;
   onMapClick?: (e) => void;
   canEdit: boolean;
-  markers?: List<LocationMarker>; // A list of additional markers to add to the map
+  markers?: List<LocationMarker> | List<{}>; // A list of additional markers to add to the map
   allowSearchByCoordinate?: boolean;
-  bounds?: [number, number];
-  boundingRectangles?: List<BoundingRectangle>;
+  bounds?: any[];
+  boundingRectangles?: List<BoundingRectangle> | List<{}>;
+  onZoomChange?: (zoom) => void;
+  zoom?: number;
   // Show/Hide certain features
   hideZoomControl?: boolean;
   hideSearchBar?: boolean;
@@ -403,6 +404,10 @@ class MapComponent extends TerrainComponent<Props>
       this.setState({
         zoom: viewport.zoom,
       });
+      if (this.props.onZoomChange !== undefined)
+      {
+        this.props.onZoomChange(viewport.zoom);
+      }
     }
   }
 
@@ -418,6 +423,7 @@ class MapComponent extends TerrainComponent<Props>
     return null;
   }
 
+  // returns correct center / bounds based on the location and props
   public getMapProps(location)
   {
     const center = location;
@@ -429,7 +435,7 @@ class MapComponent extends TerrainComponent<Props>
     }
     else if (this.props.markers !== undefined && this.props.markers.size > 0)
     {
-      let locations = this.props.markers.map((loc) => loc.coordinates).toList();
+      let locations = (this.props.markers as List<LocationMarker>).map((loc) => loc.coordinates).toList();
       if (location !== undefined)
       {
         locations = locations.push([location[1], location[0]]);
@@ -478,13 +484,13 @@ class MapComponent extends TerrainComponent<Props>
 
   public renderMap()
   {
-    const { coordinates, inputValue } = this.props;
+    const { coordinates, inputValue, zoom } = this.props;
     const location = this.parseLocation(coordinates, inputValue);
     return (
       <div className={this.props.className} >
         <Map
-          {...this.getMapProps(location) }
-          zoom={this.state.zoom}
+          {...this.getMapProps(location)}
+          zoom={zoom !== undefined ? zoom : this.state.zoom}
           onViewportChanged={this.setZoomLevel}
           maxBounds={[[85, -180], [-85, 180]]}
           minZoom={1}

@@ -55,18 +55,18 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import BuilderActions from 'app/builder/data/BuilderActions';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import DatePickerWrapper from 'app/common/components/DatePickerWrapper';
 import Dropdown from 'app/common/components/Dropdown';
-import SearchableDropdown from 'app/common/components/SearchableDropdown';
 import MapComponent, { units } from 'app/common/components/MapComponent';
+import SearchableDropdown from 'app/common/components/SearchableDropdown';
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
-import BuilderActions from 'app/builder/data/BuilderActions';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -109,6 +109,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       type: 'fields',
       source,
       schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
     }).map((x) => x.value).toList();
 
     const comparisonOptions = source.dataSource.getChoiceOptions({
@@ -117,6 +118,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       fieldType: filterLine.fieldType,
       source,
       schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
     }).map((x) => x.value).toList();
 
     return (
@@ -129,14 +131,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         <SearchableDropdown
           selectedIndex={fieldOptions.indexOf(filterLine.field)}
           keyPath={this.props.keyPath.push('field')}
-          action={BuilderActions.changePath}
+          action={'changePath'}
           canEdit={canEdit}
           options={fieldOptions}
         />
         <SearchableDropdown
           selectedIndex={comparisonOptions.indexOf(filterLine.comparison)}
           keyPath={this.props.keyPath.push('comparison')}
-          action={BuilderActions.changePath}
+          action={'changePath'}
           canEdit={canEdit}
           options={comparisonOptions}
         />
@@ -173,6 +175,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       fieldType: filterLine.fieldType,
       source,
       schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
     });
     switch (filterLine.fieldType)
     {
@@ -187,14 +190,15 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               alignItems: 'flex-start',
             }}
           >
-              <Autocomplete
-                options={pathfinderContext.source.dataSource.getChoiceOptions({
-                  type: 'input',
-                }).map((c) => c.value).toList()}
-                value={filterLine.value as string | number}
-                onChange={this._fn(this.handleChange, 'value')}
-                disabled={!pathfinderContext.canEdit}
-              />
+            <Autocomplete
+              options={pathfinderContext.source.dataSource.getChoiceOptions({
+                type: 'input',
+                builderState: pathfinderContext.builderState,
+              }).map((c) => c.value).toList()}
+              value={filterLine.value as string | number}
+              onChange={this._fn(this.handleChange, 'value')}
+              disabled={!pathfinderContext.canEdit}
+            />
           </div>
         );
 
@@ -229,33 +233,33 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               alignItems: 'flex-start',
             }}
           >
-              <div className='pf-filter-map-input-wrapper'>
-                <BuilderTextbox
-                  value={value.distance}
-                  canEdit={pathfinderContext.canEdit}
-                  keyPath={this.props.keyPath.push('value').push('distance')}
-                  action={this.props.onChange}
-                />
-                <Dropdown
-                  options={List(_.keys(units))}
-                  selectedIndex={_.keys(units).indexOf(value.units)}
-                  canEdit={pathfinderContext.canEdit}
-                  optionsDisplayName={Map(units)}
-                  keyPath={this.props.keyPath.push('value').push('units')}
-                  action={this.props.onChange}
-                />
-                <MapComponent
-                  geocoder='photon'
-                  inputValue={value.address}
-                  coordinates={value.location !== undefined ? value.location : [0, 0]}
-                  distance={value.distance}
-                  distanceUnit={value.units}
-                  wrapperClassName={'pf-filter-map-component-wrapper'}
-                  fadeInOut={true}
-                  onChange={this.handleMapChange}
-                  canEdit={pathfinderContext.canEdit}
-                />
-              </div>
+            <div className='pf-filter-map-input-wrapper'>
+              <BuilderTextbox
+                value={value.distance}
+                canEdit={pathfinderContext.canEdit}
+                keyPath={this.props.keyPath.push('value').push('distance')}
+                action={this.props.onChange}
+              />
+              <Dropdown
+                options={List(_.keys(units))}
+                selectedIndex={_.keys(units).indexOf(value.units)}
+                canEdit={pathfinderContext.canEdit}
+                optionsDisplayName={Map(units)}
+                keyPath={this.props.keyPath.push('value').push('units')}
+                action={this.props.onChange}
+              />
+              <MapComponent
+                geocoder='photon'
+                inputValue={value.address}
+                coordinates={value.location !== undefined ? value.location : [0, 0]}
+                distance={value.distance}
+                distanceUnit={value.units}
+                wrapperClassName={'pf-filter-map-component-wrapper'}
+                fadeInOut={true}
+                onChange={this.handleMapChange}
+                canEdit={pathfinderContext.canEdit}
+              />
+            </div>
           </div>
         );
 
@@ -292,6 +296,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         fieldType,
         source,
         schemaState: pathfinderContext.schemaState,
+        builderState: pathfinderContext.builderState,
       });
 
       if (comparisonOptions.findIndex((option) => option.value === filterLine.comparison) === -1

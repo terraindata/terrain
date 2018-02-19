@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file member-access strict-boolean-expressions
 
 import * as Immutable from 'immutable';
+import { createRecordType } from 'src/app/Classes';
 const { List, Map } = Immutable;
 
 export class Format
@@ -58,7 +59,7 @@ export class Format
   set: (f: string, v: any) => Format;
   setIn: (f: string[], v: any) => Format;
 }
-const Format_Record = Immutable.Record(new Format());
+const Format_Record = createRecordType(new Format(), 'FormatC');
 export const _Format = (config?: any) =>
 {
   return new Format_Record(config || {}) as any as Format;
@@ -78,7 +79,7 @@ export class ResultsConfig
   setIn: (f: string[], v: any) => ResultsConfig;
   toJS: () => any;
 }
-const ResultsConfig_Record = Immutable.Record(new ResultsConfig());
+const ResultsConfig_Record = createRecordType(new ResultsConfig(), 'ResultsConfig');
 export const _ResultsConfig = (config?: any) =>
 {
   let conf = new ResultsConfig_Record(config || {}) as any as ResultsConfig;
