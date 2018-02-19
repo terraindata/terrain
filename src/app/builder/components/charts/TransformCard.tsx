@@ -135,11 +135,14 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
-      nextProps.builder.query.inputs !== this.props.builder.query.inputs)
-      && !this.props.data.closed)
+    if (nextProps.data.input === '_score')
     {
-      this.computeBars(this.props.data.input, this.state.maxDomain, true, nextProps.builder.query);
+      if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
+        nextProps.builder.query.inputs !== this.props.builder.query.inputs)
+        && !this.props.data.closed)
+      {
+        this.computeBars(this.props.data.input, this.state.maxDomain, true, nextProps.builder.query);
+      }
     }
 
     // nextProps.data.domain is list<string>
@@ -268,6 +271,7 @@ class TransformCard extends TerrainComponent<Props>
           builder={this.props.builder}
         />
         <TransformCardPeriscope
+          onChange={this.props.onChange}
           onDomainChange={this.handleChartDomainChange}
           barsData={this.state.bars}
           domain={this.state.chartDomain}
@@ -279,7 +283,6 @@ class TransformCard extends TerrainComponent<Props>
           width={width}
           language={this.props.language}
           colors={this.props.data.static.colors}
-          builder={this.props.builder}
         />
       </div>
     );

@@ -53,12 +53,10 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { BuilderState } from 'builder/data/BuilderState';
 import Autocomplete from 'common/components/Autocomplete';
 // import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
-import BuilderActions from '../../data/BuilderActions';
 import Periscope from './Periscope';
 import { Bar, Bars } from './TransformCard';
 
@@ -74,8 +72,8 @@ export interface Props
   canEdit: boolean;
   width: number;
   language: string;
+  onChange: (keyPath: KeyPath, value: any, isDirty?: boolean) => void;
   colors: [string, string];
-  builderActions?: typeof BuilderActions;
 }
 
 const MAX_BARS = 100;
@@ -219,7 +217,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
 
   public handleDomainTextChange()
   {
-    this.props.builderActions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
+    this.props.onChange(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
   }
 
   public handleDomainLowChange(value)
@@ -242,7 +240,8 @@ class TransformCardPeriscope extends TerrainComponent<Props>
   {
     if (!isNaN(maxDomainLow) && !isNaN(maxDomainHigh) && maxDomainLow < maxDomainHigh)
     {
-      this.props.builderActions.change(this._ikeyPath(this.props.keyPath, 'domain'), List([maxDomainLow, maxDomainHigh]));
+      this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'),
+        List([parseFloat(String(maxDomainLow)), parseFloat(String(maxDomainHigh))]));
       this.handleDomainTextChange();
     }
   }
@@ -284,8 +283,4 @@ class TransformCardPeriscope extends TerrainComponent<Props>
   }
 }
 
-export default Util.createTypedContainer(
-  TransformCardPeriscope,
-  [],
-  { builderActions: BuilderActions },
-);
+export default TransformCardPeriscope;

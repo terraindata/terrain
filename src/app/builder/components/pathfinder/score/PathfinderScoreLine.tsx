@@ -150,15 +150,15 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     const data = {
       input: line.field,
       domain: line.transformData.domain,
-      hasCustomDomain: false,
+      hasCustomDomain: line.transformData.hasCustomDomain,
       scorePoints: line.transformData.scorePoints,
       static: {
         colors: [Colors().builder.cards.categories.score, Colors().bg3],
       },
       mode: line.transformData.mode,
       dataDomain: line.transformData.dataDomain,
+      closed: !line.expanded,
     };
-
     return (
       <div className='pf-score-line-transform'>
         <LinearSelector

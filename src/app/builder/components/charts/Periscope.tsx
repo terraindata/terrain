@@ -265,7 +265,6 @@ const Periscope = {
     handle.exit().remove();
   },
 
-<<<<<<< HEAD
   _drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange)
   {
     d3.select(el).selectAll('.domain-input').remove();
