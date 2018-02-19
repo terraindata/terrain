@@ -53,14 +53,13 @@ import * as React from 'react';
 import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List } = Immutable;
-import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import Util from 'app/util/Util';
 import { SchemaState } from 'schema/SchemaTypes';
 import './Pathfinder.less';
 import PathfinderArea from './PathfinderArea';
-import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
+import { Path } from './PathfinderTypes';
 
 export interface Props
 {

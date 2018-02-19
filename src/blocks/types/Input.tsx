@@ -71,7 +71,7 @@ export function isRuntimeInput(name: string)
     name.substring(1).split('.')[0] === 'parent';
 }
 
-export function isInput(name: string, inputs: Immutable.List<Input>)
+export function isInput(name: string, inputs: Immutable.List<Input>): boolean
 {
   return inputs && name && name.charAt(0) === InputPrefix &&
     (inputs.findIndex((input: Input) => (name.substring(1) === input.key)) > -1);

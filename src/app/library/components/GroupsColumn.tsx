@@ -656,10 +656,10 @@ class GroupsColumn extends TerrainComponent<Props>
   {
     const categoryKeys = _.keys(this.props.categories.toJS());
     const values: string[] = categoryKeys.sort((a, b) => parseFloat(a) - parseFloat(b));
-    let categoryNames = Immutable.Map<number, string>({});
+    let categoryNames = Immutable.Map<string, string>({});
     categoryKeys.forEach((key) =>
     {
-      categoryNames = categoryNames.set(parseFloat(key), this.props.categories.get(parseFloat(key)).name);
+      categoryNames = categoryNames.set(key, this.props.categories.get(parseFloat(key)).name);
     });
     return (
       <div className='new-group-modal-child'>

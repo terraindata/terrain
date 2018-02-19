@@ -65,7 +65,7 @@ export interface Props
   onClick?: () => void;
   inline?: boolean; // render inline, rather than absolutely middle
   buttons?: string[];
-  buttonFunctions?: [() => void];
+  buttonFunctions?: Array<() => void>;
 }
 
 @Radium

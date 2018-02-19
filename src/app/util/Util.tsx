@@ -687,15 +687,29 @@ const Util = {
     });
   },
 
-  createContainer(component, stateToPropsKeys, dispatchToPropsMap)
+  createContainer(
+    component,
+    stateToPropsKeys,
+    dispatchToPropsMap,
+    options = {},
+  )
   {
     const mapStateToProps = (state) =>
     {
       const stateToProps = {};
       stateToPropsKeys.forEach((key) =>
       {
-        stateToProps[key] = state.get(key);
+        if (_.isArray(key))
+        {
+          const stateKey = _.last(key);
+          stateToProps[stateKey] = state.getIn(key);
+        }
+        else
+        {
+          stateToProps[key] = state.get(key);
+        }
       });
+
       return stateToProps;
     };
 
@@ -714,12 +728,14 @@ const Util = {
     return connect(
       mapStateToProps,
       mapDispatchToProps,
+      null,
+      options,
     )(component);
   },
 
-  createTypedContainer<ComponentType>(component: ComponentType, stateToPropsKeys, dispatchToPropsMap): ComponentType
+  createTypedContainer<ComponentType>(component: ComponentType, stateToPropsKeys, dispatchToPropsMap, options = {}): ComponentType
   {
-    return Util.createContainer(component, stateToPropsKeys, dispatchToPropsMap);
+    return Util.createContainer(component, stateToPropsKeys, dispatchToPropsMap, options);
   },
 
   /*

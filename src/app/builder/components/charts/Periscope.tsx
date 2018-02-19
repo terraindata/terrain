@@ -53,6 +53,9 @@ import { Colors } from '../../../colors/Colors';
 // consider upgrading d3 to v4, which has available types
 // import * as d3 from 'd3';
 const d3 = require('d3');
+const moment = require('moment');
+
+import ElasticBlockHelpers from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import Util from '../../../util/Util';
 
 const xMargin = 45;
@@ -262,6 +265,7 @@ const Periscope = {
     handle.exit().remove();
   },
 
+<<<<<<< HEAD
   _drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange)
   {
     d3.select(el).selectAll('.domain-input').remove();

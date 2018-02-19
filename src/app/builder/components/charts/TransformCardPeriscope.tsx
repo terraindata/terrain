@@ -53,11 +53,12 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import { BuilderState } from 'builder/data/BuilderState';
 import Autocomplete from 'common/components/Autocomplete';
 // import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import Periscope from './Periscope';
 import { Bar, Bars } from './TransformCard';
 
@@ -68,11 +69,13 @@ export interface Props
   domain: List<number>;
   range: List<number>;
   onDomainChange: (domain: List<number>) => void;
+  inputKey: string;
   keyPath: KeyPath;
   canEdit: boolean;
   width: number;
   language: string;
   colors: [string, string];
+  builderActions?: typeof BuilderActions;
 }
 
 const MAX_BARS = 100;
@@ -148,7 +151,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     this.setState({
       chartState,
     });
-    Periscope.create(el, chartState.toJS());
+    Periscope.create(el, chartState.toObject());
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -180,7 +183,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
   public update(overrideState?)
   {
     const el = ReactDOM.findDOMNode(this.refs.chart);
-    Periscope.update(el, this.getChartState(overrideState).toJS());
+    Periscope.update(el, this.getChartState(overrideState).toObject());
   }
 
   public handleDomainChangeStart(initialVal)
@@ -216,7 +219,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
 
   public handleDomainTextChange()
   {
-    Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
+    this.props.builderActions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
   }
 
   public handleDomainLowChange(value)
@@ -239,7 +242,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
   {
     if (!isNaN(maxDomainLow) && !isNaN(maxDomainHigh) && maxDomainLow < maxDomainHigh)
     {
-      Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), List([maxDomainLow, maxDomainHigh]));
+      this.props.builderActions.change(this._ikeyPath(this.props.keyPath, 'domain'), List([maxDomainLow, maxDomainHigh]));
       this.handleDomainTextChange();
     }
   }
@@ -280,4 +283,9 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     );
   }
 }
-export default TransformCardPeriscope;
+
+export default Util.createTypedContainer(
+  TransformCardPeriscope,
+  [],
+  { builderActions: BuilderActions },
+);

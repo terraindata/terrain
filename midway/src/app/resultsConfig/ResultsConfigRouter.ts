@@ -44,69 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import { makePromiseCallback } from '../../Utils';
 
-// make sure importing ESCardParser before importing ElasticToCards
-import ESCardParser from 'src/database/elastic/conversion/ESCardParser';
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import * as Tasty from '../../tasty/Tasty';
+import ResultsConfig from './ResultsConfig';
+import ResultsConfigConfig from './ResultsConfigConfig';
 
-import { ElasticValueInfoToCards, parseCardFromValueInfo } from 'src/database/elastic/conversion/ElasticToCards';
+const Router = new KoaRouter();
+export const resultsConfig = new ResultsConfig();
 
-import * as Immutable from 'immutable';
-import ESParserError from 'shared/database/elastic/parser/ESParserError';
-import CardsToElastic from 'src/database/elastic/conversion/CardsToElastic';
-
-function getExpectedFile(): string
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  return __filename.split('.')[0] + '.expected';
-}
-
-let expected;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const contents: any = await new Promise((resolve, reject) =>
+  let getItems;
+  if (ctx.request.body.body !== undefined && ctx.request.body.body.index !== undefined)
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(contents);
-  done();
+    winston.info('Getting results config of a specific index');
+    getItems = await resultsConfig.get(undefined, ctx.request.body.body.index);
+  }
+  else
+  {
+    winston.info('getting all results config');
+    getItems = await resultsConfig.get();
+  }
+  ctx.body = getItems;
 });
 
-function testCardParse(testName: string,
-  testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
+Router.post('/update', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('testing "' + testName + '": "' + testString + '"');
-  const emptyCards = Immutable.List([]);
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
-  const rootValueInfo = parser.getValueInfo();
-  const rootCards = ElasticValueInfoToCards(rootValueInfo, Immutable.List([]));
-  // parse the card
-  const rootCard = rootCards.get(0);
-  expect(rootCard['type']).toEqual('eqlbody');
-  const cardParser = new ESCardParser(rootCard);
-  // interpreting the parsed card
-  const cardInterpreter = new ESInterpreter(cardParser);
-  expect(cardInterpreter.errors).toEqual(expectedErrors);
-  expect(CardsToElastic.blockToElastic(rootCard)).toEqual(expectedValue);
-}
-
-test('parse card', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
-    {
-      const testValue: any = expected[testName];
-      testCardParse('test', JSON.stringify(testValue), testValue);
-    });
+  winston.info('Updating a results config');
+  const index: string = ctx.request.body.body.index;
+  const resultConfig: ResultsConfigConfig = ctx.request.body.body.resultsConfig;
+  ctx.body = await resultsConfig.upsert(ctx.state.user, index, resultConfig);
 });
+
+export default Router;
