@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import GraphLib = require('graphlib');
 import { List, Map } from 'immutable';
+import * as arrayTypeOfValues from 'array-typeof-values';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import nestedProperty = require('nested-property');
@@ -216,13 +217,13 @@ export class TransformationEngine
     };
   }
 
-  public addField(fullKeyPath: KeyPath, typeName: string): number
+  public addField(fullKeyPath: KeyPath, typeName: string, options: object = {}): number
   {
     this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
     this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
     this.fieldTypes = this.fieldTypes.set(this.uidField, typeName);
     this.fieldEnabled = this.fieldEnabled.set(this.uidField, true);
-    this.fieldProps = this.fieldProps.set(this.uidField, {});
+    this.fieldProps = this.fieldProps.set(this.uidField, options);
 
     this.uidField++;
     return this.uidField - 1;
@@ -380,26 +381,56 @@ export class TransformationEngine
         (fieldNamesOrIDs as List<KeyPath>).map((name: KeyPath) => this.fieldNameToIDMap.get(name)).toList()) : List<number>();
   }
 
-  private generateInitialFieldMaps(obj: object, currentKeyPath: KeyPath = List<string>()): List<number>
+  private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
-    let ids: List<number> = List<number>();
+    return ids.push(this.addField(currentKeyPath.push(key.toString()), typeof obj[key]));
+  }
+
+  private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
+  {
+    const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
+    ids = ids.push(arrayID);
+    this.setFieldProp(arrayID, KeyPath(['valueType']), arrayTypeOfValues(obj[key]));
+    for (let i: number = 0; i < obj[key].length; i++)
+    {
+      if (isPrimitive(obj[key][i]))
+      {
+        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+      } else if (Array.isArray(obj[key][i]))
+      {
+        ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+      } else
+      {
+        ids = ids.push(this.addField(currentKeyPath.push(key).push(i.toString()), typeof obj[key][i]));
+        ids = this.addObjectField(ids, obj[key][i], currentKeyPath.push(key.toString()).push(i.toString()));
+      }
+    }
+    return ids;
+  }
+
+  private addObjectField(ids: List<number>, obj: object, currentKeyPath: KeyPath): List<number>
+  {
     for (const key of Object.keys(obj))
     {
       if (isPrimitive(obj[key]))
       {
-        ids = ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
+        ids = this.addPrimitiveField(ids, obj, currentKeyPath, key);
       } else if (Array.isArray(obj[key]))
       {
-        for (const item of obj[key])
-        {
-          // TODO transform arrays in docs
-        }
+        ids = this.addArrayField(ids, obj, currentKeyPath, key);
       } else
       {
         ids = ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
-        ids = ids.concat(this.generateInitialFieldMaps(obj[key], currentKeyPath.push(key))).toList();
+        ids = this.addObjectField(ids, obj[key], currentKeyPath.push(key));
       }
     }
+    return ids;
+  }
+
+  private generateInitialFieldMaps(obj: object, currentKeyPath: KeyPath = List<string>()): List<number>
+  {
+    let ids: List<number> = List<number>();
+    ids = this.addObjectField(ids, obj, currentKeyPath);
     return ids;
   }
 

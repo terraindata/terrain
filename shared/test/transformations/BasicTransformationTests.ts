@@ -67,6 +67,11 @@ const doc2 = {
   },
 };
 
+const doc3 = {
+  name: 'Bob',
+  arr: [5, ['a', 'b'], { xkcd: 1270 }],
+};
+
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
@@ -242,4 +247,10 @@ test('rename a field (an object with subkeys)', () =>
   expect(e.transform(doc2)['meta']).toBe(undefined);
   expect(e.transform(doc2)['school']).toBe('Stanford');
   expect(e.transform(doc2)['sport']).toBe('bobsled');
+});
+
+test('process array types', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc3);
+  // console.dir(e, {colors: true, depth: null});
 });

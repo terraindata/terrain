@@ -789,6 +789,10 @@ array-reduce@~0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/array-reduce/-/array-reduce-0.0.0.tgz#173899d3ffd1c7d9383e4479525dbe278cab5f2b"
 
+array-typeof-values@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/array-typeof-values/-/array-typeof-values-1.0.1.tgz#5ae6d4d91bcbae8e63f6bc5900ca84b131f3ed82"
+
 array-union@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/array-union/-/array-union-1.0.2.tgz#9a34410e4f4e3da23dea375be5be70f24778ec39"
