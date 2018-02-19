@@ -54,6 +54,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { BuilderState } from 'builder/data/BuilderState';
 import Util from 'util/Util';
@@ -90,6 +91,7 @@ export interface Props
 
   builder?: BuilderState;
   builderActions?: typeof BuilderActions;
+  colorsActions?: typeof ColorsActions;
 }
 
 class PathfinderScoreLine extends TerrainComponent<Props>
@@ -103,6 +105,15 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       expanded: this.props.line.expanded,
       fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
     };
+
+  public componentWillMount()
+  {
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-score-line-transform .linear-selector-wrapper .linear-selector-option',
+      style: fontColor(Colors().fontColorLightest),
+    });
+  }
 
   public componentWillReceiveProps(nextProps)
   {
@@ -154,7 +165,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           options={List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'])}
           selected={line.transformData.mode}
           keyPath={this.props.keyPath.push('transformData').push('mode')}
-          action={BuilderActions.changePath}
+          action={this.props.builderActions.changePath}
           canEdit={pathfinderContext.canEdit}
           displayNames={Map({
             linear: 'Linear',
@@ -284,5 +295,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderScoreLine,
   ['builder'],
-  { builderActions: BuilderActions },
+  {
+    builderActions: BuilderActions,
+    colorsActions: ColorsActions,
+  },
 );
