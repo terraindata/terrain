@@ -92,7 +92,23 @@
   .lines-bg {
     opacity: .5;
   }
-  
+  .bar {
+    .bar-path {
+    opacity: 0.7
+    }
+    .bar-percentage {
+      font-size: 12px;
+      opacity: 0;
+      .transition;
+    }
+    &:hover {
+      .bar-percentage {
+        opacity: 1;
+      }
+    }
+  }
+
+
   .lines {
     stroke-width: 2px;
     fill: none;
@@ -106,10 +122,7 @@
       stroke: #fc5218;
     }
   }
-  
-  .bar {
-    opacity: .5;
-  }
+
 
   .popup {
     font-weight: bold;

@@ -106,11 +106,11 @@ const TransformChart = {
       .attr('opacity', 0);
 
     innerSvg.append('g')
-      .attr('class', 'bars');
-    innerSvg.append('g')
       .append('path')
       .attr('class', 'lines-bg')
       .attr('fill', state.colors[0]);
+    innerSvg.append('g')
+      .attr('class', 'bars');
 
     innerSvg.append('g')
       .append('path')
@@ -496,16 +496,16 @@ const TransformChart = {
   _roundedRect(x, y, w, h, r)
   {
     let retval;
-    retval  = "M" + (x + r) + "," + y;
-    retval += "h" + (w - 2 * r);
-    retval += "a" + r + "," + r + " 0 0 1 " + r + "," + r;
-    retval += "v" + (h - 2 * r);
-    retval += "v" + r; retval += "h" + -r;
-    retval += "h" + (2 * r - w);
-    retval += "h" + -r; retval += "v" + -r;
-    retval += "v" + (2 * r - h);
-    retval += "a" + r + "," + r + " 0 0 1 " + r + "," + -r;
-    retval += "z";
+    retval = 'M' + (x + r) + ',' + y;
+    retval += 'h' + (w - 2 * r);
+    retval += 'a' + r + ',' + r + ' 0 0 1 ' + r + ',' + r;
+    retval += 'v' + (h - 2 * r);
+    retval += 'v' + r; retval += 'h' + -r;
+    retval += 'h' + (2 * r - w);
+    retval += 'h' + -r; retval += 'v' + -r;
+    retval += 'v' + (2 * r - h);
+    retval += 'a' + r + ',' + r + ' 0 0 1 ' + r + ',' + -r;
+    retval += 'z';
     return retval;
   },
 
@@ -517,31 +517,67 @@ const TransformChart = {
       .data(barsData, (d) => d['id']);
 
     const xPadding = 5;
+    const radius = 3;
+    const barEnter = bar.enter()
+      .append('g')
+      .attr('class', 'bar');
 
-    const barWidth = (d) =>
+    barEnter.append('path')
+      .attr('class', 'bar-path');
+    barEnter.append('text')
+      .attr('class', 'bar-percentage');
+
+    bar.select('.bar-path')
+      .attr('d', function(d)
+      {
+        return TransformChart._roundedRect
+          (scales.realX(d['range']['min']) + xPadding,
+          scales.realBarY(d['percentage']),
+          Math.max(1, scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding),
+          scaleMin(scales.realBarY) - scales.realBarY(d['percentage']),
+          radius);
+      })
+      .attr('fill', colors[0])
+      ;
+
+    const textX = (d) =>
     {
       let width = scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding;
       if (width < 1)
       {
         width = 1;
       }
-      return width;
+      let offset = 7;
+      if (d['percentage'] * 100 < 10)
+      {
+        offset = 3;
+      }
+      return scales.realX(d['range']['min']) + width / 2 - offset;
     };
-    const radius = 3;
-    bar.enter()
-      .append('path')
-      .attr("d", function(d) {
-      return TransformChart._roundedRect
-        (scales.realX(d['range']['min']) + xPadding,
-         scales.realBarY(d['percentage']),
-         Math.max(1, scales.realX(d['range']['max']) - scales.realX(d['range']['min']) - 2 * xPadding),
-         scaleMin(scales.realBarY) - scales.realBarY(d['percentage']),
-         radius);
-      })
-      .attr('class', 'bar')
-      .attr('fill', colors[0])
-    ;
 
+    const textY = (d) =>
+    {
+      if (d['percentage'] * 100 >= 5)
+      {
+        return scales.realBarY(d['percentage']) + 20;
+      }
+      return scales.realBarY(d['percentage']) - 5;
+    };
+
+    const textColor = (d) =>
+    {
+      if (d['percentage'] * 100 >= 5)
+      {
+        return Colors().fontWhite;
+      }
+      return Colors().fontColor2;
+    };
+
+    bar.select('.bar-percentage')
+      .attr('x', textX)
+      .attr('y', textY)
+      .attr('fill', textColor)
+      .text((d) => Math.round(d['percentage'] * 100) + '%');
     bar.exit().remove();
   },
 

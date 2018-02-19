@@ -176,7 +176,7 @@ const Periscope = {
         return Colors().active;
       }
       return Colors().blockOutline;
-    }
+    };
 
     bar.enter()
       .append('rect')
@@ -280,11 +280,11 @@ const Periscope = {
         .style('left', left + 'px')
         .style('color', Colors().active)
         .on('change', function()
-          {
-            let value = d3.select(el).select('#input-0').node().value;
-            value = Util.formattedToNumber(value);
-            onDomainLowChange(value)
-          }.bind(this))
+        {
+          let value = d3.select(el).select('#input-0').node().value;
+          value = Util.formattedToNumber(value);
+          onDomainLowChange(value);
+        }.bind(this))
         ;
     }
     // get the second handle
@@ -299,12 +299,11 @@ const Periscope = {
         .style('left', left2 + 'px')
         .style('color', Colors().active)
         .on('change', function()
-          {
-            let value = d3.select(el).select('#input-1').node().value;
-            value = Util.formattedToNumber(value);
-            onDomainHighChange(value);
-          }.bind(this))
-        ;
+        {
+          let value = d3.select(el).select('#input-1').node().value;
+          value = Util.formattedToNumber(value);
+          onDomainHighChange(value);
+        }.bind(this))
         ;
     }
   },

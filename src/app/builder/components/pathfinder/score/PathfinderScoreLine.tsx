@@ -54,6 +54,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import LinearSelector from 'app/common/components/LinearSelector';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
 import SearchableDropdown from '../../../../common/components/SearchableDropdown';
@@ -62,7 +63,6 @@ import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
-import LinearSelector from 'app/common/components/LinearSelector';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
@@ -131,7 +131,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public renderTransformChart()
   {
-    const {line, pathfinderContext} = this.props;
+    const { line, pathfinderContext } = this.props;
     const data = {
       input: line.field,
       domain: line.transformData.domain,
@@ -152,12 +152,13 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           keyPath={this.props.keyPath.push('transformData').push('mode')}
           action={BuilderActions.changePath}
           canEdit={pathfinderContext.canEdit}
-          displayNames={Map({linear: 'Linear',
-                            logarithmic: 'Logarithmic',
-                            exponential: 'Exponential',
-                            normal: 'Bell-Curve',
-                            sigmoid: 'S-Curve',
-                        })}
+          displayNames={Map({
+            linear: 'Linear',
+            logarithmic: 'Logarithmic',
+            exponential: 'Exponential',
+            normal: 'Bell-Curve',
+            sigmoid: 'S-Curve',
+          })}
         />
         <TransformCard
           builderState={BuilderStore.getState()}
