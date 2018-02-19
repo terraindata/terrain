@@ -107,9 +107,11 @@ export interface Props
 class HitComponent extends TerrainComponent<Props> {
 
   public state: {
+    hovered: boolean;
     // spotlights: IMMap<string, any>;
   } =
     {
+      hovered: false,
       // spotlights: SpotlightStore.getState().spotlights,
     };
 
@@ -324,6 +326,8 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className={classes}
         onDoubleClick={this.expand}
+        onMouseEnter={this._fn(this.handleHover, true)}
+        onMouseLeave={this._fn(this.handleHover, false)}
       >
         <div
           className={classNames({
@@ -347,22 +351,25 @@ class HitComponent extends TerrainComponent<Props> {
                   width: thumbnailWidth,
                   minWidth: thumbnailWidth,
                 }}
+                key={1}
               >
               </div>
             ,
-            <Draggable
-              axis='x'
-              bounds='parent'
-              position={{
-                x: thumbnailWidth - 15,
-                y: 0,
-              }}
-              onDrag={this.handleThumbnailResize}
-            >
-              <div
-                className='result-thumbnail-resizer'
-              />
-            </Draggable>
+            this.state.hovered &&
+              <Draggable
+                axis='x'
+                bounds='parent'
+                position={{
+                  x: thumbnailWidth - 15,
+                  y: 0,
+                }}
+                onDrag={this.handleThumbnailResize}
+                key={2}
+              >
+                <div
+                  className='result-thumbnail-resizer'
+                />
+              </Draggable>
           ] : null}
           <div 
             className={classNames({
@@ -421,13 +428,19 @@ class HitComponent extends TerrainComponent<Props> {
     ));
   }
   
+  private handleHover(hovered: boolean)
+  {
+    this.setState({
+      hovered,
+    });
+  }
+  
   private handleThumbnailResize(e, data: { 
     x: number, y: number,
     deltaX: number, deltaY: number,
   })
   {
     const {x, y} = data;
-    console.log(x, y, data.deltaX);
     
     let config = this.props.resultsConfig;
     const key = this.props.hitSize === 'small' ? 'smallThumbnailWidth' : 'thumbnailWidth';

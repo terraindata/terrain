@@ -449,7 +449,7 @@ class HitsArea extends TerrainComponent<Props>
     {
       hitsAreOutdated = true;
       infoAreaContent = <InfoArea
-        large='The database is empty, please select the database.'
+        large='The database is empty, please select a database.'
       />;
     }
     else if (this.isQueryEmpty())
@@ -549,12 +549,11 @@ class HitsArea extends TerrainComponent<Props>
       catch (e)
       { }
       hitsContent = (
-        <InfiniteScroll
+        <div
           className={classNames({
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
-          onRequestMoreItems={this.handleRequestMoreHits}
         >
           {
             hits.map((hit, index) =>
@@ -581,13 +580,8 @@ class HitsArea extends TerrainComponent<Props>
               );
             })
           }
-          {
-            this.hitsFodderRange.map(
-              (i) =>
-                <div className='results-area-fodder' key={i} />,
-            )
-          }
-        </InfiniteScroll>
+          
+        </div>
       );
     }
 

@@ -342,7 +342,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
                   {...textboxProps}
                   isTextInput={true}
                   canEdit={this.props.canEdit}
-                  onKeyDown={this.handleSearchKeyDown}
+                  onKeyDown={this.handleInputKeyDown}
                   onFocus={this.handleOptionSearchFocus}
                   id={index}
                 />
@@ -353,7 +353,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
                 length={0}
                 onIndexChange={_.noop}
                 onSelect={_.noop}
-                onKeyDown={this.handleSearchKeyDown}
+                onKeyDown={this.handleInputKeyDown}
                 onFocus={this._fn(this.handleOptionSearchFocus, index)}
                 onFocusLost={this._fn(this.handleOptionSearchFocusLost, index)}
                 focusOverride={this.state.focusedSetIndex === index}
@@ -416,7 +416,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
     }, 200);
   }
   
-  private handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>)
+  private handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>)
   {
     const { keyCode } = e;
     const { optionSets } = this.props;
@@ -458,6 +458,16 @@ export class MultiPathPicker extends TerrainComponent<Props>
         // enter
         entered = true;
         break;
+      default:
+        const set = optionSets.get(focusedSetIndex);
+        if (set && set.hasOther)
+        {
+          // keydown occured in a value textbox
+          //  reset the focused index so that the user doesn't hit enter
+          //   thinking they are using the value when they're actually focused
+          //   on an option
+          focusedOptionIndex = -1;
+        }
     }
     
     // gate between allowable values
@@ -531,27 +541,12 @@ export class MultiPathPicker extends TerrainComponent<Props>
       
       if(el)
       {
-        console.log('el');
         el.scrollIntoView({
           behavior: 'smooth',
           block: 'nearest',
           inline: 'nearest',
         });
       }
-      
-      // const columnEl = ReactDOM.findDOMNode(this.state.columnRefs.get(focusedSetIndex));
-      // console.log(this.state.columnRefs.get(focusedSetIndex), focusedSetIndex, this.state.columnRefs);
-      //   console.log('1');
-      // if (columnEl)
-      // {
-      //   console.log('2');
-      //   const focusedOptionEl = columnEl.getElementsByClassName('pathpicker-option-focused')[0];
-      //   if (focusedOptionEl)
-      //   {
-      //   console.log('3');
-          
-      //   }
-      // }
     }, 100);
   }
   
@@ -834,7 +829,6 @@ export class MultiPathPicker extends TerrainComponent<Props>
   
   private attachColumnRef(optionSetIndex, columnRef)
   {
-    console.log(optionSetIndex, columnRef);
     this.setState({
       columnRefs: this.state.columnRefs.set(optionSetIndex, columnRef),
     });

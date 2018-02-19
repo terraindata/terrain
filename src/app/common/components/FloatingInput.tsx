@@ -193,7 +193,16 @@ export class FloatingInput extends TerrainComponent<Props>
     valueRef: null,
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.autoFocus && !this.props.autoFocus)
+    {
+      // needed because the autoFocus prop is only checked on mount
+      this.autoFocus();
+    }
+  }
+  
+  public componentDidMount()
   {
     //
   }
@@ -267,16 +276,17 @@ export class FloatingInput extends TerrainComponent<Props>
       // Return a text input
       return (
         <Input
+          type='text'
           large={props.large}
-          value={value === null ? '' : value}
-          id={state.myId}
+          value={value === null || value === undefined ? '' : value}
           onChange={this.handleChange}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          ref={this.getValueRef}
-          onKeyDown={this.handleKeyDown}
           autoFocus={props.autoFocus}
           noBorder={props.noBorder}
+          onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
+          id={state.myId}
+          ref={this.getValueRef}
+          onKeyDown={this.handleKeyDown}
         />
       );
     }
@@ -343,6 +353,20 @@ export class FloatingInput extends TerrainComponent<Props>
     }
     
     this.props.onKeyDown && this.props.onKeyDown(e);
+  }
+  
+  private autoFocus()
+  {
+    // force focus, needed if component has mounted and autoFocus flag changes
+    let { valueRef } = this.state;
+    if (valueRef)
+    {
+      const valueEl = ReactDOM.findDOMNode(valueRef);
+      if (valueEl && valueEl['focus'])
+      {
+        valueEl['focus']();
+      }
+    }
   }
 }
 

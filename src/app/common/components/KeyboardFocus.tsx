@@ -99,6 +99,7 @@ class KeyboardFocus extends TerrainComponent<Props>
 
   componentWillReceiveProps(nextProps: Props)
   {
+    // this is necessary because autofocus only triggers on initial render
     if (nextProps.focusOverride && !this.props.focusOverride)
     {
       this.refs['select']['focus']();
@@ -120,6 +121,7 @@ class KeyboardFocus extends TerrainComponent<Props>
         onBlur={this.props.onFocusLost}
         onKeyDown={this.handleKeyDown}
         ref='select'
+        autoFocus={this.props.focusOverride}
       >
       </select>
     );
