@@ -51,7 +51,7 @@ export class ExportTemplateConfig extends TemplateBase
 {
   public objectKey?: string = undefined;
   public query?: string = undefined;
-  public rank?: boolean = undefined;
+  public rank?: boolean = false;
   public templateId?: number = undefined;
   public algorithmId?: number = undefined;
 

@@ -57,6 +57,8 @@ import v8 = require('v8');
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
+import any = jasmine.any;
+import appStats from './AppStats';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
@@ -78,12 +80,14 @@ export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
 
+export let currentApp: App = null;
+
 export class App
 {
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DBUtil.makeDatabaseController(type, dsn);
+    const controller = DBUtil.makeDatabaseController(type, 0, dsn);
     return controller.getTasty();
   }
 
@@ -103,9 +107,19 @@ export class App
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
+  private numRequests: number;
+  private numRequestsThatThrew: number;
+  private numRequestsCompleted: number;
+  private startTime: Date;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
+    this.startTime = new Date();
+    this.numRequests = 0;
+    this.numRequestsThatThrew = 0;
+    this.numRequestsCompleted = 0;
+    currentApp = this;
+
     process.on('uncaughtException', App.uncaughtExceptionHandler);
     process.on('unhandledRejection', App.unhandledRejectionHandler);
 
@@ -127,6 +141,48 @@ export class App
       ctx.req.setTimeout(0, () => { });
       await next();
     });
+
+    this.app.use(async (ctx, next) =>
+    {
+      const requestNumber: number = ++appStats.numRequests;
+
+      const logPrefix: string = 'Request #' + requestNumber.toString() + ': ';
+
+      const start = Date.now();
+      const info: string = JSON.stringify(
+        [
+          ctx.request.ip,
+          ctx.request.headers['X-Orig-IP'],
+          ctx.request.method,
+          ctx.request.type,
+          ctx.request.length,
+          ctx.request.href,
+        ]);
+
+      winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': BEGIN : ' + info);
+
+      let err: any = null;
+      try
+      {
+        await next();
+      } catch (e)
+      {
+        err = e;
+        appStats.numRequestsThatThrew++;
+        winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': ERROR : ' + info);
+      }
+
+      appStats.numRequestsCompleted++;
+      const ms = Date.now() - start;
+      winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': END (' + ms.toString() + 'ms): ' + info);
+
+      if (err !== null)
+      {
+        throw err;
+      }
+
+    });
+
     this.app.use(cors());
     this.app.use(session(undefined, this.app));
 
@@ -209,6 +265,16 @@ export class App
   public getConfig(): Config.Config
   {
     return this.config;
+  }
+
+  public getRequestCounts(): number[]
+  {
+    return [this.numRequests, this.numRequests - this.numRequestsCompleted, this.numRequestsThatThrew];
+  }
+
+  public getStartTime(): Date
+  {
+    return this.startTime;
   }
 }
 

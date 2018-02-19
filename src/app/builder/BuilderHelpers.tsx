@@ -51,15 +51,18 @@ import { Input, InputPrefix } from '../../blocks/types/Input';
 
 import * as Immutable from 'immutable';
 import { SchemaState } from 'schema/SchemaTypes';
-import { BuilderState, BuilderStore } from './data/BuilderStore';
+import { BuilderState } from './data/BuilderState';
 
-export function getTermsForKeyPath(keyPath: KeyPath, schemaState: SchemaState): List<string>
+export function getTermsForKeyPath(
+  keyPath: KeyPath,
+  schemaState: SchemaState,
+  builderState: BuilderState,
+): List<string>
 {
-  const state = BuilderStore.getState();
-  const terms = getTermsForKeyPathHelper(keyPath, state, schemaState);
+  const terms = getTermsForKeyPathHelper(keyPath, builderState, schemaState);
 
   // TODO migrate inputs reduction to the Query class if we get a query class
-  const inputs = state.query && state.query.inputs;
+  const inputs = builderState.query && builderState.query.inputs;
   if (inputs && inputs.size)
   {
     const inputTerms = inputs.map(
@@ -84,7 +87,7 @@ function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState, schemaS
 
   let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state, schemaState);
 
-  const block = BuilderStore.getState().getIn(keyPath);
+  const block = state.getIn(keyPath);
 
   if (block && block._isCard)
   {
@@ -107,7 +110,7 @@ function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState, schemaS
         {
           if (childCard.static.getParentTerms)
           {
-            terms = terms.concat(childCard.static.getParentTerms(childCard, schemaState)).toList();
+            terms = terms.concat(childCard.static.getParentTerms(childCard, schemaState, state)).toList();
           }
         },
       );

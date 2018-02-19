@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import { Record } from 'immutable';
+import { createRecordType } from '../Classes';
 
 // equivalent of SchedulerConfig defined in miday/src/app/scheduler/SchedulerConfig.ts
 class SchedulerConfigC
@@ -67,7 +68,7 @@ class SchedulerConfigC
   public transportStr?: string = '';             // JSON stringified representation of transport
 }
 
-const SchedulerConfig_Record = Record(new SchedulerConfigC());
+const SchedulerConfig_Record = createRecordType(new SchedulerConfigC(), 'SchedulerConfigC');
 export interface SchedulerConfig extends SchedulerConfigC, IRecord<SchedulerConfig> { }
 export const _SchedulerConfig =
   (config: {
@@ -100,7 +101,7 @@ class CredentialConfigC
   public type: string = '';
 }
 
-const CredentialConfig_Record = Record(new CredentialConfigC());
+const CredentialConfig_Record = createRecordType(new CredentialConfigC(), 'CredentialConfigC');
 export interface CredentialConfig extends CredentialConfigC, IRecord<CredentialConfig> { }
 export const _CredentialConfig =
   (config: {

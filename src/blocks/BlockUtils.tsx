@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import { Block, BlockConfig } from './types/Block';
 import { Card, Cards } from './types/Card';
 
+import { createRecordType } from '../app/Classes';
 import { DisplayType } from './displays/Display';
 // import { AllBackendsMap } from '../database/AllBackends';
 
@@ -338,7 +339,7 @@ export function initBlocks(Blocks)
       // Set the "type" field for all blocks equal to its key
       Blocks[i].type = i;
       // finally, add Blocks to the blockTypeToBlockRecord map
-      blockTypeToBlockRecord[i] = Immutable.Record(Blocks[i]);
+      blockTypeToBlockRecord[i] = createRecordType(Blocks[i], i);
     },
   );
 }

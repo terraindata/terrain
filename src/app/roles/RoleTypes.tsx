@@ -44,14 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import { createRecordType } from '../Classes';
 
-const _Role = Immutable.Record(
+const _Role = createRecordType(
   {
     categoryId: '',
     userId: '',
     admin: false,
     builder: false,
-  });
+  }, 'RoleC');
 export class Role extends _Role
 {
   public categoryId: ID;

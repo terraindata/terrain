@@ -126,21 +126,7 @@ class ElasticClient
   public deleteScript(params: Elastic.DeleteScriptParams, callback: (error: any, response: any) => void): void
   {
     this.log('deleteScript', params);
-
-    let host = this.getConfig().host;
-    if (host === undefined)
-    {
-      if (this.getConfig().hosts !== undefined && this.getConfig().hosts.length > 0)
-      {
-        host = this.getConfig().hosts[0];
-      }
-    }
-
-    if (host === undefined)
-    {
-      return callback(new Error('Unknown host'), undefined);
-    }
-
+    const host = this.getHostFromConfig();
     request({
       method: 'DELETE',
       url: String(host) + '/_scripts/' + params.id,
@@ -172,21 +158,7 @@ class ElasticClient
     callback: (error: any, response: any) => void): void
   {
     this.log('get script', params);
-
-    let host = this.getConfig().host;
-    if (host === undefined)
-    {
-      if (this.getConfig().hosts !== undefined && this.getConfig().hosts.length > 0)
-      {
-        host = this.getConfig().hosts[0];
-      }
-    }
-
-    if (host === undefined)
-    {
-      return callback(new Error('Unknown host'), undefined);
-    }
-
+    const host = this.getHostFromConfig();
     request({
       method: 'GET',
       json: true,
@@ -222,21 +194,7 @@ class ElasticClient
   public putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void
   {
     this.log('putScript', params);
-
-    let host = this.getConfig().host;
-    if (host === undefined)
-    {
-      if (this.getConfig().hosts !== undefined && this.getConfig().hosts.length > 0)
-      {
-        host = this.getConfig().hosts[0];
-      }
-    }
-
-    if (host === undefined)
-    {
-      return callback(new Error('Unknown host'), undefined, undefined);
-    }
-
+    const host = this.getHostFromConfig();
     request({
       method: 'POST',
       url: String(host) + '/_scripts/' + params.id,
@@ -247,7 +205,10 @@ class ElasticClient
           source: params.body,
         },
       },
-    }, callback);
+    }, (err, res, body) =>
+      {
+        callback(err, body, res.statusCode);
+      });
 
     // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
     // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
@@ -334,6 +295,29 @@ class ElasticClient
     this.controller.log('ElasticClient.' + methodName, info);
   }
 
+  private getHostFromConfig(): string
+  {
+    let host: string = this.getConfig().host;
+    if (host === undefined)
+    {
+      if (this.getConfig().hosts !== undefined && this.getConfig().hosts.length > 0)
+      {
+        host = this.getConfig().hosts[0];
+      }
+    }
+
+    if (host === undefined)
+    {
+      throw new Error('Unknown host');
+    }
+
+    if (host.substr(0, 4) !== 'http')
+    {
+      host = 'http://' + String(host);
+    }
+
+    return host;
+  }
 }
 
 export default ElasticClient;

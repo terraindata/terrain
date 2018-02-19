@@ -77,6 +77,7 @@ export interface Props
   hideTitle?: boolean;
   colorsActions?: typeof ColorsActions;
   toSkip?: number;
+  builderActions?: typeof BuilderActions;
 }
 
 class PathfinderMoreSection extends TerrainComponent<Props>
@@ -102,29 +103,29 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleReferenceChange(i, value)
   {
-    BuilderActions.changePath(this.props.keyPath.push('references').push(i), value);
+    this.props.builderActions.changePath(this.props.keyPath.push('references').push(i), value);
     if (this.props.path.nested.get(i) === undefined)
     {
       const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
-      BuilderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
+      this.props.builderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
     }
   }
 
   public handleAddNested()
   {
-    BuilderActions.changePath(this.props.keyPath.push('references'), this.props.more.references.push(''));
+    this.props.builderActions.changePath(this.props.keyPath.push('references'), this.props.more.references.push(''));
     const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested');
-    BuilderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
+    this.props.builderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
   }
 
   public handleDeleteNested(i)
   {
-    BuilderActions.changePath(
+    this.props.builderActions.changePath(
       this.props.keyPath.push('references'),
       this.props.more.references.splice(i, 1),
     );
     const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested');
-    BuilderActions.changePath(
+    this.props.builderActions.changePath(
       nestedKeyPath,
       this.props.path.nested.splice(i, 1), true);
   }
@@ -132,13 +133,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleAddLine()
   {
     const newLines = this.props.more.aggregations.push(_AggregationLine());
-    BuilderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
+    this.props.builderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
   }
 
   public handleDeleteLine(index)
   {
     const newLines = this.props.more.aggregations.delete(index);
-    BuilderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
+    this.props.builderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
   }
 
   public handleLinesReorder(items)
@@ -148,7 +149,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     {
       return this.props.more.aggregations.get(index);
     });
-    BuilderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
+    this.props.builderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
   }
 
   public getAggregationLines()
@@ -283,5 +284,6 @@ export default Util.createContainer(
   ['colors'],
   {
     colorsActions: ColorsActions,
+    builderActions: BuilderActions,
   },
 );

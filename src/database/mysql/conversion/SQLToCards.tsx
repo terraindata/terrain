@@ -227,26 +227,26 @@ const generalProcessors: {
         const tables = _.compact(
           flattenCommas(node.child)
             .map(
-            (tableNode) =>
-            {
-              if (!tableNode)
+              (tableNode) =>
               {
-                return null;
-              }
-              if (typeof tableNode !== 'object' || tableNode.op !== 'AS')
-              {
-                return make(Blocks.table, {
-                  table: tableNode,
-                });
-              }
-              else
-              {
-                return make(Blocks.table, {
-                  table: parseNode(tableNode.left_child),
-                  alias: tableNode.right_child,
-                });
-              }
-            },
+                if (!tableNode)
+                {
+                  return null;
+                }
+                if (typeof tableNode !== 'object' || tableNode.op !== 'AS')
+                {
+                  return make(Blocks.table, {
+                    table: tableNode,
+                  });
+                }
+                else
+                {
+                  return make(Blocks.table, {
+                    table: parseNode(tableNode.left_child),
+                    alias: tableNode.right_child,
+                  });
+                }
+              },
           ));
 
         let cards = List([]);

@@ -5,7 +5,7 @@
   "main": "lib/analytics.ts",
   "private": true,
   "scripts": {
-    "build": "webpack --config webpack.config.js --output-filename ./build/bundle.js",
+    "build": "mkdir build ; webpack --config webpack.config.js --output-filename ./build/bundle.js",
     "lint": "tslint -c tslint.json --fix --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;"

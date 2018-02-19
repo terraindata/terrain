@@ -53,6 +53,7 @@ import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
 import Select from 'react-select';
+import Util from 'util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import ElasticBlockHelpers from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
@@ -64,7 +65,6 @@ import PathfinderLine from '../PathfinderLine';
 import PathfinderText from '../PathfinderText';
 import { ADVANCED_MAPPINGS, AggregationLine, AggregationTypes, PathfinderContext } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
-import { BuilderStore } from './../../../data/BuilderStore';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';
 import PathfinderAggregationMoreArea from './PathfinderAggregationMoreArea';
 
@@ -77,6 +77,9 @@ export interface Props
   onDelete: (index) => void;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
+
+  builderActions?: typeof BuilderActions;
+  db?: any;
 }
 
 class PathfinderAggregationLine extends TerrainComponent<Props>
@@ -116,7 +119,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 
   public toggleExpanded()
   {
-    BuilderActions.changePath(this.props.keyPath.push('expanded'), !this.props.aggregation.expanded);
+    this.props.builderActions.changePath(this.props.keyPath.push('expanded'), !this.props.aggregation.expanded);
   }
 
   public handleTypeChange(index)
@@ -128,13 +131,14 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleFieldChange(index: number)
   {
     const newField = this.state.fieldOptions.get(index);
-    BuilderActions.changePath(this.props.keyPath.push('field'), newField, false, true);
+    this.props.builderActions.changePath(this.props.keyPath.push('field'), newField, false, true);
     const fieldType = ElasticBlockHelpers.getTypeOfField(
       this.props.pathfinderContext.schemaState,
+      this.props.pathfinderContext.builderState,
       newField,
       this.props.pathfinderContext.source.dataSource,
     );
-    BuilderActions.changePath(this.props.keyPath.push('fieldType'), fieldType);
+    this.props.builderActions.changePath(this.props.keyPath.push('fieldType'), fieldType);
     this.updateAggregation(this.props.aggregation.type, newField);
   }
 
@@ -151,13 +155,13 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     {
       elasticType = this.getElasticType(type, field);
     }
-    BuilderActions.changePath(this.props.keyPath.push('elasticType'), elasticType);
+    this.props.builderActions.changePath(this.props.keyPath.push('elasticType'), elasticType);
 
     // Update the advanced section of the aggregation
     const advancedTypes = this.getAdvancedOptions(type, elasticType);
     const advancedObj = this.createAdvancedObject(advancedTypes, field);
-    BuilderActions.changePath(this.props.keyPath.push('advanced'), Map(advancedObj));
-    BuilderActions.changePath(this.props.keyPath.push('advanced').push('name'), type + ' ' + field);
+    this.props.builderActions.changePath(this.props.keyPath.push('advanced'), Map(advancedObj));
+    this.props.builderActions.changePath(this.props.keyPath.push('advanced').push('name'), type + ' ' + field);
   }
 
   // This function, given a type of aggregation, returns a list of the advanced settings for that
@@ -204,7 +208,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     // For the keys min, max, and interval (if they exist), auto-fill by running an aggregation query
     if (advancedObj.get('min') !== undefined)
     {
-      const { db } = BuilderStore.getState();
+      const { db } = this.props;
       const backend = {
         id: db.id,
         name: db.name,
@@ -248,9 +252,9 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
             const min = resp.result.aggregations.minimum.value;
             const max = resp.result.aggregations.maximum.value;
             const interval = (max - min) / 10;
-            BuilderActions.changePath(this.props.keyPath.push('advanced').push('min'), min);
-            BuilderActions.changePath(this.props.keyPath.push('advanced').push('max'), max);
-            BuilderActions.changePath(this.props.keyPath.push('advanced').push('interval'), interval);
+            this.props.builderActions.changePath(this.props.keyPath.push('advanced').push('min'), min);
+            this.props.builderActions.changePath(this.props.keyPath.push('advanced').push('max'), max);
+            this.props.builderActions.changePath(this.props.keyPath.push('advanced').push('interval'), interval);
           }
 
         },
@@ -273,6 +277,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     // Get the type of field (using schema) and narrow down th options with fieldTypesToElasticTYpes
     const fieldType: FieldType = ElasticBlockHelpers.getTypeOfField(
       this.props.pathfinderContext.schemaState,
+      this.props.pathfinderContext.builderState,
       field,
       this.props.pathfinderContext.source.dataSource,
     );
@@ -331,7 +336,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   // (e.g. average aggregations can only be used on numerical or date fields, not text fields)
   public filterFieldOptions(type): List<string>
   {
-    const { schemaState, source } = this.props.pathfinderContext;
+    const { schemaState, builderState, source } = this.props.pathfinderContext;
     let allFieldOptions = List([]);
     if (source.dataSource.getChoiceOptions !== undefined)
     {
@@ -339,6 +344,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         type: 'fields',
         source,
         schemaState,
+        builderState,
       }).map((option) => option.displayName).toList();
     }
     // If the type has not been chosen, or the type can accept Any field, return all fields
@@ -350,7 +356,14 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     const acceptedTypes = AggregationTypes.get(type).acceptedTypes;
     acceptedTypes.forEach((fieldType) =>
     {
-      filteredOptions = filteredOptions.union(ElasticBlockHelpers.getFieldsOfType(schemaState, fieldType, source.dataSource).toSet());
+      filteredOptions = filteredOptions.union(
+        ElasticBlockHelpers.getFieldsOfType(
+          schemaState,
+          builderState,
+          fieldType,
+          source.dataSource,
+        ).toSet(),
+      );
     });
     return filteredOptions.toList();
   }
@@ -369,7 +382,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           keyPath={this.props.keyPath.push('type')}
           onChange={this.handleTypeChange}
           canEdit={canEdit}
-          action={BuilderActions.changePath}
+          action={this.props.builderActions.changePath}
         />
         <SearchableDropdown
           selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
@@ -410,12 +423,12 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       return;
     }
     elasticType = this.getElasticType(type, undefined, key);
-    BuilderActions.changePath(this.props.keyPath.push('elasticType'), elasticType);
+    this.props.builderActions.changePath(this.props.keyPath.push('elasticType'), elasticType);
     // If switching from ranges to uniform interval, auto-fill the interval values
     if (radioKey === 'rangeType')
     {
       const advancedTypes = this.getAdvancedOptions(this.props.aggregation.type, elasticType);
-      BuilderActions.changePath(this.props.keyPath.push('advanced'),
+      this.props.builderActions.changePath(this.props.keyPath.push('advanced'),
         this.createAdvancedObject(advancedTypes, this.props.aggregation.field));
     }
   }
@@ -476,4 +489,8 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderAggregationLine;
+export default Util.createTypedContainer(
+  PathfinderAggregationLine,
+  [['builder', 'db']],
+  { builderActions: BuilderActions },
+);

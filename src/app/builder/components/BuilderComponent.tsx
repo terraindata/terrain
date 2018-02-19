@@ -50,6 +50,7 @@ import './BuilderComponent.less';
 
 import FadeInOut from 'common/components/FadeInOut';
 import * as React from 'react';
+import Util from 'util/Util';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
@@ -57,7 +58,7 @@ import Dropdown from '../../common/components/Dropdown';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
-import { BuilderState, BuilderStore } from '../data/BuilderStore';
+import { BuilderState } from '../data/BuilderState';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 
@@ -85,6 +86,8 @@ export interface Props
   tuningMode?: boolean;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
+  builder?: BuilderState;
+  builderActions?: typeof BuilderActions;
 }
 
 class BuilderComponent extends TerrainComponent<Props>
@@ -98,17 +101,17 @@ class BuilderComponent extends TerrainComponent<Props>
 
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
-    BuilderActions.create(keyPath, index + 1, display.factoryType);
+    this.props.builderActions.create(keyPath, index + 1, display.factoryType);
   }
 
   public removeRow(keyPath: KeyPath, index: number)
   {
-    BuilderActions.remove(keyPath, index);
+    this.props.builderActions.remove(keyPath, index);
   }
 
   public moveRow(keyPath: KeyPath, index: number, newIndex: number)
   {
-    BuilderActions.move(keyPath, index, newIndex);
+    this.props.builderActions.move(keyPath, index, newIndex);
   }
 
   public renderDisplay(displayArg: Display | Display[],
@@ -227,6 +230,7 @@ class BuilderComponent extends TerrainComponent<Props>
           display={d}
           language={this.props.language}
           tuningMode={this.props.tuningMode}
+          builderActions={this.props.builderActions}
         />;
         break;
       case DisplayType.DROPDOWN:
@@ -423,8 +427,8 @@ class BuilderComponent extends TerrainComponent<Props>
                   canEdit: this.props.canEdit,
                   helpOn: this.props.helpOn,
                   className,
-                  onChange: BuilderActions.change,
-                  builderState: d.requiresBuilderState && BuilderStore.getState(),
+                  onChange: this.props.builderActions.change,
+                  builderState: d.requiresBuilderState && this.props.builder,
                   language: this.props.language,
                   handleCardDrop: this.props.handleCardDrop,
                 },
@@ -554,4 +558,8 @@ class BuilderComponent extends TerrainComponent<Props>
   }
 }
 
-export default BuilderComponent;
+export default Util.createTypedContainer(
+  BuilderComponent,
+  ['builder'],
+  { builderActions: BuilderActions },
+);

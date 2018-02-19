@@ -61,11 +61,9 @@ import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
-import Actions from '../../data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
-
 import Ajax from 'app/util/Ajax';
 import Radium = require('radium');
 import { AllBackendsMap } from '../../../../database/AllBackends';
@@ -76,8 +74,9 @@ import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import MapComponent from '../../../common/components/MapComponent';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import MapUtil from '../../../util/MapUtil';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
+import {BuilderState} from 'app/builder/data/BuilderState';
+import Util from 'app/util/Util';
 
 const HITS_PAGE_SIZE = 20;
 
@@ -85,6 +84,7 @@ export interface Props
 {
   resultsState: ResultsState;
   exportState?: FileImportState;
+  builder?: BuilderState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -122,9 +122,9 @@ const MAP_MIN_HEIGHT = 25; // height of top bar on map
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
-  public static handleConfigChange(config: ResultsConfig)
+  public static handleConfigChange(config: ResultsConfig, builderActions)
   {
-    Actions.changeResultsConfig(config);
+    builderActions.changeResultsConfig(config);
   }
 
   public state: State = {
@@ -189,7 +189,7 @@ class HitsArea extends TerrainComponent<Props>
 
   public setIndexAndResultsConfig(props: Props)
   {
-    let indexName = props.db.name + '/' + getIndex();
+    let indexName = props.db.name + '/' + getIndex('', this.props.builder);
     if (props.query.path &&
       props.query.path.source &&
       props.query.path.source.dataSource)
@@ -917,4 +917,9 @@ column if you have customized the results view.');
   }
 }
 
-export default HitsArea;
+export default Util.createContainer(
+  HitsArea,
+  ['builder'],
+  {
+  },
+);

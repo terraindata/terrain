@@ -52,6 +52,8 @@ import * as stream from 'stream';
 import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
 import { Export, ExportConfig } from './Export';
+import { Sources } from './sources/Sources';
+import * as Auth from './templates/Authenticate';
 import ExportTemplateRouter from './templates/ExportTemplateRouter';
 
 const Router = new KoaRouter();
@@ -85,7 +87,7 @@ Router.post('/types', passport.authenticate('access-token-local'), async (ctx, n
 Router.post('/headless', async (ctx, next) =>
 {
   const exprtConf: ExportConfig = ctx.request.body.body;
-  const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.body);
+  const authStream: object = await Auth.authenticatePersistentAccessToken(ctx.request.body);
   if (authStream['template'] === null)
   {
     ctx.body = 'Unauthorized';
@@ -106,7 +108,7 @@ Router.post('/headless', async (ctx, next) =>
 
 Router.get('/headless', async (ctx, next) =>
 {
-  const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.query);
+  const authStream: object = await Auth.authenticatePersistentAccessToken(ctx.request.query);
   if (authStream['template'] === null)
   {
     ctx.body = 'Unauthorized';

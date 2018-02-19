@@ -73,7 +73,7 @@ const FileImportActions =
         $(ActionTypes.setServerDbTable, { serverId, name, dbName, tableName }),
 
     fetchTypesFromQuery:
-      (serverId: number, query: object) =>
+      (serverId: number, query: string) =>
         $(ActionTypes.fetchTypesFromQuery, { serverId, query, setColumnNamesAndTypes: FileImportActions.setColumnNamesAndTypes }),
 
     setColumnNamesAndTypes:
