@@ -64,17 +64,11 @@ export const KeyPath = (args: string[] = []) => List<string>(args);
 
 export class TransformationEngine
 {
-  // TODO parse from strings as well (need to recover type information e.g. for nodes)
-  public static load(json: object): TransformationEngine
+  public static load(json: object | string): TransformationEngine
   {
-    const parsedJSON = typeof json === 'string' ? JSON.parse(json) : json;
+    const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
     const e: TransformationEngine = new TransformationEngine();
     const dag: any = GraphLib.json.read(parsedJSON['dag']);
-    /*for(let i: number =  0; i < dag.nodes.length; i++)
-    {
-      console.log('hh');
-      dag.nodes[i].value = new TransformationNode(dag.nodes[i].value.id, dag.nodes[i].value.typeCode, dag.nodes[i].value.fieldIDs);
-    }*/
     e.dag = dag;
     e.doc = parsedJSON['doc'];
     e.uidField = parsedJSON['uidField'];
@@ -85,6 +79,20 @@ export class TransformationEngine
     e.fieldEnabled = Map<number, boolean>(parsedJSON['fieldEnabled']);
     e.fieldProps = Map<number, object>(parsedJSON['fieldProps']);
     return e;
+  }
+
+  private static parseSerializedString(s: string): object
+  {
+    const parsed: object = JSON.parse(s);
+    parsed['fieldNameToIDMap'] = parsed['fieldNameToIDMap'].map((v) => [KeyPath(v[0]), v[1]]);
+    parsed['IDToFieldNameMap'] = parsed['IDToFieldNameMap'].map((v) => [v[0], KeyPath(v[1])]);
+    for (let i: number = 0; i < parsed['dag']['nodes'].length; i++)
+    {
+      const raw: object = parsed['dag']['nodes'][i]['value'];
+      parsed['dag']['nodes'][i]['value'] =
+        new TransformationNode(raw['id'], raw['typeCode'], List<number>(raw['fieldIDs']), raw['options']);
+    }
+    return parsed;
   }
 
   private static keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean

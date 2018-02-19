@@ -164,6 +164,19 @@ test('JSON serialize/deserialize round trip', () =>
   expect(e.equals(e2)).toBe(false);
 });
 
+test('String serialize/deserialize round trip', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  const j: string = JSON.stringify(e.json());
+  const e2 = TransformationEngine.load(j);
+  expect(e.equals(e2)).toBe(true);
+  expect(e2.transform(doc1)['name']).toBe('BOB');
+  e2.addField(KeyPath(['i']), 'number');
+  expect(e.equals(e2)).toBe(false);
+});
+
 test('linear chain of transformations', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
