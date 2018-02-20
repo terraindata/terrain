@@ -205,19 +205,19 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       );
       const handleResponse = (response: MidwayQueryResponse) =>
       {
-        const hits = List(_.get(response, ['result', 'hits', 'hits'], []));
+        const hits = List(_.get(response, ['result', 'hits', 'hits'], [])).map((doc, index) => doc['_source']).toList();
         directDispatch({
           actionType: 'setDocuments',
           documents: hits,
-        });
-        directDispatch({
-          actionType: 'setLoading',
-          loading: false,
         });
         if (action.onFetched != null)
         {
           action.onFetched(hits);
         }
+        directDispatch({
+          actionType: 'setLoading',
+          loading: false,
+        });
       };
 
       const handleError = (ev: string | MidwayError) =>

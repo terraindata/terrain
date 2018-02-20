@@ -50,9 +50,11 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as shallowCompare from 'react-addons-shallow-compare';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
+import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
@@ -89,6 +91,44 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     super(props);
     this.onRootMutationBound = this.onRootMutation.bind(this);
+    this.getKPCachedFn = memoizeOne(this.getKPCachedFn);
+    this.getDKPCachedFn = memoizeOne(this.getDKPCachedFn);
+  }
+
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    // if (this.props.field.name === 'title')
+    // {
+    //   console.log('----');
+    //   for (const propName in this.props)
+    //   {
+    //     if (this.props[propName] !== nextProps[propName])
+    //     {
+    //       console.log(propName);
+    //     }
+    //   }
+    // }
+    return shallowCompare(this, nextProps, nextState);
+  }
+
+  protected _getChildPaths(index, cacheKey = this.props.field.children): { displayKeyPath: KeyPath, keyPath: KeyPath }
+  {
+    const keyPath = this.getKPCachedFn(this.props.keyPath, cacheKey)(index);
+    const displayKeyPath = this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
+    return {
+      keyPath,
+      displayKeyPath,
+    };
+  }
+
+  protected _getPreviewChildPaths(index, cacheKey = this.props.preview): { displayKeyPath: KeyPath, keyPath: KeyPath }
+  {
+    const keyPath = this.props.keyPath;
+    const displayKeyPath = this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
+    return {
+      keyPath,
+      displayKeyPath,
+    };
   }
 
   protected _proxy(): FieldNodeProxy
@@ -140,4 +180,23 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       rootField: field,
     });
   }
+
+  // gets memoizeOne'd
+  private getKPCachedFn(keyPath, cacheDependency)
+  {
+    return _.memoize((index) =>
+    {
+      return keyPath.push('children', index);
+    });
+  }
+
+  // gets memoizedOne'd
+  private getDKPCachedFn(displayKeyPath, cacheDependency)
+  {
+    return _.memoize((index) =>
+    {
+      return displayKeyPath.push(index);
+    });
+  }
+
 }

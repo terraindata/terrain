@@ -58,58 +58,12 @@ import { Ajax } from 'util/Ajax';
 
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-// class QueryManagerC
+// export class CacheGuardian<T>
 // {
-//   private readonly queryPending: boolean = false;
-//   private readonly queryId: ID = null;
-//   private readonly xhr: XMLHttpRequest = null;
-//   private readonly onSelfChange: (newQueryManager) => void = null;
-
-//   public isQueryPending()
+//   public get()
 //   {
-//     return this.queryPending;
+
 //   }
 
-//   public abortQuery(suppressChanges = false): ((self) => QueryManager) | null // returns a side effect function if suppress is true
-//   {
-//     if (this.xhr != null)
-//     {
-//       this.xhr.abort();
-//     }
-//     const sideEffect = (self) => self.set('queryPending', false).set('xhr', null);
-
-//     if (suppressChanges)
-//     {
-//       return sideEffect;
-//     }
-//     else
-//     {
-//       this.onSelfChange(sideEffect(this));
-//       return null;
-//     }
-//   }
-
-//   public sendQuery(query, db, responseHandler, errorHandler)
-//   {
-//     const delayedFn = this.abortQuery(true);
-//     const eql = AllBackendsMap[query.language].parseTreeToQueryString(
-//       query,
-//       {
-//         replaceInputs: true,
-//       },
-//     );
-
-//     const { queryId, xhr } = Ajax.query(
-//       eql,
-//       db,
-//       responseHandler,
-//       errorHandler,
-//     );
-
-//     const newQueryManager = delayedFn(this).set('queryId', queryId)
-//       .set('xhr', xhr).set('queryPending', true);
-//     this.onSelfChange(newQueryManager);
-//   }
+//   get 
 // }
-// export type QueryManager = WithIRecord<QueryManagerC>;
-// export const _QueryManager = makeExtendedConstructor(QueryManagerC, true);
