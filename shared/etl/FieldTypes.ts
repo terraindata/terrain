@@ -93,17 +93,15 @@ export class FieldTypes
           break;
         case 'array':
           let innerTypeArray = value;
-          let isNestedArray: boolean = false;
           while (innerTypeArray['type'] === 'array')
           {
             innerTypeArray = value['innerType'];
           }
-          if (innerTypeArray['type'] === 'nested')
-          {
-            isNestedArray = true;
-          }
           type = await this.getESTypeFromFullType(innerTypeArray);
-          if (isNestedArray === true)
+
+          // https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html
+          // special case from the ES docs where an array of nested objects must contain the type: nested kv pair
+          if (innerTypeArray['type'] === 'nested')
           {
             type['type'] = 'nested';
           }
