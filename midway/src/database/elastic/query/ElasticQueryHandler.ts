@@ -61,6 +61,7 @@ import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 import ElasticStream from './ElasticStream';
+import { handleGroupJoin } from './GroupJoin';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -68,10 +69,6 @@ import ElasticStream from './ElasticStream';
 export default class ElasticQueryHandler extends QueryHandler
 {
   private controller: ElasticController;
-
-  private GROUPJOIN_MSEARCH_BATCH_SIZE = 100;
-  private GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES = 1;
-  private GROUPJOIN_DEFAULT_SIZE = 10;
 
   constructor(controller: ElasticController)
   {
@@ -105,7 +102,7 @@ export default class ElasticQueryHandler extends QueryHandler
         const query = parser.getValue();
         if (query['groupJoin'] !== undefined)
         {
-          return this.handleGroupJoin(request, parser, query);
+          return handleGroupJoin(client, request, parser, query);
         }
         else
         {
@@ -140,160 +137,6 @@ export default class ElasticQueryHandler extends QueryHandler
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');
-  }
-
-  private async handleGroupJoin(request: QueryRequest, parser: ESParser, query: object): Promise<QueryResponse | Readable>
-  {
-    // get the child (groupJoin) query
-    const childQuery = query['groupJoin'];
-    query['groupJoin'] = undefined;
-
-    // determine other groupJoin settings from the query
-    const dropIfLessThan = (childQuery['dropIfLessThan'] !== undefined) ? childQuery['dropIfLessThan'] : 0;
-    delete childQuery['dropIfLessThan'];
-
-    const parentAlias = (childQuery['parentAlias'] !== undefined) ? childQuery['parentAlias'] : 'parent';
-    delete childQuery['parentAlias'];
-
-    const parentQuery: Elastic.SearchParams | undefined = query;
-    if (parentQuery === undefined)
-    {
-      throw new Error('Expecting body parameter in the groupJoin query');
-    }
-
-    const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
-    if (valueInfo === null)
-    {
-      throw new Error('Error finding groupJoin clause in the query');
-    }
-
-    const handleSubQueries = async (error, response) =>
-    {
-      try
-      {
-        await this.handleGroupJoinSubQueries(valueInfo, childQuery, response, parentAlias);
-      }
-      catch (e)
-      {
-        throw e;
-      }
-
-      if (dropIfLessThan > 0)
-      {
-        const subQueries = Object.keys(childQuery);
-        response.hits.hits = response.hits.hits.filter((r) =>
-        {
-          return (subQueries.reduce((count, subQuery) =>
-          {
-            if (r[subQuery] !== undefined && Array.isArray(r[subQuery]))
-            {
-              count += r[subQuery].length;
-            }
-            return count;
-          }, 0) >= dropIfLessThan);
-        });
-      }
-      return response;
-    };
-
-    const client: ElasticClient = this.controller.getClient();
-
-    if (request.streaming === true)
-    {
-      return new ElasticStream(client, parentQuery, { objectMode: true }, handleSubQueries);
-    }
-    else
-    {
-      return new Promise<QueryResponse>((resolve, reject) =>
-      {
-        client.search({ body: parentQuery } as Elastic.SearchParams,
-          async (error, response) =>
-          {
-            const r = await handleSubQueries(null, response);
-            this.makeQueryCallback(resolve, reject)(error, r);
-          });
-      });
-    }
-  }
-
-  private async handleGroupJoinSubQueries(parentValueInfo: ESValueInfo, query: object, results: object, parentAlias: string)
-  {
-    const promises: Array<Promise<any>> = [];
-    for (const subQuery of Object.keys(query))
-    {
-      const vi = parentValueInfo.objectChildren[subQuery].propertyValue;
-      if (vi === null)
-      {
-        throw new Error('Error finding subquery property');
-      }
-
-      promises.push(this.handleGroupJoinSubQuery(vi, subQuery, results, parentAlias));
-    }
-    return Promise.all(promises);
-  }
-
-  private async handleGroupJoinSubQuery(valueInfo: ESValueInfo, subQuery: string, parentResults: any, parentAlias: string)
-  {
-    const hits = parentResults.hits.hits;
-    const promises: Array<Promise<any>> = [];
-    for (let i = 0, batchSize = this.GROUPJOIN_MSEARCH_BATCH_SIZE; i < hits.length; i += batchSize)
-    {
-      if (i + batchSize > hits.length)
-      {
-        batchSize = hits.length - i;
-      }
-
-      // todo: optimization to avoid repeating index and type if they're the same
-      // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
-      // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
-
-      promises.push(new Promise((resolve, reject) =>
-      {
-        const body: any[] = [];
-        for (let j = i; j < i + batchSize; ++j)
-        {
-          // winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
-          const header = {};
-          body.push(header);
-
-          const queryStr = ESParameterFiller.generate(valueInfo, { [parentAlias]: hits[j]._source });
-          body.push(queryStr);
-        }
-
-        const client: ElasticClient = this.controller.getClient();
-        client.msearch(
-          {
-            body,
-          },
-          (error: Error | null, response: any) =>
-          {
-            if (error !== null && error !== undefined)
-            {
-              return reject(error);
-            }
-
-            for (let j = 0; j < batchSize; ++j)
-            {
-              if (response.error !== undefined)
-              {
-                return reject(response.error);
-              }
-
-              if (response.responses[j].hits !== undefined)
-              {
-                hits[i + j][subQuery] = response.responses[j].hits.hits;
-              }
-            }
-            resolve();
-          });
-      }));
-
-      if (promises.length >= this.GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES)
-      {
-        await Promise.all(promises);
-      }
-    }
-    return Promise.all(promises);
   }
 
   private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
