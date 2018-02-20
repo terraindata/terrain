@@ -87,17 +87,26 @@ export class FieldTypes
       switch (value['type'])
       {
         case 'nested':
-          const innerTypeNested = this.getESMappingFromDocument(value['innerType']);
+          const innerTypeNested = await this.getESMappingFromDocument(value['innerType']);
           innerTypeNested['type'] = 'nested';
           type = innerTypeNested;
           break;
         case 'array':
           let innerTypeArray = value;
+          let isNestedArray: boolean = false;
           while (innerTypeArray['type'] === 'array')
           {
             innerTypeArray = value['innerType'];
           }
-          type = this.getESTypeFromFullType(innerTypeArray);
+          if (innerTypeArray['type'] === 'nested')
+          {
+            isNestedArray = true;
+          }
+          type = await this.getESTypeFromFullType(innerTypeArray);
+          if (isNestedArray === true)
+          {
+            type['type'] = 'nested';
+          }
           break;
         case 'null': // treat as text
           type = {
@@ -219,7 +228,6 @@ export class FieldTypes
       }
       resolve(returnObj);
     });
-
   }
 
   public async getFieldTypesFromMySQLFormatStream(files: stream.Readable[] | stream.Readable, params: object): Promise<stream.Readable>
