@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -73,6 +73,8 @@ export interface TemplateEditorActionTypes
   setExportAlgorithm: {
     actionType: 'setExportAlgorithm';
     algorithmId: ID;
+    libraryState: any;
+    schemaState: any;
   };
   setRoot: { // this should be the only way to edit the template tree
     actionType: 'setRoot';
@@ -151,21 +153,20 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       },
     };
 
-  public setExportAlgorithmAction(dispatch)
+  public setExportAlgorithmAction(action, dispatch)
   {
 
   }
 
   public overrideAct(action: Unroll<TemplateEditorActionTypes>)
   {
-    // switch (action.actionType)
-    // {
-    //   case 'setExportAlgorithm':
-    //     return this.setExportAlgorithmAction.bind(this);
-    //   default:
-    //     return undefined;
-    // }
-    return undefined;
+    switch (action.actionType)
+    {
+      case 'setExportAlgorithm':
+        return this.setExportAlgorithmAction.bind(this, action);
+      default:
+        return undefined;
+    }
   }
 }
 

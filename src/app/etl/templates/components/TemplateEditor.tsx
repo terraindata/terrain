@@ -79,7 +79,7 @@ export interface Props
 }
 
 @Radium
-class ETLExportDisplay extends TerrainComponent<Props>
+class TemplateEditor extends TerrainComponent<Props>
 {
 
   public initFromDocs(documents, name = 'No Title')
@@ -234,7 +234,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
 const emptyList = List([]);
 
 export default Util.createContainer(
-  ETLExportDisplay,
+  TemplateEditor,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );

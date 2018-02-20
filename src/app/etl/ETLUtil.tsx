@@ -42,83 +42,75 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:import-spacing max-classes-per-file strict-boolean-expressions
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as Radium from 'radium';
-import * as React from 'react';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+const { List, Map } = Immutable;
 
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import { MidwayError } from 'shared/error/MidwayError';
+import { AllBackendsMap } from 'src/database/AllBackends';
+import BackendInstance from 'src/database/types/BackendInstance';
+import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
+import { _Query, Query, queryForSave } from 'src/items/types/Query';
+import { Ajax } from 'util/Ajax';
 
-import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import './ETLExportDisplay.less';
-
-export interface Props
+abstract class QueryManagerC
 {
-  params?: {
-    algorithmId?: number,
-  };
-  placeholder?: any;
-  act?: typeof TemplateEditorActions;
-}
+  protected abstract set: (k, v) => QueryManagerC;
+  private readonly queryPending: boolean = false;
+  private readonly queryId: ID = null;
+  private readonly xhr: XMLHttpRequest = null;
+  private readonly onSelfChange: (newQueryManager) => void = null;
 
-@Radium
-class ETLExportDisplay extends TerrainComponent<Props>
-{
-  public getAlgorithmId(params)
+  public isQueryPending()
   {
-    return params != null ? (params.algorithmId != null ? params.algorithmId : -1) : -1;
+    return this.queryPending;
   }
 
-  public componentWillMount()
+  public abortQuery(suppressChanges = false): ((self) => QueryManagerC) | null // returns a side effect function if suppress is true
   {
-    const { act, params } = this.props;
-    act({
-      actionType: 'setExportAlgorithm',
-      algorithmId: this.getAlgorithmId(params),
-      libraryState: null,
-      schemaState: null,
-    });
-  }
-
-  public componentWillReceiveProps(nextProps)
-  {
-    const { act, params } = this.props;
-    const nextId = this.getAlgorithmId(nextProps.params);
-    const currId = this.getAlgorithmId(params);
-    if (nextId !== currId)
+    if (this.xhr != null)
     {
-      act({
-        actionType: 'setExportAlgorithm',
-        algorithmId: nextId,
-        libraryState: null,
-        schemaState: null,
-      });
+      this.xhr.abort();
+    }
+    const sideEffect = (self) => self.set('queryPending', false).set('xhr', null);
+
+    if (suppressChanges)
+    {
+      return sideEffect;
+    }
+    else
+    {
+      this.onSelfChange(sideEffect(this));
+      return null;
     }
   }
 
-  public render()
+  public sendQuery(query, db, responseHandler, errorHandler)
   {
-    return (
-      <div
-        className='etl-export-display-wrapper'
-        style={[fontColor(Colors().text1)]}
-      >
-        <div className='export-display-logo-bg' />
-        <TemplateEditor />
-      </div>
+    const delayedFn = this.abortQuery(true);
+    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+      query,
+      {
+        replaceInputs: true,
+      },
     );
+
+    const { queryId, xhr } = Ajax.query(
+      eql,
+      db,
+      responseHandler,
+      errorHandler,
+    );
+
+    const newQueryManager = delayedFn(this).set('queryId', queryId)
+      .set('xhr', xhr).set('queryPending', true);
+    this.onSelfChange(newQueryManager);
   }
 }
-
-export default Util.createContainer(
-  ETLExportDisplay,
-  [['library', 'algorithms']],
-  { act: TemplateEditorActions },
-);
+export type QueryManager = WithIRecord<QueryManagerC>;
+export const _QueryManager = makeExtendedConstructor(QueryManagerC, true);
