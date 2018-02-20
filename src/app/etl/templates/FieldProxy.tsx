@@ -56,7 +56,7 @@ import { KeyPath as EngineKeypath, TransformationEngine } from 'shared/transform
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 
 /*
- *  The FieldProxy structures act as the controllers / binders between the TemplateEditorField
+ *  The FieldProxy structures act as the binding between the TemplateEditorField
  *  tree structure and the flattened structure of the transformation engine
  *  The proxy objects are generated synchronously and aren't meant to be persisted
  *  (don't hold references to proxies across call contexts!)

@@ -77,7 +77,6 @@ export interface Props extends TemplateEditorFieldProps
 @Radium
 class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 {
-
   public render()
   {
     const { canEdit, field, keyPath, preview, hidePreviewValue, displayValueOverride } = this.props;

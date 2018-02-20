@@ -52,10 +52,10 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
-import TemplateEditorDocumentsPreview from 'etl/templates/components/TemplateEditorDocumentsPreview';
+import TemplateEditorDocumentsPreview from 'etl/templates/components/preview/TemplateEditorDocumentsPreview';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import TemplateEditorFieldSettings from 'etl/templates/components/TemplateEditorFieldSettings';
-import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEditorPreviewControl';
+import TemplateEditorPreviewControl from 'etl/templates/components/preview/TemplateEditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';

@@ -56,7 +56,7 @@ import Util from 'util/Util';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import TemplateEditorFieldNode from './TemplateEditorFieldNode';
+import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 
 import './TemplateEditorDocumentsPreview.less';
 const { List } = Immutable;
