@@ -51,12 +51,7 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
-import Slider, { Range } from 'rc-slider';
-// We can just import Slider or Range to reduce bundle size
-// import Slider from 'rc-slider/lib/Slider';
-// import Range from 'rc-slider/lib/Range';
-import 'rc-slider/assets/index.css';
-
+import ScoreWeightSlider from './ScoreWeightSlider';
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
@@ -65,17 +60,6 @@ const SCORE_COLORS =
     POSITIVE: ['#4ef9ab'],
     NEGATIVE: ['#d14f42'],
   };
-
-const FIXED_SLIDER_HANDLE_STYLE = { display: 'none' };
-const DRAGGABLE_SLIDER_HANDLE_STYLE = {
-  width: '24px',
-  height: '24px',
-  marginTop: 3,
-  marginLeft: 12,
-  borderRadius: 6,
-  border: 0,
-  marginLeft: -11,
-}
 
 interface Props {
   parentData: {
@@ -97,6 +81,11 @@ class ScoreBar extends TerrainComponent<Props>
     this.state = {
       sliderValue: [0, 0];
     };
+  }
+
+  public handleWeightChange(value: Array<number>)
+  {
+    this.setState({ sliderValue: value });
   }
 
   public render()
@@ -133,37 +122,17 @@ class ScoreBar extends TerrainComponent<Props>
       style.borderBottomLeftRadius = BORDER_RADIUS;
     }
 
-    const handleStyle = this.state.sliderValue === [0, 0]  || this.state.sliderValue[0] < 0 ?
-      [
-        { ...DRAGGABLE_SLIDER_HANDLE_STYLE, backgroundColor: SCORE_COLORS.NEGATIVE },
-        FIXED_SLIDER_HANDLE_STYLE,
-      ] :
-      [
-        FIXED_SLIDER_HANDLE_STYLE,
-        { ...DRAGGABLE_SLIDER_HANDLE_STYLE, backgroundColor: SCORE_COLORS.POSITIVE },
-      ]
-
-    const trackStyle = this.state.sliderValue === [0, 0]  || this.state.sliderValue[0] < 0 ?
-      [{ backgroundColor: SCORE_COLORS.NEGATIVE, height: '24px', borderRadius: 0, top: 8 }] :
-      [{ backgroundColor: SCORE_COLORS.POSITIVE, height: '24px', borderRadius: 0, top: 8 }];
-
-
     return (
-      <div style={{ width: '100%', position: 'relative' }}>
-        <div style={{ position: 'absolute', top: 5, left: 0, height: '30px', width: '100%', borderRadius: 6, backgroundColor: '#e9e9e9' }} />
-        <div style={{ width: 'calc(100% - 30px)', position: 'relative', marginLeft: 14 }}>
-          <div style={{ zIndex: 2, position: 'absolute', left: '50%', top: 2, borderLeft: '1px solid #abe2fb', height: '34px' }} />
-          <Range
-            min= {-10}
-            max={10}
-            defaultValue={[0,0]}
-            railStyle={{ height: '30px' }}
-            trackStyle={trackStyle}
-            handleStyle={handleStyle}
-            onChange={(value) => this.setState({ sliderValue: value })}
-          />
-        </div>
-      </div>
+      <ScoreWeightSlider
+        value={this.state.sliderValue}
+        onChange={this.handleWeightChange}
+        min={-10}
+        max={10}
+        negativeColor={'red'}
+        positiveColor={'blue'}
+        dividerColor={'#abe2fb'}
+        height={30}
+      />
     );
   }
 }
