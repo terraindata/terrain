@@ -84,7 +84,6 @@ export class TastyNode
 
   public type: string;
   public value: any;
-  private chidlren: any;
 
   constructor(type: string, value: any)
   {
@@ -171,6 +170,7 @@ export class TastyNode
     return new TastyNode('!', [this]);
   }
 
+  // tslint:disable-next-line:no-unused-variable
   private toString(): string
   {
     return JSON.stringify(this, null, 2);

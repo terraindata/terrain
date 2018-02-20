@@ -46,9 +46,6 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
-import * as Utils from '../../../Utils';
-
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
