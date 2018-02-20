@@ -112,7 +112,7 @@ const itemDropTarget = {
   },
   canDrop(props, monitor)
   {
-    return props.keyPath !== monitor.getItem().keyPath;
+    return !props.keyPath.equals(monitor.getItem().keyPath);
   },
 };
 
