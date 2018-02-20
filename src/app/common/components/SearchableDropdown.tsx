@@ -531,10 +531,9 @@ class SearchableDropdown extends TerrainComponent<Props>
   }
 }
 
-export default onClickOutside(
+export default
   Util.createTypedContainer(
-    SearchableDropdown,
+    onClickOutside(SearchableDropdown),
     [],
     { builderActions: BuilderActions },
-  ),
-);
+  );

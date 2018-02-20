@@ -58,6 +58,7 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
+import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
@@ -120,9 +121,9 @@ class PathfinderArea extends TerrainComponent<Props>
     return this.props.keyPath !== undefined ? this.props.keyPath : List(['query', 'path']);
   }
 
-  public changePathName(value)
+  public changePathData(key, value)
   {
-    this.props.builderActions.changePath(this.getKeyPath().push('name'), value);
+    this.props.builderActions.changePath(this.getKeyPath().push(key), value);
   }
 
   public render()
@@ -142,12 +143,23 @@ class PathfinderArea extends TerrainComponent<Props>
             >
               <FloatingInput
                 value={path.name}
-                onChange={this.changePathName}
+                onChange={this._fn(this.changePathData, 'name')}
                 label={'Algorithm Name'}
                 isTextInput={true}
                 canEdit={pathfinderContext.canEdit}
                 className='pf-column-name'
               />
+              {tooltip(
+                <FloatingInput
+                  value={path.minMatches}
+                  onChange={this._fn(this.changePathData, 'minMatches')}
+                  label={'Minimum Matches'}
+                  isTextInput={true}
+                  canEdit={pathfinderContext.canEdit}
+                  className='pf-column-matches'
+                />,
+                'The minimum number of results from the inner query to return the result',
+              )}
             </div>
           }
           open={path.name !== undefined}
