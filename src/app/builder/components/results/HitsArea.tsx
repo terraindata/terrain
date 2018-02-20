@@ -53,6 +53,7 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 
 import ETLExportDisplay from 'etl/components/ETLExportDisplay';
 
@@ -90,7 +91,7 @@ export interface Props
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
-  algorithmName: string;
+  algorithmId: ID;
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
@@ -693,9 +694,10 @@ class HitsArea extends TerrainComponent<Props>
 
   public showExport()
   {
-    this.setState({
-      showingExport: true,
-    });
+    browserHistory.push(`/etl/export/${this.props.algorithmId}`);
+    // this.setState({
+    //   showingExport: true,
+    // });
   }
 
   public hideExport()

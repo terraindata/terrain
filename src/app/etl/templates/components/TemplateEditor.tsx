@@ -138,7 +138,8 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public renderEditorSection(showEditor: boolean = true)
   {
-    const { template, documents, previewIndex, rootField } = this.props.templateEditor;
+    const { template, rootField } = this.props.templateEditor;
+    const { documents, previewIndex } = this.props.templateEditor.uiState;
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
     const transformedPreviewDocument = template.transformationEngine.transform(previewDocument);
     if (!showEditor)
@@ -209,7 +210,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public render()
   {
-    const { previewIndex, documents } = this.props.templateEditor;
+    const { previewIndex, documents, modalRequests } = this.props.templateEditor.uiState;
     const showEditor = previewIndex >= 0 && previewIndex < documents.size;
     return (
       <div className='template-editor-root-container'>
@@ -221,7 +222,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
           </div>
         </div>
         <MultiModal
-          requests={this.props.templateEditor.modalRequests}
+          requests={modalRequests}
           setRequests={this.setModalRequests}
         />
       </div>

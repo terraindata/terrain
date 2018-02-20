@@ -48,6 +48,7 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -56,24 +57,25 @@ import './ETLPage.less';
 
 export interface Props
 {
+  children?: any;
   placeholder?: any;
 }
 
-const enum ViewState
-{ // temporary stand in. TODO: use a combination of routing and redux
-  SHOW_BUTTONS,
-  SHOW_IMPORT,
-  SHOW_EXPORT,
-}
+// const enum ViewState
+// { // temporary stand in. TODO: use a combination of routing and redux
+//   SHOW_BUTTONS,
+//   SHOW_IMPORT,
+//   SHOW_EXPORT,
+// }
 
 @Radium
 export default class ETLPage extends TerrainComponent<Props>
 {
-  public state: {
-    view: ViewState;
-  } = {
-      view: ViewState.SHOW_BUTTONS,
-    };
+  // public state: {
+  //   view: ViewState;
+  // } = {
+  //     view: ViewState.SHOW_BUTTONS,
+  //   };
 
   public renderButtons()
   {
@@ -113,26 +115,32 @@ export default class ETLPage extends TerrainComponent<Props>
   {
     return (
       <div className='etl-page-root'>
-        {(this.state.view === ViewState.SHOW_BUTTONS && this.renderButtons()) ||
+        {/*(this.state.view === ViewState.SHOW_BUTTONS && this.renderButtons()) ||
           (this.state.view === ViewState.SHOW_IMPORT && this.renderImport()) ||
-          (this.state.view === ViewState.SHOW_EXPORT && this.renderExport())
+          (this.state.view === ViewState.SHOW_EXPORT && this.renderExport())*/
         }
-
+        {
+          this.props.children == null ?
+            this.renderButtons() :
+            this.props.children
+        }
       </div>
     );
   }
 
   public handleImportClicked()
   {
-    this.setState({
-      view: ViewState.SHOW_IMPORT,
-    });
+    browserHistory.push(`/etl/import`);
+    // this.setState({
+    //   view: ViewState.SHOW_IMPORT,
+    // });
   }
 
   public handleExportClicked()
   {
-    this.setState({
-      view: ViewState.SHOW_EXPORT,
-    });
+    browserHistory.push(`/etl/export`);
+    // this.setState({
+    //   view: ViewState.SHOW_EXPORT,
+    // });
   }
 }

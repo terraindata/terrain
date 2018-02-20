@@ -46,6 +46,11 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
+export enum LANGUAGES
+{
+  ELASTIC = 'elastic',
+}
+
 export enum ELASTIC_TYPES
 {
   TEXT = 'text',

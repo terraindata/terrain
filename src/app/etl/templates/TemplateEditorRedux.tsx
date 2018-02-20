@@ -70,6 +70,10 @@ export interface TemplateEditorActionTypes
     actionType: 'loadTemplate';
     template: ETLTemplate;
   };
+  setExportAlgorithm: {
+    actionType: 'setExportAlgorithm';
+    algorithmId: ID;
+  };
   setRoot: { // this should be the only way to edit the template tree
     actionType: 'setRoot';
     rootField: TemplateField;
@@ -117,30 +121,52 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       },
       addModalConfirmation: (state, action) =>
       {
-        return state.set('modalRequests',
-          MultiModal.addRequest(state.modalRequests, action.payload.props));
+        return state.setIn(['uiState', 'modalRequests'],
+          MultiModal.addRequest(state.uiState.modalRequests, action.payload.props));
       },
       setModalRequests: (state, action) =>
       {
-        return state.set('modalRequests', action.payload.requests);
+        return state.setIn(['uiState', 'modalRequests'], action.payload.requests);
       },
       setDocuments: (state, action) =>
       {
-        return state.set('documents', action.payload.documents);
+        return state.setIn(['uiState', 'documents'], action.payload.documents);
       },
       setPreviewIndex: (state, action) =>
       {
-        return state.set('previewIndex', action.payload.index);
+        return state.setIn(['uiState', 'previewIndex'], action.payload.index);
       },
       setSettingsKeyPath: (state, action) =>
       {
-        return state.set('settingsKeyPath', action.payload.keyPath).set('settingsDisplayKeyPath', action.payload.displayKeyPath);
+        return state.setIn(['uiState', 'settingsKeyPath'], action.payload.keyPath)
+          .setIn(['uiState', 'settingsDisplayKeyPath'], action.payload.displayKeyPath);
       },
       closeSettings: (state, action) =>
       {
-        return state.set('settingsKeyPath', null).set('settingsDisplayKeyPath', null);
+        return state.setIn(['uiState', 'settingsKeyPath'], null).setIn(['uiState', 'settingsDisplayKeyPath'], null);
+      },
+      setExportAlgorithm: (state, action) =>
+      {
+        return state;
       },
     };
+
+  public setExportAlgorithmAction(dispatch)
+  {
+
+  }
+
+  public overrideAct(action: Unroll<TemplateEditorActionTypes>)
+  {
+    // switch (action.actionType)
+    // {
+    //   case 'setExportAlgorithm':
+    //     return this.setExportAlgorithmAction.bind(this);
+    //   default:
+    //     return undefined;
+    // }
+    return undefined;
+  }
 }
 
 const ReduxInstance = new TemplateEditorActionsClass();

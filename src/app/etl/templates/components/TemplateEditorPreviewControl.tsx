@@ -72,7 +72,7 @@ class TemplateEditorPreviewControl extends TerrainComponent<Props>
 {
   public render()
   {
-    const { documents, previewIndex } = this.props.templateEditor;
+    const { documents, previewIndex } = this.props.templateEditor.uiState;
     const indexSelectorText = documents.size > 0 ?
       `${previewIndex + 1} of ${documents.size}` :
       'no preview available';
@@ -108,7 +108,7 @@ class TemplateEditorPreviewControl extends TerrainComponent<Props>
 
   public handleDecrementDocument()
   {
-    const { documents, previewIndex } = this.props.templateEditor;
+    const { documents, previewIndex } = this.props.templateEditor.uiState;
     if (previewIndex > 0)
     {
       this.props.act({
@@ -123,7 +123,7 @@ class TemplateEditorPreviewControl extends TerrainComponent<Props>
 
   public handleIncrementDocument()
   {
-    const { documents, previewIndex } = this.props.templateEditor;
+    const { documents, previewIndex } = this.props.templateEditor.uiState;
     if (previewIndex + 1 < documents.size)
     {
       this.props.act({

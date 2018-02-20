@@ -60,6 +60,9 @@ import './ETLExportDisplay.less';
 
 export interface Props
 {
+  params?: {
+    algorithmId?: number,
+  };
   placeholder?: any;
 }
 

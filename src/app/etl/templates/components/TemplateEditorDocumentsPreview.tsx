@@ -82,7 +82,8 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
 
   public renderDocument(document: object, index: number)
   {
-    const { previewIndex, documents, template, rootField } = this.props.templateEditor;
+    const { template, rootField } = this.props.templateEditor;
+    const { previewIndex, documents } = this.props.templateEditor.uiState;
     const border = index === previewIndex ?
       borderColor(Colors().inactiveHover, Colors().inactiveHover) :
       borderColor('rgba(0,0,0,0)', Colors().activeHover);
@@ -127,7 +128,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
     return (
       <div className='template-editor-documents-container'>
         <div className='documents-area' tabIndex={-1}>
-          {this.props.templateEditor.documents.map(this.renderDocument)}
+          {this.props.templateEditor.uiState.documents.map(this.renderDocument)}
         </div>
       </div>
     );

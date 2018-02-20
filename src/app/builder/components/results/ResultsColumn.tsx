@@ -76,7 +76,7 @@ export interface Props
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
-  algorithmName: string;
+  algorithmId: ID;
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
@@ -240,7 +240,7 @@ class ResultsColumn extends TerrainComponent<Props>
             query={this.props.query}
             canEdit={this.props.canEdit}
             db={this.props.db}
-            algorithmName={this.props.algorithmName}
+            algorithmId={this.props.algorithmId}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
             showExport={this.props.showExport}

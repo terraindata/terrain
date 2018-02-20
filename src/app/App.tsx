@@ -142,7 +142,7 @@ const links =
     {
       icon: <ImportIcon />,
       text: 'Import',
-      route: '/import',
+      route: '/etl',
     },
     {
       icon: <ReportingIcon />,

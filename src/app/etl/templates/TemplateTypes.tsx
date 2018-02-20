@@ -53,23 +53,55 @@ import { FILE_TYPES } from 'shared/etl/ETLTypes';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { ExportTemplateBase, ImportTemplateBase, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
+import { ExportTemplateBase, ImportTemplateBase, LANGUAGES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class TemplateEditorStateC
 {
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
+  public params: ExportParameters | ImportParameters = _ExportParameters({});
   public rootField: TemplateField = _TemplateField();
   public isDirty: boolean = true;
-  public modalRequests: List<ModalProps> = List([]);
-  public documents: List<object> = List([]);
-  public transformedDocuments: List<object> = List([]);
-  public previewIndex: number = 0; // set to -1
-  public settingsKeyPath: KeyPath = null;
-  public settingsDisplayKeyPath: KeyPath = null;
+  public uiState: EditorDisplayState = _EditorDisplayState();
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
+
+class EditorDisplayStateC
+{
+  public documents: List<object> = List([]);
+  public modalRequests: List<ModalProps> = List([]);
+  public previewIndex: number = -1;
+  public loading: boolean = false;
+  public settingsKeyPath: KeyPath = null;
+  public settingsDisplayKeyPath: KeyPath = null;
+}
+export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
+export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
+
+class ExportParametersC
+{
+  public algorithmId: ID;
+  public fileType: FILE_TYPES = FILE_TYPES.JSON;
+  public includeTerrainRank: boolean = true;
+  public requireAllFields: boolean = true;
+}
+export type ExportParameters = WithIRecord<ExportParametersC>;
+export const _ExportParameters = makeConstructor(ExportParametersC);
+
+class ImportParametersC
+{
+  public importSource: List<object> = List([{
+    sourceType: 'ClientLocal',
+    filename: 'test.csv',
+    fileType: 'csv',
+  }]); // TODO change this for multi source imports
+  public language: LANGUAGES = LANGUAGES.ELASTIC;
+  public dbid: ID = -1;
+  public dbname: string = '';
+}
+export type ImportParameters = WithIRecord<ImportParametersC>;
+export const _ImportParemeters = makeConstructor(ImportParametersC);
 
 class ExportTemplateC implements ExportTemplateBase
 {

@@ -54,12 +54,13 @@ import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { ELASTIC_TYPES, jsToElastic } from 'shared/etl/ETLTypes';
 import { KeyPath as EngineKeypath, TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+
 /*
- *  In the MVC framework of the template editor, the proxy data structure acts as the controller
+ *  The FieldProxy structures act as the controllers / binders between the TemplateEditorField
+ *  tree structure and the flattened structure of the transformation engine
  *  The proxy objects are generated synchronously and aren't meant to be persisted
  *  (don't hold references to proxies across call contexts!)
  */
-
 export class FieldTreeProxy
 {
   private onMutate: (root: TemplateField) => void = doNothing;

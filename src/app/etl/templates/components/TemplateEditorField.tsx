@@ -112,8 +112,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     const { displayKeyPath, keyPath, templateEditor, noInteract } = this.props;
     return !noInteract &&
-      displayKeyPath.equals(templateEditor.settingsDisplayKeyPath) &&
-      keyPath.equals(templateEditor.settingsKeyPath);
+      displayKeyPath.equals(templateEditor.uiState.settingsDisplayKeyPath) &&
+      keyPath.equals(templateEditor.uiState.settingsKeyPath);
   }
 
   // Returns the given function if input is not disabled. Otherwise returns undefined.
