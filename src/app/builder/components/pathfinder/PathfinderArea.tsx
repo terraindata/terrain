@@ -59,7 +59,7 @@ import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { BuilderState } from 'builder/data/BuilderState';
-import withScrolling, {createHorizontalStrength} from 'react-dnd-scrollzone';
+import withScrolling, { createHorizontalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection2';
@@ -130,7 +130,8 @@ class PathfinderArea extends TerrainComponent<Props>
   }
 
   // This disables horizontal scrolling
-  public hStrength(box, point) {
+  public hStrength(box, point)
+  {
     return linearHorizontalStrength(box, point);
   }
 

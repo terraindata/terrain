@@ -459,7 +459,7 @@ const BuilderColumn = createReactClass<any, any>(
               }
             </div>
           </div>
-         {
+          {
             this.props.index === 0 ? null : (
               <div
                 className='builder-resize-handle'

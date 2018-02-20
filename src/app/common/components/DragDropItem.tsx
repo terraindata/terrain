@@ -93,7 +93,7 @@ const itemSource = {
     {
       props.onDragStop();
     }
-  }
+  },
 };
 
 function itemDragCollect(connect, monitor)
@@ -151,16 +151,16 @@ class ItemComponent extends TerrainComponent<ItemProps>
         <div
           ref='item'
         >
-         {
-           hoverHeader !== undefined &&
-           <div
-             className={classNames({
-               'drag-drop-item-header': true,
-               'drag-drop-item-header-visible': isOver,
-             })}
-           >
-             {hoverHeader}
-           </div>
+          {
+            hoverHeader !== undefined &&
+            <div
+              className={classNames({
+                'drag-drop-item-header': true,
+                'drag-drop-item-header-visible': isOver,
+              })}
+            >
+              {hoverHeader}
+            </div>
           }
           {children}
         </div>

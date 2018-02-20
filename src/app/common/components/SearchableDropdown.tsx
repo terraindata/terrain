@@ -189,7 +189,7 @@ class SearchableDropdown extends TerrainComponent<Props>
     {
       if (this.props.action)
       {
-        const {action} = this.props;
+        const { action } = this.props;
         if (typeof action === 'string')
         {
           this.props.builderActions[action](this.props.keyPath, value);
@@ -549,5 +549,5 @@ class SearchableDropdown extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   onClickOutside(SearchableDropdown),
   [],
-  { builderActions: BuilderActions},
+  { builderActions: BuilderActions },
 );

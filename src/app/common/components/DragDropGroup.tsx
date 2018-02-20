@@ -103,7 +103,7 @@ const groupSource = {
     {
       props.onDragStop();
     }
-  }
+  },
 };
 
 function groupDragCollect(connect, monitor)
@@ -195,7 +195,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
     const { data, renderHeader, isDragging, items, keyPath, keyPathStarter, onReorder, isOver, depth } = this.props;
     const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
     // Note: Radium causes issues when combined with drag drop library, which is why we don't use it here for styling
-    const draggingStyle = isDragging ? { opacity: 0.3} : {};
+    const draggingStyle = isDragging ? { opacity: 0.3 } : {};
     const droppingStyle = isOver ? borderColor(Colors().active) : {};
     return (
       <div
@@ -209,7 +209,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
           draggingStyle,
           droppingStyle,
           { width: depth !== undefined ? `calc(100% - 12px)` : '100%' },
-          this.props.style
+          this.props.style,
         )}
       >
         <div

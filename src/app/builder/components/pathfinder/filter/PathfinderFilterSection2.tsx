@@ -52,7 +52,7 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import Colors from 'app/colors/Colors';
-import {ColorsActions} from 'app/colors/data/ColorsRedux';
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import CustomDragLayer from 'app/common/components/CustomDragLayer';
 import DragDropGroup from 'app/common/components/DragDropGroup';
 import DragDropItem from 'app/common/components/DragDropItem';
@@ -79,28 +79,28 @@ export interface Props
 class PathfinderFilterSection extends TerrainComponent<Props>
 {
   public state:
-  {
-    opacity: boolean,
-  } = {
-    opacity: true,
-  }
+    {
+      opacity: boolean,
+    } = {
+      opacity: true,
+    };
 
   public componentWillMount()
   {
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.drag-drop-item-header .pf-filter-group-header',
-      style: {background: Colors().blockBg, border: 'none'},
+      style: { background: Colors().blockBg, border: 'none' },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.drag-drop-item-header .pf-filter-group-header .close',
-      style: {display: 'none'},
+      style: { display: 'none' },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.drag-drop-item-is-over',
-      style: {background: Colors().blockBg},
+      style: { background: Colors().blockBg },
     });
   }
 
@@ -363,7 +363,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                     canDrop={true}
                     data={line}
                     hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
-                    style={{opacity: this.state.opacity ? 1 : 0.5}}
+                    style={{ opacity: this.state.opacity ? 1 : 0.5 }}
                     onDragStart={this._toggle('opacity')}
                     onDragStop={this._toggle('opacity')}
                   />
@@ -382,7 +382,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                     hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
                     onDragStart={this._toggle('opacity')}
                     onDragStop={this._toggle('opacity')}
-                    style={{opacity: this.state.opacity ? 1 : 0.5}}
+                    style={{ opacity: this.state.opacity ? 1 : 0.5 }}
 
                   />
               }
@@ -415,7 +415,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderFilterSection,
   [],
-  { builderActions: BuilderActions,
+  {
+    builderActions: BuilderActions,
     colorsActions: ColorsActions,
   },
 );
