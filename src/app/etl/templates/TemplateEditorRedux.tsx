@@ -58,7 +58,16 @@ import
   ETLTemplate,
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
-import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
+import { MidwayError } from 'shared/error/MidwayError';
+import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
+import { AllBackendsMap } from 'src/database/AllBackends';
+import BackendInstance from 'src/database/types/BackendInstance';
+import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
+import { _Query, Query, queryForSave } from 'src/items/types/Query';
+import { Ajax } from 'util/Ajax';
+import { Algorithm } from 'library/LibraryTypes';
+import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
+import { toInputMap } from 'src/blocks/types/Input';
 
 const { List, Map } = Immutable;
 
@@ -66,15 +75,9 @@ import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 
 export interface TemplateEditorActionTypes
 {
-  loadTemplate: {
-    actionType: 'loadTemplate';
+  setTemplate: {
+    actionType: 'setTemplate';
     template: ETLTemplate;
-  };
-  setExportAlgorithm: {
-    actionType: 'setExportAlgorithm';
-    algorithmId: ID;
-    libraryState: any;
-    schemaState: any;
   };
   setRoot: { // this should be the only way to edit the template tree
     actionType: 'setRoot';
@@ -91,6 +94,18 @@ export interface TemplateEditorActionTypes
   setDocuments: {
     actionType: 'setDocuments';
     documents: List<object>
+  };
+  fetchDocuments: {
+    actionType: 'fetchDocuments';
+    source: {
+      type: 'algorithm',
+      algorithm: Algorithm;
+    };
+    onFetched?: (hits: List<object>) => void;
+  };
+  setLoading: {
+    actionType: 'setLoading';
+    loading: boolean;
   };
   setPreviewIndex: {
     actionType: 'setPreviewIndex';
@@ -112,7 +127,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
 {
   public reducers: ConstrainedMap<TemplateEditorActionTypes, TemplateEditorState> =
     {
-      loadTemplate: (state, action) =>
+      setTemplate: (state, action) =>
       {
         return state.set('isDirty', false).
           set('template', action.payload.template);
@@ -134,6 +149,14 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       {
         return state.setIn(['uiState', 'documents'], action.payload.documents);
       },
+      fetchDocuments: (state, action) =>
+      {
+        return state; // do nothing
+      },
+      setLoading: (state, action) =>
+      {
+        return state.setIn(['uiState', 'loading'], action.payload.loading);
+      },
       setPreviewIndex: (state, action) =>
       {
         return state.setIn(['uiState', 'previewIndex'], action.payload.index);
@@ -147,25 +170,67 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       {
         return state.setIn(['uiState', 'settingsKeyPath'], null).setIn(['uiState', 'settingsDisplayKeyPath'], null);
       },
-      setExportAlgorithm: (state, action) =>
-      {
-        return state;
-      },
     };
-
-  public setExportAlgorithmAction(action, dispatch)
-  {
-
-  }
 
   public overrideAct(action: Unroll<TemplateEditorActionTypes>)
   {
     switch (action.actionType)
     {
-      case 'setExportAlgorithm':
-        return this.setExportAlgorithmAction.bind(this, action);
+      case 'fetchDocuments':
+        return this.fetchDocumentsAction.bind(this, action);
       default:
         return undefined;
+    }
+  }
+
+  public fetchDocumentsAction(action: TemplateEditorActionType<'fetchDocuments'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'setLoading',
+      loading: true,
+    }); // set loading to true
+
+    if (action.source.type === 'algorithm' && action.source.algorithm != null)
+    {
+      const algorithm = action.source.algorithm;
+      let query = algorithm.query;
+      query = query.set('parseTree', new ESInterpreter(query.tql, toInputMap(query.inputs)));
+
+      const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+        query,
+        {
+          replaceInputs: true,
+        },
+      );
+      const handleResponse = (response: MidwayQueryResponse) =>
+      {
+        const hits = List(_.get(response, ['result', 'hits', 'hits'], []));
+        directDispatch({
+          actionType: 'setDocuments',
+          documents: hits,
+        });
+        directDispatch({
+          actionType: 'setLoading',
+          loading: false,
+        });
+        if (action.onFetched != null)
+        {
+          action.onFetched(hits);
+        }
+      };
+
+      const handleError = (ev: string | MidwayError) =>
+      {
+        // TODO
+      }
+
+      const { queryId, xhr } = Ajax.query(
+        eql,
+        algorithm.db,
+        handleResponse,
+        handleError,
+      );
     }
   }
 }

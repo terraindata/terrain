@@ -58,59 +58,58 @@ import { Ajax } from 'util/Ajax';
 
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-abstract class QueryManagerC
-{
-  protected abstract set: (k, v) => QueryManagerC;
-  private readonly queryPending: boolean = false;
-  private readonly queryId: ID = null;
-  private readonly xhr: XMLHttpRequest = null;
-  private readonly onSelfChange: (newQueryManager) => void = null;
+// class QueryManagerC
+// {
+//   private readonly queryPending: boolean = false;
+//   private readonly queryId: ID = null;
+//   private readonly xhr: XMLHttpRequest = null;
+//   private readonly onSelfChange: (newQueryManager) => void = null;
 
-  public isQueryPending()
-  {
-    return this.queryPending;
-  }
+//   public isQueryPending()
+//   {
+//     return this.queryPending;
+//   }
 
-  public abortQuery(suppressChanges = false): ((self) => QueryManagerC) | null // returns a side effect function if suppress is true
-  {
-    if (this.xhr != null)
-    {
-      this.xhr.abort();
-    }
-    const sideEffect = (self) => self.set('queryPending', false).set('xhr', null);
+//   public abortQuery(suppressChanges = false): ((self) => QueryManager) | null // returns a side effect function if suppress is true
+//   {
+//     if (this.xhr != null)
+//     {
+//       this.xhr.abort();
+//     }
+//     const sideEffect = (self) => self.set('queryPending', false).set('xhr', null);
 
-    if (suppressChanges)
-    {
-      return sideEffect;
-    }
-    else
-    {
-      this.onSelfChange(sideEffect(this));
-      return null;
-    }
-  }
+//     if (suppressChanges)
+//     {
+//       return sideEffect;
+//     }
+//     else
+//     {
+//       this.onSelfChange(sideEffect(this));
+//       return null;
+//     }
+//   }
 
-  public sendQuery(query, db, responseHandler, errorHandler)
-  {
-    const delayedFn = this.abortQuery(true);
-    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {
-        replaceInputs: true,
-      },
-    );
+//   public sendQuery(query, db, responseHandler, errorHandler)
+//   {
+//     const delayedFn = this.abortQuery(true);
+//     const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+//       query,
+//       {
+//         replaceInputs: true,
+//       },
+//     );
 
-    const { queryId, xhr } = Ajax.query(
-      eql,
-      db,
-      responseHandler,
-      errorHandler,
-    );
+//     const { queryId, xhr } = Ajax.query(
+//       eql,
+//       db,
+//       responseHandler,
+//       errorHandler,
+//     );
 
-    const newQueryManager = delayedFn(this).set('queryId', queryId)
-      .set('xhr', xhr).set('queryPending', true);
-    this.onSelfChange(newQueryManager);
-  }
-}
-export type QueryManager = WithIRecord<QueryManagerC>;
-export const _QueryManager = makeExtendedConstructor(QueryManagerC, true);
+//     const newQueryManager = delayedFn(this).set('queryId', queryId)
+//       .set('xhr', xhr).set('queryPending', true);
+//     this.onSelfChange(newQueryManager);
+//   }
+// }
+// export type QueryManager = WithIRecord<QueryManagerC>;
+// export const _QueryManager = makeExtendedConstructor(QueryManagerC, true);

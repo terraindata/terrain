@@ -102,28 +102,39 @@ interface TemplateBase
   templateId: ID;
   templateName: string;
   type: TEMPLATE_TYPES;
-  filetype: FILE_TYPES;
-  objectKey: string;
-  dbid: number;
-  dbname: string;
-  tablename: string;
+  configuration: ImportConfiguration | ExportConfiguration;
   transformationEngine: TransformationEngine;
 }
 
-export interface ExportTemplateBase extends TemplateBase
+export interface ExportTemplate extends TemplateBase
 {
+  configuration: ExportConfiguration;
   type: TEMPLATE_TYPES.EXPORT;
-  rank: boolean;
 }
 
-export interface ImportTemplateBase extends TemplateBase
+export interface ImportTemplate extends TemplateBase
 {
+  configuration: ImportConfiguration;
   type: TEMPLATE_TYPES.IMPORT;
   primaryKeySettings: any;
 }
 
-// for the backend
-export type ExportTemplate = ExportTemplateBase;
-
-// for the backend
-export type ImportTemplate = ImportTemplateBase;
+// default configuration options for imports and exports
+export interface ImportConfiguration
+{
+  dbid: ID; // default db and table that the file gets imported into
+  tableName: string;
+  requireAllFields: boolean;
+  csvHeader: boolean;
+  jsonNewlines: boolean;
+  upsert: boolean; // whether or not to upsert or do only inserts
+  fileType: FILE_TYPES; // what format the input file is
+}
+export interface ExportConfiguration
+{
+  algorithmId: ID; // default algorithm whose query gets exported
+  fileType: FILE_TYPES; // what format the output file is
+  csvHeader: boolean;
+  jsonNewlines: boolean;
+  includeRank: boolean;
+}

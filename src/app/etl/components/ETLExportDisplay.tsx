@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 
@@ -55,8 +56,14 @@ import Util from 'util/Util';
 
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { NoArrayDocuments, testSerialization } from 'etl/templates/TemplateUtil';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 
+import { createTreeFromEngine } from 'etl/templates/SyncUtil';
+
+const { List } = Immutable;
 import './ETLExportDisplay.less';
 
 export interface Props
@@ -64,43 +71,115 @@ export interface Props
   params?: {
     algorithmId?: number,
   };
+  algorithms: IMMap<ID, Algorithm>;
+
   placeholder?: any;
   act?: typeof TemplateEditorActions;
+}
+
+function getAlgorithmId(params)
+{
+  const asNumber = (params != null && params.algorithmId != null) ? Number(params.algorithmId) : NaN;
+  return Number.isNaN(asNumber) ? -1 : asNumber;
+}
+
+function initialTemplateFromDocs(documents: List<object>): { template: ETLTemplate, rootField: TemplateField }
+{
+  if (documents.size === 0)
+  {
+    return {
+      template: _ExportTemplate(),
+      rootField: _TemplateField(),
+    }
+  }
+
+  const firstDoc = documents.get(0);
+  const engine = new TransformationEngine(firstDoc);
+  const rootField = createTreeFromEngine(engine);
+
+  const template = _ExportTemplate({
+    templateId: -1,
+    templateName: name,
+    transformationEngine: engine,
+  });
+
+  return {
+    template,
+    rootField,
+  };
 }
 
 @Radium
 class ETLExportDisplay extends TerrainComponent<Props>
 {
-  public getAlgorithmId(params)
-  {
-    return params != null ? (params.algorithmId != null ? params.algorithmId : -1) : -1;
-  }
+  // public initFromDocs(documents, name = 'No Title')
+  // {
+  //   if (!Array.isArray(documents) || documents.length === 0)
+  //   {
+  //     return;
+  //   }
+  //   const firstDoc = documents[0];
+  //   const engine = new TransformationEngine(firstDoc);
+  //   const rootField = createTreeFromEngine(engine);
 
-  public componentWillMount()
+  //   const template = _ExportTemplate({
+  //     templateId: -1,
+  //     templateName: name,
+  //     transformationEngine: engine,
+  //   });
+
+  //   this.props.act({
+  //     actionType: 'setTemplate',
+  //     template,
+  //   });
+
+  //   this.props.act({
+  //     actionType: 'setRoot',
+  //     rootField,
+  //   });
+
+  //   this.props.act({
+  //     actionType: 'setDocuments',
+  //     documents: List(documents),
+  //   });
+  // }
+
+  public initFromAlgorithm()
   {
-    const { act, params } = this.props;
+    const { algorithms, params, act } = this.props;
+    const algorithmId = getAlgorithmId(params);
+    const algorithm = (algorithms != null && algorithms.has(algorithmId)) ? algorithms.get(algorithmId) : null;
+
+    const onFetched = (hits: List<object>) =>
+    {
+      const { template, rootField } = initialTemplateFromDocs(hits);
+      act({
+        actionType: 'setTemplate',
+        template,
+      });
+      act({
+        actionType: 'setRoot',
+        rootField,
+      });
+    }
     act({
-      actionType: 'setExportAlgorithm',
-      algorithmId: this.getAlgorithmId(params),
-      libraryState: null,
-      schemaState: null,
+      actionType: 'fetchDocuments',
+      source: {
+        type: 'algorithm',
+        algorithm,
+      },
+      onFetched,
     });
   }
 
-  public componentWillReceiveProps(nextProps)
+  // public testInit()
+  // {
+  //   this.initFromDocs(NoArrayDocuments);
+  // }
+
+  public componentDidMount()
   {
-    const { act, params } = this.props;
-    const nextId = this.getAlgorithmId(nextProps.params);
-    const currId = this.getAlgorithmId(params);
-    if (nextId !== currId)
-    {
-      act({
-        actionType: 'setExportAlgorithm',
-        algorithmId: nextId,
-        libraryState: null,
-        schemaState: null,
-      });
-    }
+    this.initFromAlgorithm();
   }
 
   public render()

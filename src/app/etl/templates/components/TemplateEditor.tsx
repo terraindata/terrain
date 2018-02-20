@@ -51,8 +51,6 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { recordForSave } from 'src/app/Classes';
-
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorDocumentsPreview from 'etl/templates/components/TemplateEditorDocumentsPreview';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
@@ -60,13 +58,7 @@ import TemplateEditorFieldSettings from 'etl/templates/components/TemplateEditor
 import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
-import { _TemplateField, ElasticFieldSettings, TemplateField } from 'etl/templates/FieldTypes';
-import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-import { createTreeFromEngine } from '../SyncUtil';
-import { NoArrayDocuments, testSerialization } from '../TemplateUtil';
-
+import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
 const { List } = Immutable;
@@ -81,53 +73,6 @@ export interface Props
 @Radium
 class TemplateEditor extends TerrainComponent<Props>
 {
-
-  public initFromDocs(documents, name = 'No Title')
-  {
-    if (!Array.isArray(documents) || documents.length === 0)
-    {
-      return;
-    }
-    const firstDoc = documents[0];
-    const engine = new TransformationEngine(firstDoc);
-    const rootField = createTreeFromEngine(engine);
-
-    const template = _ExportTemplate({
-      templateId: -1,
-      templateName: name,
-      transformationEngine: engine,
-    });
-
-    // this.props.act({
-    //   actionType: 'loadTemplate',
-    //   template: testSerialization(template),
-    // });
-    this.props.act({
-      actionType: 'loadTemplate',
-      template,
-    });
-
-    this.props.act({
-      actionType: 'setRoot',
-      rootField,
-    });
-
-    this.props.act({
-      actionType: 'setDocuments',
-      documents: List(documents),
-    });
-  }
-
-  public testInit()
-  {
-    this.initFromDocs(NoArrayDocuments);
-  }
-
-  public componentDidMount()
-  {
-    this.testInit();
-  }
-
   public setModalRequests(requests)
   {
     this.props.act({

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing ordered-imports
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
@@ -53,13 +53,18 @@ import { FILE_TYPES } from 'shared/etl/ETLTypes';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { ExportTemplateBase, ImportTemplateBase, LANGUAGES, TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
+import
+{
+  LANGUAGES, TEMPLATE_TYPES,
+  ExportTemplate as ExportTemplateI, ImportTemplate as ImportTemplateI,
+  ExportConfiguration as ExportConfigurationI,
+  ImportConfiguration as ImportConfigurationI,
+} from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class TemplateEditorStateC
 {
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
-  public params: ExportParameters | ImportParameters = _ExportParameters({});
   public rootField: TemplateField = _TemplateField();
   public isDirty: boolean = true;
   public uiState: EditorDisplayState = _EditorDisplayState();
@@ -79,41 +84,36 @@ class EditorDisplayStateC
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
-class ExportParametersC
+class ExportConfigurationC implements ExportConfigurationI
 {
-  public algorithmId: ID;
+  public algorithmId: ID = -1;
   public fileType: FILE_TYPES = FILE_TYPES.JSON;
-  public includeTerrainRank: boolean = true;
-  public requireAllFields: boolean = true;
+  public csvHeader: boolean = true;
+  public jsonNewlines: boolean = false;
+  public includeRank: boolean = true;
 }
-export type ExportParameters = WithIRecord<ExportParametersC>;
-export const _ExportParameters = makeConstructor(ExportParametersC);
+export type ExportConfiguration = WithIRecord<ExportConfigurationC>;
+export const _ExportConfiguration = makeConstructor(ExportConfigurationC);
 
-class ImportParametersC
+class ImportConfigurationC implements ImportConfigurationI
 {
-  public importSource: List<object> = List([{
-    sourceType: 'ClientLocal',
-    filename: 'test.csv',
-    fileType: 'csv',
-  }]); // TODO change this for multi source imports
-  public language: LANGUAGES = LANGUAGES.ELASTIC;
-  public dbid: ID = -1;
-  public dbname: string = '';
+  public dbid = -1;
+  public tableName = '';
+  public requireAllFields = false;
+  public csvHeader = true;
+  public jsonNewlines = false;
+  public upsert = true;
+  public fileType = FILE_TYPES.JSON;
 }
-export type ImportParameters = WithIRecord<ImportParametersC>;
-export const _ImportParemeters = makeConstructor(ImportParametersC);
+export type ImportConfiguration = WithIRecord<ImportConfigurationC>;
+export const _ImportConfiguration = makeConstructor(ImportConfigurationC);
 
-class ExportTemplateC implements ExportTemplateBase
+class ExportTemplateC implements ExportTemplateI
 {
   public templateId = -1;
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.EXPORT;
-  public filetype = FILE_TYPES.JSON;
-  public objectKey = '';
-  public dbid = -1;
-  public dbname = '';
-  public tablename = '';
-  public rank = true;
+  public configuration = _ExportConfiguration();
   public transformationEngine = new TransformationEngine();
 }
 export type ExportTemplate = WithIRecord<ExportTemplateC>;
@@ -121,17 +121,13 @@ export const _ExportTemplate = makeExtendedConstructor(ExportTemplateC, false, {
   transformationEngine: TransformationEngine.load,
 });
 
-class ImportTemplateC implements ImportTemplateBase
+class ImportTemplateC implements ImportTemplateI
 {
   public templateId = -1;
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.IMPORT;
-  public filetype = FILE_TYPES.JSON;
-  public objectKey = '';
-  public dbid = -1;
-  public dbname = '';
-  public tablename = '';
   public primaryKeySettings = {};
+  public configuration = _ImportConfiguration();
   public transformationEngine = new TransformationEngine();
 }
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
