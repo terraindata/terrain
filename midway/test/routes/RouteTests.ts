@@ -210,6 +210,50 @@ beforeAll(async (done) =>
   }
 });
 
+describe('Status tests', () =>
+{
+  test('Check status: GET /midway/v1/status/', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/status/')
+      .expect(200)
+      .then((response) =>
+      {
+        const responseObject = JSON.parse(response.text);
+        expect(responseObject.status).toBe('ok');
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/status/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Check stats: GET /midway/v1/status/stats', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/status/stats')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        const responseObject = JSON.parse(response.text);
+        winston.info(JSON.stringify(responseObject, null, 1));
+        expect(responseObject.uptime > 0);
+        expect(responseObject.numRequests > 0);
+        expect(responseObject.numRequestsCompleted > 0 && responseObject.numRequestsCompleted < responseObject.numRequests);
+        expect(responseObject.numRequestsPending === responseObject.numRequests - responseObject.numRequestsCompleted);
+        expect(responseObject.numRequestsThatThrew >= 0 && responseObject.numRequestsThatThrew < responseObject.numRequests);
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/status/stats request returned an error: ' + String(error));
+      });
+  });
+});
+
 describe('User and auth route tests', () =>
 {
   test('http login route: GET /midway/v1/auth/login', async () =>
@@ -424,13 +468,13 @@ describe('Item route tests', () =>
 
   test('Update item: POST /midway/v1/items/', async () =>
   {
-    const insertOjbect = { id: 2, name: 'Updated Item', status: 'LIVE' };
+    const insertObject = { id: 2, name: 'Updated Item', status: 'LIVE' };
     await request(server)
       .post('/midway/v1/items/2')
       .send({
         id: 1,
         accessToken: 'ImAnAdmin',
-        body: insertOjbect,
+        body: insertObject,
       })
       .expect(200)
       .then((response) =>
@@ -438,7 +482,7 @@ describe('Item route tests', () =>
         expect(response.text).not.toBe('Unauthorized');
         const respData = JSON.parse(response.text);
         expect(respData.length).toBeGreaterThan(0);
-        expect(respData[0]).toMatchObject(insertOjbect);
+        expect(respData[0]).toMatchObject(insertObject);
       })
       .catch((error) =>
       {
@@ -770,12 +814,13 @@ describe('Query route tests', () =>
               }
             },
             "groupJoin": {
+              "parentAlias": "movie",
               "englishMovies": {
                 "_source": ["movieid", "overview"],
                 "query" : {
                   "bool" : {
                     "filter": [
-                      { "term": {"movieid" : @parent.movieid} }
+                      { "term": {"movieid" : @movie.movieid} }
                     ],
                     "must" : [
                       { "match": {"_index" : "movies"} },
@@ -1011,7 +1056,25 @@ describe('File io templates route tests', () =>
           dbname: 'mysqlimport',
           tablename: 'data',
           csvHeaderMissing: false,
-          originalNames: ['movieid', 'title', 'genres', 'backdroppath', 'overview', 'posterpath', 'status', 'tagline', 'releasedate', 'budget', 'revenue', 'votecount', 'popularity', 'voteaverage', 'homepage', 'language', 'runtime'],
+          originalNames: [
+            'movieid',
+            'title',
+            'genres',
+            'backdroppath',
+            'overview',
+            'posterpath',
+            'status',
+            'tagline',
+            'releasedate',
+            'budget',
+            'revenue',
+            'votecount',
+            'popularity',
+            'voteaverage',
+            'homepage',
+            'language',
+            'runtime',
+          ],
           columnTypes:
             {
               movieid: { type: 'long' },
@@ -1050,7 +1113,25 @@ describe('File io templates route tests', () =>
             dbid: 1,
             dbname: 'mysqlimport',
             tablename: 'data',
-            originalNames: ['movieid', 'title', 'genres', 'backdroppath', 'overview', 'posterpath', 'status', 'tagline', 'releasedate', 'budget', 'revenue', 'votecount', 'popularity', 'voteaverage', 'homepage', 'language', 'runtime'],
+            originalNames: [
+              'movieid',
+              'title',
+              'genres',
+              'backdroppath',
+              'overview',
+              'posterpath',
+              'status',
+              'tagline',
+              'releasedate',
+              'budget',
+              'revenue',
+              'votecount',
+              'popularity',
+              'voteaverage',
+              'homepage',
+              'language',
+              'runtime',
+            ],
             columnTypes:
               {
                 movieid: { type: 'long' },
@@ -1420,22 +1501,24 @@ describe('Credentials tests', () =>
       {
         const result = JSON.parse(response.text);
         expect(result.length).toBeGreaterThanOrEqual(2);
-        expect(result).toEqual(expect.arrayContaining([{
-          createdBy: 1,
-          id: 1,
-          meta: '',
-          name: 'Local Filesystem Config',
-          permissions: 0,
-          type: 'local',
-        },
-        {
-          createdBy: 1,
-          id: 2,
-          meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
-          name: 'SFTP Test 1',
-          permissions: 1,
-          type: 'sftp',
-        }]));
+        expect(result).toEqual(expect.arrayContaining([
+          {
+            createdBy: 1,
+            id: 1,
+            meta: '',
+            name: 'Local Filesystem Config',
+            permissions: 0,
+            type: 'local',
+          },
+          {
+            createdBy: 1,
+            id: 2,
+            meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
+            name: 'SFTP Test 1',
+            permissions: 1,
+            type: 'sftp',
+          },
+        ]));
       })
       .catch((error) =>
       {

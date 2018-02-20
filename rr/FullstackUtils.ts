@@ -44,50 +44,69 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParameterSubstituter from './ESParameterSubstituter';
-import ESValueInfo from './ESValueInfo';
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
 
-/**
- * Fills values in for parameters in a query using a given substitutionFunction,
- * ultimately producing a new query string.
- *
- * Different possible strategies for substituting parameters:
- * + Emit new JSON, and then reparse if needed
- * + Emit new JS object and then interpret if needed
- * + Mutate VI's (reparse if needed)
- *  + traverse and replace
- * + Deep Copy + Mutate
- *  + traverse and copy
- *  + traverse and replace
- * + Immutable Substitution -> must first identify mutation locations before copy
- *  + traverse and mark, copy on return
- */
-export default class ESParameterFiller
+import readline from 'readline-promise';
+import * as sleep from 'sleep';
+
+function ignoreBuilderAction(action: string): boolean
 {
-  public static generate(source: ESValueInfo,
-    params: { [name: string]: any }): string
+  if (action.startsWith('{"type":"builderCards.hoverCard"') || action.startsWith('{"type":"colors.setStyle"')
+    || action.startsWith('{"type":"builder.results"'))
   {
-    return ESParameterSubstituter.generate(source,
-      (param: string, runtimeParam?: string): string =>
-      {
-        const ps = param.split('.');
-        if (runtimeParam !== undefined && ps[0] === runtimeParam && params[runtimeParam] === undefined)
-        {
-          return JSON.stringify('@' + param);
-        }
-
-        let value = params;
-        for (const p of ps)
-        {
-          value = value[p];
-        }
-
-        if (value === undefined)
-        {
-          throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
-        }
-
-        return JSON.stringify(value);
-      });
+    return true;
   }
+  return false;
+}
+
+export async function waitForInput(msg: string)
+{
+  const rl = readline.createInterface(
+    {
+      input: process.stdin,
+      output: process.stdout,
+      terminal: true,
+    });
+  const answer = await rl.questionAsync(msg);
+  rl.close();
+}
+
+export async function replayBuilderActions(page, url, actions, records, actionCallBack?)
+{
+  const loadRecords = await page.evaluate((recordNames) =>
+  {
+    // window['TerrainTools'].setLogLevel();
+    return window['TerrainTools'].terrainStoreLogger.resetSerializeRecordArray(recordNames);
+  }, records);
+  if (loadRecords === false)
+  {
+    console.log('Failed to load the serialization records: ' + records);
+    return;
+  }
+  // replay the log
+  for (let i = 0; i < actions.length; i = i + 1)
+  {
+    const action = actions[i];
+    console.log('Replaying Action ' + typeof action + ':' + action);
+
+    if (ignoreBuilderAction(action))
+    {
+      console.log('Ignoring action: ' + String(action));
+      continue;
+    }
+    await page.evaluate((act) =>
+    {
+      return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);
+    }, action);
+    sleep.sleep(1);
+    if (actionCallBack)
+    {
+      await actionCallBack();
+    }
+  }
+}
+
+export function filteringRecordBuilderActions(actions: string[])
+{
+  return actions.filter((action) => ignoreBuilderAction(action) === false);
 }
