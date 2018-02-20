@@ -53,10 +53,10 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 
 import './TemplateEditorDocumentsPreview.less';
 const { List } = Immutable;

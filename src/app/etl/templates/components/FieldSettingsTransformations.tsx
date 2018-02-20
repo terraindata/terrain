@@ -64,13 +64,11 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 
 import { TemplateField, TransformationNode } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 import { TransformationCreator } from 'etl/templates/components/transformations/TransformationCreator';
 import { TransformationEditor } from 'etl/templates/components/transformations/TransformationEditor';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import { TransformationsInfo } from 'shared/transformations/TransformationsInfo';
 
@@ -79,12 +77,7 @@ import './transformations/TransformationEditor.less';
 const EditIcon = require('images/icon_edit.svg');
 const AddIcon = require('images/icon_add.svg');
 
-export interface Props extends TemplateEditorFieldProps
-{
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
-}
+export type Props = TemplateEditorFieldProps;
 
 const enum ViewState
 {
@@ -122,7 +115,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         <TransformationEditor
           key={currentIndex}
           transformation={field.transformations.get(currentIndex)}
-          engine={this.props.templateEditor.template.transformationEngine}
+          engine={this._template.transformationEngine}
           fieldID={this.props.field.fieldId}
           onTransformationChange={this.handleTransformationChange}
           onClose={this.handleUIClose}
@@ -135,7 +128,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
   {
     return (
       <TransformationCreator
-        engine={this.props.templateEditor.template.transformationEngine}
+        engine={this._template.transformationEngine}
         fieldID={this.props.field.fieldId}
         onTransformationCreated={this.handleTransformationChange}
         onClose={this.handleUIClose}
@@ -296,6 +289,6 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
 export default Util.createTypedContainer(
   FieldSettingsTransformations,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+  mapStateKeys,
+  mapDispatchKeys,
 );

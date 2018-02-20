@@ -58,9 +58,7 @@ const { List, Map } = Immutable;
 
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 
@@ -73,9 +71,6 @@ export interface Props extends TemplateEditorFieldProps
   label?: string;
   renderNestedFields?: (preview: any, displayKeyPath: KeyPath) => any;
   injectedContent?: any;
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
 }
 
 @Radium
@@ -211,8 +206,8 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
 
 const TemplateEditorFieldArrayNode = Util.createTypedContainer(
   TemplateEditorFieldArrayNodeC,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+  mapStateKeys,
+  mapDispatchKeys,
 );
 
 export default TemplateEditorFieldArrayNode;

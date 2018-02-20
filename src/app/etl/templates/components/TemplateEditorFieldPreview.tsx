@@ -59,9 +59,8 @@ const { List, Map } = Immutable;
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './TemplateEditorField.less';
 
@@ -69,9 +68,6 @@ export interface Props extends TemplateEditorFieldProps
 {
   hidePreviewValue?: boolean;
   displayValueOverride?: any;
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
 }
 
 @Radium
@@ -143,6 +139,6 @@ const emptyOptions = List([]);
 
 export default Util.createTypedContainer(
   TemplateEditorFieldPreview,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+  mapStateKeys,
+  mapDispatchKeys,
 );

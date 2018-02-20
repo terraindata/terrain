@@ -58,16 +58,16 @@ import
   ETLTemplate,
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
+import { Algorithm } from 'library/LibraryTypes';
+import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
 import { MidwayError } from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
+import { toInputMap } from 'src/blocks/types/Input';
 import { AllBackendsMap } from 'src/database/AllBackends';
 import BackendInstance from 'src/database/types/BackendInstance';
 import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
 import { _Query, Query, queryForSave } from 'src/items/types/Query';
 import { Ajax } from 'util/Ajax';
-import { Algorithm } from 'library/LibraryTypes';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import { toInputMap } from 'src/blocks/types/Input';
 
 const { List, Map } = Immutable;
 
@@ -223,7 +223,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       const handleError = (ev: string | MidwayError) =>
       {
         // TODO
-      }
+      };
 
       const { queryId, xhr } = Ajax.query(
         eql,

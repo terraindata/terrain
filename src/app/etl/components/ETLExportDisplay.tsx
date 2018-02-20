@@ -55,11 +55,11 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
+import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { NoArrayDocuments, testSerialization } from 'etl/templates/TemplateUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 
@@ -90,7 +90,7 @@ function initialTemplateFromDocs(documents: List<object>): { template: ETLTempla
     return {
       template: _ExportTemplate(),
       rootField: _TemplateField(),
-    }
+    };
   }
 
   const firstDoc = documents.get(0);
@@ -161,7 +161,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
         actionType: 'setRoot',
         rootField,
       });
-    }
+    };
     act({
       actionType: 'fetchDocuments',
       source: {

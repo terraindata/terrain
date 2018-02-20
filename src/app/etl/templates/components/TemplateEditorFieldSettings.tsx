@@ -57,23 +57,15 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 import FieldMainSettings from './FieldMainSettings';
 import FieldSettingsTransformations from './FieldSettingsTransformations';
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
 
-export interface Props extends TemplateEditorFieldProps
-{
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
-}
+export type Props = TemplateEditorFieldProps;
 
 const CloseIcon = require('images/icon_close.svg');
 
@@ -196,6 +188,6 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 
 export default Util.createTypedContainer(
   TemplateEditorFieldSettings,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+  mapStateKeys,
+  mapDispatchKeys,
 );

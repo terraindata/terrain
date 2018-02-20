@@ -59,24 +59,17 @@ const { List, Map } = Immutable;
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
 import
 {
   _ElasticFieldSettings, _TemplateField,
   ElasticFieldSettings, TemplateField,
 } from 'etl/templates/FieldTypes';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
 
-export interface Props extends TemplateEditorFieldProps
-{
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
-}
+export type Props = TemplateEditorFieldProps;
 
 @Radium
 class FieldMainSettings extends TemplateEditorField<Props>
@@ -186,6 +179,6 @@ const settingsInputMap: InputDeclarationMap<SettingsState> = {
 
 export default Util.createTypedContainer(
   FieldMainSettings,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+  mapStateKeys,
+  mapDispatchKeys,
 );

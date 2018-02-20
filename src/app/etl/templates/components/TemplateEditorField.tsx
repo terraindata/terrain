@@ -60,7 +60,7 @@ const { List, Map } = Immutable;
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { EditorDisplayState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 import { TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 
@@ -79,8 +79,24 @@ export interface TemplateEditorFieldProps
   preview: any;
   displayKeyPath: KeyPath; // not the key path in the store, but the key path in virtual DOM
 
-  templateEditor?: TemplateEditorState; // from container
-  act?: typeof TemplateEditorActions; // from container
+  // injected props:
+  act?: typeof TemplateEditorActions;
+}
+
+export const mapDispatchKeys = {
+  act: TemplateEditorActions
+};
+export const mapStateKeys = [
+  ['templateEditor', 'template'],
+  ['templateEditor', 'uiState'],
+  ['templateEditor', 'rootField'],
+];
+
+interface Injected
+{
+  template: ETLTemplate;
+  uiState: EditorDisplayState;
+  rootField: TemplateField
 }
 
 export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
@@ -111,6 +127,31 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return shallowCompare(this, nextProps, nextState);
   }
 
+  get _template(): ETLTemplate
+  {
+    return (this.props as Props & Injected).template;
+  }
+
+  get _rootField(): TemplateField
+  {
+    return (this.props as Props & Injected).rootField;
+  }
+
+  // protected _template()
+  // {
+  //   return (this.props as Props & Injected).template;
+  // }
+
+  get _uiState(): EditorDisplayState
+  {
+    return (this.props as Props & Injected).uiState;
+  }
+
+  // protected _rootField()
+  // {
+  //   return (this.props as Props & Injected).rootField;
+  // }
+
   protected _getChildPaths(index, cacheKey = this.props.field.children): { displayKeyPath: KeyPath, keyPath: KeyPath }
   {
     const keyPath = this.getKPCachedFn(this.props.keyPath, cacheKey)(index);
@@ -133,8 +174,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _proxy(): FieldNodeProxy
   {
-    const engine = this.props.templateEditor.template.transformationEngine;
-    const tree = new FieldTreeProxy(this._rootField(), engine, this.onRootMutationBound);
+    const engine = this._template.transformationEngine;
+    const tree = new FieldTreeProxy(this._rootField, engine, this.onRootMutationBound);
     return new FieldNodeProxy(tree, this.props.keyPath);
   }
 
@@ -150,10 +191,10 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _settingsAreOpen(): boolean
   {
-    const { displayKeyPath, keyPath, templateEditor, noInteract } = this.props;
+    const { displayKeyPath, keyPath, noInteract } = this.props;
     return !noInteract &&
-      displayKeyPath.equals(templateEditor.uiState.settingsDisplayKeyPath) &&
-      keyPath.equals(templateEditor.uiState.settingsKeyPath);
+      displayKeyPath.equals(this._uiState.settingsDisplayKeyPath) &&
+      keyPath.equals(this._uiState.settingsKeyPath);
   }
 
   // Returns the given function if input is not disabled. Otherwise returns undefined.
@@ -164,13 +205,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _isExport(): boolean
   {
-    return this.props.templateEditor.template !== undefined &&
-      this.props.templateEditor.template.type === TEMPLATE_TYPES.EXPORT;
-  }
-
-  protected _rootField()
-  {
-    return this.props.templateEditor.rootField;
+    return this._template !== undefined &&
+      this._template.type === TEMPLATE_TYPES.EXPORT;
   }
 
   private onRootMutation(field: TemplateField)
@@ -198,5 +234,4 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       return displayKeyPath.push(index);
     });
   }
-
 }

@@ -59,19 +59,12 @@ const { List, Map } = Immutable;
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { _ElasticFieldSettings, ElasticFieldSettings } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
 
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 
-export interface Props extends TemplateEditorFieldProps
-{
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
-}
+export type Props = TemplateEditorFieldProps;
 
 @Radium
 class ElasticFieldTypeSection extends TemplateEditorField<Props>
@@ -333,6 +326,6 @@ const voidFunction = () => { /* do nothing */ };
 
 export default Util.createTypedContainer(
   ElasticFieldTypeSection,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+  mapStateKeys,
+  mapDispatchKeys,
 );

@@ -59,20 +59,13 @@ import FadeInOut from 'common/components/FadeInOut';
 
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldArrayNode from './TemplateEditorFieldArrayNode';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
-export interface Props extends TemplateEditorFieldProps
-{
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
-}
+export type Props = TemplateEditorFieldProps;
 
 @Radium
 class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
@@ -199,8 +192,8 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
 const TemplateEditorFieldNode = Util.createTypedContainer(
   TemplateEditorFieldNodeC,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+  mapStateKeys,
+  mapDispatchKeys,
 );
 
 export default TemplateEditorFieldNode;
