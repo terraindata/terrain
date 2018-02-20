@@ -48,9 +48,9 @@ THE SOFTWARE.
 
 import { borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 const { List, Map } = Immutable;
@@ -67,6 +67,8 @@ interface ItemProps
   children?: El | string;
   data?: any;
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
+  onDragStart?: () => void;
+  onDragStop?: () => void;
   // injected props
   connectDragSource: (El) => El;
   isDragging: boolean;
@@ -78,9 +80,20 @@ interface ItemProps
 const itemSource = {
   beginDrag(props, monitor, component)
   {
+    if (props.onDragStart !== undefined)
+    {
+      props.onDragStart();
+    }
     const boundingRect = component.refs['item']['getBoundingClientRect']();
     return { keyPath: props.keyPath, data: props.data, width: boundingRect.width };
   },
+  endDrag(props, monitor, component)
+  {
+    if (props.onDragStop !== undefined)
+    {
+      props.onDragStop();
+    }
+  }
 };
 
 function itemDragCollect(connect, monitor)
@@ -99,15 +112,15 @@ const itemDropTarget = {
   },
   canDrop(props, monitor)
   {
-    return props.keyPath !== monitor.getItem().keyPath
-  }
+    return props.keyPath !== monitor.getItem().keyPath;
+  },
 };
 
 function itemDropCollect(connect, monitor)
 {
   return {
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver() && monitor.canDrop()
+    isOver: monitor.isOver() && monitor.canDrop(),
   };
 }
 
@@ -133,7 +146,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
         )}
         className={classNames({
           'drag-drop-item': true,
-          'drag-drop-item-is-over': isOver
+          'drag-drop-item-is-over': isOver,
         })}>
         <div
           ref='item'

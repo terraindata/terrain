@@ -72,6 +72,9 @@ interface GroupProps
   setCollapsed: (keyPath, value: boolean) => void; // set something as collapsed, or not
   depth?: number;
   hoverHeader?: El;
+  onDragStart?: () => void;
+  onDragStop?: () => void;
+  style?: any;
   // Injected drag drop props
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onReorder: (itemKeyPath: List<number>, dropKeyPath: List<number>) => void;
@@ -83,13 +86,24 @@ interface GroupProps
 }
 
 const groupSource = {
-  beginDrag(props, monitor, component)
+  beginDrag(props: GroupProps, monitor, component)
   {
+    if (props.onDragStart !== undefined)
+    {
+      props.onDragStart();
+    }
     props.setCollapsed(props.keyPath, true);
     // need to figure out what the width is for the custom drag layer
     const boundingRect = component.refs['group']['getBoundingClientRect']();
     return { keyPath: props.keyPath, data: props.data, width: boundingRect.width };
   },
+  endDrag(props: GroupProps, monitor, component)
+  {
+    if (props.onDragStop !== undefined)
+    {
+      props.onDragStop();
+    }
+  }
 };
 
 function groupDragCollect(connect, monitor)
@@ -149,12 +163,12 @@ class GroupComponent extends TerrainComponent<GroupProps>
               {
                 !(isGroup(item)) ?
                   <DragDropItem
+                    {...this.props}
                     children={renderChildren(item, newKeyPath.push(i))}
                     keyPath={newKeyPath.push(i)}
                     onDrop={onDrop}
                     canDrop={true}
                     data={item}
-                    hoverHeader={this.props.hoverHeader}
                   />
                   :
                   <DragDropGroup
@@ -181,7 +195,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
     const { data, renderHeader, isDragging, items, keyPath, keyPathStarter, onReorder, isOver, depth } = this.props;
     const newKeyPath = keyPathStarter ? keyPath.concat(keyPathStarter).toList() : keyPath;
     // Note: Radium causes issues when combined with drag drop library, which is why we don't use it here for styling
-    const draggingStyle = isDragging ? { opacity: 0.3, height: 30 } : {};
+    const draggingStyle = isDragging ? { opacity: 0.3} : {};
     const droppingStyle = isOver ? borderColor(Colors().active) : {};
     return (
       <div
@@ -195,6 +209,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
           draggingStyle,
           droppingStyle,
           { width: depth !== undefined ? `calc(100% - 12px)` : '100%' },
+          this.props.style
         )}
       >
         <div
