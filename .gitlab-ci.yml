@@ -112,3 +112,4 @@ deploy:
 
 after_script:
   - killall node || true;
+  - ./midway/test/scripts/copy_screenshot.sh || true;

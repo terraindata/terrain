@@ -814,12 +814,13 @@ describe('Query route tests', () =>
               }
             },
             "groupJoin": {
+              "parentAlias": "movie",
               "englishMovies": {
                 "_source": ["movieid", "overview"],
                 "query" : {
                   "bool" : {
                     "filter": [
-                      { "term": {"movieid" : @parent.movieid} }
+                      { "term": {"movieid" : @movie.movieid} }
                     ],
                     "must" : [
                       { "match": {"_index" : "movies"} },
