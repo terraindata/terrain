@@ -213,6 +213,13 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     return (
       <div className='pf-line pf-score-line-inner'>
+        <SearchableDropdown
+          options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
+          selectedIndex={this.state.fieldIndex}
+          canEdit={this.props.pathfinderContext.canEdit}
+          placeholder={'Field...'}
+          onChange={this.handleFieldChange}
+        />
         <ScoreBar
           parentData={{ weights: this.props.allWeights }}
           data={{ weight: this.state.weight }}
@@ -229,14 +236,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           autoDisabled={true}
           onChange={this.props.onAnimateScoreBars}
           action={this.props.builderActions.changePath}
-        />
-        <span className='pf-score-line-text'>times</span>
-        <SearchableDropdown
-          options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
-          selectedIndex={this.state.fieldIndex}
-          canEdit={this.props.pathfinderContext.canEdit}
-          placeholder={'Field...'}
-          onChange={this.handleFieldChange}
         />
         {
           this.props.line.field &&

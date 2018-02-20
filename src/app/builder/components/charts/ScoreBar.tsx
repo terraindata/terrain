@@ -66,7 +66,18 @@ const SCORE_COLORS =
     NEGATIVE: ['#d14f42'],
   };
 
-class ScoreBar extends TerrainComponent<{
+const FIXED_SLIDER_HANDLE_STYLE = { display: 'none' };
+const DRAGGABLE_SLIDER_HANDLE_STYLE = {
+  width: '24px',
+  height: '24px',
+  marginTop: 3,
+  marginLeft: 12,
+  borderRadius: 6,
+  border: 0,
+  marginLeft: -11,
+}
+
+interface Props {
   parentData: {
     weights: Array<{ weight: number }>;
   };
@@ -75,8 +86,19 @@ class ScoreBar extends TerrainComponent<{
   }
   keyPath: KeyPath;
   noAnimation?: boolean;
-}>
+}
+
+class ScoreBar extends TerrainComponent<Props>
 {
+  public constructor(props)
+  {
+    super(props);
+
+    this.state = {
+      sliderValue: [0, 0];
+    };
+  }
+
   public render()
   {
     const weights = this.props.parentData.weights;
@@ -111,22 +133,36 @@ class ScoreBar extends TerrainComponent<{
       style.borderBottomLeftRadius = BORDER_RADIUS;
     }
 
+    const handleStyle = this.state.sliderValue === [0, 0]  || this.state.sliderValue[0] < 0 ?
+      [
+        { ...DRAGGABLE_SLIDER_HANDLE_STYLE, backgroundColor: SCORE_COLORS.NEGATIVE },
+        FIXED_SLIDER_HANDLE_STYLE,
+      ] :
+      [
+        FIXED_SLIDER_HANDLE_STYLE,
+        { ...DRAGGABLE_SLIDER_HANDLE_STYLE, backgroundColor: SCORE_COLORS.POSITIVE },
+      ]
+
+    const trackStyle = this.state.sliderValue === [0, 0]  || this.state.sliderValue[0] < 0 ?
+      [{ backgroundColor: SCORE_COLORS.NEGATIVE, height: '24px', borderRadius: 0, top: 8 }] :
+      [{ backgroundColor: SCORE_COLORS.POSITIVE, height: '24px', borderRadius: 0, top: 8 }];
+
+
     return (
-      <div
-        className='weight-graph'
-        style={borderColor(Colors().stroke)}
-      >
-        <div className='weight-graph-inner'>
-          <div className={classNames({
-            'weight-graph-bar': true,
-            'weight-graph-bar-no-animate': this.props.noAnimation,
-          })}
-            style={style}
+      <div style={{ width: '100%', position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 5, left: 0, height: '30px', width: '100%', borderRadius: 6, backgroundColor: '#e9e9e9' }} />
+        <div style={{ width: 'calc(100% - 30px)', position: 'relative', marginLeft: 14 }}>
+          <div style={{ zIndex: 2, position: 'absolute', left: '50%', top: 2, borderLeft: '1px solid #abe2fb', height: '34px' }} />
+          <Range
+            min= {-10}
+            max={10}
+            defaultValue={[0,0]}
+            railStyle={{ height: '30px' }}
+            trackStyle={trackStyle}
+            handleStyle={handleStyle}
+            onChange={(value) => this.setState({ sliderValue: value })}
           />
         </div>
-        <div className='weight-graph-line' />
-        <Slider />
-        <Range />
       </div>
     );
   }
