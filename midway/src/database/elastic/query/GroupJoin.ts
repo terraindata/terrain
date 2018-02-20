@@ -60,13 +60,15 @@ import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
+import { ElasticQueryHandler } from './ElasticQueryHandler';
 import ElasticStream from './ElasticStream';
 
 const GROUPJOIN_MSEARCH_BATCH_SIZE = 100;
 const GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES = 1;
 const GROUPJOIN_DEFAULT_SIZE = 10;
 
-export async function handleGroupJoin(client: ElasticClient, request: QueryRequest, parser: ESParser, query: object): Promise<QueryResponse | Readable>
+export async function handleGroupJoin(client: ElasticClient, request: QueryRequest,
+  parser: ESParser, query: object): Promise<QueryResponse | Readable>
 {
   // get the child (groupJoin) query
   const childQuery = query['groupJoin'];
@@ -132,13 +134,14 @@ export async function handleGroupJoin(client: ElasticClient, request: QueryReque
         async (error, response) =>
         {
           const r = await handleSubQueries(null, response);
-          this.makeQueryCallback(resolve, reject)(error, r);
+          ElasticQueryHandler.makeQueryCallback(resolve, reject)(error, r);
         });
     });
   }
 }
 
-async function handleGroupJoinSubQueries(client: ElasticClient, parentValueInfo: ESValueInfo, query: object, results: object, parentAlias: string)
+async function handleGroupJoinSubQueries(client: ElasticClient, parentValueInfo: ESValueInfo, query: object,
+  results: object, parentAlias: string)
 {
   const promises: Array<Promise<any>> = [];
   for (const subQuery of Object.keys(query))
@@ -154,7 +157,8 @@ async function handleGroupJoinSubQueries(client: ElasticClient, parentValueInfo:
   return Promise.all(promises);
 }
 
-async function handleGroupJoinSubQuery(client: ElasticClient, valueInfo: ESValueInfo, subQuery: string, parentResults: any, parentAlias: string)
+async function handleGroupJoinSubQuery(client: ElasticClient, valueInfo: ESValueInfo, subQuery: string,
+  parentResults: any, parentAlias: string)
 {
   const hits = parentResults.hits.hits;
   const promises: Array<Promise<any>> = [];

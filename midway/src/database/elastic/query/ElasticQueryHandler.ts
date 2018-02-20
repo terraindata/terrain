@@ -66,8 +66,48 @@ import { handleGroupJoin } from './GroupJoin';
 /**
  * Implements the QueryHandler interface for ElasticSearch
  */
-export default class ElasticQueryHandler extends QueryHandler
+export class ElasticQueryHandler extends QueryHandler
 {
+  public static makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
+  {
+    return (error: Error | null, response: any) =>
+    {
+      if (error !== null && error !== undefined)
+      {
+        if (QueryError.isElasticQueryError(error))
+        {
+          const res: QueryResponse =
+            new QueryResponse(
+              {},
+              QueryError.fromElasticQueryError(error).getMidwayErrors());
+          resolve(res);
+        }
+        else if (QueryError.isESParserError(error))
+        {
+          const res: QueryResponse =
+            new QueryResponse(
+              {},
+              QueryError.fromESParserError(error).getMidwayErrors());
+          resolve(res);
+        }
+        else
+        {
+          reject(error); // this will be handled by RouteError.RouteErrorHandler
+        }
+      }
+      else
+      {
+        if (typeof response !== 'object')
+        {
+          winston.error('The response from Elasticsearch is not an object, ' + JSON.stringify(response));
+          response = { response };
+        }
+        const res: QueryResponse = new QueryResponse(response);
+        resolve(res);
+      }
+    };
+  }
+
   private controller: ElasticController;
 
   constructor(controller: ElasticController)
@@ -114,7 +154,7 @@ export default class ElasticQueryHandler extends QueryHandler
           {
             return new Promise<QueryResponse>((resolve, reject) =>
             {
-              client.search({ body: query } as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
+              client.search({ body: query } as Elastic.SearchParams, ElasticQueryHandler.makeQueryCallback(resolve, reject));
             });
           }
         }
@@ -129,7 +169,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          handler.call(client, request.body, this.makeQueryCallback(resolve, reject));
+          handler.call(client, request.body, ElasticQueryHandler.makeQueryCallback(resolve, reject));
         });
 
       default:
@@ -138,44 +178,6 @@ export default class ElasticQueryHandler extends QueryHandler
 
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
-
-  private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
-  {
-    return (error: Error | null, response: any) =>
-    {
-      if (error !== null && error !== undefined)
-      {
-        if (QueryError.isElasticQueryError(error))
-        {
-          const res: QueryResponse =
-            new QueryResponse(
-              {},
-              QueryError.fromElasticQueryError(error).getMidwayErrors());
-          resolve(res);
-        }
-        else if (QueryError.isESParserError(error))
-        {
-          const res: QueryResponse =
-            new QueryResponse(
-              {},
-              QueryError.fromESParserError(error).getMidwayErrors());
-          resolve(res);
-        }
-        else
-        {
-          reject(error); // this will be handled by RouteError.RouteErrorHandler
-        }
-      }
-      else
-      {
-        if (typeof response !== 'object')
-        {
-          winston.error('The response from Elasticsearch is not an object, ' + JSON.stringify(response));
-          response = { response };
-        }
-        const res: QueryResponse = new QueryResponse(response);
-        resolve(res);
-      }
-    };
-  }
 }
+
+export default ElasticQueryHandler;
