@@ -315,7 +315,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     // However, we are not sure why that was necessary.
     // It's now disabled, so that actions are only dispatched when the point is released,
     //  to help with performance concerns.
-    const isConcrete = false; // this.state.moveSeed !== this.state.movedSeed;
+    const isConcrete = true; // this.state.moveSeed !== this.state.movedSeed;
     this.setState({
       movedSeed: this.state.moveSeed,
     });
