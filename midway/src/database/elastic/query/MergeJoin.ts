@@ -68,7 +68,7 @@ export async function handleMergeJoin(client: ElasticClient, request: QueryReque
   const childQuery = query['mergeJoin'];
   query['mergeJoin'] = undefined;
 
-  if (childQuery['joinKey'] !== undefined)
+  if (childQuery['joinKey'] === undefined)
   {
     throw new Error('joinKey must be specified for a merge join');
   }
@@ -92,7 +92,6 @@ export async function handleMergeJoin(client: ElasticClient, request: QueryReque
     {
       throw e;
     }
-
     return response;
   };
 
@@ -124,7 +123,10 @@ async function handleMergeJoinSubQuery(client: ElasticClient, query: object, sub
 {
   return new Promise<QueryResponse>((resolve, reject) =>
   {
-    client.search(query[subQuery] as Elastic.SearchParams,
+    client.search(
+      {
+        body: query[subQuery],
+      } as Elastic.SearchParams,
       async (error: Error | null, response: any) =>
       {
         if (error !== null && error !== undefined)

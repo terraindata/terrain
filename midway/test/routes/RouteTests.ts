@@ -895,9 +895,6 @@ describe('Query route tests', () =>
                 "_source": ["movieid", "overview"],
                 "query" : {
                   "bool" : {
-                    "filter": [
-                      { "term": {"movieid" : @movie.movieid} }
-                    ],
                     "must" : [
                       { "match": {"_index" : "movies"} },
                       { "match": {"_type" : "data"} }
