@@ -53,7 +53,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
@@ -265,7 +265,8 @@ class HitComponent extends TerrainComponent<Props> {
 
   public render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, hit, hitSize, expanded } = this.props;
+    const { isDragging, connectDragSource, isOver, connectDropTarget, hit, hitSize, expanded } = this.props;
+    let { resultsConfig } = this.props;
 
     const classes = classNames({
       'result': true,
@@ -320,6 +321,10 @@ class HitComponent extends TerrainComponent<Props> {
       );
     }
     
+    if (!resultsConfig)
+    {
+      resultsConfig = _ResultsConfig();
+    }
     const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
       resultsConfig.thumbnailWidth;
 

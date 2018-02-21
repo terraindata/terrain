@@ -197,6 +197,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         fieldType: filterLine.fieldType,
         source,
         schemaState: pathfinderContext.schemaState,
+        builderState: pathfinderContext.builderState,
       });
       comparisonHeader = '';
     }
@@ -223,6 +224,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       // TODO add value component selector for Other
       valueOptions = pathfinderContext.source.dataSource.getChoiceOptions({
         type: 'input',
+        builderState: pathfinderContext.builderState,
       });
     }
     else if(filterLine.field && !filterLine.comparison)
@@ -277,6 +279,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           type: 'fields',
           source,
           schemaState: props.pathfinderContext.schemaState,
+          builderState: props.pathfinderContext.builderState,
         });
         const fieldChoice = fieldOptions.find((option) => option.value === value);
         this.handleChange('field', value, fieldChoice.meta.fieldType, true);
