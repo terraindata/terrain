@@ -380,6 +380,13 @@ class TerrainComponent<T> extends React.Component<T, any>
         })
     );
   }
+  
+  protected _saveRefToState(stateKey: string, ref)
+  {
+    this.setState({
+      [stateKey]: ref,
+    });
+  }
 }
 
 export default TerrainComponent;

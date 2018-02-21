@@ -6,11 +6,11 @@
 @close-width: 35px;
 @picker-height: 450px;
 
-.pathpicker-wrapper {
+.routeselector-wrapper {
 	width: 100%;
 }
 
-.pathpicker {
+.routeselector {
 	min-width: 125px; // arbitrary, can change
 	width: 100%;
 	position: relative;
@@ -19,13 +19,13 @@
 		box-sizing: border-box;
 	}
 	
-	.pathpicker-box-value {
+	.routeselector-box-value {
 		border-bottom: 1px solid #eee;
 		padding: 12px;
 		box-sizing: border-box;
 		
 		position: relative;
-		&.pathpicker-box-value-open {
+		&.routeselector-box-value-open {
 	    z-index: 1;
 		}
 		
@@ -37,18 +37,18 @@
     align-items: center;
     
     
-    &.pathpicker-box-value-open:not(.pathpicker-box-value-force-open) {
+    &.routeselector-box-value-open:not(.routeselector-box-value-force-open) {
     	border-top-left-radius: @br;
     	border-top-right-radius: @br;
     }
     &:hover {
-    	&:not(.pathpicker-box-value-open) {
+    	&:not(.routeselector-box-value-open) {
 	    	background: #f5f5f5;
     	}
     }
 	}
 	
-	.pathpicker-close {
+	.routeselector-close {
   	flex-shrink: 1;
   	font-size: 12px;
   	color: #ddd;
@@ -58,16 +58,16 @@
   	width: @close-width;
   }
   
-	.pathpicker-box-values-open:not(.pathpicker-box-values-force-open),
-	.pathpicker-box-value-open:not(.pathpicker-box-value-force-open) {
-  	.pathpicker-close {
+	.routeselector-box-values-open:not(.routeselector-box-values-force-open),
+	.routeselector-box-value-open:not(.routeselector-box-value-force-open) {
+  	.routeselector-close {
   		color: #1eb4f7;
   		opacity: 1;
   	}
 	}
     
 	
-	.pathpicker-picker {
+	.routeselector-picker {
 		position: absolute;
 		@LEFT: 0px;
 		left: @LEFT;
@@ -77,11 +77,12 @@
 		padding: 12px;
 		border-bottom-left-radius: @br;
 		border-bottom-right-radius: @br;
-		&:not(.pathpicker-picker-no-shadow) {
+		&:not(.routeselector-picker-no-shadow) {
 			box-shadow: 0px 0px 24px rgba(0,0,0,0.25);
 		}
 		background: #fff;
-		z-index: 1;
+
+		z-index: 1002;
 		opacity: 1;
 		
 		max-height: @picker-height;
@@ -89,29 +90,29 @@
 		
 		.transition;
 		
-		.pathpicker-picker-inner {
+		.routeselector-picker-inner {
 			opacity: 1;
 	    height: 100%;
 	    max-height: @picker-height;
 		}
 		
-		.pathpicker-multi-picker-inner {
+		.routeselector-multi-picker-inner {
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: top;
 			padding-right: @close-width;
 		}
 		
-		&.pathpicker-multi-picker {
+		&.routeselector-multi-picker {
 			padding: 0px;
 		}
 		
-		.pathpicker-header {
+		.routeselector-header {
 			margin: 6px;
 			font-size: 16px;
 		}
 		
-		.pathpicker-option-set {
+		.routeselector-option-set {
 	    flex-grow: 1;
 	    flex-basis: 0px;
       display: flex;
@@ -121,26 +122,33 @@
 	    max-height: @picker-height;
 		}
 		
-		.pathpicker-util-row {
+		.routeselector-util-row {
 			min-height: 48px;
 		}
 		
-		.pathpicker-options {
+		.routeselector-value-component {
+			margin-top: 12px;
+		}
+		
+		.routeselector-options {
 			display: flex;
 			flex-wrap: wrap;
 			flex-grow: 1;
 	    overflow: auto;
 			
-			&.pathpicker-options-column {
+			&.routeselector-options-column {
 				flex-direction: column;
 				padding-left: 16px; // make space for arrow
 				flex-wrap: nowrap;
 			}
 			
-			.pathpicker-option {
+			.routeselector-option-wrapper {
 				flex-grow: 1;
 		    flex-basis: 30%;
 		    min-width: 100px;
+			}
+			
+			.routeselector-option {
 				max-height: @option-max-height;
 				border-bottom: 1px solid #eee;
 				padding: 6px;
@@ -160,7 +168,7 @@
 					border-color: #1eb4fa;
 				}
 				
-				&.pathpicker-option-focused {
+				&.routeselector-option-focused {
 					&:before {
 						content: "";
 						display: block;
@@ -174,24 +182,24 @@
 					}
 				}
 				
-				&.pathpicker-option-selected {
+				&.routeselector-option-selected {
 					border-color: #1eb4fa;
 				}
 			}
 		}
 		
-		.pathpicker-data {
+		.routeselector-data {
 			background: #eee;
 			padding: 6px;
 			overflow-y: auto;
 			
-			.pathpicker-data-header {
+			.routeselector-data-header {
 				text-align: center;
 				// padding-top: 6px;
 			}
 		}
 		
-		.pathpicker-data-piece {
+		.routeselector-data-piece {
 			background: #fff;
 			margin-bottom: 6px;
 			border-radius: 3px;
@@ -202,13 +210,13 @@
 	    table-layout: fixed;
 			
 			
-			.pathpicker-data-row {
+			.routeselector-data-row {
 				border-bottom: 1px solid #eee;
 				margin: 2px;
 				display: table-row;
 				
-				.pathpicker-data-field,
-				.pathpicker-data-value {
+				.routeselector-data-field,
+				.routeselector-data-value {
 					border-bottom: 1px solid #eee;
 					display: table-cell;
 					padding: 6px;
@@ -220,7 +228,7 @@
 					}
 				}
 				
-				.pathpicker-data-value {
+				.routeselector-data-value {
 					font-weight: 600;
 				}
 			}
@@ -228,18 +236,18 @@
 	}
 	
 
-	&.pathpicker-large {
-		.pathpicker-header {
+	&.routeselector-large {
+		.routeselector-header {
 			font-size: 24px;
 		}
 		
-		.pathpicker-option-name {
+		.routeselector-option-name {
 			padding: 12px 24px;
 			font-size: 42px;
 			display: flex;
 			align-items: center;
 			
-			.pathpicker-option-icon {
+			.routeselector-option-icon {
 				margin-right: 12px;
 				text-align: right;
 				width: 20px;
@@ -250,14 +258,14 @@
 				}
 			}
 			
-			.pathpicker-option-name-inner {
+			.routeselector-option-name-inner {
 				flex-grow: 1;
 			}
 		}
 	}
 }
 
-.pathpicker-option-name {
+.routeselector-option-name {
 	padding: 6px 12px;
 	font-size: 24px;
 	max-width: 100%;
@@ -266,13 +274,14 @@
   text-overflow: ellipsis;
 }
 
-.pathpicker-veil, .pathpicker-veil-open {
+.routeselector-veil, .routeselector-veil-open {
 	.transition;
 	position: absolute;
 	left: 0px;
 	top: 0px;
 	height: 100%;
 	width: 100%;
+	z-index: 999;
 	
 	// left: -5000px;
 	// top: -5000px;
@@ -280,12 +289,12 @@
 	// width: 10000px;
 }
 
-.pathpicker-veil-open {
+.routeselector-veil-open {
 	background: rgba(0,0,0,0.25);
 }
 
-.pathpicker.pathpicker-picked .pathpicker-veil,
-.pathpicker-veil:not(.pathpicker-veil-open) {
+.routeselector.routeselector-picked .routeselector-veil,
+.routeselector-veil:not(.routeselector-veil-open) {
 	background: rgba(0,0,0,0);
 	pointer-events: none;
 }
@@ -310,19 +319,19 @@
 
 // these need to be here, not in the above nested structure, so that they don't override
 //  the opacity: 0 call below
-// .pathpicker-close,
-// .pathpicker-option,
-// .pathpicker-data,
-// .pathpicker-option-name {
+// .routeselector-close,
+// .routeselector-option,
+// .routeselector-data,
+// .routeselector-option-name {
 // 	opacity: 1;
 // 	.transition;
 // }
 
-.pathpicker.pathpicker-picked {
+.routeselector.routeselector-picked {
 	
-	.pathpicker-picker {
+	.routeselector-picker {
 		
-		.pathpicker-picker-inner {
+		.routeselector-picker-inner {
 			opacity: 0;
 			.transition(~"all 0.5s");
 		}
@@ -332,21 +341,21 @@
 		.transition(~"all 1s");
 	}
 	
-	.pathpicker-box-value-open:not(.pathpicker-box-value-force-open) {
+	.routeselector-box-value-open:not(.routeselector-box-value-force-open) {
   	border-bottom-left-radius: @br;
   	border-bottom-right-radius: @br;
   }
 	
-	// .pathpicker-picker {
+	// .routeselector-picker {
 	// 	top: 0px;
 	// 	background: rgba(255,255,255,0);
 	// 	.transition;
 	// }
 	
-	// .pathpicker-header,
-	// .pathpicker-close,
-	// .pathpicker-option,
-	// .pathpicker-data {
+	// .routeselector-header,
+	// .routeselector-close,
+	// .routeselector-option,
+	// .routeselector-data {
 	// 	opacity: 0;
 	// 	.transition;
 	// 	border-color: rgba(0,0,0,0) !important;
@@ -354,26 +363,26 @@
 	// 	margin: 0px !important;
 	// }
 	
-	// .pathpicker-option:not(.pathpicker-option-picked) {
+	// .routeselector-option:not(.routeselector-option-picked) {
 	// 	.collapse-option;
 	// }
 	
-	// .pathpicker-option.pathpicker-option-picked {
+	// .routeselector-option.routeselector-option-picked {
 	// 	opacity: 1;
-	// 	.pathpicker-data {
+	// 	.routeselector-data {
 	// 		opacity: 0;
 	// 	}
-	// 	.pathpicker-option-name {
+	// 	.routeselector-option-name {
 	// 		padding: 0px;
 	// 	}
 	// }
 	
 }
 
-.pathpicker-box-values {
+.routeselector-box-values {
 	position: relative;
 	
-  &.pathpicker-box-value-open {
+  &.routeselector-box-value-open {
     z-index: 1;
 	}
 		
@@ -389,21 +398,25 @@
 	
 	cursor: pointer;
 	
-	.pathpicker-box-value {
+	.routeselector-box-value {
 		flex-grow: 1;
 		border-bottom: none;
 	}
 	
-	&:hover:not(.pathpicker-box-values-open) {
+	&.routeselector-box-values-open {
+		z-index: 1001;
+	}
+	
+	&:hover:not(.routeselector-box-values-open) {
 		background: #f5f5f5;
 	}
 	
-	.pathpicker-box-value,
-	.pathpicker-box-value:hover {
+	.routeselector-box-value,
+	.routeselector-box-value:hover {
 		background: none;
 	}
 	
-	.pathpicker-box-value {
+	.routeselector-box-value {
 		border-radius: 0px;
 	}
 }

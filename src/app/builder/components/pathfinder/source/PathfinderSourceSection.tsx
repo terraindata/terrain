@@ -59,7 +59,7 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
-import PathPicker from 'app/common/components/PathPicker';
+import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
@@ -107,13 +107,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const { source, step, canEdit } = this.props.pathfinderContext;
     const { dataSourceOptions } = this.state;
-    const sourceValues = dataSourceOptions.map((option) => option.value).toList();
-    const sourceNames = dataSourceOptions.map((option) => option.displayName).toList();
-    let displayNames: IMMap<string, any> = Map({});
-    dataSourceOptions.forEach((option) =>
-    {
-      displayNames = displayNames.set(option.value, option.displayName);
-    });
     
     const pickerIsForcedOpen = step === PathfinderSteps.Source;
     
@@ -121,7 +114,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       <div
         className='pf-section'
       >
-        <PathPicker
+        <SingleRouteSelector
           options={dataSourceOptions}
           value={source.dataSource.index}
           onChange={this.handleSourcePathChange}

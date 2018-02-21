@@ -56,7 +56,7 @@ import * as $ from 'jquery';
 import { List, Map } from 'immutable';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import './PathPickerStyle.less';
+import './RouteSelectorStyle.less';
 import { FloatingInput, LARGE_FONT_SIZE, FONT_SIZE } from './FloatingInput';
 import FadeInOut from './FadeInOut';
 import { ResultsConfig, _ResultsConfig } from 'shared/results/types/ResultsConfig';
@@ -65,7 +65,7 @@ import Util from 'util/Util';
 import KeyboardFocus from './KeyboardFocus';
 
 
-export interface PathPickerOption
+export interface RouteSelectorOption
 {
   value: any;
   displayName?: string | number | El;
@@ -75,11 +75,11 @@ export interface PathPickerOption
   icon?: any;
 }
 
-export interface PathPickerOptionSet
+export interface RouteSelectorOptionSet
 {
   key: string;
-  options: List<PathPickerOption>;
-  hasOther?: boolean;  // TODO implement Other, if necessary
+  options: List<RouteSelectorOption>;
+  hasOther?: boolean;
   focusOtherByDefault?: boolean;
   shortNameText: string;
   headerText: string;
@@ -87,11 +87,14 @@ export interface PathPickerOptionSet
   hasSearch?: boolean; // NOTE not compatible with hasOther
   column?: boolean; // force a column layout
   hideSampleData?: boolean; // hide sample data, even if it's present
+  getCustomDisplayName?: (value, setIndex: number) => string | undefined;
+  
+  valueComponent?: React.Component;
 }
 
 export interface Props
 {
-  optionSets: List<PathPickerOptionSet>;
+  optionSets: List<RouteSelectorOptionSet>;
   values: List<any>;
   onChange: (key: number, value: any) => void;
   canEdit: boolean;
@@ -103,7 +106,7 @@ export interface Props
 }
 
 @Radium
-export class MultiPathPicker extends TerrainComponent<Props>
+export class RouteSelector extends TerrainComponent<Props>
 {
   state = {
     open: !! this.props.defaultOpen,
@@ -114,6 +117,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
     
     columnRefs: Map<number, any>({}),
     optionRefs: Map({}),
+    pickerRef: null,
     
     // TODO re-add animation / picked logic
     // picked: false,
@@ -138,16 +142,16 @@ export class MultiPathPicker extends TerrainComponent<Props>
 
     return (
       <div
-        className='pathpicker-wrapper'
+        className='routeselector-wrapper'
       >
         {
           this.renderVeil()
         }
         <div
           className={classNames({
-            'pathpicker': true,
-            'pathpicker-large': props.large,
-            // 'pathpicker-picked': state.picked,
+            'routeselector': true,
+            'routeselector-large': props.large,
+            // 'routeselector-picked': state.picked,
           })}
         >
           {
@@ -173,21 +177,21 @@ export class MultiPathPicker extends TerrainComponent<Props>
     return (
       <div
         className={classNames({
-          'pathpicker-box-values': true,
-          'pathpicker-box-values-open': this.isOpen(),
-          'pathpicker-box-values-force-open': props.forceOpen,
+          'routeselector-box-values': true,
+          'routeselector-box-values-open': this.isOpen(),
+          'routeselector-box-values-force-open': props.forceOpen,
         })}
       >
         {
           props.optionSets.map((optionSet, index) => (
             <div
               className={classNames({
-                'pathpicker-box-value': true,
+                'routeselector-box-value': true,
                 'noselect': true,
-                'pathpicker-box-value-open': this.isOpen(),
-                'pathpicker-box-value-force-open': props.forceOpen,
+                'routeselector-box-value-open': this.isOpen(),
+                'routeselector-box-value-force-open': props.forceOpen,
               })}
-              key={index}
+              key={optionSet.key}
               onClick={this._fn(this.handleSingleBoxValueClick, index)}
               style={getStyle('width', (100 / props.optionSets.size) + '%')}
             >
@@ -206,7 +210,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
           ))
         }
         <div
-          className='pathpicker-close'
+          className='routeselector-close'
         >
           Close
         </div>
@@ -217,18 +221,28 @@ export class MultiPathPicker extends TerrainComponent<Props>
   private getDisplayName(optionSetIndex: number, optionIndex?: number)
   {
     const { values, optionSets } = this.props;
-    const options = optionSets.get(optionSetIndex).options;
+    const optionSet = optionSets.get(optionSetIndex);
+    const options = optionSet.options;
     const wantsCurrentValue = optionIndex === undefined;
     
     if (wantsCurrentValue)
     {
       // default to current value
       const value = values.get(optionSetIndex);
+      if (optionSet.getCustomDisplayName)
+      {
+        const name = optionSet.getCustomDisplayName(value, optionSetIndex);
+        if (name !== undefined)
+        {
+          return name;
+        }
+      }
+      
       optionIndex = options.findIndex((option) => option.value === value);
       
       if (optionIndex === -1)
       {
-        // no value set
+        // no value set, or unknown value
         return values.get(optionSetIndex);
       }
     }
@@ -246,9 +260,29 @@ export class MultiPathPicker extends TerrainComponent<Props>
 
   private handleBoxValueClick()
   {
+    let open = !this.state.open;
+    
     this.setState({
-      open: !this.state.open,
+      open,
     });
+    
+    if (open)
+    {
+      // scroll the picker into view
+      setTimeout(() =>
+      {
+        const el = ReactDOM.findDOMNode(this.state.pickerRef);
+      
+        if (el)
+        {
+          el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest',
+          });
+        }
+      }, 200);
+    }
   }
   
   private handleSingleBoxValueClick(optionSetIndex)
@@ -271,12 +305,13 @@ export class MultiPathPicker extends TerrainComponent<Props>
     return (
       <div
         className={classNames({
-          'pathpicker-picker': true,
-          'pathpicker-multi-picker': true,
-          'pathpicker-picker-no-shadow': props.noShadow,
+          'routeselector-picker': true,
+          'routeselector-multi-picker': true,
+          'routeselector-picker-no-shadow': props.noShadow,
         })}
+        ref={this._fn(this._saveRefToState, 'pickerRef')}
       >
-        <div className='pathpicker-picker-inner pathpicker-multi-picker-inner'>
+        <div className='routeselector-picker-inner routeselector-multi-picker-inner'>
           {
             props.optionSets.map(this.renderOptionSet)
           }
@@ -285,9 +320,10 @@ export class MultiPathPicker extends TerrainComponent<Props>
     );
   }
   
-  private renderOptionSet(optionSet: PathPickerOptionSet, index: number)
+  private renderOptionSet(optionSet: RouteSelectorOptionSet, index: number)
   {
     const { state, props } = this;
+    const value = props.values.get(index);
     
     // counter passed down to renderOption to keep track of how many options are currently visible
     //  so that we can get the focused option index correct
@@ -309,34 +345,52 @@ export class MultiPathPicker extends TerrainComponent<Props>
     if (optionSet.hasOther)
     {
       textboxProps = {
-        value: props.values.get(index),
+        value,
         label: 'Value', // TODO confirm copy
         onChange: this._fn(this.handleOtherChange, index),
         autoFocus: state.focusedSetIndex === index && optionSet.focusOtherByDefault,
       };
     }
     
+    let valueComponentContent = null;
+    console.log(optionSet.valueComponent);
+    if (optionSet.valueComponent)
+    {
+      let ValueComp = optionSet.valueComponent;
+      
+      valueComponentContent = (
+        <div className='routeselector-value-component'>
+          <ValueComp
+            value={value}
+          />
+        </div>
+      );
+      // ({
+      //   value,
+      // });
+    }
+    
     return (
       <div
-        className='pathpicker-option-set'
-        key={index}
+        className='routeselector-option-set'
+        key={optionSet.key}
         style={getStyle('width', (100 / props.optionSets.size) + '%')}
       >
         <div
-          className='pathpicker-header'
+          className='routeselector-header'
         >
           {
             optionSet.headerText
           }
         </div>
         <div
-          className='pathpicker-util-row'
+          className='routeselector-util-row'
         >
           {/*TODO could hide this if it is not needed*/}
           {
             showTextbox ?
               <div
-                className='pathpicker-search'
+                className='routeselector-search'
               >
                 <FloatingInput
                   {...textboxProps}
@@ -360,10 +414,13 @@ export class MultiPathPicker extends TerrainComponent<Props>
               />
           }
         </div>
+        {
+          valueComponentContent
+        }
         <div
           className={classNames({
-            'pathpicker-options': true,
-            'pathpicker-options-column': optionSet.column,
+            'routeselector-options': true,
+            'routeselector-options-column': optionSet.column,
           })}
           ref={this._fn(this.attachColumnRef, index)}
         >
@@ -527,7 +584,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
       }
     }
     
-    // TODO handle tabbing OUT of pathpicker
+    // TODO handle tabbing OUT of routeselector
     
     this.setState({
       focusedSetIndex,
@@ -537,7 +594,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
     // TODO make this more declarative, to avoid forced reflow
     setTimeout(() =>
     {
-      const el = document.getElementsByClassName('pathpicker-option-focused')[0];
+      const el = document.getElementsByClassName('routeselector-option-focused')[0];
       
       if(el)
       {
@@ -551,7 +608,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
   }
   
   private renderOption(optionSetIndex: number, visibleOptionCounter: { count: number }, incrementVisibleOptions: () => void,
-    option: PathPickerOption, index: number)
+    option: RouteSelectorOption, index: number)
   {
     const { props, state } = this;
     const optionSet = props.optionSets.get(optionSetIndex);
@@ -566,68 +623,72 @@ export class MultiPathPicker extends TerrainComponent<Props>
     const visibleOptionsIndex = visibleOptionCounter.count;
     
     return (
-      <FadeInOut
-        open={isShowing}
+      <div 
+        className='routeselector-option-wrapper'
         key={index}
       >
-        <div
-          className={classNames({
-            'pathpicker-option': true,
-            'pathpicker-option-selected': props.values.get(optionSetIndex) === option.value,
-            'pathpicker-option-focused': state.focusedOptionIndex === visibleOptionsIndex
-              && optionSetIndex === state.focusedSetIndex
-              && state.focusedOptionIndex !== -1
-              && state.focusedSetIndex !== -1,
-            // 'pathpicker-option-picked': this.state.pickedIndex === index, // when it's just been picked
-          })}
-          onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
-          
+        <FadeInOut
+          open={isShowing}
         >
           <div
-            className='pathpicker-option-name'
-            style={OPTION_NAME_STYLE}
-            ref={'option-'+index}
+            className={classNames({
+              'routeselector-option': true,
+              'routeselector-option-selected': props.values.get(optionSetIndex) === option.value,
+              'routeselector-option-focused': state.focusedOptionIndex === visibleOptionsIndex
+                && optionSetIndex === state.focusedSetIndex
+                && state.focusedOptionIndex !== -1
+                && state.focusedSetIndex !== -1,
+              // 'routeselector-option-picked': this.state.pickedIndex === index, // when it's just been picked
+            })}
+            onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
+            
           >
+            <div
+              className='routeselector-option-name'
+              style={OPTION_NAME_STYLE}
+              ref={'option-'+index}
+            >
+              {
+                option.icon !== undefined &&
+                  <div className='routeselector-option-icon'>
+                    {
+                      option.icon
+                    }
+                  </div>
+              }
+              <div className='routeselector-option-name-inner'>
+                {
+                  option.displayName
+                }
+              </div>
+            </div>
+            
             {
-              option.icon !== undefined &&
-                <div className='pathpicker-option-icon'>
+              option.sampleData && !optionSet.hideSampleData &&
+                <div className='routeselector-data'>
+                  <div className='routeselector-data-header'>
+                    Sample Data
+                  </div>
                   {
-                    option.icon
+                    option.sampleData.map(this.renderSampleDatum)
+                  }
+                  {
+                    option.sampleData.size === 0 &&
+                      <div
+                      >
+                        {/* TODO styling */}
+                        No data available
+                      </div>
                   }
                 </div>
             }
-            <div className='pathpicker-option-name-inner'>
-              {
-                option.displayName
-              }
-            </div>
           </div>
-          
-          {
-            option.sampleData && !optionSet.hideSampleData &&
-              <div className='pathpicker-data'>
-                <div className='pathpicker-data-header'>
-                  Sample Data
-                </div>
-                {
-                  option.sampleData.map(this.renderSampleDatum)
-                }
-                {
-                  option.sampleData.size === 0 &&
-                    <div
-                    >
-                      {/* TODO styling */}
-                      No data available
-                    </div>
-                }
-              </div>
-          }
-        </div>
-      </FadeInOut>
+        </FadeInOut>
+      </div>
     );
   }
   
-  private shouldShowOption(option: PathPickerOption, search: string)
+  private shouldShowOption(option: RouteSelectorOption, search: string)
   {
     if (!search || search.length === 0)
     {
@@ -694,7 +755,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
     //   const option = this.props.options.get(pickedIndex);
       
     //   animationEl = $("<div>" + option.displayName + "</div>")
-    //     .addClass("pathpicker-option-name")
+    //     .addClass("routeselector-option-name")
     //     .css("position", "fixed")
     //     .css("color", OPTION_NAME_STYLE.color)
     //     .css("font-size", OPTION_NAME_STYLE.fontSize)
@@ -797,7 +858,7 @@ export class MultiPathPicker extends TerrainComponent<Props>
     const isOpen = this.isOpen();
     return (
       <div 
-        className={'pathpicker-veil' + (isOpen ? '-open' : '')} 
+        className={'routeselector-veil' + (isOpen ? '-open' : '')} 
         onClick={this.handleVeilClick}
       />
     );
@@ -854,4 +915,4 @@ const OPTION_NAME_STYLE = {
   color: Colors().active,
 };
 
-export default MultiPathPicker;
+export default RouteSelector;
