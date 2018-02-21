@@ -58,12 +58,179 @@ import { Ajax } from 'util/Ajax';
 
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-// export class CacheGuardian<T>
-// {
-//   public get()
-//   {
+// like elements of field tree proxy, you shouldn't hold references to PropertyTracker
+/*
+ *  PropertyTracker is an object that wraps around an object and remembers which properties you've "seen".
+ *  This enables you to tell if two objects are "visibly" equal to each other.
+ *  Two objects a and b are visibly equal to each other if and only if
+ *  For each property K of the objects that you've seen, a[K] === b[K]
+ *  If value() is called, then the entire object is considered to have been seen, and the
+ *  equality check is instead a === b
+ */
 
-//   }
+export class PropertyTracker<T>
+{
+  private seen: any = { };
+  private valueSeen = false;
 
-//   get
-// }
+  constructor(private getItem: () => T) { }
+
+  public reset()
+  {
+    this.seen = { };
+    this.valueSeen = false;
+  }
+
+  public get<K extends keyof T>(key: K): T[K]
+  {
+    this.seen[key] = true;
+    return this.getItem()[key];
+  }
+
+  public value(): T
+  {
+    this.valueSeen = true;
+    return this.getItem();
+  }
+
+  public getValueSeen()
+  {
+    return this.valueSeen;
+  }
+
+  public getSeen()
+  {
+    return Object.keys(this.seen);
+  }
+
+  public isVisiblyEqual(a: T, b: T)
+  {
+    return isVisiblyEqual(a, b, Object.keys(this.seen), this.valueSeen);
+  }
+}
+
+export function isVisiblyEqual<T>(a: T, b: T, seen: Array<string | number>, valueSeen = false)
+{
+  if (valueSeen)
+  {
+    return a === b;
+  }
+  for (const k of seen)
+  {
+    if (a[k] !== b[k])
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+export function compareObjects(a: object, b: object, custom: {[k: string]: (x, y) => boolean} = {})
+{
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length)
+  {
+    // console.log('not same length')
+    return false;
+  }
+  for (const key of aKeys)
+  {
+    if (!b.hasOwnProperty(key))
+    {
+      // console.log('key does not exist')
+      return false;
+    }
+    const compareFn = custom[key];
+    if (compareFn !== undefined)
+    {
+      if (compareFn(a[key], b[key]) === false)
+      {
+        // console.log('custom says different');
+        return false;
+      }
+    }
+    else if (a[key] !== b[key])
+    {
+      // console.log('straight up not the same', key)
+      return false;
+    }
+  }
+  return true;
+}
+
+// TODO make these tests
+// console.log(true === compareObjects(
+//   { a: 5 },
+//   { a: 5 },
+// ));
+// console.log(true === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbye' },
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbyez' },
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbye', c: 'extra' },
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', b: 'goodbye', c: 'extra' },
+//   { a: 'hello', b: 'goodbye' },
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', c: 'goodbye' },
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', c: 'goodbye' },
+//   { a: 'hello', b: 'goodbye' },
+// ));
+// console.log(true === compareObjects(
+//   { 0: 'hello', 1: 'goodbye' },
+//   { 0: 'hello', 1: 'goodbye' },
+// ));
+// console.log(true === compareObjects(
+//   { a: null, b: undefined },
+//   { a: null, b: undefined },
+// ));
+// console.log(false === compareObjects(
+//   { a: undefined, b: 'hi' },
+//   { b: 'hi', c: undefined },
+// ));
+// console.log(false === compareObjects(
+//   { b: 'hi', c: undefined },
+//   { a: undefined, b: 'hi' },
+// ));
+// console.log(true === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbyez' },
+//   { b: (x, y) => true }
+// ));
+// console.log(true === compareObjects(
+//   { a: 'hellos', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbye' },
+//   { a: (x, y) => true }
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbye' },
+//   { b: (x, y) => false }
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbye' },
+//   { a: (x, y) => false }
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbye' },
+//   { a: (x, y) => false, b: (x, y) => true }
+// ));
+// console.log(false === compareObjects(
+//   { a: 'hello', b: 'goodbye' },
+//   { a: 'hello', b: 'goodbye' },
+//   { b: (x, y) => true, a: (x, y) => false }
+// ));

@@ -57,8 +57,9 @@ import * as Immutable from 'immutable';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 
+import { compareObjects, isVisiblyEqual, PropertyTracker } from 'etl/ETLUtil';
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
-import { TemplateField } from 'etl/templates/FieldTypes';
+import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
@@ -102,6 +103,7 @@ interface Injected
 export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
 {
   private onRootMutationBound: (f: TemplateField) => void;
+  private uiStateTracker: PropertyTracker<EditorDisplayState> = new PropertyTracker(this.getUIStateValue.bind(this));
 
   constructor(props)
   {
@@ -111,20 +113,26 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     this.getDKPCachedFn = memoizeOne(this.getDKPCachedFn);
   }
 
+  public componentWillUpdate(nextProps, nextState)
+  {
+    // if you override this function, please call this
+    this.uiStateTracker.reset();
+  }
+
   public shouldComponentUpdate(nextProps, nextState)
   {
-    // if (this.props.field.name === 'title')
-    // {
-    //   console.log('----');
-    //   for (const propName in this.props)
-    //   {
-    //     if (this.props[propName] !== nextProps[propName])
-    //     {
-    //       console.log(propName);
-    //     }
-    //   }
-    // }
-    return shallowCompare(this, nextProps, nextState);
+    const seen = this.uiStateTracker.getSeen();
+    const valueSeen = this.uiStateTracker.getValueSeen();
+    const customComparatorMap = {
+      uiState: (a, b) => {
+        return isVisiblyEqual(a, b, seen, valueSeen);
+      }
+    };
+    if (!compareObjects(this.state, nextState))
+    {
+      return true;
+    }
+    return !compareObjects(this.props, nextProps, customComparatorMap);
   }
 
   get _template(): ETLTemplate
@@ -137,20 +145,10 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return (this.props as Props & Injected).rootField;
   }
 
-  // protected _template()
-  // {
-  //   return (this.props as Props & Injected).template;
-  // }
-
-  get _uiState(): EditorDisplayState
+  get _uiState(): PropertyTracker<EditorDisplayState>
   {
-    return (this.props as Props & Injected).uiState;
+    return this.uiStateTracker;
   }
-
-  // protected _rootField()
-  // {
-  //   return (this.props as Props & Injected).rootField;
-  // }
 
   protected _getChildPaths(index, cacheKey = this.props.field.children): { displayKeyPath: KeyPath, keyPath: KeyPath }
   {
@@ -193,8 +191,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     const { displayKeyPath, keyPath, noInteract } = this.props;
     return !noInteract &&
-      displayKeyPath.equals(this._uiState.settingsDisplayKeyPath) &&
-      keyPath.equals(this._uiState.settingsKeyPath);
+      displayKeyPath.equals(this._uiState.get('settingsDisplayKeyPath')) &&
+      keyPath.equals(this._uiState.get('settingsKeyPath'));
   }
 
   // Returns the given function if input is not disabled. Otherwise returns undefined.
@@ -233,5 +231,10 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     {
       return displayKeyPath.push(index);
     });
+  }
+
+  private getUIStateValue(): EditorDisplayState
+  {
+    return (this.props as Props & Injected).uiState;
   }
 }
