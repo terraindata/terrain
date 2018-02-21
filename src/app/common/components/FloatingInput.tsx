@@ -51,17 +51,39 @@ import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import styled, { StyledFunction } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+
+export let LARGE_FONT_SIZE = '52px';
+export let FONT_SIZE = '18px';
+export let LARGE_LABEL_FLOATING_FONT_SIZE = '14px';
+export let LABEL_FLOATING_FONT_SIZE = '10px';
 
 const Container = styled.div`
   position: relative;
   flex-grow: 1;
   line-height: normal;
+  border: 1px solid ${Colors().inputBorder};
+  border-radius: 3px;
+  height: ${(props) => props.large ? '86px' : '48px'};
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 100px;
+  background: ${Colors().textboxBg};
+
+  &:hover {
+    border-color: ${Colors().active};
+  }
+
+  ${(props) => props['noBorder'] && (`
+    border: none !important;
+    background: none;
+  `)}
 `;
 
-const LEFT = '12px';
+const LEFT = (props) => props.large ? '18px' : '12px';
 
 const Label = styled.label`
   position: absolute;
@@ -70,42 +92,59 @@ const Label = styled.label`
   font-size: 16px;
   transition: all 0.15s;
   color: ${Colors().text3};
+  cursor: pointer;
+  text-transform: uppercase;
+
+  font-size: ${(props) =>
+    {
+      if (props.isFloating)
+      {
+        return props.large ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
+      }
+
+      return props.large ? LARGE_FONT_SIZE : FONT_SIZE;
+    }};
 `;
 
 const floatingLabelStyle = {
-  fontSize: 10,
   top: 6,
 };
 
 const inputStyle = `
-  padding-right: 6px;
-  padding-left: ${LEFT};
   padding-top: 20px;
   padding-bottom: 4px;
   border-radius: 3px;
   width: 100%;
-  border: 1px solid ${Colors().inputBorder};
+  box-sizing: border-box;
+  border: none;
   outline: none;
-  font-size: 18px;
   color: ${Colors().text1};
   transition: all 0.15s;
+  color: ${Colors().active};
 
   &:hover {
     border-color: ${Colors().active};
   }
 `;
-const noBorderFn = (props) => props.noBorder && 'border: none !important;';
 
+const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : FONT_SIZE;
+
+// duplication of code because the functions don't work if you put them
+//  in inputStyle
 const InputC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = styled.input;
 const Input = InputC`
   ${inputStyle}
-  ${noBorderFn}
+  padding-left: ${LEFT};
+  padding-right: ${LEFT};
+  font-size: ${fontSizeFn};
 `;
 
 const InputDivC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
 const InputDiv = InputDivC`
   ${inputStyle}
-  ${noBorderFn}
+  padding-left: ${LEFT};
+  padding-right: ${LEFT};
+  font-size: ${fontSizeFn};
   cursor: pointer;
 `;
 
@@ -134,19 +173,35 @@ export interface Props
   id?: any; // a unique identifier, pass to props handlers
   onChange?: (value: any, id: any) => void;
   onClick?: (id: any) => void;
+  onFocus?: (id: any) => void;
   canEdit?: boolean;
   noBorder?: boolean;
+  large?: boolean;
+  forceFloat?: boolean;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  autoFocus?: boolean;
+  getValueRef?: (ref) => void;
   className?: string;
 }
 
-class FloatingInput extends TerrainComponent<Props>
+export class FloatingInput extends TerrainComponent<Props>
 {
   state = {
     isFocused: false,
     myId: String(Math.random()) + '-floatinginput',
+    valueRef: null,
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.autoFocus && !this.props.autoFocus)
+    {
+      // needed because the autoFocus prop is only checked on mount
+      this.autoFocus();
+    }
+  }
+
+  public componentDidMount()
   {
     //
   }
@@ -159,16 +214,24 @@ class FloatingInput extends TerrainComponent<Props>
   public render()
   {
     const { props, state } = this;
-    const { value } = props;
+    const { value, onClick } = props;
 
     const isFloating = this.isFloating();
 
     return (
-      <Container className={this.props.className}>
+      <Container
+        large={props.large}
+        noBorder={props.noBorder}
+        onClick={props.onClick}
+        className={props.className}
+      >
         {
           this.renderValue()
         }
         <Label
+          large={props.large}
+          noBorder={props.noBorder}
+          isFloating={isFloating}
           htmlFor={state.myId}
           style={isFloating ? floatingLabelStyle : undefined}
         >
@@ -182,12 +245,12 @@ class FloatingInput extends TerrainComponent<Props>
 
   private isFloating()
   {
-    if (this.state.isFocused)
+    const { value, forceFloat } = this.props;
+
+    if (this.state.isFocused || forceFloat)
     {
       return true;
     }
-
-    const { value } = this.props;
 
     if (value === undefined || value === null)
     {
@@ -212,12 +275,17 @@ class FloatingInput extends TerrainComponent<Props>
       // Return a text input
       return (
         <Input
-          value={value}
-          id={state.myId}
+          type='text'
+          large={props.large}
+          value={value === null || value === undefined ? '' : value}
           onChange={this.handleChange}
+          autoFocus={props.autoFocus}
+          noBorder={props.noBorder}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
-          noBorder={props.noBorder}
+          id={state.myId}
+          ref={this.getValueRef}
+          onKeyDown={this.handleKeyDown}
         />
       );
     }
@@ -225,6 +293,8 @@ class FloatingInput extends TerrainComponent<Props>
     // Return a normal div, uneditable
     return (
       <InputDiv
+        {...props as any}
+        ref={props.getValueRef}
         onClick={this.handleClick}
         noBorder={props.noBorder}
       >
@@ -250,6 +320,12 @@ class FloatingInput extends TerrainComponent<Props>
     this.setState({
       isFocused: true,
     });
+
+    const { props } = this;
+    if (props.onFocus)
+    {
+      props.onFocus(props.id);
+    }
   }
 
   private handleBlur()
@@ -259,6 +335,46 @@ class FloatingInput extends TerrainComponent<Props>
     });
   }
 
+  private getValueRef(ref)
+  {
+    this.setState({
+      valueRef: ref,
+    });
+    if (this.props.getValueRef)
+    {
+      this.props.getValueRef(ref);
+    }
+  }
+
+  private handleKeyDown(e)
+  {
+    switch (e.keyCode)
+    {
+      case 9: // tab
+      case 13: // enter
+        ReactDOM.findDOMNode(this.state.valueRef)['blur']();
+        break;
+      default:
+    }
+    if (this.props.onKeyDown)
+    {
+      this.props.onKeyDown(e);
+    }
+  }
+
+  private autoFocus()
+  {
+    // force focus, needed if component has mounted and autoFocus flag changes
+    const { valueRef } = this.state;
+    if (valueRef)
+    {
+      const valueEl = ReactDOM.findDOMNode(valueRef);
+      if (valueEl && valueEl['focus'])
+      {
+        valueEl['focus']();
+      }
+    }
+  }
 }
 
 export default FloatingInput;

@@ -168,47 +168,43 @@ class PathfinderArea extends TerrainComponent<Props>
             pathfinderContext={pathfinderContext}
             keyPath={keyPath.push('source')}
             onStepChange={this.incrementStep}
-            step={path.step}
             source={path.source}
           />
-          <FadeInOut
-            children={
-              <PathfinderFilterSection
-                pathfinderContext={pathfinderContext}
-                filterGroup={path.filterGroup}
-                keyPath={keyPath.push('filterGroup')}
-                onStepChange={this.incrementStep}
-                step={path.step}
-                toSkip={this.props.toSkip}
-              />
-            }
-            open={path.step >= PathfinderSteps.Filter}
-          />
-          <FadeInOut
-            children={
-              <PathfinderScoreSection
-                pathfinderContext={pathfinderContext}
-                score={path.score}
-                keyPath={keyPath.push('score')}
-                step={path.step}
-                onStepChange={this.incrementStep}
 
-              />
-            }
-            open={path.step >= PathfinderSteps.Score}
-          />
           <FadeInOut
-            children={
-              <PathfinderMoreSection
-                pathfinderContext={pathfinderContext}
-                more={path.more}
-                path={path}
-                keyPath={keyPath.push('more')}
-                toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
-              />
-            }
+            open={path.step >= PathfinderSteps.Filter}
+          >
+            <PathfinderFilterSection
+              pathfinderContext={pathfinderContext}
+              filterGroup={path.filterGroup}
+              keyPath={keyPath.push('filterGroup')}
+              onStepChange={this.incrementStep}
+              toSkip={this.props.toSkip}
+            />
+          </FadeInOut>
+
+          <FadeInOut
+            open={path.step >= PathfinderSteps.Score}
+          >
+            <PathfinderScoreSection
+              pathfinderContext={pathfinderContext}
+              score={path.score}
+              keyPath={keyPath.push('score')}
+              onStepChange={this.incrementStep}
+            />
+          </FadeInOut>
+
+          <FadeInOut
             open={path.step >= PathfinderSteps.More}
-          />
+          >
+            <PathfinderMoreSection
+              pathfinderContext={pathfinderContext}
+              more={path.more}
+              path={path}
+              keyPath={keyPath.push('more')}
+              toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
+            />
+          </FadeInOut>
         </div>
       </ScrollingComponent>
     );

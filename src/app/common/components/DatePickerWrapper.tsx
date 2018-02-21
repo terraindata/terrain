@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 const moment = require('moment');
-import onClickOutside from 'react-onclickoutside';
+import OnClickOut from 'react-onclickoutside';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import Dropdown from './Dropdown';
@@ -125,4 +125,4 @@ class DatePickerWrapper extends TerrainComponent<Props>
   }
 }
 
-export default onClickOutside(DatePickerWrapper);
+export default OnClickOut(DatePickerWrapper);

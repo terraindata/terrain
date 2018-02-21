@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import Ajax from 'app/util/Ajax';
+import { _Hit } from 'builder/components/results/ResultTypes';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { SchemaActionType, SchemaActionTypes } from 'schema/data/SchemaRedux';
@@ -207,7 +208,12 @@ export function parseElasticDb(elasticServer: object,
             results = resp.result.hits;
             tables = tables.setIn(
               [tableId, 'sampleData'],
-              results.hits,
+              results.hits.map((hit) =>
+                {
+                  return _Hit({
+                    fields: Immutable.Map(hit['_source']),
+                  });
+                }),
             );
             _.each((tableFields as any), (fieldProperties, fieldName) =>
             {
@@ -250,7 +256,11 @@ export function parseElasticDb(elasticServer: object,
               {
                 const sampleData = results.hits.map((hit) =>
                 {
-                  return hit._source[fieldName];
+                  return _Hit({
+                    fields: Map({
+                      [fieldName]: hit._source[fieldName],
+                    }),
+                  });
                 });
                 column = column.set('sampleData', sampleData);
               }

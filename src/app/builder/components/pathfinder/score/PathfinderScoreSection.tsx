@@ -73,8 +73,6 @@ export interface Props
   score: Score;
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
-  step: PathfinderSteps;
-
   builderActions?: typeof BuilderActions;
 }
 
@@ -261,9 +259,11 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
   public handleStepChange()
   {
-    if (this.props.step === PathfinderSteps.Score)
+    const { step } = this.props.pathfinderContext;
+
+    if (step === PathfinderSteps.Score)
     {
-      this.props.onStepChange(this.props.step);
+      this.props.onStepChange(step);
     }
   }
 
@@ -280,10 +280,10 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       <div
         className='pf-section'
       >
-        <PathfinderSectionTitle
+        {/*<PathfinderSectionTitle
           title={PathfinderText.scoreSectionTitle}
           text={PathfinderText.scoreSectionSubtitle}
-        />
+        />*/}
         <div className='pf-score-section-type'>
           Score Type:
           <Dropdown

@@ -46,26 +46,19 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access
 
-import * as classNames from 'classnames';
-import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
+import { List, Map } from 'immutable';
+import * as $ from 'jquery';
 import * as _ from 'lodash';
-import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import * as ReactDOM from 'react-dom';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import './PathPickerStyle.less';
+import { RouteSelector, RouteSelectorOption as _RouteSelectorOption, RouteSelectorOptionSet } from './RouteSelector';
 
-export interface PathPickerOption
-{
-  value: any;
-  displayName?: string | number | El;
-  color?: string;
-  extraContent?: string | El;
-}
+export type RouteSelectorOption = _RouteSelectorOption;
 
 export interface Props
 {
-  options: List<PathPickerOption>;
+  options: List<RouteSelectorOption>;
   value: any;
   onChange: (value: any) => void;
   canEdit?: boolean;
@@ -74,26 +67,66 @@ export interface Props
   headerText: string;
 
   forceOpen?: boolean;
-  hasOther?: string;
-
-  // wrapperTooltip?: string;
+  defaultOpen?: boolean;
+  hasOther?: boolean;
+  large?: boolean;
+  noShadow?: boolean;
+  focusOtherByDefault?: boolean;
+  hasSearch?: boolean;
+  hideSampleData?: boolean;
+  column?: boolean;
 }
 
-@Radium
-class PathPicker extends TerrainComponent<Props>
+export class SingleRouteSelector extends TerrainComponent<Props>
 {
   state = {
-    showOther: false,
+    values: List([this.props.value]),
+    optionSets: this.getOptionSets(this.props),
   };
 
   componentWillReceiveProps(nextProps: Props)
   {
-    //
+    if (nextProps.value !== this.props.value)
+    {
+      this.setState({
+        values: List([nextProps.value]),
+      });
+    }
+
+    if (this.optionSetKeys.findIndex((key) => nextProps[key] !== this.props[key]) !== -1)
+    {
+      // an option set property changed; re-memoize
+      this.setState({
+        optionSets: this.getOptionSets(nextProps),
+      });
+    }
   }
 
-  public componentDidUpdate(prevProps: Props, prevState)
+  // keys that play a factor in the option set
+  optionSetKeys = [
+    'options',
+    'hasOther',
+    'focusOtherByDefault',
+    'shortNameText',
+    'headerText',
+    'hasSearch',
+    'column',
+    'hideSampleData',
+  ];
+
+  public getOptionSets(props: Props): List<RouteSelectorOptionSet>
   {
-    //
+    return List([{
+      key: 'v', // unused
+      options: props.options,
+      hasOther: props.hasOther,
+      focusOtherByDefault: props.focusOtherByDefault,
+      shortNameText: props.shortNameText,
+      headerText: props.headerText,
+      hasSearch: props.hasSearch,
+      column: props.column,
+      hideSampleData: props.hideSampleData,
+    }]);
   }
 
   public render()
@@ -101,108 +134,24 @@ class PathPicker extends TerrainComponent<Props>
     const { props, state } = this;
 
     return (
-      <div
-        className='pathpicker'
-      >
-        {
-          this.renderBoxValue()
-        }
+      <RouteSelector
+        optionSets={state.optionSets}
+        values={state.values}
+        onChange={this.handleChange}
+        canEdit={props.canEdit}
 
-        {
-          this.renderPicker()
-        }
-      </div>
+        forceOpen={props.forceOpen}
+        defaultOpen={props.defaultOpen}
+        large={props.large}
+        noShadow={props.noShadow}
+      />
     );
   }
 
-  private renderBoxValue()
+  private handleChange(key, value)
   {
-    const { props, state } = this;
-
-    return (
-      <div
-        className='pathpicker-box-value'
-        style={borderColor(Colors().bg1)}
-        onClick={this.handleBoxValueClick}
-      >
-        <div className='pathpicker-short-title'>
-          {
-            props.shortNameText
-          }
-        </div>
-        <div className='pathpicker-value'>
-          {
-            this.renderValue('short', this.getCurrentIndex())
-          }
-        </div>
-      </div>
-    );
-  }
-
-  private renderValue(type: 'short' | 'long', index: number)
-  {
-    const { props, state } = this;
-    let showOther = false;
-    let value;
-    let option;
-
-    if (index === -1)
-    {
-      // value not present
-      showOther = true;
-      value = props.value;
-    }
-    else
-    {
-      option = props.options.get(index);
-      value = option.value;
-    }
-
-    return (
-      <div
-      >
-        <div
-          className='pathpicker-value-text'
-          style={fontColor(Colors().active)}
-        >
-          {
-            value
-          }
-        </div>
-      </div>
-    );
-  }
-
-  private handleBoxValueClick()
-  {
-    //
-  }
-
-  private getCurrentIndex(): number
-  {
-    const { props, state } = this;
-    return props.options.findIndex(
-      (option) => option.value === props.value);
-  }
-
-  private renderPicker()
-  {
-    const { props, state } = this;
-
-    return (
-      <div
-      >
-      </div>
-    );
+    this.props.onChange(value);
   }
 }
-// <input
-//   type='text'
-//   value={props.value}
-//   placeholder={this.props.textPlaceholder !== undefined ?
-//     this.props.textPlaceholder : 'Custom value'}
-//   onChange={this.handleTextChange}
-//   className='transition box-size'
-// />
 
-export default PathPicker;
+export default SingleRouteSelector;

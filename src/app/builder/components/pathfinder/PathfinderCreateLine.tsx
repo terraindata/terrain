@@ -51,6 +51,8 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
+
 export interface Props
 {
   text: string;
@@ -64,7 +66,7 @@ class PathfinderCreateLine extends TerrainComponent<Props>
 {
   public render()
   {
-    const { onCreate, canEdit, text } = this.props;
+    const { onCreate, canEdit, text, style } = this.props;
 
     if (!canEdit)
     {
@@ -75,12 +77,15 @@ class PathfinderCreateLine extends TerrainComponent<Props>
       <div
         className='pf-create'
         style={[
-          fontColor(Colors().text3, Colors().active),
-          this.props.style,
+          fontColor(Colors().active),
+          style,
         ]}
         onClick={onCreate}
       >
-        + Add {text}
+        <AddIcon />
+        <span>
+          Add {text}
+        </span>
       </div>
     );
   }

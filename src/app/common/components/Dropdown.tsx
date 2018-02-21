@@ -421,7 +421,10 @@ class Dropdown extends TerrainComponent<Props>
             })}
             ref='value'
             style={[
-              { width: this.props.width },
+              {
+                width: this.props.width,
+                background: Colors().bg,
+              },
               ...dropdownValueStyle,
             ]}
             key='dropdown-value'
