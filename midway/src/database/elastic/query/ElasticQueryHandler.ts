@@ -61,6 +61,7 @@ import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 import ElasticStream from './ElasticStream';
 import { handleGroupJoin } from './GroupJoin';
+import { handleMergeJoin } from './MergeJoin';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -139,9 +140,19 @@ export class ElasticQueryHandler extends QueryHandler
         }
 
         const query = parser.getValue();
+        // TODO: remove this restriction
+        if (query['groupJoin'] !== undefined && query['mergeJoin'] !== undefined)
+        {
+          throw new Error('Specifying multiple join types is not supported at the moment.');
+        }
+
         if (query['groupJoin'] !== undefined)
         {
           return handleGroupJoin(client, request, parser, query);
+        }
+        else if (query['mergeJoin'] !== undefined)
+        {
+          return handleMergeJoin(client, request, parser, query);
         }
         else
         {
