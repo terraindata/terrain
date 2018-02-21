@@ -95,6 +95,11 @@ class PostgreSQLClient
     this.controller.log('PostgreSQLClient.end');
     return this.delegate.end(callback);
   }
+
+  public getConfig(): PostgreSQLConfig
+  {
+    return this.config;
+  }
 }
 
 export default PostgreSQLClient;
