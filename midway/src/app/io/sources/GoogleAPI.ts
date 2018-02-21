@@ -51,7 +51,6 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import CredentialConfig from '../../credentials/CredentialConfig';
 import Credentials from '../../credentials/Credentials';
 
 export const credentials: Credentials = new Credentials();

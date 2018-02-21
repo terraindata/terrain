@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'supertest';
-import * as winston from 'winston';
 
 import App from '../src/App';
 

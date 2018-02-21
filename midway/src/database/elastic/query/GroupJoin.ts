@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
@@ -65,7 +64,6 @@ import ElasticStream from './ElasticStream';
 
 const GROUPJOIN_MSEARCH_BATCH_SIZE = 100;
 const GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES = 1;
-const GROUPJOIN_DEFAULT_SIZE = 10;
 
 export async function handleGroupJoin(client: ElasticClient, request: QueryRequest,
   parser: ESParser, query: object): Promise<QueryResponse | Readable>

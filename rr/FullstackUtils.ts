@@ -67,7 +67,7 @@ export async function waitForInput(msg: string)
       output: process.stdout,
       terminal: true,
     });
-  const answer = await rl.questionAsync(msg);
+  await rl.questionAsync(msg);
   rl.close();
 }
 

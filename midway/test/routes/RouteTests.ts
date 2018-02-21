@@ -54,7 +54,6 @@ import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
 import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
 import * as Tasty from '../../src/tasty/Tasty';
-import { readFile } from '../Utils';
 
 let elasticDB: ElasticDB;
 let server;

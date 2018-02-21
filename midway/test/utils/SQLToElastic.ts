@@ -96,7 +96,7 @@ export const _async = (async () =>
   {
     await initializeDBs();
     await copyTable(DBMovies, mysqlController, elasticController);
-    const elements = await readTable(DBMovies, mysqlController);
+    await readTable(DBMovies, mysqlController);
     winston.info('Copied the table movies.');
   }
   catch (e)
