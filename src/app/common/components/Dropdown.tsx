@@ -177,7 +177,7 @@ class Dropdown extends TerrainComponent<Props>
       ':hover': {
         borderColor: Colors().inactiveHover,
         // color: Colors().activeText,
-        stroke: Colors().activeText,
+        stroke: Colors().active,
       },
       'stroke': customColor,
     };
@@ -198,9 +198,9 @@ class Dropdown extends TerrainComponent<Props>
         ':hover': {
           borderColor: customColor || Colors().active,
           // color: Colors().activeText,
-          stroke: Colors().activeText,
+          stroke: Colors().active,
         },
-        'stroke': Colors().activeText,
+        'stroke': Colors().active,
       });
     }
 
@@ -374,16 +374,16 @@ class Dropdown extends TerrainComponent<Props>
         borderColor(Colors().darkerHighlight)
       ,
       this.state.open ?
-        fontColor(Colors().activeText) :
+        fontColor(Colors().active) :
         fontColor(
           customColor || Colors().text1,
-          this.props.canEdit ? Colors().activeText : (customColor || Colors().text1),
+          this.props.canEdit ? Colors().active : (customColor || Colors().text1),
         ),
       this.state.open ?
-        getStyle('stroke', Colors().activeText) :
+        getStyle('stroke', Colors().active) :
         getStyle('stroke',
           customColor || Colors().text1,
-          this.props.canEdit ? Colors().activeText : (customColor || Colors().text1),
+          this.props.canEdit ? Colors().active : (customColor || Colors().text1),
         ),
       borderColor(Colors().inputBorder),
     ];

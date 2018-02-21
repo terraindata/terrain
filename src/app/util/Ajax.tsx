@@ -1272,6 +1272,46 @@ export const Ajax =
       });
     },
 
+    getResultsConfig(
+      index: string,
+      onLoad?: (resp) => void,
+      onError?: (error) => void,
+    )
+    {
+      return Ajax.req('post', 'resultsconfig/', { index }, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(JSON.parse(JSON.stringify(resp)));
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
+    updateResultsConfig(
+      index: string,
+      resultsConfig: any,
+      onLoad?: (resp) => void,
+      onError?: (error) => void,
+    )
+    {
+      const body = { resultsConfig, index };
+      return Ajax.req('post', 'resultsconfig/update', body, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
     runOnDemandSchedule(
       id: ID,
       onLoad: (resp: object[]) => void,

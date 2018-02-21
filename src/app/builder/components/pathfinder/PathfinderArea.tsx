@@ -58,6 +58,7 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
+import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
 import withScrolling, { createHorizontalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
@@ -124,9 +125,9 @@ class PathfinderArea extends TerrainComponent<Props>
     return this.props.keyPath !== undefined ? this.props.keyPath : List(['query', 'path']);
   }
 
-  public changePathName(value)
+  public changePathData(key, value)
   {
-    this.props.builderActions.changePath(this.getKeyPath().push('name'), value);
+    this.props.builderActions.changePath(this.getKeyPath().push(key), value);
   }
 
   // This disables horizontal scrolling

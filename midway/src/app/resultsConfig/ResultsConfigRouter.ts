@@ -44,86 +44,41 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-import './LibraryColumn.less';
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import * as Tasty from '../../tasty/Tasty';
+import ResultsConfig from './ResultsConfig';
+import ResultsConfigConfig from './ResultsConfigConfig';
 
-import * as classNames from 'classnames';
-import * as _ from 'lodash';
-import * as React from 'react';
-import { Link } from 'react-router';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
-const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
+const Router = new KoaRouter();
+export const resultsConfig = new ResultsConfig();
 
-export interface Props
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  index: number;
-  title: string;
-  referrer?: { label: string, path: string };
-}
-
-const COLUMN_STYLE = _.extend({},
-  borderColor(Colors().bg3),
-);
-
-const TITLE_STYLE = _.extend({},
-  backgroundColor(Colors().bg3),
-  fontColor(Colors().text1),
-);
-
-class LibraryColumn extends TerrainComponent<Props>
-{
-  public static defaultProps = {
-    referrer: null,
-  };
-
-  public render()
+  let getItems;
+  if (ctx.request.body.body !== undefined && ctx.request.body.body.index !== undefined)
   {
-    const { referrer } = this.props;
-
-    return (
-      <div
-        className={'library-column library-column-' + this.props.index}
-      >
-        {referrer !== null ?
-          <div className='library-column-referrer'>
-            <div className='library-column-referrer-back-button'>
-              <Link to={referrer.path}>
-                <div className='link link-with-svg-180'>
-                  <ExpandIcon className='rotate180' />
-                  <div>Back</div>
-                </div>
-              </Link>
-            </div>
-            <div className='library-column-referrer-label'>{referrer.label}</div>
-          </div> : null
-        }
-        {
-          this.props.title &&
-          <div
-            className='library-column-title'
-            style={TITLE_STYLE}
-          >
-            {
-              this.props.title
-            }
-          </div>
-        }
-        <div
-          className={classNames({
-            'library-column-content': true,
-            'library-column-content-no-title': !this.props.title,
-          })}
-          style={COLUMN_STYLE}
-        >
-          {
-            this.props['children']
-          }
-        </div>
-      </div>
-    );
+    winston.info('Getting results config of a specific index');
+    getItems = await resultsConfig.get(undefined, ctx.request.body.body.index);
   }
-}
+  else
+  {
+    winston.info('getting all results config');
+    getItems = await resultsConfig.get();
+  }
+  ctx.body = getItems;
+});
 
-export default LibraryColumn;
+Router.post('/update', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('Updating a results config');
+  const index: string = ctx.request.body.body.index;
+  const resultConfig: ResultsConfigConfig = ctx.request.body.body.resultsConfig;
+  ctx.body = await resultsConfig.upsert(ctx.state.user, index, resultConfig);
+});
+
+export default Router;

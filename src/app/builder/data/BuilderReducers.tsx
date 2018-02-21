@@ -563,8 +563,11 @@ const BuilderReducersWrapper = (
 
   if (BuilderPathActionTypes[action.type])
   {
-    const path = state.query.path;
-    state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
+    if (!action.payload.notDirty)
+    {
+      const path = state.query.path;
+      state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
+    }
   }
 
   if (BuilderCardActionTypes[action.type])
