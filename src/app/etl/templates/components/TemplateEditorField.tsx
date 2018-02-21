@@ -85,7 +85,7 @@ export interface TemplateEditorFieldProps
 }
 
 export const mapDispatchKeys = {
-  act: TemplateEditorActions
+  act: TemplateEditorActions,
 };
 export const mapStateKeys = [
   ['templateEditor', 'template'],
@@ -97,18 +97,20 @@ interface Injected
 {
   template: ETLTemplate;
   uiState: EditorDisplayState;
-  rootField: TemplateField
+  rootField: TemplateField;
 }
 
 export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
 {
   private onRootMutationBound: (f: TemplateField) => void;
+  private updateEngineVersionBound: () => void;
   private uiStateTracker: PropertyTracker<EditorDisplayState> = new PropertyTracker(this.getUIStateValue.bind(this));
 
   constructor(props)
   {
     super(props);
     this.onRootMutationBound = this.onRootMutation.bind(this);
+    this.updateEngineVersionBound = this.updateEngineVersion.bind(this);
     this.getKPCachedFn = memoizeOne(this.getKPCachedFn);
     this.getDKPCachedFn = memoizeOne(this.getDKPCachedFn);
   }
@@ -126,7 +128,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     const customComparatorMap = {
       uiState: (a, b) => {
         return isVisiblyEqual(a, b, seen, valueSeen);
-      }
+      },
     };
     if (!compareObjects(this.state, nextState))
     {
@@ -173,7 +175,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _proxy(): FieldNodeProxy
   {
     const engine = this._template.transformationEngine;
-    const tree = new FieldTreeProxy(this._rootField, engine, this.onRootMutationBound);
+    const tree = new FieldTreeProxy(this._rootField, engine, this.onRootMutationBound, this.updateEngineVersionBound);
     return new FieldNodeProxy(tree, this.props.keyPath);
   }
 
@@ -212,6 +214,13 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     this.props.act({
       actionType: 'setRoot',
       rootField: field,
+    });
+  }
+
+  private updateEngineVersion()
+  {
+    this.props.act({
+      actionType: 'updateEngineVersion',
     });
   }
 

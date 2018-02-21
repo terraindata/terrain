@@ -131,14 +131,12 @@ export function compareObjects(a: object, b: object, custom: {[k: string]: (x, y
   const bKeys = Object.keys(b);
   if (aKeys.length !== bKeys.length)
   {
-    // console.log('not same length')
     return false;
   }
   for (const key of aKeys)
   {
     if (!b.hasOwnProperty(key))
     {
-      // console.log('key does not exist')
       return false;
     }
     const compareFn = custom[key];
@@ -146,13 +144,11 @@ export function compareObjects(a: object, b: object, custom: {[k: string]: (x, y
     {
       if (compareFn(a[key], b[key]) === false)
       {
-        // console.log('custom says different');
         return false;
       }
     }
     else if (a[key] !== b[key])
     {
-      // console.log('straight up not the same', key)
       return false;
     }
   }

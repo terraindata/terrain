@@ -63,21 +63,25 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
  */
 export class FieldTreeProxy
 {
-  private onMutate: (root: TemplateField) => void = doNothing;
-
+  private onMutate: (root: TemplateField) => void;
+  private updateVersion: () => void;
   constructor(private root: TemplateField,
     private engine: TransformationEngine,
-    onMutate?: (f: TemplateField) => void)
+    onMutate?: (f: TemplateField) => void,
+    updateVersion?: () => void)
   {
-    if (onMutate !== undefined)
-    {
-      this.onMutate = onMutate;
-    }
+    this.onMutate = onMutate !== undefined ? onMutate : doNothing;
+    this.updateVersion = updateVersion !== undefined ? updateVersion : doNothing;
   }
 
   public getEngine(): TransformationEngine
   {
     return this.engine;
+  }
+
+  public updateEngineVersion()
+  {
+    this.updateVersion();
   }
 
   public createField(pathToField: KeyPath, field: TemplateField): FieldNodeProxy
@@ -197,6 +201,7 @@ export class FieldNodeProxy
     {
       const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.id(), this.field());
       this.tree.setField(this.path, updatedField);
+      this.tree.updateEngineVersion();
       this.shouldSync = false;
     }
     else

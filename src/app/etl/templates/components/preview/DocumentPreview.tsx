@@ -53,40 +53,33 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { MultiModal } from 'common/components/overlay/MultiModal';
-import TemplateEditorDocumentsPreview from 'etl/templates/components/preview/TemplateEditorDocumentsPreview';
-import TemplateEditorPreviewControl from 'etl/templates/components/preview/TemplateEditorPreviewControl';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
-import TemplateEditorFieldSettings from 'etl/templates/components/TemplateEditorFieldSettings';
+import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import './TemplateEditor.less';
 
+import './TemplateEditorDocumentsPreview.less';
 const { List } = Immutable;
+const Color = require('color');
+const ShowIcon = require('images/icon_search.svg');
 
 export interface Props
 {
+  index: number;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
 }
 
 @Radium
-class TemplateEditor extends TerrainComponent<Props>
+class DocumentPreview extends TerrainComponent<Props>
 {
   constructor(props)
   {
     super(props);
+    this.getVeilStyle = memoizeOne(this.getVeilStyle);
+    this.getFaderStyle = memoizeOne(this.getFaderStyle);
     this.transformDocument = memoizeOne(this.transformDocument);
-  }
-
-  public setModalRequests(requests)
-  {
-    this.props.act({
-      actionType: 'setModalRequests',
-      requests,
-    });
   }
 
   // gets memoizedOne'd
@@ -97,109 +90,102 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public getDocument()
   {
-    const { template } = this.props.templateEditor;
-    const { documents, previewIndex, engineVersion } = this.props.templateEditor.uiState;
-    const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
+    const { index } = this.props;
+    const { template, uiState } = this.props.templateEditor;
+    const { previewIndex, documents, engineVersion } = uiState;
+    const previewDocument = index < documents.size && documents.size > 0 ? documents.get(index) : null;
     return this.transformDocument(previewDocument, template.transformationEngine, engineVersion);
-  }
-
-  public renderEditorSection(showEditor: boolean = true)
-  {
-    const { rootField } = this.props.templateEditor;
-    const transformedPreviewDocument = this.getDocument();
-    if (!showEditor)
-    {
-      return <div className='template-editor-column main-document-column-hidden' />;
-    }
-    else
-    {
-      return (
-        <div className='template-editor-column main-document-column'>
-          <div className='template-editor-title-bar'>
-            <div className='template-editor-title-bar-spacer' />
-            <div className='template-editor-title'>
-              Preview
-            </div>
-            <div className='template-editor-preview-control-spacer'>
-              <TemplateEditorPreviewControl />
-            </div>
-          </div>
-          <div
-            className='template-editor'
-            style={backgroundColor(Colors().bg3)}
-            tabIndex={-1}
-          >
-            <div className='template-editor-full-area'>
-              <TemplateEditorFieldNode
-                keyPath={emptyList}
-                field={rootField}
-                canEdit={true}
-                noInteract={false}
-                preview={transformedPreviewDocument}
-                displayKeyPath={emptyList}
-              />
-            </div>
-          </div>
-        </div>
-      );
-    }
-  }
-
-  public renderDocumentsSection()
-  {
-    return (
-      <div className='template-editor-column preview-documents-column'>
-        <div className='template-editor-title-bar' />
-        <TemplateEditorDocumentsPreview />
-      </div>
-    );
-  }
-
-  public renderTopBar()
-  {
-    const itemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
-    return (
-      <div className='template-editor-top-bar'>
-        <div className='editor-top-bar-item' style={itemStyle} key='undo'>
-          Undo
-        </div>
-        <div className='editor-top-bar-item' style={itemStyle} key='redo'>
-          Redo
-        </div>
-        <div className='editor-top-bar-item' style={itemStyle} key='save'>
-          Save
-        </div>
-      </div>
-    );
   }
 
   public render()
   {
-    const { previewIndex, documents, modalRequests } = this.props.templateEditor.uiState;
-    const showEditor = previewIndex >= 0 && previewIndex < documents.size;
+    const { rootField, uiState } = this.props.templateEditor;
+    const transformedPreviewDocument = this.getDocument();
+
+    const isCurrentPreview = this.props.index === uiState.previewIndex;
+    const border = isCurrentPreview ?
+      borderColor(Colors().inactiveHover, Colors().inactiveHover) :
+      borderColor('rgba(0,0,0,0)', Colors().activeHover);
+    const bgColor = Colors().bg3;
+
     return (
-      <div className='template-editor-root-container'>
-        <div className='template-editor-width-spacer'>
-          {this.renderTopBar()}
-          <div className='template-editor-columns-area'>
-            {this.renderEditorSection(showEditor)}
-            {this.renderDocumentsSection()}
-          </div>
+      <div
+        className='preview-document'
+        style={_.extend({}, backgroundColor(bgColor), border)}
+        onClick={this.handleDocumentClicked}
+      >
+        <div className='preview-document-spacer'>
+          <TemplateEditorFieldNode
+            keyPath={emptyList}
+            field={rootField}
+            canEdit={false}
+            noInteract={true}
+            preview={transformedPreviewDocument}
+            displayKeyPath={emptyList}
+          />
         </div>
-        <MultiModal
-          requests={modalRequests}
-          setRequests={this.setModalRequests}
+        <div
+          key='fader'
+          className='preview-document-fader'
+          style={this.getFaderStyle(bgColor)}
         />
+        <div
+          key='veil'
+          className='preview-document-veil'
+          style={this.getVeilStyle(bgColor, isCurrentPreview)}
+        >
+          <ShowIcon className='preview-document-icon' width='64px' />
+        </div>
       </div>
     );
   }
 
+  public handleDocumentClicked()
+  {
+    this.props.act({
+      actionType: 'closeSettings',
+    });
+    this.props.act({
+      actionType: 'setPreviewIndex',
+      index: this.props.index,
+    });
+  }
+
+  public getVeilStyle(bg: string, active: boolean)
+  {
+    const hoverCol = scaleAlpha(bg, 0.5);
+    const defaultCol = scaleAlpha(bg, 0.0);
+    if (active)
+    {
+      const activeCol = scaleAlpha(Colors().active, 0.7);
+      return [backgroundColor(hoverCol, hoverCol), fontColor(activeCol, activeCol)];
+    }
+    else
+    {
+      const activeCol = scaleAlpha(Colors().inactiveHover, 0.5);
+      return [backgroundColor(defaultCol, hoverCol), fontColor('rgba(0,0,0,0)', activeCol)];
+    }
+  }
+
+  public getFaderStyle(bg: string)
+  {
+    const colObj = Color(bg);
+    const minFade = colObj.alpha(colObj.alpha());
+    const maxFade = colObj.alpha(0);
+    return getStyle('background', `linear-gradient(${maxFade.toString()}, ${minFade.toString()})`);
+  }
 }
 
 const emptyList = List([]);
 
+function scaleAlpha(color, factor)
+{
+  const colObj = Color(color);
+  return colObj.alpha(colObj.alpha() * factor).toString();
+}
+
 export default Util.createContainer(
-  TemplateEditor,
+  DocumentPreview,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );

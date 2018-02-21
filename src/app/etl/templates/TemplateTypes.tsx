@@ -80,6 +80,7 @@ class EditorDisplayStateC
   public loading: boolean = false;
   public settingsKeyPath: KeyPath = null;
   public settingsDisplayKeyPath: KeyPath = null;
+  public engineVersion: number = 0;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);

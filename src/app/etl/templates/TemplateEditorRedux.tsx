@@ -119,6 +119,9 @@ export interface TemplateEditorActionTypes
   closeSettings: {
     actionType: 'closeSettings';
   };
+  updateEngineVersion: {
+    actionType: 'updateEngineVersion';
+  };
 }
 
 const ROOT_PATH = List(['rootField']);
@@ -169,6 +172,11 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       closeSettings: (state, action) =>
       {
         return state.setIn(['uiState', 'settingsKeyPath'], null).setIn(['uiState', 'settingsDisplayKeyPath'], null);
+      },
+      updateEngineVersion: (state, action) =>
+      {
+        const oldVersion = state.uiState.engineVersion;
+        return state.setIn(['uiState', 'engineVersion'], oldVersion + 1);
       },
     };
 

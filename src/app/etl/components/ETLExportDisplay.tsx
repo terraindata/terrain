@@ -77,16 +77,6 @@ export interface Props
   act?: typeof TemplateEditorActions;
 }
 
-// import { PropertyTracker } from 'etl/ETLUtil';
-// const field = _TemplateField({name: 'hi', id: 1});
-// const tracker = new PropertyTracker(field);
-// console.log('should be hi', tracker.get('name'));
-// console.log('should be [name]', tracker.getTouched());
-// const newField = field.set('fieldId', 3);
-// console.log('should be true', tracker.isVisiblyEqual(field, newField));
-// const newField2 = field.set('name', 'goodbye');
-// console.log('should be false', tracker.isVisiblyEqual(field, newField2));
-
 function getAlgorithmId(params)
 {
   const asNumber = (params != null && params.algorithmId != null) ? Number(params.algorithmId) : NaN;
@@ -181,11 +171,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
       onFetched,
     });
   }
-
-  // public testInit()
-  // {
-  //   this.initFromDocs(NoArrayDocuments);
-  // }
 
   public componentDidMount()
   {

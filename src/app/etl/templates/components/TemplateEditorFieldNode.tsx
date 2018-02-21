@@ -81,7 +81,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     const { field, keyPath, canEdit } = this.props;
     return field.getSubfields().map((value, index) =>
     {
-      // const newKeyPath = keyPath.push('children', index);
       const childPaths = this._getChildPaths(index);
       const childPreview = preview !== undefined && preview !== null ? preview[value.name] : null;
       return (
@@ -91,7 +90,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
             field: value,
             canEdit: field.isIncluded && canEdit,
             preview: childPreview,
-            // displayKeyPath: displayKeyPath.push(index),
             displayKeyPath: childPaths.displayKeyPath,
           })}
           key={index}

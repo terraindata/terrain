@@ -53,15 +53,12 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
-import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
+import DocumentPreview from './DocumentPreview';
 import './TemplateEditorDocumentsPreview.less';
 const { List } = Immutable;
-const Color = require('color');
-const ShowIcon = require('images/icon_search.svg');
 
 export interface Props
 {
@@ -73,53 +70,10 @@ export interface Props
 @Radium
 class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
 {
-  constructor(props)
+  public renderDocument(document, index)
   {
-    super(props);
-    this.handleDocumentClickedFactory = _.memoize(this.handleDocumentClickedFactory);
-    this.getVeilStyle = _.memoize(this.getVeilStyle, (bg: string, active: boolean) => active ? bg : bg + '!');
-  }
-
-  public renderDocument(document: object, index: number)
-  {
-    const { template, rootField } = this.props.templateEditor;
-    const { previewIndex, documents } = this.props.templateEditor.uiState;
-    const border = index === previewIndex ?
-      borderColor(Colors().inactiveHover, Colors().inactiveHover) :
-      borderColor('rgba(0,0,0,0)', Colors().activeHover);
-    const previewDocument = index < documents.size && documents.size > 0 ? documents.get(index) : null;
-    const transformedPreviewDocument = template.transformationEngine.transform(previewDocument);
-    const bgColor = Colors().bg3;
     return (
-      <div
-        className='preview-document'
-        key={index}
-        style={_.extend({}, backgroundColor(bgColor), border)}
-        onClick={this.handleDocumentClickedFactory(index)}
-      >
-        <div className='preview-document-spacer'>
-          <TemplateEditorFieldNode
-            keyPath={emptyList}
-            field={rootField}
-            canEdit={false}
-            noInteract={true}
-            preview={transformedPreviewDocument}
-            displayKeyPath={emptyList}
-          />
-        </div>
-        <div
-          key={`fader ${index}`}
-          className='preview-document-fader'
-          style={this.getFaderStyle(bgColor)}
-        />
-        <div
-          key={`veil ${index}`}
-          className='preview-document-veil'
-          style={this.getVeilStyle(bgColor, index === previewIndex)}
-        >
-          <ShowIcon className='preview-document-icon' width='64px' />
-        </div>
-      </div>
+      <DocumentPreview index={index} key={index}/>
     );
   }
 
@@ -133,53 +87,6 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
       </div>
     );
   }
-
-  // memoized
-  public handleDocumentClickedFactory(index): () => void
-  {
-    return () =>
-    {
-      this.props.act({
-        actionType: 'closeSettings',
-      });
-      this.props.act({
-        actionType: 'setPreviewIndex',
-        index,
-      });
-    };
-  }
-
-  public getVeilStyle(bg: string, active: boolean)
-  {
-    const hoverCol = scaleAlpha(bg, 0.5);
-    const defaultCol = scaleAlpha(bg, 0.0);
-    if (active)
-    {
-      const activeCol = scaleAlpha(Colors().active, 0.7);
-      return [backgroundColor(hoverCol, hoverCol), fontColor(activeCol, activeCol)];
-    }
-    else
-    {
-      const activeCol = scaleAlpha(Colors().inactiveHover, 0.5);
-      return [backgroundColor(defaultCol, hoverCol), fontColor('rgba(0,0,0,0)', activeCol)];
-    }
-  }
-
-  public getFaderStyle(bg: string)
-  {
-    const colObj = Color(bg);
-    const minFade = colObj.alpha(colObj.alpha());
-    const maxFade = colObj.alpha(0);
-    return getStyle('background', `linear-gradient(${maxFade.toString()}, ${minFade.toString()})`);
-  }
-}
-
-const emptyList = List([]);
-
-function scaleAlpha(color, factor)
-{
-  const colObj = Color(color);
-  return colObj.alpha(colObj.alpha() * factor).toString();
 }
 
 export default Util.createContainer(
