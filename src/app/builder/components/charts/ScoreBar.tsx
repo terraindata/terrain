@@ -52,6 +52,7 @@ import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
 import ScoreWeightSlider from './ScoreWeightSlider';
+import BuilderActions from 'builder/data/BuilderActions';
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
@@ -67,25 +68,19 @@ interface Props {
   };
   data: {
     weight: number;
-  }
+  };
   keyPath: KeyPath;
   noAnimation?: boolean;
+  builderActions: typeof BuilderActions;
 }
 
 class ScoreBar extends TerrainComponent<Props>
 {
-  public constructor(props)
+  public handleWeightChange(value: number)
   {
-    super(props);
+    const { keyPath } = this.props;
 
-    this.state = {
-      sliderValue: [0, 0];
-    };
-  }
-
-  public handleWeightChange(value: Array<number>)
-  {
-    this.setState({ sliderValue: value });
+    this.props.builderActions.changePath(keyPath, value);
   }
 
   public render()
@@ -124,13 +119,11 @@ class ScoreBar extends TerrainComponent<Props>
 
     return (
       <ScoreWeightSlider
-        value={this.state.sliderValue}
+        value={this.props.data.weight}
         onChange={this.handleWeightChange}
-        min={-10}
-        max={10}
-        negativeColor={'red'}
-        positiveColor={'blue'}
-        dividerColor={'#abe2fb'}
+        min={0}
+        max={100}
+        color={'rgb(30, 180, 250)'}
         height={30}
       />
     );

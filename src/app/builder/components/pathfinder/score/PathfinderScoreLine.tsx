@@ -225,6 +225,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           data={{ weight: this.state.weight }}
           keyPath={this.props.keyPath.push('weight')}
           noAnimation={!this.props.animateScoreBars}
+          builderActions={this.props.builderActions}
         />
         <BuilderTextbox
           keyPath={this.props.keyPath.push('weight')}

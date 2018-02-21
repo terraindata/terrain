@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import Slider, { Range } from 'rc-slider';
+import Slider from 'rc-slider';
 // We can just import Slider or Range to reduce bundle size
 // import Slider from 'rc-slider/lib/Slider';
 // import Range from 'rc-slider/lib/Range';
@@ -55,13 +55,11 @@ import 'rc-slider/assets/index.css';
 const FIXED_SLIDER_HANDLE_STYLE = { display: 'none' };
 
 interface ScoreWeightSliderProps {
-  negativeColor: string;
-  positiveColor: string;
-  dividerColor: string;
+  color: string;
   min: number;
   max: number;
-  value: Array<number>;
-  onChange: (value: Array<number>) => void;
+  value: number;
+  onChange: (value: number) => void;
   height: number;
 }
 
@@ -71,45 +69,33 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
   {
     const {
       value,
-      negativeColor,
-      positiveColor,
+      color,
     } = this.props;
 
     const baseStyle = {
       width: this.getTrackHeight(), // to make the handle a square, we set width === height
       height: this.getTrackHeight(), // the handle height is always the same as the track's
-      marginTop: 3,
-      borderRadius: 6,
+      marginTop: 0,
+      borderRadius: 4,
       border: 0,
       marginLeft: -11,
     };
 
-    return value === [0, 0]  || value[0] < 0 ?
-      [
-        { ...baseStyle, backgroundColor: negativeColor },
-        FIXED_SLIDER_HANDLE_STYLE,
-      ] :
-      [
-        FIXED_SLIDER_HANDLE_STYLE,
-        { ...baseStyle, backgroundColor: positiveColor },
-      ];
+    return { ...baseStyle, backgroundColor: color };
   }
 
   public getTrackStyle()
   {
     const {
       value,
-      negativeColor,
-      positiveColor,
+      color,
     } = this.props;
 
     // The track is always 6 pixels smaller than the height defined for the component
     // to give the sense of padding.
-    const baseStyle = { height: this.getTrackHeight(), borderRadius: 0, top: 8 };
+    const baseStyle = { height: this.getTrackHeight(), borderRadius: 0 };
 
-    return value === [0, 0]  || value[0] < 0 ?
-      [{ ...baseStyle, backgroundColor: negativeColor }] :
-      [{ ...baseStyle, backgroundColor: positiveColor }] :
+    return { ...baseStyle, backgroundColor: color };
   }
 
   private getTrackHeight()
@@ -127,24 +113,9 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       left: 0,
       height,
       width: '100%',
-      borderRadius: 6,
-      backgroundColor: '#e9e9e9'
+      borderRadius: 4,
+      backgroundColor: 'transparent'
     };
-  }
-
-  public handleChange(newValue)
-  {
-    const { value: oldValue } = this.props;
-
-    // One of the values must always be zero
-    if (newValue[0] !== 0 && newValue[1] !== 0)
-    {
-      this.props.onChange(oldValue);
-    }
-    else
-    {
-      this.props.onChange(newValue);
-    }
   }
 
   public render()
@@ -154,26 +125,25 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       max,
       height,
       value,
-      dividerColor,
     } = this.props;
     const handleStyle = this.getHandleStyle();
     const trackStyle = this.getTrackStyle();
     const railStyle = this.getCustomRailStyle();
 
     return (
-      <div style={{ width: '100%', position: 'relative' }}>
+      <div style={{ width: '100%', position: 'relative', height: 33 }}>
         <div style={railStyle} />
         <div style={{ width: `calc(100% - ${height}px)`, position: 'relative', marginLeft: 14 }}>
-          <div style={{ zIndex: 2, position: 'absolute', left: '50%', top: 2, borderLeft: `1px solid ${dividerColor}`, height: (height + 4) }} />
-          <Range
+          <div style={{ zIndex: 2, top: 2, position: 'absolute', height, borderLeft: '1px solid rgba(30, 180, 250, .5)' }} />
+          <Slider
             min={min}
             max={max}
             value={value}
-            defaultValue={[0,0]}
-            railStyle={{ height }}
+            defaultValue={50}
+            railStyle={{ height, backgroundColor: 'transparent' }}
             trackStyle={trackStyle}
             handleStyle={handleStyle}
-            onChange={this.handleChange}
+            onChange={this.props.onChange}
           />
         </div>
       </div>
