@@ -1,2 +1,2 @@
-Version: v2.2.0.5
-Updates: Streaming export fixed
+Version: v2.2.0.6
+Updates: Transform chart fix, streaming export 
