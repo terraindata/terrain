@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
@@ -71,7 +70,6 @@ export default class ElasticQueryHandler extends QueryHandler
 
   private GROUPJOIN_MSEARCH_BATCH_SIZE = 100;
   private GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES = 1;
-  private GROUPJOIN_DEFAULT_SIZE = 10;
 
   constructor(controller: ElasticController)
   {

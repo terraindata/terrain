@@ -50,15 +50,11 @@ import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
 import UserConfig from '../../users/UserConfig';
 import * as Util from '../../Util';
-import ExportTemplateConfig from './ExportTemplateConfig';
 import ImportTemplateBaseStringified from './ImportTemplateBaseStringified';
 import ImportTemplateConfig from './ImportTemplateConfig';
-import { TemplateBase } from './TemplateBase';
-import { TemplateBaseStringified } from './TemplateBaseStringified';
 
 export class ImportTemplates
 {
-  private exportTemplateTable: Tasty.Table;
   private importTemplateTable: Tasty.Table;
 
   constructor()

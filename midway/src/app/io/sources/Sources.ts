@@ -45,10 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
-import { Magento, MagentoSourceConfig } from './Magento';
+import { Magento } from './Magento';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
