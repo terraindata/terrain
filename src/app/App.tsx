@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires no-reference strict-boolean-expressions max-line-length no-console
+// tslint:disable:no-var-requires no-reference no-unused-expression strict-boolean-expressions max-line-length no-console
 
 /// <reference path="../typings/tsd.d.ts" />
 
@@ -90,6 +90,7 @@ import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
 import { AuthState } from 'auth/AuthTypes';
 import { LibraryState } from 'library/LibraryTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
+import { injectGlobal } from 'styled-components';
 import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import { AuthActions } from './auth/data/AuthRedux';
@@ -98,13 +99,11 @@ import LibraryActions from './library/data/LibraryActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
 import { UserActions } from './users/data/UserRedux';
-import { injectGlobal } from 'styled-components';
 const GilroySrc = require('app/common/fonts/Gilroy-Regular.woff');
 const GilroyLightSrc = require('app/common/fonts/Gilroy-Light.woff');
 const GilroyLightItalicSrc = require('app/common/fonts/Gilroy-LightItalic.woff');
 const GilroyBoldSrc = require('app/common/fonts/Gilroy-Bold.woff');
 const GilroySemiBoldSrc = require('app/common/fonts/Gilroy-SemiBold.woff');
-
 
 // Icons
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
