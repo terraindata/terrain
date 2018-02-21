@@ -124,7 +124,7 @@ class ScoreBar extends TerrainComponent<Props>
         min={0}
         max={100}
         color={'rgb(30, 180, 250)'}
-        height={30}
+        height={34}
       />
     );
   }

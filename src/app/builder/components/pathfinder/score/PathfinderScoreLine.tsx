@@ -100,11 +100,13 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     weight: number;
     expanded: boolean;
     fieldIndex: number;
+    showFieldDropdown: boolean;
   } = {
-      weight: this.props.line.weight,
-      expanded: this.props.line.expanded,
-      fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
-    };
+    weight: this.props.line.weight,
+    expanded: this.props.line.expanded,
+    fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
+    showFieldDropdown: false;
+  };
 
   public componentWillMount()
   {
@@ -142,6 +144,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     const value = this.props.dropdownOptions.map((v) => v.displayName).toList().get(index);
     this.props.builderActions.changePath(this.props.keyPath.push('field'), value, false, true);
+    this.setState((state) => ({ showFieldDropdown: false }));
   }
 
   public renderTransformChart()
@@ -209,17 +212,30 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     );
   }
 
+  public showFieldDropdown()
+  {
+    this.setState((state) => ({ showFieldDropdown: true }));
+  }
+
   public renderLineContents()
   {
     return (
       <div className='pf-line pf-score-line-inner'>
-        <SearchableDropdown
-          options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
-          selectedIndex={this.state.fieldIndex}
-          canEdit={this.props.pathfinderContext.canEdit}
-          placeholder={'Field...'}
-          onChange={this.handleFieldChange}
-        />
+        {!this.state.showFieldDropdown ?
+          (
+            <div className="field-name" onClick={this.showFieldDropdown}>
+              {this.props.dropdownOptions.get(this.state.fieldIndex).displayName}
+            </div>
+          ) : (
+            <SearchableDropdown
+              options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
+              selectedIndex={this.state.fieldIndex}
+              canEdit={this.props.pathfinderContext.canEdit}
+              placeholder={'Field...'}
+              onChange={this.handleFieldChange}
+            />
+          )
+        }
         <ScoreBar
           parentData={{ weights: this.props.allWeights }}
           data={{ weight: this.state.weight }}
