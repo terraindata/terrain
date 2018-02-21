@@ -96,7 +96,7 @@ export async function provisionScripts(controller: DatabaseController)
           (resolve, reject) =>
           {
             client.ping({
-              requestTimeout: 100,
+              requestTimeout: 1000,
             }, (error) => resolve(!error));
           });
 

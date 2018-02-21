@@ -58,7 +58,7 @@ export class TemplateBase extends ConfigType
   public originalNames: string[] = [];    // array of strings (oldName)
   public persistentAccessToken?: string = undefined;    // persistent access token
   public primaryKeyDelimiter?: string = undefined;
-  public primaryKeys: string[] = [];  // newName of primary key(s)
+  public primaryKeys: string[] = [];  // newName of primary key(s)\
   public tablename: string = '';      // for elastic, type name
   public transformations: object[] = [];  // list of in-order data transformations
 
@@ -68,3 +68,5 @@ export class TemplateBase extends ConfigType
     ConfigType.initialize(this, props);
   }
 }
+
+export default TemplateBase;

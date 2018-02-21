@@ -66,6 +66,7 @@ import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
 import { Hit } from './ResultTypes';
 import Draggable from 'react-draggable';
+
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -283,7 +284,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
-    const thumbnail = resultsConfig.thumbnail !== null ?
+    const thumbnail = resultsConfig && resultsConfig.thumbnail !== null ?
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);

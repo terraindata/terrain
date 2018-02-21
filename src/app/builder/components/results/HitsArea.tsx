@@ -54,28 +54,28 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { BuilderState } from 'app/builder/data/BuilderState';
+import Ajax from 'app/util/Ajax';
+import Util from 'app/util/Util';
+import Radium = require('radium');
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { AllBackendsMap } from '../../../../database/AllBackends';
+import { getIndex } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
-import InfoArea from '../../../common/components/InfoArea';
-import Modal from '../../../common/components/Modal';
-import FileImportPreview from '../../../fileImport/components/FileImportPreview';
-import { FileImportState } from '../../../fileImport/FileImportTypes';
-import Actions from '../../data/BuilderActions';
-import Hit from '../results/Hit';
-import ResultsConfigComponent from '../results/ResultsConfigComponent';
-import HitsTable from './HitsTable';
-
-import Radium = require('radium');
-
-import { AllBackendsMap } from '../../../../database/AllBackends';
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
+import InfoArea from '../../../common/components/InfoArea';
 import MapComponent from '../../../common/components/MapComponent';
+import Modal from '../../../common/components/Modal';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import MapUtil from '../../../util/MapUtil';
+import FileImportPreview from '../../../fileImport/components/FileImportPreview';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
+import Hit from '../results/Hit';
+import ResultsConfigComponent from '../results/ResultsConfigComponent';
+import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
 const HITS_PAGE_SIZE = 20;
@@ -84,6 +84,7 @@ export interface Props
 {
   resultsState: ResultsState;
   exportState?: FileImportState;
+  builder?: BuilderState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -113,6 +114,8 @@ interface State
   mapMaxHeight?: number;
   spotlightHits?: Immutable.Map<string, any>;
   
+  indexName: string;
+  resultsConfig?: any;
 }
 
 const MAP_MAX_HEIGHT = 300;
@@ -121,9 +124,9 @@ const MAP_MIN_HEIGHT = 25; // height of top bar on map
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
-  public static handleConfigChange(config: ResultsConfig)
+  public static handleConfigChange(config: ResultsConfig, builderActions)
   {
-    Actions.changeResultsConfig(config);
+    builderActions.changeResultsConfig(config);
   }
 
   public state: State = {
@@ -138,13 +141,26 @@ class HitsArea extends TerrainComponent<Props>
     mapMaxHeight: undefined,
     spotlightHits: Immutable.Map<string, any>({}),
     hitSize: 'large',
+    indexName: '',
+    resultsConfig: undefined,
   };
 
   public hitsFodderRange = _.range(0, 25);
   public locations = {};
 
+  public componentWillMount()
+  {
+    this.setIndexAndResultsConfig(this.props);
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
+    if (this.props.db.name !== nextProps.db.name ||
+      this.props.query.path.source !== nextProps.query.path.source ||
+      this.props.query.resultsConfig !== nextProps.query.resultsConfig)
+    {
+      this.setIndexAndResultsConfig(nextProps);
+    }
     if (nextProps.query.cards !== this.props.query.cards
       || nextProps.query.inputs !== this.props.query.inputs)
     {
@@ -174,6 +190,48 @@ class HitsArea extends TerrainComponent<Props>
     }
   }
 
+  public setIndexAndResultsConfig(props: Props)
+  {
+    let indexName = props.db.name + '/' + getIndex('', this.props.builder);
+    if (props.query.path &&
+      props.query.path.source &&
+      props.query.path.source.dataSource)
+    {
+      indexName = (props.query.path.source.dataSource as any).index;
+    }
+    this.setState({
+      indexName,
+    });
+    if (props.query.resultsConfig !== undefined &&
+      props.query.resultsConfig.enabled)
+    {
+      this.setState({
+        resultsConfig: props.query.resultsConfig,
+      });
+    }
+    // Try to get results config from midway (stored by index)
+    else
+    {
+      Ajax.getResultsConfig(indexName, (resp) =>
+      {
+        if (resp.length > 0)
+        {
+          resp[0]['fields'] = JSON.parse(resp[0]['fields']);
+          resp[0]['formats'] = JSON.parse(resp[0]['formats']);
+          resp[0]['primaryKeys'] = JSON.parse(resp[0]['primaryKeys']);
+          resp[0]['enabled'] = true;
+          this.setState({
+            resultsConfig: _ResultsConfig(resp[0]),
+          });
+        }
+      },
+        (error) =>
+        {
+          // console.log('error', error);
+        });
+    }
+  }
+
   public handleCollapse()
   {
     this.setState({
@@ -193,7 +251,6 @@ class HitsArea extends TerrainComponent<Props>
   {
     const { expandedHitIndex, hitSize } = this.state;
     const { hits } = this.props.resultsState;
-    const { resultsConfig } = this.props.query;
 
     let hit: HitClass;
 
@@ -206,7 +263,6 @@ class HitsArea extends TerrainComponent<Props>
     {
       return null;
     }
-
     // noinspection CheckTagEmptyBody
     return (
       <div className={classNames({
@@ -217,7 +273,7 @@ class HitsArea extends TerrainComponent<Props>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Hit
           hit={hit}
-          resultsConfig={resultsConfig}
+          resultsConfig={this.state.resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
           allowSpotlights={this.props.allowSpotlights}
@@ -293,7 +349,7 @@ class HitsArea extends TerrainComponent<Props>
       const target = locations[field];
       hits.forEach((hit, i) =>
       {
-        const { resultsConfig } = this.props.query;
+        const { resultsConfig } = this.state;
         const name = resultsConfig.enabled && resultsConfig.name !== undefined ?
           hit.fields.get(resultsConfig.name) : hit.fields.get('_id');
         const spotlight = this.state.spotlightHits.get(hit.primaryKey);
@@ -439,7 +495,7 @@ class HitsArea extends TerrainComponent<Props>
   {
     const { resultsState } = this.props;
     const { hits } = resultsState;
-    const { resultsConfig } = this.props.query;
+    const { resultsConfig } = this.state;
 
     let infoAreaContent: any = null;
     let hitsContent: any = null;
@@ -781,8 +837,10 @@ column if you have customized the results view.');
     });
   }
 
-  public hideConfig()
+  public hideConfig(config: ResultsConfig)
   {
+    // Update the default config for this index
+    Ajax.updateResultsConfig(this.state.indexName, config);
     this.setState({
       showingConfig: false,
     });
@@ -873,4 +931,9 @@ column if you have customized the results view.');
   }
 }
 
-export default HitsArea;
+export default Util.createContainer(
+  HitsArea,
+  ['builder'],
+  {
+  },
+);

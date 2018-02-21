@@ -114,7 +114,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   {
     return baseQuery;
   }
-  const text = stringifyWithParameters(baseQuery.toJS(), inputs);
+  const text = stringifyWithParameters(baseQuery.toJS(), (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
 }
@@ -551,7 +551,12 @@ function parseNested(more: More, nested: List<Path>, inputs)
     return undefined;
   }
   let groupJoins = Map({});
-  nested.forEach((n) =>
+  if (nested.get(0) && nested.get(0).minMatches)
+  {
+    groupJoins = groupJoins.set('dropIfLessThan', parseFloat(String(nested.get(0).minMatches)));
+  }
+  groupJoins = groupJoins.set('parentAlias', more.references.get(0));
+  nested.forEach((n, i) =>
   {
     if (n)
     {

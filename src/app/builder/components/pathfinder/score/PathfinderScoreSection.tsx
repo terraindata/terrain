@@ -73,6 +73,8 @@ export interface Props
   score: Score;
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
+
+  builderActions?: typeof BuilderActions;
 }
 
 class PathfinderScoreSection extends TerrainComponent<Props>
@@ -113,14 +115,14 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   {
     this.handleAnimateScoreBars();
     const newLines = this.props.score.lines.delete(index);
-    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleAddScoreLine()
   {
     this.handleAnimateScoreBars();
     const newLines = this.props.score.lines.push(_ScoreLine());
-    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleValueChange(key, index, value)
@@ -128,7 +130,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     this.handleAnimateScoreBars();
     const newLine = this.props.score.lines.get(index).set(key, value);
     const newLines = this.props.score.lines.set(index, newLine);
-    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleAnimateScoreBars()
@@ -147,7 +149,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           selectedIndex={dropdownOptions.map((option) => option.displayName).indexOf(line.field)}
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('lines').push(index).push('field')}
-          action={BuilderActions.changePath}
+          action={this.props.builderActions.changePath}
         />
         <Dropdown
           options={List(['asc', 'desc'])}
@@ -155,7 +157,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           selectedIndex={List(['asc', 'desc']).indexOf(line.sortOrder)}
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('lines').push(index).push('sortOrder')}
-          action={BuilderActions.changePath}
+          action={this.props.builderActions.changePath}
         />
       </div>
     );
@@ -163,7 +165,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
   public getLinearScoreLines(scoreLines)
   {
-    const { source, step, canEdit, schemaState } = this.props.pathfinderContext;
+    const { source, step, canEdit, schemaState, builderState } = this.props.pathfinderContext;
     let dropdownOptions = List([]);
     if (source.dataSource.getChoiceOptions !== undefined)
     {
@@ -171,6 +173,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
         type: 'fields',
         source,
         schemaState,
+        builderState,
       });
     }
     return (
@@ -196,7 +199,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
   public getScoreLines(scoreLines)
   {
-    const { source, step, canEdit, schemaState } = this.props.pathfinderContext;
+    const { source, step, canEdit, schemaState, builderState } = this.props.pathfinderContext;
     let dropdownOptions = List([]);
     if (source.dataSource.getChoiceOptions !== undefined)
     {
@@ -204,6 +207,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
         type: 'transformFields',
         source,
         schemaState,
+        builderState,
       });
     }
     const keyPath = this.props.keyPath.push('lines');
@@ -244,7 +248,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     {
       return this.props.score.lines.get(index);
     });
-    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleDragStart()
@@ -290,7 +294,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             keyPath={this.props.keyPath.push('type')}
             tooltips={List(types.map((type) => PathfinderText.scoreSectionTypes[type].tooltip))}
             canEdit={canEdit}
-            action={BuilderActions.changePath}
+            action={this.props.builderActions.changePath}
           />
         </div>
         {
@@ -318,7 +322,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
         }
 
         {
-          this.props.step === PathfinderSteps.Score &&
+          this.props.pathfinderContext.step === PathfinderSteps.Score &&
           <div
             onClick={this.handleStepChange}
             className='pf-step-button'
@@ -331,4 +335,8 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderScoreSection;
+export default Util.createTypedContainer(
+  PathfinderScoreSection,
+  [],
+  { builderActions: BuilderActions },
+);

@@ -1,0 +1,312 @@
+yarn run v1.3.2
+$ nodemon --exec ./node_modules/.bin/ts-node -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./midway/src/Midway.ts
+[33m[nodemon] 1.15.0[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching: *.*[39m
+[32m[nodemon] starting `./node_modules/.bin/ts-node --harmony --max_executable_size=8192 --max_old_space_size=8192 ./midway/src/Midway.ts`[39m
+2018-02-19 10:04:37.222 [15638] [32minfo[39m: Initializing system database { type: postgres dsn: t3rr41n-demo:r3curs1v3$@127.0.0.1:5432/midway } 
+2018-02-19 10:04:37.228 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:0:PostgreSQLClient.isConnected 
+2018-02-19 10:04:37.251 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:1:PostgreSQLClient 
+2018-02-19 10:04:37.252 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:2:PostgreSQLClient.query 
+2018-02-19 10:04:37.267 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:3:PostgreSQLClient 
+2018-02-19 10:04:37.274 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:4:PostgreSQLClient.query 
+2018-02-19 10:04:37.278 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:5:PostgreSQLClient 
+2018-02-19 10:04:37.285 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:6:PostgreSQLClient.query 
+2018-02-19 10:04:37.288 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:7:PostgreSQLClient 
+2018-02-19 10:04:37.294 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:8:PostgreSQLClient.query 
+2018-02-19 10:04:37.298 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:9:PostgreSQLClient 
+2018-02-19 10:04:37.304 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:10:PostgreSQLClient.query 
+2018-02-19 10:04:37.308 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:11:PostgreSQLClient 
+2018-02-19 10:04:37.315 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:12:PostgreSQLClient.query 
+2018-02-19 10:04:37.319 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:13:PostgreSQLClient 
+2018-02-19 10:04:37.325 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:14:PostgreSQLClient.query 
+2018-02-19 10:04:37.330 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:15:PostgreSQLClient 
+2018-02-19 10:04:37.338 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:16:PostgreSQLClient.query 
+2018-02-19 10:04:37.341 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:17:PostgreSQLClient 
+2018-02-19 10:04:37.348 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:18:PostgreSQLClient.query 
+2018-02-19 10:04:37.352 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:19:PostgreSQLClient 
+2018-02-19 10:04:37.359 [15638] [32minfo[39m: Finished creating application schema... 
+2018-02-19 10:04:37.366 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:20:PostgreSQLClient.query 
+2018-02-19 10:04:37.366 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:20:PostgreSQLClient.query: "SELECT databases.id, databases.name \n  FROM databases;" 
+2018-02-19 10:04:37.366 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:20:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.367 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:21:PostgreSQLClient 
+2018-02-19 10:04:37.367 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:21:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.376 [15638] [32minfo[39m: Registering new database item:  
+	{"name":"My ElasticSearch Instance","type":"elastic","dsn":"127.0.0.1:9200","host":"127.0.0.1:9200","isAnalytics":true,"analyticsIndex":"terrain-analytics","analyticsType":"events","id":1,"status":"DISCONNECTED"}
+2018-02-19 10:04:37.377 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:22:PostgreSQLClient.query 
+2018-02-19 10:04:37.377 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:22:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 1;" 
+2018-02-19 10:04:37.377 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:22:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.378 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:23:PostgreSQLClient 
+2018-02-19 10:04:37.384 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:23:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.396 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:24:PostgreSQLClient.query 
+2018-02-19 10:04:37.399 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:24:PostgreSQLClient.query: "INSERT INTO databases (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (id) DO UPDATE SET (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (databases.id) = (1) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.404 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:24:PostgreSQLClient.query: [
+ "terrain-analytics",
+ "events",
+ "127.0.0.1:9200",
+ "127.0.0.1:9200",
+ 1,
+ true,
+ "My ElasticSearch Instance",
+ "DISCONNECTED",
+ "elastic"
+] 
+2018-02-19 10:04:37.404 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:25:PostgreSQLClient 
+2018-02-19 10:04:37.404 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:25:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.408 [15638] [32minfo[39m: Registering new database item:  
+	{"name":"My MySQL Instance","type":"mysql","dsn":"t3rr41n-demo:r3curs1v3$@127.0.0.1:63306","host":"127.0.0.1:63306","id":2,"status":"DISCONNECTED"}
+2018-02-19 10:04:37.409 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:26:PostgreSQLClient.query 
+2018-02-19 10:04:37.409 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:26:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 2;" 
+2018-02-19 10:04:37.409 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:26:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.409 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:27:PostgreSQLClient 
+2018-02-19 10:04:37.409 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:27:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.411 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:28:PostgreSQLClient.query 
+2018-02-19 10:04:37.411 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:28:PostgreSQLClient.query: "INSERT INTO databases (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (id) DO UPDATE SET (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (databases.id) = (2) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.411 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:28:PostgreSQLClient.query: [
+ null,
+ null,
+ "t3rr41n-demo:r3curs1v3$@127.0.0.1:63306",
+ "127.0.0.1:63306",
+ 2,
+ false,
+ "My MySQL Instance",
+ "DISCONNECTED",
+ "mysql"
+] 
+2018-02-19 10:04:37.411 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:29:PostgreSQLClient 
+2018-02-19 10:04:37.411 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:29:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.413 [15638] [34mdebug[39m: Finished processing configuration options... 
+2018-02-19 10:04:37.414 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:30:PostgreSQLClient.query 
+2018-02-19 10:04:37.414 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:30:PostgreSQLClient.query: "SELECT users.id \n  FROM users\n  WHERE users.email = 'admin@terraindata.com';" 
+2018-02-19 10:04:37.414 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:30:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.414 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:31:PostgreSQLClient 
+2018-02-19 10:04:37.414 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:31:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.418 [15638] [34mdebug[39m: Finished creating a default user... 
+2018-02-19 10:04:37.418 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:32:PostgreSQLClient.query 
+2018-02-19 10:04:37.418 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:32:PostgreSQLClient.query: "SELECT users.accessToken, users.email, users.id, users.isDisabled, users.isSuperUser, users.meta, users.name, users.oldPassword, users.password, users.timezone \n  FROM users\n  WHERE users.email = 'admin@terraindata.com';" 
+2018-02-19 10:04:37.418 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:32:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.419 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:33:PostgreSQLClient 
+2018-02-19 10:04:37.419 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:33:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.421 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:34:PostgreSQLClient.query 
+2018-02-19 10:04:37.421 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:34:PostgreSQLClient.query: "SELECT credentials.createdBy, credentials.id, credentials.meta, credentials.name, credentials.permissions, credentials.type \n  FROM credentials\n  WHERE credentials.type = 'local';" 
+2018-02-19 10:04:37.421 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:34:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.421 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:35:PostgreSQLClient 
+2018-02-19 10:04:37.421 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:35:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.425 [15638] [34mdebug[39m: Finished adding local filesystem credentials... 
+2018-02-19 10:04:37.425 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:36:PostgreSQLClient.query 
+2018-02-19 10:04:37.425 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:36:PostgreSQLClient.query: "SELECT databases.id \n  FROM databases;" 
+2018-02-19 10:04:37.426 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:36:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.426 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:37:PostgreSQLClient 
+2018-02-19 10:04:37.426 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:37:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.428 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:38:PostgreSQLClient.query 
+2018-02-19 10:04:37.428 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:38:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 3;" 
+2018-02-19 10:04:37.428 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:38:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.428 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:39:PostgreSQLClient 
+2018-02-19 10:04:37.428 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:39:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.453 [15638] [33mwarn[39m: Ignoring script file with unsupported extension: "Scripts.ts" 
+2018-02-19 10:04:37.487 [15638] [33mwarn[39m: Ignoring script file with unsupported extension: "Utils.ts" 
+2018-02-19 10:04:37.536 [15638] [32minfo[39m: DB:3:Elastic:ElasticController:0:ElasticClient.putScript 
+2018-02-19 10:04:37.537 [15638] [34mdebug[39m: DB:3:Elastic:ElasticController:0:ElasticClient.putScript: {
+ "id": "Terrain.Score.PWL",
+ "lang": "painless",
+ "body": "// Copyright 2017 Terrain Data, Inc.\n\ndouble pwlTransform(def ranges, def outputs, def input)\n{\n  if (ranges.length == 0)\n  {\n    return 1;\n  }\n\n  if (input <= ranges[0])\n  {\n    return outputs[0];\n  }\n  \n  if (input >= ranges[ranges.length - 1])\n  {\n    return outputs[outputs.length - 1];\n  }\n  \n  int range = Collections.binarySearch(ranges, input,\n    (lhs, rhs) -> (lhs < rhs ? -1 : (lhs == rhs ? 0 : 1)));\n  \n  if (range < 0)\n  {\n    range = -range - 1;\n  }\n  \n  def low = ranges[range - 1];\n  def high = ranges[range];\n  double pos = (input - low) / (double)(high - low);\n  def a = outputs[range - 1];\n  def b = outputs[range];\n  return a + (b - a) * pos;\n}\n\ndouble accumulateFactors(def doc, List factors, double offset, def _score)\n{\n  double acc = offset;\n  def range = 0;\n  for (List element : factors)\n  {\n    if (element[0].equals(\"\"))\n    {\n      continue;\n    }\n\n    def sourceValue;\n    if (element[0].equalsIgnoreCase(\"_score\"))\n    {\n      sourceValue = _score;\n    }\n    else\n    {\n      sourceValue = doc[element[0]].value;\n    }\n\n    def value;\n    if (!(sourceValue instanceof Number))\n    {\n      value = sourceValue.getMillis();\n    }\n    else\n    {\n      value = sourceValue;\n    }\n\n    acc += element[1] * value;\n  }\n  return acc;\n}\n\nList factors = params.factors;\ndouble total = 0.0;\nfor (int i = 0; i < factors.length; ++i)\n{\n  Map factor = factors[i];\n  double weight = factor['weight'];\n  if (weight == 0)\n  {\n    continue;\n  }\n  double numerator = accumulateFactors(doc, factor['numerators'], factor['a'], _score);\n  double denominator = accumulateFactors(doc, factor['denominators'], factor['b'], _score);\n  double input = numerator / denominator;\n  double output = pwlTransform(factor.ranges, factor.outputs, input);\n  total += weight * output;\n}\n\nreturn total;"
+} 
+2018-02-19 10:04:37.592 [15638] [32minfo[39m: Provisioned script Terrain.Score.PWL to database Elastic 
+2018-02-19 10:04:37.593 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:40:PostgreSQLClient.query 
+2018-02-19 10:04:37.593 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:40:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 3;" 
+2018-02-19 10:04:37.593 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:40:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.593 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:41:PostgreSQLClient 
+2018-02-19 10:04:37.593 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:41:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.597 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:42:PostgreSQLClient.query 
+2018-02-19 10:04:37.597 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:42:PostgreSQLClient.query: "INSERT INTO databases (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (id) DO UPDATE SET (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (databases.id) = (3) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.597 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:42:PostgreSQLClient.query: [
+ null,
+ null,
+ "10.1.0.30:9200",
+ "10.1.0.30:9200",
+ 3,
+ false,
+ "Zazzle ES 1",
+ "CONNECTED",
+ "elastic"
+] 
+2018-02-19 10:04:37.597 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:43:PostgreSQLClient 
+2018-02-19 10:04:37.597 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:43:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.599 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:44:PostgreSQLClient.query 
+2018-02-19 10:04:37.599 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:44:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 4;" 
+2018-02-19 10:04:37.599 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:44:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.600 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:45:PostgreSQLClient 
+2018-02-19 10:04:37.600 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:45:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.602 [15638] [33mwarn[39m: Ignoring script file with unsupported extension: "Scripts.ts" 
+2018-02-19 10:04:37.603 [15638] [33mwarn[39m: Ignoring script file with unsupported extension: "Utils.ts" 
+2018-02-19 10:04:37.663 [15638] [32minfo[39m: DB:4:Elastic:ElasticController:0:ElasticClient.putScript 
+2018-02-19 10:04:37.663 [15638] [34mdebug[39m: DB:4:Elastic:ElasticController:0:ElasticClient.putScript: {
+ "id": "Terrain.Score.PWL",
+ "lang": "painless",
+ "body": "// Copyright 2017 Terrain Data, Inc.\n\ndouble pwlTransform(def ranges, def outputs, def input)\n{\n  if (ranges.length == 0)\n  {\n    return 1;\n  }\n\n  if (input <= ranges[0])\n  {\n    return outputs[0];\n  }\n  \n  if (input >= ranges[ranges.length - 1])\n  {\n    return outputs[outputs.length - 1];\n  }\n  \n  int range = Collections.binarySearch(ranges, input,\n    (lhs, rhs) -> (lhs < rhs ? -1 : (lhs == rhs ? 0 : 1)));\n  \n  if (range < 0)\n  {\n    range = -range - 1;\n  }\n  \n  def low = ranges[range - 1];\n  def high = ranges[range];\n  double pos = (input - low) / (double)(high - low);\n  def a = outputs[range - 1];\n  def b = outputs[range];\n  return a + (b - a) * pos;\n}\n\ndouble accumulateFactors(def doc, List factors, double offset, def _score)\n{\n  double acc = offset;\n  def range = 0;\n  for (List element : factors)\n  {\n    if (element[0].equals(\"\"))\n    {\n      continue;\n    }\n\n    def sourceValue;\n    if (element[0].equalsIgnoreCase(\"_score\"))\n    {\n      sourceValue = _score;\n    }\n    else\n    {\n      sourceValue = doc[element[0]].value;\n    }\n\n    def value;\n    if (!(sourceValue instanceof Number))\n    {\n      value = sourceValue.getMillis();\n    }\n    else\n    {\n      value = sourceValue;\n    }\n\n    acc += element[1] * value;\n  }\n  return acc;\n}\n\nList factors = params.factors;\ndouble total = 0.0;\nfor (int i = 0; i < factors.length; ++i)\n{\n  Map factor = factors[i];\n  double weight = factor['weight'];\n  if (weight == 0)\n  {\n    continue;\n  }\n  double numerator = accumulateFactors(doc, factor['numerators'], factor['a'], _score);\n  double denominator = accumulateFactors(doc, factor['denominators'], factor['b'], _score);\n  double input = numerator / denominator;\n  double output = pwlTransform(factor.ranges, factor.outputs, input);\n  total += weight * output;\n}\n\nreturn total;"
+} 
+2018-02-19 10:04:37.731 [15638] [32minfo[39m: Provisioned script Terrain.Score.PWL to database Elastic 
+2018-02-19 10:04:37.731 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:46:PostgreSQLClient.query 
+2018-02-19 10:04:37.731 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:46:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 4;" 
+2018-02-19 10:04:37.731 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:46:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.732 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:47:PostgreSQLClient 
+2018-02-19 10:04:37.732 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:47:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.735 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:48:PostgreSQLClient.query 
+2018-02-19 10:04:37.735 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:48:PostgreSQLClient.query: "INSERT INTO databases (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (id) DO UPDATE SET (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (databases.id) = (4) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.736 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:48:PostgreSQLClient.query: [
+ null,
+ null,
+ "52.35.213.216:9200",
+ "52.35.213.216:9200",
+ 4,
+ false,
+ "Aurea ES 1",
+ "CONNECTED",
+ "elastic"
+] 
+2018-02-19 10:04:37.736 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:49:PostgreSQLClient 
+2018-02-19 10:04:37.736 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:49:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.739 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:50:PostgreSQLClient.query 
+2018-02-19 10:04:37.739 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:50:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 1;" 
+2018-02-19 10:04:37.739 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:50:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.739 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:51:PostgreSQLClient 
+2018-02-19 10:04:37.739 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:51:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.742 [15638] [33mwarn[39m: Ignoring script file with unsupported extension: "Scripts.ts" 
+2018-02-19 10:04:37.742 [15638] [33mwarn[39m: Ignoring script file with unsupported extension: "Utils.ts" 
+2018-02-19 10:04:37.768 [15638] [32minfo[39m: DB:1:Elastic:ElasticController:0:ElasticClient.putScript 
+2018-02-19 10:04:37.768 [15638] [34mdebug[39m: DB:1:Elastic:ElasticController:0:ElasticClient.putScript: {
+ "id": "Terrain.Score.PWL",
+ "lang": "painless",
+ "body": "// Copyright 2017 Terrain Data, Inc.\n\ndouble pwlTransform(def ranges, def outputs, def input)\n{\n  if (ranges.length == 0)\n  {\n    return 1;\n  }\n\n  if (input <= ranges[0])\n  {\n    return outputs[0];\n  }\n  \n  if (input >= ranges[ranges.length - 1])\n  {\n    return outputs[outputs.length - 1];\n  }\n  \n  int range = Collections.binarySearch(ranges, input,\n    (lhs, rhs) -> (lhs < rhs ? -1 : (lhs == rhs ? 0 : 1)));\n  \n  if (range < 0)\n  {\n    range = -range - 1;\n  }\n  \n  def low = ranges[range - 1];\n  def high = ranges[range];\n  double pos = (input - low) / (double)(high - low);\n  def a = outputs[range - 1];\n  def b = outputs[range];\n  return a + (b - a) * pos;\n}\n\ndouble accumulateFactors(def doc, List factors, double offset, def _score)\n{\n  double acc = offset;\n  def range = 0;\n  for (List element : factors)\n  {\n    if (element[0].equals(\"\"))\n    {\n      continue;\n    }\n\n    def sourceValue;\n    if (element[0].equalsIgnoreCase(\"_score\"))\n    {\n      sourceValue = _score;\n    }\n    else\n    {\n      sourceValue = doc[element[0]].value;\n    }\n\n    def value;\n    if (!(sourceValue instanceof Number))\n    {\n      value = sourceValue.getMillis();\n    }\n    else\n    {\n      value = sourceValue;\n    }\n\n    acc += element[1] * value;\n  }\n  return acc;\n}\n\nList factors = params.factors;\ndouble total = 0.0;\nfor (int i = 0; i < factors.length; ++i)\n{\n  Map factor = factors[i];\n  double weight = factor['weight'];\n  if (weight == 0)\n  {\n    continue;\n  }\n  double numerator = accumulateFactors(doc, factor['numerators'], factor['a'], _score);\n  double denominator = accumulateFactors(doc, factor['denominators'], factor['b'], _score);\n  double input = numerator / denominator;\n  double output = pwlTransform(factor.ranges, factor.outputs, input);\n  total += weight * output;\n}\n\nreturn total;"
+} 
+2018-02-19 10:04:37.806 [15638] [32minfo[39m: Provisioned script Terrain.Score.PWL to database Elastic 
+2018-02-19 10:04:37.807 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:52:PostgreSQLClient.query 
+2018-02-19 10:04:37.807 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:52:PostgreSQLClient.query: "SELECT metrics.id, metrics.label \n  FROM metrics;" 
+2018-02-19 10:04:37.807 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:52:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.807 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:53:PostgreSQLClient 
+2018-02-19 10:04:37.807 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:53:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.812 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:54:PostgreSQLClient.query 
+2018-02-19 10:04:37.812 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:54:PostgreSQLClient.query: "INSERT INTO metrics (database, events, id, label) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET (database, events, id, label) = ($1, $2, $3, $4) WHERE (metrics.id) = (1) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.812 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:54:PostgreSQLClient.query: [
+ 1,
+ "impression",
+ 1,
+ "Impressions"
+] 
+2018-02-19 10:04:37.812 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:55:PostgreSQLClient.query 
+2018-02-19 10:04:37.812 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:55:PostgreSQLClient.query: "INSERT INTO metrics (database, events, id, label) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET (database, events, id, label) = ($1, $2, $3, $4) WHERE (metrics.id) = (2) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.812 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:55:PostgreSQLClient.query: [
+ 1,
+ "click",
+ 2,
+ "Clicks"
+] 
+2018-02-19 10:04:37.812 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:56:PostgreSQLClient.query 
+2018-02-19 10:04:37.813 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:56:PostgreSQLClient.query: "INSERT INTO metrics (database, events, id, label) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET (database, events, id, label) = ($1, $2, $3, $4) WHERE (metrics.id) = (3) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.813 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:56:PostgreSQLClient.query: [
+ 1,
+ "conversion",
+ 3,
+ "Conversions"
+] 
+2018-02-19 10:04:37.813 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:57:PostgreSQLClient.query 
+2018-02-19 10:04:37.813 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:57:PostgreSQLClient.query: "INSERT INTO metrics (database, events, id, label) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET (database, events, id, label) = ($1, $2, $3, $4) WHERE (metrics.id) = (5) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.813 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:57:PostgreSQLClient.query: [
+ 1,
+ "click,impression",
+ 5,
+ "Click-Through Rate"
+] 
+2018-02-19 10:04:37.813 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:58:PostgreSQLClient.query 
+2018-02-19 10:04:37.813 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:58:PostgreSQLClient.query: "INSERT INTO metrics (database, events, id, label) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET (database, events, id, label) = ($1, $2, $3, $4) WHERE (metrics.id) = (4) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.813 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:58:PostgreSQLClient.query: [
+ 1,
+ "conversion,impression",
+ 4,
+ "Conversion Rate"
+] 
+2018-02-19 10:04:37.813 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:59:PostgreSQLClient.query 
+2018-02-19 10:04:37.814 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:59:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 1;" 
+2018-02-19 10:04:37.814 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:59:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.814 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:60:PostgreSQLClient 
+2018-02-19 10:04:37.814 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:60:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.835 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:61:PostgreSQLClient 
+2018-02-19 10:04:37.835 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:61:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.835 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:62:PostgreSQLClient 
+2018-02-19 10:04:37.835 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:62:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.836 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:63:PostgreSQLClient 
+2018-02-19 10:04:37.836 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:63:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.836 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:64:PostgreSQLClient 
+2018-02-19 10:04:37.836 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:64:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.836 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:65:PostgreSQLClient 
+2018-02-19 10:04:37.836 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:65:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.841 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:66:PostgreSQLClient.query 
+2018-02-19 10:04:37.841 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:66:PostgreSQLClient.query: "INSERT INTO databases (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (id) DO UPDATE SET (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (databases.id) = (1) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.841 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:66:PostgreSQLClient.query: [
+ "terrain-analytics",
+ "events",
+ "127.0.0.1:9200",
+ "127.0.0.1:9200",
+ 1,
+ true,
+ "My ElasticSearch Instance",
+ "CONNECTED",
+ "elastic"
+] 
+2018-02-19 10:04:37.841 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:67:PostgreSQLClient 
+2018-02-19 10:04:37.841 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:67:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.844 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:68:PostgreSQLClient.query 
+2018-02-19 10:04:37.844 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:68:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 2;" 
+2018-02-19 10:04:37.844 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:68:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.844 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:69:PostgreSQLClient 
+2018-02-19 10:04:37.844 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:69:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.874 [15638] [33mwarn[39m: Script provisioning not implemented for database type: MySQLController 
+2018-02-19 10:04:37.874 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:70:PostgreSQLClient.query 
+2018-02-19 10:04:37.874 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:70:PostgreSQLClient.query: "SELECT databases.analyticsIndex, databases.analyticsType, databases.dsn, databases.host, databases.id, databases.isAnalytics, databases.name, databases.status, databases.type \n  FROM databases\n  WHERE databases.id = 2;" 
+2018-02-19 10:04:37.874 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:70:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.875 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:71:PostgreSQLClient 
+2018-02-19 10:04:37.875 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:71:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.877 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:72:PostgreSQLClient.query 
+2018-02-19 10:04:37.877 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:72:PostgreSQLClient.query: "INSERT INTO databases (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (id) DO UPDATE SET (analyticsIndex, analyticsType, dsn, host, id, isAnalytics, name, status, type) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (databases.id) = (2) RETURNING id AS insertid;" 
+2018-02-19 10:04:37.877 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:72:PostgreSQLClient.query: [
+ null,
+ null,
+ "t3rr41n-demo:r3curs1v3$@127.0.0.1:63306",
+ "127.0.0.1:63306",
+ 2,
+ false,
+ "My MySQL Instance",
+ "CONNECTED",
+ "mysql"
+] 
+2018-02-19 10:04:37.878 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:73:PostgreSQLClient 
+2018-02-19 10:04:37.878 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:73:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.880 [15638] [34mdebug[39m: Finished connecting to configured databases... 
+2018-02-19 10:04:37.883 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:74:PostgreSQLClient.query 
+2018-02-19 10:04:37.883 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:74:PostgreSQLClient.query: "SELECT schedules.active, schedules.archived, schedules.currentlyRunning, schedules.id, schedules.jobId, schedules.jobType, schedules.name, schedules.paramsScheduleStr, schedules.schedule, schedules.sort, schedules.transportStr \n  FROM schedules;" 
+2018-02-19 10:04:37.883 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:74:PostgreSQLClient.query: [] 
+2018-02-19 10:04:37.883 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:75:PostgreSQLClient 
+2018-02-19 10:04:37.883 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:75:PostgreSQLClient: "Connection acquired " 
+2018-02-19 10:04:37.887 [15638] [34mdebug[39m: Finished initializing scheduler jobs and schedules... 
+2018-02-19 10:04:37.887 [15638] [32minfo[39m: Listening on port 3000 
+2018-02-19 10:04:41.463 [15638] [32minfo[39m: Request #1: [1,1,0]: BEGIN : ["::ffff:10.0.1.18",null,"GET","",null,"http://10.0.1.18:3000/"] 
+2018-02-19 10:04:41.471 [15638] [32minfo[39m: GET / 200 6ms 
+2018-02-19 10:04:41.471 [15638] [32minfo[39m: Request #1: [1,0,0]: END (8ms): ["::ffff:10.0.1.18",null,"GET","",null,"http://10.0.1.18:3000/"] 
+2018-02-19 10:04:41.484 [15638] [32minfo[39m: Request #2: [2,1,0]: BEGIN : ["::ffff:10.0.1.18",null,"GET","",null,"http://10.0.1.18:3000/assets/vendor.bundle.js"] 
+2018-02-19 10:04:41.486 [15638] [32minfo[39m: Request #3: [3,2,0]: BEGIN : ["::ffff:10.0.1.18",null,"GET","",null,"http://10.0.1.18:3000/assets/bundle.js"] 
+2018-02-19 10:04:41.487 [15638] [32minfo[39m: GET /assets/vendor.bundle.js 200 3ms 
+2018-02-19 10:04:41.487 [15638] [32minfo[39m: Request #2: [3,1,0]: END (3ms): ["::ffff:10.0.1.18",null,"GET","",null,"http://10.0.1.18:3000/assets/vendor.bundle.js"] 
+2018-02-19 10:04:41.487 [15638] [32minfo[39m: GET /assets/bundle.js 200 1ms 
+2018-02-19 10:04:41.487 [15638] [32minfo[39m: Request #3: [3,0,0]: END (2ms): ["::ffff:10.0.1.18",null,"GET","",null,"http://10.0.1.18:3000/assets/bundle.js"] 
+2018-02-19 10:04:47.822 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:76:PostgreSQLClient 
+2018-02-19 10:04:47.822 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:76:PostgreSQLClient: "Connection released " 
+2018-02-19 10:04:47.842 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:77:PostgreSQLClient 
+2018-02-19 10:04:47.842 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:77:PostgreSQLClient: "Connection released " 
+2018-02-19 10:04:47.843 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:78:PostgreSQLClient 
+2018-02-19 10:04:47.843 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:78:PostgreSQLClient: "Connection released " 
+2018-02-19 10:04:47.843 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:79:PostgreSQLClient 
+2018-02-19 10:04:47.843 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:79:PostgreSQLClient: "Connection released " 
+2018-02-19 10:04:47.843 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:80:PostgreSQLClient 
+2018-02-19 10:04:47.843 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:80:PostgreSQLClient: "Connection released " 
+2018-02-19 10:04:47.890 [15638] [32minfo[39m: DB:0:PostgreSQL:PostgreSQLController:81:PostgreSQLClient 
+2018-02-19 10:04:47.890 [15638] [34mdebug[39m: DB:0:PostgreSQL:PostgreSQLController:81:PostgreSQLClient: "Connection released " 

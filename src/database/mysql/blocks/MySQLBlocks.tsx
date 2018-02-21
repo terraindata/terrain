@@ -67,7 +67,6 @@ const { make } = BlockUtils;
 import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import Actions from '../../../app/builder/data/BuilderActions';
-import Store from '../../../app/builder/data/BuilderStore';
 
 const _acceptsMath = (list: List<string>) =>
   list.concat(
@@ -327,11 +326,11 @@ export const MySQLBlocks =
           }),
 
           getParentTerms:
-            (card: Card, schemaState) =>
+            (card: Card, schemaState, builderState) =>
               card['tables'].reduce(
                 (list: List<string>, tableBlock: { table: string, alias: string }): List<string> =>
                 {
-                  const dbName = Store.getState().db.name;
+                  const dbName = builderState.db.name;
                   let columnNames = schemaState.columnNamesByDb.getIn(
                     [dbName, dbName + '.' + tableBlock.table],
                   ) || List([]);
@@ -366,9 +365,9 @@ export const MySQLBlocks =
                         // help: ManualConfig.help['table'],
                         accepts: List(['sfw']),
                         showWhenCards: true,
-                        getAutoTerms: (schemaState) =>
+                        getAutoTerms: (schemaState, builderState) =>
                         {
-                          const db = Store.getState().db.name; // TODO correct?
+                          const db = builderState.db.name; // TODO correct?
                           const tableNames = schemaState.tableNamesByDb.get(db);
                           // if (!tableNames)
                           // {
@@ -409,7 +408,7 @@ export const MySQLBlocks =
                             const keyPath: KeyPath = comp.props.keyPath;
                             const aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
                             const aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
-                            const initialAlias: string = Store.getState().getIn(aliasKeyPath);
+                            const initialAlias: string = comp.props.builder.getIn(aliasKeyPath);
 
                             if (!initialTable || initialTable === ''
                               || initialAlias === '' || initialAlias === suggestAlias(initialTable))
@@ -436,7 +435,7 @@ export const MySQLBlocks =
                         {
                           const keyPath: KeyPath = comp.props.keyPath;
                           const wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
-                          if (Store.getState().getIn(wasSuggestedKeyPath))
+                          if (comp.props.builder.getIn(wasSuggestedKeyPath))
                           {
                             Util.selectText(event.target, 0, event.target['value'].length);
                             Actions.change(wasSuggestedKeyPath, false);

@@ -52,6 +52,7 @@ import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import { _Path, Path } from '../../app/builder/components/pathfinder/PathfinderTypes';
 import { Aggregation } from '../../app/builder/components/results/ResultTypes';
+import { BaseClass, createRecordType, New } from '../../app/Classes';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
@@ -105,7 +106,7 @@ class QueryC
   cardKeyPaths: Map<ID, KeyPath> = Map<ID, KeyPath>({});
 
 }
-const Query_Record = Record(new QueryC());
+export const Query_Record = createRecordType(new QueryC(), 'QueryC');
 export interface Query extends QueryC, IRecord<Query> { }
 
 export const _Query = (config?: object) =>

@@ -108,6 +108,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      persistentAccessToken text NOT NULL,
      primaryKeyDelimiter text,
      primaryKeys text NOT NULL,
+     requireJSONHaveAllFields bool NOT NULL DEFAULT true,
      transformations text NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS schedules
     (id ` + primaryKeyType + ` PRIMARY KEY,
@@ -138,7 +139,16 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
        columnId text NOT NULL,
        count integer NOT NULL,
        starred bool NOT NULL,
-       countByAlgorithm text); `
+       countByAlgorithm text); `,
+  `CREATE TABLE IF NOT EXISTS resultsConfig
+       (id ` + primaryKeyType + ` PRIMARY KEY,
+       index text NOT NULL,
+       thumbnail text,
+       name text,
+       score text,
+       fields text,
+       formats text,
+       primaryKeys text); `
   ,
 ];
 

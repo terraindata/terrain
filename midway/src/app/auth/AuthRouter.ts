@@ -48,6 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import { UserConfig } from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
@@ -62,10 +63,21 @@ Router.post('/login', passport.authenticate('local'), async (ctx, next) =>
   winston.info('User has successfully authenticated as ' + String(ctx.state.user.email));
 });
 
-Router.post('/logout', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/logout', async (ctx, next) =>
 {
-  winston.info('Logging out user ' + String(ctx.state.user.email));
-  ctx.body = await users.logout(ctx.request.body.id, ctx.request.body.accessToken);
+  if (!ctx.request.body.hasOwnProperty('id') || !ctx.request.body.hasOwnProperty('accessToken'))
+  {
+    ctx.body = '';
+    return;
+  }
+  const logoutStatus: UserConfig | null = await users.loginWithAccessToken(Number(ctx.request.body['id']), ctx.request.body['accessToken']);
+  if (logoutStatus === null)
+  {
+    ctx.body = '';
+    return;
+  }
+  winston.info('Logging out user ' + String((logoutStatus as UserConfig).email));
+  ctx.body = 'Success';
 });
 
 export default Router;

@@ -68,6 +68,7 @@ import
 } from '../PathfinderTypes';
 
 import FloatingInput from 'app/common/components/FloatingInput';
+import Util from 'util/Util';
 
 export interface Props
 {
@@ -75,6 +76,8 @@ export interface Props
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
   source: Source;
+
+  builderActions?: typeof BuilderActions;
 }
 
 class PathfinderSourceSection extends TerrainComponent<Props>
@@ -136,7 +139,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     const keyPath = props.keyPath.push('dataSource');
     
     // BuilderActions.changePath(keyPath, value);
-    BuilderActions.changePath(keyPath.push('index'), value);
+    props.builderActions.changePath(keyPath.push('index'), value);
     // BuilderActions.changePath(keyPath.push('types'), value.tableIds);
     
     if (props.pathfinderContext.step === PathfinderSteps.Source)
@@ -147,15 +150,19 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   private handleCountChange(value: string | number)
   {
-    BuilderActions.changePath(this.props.keyPath.push('count'), value);
+    this.props.builderActions.changePath(this.props.keyPath.push('count'), value);
   }
 
   private getDataSourceOptions(overrideContext?: PathfinderContext): List<ChoiceOption>
   {
-    const { schemaState, source } = (overrideContext || this.props.pathfinderContext);
-    const options = source.dataSource.getChoiceOptions({ schemaState, type: 'source' });
+    const { schemaState, builderState, source } = (overrideContext || this.props.pathfinderContext);
+    const options = source.dataSource.getChoiceOptions({ schemaState, builderState, type: 'source' });
     return options;
   }
 }
 
-export default PathfinderSourceSection;
+export default Util.createTypedContainer(
+  PathfinderSourceSection,
+  [],
+  { builderActions: BuilderActions },
+);

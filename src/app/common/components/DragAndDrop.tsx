@@ -149,7 +149,7 @@ class DragAndDrop extends TerrainComponent<Props>
         style={this.getItemStyle(
           provided.draggableStyle,
           snapshot.isDragging)}
-        { ...provided.dragHandleProps}
+        {...provided.dragHandleProps}
       >
         {item.content}
       </div>

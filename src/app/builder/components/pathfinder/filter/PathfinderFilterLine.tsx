@@ -100,6 +100,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               type: 'fields',
               source,
               schemaState: pathfinderContext.schemaState,
+              builderState: pathfinderContext.builderState,
             })}
             value={filterLine.field}
             canEdit={pathfinderContext.canEdit}
@@ -114,6 +115,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   field: filterLine.field,
                   source,
                   schemaState: pathfinderContext.schemaState,
+                  builderState: pathfinderContext.builderState,
                 })}
                 value={filterLine.comparison}
                 canEdit={pathfinderContext.canEdit}
@@ -141,6 +143,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       comparison: filterLine.comparison,
       source: pathfinderContext.source,
       schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
     });
     if (valueTypes.size !== 1)
     {
@@ -159,6 +162,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           <Autocomplete
             options={pathfinderContext.source.dataSource.getChoiceOptions({
               type: 'input',
+              builderState: pathfinderContext.builderState,
             }).map((c) => c.value).toList()}
             value={filterLine.value as string | number}
             onChange={this._fn(this.handleChange, 'value')}
@@ -226,6 +230,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           <AdvancedDropdown
             options={pathfinderContext.source.dataSource.getChoiceOptions({
               type: 'input',
+              builderState: pathfinderContext.builderState,
             })}
             value={filterLine.value}
             canEdit={pathfinderContext.canEdit}

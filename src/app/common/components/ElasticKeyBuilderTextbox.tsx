@@ -49,9 +49,10 @@ THE SOFTWARE.
 import './BuilderTextbox.less';
 
 import * as React from 'react';
+import Util from 'util/Util';
 import { Display } from '../../../blocks/displays/Display';
 import { CardString } from '../../../blocks/types/Card';
-import BuilderStore from '../../builder/data/BuilderStore';
+import { BuilderState } from '../../builder/data/BuilderState';
 // import { AllBackendsMap } from '../../../../shared/database/AllBackends';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import BuilderTextbox from './BuilderTextbox';
@@ -79,7 +80,7 @@ export interface Props
   parentId?: string;
 
   autoDisabled?: boolean;
-  getAutoTerms?: (schemaState) => List<string>;
+  getAutoTerms?: (schemaState, builderState) => List<string>;
 
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
@@ -93,6 +94,8 @@ export interface Props
 
   onFocus?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
   onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
+
+  builder?: BuilderState;
 }
 
 class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
@@ -119,7 +122,7 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
   private computeShouldRender(props: Props): boolean
   {
     // TODO this is a hacky approach, find a better one
-    const state = BuilderStore.getState();
+    const state = this.props.builder;
     const parentCardKeyPath = this.findParentCardKeyPath(state, this.findParentCardKeyPath(state, props.keyPath));
     // find the parent card's key path. Requires double, since the first
     //  will hit the card this textbox is in.
@@ -162,4 +165,8 @@ const PLACEHOLDER_STYLE = {
   marginLeft: 75,
 };
 
-export default ElasticKeyBuilderTextbox;
+export default Util.createTypedContainer(
+  ElasticKeyBuilderTextbox,
+  ['builder'],
+  {},
+);

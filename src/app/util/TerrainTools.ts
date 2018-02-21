@@ -44,17 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'lodash';
+import * as TerrainLog from 'loglevel';
+import { LogLevelDesc } from 'loglevel';
 import TerrainStore from 'store/TerrainStore';
+import TerrainStoreLogger from 'store/TerrainStoreLogger';
+
 // Log levels
-const LEVEL_TEXT = 'text';
+const LEVEL_TRACE = 'trace';
 const LEVEL_DEBUG = 'debug';
 const LEVEL_INFO = 'info';
 const LEVEL_WARN = 'warn';
 const LEVEL_ERROR = 'error';
+const LEVEL_SILENT = 'silent';
 
 // Log message styles per level
 const logStyles = {
-  [LEVEL_TEXT]: 'color: darkgrey;',
+  [LEVEL_TRACE]: 'color: darkgrey;',
   [LEVEL_DEBUG]: 'color: white; background-color: darkgrey; display: block;',
   [LEVEL_INFO]: 'color: white; background: blue; font-weight: bold; display: block;',
   [LEVEL_WARN]: 'color: white; background-color: orange; display: block;',
@@ -69,6 +74,9 @@ class TerrainTools
 {
   public static ANALYTICS = 'analytics';
   public static OPERATORS = 'operators';
+
+  public static terrainStoreLogger = TerrainStoreLogger;
+  public static terrainStore = TerrainStore;
 
   public static welcome()
   {
@@ -86,7 +94,7 @@ Example:
 TerrainTools.activate(TerrainTools.ANALYITICS);
 
 Toggle-able Features:
-* TerrainTools.ANALYTICS`, LEVEL_TEXT);
+* TerrainTools.ANALYTICS`, LEVEL_INFO);
   }
 
   public static isAdmin()
@@ -133,8 +141,36 @@ Toggle-able Features:
 
   public static log(message, logLevel = LEVEL_INFO)
   {
-    console.error(`%c ${message} `, logStyles[logLevel]);
+    switch (logLevel)
+    {
+      case LEVEL_TRACE:
+        TerrainLog.trace(`%c ${message} `, logStyles[logLevel]);
+        break;
+      case LEVEL_DEBUG:
+        TerrainLog.debug(`%c ${message} `, logStyles[logLevel]);
+        break;
+      case LEVEL_INFO:
+        TerrainLog.info(`%c ${message} `, logStyles[logLevel]);
+        break;
+      case LEVEL_WARN:
+        TerrainLog.warn(`%c ${message} `, logStyles[logLevel]);
+        break;
+      case LEVEL_ERROR:
+        TerrainLog.error(`%c ${message} `, logStyles[logLevel]);
+        break;
+      default:
+        TerrainLog.error(`%c ${message} `, logStyles[logLevel]);
+    }
+  }
+  // turn on all levels of logging if no parameter
+  public static setLogLevel(logLevel = LEVEL_TRACE)
+  {
+    TerrainLog.setLevel(logLevel as LogLevelDesc);
+  }
+
+  public static setDefaultLogLevel(logLevel = LEVEL_WARN)
+  {
+    TerrainLog.setDefaultLevel(logLevel as LogLevelDesc);
   }
 }
-
 export default TerrainTools;

@@ -59,6 +59,7 @@ import Credentials from '../credentials/Credentials';
 import DatabaseConfig from '../database/DatabaseConfig';
 import { Export, ExportConfig } from '../io/Export';
 import { Import } from '../io/Import';
+import { Sources } from '../io/sources/Sources';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 import SchedulerConfig from './SchedulerConfig';
@@ -66,6 +67,7 @@ import SchedulerConfig from './SchedulerConfig';
 export const exprt: Export = new Export();
 export const imprt: Import = new Import();
 export const credentials: Credentials = new Credentials();
+const sources = new Sources();
 
 export class Scheduler
 {
@@ -210,6 +212,17 @@ export class Scheduler
         jobId = 5;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
+      else if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'magento')
+      {
+        jobId = 6;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'magento')
+      {
+        jobId = 7;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+
       req.active = true;
       req.archived = false;
       req.jobId = jobId;
@@ -283,6 +296,8 @@ export class Scheduler
     // 3: export via http (not implemented yet)
     // 4: import via local filesystem
     // 5: export via local filesystem
+    // 6: import via magento (not implemented yet)
+    // 7: export via magento
     await this.createJob(async (scheduleID: number, fields: object, // 0
       transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
@@ -604,6 +619,50 @@ export class Scheduler
         }
       });
     });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 6
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // import from magento
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        // TODO add this after adding Magento as an ETL source
+        resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 7
+      sort: string, encoding?: string | null) => // export to magento
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        try
+        {
+          await this.setJobStatus(scheduleID, 1);
+          fields['filetype'] = 'json';
+          const jsonStream: stream.Readable | string = await exprt.export(fields as ExportConfig, true);
+          if (typeof jsonStream === 'string')
+          {
+            winston.info(jsonStream as string);
+          }
+          else
+          {
+            // get source from request body
+            const magentoArgs =
+              {
+                body:
+                  JSON.parse(transport['filename']),
+              };
+            const result = await sources.handleTemplateSourceExport(magentoArgs, jsonStream as stream.Readable);
+          }
+        }
+        catch (e)
+        {
+          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob(e.toString());
+        }
+      });
+    });
   }
 
   public async initializeSchedules(): Promise<void>
@@ -611,7 +670,8 @@ export class Scheduler
     const schedules: SchedulerConfig[] = await this.get() as SchedulerConfig[];
     for (const scheduleInd in schedules)
     {
-      if (schedules[scheduleInd].active === true) // only start active schedules
+      // only start active schedules that aren't archived
+      if (schedules[scheduleInd].active === true && schedules[scheduleInd].archived === false)
       {
         const schedule: SchedulerConfig = schedules[scheduleInd];
         const scheduleJobId: string = schedule['id'] !== undefined ? (schedule['id'] as number).toString() : '-1';

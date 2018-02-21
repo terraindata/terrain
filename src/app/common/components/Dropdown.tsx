@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access
 
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as $ from 'jquery';
@@ -53,7 +54,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Actions from '../../builder/data/BuilderActions';
+import Util from 'util/Util';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -81,8 +82,11 @@ export interface Props
   wrapperTooltip?: string;
   placeholder?: string;
   icons?: Immutable.Map<any, any>;
+
   action?: (keyPath, value) => void;
   floatingLabel?: string;
+
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -123,7 +127,7 @@ class Dropdown extends TerrainComponent<Props>
           }
           else
           {
-            Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
+            this.props.builderActions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
           }
         }
         if (pr.onChange)
@@ -173,7 +177,7 @@ class Dropdown extends TerrainComponent<Props>
       ':hover': {
         borderColor: Colors().inactiveHover,
         // color: Colors().activeText,
-        stroke: Colors().activeText,
+        stroke: Colors().active,
       },
       'stroke': customColor,
     };
@@ -194,9 +198,9 @@ class Dropdown extends TerrainComponent<Props>
         ':hover': {
           borderColor: customColor || Colors().active,
           // color: Colors().activeText,
-          stroke: Colors().activeText,
+          stroke: Colors().active,
         },
-        'stroke': Colors().activeText,
+        'stroke': Colors().active,
       });
     }
 
@@ -376,10 +380,10 @@ class Dropdown extends TerrainComponent<Props>
           this.props.canEdit ? Colors().active : (customColor || Colors().text1),
         ),
       this.state.open ?
-        getStyle('stroke', Colors().activeText) :
+        getStyle('stroke', Colors().active) :
         getStyle('stroke',
           customColor || Colors().text1,
-          this.props.canEdit ? Colors().activeText : (customColor || Colors().text1),
+          this.props.canEdit ? Colors().active : (customColor || Colors().text1),
         ),
       borderColor(Colors().inputBorder),
     ];
@@ -496,4 +500,8 @@ class Dropdown extends TerrainComponent<Props>
   }
 }
 
-export default Dropdown;
+export default Util.createTypedContainer(
+  Dropdown,
+  [],
+  { builderActions: BuilderActions },
+);

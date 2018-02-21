@@ -173,6 +173,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       type: 'fields',
       source,
       schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
     });
     
     const fieldSet: RouteSelectorOptionSet = {
@@ -376,6 +377,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       fieldType: filterLine.fieldType,
       source,
       schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
     });
     
     switch (filterLine.fieldType)
@@ -477,6 +479,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         fieldType,
         source,
         schemaState: pathfinderContext.schemaState,
+        builderState: pathfinderContext.builderState,
       });
 
       if (comparisonOptions.findIndex((option) => option.value === filterLine.comparison) === -1

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires no-reference strict-boolean-expressions max-line-length no-console
+// tslint:disable:no-var-requires no-reference no-unused-expression strict-boolean-expressions max-line-length no-console
 
 /// <reference path="../typings/tsd.d.ts" />
 
@@ -90,6 +90,7 @@ import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
 import { AuthState } from 'auth/AuthTypes';
 import { LibraryState } from 'library/LibraryTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
+import { injectGlobal } from 'styled-components';
 import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import { AuthActions } from './auth/data/AuthRedux';
@@ -98,6 +99,11 @@ import LibraryActions from './library/data/LibraryActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
 import { UserActions } from './users/data/UserRedux';
+const GilroySrc = require('app/common/fonts/Gilroy-Regular.woff');
+const GilroyLightSrc = require('app/common/fonts/Gilroy-Light.woff');
+const GilroyLightItalicSrc = require('app/common/fonts/Gilroy-LightItalic.woff');
+const GilroyBoldSrc = require('app/common/fonts/Gilroy-Bold.woff');
+const GilroySemiBoldSrc = require('app/common/fonts/Gilroy-SemiBold.woff');
 
 // Icons
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
@@ -110,6 +116,43 @@ const ControlIcon = require('./../images/icon_gear.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
 const BackgroundImage = require('./../images/background.png');
+
+injectGlobal`
+  @font-face {
+    font-family: 'Gilroy';
+    src: url(${GilroySrc}) format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+@font-face {
+    font-family: 'Gilroy-Light-Italic';
+    src: url(${GilroyLightItalicSrc}) format('woff');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Gilroy-Light';
+    src: url(${GilroyLightSrc}) format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gilroy-Bold';
+    src: url(${GilroyBoldSrc}) format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+  @font-face {
+      font-family: 'Gilroy-Semi-Bold';
+      src: url(${GilroySemiBoldSrc}) format('woff');
+      font-weight: 600;
+      font-style: normal;
+  }
+`;
 
 const links =
   [
@@ -176,6 +219,7 @@ interface Props
   authActions?: typeof AuthActions;
   library?: LibraryState;
   libraryActions?: typeof LibraryActions;
+  builderActions?: typeof BuilderActions;
 }
 
 const APP_STYLE = _.extend({},
@@ -447,7 +491,7 @@ class App extends TerrainComponent<Props>
 
   public handleMouseMove(e: MEvent)
   {
-    BuilderActions.hoverCard(null);
+    this.props.builderActions.hoverCard(null);
   }
 
   public render()
@@ -498,5 +542,6 @@ export default Util.createContainer(
     userActions: UserActions,
     colorsActions: ColorsActions,
     libraryActions: LibraryActions,
+    builderActions: BuilderActions,
   },
 );

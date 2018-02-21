@@ -248,17 +248,17 @@ class CategoriesColumn extends TerrainComponent<Props>
             categoryRoles && categoryRoles.toArray()
               .filter((role) => role.builder || role.admin)
               .map(
-              (role, index) =>
-                index > 8 || (me && role.userId === me.id) ? null :
-                  <UserThumbnail
-                    userId={role.userId}
-                    key={role.userId}
-                    medium={true}
-                    extra={
-                      categoryRoles.getIn([role.userId, 'admin']) ? 'Admin' :
-                        (categoryRoles.getIn([role.userId, 'builder']) ? 'Builder' : 'Viewer')
-                    }
-                  />,
+                (role, index) =>
+                  index > 8 || (me && role.userId === me.id) ? null :
+                    <UserThumbnail
+                      userId={role.userId}
+                      key={role.userId}
+                      medium={true}
+                      extra={
+                        categoryRoles.getIn([role.userId, 'admin']) ? 'Admin' :
+                          (categoryRoles.getIn([role.userId, 'builder']) ? 'Builder' : 'Viewer')
+                      }
+                    />,
             )
           }
         </div>

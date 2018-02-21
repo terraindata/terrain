@@ -55,9 +55,9 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
-import BuilderStore from 'app/builder/data/BuilderStore';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
+import Util from 'util/Util';
 import { FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
@@ -71,6 +71,7 @@ export interface Props
   keyPath: KeyPath;
   onStepChange?: (oldStep: PathfinderSteps) => void;
   toSkip?: number; // how many keys in key path to skip (sometimes paths may be nested)
+  builderActions?: typeof BuilderActions;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -122,14 +123,14 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   private handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean)
   {
-    BuilderActions.changePath(keyPath, filter, notDirty, fieldChange);
+    this.props.builderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
 
   private handleAddFilter(keyPath, filter: FilterGroup | FilterLine)
   {
     const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
     const oldLines = this.props.filterGroup.getIn(keyPath.skip(skip).toList());
-    BuilderActions.changePath(keyPath, oldLines.push(filter));
+    this.props.builderActions.changePath(keyPath, oldLines.push(filter));
   }
 
   private handleFilterDelete(keyPath: KeyPath)
@@ -138,7 +139,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(skip).toList());
     const index = keyPath.last();
-    BuilderActions.changePath(parentKeyPath, parent.splice(index, 1));
+    this.props.builderActions.changePath(parentKeyPath, parent.splice(index, 1));
     // TODO consider 'removeIn' instead
   }
 
@@ -241,4 +242,8 @@ interface FilterEntry
   keyPath: KeyPath;
 }
 
-export default PathfinderFilterSection;
+export default Util.createTypedContainer(
+  PathfinderFilterSection,
+  [],
+  { builderActions: BuilderActions },
+);

@@ -43,18 +43,108 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
-
-export const Ajax: any = {};
-
-export function createMockStore()
+// tslint:disable:max-classes-per-file
+import * as Immutable from 'immutable';
+import
 {
-  const middlewares = [thunk.withExtraArgument(Ajax)];
-  return configureMockStore(middlewares);
+  _Algorithm,
+  _Category,
+  _Group,
+  _LibraryState,
+  Algorithm,
+  Category,
+  Group,
+} from 'library/LibraryTypes';
+import { ItemType } from '../../items/types/Item';
+
+export default class LibraryHelper
+{
+  public static mockState()
+  {
+    return new LibraryStateMock();
+  }
+
+  public static mockCategory()
+  {
+    return _Category();
+  }
 }
 
-export function connect(componentName)
+class LibraryStateMock
 {
-  return `Connect(${componentName})`;
+  public state;
+
+  public constructor()
+  {
+    this.state = _LibraryState({
+      categories: Immutable.Map<number, Category>({}),
+      groups: Immutable.Map<number, Group>({}),
+      algorithms: Immutable.Map<number, Algorithm>({}),
+    });
+  }
+
+  public addCategory(id: number, categoryName: string)
+  {
+    const category = _Category({
+      type: ItemType.Category,
+      id,
+      name: categoryName,
+      lastEdited: '',
+      lastUserId: '',
+      userIds: Immutable.List([]),
+      defaultLanguage: 'elastic',
+      parent: 0,
+    }));
+
+    this.state = this.state.set(
+      'categories',
+      this.state.categories.set(id, category),
+    );
+
+    return this;
+  }
+
+  public addGroup(categoryId: number, groupId: number, groupName: string)
+  {
+    const group = _Group({
+      id: groupId,
+      name: 'Group 1',
+      lastEdited: '',
+      lastUserId: '',
+      userIds: Immutable.List([]),
+      defaultLanguage: 'elastic',
+      parent: 0,
+    });
+
+    this.state = this.state
+      .setIn(['groups', groupId], group)
+      .setIn(
+        ['categories', categoryId, 'groupsOrder'],
+        this.state.categories.get(categoryId).groupsOrder.push(groupId),
+    );
+
+    return this;
+  }
+
+  public addAlgorithm(groupId: number, algorithmId: number, algorithmName: string)
+  {
+    const algorithm = _Algorithm({
+      id: algorithmId,
+      name: algorithmName,
+    });
+
+    this.state = this.state
+      .setIn(['algorithms', algorithmId], algorithm)
+      .setIn(
+        ['groups', groupId, 'algorithmsOrder'],
+        this.state.groups.get(groupId).algorithmsOrder.push(algorithmId),
+    );
+
+    return this;
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
 }

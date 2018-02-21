@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -74,9 +75,10 @@ export interface Props
 {
   fields: List<string>;
   config: ResultsConfig;
-  onConfigChange: (config: ResultsConfig) => void;
-  onClose: () => void;
+  onConfigChange: (config: ResultsConfig, builderActions: typeof BuilderActions) => void;
+  onClose: (config: ResultsConfig) => void;
   colorsActions: typeof ColorsActions;
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -237,8 +239,8 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
 
   public handleClose()
   {
-    this.props.onConfigChange(this.state.config);
-    this.props.onClose();
+    this.props.onConfigChange(this.state.config, this.props.builderActions);
+    this.props.onClose(this.state.config);
   }
 
   public handlePrimaryKeysChange(primaryKeys: List<string>)
@@ -821,5 +823,6 @@ export default Util.createContainer(
   [],
   {
     colorsActions: ColorsActions,
+    builderActions: BuilderActions,
   },
 );
