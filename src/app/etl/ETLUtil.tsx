@@ -64,38 +64,23 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
  *  This enables you to tell if two objects are "visibly" equal to each other.
  *  Two objects a and b are visibly equal to each other if and only if
  *  For each property K of the objects that you've seen, a[K] === b[K]
- *  If value() is called, then the entire object is considered to have been seen, and the
- *  equality check is instead a === b
  */
 
 export class PropertyTracker<T>
 {
   private seen: any = { };
-  private valueSeen = false;
 
   constructor(private getItem: () => T) { }
 
   public reset()
   {
     this.seen = { };
-    this.valueSeen = false;
   }
 
   public get<K extends keyof T>(key: K): T[K]
   {
     this.seen[key] = true;
     return this.getItem()[key];
-  }
-
-  public value(): T
-  {
-    this.valueSeen = true;
-    return this.getItem();
-  }
-
-  public getValueSeen()
-  {
-    return this.valueSeen;
   }
 
   public getSeen()
@@ -105,16 +90,12 @@ export class PropertyTracker<T>
 
   public isVisiblyEqual(a: T, b: T)
   {
-    return isVisiblyEqual(a, b, Object.keys(this.seen), this.valueSeen);
+    return isVisiblyEqual(a, b, Object.keys(this.seen));
   }
 }
 
-export function isVisiblyEqual<T>(a: T, b: T, seen: Array<string | number>, valueSeen = false)
+export function isVisiblyEqual<T>(a: T, b: T, seen: Array<string | number>)
 {
-  if (valueSeen)
-  {
-    return a === b;
-  }
   for (const k of seen)
   {
     if (a[k] !== b[k])

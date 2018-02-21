@@ -124,10 +124,9 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   public shouldComponentUpdate(nextProps, nextState)
   {
     const seen = this.uiStateTracker.getSeen();
-    const valueSeen = this.uiStateTracker.getValueSeen();
     const customComparatorMap = {
       uiState: (a, b) => {
-        return isVisiblyEqual(a, b, seen, valueSeen);
+        return isVisiblyEqual(a, b, seen);
       },
     };
     if (!compareObjects(this.state, nextState))
