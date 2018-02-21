@@ -85,41 +85,11 @@ class ScoreBar extends TerrainComponent<Props>
 
   public render()
   {
-    const weights = this.props.parentData.weights;
-    const weight = this.props.data;
-
-    let max = 0;
-    weights.map((w) =>
-    {
-      if (Math.abs(w.weight) > max)
-      {
-        max = Math.abs(w.weight);
-      }
-    });
-
-    const perc = Math.abs(weight.weight) / max * 100;
-    const style: React.CSSProperties = {
-      width: perc / 2 + '%',
-    };
-
-    if (weight.weight > 0)
-    {
-      style.left = '50%';
-      style['background'] = SCORE_COLORS.POSITIVE[Math.floor((perc - 1) / (100 / SCORE_COLORS.POSITIVE.length))];
-      style.borderTopRightRadius = BORDER_RADIUS;
-      style.borderBottomRightRadius = BORDER_RADIUS;
-    }
-    else if (weight.weight < 0)
-    {
-      style.right = '50%';
-      style['background'] = SCORE_COLORS.NEGATIVE[Math.floor((perc - 1) / (100 / SCORE_COLORS.NEGATIVE.length))];
-      style.borderTopLeftRadius = BORDER_RADIUS;
-      style.borderBottomLeftRadius = BORDER_RADIUS;
-    }
+    const { weight } = this.props.data;
 
     return (
       <ScoreWeightSlider
-        value={this.props.data.weight}
+        value={weight}
         onChange={this.handleWeightChange}
         min={0}
         max={100}
