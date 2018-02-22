@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import {Map} from 'immutable';
 import Colors, { backgroundColor, borderColor, fontColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as _ from 'lodash';
@@ -63,6 +64,23 @@ function collect(monitor)
     itemType: monitor.getItemType(),
   };
 }
+
+const comparisons: Map<string, string> = Map({
+  contains: 'contains',
+  exists: 'exists',
+  equal: '=',
+  notequal: '≠',
+  notcontain: 'does not contain',
+  greater: '>',
+  less: '<',
+  greaterequal: '≥',
+  lessequal: '≤',
+  alphabefore: 'comes before',
+  alphaafter: 'comes after',
+  datebefore: 'starts before',
+  dateafter: 'starts after',
+  located: 'is located within'
+});
 
 /*
   This file creates custom drag layers for different drag items. It is important for
@@ -90,7 +108,11 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
             className={`drag-drop-item-${key}-value`}
             style={valueStyle}
           >
-              {data[key]}
+              {
+                key === 'comparison' ?
+                comparisons.get(data['comparison']) :
+                  data[key]
+              }
           </div>
         </div>
     );

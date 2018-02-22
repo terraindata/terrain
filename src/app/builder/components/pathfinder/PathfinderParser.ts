@@ -311,8 +311,13 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
 function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
 {
   const lineValue = String(line.value);
-  const value: any = String(line.value || '');
+  let value: any = String(line.value || '');
   const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight;
+  // Parse date
+  if (line.comparison === 'datebefore' || line.comparison === 'dateafter')
+  {
+    value = Util.formatInputDate(new Date(value), 'elastic');
+  }
   switch (line.comparison)
   {
     case 'exists':
