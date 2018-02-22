@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as arrayTypeOfValues from 'array-typeof-values';
+// tslint:disable-next-line
+const arrayTypeOfValues = require('array-typeof-values');
+
 import GraphLib = require('graphlib');
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');

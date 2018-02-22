@@ -87,31 +87,32 @@ export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
 class ExportConfigurationC implements ExportConfigurationI
 {
-  public algorithmId: ID = -1;
   public fileType: FILE_TYPES = FILE_TYPES.JSON;
   public csvHeader: boolean = true;
   public jsonNewlines: boolean = false;
   public includeRank: boolean = true;
+  public source: any = null;
+  public destination: any = null;
 }
 export type ExportConfiguration = WithIRecord<ExportConfigurationC>;
 export const _ExportConfiguration = makeConstructor(ExportConfigurationC);
 
 class ImportConfigurationC implements ImportConfigurationI
 {
-  public dbid = -1;
-  public tableName = '';
   public requireAllFields = false;
   public csvHeader = true;
   public jsonNewlines = false;
   public upsert = true;
   public fileType = FILE_TYPES.JSON;
+  public sources: any = null;
+  public destination: any = null;
 }
 export type ImportConfiguration = WithIRecord<ImportConfigurationC>;
 export const _ImportConfiguration = makeConstructor(ImportConfigurationC);
 
 class ExportTemplateC implements ExportTemplateI
 {
-  public templateId = -1;
+  public id = -1;
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.EXPORT;
   public configuration = _ExportConfiguration();
@@ -124,10 +125,9 @@ export const _ExportTemplate = makeExtendedConstructor(ExportTemplateC, false, {
 
 class ImportTemplateC implements ImportTemplateI
 {
-  public templateId = -1;
+  public id = -1;
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.IMPORT;
-  public primaryKeySettings = {};
   public configuration = _ImportConfiguration();
   public transformationEngine = new TransformationEngine();
 }

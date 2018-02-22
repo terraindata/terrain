@@ -99,7 +99,7 @@ export enum FILE_TYPES
 
 interface TemplateBase
 {
-  templateId: ID;
+  id: ID;
   templateName: string;
   type: TEMPLATE_TYPES;
   configuration: ImportConfiguration | ExportConfiguration;
@@ -116,25 +116,33 @@ export interface ImportTemplate extends TemplateBase
 {
   configuration: ImportConfiguration;
   type: TEMPLATE_TYPES.IMPORT;
-  primaryKeySettings: any;
 }
+
+type SourceConfig = object; // this type definition should be somewhere else
+
+type DestinationConfig = object; // these are placeholders
 
 // default configuration options for imports and exports
 export interface ImportConfiguration
 {
-  dbid: ID; // default db and table that the file gets imported into
-  tableName: string;
   requireAllFields: boolean;
+  fileType: FILE_TYPES;
   csvHeader: boolean;
   jsonNewlines: boolean;
-  upsert: boolean; // whether or not to upsert or do only inserts
-  fileType: FILE_TYPES; // what format the input file is
+  upsert: boolean;
+
+  sources: {
+    [k: string]: SourceConfig;
+  };
+  destination: DestinationConfig;
 }
 export interface ExportConfiguration
 {
-  algorithmId: ID; // default algorithm whose query gets exported
   fileType: FILE_TYPES; // what format the output file is
   csvHeader: boolean;
   jsonNewlines: boolean;
   includeRank: boolean;
+
+  source: SourceConfig;
+  destination: DestinationConfig;
 }
