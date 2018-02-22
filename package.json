@@ -100,6 +100,7 @@
   "dependencies": {
     "JSONStream": "^1.3.2",
     "aes-js": "^3.1.0",
+    "array-typeof-values": "^1.0.1",
     "async-busboy": "^0.6.2",
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
