@@ -138,7 +138,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     // check props
     const seen = this.uiStateTracker.getSeen();
     const customComparatorMap = {
-      uiState: (value, nextValue) => {
+      uiState: (value, nextValue) =>
+      {
         return isVisiblyEqual(value, nextValue, seen);
       },
     };
@@ -201,17 +202,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     this.updateChecker.addChecker(this.settingsAreOpenEquivalent, 'settingsOpen');
     return settingsAreOpen(this.props);
-    // const { displayKeyPath, keyPath, noInteract } = props;
-    // if (noInteract)
-    // {
-    //   return false;
-    // }
-    // else
-    // {
-    //   this.updateChecker.addChecker(this.didSettingsAreOpenChange);
-    //   return keyPath.equals((props as Props & Injected).uiState.settingsKeyPath) &&
-    //     displayKeyPath.equals((props as Props & Injected).uiState.settingsDisplayKeyPath);
-    // }
   }
 
   // Returns the given function if input is not disabled. Otherwise returns undefined.

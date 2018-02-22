@@ -61,8 +61,8 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 export class UpdateChecker
 {
   private checkFns: {
-    [k: string]: (props, nextProps, state?, nextState?) => boolean
-  }
+    [k: string]: (props, nextProps, state?, nextState?) => boolean,
+  };
   private isRunning: boolean = false;
 
   constructor()
@@ -117,13 +117,13 @@ export class UpdateChecker
 
 export class PropertyTracker<T>
 {
-  private seen: any = { };
+  private seen: any = {};
 
   constructor(private getItem: () => T) { }
 
   public reset()
   {
-    this.seen = { };
+    this.seen = {};
   }
 
   // get the value at key - this tells the property tracker that the value has been seen
@@ -162,7 +162,7 @@ export function isVisiblyEqual<T>(a: T, b: T, seen: Array<string | number>)
   return true;
 }
 
-export function compareObjects(a: object, b: object, custom: {[k: string]: (aValue, bValue) => boolean} = {})
+export function compareObjects(a: object, b: object, custom: { [k: string]: (aValue, bValue) => boolean } = {})
 {
   const aKeys = Object.keys(a);
   const bKeys = Object.keys(b);

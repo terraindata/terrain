@@ -73,7 +73,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
   public renderDocument(document, index)
   {
     return (
-      <DocumentPreview index={index} key={index}/>
+      <DocumentPreview index={index} key={index} />
     );
   }
 
