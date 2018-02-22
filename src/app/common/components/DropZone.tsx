@@ -104,7 +104,8 @@ class DropZoneComponent extends TerrainComponent<DropProps>
   {
     const style = _.extend({},
       {
-        height: this.props.isOver ? 36 : 15,
+        height: this.props.isOver ? 60 : 20,
+        marginBottom: this.props.isOver ? 0 : 10,
       },
       backgroundColor(this.props.isOver ? Colors().blockOutline : ''),
     );
@@ -112,12 +113,9 @@ class DropZoneComponent extends TerrainComponent<DropProps>
       this.props.connectDropTarget(
         <div
           className='drop'
-          style={{
-            height: this.props.isOver ? 48 : 15,
-          }}
+          style={backgroundColor(this.props.isOver ? Colors().blockOutline : '')}
         >
           <div
-            style={style}
             className='drop-area'
           >
           </div>

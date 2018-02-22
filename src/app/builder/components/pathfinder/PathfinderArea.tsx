@@ -155,7 +155,7 @@ class PathfinderArea extends TerrainComponent<Props>
           >
             <FloatingInput
               value={path.name}
-              onChange={this.changePathName}
+              onChange={this._fn(this.changePathData, 'name')}
               label={'Algorithm Name'}
               isTextInput={true}
               canEdit={pathfinderContext.canEdit}

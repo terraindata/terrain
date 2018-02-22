@@ -61,7 +61,8 @@ export let FONT_SIZE = '18px';
 export let LARGE_LABEL_FLOATING_FONT_SIZE = '14px';
 export let LABEL_FLOATING_FONT_SIZE = '10px';
 
-const Container = styled.div`
+const ContainerC: StyledFunction<ContainerProps & React.HTMLProps<HTMLInputElement>> = styled.div;
+const Container = ContainerC`
   position: relative;
   flex-grow: 1;
   line-height: normal;
@@ -85,7 +86,8 @@ const Container = styled.div`
 
 const LEFT = (props) => props.large ? '18px' : '12px';
 
-const Label = styled.label`
+const LabelC: StyledFunction<LabelProps & React.HTMLProps<HTMLInputElement>> = styled.label;
+const Label = LabelC`
   position: absolute;
   left: ${LEFT};
   top: 14px;
@@ -151,6 +153,7 @@ const InputDiv = InputDivC`
 interface InputProps
 {
   noBorder: boolean;
+  large?: boolean;
   id: string;
   onChange: (value) => void;
   onFocus: () => void;
@@ -161,7 +164,24 @@ interface InputProps
 interface InputDivProps
 {
   noBorder: boolean;
+  large?: boolean;
   onClick: () => void;
+}
+
+interface ContainerProps
+{
+  large: boolean;
+  noBorder: boolean;
+  onClick: (id: any) => void;
+}
+
+interface LabelProps
+{
+  large?: boolean;
+  noBorder?: boolean;
+  isFloating: boolean;
+  htmlFor: any;
+  style: any;
 }
 
 export interface Props

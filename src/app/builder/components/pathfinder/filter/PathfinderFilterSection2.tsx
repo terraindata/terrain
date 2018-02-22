@@ -68,7 +68,6 @@ export interface Props
   pathfinderContext: PathfinderContext;
   filterGroup: FilterGroup;
   keyPath: KeyPath;
-  step?: PathfinderSteps;
   onStepChange?: (oldStep: PathfinderSteps) => void;
   toSkip?: number;
 
@@ -333,9 +332,10 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public handleStepChange()
   {
-    if (this.props.step === PathfinderSteps.Filter)
+    const {step} = this.props.pathfinderContext;
+    if (step === PathfinderSteps.Filter)
     {
-      this.props.onStepChange(this.props.step);
+      this.props.onStepChange(step);
     }
   }
 
@@ -399,7 +399,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           onCreate={this.handleAddFilter}
         />
         {
-          this.props.step === PathfinderSteps.Filter &&
+          this.props.pathfinderContext.step === PathfinderSteps.Filter &&
           <div
             onClick={this.handleStepChange}
             className='pf-step-button'

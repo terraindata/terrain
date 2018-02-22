@@ -119,7 +119,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       >
         <SingleRouteSelector
           options={dataSourceOptions}
-          value={source.dataSource.index}
+          value={(source.dataSource as any).index}
           onChange={this.handleSourcePathChange}
           canEdit={canEdit}
           shortNameText={'Find'}
@@ -137,9 +137,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const { props } = this;
     const keyPath = props.keyPath.push('dataSource');
-    // BuilderActions.changePath(keyPath, value);
-    BuilderActions.changePath(keyPath.push('index'), value);
-    // BuilderActions.changePath(keyPath.push('types'), value.tableIds);
+    this.props.builderActions.changePath(keyPath.push('index'), value);
     if (props.pathfinderContext.step === PathfinderSteps.Source)
     {
       props.onStepChange(props.pathfinderContext.step);

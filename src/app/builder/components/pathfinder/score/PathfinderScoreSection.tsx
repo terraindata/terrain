@@ -219,7 +219,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             content: <PathfinderScoreLine
               key={String(index)}
               line={line}
-              step={step}
               onDelete={this.handleDeleteLine}
               index={index}
               onValueChange={this.handleValueChange}
@@ -321,7 +320,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
         }
 
         {
-          this.props.step === PathfinderSteps.Score &&
+          this.props.pathfinderContext.step === PathfinderSteps.Score &&
           <div
             onClick={this.handleStepChange}
             className='pf-step-button'

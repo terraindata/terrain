@@ -1,6 +1,5 @@
 
 .drag-drop-item {
-	height: 45px;
 	width: 100%;
 	position: relative;
 	border-radius: 3px;
@@ -8,12 +7,9 @@
 	padding: 1px;
 	cursor: pointer;
 	transition: all .3s linear .5s;
-	&:hover {
-		border-color: lightgray;
-	}
-	&.drag-drop-item-is-over {
-		height: 67px;
-	}
+	margin-top: -19px;
+	margin-bottom: -19px;
+	z-index: 1;
 	.drag-drop-item-header {
 		overflow: hidden;
 		transition: height .3s linear .5s;
@@ -27,15 +23,15 @@
 .drop {
 	width: 100%;
     position: relative;
-    margin-top: -6px;
-    margin-bottom: -6x;
+    height: 30px;
+    background: lightblue;
 	transition: all 0.2s ease-in-out;
 	.drop-area {
     	// border: 1px solid transparent;
 		position: relative;
     	border-radius: 3px;
-		top: 6px;
 		opacity: 0.3;
+		height: 0px
 	}
 }
 
@@ -64,19 +60,30 @@
 }
 
 .drag-drop-item-preview {
-	height: 42px;
+	height: 61px;
 	display: inline-flex;
 	font-size: 16px;
-	color: black;
 	.drag-drop-item-field {
-		left: 16px;
+		padding-left: 24px
+	}
+	.drag-drop-item-comparison {
+		left: -22px;
+	}
+	.drag-drop-item-value {
+		left: -40px;
 	}
 	.drag-drop-item-field, .drag-drop-item-comparison, .drag-drop-item-value {
-		border-radius: 6px;
-		padding: 3px;
-		top: 6px;
+		width: 33%;
 		position: relative;
-		flex-grow: 1;
+		top: 8px;
+		.drag-drop-item-field-value, .drag-drop-item-comparison-value, .drag-drop-item-value-value {
+			font-size: 18px;
+			top: 10px;
+		}
+		.drag-drop-item-field-header, .drag-drop-item-comparison-header, .drag-drop-item-value-header {
+			text-transform: uppercase;
+			font-size: 10px;
+		}
 	}
 }
 

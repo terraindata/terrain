@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
+import Colors, { backgroundColor, borderColor, fontColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -73,6 +73,29 @@ function collect(monitor)
   React-dnd DragLayer for performance optimization.
 */
 class CustomDragLayerRaw extends TerrainComponent<Props> {
+
+  public renderItemBlock(key: string, header: string, data: any)
+  {
+    const headerStyle = fontColor(Colors().fontColor2);
+    const valueStyle = fontColor(Colors().active);
+    return (
+       <div className={`drag-drop-item-${key}`}>
+          <div
+            className={`drag-drop-item-${key}-header`}
+            style={headerStyle}
+          >
+            {header}
+          </div>
+          <div
+            className={`drag-drop-item-${key}-value`}
+            style={valueStyle}
+          >
+              {data[key]}
+          </div>
+        </div>
+    );
+  }
+
   public render()
   {
     const { item, itemType } = this.props;
@@ -103,9 +126,9 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
             className='drag-drop-item-preview'
             style={itemStyle}
           >
-            <div className='drag-drop-item-field'>{data.field}</div>
-            <div className='drag-drop-item-comparison'>{data.comparison}</div>
-            <div className='drag-drop-item-value'>{data.value}</div>
+           {this.renderItemBlock('field', 'data field', data)}
+           {this.renderItemBlock('comparison', 'condition', data)}
+           {this.renderItemBlock('value', 'value', data)}
           </div>
         );
       default:

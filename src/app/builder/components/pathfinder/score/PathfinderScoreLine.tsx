@@ -77,7 +77,6 @@ const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 export interface Props
 {
   line: ScoreLine;
-  step: string;
   index: number;
   onDelete: (index) => void;
   onValueChange: (key: string, index: number, newValue: any) => void;
@@ -276,7 +275,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public render()
   {
-    const { step } = this.props;
     const expandableContent = this.props.line.field ?
       this.renderTransformChart() : null;
     return (

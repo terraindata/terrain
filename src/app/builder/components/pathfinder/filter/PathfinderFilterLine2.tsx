@@ -72,7 +72,7 @@ export interface Props
 {
   filterLine: FilterLine;
   canEdit: boolean;
-  depth: number;
+  depth?: number;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
@@ -102,7 +102,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   public render()
   {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
+    const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
 
     return (
@@ -165,7 +165,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private getOptionSets(): List<RouteSelectorOptionSet>
   {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
+    const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
 
     // TODO save to state for better runtime?

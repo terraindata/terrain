@@ -88,7 +88,7 @@ export interface RouteSelectorOptionSet
   hideSampleData?: boolean; // hide sample data, even if it's present
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
 
-  valueComponent?: React.Component;
+  valueComponent?: React.Component | null;
 }
 
 export interface Props

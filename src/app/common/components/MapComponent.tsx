@@ -89,9 +89,6 @@ export interface Props
   wrapperClassName?: string;
   // When the text box is selected, the map will expand below it, otherwise it will be hidden
   fadeInOut?: boolean;
-
-  disableOnClickOutside?: () => void;
-  enableOnClickOutside?: () => void;
 }
 
 interface LocationMarker
@@ -651,4 +648,4 @@ class MapComponent extends TerrainComponent<Props>
   }
 }
 
-export default onClickOutside(MapComponent as any);
+export default onClickOutside(MapComponent);
