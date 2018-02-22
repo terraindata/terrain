@@ -69,6 +69,8 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
+import { stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
+import { isInput } from '../../../../blocks/types/Input';
 
 const NUM_BARS = 1000;
 
@@ -325,7 +327,7 @@ class TransformCard extends TerrainComponent<Props>
       totalDoc = hits.total;
     }
     let theHist;
-    if (totalDoc > 0 && elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+    if (elasticHistogram.transformCard.buckets.length >= NUM_BARS)
     {
       theHist = elasticHistogram.transformCard.buckets;
     } else
@@ -338,7 +340,7 @@ class TransformCard extends TerrainComponent<Props>
       bars.push({
         id: '' + j,
         count: theHist[j].doc_count,
-        percentage: theHist[j].doc_count / totalDoc,
+        percentage: totalDoc ? (theHist[j].doc_count / totalDoc) : '',
         range: {
           min: theHist[j].key,
           max: theHist[j + 1].key,
@@ -393,12 +395,7 @@ class TransformCard extends TerrainComponent<Props>
   private computeScoreElasticBars(maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
     const query = overrideQuery || this.props.builder.query;
-    const tqlString = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {
-        replaceInputs: true,
-      },
-    );
+    const tqlString = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
     const tql = JSON.parse(tqlString);
     tql['size'] = 0;
     tql['sort'] = {};
@@ -505,19 +502,19 @@ class TransformCard extends TerrainComponent<Props>
             },
           },
         };
-        Ajax.query(
-          JSON.stringify(domainQuery),
-          db,
-          (resp) =>
-          {
-            this.handleElasticDomainAggregationResponse(resp);
-          },
-          (err) =>
-          {
-            this.handleElasticAggregationError(err);
-          },
-        );
       }
+      Ajax.query(
+        JSON.stringify(domainQuery),
+        db,
+        (resp) =>
+        {
+          this.handleElasticDomainAggregationResponse(resp);
+        },
+        (err) =>
+        {
+          this.handleElasticAggregationError(err);
+        },
+      );
     }
     else
     {
@@ -555,20 +552,20 @@ class TransformCard extends TerrainComponent<Props>
           },
           size: 0,
         };
-        this.setState(
-          Ajax.query(
-            JSON.stringify(aggQuery),
-            db,
-            (resp) =>
-            {
-              this.handleElasticAggregationResponse(resp);
-            },
-            (err) =>
-            {
-              this.handleElasticAggregationError(err);
-            }),
-        );
       }
+      this.setState(
+        Ajax.query(
+          JSON.stringify(aggQuery),
+          db,
+          (resp) =>
+          {
+            this.handleElasticAggregationResponse(resp);
+          },
+          (err) =>
+          {
+            this.handleElasticAggregationError(err);
+          }),
+      );
     }
   }
 
