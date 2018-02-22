@@ -123,7 +123,6 @@ export class ResultsManager extends TerrainComponent<Props>
   public componentWillMount()
   {
     Util.addBeforeLeaveHandler(this.killQueries);
-    this.queryResults(this.props.query, this.props.db);
   }
 
   public componentWillUnmount()
