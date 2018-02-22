@@ -42,52 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.QueryResponse
 
-// tslint:disable:no-console
-import * as _ from 'lodash';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+import AQueryResponse from './AQueryResponse';
+import QueryRequest from './QueryRequest';
+import QueryResult from './QueryResult';
 
-import ElasticQueryResult from '../../../shared/database/elastic/ElasticQueryResponse';
-import QueryRequest from '../../../shared/database/types/QueryRequest';
-import QueryResponse from '../../../shared/database/types/QueryResponse';
-import QueryResult from '../../../shared/database/types/QueryResult';
-import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
-
-export default class MidwayQueryResponse extends QueryResponse
+export default class QueryResponse extends AQueryResponse
 {
-  public static fromJSON(json: string)
-  {
-    const responseObject = JSON.parse(json);
-    return new MidwayQueryResponse(responseObject.result, responseObject.errors, responseObject.request);
-  }
+  public result: QueryResult;
 
-  public static fromParsedJsonObject(obj: any)
+  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request?: QueryRequest)
   {
-    return new MidwayQueryResponse(obj.result, obj.errors, obj.request);
-  }
+    super(errors, request);
 
-  public static formatElasticResult(result: QueryResult): any
-  {
-    return result;
-  }
-
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)
-  {
-    super(result, errors, request);
-  }
-
-  public getResultsData(): any
-  {
-    let result;
-    switch (this.request.databasetype)
-    {
-      case 'elastic':
-        result = MidwayQueryResponse.formatElasticResult(this.result);
-        break;
-      default:
-        result = [];
-        console.log('Unknown request type when extracting results from midway query response ' + this.request.type);
-    }
-    return result;
+    this.result = result;
   }
 }
