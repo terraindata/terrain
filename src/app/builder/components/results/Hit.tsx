@@ -285,7 +285,8 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
-    const thumbnail = resultsConfig && resultsConfig.thumbnail !== null ?
+    console.log(resultsConfig.thumbnail);
+    const thumbnail = resultsConfig && resultsConfig.thumbnail ?
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
@@ -345,38 +346,40 @@ class HitComponent extends TerrainComponent<Props> {
             backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
-          {thumbnail !== null ?
-            [
-              <div 
-                className={classNames({
-                  'result-thumbnail-wrapper': true,
-                  'results-are-small': hitSize === 'small',
-                })}
-                style={{
-                  backgroundImage: `url(${thumbnail})`,
-                  width: thumbnailWidth,
-                  minWidth: thumbnailWidth,
-                }}
-                key={1}
-              >
-              </div>
-            ,
-            this.state.hovered &&
-              <Draggable
-                axis='x'
-                bounds='parent'
-                position={{
-                  x: thumbnailWidth - 15,
-                  y: 0,
-                }}
-                onDrag={this.handleThumbnailResize}
-                key={2}
-              >
-                <div
-                  className='result-thumbnail-resizer'
-                />
-              </Draggable>
-          ] : null}
+          {
+            thumbnail &&
+              [
+                <div 
+                  className={classNames({
+                    'result-thumbnail-wrapper': true,
+                    'results-are-small': hitSize === 'small',
+                  })}
+                  style={{
+                    backgroundImage: `url(${thumbnail})`,
+                    width: thumbnailWidth,
+                    minWidth: thumbnailWidth,
+                  }}
+                  key={1}
+                >
+                </div>
+              ,
+              this.state.hovered &&
+                <Draggable
+                  axis='x'
+                  bounds='parent'
+                  position={{
+                    x: thumbnailWidth - 15,
+                    y: 0,
+                  }}
+                  onDrag={this.handleThumbnailResize}
+                  key={2}
+                >
+                  <div
+                    className='result-thumbnail-resizer'
+                  />
+                </Draggable>
+            ]
+          }
           <div 
             className={classNames({
               'result-details-wrapper': true,
