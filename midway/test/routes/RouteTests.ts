@@ -819,9 +819,7 @@ describe('Query route tests', () =>
                 "query" : {
                   "bool" : {
                     "filter": [
-                      { "term": {"movieid" : @movie.movieid} }
-                    ],
-                    "must" : [
+                      { "term": {"movieid" : @movie.movieid} },
                       { "match": {"_index" : "movies"} },
                       { "match": {"_type" : "data"} }
                     ]
@@ -895,7 +893,7 @@ describe('Query route tests', () =>
                 "_source": ["movieid", "overview"],
                 "query" : {
                   "bool" : {
-                    "must" : [
+                    "filter" : [
                       { "match": {"_index" : "movies"} },
                       { "match": {"_type" : "data"} }
                     ]
@@ -918,8 +916,11 @@ describe('Query route tests', () =>
         const respData = JSON.parse(response.text);
         expect(respData['errors'].length).toEqual(0);
         expect(respData['result'].hits.hits.length).toEqual(5);
-        expect(respData['result'].hits.hits[0]._id === respData['result'].hits.hits[0].selfMergeJoin[0]._id);
-        expect(respData['result'].hits.hits[0]._source.movieid === respData['result'].hits.hits[0].selfMergeJoin[0]._source.movieid);
+        for (let i = 0; i < respData['result'].hits.hits.length; ++i)
+        {
+          expect(respData['result'].hits.hits[i]._id === respData['result'].hits.hits[i].selfMergeJoin._id);
+          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin._source.movieid);
+        }
       })
       .catch((error) =>
       {

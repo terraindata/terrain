@@ -66,7 +66,7 @@ export async function handleMergeJoin(client: ElasticClient, request: QueryReque
   parser: ESParser, query: object): Promise<QueryResponse | Readable>
 {
   const childQuery = query['mergeJoin'];
-  query['mergeJoin'] = undefined;
+  delete query['mergeJoin'];
 
   if (childQuery['joinKey'] === undefined)
   {
@@ -88,7 +88,7 @@ export async function handleMergeJoin(client: ElasticClient, request: QueryReque
     throw new Error('Sort clause(s) not allowed in a mergeJoin query');
   }
 
-  parentQuery['sort'] = JSON.stringify({ [joinKey]: 'asc' });
+  parentQuery.sort = { [joinKey]: 'asc' } as any;
   const handleSubQueries = async (error, response) =>
   {
     try
@@ -130,10 +130,12 @@ async function handleMergeJoinSubQuery(client: ElasticClient, query: object, sub
 {
   return new Promise<QueryResponse>((resolve, reject) =>
   {
+    query[subQuery]['sort'] = { [joinKey]: 'asc' };
+    const q = {
+      body: query[subQuery]
+    } as Elastic.SearchParams;
     client.search(
-      {
-        body: query[subQuery],
-      } as Elastic.SearchParams,
+      q,
       async (error: Error | null, response: any) =>
       {
         if (error !== null && error !== undefined)
@@ -147,11 +149,15 @@ async function handleMergeJoinSubQuery(client: ElasticClient, query: object, sub
         }
 
         const hits = parentResults.hits.hits;
-        for (let i = 0; i < hits.length; i++)
+        for (let i = 0, j = 0; i < hits.length && j < response.hits.hits.length; j++)
         {
           if (response.hits !== undefined)
           {
-            hits[i][subQuery] = response.hits.hits[i];
+            if (hits[i]._source[joinKey] === response.hits.hits[j]._source[joinKey])
+            {
+              hits[i][subQuery] = response.hits.hits[j];
+              i++;
+            }
           }
         }
         resolve();
