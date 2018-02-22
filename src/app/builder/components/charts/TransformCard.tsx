@@ -139,9 +139,9 @@ class TransformCard extends TerrainComponent<Props>
   {
     if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
       nextProps.builder.query.inputs !== this.props.builder.query.inputs)
-      && !this.props.data.closed)
+      && !this.props.data.closed && nextProps.data.input === '_score')
     {
-      this.computeBars(this.props.data.input, this.state.maxDomain, true, nextProps.builder.query);
+      this.computeBars(nextProps.data.input, this.state.maxDomain, true, nextProps.builder.query);
     }
 
     // nextProps.data.domain is list<string>

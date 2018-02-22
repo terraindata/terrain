@@ -50,19 +50,15 @@ import * as KoaRouter from 'koa-router';
 import Credentials from '../credentials/Credentials';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
-import Users from '../users/Users';
 import * as Util from '../Util';
 import Scheduler from './Scheduler';
 import SchedulerConfig from './SchedulerConfig';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
-const users = new Users();
 
 export const credentials: Credentials = new Credentials();
 export const scheduler: Scheduler = new Scheduler();
-
-const allowedTypes: string[] = ['http', 'sftp', 'local'];
 
 // Get connections from credentials table, requires type=<one of allowedTypes>
 Router.get('/connections', passport.authenticate('access-token-local'), async (ctx, next) =>
