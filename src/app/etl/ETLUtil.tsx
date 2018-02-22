@@ -58,6 +58,55 @@ import { Ajax } from 'util/Ajax';
 
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
+export class UpdateChecker
+{
+  private checkFns: {
+    [k: string]: (props, nextProps, state?, nextState?) => boolean
+  }
+  private isRunning: boolean = false;
+
+  constructor()
+  {
+    this.checkFns = {};
+  }
+
+  // checker function takes in props and states and returns false if the given props and state indicate a changed value
+  public addChecker(fn: (props, nextProps, state?, nextState?) => boolean, key: string)
+  {
+    if (!this.isRunning)
+    {
+      this.checkFns[key] = fn;
+    }
+  }
+
+  public reset()
+  {
+    this.checkFns = {};
+  }
+
+  // returns true if any checks return true
+  public runChecks(props, nextProps, state?, nextState?): boolean
+  {
+    this.isRunning = true;
+    const result = this.executeAll(props, nextProps, state, nextState);
+    this.isRunning = false;
+    return result;
+  }
+
+  private executeAll(props, nextProps, state, nextState): boolean
+  {
+    for (const k of Object.keys(this.checkFns))
+    {
+      const fn = this.checkFns[k];
+      if (!fn(props, nextProps, state, nextState))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
 // like elements of field tree proxy, you shouldn't hold references to PropertyTracker
 /*
  *  PropertyTracker is an object that wraps around an object and remembers which properties you've "seen".
@@ -77,9 +126,16 @@ export class PropertyTracker<T>
     this.seen = { };
   }
 
+  // get the value at key - this tells the property tracker that the value has been seen
   public get<K extends keyof T>(key: K): T[K]
   {
     this.seen[key] = true;
+    return this.getItem()[key];
+  }
+
+  // get the value at key without telling the property tracker that the value has been seen
+  public getUntracked<K extends keyof T>(key: K): T[K]
+  {
     return this.getItem()[key];
   }
 
@@ -106,7 +162,7 @@ export function isVisiblyEqual<T>(a: T, b: T, seen: Array<string | number>)
   return true;
 }
 
-export function compareObjects(a: object, b: object, custom: {[k: string]: (x, y) => boolean} = {})
+export function compareObjects(a: object, b: object, custom: {[k: string]: (aValue, bValue) => boolean} = {})
 {
   const aKeys = Object.keys(a);
   const bKeys = Object.keys(b);
