@@ -146,6 +146,11 @@ async function handleMergeJoinSubQuery(client: ElasticClient, query: object, sub
       ];
     }
 
+    if (query[subQuery].query.size !== undefined)
+    {
+      delete query[subQuery].query.size;
+    }
+
     client.search(
       {
         body: query[subQuery],
