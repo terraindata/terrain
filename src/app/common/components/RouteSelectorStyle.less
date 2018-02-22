@@ -275,7 +275,7 @@
 }
 
 .routeselector-veil, .routeselector-veil-open {
-	.transition;
+	.transition(~"all 0.25s");
 	position: absolute;
 	left: 0px;
 	top: 0px;
@@ -290,7 +290,8 @@
 }
 
 .routeselector-veil-open {
-	background: rgba(0,0,0,0.25);
+	background: rgba(255,255,255,0.65);
+	.transition(~"all 1s");
 }
 
 .routeselector.routeselector-picked .routeselector-veil,
