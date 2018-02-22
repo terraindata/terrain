@@ -94,18 +94,11 @@ function collect(connect, monitor)
 
 class DropZoneComponent extends TerrainComponent<DropProps>
 {
-  public state: {
-    height: number,
-  } = {
-      height: 15,
-    };
-
   public render()
   {
     const style = _.extend({},
       {
-        height: this.props.isOver ? 60 : 20,
-        marginBottom: this.props.isOver ? 0 : 10,
+        height: this.props.isOver ? 52 : 35,
       },
       backgroundColor(this.props.isOver ? Colors().blockOutline : ''),
     );
@@ -113,9 +106,12 @@ class DropZoneComponent extends TerrainComponent<DropProps>
       this.props.connectDropTarget(
         <div
           className='drop'
-          style={backgroundColor(this.props.isOver ? Colors().blockOutline : '')}
+          style={{
+            height: this.props.isOver ? 60 : 35,
+          }}
         >
           <div
+            style={style}
             className='drop-area'
           >
           </div>

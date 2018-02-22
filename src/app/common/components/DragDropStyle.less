@@ -6,10 +6,14 @@
 	border: 1px solid transparent;
 	padding: 1px;
 	cursor: pointer;
-	transition: all .3s linear .5s;
-	margin-top: -19px;
-	margin-bottom: -19px;
-	z-index: 1;
+	transition: height .3s linear .5s;
+	z-index: 9;
+	.drag-drop-item-drop-zone {
+		position: absolute;
+		height: 40px;
+		width: 100%;
+		top: 21px;
+	}
 	.drag-drop-item-header {
 		overflow: hidden;
 		transition: height .3s linear .5s;
@@ -23,9 +27,10 @@
 .drop {
 	width: 100%;
     position: relative;
-    height: 30px;
-    background: lightblue;
 	transition: all 0.2s ease-in-out;
+	margin-top: -19px;
+	margin-bottom: -19px;
+	z-index: 10;
 	.drop-area {
     	// border: 1px solid transparent;
 		position: relative;
@@ -63,6 +68,8 @@
 	height: 61px;
 	display: inline-flex;
 	font-size: 16px;
+	z-index: 999999999 !important;
+	position: relative;
 	.drag-drop-item-field {
 		padding-left: 24px
 	}

@@ -117,20 +117,20 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
           </div>
         );
       case 'ITEM':
-        const itemStyle = _.extend({},
-          backgroundColor(Colors().sidebarBg),
-          { width: item.width },
-        );
-        return (
-          <div
-            className='drag-drop-item-preview'
-            style={itemStyle}
-          >
-           {this.renderItemBlock('field', 'data field', data)}
-           {this.renderItemBlock('comparison', 'condition', data)}
-           {this.renderItemBlock('value', 'value', data)}
-          </div>
-        );
+        // const itemStyle = _.extend({},
+        //   backgroundColor(Colors().sidebarBg),
+        //   { width: item.width },
+        // );
+        // return (
+        //   <div
+        //     className='drag-drop-item-preview'
+        //     style={itemStyle}
+        //   >
+        //    {this.renderItemBlock('field', 'data field', data)}
+        //    {this.renderItemBlock('comparison', 'condition', data)}
+        //    {this.renderItemBlock('value', 'value', data)}
+        //   </div>
+        // );
       default:
         return null;
     }

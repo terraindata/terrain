@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import { borderColor, Colors } from 'app/colors/Colors';
+import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -130,9 +130,18 @@ class ItemComponent extends TerrainComponent<ItemProps>
   {
     // Use empty image as a drag preview so browsers don't draw it
     // and we can draw whatever we want on the custom drag layer instead.
-    this.props.connectDragPreview(getEmptyImage(), {
-      captureDraggingState: true,
-    });
+    // this.props.connectDragPreview(getEmptyImage(), {
+    //   captureDraggingState: true,
+    // });
+  }
+
+  public renderItemDropZone()
+  {
+    return this.props.connectDropTarget(
+      <div
+        className='drag-drop-item-drop-zone'
+      />
+    );
   }
 
   public render()
@@ -163,13 +172,10 @@ class ItemComponent extends TerrainComponent<ItemProps>
             </div>
           }
           {children}
+          {this.props.canDrop && this.renderItemDropZone()}
         </div>
       </div>,
     );
-    if (this.props.canDrop)
-    {
-      return this.props.connectDropTarget(draggable);
-    }
     return draggable;
   }
 }

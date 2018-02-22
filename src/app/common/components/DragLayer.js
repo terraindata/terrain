@@ -55,7 +55,7 @@ function layerStyles(isDragging) {
   return {
     position: 'fixed',
     pointerEvents: 'none',
-    zIndex: 1,
+    zIndex: 1000,
     left: 0,
     top: 0,
     width: isDragging ? '100%' : 0,
