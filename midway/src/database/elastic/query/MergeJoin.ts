@@ -82,11 +82,9 @@ export async function handleMergeJoin(client: ElasticClient, request: QueryReque
     throw new Error('Expecting body parameter in the mergeJoin query');
   }
 
-  const doChildQueriesLackSort: boolean = Object.keys(childQuery).reduce(
-    (prev, curr) => prev && (childQuery[curr]['sort'] !== undefined), true);
-  if (parentQuery['sort'] !== undefined && !doChildQueriesLackSort)
+  if (parentQuery['sort'] !== undefined)
   {
-    throw new Error('Sort clause(s) not allowed in a mergeJoin query');
+    throw new Error('Sort clause(s) not allowed in a mergeJoin paernt query');
   }
 
   parentQuery.sort = { [joinKey]: 'asc' } as any;
@@ -131,12 +129,27 @@ async function handleMergeJoinSubQuery(client: ElasticClient, query: object, sub
 {
   return new Promise<QueryResponse>((resolve, reject) =>
   {
-    query[subQuery]['sort'] = { [joinKey]: 'asc' };
-    const q = {
-      body: query[subQuery],
-    } as Elastic.SearchParams;
+    const joinClause = { [joinKey]: 'asc' };
+    if (query[subQuery]['sort'] === undefined)
+    {
+      query[subQuery]['sort'] = joinClause;
+    }
+    else if (Array.isArray(query[subQuery]['sort'] === 'array'))
+    {
+      query[subQuery]['sort'].unshift(joinClause);
+    }
+    else
+    {
+      query[subQuery]['sort'] = [
+        joinClause,
+        query[subQuery]['sort'],
+      ];
+    }
+
     client.search(
-      q,
+      {
+        body: query[subQuery],
+      } as Elastic.SearchParams,
       async (error: Error | null, response: any) =>
       {
         if (error !== null && error !== undefined)
