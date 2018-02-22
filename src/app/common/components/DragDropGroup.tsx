@@ -75,6 +75,8 @@ interface GroupProps
   onDragStart?: () => void;
   onDragStop?: () => void;
   style?: any;
+  itemStyle?: any;
+  dropZoneStyle?: any;
   // Injected drag drop props
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onReorder: (itemKeyPath: List<number>, dropKeyPath: List<number>) => void;
@@ -150,12 +152,13 @@ class GroupComponent extends TerrainComponent<GroupProps>
 
   public renderGroupChildren(items, newKeyPath)
   {
-    const { keyPathStarter, onReorder, onDrop, isGroup, renderChildren, depth } = this.props;
+    const { keyPathStarter, onReorder, onDrop, isGroup, renderChildren, depth, dropZoneStyle } = this.props;
     return (
       <div>
         <DropZone
           keyPath={newKeyPath.push(0)}
           onDrop={onReorder}
+          style={dropZoneStyle}
         />
         {
           items.map((item, i: number) =>
@@ -164,6 +167,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
                 !(isGroup(item)) ?
                   <DragDropItem
                     {...this.props}
+                    style={this.props.itemStyle}
                     children={renderChildren(item, newKeyPath.push(i))}
                     keyPath={newKeyPath.push(i)}
                     onDrop={onDrop}
@@ -182,6 +186,7 @@ class GroupComponent extends TerrainComponent<GroupProps>
               <DropZone
                 keyPath={newKeyPath.push(i + 1)}
                 onDrop={onReorder}
+                style={dropZoneStyle}
               />
             </div>,
           )

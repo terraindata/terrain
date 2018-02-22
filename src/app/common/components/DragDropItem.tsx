@@ -69,6 +69,8 @@ interface ItemProps
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onDragStart?: () => void;
   onDragStop?: () => void;
+  style?: any;
+  dropZoneStyle?: any;
   // injected props
   connectDragSource: (El) => El;
   isDragging: boolean;
@@ -130,9 +132,9 @@ class ItemComponent extends TerrainComponent<ItemProps>
   {
     // Use empty image as a drag preview so browsers don't draw it
     // and we can draw whatever we want on the custom drag layer instead.
-    // this.props.connectDragPreview(getEmptyImage(), {
-    //   captureDraggingState: true,
-    // });
+    this.props.connectDragPreview(getEmptyImage(), {
+      captureDraggingState: true,
+    });
   }
 
   public renderItemDropZone()
@@ -140,6 +142,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
     return this.props.connectDropTarget(
       <div
         className='drag-drop-item-drop-zone'
+        style={this.props.dropZoneStyle}
       />
     );
   }
@@ -152,6 +155,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
         style={_.extend({},
           { opacity: isDragging ? 0.3 : 1 },
           isOver ? { borderColor: Colors().active } : {},
+          this.props.style,
         )}
         className={classNames({
           'drag-drop-item': true,

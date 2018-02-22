@@ -107,7 +107,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
     return (
       <div
-        className='pf-filter-line flex-container'
+        className='pf-filter-line'
         style={{
           alignItems: 'flex-start',
         }}

@@ -61,6 +61,7 @@ interface DropProps
 {
   keyPath: KeyPath;
   onDrop: (keyPath: List<number>, dropKeyPath: List<number>) => void;
+  style?: any;
   // injected props
   isOver: boolean;
   connectDropTarget: (El) => El;
@@ -98,17 +99,21 @@ class DropZoneComponent extends TerrainComponent<DropProps>
   {
     const style = _.extend({},
       {
-        height: this.props.isOver ? 52 : 35,
+        height: this.props.isOver ? 52 : 0,
       },
       backgroundColor(this.props.isOver ? Colors().blockOutline : ''),
+    );
+    const wrapperStyle = _.extend({},
+    {
+      height: this.props.isOver ? 87 : 35,
+    },
+      this.props.style
     );
     return (
       this.props.connectDropTarget(
         <div
-          className='drop'
-          style={{
-            height: this.props.isOver ? 60 : 35,
-          }}
+        className='drop'
+          style={wrapperStyle}
         >
           <div
             style={style}

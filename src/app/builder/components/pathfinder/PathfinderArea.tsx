@@ -60,7 +60,7 @@ import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
-import withScrolling, { createHorizontalStrength } from 'react-dnd-scrollzone';
+import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection2';
@@ -85,7 +85,7 @@ export interface Props
   builderActions?: typeof BuilderActions;
 }
 const linearHorizontalStrength = createHorizontalStrength(0);
-
+const linearVerticalStrength = createVerticalStrength(75);
 @Radium
 class PathfinderArea extends TerrainComponent<Props>
 {
@@ -136,6 +136,11 @@ class PathfinderArea extends TerrainComponent<Props>
     return linearHorizontalStrength(box, point);
   }
 
+  public vStrength(box, point)
+  {
+    return linearVerticalStrength(box, point);
+  }
+
   public render()
   {
     const { path } = this.props;
@@ -145,6 +150,7 @@ class PathfinderArea extends TerrainComponent<Props>
       <ScrollingComponent
         className='pf-area'
         horizontalStrength={this.hStrength}
+        verticalStrength={this.vStrength}
       >
         <FadeInOut
           open={path.name !== undefined}

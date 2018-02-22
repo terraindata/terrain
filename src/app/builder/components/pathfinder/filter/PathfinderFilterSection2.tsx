@@ -79,9 +79,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 {
   public state:
     {
-      opacity: boolean,
+      dragging: boolean,
     } = {
-      opacity: true,
+      dragging: false,
     };
 
   public componentWillMount()
@@ -342,6 +342,10 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public render()
   {
     const { filterGroup, pathfinderContext } = this.props;
+    const { dragging } = this.state;
+    const dropZoneStyle = { zIndex: dragging ? 20 : -1 };
+    const itemStyle = { opacity: dragging ? 0.7 : 1};
+    const groupStyle = { opacity: dragging ? 0.7 : 1, zIndex: dragging ? 99 : 5};
     return (
       <div
         className='pf-section pf-filter-section'
@@ -350,6 +354,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         <DropZone
           keyPath={List([0])}
           onDrop={this.handleDrop}
+          style={dropZoneStyle}
         />
         {
           filterGroup.lines.map((line, i) =>
@@ -363,9 +368,10 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                     canDrop={true}
                     data={line}
                     hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
-                    style={{ opacity: this.state.opacity ? 1 : 0.5 }}
-                    onDragStart={this._toggle('opacity')}
-                    onDragStop={this._toggle('opacity')}
+                    style={itemStyle}
+                    onDragStart={this._toggle('dragging')}
+                    onDragStop={this._toggle('dragging')}
+                    dropZoneStyle={dropZoneStyle}
                   />
                   :
                   <DragDropGroup
@@ -380,15 +386,17 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                     renderHeader={this.renderGroupHeader}
                     setCollapsed={this.changeCollapsed}
                     hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
-                    onDragStart={this._toggle('opacity')}
-                    onDragStop={this._toggle('opacity')}
-                    style={{ opacity: this.state.opacity ? 1 : 0.5 }}
-
+                    onDragStart={this._toggle('dragging')}
+                    onDragStop={this._toggle('dragging')}
+                    style={groupStyle}
+                    dropZoneStyle={dropZoneStyle}
+                    itemStyle={itemStyle}
                   />
               }
               <DropZone
                 keyPath={List([i + 1])}
                 onDrop={this.handleDrop}
+                style={dropZoneStyle}
               />
             </div>,
           )
