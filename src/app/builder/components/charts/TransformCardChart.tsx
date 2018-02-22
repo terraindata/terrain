@@ -195,11 +195,6 @@ export class TransformCardChart extends TerrainComponent<Props>
       pointsCache: points,
       pointsBuffer: null,
     });
-    this.debouncedUpdatePoints(points, isConcrete);
-    if (isConcrete)
-    {
-      this.debouncedUpdatePoints.flush();
-    }
   }
 
   public onPointMoveStart(initialScore, initialValue)
@@ -315,15 +310,15 @@ export class TransformCardChart extends TerrainComponent<Props>
     // However, we are not sure why that was necessary.
     // It's now disabled, so that actions are only dispatched when the point is released,
     //  to help with performance concerns.
-    const isConcrete = false; // this.state.moveSeed !== this.state.movedSeed;
     this.setState({
       movedSeed: this.state.moveSeed,
     });
-    this.updatePoints(points.toList(), isConcrete);
+    this.updatePoints(points.toList(), false);
   }
 
   public onPointRelease()
   {
+    this.debouncedUpdatePoints(this.state.pointsCache, true);
     this.debouncedUpdatePoints.flush();
     this.setState({
       dragging: false,
