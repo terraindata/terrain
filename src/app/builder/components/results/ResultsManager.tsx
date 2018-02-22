@@ -439,7 +439,10 @@ export class ResultsManager extends TerrainComponent<Props>
       {
         eql = this.postprocessEQL(eql);
       }
-
+      if (this.state.query && this.state.query.xhr)
+      {
+        this.state.query.xhr.abort();
+      }
       this.setState({
         lastQuery: query,
         queriedTql: eql,
