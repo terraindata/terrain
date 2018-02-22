@@ -193,7 +193,6 @@ class TemplateEditor extends TerrainComponent<Props>
       </div>
     );
   }
-
 }
 
 const emptyList = List([]);

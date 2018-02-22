@@ -694,10 +694,7 @@ class HitsArea extends TerrainComponent<Props>
 
   public showExport()
   {
-    browserHistory.push(`/etl/export/${this.props.algorithmId}`);
-    // this.setState({
-    //   showingExport: true,
-    // });
+    browserHistory.push(`/etl/export/edit/algId=${this.props.algorithmId}`);
   }
 
   public hideExport()

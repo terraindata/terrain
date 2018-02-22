@@ -97,52 +97,29 @@ export enum FILE_TYPES
   CSV = 'csv',
 }
 
-interface TemplateBase
+export interface Template
 {
   id: ID;
   templateName: string;
-  type: TEMPLATE_TYPES;
-  configuration: ImportConfiguration | ExportConfiguration;
+  type: TEMPLATE_TYPES; // technically this actually just helps the editing process.
+  configuration: ETLConfiguration;
   transformationEngine: TransformationEngine;
 }
 
-export interface ExportTemplate extends TemplateBase
-{
-  configuration: ExportConfiguration;
-  type: TEMPLATE_TYPES.EXPORT;
-}
-
-export interface ImportTemplate extends TemplateBase
-{
-  configuration: ImportConfiguration;
-  type: TEMPLATE_TYPES.IMPORT;
-}
-
 type SourceConfig = object; // this type definition should be somewhere else
-
 type DestinationConfig = object; // these are placeholders
 
-// default configuration options for imports and exports
-export interface ImportConfiguration
+export interface ETLConfiguration
 {
   requireAllFields: boolean;
-  fileType: FILE_TYPES;
-  csvHeader: boolean;
-  jsonNewlines: boolean;
-  upsert: boolean;
-
   sources: {
     [k: string]: SourceConfig;
   };
   destination: DestinationConfig;
-}
-export interface ExportConfiguration
-{
-  fileType: FILE_TYPES; // what format the output file is
-  csvHeader: boolean;
-  jsonNewlines: boolean;
-  includeRank: boolean;
 
-  source: SourceConfig;
-  destination: DestinationConfig;
+  // TODOS
+  // fileType: FILE_TYPES; this belongs in the source & destination config
+  // csvHeader: boolean; this belongs in the source & destination config
+  // jsonNewlines: boolean; this belongs in the source & destination config
+  // upsert: boolean; this belongs in the destination config
 }

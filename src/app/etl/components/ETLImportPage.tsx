@@ -43,83 +43,53 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires strict-boolean-expressions
+// tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
+
+import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import ETLExportDisplay from 'etl/components/ETLExportDisplay';
-import './ETLPage.less';
+import TemplateEditor from 'etl/templates/components/TemplateEditor';
+import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { _Template, Template, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { NoArrayDocuments, testSerialization } from 'etl/templates/TemplateUtil';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
+import { createTreeFromEngine } from 'etl/templates/SyncUtil';
+
+const { List } = Immutable;
+import './ETLExportDisplay.less';
 
 export interface Props
 {
-  children?: any;
-  placeholder?: any;
+  act?: typeof TemplateEditorActions;
 }
 
 @Radium
-export default class ETLPage extends TerrainComponent<Props>
+class ETLImportPage extends TerrainComponent<Props>
 {
-
-  public renderButtons()
-  {
-    return (
-      <div className='button-holder' style={backgroundColor(Colors().bg3)}>
-        <div
-          key='import'
-          className='test-button'
-          style={[backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)]}
-          onClick={this.handleImportClicked}
-        >
-          Test Import Button
-        </div>
-        <div
-          key='export'
-          className='test-button'
-          style={[backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)]}
-          onClick={this.handleExportClicked}
-        >
-          Test Export Button
-        </div>
-      </div>
-    );
-  }
-
-  public renderImport()
-  {
-    return 'implement me please';
-  }
-
-  public renderExport()
-  {
-    return <ETLExportDisplay />;
-  }
 
   public render()
   {
     return (
-      <div className='etl-page-root'>
-        {
-          this.props.children == null ?
-            this.renderButtons() :
-            this.props.children
-        }
+      <div
+        className='etl-export-display-wrapper'
+        style={[fontColor(Colors().text1)]}
+      >
+
       </div>
     );
   }
-
-  public handleImportClicked()
-  {
-    browserHistory.push(`/etl/import`);
-  }
-
-  public handleExportClicked()
-  {
-    browserHistory.push(`/etl/export`);
-
-  }
 }
+
+export default Util.createContainer(
+  ETLImportPage,
+  [],
+  { act: TemplateEditorActions },
+);

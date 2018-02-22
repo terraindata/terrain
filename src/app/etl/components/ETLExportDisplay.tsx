@@ -57,7 +57,7 @@ import Util from 'util/Util';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _Template, Template, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { NoArrayDocuments, testSerialization } from 'etl/templates/TemplateUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
@@ -73,22 +73,21 @@ export interface Props
   };
   algorithms: IMMap<ID, Algorithm>;
 
-  placeholder?: any;
   act?: typeof TemplateEditorActions;
 }
 
-function getAlgorithmId(params)
+function getAlgorithmId(params): number
 {
   const asNumber = (params != null && params.algorithmId != null) ? Number(params.algorithmId) : NaN;
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-function initialTemplateFromDocs(documents: List<object>): { template: ETLTemplate, rootField: TemplateField }
+function initialTemplateFromDocs(documents: List<object>): { template: Template, rootField: TemplateField }
 {
   if (documents.size === 0)
   {
     return {
-      template: _ExportTemplate(),
+      template: _Template(),
       rootField: _TemplateField(),
     };
   }
@@ -97,7 +96,7 @@ function initialTemplateFromDocs(documents: List<object>): { template: ETLTempla
   const engine = new TransformationEngine(firstDoc);
   const rootField = createTreeFromEngine(engine);
 
-  const template = _ExportTemplate({
+  const template = _Template({
     templateId: -1,
     templateName: name,
     transformationEngine: engine,
@@ -112,38 +111,6 @@ function initialTemplateFromDocs(documents: List<object>): { template: ETLTempla
 @Radium
 class ETLExportDisplay extends TerrainComponent<Props>
 {
-  // public initFromDocs(documents, name = 'No Title')
-  // {
-  //   if (!Array.isArray(documents) || documents.length === 0)
-  //   {
-  //     return;
-  //   }
-  //   const firstDoc = documents[0];
-  //   const engine = new TransformationEngine(firstDoc);
-  //   const rootField = createTreeFromEngine(engine);
-
-  //   const template = _ExportTemplate({
-  //     templateId: -1,
-  //     templateName: name,
-  //     transformationEngine: engine,
-  //   });
-
-  //   this.props.act({
-  //     actionType: 'setTemplate',
-  //     template,
-  //   });
-
-  //   this.props.act({
-  //     actionType: 'setRoot',
-  //     rootField,
-  //   });
-
-  //   this.props.act({
-  //     actionType: 'setDocuments',
-  //     documents: List(documents),
-  //   });
-  // }
-
   public initFromAlgorithm()
   {
     const { algorithms, params, act } = this.props;
@@ -172,9 +139,15 @@ class ETLExportDisplay extends TerrainComponent<Props>
     });
   }
 
-  public componentDidMount()
+  public componentWillMount()
   {
-    this.initFromAlgorithm();
+    this.props.act({
+      actionType: 'resetState'
+    });
+    if (this.props.params.algorithmId !== undefined)
+    {
+      this.initFromAlgorithm();
+    }
   }
 
   public render()

@@ -46,8 +46,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires import-spacing
 import
 {
-  _ExportTemplate, destringifySavedTemplate,
-  ETLTemplate, templateForSave,
+  _Template, destringifySavedTemplate,
+  Template, templateForSave,
 } from 'etl/templates/TemplateTypes';
 
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -56,9 +56,9 @@ import * as Immutable from 'immutable';
 import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
 const { List } = Immutable;
 
-export function testSerialization(template: ETLTemplate): ETLTemplate
+export function testSerialization(template: Template): Template
 {
-  return _ExportTemplate(destringifySavedTemplate(templateForSave(template)), true);
+  return _Template(destringifySavedTemplate(templateForSave(template)), true);
 }
 
 export const NoArrayDocuments = [

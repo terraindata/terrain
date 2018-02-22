@@ -61,7 +61,7 @@ import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from '
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { EditorDisplayState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { EditorDisplayState, Template, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 import { TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
 
@@ -95,7 +95,7 @@ export const mapStateKeys = [
 
 interface Injected
 {
-  template: ETLTemplate;
+  template: Template;
   uiState: EditorDisplayState;
   rootField: TemplateField;
 }
@@ -146,7 +146,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return !compareObjects(this.props, nextProps, customComparatorMap);
   }
 
-  get _template(): ETLTemplate
+  get _template(): Template
   {
     return (this.props as Props & Injected).template;
   }

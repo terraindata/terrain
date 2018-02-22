@@ -56,15 +56,14 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import
 {
   LANGUAGES, TEMPLATE_TYPES,
-  ExportTemplate as ExportTemplateI, ImportTemplate as ImportTemplateI,
-  ExportConfiguration as ExportConfigurationI,
-  ImportConfiguration as ImportConfigurationI,
+  Template as TemplateI,
+  ETLConfiguration as ETLConfigurationI,
 } from 'shared/etl/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class TemplateEditorStateC
 {
-  public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
+  public template: Template = _Template();
   public rootField: TemplateField = _TemplateField();
   public isDirty: boolean = true;
   public uiState: EditorDisplayState = _EditorDisplayState();
@@ -85,55 +84,27 @@ class EditorDisplayStateC
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
-class ExportConfigurationC implements ExportConfigurationI
-{
-  public fileType: FILE_TYPES = FILE_TYPES.JSON;
-  public csvHeader: boolean = true;
-  public jsonNewlines: boolean = false;
-  public includeRank: boolean = true;
-  public source: any = null;
-  public destination: any = null;
-}
-export type ExportConfiguration = WithIRecord<ExportConfigurationC>;
-export const _ExportConfiguration = makeConstructor(ExportConfigurationC);
-
-class ImportConfigurationC implements ImportConfigurationI
+class ETLConfigurationC implements ETLConfigurationI
 {
   public requireAllFields = false;
-  public csvHeader = true;
-  public jsonNewlines = false;
-  public upsert = true;
-  public fileType = FILE_TYPES.JSON;
-  public sources: any = null;
-  public destination: any = null;
+  public sources = null;
+  public destination = null;
 }
-export type ImportConfiguration = WithIRecord<ImportConfigurationC>;
-export const _ImportConfiguration = makeConstructor(ImportConfigurationC);
+export type ETLConfiguration = WithIRecord<ETLConfigurationC>;
+export const _ETLConfiguration = makeConstructor(ETLConfigurationC);
 
-class ExportTemplateC implements ExportTemplateI
+class TemplateC implements TemplateI
 {
   public id = -1;
   public templateName = '';
-  public readonly type = TEMPLATE_TYPES.EXPORT;
-  public configuration = _ExportConfiguration();
+  public type = TEMPLATE_TYPES.IMPORT;
+  public configuration = _ETLConfiguration();
   public transformationEngine = new TransformationEngine();
 }
-export type ExportTemplate = WithIRecord<ExportTemplateC>;
-export const _ExportTemplate = makeExtendedConstructor(ExportTemplateC, false, {
-  transformationEngine: TransformationEngine.load,
-});
-
-class ImportTemplateC implements ImportTemplateI
-{
-  public id = -1;
-  public templateName = '';
-  public readonly type = TEMPLATE_TYPES.IMPORT;
-  public configuration = _ImportConfiguration();
-  public transformationEngine = new TransformationEngine();
-}
-export type ImportTemplate = WithIRecord<ImportTemplateC>;
-export const _ImportTemplate = makeExtendedConstructor(ImportTemplateC, false, {
-  transformationEngine: TransformationEngine.load,
+export type Template = WithIRecord<TemplateC>;
+export const _Template = makeExtendedConstructor(TemplateC, false, {
+  configuration: _ETLConfiguration,
+  transformationEngine: TransformationEngine.load
 });
 
 export function destringifySavedTemplate(obj: object): object
@@ -143,11 +114,9 @@ export function destringifySavedTemplate(obj: object): object
   return newObj;
 }
 
-export function templateForSave(template: ImportTemplate | ExportTemplate): object
+export function templateForSave(template: Template): object
 {
   const obj = (template as any).toObject();
   obj.transformationEngine = JSON.stringify(obj.transformationEngine.json());
   return obj;
 }
-
-export type ETLTemplate = ImportTemplate | ExportTemplate;

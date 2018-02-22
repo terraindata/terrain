@@ -55,7 +55,7 @@ import
 import
 {
   _TemplateEditorState,
-  ETLTemplate,
+  Template,
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
 import { Algorithm } from 'library/LibraryTypes';
@@ -77,7 +77,7 @@ export interface TemplateEditorActionTypes
 {
   setTemplate: {
     actionType: 'setTemplate';
-    template: ETLTemplate;
+    template: Template;
   };
   setRoot: { // this should be the only way to edit the template tree
     actionType: 'setRoot';
@@ -122,6 +122,9 @@ export interface TemplateEditorActionTypes
   updateEngineVersion: {
     actionType: 'updateEngineVersion';
   };
+  resetState: {
+    actionType: 'resetState';
+  }
 }
 
 const ROOT_PATH = List(['rootField']);
@@ -178,6 +181,10 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         const oldVersion = state.uiState.engineVersion;
         return state.setIn(['uiState', 'engineVersion'], oldVersion + 1);
       },
+      resetState: (state, action) =>
+      {
+        return _TemplateEditorState();
+      }
     };
 
   public overrideAct(action: Unroll<TemplateEditorActionTypes>)
