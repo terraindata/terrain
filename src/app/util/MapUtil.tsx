@@ -315,7 +315,7 @@ const MapUtil = {
   {
     if (geopoint === undefined)
     {
-      return;
+      return [0, 0];
     }
     let lat: number;
     let lon: number;
