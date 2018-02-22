@@ -145,7 +145,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
     const fieldValue = props.filterLine.field;
     const comparisonValue = props.filterLine.comparison;
-    const valueValue = props.filterLine.value;
+    const valueValue = this.shouldShowValue() ? props.filterLine.value : '';
     const values = List([
       fieldValue,
       comparisonValue,
@@ -161,6 +161,21 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         defaultOpen={fieldValue === null}
       />
     );
+  }
+
+  private shouldShowValue(): boolean
+  {
+    const { filterLine } = this.props;
+
+    if (!filterLine.field || !filterLine.comparison)
+    {
+      return false;
+    }
+    if (COMPARISONS_WITHOUT_VALUES.indexOf(filterLine.comparison) !== -1)
+    {
+      return false;
+    }
+    return true;
   }
 
   private getOptionSets(): List<RouteSelectorOptionSet>
@@ -191,15 +206,26 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     let comparisonHeader = 'Choose a data field first';
     if (filterLine.field)
     {
+      comparisonHeader = '';
+      
       comparisonOptions = source.dataSource.getChoiceOptions({
         type: 'comparison',
         field: filterLine.field,
         fieldType: filterLine.fieldType,
         source,
         schemaState: pathfinderContext.schemaState,
-        builderState: pathfinderContext.builderState
+        builderState: pathfinderContext.builderState,
       });
-      comparisonHeader = '';
+      comparisonOptions = comparisonOptions.map((option) =>
+      {
+        option = option['toJS'](); // TODO perhaps a better conversion between ChoiceOption and RouteOption
+        if (COMPARISONS_WITHOUT_VALUES.indexOf(option.value) !== -1)
+        {
+          // comparisons without values should close the picker when selected
+          option.closeOnPick = true;
+        }
+        return option;
+      }).toList();
     }
 
     const comparisonSet: RouteSelectorOptionSet = {
@@ -214,16 +240,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
     let valueOptions = List<RouteSelectorOption>();
     let valueHeader = '';
-    const shouldShowValue = filterLine.field && filterLine.comparison &&
-      COMPARISONS_WITHOUT_VALUES.indexOf(filterLine.comparison) === -1;
-
+    const shouldShowValue = this.shouldShowValue();
     if (shouldShowValue)
     {
       // TODO add more value options
       // TODO add value component selector for Other
       valueOptions = pathfinderContext.source.dataSource.getChoiceOptions({
         type: 'input',
-        builderState: pathfinderContext.builderState
+        builderState: pathfinderContext.builderState,
       });
     }
     else if (filterLine.field && !filterLine.comparison)
@@ -234,7 +258,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const valueSet: RouteSelectorOptionSet = {
       key: 'value',
       options: valueOptions,
-      shortNameText: 'Value',
+      shortNameText: shouldShowValue ? 'Value' : '',
       headerText: valueHeader,
       column: true,
       hideSampleData: true,
@@ -258,6 +282,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     switch (this.props.filterLine.fieldType)
     {
       case FieldType.Date:
+        if (!value)
+        {
+          return '';
+        }
+        
         return Util.formatDate(value, true);
       default:
         return undefined;
@@ -280,7 +309,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           builderState: props.pathfinderContext.builderState,
         });
         const fieldChoice = fieldOptions.find((option) => option.value === value);
-        console.log(fieldChoice);
         this.handleChange('field', value, fieldChoice.meta.fieldType, true);
         return;
 

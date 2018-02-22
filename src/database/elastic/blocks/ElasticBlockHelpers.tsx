@@ -83,6 +83,10 @@ const metaFields = ['_index', '_type', '_uid', '_id',
 export const ElasticBlockHelpers = {
   getColumnType(schemaState: SchemaState, builderState: BuilderState, column: string): string
   {
+    if (!schemaState || !builderState)
+    {
+      return undefined;
+    }
     const serverName = builderState.db.name;
     const index = getIndex('', builderState);
     const type = getType('', builderState);

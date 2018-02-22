@@ -85,7 +85,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
 import Util from 'app/util/Util';
-import { _Hit, Hit } from 'builder/components/results/ResultTypes';
+import { Hit } from 'builder/components/results/ResultTypes';
+// import TerrainTools from 'util/TerrainTools';
+>>>>>>> 1186-path-picker-2
 import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
@@ -478,8 +480,9 @@ class ElasticDataSourceC extends DataSource
 
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
-    const server = context.builderState.db.name;
     // TODO this function needs to be refactored
+    const server = context.builderState.db.name;
+    
     if (context.type === 'source')
     {
       // we need to make it clear what parts of Source are tracked

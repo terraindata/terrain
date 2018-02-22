@@ -113,6 +113,7 @@ interface State
   mouseStartY?: number;
   mapMaxHeight?: number;
   spotlightHits?: Immutable.Map<string, any>;
+
   indexName: string;
   resultsConfig?: any;
 }
@@ -139,9 +140,9 @@ class HitsArea extends TerrainComponent<Props>
     mouseStartY: 0,
     mapMaxHeight: undefined,
     spotlightHits: Immutable.Map<string, any>({}),
+    hitSize: 'large',
     indexName: '',
     resultsConfig: undefined,
-    hitSize: 'large',
   };
 
   public hitsFodderRange = _.range(0, 25);
