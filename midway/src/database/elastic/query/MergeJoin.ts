@@ -84,7 +84,7 @@ export async function handleMergeJoin(client: ElasticClient, request: QueryReque
 
   if (parentQuery['sort'] !== undefined)
   {
-    throw new Error('Sort clause(s) not allowed in a mergeJoin paernt query');
+    throw new Error('Sort clause(s) not allowed in a mergeJoin parent query');
   }
 
   parentQuery.sort = { [joinKey]: 'asc' } as any;
@@ -168,16 +168,32 @@ async function handleMergeJoinSubQuery(client: ElasticClient, query: object, sub
         }
 
         const hits = parentResults.hits.hits;
-        for (let i = 0, j = 0; i < hits.length && j < response.hits.hits.length; j++)
+        for (let i = 0, j = 0; i < hits.length; i++)
         {
-          if (response.hits !== undefined)
+          if (hits[i][subQuery] === undefined)
           {
-            if (hits[i]._source[joinKey] === response.hits.hits[j]._source[joinKey])
-            {
-              hits[i][subQuery] = response.hits.hits[j];
-              i++;
-            }
+            hits[i][subQuery] = [];
           }
+
+          while (j < response.hits.hits.length &&
+            (hits[i]._source[joinKey] !== response.hits.hits[j]._source[joinKey]))
+          {
+            j++;
+          }
+
+          if (j === response.hits.hits.length)
+          {
+            continue;
+          }
+
+          let k = j;
+          while (j < response.hits.hits.length &&
+            (hits[i]._source[joinKey] === response.hits.hits[j]._source[joinKey]))
+          {
+            hits[i][subQuery].push(response.hits.hits[j]);
+            j++;
+          }
+          j = k;
         }
         resolve();
       });

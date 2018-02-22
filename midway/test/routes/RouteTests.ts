@@ -892,13 +892,17 @@ describe('Query route tests', () =>
               "selfMergeJoin": {
                 "_source": ["movieid", "overview"],
                 "query" : {
-                  "bool" : {
-                    "filter" : [
+                  "bool": {
+                    "filter": [
                       { "match": {"_index" : "movies"} },
                       { "match": {"_type" : "data"} }
+                    ],
+                    "must_not": [
+                      { "term": { "budget": 0 } },
                     ]
                   }
-                }
+                },
+                "sort": "revenue",
               }
             }
           }`,
@@ -918,8 +922,8 @@ describe('Query route tests', () =>
         expect(respData['result'].hits.hits.length).toEqual(5);
         for (let i = 0; i < respData['result'].hits.hits.length; ++i)
         {
-          expect(respData['result'].hits.hits[i]._id === respData['result'].hits.hits[i].selfMergeJoin._id);
-          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin._source.movieid);
+          expect(respData['result'].hits.hits[i]._id === respData['result'].hits.hits[i].selfMergeJoin[0]._id);
+          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin[0]._source.movieid);
         }
       })
       .catch((error) =>
