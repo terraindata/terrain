@@ -285,7 +285,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
-    console.log(resultsConfig.thumbnail);
+
     const thumbnail = resultsConfig && resultsConfig.thumbnail ?
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;

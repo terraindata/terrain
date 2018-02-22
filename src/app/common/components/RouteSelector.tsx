@@ -73,6 +73,7 @@ export interface RouteSelectorOption
   sampleData: List<any>;
   extraContent?: string | El;
   icon?: any;
+  closeOnPick?: boolean; // close the picker when this option is picked
 }
 
 export interface RouteSelectorOptionSet
@@ -353,7 +354,6 @@ export class RouteSelector extends TerrainComponent<Props>
     }
     
     let valueComponentContent = null;
-    console.log(optionSet.valueComponent);
     if (optionSet.valueComponent)
     {
       let ValueComp = optionSet.valueComponent;
@@ -726,11 +726,12 @@ export class RouteSelector extends TerrainComponent<Props>
       // searches: state.searches.set(optionSetIndex, ''), // this would clear the search when an option is chosen
       focusedSetIndex: optionSetIndex + 1,
       focusedOptionIndex: 0,
-    })
+    });
     
-    if (optionSetIndex === props.optionSets.size - 1)
+    const option = props.optionSets.get(optionSetIndex).options.find((option) => option.value === value);
+    
+    if (optionSetIndex === props.optionSets.size - 1 || (option && option.closeOnPick))
     {
-      // TODO add more auto-close intelligence
       this.close();
     }
     
