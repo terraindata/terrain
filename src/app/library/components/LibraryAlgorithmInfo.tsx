@@ -81,12 +81,31 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     algorithmStatusErrorModalOpen: boolean,
     errorModalMessage: string,
     selectedAlgorithm: ID,
+    algorithmStatusAjax: any;
   } = {
       algorithmStatus: 'Loading...',
       algorithmStatusErrorModalOpen: false,
       errorModalMessage: '',
       selectedAlgorithm: -1,
+      algorithmStatusAjax: null,
     };
+
+  public killAlgorithmStatusAjax()
+  {
+    if (this.state.algorithmStatusAjax)
+    {
+      const xhr = this.state.algorithmStatusAjax.xhr;
+      if (xhr)
+      {
+        xhr.abort();
+      }
+    }
+  }
+
+  public componentWillUnmount()
+  {
+    this.killAlgorithmStatusAjax();
+  }
 
   public componentWillReceiveProps(nextProps)
   {
@@ -113,26 +132,44 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     });
   }
 
+  public componentDidMount()
+  {
+    if (this.props.algorithm !== undefined)
+    {
+      this.fetchStatus(this.props.algorithm);
+    }
+  }
+
   public fetchStatus(algorithm: Algorithm)
   {
     if (algorithm !== undefined)
     {
       this.setState({ algorithmStatus: 'Loading...' });
-      Ajax.getAlgorithmStatus(
+      this.killAlgorithmStatusAjax();
+      const algorithmStatusAjax = Ajax.getAlgorithmStatus(
         algorithm.id,
         algorithm.db.id as number,
         algorithm.deployedName,
         (response) =>
         {
-          this.setState({ algorithmStatus: response });
+          this.setState({
+            algorithmStatus: response,
+            algorithmStatusAjax: null,
+          });
         },
         (error) =>
         {
           const readable: string = MidwayError.fromJSON(error).getDetail();
-          this.setState({ errorModalMessage: readable });
+          this.setState({
+            errorModalMessage: readable,
+            algorithmStatusAjax: null,
+          });
           this.toggleAlgorithmStatusError();
         },
       );
+      this.setState({
+        algorithmStatusAjax,
+      });
     }
   }
 
