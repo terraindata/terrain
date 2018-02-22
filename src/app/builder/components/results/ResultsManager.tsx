@@ -123,6 +123,10 @@ export class ResultsManager extends TerrainComponent<Props>
   public componentWillMount()
   {
     Util.addBeforeLeaveHandler(this.killQueries);
+    // TODO consider querying results when the component is loaded
+    // however adding a call to queryResults here causes a bug with our 
+    // current architecture that causes outdated results to be displayed
+    // when you open an algorithm from the builder
   }
 
   public componentWillUnmount()
