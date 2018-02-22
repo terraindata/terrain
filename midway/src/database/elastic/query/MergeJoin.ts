@@ -82,6 +82,13 @@ export async function handleMergeJoin(client: ElasticClient, request: QueryReque
     throw new Error('Expecting body parameter in the mergeJoin query');
   }
 
+  const doChildQueriesLackSort: boolean = Object.keys(childQuery).reduce((prev, curr) => prev && (childQuery[curr]['sort'] !== undefined), true);
+  if (parentQuery['sort'] !== undefined && !doChildQueriesLackSort)
+  {
+    throw new Error('Sort clause(s) not allowed in a mergeJoin query');
+  }
+
+  parentQuery['sort'] = JSON.stringify({ [joinKey]: 'asc' });
   const handleSubQueries = async (error, response) =>
   {
     try
