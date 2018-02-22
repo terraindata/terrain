@@ -76,6 +76,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   else
   {
     ctx.body = '';
+    // tslint:disable-next-line:no-unused-variable
     for (const [id, database] of DatabaseRegistry.getAll())
     {
       ctx.body += await getSchema(id);

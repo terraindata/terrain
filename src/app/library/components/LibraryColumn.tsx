@@ -64,7 +64,6 @@ export interface Props
 }
 
 const COLUMN_STYLE = _.extend({},
-  backgroundColor(Colors().bg1),
   borderColor(Colors().bg3),
 );
 

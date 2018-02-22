@@ -49,7 +49,6 @@ import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import MetricConfig from '../events/MetricConfig';
 import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
@@ -76,7 +75,6 @@ export class Items
 
   public async delete(id: number): Promise<ItemConfig[]>
   {
-    const idObj: object = { id };
     return App.DB.delete(this.itemTable, { id } as object) as Promise<ItemConfig[]>;
   }
 
@@ -259,8 +257,7 @@ export class Items
         {
           return resolve('Item is not an Algorithm');
         }
-        if (resp['_id'] === deployedName && resp['found'] === true && items[0].status === 'LIVE'
-          && await this._verifyAlgorithmScript(algorithmId, resp['_script']))
+        if (resp['_id'] === deployedName && resp['found'] === true && items[0].status === 'LIVE')
         {
           return resolve('Algorithm is LIVE as ' + (deployedName as string));
         }
@@ -311,14 +308,6 @@ export class Items
         }
         return resolve(storedScriptNames);
       });
-    });
-  }
-
-  private async _verifyAlgorithmScript(algorithmId: number, storedScript: string): Promise<boolean>
-  {
-    return new Promise<boolean>(async (resolve, reject) =>
-    {
-      return resolve(true);
     });
   }
 }

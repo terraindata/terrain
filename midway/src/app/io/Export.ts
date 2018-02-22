@@ -53,16 +53,12 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
-import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
-import ESParser from '../../../../shared/database/elastic/parser/ESParser';
-import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
 
 import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Tasty from '../../tasty/Tasty';
 import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
@@ -72,9 +68,7 @@ import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
 
 const exportTemplates = new ExportTemplates();
-
 const TastyItems: Items = new Items();
-const typeParser: CSVTypeParser = new CSVTypeParser();
 
 export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 {
@@ -85,7 +79,6 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 export class Export
 {
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
-  private SCROLL_TIMEOUT: string = '60s';
   private MAX_ROW_THRESHOLD: number = 2000;
 
   public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
@@ -238,59 +231,56 @@ export class Export
         };
 
         let isFirstJSONObj: boolean = true;
-        await new Promise(async (res, rej) =>
+        respStream.on('data', (docs) =>
         {
-          respStream.on('data', (docs) =>
+          if (docs === undefined || docs === null)
           {
-            if (docs === undefined || docs === null)
-            {
-              return res();
-            }
+            writer.end();
+          }
 
-            try
+          try
+          {
+            for (let doc of docs)
             {
-              for (let doc of docs)
+              doc = this._postProcessDoc(doc, cfg);
+              if (exprt.filetype === 'csv')
               {
-                doc = this._postProcessDoc(doc, cfg);
-                if (exprt.filetype === 'csv')
-                {
-                  writer.write(doc);
-                }
-                else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-                {
-                  isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-                  writer.write(JSON.stringify(doc));
-                }
+                writer.write(doc);
+              }
+              else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+              {
+                isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+                writer.write(JSON.stringify(doc));
+              }
 
-                if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+              if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+              {
+                writer.write(']');
+                if (exprt.filetype === 'json [type object]')
                 {
-                  writer.write(']');
-                  if (exprt.filetype === 'json [type object]')
-                  {
-                    writer.write('}');
-                  }
+                  writer.write('}');
                 }
               }
             }
-            catch (e)
-            {
-              return rej(e);
-            }
-          });
-
-          respStream.on('end', () =>
+          }
+          catch (e)
           {
-            return res();
-          });
-
-          respStream.on('error', (err) =>
-          {
-            winston.error(err);
-            return rej(err);
-          });
+            winston.error(e);
+            throw e;
+          }
         });
 
-        writer.end();
+        respStream.on('end', () =>
+        {
+          writer.end();
+        });
+
+        respStream.on('error', (err) =>
+        {
+          winston.error(err);
+          throw err;
+        });
+
         return resolve(writer);
       }
       catch (e)
@@ -425,7 +415,6 @@ export class Export
     {
       const fieldObj: object = {};
       let fieldsAndTypes: object = {};
-      let rankCounter = 1;
       const qh: QueryHandler = database.getQueryHandler();
       const payload = {
         database: dbid as number,
@@ -454,7 +443,6 @@ export class Export
         return resolve(fieldObj);
       }
       fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
-      rankCounter += newDocs.length;
       for (const field of Object.keys(fieldsAndTypes))
       {
         fieldObj[field] = this._getPriorityType(fieldsAndTypes[field]);
@@ -473,9 +461,9 @@ export class Export
     }
     return new Promise<object>(async (resolve, reject) =>
     {
-      for (const doc of docs)
+      for (let doc of docs)
       {
-        const mergeDoc = this._mergeGroupJoin(doc);
+        doc = this._mergeGroupJoin(doc);
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
@@ -590,35 +578,31 @@ export class Export
 
   private _getPriorityType(types: object[]): object
   {
-    const topPriorityTypes: string[] = ['array', 'object']; // string is default case
     if (types.length === 1)
     {
       return types[0];
     }
 
-    for (const type of topPriorityTypes)
+    if (types.map((typesObj) => typesObj['type']).indexOf('array') >= 0)
     {
-      if (types.map((typesObj) => typesObj['type']).indexOf('array') >= 0)
+      const arrayTypes: object[] = types.filter((typeObj) => typeObj['type'] === 'array');
+      const innermostTypes: string[] = arrayTypes.map((arrayType) =>
       {
-        const arrayTypes: object[] = types.filter((typeObj) => typeObj['type'] === 'array');
-        const innermostTypes: string[] = arrayTypes.map((arrayType) =>
-        {
-          return this._getInnermostType(arrayType);
-        });
-        if (types.length === 1)
-        {
-          return arrayTypes[0];
-        }
-        if (equal(innermostTypes.sort(), ['double', 'long']))
-        {
-          return { type: 'double', index: 'not_analyzed', analyzer: null };
-        }
-        return { type: 'text', index: 'analyzed', analyzer: 'standard' };
-      }
-      else if (types.map((typesObj) => typesObj['type']).indexOf('object') >= 0)
+        return this._getInnermostType(arrayType);
+      });
+      if (types.length === 1)
       {
-        return { type: 'object', index: 'not_analyzed', analyzer: null };
+        return arrayTypes[0];
       }
+      if (equal(innermostTypes.sort(), ['double', 'long']))
+      {
+        return { type: 'double', index: 'not_analyzed', analyzer: null };
+      }
+      return { type: 'text', index: 'analyzed', analyzer: 'standard' };
+    }
+    else if (types.map((typesObj) => typesObj['type']).indexOf('object') >= 0)
+    {
+      return { type: 'object', index: 'not_analyzed', analyzer: null };
     }
 
     if (equal(types.map((typeObj) => typeObj['type']).sort(), ['double', 'long']))
@@ -846,113 +830,6 @@ export class Export
   private _convertArrayToCSVArray(arr: any[]): string
   {
     return JSON.stringify(arr);
-  }
-
-  /* parses string input from CSV and checks against expected types ; handles arrays recursively */
-  private _csvCheckTypesHelper(item: object, typeObj: object, field: string): boolean
-  {
-    switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
-    {
-      case 'double':
-        if (item[field] === '' || item[field] === 'null')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          const parsedValue: number | boolean = typeParser.getDoubleFromString(String(item[field]));
-          if (typeof parsedValue === 'number')
-          {
-            item[field] = parsedValue;
-            return true;
-          }
-          return false;
-        }
-        break;
-      case 'long':
-        if (item[field] === '' || item[field] === 'null')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          const parsedValue: number | boolean = typeParser.getDoubleFromString(String(item[field]));
-          if (typeof parsedValue === 'number')
-          {
-            item[field] = parsedValue;
-            return true;
-          }
-          return false;
-        }
-        break;
-      case 'boolean':
-        if (item[field] === 'true')
-        {
-          item[field] = true;
-        }
-        else if (item[field] === 'false')
-        {
-          item[field] = false;
-        }
-        else if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          return false;
-        }
-        break;
-      case 'date':
-        const date: number = Date.parse(item[field]);
-        if (!isNaN(date))
-        {
-          item[field] = new Date(date);
-        }
-        else if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          return false;
-        }
-        break;
-      case 'array':
-        if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          try
-          {
-            if (typeof item[field] === 'string')
-            {
-              item[field] = JSON.parse(item[field]);
-            }
-          } catch (e)
-          {
-            return false;
-          }
-          if (!Array.isArray(item[field]))
-          {
-            return false;
-          }
-          let i: number = 0;
-          while (i < Object.keys(item[field]).length)    // lint hack to get around not recognizing item[field] as an array
-          {
-            if (!this._csvCheckTypesHelper(item[field], typeObj['innerType'], String(i)))
-            {
-              return false;
-            }
-            i++;
-          }
-        }
-        break;
-      default:  // "text" case, leave as string
-    }
-    return true;
   }
 
   /* assumes arrays are of uniform depth */

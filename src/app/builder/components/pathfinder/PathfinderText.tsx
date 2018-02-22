@@ -95,9 +95,9 @@ export const PathfinderText = {
   },
 
   // More section
-  moreSectionTitle: 'More',
+  moreSectionTitle: 'Advanced',
   moreSectionSubtitle: `
-  Look at the metadata for your data and add facets to better understand your data.
+  Add nested algorithms to create a set of results for each result of your parent algorithm.
   `,
   referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',
   nestedExplanation: 'Add another algorithm that uses the results of this one as input',

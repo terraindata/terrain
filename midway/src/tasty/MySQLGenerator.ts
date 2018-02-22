@@ -247,8 +247,6 @@ export default class MySQLGenerator
     this.queryString += this.escapeString(query.table.getTableName());
 
     const baseQuery = this.queryString;
-
-    const primaryKeys = query.table.getPrimaryKeys();
     const columns: string[] = query.table.getColumnNames();
     let definedColumnsList: string[] = [];
     let definedColumnsSet: Set<string> = new Set();

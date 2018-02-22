@@ -81,6 +81,7 @@ export class SQLiteDB implements TastyDB
 
   public generate(query: TastyQuery): string[]
   {
+    // tslint:disable-next-line:no-unused-variable
     const [statements, values] = this.generateQuery(query, false);
     return statements;
   }

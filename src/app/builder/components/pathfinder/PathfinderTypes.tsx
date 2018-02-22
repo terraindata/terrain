@@ -109,6 +109,7 @@ class PathC extends BaseClass
   public more: More = _More();
   public nested: List<Path> = List([]);
   public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
+  public minMatches?: number = 0; // also helpful for inner-queries of groupjoins
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
