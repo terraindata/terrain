@@ -64,32 +64,107 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 
 const { List } = Immutable;
-import './ETLExportDisplay.less';
+import './TemplateEditorDisplay.less';
 
 export interface Props
 {
+  params?: {
+    algorithmId?: number,
+  };
+  algorithms: IMMap<ID, Algorithm>;
+
   act?: typeof TemplateEditorActions;
 }
 
-@Radium
-class ETLImportPage extends TerrainComponent<Props>
+function getAlgorithmId(params): number
 {
+  const asNumber = (params != null && params.algorithmId != null) ? Number(params.algorithmId) : NaN;
+  return Number.isNaN(asNumber) ? -1 : asNumber;
+}
+
+function initialTemplateFromDocs(documents: List<object>): { template: ETLTemplate, rootField: TemplateField }
+{
+  if (documents.size === 0)
+  {
+    return {
+      template: _ETLTemplate(),
+      rootField: _TemplateField(),
+    };
+  }
+
+  const firstDoc = documents.get(0);
+  const engine = new TransformationEngine(firstDoc);
+  const rootField = createTreeFromEngine(engine);
+
+  const template = _ETLTemplate({
+    templateId: -1,
+    templateName: name,
+    transformationEngine: engine,
+  });
+  return {
+    template,
+    rootField,
+  };
+}
+
+@Radium
+class TemplateEditorDisplay extends TerrainComponent<Props>
+{
+  public initFromAlgorithm()
+  {
+    const { algorithms, params, act } = this.props;
+    const algorithmId = getAlgorithmId(params);
+    const algorithm = (algorithms != null && algorithms.has(algorithmId)) ? algorithms.get(algorithmId) : null;
+
+    const onFetched = (hits: List<object>) =>
+    {
+      const { template, rootField } = initialTemplateFromDocs(hits);
+      act({
+        actionType: 'setTemplate',
+        template,
+      });
+      act({
+        actionType: 'setRoot',
+        rootField,
+      });
+    };
+    act({
+      actionType: 'fetchDocuments',
+      source: {
+        type: 'algorithm',
+        algorithm,
+      },
+      onFetched,
+    });
+  }
+
+  public componentWillMount()
+  {
+    this.props.act({
+      actionType: 'resetState',
+    });
+    if (this.props.params.algorithmId !== undefined)
+    {
+      this.initFromAlgorithm();
+    }
+  }
 
   public render()
   {
     return (
       <div
-        className='etl-export-display-wrapper'
+        className='template-display-wrapper'
         style={[fontColor(Colors().text1)]}
       >
-
+        <div className='export-display-logo-bg' />
+        <TemplateEditor />
       </div>
     );
   }
 }
 
 export default Util.createContainer(
-  ETLImportPage,
-  [],
+  TemplateEditorDisplay,
+  [['library', 'algorithms']],
   { act: TemplateEditorActions },
 );

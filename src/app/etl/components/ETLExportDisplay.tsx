@@ -57,7 +57,7 @@ import Util from 'util/Util';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _Template, Template, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { NoArrayDocuments, testSerialization } from 'etl/templates/TemplateUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
@@ -82,12 +82,12 @@ function getAlgorithmId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-function initialTemplateFromDocs(documents: List<object>): { template: Template, rootField: TemplateField }
+function initialTemplateFromDocs(documents: List<object>): { template: ETLTemplate, rootField: TemplateField }
 {
   if (documents.size === 0)
   {
     return {
-      template: _Template(),
+      template: _ETLTemplate(),
       rootField: _TemplateField(),
     };
   }
@@ -96,7 +96,7 @@ function initialTemplateFromDocs(documents: List<object>): { template: Template,
   const engine = new TransformationEngine(firstDoc);
   const rootField = createTreeFromEngine(engine);
 
-  const template = _Template({
+  const template = _ETLTemplate({
     templateId: -1,
     templateName: name,
     transformationEngine: engine,
@@ -141,9 +141,9 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.act({
-      actionType: 'resetState'
-    });
+    // this.props.act({
+    //   actionType: 'resetState'
+    // });
     if (this.props.params.algorithmId !== undefined)
     {
       this.initFromAlgorithm();

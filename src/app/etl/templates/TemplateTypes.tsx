@@ -63,7 +63,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 
 class TemplateEditorStateC
 {
-  public template: Template = _Template();
+  public template: ETLTemplate = _ETLTemplate();
   public rootField: TemplateField = _TemplateField();
   public isDirty: boolean = true;
   public uiState: EditorDisplayState = _EditorDisplayState();
@@ -93,7 +93,7 @@ class ETLConfigurationC implements ETLConfigurationI
 export type ETLConfiguration = WithIRecord<ETLConfigurationC>;
 export const _ETLConfiguration = makeConstructor(ETLConfigurationC);
 
-class TemplateC implements TemplateI
+class ETLTemplateC implements TemplateI
 {
   public id = -1;
   public templateName = '';
@@ -101,10 +101,10 @@ class TemplateC implements TemplateI
   public configuration = _ETLConfiguration();
   public transformationEngine = new TransformationEngine();
 }
-export type Template = WithIRecord<TemplateC>;
-export const _Template = makeExtendedConstructor(TemplateC, false, {
+export type ETLTemplate = WithIRecord<ETLTemplateC>;
+export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
   configuration: _ETLConfiguration,
-  transformationEngine: TransformationEngine.load
+  transformationEngine: TransformationEngine.load,
 });
 
 export function destringifySavedTemplate(obj: object): object
@@ -114,7 +114,7 @@ export function destringifySavedTemplate(obj: object): object
   return newObj;
 }
 
-export function templateForSave(template: Template): object
+export function templateForSave(template: ETLTemplate): object
 {
   const obj = (template as any).toObject();
   obj.transformationEngine = JSON.stringify(obj.transformationEngine.json());
