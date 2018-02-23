@@ -54,10 +54,9 @@ import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import ControlPage from './control/components/ControlPage';
-// import ETLExportDisplay from './etl/components/ETLExportDisplay';
 import ETLImportPage from './etl/components/ETLImportPage';
 import ETLPage from './etl/components/ETLPage';
-import TemplateEditorDisplay from './etl/components/TemplateEditorDisplay';
+import ETLEditorPage from './etl/components/ETLEditorPage';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
@@ -139,9 +138,8 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/etl' component={ETLPage}>
             <Route path='/etl/import' component={ETLImportPage} />
             {/*<Route path='/etl/export' component={ETLExportPage} />*/}
-            {/*<Route path='/etl/export/edit/algId=:algorithmId' component={ETLExportDisplay} />*/}
-            <Route path='/etl/edit/algorithmId=:algorithmId' component={TemplateEditorDisplay} />
-            {/*<Route path='/etl/edit/templateId=:templateId' component={TemplateEditorDisplay} />*/}
+            <Route path='/etl/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
+            {/*<Route path='/etl/edit/templateId=:templateId' component={ETLEditorPage} />*/}
           </Route>
           <Route path='/analytics'>
             <IndexRoute component={analyticsLibrary} />

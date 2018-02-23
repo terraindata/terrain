@@ -52,7 +52,6 @@ import { browserHistory } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import ETLExportDisplay from 'etl/components/ETLExportDisplay';
 import './ETLPage.less';
 
 export interface Props
@@ -87,16 +86,6 @@ export default class ETLPage extends TerrainComponent<Props>
         </div>
       </div>
     );
-  }
-
-  public renderImport()
-  {
-    return 'implement me please';
-  }
-
-  public renderExport()
-  {
-    // return <ETLExportDisplay />;
   }
 
   public render()

@@ -64,7 +64,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 
 const { List } = Immutable;
-import './TemplateEditorDisplay.less';
+import './ETLEditorPage.less';
 
 export interface Props
 {
@@ -108,7 +108,7 @@ function initialTemplateFromDocs(documents: List<object>): { template: ETLTempla
 }
 
 @Radium
-class TemplateEditorDisplay extends TerrainComponent<Props>
+class ETLEditorPage extends TerrainComponent<Props>
 {
   public initFromAlgorithm()
   {
@@ -164,7 +164,7 @@ class TemplateEditorDisplay extends TerrainComponent<Props>
 }
 
 export default Util.createContainer(
-  TemplateEditorDisplay,
+  ETLEditorPage,
   [['library', 'algorithms']],
   { act: TemplateEditorActions },
 );

@@ -64,7 +64,6 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 
 const { List } = Immutable;
-import './ETLExportDisplay.less';
 
 export interface Props
 {

@@ -55,8 +55,6 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
-import ETLExportDisplay from 'etl/components/ETLExportDisplay';
-
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
@@ -110,7 +108,6 @@ interface State
   hitsPages: number;
   onHitsLoaded?: (unchanged?: boolean) => void;
 
-  showingExport?: boolean;
   mapHeight?: number;
   mouseStartY?: number;
   mapMaxHeight?: number;
@@ -132,7 +129,6 @@ class HitsArea extends TerrainComponent<Props>
     expanded: false,
     expandedHitIndex: null,
     showingConfig: false,
-    showingExport: false,
     hitsPages: 1,
     hitFormat: 'icon',
     mapHeight: MAP_MIN_HEIGHT,
@@ -697,13 +693,6 @@ class HitsArea extends TerrainComponent<Props>
     browserHistory.push(`/etl/edit/algorithmId=${this.props.algorithmId}`);
   }
 
-  public hideExport()
-  {
-    this.setState({
-      showingExport: false,
-    });
-  }
-
   public showConfig()
   {
     this.setState({
@@ -716,29 +705,6 @@ class HitsArea extends TerrainComponent<Props>
     this.setState({
       showingConfig: false,
     });
-  }
-
-  public renderExport()
-  {
-
-    const content = (
-      <ETLExportDisplay
-      // query={this.props.query}
-      // serverId={this.props.db.id}
-      // algorithmName={this.props.algorithmName}
-      />
-    );
-
-    return (
-      <Modal
-        open={this.state.showingExport}
-        onClose={this.hideExport}
-        title={'Export'}
-        children={content}
-        fill={true}
-        noFooterPadding={true}
-      />
-    );
   }
 
   public renderConfig()
@@ -770,7 +736,6 @@ class HitsArea extends TerrainComponent<Props>
         {this.renderHitsMap()}
         {this.renderExpandedHit()}
         {this.props.showCustomizeView && this.renderConfig()}
-        {this.props.showExport && this.renderExport()}
       </div>
     );
   }
