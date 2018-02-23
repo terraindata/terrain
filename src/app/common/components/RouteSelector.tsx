@@ -299,10 +299,6 @@ export class RouteSelector extends TerrainComponent<Props>
   {
     const { props, state } = this;
     
-    // we need to duplicate the inner picker content
-    // so that we can get the wrapper to size dynamically
-    // to the content (in a hidden copy) and show the real copy
-    // pinned to the bottom edge of the wrapper, for the drawer animation
     const pickerInnerContent = (
       <div className='routeselector-picker-inner routeselector-multi-picker-inner'>
         {
@@ -312,6 +308,10 @@ export class RouteSelector extends TerrainComponent<Props>
     );
     
     return (
+      <DrawerAnimation
+        open={this.isOpen()}
+        maxHeight={400 /* coordinate this with LESS */ }
+      >
         <div
           className={classNames({
             'routeselector-picker': true,
@@ -321,21 +321,12 @@ export class RouteSelector extends TerrainComponent<Props>
           })}
           ref={this._fn(this._saveRefToState, 'pickerRef')}
         >
-          <div className='routeselector-picker-inner-copy'>
-            {
-              pickerInnerContent
-            }
-          </div>
           {
             pickerInnerContent
           }
         </div>
+      </DrawerAnimation>
     );
-      // <DrawerAnimation
-      //   open={this.isOpen()}
-      //   height={400}
-      // >
-      // </DrawerAnimation>
   }
   
   private renderOptionSet(optionSet: RouteSelectorOptionSet, index: number)
