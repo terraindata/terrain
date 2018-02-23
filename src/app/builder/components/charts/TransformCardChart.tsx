@@ -195,9 +195,9 @@ export class TransformCardChart extends TerrainComponent<Props>
       pointsCache: points,
       pointsBuffer: null,
     });
-    this.debouncedUpdatePoints(points, isConcrete);
     if (isConcrete)
     {
+      this.debouncedUpdatePoints(points, true);
       this.debouncedUpdatePoints.flush();
     }
   }
@@ -319,12 +319,12 @@ export class TransformCardChart extends TerrainComponent<Props>
     this.setState({
       movedSeed: this.state.moveSeed,
     });
-    this.updatePoints(points.toList(), isConcrete);
+    this.updatePoints(points.toList(), false);
   }
 
   public onPointRelease()
   {
-    this.debouncedUpdatePoints.flush();
+    this.updatePoints(this.state.pointsCache, true);
     this.setState({
       dragging: false,
     });
@@ -447,7 +447,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       point = point.set('value', newValue);
       return point;
     });
-    this.updatePoints(points.toList());
+    this.updatePoints(points.toList(), true);
   }
 
   public onZoomToData(el, mouse)
@@ -496,7 +496,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       });
       scorePoints = scorePoints.push(p);
     }
-    this.updatePoints(scorePoints);
+    this.updatePoints(scorePoints, true);
     return points;
   }
 
@@ -521,7 +521,7 @@ export class TransformCardChart extends TerrainComponent<Props>
         scorePoints = scorePoints.push(p);
       }
       scorePoints = scorePoints.sortBy((pt) => pt.value).toList();
-      this.updatePoints(scorePoints);
+      this.updatePoints(scorePoints, true);
     }
     else if (oldSize > newSize)
     {
