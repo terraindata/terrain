@@ -44,16 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Elastic from 'elasticsearch';
 import { Readable } from 'stream';
 import * as winston from 'winston';
-
-import * as Elastic from 'elasticsearch';
 
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
-import QueryRequest from '../../../../../src/database/types/QueryRequest';
-import QueryResponse from '../../../../../src/database/types/QueryResponse';
+import QueryRequest from '../../../../../shared/database/types/QueryRequest';
+import QueryResponse from '../../../../../shared/database/types/QueryResponse';
+import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
@@ -72,18 +72,24 @@ export async function handleGroupJoin(client: ElasticClient, request: QueryReque
   const childQuery = query['groupJoin'];
   query['groupJoin'] = undefined;
 
+  const parentQuery: Elastic.SearchParams | undefined = query;
+  if (parentQuery === undefined)
+  {
+    throw new Error('Expecting body parameter in the groupJoin query');
+  }
+
+  if (request.streaming === true)
+  {
+    const elasticStream = new ElasticStream(client, parentQuery);
+    return new GroupJoinTransform(client, elasticStream, childQuery);
+  }
+
   // determine other groupJoin settings from the query
   const dropIfLessThan = (childQuery['dropIfLessThan'] !== undefined) ? childQuery['dropIfLessThan'] : 0;
   delete childQuery['dropIfLessThan'];
 
   const parentAlias = (childQuery['parentAlias'] !== undefined) ? childQuery['parentAlias'] : 'parent';
   delete childQuery['parentAlias'];
-
-  const parentQuery: Elastic.SearchParams | undefined = query;
-  if (parentQuery === undefined)
-  {
-    throw new Error('Expecting body parameter in the groupJoin query');
-  }
 
   const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
   if (valueInfo === null)
@@ -120,22 +126,15 @@ export async function handleGroupJoin(client: ElasticClient, request: QueryReque
     return response;
   };
 
-  if (request.streaming === true)
+  return new Promise<QueryResponse>((resolve, reject) =>
   {
-    return new ElasticStream(client, parentQuery, { objectMode: true }, handleSubQueries);
-  }
-  else
-  {
-    return new Promise<QueryResponse>((resolve, reject) =>
-    {
-      client.search({ body: parentQuery } as Elastic.SearchParams,
-        async (error, response) =>
-        {
-          const r = await handleSubQueries(null, response);
-          ElasticQueryHandler.makeQueryCallback(resolve, reject)(error, r);
-        });
-    });
-  }
+    client.search({ body: parentQuery } as Elastic.SearchParams,
+      async (error, response) =>
+      {
+        const r = await handleSubQueries(null, response);
+        ElasticQueryHandler.makeQueryCallback(resolve, reject)(error, r);
+      });
+  });
 }
 
 async function handleGroupJoinSubQueries(client: ElasticClient, parentValueInfo: ESValueInfo, query: object,

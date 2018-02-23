@@ -46,122 +46,151 @@ THE SOFTWARE.
 
 import * as Elastic from 'elasticsearch';
 import * as Stream from 'stream';
+import * as winston from 'winston';
 
+import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import ElasticClient from '../client/ElasticClient';
-
-export type StreamTransformer = (error, response) => Promise<typeof response>;
 
 export class ElasticStream extends Stream.Readable
 {
   private client: ElasticClient;
   private query: any;
 
-  private isReading: boolean;
-  private forceClose: boolean;
-  private rowsProcessed: number;
+  private querying: boolean = false;
+  private doneReading: boolean = false;
+  private rowsProcessed: number = 0;
   private scroll: string;
   private size: number;
-  private transform: StreamTransformer;
 
-  private MAX_SEARCH_SIZE = 10000;
-  private DEFAULT_SEARCH_SIZE = 10;
-  private DEFAULT_SCROLL_TIMEOUT = '5m';
+  private scrollID: string | undefined = undefined;
 
-  constructor(client: ElasticClient, query: any, opts?: Stream.ReadableOptions, transform?: StreamTransformer)
+  private MAX_SEARCH_SIZE: number = 10 * 1000;
+  private DEFAULT_SEARCH_SIZE: number = 8 * 1024;
+  private DEFAULT_SCROLL_TIMEOUT: string = '5m';
+
+  private numRequested: number = 0;
+
+  constructor(client: ElasticClient, query: any)
   {
-    super(opts);
+    super({ objectMode: true, highWaterMark: 1024 * 128 });
+
     this.client = client;
     this.query = query;
-    this.isReading = false;
-    this.forceClose = false;
-    this.rowsProcessed = 0;
-
-    if (transform !== undefined)
-    {
-      this.transform = transform;
-    }
 
     this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
-  }
-
-  public async _read()
-  {
-    if (this.isReading)
-    {
-      return false;
-    }
-
-    this.isReading = true;
-
-    let size = this.size;
-    if (size > this.MAX_SEARCH_SIZE)
-    {
-      size = this.MAX_SEARCH_SIZE;
-    }
 
     try
     {
+      this.querying = true;
       this.client.search({
         body: this.query,
         scroll: this.scroll,
-        size,
-      }, this.getMoreUntilDone.bind(this));
+        size: Math.min(this.size, this.MAX_SEARCH_SIZE),
+      },
+        (error, response): void =>
+        {
+          this.scrollCallback(error, response);
+        });
     }
     catch (e)
     {
-      return this.emit('error', e);
+      this.emit('error', e);
     }
   }
 
-  public close()
+  public _read(size: number = 1024)
   {
-    this.forceClose = true;
+    this.numRequested = size;
+    this.continueScrolling();
   }
 
-  private async getMoreUntilDone(error, response)
+  public _destroy(error, callback)
   {
+    this._final(callback);
+  }
+
+  public _final(callback)
+  {
+    this.doneReading = true;
+    this.continueScrolling();
+    callback();
+  }
+
+  private scrollCallback(error, response): void
+  {
+    if (typeof response._scroll_id === 'string')
+    {
+      this.scrollID = response._scroll_id;
+    }
+
     if (error !== null && error !== undefined)
     {
-      throw error;
+      this.emit('error', error);
     }
 
-    let length: number = response.hits.hits.length;
+    let hits: ElasticQueryHit[] = response.hits.hits;
+    let length: number = hits.length;
+
+    // trim off excess results
     if (this.rowsProcessed + length > this.size)
     {
       length = this.size - this.rowsProcessed;
-      response.hits.hits = response.hits.hits.slice(0, length);
+      hits = hits.slice(0, length);
     }
 
     this.rowsProcessed += length;
+    this.numRequested = Math.max(0, this.numRequested - length);
 
-    if (this.transform !== undefined)
+    for (let i = 0; i < hits.length; ++i)
     {
-      response = await this.transform(error, response);
+      this.push(hits[i]);
     }
-    this.push(response.hits.hits);
 
-    if (
-      (length > 0) &&
-      (this.forceClose !== true) &&
-      (Math.min(response.hits.total, this.size) > this.rowsProcessed)
-    )
+    this.querying = false;
+    this.doneReading = this.doneReading
+      || length <= 0
+      || this.rowsProcessed >= this.size;
+
+    this.continueScrolling();
+  }
+
+  private continueScrolling()
+  {
+    if (this.querying)
     {
+      return;
+    }
+
+    if (this.doneReading)
+    {
+      // stop scrolling
+      if (this.scrollID !== undefined)
+      {
+        this.client.clearScroll({
+          scrollId: this.scrollID,
+        }, (_err, _resp) =>
+          {
+            this.push(null);
+          });
+
+        this.scrollID = undefined;
+      }
+
+      return;
+    }
+
+    if (this.numRequested > 0)
+    {
+      // continue scrolling
+      this.querying = true;
       this.client.scroll({
-        scrollId: response._scroll_id,
+        scrollId: this.scrollID,
         scroll: this.scroll,
-      } as Elastic.ScrollParams, this.getMoreUntilDone.bind(this));
-    }
-    else
-    {
-      this.client.clearScroll({
-        scrollId: response._scroll_id,
-      }, (_err, _resp) =>
+      } as Elastic.ScrollParams,
+        (error, response) =>
         {
-          this.isReading = false;
-          this.rowsProcessed = 0;
-          this.forceClose = false;
-          this.push(null);
+          this.scrollCallback(error, response);
         });
     }
   }

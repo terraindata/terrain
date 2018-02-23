@@ -252,6 +252,10 @@
     "@types/d3-voronoi" "*"
     "@types/d3-zoom" "*"
 
+"@types/double-ended-queue@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/double-ended-queue/-/double-ended-queue-2.1.0.tgz#adc862d8d53bdf7d1b23a7d85559815ec1fbb92c"
+
 "@types/elasticsearch@^5.0.19":
   version "5.0.19"
   resolved "https://registry.yarnpkg.com/@types/elasticsearch/-/elasticsearch-5.0.19.tgz#2783b02360090265a1b8a4cc87425cebed30c303"
@@ -3120,6 +3124,10 @@ dot-prop@^4.1.0:
 dotsplit.js@^1.0.3:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/dotsplit.js/-/dotsplit.js-1.1.0.tgz#25a239eabe922a91ffa5d2a172d6c9fb82451e02"
+
+double-ended-queue@^2.1.0-0:
+  version "2.1.0-0"
+  resolved "https://registry.yarnpkg.com/double-ended-queue/-/double-ended-queue-2.1.0-0.tgz#103d3527fd31528f40188130c841efdd78264e5c"
 
 duplexer2@^0.1.4:
   version "0.1.4"

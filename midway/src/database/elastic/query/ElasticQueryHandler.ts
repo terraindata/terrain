@@ -44,10 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Elastic from 'elasticsearch';
 import { Readable } from 'stream';
 import * as winston from 'winston';
-
-import * as Elastic from 'elasticsearch';
 
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
@@ -158,7 +157,7 @@ export class ElasticQueryHandler extends QueryHandler
         {
           if (request.streaming === true)
           {
-            return new ElasticStream(client, query, { objectMode: true });
+            return new ElasticStream(client, query);
           }
           else
           {
