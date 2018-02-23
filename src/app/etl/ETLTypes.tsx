@@ -43,12 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing
+// tslint:disable:import-spacing max-classes-per-file
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+
+import { TemplateTypes } from 'shared/etl/TemplateTypes';
 
 class ETLStateC
 {
@@ -102,4 +104,10 @@ const ViewGraph = {
 class WalkthroughStateC
 {
   public Step: ViewState = ViewState.Start;
+  public type: TemplateTypes = null;
+  public source: any = null;
+  public sink: any = null;
+  public chosenTemplateId: ID = -1;
 }
+export type WalkThroughState = WithIRecord<WalkThroughStateC>;
+export const _WalkThroughState = makeConstructor(WalkThroughStateC);

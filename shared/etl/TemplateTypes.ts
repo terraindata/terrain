@@ -104,7 +104,7 @@ export interface Template
   templateName: string;
   type: TemplateTypes; // TODO get rid of?
   transformationEngine: TransformationEngine;
-  transformationConfig: any;
+  transformationConfig: any; // terrain rank, what to do on failures
   sources: {
     [k: string]: SourceConfig;
   };
