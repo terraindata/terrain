@@ -219,41 +219,54 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public renderLineContents()
   {
+    const { fieldIndex } = this.state;
+
     return (
       <div className='pf-line pf-score-line-inner'>
-        {!this.state.showFieldDropdown ?
-          (
-            <div className="field-name" onClick={this.showFieldDropdown}>
-              {this.props.dropdownOptions.get(this.state.fieldIndex).displayName}
-            </div>
-          ) : (
-            <SearchableDropdown
-              options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
-              selectedIndex={this.state.fieldIndex}
-              canEdit={this.props.pathfinderContext.canEdit}
-              placeholder={'Field...'}
-              onChange={this.handleFieldChange}
-            />
-          )
+        {
+          !this.state.showFieldDropdown ?
+            (
+              <div className="field-name" onClick={this.showFieldDropdown}>
+                {this.props.dropdownOptions.get(fieldIndex).displayName}
+              </div>
+            ) :
+            (
+              <SearchableDropdown
+                options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
+                selectedIndex={fieldIndex}
+                canEdit={this.props.pathfinderContext.canEdit}
+                placeholder={'Field...'}
+                onChange={this.handleFieldChange}
+              />
+            )
         }
-        <ScoreBar
-          parentData={{ weights: this.props.allWeights }}
-          data={{ weight: this.state.weight }}
-          keyPath={this.props.keyPath.push('weight')}
-          noAnimation={!this.props.animateScoreBars}
-          builderActions={this.props.builderActions}
-        />
-        <BuilderTextbox
-          keyPath={this.props.keyPath.push('weight')}
-          value={this.props.line.weight}
-          language={'elastic'}
-          canEdit={this.props.pathfinderContext.canEdit}
-          placeholder={'weight'}
-          isNumber={true}
-          autoDisabled={true}
-          onChange={this.props.onAnimateScoreBars}
-          action={this.props.builderActions.changePath}
-        />
+
+        {
+          fieldIndex > -1 ?
+            (
+              <div style={{ width: '66.66%', display: 'flex' }} >
+                <ScoreBar
+                  parentData={{ weights: this.props.allWeights }}
+                  data={{ weight: this.state.weight }}
+                  keyPath={this.props.keyPath.push('weight')}
+                  noAnimation={!this.props.animateScoreBars}
+                  builderActions={this.props.builderActions}
+                />
+                <BuilderTextbox
+                  keyPath={this.props.keyPath.push('weight')}
+                  value={this.props.line.weight}
+                  language={'elastic'}
+                  canEdit={this.props.pathfinderContext.canEdit}
+                  placeholder={'weight'}
+                  isNumber={true}
+                  autoDisabled={true}
+                  onChange={this.props.onAnimateScoreBars}
+                  action={this.props.builderActions.changePath}
+                />
+              </div>
+            ) : null
+        }
+
         {
           !this.props.line.expanded ?
             this.renderTransformChartPreview() :
