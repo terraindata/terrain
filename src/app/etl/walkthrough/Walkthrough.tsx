@@ -42,50 +42,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing max-classes-per-file
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires max-classes-per-file
 
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import * as Radium from 'radium';
+import * as React from 'react';
 
-import { TemplateTypes } from 'shared/etl/TemplateTypes';
-
-class ETLStateC
+export interface WalkthroughProps<State>
 {
-  public walkthrough: WalkthroughState = _WalkthroughState();
+  state: State;
 }
-export type ETLState = WithIRecord<ETLStateC>;
-export const _ETLState = makeConstructor(ETLStateC);
 
-class WalkthroughStateC
-{
-  public step: ViewState = ViewState.Start;
-  public stepHistory: List<ViewState> = List([]);
-  public type: TemplateTypes = null;
-  public source: any = null;
-  public sink: any = null;
-  public chosenTemplateId: ID = -1;
-}
-export type WalkthroughState = WithIRecord<WalkthroughStateC>;
-export const _WalkthroughState = makeConstructor(WalkthroughStateC);
+export type WalkthroughComponent<State> = React.ComponentClass<State>;
 
-export enum ViewState
+export interface WalkthroughGraphType<ViewEnum, State>
 {
-  Start,
-  Import,
-  Export,
-  PickExportTemplate,
-  PickExportAlgorithm,
-  PickExportDestination,
-  ExportDestination,
-  NewImport,
-  PickImportTemplate,
-  PickLocalFile,
-  PickImportSource,
-  ImportDestination,
-  PickDatabase,
-  Review,
-  Finish, // unreachable view state
+  [k: number]: {
+    prompt: string; // the main prompt to give to the user
+    crumbText?: string; // the text that shows up in the breadcrumbs
+    additionalText?: string; // a subtitle for the prompt
+    options: Array<{
+      link: ViewEnum; // What ViewEnum to go to next
+      buttonText?: string; // if it's a simple button, what does it say?
+      component?: WalkthroughComponent<State>; // if it's a custom ui interaction, what component to use
+      default?: boolean;
+    }>;
+  }
 }
