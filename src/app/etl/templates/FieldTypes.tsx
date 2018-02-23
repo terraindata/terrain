@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
+import { ELASTIC_TYPES } from 'shared/etl/TemplateTypes';
 import { TransformationNode as TransformationNodeBase } from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';

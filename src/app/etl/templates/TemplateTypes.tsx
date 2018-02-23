@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
-import { FILE_TYPES } from 'shared/etl/ETLTypes';
+import { FILE_TYPES } from 'shared/etl/TemplateTypes';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
@@ -57,8 +57,8 @@ import
 {
   LANGUAGES, TEMPLATE_TYPES,
   Template as TemplateI,
-  ETLConfiguration as ETLConfigurationI,
-} from 'shared/etl/ETLTypes';
+  TemplateConfiguration as TemplateConfigurationI,
+} from 'shared/etl/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class TemplateEditorStateC
@@ -84,26 +84,26 @@ class EditorDisplayStateC
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
-class ETLConfigurationC implements ETLConfigurationI
+class TemplateConfigurationC implements TemplateConfigurationI
 {
   public requireAllFields = false;
   public sources = null;
   public destination = null;
 }
-export type ETLConfiguration = WithIRecord<ETLConfigurationC>;
-export const _ETLConfiguration = makeConstructor(ETLConfigurationC);
+export type TemplateConfiguration = WithIRecord<TemplateConfigurationC>;
+export const _TemplateConfiguration = makeConstructor(TemplateConfigurationC);
 
 class ETLTemplateC implements TemplateI
 {
   public id = -1;
   public templateName = '';
   public type = TEMPLATE_TYPES.IMPORT;
-  public configuration = _ETLConfiguration();
+  public configuration = _TemplateConfiguration();
   public transformationEngine = new TransformationEngine();
 }
 export type ETLTemplate = WithIRecord<ETLTemplateC>;
 export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
-  configuration: _ETLConfiguration,
+  configuration: _TemplateConfiguration,
   transformationEngine: TransformationEngine.load,
 });
 

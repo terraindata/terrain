@@ -53,7 +53,7 @@ import
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import * as Immutable from 'immutable';
-import { ELASTIC_TYPES } from 'shared/etl/ETLTypes';
+import { ELASTIC_TYPES } from 'shared/etl/TemplateTypes';
 const { List } = Immutable;
 
 export function testSerialization(template: ETLTemplate): ETLTemplate

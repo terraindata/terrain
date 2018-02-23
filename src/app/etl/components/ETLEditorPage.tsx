@@ -70,6 +70,7 @@ export interface Props
 {
   params?: {
     algorithmId?: number,
+    templateId?: number;
   };
   algorithms: IMMap<ID, Algorithm>;
 
@@ -146,6 +147,10 @@ class ETLEditorPage extends TerrainComponent<Props>
     if (this.props.params.algorithmId !== undefined)
     {
       this.initFromAlgorithm();
+    }
+    else if (this.props.params.templateId !== undefined)
+    {
+      // TODO
     }
   }
 

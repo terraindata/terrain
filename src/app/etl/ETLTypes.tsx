@@ -43,83 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+// tslint:disable:import-spacing
 
-export enum LANGUAGES
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+const { List, Map } = Immutable;
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+
+class ETLStateC
 {
-  ELASTIC = 'elastic',
+  public ImportUIState = _ImportUIState();
+}
+export type ETLState = WithIRecord<ETLStateC>;
+export const _ETLState = makeConstructor(ETLStateC);
+
+export const ImportStepMap =
+{
+  fromFile: {
+
+  }
 }
 
-export enum ELASTIC_TYPES
+// pick source OR 
+//
+
+class ImportUIStateC
 {
-  TEXT = 'text',
-  LONG = 'long',
-  BOOLEAN = 'boolean',
-  DATE = 'date',
-  ARRAY = 'array',
-  NESTED = 'nested',
-  DOUBLE = 'double',
-  SHORT = 'short',
-  BYTE = 'byte',
-  INTEGER = 'integer',
-  HALF_FLOAT = 'half_float',
-  FLOAT = 'float',
-  GEO_POINT = 'geo_point',
+  public step: 
 }
-
-export const JS_TO_ES = {
-  array: ELASTIC_TYPES.ARRAY,
-  object: ELASTIC_TYPES.NESTED,
-  string: ELASTIC_TYPES.TEXT,
-  number: ELASTIC_TYPES.DOUBLE,
-  boolean: ELASTIC_TYPES.BOOLEAN,
-  null: ELASTIC_TYPES.TEXT,
-  undefined: ELASTIC_TYPES.TEXT,
-};
-
-export function jsToElastic(type): ELASTIC_TYPES
-{
-  const eType = JS_TO_ES[type];
-  return eType !== undefined ? eType : ELASTIC_TYPES.TEXT;
-}
-
-export enum TEMPLATE_TYPES
-{
-  EXPORT = 'export',
-  IMPORT = 'import',
-}
-
-export enum FILE_TYPES
-{
-  JSON = 'json',
-  JSON_TYPE_OBJECT = 'json [type object]',
-  CSV = 'csv',
-}
-
-export interface Template
-{
-  id: ID;
-  templateName: string;
-  type: TEMPLATE_TYPES; // technically this actually just helps the editing process.
-  configuration: ETLConfiguration;
-  transformationEngine: TransformationEngine;
-}
-
-type SourceConfig = object; // this type definition should be somewhere else
-type DestinationConfig = object; // these are placeholders
-
-export interface ETLConfiguration
-{
-  requireAllFields: boolean;
-  sources: {
-    [k: string]: SourceConfig;
-  };
-  destination: DestinationConfig;
-
-  // TODOS
-  // fileType: FILE_TYPES; this belongs in the source & destination config
-  // csvHeader: boolean; this belongs in the source & destination config
-  // jsonNewlines: boolean; this belongs in the source & destination config
-  // upsert: boolean; this belongs in the destination config
-}
+export type ImportUIState = WithIRecord<ImportUIStateC>;
+export const _ImportUIState = makeConstructor(ImportUIStateC);

@@ -63,7 +63,7 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-import { TEMPLATE_TYPES } from 'shared/etl/ETLTypes';
+import { TEMPLATE_TYPES } from 'shared/etl/TemplateTypes';
 
 /*
  *  This class defines a base class with useful functions that are used by components
