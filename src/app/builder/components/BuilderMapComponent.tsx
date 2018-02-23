@@ -93,7 +93,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
 
   public handleZoomChange(zoom)
   {
-    this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapZoomValue'), zoom, true);
+    this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapZoomValue'), zoom);
   }
 
   public handleChange(coordinates, inputValue)
@@ -133,7 +133,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
         <MapComponent
           geocoder='photon'
           inputValue={mapInputValue}
-          coordinates={locationValue}
+          coordinates={locationValue !== undefined ? locationValue : [0, 0]}
           distance={distance}
           distanceUnit={distanceUnit}
           inputs={this.state.inputs}

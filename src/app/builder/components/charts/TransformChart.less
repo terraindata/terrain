@@ -58,9 +58,17 @@
 }
 
 .transform-chart {
+  .bottomAxis {
+    .tick line {
+      display: none;
+    }
+  }
+
+  .tick text {
+    stroke: none;
+  }
 
   .tick line {
-    stroke: lightgrey;
     stroke-width: 1px;
   }
   
@@ -72,11 +80,11 @@
   .point {
     cursor: pointer;
     transition: stroke-width 0.15s, stroke 0.15s;
-    stroke-width: 3px;
+    stroke-width: 2px;
     &:not(.point-disabled) {
       &:hover,
       &[active="1"] {
-        stroke-width: 5px;
+        stroke-width: 3px;
       }
     }
   }
@@ -84,9 +92,25 @@
   .lines-bg {
     opacity: .5;
   }
-  
+  .bar {
+    .bar-path {
+    opacity: 0.7
+    }
+    .bar-percentage {
+      font-size: 12px;
+      opacity: 0;
+      .transition;
+    }
+    &:hover {
+      .bar-percentage {
+        opacity: 1;
+      }
+    }
+  }
+
+
   .lines {
-    stroke-width: 5px;
+    stroke-width: 2px;
     fill: none;
     .transition(~"stroke 0.15s");
     
@@ -98,10 +122,7 @@
       stroke: #fc5218;
     }
   }
-  
-  .bar {
-    opacity: .5;
-  }
+
 
   .popup {
     font-weight: bold;

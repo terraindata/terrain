@@ -49,8 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as os from 'os';
 import * as process from 'process';
 import * as v8 from 'v8';
-import * as winston from 'winston';
-import { App, currentApp } from '../App';
+
 import appStats from '../AppStats';
 
 const Router = new KoaRouter();

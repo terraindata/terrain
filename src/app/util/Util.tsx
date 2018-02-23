@@ -305,13 +305,11 @@ const Util = {
 
   formatNumber(n: number): string
   {
-    const precision: number = 3;
-
+    const precision = 3;
     if (!n)
     {
       return n + '';
     }
-
     const sign = n < 0 ? '-' : '';
     n = Math.abs(n);
 
@@ -348,13 +346,31 @@ const Util = {
         // if there are extra 0's after the decimal point, trim them (and the point if necessary)
         str = str.substr(0, str.length - 1);
       }
-
       return sign + str + suffix;
     }
 
     return sign + n.toExponential(precision);
   },
-
+  formattedToNumber(formattedNumber: string)
+  {
+    if (!isNaN(parseFloat(formattedNumber)))
+    {
+      const num = parseFloat(formattedNumber);
+      if (formattedNumber.indexOf('k') >= 0)
+      {
+        return 1000 * num;
+      }
+      else if (formattedNumber.indexOf('B') >= 0)
+      {
+        return 1000000000 * num;
+      }
+      else if (formattedNumber.indexOf('M') >= 0)
+      {
+        return 1000000 * num;
+      }
+    }
+    return formattedNumber;
+  },
   getId(isString: boolean = false): ID
   {
     if (isString)

@@ -54,6 +54,8 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
+import LinearSelector from 'app/common/components/LinearSelector';
 import { BuilderState } from 'builder/data/BuilderState';
 import Util from 'util/Util';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
@@ -64,7 +66,6 @@ import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
-import Menu from './../../../../common/components/Menu';
 import BuilderActions from './../../../data/BuilderActions';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
@@ -89,6 +90,7 @@ export interface Props
 
   builder?: BuilderState;
   builderActions?: typeof BuilderActions;
+  colorsActions?: typeof ColorsActions;
 }
 
 class PathfinderScoreLine extends TerrainComponent<Props>
@@ -102,6 +104,15 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       expanded: this.props.line.expanded,
       fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
     };
+
+  public componentWillMount()
+  {
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-score-line-transform .linear-selector-wrapper .linear-selector-option',
+      style: fontColor(Colors().fontColorLightest),
+    });
+  }
 
   public componentWillReceiveProps(nextProps)
   {
@@ -134,62 +145,38 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public renderTransformChart()
   {
+    const { line, pathfinderContext } = this.props;
     const data = {
-      input: this.props.line.field,
-      domain: this.props.line.transformData.domain,
-      hasCustomDomain: false,
-      scorePoints: this.props.line.transformData.scorePoints,
+      input: line.field,
+      domain: line.transformData.domain,
+      hasCustomDomain: line.transformData.hasCustomDomain,
+      scorePoints: line.transformData.scorePoints,
       static: {
         colors: [Colors().builder.cards.categories.score, Colors().bg3],
       },
-      mode: this.props.line.transformData.mode,
-      dataDomain: this.props.line.transformData.dataDomain,
+      mode: line.transformData.mode,
+      dataDomain: line.transformData.dataDomain,
+      closed: !line.expanded,
     };
-
     return (
       <div className='pf-score-line-transform'>
-        <Menu
-          options={List([
-            {
-              text: 'freeform',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'linear',
-              icon: <LinearIcon />,
-              iconColor: Colors().active,
-            },
-            {
-              text: 'logarithmic',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'logarithmic',
-              icon: <LogarithmicIcon />,
-              iconColor: Colors().active,
-            },
-            {
-              text: 'exponential',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'exponential',
-              icon: <ExponentialIcon />,
-              iconColor: Colors().active,
-            },
-            {
-              text: 'bell-curve',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'normal',
-              icon: <NormalIcon />,
-              iconColor: Colors().active,
-            },
-            {
-              text: 's-curve',
-              onClick: this.handleTransformModeChange,
-              selected: this.props.line.transformData.mode === 'sigmoid',
-              icon: <SigmoidIcon />,
-              iconColor: Colors().active,
-            },
-          ])}
+        <LinearSelector
+          options={List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'])}
+          selected={line.transformData.mode}
+          keyPath={this.props.keyPath.push('transformData').push('mode')}
+          action={this.props.builderActions.changePath}
+          canEdit={pathfinderContext.canEdit}
+          displayNames={Map({
+            linear: 'Linear',
+            logarithmic: 'Logarithmic',
+            exponential: 'Exponential',
+            normal: 'Bell-Curve',
+            sigmoid: 'S-Curve',
+          })}
         />
         <TransformCard
           builderState={this.props.builder}
-          canEdit={this.props.pathfinderContext.canEdit}
+          canEdit={pathfinderContext.canEdit}
           className={'builder-comp-list-item'}
           data={data}
           handleCardDrop={undefined}
@@ -198,7 +185,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           language={'elastic'}
           onChange={this.props.builderActions.changePath}
           parentData={undefined}
-          index={this.props.pathfinderContext.source.dataSource.name}
+          index={pathfinderContext.source.dataSource.name}
         />
       </div>);
   }
@@ -306,5 +293,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderScoreLine,
   ['builder'],
-  { builderActions: BuilderActions },
+  {
+    builderActions: BuilderActions,
+    colorsActions: ColorsActions,
+  },
 );

@@ -57,7 +57,6 @@ import v8 = require('v8');
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
-import any = jasmine.any;
 import appStats from './AppStats';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';

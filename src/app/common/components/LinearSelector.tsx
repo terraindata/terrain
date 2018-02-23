@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions member-access
 
 import * as classNames from 'classnames';
+import { List, Map } from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -63,6 +64,7 @@ import './LinearSelector.less';
 export interface Props
 {
   options: List<string | number>;
+  displayNames?: Map<string | number, string>;
   selected: string | number;
   keyPath?: KeyPath;
   onChange?: (value: string | number) => void;
@@ -147,6 +149,7 @@ class LinearSelector extends TerrainComponent<Props>
     const onClickFn = this.state.showAllOptions ?
       this._fn(this.selectOption, option, false) :
       this._toggle('showAllOptions');
+
     const selected = this.props.selected === option;
     return (
       <div
@@ -163,7 +166,7 @@ class LinearSelector extends TerrainComponent<Props>
           backgroundColor(selected ? Colors().active : ''),
         ]}
       >
-        {option}
+        {this.props.displayNames ? this.props.displayNames.get(option) : option}
       </div>
     );
   }
