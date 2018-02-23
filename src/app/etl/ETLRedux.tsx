@@ -59,27 +59,22 @@ export interface ETLActionTypes
   placeholder: {
     actionType: 'placeholder';
   };
-  
-
 }
-
-const ROOT_PATH = List(['rootField']);
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 {
   public reducers: ConstrainedMap<ETLActionTypes, ETLState> =
     {
-      setTemplate: (state, action) =>
+      placeholder: (state, action) =>
       {
-        return state.set('isDirty', false).
-          set('template', action.payload.template);
+        return state;
       },
     };
 
 }
 
 const ReduxInstance = new ETLRedux();
-export const TemplateEditorActions = ReduxInstance._actionsForExport();
-export const TemplateEditorReducers = ReduxInstance._reducersForExport(_ETLState);
+export const ETLActions = ReduxInstance._actionsForExport();
+export const ETLReducers = ReduxInstance._reducersForExport(_ETLState);
 export declare type TemplateEditorActionType<K extends keyof ETLActionTypes> =
   GetType<K, ETLActionTypes>;

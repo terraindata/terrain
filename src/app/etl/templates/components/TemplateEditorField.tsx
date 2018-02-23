@@ -63,7 +63,7 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-import { TEMPLATE_TYPES } from 'shared/etl/TemplateTypes';
+import { TemplateTypes } from 'shared/etl/TemplateTypes';
 
 /*
  *  This class defines a base class with useful functions that are used by components
@@ -213,7 +213,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _isExport(): boolean
   {
     return this._template !== undefined &&
-      this._template.type === TEMPLATE_TYPES.EXPORT;
+      this._template.type === TemplateTypes.Export;
   }
 
   private onRootMutation(field: TemplateField)

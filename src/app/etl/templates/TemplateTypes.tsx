@@ -49,15 +49,14 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
-import { FILE_TYPES } from 'shared/etl/TemplateTypes';
+import { FileTypes } from 'shared/etl/TemplateTypes';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import
 {
-  LANGUAGES, TEMPLATE_TYPES,
+  Languages, TemplateTypes,
   Template as TemplateI,
-  TemplateConfiguration as TemplateConfigurationI,
 } from 'shared/etl/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
@@ -84,26 +83,18 @@ class EditorDisplayStateC
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
-class TemplateConfigurationC implements TemplateConfigurationI
-{
-  public requireAllFields = false;
-  public sources = null;
-  public destination = null;
-}
-export type TemplateConfiguration = WithIRecord<TemplateConfigurationC>;
-export const _TemplateConfiguration = makeConstructor(TemplateConfigurationC);
-
 class ETLTemplateC implements TemplateI
 {
   public id = -1;
   public templateName = '';
-  public type = TEMPLATE_TYPES.IMPORT;
-  public configuration = _TemplateConfiguration();
+  public type = TemplateTypes.Import;
   public transformationEngine = new TransformationEngine();
+  public transformationConfig = null;
+  public sources = null;
+  public sinks = null;
 }
 export type ETLTemplate = WithIRecord<ETLTemplateC>;
 export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
-  configuration: _TemplateConfiguration,
   transformationEngine: TransformationEngine.load,
 });
 

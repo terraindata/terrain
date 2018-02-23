@@ -52,24 +52,54 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 
 class ETLStateC
 {
-  public ImportUIState = _ImportUIState();
+
 }
 export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor(ETLStateC);
 
-export const ImportStepMap =
+export enum ViewState
 {
-  fromFile: {
-
-  }
+  Start,
+  Import,
+  Export,
+  NewExport,
+  PickExportTemplate,
+  PickExportAlgorithm,
+  PickExportSource,
+  PickExportDestination,
+  ExportDestination,
+  NewImport,
+  PickImportTemplate,
+  PickLocalFile,
+  PickImportSource,
+  ImportDestination,
+  PickDatabase,
+  PickImportDestination,
+  Finish,
 }
+const V = ViewState; // just an alias to make below easier to read
+const ViewGraph = {
+  [V.Start]: [ V.Import, V.Export ],
+  // export
+  [V.Export]: [ V.NewExport, V.PickExportTemplate ],
+  [V.PickExportTemplate]: [ V.Finish ],
+  [V.NewExport]: [ V.PickExportAlgorithm, V.PickExportSource /* custom */ ],
+  [V.PickExportAlgorithm]: [ V.ExportDestination ],
+  [V.PickExportSource]: [ V.ExportDestination ],
+  [V.ExportDestination]: [ V.PickExportDestination, V.Finish /*local*/ ],
+  [V.PickExportDestination]: [ V.Finish ],
+  // import
+  [V.Import]: [ V.NewImport, V.PickImportTemplate ],
+  [V.PickImportTemplate]: [ V.Finish ],
+  [V.NewImport]: [ V.PickLocalFile, V.PickImportSource ],
+  [V.PickLocalFile]: [ V.ImportDestination ],
+  [V.PickImportSource]: [ V.ImportDestination ],
+  [V.ImportDestination]: [ V.PickDatabase, V.PickImportDestination /* custom */ ],
+  [V.PickDatabase]: [ V.Finish ],
+  [V.PickImportDestination]: [ V.Finish ],
+};
 
-// pick source OR 
-//
-
-class ImportUIStateC
+class WalkthroughStateC
 {
-  public step: 
+  public Step: ViewState = ViewState.Start;
 }
-export type ImportUIState = WithIRecord<ImportUIStateC>;
-export const _ImportUIState = makeConstructor(ImportUIStateC);

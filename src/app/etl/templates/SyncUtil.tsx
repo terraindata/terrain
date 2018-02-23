@@ -51,7 +51,7 @@ const { List, Map } = Immutable;
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import { _ElasticFieldSettings, _TemplateField, _TransformationNode, ElasticFieldSettings, TemplateField, TransformationNode }
   from 'etl/templates/FieldTypes';
-import { ELASTIC_TYPES, jsToElastic } from 'shared/etl/TemplateTypes';
+import { ElasticTypes, jsToElastic, Languages } from 'shared/etl/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export function createTreeFromEngine(engine: TransformationEngine): TemplateField
@@ -91,7 +91,7 @@ export function createTreeFromEngine(engine: TransformationEngine): TemplateFiel
 export function createFieldFromEngine(
   engine: TransformationEngine,
   id: number,
-  language = 'elastic',
+  language = Languages.Elastic,
 ): TemplateField
 {
   const enginePath = engine.getOutputKeyPath(id).toJS();
@@ -134,7 +134,7 @@ export function updateFieldFromEngine(
   engine: TransformationEngine,
   id: number,
   oldField: TemplateField,
-  language = 'elastic',
+  language = Languages.Elastic,
 ): TemplateField
 {
   const updatedField = createFieldFromEngine(engine, id, language);

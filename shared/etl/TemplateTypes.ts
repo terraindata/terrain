@@ -46,12 +46,12 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-export enum LANGUAGES
+export enum Languages
 {
-  ELASTIC = 'elastic',
+  Elastic = 'elastic',
 }
 
-export enum ELASTIC_TYPES
+export enum ElasticTypes
 {
   TEXT = 'text',
   LONG = 'long',
@@ -69,57 +69,57 @@ export enum ELASTIC_TYPES
 }
 
 export const JS_TO_ES = {
-  array: ELASTIC_TYPES.ARRAY,
-  object: ELASTIC_TYPES.NESTED,
-  string: ELASTIC_TYPES.TEXT,
-  number: ELASTIC_TYPES.DOUBLE,
-  boolean: ELASTIC_TYPES.BOOLEAN,
-  null: ELASTIC_TYPES.TEXT,
-  undefined: ELASTIC_TYPES.TEXT,
+  array: ElasticTypes.ARRAY,
+  object: ElasticTypes.NESTED,
+  string: ElasticTypes.TEXT,
+  number: ElasticTypes.DOUBLE,
+  boolean: ElasticTypes.BOOLEAN,
+  null: ElasticTypes.TEXT,
+  undefined: ElasticTypes.TEXT,
 };
 
-export function jsToElastic(type): ELASTIC_TYPES
+export function jsToElastic(type): ElasticTypes
 {
   const eType = JS_TO_ES[type];
-  return eType !== undefined ? eType : ELASTIC_TYPES.TEXT;
+  return eType !== undefined ? eType : ElasticTypes.TEXT;
 }
 
-export enum TEMPLATE_TYPES
+// TODO refactor these enums to be pascal case
+export enum TemplateTypes
 {
-  EXPORT = 'export',
-  IMPORT = 'import',
+  Export = 'export',
+  Import = 'import',
 }
 
-export enum FILE_TYPES
+export enum FileTypes
 {
-  JSON = 'json',
-  JSON_TYPE_OBJECT = 'json [type object]',
-  CSV = 'csv',
+  Json = 'json',
+  JsonTypeObject = 'json [type object]',
+  Csv = 'csv',
 }
 
 export interface Template
 {
   id: ID;
   templateName: string;
-  type: TEMPLATE_TYPES; // technically this actually just helps the editing process.
-  configuration: TemplateConfiguration;
+  type: TemplateTypes; // TODO get rid of?
   transformationEngine: TransformationEngine;
-}
-
-type SourceConfig = object; // this type definition should be somewhere else
-type DestinationConfig = object; // these are placeholders
-
-export interface TemplateConfiguration
-{
-  requireAllFields: boolean;
+  transformationConfig: any;
   sources: {
     [k: string]: SourceConfig;
   };
-  destination: DestinationConfig;
+  sinks: {
+    [k: string]: SinkConfig;
+  };
+}
 
-  // TODOS
-  // fileType: FILE_TYPES; this belongs in the source & destination config
-  // csvHeader: boolean; this belongs in the source & destination config
-  // jsonNewlines: boolean; this belongs in the source & destination config
-  // upsert: boolean; this belongs in the destination config
+interface SourceConfig
+{
+  type: string;
+  params: object;
+} // this type definition should be somewhere else. it's also a placeholder
+interface SinkConfig
+{
+  type: string;
+  params: object;
 }

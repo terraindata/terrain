@@ -52,6 +52,8 @@ import { browserHistory } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { ViewState } from 'etl/ETLTypes';
+
 import './ETLPage.less';
 
 export interface Props

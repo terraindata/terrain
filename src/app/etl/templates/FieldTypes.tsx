@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { ELASTIC_TYPES } from 'shared/etl/TemplateTypes';
+import { ElasticTypes, Languages } from 'shared/etl/TemplateTypes';
 import { TransformationNode as TransformationNodeBase } from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
@@ -55,11 +55,11 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 
 class ElasticFieldSettingsC
 {
-  public langType: string = 'elastic';
+  public langType: Languages = Languages.Elastic;
   public isAnalyzed: boolean = true;
   public analyzer: string = '';
-  public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
-  public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
+  public type: ElasticTypes = ElasticTypes.TEXT;
+  public arrayType: List<ElasticTypes> = List([ElasticTypes.TEXT]);
 }
 export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
 export const _ElasticFieldSettings = makeExtendedConstructor(ElasticFieldSettingsC, false, {
@@ -79,7 +79,7 @@ class TemplateFieldC
   public isArray(): boolean
   {
     const type = this.langSettings.type;
-    return type === ELASTIC_TYPES.ARRAY;
+    return type === ElasticTypes.ARRAY;
   }
 
   // returns how deep the array type is. For example, if the field's type is array of array of text, then the depth is 2.
@@ -92,8 +92,8 @@ class TemplateFieldC
   public isNested(): boolean
   {
     const { type, arrayType } = this.langSettings;
-    return type === ELASTIC_TYPES.NESTED ||
-      (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
+    return type === ElasticTypes.NESTED ||
+      (type === ElasticTypes.ARRAY && arrayType.size > 0 && arrayType.last() === ElasticTypes.NESTED);
   }
 
   public getSubfields() // TODO: if nothing fancy needs to happen, just directly access children

@@ -53,7 +53,7 @@ import
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import * as Immutable from 'immutable';
-import { ELASTIC_TYPES } from 'shared/etl/TemplateTypes';
+import { ElasticTypes } from 'shared/etl/TemplateTypes';
 const { List } = Immutable;
 
 export function testSerialization(template: ETLTemplate): ETLTemplate
@@ -188,15 +188,15 @@ export const SampleDocuments = [
 //     {
 //       if (typeof value === 'number')
 //       {
-//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.FLOAT }) }));
+//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ElasticTypes.FLOAT }) }));
 //       }
 //       else if (typeof value === 'boolean')
 //       {
-//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.BOOLEAN }) }));
+//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ElasticTypes.BOOLEAN }) }));
 //       }
 //       else // assume text
 //       {
-//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.TEXT }) }));
+//         children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ElasticTypes.TEXT }) }));
 //       }
 //     }
 //     else if (Array.isArray(value))
@@ -206,7 +206,7 @@ export const SampleDocuments = [
 
 //       while (Array.isArray(arrayVal))
 //       {
-//         arrayType.push(ELASTIC_TYPES.ARRAY);
+//         arrayType.push(ElasticTypes.ARRAY);
 //         if (arrayVal.length > 0)
 //         {
 //           arrayVal = arrayVal[0];
@@ -218,23 +218,23 @@ export const SampleDocuments = [
 //       }
 //       if (typeof arrayVal === 'object')
 //       {
-//         arrayType.push(ELASTIC_TYPES.NESTED);
+//         arrayType.push(ElasticTypes.NESTED);
 //       }
 //       else if (typeof arrayVal === 'number')
 //       {
-//         arrayType.push(ELASTIC_TYPES.FLOAT);
+//         arrayType.push(ElasticTypes.FLOAT);
 //       }
 //       else if (typeof arrayVal === 'boolean')
 //       {
-//         arrayType.push(ELASTIC_TYPES.BOOLEAN);
+//         arrayType.push(ElasticTypes.BOOLEAN);
 //       }
 //       else
 //       {
-//         arrayType.push(ELASTIC_TYPES.TEXT);
+//         arrayType.push(ElasticTypes.TEXT);
 //       }
 //       if (typeof arrayVal === 'object')
 //       {
-//         const override = _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) });
+//         const override = _ElasticFieldSettings({ type: ElasticTypes.ARRAY, arrayType: List(arrayType) });
 //         children.push(treeFromDocument(arrayVal, key, override));
 //       }
 //       else
@@ -242,7 +242,7 @@ export const SampleDocuments = [
 //         children.push(_TemplateField(
 //           {
 //             name: key,
-//             langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }),
+//             langSettings: _ElasticFieldSettings({ type: ElasticTypes.ARRAY, arrayType: List(arrayType) }),
 //           }));
 //       }
 //     }
@@ -255,6 +255,6 @@ export const SampleDocuments = [
 //     {
 //       name,
 //       children: List(children),
-//       langSettings: fieldSettingsOverride !== undefined ? fieldSettingsOverride : _ElasticFieldSettings({ type: ELASTIC_TYPES.NESTED }),
+//       langSettings: fieldSettingsOverride !== undefined ? fieldSettingsOverride : _ElasticFieldSettings({ type: ElasticTypes.NESTED }),
 //     });
 // }

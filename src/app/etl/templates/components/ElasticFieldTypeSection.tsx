@@ -59,7 +59,7 @@ const { List, Map } = Immutable;
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { _ElasticFieldSettings, ElasticFieldSettings } from 'etl/templates/FieldTypes';
-import { ELASTIC_TYPES } from 'shared/etl/TemplateTypes';
+import { ElasticTypes } from 'shared/etl/TemplateTypes';
 
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
@@ -161,12 +161,12 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
       />
     );
 
-    const showArrayTypeSection = field.langSettings.type === ELASTIC_TYPES.ARRAY;
-    const showAnalyzedSection = field.langSettings.type === ELASTIC_TYPES.TEXT ||
+    const showArrayTypeSection = field.langSettings.type === ElasticTypes.ARRAY;
+    const showAnalyzedSection = field.langSettings.type === ElasticTypes.TEXT ||
       (
-        field.langSettings.type === ELASTIC_TYPES.ARRAY &&
+        field.langSettings.type === ElasticTypes.ARRAY &&
         field.langSettings.arrayType.size > 0 &&
-        field.langSettings.arrayType.get(field.langSettings.arrayType.size - 1) === ELASTIC_TYPES.TEXT
+        field.langSettings.arrayType.get(field.langSettings.arrayType.size - 1) === ElasticTypes.TEXT
       );
     // TODO make it show only for import
 
@@ -189,9 +189,9 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
     // const { field, act } = this.props;
     // const nextType = elasticTypeOptions.get(index);
     // const currentType = this.props.field.langSettings.type;
-    // if (currentType === ELASTIC_TYPES.ARRAY && nextType !== ELASTIC_TYPES.ARRAY)
+    // if (currentType === ElasticTypes.ARRAY && nextType !== ElasticTypes.ARRAY)
     // { // if user changes type from array, clear the array type
-    //   this.setLangSettings('arrayType', List([ELASTIC_TYPES.TEXT]));
+    //   this.setLangSettings('arrayType', List([ElasticTypes.TEXT]));
     //   this.setLangSettings('type', elasticTypeOptions.get(index));
     // }
     // else if (isNested(currentType, field.langSettings.arrayType)
@@ -267,19 +267,19 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
 }
 
 const elasticTypeOptions = List([
-  ELASTIC_TYPES.TEXT,
-  ELASTIC_TYPES.LONG,
-  ELASTIC_TYPES.BOOLEAN,
-  ELASTIC_TYPES.DATE,
-  ELASTIC_TYPES.ARRAY,
-  ELASTIC_TYPES.NESTED,
-  ELASTIC_TYPES.DOUBLE,
-  ELASTIC_TYPES.SHORT,
-  ELASTIC_TYPES.BYTE,
-  ELASTIC_TYPES.INTEGER,
-  ELASTIC_TYPES.HALF_FLOAT,
-  ELASTIC_TYPES.FLOAT,
-  ELASTIC_TYPES.GEO_POINT,
+  ElasticTypes.TEXT,
+  ElasticTypes.LONG,
+  ElasticTypes.BOOLEAN,
+  ElasticTypes.DATE,
+  ElasticTypes.ARRAY,
+  ElasticTypes.NESTED,
+  ElasticTypes.DOUBLE,
+  ElasticTypes.SHORT,
+  ElasticTypes.BYTE,
+  ElasticTypes.INTEGER,
+  ElasticTypes.HALF_FLOAT,
+  ElasticTypes.FLOAT,
+  ElasticTypes.GEO_POINT,
 ]);
 
 const elasticAnalyzerOptions = List([
@@ -289,9 +289,9 @@ const elasticAnalyzerOptions = List([
 ]); // this is just a placeholder
 
 // returns true if type or arrayType are nested
-function isNested(type: ELASTIC_TYPES, arrayType: List<ELASTIC_TYPES>)
+function isNested(type: ElasticTypes, arrayType: List<ElasticTypes>)
 {
-  return type === ELASTIC_TYPES.NESTED || (arrayType && arrayType.last() === ELASTIC_TYPES.NESTED);
+  return type === ElasticTypes.NESTED || (arrayType && arrayType.last() === ElasticTypes.NESTED);
 }
 
 /*
@@ -299,13 +299,13 @@ function isNested(type: ELASTIC_TYPES, arrayType: List<ELASTIC_TYPES>)
  * Turns [array, array] into [array, array, text]
  * Turns [array, array, text, array] into [array, array, text]
  */
-function cleanArrayType(arrayType: List<ELASTIC_TYPES>)
+function cleanArrayType(arrayType: List<ElasticTypes>)
 {
   let cutIndex = -1;
   let newArrayType = arrayType;
   arrayType.forEach((value, index) =>
   {
-    if (value !== ELASTIC_TYPES.ARRAY)
+    if (value !== ElasticTypes.ARRAY)
     {
       cutIndex = index + 1;
       return false;
@@ -315,9 +315,9 @@ function cleanArrayType(arrayType: List<ELASTIC_TYPES>)
   {
     newArrayType = arrayType.slice(0, cutIndex).toList();
   }
-  if (newArrayType.size === 0 || newArrayType.last() === ELASTIC_TYPES.ARRAY)
+  if (newArrayType.size === 0 || newArrayType.last() === ElasticTypes.ARRAY)
   {
-    newArrayType = newArrayType.push(ELASTIC_TYPES.TEXT);
+    newArrayType = newArrayType.push(ElasticTypes.TEXT);
   }
   return newArrayType;
 }
