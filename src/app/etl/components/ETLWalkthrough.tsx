@@ -54,24 +54,20 @@ import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { ETLActions } from 'etl/ETLRedux';
+import { ETLState, ViewGraph, ViewState, WalkthroughState } from 'etl/ETLTypes';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { NoArrayDocuments, testSerialization } from 'etl/templates/TemplateUtil';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 
 const { List } = Immutable;
 
 export interface Props
 {
-  act?: typeof TemplateEditorActions;
+  walkthrough: WalkthroughState;
+  act?: typeof ETLActions;
 }
 
 @Radium
-class ETLImportPage extends TerrainComponent<Props>
+class ETLWalkthrough extends TerrainComponent<Props>
 {
 
   public render()
@@ -88,7 +84,7 @@ class ETLImportPage extends TerrainComponent<Props>
 }
 
 export default Util.createContainer(
-  ETLImportPage,
-  [],
-  { act: TemplateEditorActions },
+  ETLWalkthrough,
+  ['etl', 'walkthrough'],
+  { act: ETLActions },
 );

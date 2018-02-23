@@ -55,8 +55,8 @@ import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import ControlPage from './control/components/ControlPage';
 import ETLEditorPage from './etl/components/ETLEditorPage';
-import ETLImportPage from './etl/components/ETLImportPage';
 import ETLPage from './etl/components/ETLPage';
+import ETLWalkthrough from './etl/components/ETLWalkthrough';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
@@ -136,10 +136,8 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
           <Route path='/etl' component={ETLPage}>
-            <Route path='/etl/import' component={ETLImportPage} />
-            {/*<Route path='/etl/export' component={ETLExportPage} />*/}
-            <Route path='/etl/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
-            {/*<Route path='/etl/edit/templateId=:templateId' component={ETLEditorPage} />*/}
+            <IndexRoute component={ETLWalkthrough} />
+            <Route path='edit/algorithmId=:algorithmId' component={ETLEditorPage} />
           </Route>
           <Route path='/analytics'>
             <IndexRoute component={analyticsLibrary} />

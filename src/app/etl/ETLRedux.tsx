@@ -70,7 +70,6 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return state;
       },
     };
-
 }
 
 const ReduxInstance = new ETLRedux();

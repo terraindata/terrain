@@ -51,6 +51,7 @@ import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
 import { AuthReducers } from 'auth/data/AuthRedux';
 import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
 import BuilderReducers from 'builder/data/BuilderReducers';
+import { ETLReducers } from 'etl/ETLRedux';
 import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
@@ -68,6 +69,7 @@ const reducers = {
   auth: AuthReducers,
   builder: BuilderReducers,
   colors: ColorsReducers,
+  etl: ETLReducers,
   library: LibraryReducer,
   roles: RolesReducer,
   templateEditor: TemplateEditorReducers,

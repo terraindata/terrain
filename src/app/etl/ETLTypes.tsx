@@ -54,20 +54,30 @@ import { TemplateTypes } from 'shared/etl/TemplateTypes';
 
 class ETLStateC
 {
-
+ public walkthrough: WalkthroughState = _WalkthroughState();
 }
 export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor(ETLStateC);
+
+class WalkthroughStateC
+{
+  public step: ViewState = ViewState.Start;
+  public stepHistory: List<ViewState> = List([]);
+  public type: TemplateTypes = null;
+  public source: any = null;
+  public sink: any = null;
+  public chosenTemplateId: ID = -1;
+}
+export type WalkthroughState = WithIRecord<WalkthroughStateC>;
+export const _WalkthroughState = makeConstructor(WalkthroughStateC);
 
 export enum ViewState
 {
   Start,
   Import,
   Export,
-  NewExport,
   PickExportTemplate,
   PickExportAlgorithm,
-  PickExportSource,
   PickExportDestination,
   ExportDestination,
   NewImport,
@@ -76,38 +86,6 @@ export enum ViewState
   PickImportSource,
   ImportDestination,
   PickDatabase,
-  PickImportDestination,
-  Finish,
+  Review,
+  Finish, // unreachable view state
 }
-const V = ViewState; // just an alias to make below easier to read
-const ViewGraph = {
-  [V.Start]: [ V.Import, V.Export ],
-  // export
-  [V.Export]: [ V.NewExport, V.PickExportTemplate ],
-  [V.PickExportTemplate]: [ V.Finish ],
-  [V.NewExport]: [ V.PickExportAlgorithm, V.PickExportSource /* custom */ ],
-  [V.PickExportAlgorithm]: [ V.ExportDestination ],
-  [V.PickExportSource]: [ V.ExportDestination ],
-  [V.ExportDestination]: [ V.PickExportDestination, V.Finish /*local*/ ],
-  [V.PickExportDestination]: [ V.Finish ],
-  // import
-  [V.Import]: [ V.NewImport, V.PickImportTemplate ],
-  [V.PickImportTemplate]: [ V.Finish ],
-  [V.NewImport]: [ V.PickLocalFile, V.PickImportSource ],
-  [V.PickLocalFile]: [ V.ImportDestination ],
-  [V.PickImportSource]: [ V.ImportDestination ],
-  [V.ImportDestination]: [ V.PickDatabase, V.PickImportDestination /* custom */ ],
-  [V.PickDatabase]: [ V.Finish ],
-  [V.PickImportDestination]: [ V.Finish ],
-};
-
-class WalkthroughStateC
-{
-  public Step: ViewState = ViewState.Start;
-  public type: TemplateTypes = null;
-  public source: any = null;
-  public sink: any = null;
-  public chosenTemplateId: ID = -1;
-}
-export type WalkThroughState = WithIRecord<WalkThroughStateC>;
-export const _WalkThroughState = makeConstructor(WalkThroughStateC);

@@ -52,65 +52,60 @@ import { browserHistory } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { ViewState } from 'etl/ETLTypes';
-
 import './ETLPage.less';
 
 export interface Props
 {
   children?: any;
-  placeholder?: any;
 }
 
 @Radium
 export default class ETLPage extends TerrainComponent<Props>
 {
 
-  public renderButtons()
-  {
-    return (
-      <div className='button-holder' style={backgroundColor(Colors().bg3)}>
-        <div
-          key='import'
-          className='test-button'
-          style={[backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)]}
-          onClick={this.handleImportClicked}
-        >
-          Test Import Button
-        </div>
-        <div
-          key='export'
-          className='test-button'
-          style={[backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)]}
-          onClick={this.handleExportClicked}
-        >
-          Test Export Button
-        </div>
-      </div>
-    );
-  }
+  // public renderButtons()
+  // {
+  //   return (
+  //     <div className='button-holder' style={backgroundColor(Colors().bg3)}>
+  //       <div
+  //         key='import'
+  //         className='test-button'
+  //         style={[backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)]}
+  //         onClick={this.handleImportClicked}
+  //       >
+  //         Test Import Button
+  //       </div>
+  //       <div
+  //         key='export'
+  //         className='test-button'
+  //         style={[backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)]}
+  //         onClick={this.handleExportClicked}
+  //       >
+  //         Test Export Button
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   public render()
   {
     return (
       <div className='etl-page-root'>
         {
-          this.props.children == null ?
-            this.renderButtons() :
-            this.props.children
+          this.props.children
         }
       </div>
     );
   }
 
-  public handleImportClicked()
-  {
-    browserHistory.push(`/etl/import`);
-  }
+  // public handleImportClicked()
+  // {
+  //   browserHistory.push(`/etl/import`);
+  // }
 
-  public handleExportClicked()
-  {
-    browserHistory.push(`/etl/export`);
+  // public handleExportClicked()
+  // {
+  //   browserHistory.push(`/etl/export`);
 
-  }
+  // }
 }
