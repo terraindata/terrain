@@ -236,7 +236,7 @@ class CardsArea extends TerrainComponent<Props>
             wrapType={this.props.singleChild && cards && cards.size === 1 && cards.get(0).type}
             wrapUp={true}
             handleCardDrop={this.props.handleCardDrop}
-            language={this.props.builder.query.language}
+            language={this.props.builder.query && this.props.builder.query.language}
             builderActions={this.props.builderActions}
           />
 
