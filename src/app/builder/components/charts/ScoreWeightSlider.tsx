@@ -59,7 +59,9 @@ interface ScoreWeightSliderProps {
   min: number;
   max: number;
   value: number;
+  onBeforeChange: (value: number) => void;
   onChange: (value: number) => void;
+  onAfterChange: (value: number) => void;
   height: number;
 }
 
@@ -143,7 +145,9 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
             railStyle={{ height, backgroundColor: 'transparent' }}
             trackStyle={trackStyle}
             handleStyle={handleStyle}
+            onBeforeChange={this.props.onBeforeChange}
             onChange={this.props.onChange}
+            onAfterChange={this.props.onAfterChange}
           />
         </div>
       </div>

@@ -94,18 +94,24 @@ export interface Props
   colorsActions?: typeof ColorsActions;
 }
 
+const EditableField = (props) =>
+  props.editing ? props.editComponent : props.readOnlyComponent;
+
+
 class PathfinderScoreLine extends TerrainComponent<Props>
 {
   public state: {
     weight: number;
     expanded: boolean;
     fieldIndex: number;
-    showFieldDropdown: boolean;
+    editingField: boolean;
+    editingWeight: boolean;
   } = {
     weight: this.props.line.weight,
     expanded: this.props.line.expanded,
     fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
-    showFieldDropdown: false;
+    editingField: false;
+    editingWeight: false;
   };
 
   public componentWillMount()
@@ -121,9 +127,10 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     if (this.props.line !== nextProps.line)
     {
+      const weight = nextProps.line.weight;
       this.setState({
         fieldIndex: nextProps.dropdownOptions.map((v) => v.displayName).toList().indexOf(nextProps.line.field),
-        weight: nextProps.line.weight,
+        weight: weight !== '' ? parseInt(weight, 10) : 0,
         expanded: nextProps.line.expanded,
       });
     }
@@ -144,7 +151,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     const value = this.props.dropdownOptions.map((v) => v.displayName).toList().get(index);
     this.props.builderActions.changePath(this.props.keyPath.push('field'), value, false, true);
-    this.setState((state) => ({ showFieldDropdown: false }));
+    this.setState((state) => ({ editingField: false }));
   }
 
   public renderTransformChart()
@@ -212,9 +219,34 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     );
   }
 
-  public showFieldDropdown()
+  public editingField()
   {
-    this.setState((state) => ({ showFieldDropdown: true }));
+    this.setState((state) => ({ editingField: true }));
+  }
+
+  public editingWeight()
+  {
+    this.setState((state) => ({ editingWeight: true }));
+  }
+
+  public handleWeightBeforeChange(value: number)
+  {
+    if (this.state.editingWeight)
+    {
+      this.setState((state) => ({ editingWeight: false }));
+    }
+  }
+
+  public handleWeightChange(value: number)
+  {
+    this.setState((state) => ({ weight: value }));
+  }
+
+  public handleWeightAfterChange(value: number)
+  {
+    const { keyPath } = this.props;
+
+    this.props.builderActions.changePath(this.props.keyPath.push('weight'), value);
   }
 
   public renderLineContents()
@@ -223,23 +255,24 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
     return (
       <div className='pf-line pf-score-line-inner'>
-        {
-          !this.state.showFieldDropdown ?
-            (
-              <div className="field-name" onClick={this.showFieldDropdown}>
-                {this.props.dropdownOptions.get(fieldIndex).displayName}
-              </div>
-            ) :
-            (
-              <SearchableDropdown
-                options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
-                selectedIndex={fieldIndex}
-                canEdit={this.props.pathfinderContext.canEdit}
-                placeholder={'Field...'}
-                onChange={this.handleFieldChange}
-              />
-            )
-        }
+        <EditableField
+          editing={this.state.editingField}
+          editComponent={
+            <SearchableDropdown
+              options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
+              selectedIndex={fieldIndex}
+              canEdit={this.props.pathfinderContext.canEdit}
+              placeholder={'Field...'}
+              onChange={this.handleFieldChange}
+              width={fieldIndex > -1 ? '33.33%' : '100%'}
+            />
+          }
+          readOnlyComponent={
+            <div className="field-name" onClick={this.editingField}>
+              {this.props.dropdownOptions.get(fieldIndex).displayName}
+            </div>
+          }
+        />
 
         {
           fieldIndex > -1 ?
@@ -251,17 +284,30 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                   keyPath={this.props.keyPath.push('weight')}
                   noAnimation={!this.props.animateScoreBars}
                   builderActions={this.props.builderActions}
+                  onBeforeChange={this.handleWeightBeforeChange}
+                  onChange={this.handleWeightChange}
+                  onAfterChange={this.handleWeightAfterChange}
                 />
-                <BuilderTextbox
-                  keyPath={this.props.keyPath.push('weight')}
-                  value={this.props.line.weight}
-                  language={'elastic'}
-                  canEdit={this.props.pathfinderContext.canEdit}
-                  placeholder={'weight'}
-                  isNumber={true}
-                  autoDisabled={true}
-                  onChange={this.props.onAnimateScoreBars}
-                  action={this.props.builderActions.changePath}
+                <EditableField
+                  editing={this.state.editingWeight}
+                  editComponent={
+                    <BuilderTextbox
+                      keyPath={this.props.keyPath.push('weight')}
+                      value={this.props.line.weight}
+                      language={'elastic'}
+                      canEdit={this.props.pathfinderContext.canEdit}
+                      placeholder={'weight'}
+                      isNumber={true}
+                      autoDisabled={true}
+                      onChange={this.props.onAnimateScoreBars}
+                      action={this.props.builderActions.changePath}
+                    />
+                  }
+                  readOnlyComponent={
+                    <div className="field-weight" onClick={this.editingWeight}>
+                      {this.state.weight}
+                    </div>
+                  }
                 />
               </div>
             ) : null

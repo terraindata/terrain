@@ -72,25 +72,39 @@ interface Props {
   keyPath: KeyPath;
   noAnimation?: boolean;
   builderActions: typeof BuilderActions;
+  onBeforeChange: (value: number) => void;
+  onChange: (value: number) => void;
+  onAfterChange: (value: number) => void;
 }
 
 class ScoreBar extends TerrainComponent<Props>
 {
+  public handleWeightBeforeChange(value: number)
+  {
+    this.props.onBeforeChange(value);
+  }
+
   public handleWeightChange(value: number)
   {
-    const { keyPath } = this.props;
+    this.props.onChange(value);
+  }
 
-    this.props.builderActions.changePath(keyPath, value);
+  public handleWeightAfterChange(value: number)
+  {
+    this.props.onAfterChange(value);
   }
 
   public render()
   {
     const { weight } = this.props.data;
+    console.error('scorebar', weight)
 
     return (
       <ScoreWeightSlider
         value={weight}
+        onBeforeChange={this.handleWeightBeforeChange}
         onChange={this.handleWeightChange}
+        onAfterChange={this.handleWeightAfterChange}
         min={0}
         max={100}
         color={'rgb(30, 180, 250)'}
