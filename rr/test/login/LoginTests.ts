@@ -90,7 +90,7 @@ async function loginToBuilder(page, url)
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type('admin@terraindata.com');
   await page.click(PASSWORD_SELECTOR);
-  await page.keyboard.type('secretz');
+  await page.keyboard.type('secret');
   await page.click(BUTTON_SELECTOR);
   sleep.sleep(1);
   winston.info('Goto the starting page.');
