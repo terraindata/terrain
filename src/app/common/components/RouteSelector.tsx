@@ -59,6 +59,7 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import './RouteSelectorStyle.less';
 import { FloatingInput, LARGE_FONT_SIZE, FONT_SIZE } from './FloatingInput';
 import FadeInOut from './FadeInOut';
+import DrawerAnimation from './DrawerAnimation';
 import { ResultsConfig, _ResultsConfig } from 'shared/results/types/ResultsConfig';
 import Hit from 'builder/components/results/Hit.tsx';
 import Util from 'util/Util';
@@ -274,7 +275,7 @@ export class RouteSelector extends TerrainComponent<Props>
       {
         const el = ReactDOM.findDOMNode(this.state.pickerRef);
       
-        if (el)
+        if (el && false) // TODO LK
         {
           el.scrollIntoView({
             behavior: 'smooth',
@@ -298,27 +299,43 @@ export class RouteSelector extends TerrainComponent<Props>
   {
     const { props, state } = this;
     
-    if(!this.isOpen())
-    {
-      return null;
-    }
-
-    return (
-      <div
-        className={classNames({
-          'routeselector-picker': true,
-          'routeselector-multi-picker': true,
-          'routeselector-picker-no-shadow': props.noShadow,
-        })}
-        ref={this._fn(this._saveRefToState, 'pickerRef')}
-      >
-        <div className='routeselector-picker-inner routeselector-multi-picker-inner'>
-          {
-            props.optionSets.map(this.renderOptionSet)
-          }
-        </div>
+    // we need to duplicate the inner picker content
+    // so that we can get the wrapper to size dynamically
+    // to the content (in a hidden copy) and show the real copy
+    // pinned to the bottom edge of the wrapper, for the drawer animation
+    const pickerInnerContent = (
+      <div className='routeselector-picker-inner routeselector-multi-picker-inner'>
+        {
+          props.optionSets.map(this.renderOptionSet)
+        }
       </div>
     );
+    
+    return (
+        <div
+          className={classNames({
+            'routeselector-picker': true,
+            'routeselector-picker-closed': !this.isOpen(),
+            'routeselector-multi-picker': true,
+            'routeselector-picker-no-shadow': props.noShadow,
+          })}
+          ref={this._fn(this._saveRefToState, 'pickerRef')}
+        >
+          <div className='routeselector-picker-inner-copy'>
+            {
+              pickerInnerContent
+            }
+          </div>
+          {
+            pickerInnerContent
+          }
+        </div>
+    );
+      // <DrawerAnimation
+      //   open={this.isOpen()}
+      //   height={400}
+      // >
+      // </DrawerAnimation>
   }
   
   private renderOptionSet(optionSet: RouteSelectorOptionSet, index: number)

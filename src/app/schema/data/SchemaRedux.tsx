@@ -127,7 +127,7 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
       {
         const { schemaMetadata } = action.payload;
         return state
-          .set('schemaMetadata', List(schemaMetadata.map((d) => _SchemaMetadata(d))));
+          .set('schemaMetadata', List(schemaMetadata !== null ? schemaMetadata.map((d) => _SchemaMetadata(d)) : []));
       },
 
       setServer: (state, action) =>
