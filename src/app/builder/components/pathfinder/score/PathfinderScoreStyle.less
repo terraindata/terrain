@@ -11,12 +11,22 @@
 		    top: -5px;
 		}
 	}
-	.pf-linear-score-line {
-		display: inline-flex;
-		.dropdown-wrapper:first-child {
-		    margin-left: 12px;
-			margin-right: 6px;
+	.drag-drop-pf-score {
+		.pf-line-wrapper
+		{
+			.close{
+				opacity: 0;
+				.transition;
+			}
+			&:hover {
+				.close {
+					opacity: 1;
+				}
+			}
 		}
+	}
+	.pf-linear-score-line {
+		width: 90%;
 	}
 	.pf-score-line-transform {
 		padding-bottom: 10px;
