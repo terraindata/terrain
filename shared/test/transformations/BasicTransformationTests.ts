@@ -69,7 +69,7 @@ const doc2 = {
 
 const doc3 = {
   name: 'Bob',
-  arr: [5, ['a', 'b'], { xkcd: 1270 }],
+  arr: ['sled', ['a', 'b'], { xkcd: 1270 }],
 };
 
 test('add fields manually', () =>
@@ -252,5 +252,6 @@ test('rename a field (an object with subkeys)', () =>
 test('process array types', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
-  // console.dir(e, {colors: true, depth: null});
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['arr', '0'])]));
+  // console.log(e.transform(doc3));
 });

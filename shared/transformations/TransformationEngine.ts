@@ -49,19 +49,17 @@ import GraphLib = require('graphlib');
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
-import nestedProperty = require('nested-property');
-import deepGet = require('utils-deep-get');
-import deepSet = require('utils-deep-set');
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+import * as yadeep from './yadeep';
 
 const Graph = GraphLib.Graph;
-export type KeyPath = List<string>;
-export const KeyPath = (args: string[] = []) => List<string>(args);
+export type KeyPath = List<string | string[]>;
+export const KeyPath = (args: Array<string | string[]> = []) => List<string | string[]>(args);
 
 export class TransformationEngine
 {
@@ -334,7 +332,7 @@ export class TransformationEngine
 
   public getFieldProp(fieldID: number, prop: KeyPath): any
   {
-    return deepGet(this.fieldProps.get(fieldID), prop.toArray());
+    return yadeep.get(this.fieldProps.get(fieldID), prop);
   }
 
   public getFieldProps(fieldID: number): object
@@ -350,7 +348,7 @@ export class TransformationEngine
   public setFieldProp(fieldID: number, prop: KeyPath, value: any): void
   {
     const newProps: object = this.fieldProps.get(fieldID);
-    deepSet(newProps, prop.toArray(), value, { create: true });
+    yadeep.set(newProps, prop, value, { create: true });
     this.fieldProps = this.fieldProps.set(fieldID, newProps);
   }
 
@@ -439,15 +437,15 @@ export class TransformationEngine
     const output: object = {};
     this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
     {
-      if (deepGet(obj, keyPath.toArray()) !== undefined)
+      if (yadeep.get(obj, keyPath) !== undefined)
       {
-        const ref: any = deepGet(obj, keyPath.toArray());
+        const ref: any = yadeep.get(obj, keyPath);
         if (isPrimitive(ref))
         {
           output[value] = ref;
         } else if (Array.isArray(ref))
         {
-          // TODO arrays
+          // TODO array
         } else
         {
           output[value] = Object.assign({}, ref);
@@ -464,7 +462,7 @@ export class TransformationEngine
     {
       if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
       {
-        deepSet(output, value.toArray(), obj[key], { create: true });
+        yadeep.set(output, value, obj[key], { create: true });
       }
     });
     return output;
