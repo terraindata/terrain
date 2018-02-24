@@ -143,6 +143,7 @@ class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
   public type: 'terrain' | 'linear' | 'elastic' | 'random' | 'none' = 'terrain';
+  public seed: number = 10; // For random scoring
 }
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>

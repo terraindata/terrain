@@ -50,6 +50,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
@@ -78,6 +79,7 @@ export interface Props
   builderActions?: typeof BuilderActions;
 }
 
+@Radium
 class PathfinderScoreSection extends TerrainComponent<Props>
 {
   public state: {
@@ -147,7 +149,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     const { source } = pathfinderContext;
 
     const fieldOptions = source.dataSource.getChoiceOptions({
-      type: 'fields',
+      type: 'transformFields',
       source,
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
@@ -305,11 +307,16 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   public handleStepChange()
   {
     const { step } = this.props.pathfinderContext;
-    
     if (step === PathfinderSteps.Score)
     {
       this.props.onStepChange(step);
     }
+  }
+
+  public randomizeScore()
+  {
+    this.props.builderActions.changePath(this.props.keyPath.push('seed'),
+      Math.round(Math.random() * 100));
   }
 
   public render()
@@ -364,11 +371,25 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             :
             null
         }
+        {
+          this.props.score.type === 'random' &&
+          <div
+            className='pf-score-randomize-button'
+            onClick={this.randomizeScore}
+            style={[
+              fontColor(Colors().fontWhite),
+              backgroundColor(Colors().active),
+            ]}
+          >
+            Randomize
+          </div>
+        }
 
         {
           this.props.pathfinderContext.step === PathfinderSteps.Score &&
           <div
             onClick={this.handleStepChange}
+            style={[]}
             className='pf-step-button'
           >
             Scoring looks good for now
