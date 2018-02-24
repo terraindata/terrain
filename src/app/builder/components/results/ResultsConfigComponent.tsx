@@ -48,19 +48,23 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
+import * as _ from 'lodash';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
 import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
-import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { _Format, Format, ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+import ElasticBlockHelpers, {getIndex} from 'database/elastic/blocks/ElasticBlockHelpers';
+import {SchemaState} from 'app/schema/SchemaTypes';
+import {BuilderState} from 'app/builder/data/BuilderState';
 
 const Color = require('color');
 
@@ -79,6 +83,10 @@ export interface Props
   onClose: (config: ResultsConfig) => void;
   colorsActions: typeof ColorsActions;
   builderActions?: typeof BuilderActions;
+  dataSource?: any;
+  schema?: SchemaState;
+  builder?: BuilderState;
+  columns?: any;
 }
 
 @Radium
@@ -87,9 +95,15 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
   public state: {
     lastHover: { index: number, field: string },
     config: ResultsConfig;
+    nestedFields: List<string>,
+    showingNestedConfig: boolean,
+    nestedField: string,
   } = {
       lastHover: { index: null, field: null },
       config: null,
+      nestedFields: List([]),
+      showingNestedConfig: false,
+      nestedField: '',
     };
 
   constructor(props: Props)
@@ -105,6 +119,20 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       selector: '.results-config-field-gear',
       style: { fill: Colors().iconColor },
     });
+    // Get the fields that are nested
+    const nestedFields = this.props.fields.filter((field) => {
+      const type = ElasticBlockHelpers.getTypeOfField(
+          this.props.schema,
+          this.props.builder,
+          field,
+          this.props.dataSource,
+          true
+      );
+      return type === 'nested';
+    }).toList();
+    this.setState({
+      nestedFields,
+    });
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -114,6 +142,22 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       this.setState({
         config: nextProps.config,
       });
+    }
+    if (this.props.fields !== nextProps.fields)
+    {
+      const nestedFields = nextProps.fields.filter((field) => {
+      const type = ElasticBlockHelpers.getTypeOfField(
+          nextProps.schema,
+          nextProps.builder,
+          field,
+          nextProps.dataSource,
+          true
+      );
+      return type === 'nested';
+    }).toList();
+    this.setState({
+      nestedFields,
+    });
     }
   }
 
@@ -174,6 +218,69 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         lastHover: { index: null, field: null },
       });
     }
+  }
+
+  public handleNestedConfigChange(field, config, builderActions)
+  {
+    builderActions.changeResultsConfig(config, field);
+  }
+
+  public handleNestedConfigClose(field, config)
+  {
+    this.setState({
+      showingNestedConfig: false,
+      nestedField: '',
+    });
+  }
+
+  public renderNestedConfig()
+  {
+    const field = this.state.nestedField;
+    if (!this.state.showingNestedConfig)
+    {
+      return null;
+    }
+    const format = this.props.config.formats.get(field);
+    // Get fields from the schema - this is for if nested is part of the object (not groupJoined)
+    const { dataSource, schema, builder } = this.props;
+    const index = dataSource && dataSource.index.split('/')[1] || getIndex('', builder);
+    const server = builder.db.name;
+    const indexId = `${builder.db.name}/${String(index)}`;
+    let columns;
+    if (this.props.columns)
+    {
+      columns = this.props.columns.get(field).properties;
+    }
+    else
+    {
+      const cols = this.props.columns || schema.columns;
+      // Get properties of column that matches field / index / serverId
+      columns = cols.filter((col) =>
+        col.serverId === String(server) &&
+        col.databaseId === String(indexId) &&
+        col.name === field
+      )
+      .map((col) => col.properties)
+      .toList().get(0);
+    }
+    return (
+      <ResultsConfigComponent
+        {...this.props}
+        fields={List(_.keys(columns))}
+        config={format !== undefined ? format.config : _ResultsConfig()}
+        onConfigChange={this._fn(this.handleNestedConfigChange, field)}
+        onClose={this._fn(this.handleNestedConfigClose, field)}
+        columns={columns}
+      />
+    )
+  }
+
+  public handleOpenConfig(field)
+  {
+    this.setState({
+      showingNestedConfig: true,
+      nestedField: field,
+    });
   }
 
   public changeConfig(config: ResultsConfig)
@@ -321,6 +428,8 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onFormatChange={this.handleFormatChange}
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                      nested={this.state.nestedFields.indexOf(config.thumbnail) !== -1}
+                      openConfig={this.handleOpenConfig}
                     />
                     :
                     <div className='results-config-placeholder' style={placeholderStyle}>
@@ -346,6 +455,8 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onFormatChange={this.handleFormatChange}
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                      nested={this.state.nestedFields.indexOf(config.name) !== -1}
+                      openConfig={this.handleOpenConfig}
                     />
                     :
                     <div className='results-config-placeholder' style={placeholderStyle}>
@@ -371,6 +482,8 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onFormatChange={this.handleFormatChange}
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                      openConfig={this.handleOpenConfig}
+                      nested={this.state.nestedFields.indexOf(config.score) !== -1}
                     />
                     :
                     <div className='results-config-placeholder' style={placeholderStyle}>
@@ -388,20 +501,25 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 </div>
                 {
                   config && config.fields.map((field, index) =>
-                    <div className='results-config-field-wrapper' key={field}>
-                      <ResultsConfigResult
-                        field={field}
-                        is='field'
-                        index={index}
-                        onHover={this.handleFieldHover}
-                        draggingField={this.state.lastHover.field}
-                        onRemove={this.handleRemove}
-                        format={formats.get(field)}
-                        onFormatChange={this.handleFormatChange}
-                        primaryKeys={config.primaryKeys}
-                        onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                      />
-                    </div>,
+                {
+                    return (
+                      <div className='results-config-field-wrapper' key={field}>
+                        <ResultsConfigResult
+                          field={field}
+                          is='field'
+                          index={index}
+                          onHover={this.handleFieldHover}
+                          draggingField={this.state.lastHover.field}
+                          onRemove={this.handleRemove}
+                          format={formats.get(field)}
+                          onFormatChange={this.handleFormatChange}
+                          primaryKeys={config.primaryKeys}
+                          onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                          openConfig={this.handleOpenConfig}
+                          nested={this.state.nestedFields.indexOf(field) !== -1}
+                        />
+                      </div>
+                    )}
                   )
                 }
                 <div className='results-config-placeholder' style={placeholderStyle}>
@@ -427,6 +545,8 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                   onFormatChange={this.handleFormatChange}
                   primaryKeys={config.primaryKeys}
                   onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                  openConfig={this.handleOpenConfig}
+                  nested={this.state.nestedFields.indexOf(field) !== -1}
                 />,
               )
             }
@@ -443,6 +563,9 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             </div>
           </div>
         </div>
+        {
+          this.renderNestedConfig()
+        }
       </div>
     );
   }
@@ -464,6 +587,8 @@ interface ResultsConfigResultProps
   onFormatChange: (field: string, format: Format) => void;
   primaryKeys: List<string>;
   onPrimaryKeysChange: (primaryKeys: List<string>) => void;
+  nested?: boolean;
+  openConfig: (field: string) => void;
 }
 
 @Radium
@@ -547,10 +672,10 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 
   public render()
   {
-    const { format } = this.props;
+    const { format, field } = this.props;
     const image = format && format.type === 'image';
     const map = format && format.type === 'map';
-
+    // Check using the schema if it can be nested
     const selected: boolean = this.props.is !== null && this.props.isAvailableField;
     const mainStyle = [
       backgroundColor(Colors().bg3),
@@ -580,7 +705,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         className={classNames({
           'results-config-field': true,
           'results-config-field-dragging': this.props.isDragging ||
-            (this.props.draggingField && this.props.draggingField === this.props.field),
+            (this.props.draggingField && this.props.draggingField === field),
           'results-config-field-thumbnail': this.props.is === 'thumbnail',
           'results-config-field-name': this.props.is === 'name',
           'results-config-field-score': this.props.is === 'score',
@@ -591,12 +716,12 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         <div className='results-config-field-body flex-container'>
           <span className='results-config-handle'>
             <DragHandle
-              key={'handle-for-' + this.props.field + String(this.props.index)}
+              key={'handle-for-' + field + String(this.props.index)}
             />
           </span>
           <span className='results-config-text flex-grow'>
             {
-              this.props.field
+              field
             }
           </span>
           {
@@ -623,47 +748,52 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
           <div className='results-config-format-header'>
             <input
               type='checkbox'
-              checked={this.props.primaryKeys.contains(this.props.field)}
+              checked={this.props.primaryKeys.contains(field)}
               onChange={this.handlePrimaryKeyChange}
               id={'primaryKey-' + this.props.field}
               className='rcf-primary-key-input'
             />
             <label
-              htmlFor={'primaryKey-' + this.props.field}
+              htmlFor={'primaryKey-' + field}
               className='rcf-primary-key-label'
             >
               {this.props.field} is a primary key
             </label>
           </div>
           <div className='results-config-format-header'>
-            Display the value of {this.props.field} as:
+            Display the value of {field} as:
           </div>
-          <div className='results-config-format-btns'>
-            <div className='results-config-text-btn'
-              key={'text-btn-' + this.props.field}
-              onClick={this.changeToText}
-              style={(image || map) ? inactiveBtnStyle : activeBtnStyle}
-            >
-              <TextIcon /> Text
+          {
+           !this.props.nested &&
+            <div className='results-config-format-btns'>
+
+              <div className='results-config-text-btn'
+                key={'text-btn-' + field}
+                onClick={this.changeToText}
+                style={(image || map) ? inactiveBtnStyle : activeBtnStyle}
+              >
+                <TextIcon /> Text
+              </div>
+                <div className='results-config-image-btn'
+                  key={'image-btn-' + field}
+                  onClick={this.changeToImage}
+                  style={image ? activeBtnStyle : inactiveBtnStyle}
+                >
+                  <ImageIcon /> Image
+                </div>
             </div>
-            <div className='results-config-image-btn'
-              key={'image-btn-' + this.props.field}
-              onClick={this.changeToImage}
-              style={image ? activeBtnStyle : inactiveBtnStyle}
-            >
-              <ImageIcon /> Image
+          }
+          {
+            this.props.nested &&
+            <div className='results-config-format-btns'>
+              <div className='results-config-text-btn'
+                onClick={this._fn(this.props.openConfig, field)}
+                style={activeBtnStyle}
+              >
+               Configure
+              </div>
             </div>
-            {
-              // Disallow option of having each result have their own map
-              // <div className='results-config-map-btn'
-              // key={'map-btn-' + this.props.field}
-              // onClick={this.changeToMap}
-              // style={map ? activeBtnStyle : inactiveBtnStyle}
-              // >
-              //   <MarkerIcon /> Map
-              // </div>
-            }
-          </div>
+          }
 
           <div className='results-config-image'>
             <div>
@@ -678,29 +808,29 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
               />
             </div>
             <div>
-              <em>For example: http://example.com/[value].png or "[value]" which inserts the value of {this.props.field}</em>
+              <em>For example: http://example.com/[value].png or "[value]" which inserts the value of {field}</em>
             </div>
             <div className='results-config-field-value'>
               <input
                 type='checkbox'
-                id={'check-f-' + this.props.field}
+                id={'check-f-' + field}
                 checked={format && format.showField}
                 onChange={this.toggleField}
                 value={'' /* can remove when updated to newest React */}
               />
-              <label htmlFor={'check-f-' + this.props.field}>
+              <label htmlFor={'check-f-' + field}>
                 Show field name label
               </label>
             </div>
             <div className='results-config-raw-value'>
               <input
                 type='checkbox'
-                id={'check-' + this.props.field}
+                id={'check-' + field}
                 checked={!!format && format.showRaw}
                 onChange={this.toggleRaw}
                 value={'' /* can remove when updated to newest React */}
               />
-              <label htmlFor={'check-' + this.props.field}>
+              <label htmlFor={'check-' + field}>
                 Show raw value, as well
               </label>
             </div>

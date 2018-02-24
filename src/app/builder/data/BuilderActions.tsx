@@ -155,9 +155,10 @@ const BuilderActions =
         $(ActionTypes.checkpoint, {}),
 
     changeResultsConfig:
-      (resultsConfig) =>
+      (resultsConfig, field?) =>
         $(ActionTypes.changeResultsConfig, {
           resultsConfig,
+          field
         }),
 
     updateKeyPath:

@@ -221,6 +221,7 @@ class ColumnC extends SchemaBaseClass
   public isPrimaryKey = false;
 
   public sampleData: List<any> = List();
+  public properties?: List<any> = List();
 }
 export type Column = ColumnC & IRecord<ColumnC>;
 export const _Column = (config: {

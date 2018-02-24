@@ -550,7 +550,39 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     value = 'null';
     italics = true;
   }
-
+  if ((format && format.config !== undefined))
+  {
+    const thumbnail = format.config.thumbnail;
+    const template = format.config.formats.get(thumbnail).template;
+    return (
+      <div className='hit-nested-value'>
+        {
+          value.slice(0, 5).map((nested, i) =>
+          {
+            const image = nested.get(thumbnail);
+            const url = template.replace(/\[value\]/g, image as string);
+            return (
+              <div
+                className='result-field-value-image-wrapper-nested'
+                key={i}
+              >
+                <div
+                  className='result-field-value-nested-image'
+                  style={{
+                    backgroundImage: `url(${url})`,
+                    // give the div the background image, to make use of the "cover" CSS positioning,
+                    // but also include the <img> tag below (with opacity 0) so that right-click options still work
+                  }}
+                >
+                  {/*<img src={url} />*/}
+                </div>
+              </div>
+            )
+          })
+        }
+      </div>
+    )
+  }
   if ((format && format.type !== 'map') || !format)
   {
     if (List.isList(value))

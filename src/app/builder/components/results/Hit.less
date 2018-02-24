@@ -14,6 +14,27 @@
 
 @small-result-height: 55px;
 
+.result-field-value-image-wrapper-nested {
+  height: 50px;
+  width: 50px;
+  .result-field-value-nested-image {
+    display: inline-block;
+    width: 100%;
+    height: 100%; 
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    border-radius: 4px 0 0 4px;
+
+    img {
+      width: 100%;
+      // height: 100%;
+      opacity: 0;
+    }
+  }
+}
+
 .result,
 .results-area-fodder {
   min-width: 95%;

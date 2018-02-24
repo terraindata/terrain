@@ -56,12 +56,14 @@ export class Format
   template: string = '';
   showRaw: boolean = false;
   showField: boolean = false;
+  config?: ResultsConfig = undefined; // For nested results
   set: (f: string, v: any) => Format;
   setIn: (f: string[], v: any) => Format;
 }
 const Format_Record = createRecordType(new Format(), 'FormatC');
 export const _Format = (config?: any) =>
 {
+  config['config'] = _ResultsConfig(config['config']);
   return new Format_Record(config || {}) as any as Format;
 };
 

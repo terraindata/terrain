@@ -77,6 +77,7 @@ import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
+import { SchemaState } from 'app/schema/SchemaTypes';
 
 const HITS_PAGE_SIZE = 20;
 
@@ -85,6 +86,7 @@ export interface Props
   resultsState: ResultsState;
   exportState?: FileImportState;
   builder?: BuilderState;
+  schema?: SchemaState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -900,6 +902,9 @@ column if you have customized the results view.');
         fields={this.props.resultsState.fields}
         onClose={this.hideConfig}
         onConfigChange={HitsArea.handleConfigChange}
+        builder={this.props.builder}
+        schema={this.props.schema}
+        dataSource={this.props.query.path.source.dataSource}
       />;
     }
   }
@@ -933,7 +938,7 @@ column if you have customized the results view.');
 
 export default Util.createContainer(
   HitsArea,
-  ['builder'],
+  ['builder', 'schema'],
   {
   },
 );
