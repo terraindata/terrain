@@ -158,7 +158,7 @@ const BuilderActions =
       (resultsConfig, field?) =>
         $(ActionTypes.changeResultsConfig, {
           resultsConfig,
-          field
+          field,
         }),
 
     updateKeyPath:

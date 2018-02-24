@@ -109,7 +109,7 @@ export interface Props
 export class RouteSelector extends TerrainComponent<Props>
 {
   state = {
-    open: !! this.props.defaultOpen,
+    open: !!this.props.defaultOpen,
     searches: List<string>([]),
 
     focusedSetIndex: this.props.defaultOpen ? 0 : -1,
@@ -204,7 +204,7 @@ export class RouteSelector extends TerrainComponent<Props>
                 large={props.large}
                 noBorder={true}
               />
-                {/*getValueRef={this.handleValueRef}
+              {/*getValueRef={this.handleValueRef}
                 forceFloat={state.picked}*/}
             </div>
           ))
@@ -327,7 +327,7 @@ export class RouteSelector extends TerrainComponent<Props>
     // counter passed down to renderOption to keep track of how many options are currently visible
     //  so that we can get the focused option index correct
     const visibleOptionCounter = { count: -1 };
-    const incrementVisibleOptions = () => visibleOptionCounter.count ++;
+    const incrementVisibleOptions = () => visibleOptionCounter.count++;
 
     const showTextbox = optionSet.hasSearch || optionSet.hasOther;
 
@@ -399,7 +399,7 @@ export class RouteSelector extends TerrainComponent<Props>
                   id={index}
                 />
               </div>
-            :
+              :
               <KeyboardFocus
                 index={0 /* we handle index manipulation internally in this class */}
                 length={0}
@@ -556,16 +556,16 @@ export class RouteSelector extends TerrainComponent<Props>
         {
           if (this.shouldShowOption(options.get(realOptionIndex), this.state.searches.get(focusedSetIndex)))
           {
-            visibleOptionsIndex ++;
+            visibleOptionsIndex++;
           }
-          realOptionIndex ++;
+          realOptionIndex++;
         }
         realOptionIndex -= 1;
 
         this.handleOptionClick(focusedSetIndex, options.get(realOptionIndex).value);
       }
 
-      focusedSetIndex ++;
+      focusedSetIndex++;
       focusedOptionIndex = 0;
 
       const nextSet = optionSets.get(focusedSetIndex);
@@ -647,11 +647,11 @@ export class RouteSelector extends TerrainComponent<Props>
             >
               {
                 option.icon !== undefined &&
-                  <div className='routeselector-option-icon'>
-                    {
-                      option.icon
-                    }
-                  </div>
+                <div className='routeselector-option-icon'>
+                  {
+                    option.icon
+                  }
+                </div>
               }
               <div className='routeselector-option-name-inner'>
                 {
@@ -662,22 +662,22 @@ export class RouteSelector extends TerrainComponent<Props>
 
             {
               option.sampleData && !optionSet.hideSampleData &&
-                <div className='routeselector-data'>
-                  <div className='routeselector-data-header'>
-                    Sample Data
+              <div className='routeselector-data'>
+                <div className='routeselector-data-header'>
+                  Sample Data
                   </div>
-                  {
-                    option.sampleData.map(this.renderSampleDatum)
-                  }
-                  {
-                    option.sampleData.size === 0 &&
-                      <div
-                      >
-                        {/* TODO styling */}
-                        No data available
+                {
+                  option.sampleData.map(this.renderSampleDatum)
+                }
+                {
+                  option.sampleData.size === 0 &&
+                  <div
+                  >
+                    {/* TODO styling */}
+                    No data available
                       </div>
-                  }
-                </div>
+                }
+              </div>
             }
           </div>
         </FadeInOut>
@@ -696,15 +696,15 @@ export class RouteSelector extends TerrainComponent<Props>
 
     if (
       searchFields.findIndex(
-      (field) =>
-      {
-        if (typeof field === 'string')
+        (field) =>
         {
-          return field.toUpperCase().indexOf(search.toUpperCase()) >= 0;
-        }
+          if (typeof field === 'string')
+          {
+            return field.toUpperCase().indexOf(search.toUpperCase()) >= 0;
+          }
 
-        return false;
-      },
+          return false;
+        },
       ) >= 0)
     {
       return true;
@@ -796,7 +796,7 @@ export class RouteSelector extends TerrainComponent<Props>
     // {
     //   // close without dispatching a value change
     //   setTimeout(() => {
-          // this.close();
+    // this.close();
     //   }, 850);
     // }
 

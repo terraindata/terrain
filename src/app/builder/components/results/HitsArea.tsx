@@ -55,6 +55,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { BuilderState } from 'app/builder/data/BuilderState';
+import { SchemaState } from 'app/schema/SchemaTypes';
 import Ajax from 'app/util/Ajax';
 import Util from 'app/util/Util';
 import Radium = require('radium');
@@ -77,7 +78,6 @@ import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
-import { SchemaState } from 'app/schema/SchemaTypes';
 
 const HITS_PAGE_SIZE = 20;
 

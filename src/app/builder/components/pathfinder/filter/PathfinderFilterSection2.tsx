@@ -332,7 +332,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public handleStepChange()
   {
-    const {step} = this.props.pathfinderContext;
+    const { step } = this.props.pathfinderContext;
     if (step === PathfinderSteps.Filter)
     {
       this.props.onStepChange(step);
@@ -344,8 +344,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const { filterGroup, pathfinderContext } = this.props;
     const { dragging } = this.state;
     const dropZoneStyle = { zIndex: dragging ? 20 : -1 };
-    const itemStyle = { opacity: dragging ? 0.7 : 1};
-    const groupStyle = { opacity: dragging ? 0.7 : 1, zIndex: dragging ? 99 : 5};
+    const itemStyle = { opacity: dragging ? 0.7 : 1 };
+    const groupStyle = { opacity: dragging ? 0.7 : 1, zIndex: dragging ? 99 : 5 };
     return (
       <div
         className='pf-section pf-filter-section'

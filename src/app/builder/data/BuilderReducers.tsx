@@ -447,19 +447,19 @@ const BuilderReducers =
         resultsConfig: any,
         field: string,
       }>) =>
-     {
-       const {field, resultsConfig} = action.payload;
-       if (field !== undefined)
-       {
-         const newConfig = state.query.resultsConfig.setIn(['formats', field, 'config'], resultsConfig);
-         return state.setIn(['query', 'resultsConfig'], newConfig);
-       }
-       return state
-         .update('query',
-           (query) =>
-             query.set('resultsConfig', resultsConfig),
-       )
-      },
+    {
+      const { field, resultsConfig } = action.payload;
+      if (field !== undefined)
+      {
+        const newConfig = state.query.resultsConfig.setIn(['formats', field, 'config'], resultsConfig);
+        return state.setIn(['query', 'resultsConfig'], newConfig);
+      }
+      return state
+        .update('query',
+          (query) =>
+            query.set('resultsConfig', resultsConfig),
+      );
+    },
 
     [ActionTypes.save]: (state: BuilderState,
       action: Action<{

@@ -47,24 +47,24 @@ THE SOFTWARE.
 // tslint:disable:no-empty max-classes-per-file strict-boolean-expressions max-line-length no-var-requires
 
 import * as Immutable from 'immutable';
-import * as Radium from 'radium';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
+import { BuilderState } from 'app/builder/data/BuilderState';
+import { SchemaState } from 'app/schema/SchemaTypes';
 import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
+import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
-import { _Format, Format, ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { _Format, _ResultsConfig, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import ElasticBlockHelpers, {getIndex} from 'database/elastic/blocks/ElasticBlockHelpers';
-import {SchemaState} from 'app/schema/SchemaTypes';
-import {BuilderState} from 'app/builder/data/BuilderState';
 
 const Color = require('color');
 
@@ -120,13 +120,14 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       style: { fill: Colors().iconColor },
     });
     // Get the fields that are nested
-    const nestedFields = this.props.fields.filter((field) => {
+    const nestedFields = this.props.fields.filter((field) =>
+    {
       const type = ElasticBlockHelpers.getTypeOfField(
-          this.props.schema,
-          this.props.builder,
-          field,
-          this.props.dataSource,
-          true
+        this.props.schema,
+        this.props.builder,
+        field,
+        this.props.dataSource,
+        true,
       );
       return type === 'nested';
     }).toList();
@@ -145,19 +146,20 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     }
     if (this.props.fields !== nextProps.fields)
     {
-      const nestedFields = nextProps.fields.filter((field) => {
-      const type = ElasticBlockHelpers.getTypeOfField(
+      const nestedFields = nextProps.fields.filter((field) =>
+      {
+        const type = ElasticBlockHelpers.getTypeOfField(
           nextProps.schema,
           nextProps.builder,
           field,
           nextProps.dataSource,
-          true
-      );
-      return type === 'nested';
-    }).toList();
-    this.setState({
-      nestedFields,
-    });
+          true,
+        );
+        return type === 'nested';
+      }).toList();
+      this.setState({
+        nestedFields,
+      });
     }
   }
 
@@ -258,10 +260,10 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       columns = cols.filter((col) =>
         col.serverId === String(server) &&
         col.databaseId === String(indexId) &&
-        col.name === field
+        col.name === field,
       )
-      .map((col) => col.properties)
-      .toList().get(0);
+        .map((col) => col.properties)
+        .toList().get(0);
     }
     return (
       <ResultsConfigComponent
@@ -272,7 +274,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         onClose={this._fn(this.handleNestedConfigClose, field)}
         columns={columns}
       />
-    )
+    );
   }
 
   public handleOpenConfig(field)
@@ -501,7 +503,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 </div>
                 {
                   config && config.fields.map((field, index) =>
-                {
+                  {
                     return (
                       <div className='results-config-field-wrapper' key={field}>
                         <ResultsConfigResult
@@ -519,7 +521,8 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                           nested={this.state.nestedFields.indexOf(field) !== -1}
                         />
                       </div>
-                    )}
+                    );
+                  },
                   )
                 }
                 <div className='results-config-placeholder' style={placeholderStyle}>
@@ -764,7 +767,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             Display the value of {field} as:
           </div>
           {
-           !this.props.nested &&
+            !this.props.nested &&
             <div className='results-config-format-btns'>
 
               <div className='results-config-text-btn'
@@ -774,12 +777,12 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
               >
                 <TextIcon /> Text
               </div>
-                <div className='results-config-image-btn'
-                  key={'image-btn-' + field}
-                  onClick={this.changeToImage}
-                  style={image ? activeBtnStyle : inactiveBtnStyle}
-                >
-                  <ImageIcon /> Image
+              <div className='results-config-image-btn'
+                key={'image-btn-' + field}
+                onClick={this.changeToImage}
+                style={image ? activeBtnStyle : inactiveBtnStyle}
+              >
+                <ImageIcon /> Image
                 </div>
             </div>
           }
@@ -790,7 +793,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
                 onClick={this._fn(this.props.openConfig, field)}
                 style={activeBtnStyle}
               >
-               Configure
+                Configure
               </div>
             </div>
           }
