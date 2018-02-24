@@ -49,6 +49,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
@@ -65,22 +66,23 @@ const { List } = Immutable;
 export interface Props
 {
   etl: ETLState;
+  params: {
+    step: number;
+  };
   act?: typeof ETLActions;
 }
 
-@Radium
 class ETLWalkthrough extends TerrainComponent<Props>
 {
   public render()
   {
     const { etl } = this.props;
+    const currentStep = this.getStepFromRoute();
     return (
-      <div
-
-      >
+      <div>
         <WalkthroughComponentClass
           context={etl}
-          stepIndex={etl.walkthrough.currentStep}
+          stepIndex={currentStep}
           stepHistory={etl.walkthrough.stepHistory}
           setSteps={this.handleStepsChange}
 
@@ -92,6 +94,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
   public handleStepsChange(newStep: number, newHistory: List<ViewState>)
   {
     const { walkthrough } = this.props.etl;
+    const currentStep = this.getStepFromRoute();
 
     if (newHistory.last() === ViewState.Finish)
     {
@@ -103,16 +106,37 @@ class ETLWalkthrough extends TerrainComponent<Props>
     {
       newState = newState.set('stepHistory', newHistory);
     }
-    if (newStep !== walkthrough.currentStep)
+    if (newStep !== currentStep)
     {
-      newState = newState.set('currentStep', newStep);
+      browserHistory.push(`/etl/new/${newStep}`);
     }
     this.props.act({
       actionType: 'setWalkthroughState',
       newState,
     });
   }
+
+  public getStepFromRoute()
+  {
+    const { params, etl } = this.props;
+    if (params != null && params.step != null)
+    {
+      const val = Number(params.step);
+      if (isNaN(val) || val < 0 || val >= etl.walkthrough.stepHistory.size)
+      {
+        return 0;
+      }
+      return val;
+    }
+    return 0;
+  }
 }
+
+export default Util.createContainer(
+  ETLWalkthrough,
+  ['etl'],
+  { act: ETLActions },
+);
 
 export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
 {
@@ -126,7 +150,7 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       {
         link: ViewState.Import,
         buttonText: 'Import a File',
-      }
+      },
     ],
   },
   // Export
@@ -136,12 +160,12 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
     options: [
       {
         link: ViewState.PickExportAlgorithm,
-        buttonText: 'Start a New Export'
+        buttonText: 'Start a New Export',
       },
       {
         link: ViewState.PickExportTemplate,
-        buttonText: 'Use an Existing Export'
-      }
+        buttonText: 'Use an Existing Export',
+      },
     ],
   },
   [ViewState.PickExportTemplate]: {
@@ -151,7 +175,7 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       {
         link: ViewState.Review,
         component: null,
-      }
+      },
     ],
   },
   [ViewState.PickExportAlgorithm]: {
@@ -160,9 +184,9 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
     options: [
       {
         link: ViewState.ExportDestination,
-        component: null
-      }
-    ]
+        component: null,
+      },
+    ],
   },
   [ViewState.ExportDestination]: {
     prompt: 'Where Would You Like the Results?',
@@ -176,9 +200,9 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       },
       {
         link: ViewState.PickExportDestination,
-        buttonText: 'Send The Results to a Custom Destination'
-      }
-    ]
+        buttonText: 'Send to a Custom Destination',
+      },
+    ],
   },
   [ViewState.PickExportDestination]: {
     prompt: 'Select an Export Destination',
@@ -187,8 +211,8 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       {
         link: ViewState.Review,
         component: null,
-      }
-    ]
+      },
+    ],
   },
   // Import
   [ViewState.Import]: {
@@ -197,12 +221,12 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
     options: [
       {
         link: ViewState.NewImport,
-        buttonText: 'Start a New Import'
+        buttonText: 'Start a New Import',
       },
       {
         link: ViewState.PickImportTemplate,
-        buttonText: 'Use an Existing Import'
-      }
+        buttonText: 'Use an Existing Import',
+      },
     ],
   },
   [ViewState.PickImportTemplate]: {
@@ -212,8 +236,8 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       {
         link: ViewState.Review,
         component: null,
-      }
-    ]
+      },
+    ],
   },
   [ViewState.NewImport]: {
     prompt: 'What Would You Like to Import?',
@@ -226,9 +250,9 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       },
       {
         link: ViewState.PickImportSource,
-        buttonText: 'Import From an External Source'
-      }
-    ]
+        buttonText: 'Import From an External Source',
+      },
+    ],
   },
   [ViewState.PickLocalFile]: {
     prompt: 'Choose a File',
@@ -237,8 +261,8 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       {
         link: ViewState.PickDatabase,
         component: null,
-      }
-    ]
+      },
+    ],
   },
   [ViewState.PickImportSource]: {
     prompt: 'Select a Source to Import From',
@@ -247,8 +271,8 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       {
         link: ViewState.PickDatabase,
         component: null,
-      }
-    ]
+      },
+    ],
   },
   [ViewState.PickDatabase]: {
     prompt: 'Choose a Database to Import Into',
@@ -258,7 +282,7 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
         link: ViewState.Review,
         component: null,
       },
-    ]
+    ],
   },
   [ViewState.Review]: {
     prompt: 'Review Details',
@@ -267,14 +291,8 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
       {
         link: ViewState.Finish,
         component: null,
-      }
-    ]
+      },
+    ],
   },
 };
 const WalkthroughComponentClass = walkthroughFactory<ViewState, ETLState>(WalkthroughGraph);
-
-export default Util.createContainer(
-  ETLWalkthrough,
-  ['etl'],
-  { act: ETLActions },
-);

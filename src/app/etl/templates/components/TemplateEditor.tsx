@@ -126,7 +126,10 @@ class TemplateEditor extends TerrainComponent<Props>
           </div>
           <div
             className='template-editor'
-            style={backgroundColor(Colors().bg3)}
+            style={[
+                backgroundColor(Colors().bg3),
+                getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
+              ]}
             tabIndex={-1}
           >
             <div className='template-editor-full-area'>

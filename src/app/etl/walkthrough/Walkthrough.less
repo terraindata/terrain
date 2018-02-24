@@ -1,0 +1,50 @@
+@import "../../common/Common.less";
+
+.walkthrough-root {
+  position: relative;
+
+  .walkthrough-step-view {
+    display: flex;
+    flex-direction: column;
+
+    .walkthrough-step-prompt {
+      padding: @half-spacing;
+      text-align: center;
+      .title-text;
+    }
+
+    .walkthrough-additional-text {
+      padding: @half-spacing;
+      text-align: center;
+      .big-text;
+    }
+
+    .walkthrough-options {
+      display: flex;
+      justify-content: center;
+      padding: @spacing;
+    }
+
+    .walkthrough-option-button {
+      cursor: pointer;
+      border-radius: 3px;
+      display: flex;
+      margin: @half-spacing;
+      padding: @half-spacing;
+      width: 140px;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .walkthrough-or-element {
+      display: flex;
+      align-items: center;
+      margin: @half-spacing;
+    }
+
+    .walkthrough-option-button-text {
+      font-size: @pretty-large-font-size;
+    }
+  }
+}

@@ -59,7 +59,6 @@ export interface Props
   children?: any;
 }
 
-@Radium
 export default class ETLPage extends TerrainComponent<Props>
 {
 

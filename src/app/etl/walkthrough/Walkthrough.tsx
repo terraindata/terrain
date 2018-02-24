@@ -51,6 +51,9 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import './Walkthrough.less';
+
 export interface WalkthroughProps<ViewEnum, Context>
 {
   context: Context; // passed to custom components to help them display
@@ -85,55 +88,74 @@ export interface WalkthroughGraphNode<ViewEnum extends string, Context>
 
 export interface WalkthroughGraphType<ViewEnum extends string, Context>
 {
-  [k: string]: WalkthroughGraphNode<ViewEnum, Context>
+  [k: string]: WalkthroughGraphNode<ViewEnum, Context>;
 }
 
 export function walkthroughFactory<ViewEnum extends string, Context>(graph: WalkthroughGraphType<ViewEnum, Context>)
 {
   // TODO. Perform an integrity check of the provided graph to make sure it is a single DAG
-
-  return class Walkthrough extends TerrainComponent<WalkthroughProps<ViewEnum, Context>>
+  class Walkthrough extends TerrainComponent<WalkthroughProps<ViewEnum, Context>>
   {
     public renderOption(option: WalkthroughNodeOption<ViewEnum, Context>, index)
     {
+      const buttonText = option.buttonText != null ?
+        option.buttonText :
+        'Next';
+      // add the text 'or' in between buttons or elements
+      const orText = index % 2 === 0 ? null :
+        <div
+          key={`or ${index}`}
+          className='walkthrough-or-element'
+        >
+          Or
+        </div>;
+
       if (option.component != null)
       {
         const ComponentClass = option.component;
-        return (
+        return ([
           <ComponentClass
             key={index}
             context={this.props.context}
             onDone={this.handleMoveToNextFactory(option.link)}
-          />
-        );
+          />,
+        ]);
       }
       else
       {
-        return (
-          <div key={index}>
-            <div onClick={this.handleMoveToNextFactory(option.link)}>
-            {option.buttonText}
+        return ([
+          orText,
+          <RadiumQuarantine>
+            <div
+              key={index}
+              style={buttonStyle}
+              className='walkthrough-option-button'
+              onClick={this.handleMoveToNextFactory(option.link)}
+            >
+              <div className='walkthrough-option-button-text'>
+                {buttonText}
+              </div>
             </div>
-          </div>
-        )
+          </RadiumQuarantine>,
+        ]);
       }
     }
 
     public renderNode(node: WalkthroughGraphNode<ViewEnum, Context>)
     {
       return (
-        <div>
-          <div>
+        <div className='walkthrough-step-view'>
+          <div className='walkthrough-step-prompt'>
             { node.prompt }
           </div>
-          <div>
+          <div className='walkthrough-additional-text'>
             { node.additionalText }
           </div>
-          <div>
+          <div className='walkthrough-options'>
             { node.options.map(this.renderOption) }
           </div>
         </div>
-      )
+      );
     }
 
     public render()
@@ -142,8 +164,12 @@ export function walkthroughFactory<ViewEnum extends string, Context>(graph: Walk
       const currentStep = stepHistory.get(stepIndex);
       const graphNode = graph[currentStep];
       return (
-        <div>
-          { this.renderNode(graphNode) }
+        <div className='walkthrough-root'>
+          {
+            graphNode != null ?
+              this.renderNode(graphNode) :
+              null
+          }
         </div>
       );
     }
@@ -173,5 +199,22 @@ export function walkthroughFactory<ViewEnum extends string, Context>(graph: Walk
         }
       };
     }
+  }
+  return Walkthrough;
+}
+
+const buttonStyle = [
+  backgroundColor(Colors().active, Colors().activeHover),
+  fontColor(Colors().activeText),
+];
+
+// very simple passthrough component to prevent unnecessary re-renders
+// and prevent some subtle radium event handler bugs
+@Radium
+class RadiumQuarantine extends React.Component
+{
+  public render()
+  {
+    return this.props.children;
   }
 }

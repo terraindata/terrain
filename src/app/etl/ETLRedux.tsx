@@ -76,7 +76,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       setWalkthroughState: (state, action) =>
       {
         return state.set('walkthrough', action.payload.newState);
-      }
+      },
     };
 }
 

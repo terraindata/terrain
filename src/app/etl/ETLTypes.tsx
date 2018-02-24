@@ -61,7 +61,6 @@ export const _ETLState = makeConstructor(ETLStateC);
 
 class WalkthroughStateC
 {
-  public currentStep: number = 0;
   public stepHistory: List<ViewState> = List([ViewState.Start]);
   public type: TemplateTypes = null;
   public source: any = null;

@@ -107,11 +107,15 @@ class DocumentPreview extends TerrainComponent<Props>
       borderColor(Colors().inactiveHover, Colors().inactiveHover) :
       borderColor('rgba(0,0,0,0)', Colors().activeHover);
     const bgColor = Colors().bg3;
-
+    const documentStyle = [
+      backgroundColor(bgColor),
+      getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
+      border,
+    ];
     return (
       <div
         className='preview-document'
-        style={_.extend({}, backgroundColor(bgColor), border)}
+        style={documentStyle}
         onClick={this.handleDocumentClicked}
       >
         <div className='preview-document-spacer'>
@@ -158,12 +162,18 @@ class DocumentPreview extends TerrainComponent<Props>
     if (active)
     {
       const activeCol = scaleAlpha(Colors().active, 0.7);
-      return [backgroundColor(hoverCol, hoverCol), fontColor(activeCol, activeCol)];
+      return [
+        backgroundColor(hoverCol, hoverCol),
+        fontColor(activeCol, activeCol),
+      ];
     }
     else
     {
       const activeCol = scaleAlpha(Colors().inactiveHover, 0.5);
-      return [backgroundColor(defaultCol, hoverCol), fontColor('rgba(0,0,0,0)', activeCol)];
+      return [
+        backgroundColor(defaultCol, hoverCol),
+        fontColor('rgba(0,0,0,0)', activeCol),
+      ];
     }
   }
 
