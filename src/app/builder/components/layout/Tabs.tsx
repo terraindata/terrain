@@ -179,6 +179,7 @@ export interface TabAction
   icon: any;
   enabled?: boolean;
   onClick();
+  style?: any;
 }
 
 interface TabsProps
@@ -221,12 +222,12 @@ class Tabs extends TerrainComponent<TabsProps> {
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.tabs-container .tabs-actions .tabs-action svg',
-      style: { fill: Colors().text3 },
+      style: { fill: Colors().fontWhite },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.tabs-container .tabs-actions .tabs-action',
-      style: { 'border-color': Colors().text3 },
+      style: { 'border-color': Colors().fontWhite },
     });
 
     this.computeTabs(this.props.config, this.props);
@@ -311,8 +312,10 @@ class Tabs extends TerrainComponent<TabsProps> {
                 })}
                 key={index}
                 onClick={action.onClick}
-                style={
-                  action.text ? backgroundColor(action.enabled ? Colors().sidebarBg : Colors().blockBg) : undefined
+                style={_.extend({},
+                    action.text ? backgroundColor(action.enabled ? Colors().sidebarBg : Colors().blockBg) : {},
+                    action.style
+                  )
                 }
               >
                 {
