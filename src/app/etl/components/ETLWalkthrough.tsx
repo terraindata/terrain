@@ -58,34 +58,63 @@ import { ETLActions } from 'etl/ETLRedux';
 import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 
-import { WalkthroughComponent, WalkthroughGraphType, WalkthroughProps } from 'etl/walkthrough/Walkthrough';
+import { walkthroughFactory, WalkthroughGraphType } from 'etl/walkthrough/Walkthrough';
 
 const { List } = Immutable;
 
 export interface Props
 {
-  walkthrough: WalkthroughState;
+  etl: ETLState;
   act?: typeof ETLActions;
 }
 
 @Radium
 class ETLWalkthrough extends TerrainComponent<Props>
 {
-
   public render()
   {
+    const { etl } = this.props;
     return (
       <div
-        className='etl-export-display-wrapper'
-        style={[fontColor(Colors().text1)]}
-      >
 
+      >
+        <WalkthroughComponentClass
+          context={etl}
+          stepIndex={etl.walkthrough.currentStep}
+          stepHistory={etl.walkthrough.stepHistory}
+          setSteps={this.handleStepsChange}
+
+        />
       </div>
     );
   }
+
+  public handleStepsChange(newStep: number, newHistory: List<ViewState>)
+  {
+    const { walkthrough } = this.props.etl;
+
+    if (newHistory.last() === ViewState.Finish)
+    {
+      // we're done
+    }
+
+    let newState = walkthrough;
+    if (walkthrough.stepHistory !== newHistory)
+    {
+      newState = newState.set('stepHistory', newHistory);
+    }
+    if (newStep !== walkthrough.currentStep)
+    {
+      newState = newState.set('currentStep', newStep);
+    }
+    this.props.act({
+      actionType: 'setWalkthroughState',
+      newState,
+    });
+  }
 }
 
-export const WalkthroughGraph: WalkthroughGraphType<ViewState, WalkthroughState> =
+export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
 {
   [ViewState.Start]: {
     prompt: 'What Would You Like to Do?',
@@ -242,9 +271,10 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, WalkthroughState>
     ]
   },
 };
+const WalkthroughComponentClass = walkthroughFactory<ViewState, ETLState>(WalkthroughGraph);
 
 export default Util.createContainer(
   ETLWalkthrough,
-  ['etl', 'walkthrough'],
+  ['etl'],
   { act: ETLActions },
 );

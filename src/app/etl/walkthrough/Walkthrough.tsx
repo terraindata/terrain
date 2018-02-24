@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires max-classes-per-file
+// tslint:disable:no-var-requires max-classes-per-file no-console
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
@@ -51,24 +51,127 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-export interface WalkthroughProps<State>
+export interface WalkthroughProps<ViewEnum, Context>
 {
-  state: State;
+  context: Context; // passed to custom components to help them display
+  stepIndex: number; // current position in the step history
+  stepHistory: List<ViewEnum>;
+  setSteps: (newStep: number, newHistory: List<ViewEnum>) => void;
 }
 
-export type WalkthroughComponent<State> = React.ComponentClass<State>;
-
-export interface WalkthroughGraphType<ViewEnum, State>
+export interface ComponentProps<Context>
 {
-  [k: number]: {
-    prompt: string; // the main prompt to give to the user
-    crumbText?: string; // the text that shows up in the breadcrumbs
-    additionalText?: string; // a subtitle for the prompt
-    options: Array<{
-      link: ViewEnum; // What ViewEnum to go to next
-      buttonText?: string; // if it's a simple button, what does it say?
-      component?: WalkthroughComponent<State>; // if it's a custom ui interaction, what component to use
-      default?: boolean;
-    }>;
+  context: Context;
+  onDone: () => void;
+}
+
+export type WalkthroughComponentClass<Context> = React.ComponentClass<ComponentProps<Context>>;
+
+export interface WalkthroughNodeOption<ViewEnum, Context>
+{
+  link: ViewEnum; // What ViewEnum to go to next
+  buttonText?: string; // if it's a simple button, what does it say?
+  component?: WalkthroughComponentClass<Context>; // if it's a custom ui interaction, what component to use
+  default?: boolean;
+}
+
+export interface WalkthroughGraphNode<ViewEnum extends string, Context>
+{
+  prompt: string; // the main prompt to give to the user
+  crumbText?: string; // the text that shows up in the breadcrumbs
+  additionalText?: string; // a subtitle for the prompt
+  options: Array<WalkthroughNodeOption<ViewEnum, Context>>;
+}
+
+export interface WalkthroughGraphType<ViewEnum extends string, Context>
+{
+  [k: string]: WalkthroughGraphNode<ViewEnum, Context>
+}
+
+export function walkthroughFactory<ViewEnum extends string, Context>(graph: WalkthroughGraphType<ViewEnum, Context>)
+{
+  // TODO. Perform an integrity check of the provided graph to make sure it is a single DAG
+
+  return class Walkthrough extends TerrainComponent<WalkthroughProps<ViewEnum, Context>>
+  {
+    public renderOption(option: WalkthroughNodeOption<ViewEnum, Context>, index)
+    {
+      if (option.component != null)
+      {
+        const ComponentClass = option.component;
+        return (
+          <ComponentClass
+            key={index}
+            context={this.props.context}
+            onDone={this.handleMoveToNextFactory(option.link)}
+          />
+        );
+      }
+      else
+      {
+        return (
+          <div key={index}>
+            <div onClick={this.handleMoveToNextFactory(option.link)}>
+            {option.buttonText}
+            </div>
+          </div>
+        )
+      }
+    }
+
+    public renderNode(node: WalkthroughGraphNode<ViewEnum, Context>)
+    {
+      return (
+        <div>
+          <div>
+            { node.prompt }
+          </div>
+          <div>
+            { node.additionalText }
+          </div>
+          <div>
+            { node.options.map(this.renderOption) }
+          </div>
+        </div>
+      )
+    }
+
+    public render()
+    {
+      const { stepIndex, stepHistory } = this.props;
+      const currentStep = stepHistory.get(stepIndex);
+      const graphNode = graph[currentStep];
+      return (
+        <div>
+          { this.renderNode(graphNode) }
+        </div>
+      );
+    }
+
+    public handleMoveToNextFactory(link: ViewEnum)
+    {
+      return () => {
+        const { stepIndex, stepHistory } = this.props;
+        if (stepIndex < stepHistory.size - 1) // not on the most recent step
+        {
+          // if link is to a different step then the next step, then we should overwrite history
+          const nextStepInHistory = stepHistory.get(stepIndex + 1);
+          if (link === nextStepInHistory)
+          {
+            this.props.setSteps(stepIndex + 1, stepHistory);
+          }
+          else
+          {
+            const nextHistory = stepHistory.slice(0, stepIndex + 1).toList().push(link);
+            this.props.setSteps(stepIndex + 1, nextHistory);
+          }
+        }
+        else
+        {
+          const nextHistory = stepHistory.push(link);
+          this.props.setSteps(stepIndex + 1, nextHistory);
+        }
+      };
+    }
   }
 }

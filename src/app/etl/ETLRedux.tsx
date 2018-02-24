@@ -52,12 +52,16 @@ const { List, Map } = Immutable;
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 import { Ajax } from 'util/Ajax';
 
-import { _ETLState, ETLState } from './ETLTypes';
+import { _ETLState, ETLState, ViewState, WalkthroughState } from './ETLTypes';
 
 export interface ETLActionTypes
 {
   placeholder: {
     actionType: 'placeholder';
+  };
+  setWalkthroughState: {
+    actionType: 'setWalkthroughState';
+    newState: WalkthroughState;
   };
 }
 
@@ -69,6 +73,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       {
         return state;
       },
+      setWalkthroughState: (state, action) =>
+      {
+        return state.set('walkthrough', action.payload.newState);
+      }
     };
 }
 

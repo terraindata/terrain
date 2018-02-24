@@ -61,8 +61,8 @@ export const _ETLState = makeConstructor(ETLStateC);
 
 class WalkthroughStateC
 {
-  public step: ViewState = ViewState.Start;
-  public stepHistory: List<ViewState> = List([]);
+  public currentStep: number = 0;
+  public stepHistory: List<ViewState> = List([ViewState.Start]);
   public type: TemplateTypes = null;
   public source: any = null;
   public sink: any = null;
@@ -73,19 +73,19 @@ export const _WalkthroughState = makeConstructor(WalkthroughStateC);
 
 export enum ViewState
 {
-  Start,
-  Import,
-  Export,
-  PickExportTemplate,
-  PickExportAlgorithm,
-  PickExportDestination,
-  ExportDestination,
-  NewImport,
-  PickImportTemplate,
-  PickLocalFile,
-  PickImportSource,
-  ImportDestination,
-  PickDatabase,
-  Review,
-  Finish, // unreachable view state
+  Start = 'Start',
+  Import = 'Import',
+  Export = 'Export',
+  PickExportTemplate = 'PickExportTemplate',
+  PickExportAlgorithm = 'PickExportAlgorithm',
+  PickExportDestination = 'PickExportDestination',
+  ExportDestination = 'ExportDestination',
+  NewImport = 'NewImport',
+  PickImportTemplate = 'PickImportTemplate',
+  PickLocalFile = 'PickLocalFile',
+  PickImportSource = 'PickImportSource',
+  ImportDestination = 'ImportDestination',
+  PickDatabase = 'PickDatabase',
+  Review = 'Review',
+  Finish = 'Finish', // unreachable view state
 }
