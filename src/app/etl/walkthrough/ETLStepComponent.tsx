@@ -43,35 +43,43 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires strict-boolean-expressions
+// tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 
-import FilePicker from 'common/components/FilePicker';
+import FadeInOut from 'common/components/FadeInOut';
+import { ComponentProps } from 'common/components/walkthrough/WalkthroughTypes';
+import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import './ETLPage.less';
+import { ETLActions } from 'etl/ETLRedux';
+import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
 
-export interface Props
+const { List } = Immutable;
+
+export interface StepProps extends ComponentProps
 {
-  children?: any;
+  onDone: () => void;
+  etl: ETLState;
+  act?: typeof ETLActions;
 }
 
-export default class ETLPage extends TerrainComponent<Props>
+abstract class ETLStepComponent<Props extends StepProps> extends TerrainComponent<Props>
 {
-  public render()
+  public renderNextButton(enabled)
   {
     return (
-      <div className='etl-page-root'>
-        {
-          this.props.children
-        }
-      </div>
+      <FadeInOut open={enabled}>
+        <div
+          onClick={enabled ? this.props.onDone : () => null}
+        >
+          Next
+        </div>
+      </FadeInOut>
     );
   }
-
 }

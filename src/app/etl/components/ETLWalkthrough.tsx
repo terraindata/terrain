@@ -51,16 +51,14 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { ETLActions } from 'etl/ETLRedux';
 import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
-import TemplateEditor from 'etl/templates/components/TemplateEditor';
 
-import { walkthroughFactory } from 'etl/walkthrough/Walkthrough';
-import { WalkthroughGraphType } from 'etl/walkthrough/WalkthroughTypes';
+import { walkthroughFactory } from 'common/components/walkthrough/Walkthrough';
+import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughTypes';
 
 const { List } = Immutable;
 
@@ -138,7 +136,7 @@ export default Util.createContainer(
   { act: ETLActions },
 );
 
-export const walkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
+export const walkthroughGraph: WalkthroughGraphType<ViewState> =
 {
   [ViewState.Start]: {
     prompt: 'What Would You Like to Do?',
@@ -295,4 +293,4 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
     ],
   },
 };
-const WalkthroughComponentClass = walkthroughFactory<ViewState, ETLState>(walkthroughGraph);
+const WalkthroughComponentClass = walkthroughFactory<ViewState>(walkthroughGraph);

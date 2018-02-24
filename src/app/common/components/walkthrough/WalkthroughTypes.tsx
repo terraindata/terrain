@@ -65,8 +65,8 @@ export interface WalkthroughProps<ViewEnum, Context>
 export interface ComponentProps<Context>
 {
   context: Context;
-  onDone: () => void; 
-  [k: string]: any; // for compatibility 
+  onDone: () => void;
+  [k: string]: any; // for compatibility
 }
 
 export type WalkthroughComponentClass<Context> = React.ComponentClass<ComponentProps<Context>>;
@@ -76,6 +76,7 @@ export interface WalkthroughNodeOption<ViewEnum, Context>
   link: ViewEnum; // What ViewEnum to go to next
   buttonText?: string; // if it's a simple button, what does it say?
   component?: WalkthroughComponentClass<Context>; // if it's a custom ui interaction, what component to use
+  componentNeedsButton?: boolean;
   default?: boolean;
 }
 
@@ -87,7 +88,7 @@ export interface WalkthroughGraphNode<ViewEnum, Context>
   options: Array<WalkthroughNodeOption<ViewEnum, Context>>;
 }
 
-export interface WalkthroughGraphType<ViewEnum, Context>
+export interface WalkthroughGraphType<ViewEnum, Context = any>
 {
   [kS: string]: WalkthroughGraphNode<ViewEnum, Context>; // for string enums
   [kN: number]: WalkthroughGraphNode<ViewEnum, Context>; // for traditional enums

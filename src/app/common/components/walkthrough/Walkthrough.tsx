@@ -64,7 +64,7 @@ import {
 
 import './Walkthrough.less';
 
-export function walkthroughFactory<ViewEnum, Context>(graph: WalkthroughGraphType<ViewEnum, Context>)
+export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGraphType<ViewEnum, Context>)
 {
   // TODO. Perform an integrity check of the provided graph if views is provided
   class Walkthrough extends TerrainComponent<WalkthroughProps<ViewEnum, Context>>
@@ -82,23 +82,8 @@ export function walkthroughFactory<ViewEnum, Context>(graph: WalkthroughGraphTyp
         >
           Or
         </div>;
-
-      if (option.component != null)
-      {
-        const ComponentClass = option.component;
-        return ([
-          <ComponentClass
-            key={index}
-            context={this.props.context}
-            onDone={this.handleMoveToNextFactory(option.link)}
-          />,
-        ]);
-      }
-      else
-      {
-        return ([
-          orText,
-          <RadiumQuarantine>
+      const buttonComponent = (
+        <RadiumQuarantine>
             <div
               key={index}
               style={buttonStyle}
@@ -109,8 +94,30 @@ export function walkthroughFactory<ViewEnum, Context>(graph: WalkthroughGraphTyp
                 {buttonText}
               </div>
             </div>
-          </RadiumQuarantine>,
-        ]);
+        </RadiumQuarantine>
+      );
+
+      if (option.component != null)
+      {
+        const ComponentClass = option.component;
+        const customComponent = (
+          <div>
+            <ComponentClass
+              key={index}
+              context={this.props.context}
+              onDone={this.handleMoveToNextFactory(option.link)}
+            />
+            { option.componentNeedsButton ? buttonComponent : null }
+          </div>
+        );
+        // TODO style the container
+        return (
+          [ orText, customComponent ]
+        );
+      }
+      else
+      {
+        return ([ orText, buttonComponent ]);
       }
     }
 
