@@ -622,7 +622,7 @@ class HitsArea extends TerrainComponent<Props>
                   resultsConfig={resultsConfig}
                   onExpand={this.handleExpand}
                   index={index}
-                  key={index}
+                  key={hit.primaryKey}
                   primaryKey={hit.primaryKey}
                   allowSpotlights={this.props.allowSpotlights}
                   locations={this.locations}

@@ -307,7 +307,6 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       );
     }
-
     return ((
       <div
         className={classes}
@@ -414,7 +413,6 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
   {
     thumbnailField = _.first(getResultFields(hit, config));
   }
-
   return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color);
 }
 
