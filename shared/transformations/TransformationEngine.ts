@@ -58,8 +58,8 @@ import TransformationVisitResult from './TransformationVisitResult';
 import * as yadeep from './yadeep';
 
 const Graph = GraphLib.Graph;
-export type KeyPath = List<string | string[]>;
-export const KeyPath = (args: Array<string | string[]> = []) => List<string | string[]>(args);
+export type KeyPath = List<string | Array<string | number>>;
+export const KeyPath = (args: Array<string | Array<string | number>> = []) => List<string | Array<string | number>>(args);
 
 export class TransformationEngine
 {

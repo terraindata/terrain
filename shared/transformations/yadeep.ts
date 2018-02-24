@@ -49,8 +49,8 @@ THE SOFTWARE.
 import { List } from 'immutable';
 // import isPrimitive = require('is-primitive');
 
-export type KeyPath = List<string | string[]>;
-export const KeyPath = (args: Array<string | string[]> = []) => List<string | string[]>(args);
+export type KeyPath = List<string | Array<string | number>>;
+export const KeyPath = (args: Array<string | Array<string | number>> = []) => List<string | Array<string | number>>(args);
 
 export function get(obj: object, path: KeyPath): any
 {
@@ -65,19 +65,56 @@ export function get(obj: object, path: KeyPath): any
   if (obj.constructor === Array)
   {
     const idx: number = parseInt(path.get(0) as string, 10);
-    if (idx < (obj as any[]).length)
+    if (isNaN(idx))
+    {
+      // implicit wildcard
+      const results: any[] = [];
+      for (let j: number = 0; j < obj.length; j++)
+      {
+        results.push(get(obj[j], path));
+      }
+      return results;
+    }
+    else if (idx < (obj as any[]).length)
     {
       return get(obj[idx], path.shift());
     }
     return undefined;
   }
 
+  const target: any = path.get(0);
   const keys: string[] = Object.keys(obj);
   for (let i: number = 0; i < keys.length; ++i)
   {
-    if (keys[i] === path.get(0))
+    if (typeof target === 'string' && keys[i] === target)
     {
       return get(obj[keys[i]], path.shift());
+    }
+    else if (target.constructor === Array && keys[i] === target[0])
+    {
+      if (target.length >= 2)
+      {
+        // console.log('here');
+        let lastNestedArray = obj[keys[i]];
+        for (let j: number = 1; j < target.length; j++)
+        {
+          lastNestedArray = lastNestedArray[target[j]];
+        }
+        // TODO there are some missing cases here like ['arr', 0, *, 1] (interspersed wildcard)
+        //      or ['arr', 0] (trailing implicit wildcards)...
+        // console.log(lastNestedArray);
+        return get(lastNestedArray, path.shift());
+      }
+      else
+      {
+        // implicit wildcard
+        const results: any[] = [];
+        for (let j: number = 0; j < obj[keys[i]].length; j++)
+        {
+          results.push(get(obj[keys[i]][j], path.shift()));
+        }
+        return results;
+      }
     }
   }
 
@@ -121,13 +158,41 @@ export function set(obj: object, path: KeyPath, value: any, options: object = {}
     return;
   }
 
+  const target: any = path.get(0);
   const keys: string[] = Object.keys(obj);
   for (let i: number = 0; i < keys.length; ++i)
   {
-    if (keys[i] === path.get(0))
+    if (typeof target === 'string' && keys[i] === target)
     {
       return set(obj[keys[i]], path.shift(), value, options);
     }
+    else if (target.constructor === Array && keys[i] === target[0])
+    {
+      if (target.length >= 2)
+      {
+        // console.log('here');
+        let lastNestedArray = obj[keys[i]];
+        for (let j: number = 1; j < target.length; j++)
+        {
+          lastNestedArray = lastNestedArray[target[j]];
+        }
+        // TODO there are some missing cases here like ['arr', 0, *, 1] (interspersed wildcard)
+        //      or ['arr', 0] (trailing implicit wildcards)...
+        // console.log(lastNestedArray);
+        return set(lastNestedArray, path.shift(), value, options);
+      }
+      else
+      {
+        // implicit wildcard
+        // const results: any[] = [];
+        // for (let j: number = 0; j < obj[keys[i]].length; j++)
+        // {
+        //     results.push(get(obj[keys[i]][j], path.shift()));
+        // }
+        // return results;
+      }
+    }
+
   }
 
   if (options['create'] === true)
