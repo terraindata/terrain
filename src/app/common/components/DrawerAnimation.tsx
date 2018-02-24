@@ -118,7 +118,7 @@ class DrawerAnimation extends TerrainComponent<Props>
             inline: 'nearest',
           });
         }
-      }, 300); // coordinate this value with LESS
+      }, 350); // coordinate this value with LESS
       // in the future you could consider a ghost element down at the bottom
       // of the position, so the window can scroll before the content has opened
     }

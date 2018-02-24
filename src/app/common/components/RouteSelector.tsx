@@ -300,7 +300,7 @@ export class RouteSelector extends TerrainComponent<Props>
     const { props, state } = this;
     
     const pickerInnerContent = (
-      <div className='routeselector-picker-inner routeselector-multi-picker-inner'>
+      <div className='routeselector-picker-inner'>
         {
           props.optionSets.map(this.renderOptionSet)
         }
@@ -316,7 +316,6 @@ export class RouteSelector extends TerrainComponent<Props>
           className={classNames({
             'routeselector-picker': true,
             'routeselector-picker-closed': !this.isOpen(),
-            'routeselector-multi-picker': true,
             'routeselector-picker-no-shadow': props.noShadow,
           })}
           ref={this._fn(this._saveRefToState, 'pickerRef')}
