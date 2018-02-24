@@ -54,6 +54,7 @@ import { TemplateTypes } from 'shared/etl/TemplateTypes';
 
 class ETLStateC
 {
+  public file: File = null;
   public walkthrough: WalkthroughState = _WalkthroughState();
 }
 export type ETLState = WithIRecord<ETLStateC>;

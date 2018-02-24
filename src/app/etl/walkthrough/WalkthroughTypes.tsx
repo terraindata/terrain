@@ -43,37 +43,52 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires strict-boolean-expressions
+// tslint:disable:no-var-requires max-classes-per-file no-console
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 
-import FilePicker from 'common/components/FilePicker';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import './Walkthrough.less';
 
-import './ETLPage.less';
-
-export interface Props
+export interface WalkthroughProps<ViewEnum, Context>
 {
-  children?: any;
+  context?: Context; // passed to custom components
+  stepIndex: number; // current position in the step history
+  stepHistory: List<ViewEnum>;
+  setSteps: (newStep: number, newHistory: List<ViewEnum>) => void;
 }
 
-export default class ETLPage extends TerrainComponent<Props>
+export interface ComponentProps<Context>
 {
+  context: Context;
+  onDone: () => void; 
+  [k: string]: any; // for compatibility 
+}
 
-  public render()
-  {
-    return (
-      <div className='etl-page-root'>
-        <FilePicker onChange={() => null} large={true}/>
-        {
-          this.props.children
-        }
-      </div>
-    );
-  }
+export type WalkthroughComponentClass<Context> = React.ComponentClass<ComponentProps<Context>>;
 
+export interface WalkthroughNodeOption<ViewEnum, Context>
+{
+  link: ViewEnum; // What ViewEnum to go to next
+  buttonText?: string; // if it's a simple button, what does it say?
+  component?: WalkthroughComponentClass<Context>; // if it's a custom ui interaction, what component to use
+  default?: boolean;
+}
+
+export interface WalkthroughGraphNode<ViewEnum, Context>
+{
+  prompt: string; // the main prompt to give to the user
+  crumbText?: string; // the text that shows up in the breadcrumbs
+  additionalText?: string; // a subtitle for the prompt
+  options: Array<WalkthroughNodeOption<ViewEnum, Context>>;
+}
+
+export interface WalkthroughGraphType<ViewEnum, Context>
+{
+  [kS: string]: WalkthroughGraphNode<ViewEnum, Context>; // for string enums
+  [kN: number]: WalkthroughGraphNode<ViewEnum, Context>; // for traditional enums
 }

@@ -107,7 +107,6 @@ export class UpdateChecker
   }
 }
 
-// like elements of field tree proxy, you shouldn't hold references to PropertyTracker
 /*
  *  PropertyTracker is an object that wraps around an object and remembers which properties you've "seen".
  *  This enables you to tell if two objects are "visibly" equal to each other.

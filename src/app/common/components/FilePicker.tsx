@@ -42,38 +42,83 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
+import * as ReactDOM from 'react-dom';
+import { backgroundColor, fontColor, Colors, buttonColors, disabledButtonColors } from 'src/app/colors/Colors';
 
-import FilePicker from 'common/components/FilePicker';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+import './FilePicker.less';
 
-import './ETLPage.less';
-
-export interface Props
+interface Props
 {
-  children?: any;
+  disabled?: boolean;
+  extensions?: string;
+  large?: boolean;
+  onChange: ( file ) => void;
 }
 
-export default class ETLPage extends TerrainComponent<Props>
+@Radium
+export default class FilePicker extends TerrainComponent<Props>
 {
+  private fileInput: any;
 
   public render()
   {
+    const buttonStyle = this.props.disabled ? disabledStyle : activeStyle;
     return (
-      <div className='etl-page-root'>
-        <FilePicker onChange={() => null} large={true}/>
-        {
-          this.props.children
+      <div
+        className={classNames({
+          'file-picker': true,
+          'file-picker-disabled': this.props.disabled,
+          'file-picker-large': this.props.large,
+        })}
+        style={buttonStyle}
+        onClick={
+          this.props.disabled ? () => null : this.handleSelectClicked
         }
+      >
+        Choose File
+        <input
+          ref={(input) => { this.fileInput = input; }}
+          type='file'
+          accept={this.props.extensions}
+          name='file-picker'
+          onChange={this.handleChange}
+          style={{display: 'none'}}
+        />
       </div>
     );
   }
 
+  public handleChange(ev)
+  {
+    const file = ev.target.files && ev.target.files[0];
+    if (file)
+    {
+      this.props.onChange(file);
+    }
+  }
+
+  public handleSelectClicked()
+  {
+    if (this.fileInput)
+    {
+      this.fileInput.value = null;
+      this.fileInput.click();
+    }
+  }
 }
+
+const activeStyle = [
+  backgroundColor(Colors().active, Colors().activeHover),
+  fontColor(Colors().activeText),
+];
+const disabledStyle = [
+  backgroundColor(Colors().activeHover, Colors().activeHover),
+  fontColor(Colors().activeText),
+]

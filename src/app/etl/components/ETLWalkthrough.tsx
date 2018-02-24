@@ -59,7 +59,8 @@ import { ETLActions } from 'etl/ETLRedux';
 import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 
-import { walkthroughFactory, WalkthroughGraphType } from 'etl/walkthrough/Walkthrough';
+import { walkthroughFactory } from 'etl/walkthrough/Walkthrough';
+import { WalkthroughGraphType } from 'etl/walkthrough/WalkthroughTypes';
 
 const { List } = Immutable;
 
@@ -81,11 +82,9 @@ class ETLWalkthrough extends TerrainComponent<Props>
     return (
       <div>
         <WalkthroughComponentClass
-          context={etl}
           stepIndex={currentStep}
           stepHistory={etl.walkthrough.stepHistory}
           setSteps={this.handleStepsChange}
-
         />
       </div>
     );
@@ -98,7 +97,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
 
     if (newHistory.last() === ViewState.Finish)
     {
-      // we're done
+      // TODO: create a template and change the route
     }
 
     let newState = walkthrough;
@@ -116,6 +115,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
     });
   }
 
+  // if the step is invalid or doesn't exist then return 0
   public getStepFromRoute()
   {
     const { params, etl } = this.props;
@@ -138,7 +138,7 @@ export default Util.createContainer(
   { act: ETLActions },
 );
 
-export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
+export const walkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
 {
   [ViewState.Start]: {
     prompt: 'What Would You Like to Do?',
@@ -295,4 +295,4 @@ export const WalkthroughGraph: WalkthroughGraphType<ViewState, ETLState> =
     ],
   },
 };
-const WalkthroughComponentClass = walkthroughFactory<ViewState, ETLState>(WalkthroughGraph);
+const WalkthroughComponentClass = walkthroughFactory<ViewState, ETLState>(walkthroughGraph);

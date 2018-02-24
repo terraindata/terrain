@@ -52,48 +52,21 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+
+import {
+  ComponentProps,
+  WalkthroughComponentClass,
+  WalkthroughGraphNode,
+  WalkthroughGraphType,
+  WalkthroughNodeOption,
+  WalkthroughProps,
+} from './WalkthroughTypes';
+
 import './Walkthrough.less';
 
-export interface WalkthroughProps<ViewEnum, Context>
+export function walkthroughFactory<ViewEnum, Context>(graph: WalkthroughGraphType<ViewEnum, Context>)
 {
-  context: Context; // passed to custom components to help them display
-  stepIndex: number; // current position in the step history
-  stepHistory: List<ViewEnum>;
-  setSteps: (newStep: number, newHistory: List<ViewEnum>) => void;
-}
-
-export interface ComponentProps<Context>
-{
-  context: Context;
-  onDone: () => void;
-}
-
-export type WalkthroughComponentClass<Context> = React.ComponentClass<ComponentProps<Context>>;
-
-export interface WalkthroughNodeOption<ViewEnum, Context>
-{
-  link: ViewEnum; // What ViewEnum to go to next
-  buttonText?: string; // if it's a simple button, what does it say?
-  component?: WalkthroughComponentClass<Context>; // if it's a custom ui interaction, what component to use
-  default?: boolean;
-}
-
-export interface WalkthroughGraphNode<ViewEnum extends string, Context>
-{
-  prompt: string; // the main prompt to give to the user
-  crumbText?: string; // the text that shows up in the breadcrumbs
-  additionalText?: string; // a subtitle for the prompt
-  options: Array<WalkthroughNodeOption<ViewEnum, Context>>;
-}
-
-export interface WalkthroughGraphType<ViewEnum extends string, Context>
-{
-  [k: string]: WalkthroughGraphNode<ViewEnum, Context>;
-}
-
-export function walkthroughFactory<ViewEnum extends string, Context>(graph: WalkthroughGraphType<ViewEnum, Context>)
-{
-  // TODO. Perform an integrity check of the provided graph to make sure it is a single DAG
+  // TODO. Perform an integrity check of the provided graph if views is provided
   class Walkthrough extends TerrainComponent<WalkthroughProps<ViewEnum, Context>>
   {
     public renderOption(option: WalkthroughNodeOption<ViewEnum, Context>, index)
@@ -162,7 +135,7 @@ export function walkthroughFactory<ViewEnum extends string, Context>(graph: Walk
     {
       const { stepIndex, stepHistory } = this.props;
       const currentStep = stepHistory.get(stepIndex);
-      const graphNode = graph[currentStep];
+      const graphNode = graph[currentStep as any];
       return (
         <div className='walkthrough-root'>
           {
