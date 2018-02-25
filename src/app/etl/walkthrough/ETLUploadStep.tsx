@@ -47,10 +47,13 @@ THE SOFTWARE.
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import FadeInOut from 'common/components/FadeInOut';
 import FilePicker from 'common/components/FilePicker';
+
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -58,6 +61,8 @@ import { ETLActions } from 'etl/ETLRedux';
 import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
 import { ETLStepComponent, RevertParams } from 'etl/walkthrough/ETLStepComponent';
 import './ETLStepComponent.less';
+
+const UploadIcon = require('images/icon_export.svg');
 
 enum Stage
 {
@@ -71,10 +76,11 @@ class ETLUploadStep extends ETLStepComponent
   public static onRevert(params: RevertParams)
   {
     const walkthrough = params.etl.walkthrough
-      .set('file', null).set('source', null);
+      .set('file', null)
+      .set('source', null);
     params.act({
       actionType: 'setWalkthroughState',
-      newState: walkthrough
+      newState: walkthrough,
     });
   }
 
@@ -97,24 +103,48 @@ class ETLUploadStep extends ETLStepComponent
 
   public renderUploadSection()
   {
+    const button = (
+      <div className='etl-upload-button' style={uploadButtonStyle}>
+        <UploadIcon width='32px'/>
+        <div className='upload-button-text'>
+          Choose a File
+        </div>
+      </div>
+    );
+
+    const file = this.props.etl.walkthrough.file;
+    const showFileName = file != null;
     return (
-      <FilePicker
-        large={true}
-        onChange={this.handleChangeFile}
-        accept={'.csv,.json'}
-        customButton={<div> YOOOO </div>}
-      />
+      <div className='etl-transition-column'>
+        <FilePicker
+          large={true}
+          onChange={this.handleChangeFile}
+          accept={'.csv,.json'}
+          customButton={button}
+        />
+        <span style={{height: transitionRowHeight}}>
+          <div
+            className='etl-transition-element step-upload-filename'
+            style={{height: showFileName ? transitionRowHeight : '0px'}}
+          >
+            { showFileName ? file.name : 'Invalid File' }
+          </div>
+        </span>
+      </div>
     );
   }
 
   public renderFileTypeSettings(show: boolean)
   {
-    if (! show)
-    {
-      return null;
-    }
     return (
-      <div> hey </div>
+      <span style={{height: transitionRowHeight}}>
+        <div
+          className='etl-transition-element field-type-q'
+          style={{height: show ? transitionRowHeight : '0px'}}
+        >
+          File Has CSV Header
+        </div>
+      </span>
     );
   }
 
@@ -122,7 +152,7 @@ class ETLUploadStep extends ETLStepComponent
   {
     const stage: number = this.getStage();
     return (
-      <div className='etl-step-column'>
+      <div className='etl-transition-column etl-upload-step'>
         { this.renderUploadSection() }
         { this.renderFileTypeSettings(stage > Stage.PickFile) }
         { this._renderNextButton(false) }
@@ -135,13 +165,22 @@ class ETLUploadStep extends ETLStepComponent
     const walkthrough = this.props.etl.walkthrough;
     this.props.act({
       actionType: 'setWalkthroughState';
-      newState: walkthrough.set('file', file).set('source', { hasCSVHeader: true});
+      newState: walkthrough
+        .set('file', file)
+        .set('source', { hasCSVHeader: true});
     });
   }
 }
 
+const transitionRowHeight = '28px';
+const uploadButtonStyle = [
+  backgroundColor(Colors().bg3),
+  borderColor(Colors().darkerHighlight, Colors().active),
+  getStyle('boxShadow', `2px 1px 3px ${Colors().boxShadow}`),
+];
+
 export default Util.createTypedContainer(
   ETLUploadStep,
   ['etl'],
-  { act: ETLActions }
+  { act: ETLActions },
 );

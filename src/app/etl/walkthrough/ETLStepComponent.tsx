@@ -70,8 +70,8 @@ export interface StepProps extends ComponentProps
 
 export interface RevertParams
 {
-  act: typeof ETLActions,
-  etl: ETLState,
+  act: typeof ETLActions;
+  etl: ETLState;
 }
 
 export abstract class ETLStepComponent<Props extends StepProps = StepProps> extends TerrainComponent<Props>

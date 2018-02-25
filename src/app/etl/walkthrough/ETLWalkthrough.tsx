@@ -59,6 +59,7 @@ import Util from 'util/Util';
 import { ETLActions } from 'etl/ETLRedux';
 import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
 import ETLUploadStep from 'etl/walkthrough/ETLUploadStep';
+import './ETLWalkthrough.less';
 
 const { List } = Immutable;
 
@@ -83,12 +84,13 @@ class ETLWalkthrough extends TerrainComponent<Props>
     const { etl } = this.props;
     const currentStep = this.getStepFromRoute();
     return (
-      <div>
+      <div className='etl-walkthrough'>
         <WalkthroughComponentClass
           stepIndex={currentStep}
           stepHistory={etl.walkthrough.stepHistory}
           setSteps={this.handleStepsChange}
         />
+        <div className='etl-walkthrough-spacer'/>
       </div>
     );
   }
@@ -263,7 +265,7 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
     ],
   },
   [ViewState.PickLocalFile]: {
-    prompt: 'Choose a File',
+    prompt: '',
     crumbText: 'Upload File',
     options: [
       {

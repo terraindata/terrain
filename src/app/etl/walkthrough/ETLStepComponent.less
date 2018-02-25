@@ -8,6 +8,7 @@
   cursor: pointer;
   border-radius: 3px;
   font-size: @pretty-large-font-size;
+  .transition;
   &.button-disabled {
     cursor: default;
   }
@@ -17,4 +18,61 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.etl-transition-column {
+
+  .etl-transition-element {
+    .transition;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.etl-alt-button {
+  border: 1px solid;
+  padding: @spacing;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  font-size: @pretty-large-font-size;
+  .transition;
+  &.button-disabled {
+    cursor: default;
+  }
+}
+
+
+// ETLUploadStep
+.etl-upload-step {
+  
+  .etl-upload-button {
+    .etl-alt-button;
+    margin-bottom: @half-spacing;
+
+    svg {
+      margin-bottom: 3px;
+    }
+
+    .upload-button-text {
+      margin: 0px @spacing;
+    }
+  }
+
+  .step-upload-filename {
+    justify-content: center;
+  }
+
+  .field-type-q {
+    justify-content: center;
+  }
 }

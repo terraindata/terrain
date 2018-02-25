@@ -50,7 +50,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { backgroundColor, fontColor, Colors, buttonColors, disabledButtonColors } from 'src/app/colors/Colors';
+import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor } from 'src/app/colors/Colors';
 
 import './FilePicker.less';
 
@@ -145,4 +145,4 @@ const activeStyle = [
 const disabledStyle = [
   backgroundColor(Colors().activeHover, Colors().activeHover),
   fontColor(Colors().activeText),
-]
+];
