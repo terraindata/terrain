@@ -46,124 +46,128 @@ THE SOFTWARE.
 
 // Yet another deep JSON getter/setter module
 
-import {KeyPath, WayPoint} from './KeyPath';
+import { KeyPath, WayPoint } from './KeyPath';
 // import isPrimitive = require('is-primitive');
 
 export function find(obj: object, path: KeyPath, next: (found) => any, options: object = {}): void
 {
-    if (path.size === 0 || obj === undefined)
+  if (path.size === 0 || obj === undefined)
+  {
+    //console.log('obj:');
+    //console.log(obj);
+    obj = next(obj);
+    //console.log(obj);
+    return;
+  }
+
+  const waypoint: WayPoint = path.get(0);
+  //console.log('waypoint');
+  //console.log(waypoint);
+
+  if (options['create'] === true)
+  {
+    // console.log('hh1')
+    if (typeof waypoint === 'string' && !obj.hasOwnProperty(waypoint as string))
     {
-        //console.log('obj:');
+      //  console.log('hh2')
+      obj[waypoint] = {};
+    }
+    else if (waypoint.constructor === Array && !obj.hasOwnProperty((waypoint as any[])[0]))
+    {
+      obj[(waypoint as any[])[0]] = [];
+    }
+  }
+
+  if (obj.constructor === Array)
+  {
+    console.log('UNEXPECTED');
+    obj = next(undefined);
+    return;
+  }
+
+  const keys: string[] = Object.keys(obj);
+  for (let i: number = 0; i < keys.length; ++i)
+  {
+    if (typeof waypoint === 'string' && keys[i] === waypoint)
+    {
+      if (path.size === 1)
+      {
+        //console.log('aaaaobj:');
         //console.log(obj);
-        obj = next(obj);
+        obj[keys[i]] = next(obj[keys[i]]);
         //console.log(obj);
         return;
+      } else {
+        return find(obj[keys[i]], path.shift(), next, options);
+      }
     }
-
-    const waypoint: WayPoint = path.get(0);
-    //console.log('waypoint');
-    //console.log(waypoint);
-
-    if (options['create'] === true)
+    else if (waypoint.constructor === Array && keys[i] === waypoint[0])
     {
-       // console.log('hh1')
-        if (typeof waypoint === 'string' && !obj.hasOwnProperty(waypoint as string))
-        {
-          //  console.log('hh2')
-            obj[waypoint] = {};
-        }
-        else if (waypoint.constructor === Array && !obj.hasOwnProperty((waypoint as any[])[0]))
-        {
-            obj[(waypoint as any[])[0]] = [];
-        }
-    }
+      let lastNestedArray = obj[keys[i]];
+      const recall: any[] = [...waypoint];
+      let spliced: number = 0;
 
-    if (obj.constructor === Array)
-    {
-        console.log('UNEXPECTED');
-        obj = next(undefined);
-        return;
-    }
-
-    const keys: string[] = Object.keys(obj);
-    for (let i: number = 0; i < keys.length; ++i)
-    {
-        if (typeof waypoint === 'string' && keys[i] === waypoint)
+      while (waypoint.length > 1)
+      {
+        const firstWildcard = (waypoint as any[]).indexOf('*');
+        if (firstWildcard === 1)
         {
-            if (path.size === 1)
+          //(waypoint as any[]).splice(1, 1);
+          //console.log('waypoint:');
+          //console.log(waypoint);
+          const results: any[] = [];
+          for (let j: number = 0; j < lastNestedArray.length; j++)
+          {
+            //console.log('waypoint: ');
+            //console.log(waypoint);
+            //const recall = [...waypoint];
+            //console.log('HAHA');
+            //console.log(lastNestedArray[j]);
+            //console.log(path.set(0, waypoint));
+            recall[spliced + firstWildcard] = j.toString();
+            // waypoint cloned here
+            const newPath = waypoint.length === 1 ? path.shift() : path.set(0, [...recall]);
+            //console.log('newpath ');
+            //console.log(newPath);
+            find(obj, newPath, (found) =>
             {
-                //console.log('aaaaobj:');
-                //console.log(obj);
-                obj[keys[i]] = next(obj[keys[i]]);
-                //console.log(obj);
-                return;
-            }else
-                return find(obj[keys[i]], path.shift(), next, options);
+              //console.log('rj = ');
+              //console.log(found);
+              results[j] = found;
+              next(found);
+            }, options);
+            //console.log('recall: ');
+            //console.log(recall);
+            //waypoint = recall;
+          }
+          //console.log('r here:');
+          //console.log(results);
+          obj = next(results);
+          return;
         }
-        else if (waypoint.constructor === Array && keys[i] === waypoint[0])
+        else
         {
-            let lastNestedArray = obj[keys[i]];
-            const recall: any[] = [...waypoint];
-            let spliced: number = 0;
-
-            while(waypoint.length > 1)
-            {
-                let firstWildcard = (waypoint as any[]).indexOf('*');
-                if(firstWildcard === 1)
-                {
-                    //(waypoint as any[]).splice(1, 1);
-                    //console.log('waypoint:');
-                    //console.log(waypoint);
-                    const results: any[] = [];
-                    for (let j: number = 0; j < lastNestedArray.length; j++)
-                    {
-                        //console.log('waypoint: ');
-                        //console.log(waypoint);
-                        //const recall = [...waypoint];
-                        //console.log('HAHA');
-                        //console.log(lastNestedArray[j]);
-                        //console.log(path.set(0, waypoint));
-                        recall[spliced + firstWildcard] = j.toString();
-                        // waypoint cloned here
-                        let newPath = waypoint.length === 1 ? path.shift() : path.set(0, [...recall]);
-                        //console.log('newpath ');
-                        //console.log(newPath);
-                        find(obj, newPath, (found) => {
-                            //console.log('rj = ');
-                            //console.log(found);
-                            results[j] = found;
-                            next(found);
-                        }, options);
-                        //console.log('recall: ');
-                        //console.log(recall);
-                        //waypoint = recall;
-                    }
-                    //console.log('r here:');
-                    //console.log(results);
-                    obj = next(results);
-                    return;
-                }
-                else
-                {
-                    if((waypoint as any[]).length === 2){
-                        lastNestedArray[waypoint[1]] = next(lastNestedArray[waypoint[1]]);
-                        return;
-                    }else {
-                        lastNestedArray = lastNestedArray[waypoint[1]];
-                        (waypoint as any[]).splice(1, 1);
-                        spliced++;
-                    }
-                }
-            }
-
-            //console.log('lastNestedArray:');
-            //console.log(lastNestedArray);
-
-            return find(lastNestedArray, path.shift(), next, options);
+          if ((waypoint as any[]).length === 2)
+          {
+            lastNestedArray[waypoint[1]] = next(lastNestedArray[waypoint[1]]);
+            return;
+          } else
+          {
+            lastNestedArray = lastNestedArray[waypoint[1]];
+            (waypoint as any[]).splice(1, 1);
+            spliced++;
+          }
         }
-    }
+      }
 
-    return next(undefined);
+      //console.log('lastNestedArray:');
+      //console.log(lastNestedArray);
+
+      return find(lastNestedArray, path.shift(), next, options);
+    }
+  }
+
+  return next(undefined);
 }
 
 export function get(obj: object, path: KeyPath): any
@@ -171,22 +175,24 @@ export function get(obj: object, path: KeyPath): any
   // console.log('obj, path:');
   // console.log(obj);
   // console.log(path);
-    let result: any;
-    find(obj, path, (found) => {
-        result = found;
-        return found;
-    });
-    //console.log('result:');
-    //console.log(result);
-    return result;
+  let result: any;
+  find(obj, path, (found) =>
+  {
+    result = found;
+    return found;
+  });
+  //console.log('result:');
+  //console.log(result);
+  return result;
 }
 
 export function set(obj: object, path: KeyPath, value: any, options: object = {}): any
 {
-    console.log('setting ', path);
-    //let result = obj;
-    find(obj, path, (found) => {
-        return value;
-    }, options);
-    //return result;
+  console.log('setting ', path);
+  //let result = obj;
+  find(obj, path, (found) =>
+  {
+    return value;
+  }, options);
+  //return result;
 }

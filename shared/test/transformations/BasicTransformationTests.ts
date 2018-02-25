@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import nestedProperty = require('nested-property');
+import { KeyPath } from '../../transformations/KeyPath';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 import * as yadeep from '../../transformations/yadeep';
-import {KeyPath} from '../../transformations/KeyPath';
 
 const doc1 = {
   name: 'Bob',
@@ -72,7 +72,7 @@ const doc2 = {
 const doc3 = {
   //name: 'Bob',
   arr: ['sled', [{ a: 'dog' }, { b: 'doggo' }]],
-  hardarr: [['a'], ['b', ['c']]]
+  hardarr: [['a'], ['b', ['c']]],
 };
 
 test('add fields manually', () =>
@@ -255,9 +255,9 @@ test('rename a field (an object with subkeys)', () =>
 
 test('process array types', () =>
 {
-//    console.log(yadeep.get(doc3, KeyPath([['arr', 1, '*'], 'a'])));
-    //console.log(yadeep.get(doc3, KeyPath([['hardarr', '0', '*']])));
-    //console.log(yadeep.get(doc3, KeyPath([['arr', 1], 'a'])));
+  //    console.log(yadeep.get(doc3, KeyPath([['arr', 1, '*'], 'a'])));
+  //console.log(yadeep.get(doc3, KeyPath([['hardarr', '0', '*']])));
+  //console.log(yadeep.get(doc3, KeyPath([['arr', 1], 'a'])));
   //yadeep.set(doc3, KeyPath([['arr', '0']]), 'jim');
   //console.log(doc3);
   // console.log(doc3['arr'][1][0]['a']);

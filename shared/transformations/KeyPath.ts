@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import {List} from "immutable";
+import { List } from 'immutable';
 
 export type WayPoint = string | Array<string | number>;
 export type KeyPath = List<WayPoint>;
-export const KeyPath = (args: Array<WayPoint> = []) => List<WayPoint>(args);
+export const KeyPath = (args: WayPoint[] = []) => List<WayPoint>(args);

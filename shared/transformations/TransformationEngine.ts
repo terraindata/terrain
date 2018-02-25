@@ -49,6 +49,7 @@ import GraphLib = require('graphlib');
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
+import { KeyPath, WayPoint } from './KeyPath';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
@@ -56,7 +57,6 @@ import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 import * as yadeep from './yadeep';
-import {KeyPath, WayPoint} from './KeyPath';
 
 const Graph = GraphLib.Graph;
 
@@ -385,17 +385,17 @@ export class TransformationEngine
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
-    let arrayKey: any = [key.toString()];
+    const arrayKey: any = [key.toString()];
     const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
     ids = ids.push(arrayID);
     this.setFieldProp(arrayID, KeyPath(['valueType']), arrayTypeOfValues(obj[key]));
     for (let i: number = 0; i < obj[key].length; i++)
     {
-        let arrayKey_i: any = arrayKey.push(i.toString());
+      const arrayKey_i: any = arrayKey.push(i.toString());
       if (isPrimitive(obj[key][i]))
       {
         //ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
-          ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
+        ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
         ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i);
@@ -439,7 +439,7 @@ export class TransformationEngine
     const output: object = {};
     this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
     {
-        console.log('CALLING GET ON KP: ', keyPath);
+      console.log('CALLING GET ON KP: ', keyPath);
       const ref: any = yadeep.get(obj, keyPath);
       if (ref !== undefined)
       {
