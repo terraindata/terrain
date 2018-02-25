@@ -51,133 +51,112 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import CheckBox from 'common/components/CheckBox';
 import FadeInOut from 'common/components/FadeInOut';
 import FilePicker from 'common/components/FilePicker';
-
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
+
+import * as FileUtil from 'shared/etl/FileUtil';
+import { FileTypes, TemplateTypes } from 'shared/etl/TemplateTypes';
 
 import { ETLActions } from 'etl/ETLRedux';
 import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
 import { ETLStepComponent, RevertParams } from 'etl/walkthrough/ETLStepComponent';
-import SourceFileTypeOptions from 'etl/walkthrough/SourceFileTypeOptions';
 import './ETLStepComponent.less';
 
-const UploadIcon = require('images/icon_export.svg');
-
-enum Stage
+interface Props
 {
-  PickFile = 0,
-  FileTypeSettings = 1,
-  Confirm = 2,
+  hide?: boolean;
+
+  // injected props
+  act?: typeof ETLActions;
+  etl?: ETLState;
 }
 
-class ETLUploadStep extends ETLStepComponent
+class SourceFileTypeOptions extends TerrainComponent<Props>
 {
-  public static onRevert(params: RevertParams)
-  {
-    const walkthrough = params.etl.walkthrough
-      .set('file', null)
-      .set('source', null);
-    params.act({
-      actionType: 'setWalkthroughState',
-      newState: walkthrough,
-    });
-  }
-
-  public getStage(): Stage
+  public hasCsvHeader(): boolean
   {
     const { walkthrough } = this.props.etl;
-    if (walkthrough.file == null || walkthrough.source == null)
-    {
-      return Stage.PickFile;
-    }
-    else if (walkthrough.source.hasCSVHeader == null)
-    {
-      return Stage.FileTypeSettings;
-    }
-    else
-    {
-      return Stage.Confirm;
-    }
+    return _.get(
+      walkthrough.source,
+      ['params', 'hasCsvHeader'],
+      false,
+    );
   }
 
-  public renderUploadSection()
+  public renderCsvOptions()
   {
-    const button = (
-      <div className='etl-upload-button' style={uploadButtonStyle}>
-        <UploadIcon width='32px'/>
-        <div className='upload-button-text'>
-          Choose a File
+    const hasHeader = this.hasCsvHeader();
+
+    return (
+      <div
+        className='source-file-type-row-button'
+        onClick={this.handleCsvHeaderChange}
+      >
+        <CheckBox
+          checked={hasHeader}
+          onChange={() => null}
+        />
+        <div className='source-file-type-checkbox-label'>
+          This File Has a Header
         </div>
       </div>
     );
-
-    const file = this.props.etl.walkthrough.file;
-    const showFileName = file != null;
-    return (
-      <div className='etl-transition-column'>
-        <FilePicker
-          large={true}
-          onChange={this.handleChangeFile}
-          accept={'.csv,.json'}
-          customButton={button}
-        />
-        <span style={{minHeight: transitionRowHeight}}>
-          <div
-            className='etl-transition-element step-upload-filename'
-            style={{height: showFileName ? transitionRowHeight : '0px'}}
-          >
-            { showFileName ? file.name : 'Invalid File' }
-          </div>
-        </span>
-      </div>
-    );
   }
 
-  public renderFileTypeSettings(show: boolean)
+  public renderJsonOptions()
   {
-    return (
-      <SourceFileTypeOptions/>
-    );
+    return null;
   }
 
   public render()
   {
-    const stage: number = this.getStage();
+    const { file } = this.props.etl.walkthrough;
+    const type = file != null ? FileUtil.getFileType(file) : null;
+
     return (
-      <div className='etl-transition-column etl-upload-step'>
-        { this.renderUploadSection() }
-        <SourceFileTypeOptions
-          hide={stage <= Stage.PickFile}
-        />
-        { this._renderNextButton(false) }
-      </div>
+      <span style={{height: transitionRowHeight}}>
+        <div
+          className='etl-transition-element field-type-q'
+          style={{height: !this.props.hide ? transitionRowHeight : '0px'}}
+        >
+          <div className='source-file-type-options'>
+            {type === FileTypes.Csv ? this.renderCsvOptions() : null}
+            {type === FileTypes.Json ? this.renderJsonOptions() : null}
+          </div>
+        </div>
+      </span>
     );
   }
 
-  public handleChangeFile(file: File)
+  public handleCsvHeaderChange()
   {
-    const walkthrough = this.props.etl.walkthrough;
+    const { walkthrough } = this.props.etl;
+    const hasHeader = this.hasCsvHeader();
+    const source = _.get(walkthrough, 'source', {});
+    const sourceParams = _.get(source, 'params', {});
+    const newSourceParams = _.extend({},
+      sourceParams,
+      { hasCsvHeader: !hasHeader },
+    );
+    const newSource = _.extend({},
+      source,
+      { params: newSourceParams },
+    );
+
     this.props.act({
       actionType: 'setWalkthroughState';
-      newState: walkthrough
-        .set('file', file)
-        .set('source', { type: 'local'});,
+      newState: walkthrough.set('source', newSource),
     });
   }
 }
 
 const transitionRowHeight = '28px';
-const uploadButtonStyle = [
-  backgroundColor(Colors().bg3),
-  fontColor(Colors().text2, Colors().active),
-  borderColor(Colors().darkerHighlight, Colors().active),
-  getStyle('boxShadow', `2px 1px 3px ${Colors().boxShadow}`),
-];
 
 export default Util.createTypedContainer(
-  ETLUploadStep,
+  SourceFileTypeOptions,
   ['etl'],
   { act: ETLActions },
 );
