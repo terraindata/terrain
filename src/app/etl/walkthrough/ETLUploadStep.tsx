@@ -45,78 +45,103 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import FadeInOut from 'common/components/FadeInOut';
-import { ComponentProps } from 'common/components/walkthrough/WalkthroughTypes';
-
+import FilePicker from 'common/components/FilePicker';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Quarantine from 'util/RadiumQuarantine';
+import Util from 'util/Util';
 
 import { ETLActions } from 'etl/ETLRedux';
 import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
+import { ETLStepComponent, RevertParams } from 'etl/walkthrough/ETLStepComponent';
 import './ETLStepComponent.less';
 
-export interface StepProps extends ComponentProps
+enum Stage
 {
-  onDone: () => void;
-  etl?: ETLState;
-  act?: typeof ETLActions;
+  PickFile = 0,
+  FileTypeSettings = 1,
+  Confirm = 2,
 }
 
-export interface RevertParams
-{
-  act: typeof ETLActions,
-  etl: ETLState,
-}
-
-export abstract class ETLStepComponent<Props extends StepProps = StepProps> extends TerrainComponent<Props>
+class ETLUploadStep extends ETLStepComponent
 {
   public static onRevert(params: RevertParams)
   {
-    // do nothing by default
-  }
-
-  public _getButtonStyle(enabled)
-  {
-    return enabled ? activeStyle : disabledStyle;
-  }
-
-  public _getButtonClass(enabled)
-  {
-    return classNames({
-      'etl-step-big-button': true,
-      'button-disabled': !enabled,
+    const walkthrough = params.etl.walkthrough
+      .set('file', null).set('source', null);
+    params.act({
+      actionType: 'setWalkthroughState',
+      newState: walkthrough
     });
   }
 
-  public _renderNextButton(shown = true, enabled = true)
+  public getStage(): Stage
+  {
+    const { walkthrough } = this.props.etl;
+    if (walkthrough.file == null || walkthrough.source == null)
+    {
+      return Stage.PickFile;
+    }
+    else if (walkthrough.source.hasCSVHeader == null)
+    {
+      return Stage.FileTypeSettings;
+    }
+    else
+    {
+      return Stage.Confirm;
+    }
+  }
+
+  public renderUploadSection()
   {
     return (
-      <FadeInOut open={shown}>
-        <Quarantine>
-          <div
-            className={this._getButtonClass(enabled)}
-            onClick={enabled ? this.props.onDone : () => null}
-            style={this._getButtonStyle(enabled)}
-          >
-            Next
-          </div>
-        </Quarantine>
-      </FadeInOut>
+      <FilePicker
+        large={true}
+        onChange={this.handleChangeFile}
+        accept={'.csv,.json'}
+        customButton={<div> YOOOO </div>}
+      />
     );
+  }
+
+  public renderFileTypeSettings(show: boolean)
+  {
+    if (! show)
+    {
+      return null;
+    }
+    return (
+      <div> hey </div>
+    );
+  }
+
+  public render()
+  {
+    const stage: number = this.getStage();
+    return (
+      <div className='etl-step-column'>
+        { this.renderUploadSection() }
+        { this.renderFileTypeSettings(stage > Stage.PickFile) }
+        { this._renderNextButton(false) }
+      </div>
+    );
+  }
+
+  public handleChangeFile(file: File)
+  {
+    const walkthrough = this.props.etl.walkthrough;
+    this.props.act({
+      actionType: 'setWalkthroughState';
+      newState: walkthrough.set('file', file).set('source', { hasCSVHeader: true});
+    });
   }
 }
 
-const activeStyle = [
-  backgroundColor(Colors().active, Colors().activeHover),
-  fontColor(Colors().activeText),
-];
-const disabledStyle = [
-  backgroundColor(Colors().activeHover, Colors().activeHover),
-  fontColor(Colors().activeText),
-];
+export default Util.createTypedContainer(
+  ETLUploadStep,
+  ['etl'],
+  { act: ETLActions }
+);

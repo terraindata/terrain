@@ -54,7 +54,6 @@ import { TemplateTypes } from 'shared/etl/TemplateTypes';
 
 class ETLStateC
 {
-  public file: File = null;
   public walkthrough: WalkthroughState = _WalkthroughState();
 }
 export type ETLState = WithIRecord<ETLStateC>;
@@ -62,11 +61,12 @@ export const _ETLState = makeConstructor(ETLStateC);
 
 class WalkthroughStateC
 {
-  public stepHistory: List<ViewState> = List([ViewState.Start]);
+  public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
   public type: TemplateTypes = null;
   public source: any = null;
   public sink: any = null;
   public chosenTemplateId: ID = -1;
+  public file: File = null;
 }
 export type WalkthroughState = WithIRecord<WalkthroughStateC>;
 export const _WalkthroughState = makeConstructor(WalkthroughStateC);

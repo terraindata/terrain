@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file no-console
 
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -59,25 +59,27 @@ export interface WalkthroughProps<ViewEnum, Context>
   context?: Context; // passed to custom components
   stepIndex: number; // current position in the step history
   stepHistory: List<ViewEnum>;
+  revertParams?: object;
   setSteps: (newStep: number, newHistory: List<ViewEnum>) => void;
 }
 
-export interface ComponentProps<Context>
+export interface ComponentProps<Context = any>
 {
-  context: Context;
+  context?: Context;
   onDone: () => void;
   [k: string]: any; // for compatibility
 }
 
-export type WalkthroughComponentClass<Context> = React.ComponentClass<ComponentProps<Context>>;
+export type WalkthroughComponentClass<Context = any> = React.ComponentClass<ComponentProps<Context>>;
 
 export interface WalkthroughNodeOption<ViewEnum, Context>
 {
   link: ViewEnum; // What ViewEnum to go to next
   buttonText?: string; // if it's a simple button, what does it say?
   component?: WalkthroughComponentClass<Context>; // if it's a custom ui interaction, what component to use
+  onRevert?: (params: object) => void; // called when the step gets reverted (if a user goes to a previous crumb and changes the path)
   componentNeedsButton?: boolean;
-  default?: boolean;
+  default?: boolean; // TODO
 }
 
 export interface WalkthroughGraphNode<ViewEnum, Context>

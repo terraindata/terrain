@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires max-classes-per-file no-console
 
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -52,7 +52,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-
+import Quarantine from 'util/RadiumQuarantine';
 import {
   ComponentProps,
   WalkthroughComponentClass,
@@ -83,18 +83,18 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
           Or
         </div>;
       const buttonComponent = (
-        <RadiumQuarantine>
-            <div
-              key={index}
-              style={buttonStyle}
-              className='walkthrough-option-button'
-              onClick={this.handleMoveToNextFactory(option.link)}
-            >
-              <div className='walkthrough-option-button-text'>
-                {buttonText}
-              </div>
+        <Quarantine>
+          <div
+            key={index}
+            style={buttonStyle}
+            className='walkthrough-option-button'
+            onClick={this.handleMoveToNextFactory(option.link)}
+          >
+            <div className='walkthrough-option-button-text'>
+              {buttonText}
             </div>
-        </RadiumQuarantine>
+          </div>
+        </Quarantine>
       );
 
       if (option.component != null)
@@ -154,30 +154,46 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
       );
     }
 
-    public handleMoveToNextFactory(link: ViewEnum)
+    public moveToNext(link: ViewEnum)
     {
-      return () => {
-        const { stepIndex, stepHistory } = this.props;
-        if (stepIndex < stepHistory.size - 1) // not on the most recent step
+      const { stepIndex, stepHistory } = this.props;
+      if (stepIndex < stepHistory.size - 1) // not on the most recent step
+      {
+        const nextStepInHistory = stepHistory.get(stepIndex + 1);
+        if (link === nextStepInHistory)
         {
-          // if link is to a different step then the next step, then we should overwrite history
-          const nextStepInHistory = stepHistory.get(stepIndex + 1);
-          if (link === nextStepInHistory)
-          {
-            this.props.setSteps(stepIndex + 1, stepHistory);
-          }
-          else
-          {
-            const nextHistory = stepHistory.slice(0, stepIndex + 1).toList().push(link);
-            this.props.setSteps(stepIndex + 1, nextHistory);
-          }
+          this.props.setSteps(stepIndex + 1, stepHistory);
         }
         else
         {
-          const nextHistory = stepHistory.push(link);
+          // if link is to a different step then the next step, then
+          // 1: overwrite the history from this point on and
+          // 2: call onRevert for each option that has it defined
+          const nextHistory = stepHistory.slice(0, stepIndex + 1).toList().push(link);
+          const removedSteps = stepHistory.slice(stepIndex + 1);
+          removedSteps.forEach((step, i) => {
+            const graphNode = graph[step as any];
+            const nextStep = removedSteps[i + 1]; // if out of range, will be undefined
+            graphNode.options.forEach((option, j) => {
+              if (option.link === nextStep && option.onRevert != null)
+              {
+                option.onRevert(this.props.revertParams);
+              }
+            });
+          });
           this.props.setSteps(stepIndex + 1, nextHistory);
         }
-      };
+      }
+      else
+      {
+        const nextHistory = stepHistory.push(link);
+        this.props.setSteps(stepIndex + 1, nextHistory);
+      }
+    }
+
+    public handleMoveToNextFactory(link: ViewEnum)
+    {
+      return () => this.moveToNext(link);
     }
   }
   return Walkthrough;
@@ -187,14 +203,3 @@ const buttonStyle = [
   backgroundColor(Colors().active, Colors().activeHover),
   fontColor(Colors().activeText),
 ];
-
-// very simple passthrough component to prevent unnecessary re-renders
-// and prevent some subtle radium event handler bugs
-@Radium
-class RadiumQuarantine extends React.Component
-{
-  public render()
-  {
-    return this.props.children;
-  }
-}

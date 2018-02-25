@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -51,14 +51,14 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
+import { walkthroughFactory } from 'common/components/walkthrough/Walkthrough';
+import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { ETLActions } from 'etl/ETLRedux';
 import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
-
-import { walkthroughFactory } from 'common/components/walkthrough/Walkthrough';
-import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughTypes';
+import ETLUploadStep from 'etl/walkthrough/ETLUploadStep';
 
 const { List } = Immutable;
 
@@ -73,6 +73,11 @@ export interface Props
 
 class ETLWalkthrough extends TerrainComponent<Props>
 {
+  public componentWillMount()
+  {
+    this.getStepFromRoute(true);
+  }
+
   public render()
   {
     const { etl } = this.props;
@@ -114,19 +119,24 @@ class ETLWalkthrough extends TerrainComponent<Props>
   }
 
   // if the step is invalid or doesn't exist then return 0
-  public getStepFromRoute()
+  public getStepFromRoute(fixBadRoute = false)
   {
     const { params, etl } = this.props;
     if (params != null && params.step != null)
     {
       const val = Number(params.step);
-      if (isNaN(val) || val < 0 || val >= etl.walkthrough.stepHistory.size)
+      const isInvalid = isNaN(val) || val < 0 || val >= etl.walkthrough.stepHistory.size;
+      if (!isInvalid)
       {
-        return 0;
+        return val;
       }
-      return val;
+    }
+    if (fixBadRoute)
+    {
+      browserHistory.push(`/etl/new/0`);
     }
     return 0;
+
   }
 }
 
@@ -258,7 +268,8 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
     options: [
       {
         link: ViewState.PickDatabase,
-        component: null,
+        component: ETLUploadStep,
+        onRevert: ETLUploadStep.onRevert,
       },
     ],
   },

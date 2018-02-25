@@ -57,8 +57,9 @@ import './FilePicker.less';
 interface Props
 {
   disabled?: boolean;
-  extensions?: string;
+  accept?: string;
   large?: boolean;
+  customButton?: any; // if specified, disabled and large have no effect
   onChange: ( file ) => void;
 }
 
@@ -67,32 +68,55 @@ export default class FilePicker extends TerrainComponent<Props>
 {
   private fileInput: any;
 
+  public renderInputElem()
+  {
+    return (
+      <input
+        ref={(input) => { this.fileInput = input; }}
+        type='file'
+        accept={this.props.accept}
+        name='file-picker'
+        onChange={this.handleChange}
+        style={{display: 'none'}}
+      />
+    );
+  }
+  public renderCustom()
+  {
+    return (
+      <span onClick={this.handleSelectClicked}>
+        {this.renderInputElem()}
+        {this.props.customButton}
+      </span>
+    );
+  }
+
   public render()
   {
-    const buttonStyle = this.props.disabled ? disabledStyle : activeStyle;
-    return (
-      <div
-        className={classNames({
-          'file-picker': true,
-          'file-picker-disabled': this.props.disabled,
-          'file-picker-large': this.props.large,
-        })}
-        style={buttonStyle}
-        onClick={
-          this.props.disabled ? () => null : this.handleSelectClicked
-        }
-      >
-        Choose File
-        <input
-          ref={(input) => { this.fileInput = input; }}
-          type='file'
-          accept={this.props.extensions}
-          name='file-picker'
-          onChange={this.handleChange}
-          style={{display: 'none'}}
-        />
-      </div>
-    );
+    if (this.props.customButton != null)
+    {
+      return this.renderCustom();
+    }
+    else
+    {
+      const buttonStyle = this.props.disabled ? disabledStyle : activeStyle;
+      return (
+        <div
+          className={classNames({
+            'file-picker': true,
+            'file-picker-disabled': this.props.disabled,
+            'file-picker-large': this.props.large,
+          })}
+          style={buttonStyle}
+          onClick={
+            this.props.disabled ? () => null : this.handleSelectClicked
+          }
+        >
+          Choose File
+          {this.renderInputElem()}
+        </div>
+      );
+    }
   }
 
   public handleChange(ev)

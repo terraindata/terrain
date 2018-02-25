@@ -45,78 +45,16 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
-import * as classNames from 'classnames';
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import FadeInOut from 'common/components/FadeInOut';
-import { ComponentProps } from 'common/components/walkthrough/WalkthroughTypes';
-
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Quarantine from 'util/RadiumQuarantine';
-
-import { ETLActions } from 'etl/ETLRedux';
-import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
-import './ETLStepComponent.less';
-
-export interface StepProps extends ComponentProps
+// very simple passthrough component to prevent unnecessary re-renders
+// and prevent some subtle radium event handler bugs
+@Radium
+export default class RadiumQuarantine extends React.Component
 {
-  onDone: () => void;
-  etl?: ETLState;
-  act?: typeof ETLActions;
-}
-
-export interface RevertParams
-{
-  act: typeof ETLActions,
-  etl: ETLState,
-}
-
-export abstract class ETLStepComponent<Props extends StepProps = StepProps> extends TerrainComponent<Props>
-{
-  public static onRevert(params: RevertParams)
+  public render()
   {
-    // do nothing by default
-  }
-
-  public _getButtonStyle(enabled)
-  {
-    return enabled ? activeStyle : disabledStyle;
-  }
-
-  public _getButtonClass(enabled)
-  {
-    return classNames({
-      'etl-step-big-button': true,
-      'button-disabled': !enabled,
-    });
-  }
-
-  public _renderNextButton(shown = true, enabled = true)
-  {
-    return (
-      <FadeInOut open={shown}>
-        <Quarantine>
-          <div
-            className={this._getButtonClass(enabled)}
-            onClick={enabled ? this.props.onDone : () => null}
-            style={this._getButtonStyle(enabled)}
-          >
-            Next
-          </div>
-        </Quarantine>
-      </FadeInOut>
-    );
+    return this.props.children;
   }
 }
-
-const activeStyle = [
-  backgroundColor(Colors().active, Colors().activeHover),
-  fontColor(Colors().activeText),
-];
-const disabledStyle = [
-  backgroundColor(Colors().activeHover, Colors().activeHover),
-  fontColor(Colors().activeText),
-];
