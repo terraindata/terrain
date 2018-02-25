@@ -61,3 +61,9 @@ export function getFileType(file: File): FileTypes
       return FileTypes.Json;
   }
 }
+
+
+export function getFirstLines(file: File, numLines: number)
+{
+
+}

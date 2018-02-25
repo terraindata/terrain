@@ -113,13 +113,19 @@ export interface Template
   };
 }
 
-interface SourceConfig
+export interface SourceConfig
 {
   type: string;
-  params: object;
-} // this type definition should be somewhere else. it's also a placeholder
-interface SinkConfig
+  params: {
+    hasCsvHeader?: boolean;
+    jsonNewlines?: boolean;
+  };
+}
+// these type definitions should be somewhere else. it's also a placeholder
+export interface SinkConfig
 {
   type: string;
-  params: object;
+  params: {
+
+  };
 }

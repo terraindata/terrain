@@ -56,32 +56,49 @@ import { _ETLState, ETLState, ViewState, WalkthroughState } from './ETLTypes';
 
 export interface ETLActionTypes
 {
-  placeholder: {
-    actionType: 'placeholder';
-  };
   setWalkthroughState: {
     actionType: 'setWalkthroughState';
     newState: WalkthroughState;
   };
+  loadFileSample: {
+    actionType: 'loadFileSample';
+    autodetectOptions?: boolean;
+  }
 }
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 {
   public reducers: ConstrainedMap<ETLActionTypes, ETLState> =
     {
-      placeholder: (state, action) =>
-      {
-        return state;
-      },
       setWalkthroughState: (state, action) =>
       {
         return state.set('walkthrough', action.payload.newState);
       },
+      loadFileSample: (state, action) =>
+      {
+        return state;
+      }
     };
+
+  public loadFileSampleAction(action: ETLActionType<'loadFileSample'>, dispatch)
+  {
+    
+  }
+
+  public overrideAct(action: Unroll<ETLActionTypes>)
+  {
+    switch (action.actionType)
+    {
+      case 'loadFileSample':
+        return this.loadFileSampleAction.bind(this, action);
+      default:
+        return undefined;
+    }
+  }
 }
 
 const ReduxInstance = new ETLRedux();
 export const ETLActions = ReduxInstance._actionsForExport();
 export const ETLReducers = ReduxInstance._reducersForExport(_ETLState);
-export declare type TemplateEditorActionType<K extends keyof ETLActionTypes> =
+export declare type ETLActionType<K extends keyof ETLActionTypes> =
   GetType<K, ETLActionTypes>;

@@ -86,6 +86,16 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
     );
   }
 
+  public jsonHasNewlines(): boolean
+  {
+    const { walkthrough } = this.props.etl;
+    return _.get(
+      walkthrough.source,
+      ['params', 'jsonNewlines'],
+      false,
+    );
+  }
+
   public renderCsvOptions()
   {
     const hasHeader = this.hasCsvHeader();
@@ -100,7 +110,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
           onChange={() => null}
         />
         <div className='source-file-type-checkbox-label'>
-          This File Has a Header
+          This file has a header
         </div>
       </div>
     );
@@ -108,14 +118,28 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
 
   public renderJsonOptions()
   {
-    return null;
+    const hasNewlines = this.jsonHasNewlines();
+
+    return (
+      <div
+        className='source-file-type-row-button'
+        onClick={this.handleJsonNewlinesChange}
+      >
+        <CheckBox
+          checked={hasNewlines}
+          onChange={() => null}
+        />
+        <div className='source-file-type-checkbox-label'>
+          Objects seperated by newlines
+        </div>
+      </div>
+    );
   }
 
   public render()
   {
     const { file } = this.props.etl.walkthrough;
     const type = file != null ? FileUtil.getFileType(file) : null;
-
     return (
       <span style={{height: transitionRowHeight}}>
         <div
@@ -147,7 +171,28 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
     );
 
     this.props.act({
-      actionType: 'setWalkthroughState';
+      actionType: 'setWalkthroughState',
+      newState: walkthrough.set('source', newSource),
+    });
+  }
+
+  public handleJsonNewlinesChange()
+  {
+    const { walkthrough } = this.props.etl;
+    const hasNewlines = this.jsonHasNewlines();
+    const source = _.get(walkthrough, 'source', {});
+    const sourceParams = _.get(source, 'params', {});
+    const newSourceParams = _.extend({},
+      sourceParams,
+      { jsonNewlines: !hasNewlines }),
+    );
+    const newSource = _.extend({},
+      source,
+      { params: newSourceParams }
+    );
+
+    this.props.act({
+      actionType: 'setWalkthroughState',
       newState: walkthrough.set('source', newSource),
     });
   }

@@ -92,7 +92,7 @@ class ETLUploadStep extends ETLStepComponent
     {
       return Stage.PickFile;
     }
-    else if (walkthrough.source.hasCSVHeader == null)
+    else if (walkthrough.source.params == null)
     {
       return Stage.FileTypeSettings;
     }
@@ -160,10 +160,14 @@ class ETLUploadStep extends ETLStepComponent
   {
     const walkthrough = this.props.etl.walkthrough;
     this.props.act({
-      actionType: 'setWalkthroughState';
+      actionType: 'setWalkthroughState',
       newState: walkthrough
         .set('file', file)
-        .set('source', { type: 'local'});,
+        .set('source', { type: 'local'}),
+    });
+    this.props.act({
+      actionType: 'loadFileSample',
+      autodetectOptions: true,
     });
   }
 }
