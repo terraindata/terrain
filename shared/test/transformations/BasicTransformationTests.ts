@@ -75,13 +75,14 @@ const doc3 = {
   hardarr: [['a'], ['b', ['c']]]
 };
 
-/*test('add fields manually', () =>
+test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   e.addField(KeyPath(['meta', 'school']), 'string');
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
   const r = e.transform(doc1);
-  expect(nestedProperty.get(r, 'meta.school')).toBe('STANFORD');
+  console.log(r);
+  expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
 test('capitalization', () =>
@@ -250,7 +251,7 @@ test('rename a field (an object with subkeys)', () =>
   expect(e.transform(doc2)['meta']).toBe(undefined);
   expect(e.transform(doc2)['school']).toBe('Stanford');
   expect(e.transform(doc2)['sport']).toBe('bobsled');
-});*/
+});
 
 test('process array types', () =>
 {
@@ -260,8 +261,8 @@ test('process array types', () =>
   //yadeep.set(doc3, KeyPath([['arr', '0']]), 'jim');
   //console.log(doc3);
   // console.log(doc3['arr'][1][0]['a']);
-  const e: TransformationEngine = new TransformationEngine(doc3);
-  console.dir(e.flatten(doc3), {color: true, depth: null});
+  //const e: TransformationEngine = new TransformationEngine(doc3);
+  //console.dir(e.flatten(doc3), {color: true, depth: null});
   // e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath([['arr', 0]])]));
   // console.log(e.transform(doc3));
 });

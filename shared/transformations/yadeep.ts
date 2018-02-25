@@ -66,8 +66,10 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
 
     if (options['create'] === true)
     {
+       // console.log('hh1')
         if (typeof waypoint === 'string' && !obj.hasOwnProperty(waypoint as string))
         {
+          //  console.log('hh2')
             obj[waypoint] = {};
         }
         else if (waypoint.constructor === Array && !obj.hasOwnProperty((waypoint as any[])[0]))
@@ -96,7 +98,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
                 //console.log(obj);
                 return;
             }else
-                return find(obj[keys[i]], path.shift(), next);
+                return find(obj[keys[i]], path.shift(), next, options);
         }
         else if (waypoint.constructor === Array && keys[i] === waypoint[0])
         {
@@ -131,7 +133,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
                             //console.log(found);
                             results[j] = found;
                             next(found);
-                        });
+                        }, options);
                         //console.log('recall: ');
                         //console.log(recall);
                         //waypoint = recall;
@@ -157,7 +159,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
             //console.log('lastNestedArray:');
             //console.log(lastNestedArray);
 
-            return find(lastNestedArray, path.shift(), next);
+            return find(lastNestedArray, path.shift(), next, options);
         }
     }
 
@@ -181,6 +183,7 @@ export function get(obj: object, path: KeyPath): any
 
 export function set(obj: object, path: KeyPath, value: any, options: object = {}): any
 {
+    console.log('setting ', path);
     //let result = obj;
     find(obj, path, (found) => {
         return value;

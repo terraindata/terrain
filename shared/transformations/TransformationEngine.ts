@@ -56,7 +56,7 @@ import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 import * as yadeep from './yadeep';
-import { KeyPath } from './KeyPath';
+import {KeyPath, WayPoint} from './KeyPath';
 
 const Graph = GraphLib.Graph;
 
@@ -385,14 +385,17 @@ export class TransformationEngine
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
-    const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
+    let arrayKey: any = [key.toString()];
+    const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
     ids = ids.push(arrayID);
     this.setFieldProp(arrayID, KeyPath(['valueType']), arrayTypeOfValues(obj[key]));
     for (let i: number = 0; i < obj[key].length; i++)
     {
+        let arrayKey_i: any = arrayKey.push(i.toString());
       if (isPrimitive(obj[key][i]))
       {
-        ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+        //ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+          ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
         ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i);
