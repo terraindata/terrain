@@ -46,158 +46,144 @@ THE SOFTWARE.
 
 // Yet another deep JSON getter/setter module
 
-import { List } from 'immutable';
+import {KeyPath, WayPoint} from './KeyPath';
 // import isPrimitive = require('is-primitive');
 
-export type KeyPath = List<string | Array<string | number>>;
-export const KeyPath = (args: Array<string | Array<string | number>> = []) => List<string | Array<string | number>>(args);
+export function find(obj: object, path: KeyPath, next: (found) => any, options: object = {}): void
+{
+    if (path.size === 0 || obj === undefined)
+    {
+        //console.log('obj:');
+        //console.log(obj);
+        obj = next(obj);
+        //console.log(obj);
+        return;
+    }
+
+    const waypoint: WayPoint = path.get(0);
+    //console.log('waypoint');
+    //console.log(waypoint);
+
+    if (options['create'] === true)
+    {
+        if (typeof waypoint === 'string' && !obj.hasOwnProperty(waypoint as string))
+        {
+            obj[waypoint] = {};
+        }
+        else if (waypoint.constructor === Array && !obj.hasOwnProperty((waypoint as any[])[0]))
+        {
+            obj[(waypoint as any[])[0]] = [];
+        }
+    }
+
+    if (obj.constructor === Array)
+    {
+        console.log('UNEXPECTED');
+        obj = next(undefined);
+        return;
+    }
+
+    const keys: string[] = Object.keys(obj);
+    for (let i: number = 0; i < keys.length; ++i)
+    {
+        if (typeof waypoint === 'string' && keys[i] === waypoint)
+        {
+            if (path.size === 1)
+            {
+                //console.log('aaaaobj:');
+                //console.log(obj);
+                obj[keys[i]] = next(obj[keys[i]]);
+                //console.log(obj);
+                return;
+            }else
+                return find(obj[keys[i]], path.shift(), next);
+        }
+        else if (waypoint.constructor === Array && keys[i] === waypoint[0])
+        {
+            let lastNestedArray = obj[keys[i]];
+            const recall: any[] = [...waypoint];
+            let spliced: number = 0;
+
+            while(waypoint.length > 1)
+            {
+                let firstWildcard = (waypoint as any[]).indexOf('*');
+                if(firstWildcard === 1)
+                {
+                    //(waypoint as any[]).splice(1, 1);
+                    //console.log('waypoint:');
+                    //console.log(waypoint);
+                    const results: any[] = [];
+                    for (let j: number = 0; j < lastNestedArray.length; j++)
+                    {
+                        //console.log('waypoint: ');
+                        //console.log(waypoint);
+                        //const recall = [...waypoint];
+                        //console.log('HAHA');
+                        //console.log(lastNestedArray[j]);
+                        //console.log(path.set(0, waypoint));
+                        recall[spliced + firstWildcard] = j.toString();
+                        // waypoint cloned here
+                        let newPath = waypoint.length === 1 ? path.shift() : path.set(0, [...recall]);
+                        //console.log('newpath ');
+                        //console.log(newPath);
+                        find(obj, newPath, (found) => {
+                            //console.log('rj = ');
+                            //console.log(found);
+                            results[j] = found;
+                            next(found);
+                        });
+                        //console.log('recall: ');
+                        //console.log(recall);
+                        //waypoint = recall;
+                    }
+                    //console.log('r here:');
+                    //console.log(results);
+                    obj = next(results);
+                    return;
+                }
+                else
+                {
+                    if((waypoint as any[]).length === 2){
+                        lastNestedArray[waypoint[1]] = next(lastNestedArray[waypoint[1]]);
+                        return;
+                    }else {
+                        lastNestedArray = lastNestedArray[waypoint[1]];
+                        (waypoint as any[]).splice(1, 1);
+                        spliced++;
+                    }
+                }
+            }
+
+            //console.log('lastNestedArray:');
+            //console.log(lastNestedArray);
+
+            return find(lastNestedArray, path.shift(), next);
+        }
+    }
+
+    return next(undefined);
+}
 
 export function get(obj: object, path: KeyPath): any
 {
   // console.log('obj, path:');
   // console.log(obj);
   // console.log(path);
-  if (path.size === 0)
-  {
-    return obj;
-  }
-
-  if (obj.constructor === Array)
-  {
-    const idx: number = parseInt(path.get(0) as string, 10);
-    if (isNaN(idx))
-    {
-      // implicit wildcard
-      const results: any[] = [];
-      for (let j: number = 0; j < obj.length; j++)
-      {
-        results.push(get(obj[j], path));
-      }
-      return results;
-    }
-    else if (idx < (obj as any[]).length)
-    {
-      return get(obj[idx], path.shift());
-    }
-    return undefined;
-  }
-
-  const target: any = path.get(0);
-  const keys: string[] = Object.keys(obj);
-  for (let i: number = 0; i < keys.length; ++i)
-  {
-    if (typeof target === 'string' && keys[i] === target)
-    {
-      return get(obj[keys[i]], path.shift());
-    }
-    else if (target.constructor === Array && keys[i] === target[0])
-    {
-      if (target.length >= 2)
-      {
-        // console.log('here');
-        let lastNestedArray = obj[keys[i]];
-        for (let j: number = 1; j < target.length; j++)
-        {
-          lastNestedArray = lastNestedArray[target[j]];
-        }
-        // TODO there are some missing cases here like ['arr', 0, *, 1] (interspersed wildcard)
-        //      or ['arr', 0] (trailing implicit wildcards)...
-        // console.log(lastNestedArray);
-        return get(lastNestedArray, path.shift());
-      }
-      else
-      {
-        // implicit wildcard
-        const results: any[] = [];
-        for (let j: number = 0; j < obj[keys[i]].length; j++)
-        {
-          results.push(get(obj[keys[i]][j], path.shift()));
-        }
-        return results;
-      }
-    }
-  }
-
-  return undefined;
+    let result: any;
+    find(obj, path, (found) => {
+        result = found;
+        return found;
+    });
+    //console.log('result:');
+    //console.log(result);
+    return result;
 }
 
-export function set(obj: object, path: KeyPath, value: any, options: object = {}): void
+export function set(obj: object, path: KeyPath, value: any, options: object = {}): any
 {
-  if (path.size === 0)
-  {
-    obj = value;
-    return;
-  }
-
-  if (path.size === 1)
-  {
-    if (obj.constructor === Array)
-    {
-      if (parseInt(path.get(0) as string, 10) < (obj as any[]).length || options['create'] === true)
-      {
-        obj[parseInt(path.get(0) as string, 10)] = value;
-      }
-    }
-    else if (typeof obj === 'object')
-    {
-      if (obj.hasOwnProperty(path.get(0) as string) || options['create'] === true)
-      {
-        obj[path.get(0) as string] = value;
-      }
-    }
-    return;
-  }
-
-  if (obj.constructor === Array)
-  {
-    const idx: number = parseInt(path.get(0) as string, 10);
-    if (idx < (obj as any[]).length)
-    {
-      return set(obj[idx], path.shift(), value, options);
-    }
-    return;
-  }
-
-  const target: any = path.get(0);
-  const keys: string[] = Object.keys(obj);
-  for (let i: number = 0; i < keys.length; ++i)
-  {
-    if (typeof target === 'string' && keys[i] === target)
-    {
-      return set(obj[keys[i]], path.shift(), value, options);
-    }
-    else if (target.constructor === Array && keys[i] === target[0])
-    {
-      if (target.length >= 2)
-      {
-        // console.log('here');
-        let lastNestedArray = obj[keys[i]];
-        for (let j: number = 1; j < target.length; j++)
-        {
-          lastNestedArray = lastNestedArray[target[j]];
-        }
-        // TODO there are some missing cases here like ['arr', 0, *, 1] (interspersed wildcard)
-        //      or ['arr', 0] (trailing implicit wildcards)...
-        // console.log(lastNestedArray);
-        return set(lastNestedArray, path.shift(), value, options);
-      }
-      else
-      {
-        // implicit wildcard
-        // const results: any[] = [];
-        // for (let j: number = 0; j < obj[keys[i]].length; j++)
-        // {
-        //     results.push(get(obj[keys[i]][j], path.shift()));
-        // }
-        // return results;
-      }
-    }
-
-  }
-
-  if (options['create'] === true)
-  {
-    obj[path.get(0) as string] = {};
-    return set(obj[path.get(0) as string], path.shift(), value, options);
-  }
+    //let result = obj;
+    find(obj, path, (found) => {
+        return value;
+    }, options);
+    //return result;
 }

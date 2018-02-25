@@ -56,10 +56,9 @@ import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 import * as yadeep from './yadeep';
+import { KeyPath } from './KeyPath';
 
 const Graph = GraphLib.Graph;
-export type KeyPath = List<string | Array<string | number>>;
-export const KeyPath = (args: Array<string | Array<string | number>> = []) => List<string | Array<string | number>>(args);
 
 export class TransformationEngine
 {
@@ -432,14 +431,15 @@ export class TransformationEngine
     return ids;
   }
 
-  private flatten(obj: object): object
+  public flatten(obj: object): object
   {
     const output: object = {};
     this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
     {
-      if (yadeep.get(obj, keyPath) !== undefined)
+        console.log('CALLING GET ON KP: ', keyPath);
+      const ref: any = yadeep.get(obj, keyPath);
+      if (ref !== undefined)
       {
-        const ref: any = yadeep.get(obj, keyPath);
         if (isPrimitive(ref))
         {
           output[value] = ref;
