@@ -46,13 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands
 
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
 import ScoreWeightSlider from './ScoreWeightSlider';
-import BuilderActions from 'builder/data/BuilderActions';
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
@@ -62,7 +62,8 @@ const SCORE_COLORS =
     NEGATIVE: ['#d14f42'],
   };
 
-interface Props {
+interface Props
+{
   parentData: {
     weights: Array<{ weight: number }>;
   };
@@ -97,7 +98,6 @@ class ScoreBar extends TerrainComponent<Props>
   public render()
   {
     const { weight } = this.props.data;
-    console.error('scorebar', weight)
 
     return (
       <ScoreWeightSlider

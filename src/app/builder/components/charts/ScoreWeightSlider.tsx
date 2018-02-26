@@ -44,17 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as React from 'react';
-import TerrainComponent from './../../../common/components/TerrainComponent';
 import Slider from 'rc-slider';
 // We can just import Slider or Range to reduce bundle size
 // import Slider from 'rc-slider/lib/Slider';
 // import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
+import * as React from 'react';
+import TerrainComponent from './../../../common/components/TerrainComponent';
 
 const FIXED_SLIDER_HANDLE_STYLE = { display: 'none' };
 
-interface ScoreWeightSliderProps {
+interface ScoreWeightSliderProps
+{
   color: string;
   min: number;
   max: number;
@@ -100,7 +101,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
     return { ...baseStyle, backgroundColor: color };
   }
 
-  private getTrackHeight()
+  public getTrackHeight()
   {
     return this.props.height - 6;
   }
@@ -116,7 +117,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       height,
       width: '100%',
       borderRadius: 4,
-      backgroundColor: 'transparent'
+      backgroundColor: 'transparent',
     };
   }
 
@@ -153,4 +154,4 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       </div>
     );
   }
-};
+}

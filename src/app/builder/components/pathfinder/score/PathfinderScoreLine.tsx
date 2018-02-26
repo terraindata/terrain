@@ -97,7 +97,6 @@ export interface Props
 const EditableField = (props) =>
   props.editing ? props.editComponent : props.readOnlyComponent;
 
-
 class PathfinderScoreLine extends TerrainComponent<Props>
 {
   public state: {
@@ -107,12 +106,12 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     editingField: boolean;
     editingWeight: boolean;
   } = {
-    weight: this.props.line.weight,
-    expanded: this.props.line.expanded,
-    fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
-    editingField: false;
-    editingWeight: false;
-  };
+      weight: this.props.line.weight,
+      expanded: this.props.line.expanded,
+      fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
+      editingField: false,
+      editingWeight: false,
+    };
 
   public componentWillMount()
   {
@@ -256,7 +255,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     return (
       <div className='pf-line pf-score-line-inner'>
         <EditableField
-          editing={this.state.editingField}
+          editing={this.state.editingField || fieldIndex === -1}
           editComponent={
             <SearchableDropdown
               options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
@@ -268,8 +267,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
             />
           }
           readOnlyComponent={
-            <div className="field-name" onClick={this.editingField}>
-              {this.props.dropdownOptions.get(fieldIndex).displayName}
+            <div className='field-name' onClick={this.editingField}>
+              {_.upperFirst(this.props.dropdownOptions.get(fieldIndex).displayName as string)}
             </div>
           }
         />
@@ -304,8 +303,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                     />
                   }
                   readOnlyComponent={
-                    <div className="field-weight" onClick={this.editingWeight}>
-                      <div className="field-weight-value">
+                    <div className='field-weight' onClick={this.editingWeight}>
+                      <div className='field-weight-value'>
                         {this.state.weight}
                       </div>
                     </div>
