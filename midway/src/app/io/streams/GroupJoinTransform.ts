@@ -47,8 +47,11 @@ THE SOFTWARE.
 import * as Deque from 'double-ended-queue';
 import { Readable } from 'stream';
 
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
+import { setTimeout } from 'timers';
 
 /**
  * Applies a group join to an output stream
@@ -58,8 +61,8 @@ export default class GroupJoinTransform extends Readable
   private client: ElasticClient;
 
   private source: Readable;
-
-  private subquery: object;
+  
+  private query: object;
 
   private blockSize = 512;
   private maxPendingQueries: number = 8;
@@ -70,11 +73,14 @@ export default class GroupJoinTransform extends Readable
   private bufferedOutputs: Deque<object>;
 
   private sourceIsEmpty: boolean = false;
+  private sourceIsReadable: boolean = false;
 
   private dropIfLessThan: number = 0;
   private parentAlias: string = 'parent';
 
-  constructor(client: ElasticClient, source: Readable, subquery: object)
+  private subqueryValueInfos: { [key: string]: ESValueInfo | null };
+
+  constructor(client: ElasticClient, source: Readable, query: object)
   {
     super({
       objectMode: true
@@ -82,27 +88,38 @@ export default class GroupJoinTransform extends Readable
 
     this.client = client;
     this.source = source;
-    this.subquery = subquery;
 
     // determine other groupJoin settings from the query
-    if (subquery['dropIfLessThan'] !== undefined)
+    if (query['dropIfLessThan'] !== undefined)
     {
-      this.dropIfLessThan = subquery['dropIfLessThan'];
-      delete subquery['dropIfLessThan'];
+      this.dropIfLessThan = query['dropIfLessThan'];
+      delete query['dropIfLessThan'];
     }
 
-    if (subquery['parentAlias'] !== undefined)
+    if (query['parentAlias'] !== undefined)
     {
-      this.parentAlias = subquery['parentAlias'];
-      delete subquery['parentAlias'];
+      this.parentAlias = query['parentAlias'];
+      delete query['parentAlias'];
     }
+
+    const parser = new ESJSONParser(JSON.stringify(query), true);
+    if (parser.hasError())
+    {
+      throw parser.getErrors();
+    }
+
+    this.query = query;
+    // for (const k of Object.keys(query))
+    // {
+    //   this.subqueryValueInfos[k] = parser.getValueInfo().objectChildren[k].propertyValue;
+    // }
 
     this.pendingQueries = new Deque<Promise<any>>(this.maxPendingQueries);
     this.maxBufferedOutputs = this.blockSize * this.maxPendingQueries;
     this.bufferedOutputs = new Deque<object>(this.maxBufferedOutputs);
   }
 
-  public _read(size?: number)
+  public _read(size: number = 1024)
   {
     if (!this.sourceIsEmpty
       && this.bufferedOutputs.length < this.maxBufferedOutputs
@@ -112,55 +129,103 @@ export default class GroupJoinTransform extends Readable
     }
   }
 
+  private waitForSourceToBeReadable(): void
+  {
+    if (this.sourceIsReadable)
+    {
+      return;
+    }
+
+    setTimeout(this.waitForSourceToBeReadable, 1);
+  }
+
   private dispatchSubqueryBlock(): void
   {
-    const subquery = this.subquery;
+    const query = this.query;
     const inputs: object[] = [];
-    while (inputs.length < this.blockSize)
+
+    this.waitForSourceToBeReadable();
+    console.log(this.sourceIsReadable);
+
+    while (inputs.length < this.blockSize && !this.sourceIsEmpty)
     {
-      await this.source.read();
+      const obj = this.source.read();
+      if (obj === null)
+      {
+        this.sourceIsEmpty = true;
+      }
+      else
+      {
+        inputs.push(obj);
+      }
     }
 
-    this.bufferedInputs = []; // swap buffer list out
-
-    const body: any[] = [];
-    for (const input: object of inputs)
+    for (const subQuery of Object.keys(query))
     {
-      // winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
-      const header = {};
-      body.push(header);
+      // const body: any[] = [];
+      // for (const input of inputs)
+      // {
+      //   const vi = this.subqueryValueInfos[subQuery];
+      //   if (vi !== null)
+      //   {
+      //     // winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
+      //     const header = {};
+      //     body.push(header);
+    
+      //     const queryStr = ESParameterFiller.generate(
+      //       vi,
+      //       {
+      //         [this.parentAlias]: input['_source'] 
+      //       });
+      //     body.push(queryStr);
+      //   }
+      // }  
 
-      const queryStr = ESParameterFiller.generate(valueInfo, { [parentAlias]: input._source });
-      body.push(queryStr);
+      // this.pendingQueries.push(new Promise((resolve, reject) =>
+      // {
+      //   this.client.msearch(
+      //     {
+      //       body,
+      //     },
+      //     (error: Error | null, response: any) =>
+      //     {
+      //       if (error !== null && error !== undefined)
+      //       {
+      //         return reject(error);
+      //       }
+
+      //       for (let j = 0; j < inputs.length; ++j)
+      //       {
+      //         if (response.error !== undefined)
+      //         {
+      //           return reject(response.error);
+      //         }
+
+      //         if (response.responses[j].hits !== undefined)
+      //         {
+      //           inputs[j][subQuery] = response.responses[j].hits.hits;
+      //         }
+      //       }
+      //       resolve();
+      //     });
+      // }));
     }
 
-    pendingQueries.push(new Promise((resolve, reject) =>
+    console.log(this.sourceIsEmpty);
+    console.log(inputs);
+    const numInputs = inputs.length;
+    for (let i = 0; i < numInputs; i++)
     {
-      this.client.msearch(
-        {
-          body,
-        },
-        (error: Error | null, response: any) =>
-        {
-          if (error !== null && error !== undefined)
-          {
-            return reject(error);
-          }
+      const obj = inputs.shift();
+      if (obj !== undefined)
+      {
+        this.push(obj);
+      }
+    }
 
-          for (let j = 0; j < inputs.length; ++j)
-          {
-            if (response.error !== undefined)
-            {
-              return reject(response.error);
-            }
-
-            if (response.responses[j].hits !== undefined)
-            {
-              inputs[j][subquery] = response.responses[j].hits.hits;
-            }
-          }
-          resolve();
-        });
-    }));
+    if (this.sourceIsEmpty)
+    {
+      this.push(null);
+    }
   }
 }
