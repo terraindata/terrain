@@ -75,7 +75,7 @@ export const TransformableTypes =
   ];
 
 const metaFields = ['_index', '_type', '_uid', '_id',
-  '_source', '_size',
+  '_source', '_size', '_score',
   '_all', '_field_names',
   '_parent', '_routing',
   '_meta'];

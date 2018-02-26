@@ -270,6 +270,7 @@ class ResultsColumn extends TerrainComponent<Props>
   {
     return (
       <div className='results-column-wrapper'>
+        {this.renderTabBar()}
         {this.renderContent()}
       </div>);
   }

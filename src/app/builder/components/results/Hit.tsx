@@ -154,6 +154,18 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
+  public renderNestedField(field)
+  {
+    const value = getResultValue(this.props.hit, field, this.props.resultsConfig,
+      false, this.props.expanded);
+    return (
+      <div key={field}>
+         <div>NESTED TOP BAR GOES HERE</div>
+         {value}
+      </div>
+    )
+  }
+
   public renderField(field, index?, fields?, overrideFormat?)
   {
     if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
@@ -266,7 +278,6 @@ class HitComponent extends TerrainComponent<Props> {
   {
     const { isDragging, connectDragSource, isOver, connectDropTarget, hit, hitSize, expanded } = this.props;
     let { resultsConfig } = this.props;
-
     const classes = classNames({
       'result': true,
       'result-expanded': this.props.expanded,
@@ -290,6 +301,7 @@ class HitComponent extends TerrainComponent<Props> {
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
+    const nestedFields = getResultNestedFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
     let bottomContent: any;
@@ -424,6 +436,9 @@ class HitComponent extends TerrainComponent<Props> {
                 _.map(fields, this.renderField)
               }
               {
+                _.map(nestedFields, this.renderNestedField)
+              }
+              {
                 expandedContent
               }
             </div>
@@ -480,7 +495,10 @@ export function getResultFields(hit: Hit, config: ResultsConfig): string[]
 
   if (resultsConfigHasFields(config))
   {
-    fields = config.fields.toArray();
+    fields = config.fields.filter((field) =>
+      config.formats.get(field) === undefined ||
+      config.formats.get(field).config === undefined
+    ).toArray();
   }
   else
   {
@@ -488,6 +506,18 @@ export function getResultFields(hit: Hit, config: ResultsConfig): string[]
   }
 
   return fields;
+}
+
+export function getResultNestedFields(hit: Hit, config: ResultsConfig): string []
+{
+  if (resultsConfigHasFields(config))
+  {
+    return config.fields.filter((field) =>
+      config.formats.get(field) !== undefined &&
+      config.formats.get(field).config !== undefined
+    ).toArray();
+  }
+  return [];
 }
 
 export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
@@ -552,12 +582,20 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   if ((format && format.config !== undefined))
   {
     const thumbnail = format.config.thumbnail;
+    if (thumbnail === undefined || format.config.formats.get(thumbnail) === undefined)
+    {
+      return null;
+    }
     const template = format.config.formats.get(thumbnail).template;
     return (
       <div className='hit-nested-value'>
         {
           value.slice(0, 5).map((nested, i) =>
           {
+            if (nested['_source'] || nested.get('_source')) // groupjoin
+            {
+              nested = nested['_source'] || nested.get('_source');
+            }
             const image = nested.get(thumbnail);
             const url = template.replace(/\[value\]/g, image as string);
             return (

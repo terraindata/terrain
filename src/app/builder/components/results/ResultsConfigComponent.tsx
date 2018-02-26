@@ -119,21 +119,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       selector: '.results-config-field-gear',
       style: { fill: Colors().iconColor },
     });
-    // Get the fields that are nested
-    const nestedFields = this.props.fields.filter((field) =>
-    {
-      const type = ElasticBlockHelpers.getTypeOfField(
-        this.props.schema,
-        this.props.builder,
-        field,
-        this.props.dataSource,
-        true,
-      );
-      return type === 'nested';
-    }).toList();
-    this.setState({
-      nestedFields,
-    });
+    this.getNestedFields(this.props);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -146,21 +132,51 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     }
     if (this.props.fields !== nextProps.fields)
     {
-      const nestedFields = nextProps.fields.filter((field) =>
+      this.getNestedFields(nextProps);
+    }
+  }
+
+  public getNestedFields(props)
+  {
+    // Get the fields that are nested
+    let nestedFields;
+    // When columns is defined, we already are in a nested results config
+    // and need to look at these columns to see what fields are nested
+    const { columns } = props;
+    if (columns !== undefined)
+    {
+      if (List.isList(columns))
+      {
+        nestedFields = columns.filter((col) =>
+          col.type === 'nested'
+        ).map((col) => col.name).toList();
+      }
+      else
+      {
+        nestedFields = _.keys(columns).filter((key) =>
+        {
+          return columns[key].type === 'nested';
+        });
+      }
+    }
+    else
+    {
+      nestedFields = props.fields.filter((field) =>
       {
         const type = ElasticBlockHelpers.getTypeOfField(
-          nextProps.schema,
-          nextProps.builder,
+          props.schema,
+          props.builder,
           field,
-          nextProps.dataSource,
+          props.dataSource,
           true,
         );
-        return type === 'nested';
+        return type === 'nested' || type === '';
       }).toList();
-      this.setState({
-        nestedFields,
-      });
     }
+    console.log('nested fields are ', nestedFields);
+    this.setState({
+      nestedFields,
+    });
   }
 
   public handleDrop(type: string, field: string, index?: number)
@@ -245,9 +261,9 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const format = this.props.config.formats.get(field);
     // Get fields from the schema - this is for if nested is part of the object (not groupJoined)
     const { dataSource, schema, builder } = this.props;
-    const index = dataSource && dataSource.index.split('/')[1] || getIndex('', builder);
+    let index = dataSource && dataSource.index.split('/')[1] || getIndex('', builder);
     const server = builder.db.name;
-    const indexId = `${builder.db.name}/${String(index)}`;
+    let indexId = `${builder.db.name}/${String(index)}`;
     let columns;
     if (this.props.columns)
     {
@@ -265,10 +281,29 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         .map((col) => col.properties)
         .toList().get(0);
     }
+    let fields = List(_.keys(columns));
+    if (columns === undefined)
+    {
+      // Figure out the index of the inner query (NOTE ONLY WORKS W/ PATHFINDER FOR NOW)
+      // Based on that, extract the columns of that index
+      const {path} = this.props.builder.query;
+      const referenceIndex = path.more.references.indexOf(field);
+      index = (path.nested.get(referenceIndex).source.dataSource as any).index;
+      index = index && index.split('/')[1];
+      indexId = `${builder.db.name}/${String(index)}`;
+      columns = schema.columns.filter((col) =>
+        col.serverId === String(server) &&
+        col.databaseId === String(indexId)
+      ).toList();
+
+      // it was actually a group join, need to extract data differently.
+      // console.log(this.props.hit.get(field));
+      fields = columns.map((col) => col.name).toList();
+    }
     return (
       <ResultsConfigComponent
         {...this.props}
-        fields={List(_.keys(columns))}
+        fields={fields}
         config={format !== undefined ? format.config : _ResultsConfig()}
         onConfigChange={this._fn(this.handleNestedConfigChange, field)}
         onClose={this._fn(this.handleNestedConfigClose, field)}
