@@ -58,7 +58,6 @@ import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { NoArrayDocuments, testSerialization } from 'etl/templates/TemplateUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';

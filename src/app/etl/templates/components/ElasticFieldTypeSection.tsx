@@ -59,7 +59,7 @@ const { List, Map } = Immutable;
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { _ElasticFieldSettings, ElasticFieldSettings } from 'etl/templates/FieldTypes';
-import { ElasticTypes } from 'shared/etl/TemplateTypes';
+import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';

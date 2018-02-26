@@ -43,19 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing max-classes-per-file
+// tslint:disable:max-classes-per-file
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
-
-import { _WalkthroughState, WalkthroughState} from 'etl/walkthrough/ETLWalkthroughTypes';
-import { SinkConfig, SourceConfig, TemplateTypes } from 'shared/etl/TemplateTypes';
-
-class ETLStateC
+export enum ElasticTypes
 {
-  // public walkthrough: WalkthroughState = _WalkthroughState();
+  TEXT = 'text',
+  LONG = 'long',
+  BOOLEAN = 'boolean',
+  DATE = 'date',
+  ARRAY = 'array',
+  NESTED = 'nested',
+  DOUBLE = 'double',
+  SHORT = 'short',
+  BYTE = 'byte',
+  INTEGER = 'integer',
+  HALF_FLOAT = 'half_float',
+  FLOAT = 'float',
+  GEO_POINT = 'geo_point',
 }
-export type ETLState = WithIRecord<ETLStateC>;
-export const _ETLState = makeConstructor(ETLStateC);
+
+export const JS_TO_ES = {
+  array: ElasticTypes.ARRAY,
+  object: ElasticTypes.NESTED,
+  string: ElasticTypes.TEXT,
+  number: ElasticTypes.DOUBLE,
+  boolean: ElasticTypes.BOOLEAN,
+  null: ElasticTypes.TEXT,
+  undefined: ElasticTypes.TEXT,
+};
+
+export function jsToElastic(type): ElasticTypes
+{
+  const eType = JS_TO_ES[type];
+  return eType !== undefined ? eType : ElasticTypes.TEXT;
+}

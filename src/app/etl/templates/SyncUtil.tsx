@@ -49,9 +49,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
-import { _ElasticFieldSettings, _TemplateField, _TransformationNode, ElasticFieldSettings, TemplateField, TransformationNode }
+import { _TemplateField, _TransformationNode,
+  TemplateField, TransformationNode }
   from 'etl/templates/FieldTypes';
-import { ElasticTypes, jsToElastic, Languages } from 'shared/etl/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export function createTreeFromEngine(engine: TransformationEngine): TemplateField
@@ -91,7 +91,6 @@ export function createTreeFromEngine(engine: TransformationEngine): TemplateFiel
 export function createFieldFromEngine(
   engine: TransformationEngine,
   id: number,
-  language = Languages.Elastic,
 ): TemplateField
 {
   const enginePath = engine.getOutputKeyPath(id).toJS();
@@ -109,10 +108,6 @@ export function createFieldFromEngine(
   }).toList();
   const result = _TemplateField({
     isIncluded: engine.getFieldEnabled(id),
-    langSettings: _ElasticFieldSettings({
-      langType: language,
-      type: jsToElastic(engine.getFieldType(id)),
-    }),
     fieldId: id,
     transformations,
     name: enginePath[enginePath.length - 1],
@@ -120,10 +115,6 @@ export function createFieldFromEngine(
 
   return _TemplateField({
     isIncluded: engine.getFieldEnabled(id),
-    langSettings: _ElasticFieldSettings({
-      langType: language,
-      type: jsToElastic(engine.getFieldType(id)),
-    }),
     fieldId: id,
     transformations,
     name: enginePath[enginePath.length - 1],
@@ -134,9 +125,8 @@ export function updateFieldFromEngine(
   engine: TransformationEngine,
   id: number,
   oldField: TemplateField,
-  language = Languages.Elastic,
 ): TemplateField
 {
-  const updatedField = createFieldFromEngine(engine, id, language);
+  const updatedField = createFieldFromEngine(engine, id);
   return updatedField.set('children', oldField.children);
 }

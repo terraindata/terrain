@@ -51,44 +51,10 @@ export enum Languages
   Elastic = 'elastic',
 }
 
-export enum ElasticTypes
-{
-  TEXT = 'text',
-  LONG = 'long',
-  BOOLEAN = 'boolean',
-  DATE = 'date',
-  ARRAY = 'array',
-  NESTED = 'nested',
-  DOUBLE = 'double',
-  SHORT = 'short',
-  BYTE = 'byte',
-  INTEGER = 'integer',
-  HALF_FLOAT = 'half_float',
-  FLOAT = 'float',
-  GEO_POINT = 'geo_point',
-}
-
-export const JS_TO_ES = {
-  array: ElasticTypes.ARRAY,
-  object: ElasticTypes.NESTED,
-  string: ElasticTypes.TEXT,
-  number: ElasticTypes.DOUBLE,
-  boolean: ElasticTypes.BOOLEAN,
-  null: ElasticTypes.TEXT,
-  undefined: ElasticTypes.TEXT,
-};
-
-export function jsToElastic(type): ElasticTypes
-{
-  const eType = JS_TO_ES[type];
-  return eType !== undefined ? eType : ElasticTypes.TEXT;
-}
-
-// TODO refactor these enums to be pascal case
 export enum TemplateTypes
 {
-  Export = 'export',
-  Import = 'import',
+  Export = 'Export',
+  Import = 'Import',
 }
 
 export enum FileTypes

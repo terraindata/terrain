@@ -51,7 +51,6 @@ const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
-import { ElasticTypes, jsToElastic } from 'shared/etl/TemplateTypes';
 import { KeyPath as EngineKeypath, TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 
