@@ -67,6 +67,7 @@ class WalkthroughStateC
   public sink: SinkConfig = null;
   public chosenTemplateId: ID = -1;
   public file: File = null;
+  public previewDocuments: object[] = [];
 }
 export type WalkthroughState = WithIRecord<WalkthroughStateC>;
 export const _WalkthroughState = makeConstructor(WalkthroughStateC);

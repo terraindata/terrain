@@ -51,8 +51,10 @@ const { List, Map } = Immutable;
 
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 import { Ajax } from 'util/Ajax';
-
 import { _ETLState, ETLState, ViewState, WalkthroughState } from './ETLTypes';
+
+import { getFileType, getSampleRows, guessJsonFileOptions } from 'shared/etl/FileUtil';
+import { FileTypes } from 'shared/etl/TemplateTypes';
 
 export interface ETLActionTypes
 {
@@ -62,7 +64,15 @@ export interface ETLActionTypes
   };
   loadFileSample: {
     actionType: 'loadFileSample';
-    autodetectOptions?: boolean;
+    file: File;
+  };
+  setPreviewDocuments: {
+    actionType: 'setPreviewDocuments';
+    documents: object[];
+  };
+  autodetectFileOptions: {
+    actionType: 'autodetectFileOptions';
+    file: File;
   }
 }
 
@@ -74,15 +84,45 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       {
         return state.set('walkthrough', action.payload.newState);
       },
-      loadFileSample: (state, action) =>
+      loadFileSample: (state, action) => state, // overriden
+      setPreviewDocuments: (state, action) =>
       {
-        return state;
-      }
+        return state.setIn(['walkthrough', 'previewDocuments'], action.payload.documents);
+      },
+      autodetectFileOptions: (state, action) => state, // overriden
     };
 
-  public loadFileSampleAction(action: ETLActionType<'loadFileSample'>, dispatch)
+  public loadFileSample(action: ETLActionType<'loadFileSample'>, dispatch)
   {
-    
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const handleResult = (result) => {
+      directDispatch({
+        actionType: 'setPreviewDocuments',
+        documents: result,
+      });
+    };
+    const handleError = (error) => {
+      // tslint:disable-next-line
+      console.error(error);
+    }
+    getSampleRows(
+      action.file,
+      5,
+      handleResult,
+      handleError
+    );
+  }
+
+  public autodetectFileOptions(action: ETLActionType<'autodetectFileOptions'>, dispatch)
+  {
+    if (getFileType(action.file) === FileTypes.Json)
+    {
+      guessJsonFileOptions(action.file, (something) => console.log(something));
+    }
+    else
+    {
+      console.log('hey its a csv');
+    }
   }
 
   public overrideAct(action: Unroll<ETLActionTypes>)
@@ -90,7 +130,9 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     switch (action.actionType)
     {
       case 'loadFileSample':
-        return this.loadFileSampleAction.bind(this, action);
+        return this.loadFileSample.bind(this, action);
+      case 'autodetectFileOptions':
+        return this.autodetectFileOptions.bind(this, action);
       default:
         return undefined;
     }

@@ -47,7 +47,10 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 
+import * as Papa from 'papaparse';
 import { FileTypes } from './TemplateTypes';
+
+import { parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from 'shared/Util';
 
 export function getFileType(file: File): FileTypes
 {
@@ -62,8 +65,107 @@ export function getFileType(file: File): FileTypes
   }
 }
 
-
-export function getFirstLines(file: File, numLines: number)
+export function getSampleRows(
+  file: File,
+  numRows: number,
+  onLoad: (result) => void,
+  onError?: (msg: string) => void,
+  opts?: {
+    hasCsvHeader?: boolean;
+    jsonNewlines?: boolean;
+  },
+)
 {
+  const options = _.extend(
+    {
+      hasCsvHeader: true,
+      jsonNewlines: false,
+    },
+    opts,
+  );
 
+  if (getFileType(file) === FileTypes.Csv)
+  {
+    const handleError = (err) => {
+      if (onError)
+      {
+        onError(JSON.stringify(err));
+      }
+    };
+
+    const handleResults = (results) => {
+      onLoad(results.data);
+    };
+
+    Papa.parse(file as any, {
+      header: options.hasCsvHeader,
+      preview: numRows,
+      complete: handleResults,
+      error: handleError,
+    });
+  }
+  else if (getFileType(file) === FileTypes.Json)
+  {
+    const fileChunk = file.slice(0, ChunkSize);
+    const fr = new FileReader();
+    fr.onloadend = () =>
+    {
+      let items;
+      try
+      {
+        items = options.jsonNewlines ?
+          parseNewlineJSONSubset(fr.result, numRows)
+          :
+          parseObjectListJSONSubset(fr.result, numRows);
+      }
+      catch (e)
+      {
+        if (onError)
+        {
+          onError(`JSON Parse Caught an Exception: ${e}`);
+        }
+        return;
+      }
+
+      if (items == null || typeof items === 'string')
+      {
+        if (onError)
+        {
+          onError(`JSON Parse Failed: ${items}`);
+        }
+      }
+      else
+      {
+        onLoad(items);
+      }
+    };
+    fr.readAsText(fileChunk);
+  }
 }
+// TODO for json, use a streaming implementation
+
+export function guessJsonFileOptions(
+  file: File,
+  onComplete: (result: { jsonNewlines?: boolean }) => void,
+)
+{
+  const fileChunk = file.slice(0, GuessChunkSize);
+  const fr = new FileReader();
+  fr.onloadend = () => {
+    onComplete({
+      jsonNewlines: detectJsonNewlines(fr.result),
+    });
+  };
+  fr.readAsText(fileChunk);
+}
+
+// reasonably accurate guess as to whether or not the file is a json array or a newline seperated list of objects
+// returns true if the file represents newline seperated objects
+function detectJsonNewlines(str): boolean
+{
+  const firstBrace = str.indexOf('{');
+  const firstBracket = str.indexOf('[');
+  return firstBrace < firstBracket;
+}
+const GuessChunkSize = 1000; // 1kb
+const ChunkSize = 1000000; // 1mb

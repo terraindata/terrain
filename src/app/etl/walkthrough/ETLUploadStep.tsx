@@ -166,8 +166,8 @@ class ETLUploadStep extends ETLStepComponent
         .set('source', { type: 'local'}),
     });
     this.props.act({
-      actionType: 'loadFileSample',
-      autodetectOptions: true,
+      actionType: 'autodetectFileOptions',
+      file,
     });
   }
 }
