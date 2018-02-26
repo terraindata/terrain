@@ -110,6 +110,11 @@ class MySQLClient
     this.controller.log('MySQLClient.getConnection');
     return this.delegate.getConnection(callback);
   }
+
+  public getConfig(): MySQLConfig
+  {
+    return this.config;
+  }
 }
 
 export default MySQLClient;

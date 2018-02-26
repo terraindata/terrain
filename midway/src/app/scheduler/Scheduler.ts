@@ -56,17 +56,15 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
-import DatabaseConfig from '../database/DatabaseConfig';
-import { Export, ExportConfig } from '../io/Export';
-import { Import } from '../io/Import';
+import { ExportConfig } from '../io/Export';
+import { exprt } from '../io/ExportRouter';
+import { imprt } from '../io/ImportRouter';
 import { Sources } from '../io/sources/Sources';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 import SchedulerConfig from './SchedulerConfig';
 import SchedulerLogs from './SchedulerLogs';
 
-export const exprt: Export = new Export();
-export const imprt: Import = new Import();
 export const credentials: Credentials = new Credentials();
 export const schedulerLogs: SchedulerLogs = new SchedulerLogs();
 export const sources = new Sources();
@@ -364,7 +362,7 @@ export class Scheduler
             {
               readStream = await sftp.get(importFilename, false, encoding);
               winston.info('Schedule ' + scheduleID.toString() + ': Starting import with sftp');
-              const result = await imprt.upsert(readStream, fields, true);
+              await imprt.upsert(readStream, fields, true);
               await this.setJobStatus(scheduleID, 0);
               await sftp.end();
               successMsg = 'Successfully completed scheduled import with sftp.';
@@ -452,10 +450,10 @@ export class Scheduler
               await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
               return rejectJob('Failed to export.');
             }
-            let readStream: stream.Readable;
+
             try
             {
-              readStream = await sftp.put(writeStream, path, false, encoding);
+              await sftp.put(writeStream, path, false, encoding);
               await sftp.end();
               successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export with sftp.';
               winston.info(successMsg);
@@ -533,7 +531,7 @@ export class Scheduler
           {
             request(httpJobConfig).pipe(readStream);
             winston.info('Schedule ' + scheduleID.toString() + ': Starting import with http');
-            const result = await imprt.upsert(readStream, fields, true);
+            await imprt.upsert(readStream, fields, true);
             await this.setJobStatus(scheduleID, 0);
             winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with http.');
             successMsg = 'Successfully completed scheduled import with http.';
@@ -593,7 +591,7 @@ export class Scheduler
               return rejectJob(errMsg);
             }
             winston.info('Schedule ' + scheduleID.toString() + ': Starting import with sftp');
-            const result = await imprt.upsert(readStream as stream.Readable, fields, true);
+            await imprt.upsert(readStream as stream.Readable, fields, true);
             await this.setJobStatus(scheduleID, 0);
             successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from local filesystem.';
             winston.info(successMsg);
@@ -720,7 +718,7 @@ export class Scheduler
                   JSON.parse(transport['filename']),
               };
             const result = await sources.handleTemplateSourceExport(magentoArgs, jsonStream as stream.Readable);
-            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to magento.';
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to magento. Response: ' + result;
             await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
           }
         }

@@ -313,6 +313,10 @@ const MapUtil = {
   // given a geopoint (4 formats in elastic) returns the coordinates as an array of numbers
   getCoordinatesFromGeopoint(geopoint: any)
   {
+    if (geopoint === undefined)
+    {
+      return [0, 0];
+    }
     let lat: number;
     let lon: number;
     geopoint = Util.asJS(geopoint);

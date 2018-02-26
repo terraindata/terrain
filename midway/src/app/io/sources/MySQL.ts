@@ -46,15 +46,12 @@ THE SOFTWARE.
 
 import csvWriter = require('csv-write-stream');
 
-import * as _ from 'lodash';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { Credentials } from '../../credentials/Credentials';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import DatabaseController from '../../../database/DatabaseController';
-import MySQLClient from '../../../database/mysql/client/MySQLClient';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
 
 export const credentials: Credentials = new Credentials();

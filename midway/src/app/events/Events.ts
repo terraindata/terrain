@@ -243,7 +243,7 @@ export class Events
       try
       {
         const fields = request.field.split(',');
-        body = body.rawOption('_source', request.field);
+        body = body.rawOption('_source', fields);
       }
       catch (e)
       {
