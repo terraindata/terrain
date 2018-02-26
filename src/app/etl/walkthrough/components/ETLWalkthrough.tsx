@@ -106,20 +106,19 @@ class ETLWalkthrough extends TerrainComponent<Props>
     {
       // TODO: create a template and change the route
     }
-
-    let newState = walkthrough;
     if (walkthrough.stepHistory !== newHistory)
     {
-      newState = newState.set('stepHistory', newHistory);
+      this.props.act({
+        actionType: 'setState',
+        state: {
+          stepHistory: newHistory,
+        },
+      });
     }
     if (newStep !== currentStep)
     {
       browserHistory.push(`/etl/new/${newStep}`);
     }
-    this.props.act({
-      actionType: 'setWalkthroughState',
-      newState,
-    });
   }
 
   // if the step is invalid or doesn't exist then return 0

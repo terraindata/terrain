@@ -57,6 +57,7 @@ import FilePicker from 'common/components/FilePicker';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { ETLStepComponent, RevertParams, StepProps } from './ETLStepComponent';
@@ -79,12 +80,12 @@ class ETLUploadStep extends ETLStepComponent
   // chooses a different path
   public static onRevert(params: RevertParams)
   {
-    const walkthrough = params.walkthrough
-      .set('file', null)
-      .set('source', null);
     params.act({
-      actionType: 'setWalkthroughState',
-      newState: walkthrough,
+      actionType: 'setState',
+      state: {
+        file: null,
+        source: _SourceConfig(),
+      },
     });
   }
 
@@ -163,10 +164,11 @@ class ETLUploadStep extends ETLStepComponent
   {
     const walkthrough = this.props.walkthrough;
     this.props.act({
-      actionType: 'setWalkthroughState',
-      newState: walkthrough
-        .set('file', file)
-        .set('source', { type: 'local'}),
+      actionType: 'setState',
+      state: {
+        file,
+        source: _SourceConfig(),
+      },
     });
     this.props.act({
       actionType: 'autodetectFileOptions',

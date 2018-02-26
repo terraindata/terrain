@@ -49,18 +49,21 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
+import { SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 import { Ajax } from 'util/Ajax';
-import { ViewState, _WalkthroughState, WalkthroughState } from './ETLWalkthroughTypes';
+import { _WalkthroughState, ViewState, WalkthroughState } from './ETLWalkthroughTypes';
 
 import { getFileType, getSampleRows, guessJsonFileOptions } from 'shared/etl/FileUtil';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 export interface WalkthroughActionTypes
 {
-  setWalkthroughState: {
-    actionType: 'setWalkthroughState';
-    newState: WalkthroughState;
+  setState: {
+    actionType: 'setState',
+    state: Partial<{
+      [k in keyof WalkthroughState]: WalkthroughState[k];
+    }>;
   };
   loadFileSample: {
     actionType: 'loadFileSample';
@@ -73,23 +76,29 @@ export interface WalkthroughActionTypes
   autodetectFileOptions: {
     actionType: 'autodetectFileOptions';
     file: File;
-  }
+  };
 }
 
 class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughState>
 {
   public reducers: ConstrainedMap<WalkthroughActionTypes, WalkthroughState> =
     {
-      setWalkthroughState: (state, action) =>
+      setState: (state, action) =>
       {
-        return action.payload.newState
+        let newState = state;
+        const toUpdate = action.payload.state;
+        for (const k of Object.keys(toUpdate))
+        {
+          newState = newState.set(k, toUpdate[k]);
+        }
+        return newState;
       },
-      loadFileSample: (state, action) => state, // overriden
       setPreviewDocuments: (state, action) =>
       {
         return state.set('previewDocuments', action.payload.documents);
       },
       autodetectFileOptions: (state, action) => state, // overriden
+      loadFileSample: (state, action) => state, // overriden
     };
 
   public loadFileSample(action: WalkthroughActionType<'loadFileSample'>, dispatch)
@@ -104,12 +113,12 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
     const handleError = (error) => {
       // tslint:disable-next-line
       console.error(error);
-    }
+    };
     getSampleRows(
       action.file,
       5,
       handleResult,
-      handleError
+      handleError,
     );
   }
 

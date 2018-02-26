@@ -79,21 +79,13 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
   public hasCsvHeader(): boolean
   {
     const { walkthrough } = this.props;
-    return _.get(
-      walkthrough.source,
-      ['fileConfig', 'hasCsvHeader'],
-      false,
-    );
+    return walkthrough.source.fileConfig.hasCsvHeader;
   }
 
   public jsonHasNewlines(): boolean
   {
     const { walkthrough } = this.props;
-    return _.get(
-      walkthrough.source,
-      ['fileConfig', 'jsonNewlines'],
-      false,
-    );
+    return walkthrough.source.fileConfig.jsonNewlines;
   }
 
   public renderCsvOptions()
@@ -159,20 +151,13 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
   {
     const { walkthrough } = this.props;
     const hasHeader = this.hasCsvHeader();
-    const source = _.get(walkthrough, 'source', {});
-    const sourceParams = _.get(source, 'fileConfig', {});
-    const newSourceParams = _.extend({},
-      sourceParams,
-      { hasCsvHeader: !hasHeader },
-    );
-    const newSource = _.extend({},
-      source,
-      { fileConfig: newSourceParams },
-    );
-
+    const newSource = walkthrough.source
+      .setIn(['fileConfig', 'hasCsvHeader'], !hasHeader);
     this.props.act({
-      actionType: 'setWalkthroughState',
-      newState: walkthrough.set('source', newSource),
+      actionType: 'setState',
+      state: {
+        source: newSource,
+      }; , ,
     });
   }
 
@@ -180,20 +165,14 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
   {
     const { walkthrough } = this.props;
     const hasNewlines = this.jsonHasNewlines();
-    const source = _.get(walkthrough, 'source', {});
-    const sourceParams = _.get(source, 'fileConfig', {});
-    const newSourceParams = _.extend({},
-      sourceParams,
-      { jsonNewlines: !hasNewlines }),
-    );
-    const newSource = _.extend({},
-      source,
-      { fileConfig: newSourceParams }
-    );
 
+    const newSource = walkthrough.source
+      .setIn(['fileConfig', 'jsonNewlines'], !hasNewlines);
     this.props.act({
-      actionType: 'setWalkthroughState',
-      newState: walkthrough.set('source', newSource),
+      actionType: 'setState',
+      state: {
+        source: newSource,
+      },
     });
   }
 }

@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as _ from 'lodash';
 

@@ -69,7 +69,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       placeholder: (state, action) =>
       {
         return state;
-      }
+      },
     };
 }
 
