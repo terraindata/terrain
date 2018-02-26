@@ -143,7 +143,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
       <div
         className='drag-drop-item-drop-zone'
         style={this.props.dropZoneStyle}
-      />
+      />,
     );
   }
 

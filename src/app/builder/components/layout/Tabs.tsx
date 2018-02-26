@@ -177,9 +177,9 @@ export interface TabAction
   text?: string;
   tooltip?: string;
   icon: any;
+  style?: any;
   enabled?: boolean;
   onClick();
-  style?: any;
 }
 
 interface TabsProps
@@ -313,9 +313,9 @@ class Tabs extends TerrainComponent<TabsProps> {
                 key={index}
                 onClick={action.onClick}
                 style={_.extend({},
-                    action.text ? backgroundColor(action.enabled ? Colors().sidebarBg : Colors().blockBg) : {},
-                    action.style
-                  )
+                  action.text ? backgroundColor(action.enabled ? Colors().sidebarBg : Colors().blockBg) : {},
+                  action.style,
+                )
                 }
               >
                 {

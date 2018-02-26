@@ -43,9 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import {Map} from 'immutable';
 import Colors, { backgroundColor, borderColor, fontColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
+import { Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { DragLayer } from 'react-dnd';
@@ -79,7 +79,7 @@ const comparisons: Map<string, string> = Map({
   alphaafter: 'comes after',
   datebefore: 'starts before',
   dateafter: 'starts after',
-  located: 'is located within'
+  located: 'is located within',
 });
 
 /*
@@ -97,24 +97,24 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
     const headerStyle = fontColor(Colors().fontColor2);
     const valueStyle = fontColor(Colors().active);
     return (
-       <div className={`drag-drop-item-${key}`}>
-          <div
-            className={`drag-drop-item-${key}-header`}
-            style={headerStyle}
-          >
-            {header}
-          </div>
-          <div
-            className={`drag-drop-item-${key}-value`}
-            style={valueStyle}
-          >
-              {
-                key === 'comparison' ?
-                comparisons.get(data['comparison']) :
-                  data[key]
-              }
-          </div>
+      <div className={`drag-drop-item-${key}`}>
+        <div
+          className={`drag-drop-item-${key}-header`}
+          style={headerStyle}
+        >
+          {header}
         </div>
+        <div
+          className={`drag-drop-item-${key}-value`}
+          style={valueStyle}
+        >
+          {
+            key === 'comparison' ?
+              comparisons.get(data['comparison']) :
+              data[key]
+          }
+        </div>
+      </div>
     );
   }
 
@@ -148,9 +148,9 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
             className='drag-drop-item-preview'
             style={itemStyle}
           >
-           {this.renderItemBlock('field', 'data field', data)}
-           {this.renderItemBlock('comparison', 'condition', data)}
-           {this.renderItemBlock('value', 'value', data)}
+            {this.renderItemBlock('field', 'data field', data)}
+            {this.renderItemBlock('comparison', 'condition', data)}
+            {this.renderItemBlock('value', 'value', data)}
           </div>
         );
       default:

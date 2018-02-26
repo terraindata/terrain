@@ -141,7 +141,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private renderPicker()
   {
-    const { props, state} = this;
+    const { props, state } = this;
 
     const fieldValue = props.filterLine.field;
     const comparisonValue = props.filterLine.comparison;
@@ -188,7 +188,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       type: 'fields',
       source,
       schemaState: pathfinderContext.schemaState,
-      builderState: pathfinderContext.builderState
+      builderState: pathfinderContext.builderState,
     });
 
     const fieldSet: RouteSelectorOptionSet = {
@@ -207,7 +207,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     if (filterLine.field)
     {
       comparisonHeader = '';
-      
+
       comparisonOptions = source.dataSource.getChoiceOptions({
         type: 'comparison',
         field: filterLine.field,
@@ -286,7 +286,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         {
           return '';
         }
-        
+
         return Util.formatDate(value, true);
       default:
         return undefined;
@@ -407,7 +407,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       fieldType: filterLine.fieldType,
       source,
       schemaState: pathfinderContext.schemaState,
-      builderState: pathfinderContext.builderState
+      builderState: pathfinderContext.builderState,
     });
 
     switch (filterLine.fieldType)
@@ -509,7 +509,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         fieldType,
         source,
         schemaState: pathfinderContext.schemaState,
-        builderState: pathfinderContext.builderState
+        builderState: pathfinderContext.builderState,
       });
 
       if (comparisonOptions.findIndex((option) => option.value === filterLine.comparison) === -1

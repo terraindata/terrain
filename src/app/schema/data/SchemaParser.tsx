@@ -209,11 +209,11 @@ export function parseElasticDb(elasticServer: object,
             tables = tables.setIn(
               [tableId, 'sampleData'],
               results.hits.map((hit) =>
-                {
-                  return _Hit({
-                    fields: Immutable.Map(hit['_source']),
-                  });
-                }),
+              {
+                return _Hit({
+                  fields: Immutable.Map(hit['_source']),
+                });
+              }),
             );
             _.each((tableFields as any), (fieldProperties, fieldName) =>
             {

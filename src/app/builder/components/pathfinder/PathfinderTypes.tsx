@@ -482,7 +482,7 @@ class ElasticDataSourceC extends DataSource
   {
     // TODO this function needs to be refactored
     const server = context.builderState.db.name;
-    
+
     if (context.type === 'source')
     {
       // we need to make it clear what parts of Source are tracked
@@ -921,11 +921,11 @@ const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 // TODO need more icons
 
 const fieldTypeToIcon =
-{
-  [FieldType.Any]: TextIcon, // TODO
-  [FieldType.Date]: DateIcon,
-  [FieldType.Geopoint]: TextIcon, // TODO
-  [FieldType.Ip]: TextIcon,
-  [FieldType.Numerical]: NumberIcon,
-  [FieldType.Text]: TextIcon,
-};
+  {
+    [FieldType.Any]: TextIcon, // TODO
+    [FieldType.Date]: DateIcon,
+    [FieldType.Geopoint]: TextIcon, // TODO
+    [FieldType.Ip]: TextIcon,
+    [FieldType.Numerical]: NumberIcon,
+    [FieldType.Text]: TextIcon,
+  };

@@ -78,22 +78,22 @@ const NTColors =
   };
 
 const NewTheme =
-{
-  fontColor: NTColors.dark3,
-  fontColor2: '#606262',
-  fontColorLightest: NTColors.grey3,
-  fontWhite: NTColors.light1,
+  {
+    fontColor: NTColors.dark3,
+    fontColor2: '#606262',
+    fontColorLightest: NTColors.grey3,
+    fontWhite: NTColors.light1,
 
-  active: NTColors.mainBlue,
+    active: NTColors.mainBlue,
 
-  bg: NTColors.light1,
-  blockBg: NTColors.light2, // e.g., in Pathfinder, behind block elements
-  blockOutline: NTColors.grey1,
+    bg: NTColors.light1,
+    blockBg: NTColors.light2, // e.g., in Pathfinder, behind block elements
+    blockOutline: NTColors.grey1,
 
-  sidebarBg: NTColors.light1,
+    sidebarBg: NTColors.light1,
 
-  textboxBg: NTColors.light1,
-};
+    textboxBg: NTColors.light1,
+  };
 
 // Will be deprecated
 interface OldTheme

@@ -446,7 +446,7 @@ class Builder extends TerrainComponent<Props>
         icon: null,
         onClick: this.onSave,
         enabled: this.shouldSave(builderState),
-        style: {top: -3}
+        style: { top: -3 },
       },
       //   {
       //     text: 'Duplicate',

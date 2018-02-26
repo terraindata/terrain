@@ -98,14 +98,14 @@ const Label = LabelC`
   text-transform: uppercase;
 
   font-size: ${(props) =>
+  {
+    if (props.isFloating)
     {
-      if (props.isFloating)
-      {
-        return props.large ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
-      }
+      return props.large ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
+    }
 
-      return props.large ? LARGE_FONT_SIZE : FONT_SIZE;
-    }};
+    return props.large ? LARGE_FONT_SIZE : FONT_SIZE;
+  }};
 `;
 
 const floatingLabelStyle = {
