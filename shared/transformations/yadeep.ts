@@ -61,39 +61,55 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
   }
 
   const waypoint: WayPoint = path.get(0);
-  //console.log('waypoint');
-  //console.log(waypoint);
+  console.log('waypoint');
+  console.log(waypoint);
+  console.log(options);
 
-  if (options['create'] === true)
+  const keys: string[] = Object.keys(obj);
+
+  if (waypoint === '*')
   {
-    // console.log('hh1')
-    if (typeof waypoint === 'string' && !obj.hasOwnProperty(waypoint as string))
+    const results: any[] = [];
+    //console.log(keys);
+    for (let j: number = 0; j < keys.length; j++)
     {
-      //  console.log('hh2')
+      console.log(obj[keys[j]]);
+      find(obj[keys[j]], path.shift(), (found) =>
+      {
+        //console.log('rj = ');
+        //console.log(found);
+        results[j] = found;
+        return next(found);
+      }, options);
+    }
+    obj = next(results);
+    return;
+  }
+
+  if (options['create'] === true && !obj.hasOwnProperty(waypoint))
+  {
+      console.log('hh2');
       obj[waypoint] = {};
-    }
-    else if (waypoint.constructor === Array && !obj.hasOwnProperty((waypoint as any[])[0]))
-    {
-      obj[(waypoint as any[])[0]] = [];
-    }
+      keys.push(waypoint);
   }
 
   if (obj.constructor === Array)
   {
-    console.log('UNEXPECTED');
-    obj = next(undefined);
-    return;
+    throw new Error('yadeep expects nested objects without arrays.  ' +
+      'Please objectify your doc before transforming (see deepObjectify).');
+    // obj = next(undefined);
+    // return;
   }
 
-  const keys: string[] = Object.keys(obj);
   for (let i: number = 0; i < keys.length; ++i)
   {
-    if (typeof waypoint === 'string' && keys[i] === waypoint)
+    if (keys[i] === waypoint)
     {
+      // Don't be fooled, this is the real base case...
       if (path.size === 1)
       {
-        //console.log('aaaaobj:');
-        //console.log(obj);
+        console.log('aaaaobj:');
+        console.log(obj);
         obj[keys[i]] = next(obj[keys[i]]);
         //console.log(obj);
         return;
@@ -101,7 +117,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
         return find(obj[keys[i]], path.shift(), next, options);
       }
     }
-    else if (waypoint.constructor === Array && keys[i] === waypoint[0])
+    /*else if (waypoint.constructor === Array && keys[i] === waypoint[0])
     {
       let lastNestedArray = obj[keys[i]];
       const recall: any[] = [...waypoint];
@@ -164,7 +180,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
       //console.log(lastNestedArray);
 
       return find(lastNestedArray, path.shift(), next, options);
-    }
+    }*/
   }
 
   return next(undefined);
@@ -172,27 +188,19 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
 
 export function get(obj: object, path: KeyPath): any
 {
-  // console.log('obj, path:');
-  // console.log(obj);
-  // console.log(path);
   let result: any;
   find(obj, path, (found) =>
   {
     result = found;
     return found;
   });
-  //console.log('result:');
-  //console.log(result);
   return result;
 }
 
 export function set(obj: object, path: KeyPath, value: any, options: object = {}): any
 {
-  console.log('setting ', path);
-  //let result = obj;
   find(obj, path, (found) =>
   {
     return value;
   }, options);
-  //return result;
 }

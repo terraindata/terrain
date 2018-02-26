@@ -44,8 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { List } from 'immutable';
+import isPrimitive = require('is-primitive');
 
-export type WayPoint = string;
-export type KeyPath = List<WayPoint>;
-export const KeyPath = (args: WayPoint[] = []) => List<WayPoint>(args);
+export default function objectify(arr) {
+  if (isPrimitive(arr))
+  {
+    return arr;
+  }
+  let obj: object = arr;
+  if (arr.constructor === Array)
+  {
+    obj = {...arr};
+  }
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key))
+    {
+      obj[key] = objectify(obj[key]);
+    }
+  }
+  return obj;
+}

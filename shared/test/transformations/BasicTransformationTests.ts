@@ -45,7 +45,9 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import isPrimitive = require('is-primitive');
 import nestedProperty = require('nested-property');
+import objectify from '../../transformations/deepObjectify';
 import { KeyPath } from '../../transformations/KeyPath';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
@@ -70,12 +72,12 @@ const doc2 = {
 };
 
 const doc3 = {
-  //name: 'Bob',
+  name: 'Bob',
   arr: ['sled', [{ a: 'dog' }, { b: 'doggo' }]],
   hardarr: [['a'], ['b', ['c']]],
 };
 
-test('add fields manually', () =>
+/*test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   e.addField(KeyPath(['meta', 'school']), 'string');
@@ -251,15 +253,18 @@ test('rename a field (an object with subkeys)', () =>
   expect(e.transform(doc2)['meta']).toBe(undefined);
   expect(e.transform(doc2)['school']).toBe('Stanford');
   expect(e.transform(doc2)['sport']).toBe('bobsled');
-});
+});*/
 
 test('process array types', () =>
 {
-  //    console.log(yadeep.get(doc3, KeyPath([['arr', 1, '*'], 'a'])));
+  console.dir(doc3, {depth: null, colors: true});
+  console.dir(objectify(doc3), {depth: null, colors: true});
+  //console.log(yadeep.get(objectify(doc3), KeyPath(['arr', '1', '*'])));
+  //console.log(yadeep.get(doc3, KeyPath([['arr', 1, '*'], 'a'])));
   //console.log(yadeep.get(doc3, KeyPath([['hardarr', '0', '*']])));
   //console.log(yadeep.get(doc3, KeyPath([['arr', 1], 'a'])));
-  //yadeep.set(doc3, KeyPath([['arr', '0']]), 'jim');
-  //console.log(doc3);
+  //yadeep.set(doc3, KeyPath(['arr', '1', '*', 'a']), 'jim', { create: true });
+  //console.dir(doc3, {depth: null, colors: true});
   // console.log(doc3['arr'][1][0]['a']);
   //const e: TransformationEngine = new TransformationEngine(doc3);
   //console.dir(e.flatten(doc3), {color: true, depth: null});
