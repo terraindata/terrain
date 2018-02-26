@@ -50,15 +50,16 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig }
+  from 'etl/EndpointTypes';
 import { TemplateTypes } from 'shared/etl/types/ETLTypes';
 
 class WalkthroughStateC
 {
   public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
   public type: TemplateTypes = null;
-  public source: SourceConfig = null;
-  public sink: SinkConfig = null;
+  public source: SourceConfig = _SourceConfig();
+  public sink: SinkConfig = _SinkConfig();
   public chosenTemplateId: ID = -1;
   public file: File = null;
   public previewDocuments: object[] = [];

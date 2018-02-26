@@ -75,6 +75,8 @@ enum Stage
 
 class ETLUploadStep extends ETLStepComponent
 {
+  // called when a user arrives at this step, but later
+  // chooses a different path
   public static onRevert(params: RevertParams)
   {
     const walkthrough = params.walkthrough

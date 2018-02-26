@@ -50,4 +50,38 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import { SinkConfig, SourceConfig } from 'shared/etl/types/ETLTypes';
+import {
+  FileConfig as FileConfigI,
+  SinkConfig as SinkConfigI,
+  SinkOptionsType, Sinks,
+  SourceConfig as SourceConfigI,
+  SourceOptionsType, Sources,
+} from 'shared/etl/types/EndpointTypes';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
+
+class FileConfigC implements FileConfigI
+{
+  public fileType: FileTypes = FileTypes.Json;
+  public hasCsvHeader = true;
+  public jsonNewlines = false;
+}
+export type FileConfig = WithIRecord<FileConfigC>;
+export const _FileConfig = makeConstructor(FileConfigC);
+
+class SourceConfigC implements SourceConfigI
+{
+  public type = Sources.Upload;
+  public fileConfig = _FileConfig();
+  public options = {};
+}
+export type SourceConfig = WithIRecord<SourceConfigC>;
+export const _SourceConfig = makeConstructor(SourceConfigC);
+
+class SinkConfigC implements SinkConfigI
+{
+  public type = Sinks.Download;
+  public fileConfig = _FileConfig();
+  public options = {};
+}
+export type SinkConfig = WithIRecord<SinkConfigC>;
+export const _SinkConfig = makeConstructor(SinkConfigC);

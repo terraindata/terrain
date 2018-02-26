@@ -61,26 +61,30 @@ export enum Sinks
   Http = 'Http',
 }
 
+export interface FileConfig
+{
+  fileType: FileTypes;
+  hasCsvHeader?: boolean;
+  jsonNewlines?: boolean;
+}
+
 export interface SourceConfig
 {
   type: SourceTypes;
-  fileConfig: {
-    fileType: FileTypes;
-    hasCsvHeader?: boolean;
-    jsonNewlines?: boolean;
-  };
+  fileConfig: FileConfig;
   options: SourceOptionsType<SourceTypes>;
+  // a union of all possible option types
 }
 
 export interface SinkConfig
 {
   type: SinkTypes;
-  fileConfig: {
-    fileType: FileTypes;
-  };
+  fileConfig: FileConfig;
   options: SinkOptionsType<SinkTypes>;
+  // a union of all possible option types
 }
 
+// so far sources and options are different
 interface SourceOptionsTypes // TODO check that these are right
 {
   Upload: {};
