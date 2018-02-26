@@ -305,7 +305,9 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                   }
                   readOnlyComponent={
                     <div className="field-weight" onClick={this.editingWeight}>
-                      {this.state.weight}
+                      <div className="field-weight-value">
+                        {this.state.weight}
+                      </div>
                     </div>
                   }
                 />

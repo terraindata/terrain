@@ -147,14 +147,16 @@
 			width: 100%;
 			height: 33px;
 			.builder-tb {
-				flex-basis: 84px;
-				margin: 0px 4px;
+				width: 50%;
 				input {
 					background-color: #e9e9e9;
 					border: none;
 					text-align: right;
 					color: #1eb4fa;
 				}
+				flex-basis: unset;
+				flex-grow: unset;
+				margin: 0;
 			}
 			.field-name {
 				text-align: left;
@@ -163,6 +165,20 @@
 				width: 33.33%;
 				padding-left: 10px;
 			}
+			.field-weight {
+				position: relative;
+				padding: 0;
+				text-align: right;
+				width: 50%;
+				color: #1eb4fa;
+				font-size: 16px;
+				.field-weight-value {
+					position: absolute;
+					right: 6px;
+					top: 6px;
+				}
+			}
+
 			.dropdown-wrapper {
 				.dropdown-value {
 					border: none;
