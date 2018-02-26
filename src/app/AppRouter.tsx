@@ -56,7 +56,7 @@ import TerrainComponent from './common/components/TerrainComponent';
 import ControlPage from './control/components/ControlPage';
 import ETLEditorPage from './etl/components/ETLEditorPage';
 import ETLPage from './etl/components/ETLPage';
-import ETLWalkthrough from './etl/walkthrough/ETLWalkthrough';
+import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';

@@ -50,43 +50,44 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
+import { _WalkthroughState, WalkthroughState} from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SinkConfig, SourceConfig, TemplateTypes } from 'shared/etl/TemplateTypes';
 
 class ETLStateC
 {
-  public walkthrough: WalkthroughState = _WalkthroughState();
+  // public walkthrough: WalkthroughState = _WalkthroughState();
 }
 export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor(ETLStateC);
 
-class WalkthroughStateC
-{
-  public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
-  public type: TemplateTypes = null;
-  public source: SourceConfig = null;
-  public sink: SinkConfig = null;
-  public chosenTemplateId: ID = -1;
-  public file: File = null;
-  public previewDocuments: object[] = [];
-}
-export type WalkthroughState = WithIRecord<WalkthroughStateC>;
-export const _WalkthroughState = makeConstructor(WalkthroughStateC);
+// class WalkthroughStateC
+// {
+//   public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
+//   public type: TemplateTypes = null;
+//   public source: SourceConfig = null;
+//   public sink: SinkConfig = null;
+//   public chosenTemplateId: ID = -1;
+//   public file: File = null;
+//   public previewDocuments: object[] = [];
+// }
+// export type WalkthroughState = WithIRecord<WalkthroughStateC>;
+// export const _WalkthroughState = makeConstructor(WalkthroughStateC);
 
-export enum ViewState
-{
-  Start = 'Start',
-  Import = 'Import',
-  Export = 'Export',
-  PickExportTemplate = 'PickExportTemplate',
-  PickExportAlgorithm = 'PickExportAlgorithm',
-  PickExportDestination = 'PickExportDestination',
-  ExportDestination = 'ExportDestination',
-  NewImport = 'NewImport',
-  PickImportTemplate = 'PickImportTemplate',
-  PickLocalFile = 'PickLocalFile',
-  PickImportSource = 'PickImportSource',
-  ImportDestination = 'ImportDestination',
-  PickDatabase = 'PickDatabase',
-  Review = 'Review',
-  Finish = 'Finish', // unreachable view state
-}
+// export enum ViewState
+// {
+//   Start = 'Start',
+//   Import = 'Import',
+//   Export = 'Export',
+//   PickExportTemplate = 'PickExportTemplate',
+//   PickExportAlgorithm = 'PickExportAlgorithm',
+//   PickExportDestination = 'PickExportDestination',
+//   ExportDestination = 'ExportDestination',
+//   NewImport = 'NewImport',
+//   PickImportTemplate = 'PickImportTemplate',
+//   PickLocalFile = 'PickLocalFile',
+//   PickImportSource = 'PickImportSource',
+//   ImportDestination = 'ImportDestination',
+//   PickDatabase = 'PickDatabase',
+//   Review = 'Review',
+//   Finish = 'Finish', // unreachable view state
+// }

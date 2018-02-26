@@ -51,30 +51,100 @@ const { List, Map } = Immutable;
 
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 import { Ajax } from 'util/Ajax';
-import { _ETLState, ETLState } from './ETLTypes';
+import { ViewState, _WalkthroughState, WalkthroughState } from './ETLWalkthroughTypes';
 
+import { getFileType, getSampleRows, guessJsonFileOptions } from 'shared/etl/FileUtil';
 import { FileTypes } from 'shared/etl/TemplateTypes';
 
-export interface ETLActionTypes
+export interface WalkthroughActionTypes
 {
-  placeholder: {
-    actionType: 'placeholder';
+  setWalkthroughState: {
+    actionType: 'setWalkthroughState';
+    newState: WalkthroughState;
   };
+  loadFileSample: {
+    actionType: 'loadFileSample';
+    file: File;
+  };
+  setPreviewDocuments: {
+    actionType: 'setPreviewDocuments';
+    documents: object[];
+  };
+  autodetectFileOptions: {
+    actionType: 'autodetectFileOptions';
+    file: File;
+  }
 }
 
-class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
+class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughState>
 {
-  public reducers: ConstrainedMap<ETLActionTypes, ETLState> =
+  public reducers: ConstrainedMap<WalkthroughActionTypes, WalkthroughState> =
     {
-      placeholder: (state, action) =>
+      setWalkthroughState: (state, action) =>
       {
-        return state;
-      }
+        return action.payload.newState
+      },
+      loadFileSample: (state, action) => state, // overriden
+      setPreviewDocuments: (state, action) =>
+      {
+        return state.set('previewDocuments', action.payload.documents);
+      },
+      autodetectFileOptions: (state, action) => state, // overriden
     };
+
+  public loadFileSample(action: WalkthroughActionType<'loadFileSample'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const handleResult = (result) => {
+      directDispatch({
+        actionType: 'setPreviewDocuments',
+        documents: result,
+      });
+    };
+    const handleError = (error) => {
+      // tslint:disable-next-line
+      console.error(error);
+    }
+    getSampleRows(
+      action.file,
+      5,
+      handleResult,
+      handleError
+    );
+  }
+
+  public autodetectFileOptions(action: WalkthroughActionType<'autodetectFileOptions'>, dispatch)
+  {
+    if (getFileType(action.file) === FileTypes.Json)
+    {
+      const setOptions = (options) => {
+
+      };
+
+      guessJsonFileOptions(action.file, setOptions);
+    }
+    else
+    {
+      console.log('hey its a csv');
+    }
+  }
+
+  public overrideAct(action: Unroll<WalkthroughActionTypes>)
+  {
+    switch (action.actionType)
+    {
+      case 'loadFileSample':
+        return this.loadFileSample.bind(this, action);
+      case 'autodetectFileOptions':
+        return this.autodetectFileOptions.bind(this, action);
+      default:
+        return undefined;
+    }
+  }
 }
 
-const ReduxInstance = new ETLRedux();
-export const ETLActions = ReduxInstance._actionsForExport();
-export const ETLReducers = ReduxInstance._reducersForExport(_ETLState);
-export declare type ETLActionType<K extends keyof ETLActionTypes> =
-  GetType<K, ETLActionTypes>;
+const ReduxInstance = new WalkthroughRedux();
+export const WalkthroughActions = ReduxInstance._actionsForExport();
+export const WalkthroughReducers = ReduxInstance._reducersForExport(_WalkthroughState);
+export declare type WalkthroughActionType<K extends keyof WalkthroughActionTypes> =
+  GetType<K, WalkthroughActionTypes>;

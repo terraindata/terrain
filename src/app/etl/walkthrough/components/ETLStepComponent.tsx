@@ -57,21 +57,21 @@ import { ComponentProps } from 'common/components/walkthrough/WalkthroughTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Quarantine from 'util/RadiumQuarantine';
 
-import { ETLActions } from 'etl/ETLRedux';
-import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
+import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
+import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import './ETLStepComponent.less';
 
-export interface StepProps extends ComponentProps
+export interface StepProps
 {
   onDone: () => void;
-  etl?: ETLState;
-  act?: typeof ETLActions;
+  walkthrough?: WalkthroughState;
+  act?: typeof WalkthroughActions;
 }
 
 export interface RevertParams
 {
-  act: typeof ETLActions;
-  etl: ETLState;
+  act: typeof WalkthroughActions;
+  walkthrough: WalkthroughState;
 }
 
 export abstract class ETLStepComponent<Props extends StepProps = StepProps> extends TerrainComponent<Props>

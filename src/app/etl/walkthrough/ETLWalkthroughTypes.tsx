@@ -43,38 +43,43 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing
+// tslint:disable:import-spacing max-classes-per-file
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
-import { Ajax } from 'util/Ajax';
-import { _ETLState, ETLState } from './ETLTypes';
+import { SinkConfig, SourceConfig, TemplateTypes } from 'shared/etl/TemplateTypes';
 
-import { FileTypes } from 'shared/etl/TemplateTypes';
-
-export interface ETLActionTypes
+class WalkthroughStateC
 {
-  placeholder: {
-    actionType: 'placeholder';
-  };
+  public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
+  public type: TemplateTypes = null;
+  public source: SourceConfig = null;
+  public sink: SinkConfig = null;
+  public chosenTemplateId: ID = -1;
+  public file: File = null;
+  public previewDocuments: object[] = [];
 }
+export type WalkthroughState = WithIRecord<WalkthroughStateC>;
+export const _WalkthroughState = makeConstructor(WalkthroughStateC);
 
-class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
+export enum ViewState
 {
-  public reducers: ConstrainedMap<ETLActionTypes, ETLState> =
-    {
-      placeholder: (state, action) =>
-      {
-        return state;
-      }
-    };
+  Start = 'Start',
+  Import = 'Import',
+  Export = 'Export',
+  PickExportTemplate = 'PickExportTemplate',
+  PickExportAlgorithm = 'PickExportAlgorithm',
+  PickExportDestination = 'PickExportDestination',
+  ExportDestination = 'ExportDestination',
+  NewImport = 'NewImport',
+  PickImportTemplate = 'PickImportTemplate',
+  PickLocalFile = 'PickLocalFile',
+  PickImportSource = 'PickImportSource',
+  ImportDestination = 'ImportDestination',
+  PickDatabase = 'PickDatabase',
+  Review = 'Review',
+  Finish = 'Finish', // unreachable view state
 }
-
-const ReduxInstance = new ETLRedux();
-export const ETLActions = ReduxInstance._actionsForExport();
-export const ETLReducers = ReduxInstance._reducersForExport(_ETLState);
-export declare type ETLActionType<K extends keyof ETLActionTypes> =
-  GetType<K, ETLActionTypes>;

@@ -56,20 +56,22 @@ import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughT
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { ETLActions } from 'etl/ETLRedux';
-import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
-import ETLUploadStep from 'etl/walkthrough/ETLUploadStep';
+import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
+import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+
+import ETLUploadStep from './ETLUploadStep';
 import './ETLWalkthrough.less';
 
 const { List } = Immutable;
 
 export interface Props
 {
-  etl: ETLState;
   params: {
     step: number;
   };
-  act?: typeof ETLActions;
+  // injected props
+  act?: typeof WalkthroughActions;
+  walkthrough?: WalkthroughState;
 }
 
 class ETLWalkthrough extends TerrainComponent<Props>
@@ -81,13 +83,13 @@ class ETLWalkthrough extends TerrainComponent<Props>
 
   public render()
   {
-    const { etl } = this.props;
+    const { walkthrough } = this.props;
     const currentStep = this.getStepFromRoute();
     return (
       <div className='etl-walkthrough'>
         <WalkthroughComponentClass
           stepIndex={currentStep}
-          stepHistory={etl.walkthrough.stepHistory}
+          stepHistory={walkthrough.stepHistory}
           setSteps={this.handleStepsChange}
         />
         <div className='etl-walkthrough-spacer'/>
@@ -97,7 +99,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
 
   public handleStepsChange(newStep: number, newHistory: List<ViewState>)
   {
-    const { walkthrough } = this.props.etl;
+    const { walkthrough } = this.props;
     const currentStep = this.getStepFromRoute();
 
     if (newHistory.last() === ViewState.Finish)
@@ -123,11 +125,11 @@ class ETLWalkthrough extends TerrainComponent<Props>
   // if the step is invalid or doesn't exist then return 0
   public getStepFromRoute(fixBadRoute = false)
   {
-    const { params, etl } = this.props;
+    const { params, walkthrough } = this.props;
     if (params != null && params.step != null)
     {
       const val = Number(params.step);
-      const isInvalid = isNaN(val) || val < 0 || val >= etl.walkthrough.stepHistory.size;
+      const isInvalid = isNaN(val) || val < 0 || val >= walkthrough.stepHistory.size;
       if (!isInvalid)
       {
         return val;
@@ -144,8 +146,8 @@ class ETLWalkthrough extends TerrainComponent<Props>
 
 export default Util.createContainer(
   ETLWalkthrough,
-  ['etl'],
-  { act: ETLActions },
+  ['walkthrough'],
+  { act: WalkthroughActions },
 );
 
 export const walkthroughGraph: WalkthroughGraphType<ViewState> =

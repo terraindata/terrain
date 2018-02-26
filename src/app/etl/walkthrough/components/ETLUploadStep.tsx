@@ -57,10 +57,11 @@ import FilePicker from 'common/components/FilePicker';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { ETLActions } from 'etl/ETLRedux';
-import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
-import { ETLStepComponent, RevertParams } from 'etl/walkthrough/ETLStepComponent';
-import SourceFileTypeOptions from 'etl/walkthrough/SourceFileTypeOptions';
+import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
+import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { ETLStepComponent, RevertParams, StepProps } from './ETLStepComponent';
+import SourceFileTypeOptions from './SourceFileTypeOptions';
+
 import './ETLStepComponent.less';
 
 const UploadIcon = require('images/icon_export.svg');
@@ -76,7 +77,7 @@ class ETLUploadStep extends ETLStepComponent
 {
   public static onRevert(params: RevertParams)
   {
-    const walkthrough = params.etl.walkthrough
+    const walkthrough = params.walkthrough
       .set('file', null)
       .set('source', null);
     params.act({
@@ -87,7 +88,7 @@ class ETLUploadStep extends ETLStepComponent
 
   public getStage(): Stage
   {
-    const { walkthrough } = this.props.etl;
+    const { walkthrough } = this.props;
     if (walkthrough.file == null || walkthrough.source == null)
     {
       return Stage.PickFile;
@@ -113,7 +114,7 @@ class ETLUploadStep extends ETLStepComponent
       </div>
     );
 
-    const file = this.props.etl.walkthrough.file;
+    const file = this.props.walkthrough.file;
     const showFileName = file != null;
     return (
       <div className='etl-transition-column'>
@@ -158,7 +159,7 @@ class ETLUploadStep extends ETLStepComponent
 
   public handleChangeFile(file: File)
   {
-    const walkthrough = this.props.etl.walkthrough;
+    const walkthrough = this.props.walkthrough;
     this.props.act({
       actionType: 'setWalkthroughState',
       newState: walkthrough
@@ -182,6 +183,6 @@ const uploadButtonStyle = [
 
 export default Util.createTypedContainer(
   ETLUploadStep,
-  ['etl'],
-  { act: ETLActions },
+  ['walkthrough'],
+  { act: WalkthroughActions },
 );

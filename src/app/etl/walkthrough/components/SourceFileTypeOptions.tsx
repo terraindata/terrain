@@ -60,9 +60,9 @@ import Util from 'util/Util';
 import * as FileUtil from 'shared/etl/FileUtil';
 import { FileTypes, TemplateTypes } from 'shared/etl/TemplateTypes';
 
-import { ETLActions } from 'etl/ETLRedux';
-import { ETLState, ViewState, WalkthroughState } from 'etl/ETLTypes';
-import { ETLStepComponent, RevertParams } from 'etl/walkthrough/ETLStepComponent';
+import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
+import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { ETLStepComponent, RevertParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
 interface Props
@@ -70,15 +70,15 @@ interface Props
   hide?: boolean;
 
   // injected props
-  act?: typeof ETLActions;
-  etl?: ETLState;
+  act?: typeof WalkthroughActions;
+  walkthrough?: WalkthroughState;
 }
 
 class SourceFileTypeOptions extends TerrainComponent<Props>
 {
   public hasCsvHeader(): boolean
   {
-    const { walkthrough } = this.props.etl;
+    const { walkthrough } = this.props;
     return _.get(
       walkthrough.source,
       ['params', 'hasCsvHeader'],
@@ -88,7 +88,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
 
   public jsonHasNewlines(): boolean
   {
-    const { walkthrough } = this.props.etl;
+    const { walkthrough } = this.props;
     return _.get(
       walkthrough.source,
       ['params', 'jsonNewlines'],
@@ -138,7 +138,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
 
   public render()
   {
-    const { file } = this.props.etl.walkthrough;
+    const { file } = this.props.walkthrough;
     const type = file != null ? FileUtil.getFileType(file) : null;
     return (
       <span style={{height: transitionRowHeight}}>
@@ -157,7 +157,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
 
   public handleCsvHeaderChange()
   {
-    const { walkthrough } = this.props.etl;
+    const { walkthrough } = this.props;
     const hasHeader = this.hasCsvHeader();
     const source = _.get(walkthrough, 'source', {});
     const sourceParams = _.get(source, 'params', {});
@@ -178,7 +178,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
 
   public handleJsonNewlinesChange()
   {
-    const { walkthrough } = this.props.etl;
+    const { walkthrough } = this.props;
     const hasNewlines = this.jsonHasNewlines();
     const source = _.get(walkthrough, 'source', {});
     const sourceParams = _.get(source, 'params', {});
@@ -202,6 +202,6 @@ const transitionRowHeight = '28px';
 
 export default Util.createTypedContainer(
   SourceFileTypeOptions,
-  ['etl'],
-  { act: ETLActions },
+  ['walkthrough'],
+  { act: WalkthroughActions },
 );
