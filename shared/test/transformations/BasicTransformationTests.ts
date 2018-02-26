@@ -73,7 +73,7 @@ const doc2 = {
 
 const doc3 = {
   name: 'Bob',
-  arr: ['sled', [{ a: 'dog' }, { b: 'doggo' }]],
+  arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
   hardarr: [['a'], ['b', ['c']]],
 };
 
@@ -259,15 +259,18 @@ test('process array types', () =>
 {
   console.dir(doc3, {depth: null, colors: true});
   console.dir(objectify(doc3), {depth: null, colors: true});
-  //console.log(yadeep.get(objectify(doc3), KeyPath(['arr', '1', '*'])));
+  console.log(yadeep.get(objectify(doc3), KeyPath(['arr', '1', '*', 'a'])));
   //console.log(yadeep.get(doc3, KeyPath([['arr', 1, '*'], 'a'])));
   //console.log(yadeep.get(doc3, KeyPath([['hardarr', '0', '*']])));
   //console.log(yadeep.get(doc3, KeyPath([['arr', 1], 'a'])));
   //yadeep.set(doc3, KeyPath(['arr', '1', '*', 'a']), 'jim', { create: true });
   //console.dir(doc3, {depth: null, colors: true});
   // console.log(doc3['arr'][1][0]['a']);
-  //const e: TransformationEngine = new TransformationEngine(doc3);
-  //console.dir(e.flatten(doc3), {color: true, depth: null});
-  // e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath([['arr', 0]])]));
-  // console.log(e.transform(doc3));
+  console.log(doc3);
+  const e: TransformationEngine = new TransformationEngine(doc3);
+  // //console.dir(e.flatten(doc3), {color: true, depth: null});
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]));
+  const t: object = e.transform(doc3);
+  console.log('FINAL RESULT:');
+  console.dir(t, {depth: null, colors: true});
 });

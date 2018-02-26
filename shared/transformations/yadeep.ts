@@ -93,13 +93,17 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
       keys.push(waypoint);
   }
 
-  if (obj.constructor === Array)
+  /*if (obj.constructor === Array)
   {
+    console.log('fffff');
+    console.log(keys);
+    console.log(obj);
+    console.log(waypoint);
     throw new Error('yadeep expects nested objects without arrays.  ' +
       'Please objectify your doc before transforming (see deepObjectify).');
     // obj = next(undefined);
     // return;
-  }
+  }*/
 
   for (let i: number = 0; i < keys.length; ++i)
   {

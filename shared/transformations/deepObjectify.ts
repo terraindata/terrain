@@ -51,7 +51,26 @@ export default function objectify(arr) {
   {
     return arr;
   }
-  let obj: object = arr;
+  let obj: object = Object.assign({}, arr);
+  if (arr.constructor === Array)
+  {
+    obj = {...arr};
+  }
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key))
+    {
+      obj[key] = objectify(obj[key]);
+    }
+  }
+  return obj;
+}
+
+export default function objectify(arr) {
+  if (isPrimitive(arr))
+  {
+    return arr;
+  }
+  let obj: object = Object.assign({}, arr);
   if (arr.constructor === Array)
   {
     obj = {...arr};

@@ -164,6 +164,7 @@ class TransformationNodeVisitor
   {
     for (const fieldID of node.fieldIDs.toJS())
     {
+      console.log('gonna T ',fieldID,' ',doc[fieldID]);
       if (typeof doc[fieldID] !== 'string')
       {
         return {
