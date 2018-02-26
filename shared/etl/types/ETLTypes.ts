@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { SinkConfig, SourceConfig } from './EndpointTypes';
 
 export enum Languages
 {
@@ -76,22 +77,5 @@ export interface Template
   };
   sinks: {
     [k: string]: SinkConfig;
-  };
-}
-
-export interface SourceConfig
-{
-  type: string;
-  params: {
-    hasCsvHeader?: boolean;
-    jsonNewlines?: boolean;
-  };
-}
-
-export interface SinkConfig
-{
-  type: string;
-  params: {
-
   };
 }

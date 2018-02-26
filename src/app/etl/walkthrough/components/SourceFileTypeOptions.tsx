@@ -81,7 +81,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
     const { walkthrough } = this.props;
     return _.get(
       walkthrough.source,
-      ['params', 'hasCsvHeader'],
+      ['fileConfig', 'hasCsvHeader'],
       false,
     );
   }
@@ -91,7 +91,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
     const { walkthrough } = this.props;
     return _.get(
       walkthrough.source,
-      ['params', 'jsonNewlines'],
+      ['fileConfig', 'jsonNewlines'],
       false,
     );
   }
@@ -160,14 +160,14 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
     const { walkthrough } = this.props;
     const hasHeader = this.hasCsvHeader();
     const source = _.get(walkthrough, 'source', {});
-    const sourceParams = _.get(source, 'params', {});
+    const sourceParams = _.get(source, 'fileConfig', {});
     const newSourceParams = _.extend({},
       sourceParams,
       { hasCsvHeader: !hasHeader },
     );
     const newSource = _.extend({},
       source,
-      { params: newSourceParams },
+      { fileConfig: newSourceParams },
     );
 
     this.props.act({
@@ -181,14 +181,14 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
     const { walkthrough } = this.props;
     const hasNewlines = this.jsonHasNewlines();
     const source = _.get(walkthrough, 'source', {});
-    const sourceParams = _.get(source, 'params', {});
+    const sourceParams = _.get(source, 'fileConfig', {});
     const newSourceParams = _.extend({},
       sourceParams,
       { jsonNewlines: !hasNewlines }),
     );
     const newSource = _.extend({},
       source,
-      { params: newSourceParams }
+      { fileConfig: newSourceParams }
     );
 
     this.props.act({

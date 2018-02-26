@@ -43,44 +43,96 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing max-classes-per-file
+// tslint:disable:max-classes-per-file no-unused-expression
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { FileTypes } from './ETLTypes';
 
-import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
-import { TemplateTypes } from 'shared/etl/types/ETLTypes';
-
-class WalkthroughStateC
+export enum Sources
 {
-  public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
-  public type: TemplateTypes = null;
-  public source: SourceConfig = null;
-  public sink: SinkConfig = null;
-  public chosenTemplateId: ID = -1;
-  public file: File = null;
-  public previewDocuments: object[] = [];
+  Upload = 'Upload', // from a browser
+  Sftp = 'Sftp',
+  Http = 'Http',
 }
-export type WalkthroughState = WithIRecord<WalkthroughStateC>;
-export const _WalkthroughState = makeConstructor(WalkthroughStateC);
 
-export enum ViewState
+export enum Sinks
 {
-  Start = 'Start',
-  Import = 'Import',
-  Export = 'Export',
-  PickExportTemplate = 'PickExportTemplate',
-  PickExportAlgorithm = 'PickExportAlgorithm',
-  PickExportDestination = 'PickExportDestination',
-  ExportDestination = 'ExportDestination',
-  NewImport = 'NewImport',
-  PickImportTemplate = 'PickImportTemplate',
-  PickLocalFile = 'PickLocalFile',
-  PickImportSource = 'PickImportSource',
-  ImportDestination = 'ImportDestination',
-  PickDatabase = 'PickDatabase',
-  Review = 'Review',
-  Finish = 'Finish', // unreachable view state
+  Download = 'Download', // to a browser
+  Sftp = 'Sftp',
+  Http = 'Http',
 }
+
+export interface SourceConfig
+{
+  type: SourceTypes;
+  fileConfig: {
+    fileType: FileTypes;
+    hasCsvHeader?: boolean;
+    jsonNewlines?: boolean;
+  };
+  options: SourceOptionsType<SourceTypes>;
+}
+
+export interface SinkConfig
+{
+  type: SinkTypes;
+  fileConfig: {
+    fileType: FileTypes;
+  };
+  options: SinkOptionsType<SinkTypes>;
+}
+
+interface SourceOptionsTypes // TODO check that these are right
+{
+  Upload: {};
+  Sftp: {
+    ip: string;
+    port: number;
+    filepath: string;
+    credentialId: ID;
+  };
+  Http: {
+    url: string;
+  };
+}
+
+interface SinkOptionsTypes
+{
+  Download: {};
+  Sftp: {
+    ip: string;
+    port: number;
+    filepath: string;
+    credentialId: ID;
+  };
+  Http: {
+    url: string; // TODO: What's in a post?
+    args: any;
+  };
+}
+
+export type SourceTypes = keyof SourceOptionsTypes;
+export type SourceOptionsType<key extends SourceTypes> = SourceOptionsTypes[key];
+export type SinkTypes = keyof SinkOptionsTypes;
+export type SinkOptionsType<key extends SinkTypes> = SinkOptionsTypes[key];
+
+// Some type wizadry to assert the above types stay correct
+// if there are errors in this section make sure that
+// 1: The source and sink enum names are the same as their values
+// 2: Each sink and source has a defined option type
+type SourceNamingAssertion = {
+  [K in keyof typeof Sources]: K
+};
+Sources as SourceNamingAssertion;
+
+type SourceAssertOptionTypesExhaustive = {
+  [K in Sources]: SourceOptionsTypes[K]
+};
+
+type SinkNamingAssertion = {
+  [K in keyof typeof Sinks]: K
+};
+Sinks as SinkNamingAssertion;
+
+type SinkAssertOptionTypesExhaustive = {
+  [K in Sinks]: SinkOptionsTypes[K]
+};

@@ -93,7 +93,7 @@ class ETLUploadStep extends ETLStepComponent
     {
       return Stage.PickFile;
     }
-    else if (walkthrough.source.params == null)
+    else if (walkthrough.source.fileConfig == null)
     {
       return Stage.FileTypeSettings;
     }

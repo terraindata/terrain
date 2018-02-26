@@ -43,44 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing max-classes-per-file
+// tslint:disable:max-classes-per-file strict-boolean-expressions import-spacing
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
-import { TemplateTypes } from 'shared/etl/types/ETLTypes';
-
-class WalkthroughStateC
-{
-  public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
-  public type: TemplateTypes = null;
-  public source: SourceConfig = null;
-  public sink: SinkConfig = null;
-  public chosenTemplateId: ID = -1;
-  public file: File = null;
-  public previewDocuments: object[] = [];
-}
-export type WalkthroughState = WithIRecord<WalkthroughStateC>;
-export const _WalkthroughState = makeConstructor(WalkthroughStateC);
-
-export enum ViewState
-{
-  Start = 'Start',
-  Import = 'Import',
-  Export = 'Export',
-  PickExportTemplate = 'PickExportTemplate',
-  PickExportAlgorithm = 'PickExportAlgorithm',
-  PickExportDestination = 'PickExportDestination',
-  ExportDestination = 'ExportDestination',
-  NewImport = 'NewImport',
-  PickImportTemplate = 'PickImportTemplate',
-  PickLocalFile = 'PickLocalFile',
-  PickImportSource = 'PickImportSource',
-  ImportDestination = 'ImportDestination',
-  PickDatabase = 'PickDatabase',
-  Review = 'Review',
-  Finish = 'Finish', // unreachable view state
-}
+import { SinkConfig, SourceConfig } from 'shared/etl/types/ETLTypes';
