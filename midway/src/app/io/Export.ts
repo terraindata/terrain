@@ -231,35 +231,32 @@ export class Export
         };
 
         let isFirstJSONObj: boolean = true;
-        respStream.on('data', (docs) =>
+        respStream.on('data', (doc) =>
         {
-          if (docs === undefined || docs === null)
+          if (doc === undefined || doc === null)
           {
             writer.end();
           }
 
           try
           {
-            for (let doc of docs)
+            doc = this._postProcessDoc(doc, cfg);
+            if (exprt.filetype === 'csv')
             {
-              doc = this._postProcessDoc(doc, cfg);
-              if (exprt.filetype === 'csv')
-              {
-                writer.write(doc);
-              }
-              else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-              {
-                isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-                writer.write(JSON.stringify(doc));
-              }
+              writer.write(doc);
+            }
+            else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+            {
+              isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+              writer.write(JSON.stringify(doc));
+            }
 
-              if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+            if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+            {
+              writer.write(']');
+              if (exprt.filetype === 'json [type object]')
               {
-                writer.write(']');
-                if (exprt.filetype === 'json [type object]')
-                {
-                  writer.write('}');
-                }
+                writer.write('}');
               }
             }
           }
