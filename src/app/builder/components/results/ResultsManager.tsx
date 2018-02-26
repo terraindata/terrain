@@ -122,7 +122,10 @@ export class ResultsManager extends TerrainComponent<Props>
   public componentWillMount()
   {
     Util.addBeforeLeaveHandler(this.killQueries);
-    this.queryResults(this.props.query, this.props.db);
+    // TODO consider querying results when the component is loaded
+    // however adding a call to queryResults here causes a bug with our
+    // current architecture that causes outdated results to be displayed
+    // when you open an algorithm from the builder
   }
 
   public componentWillUnmount()
@@ -434,7 +437,10 @@ export class ResultsManager extends TerrainComponent<Props>
       {
         eql = this.postprocessEQL(eql);
       }
-
+      if (this.state.query && this.state.query.xhr)
+      {
+        this.state.query.xhr.abort();
+      }
       this.setState({
         lastQuery: query,
         queriedTql: eql,

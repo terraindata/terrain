@@ -53,8 +53,6 @@ import * as Util from '../../Util';
 import UserConfig from '../../users/UserConfig';
 import ExportTemplateBaseStringified from './ExportTemplateBaseStringified';
 import ExportTemplateConfig from './ExportTemplateConfig';
-import { TemplateBase } from './TemplateBase';
-import { TemplateBaseStringified } from './TemplateBaseStringified';
 
 export class ExportTemplates
 {

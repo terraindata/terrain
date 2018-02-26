@@ -67,7 +67,7 @@ export async function waitForInput(msg: string)
       output: process.stdout,
       terminal: true,
     });
-  const answer = await rl.questionAsync(msg);
+  await rl.questionAsync(msg);
   rl.close();
 }
 
@@ -94,6 +94,7 @@ export async function replayBuilderActions(page, url, actions, records, actionCa
       console.log('Ignoring action: ' + String(action));
       continue;
     }
+    await page.mouse.move(0, 0);
     await page.evaluate((act) =>
     {
       return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);

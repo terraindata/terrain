@@ -17,10 +17,10 @@ if [ -d "./rr/test/builder/__image_snapshots__/__diff_output__/" ]; then
     tfile="/tmp/${now}";
     echo "copying the builder snapshots into ${tfile}"
     if [ -d "${tfile}" ]; then
-	cp -r ./rr/test/login/__image_snapshots__ ${tfile}/builder_snapshots;
+	cp -r ./rr/test/builder/__image_snapshots__ ${tfile}/builder_snapshots;
     else
 	mkdir ${tfile};
-	cp -r ./rr/test/login/__image_snapshots__ ${tfile}/builder_snapshots;
+	cp -r ./rr/test/builder/__image_snapshots__ ${tfile}/builder_snapshots;
     fi;
 fi
 

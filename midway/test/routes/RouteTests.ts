@@ -54,7 +54,6 @@ import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
 import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
 import * as Tasty from '../../src/tasty/Tasty';
-import { readFile } from '../Utils';
 
 let elasticDB: ElasticDB;
 let server;
@@ -820,9 +819,7 @@ describe('Query route tests', () =>
                 "query" : {
                   "bool" : {
                     "filter": [
-                      { "term": {"movieid" : @movie.movieid} }
-                    ],
-                    "must" : [
+                      { "term": {"movieid" : @movie.movieid} },
                       { "match": {"_index" : "movies"} },
                       { "match": {"_type" : "data"} }
                     ]
@@ -846,6 +843,88 @@ describe('Query route tests', () =>
         expect(respData['errors'].length).toEqual(0);
         expect(respData['result'].hits.hits.length).toEqual(5);
         expect(respData['result'].hits.hits[0]._id === respData['result'].hits.hits[0].englishMovies[0]._id);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Elastic mergeJoin query Result: POST /midway/v1/query', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          database: 1,
+          type: 'search',
+          body: `{
+            "size": 5,
+            "_source": ["movieid", "title"],
+            "query": {
+              "bool": {
+                "filter": [
+                  {
+                    "term": {
+                      "_index": "movies"
+                    }
+                  },
+                  {
+                    "term": {
+                      "_type": "data"
+                    }
+                  }
+                ],
+                "must": [
+                  { "match": { "status": "Released" } },
+                  { "match": { "language": "en" } }
+                ],
+                "must_not": [
+                  { "term": { "budget": 0 } },
+                  { "term": { "revenue": 0 } }
+                ]
+              }
+            },
+            "mergeJoin": {
+              "joinKey": "movieid",
+              "selfMergeJoin": {
+                "_source": ["movieid", "overview"],
+                "query" : {
+                  "bool": {
+                    "filter": [
+                      { "match": {"_index" : "movies"} },
+                      { "match": {"_type" : "data"} }
+                    ],
+                    "must_not": [
+                      { "term": { "budget": 0 } },
+                    ]
+                  }
+                },
+                "sort": "revenue",
+              }
+            }
+          }`,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(response.text);
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['errors'].length).toEqual(0);
+        expect(respData['result'].hits.hits.length).toEqual(5);
+        for (let i = 0; i < respData['result'].hits.hits.length; ++i)
+        {
+          expect(respData['result'].hits.hits[i]._id === respData['result'].hits.hits[i].selfMergeJoin[0]._id);
+          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin[0]._source.movieid);
+        }
       })
       .catch((error) =>
       {
