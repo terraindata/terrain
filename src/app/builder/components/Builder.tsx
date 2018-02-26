@@ -894,11 +894,6 @@ class Builder extends TerrainComponent<Props>
     const query = this.getQuery();
     const algorithmIdentifier = algorithm === undefined ? '' :
       `${algorithm.categoryId},${algorithm.groupId},${algorithm.id}`;
-    if (this.props.builder.query)
-    {
-    console.log('CONFIG IS ', this.props.builder.query.resultsConfig);
-      
-    }
     return (
       <div
         className={classNames({
