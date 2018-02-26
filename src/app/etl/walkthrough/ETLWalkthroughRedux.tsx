@@ -54,7 +54,7 @@ import { Ajax } from 'util/Ajax';
 import { ViewState, _WalkthroughState, WalkthroughState } from './ETLWalkthroughTypes';
 
 import { getFileType, getSampleRows, guessJsonFileOptions } from 'shared/etl/FileUtil';
-import { FileTypes } from 'shared/etl/TemplateTypes';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 export interface WalkthroughActionTypes
 {

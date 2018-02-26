@@ -58,7 +58,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import * as FileUtil from 'shared/etl/FileUtil';
-import { FileTypes, TemplateTypes } from 'shared/etl/TemplateTypes';
+import { FileTypes, TemplateTypes } from 'shared/etl/types/ETLTypes';
 
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';

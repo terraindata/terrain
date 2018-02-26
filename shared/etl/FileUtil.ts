@@ -48,7 +48,7 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 
 import * as Papa from 'papaparse';
-import { FileTypes } from './TemplateTypes';
+import { FileTypes } from './types/ETLTypes';
 
 import { parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from 'shared/Util';
 

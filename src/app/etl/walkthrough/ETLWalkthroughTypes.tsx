@@ -50,7 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import { SinkConfig, SourceConfig, TemplateTypes } from 'shared/etl/TemplateTypes';
+import { SinkConfig, SourceConfig, TemplateTypes } from 'shared/etl/types/ETLTypes';
 
 class WalkthroughStateC
 {

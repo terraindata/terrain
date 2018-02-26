@@ -87,7 +87,7 @@ export interface SourceConfig
     jsonNewlines?: boolean;
   };
 }
-// these type definitions should be somewhere else. it's also a placeholder
+
 export interface SinkConfig
 {
   type: string;

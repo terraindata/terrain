@@ -53,7 +53,7 @@ import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 's
 import { Ajax } from 'util/Ajax';
 import { _ETLState, ETLState } from './ETLTypes';
 
-import { FileTypes } from 'shared/etl/TemplateTypes';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 export interface ETLActionTypes
 {

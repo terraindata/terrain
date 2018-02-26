@@ -49,7 +49,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
-import { FileTypes } from 'shared/etl/TemplateTypes';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
@@ -57,7 +56,7 @@ import
 {
   Languages, TemplateTypes,
   Template as TemplateI,
-} from 'shared/etl/TemplateTypes';
+} from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class TemplateEditorStateC

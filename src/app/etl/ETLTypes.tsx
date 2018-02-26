@@ -51,7 +51,6 @@ const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _WalkthroughState, WalkthroughState} from 'etl/walkthrough/ETLWalkthroughTypes';
-import { SinkConfig, SourceConfig, TemplateTypes } from 'shared/etl/TemplateTypes';
 
 class ETLStateC
 {
