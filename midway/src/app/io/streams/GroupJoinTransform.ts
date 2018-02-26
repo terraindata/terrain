@@ -61,7 +61,7 @@ export default class GroupJoinTransform extends Readable
   private client: ElasticClient;
 
   private source: Readable;
-  
+
   private query: object;
 
   private blockSize = 512;
@@ -70,20 +70,21 @@ export default class GroupJoinTransform extends Readable
   private pendingQueries: Deque<Promise<any>>;
 
   private maxBufferedOutputs: number;
+  private bufferedInputs: Deque<object>;
   private bufferedOutputs: Deque<object>;
 
   private sourceIsEmpty: boolean = false;
-  private sourceIsReadable: boolean = false;
+  private continueReading: boolean = false;
 
   private dropIfLessThan: number = 0;
   private parentAlias: string = 'parent';
 
-  private subqueryValueInfos: { [key: string]: ESValueInfo | null };
+  private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
   constructor(client: ElasticClient, source: Readable, query: object)
   {
     super({
-      objectMode: true
+      objectMode: true,
     });
 
     this.client = client;
@@ -109,14 +110,44 @@ export default class GroupJoinTransform extends Readable
     }
 
     this.query = query;
-    // for (const k of Object.keys(query))
-    // {
-    //   this.subqueryValueInfos[k] = parser.getValueInfo().objectChildren[k].propertyValue;
-    // }
+    for (const k of Object.keys(query))
+    {
+      this.subqueryValueInfos[k] = parser.getValueInfo().objectChildren[k].propertyValue;
+    }
 
     this.pendingQueries = new Deque<Promise<any>>(this.maxPendingQueries);
     this.maxBufferedOutputs = this.blockSize * this.maxPendingQueries;
+    this.bufferedInputs = new Deque<object>(this.maxBufferedOutputs);
     this.bufferedOutputs = new Deque<object>(this.maxBufferedOutputs);
+
+    this.source.on('readable', () =>
+    {
+      if (!this.continueReading)
+      {
+        return;
+      }
+
+      const obj = this.source.read();
+      if (obj === null)
+      {
+        this.sourceIsEmpty = true;
+      }
+      else
+      {
+        this.bufferedInputs.push(obj);
+      }
+
+      if (this.bufferedInputs.length > this.blockSize ||
+        this.sourceIsEmpty && this.bufferedInputs.length > 0)
+      {
+        this.dispatchSubqueryBlock();
+      }
+    });
+
+    this.source.on('end', () =>
+    {
+      this.sourceIsEmpty = true;
+    });
   }
 
   public _read(size: number = 1024)
@@ -125,18 +156,8 @@ export default class GroupJoinTransform extends Readable
       && this.bufferedOutputs.length < this.maxBufferedOutputs
       && this.pendingQueries.length < this.maxPendingQueries)
     {
-      this.dispatchSubqueryBlock();
+      this.continueReading = true;
     }
-  }
-
-  private waitForSourceToBeReadable(): void
-  {
-    if (this.sourceIsReadable)
-    {
-      return;
-    }
-
-    setTimeout(this.waitForSourceToBeReadable, 1);
   }
 
   private dispatchSubqueryBlock(): void
@@ -144,42 +165,26 @@ export default class GroupJoinTransform extends Readable
     const query = this.query;
     const inputs: object[] = [];
 
-    this.waitForSourceToBeReadable();
-    console.log(this.sourceIsReadable);
-
-    while (inputs.length < this.blockSize && !this.sourceIsEmpty)
-    {
-      const obj = this.source.read();
-      if (obj === null)
-      {
-        this.sourceIsEmpty = true;
-      }
-      else
-      {
-        inputs.push(obj);
-      }
-    }
-
     for (const subQuery of Object.keys(query))
     {
-      // const body: any[] = [];
-      // for (const input of inputs)
-      // {
-      //   const vi = this.subqueryValueInfos[subQuery];
-      //   if (vi !== null)
-      //   {
-      //     // winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
-      //     const header = {};
-      //     body.push(header);
-    
-      //     const queryStr = ESParameterFiller.generate(
-      //       vi,
-      //       {
-      //         [this.parentAlias]: input['_source'] 
-      //       });
-      //     body.push(queryStr);
-      //   }
-      // }  
+      const body: any[] = [];
+      for (const input of inputs)
+      {
+        const vi = this.subqueryValueInfos[subQuery];
+        if (vi !== null)
+        {
+          // winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
+          const header = {};
+          body.push(header);
+
+          const queryStr = ESParameterFiller.generate(
+            vi,
+            {
+              [this.parentAlias]: input['_source'],
+            });
+          body.push(queryStr);
+        }
+      }
 
       // this.pendingQueries.push(new Promise((resolve, reject) =>
       // {
@@ -211,21 +216,21 @@ export default class GroupJoinTransform extends Readable
       // }));
     }
 
-    console.log(this.sourceIsEmpty);
-    console.log(inputs);
-    const numInputs = inputs.length;
+    const numInputs = this.bufferedInputs.length;
     for (let i = 0; i < numInputs; i++)
     {
-      const obj = inputs.shift();
+      const obj = this.bufferedInputs.shift();
       if (obj !== undefined)
       {
         this.push(obj);
+        this.continueReading = false;
       }
     }
 
     if (this.sourceIsEmpty)
     {
       this.push(null);
+      this.continueReading = false;
     }
   }
 }
