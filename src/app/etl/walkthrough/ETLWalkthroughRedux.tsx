@@ -49,13 +49,15 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 import { Ajax } from 'util/Ajax';
 import { _WalkthroughState, ViewState, WalkthroughState } from './ETLWalkthroughTypes';
 
 import { getFileType, getSampleRows, guessJsonFileOptions } from 'shared/etl/FileUtil';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
+
+type CfgOrHandler = (cfg: FileConfig) => FileConfig | FileConfig;
 
 export interface WalkthroughActionTypes
 {
@@ -65,16 +67,22 @@ export interface WalkthroughActionTypes
       [k in keyof WalkthroughState]: WalkthroughState[k];
     }>;
   };
+  setFileConfig: {
+    actionType: 'setFileConfig';
+    sourceConfig?: CfgOrHandler;
+    sinkConfig?: CfgOrHandler;
+  };
   loadFileSample: {
     actionType: 'loadFileSample';
+    numRows: number;
     file: File;
   };
   setPreviewDocuments: {
     actionType: 'setPreviewDocuments';
     documents: object[];
   };
-  autodetectFileOptions: {
-    actionType: 'autodetectFileOptions';
+  autodetectJsonOptions: {
+    actionType: 'autodetectJsonOptions';
     file: File;
   };
 }
@@ -82,24 +90,52 @@ export interface WalkthroughActionTypes
 class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughState>
 {
   public reducers: ConstrainedMap<WalkthroughActionTypes, WalkthroughState> =
+  {
+    setState: (state, action) =>
     {
-      setState: (state, action) =>
+      let newState = state;
+      const toUpdate = action.payload.state;
+      for (const k of Object.keys(toUpdate))
       {
-        let newState = state;
-        const toUpdate = action.payload.state;
-        for (const k of Object.keys(toUpdate))
+        newState = newState.set(k, toUpdate[k]);
+      }
+      return newState;
+    },
+    setFileConfig: (state, action) =>
+    {
+      let newState = state;
+      const { sourceConfig, sinkConfig } = action.payload;
+      if (sourceConfig != null)
+      {
+        if (typeof sourceConfig === 'function')
         {
-          newState = newState.set(k, toUpdate[k]);
+          newState = newState.updateIn(['source', 'fileConfig'], sourceConfig);
         }
-        return newState;
-      },
-      setPreviewDocuments: (state, action) =>
+        else
+        {
+          newState = newState.setIn(['source', 'fileConfig'], sourceConfig);
+        }
+      }
+      if (sinkConfig != null)
       {
-        return state.set('previewDocuments', action.payload.documents);
-      },
-      autodetectFileOptions: (state, action) => state, // overriden
-      loadFileSample: (state, action) => state, // overriden
-    };
+        if (typeof sinkConfig === 'function')
+        {
+          newState = newState.updateIn(['sink', 'fileConfig'], sinkConfig);
+        }
+        else
+        {
+          newState = newState.setIn(['sink', 'fileConfig'], sinkConfig);
+        }
+      }
+      return newState;
+    },
+    setPreviewDocuments: (state, action) =>
+    {
+      return state.set('previewDocuments', action.payload.documents);
+    },
+    autodetectJsonOptions: (state, action) => state, // overriden
+    loadFileSample: (state, action) => state, // overriden
+  };
 
   public loadFileSample(action: WalkthroughActionType<'loadFileSample'>, dispatch)
   {
@@ -116,26 +152,23 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
     };
     getSampleRows(
       action.file,
-      5,
+      action.numRows,
       handleResult,
       handleError,
     );
   }
 
-  public autodetectFileOptions(action: WalkthroughActionType<'autodetectFileOptions'>, dispatch)
+  public autodetectJsonOptions(action: WalkthroughActionType<'autodetectJsonOptions'>, dispatch)
   {
-    if (getFileType(action.file) === FileTypes.Json)
-    {
-      const setOptions = (options) => {
-
-      };
-
-      guessJsonFileOptions(action.file, setOptions);
-    }
-    else
-    {
-      console.log('hey its a csv');
-    }
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const setOptions = (options) => {
+      directDispatch({
+        actionType: 'setFileConfig',
+        sourceConfig: (cfg) =>
+          cfg.set('jsonNewlines', options.jsonNewlines),
+      });
+    };
+    guessJsonFileOptions(action.file, setOptions);
   }
 
   public overrideAct(action: Unroll<WalkthroughActionTypes>)
@@ -144,8 +177,8 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
     {
       case 'loadFileSample':
         return this.loadFileSample.bind(this, action);
-      case 'autodetectFileOptions':
-        return this.autodetectFileOptions.bind(this, action);
+      case 'autodetectJsonOptions':
+        return this.autodetectJsonOptions.bind(this, action);
       default:
         return undefined;
     }

@@ -94,10 +94,26 @@ export abstract class ETLStepComponent<Props extends StepProps = StepProps> exte
     });
   }
 
+  public _altButtonStyle()
+  {
+    return altButtonStyle;
+  }
+
+  public _altButtonClass()
+  {
+    return 'etl-alt-button';
+  }
+
   public _renderNextButton(shown = true, enabled = true)
   {
     return (
-      <FadeInOut open={shown}>
+      <span
+        className='transition'
+        style={{
+          visibility: shown ? 'visible' : 'hidden',
+          opacity: shown ? 1 : 0,
+        }}
+      >
         <Quarantine>
           <div
             className={this._getButtonClass(enabled)}
@@ -107,10 +123,17 @@ export abstract class ETLStepComponent<Props extends StepProps = StepProps> exte
             Next
           </div>
         </Quarantine>
-      </FadeInOut>
+      </span>
     );
   }
 }
+
+const altButtonStyle = [
+  backgroundColor(Colors().bg3),
+  fontColor(Colors().text2, Colors().text2),
+  borderColor(Colors().darkerHighlight, Colors().active),
+  getStyle('boxShadow', `2px 1px 3px ${Colors().boxShadow}`),
+];
 
 const activeStyle = [
   backgroundColor(Colors().active, Colors().activeHover),

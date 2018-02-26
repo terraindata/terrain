@@ -14,12 +14,6 @@
   }
 }
 
-.etl-step-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .etl-transition-column {
 
   .etl-transition-element {
@@ -45,29 +39,29 @@
   align-items: center;
   border-radius: 3px;
   font-size: @pretty-large-font-size;
+
+  svg {
+    margin-bottom: 3px;
+    fill: currentColor;
+    width: 32px;
+  }
+  .alt-button-text {
+    margin: 0px @spacing;
+  }
+
   .transition;
   &.button-disabled {
     cursor: default;
   }
 }
 
+.etl-step-next-button-spacer {
+  padding: @half-spacing;
+  margin-top: @half-spacing;
+}
 
 // ETLUploadStep
 .etl-upload-step {
-  
-  .etl-upload-button {
-    .etl-alt-button;
-    margin-bottom: @half-spacing;
-
-    svg {
-      margin-bottom: 3px;
-      fill: currentColor;
-    }
-
-    .upload-button-text {
-      margin: 0px @spacing;
-    }
-  }
 
   .step-upload-filename {
     justify-content: center;

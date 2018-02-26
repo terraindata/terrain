@@ -157,7 +157,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
       actionType: 'setState',
       state: {
         source: newSource,
-      }; , ,
+      }; , , , ,
     });
   }
 

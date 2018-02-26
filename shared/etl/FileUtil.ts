@@ -165,7 +165,18 @@ function detectJsonNewlines(str): boolean
 {
   const firstBrace = str.indexOf('{');
   const firstBracket = str.indexOf('[');
-  return firstBrace < firstBracket;
+  if (firstBracket === -1)
+  {
+    return true;
+  }
+  else if (firstBrace === -1) // probably a plain array
+  {
+    return false;
+  }
+  else
+  {
+    return firstBrace < firstBracket;
+  }
 }
 const GuessChunkSize = 1000; // 1kb
 const ChunkSize = 1000000; // 1mb

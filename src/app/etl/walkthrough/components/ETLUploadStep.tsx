@@ -60,19 +60,13 @@ import Util from 'util/Util';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { getFileType } from 'shared/etl/FileUtil';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, RevertParams, StepProps } from './ETLStepComponent';
+import './ETLStepComponent.less';
 import SourceFileTypeOptions from './SourceFileTypeOptions';
 
-import './ETLStepComponent.less';
-
 const UploadIcon = require('images/icon_export.svg');
-
-enum Stage
-{
-  PickFile = 0,
-  FileTypeSettings = 1,
-  Confirm = 2,
-}
 
 class ETLUploadStep extends ETLStepComponent
 {
@@ -89,29 +83,15 @@ class ETLUploadStep extends ETLStepComponent
     });
   }
 
-  public getStage(): Stage
-  {
-    const { walkthrough } = this.props;
-    if (walkthrough.file == null || walkthrough.source == null)
-    {
-      return Stage.PickFile;
-    }
-    else if (walkthrough.source.fileConfig == null)
-    {
-      return Stage.FileTypeSettings;
-    }
-    else
-    {
-      return Stage.Confirm;
-    }
-  }
-
   public renderUploadSection()
   {
     const button = (
-      <div className='etl-upload-button' style={uploadButtonStyle}>
-        <UploadIcon width='32px'/>
-        <div className='upload-button-text'>
+      <div
+        className={this._altButtonClass()}
+        style={this._altButtonStyle()}
+      >
+        <UploadIcon/>
+        <div className='alt-button-text'>
           Choose a File
         </div>
       </div>
@@ -127,7 +107,12 @@ class ETLUploadStep extends ETLStepComponent
           accept={'.csv,.json'}
           customButton={button}
         />
-        <span style={{minHeight: transitionRowHeight}}>
+        <span
+          style={{
+            minHeight: transitionRowHeight,
+            marginTop: '6px',
+          }}
+        >
           <div
             className='etl-transition-element step-upload-filename'
             style={{height: showFileName ? transitionRowHeight : '0px'}}
@@ -139,23 +124,18 @@ class ETLUploadStep extends ETLStepComponent
     );
   }
 
-  public renderFileTypeSettings(show: boolean)
-  {
-    return (
-      <SourceFileTypeOptions/>
-    );
-  }
-
   public render()
   {
-    const stage: number = this.getStage();
+    const filePicked = this.props.walkthrough.file != null;
     return (
       <div className='etl-transition-column etl-upload-step'>
         { this.renderUploadSection() }
         <SourceFileTypeOptions
-          hide={stage <= Stage.PickFile}
+          hide={!filePicked}
         />
-        { this._renderNextButton(false) }
+        <div className='etl-step-next-button-spacer'>
+          { this._renderNextButton(filePicked) }
+        </div>
       </div>
     );
   }
@@ -170,10 +150,14 @@ class ETLUploadStep extends ETLStepComponent
         source: _SourceConfig(),
       },
     });
-    this.props.act({
-      actionType: 'autodetectFileOptions',
-      file,
-    });
+    if (getFileType(file) === FileTypes.Json)
+    {
+      this.props.act({
+        actionType: 'autodetectJsonOptions',
+        file,
+      });
+    }
+
   }
 }
 
