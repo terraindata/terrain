@@ -79,7 +79,7 @@ export interface Props<FState>
   inputMap: InputDeclarationMap<FState>; // inputMap is memoized, so be careful about changing its properties!
   inputState: FState;
   onStateChange: (newState: FState) => void;
-  mainButton: ButtonOptions; // active styling by default
+  mainButton?: ButtonOptions; // active styling by default
   secondButton?: ButtonOptions; // buttons are rendered from right to left
   thirdButton?: ButtonOptions;
   style?: any; // gets applied to root container
@@ -97,6 +97,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.CheckBox]: this.renderCheckBox,
       [DisplayType.NumberBox]: this.renderNumberBox,
       [DisplayType.TextBox]: this.renderTextBox,
+      [DisplayType.Pick]: this.renderPick,
     };
 
   constructor(props)
@@ -108,7 +109,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
 
   public renderTextBox(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
   {
-    const options = inputInfo.options as OptionType<DisplayType.TextBox> || {};
+    const options: OptionType<DisplayType.TextBox> = inputInfo.options || {};
     return (
       <div className='dynamic-form-autocomplete-block' key={index}>
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
@@ -116,7 +117,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
           onChange={this.setStateHOC(stateName)}
-          options={options.acOptions}
+          options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
         />
       </div>
@@ -126,7 +127,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   // TODO make this only accept numbers
   public renderNumberBox(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
   {
-    const options = inputInfo.options as OptionType<DisplayType.TextBox> || {};
+    const options: OptionType<DisplayType.NumberBox> = inputInfo.options || {};
     return (
       <div className='dynamic-form-autocomplete-block' key={index}>
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
@@ -134,7 +135,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
           onChange={this.setStateHOC(stateName)}
-          options={options.acOptions}
+          options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
         />
       </div>
@@ -143,7 +144,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
 
   public renderCheckBox(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
   {
-    const options = inputInfo.options as OptionType<DisplayType.CheckBox> || {};
+    const options: OptionType<DisplayType.CheckBox> = inputInfo.options || {};
     return (
       <div
         className='dynamic-form-checkbox-row'
@@ -164,6 +165,25 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     );
   }
 
+  public renderPick(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
+  {
+    const options: OptionType<DisplayType.Pick> = inputInfo.options || {};
+    return (
+      <div className='dynamic-form-pick-block' key={index}>
+        <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
+        <span style={{marginLeft: '0px'}}>
+          <Dropdown
+            className='dynamic-form-pick'
+            selectedIndex={this.props.inputState[stateName]}
+            onChange={this.setStateHOC(stateName)}
+            options={options.pickOptions != null ? options.pickOptions(state) : emptyList}
+            canEdit={!disabled}
+          />
+        </span>
+      </div>
+    ); 
+  }
+
   public renderInputElement(inputInfo: InputDeclarationType<S>, stateName, state: S, index): any
   {
     const displayState = inputInfo.shouldShow(state);
@@ -172,6 +192,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       <FadeInOut
         key={index}
         open={displayState !== DisplayState.Hidden}
+        style={{flexGrow: inputInfo.dontFillSpace ? '0': '1'}}
       >
         <div className={inputInfo.className} style={inputInfo.style}>
           {renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive)}
@@ -336,3 +357,4 @@ function resolveBooleans(a, b)
   return a ? (b ? 'tt' : 'tf') : (b ? 'ft' : 'ff');
 }
 getButtonStyle = _.memoize(getButtonStyle, resolveBooleans);
+const emptyList = List([]);

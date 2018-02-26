@@ -43,45 +43,103 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file strict-boolean-expressions import-spacing
+// tslint:disable:no-var-requires import-spacing
+import * as classNames from 'classnames';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import {
-  FileConfig as FileConfigI,
-  SinkConfig as SinkConfigI,
-  SinkOptionsType, Sinks,
-  SourceConfig as SourceConfigI,
-  SourceOptionsType, Sources,
-} from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
-class FileConfigC implements FileConfigI
+import { DatabaseMap, Database, ServerMap, Server, TableMap, Table} from 'schema/SchemaTypes';
+import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
+
+interface FormState
 {
-  public fileType: FileTypes = FileTypes.Json;
-  public hasCsvHeader = true;
-  public jsonNewlines = false;
+  serverIdIndex: number;
+  database: string;
+  table: string;
 }
-export type FileConfig = WithIRecord<FileConfigC>;
-export const _FileConfig = makeConstructor(FileConfigC);
 
-class SourceConfigC implements SourceConfigI
+interface Props
 {
-  public type = null;
-  public fileConfig = _FileConfig();
-  public options = {};
+  language: Languages;
+  serverId: ID;
+  database: string;
+  table: string;
+  // injected props
+  servers?: ServerMap;
+  databases?: DatabaseMap;
+  tables?: TableMap;
 }
-export type SourceConfig = WithIRecord<SourceConfigC>;
-export const _SourceConfig = makeConstructor(SourceConfigC);
 
-class SinkConfigC implements SinkConfigI
+class DatabasePicker extends TerrainComponent<Props>
 {
-  public type = null;
-  public fileConfig = _FileConfig();
-  public options = {};
+  private inputMap: InputDeclarationMap<FormState>;
+
+  public state: FormState = 
+  {
+    serverIdIndex: -1,
+    database: '',
+    table: '',
+  };
+
+  constructor(props)
+  {
+    super(props);
+    this.inputMap = {
+      serverIdIndex: {
+        type: DisplayType.Pick,
+        displayName: 'Server',
+        options: {
+          pickOptions: this.getServerOptions,
+        }
+      },
+      database: {
+        type: DisplayType.TextBox,
+        displayName: 'Database',
+      },
+    }
+  }
+
+  public getServerOptions(state: FormState): List<string>
+  {
+    return this.props.servers.map(
+      (server, index) => server.name
+    ).toList();
+  }
+
+  public render()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        inputState={this.state}
+        onStateChange={this.handleStateChange}
+      />
+    )
+  }
+
+  public handleStateChange(state: FormState)
+  {
+    this.setState(state);
+  }
 }
-export type SinkConfig = WithIRecord<SinkConfigC>;
-export const _SinkConfig = makeConstructor(SinkConfigC);
+
+export default Util.createTypedContainer(
+  DatabasePicker,
+  [
+    ['schema', 'servers'],
+    ['schema', 'databases'],
+    ['schema', 'tables'],
+  ],
+  { },
+);

@@ -60,6 +60,7 @@ import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 
 import ETLUploadStep from './ETLUploadStep';
+import PickDatabaseStep from './PickDatabaseStep';
 import './ETLWalkthrough.less';
 
 const { List } = Immutable;
@@ -292,7 +293,7 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
     options: [
       {
         link: ViewState.Review,
-        component: null,
+        component: PickDatabaseStep,
       },
     ],
   },

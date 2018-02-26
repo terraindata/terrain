@@ -49,28 +49,31 @@ THE SOFTWARE.
 export enum DisplayType
 {
   TextBox = 'TextBox',
-
   NumberBox = 'NumberBox',
   CheckBox = 'CheckBox',
+  Pick = 'Pick',
 }
 
 export type InputDeclarationMap<State extends { [k: string]: any }> =
   {
-    [key in keyof State]: InputDeclaration<State>; // resolves to a more strongly typed version of InputDeclarationType
+    [key in keyof State]?: InputDeclaration<State>; // resolves to a more strongly typed version of InputDeclarationType
   };
 
 // additional types to import / look at if using advanced options
-export interface InputDeclarationOptionTypes
+export interface InputDeclarationOptionTypes<S = any>
 {
   TextBox: {
-    acOptions?: List<string>;
+    acOptions?: (state: S) => List<string>
   };
   NumberBox: {
-    acOptions?: List<string>;
+    acOptions?: (state: S) => List<string>;
     integerOnly?: boolean; // TODO not implemented yet, just an example
   };
   CheckBox: {
     large?: boolean;
+  };
+  Pick: {
+    pickOptions: (state: S) => List<string>
   };
 }
 
@@ -83,9 +86,10 @@ export interface InputDeclarationType<S>
   style?: any; // applied to the wrapper around the input element
   className?: string; // applied to the wrapper around the input element
   shouldShow?: (state: S) => DisplayState;
+  dontFillSpace?: boolean; // if true, input elements won't grow to fit their row
 }
 
-export type OptionType<K extends keyof InputDeclarationOptionTypes> = InputDeclarationOptionTypes[K];
+export type OptionType<K extends keyof InputDeclarationOptionTypes, S = any> = InputDeclarationOptionTypes<S>[K];
 export enum DisplayState
 {
   Active,
@@ -112,7 +116,7 @@ type AssertOptionTypesExhaustive = {
 interface InputDeclarationHelper<K extends DisplayTypeKeys, State> extends InputDeclarationType<State>
 {
   type: K;
-  options?: InputDeclarationOptionTypes[K];
+  options?: InputDeclarationOptionTypes<State>[K];
 }
 
 type InputDeclarationBundle<State> = {

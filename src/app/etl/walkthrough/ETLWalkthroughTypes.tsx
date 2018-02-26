@@ -59,9 +59,9 @@ class WalkthroughStateC
   public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
   public type: TemplateTypes = null;
   public source: SourceConfig = _SourceConfig();
+  public file: File = null;
   public sink: SinkConfig = _SinkConfig();
   public chosenTemplateId: ID = -1;
-  public file: File = null;
   public previewDocuments: object[] = [];
 }
 export type WalkthroughState = WithIRecord<WalkthroughStateC>;

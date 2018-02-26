@@ -76,6 +76,8 @@ export interface RevertParams
 
 export abstract class ETLStepComponent<Props extends StepProps = StepProps> extends TerrainComponent<Props>
 {
+  // called when a user arrives at this step, but later
+  // chooses a different path
   public static onRevert(params: RevertParams)
   {
     // do nothing by default

@@ -51,117 +51,81 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import FadeInOut from 'common/components/FadeInOut';
-import FilePicker from 'common/components/FilePicker';
-
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { SinkOptionsType } from 'shared/etl/types/EndpointTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
+import DatabasePicker from 'etl/common/components/DatabasePicker';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { getFileType } from 'shared/etl/FileUtil';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, RevertParams, StepProps } from './ETLStepComponent';
 import './ETLStepComponent.less';
-import SourceFileTypeOptions from './SourceFileTypeOptions';
 
-const UploadIcon = require('images/icon_export.svg');
+interface Props extends StepProps
+{
+  // injected props
+  walkthrough?: WalkthroughState;
+}
 
-class ETLUploadStep extends ETLStepComponent
+class PickDatabaseStep extends ETLStepComponent
 {
   public static onRevert(params: RevertParams)
   {
     params.act({
       actionType: 'setState',
       state: {
-        file: null,
-        source: _SourceConfig(),
-      },
+        sink: _SinkConfig(),
+      }
     });
   }
 
-  public renderUploadSection()
+  public renderPickDbSection()
   {
-    const button = (
-      <div
-        className={this._altButtonClass()}
-        style={this._altButtonStyle()}
-      >
-        <UploadIcon/>
-        <div className='alt-button-text'>
-          Choose a File
-        </div>
-      </div>
-    );
-
-    const file = this.props.walkthrough.file;
-    const showFileName = file != null;
     return (
-      <div className='etl-transition-column'>
-        <FilePicker
-          large={true}
-          onChange={this.handleChangeFile}
-          accept={'.csv,.json'}
-          customButton={button}
-        />
-        <span
-          style={{
-            minHeight: transitionRowHeight,
-            marginTop: '6px',
-          }}
-        >
-          <div
-            className='etl-transition-element step-upload-filename'
-            style={{height: showFileName ? transitionRowHeight : '0px'}}
-          >
-            { showFileName ? file.name : 'Invalid File' }
-          </div>
-        </span>
-      </div>
+      <DatabasePicker
+        language={Languages.Elastic}
+        serverId={-1}
+        database={''}
+        table={''}
+      />
     );
+  }
+
+  public renderPickIndexSection(show: boolean)
+  {
+
   }
 
   public render()
   {
-    const filePicked = this.props.walkthrough.file != null;
+    const { walkthrough } = this.props;
+    const { serverId, database, table } = walkthrough.sink.options as SinkOptionsType<'Database'>;
+    const serverPicked = serverId != null;
+    const databasePicked = database != null;
+    const tablePicked = table != null;
+    const optionsAreGood = serverPicked && databasePicked && tablePicked &&
+      serverId !== -1 && database !== '' && table !== '';
     return (
-      <div className='etl-transition-column etl-upload-step'>
-        { this.renderUploadSection() }
-        <SourceFileTypeOptions
-          hide={!filePicked}
+      <div className='etl-transition-column etl-walkthrough-db-step'>
+        <DatabasePicker
+          language={Languages.Elastic}
+          serverId={-1}
+          database={''}
+          table={''}
         />
         <div className='etl-step-next-button-spacer'>
-          { this._renderNextButton(filePicked) }
+          { this._renderNextButton(optionsAreGood) }
         </div>
       </div>
     );
-  }
-
-  public handleChangeFile(file: File)
-  {
-    const walkthrough = this.props.walkthrough;
-    this.props.act({
-      actionType: 'setState',
-      state: {
-        file,
-        source: _SourceConfig(),
-      },
-    });
-    if (getFileType(file) === FileTypes.Json)
-    {
-      this.props.act({
-        actionType: 'autodetectJsonOptions',
-        file,
-      });
-    }
-
   }
 }
 
 const transitionRowHeight = '28px';
 export default Util.createTypedContainer(
-  ETLUploadStep,
+  PickDatabaseStep,
   ['walkthrough'],
   { act: WalkthroughActions },
 );

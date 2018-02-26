@@ -45,11 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file no-unused-expression
 
-import { FileTypes } from './ETLTypes';
+import { FileTypes, Languages } from './ETLTypes';
 
 export enum Sources
 {
   Upload = 'Upload', // from a browser
+  Algorithm = 'Algorithm',
   Sftp = 'Sftp',
   Http = 'Http',
 }
@@ -57,6 +58,7 @@ export enum Sources
 export enum Sinks
 {
   Download = 'Download', // to a browser
+  Database = 'Database',
   Sftp = 'Sftp',
   Http = 'Http',
 }
@@ -88,29 +90,42 @@ export interface SinkConfig
 interface SourceOptionsTypes // TODO check that these are right
 {
   Upload: {};
-  Sftp: {
-    ip: string;
-    port: number;
-    filepath: string;
-    credentialId: ID;
+  Algorithm: {
+    algorithmId: ID;
   };
-  Http: {
-    url: string;
-  };
+  Sftp: SftpOptions;
+  Http: HttpOptions
 }
 
 interface SinkOptionsTypes
 {
   Download: {};
-  Sftp: {
-    ip: string;
-    port: number;
-    filepath: string;
-    credentialId: ID;
+  Database: {
+    language: Languages;
+    serverId: ID;
+    database: string;
+    table: string;
   };
-  Http: {
-    url: string; // TODO: What's in a post?
-    args: any;
+  Sftp: SftpOptions;
+  Http: HttpOptions;
+}
+
+interface SftpOptions
+{
+  ip: string;
+  port: number;
+  filepath: string;
+  credentialId: ID;
+  meta?: any;
+}
+
+interface HttpOptions
+{
+  url: string;
+  methods: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  headers: {
+    accept: string;
+    contentType: string;
   };
 }
 
