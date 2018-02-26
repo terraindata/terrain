@@ -186,7 +186,7 @@ async function handleMergeJoinSubQuery(client: ElasticClient, query: object, sub
             continue;
           }
 
-          let k = j;
+          const k = j;
           while (j < response.hits.hits.length &&
             (hits[i]._source[joinKey] === response.hits.hits[j]._source[joinKey]))
           {
