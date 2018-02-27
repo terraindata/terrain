@@ -53,7 +53,6 @@ import cors = require('kcors');
 
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
-import * as Events from './Events';
 import './Logging';
 import Middleware from './Middleware';
 import { Router } from './Router';
@@ -76,7 +75,6 @@ class App
 
   private app: Koa;
   private config: Config.Config;
-  private heapAvail: number;
 
   constructor(config: Config.Config = CmdLineArgs)
   {

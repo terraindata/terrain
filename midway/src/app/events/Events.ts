@@ -104,12 +104,12 @@ export class Events
         lte: request.end,
       })
       .aggregation(
-      'date_histogram',
-      'timestamp',
-      request.agg,
-      {
-        interval: request.interval,
-      },
+        'date_histogram',
+        'timestamp',
+        request.agg,
+        {
+          interval: request.interval,
+        },
     );
     return this.buildQuery(controller, body.build());
   }
@@ -146,53 +146,53 @@ export class Events
       })
 
       .aggregation(
-      'date_histogram',
-      'timestamp',
-      'histogram',
-      {
-        interval: request.interval,
-      },
-      (agg) => agg.aggregation(
-        'filter',
-        undefined,
-        numerator,
+        'date_histogram',
+        'timestamp',
+        'histogram',
         {
-          term: {
-            eventname: eventnames[0],
-          },
+          interval: request.interval,
         },
-        (agg1) => agg1.aggregation(
-          'value_count',
-          'eventname.keyword',
-          'count',
-        ),
-      )
-        .aggregation(
-        'filter',
-        undefined,
-        denominator,
-        {
-          term: {
-            eventname: eventnames[1],
+        (agg) => agg.aggregation(
+          'filter',
+          undefined,
+          numerator,
+          {
+            term: {
+              eventname: eventnames[0],
+            },
           },
-        },
-        (agg1) => agg1.aggregation(
-          'value_count',
-          'eventname.keyword',
-          'count',
-        ),
-      )
-        .aggregation(
-        'bucket_script',
-        undefined,
-        rate,
-        {
-          buckets_path: {
-            [numerator]: numerator + '>count',
-            [denominator]: denominator + '>count',
-          },
-          script: 'params.' + numerator + ' / params.' + denominator,
-        }),
+          (agg1) => agg1.aggregation(
+            'value_count',
+            'eventname.keyword',
+            'count',
+          ),
+        )
+          .aggregation(
+            'filter',
+            undefined,
+            denominator,
+            {
+              term: {
+                eventname: eventnames[1],
+              },
+            },
+            (agg1) => agg1.aggregation(
+              'value_count',
+              'eventname.keyword',
+              'count',
+            ),
+        )
+          .aggregation(
+            'bucket_script',
+            undefined,
+            rate,
+            {
+              buckets_path: {
+                [numerator]: numerator + '>count',
+                [denominator]: denominator + '>count',
+              },
+              script: 'params.' + numerator + ' / params.' + denominator,
+            }),
     );
 
     return this.buildQuery(controller, body.build());
@@ -243,7 +243,7 @@ export class Events
       try
       {
         const fields = request.field.split(',');
-        body = body.rawOption('_source', request.field);
+        body = body.rawOption('_source', fields);
       }
       catch (e)
       {

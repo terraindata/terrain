@@ -50,14 +50,8 @@ import * as winston from 'winston';
 import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 import { makePromiseCallback } from '../../Utils';
 
-// make sure importing ESCardParser before importing ElasticToCards
-import ESCardParser from 'src/database/elastic/conversion/ESCardParser';
-
-import { ElasticValueInfoToCards, parseCardFromValueInfo } from 'src/database/elastic/conversion/ElasticToCards';
-
 import * as Immutable from 'immutable';
 import ESParserError from 'shared/database/elastic/parser/ESParserError';
-import CardsToElastic from 'src/database/elastic/conversion/CardsToElastic';
 
 function getExpectedFile(): string
 {
@@ -75,30 +69,24 @@ beforeAll(async (done) =>
   {
     fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
   });
-
   expected = JSON.parse(contents);
   done();
 });
 
-function testCardParse(testName: string,
+function testCardParseWithInputParameter(testName: string,
   testString: string,
   expectedValue: any,
+  inputParameter: any,
   expectedErrors: ESParserError[] = [])
 {
-  winston.info('testing "' + testName + '": "' + testString + '"');
+  winston.info('testing "' + testName + '": "' + testString + '"' + '": "' + JSON.stringify(inputParameter) + '"');
   const emptyCards = Immutable.List([]);
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
+  const parameters = { number: 10 };
+  const interpreter: ESInterpreter = new ESInterpreter(testString, parameters);
   const parser: ESJSONParser = interpreter.parser as ESJSONParser;
   const rootValueInfo = parser.getValueInfo();
-  const rootCards = ElasticValueInfoToCards(rootValueInfo, Immutable.List([]));
-  // parse the card
-  const rootCard = rootCards.get(0);
-  expect(rootCard['type']).toEqual('eqlbody');
-  const cardParser = new ESCardParser(rootCard);
-  // interpreting the parsed card
-  const cardInterpreter = new ESInterpreter(cardParser);
-  expect(cardInterpreter.errors).toEqual(expectedErrors);
-  expect(CardsToElastic.blockToElastic(rootCard)).toEqual(expectedValue);
+  expect(rootValueInfo.value).toEqual(expectedValue);
+  expect(interpreter.errors).toEqual(expectedErrors);
 }
 
 test('parse card', () =>
@@ -107,6 +95,9 @@ test('parse card', () =>
     (testName: string) =>
     {
       const testValue: any = expected[testName];
-      testCardParse('test', JSON.stringify(testValue), testValue);
+      const testString = testValue['query'];
+      const inputParameter = testValue['parameter'];
+      const expectedValue = testValue['expect'];
+      testCardParseWithInputParameter('test', testString, expectedValue, inputParameter);
     });
 });

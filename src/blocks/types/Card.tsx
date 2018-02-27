@@ -98,6 +98,8 @@ export interface Card extends IRecord<Card>
   errors: List<string>;
   keyDisplayType: DisplayType;
   hidden: boolean;
+  // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
+  mapZoomValue?: number;
 
   // the following fields are excluded from the server save
   static: {
@@ -121,9 +123,6 @@ export interface Card extends IRecord<Card>
     tqlGlue?: string;
     topTql?: string;
 
-    // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
-    map_text?: string;
-
     anythingAccepts?: boolean;
 
     // returns an object with default values for a new card
@@ -137,7 +136,7 @@ export interface Card extends IRecord<Card>
     // TODO schemaState type is : SchemaTypes.SchemaState
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
-    getParentTerms?: (card: Card, schemaState) => List<string>;
+    getParentTerms?: (card: Card, schemaState, builderState) => List<string>;
     // returns terms for its parent and its neighbors (but not its parent's neighbors)
 
     preview: string | ((c: Card) => string);
@@ -181,7 +180,7 @@ export interface CardConfig
 
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
-    getParentTerms?: (card: Card, schemaState) => List<string>;
+    getParentTerms?: (card: Card, schemaState, builderState) => List<string>;
 
     description?: string;
 
@@ -192,7 +191,7 @@ export interface CardConfig
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['disabled', 'closed', 'tuning', 'tuningClosed', 'map_text']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['disabled', 'closed', 'tuning', 'tuningClosed']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
@@ -210,7 +209,7 @@ export const _card = (config: CardConfig) =>
     disabled: false,
     tuning: false,
     tuningClosed: false,
-    map_text: '',
+    mapZoomValue: 15,
   });
 
   if (config.static.metaFields)

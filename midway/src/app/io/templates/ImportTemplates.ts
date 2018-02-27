@@ -50,15 +50,11 @@ import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
 import UserConfig from '../../users/UserConfig';
 import * as Util from '../../Util';
-import ExportTemplateConfig from './ExportTemplateConfig';
 import ImportTemplateBaseStringified from './ImportTemplateBaseStringified';
 import ImportTemplateConfig from './ImportTemplateConfig';
-import { TemplateBase } from './TemplateBase';
-import { TemplateBaseStringified } from './TemplateBaseStringified';
 
 export class ImportTemplates
 {
-  private exportTemplateTable: Tasty.Table;
   private importTemplateTable: Tasty.Table;
 
   constructor()
@@ -75,6 +71,7 @@ export class ImportTemplates
         'persistentAccessToken',
         'primaryKeyDelimiter',
         'primaryKeys',
+        'requireJSONHaveAllFields',
         'tablename',
         'transformations',
       ],
@@ -199,6 +196,7 @@ export class ImportTemplates
         originalNames: JSON.parse(stringified['originalNames']),
         primaryKeyDelimiter: stringified['primaryKeyDelimiter'],
         primaryKeys: JSON.parse(stringified['primaryKeys']),
+        requireJSONHaveAllFields: stringified['requireJSONHaveAllFields'] !== undefined ? stringified['requireJSONHaveAllFields'] : false,
         tablename: stringified['tablename'],
         transformations: JSON.parse(stringified['transformations']),
       };
@@ -213,10 +211,12 @@ export class ImportTemplates
         columnTypes: JSON.stringify(template['columnTypes']),
         dbid: template['dbid'],
         dbname: template['dbname'],
+        id: template['id'],
         name: template['name'],
         originalNames: JSON.stringify(template['originalNames']),
         primaryKeyDelimiter: (template['primaryKeyDelimiter'] === undefined ? '-' : template['primaryKeyDelimiter']) as string,
         primaryKeys: JSON.stringify(template['primaryKeys']),
+        requireJSONHaveAllFields: template['requireJSONHaveAllFields'] !== undefined ? template['requireJSONHaveAllFields'] : false,
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };

@@ -44,86 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as asyncBusboy from 'async-busboy';
 import * as fs from 'fs';
-import * as http from 'http';
 import * as request from 'request';
 import * as rimraf from 'rimraf';
 
-import { exportTemplates } from './io/templates/ExportTemplateRouter';
-import { importTemplates } from './io/templates/ImportTemplateRouter';
-import UserConfig from './users/UserConfig';
-import Users from './users/Users';
-
-const users = new Users();
-
-export async function authenticateNormal(req: object): Promise<UserConfig | null>
-{
-  return new Promise<UserConfig | null>(async (resolve, reject) =>
-  {
-    resolve(await users.loginWithAccessToken(Number(req['id']), req['accessToken']));
-  });
-}
-
-export async function authenticateStream(req: http.IncomingMessage): Promise<object>
-{
-  return new Promise<object>(async (resolve, reject) =>
-  {
-    const { files, fields } = await asyncBusboy(req);
-    const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-    resolve({ files, fields, user });
-  });
-}
-
-export async function authenticatePersistentAccessToken(req: object): Promise<object>
-{
-  return new Promise<object>(async (resolve, reject) =>
-  {
-    if (req['templateId'] === undefined || req['persistentAccessToken'] === undefined)
-    {
-      return reject('Missing one or more auth fields.');
-    }
-    const importTemplate: object[] =
-      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
-    const exportTemplate: object[] =
-      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
-    const template = importTemplate.concat(exportTemplate);
-    if (template.length === 0)
-    {
-      return resolve({ template: null });
-    }
-    resolve({ template: template[0] });
-  });
-}
-
-export async function authenticateStreamPersistentAccessToken(req: http.IncomingMessage): Promise<object>
-{
-  return new Promise<object>(async (resolve, reject) =>
-  {
-    try
-    {
-      const { files, fields } = await asyncBusboy(req);
-      if (fields['templateId'] === undefined || fields['persistentAccessToken'] === undefined)
-      {
-        return reject(`Missing one or more auth fields. ${fields['templateId']} , ${fields['persistentAccessToken']}`);
-      }
-      const importTemplate: object[] =
-        await importTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
-      const exportTemplate: object[] =
-        await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
-      const template = importTemplate.concat(exportTemplate);
-      if (template.length === 0)
-      {
-        return resolve({ files, fields, template: null });
-      }
-      return resolve({ files, fields, template: template[0] });
-    }
-    catch (e)
-    {
-      return resolve({ template: null });
-    }
-  });
-}
+import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
+import ESParser from '../../../shared/database/elastic/parser/ESParser';
+import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
 
 export function getEmptyObject(payload: object): object
 {
@@ -162,7 +89,7 @@ export function getEmptyObject(payload: object): object
     emptyObj);
 }
 
-export function getRequest(url)
+export function doRequest(url)
 {
   return new Promise((resolve, reject) =>
   {
@@ -269,4 +196,32 @@ export async function writeFile(fileName: string, data: string, options: object)
   {
     fs.writeFile(fileName, data, options, makePromiseCallbackVoid(resolve, reject));
   });
+}
+
+export function getParsedQuery(body: string): ESParser
+{
+  const parser = new ESJSONParser(body, true);
+  if (parser.hasError())
+  {
+    const es = parser.getErrors();
+    const errors: MidwayErrorItem[] = [];
+
+    es.forEach((e) =>
+    {
+      const row = (e.token !== null) ? e.token.row : 0;
+      const col = (e.token !== null) ? e.token.col : 0;
+      const pos = (e.token !== null) ? e.token.charNumber : 0;
+      const title: string = String(row) + ':' + String(col) + ':' + String(pos) + ' ' + String(e.message);
+      errors.push({ status: -1, title, detail: '', source: {} });
+    });
+
+    if (errors.length === 0)
+    {
+      errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
+    }
+
+    throw errors;
+  }
+
+  return parser;
 }

@@ -53,6 +53,9 @@ import { Colors } from '../../../colors/Colors';
 // consider upgrading d3 to v4, which has available types
 // import * as d3 from 'd3';
 const d3 = require('d3');
+const moment = require('moment');
+
+import ElasticBlockHelpers from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import Util from '../../../util/Util';
 
 const xMargin = 45;
@@ -123,7 +126,8 @@ const Periscope = {
 
     state.numBars = 10;
     const scales = this._scales(el, state.maxDomain, state.domain, state.barsData, state.width, state.height);
-    this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart, state.colors);
+    this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart, state.colors,
+      state.inputKey, state.schema, state.builder);
   },
 
   destroy(el)
@@ -143,13 +147,18 @@ const Periscope = {
       .attr('fill', Colors().transformChartBg);
   },
 
-  _drawAxes(el, scales)
+  _drawAxes(el, scales, inputKey, schema, builder)
   {
+    const isDate = ElasticBlockHelpers.getColumnType(schema, builder, inputKey) === 'date';
+    const numTicks = isDate ? 3 : 6;
+    const tickFormatFn = isDate ?
+      ((n: number): string => moment(new Date(n)).format('YYYY-MM-DD')) : Util.formatNumber;
+
     const bottomAxis = d3.svg.axis()
       .scale(scales.x)
-      .ticks(6)
+      .ticks(numTicks)
       .tickSize(10)
-      .tickFormat(Util.formatNumber)
+      .tickFormat(tickFormatFn)
       .orient('bottom');
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
@@ -265,14 +274,14 @@ const Periscope = {
     handle.exit().remove();
   },
 
-  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors)
+  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors, inputKey, schema, builder)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    this._drawAxes(el, scales);
+    this._drawAxes(el, scales, inputKey, schema, builder);
     this._drawBars(el, scales, barsData, colors);
     this._drawLine(el, scales, domain);
     this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);

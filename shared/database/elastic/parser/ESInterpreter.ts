@@ -112,23 +112,39 @@ export default class ESInterpreter
       {
         root.clause = this.config.getClause('body');
       }
+
+      let alias = 'parent';
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
           if (info.parameter !== undefined)
           {
-            if (info.parameter.split('.')[0] === 'parent')
+            const ps = info.parameter.split('.');
+            if (ps[0] === alias)
             {
-              return false;
+              // give a special value to parameterValue
+              info.parameterValue = new ESJSONParser(info.value);
             }
-
-            const value: null | any = this.params[info.parameter];
-            if (value === undefined)
+            else
             {
-              this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
-            }
+              let value: any = this.params;
+              for (const p of ps)
+              {
+                value = value[p];
 
-            return false; // don't validate parameters
+                if (value === undefined)
+                {
+                  this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
+                  return true;
+                }
+              }
+
+              info.parameterValue = new ESJSONParser(JSON.stringify(value));
+              if (info.parameterValue.hasError())
+              {
+                this.accumulateError(info, 'Unable to parse parameter (' + info.parameter + ':' + JSON.stringify(value) + ')');
+              }
+            }
           }
 
           if (info.clause !== undefined)
@@ -137,7 +153,16 @@ export default class ESInterpreter
           }
 
           return true;
-        });
+        },
+        (info: ESValueInfo): boolean =>
+        {
+          if (info.clause !== undefined && info.clause.type === 'parentAlias')
+          {
+            alias = info.value;
+          }
+          return true;
+        },
+      );
     } catch (e)
     {
       this.accumulateError(this.rootValueInfo, 'Failed to mark the json object ' + String(e.message));

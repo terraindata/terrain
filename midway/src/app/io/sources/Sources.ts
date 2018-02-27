@@ -45,18 +45,25 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
+import { Magento } from './Magento';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
+export const magento: Magento = new Magento();
 export const mySQL: MySQL = new MySQL();
 
 export interface SourceConfig
 {
   type: string;
   params: object;
+}
+
+export interface ExportSourceConfig
+{
+  params: object;
+  stream: stream.Readable;
 }
 
 export interface ImportSourceConfig
@@ -69,7 +76,31 @@ export interface ImportSourceConfig
 export class Sources
 {
 
-  public async handleTemplateSource(body: object): Promise<ImportSourceConfig | string>
+  public async handleTemplateSourceExport(body: object, readStream: stream.Readable): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      let result = '';
+      const exprtSourceConfig: ExportSourceConfig | string =
+        {
+          params: {},
+          stream: readStream,
+        };
+      const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
+      exprtSourceConfig.params = sourceConfig.params;
+      switch (sourceConfig.type)
+      {
+        case 'magento':
+          result = await this._putJSONStreamIntoMagento(exprtSourceConfig);
+          break;
+        default:
+          break;
+      }
+      return resolve(result);
+    });
+  }
+
+  public async handleTemplateImportSource(body: object): Promise<ImportSourceConfig | string>
   {
     return new Promise<ImportSourceConfig | string>(async (resolve, reject) =>
     {
@@ -149,6 +180,15 @@ export class Sources
           stream: writeStream as stream.Readable,
         };
       return resolve(imprtSourceConfig);
+    });
+  }
+
+  // export private methods
+  private async _putJSONStreamIntoMagento(exprtSourceConfig: ExportSourceConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(exprtSourceConfig)));
     });
   }
 }

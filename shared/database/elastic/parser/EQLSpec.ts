@@ -245,7 +245,7 @@ const EQLSpec: ESClause[] =
         path: ['control'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
-        template: '1000',
+        template: '100',
       }),
     new ESEnumClause('explain_wildcards',
       ['open', 'closed', 'none', 'all'],
@@ -286,6 +286,7 @@ const EQLSpec: ESClause[] =
         ignore_failure: 'boolean',
         all_fields: 'boolean',
         groupJoin: 'groupjoin_clause',
+        mergeJoin: 'mergejoin_clause',
         // ext: 'ext', not much documents about the usage of this ext
         //        _name: 'query_name',
         //        inner_hits: 'inner_hits',
@@ -306,7 +307,7 @@ const EQLSpec: ESClause[] =
           },
           'sort:elasticScore': null,
           'from:from': 0,
-          'size:size': 1000,
+          'size:size': 100,
           'track_scores:track_scores': true,
         },
         suggestions: ['query', 'sort', 'from', 'size'],
@@ -324,9 +325,19 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
       }),
     // Terrain Extension: groupJoin clause
+    new ESStringClause('parentAlias',
+      {
+        path: ['groupjoin'],
+        desc: 'Alias to refer to the parent query.',
+      }),
+    new ESNumberClause('dropIfLessThan',
+      {
+        path: ['groupjoin'],
+        desc: 'Whether groupJoin should ignore documents with less than a given number of results.',
+      }),
     new ESMapClause('groupjoin_clause',
       'groupjoin_name',
-      'body',
+      'groupjoin_body',
       {
         path: ['groupjoin'],
         name: 'groupJoin query',
@@ -338,6 +349,44 @@ const EQLSpec: ESClause[] =
         path: ['groupjoin'],
         desc: 'names this groupJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
         url: '',
+      }),
+    new ESVariantClause('groupjoin_body',
+      {
+        string: 'parentAlias',
+        number: 'dropIfLessThan',
+        object: 'body',
+      },
+      {
+        path: ['groupjoin'],
+      }),
+    // merge join
+    new ESStringClause('joinKey',
+      {
+        path: ['mergejoin'],
+        desc: 'Common key to join on for the merge join.',
+      }),
+    new ESMapClause('mergejoin_clause',
+      'mergejoin_name',
+      'mergejoin_body',
+      {
+        path: ['mergejoin'],
+        name: 'mergeJoin query',
+        desc: 'Create and name a mergeJoin query.',
+        url: '',
+      }),
+    new ESStringClause('mergejoin_name',
+      {
+        path: ['mergejoin'],
+        desc: 'names this mergeJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
+        url: '',
+      }),
+    new ESVariantClause('mergejoin_body',
+      {
+        string: 'joinKey',
+        object: 'body',
+      },
+      {
+        path: ['mergejoin'],
       }),
     // aggregation
     // AggregatorFactories.java
@@ -1816,6 +1865,7 @@ const EQLSpec: ESClause[] =
       {
         object: 'terms_lookup',
         array: 'base[]',
+        number: 'boost',
       },
       {
         path: ['filter'],

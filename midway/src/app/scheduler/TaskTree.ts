@@ -51,12 +51,8 @@ export class TaskTree
 {
   private tasks: TaskTreeNode[];
 
-  constructor(args?: TaskConfig[])
+  constructor()
   {
-    if (args !== undefined)
-    {
-      this.create(args);
-    }
     this.tasks = [];
   }
 

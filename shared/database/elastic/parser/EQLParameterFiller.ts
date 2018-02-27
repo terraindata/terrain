@@ -68,10 +68,10 @@ export default class ESParameterFiller
     params: { [name: string]: any }): string
   {
     return ESParameterSubstituter.generate(source,
-      (param: string): string =>
+      (param: string, runtimeParam?: string): string =>
       {
         const ps = param.split('.');
-        if (ps[0] === 'parent' && params['parent'] === undefined)
+        if (runtimeParam !== undefined && ps[0] === runtimeParam && params[runtimeParam] === undefined)
         {
           return JSON.stringify('@' + param);
         }
@@ -84,7 +84,7 @@ export default class ESParameterFiller
 
         if (value === undefined)
         {
-          throw new Error('Undefined parameter ' + param + '.');
+          throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
         }
 
         return JSON.stringify(value);

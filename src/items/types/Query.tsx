@@ -51,6 +51,7 @@ import { List, Map, Record } from 'immutable';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import { Aggregation } from '../../app/builder/components/results/ResultTypes';
+import { BaseClass, createRecordType, New } from '../../app/Classes';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
@@ -80,6 +81,7 @@ class QueryC
   inputs: List<any> = List([]);
   resultsConfig = null; //: ResultsConfig = null;
   tql: string = '';
+  tqlMode: 'auto' | 'manual' = 'auto';
   parseTree: ESInterpreter = null;
   lastMutation: number = 0;
   deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
@@ -100,7 +102,7 @@ class QueryC
   cardKeyPaths: Map<ID, KeyPath> = Map<ID, KeyPath>({});
 
 }
-const Query_Record = Record(new QueryC());
+export const Query_Record = createRecordType(new QueryC(), 'QueryC');
 export interface Query extends QueryC, IRecord<Query> { }
 
 export const _Query = (config?: object) =>
@@ -138,6 +140,7 @@ export function queryForSave(query: Query): object
   query = query
     .set('cards', BlockUtils.cardsForServer(query.cards))
     .set('parseTree', null)
+    .set('tqlMode', 'auto')
     .set('resultsConfig', query.resultsConfig.toJS());
   return query.toJS();
 }

@@ -66,8 +66,8 @@ import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
 import TerrainStore from '../../store/TerrainStore';
 import Util from './../../util/Util';
-import Actions from './../data/BuilderActions';
-import { BuilderState, BuilderStore } from './../data/BuilderStore';
+import BuilderActions from './../data/BuilderActions';
+import { BuilderState } from './../data/BuilderState';
 type Algorithm = LibraryTypes.Algorithm;
 
 // Components
@@ -100,13 +100,14 @@ export interface Props
   users?: UserState;
   library?: LibraryTypes.LibraryState;
   algorithmActions: typeof LibraryActions.algorithms;
+  builder?: BuilderState;
+  builderActions?: typeof BuilderActions;
 }
 
 class Builder extends TerrainComponent<Props>
 {
   public state: {
     exportState: FileImportTypes.FileImportState,
-    builderState: BuilderState,
     algorithms: IMMap<ID, Algorithm>,
 
     colKeys: List<number>;
@@ -129,7 +130,6 @@ class Builder extends TerrainComponent<Props>
 
   } = {
       exportState: FileImportStore.getState(),
-      builderState: BuilderStore.getState(),
       algorithms: this.props.library.algorithms,
 
       colKeys: null,
@@ -140,7 +140,7 @@ class Builder extends TerrainComponent<Props>
 
       leaving: false,
       nextLocation: null,
-      tabActions: this.getTabActions(BuilderStore.getState()),
+      tabActions: this.getTabActions(this.props.builder),
 
       nonexistentAlgorithmIds: List([]),
 
@@ -156,24 +156,6 @@ class Builder extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
-    this._subscribe(BuilderStore, {
-      stateKey: 'builderState',
-      updater: (builderState: BuilderState) =>
-      {
-        if (
-          builderState.query !== this.state.builderState.query
-          || builderState.pastQueries !== this.state.builderState.pastQueries
-          || builderState.nextQueries !== this.state.builderState.nextQueries
-          || builderState.isDirty !== this.state.builderState.isDirty
-        )
-        {
-          this.setState({
-            tabActions: this.getTabActions(builderState),
-          });
-        }
-      },
-    });
 
     this._subscribe(FileImportStore, {
       stateKey: 'exportState',
@@ -257,7 +239,7 @@ class Builder extends TerrainComponent<Props>
       return true;
     }
 
-    if (this.shouldSave(BuilderStore.getState()))
+    if (this.shouldSave(this.props.builder))
     {
       // ^ need to pass in the most recent state, because when you've navigated away
       // in a dirty state, saved on the navigation prompt, and then returned,
@@ -292,6 +274,18 @@ class Builder extends TerrainComponent<Props>
   {
     const currentOpen = this.props.location.query && this.props.location.query.o;
     const nextOpen = nextProps.location.query && nextProps.location.query.o;
+
+    if (
+      nextProps.builder.query !== this.props.builder.query
+      || nextProps.builder.pastQueries !== this.props.builder.pastQueries
+      || nextProps.builder.nextQueries !== this.props.builder.nextQueries
+      || nextProps.builder.isDirty !== this.props.builder.isDirty
+    )
+    {
+      this.setState({
+        tabActions: this.getTabActions(nextProps.builder),
+      });
+    }
 
     if (
       nextProps.params.config !== this.props.params.config
@@ -360,7 +354,7 @@ class Builder extends TerrainComponent<Props>
     {
       const algorithm = this.props.library.algorithms.get(+algorithmId);
       // need to fetch data for new query
-      Actions.fetchQuery(algorithmId, this.handleNoAlgorithm, algorithm && algorithm.db);
+      this.props.builderActions.fetchQuery(algorithmId, this.handleNoAlgorithm, algorithm && algorithm.db);
     }
   }
 
@@ -399,7 +393,7 @@ class Builder extends TerrainComponent<Props>
 
   public getQuery(props?: Props): Query
   {
-    return this.state.builderState.query; // || this.loadingQuery;
+    return this.props.builder.query; // || this.loadingQuery;
   }
 
   public getAlgorithm(props?: Props): LibraryTypes.Algorithm
@@ -465,12 +459,12 @@ class Builder extends TerrainComponent<Props>
 
   public handleUndo()
   {
-    Actions.undo();
+    this.props.builderActions.undo();
   }
 
   public handleRedo()
   {
-    Actions.redo();
+    this.props.builderActions.redo();
   }
 
   public onSave()
@@ -505,7 +499,7 @@ class Builder extends TerrainComponent<Props>
 
   public onSaveError(algorithm: Algorithm)
   {
-    Actions.save(false);
+    this.props.builderActions.save(false);
     notificationManager.addNotification(
       'Error Saving',
       '"' + algorithm.name + '" failed to save.',
@@ -548,7 +542,7 @@ class Builder extends TerrainComponent<Props>
       }
     }
 
-    return !!(overrideState || this.state.builderState).isDirty;
+    return !!(overrideState || this.props.builder).isDirty;
   }
 
   public save()
@@ -564,7 +558,7 @@ class Builder extends TerrainComponent<Props>
       // TODO remove if queries/algorithms model changes
       this.props.algorithmActions.change(algorithm);
       this.onSaveSuccess(algorithm);
-      Actions.save(); // register that we are saving
+      this.props.builderActions.save(); // register that we are saving
 
       let configArr = window.location.pathname.split('/')[2].split(',');
       let currentAlgorithm;
@@ -646,7 +640,7 @@ class Builder extends TerrainComponent<Props>
       resizeHandleRef: 'resize-handle',
       content: query && <BuilderColumn
         query={query}
-        resultsState={this.state.builderState.resultsState}
+        resultsState={this.props.builder.resultsState}
         exportState={this.state.exportState}
         index={index}
         colKey={key}
@@ -850,7 +844,7 @@ class Builder extends TerrainComponent<Props>
       (response, newAlgorithm) =>
       {
         this.onSaveSuccess(newAlgorithm);
-        Actions.save();
+        this.props.builderActions.save();
 
         let configArr = window.location.pathname.split('/')[2].split(',');
         let currentAlgorithm;
@@ -957,9 +951,9 @@ class Builder extends TerrainComponent<Props>
         <ResultsManager
           query={query}
           algorithmPath={algorithmIdentifier}
-          resultsState={this.state.builderState.resultsState}
-          db={this.state.builderState.db}
-          onResultsStateChange={Actions.results}
+          resultsState={this.props.builder.resultsState}
+          db={this.props.builder.db}
+          onResultsStateChange={this.props.builderActions.results}
         />
       </div>
     );
@@ -967,7 +961,10 @@ class Builder extends TerrainComponent<Props>
 }
 const BuilderContainer = Util.createTypedContainer(
   Builder,
-  ['library', 'users'],
-  { algorithmActions: LibraryActions.algorithms },
+  ['library', 'users', 'builder'],
+  {
+    algorithmActions: LibraryActions.algorithms,
+    builderActions: BuilderActions,
+  },
 );
 export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer));

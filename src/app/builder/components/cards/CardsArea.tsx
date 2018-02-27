@@ -51,9 +51,10 @@ import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import Util from 'util/Util';
 import { Card, Cards } from '../../../../blocks/types/Card';
-import Actions from '../../data/BuilderActions';
-import { BuilderState, BuilderStore } from '../../data/BuilderStore';
+import BuilderActions from '../../data/BuilderActions';
+import { BuilderState } from '../../data/BuilderState';
 import { CardComponent, CardItem } from '../cards/CardComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardDragPreview from './CardDragPreview';
@@ -84,6 +85,9 @@ export interface Props
   tuningMode?: boolean;
   allowTuningDragAndDrop?: boolean;
   handleCardReorder?: (card, index) => void;
+
+  builder?: BuilderState;
+  builderActions?: typeof BuilderActions;
 }
 
 interface KeyState
@@ -114,36 +118,35 @@ class CardsArea extends TerrainComponent<Props>
   {
     super(props);
     this.state.cardToolOpen = props.cards.size === 0;
+  }
 
-    this._subscribe(BuilderStore, {
-      updater: (state: BuilderState) =>
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.builder.draggingCardItem !== null &&
+      nextProps.builder.draggingOverKeyPath === this.props.keyPath)
+    {
+      // dragging over
+      if (nextProps.builder.draggingOverIndex !== this.state.draggingOverIndex)
       {
-        if (state.draggingCardItem !== null && state.draggingOverKeyPath === this.props.keyPath)
-        {
-          // dragging over
-          if (state.draggingOverIndex !== this.state.draggingOverIndex)
-          {
-            this.setState({
-              isDraggingCardOver: true,
-              draggingOverIndex: state.draggingOverIndex,
-              draggingCardItem: state.draggingCardItem,
-            });
-          }
-        }
-        else
-        {
-          // not dragging over
-          if (this.state.isDraggingCardOver)
-          {
-            this.setState({
-              isDraggingCardOver: false,
-              draggingOverIndex: -1,
-              draggingCardItem: null,
-            });
-          }
-        }
-      },
-    });
+        this.setState({
+          isDraggingCardOver: true,
+          draggingOverIndex: nextProps.builder.draggingOverIndex,
+          draggingCardItem: nextProps.builder.draggingCardItem,
+        });
+      }
+    }
+    else
+    {
+      // not dragging over
+      if (this.state.isDraggingCardOver)
+      {
+        this.setState({
+          isDraggingCardOver: false,
+          draggingOverIndex: -1,
+          draggingCardItem: null,
+        });
+      }
+    }
   }
 
   public copy() { }
@@ -152,7 +155,7 @@ class CardsArea extends TerrainComponent<Props>
 
   public createFromCard()
   {
-    Actions.create(this.props.keyPath, 0, 'sfw');
+    this.props.builderActions.create(this.props.keyPath, 0, 'sfw');
   }
 
   public toggleCardTool()
@@ -196,6 +199,8 @@ class CardsArea extends TerrainComponent<Props>
                   wrapType={card.type}
                   language={this.props.language}
                   handleCardDrop={this.props.handleCardDrop}
+                  builder={this.props.builder}
+                  builderActions={this.props.builderActions}
                 />
                 <CardComponent
                   card={card}
@@ -214,6 +219,7 @@ class CardsArea extends TerrainComponent<Props>
                   tuningMode={this.props.tuningMode}
                   allowTuningDragAndDrop={this.props.allowTuningDragAndDrop}
                   handleCardReorder={this.props.handleCardReorder}
+                  builderActions={this.props.builderActions}
                 />
               </div>,
             )
@@ -229,8 +235,9 @@ class CardsArea extends TerrainComponent<Props>
             singleChild={this.props.singleChild}
             wrapType={this.props.singleChild && cards && cards.size === 1 && cards.get(0).type}
             wrapUp={true}
-            language={this.props.language}
             handleCardDrop={this.props.handleCardDrop}
+            language={this.props.builder.query && this.props.builder.query.language}
+            builderActions={this.props.builderActions}
           />
 
           {
@@ -259,4 +266,8 @@ class CardsArea extends TerrainComponent<Props>
   }
 }
 
-export default CardsArea;
+export default Util.createTypedContainer(
+  CardsArea,
+  ['builder'],
+  { builderActions: BuilderActions },
+);

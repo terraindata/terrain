@@ -55,23 +55,23 @@ import ESValueInfo from './ESValueInfo';
 export default class ESParameterSubstituter
 {
   public static generate(source: ESValueInfo,
-    substitutionFunction: (param: string) => string): string
+    substitutionFunction: (param: string, runtimeParam?: string) => string): string
   {
     return (new ESParameterSubstituter(source, substitutionFunction)).result;
   }
 
-  private substitutionFunction: (param: string) => string;
+  private substitutionFunction: (param: string, runtimeParam?: string) => string;
   private result: string;
 
   public constructor(source: ESValueInfo,
-    substitutionFunction: (param: string) => string)
+    substitutionFunction: (param: string, runtimeParam?: string) => string)
   {
     this.substitutionFunction = substitutionFunction;
     this.result = '';
     this.convert(source);
   }
 
-  public convert(source: ESValueInfo): void
+  public convert(source: ESValueInfo, inShould: boolean = false, inTerms: boolean = false, alias: string = 'parent'): void
   {
     let i: number = 0;
 
@@ -86,7 +86,7 @@ export default class ESParameterSubstituter
       case ESJSONType.string:
         if (source.parameter !== undefined)
         {
-          this.appendParameter(source.parameter);
+          this.appendParameter(source.parameter, inShould && inTerms, alias);
           break;
         }
 
@@ -94,7 +94,7 @@ export default class ESParameterSubstituter
         break;
 
       case ESJSONType.parameter:
-        this.appendParameter(source.parameter as string);
+        this.appendParameter(source.parameter as string, inShould && inTerms, alias);
         break;
 
       case ESJSONType.array:
@@ -107,7 +107,7 @@ export default class ESParameterSubstituter
               this.result += ',';
             }
 
-            this.convert(child);
+            this.convert(child, inShould, inTerms, alias);
           });
         this.result += ']';
         break;
@@ -123,14 +123,43 @@ export default class ESParameterSubstituter
               this.result += ',';
             }
 
-            this.convert(property.propertyName);
+            if (property.propertyName.value === 'groupJoin' && property.propertyValue !== null)
+            {
+              const parentAlias = property.propertyValue.objectChildren['parentAlias'];
+              if (parentAlias !== undefined && parentAlias.propertyValue !== null)
+              {
+                alias = parentAlias.propertyValue.value;
+              }
+            }
+
+            if (property.propertyName.value === 'should')
+            {
+              inShould = true;
+            }
+
+            if (inShould && property.propertyName.value === 'terms')
+            {
+              inTerms = true;
+            }
+
+            this.convert(property.propertyName, inShould, inTerms, alias);
             this.result += ':';
 
             if (property.propertyValue !== null)
             {
-              this.convert(property.propertyValue);
+              this.convert(property.propertyValue, inShould, inTerms, alias);
             }
           });
+
+        if (inShould && !inTerms)
+        {
+          inShould = false;
+        }
+
+        if (inShould && inTerms)
+        {
+          inTerms = false;
+        }
 
         this.result += ' } '; // extra spaces to avoid confusion with mustache tags
         break;
@@ -140,9 +169,14 @@ export default class ESParameterSubstituter
     }
   }
 
-  private appendParameter(param: string): void
+  private appendParameter(param: string, replaceNullWithEmptyArray: boolean, alias?: string): void
   {
-    this.result += this.substitutionFunction(param);
+    let subst = this.substitutionFunction(param, alias);
+    if (replaceNullWithEmptyArray && subst === 'null')
+    {
+      subst = '[]';
+    }
+    this.result += subst;
   }
 
   private appendJSON(value: any): void

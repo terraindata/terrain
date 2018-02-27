@@ -60,6 +60,8 @@ import Blocks from '../blocks/ElasticBlocks';
 
 import ESBaseClause from '../../../../shared/database/elastic/parser/clauses/ESBaseClause';
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
+import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import { FilterUtils } from '../blocks/ElasticFilterCard';
 import ESCardParser from './ESCardParser';
@@ -89,11 +91,11 @@ const UNIT_MAPPINGS = {
   'nautical miles': 'nmi',
 };
 
-export function ElasticValueInfoToCards(rootValueInfo: ESValueInfo, currentCards: Cards)
+export function ElasticValueInfoToCards(rootValueInfo: ESValueInfo, currentCards: Cards, query: Query)
 {
   const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'body');
   const cards = BlockUtils.reconcileCards(currentCards, List([rootCard]));
-  return ESCardParser.parseAndUpdateCards(cards);
+  return ESCardParser.parseAndUpdateCards(cards, query);
 }
 
 export const ElasticCustomCards: { [type: string]: any } =
@@ -116,7 +118,7 @@ export default function ElasticToCards(
     try
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      const cards = ElasticValueInfoToCards(rootValueInfo, query.cards);
+      const cards = ElasticValueInfoToCards(rootValueInfo, query.cards, query);
       return query
         .set('cards', cards)
         .set('cardsAndCodeInSync', true);
@@ -214,8 +216,8 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         distanceType,
         distanceUnit,
         field,
-        geopoint: coords,
-        map_text: '',
+        locationValue: fieldValue,
+        mapInputValue: typeof fieldValue !== 'object' ? fieldValue : '',
       },
       true);
   }
@@ -347,6 +349,7 @@ function parseElasticWeightBlock(obj: object): Block
   }
 
   const card = make(Blocks, 'elasticTransform', {
+    mode: obj['mode'],
     input: obj['numerators'][0][0],
     scorePoints: List(scorePoints),
   }, true);

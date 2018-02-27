@@ -47,6 +47,7 @@
     "prefer-for-of" : false,
     "strict-boolean-expressions" : true,
     "object-literal-sort-keys" : false,
+    "no-unused-variable": true,
     "interface-name" : [
       true,
       "never-prefix"

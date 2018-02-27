@@ -44,10 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
-import { json } from 'd3-request';
 import * as csv from 'fast-csv';
 import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
@@ -59,11 +57,8 @@ import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import { FieldTypes } from '../../../../shared/etl/FieldTypes';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
-import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import Items from '../items/Items';
-import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
 import ImportTemplateConfig from './templates/ImportTemplateConfig';
 import { ImportTemplates } from './templates/ImportTemplates';
@@ -72,7 +67,6 @@ import { TemplateBase } from './templates/TemplateBase';
 const importTemplates = new ImportTemplates();
 
 const fieldTypes = new FieldTypes();
-const TastyItems: Items = new Items();
 const typeParser: CSVTypeParser = new CSVTypeParser();
 
 export interface ImportConfig extends TemplateBase
@@ -107,7 +101,6 @@ export class Import
   private MAX_ACTIVE_READS: number = 3;
   private MAX_ALLOWED_QUEUE_SIZE: number = 3;
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
-  private SCROLL_TIMEOUT: string = '60s';
   private STREAMING_TEMP_FILE_PREFIX: string = 'chunk';
   private STREAMING_TEMP_FOLDER: string = 'import_streaming_tmp';
   private SUPPORTED_COLUMN_TYPES: Set<string> = new Set(Object.keys(this.COMPATIBLE_TYPES).concat(['array']));
@@ -130,12 +123,6 @@ export class Import
       if (typeof isNewlineSeparatedJSON === 'string')
       {
         return reject(isNewlineSeparatedJSON);
-      }
-
-      const requireJSONHaveAllFields: boolean | string = this._parseBooleanField(fields, 'requireJSONHaveAllFields', true);
-      if (typeof requireJSONHaveAllFields === 'string')
-      {
-        return reject(requireJSONHaveAllFields);
       }
 
       let file: stream.Readable | null = null;
@@ -166,6 +153,13 @@ export class Import
       let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
       let jsonBracketRemoved: boolean = !(fields['filetype'] === 'json' && !isNewlineSeparatedJSON);
 
+      const requireJSONHaveAllFieldsDefault: boolean | string = this._parseBooleanField(fields, 'requireJSONHaveAllFields', true);
+
+      if (typeof requireJSONHaveAllFieldsDefault === 'string')
+      {
+        return reject(requireJSONHaveAllFieldsDefault);
+      }
+
       let imprtConf: ImportConfig;
       if (headless)
       {
@@ -186,7 +180,7 @@ export class Import
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
-          requireJSONHaveAllFields,
+          requireJSONHaveAllFields: template['requireJSONHaveAllFields'],
           tablename: template['tablename'],
           transformations: template['transformations'],
           update,
@@ -212,7 +206,8 @@ export class Import
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
-            requireJSONHaveAllFields,
+            requireJSONHaveAllFields: fields['requireJSONHaveAllFields'] === undefined
+              ? requireJSONHaveAllFieldsDefault : JSON.parse(fields['requireJSONHaveAllFields']),
             tablename: fields['tablename'],
             transformations,
             update,
@@ -486,48 +481,6 @@ export class Import
     return typeObj['type'];
   }
 
-  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema,
-    database: string, tableName: string): Promise<object | string>
-  {
-    return new Promise<object | string>(async (resolve, reject) =>
-    {
-      const newDocument: object = document;
-      if (schema.tableNames(database).length === 0)
-      {
-        return resolve('Schema not found for database ' + database);
-      }
-      let tableNameArr: string[] = [];
-      if (tableName !== undefined)
-      {
-        tableNameArr = [tableName];
-      }
-      else
-      {
-        tableNameArr = schema.tableNames(database);
-      }
-      for (const table of tableNameArr)
-      {
-        const fields: object = schema.fields(database, table);
-        const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(fields), Object.keys(document));
-        for (const field of fieldsInMappingNotInDocument)
-        {
-          newDocument[field] = null;
-          // TODO: Case 740
-          // if (fields[field]['type'] === 'text')
-          // {
-          //   newDocument[field] = '';
-          // }
-        }
-        const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(fields));
-        for (const field of fieldsInDocumentNotMapping)
-        {
-          delete newDocument[field];
-        }
-      }
-      resolve(newDocument);
-    });
-  }
-
   /* check for conflicts with existing schema, return error (string) if there is one
    * filters out fields already present in the existing mapping (since they don't need to be inserted)
    * mapping: ES mapping
@@ -644,11 +597,6 @@ export class Import
     }
 
     return '';
-  }
-
-  private _convertArrayToCSVArray(arr: any[]): string
-  {
-    return JSON.stringify(arr);
   }
 
   /* parses string input from CSV and checks against expected types ; handles arrays recursively */
@@ -828,16 +776,6 @@ export class Import
     return '';
   }
 
-  /* assumes arrays are of uniform depth */
-  private _getArrayDepth(obj: any): number
-  {
-    if (Array.isArray(obj))
-    {
-      return this._getArrayDepth(obj[0]) + 1;
-    }
-    return 0;
-  }
-
   /* return ES type from type specification format of ImportConfig
    * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
   private _getESType(typeObject: object, withinArray: boolean = false, isIndexAnalyzed?: string, typeAnalyzer?: string): object
@@ -899,46 +837,6 @@ export class Import
     return fieldTypes.getESMappingFromDocument(imprt.columnTypes);
   }
 
-  /* recursive helper function for _getMappingForSchema(...)
-   * mapping: maps field name (string) to type (string or object (in the case of "object"/"nested" type))
-   * NOTE: contains functionality to handle "object"/"nested" types, though they are not yet supported by Import */
-  private _getMappingForSchemaHelper(mapping: object): object
-  {
-    const body: object = {};
-    for (const key of Object.keys(mapping))
-    {
-      if (mapping.hasOwnProperty(key) && key !== '__isNested__' && mapping[key].hasOwnProperty('type'))
-      {
-        if (typeof mapping[key]['type'] === 'string')
-        {
-          body[key] = { type: mapping[key]['type'] };
-          if (mapping[key]['type'] === 'text' && mapping[key]['index'] === 'not_analyzed')
-          {
-            body[key]['index'] = true;
-            body[key]['type'] = 'keyword';
-            body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256, index: false } };
-          }
-          else if (mapping[key]['type'] === 'text' && mapping[key]['index'] === 'analyzed')
-          {
-            body[key]['index'] = true;
-            body[key]['analyzer'] = mapping[key]['analyzer'];
-            body[key]['fields'] = { keyword: { type: 'keyword', index: true, analyzer: mapping[key]['analyzer'] } };
-          }
-        }
-        else if (typeof mapping[key]['type'] === 'object')
-        {
-          body[key] = this._getMappingForSchemaHelper(mapping[key]);
-        }
-      }
-    }
-    const payload: object = { properties: body };
-    if (mapping['__isNested__'] !== undefined)
-    {
-      payload['type'] = 'nested';
-    }
-    return payload;
-  }
-
   private _getObjectStructureStr(payload: object): string
   {
     let structStr: string = SharedUtil.getType(payload);
@@ -995,6 +893,17 @@ export class Import
     if (thisType === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
     {
       return true;
+    }
+    try
+    {
+      if (typeof JSON.parse(item as any) === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
+      {
+        return true;
+      }
+    }
+    catch (e)
+    {
+      // do nothing
     }
     if (typeObj['type'] !== thisType)
     {
@@ -1073,7 +982,7 @@ export class Import
           }
         }
 
-        if (imprt.requireJSONHaveAllFields !== false)
+        if (imprt['requireJSONHaveAllFields'] !== false)
         {
           const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
           for (const obj of items)

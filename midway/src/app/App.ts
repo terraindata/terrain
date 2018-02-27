@@ -57,6 +57,7 @@ import v8 = require('v8');
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
+import appStats from './AppStats';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
@@ -83,7 +84,7 @@ export class App
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DBUtil.makeDatabaseController(type, dsn);
+    const controller = DBUtil.makeDatabaseController(type, 0, dsn);
     return controller.getTasty();
   }
 
@@ -127,6 +128,46 @@ export class App
       ctx.req.setTimeout(0, () => { });
       await next();
     });
+
+    this.app.use(async (ctx, next) =>
+    {
+      const requestNumber: number = ++appStats.numRequests;
+      const logPrefix: string = 'Request #' + requestNumber.toString() + ': ';
+
+      const start = Date.now();
+      const info: string = JSON.stringify(
+        [
+          ctx.request.ip,
+          ctx.request.headers['X-Orig-IP'],
+          ctx.request.method,
+          ctx.request.type,
+          ctx.request.length,
+          ctx.request.href,
+        ]);
+      winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': BEGIN : ' + info);
+
+      let err: any = null;
+      try
+      {
+        await next();
+      } catch (e)
+      {
+        err = e;
+        appStats.numRequestsThatThrew++;
+        winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': ERROR : ' + info);
+      }
+
+      appStats.numRequestsCompleted++;
+      const ms = Date.now() - start;
+      winston.info(logPrefix + JSON.stringify(appStats.getRequestCounts()) + ': END (' + ms.toString() + 'ms): ' + info);
+
+      if (err !== null)
+      {
+        throw err;
+      }
+
+    });
+
     this.app.use(cors());
     this.app.use(session(undefined, this.app));
 
