@@ -50,6 +50,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
@@ -66,6 +67,7 @@ import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 import './PathfinderScoreStyle.less';
+import { RouteSelector, RouteSelectorOptionSet, RouteSelectorOption } from 'app/common/components/RouteSelector';
 
 export interface Props
 {
@@ -76,6 +78,7 @@ export interface Props
   builderActions?: typeof BuilderActions;
 }
 
+@Radium
 class PathfinderScoreSection extends TerrainComponent<Props>
 {
   public state: {
@@ -139,24 +142,79 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     });
   }
 
-  public renderLinearLineContents(line: ScoreLine, dropdownOptions, index)
+  public getOptionSets(): List<RouteSelectorOptionSet>
+  {
+    const { score, pathfinderContext } = this.props;
+    const { source } = pathfinderContext;
+
+    const fieldOptions = source.dataSource.getChoiceOptions({
+      type: 'transformFields',
+      source,
+      schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
+    });
+
+    const fieldSet: RouteSelectorOptionSet = {
+      key: 'field',
+      options: fieldOptions,
+      shortNameText: 'Data Field',
+      headerText: '',
+      column: true,
+      hideSampleData: true,
+      hasSearch: true,
+    };
+    const orderOptions = List([
+    {
+      displayName: 'ascending',
+      value: 'asc',
+    },
+    {
+      displayName: 'descending',
+      value: 'desc',
+    }
+    ]);
+    const orderSet: RouteSelectorOptionSet = {
+      key: 'sortOrder',
+      options: orderOptions,
+      shortNameText: 'Order',
+      headerText: '',
+      column: true,
+      hideSampleData: true,
+      hasSearch: false,
+    };
+    return List([
+      fieldSet,
+      orderSet,
+    ]);
+  }
+
+  public handleLinearValueChange(i: number, optionSetIndex: number, value: any)
+  {
+    const { props } = this;
+    const { source } = props.pathfinderContext;
+    if (optionSetIndex === 0)
+    {
+      this.props.builderActions.changePath(this.props.keyPath.push('lines').push(i).push('field'), value);
+    }
+    else
+    {
+      this.props.builderActions.changePath(this.props.keyPath.push('lines').push(i).push('sortOrder'), value);
+    }
+  }
+
+  public renderLinearLineContents(line: ScoreLine, index)
   {
     return (
       <div className='pf-linear-score-line'>
-        <Dropdown
-          options={dropdownOptions.map((option) => option.displayName)}
-          selectedIndex={dropdownOptions.map((option) => option.displayName).indexOf(line.field)}
+        <RouteSelector
+          optionSets={this.getOptionSets()}
+          values={List([
+            line.field,
+            line.sortOrder,
+          ])}
+          onChange={this._fn(this.handleLinearValueChange, index)}
           canEdit={this.props.pathfinderContext.canEdit}
-          keyPath={this.props.keyPath.push('lines').push(index).push('field')}
-          action={this.props.builderActions.changePath}
-        />
-        <Dropdown
-          options={List(['asc', 'desc'])}
-          optionsDisplayName={Map({ asc: 'ascending', desc: 'descending' })}
-          selectedIndex={List(['asc', 'desc']).indexOf(line.sortOrder)}
-          canEdit={this.props.pathfinderContext.canEdit}
-          keyPath={this.props.keyPath.push('lines').push(index).push('sortOrder')}
-          action={this.props.builderActions.changePath}
+          defaultOpen={line.field === null}
         />
       </div>
     );
@@ -165,22 +223,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   public getLinearScoreLines(scoreLines)
   {
     const { source, step, canEdit, schemaState, builderState } = this.props.pathfinderContext;
-    let dropdownOptions = List([]);
-    if (source.dataSource.getChoiceOptions !== undefined)
-    {
-      dropdownOptions = source.dataSource.getChoiceOptions({
-        type: 'fields',
-        source,
-        schemaState,
-        builderState,
-      });
-    }
     return (
       scoreLines.map((line, index) =>
       {
         return {
           content: <PathfinderLine
-            children={this.renderLinearLineContents(line, dropdownOptions, index)}
+            children={this.renderLinearLineContents(line, index)}
             index={index}
             canDrag={true}
             canEdit={canEdit}
@@ -189,8 +237,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           />,
           key: String(index),
           draggable: true,
-          dragHandle: <DragHandle />,
-          dragHandleStyle: { 'padding-top': '8px' },
         };
       })
     );
@@ -259,11 +305,16 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   public handleStepChange()
   {
     const { step } = this.props.pathfinderContext;
-
     if (step === PathfinderSteps.Score)
     {
       this.props.onStepChange(step);
     }
+  }
+
+  public randomizeScore()
+  {
+    this.props.builderActions.changePath(this.props.keyPath.push('seed'),
+      Math.round(Math.random() * 100));
   }
 
   public render()
@@ -318,11 +369,25 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             :
             null
         }
+        {
+          this.props.score.type === 'random' &&
+          <div
+            className='pf-score-randomize-button'
+            onClick={this.randomizeScore}
+            style={[
+              fontColor(Colors().fontWhite),
+              backgroundColor(Colors().active),
+            ]}
+          >
+            Randomize
+          </div>
+        }
 
         {
           this.props.pathfinderContext.step === PathfinderSteps.Score &&
           <div
             onClick={this.handleStepChange}
+            style={[]}
             className='pf-step-button'
           >
             Scoring looks good for now

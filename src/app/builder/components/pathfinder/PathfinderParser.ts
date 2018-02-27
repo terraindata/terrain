@@ -138,12 +138,13 @@ function parseScore(score: Score): any
     case 'linear':
       return parseLinearScore(score);
     case 'elastic':
-      return { _score: { order: 'asc' } };
+      return { _score: { order: 'desc' } };
     case 'random':
       return Map({
         function_score: Map({
+          boost_mode: 'sum',
           random_score: {
-            seed: 10,
+            seed: score.seed,
           },
           query: {},
         }),
