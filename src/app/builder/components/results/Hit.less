@@ -191,6 +191,7 @@
         flex-wrap: nowrap;
         height: 43px;
         padding-bottom: 6px;
+        flex-basis: 100%;
       }
     }
 
@@ -438,8 +439,30 @@
 
 // Nested results styling (can move later)
 .hit-nested-content {
-  .result-fields-wrapper.results-are-small{
-    flex-basis: 100%;
+    position: relative;
+  .result {
+    margin: 0px;
+    &:not(:last-child) {
+      border-bottom: 1px solid;
+    }
   }
-
+  .hit-nested-content-header {
+    display: flex;
+    position: relative;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    border: 1px solid;
+    padding: 6px;
+    font-size: 12px;
+    .hit-nested-content-expand {
+      position: absolute;
+      right: 4px;
+    }
+    .hit-nested-content-expand, .hit-nested-content-title {
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
 }

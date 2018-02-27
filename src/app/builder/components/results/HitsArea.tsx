@@ -61,7 +61,6 @@ import Util from 'app/util/Util';
 import Radium = require('radium');
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { getIndex } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
@@ -78,6 +77,7 @@ import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
+import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 
 const HITS_PAGE_SIZE = 20;
 
@@ -118,6 +118,7 @@ interface State
 
   indexName: string;
   resultsConfig?: any;
+  nestedFields: List<string>;
 }
 
 const MAP_MAX_HEIGHT = 300;
@@ -145,6 +146,7 @@ class HitsArea extends TerrainComponent<Props>
     hitSize: 'large',
     indexName: '',
     resultsConfig: undefined,
+    nestedFields: List([]),
   };
 
   public hitsFodderRange = _.range(0, 25);
@@ -153,6 +155,7 @@ class HitsArea extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.setIndexAndResultsConfig(this.props);
+    this.getNestedFields(this.props);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -162,6 +165,10 @@ class HitsArea extends TerrainComponent<Props>
       this.props.query.resultsConfig !== nextProps.query.resultsConfig)
     {
       this.setIndexAndResultsConfig(nextProps);
+    }
+    if (this.props.resultsState.fields !== nextProps.resultsState.fields)
+    {
+      this.getNestedFields(nextProps);
     }
     if (nextProps.query.cards !== this.props.query.cards
       || nextProps.query.inputs !== this.props.query.inputs)
@@ -190,6 +197,29 @@ class HitsArea extends TerrainComponent<Props>
         spotlightHits,
       });
     }
+  }
+
+  public getNestedFields(props)
+  {
+    console.log('GET NESTED FIELDS', props);
+    // Get the fields that are nested
+    const { builder, schema, resultsState } = props;
+    const dataSource = props.query.path.source.dataSource;
+    const nestedFields = resultsState.fields.filter((field) =>
+    {
+      const type = ElasticBlockHelpers.getTypeOfField(
+        schema,
+        builder,
+        field,
+        dataSource,
+        true,
+      );
+      return type === 'nested' || type === '';
+    }).toList();
+    console.log('nested fields are', nestedFields);
+    this.setState({
+      nestedFields,
+    });
   }
 
   public setIndexAndResultsConfig(props: Props)
@@ -284,6 +314,7 @@ class HitsArea extends TerrainComponent<Props>
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
           hitSize={hitSize}
+          nestedFields={this.state.nestedFields}
         />
       </div>
     );
@@ -634,6 +665,7 @@ class HitsArea extends TerrainComponent<Props>
                   onSpotlightAdded={this.handleSpotlightAdded}
                   onSpotlightRemoved={this.handleSpotlightRemoved}
                   hitSize={this.state.hitSize}
+                  nestedFields={this.state.nestedFields}
                 />
               );
             })
@@ -897,7 +929,6 @@ column if you have customized the results view.');
   {
     if (this.state.showingConfig)
     {
-      console.log(this.props);
       return <ResultsConfigComponent
         config={this.props.query.resultsConfig}
         fields={this.props.resultsState.fields}

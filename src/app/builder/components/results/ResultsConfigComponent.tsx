@@ -143,7 +143,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     // When columns is defined, we already are in a nested results config
     // and need to look at these columns to see what fields are nested
     const { columns, builder, schema, dataSource } = props;
-    console.log(props);
     if (columns !== undefined)
     {
       if (List.isList(columns))
@@ -174,7 +173,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         return type === 'nested' || type === '';
       }).toList();
     }
-    console.log('nested fields ', nestedFields);
     this.setState({
       nestedFields,
     });

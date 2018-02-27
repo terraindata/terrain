@@ -74,6 +74,7 @@ const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIco
 // TODO REMOVE
 import Actions from '../../data/BuilderActions';
 
+const NESTED_RESULT_HEIGHT = 55;
 const MAX_DEFAULT_FIELDS = 4;
 
 export interface Props
@@ -89,6 +90,9 @@ export interface Props
   onSpotlightAdded: (id, spotlightData) => void;
   onSpotlightRemoved: (id) => void;
   hitSize?: 'large' | 'small';
+  style?: any;
+  depth?: any;
+  nestedFields?: List<string>;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -109,23 +113,50 @@ class HitComponent extends TerrainComponent<Props> {
 
   public state: {
     hovered: boolean;
-    nestedStates: Immutable.Map<string, string>
+    nestedStates: Immutable.Map<string, string>,
+    nestedFields: string[]
   } =
-    {
-      hovered: false,
-      nestedStates: Map<string, string>({}),
-    };
+  {
+    hovered: false,
+    nestedStates: Map<string, string>({}),
+    nestedFields: undefined,
+  };
 
   public constructor(props: Props)
   {
     super(props);
   }
 
+  public componentWillMount()
+  {
+    this.setState({
+      nestedFields: getResultNestedFields(this.props.hit, this.props.resultsConfig),
+    });
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (!_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS())
+     || !_.isEqual(Util.asJS(this.props.resultsConfig), Util.asJS(nextProps.resultsConfig)))
+    {
+      this.setState({
+        nestedFields: getResultNestedFields(nextProps.hit, nextProps.resultsConfig),
+      })
+    }
+  }
+
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
     for (const key in nextProps)
     {
-      if (key !== 'hit' && this.props[key] !== nextProps[key])
+      if (key === 'resultsConfig' && !_.isEqual(
+        Util.asJS(this.props.resultsConfig),
+        Util.asJS(nextProps.resultsConfig)))
+      {
+        return true;
+      }
+      if (key !== 'hit' && key !== 'resultsConfig'
+        && this.props[key] !== nextProps[key])
       {
         return true;
       }
@@ -138,7 +169,6 @@ class HitComponent extends TerrainComponent<Props> {
         return true;
       }
     }
-
     return !_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS());
   }
 
@@ -162,45 +192,58 @@ class HitComponent extends TerrainComponent<Props> {
     const config = this.props.resultsConfig;
     let format = config && config.enabled && config.formats && config.formats.get(field);
     format = _Format(Util.asJS(format));
-    if (format && format.config !== undefined)
+    let allValues = Util.asJS(this.props.hit.fields.get(field));
+    if (allValues === undefined || allValues.length === undefined)
     {
-      let allValues = Util.asJS(this.props.hit.fields.get(field));
-      if (allValues === undefined)
-      {
-        return null;
-      }
-      const expandState = this.state.nestedStates.get(field);
-      if (expandState === 'normal' || !expandState)
-      {
-        allValues = allValues.slice(0, 1);
-      }
-      return (
-        <div
-          className='hit-nested-content'
-          key={field}
-        >
-          {field}
+      return null;
+    }
+    const expandState = this.state.nestedStates.get(field);
+    const size = allValues.length;
+    if (expandState === 'normal' || !expandState)
+    {
+      allValues = allValues.slice(0, 1);
+    }
+    const height = NESTED_RESULT_HEIGHT * allValues.length;
+    const depth = this.props.depth ? this.props.depth : 0;
+    console.log(this.state.nestedFields);
+    console.log('field', field);
+    console.log('ALL VALUES', allValues);
+    return (
+      <div
+        className='hit-nested-content'
+        key={field}
+        style={[
+          {left: depth * 15},
+          {width: `calc(100% - ${depth * 15}px`}
+        ]}
+      >
+       <div
+         className='hit-nested-content-header'
+         style={[borderColor(Colors().blockOutline), backgroundColor(Colors().blockBg)]}
+       >
           <div
-            className='hit-nested-content-header'
+            className='hit-nested-content-title'
             onClick={this._fn(
               this.changeNestedState,
               expandState !== 'collapsed' ? 'collapsed' : 'normal',
               field)}
           >
-              {expandState !== 'collapsed' ? 'Collapse' : 'Expand'}
+            {field} ({size})
           </div>
-          {
-            expandState === 'expanded' &&
            <div
-            className='hit-nested-content-header'
+            className='hit-nested-content-expand'
             onClick={this._fn(
               this.changeNestedState,
-              'normal',
+              expandState !== 'expanded' ? 'expanded' : 'normal',
               field)}
           >
-              Show Less
+              {expandState === 'expanded' ? 'Show Less' : 'Show More'}
           </div>
-          }
+        </div>
+        <div
+          className='hit-nested-content-values'
+          style={{height: expandState === 'collapsed' ? 0 : height}}
+        >
           {
             expandState !== 'collapsed' &&
             allValues.map((fields, i) =>
@@ -212,70 +255,31 @@ class HitComponent extends TerrainComponent<Props> {
               return (
                 <HitComponent
                   {...this.props}
-                  resultsConfig={format.config}
-                  index={0}
+                  resultsConfig={format && format.config}
+                  index={i}
                   primaryKey={''}
                   expanded={false}
                   allowSpotlights={false}
                   key={field + String(i)}
                   isNested={true}
+                  style={borderColor(Colors().blockOutline)}
                   hitSize='small'
                   hit={_Hit({
                     fields: Map(fields),
                   })}
+                  depth={depth + 1}
+                  nestedFields={undefined}
                 />)
               }
             )
           }
-          {
-            (expandState === 'normal' || !expandState) &&
-            <div
-              className='hit-nested-content-footer'
-              onClick={this._fn(
-                this.changeNestedState,
-                'expanded',
-                field)}
-            >
-                Show More
-            </div>
-           }
-
         </div>
-      );
-    }
-    const allValues = Util.asJS(this.props.hit.fields.get(field));
-    if (allValues === undefined)
-    {
-      return null;
-    }
-    console.log(allValues);
-    if (!allValues.length)
-    {
-      // TODO
-      return null;
-    }
-    return (
-      <div key={field}>
-        {
-          allValues.map((value, i) =>
-            <div key={i}>
-              {
-                _.keys(value).map((key, j) =>
-                  <div key={j}>
-                    {key}: {String(value[key])}
-                  </div>
-                )
-              }
-            </div>
-          )
-        }
       </div>
     );
   }
 
   public renderField(field, index?, fields?, overrideFormat?)
   {
-    // console.log('RENDER FIELDS', field);
     if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
     {
       return null;
@@ -407,7 +411,10 @@ class HitComponent extends TerrainComponent<Props> {
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
-    const nestedFields = getResultNestedFields(hit, resultsConfig);
+    const nestedFields = this.props.nestedFields !== undefined
+        ? this.props.nestedFields.toJS()
+        : this.state.nestedFields !== undefined ?
+        this.state.nestedFields : [];
     const fields = getResultFields(hit, resultsConfig, nestedFields);
     const configHasFields = resultsConfigHasFields(resultsConfig);
     let bottomContent: any;
@@ -449,8 +456,9 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className={classes}
         onDoubleClick={this.expand}
-        onMouseEnter={this._fn(this.handleHover, true)}
-        onMouseLeave={this._fn(this.handleHover, false)}
+        // onMouseEnter={this._fn(this.handleHover, true)}
+        // onMouseLeave={this._fn(this.handleHover, false)}
+        style={this.props.style}
       >
         <div
           className={classNames({
@@ -549,7 +557,7 @@ class HitComponent extends TerrainComponent<Props> {
             }
           </div>
         </div>
-        <div className='hit-nested-content'>
+        <div>
         {
           _.map(nestedFields, this.renderNestedField)
         }
