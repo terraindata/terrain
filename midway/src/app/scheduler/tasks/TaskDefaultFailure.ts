@@ -44,80 +44,29 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'lodash';
+import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { Task } from './Task';
-import { TaskConfig } from './TaskConfig';
-import { TaskTree } from './TaskTree';
+import { TaskConfig, TaskOutputConfig } from './TaskConfig';
 
-export class Job
+export class TaskDefaultFailure extends Task
 {
-  private tasks: TaskConfig[]; // [id]
-  private taskTree: TaskTree;
-
-  /*
-    Job (Jason)
-    Each job is comprised of a series of tasks
-    Use a visitor pattern to avoid recursion
-    Allow jobs to be chained, with conditions (run this task on failure, run a different task on success)
-    Create a unique ID for each job (can be an incrementing long counter)
-    Task
-      For I/O: source/process/sink
-      Can be extended easily for other purposes
-      Wrap each task in a Promise
-      I/O (Integrates with ETL work)
-        Source
-          SFTP/HTTP/Local Filesystem/Magento/MySQL/etc.
-          Input: params (object), type (string)
-          Output: stream.Readable
-        Process
-          Import/Export
-          Input: params (object), stream (stream.Readable)
-          Output: status (string) / result (stream.Readable | string)
-        Sink
-          SFTP/HTTP/Local Filesystem/Magento/MySQL/etc.
-          Input: status (string) / result (stream.Readable | string)
-          Output: result or status (string)
-  */
-  constructor()
+  public async run(task: TaskConfig): Promise<TaskOutputConfig>
   {
-    this.tasks = [];
-    this.taskTree = new TaskTree();
-  }
-
-  /*
-  public async addTask(task: TaskConfig): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
-      if (params.length < 3)
-      {
-        return reject('Insufficient parameters passed. Must be of format <ID, name, type, task parameters>.');
-      }
-      const taskConfig: TaskConfig =
-      {
-        id: Object.keys(this.tasks).length !== 0 ? Math.max(...Object.keys(this.tasks).map((key) => parseInt(key, 10))) + 1 : 1,
-        name,
-        type,
-        task: new Task(params, onSuccess, onFailure),
-      };
-      this.tasks[taskConfig.id] = taskConfig;
-      resolve('Success');
+      // TODO: call other functions (needs to wrap in Promise for later)
+      const taskOutputConfig: TaskOutputConfig =
+        {
+          status: false,
+          exit: true,
+          options:
+            {
+              stream: new stream.passThrough(),
+            },
+        };
+      resolve(taskOutputConfig);
     });
   }
-  */
-
-  public async create(args: TaskConfig[]): Promise<boolean>
-  {
-    this.tasks = args;
-    return this.taskTree.create(args);
-  }
-
-  public async run(): Promise<TaskOutputConfig>
-  {
-    return this.taskTree.visit(this.taskTree);
-  }
 }
-
-export default Job;

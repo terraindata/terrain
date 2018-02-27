@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as fs from 'fs';
 import * as naturalSort from 'javascript-natural-sort';
@@ -61,11 +61,14 @@ import { Export, ExportConfig } from '../io/Export';
 import { Import } from '../io/Import';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
+import { Job } from './Job';
 import SchedulerConfig from './SchedulerConfig';
 
 export const exprt: Export = new Export();
 export const imprt: Import = new Import();
 export const credentials: Credentials = new Credentials();
+
+export const job: Job = new Job();
 
 export class Scheduler
 {

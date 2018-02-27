@@ -44,73 +44,29 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as naturalSort from 'javascript-natural-sort';
-import * as nodeScheduler from 'node-schedule';
-import * as request from 'request';
-import * as Client from 'ssh2-sftp-client';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-import CredentialConfig from '../credentials/CredentialConfig';
-import Credentials from '../credentials/Credentials';
-import DatabaseConfig from '../database/DatabaseConfig';
-import { Export, ExportConfig } from '../io/Export';
-import { Import } from '../io/Import';
-import UserConfig from '../users/UserConfig';
-import { versions } from '../versions/VersionRouter';
-import SchedulerConfig from './SchedulerConfig';
+import { Task } from './Task';
+import { TaskConfig, TaskOutputConfig } from './TaskConfig';
 
-export const exprt: Export = new Export();
-export const imprt: Import = new Import();
-export const credentials: Credentials = new Credentials();
-
-export interface TaskConfig
+export class TaskDefaultExit extends Task
 {
-  id: number;
-  name: string;
-  type: string;
-  task: Task;
-}
-
-export class Task
-{
-
-/*
-  Job (Jason)
-  Each job is comprised of a series of tasks
-  Use a visitor pattern to avoid recursion
-  Allow jobs to be chained, with conditions (run this task on failure, run a different task on success)
-  Create a unique ID for each job (can be an incrementing long counter)
-  Task
-    For I/O: source/process/sink
-    Can be extended easily for other purposes
-    Wrap each task in a Promise
-    I/O (Integrates with ETL work)
-      Source
-        SFTP/HTTP/Local Filesystem/Magento/MySQL/etc.
-        Input: params (object), type (string)
-        Output: stream.Readable
-      Process
-        Import/Export
-        Input: params (object), stream (stream.Readable)
-        Output: status (string) / result (stream.Readable | string)
-      Sink
-        SFTP/HTTP/Local Filesystem/Magento/MySQL/etc.
-        Input: status (string) / result (stream.Readable | string)
-        Output: result or status (string)
-*/
-  constructor(...params)
+  public async run(task: TaskConfig): Promise<TaskOutputConfig>
   {
-    // do something here
-  }
-
-  public async run(...params)
-  {
-    //
+    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
+    {
+      // TODO: call other functions (needs to wrap in Promise for later)
+      const taskOutputConfig: TaskOutputConfig =
+        {
+          status: true,
+          exit: true,
+          options:
+            {
+              stream: new stream.passThrough(),
+            },
+        };
+      resolve(taskOutputConfig);
+    });
   }
 }
-
-export default Task;

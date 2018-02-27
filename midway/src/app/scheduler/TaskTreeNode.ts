@@ -42,82 +42,68 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import * as _ from 'lodash';
-import * as winston from 'winston';
+import { TaskConfig, TaskOutputConfig } from './TaskConfig';
+import { Task } from './tasks/Task';
+import { TaskDefaultExit } from './tasks/TaskDefaultExit';
+import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
+import { TaskExport } from './tasks/TaskExport';
+import { TaskImport } from './tasks/TaskImport';
 
-import { Task } from './Task';
-import { TaskConfig } from './TaskConfig';
-import { TaskTree } from './TaskTree';
+const taskDefaultExit: TaskDefaultExit = new TaskDefaultExit();
+const taskDefaultFailure: TaskDefaultFailure = new TaskDefaultFailure();
 
-export class Job
+export enum TaskEnum
 {
-  private tasks: TaskConfig[]; // [id]
-  private taskTree: TaskTree;
-
-  /*
-    Job (Jason)
-    Each job is comprised of a series of tasks
-    Use a visitor pattern to avoid recursion
-    Allow jobs to be chained, with conditions (run this task on failure, run a different task on success)
-    Create a unique ID for each job (can be an incrementing long counter)
-    Task
-      For I/O: source/process/sink
-      Can be extended easily for other purposes
-      Wrap each task in a Promise
-      I/O (Integrates with ETL work)
-        Source
-          SFTP/HTTP/Local Filesystem/Magento/MySQL/etc.
-          Input: params (object), type (string)
-          Output: stream.Readable
-        Process
-          Import/Export
-          Input: params (object), stream (stream.Readable)
-          Output: status (string) / result (stream.Readable | string)
-        Sink
-          SFTP/HTTP/Local Filesystem/Magento/MySQL/etc.
-          Input: status (string) / result (stream.Readable | string)
-          Output: result or status (string)
-  */
-  constructor()
-  {
-    this.tasks = [];
-    this.taskTree = new TaskTree();
-  }
-
-  /*
-  public async addTask(task: TaskConfig): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      if (params.length < 3)
-      {
-        return reject('Insufficient parameters passed. Must be of format <ID, name, type, task parameters>.');
-      }
-      const taskConfig: TaskConfig =
-      {
-        id: Object.keys(this.tasks).length !== 0 ? Math.max(...Object.keys(this.tasks).map((key) => parseInt(key, 10))) + 1 : 1,
-        name,
-        type,
-        task: new Task(params, onSuccess, onFailure),
-      };
-      this.tasks[taskConfig.id] = taskConfig;
-      resolve('Success');
-    });
-  }
-  */
-
-  public async create(args: TaskConfig[]): Promise<boolean>
-  {
-    this.tasks = args;
-    return this.taskTree.create(args);
-  }
-
-  public async run(): Promise<TaskOutputConfig>
-  {
-    return this.taskTree.visit(this.taskTree);
-  }
+  taskDefaultExit,
+  taskDefaultFailure,
+  taskExport, // TODO implement this
+  taskImport, // TODO implement this
 }
 
-export default Job;
+export class TaskTreeNode
+{
+  private value: TaskConfig;
+
+  constructor(arg: TaskConfig)
+  {
+    this.value = arg;
+  }
+
+  public async visit(): Promise<TaskOutputConfig>
+  {
+    switch (this.value.taskId)
+    {
+      case TaskEnum.taskDefaultExit:
+        return taskDefaultExit.run(this.value);
+      case TaskEnum.taskDefaultFailure:
+        return taskDefaultFailure.run(this.value);
+      case TaskEnum.taskExport:
+        return taskExport.run(this.value);
+      case TaskEnum.taskImport:
+        return taskImport.run(this.value);
+      default:
+        return TaskDefaultExit.run(this.value);
+    }
+  }
+
+  public async recurse(taskNodes: TaskTreeNode[], traversedNodes: number[]): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      if (this.value.type === 'default')
+      {
+        return resolve(true);
+      }
+      if (traversedNodes.includes(this.value.id)
+        || this.value.onSuccess === undefined || this.value.onFailure === undefined
+        || taskNodes[this.value.onSuccess] === undefined || taskNodes[this.value.onFailure] === undefined)
+      {
+        return resolve(false);
+      }
+      resolve(await taskNodes[this.value.onSuccess].recurse(taskNodes, traversedNodes.concat(this.value.id))
+        && await taskNodes[this.value.onFailure].recurse(taskNodes, traversedNodes.concat(this.value.id)));
+    });
+  }
+}
