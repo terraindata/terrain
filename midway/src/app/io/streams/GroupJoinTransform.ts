@@ -148,7 +148,7 @@ export default class GroupJoinTransform extends Readable
 
       // if we have data buffered up to blockSize, swap the input buffer list out
       // and dispatch a subquery block
-      if (this.bufferedInputs.length > this.blockSize ||
+      if (this.bufferedInputs.length >= this.blockSize ||
         this.sourceIsEmpty && this.bufferedInputs.length > 0)
       {
         const inputs = this.bufferedInputs;
