@@ -46,13 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access
 
+import { List, Map } from 'immutable';
+import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as $ from 'jquery';
-import { Map, List } from 'immutable';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import { RouteSelector, RouteSelectorOptionSet, RouteSelectorOption as _RouteSelectorOption } from './RouteSelector';
+import { RouteSelector, RouteSelectorOption as _RouteSelectorOption, RouteSelectorOptionSet } from './RouteSelector';
 
 export type RouteSelectorOption = _RouteSelectorOption;
 
@@ -84,26 +84,8 @@ export class SingleRouteSelector extends TerrainComponent<Props>
     optionSets: this.getOptionSets(this.props),
   };
 
-  componentWillReceiveProps(nextProps: Props)
-  {
-    if (nextProps.value !== this.props.value)
-    {
-      this.setState({
-        values: List([nextProps.value]),
-      });
-    }
-    
-    if (this.optionSetKeys.findIndex((key) => nextProps[key] !== this.props[key]) !== -1)
-    {
-      // an option set property changed; re-memoize
-      this.setState({
-        optionSets: this.getOptionSets(nextProps),
-      });
-    }
-  }
-  
   // keys that play a factor in the option set
-  optionSetKeys = [
+  public optionSetKeys = [
     'options',
     'hasOther',
     'focusOtherByDefault',
@@ -113,7 +95,25 @@ export class SingleRouteSelector extends TerrainComponent<Props>
     'column',
     'hideSampleData',
   ];
-  
+
+  componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.value !== this.props.value)
+    {
+      this.setState({
+        values: List([nextProps.value]),
+      });
+    }
+
+    if (this.optionSetKeys.findIndex((key) => nextProps[key] !== this.props[key]) !== -1)
+    {
+      // an option set property changed; re-memoize
+      this.setState({
+        optionSets: this.getOptionSets(nextProps),
+      });
+    }
+  }
+
   public getOptionSets(props: Props): List<RouteSelectorOptionSet>
   {
     return List([{
@@ -147,7 +147,7 @@ export class SingleRouteSelector extends TerrainComponent<Props>
       />
     );
   }
-  
+
   private handleChange(key, value)
   {
     this.props.onChange(value);

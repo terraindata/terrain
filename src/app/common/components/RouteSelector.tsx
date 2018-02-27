@@ -44,28 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access
+// tslint:disable:strict-boolean-expressions member-access no-console
 
+import Hit from 'builder/components/results/Hit.tsx';
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
+import { List, Map } from 'immutable';
+import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as $ from 'jquery';
-import { List, Map } from 'immutable';
+import { _ResultsConfig, ResultsConfig } from 'shared/results/types/ResultsConfig';
+import Util from 'util/Util';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import './RouteSelectorStyle.less';
-import { FloatingInput, LARGE_FONT_SIZE, FONT_SIZE } from './FloatingInput';
-import SearchInput from './SearchInput';
-import FadeInOut from './FadeInOut';
 import DrawerAnimation from './DrawerAnimation';
-import { ResultsConfig, _ResultsConfig } from 'shared/results/types/ResultsConfig';
-import Hit from 'builder/components/results/Hit.tsx';
-import Util from 'util/Util';
+import FadeInOut from './FadeInOut';
+import { FloatingInput, FONT_SIZE, LARGE_FONT_SIZE } from './FloatingInput';
 import KeyboardFocus from './KeyboardFocus';
-
+import './RouteSelectorStyle.less';
+import SearchInput from './SearchInput';
 
 export interface RouteSelectorOption
 {
@@ -86,12 +85,12 @@ export interface RouteSelectorOptionSet
   focusOtherByDefault?: boolean;
   shortNameText: string;
   headerText: string;
-  
+
   hasSearch?: boolean; // NOTE not compatible with hasOther
   column?: boolean; // force a column layout
   hideSampleData?: boolean; // hide sample data, even if it's present
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
-  
+
   getValueComponent?: (props: { value: any }) => Element;
 }
 
@@ -112,16 +111,16 @@ export interface Props
 export class RouteSelector extends TerrainComponent<Props>
 {
   state = {
-    open: !! this.props.defaultOpen,
+    open: !!this.props.defaultOpen,
     searches: List<string>([]),
-    
+
     focusedSetIndex: this.props.defaultOpen ? 0 : -1,
     focusedOptionIndex: 0,
-    
+
     columnRefs: Map<number, any>({}),
     pickerRef: null,
     // optionRefs: Map({}), // not needed for now, but keeping some logic around
-    
+
     // TODO re-add animation / picked logic
     // picked: false,
     // pickedIndex: -1,
@@ -168,7 +167,7 @@ export class RouteSelector extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private isOpen()
   {
     return this.state.open || this.props.forceOpen;
@@ -177,7 +176,7 @@ export class RouteSelector extends TerrainComponent<Props>
   private renderBoxValue()
   {
     const { props, state } = this;
-    
+
     return (
       <div
         className={classNames({
@@ -197,7 +196,7 @@ export class RouteSelector extends TerrainComponent<Props>
               })}
               key={optionSet.key}
               onClick={this._fn(this.handleSingleBoxValueClick, index)}
-              style={getStyle('width', (100 / props.optionSets.size) + '%')}
+              style={getStyle('width', String(100 / props.optionSets.size) + '%')}
             >
               <FloatingInput
                 label={optionSet.shortNameText}
@@ -208,7 +207,7 @@ export class RouteSelector extends TerrainComponent<Props>
                 large={props.large}
                 noBorder={true}
               />
-                {/*getValueRef={this.handleValueRef}
+              {/*getValueRef={this.handleValueRef}
                 forceFloat={state.picked}*/}
             </div>
           ))
@@ -222,14 +221,14 @@ export class RouteSelector extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private getDisplayName(optionSetIndex: number, optionIndex?: number)
   {
     const { values, optionSets } = this.props;
     const optionSet = optionSets.get(optionSetIndex);
     const options = optionSet.options;
     const wantsCurrentValue = optionIndex === undefined;
-    
+
     if (wantsCurrentValue)
     {
       // default to current value
@@ -242,24 +241,24 @@ export class RouteSelector extends TerrainComponent<Props>
           return name;
         }
       }
-      
-      optionIndex = options.findIndex((option) => option.value === value);
-      
+
+      optionIndex = options.findIndex((opt) => opt.value === value);
+
       if (optionIndex === -1)
       {
         // no value set, or unknown value
         return values.get(optionSetIndex);
       }
     }
-    
+
     const option = options.get(optionIndex);
-    
+
     if (option === undefined || option === null)
     {
       console.warn(`WARNING, non-existent option display name queried: ${optionIndex} from ${optionSetIndex}`);
-      return "";
+      return '';
     }
-    
+
     return option.displayName;
   }
 
@@ -267,7 +266,7 @@ export class RouteSelector extends TerrainComponent<Props>
   {
     this.toggle();
   }
-  
+
   private handleSingleBoxValueClick(optionSetIndex)
   {
     this.setState({
@@ -279,7 +278,7 @@ export class RouteSelector extends TerrainComponent<Props>
   private renderPicker()
   {
     const { props, state } = this;
-    
+
     const pickerInnerContent = (
       <div className='routeselector-picker-inner'>
         {
@@ -287,11 +286,11 @@ export class RouteSelector extends TerrainComponent<Props>
         }
       </div>
     );
-    
+
     return (
       <DrawerAnimation
         open={this.isOpen()}
-        maxHeight={400 /* coordinate this with LESS */ }
+        maxHeight={400 /* coordinate this with LESS */}
       >
         <div
           className={classNames({
@@ -308,19 +307,19 @@ export class RouteSelector extends TerrainComponent<Props>
       </DrawerAnimation>
     );
   }
-  
+
   private renderOptionSet(optionSet: RouteSelectorOptionSet, index: number)
   {
     const { state, props } = this;
     const value = props.values.get(index);
-    
+
     // counter passed down to renderOption to keep track of how many options are currently visible
     //  so that we can get the focused option index correct
-    let visibleOptionCounter = { count: -1 };
-    let incrementVisibleOptions = () => visibleOptionCounter.count ++;
-    
+    const visibleOptionCounter = { count: -1 };
+    const incrementVisibleOptions = () => visibleOptionCounter.count++;
+
     const showTextbox = optionSet.hasSearch || optionSet.hasOther;
-    
+
     let textboxContent = null;
     if (optionSet.hasSearch)
     {
@@ -341,7 +340,7 @@ export class RouteSelector extends TerrainComponent<Props>
       textboxContent = (
         <FloatingInput
           value={value}
-          label={'Value' /* TODO confirm copy */ }
+          label={'Value' /* TODO confirm copy */}
           onChange={this._fn(this.handleOtherChange, index)}
           autoFocus={state.focusedSetIndex === index && optionSet.focusOtherByDefault}
           isTextInput={true}
@@ -352,7 +351,7 @@ export class RouteSelector extends TerrainComponent<Props>
         />
       );
     }
-    
+
     let getValueComponentContent = null;
     if (optionSet.getValueComponent)
     {
@@ -364,12 +363,12 @@ export class RouteSelector extends TerrainComponent<Props>
         </div>
       );
     }
-    
+
     return (
       <div
         className='routeselector-option-set'
         key={optionSet.key}
-        style={getStyle('width', (100 / props.optionSets.size) + '%')}
+        style={getStyle('width', String(100 / props.optionSets.size) + '%')}
       >
         <div
           className='routeselector-header'
@@ -387,11 +386,11 @@ export class RouteSelector extends TerrainComponent<Props>
               <div
                 className='routeselector-search'
               >
-                { 
+                {
                   textboxContent
                 }
               </div>
-            :
+              :
               <KeyboardFocus
                 index={0 /* we handle index manipulation internally in this class */}
                 length={0}
@@ -419,40 +418,40 @@ export class RouteSelector extends TerrainComponent<Props>
           }
         </div>
       </div>
-    )
+    );
   }
-  
+
   private handleOtherChange(optionSetIndex: number, searchValue: string)
   {
     this.handleValueChange(optionSetIndex, searchValue);
   }
-  
+
   private handleOptionSearch(optionSetIndex: number, searchValue: string)
   {
     this.setState({
       searches: this.state.searches.set(optionSetIndex, searchValue),
     });
   }
-  
+
   private handleOptionSearchFocus(optionSetIndex: number)
   {
     let focusedOptionIndex = 0;
-    
+
     const focusedSet = this.props.optionSets.get(optionSetIndex);
     if (focusedSet && focusedSet.focusOtherByDefault)
     {
       focusedOptionIndex = -1;
     }
-    
+
     this.setState({
       focusedSetIndex: optionSetIndex,
       focusedOptionIndex,
     });
   }
-  
+
   private handleOptionSearchFocusLost(optionSetIndex: number)
   {
-    setTimeout(() => 
+    setTimeout(() =>
     {
       if (this.state.focusedSetIndex === optionSetIndex)
       {
@@ -462,17 +461,17 @@ export class RouteSelector extends TerrainComponent<Props>
       }
     }, 200);
   }
-  
+
   private handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>)
   {
     const { keyCode } = e;
     const { optionSets } = this.props;
-    
+
     let { focusedOptionIndex, focusedSetIndex } = this.state;
     let tabbed = false;
     let entered = false;
     let escaped = false;
-    
+
     // express desired change in appropriate index
     switch (keyCode)
     {
@@ -516,16 +515,16 @@ export class RouteSelector extends TerrainComponent<Props>
           focusedOptionIndex = -1;
         }
     }
-    
+
     // gate between allowable values
     focusedSetIndex = Util.valueMinMax(focusedSetIndex, 0, optionSets.size - 1);
-    
+
     if (escaped)
     {
       this.close();
       return;
     }
-    
+
     if (focusedSetIndex !== -1)
     {
       focusedOptionIndex = Util.valueMinMax(focusedOptionIndex, -1, optionSets.get(focusedSetIndex).options.size - 1);
@@ -534,14 +533,13 @@ export class RouteSelector extends TerrainComponent<Props>
     {
       focusedOptionIndex = -1;
     }
-    
-    
+
     if (entered)
     {
       if (focusedOptionIndex !== -1)
       {
         const options = optionSets.get(focusedSetIndex).options;
-        
+
         // Need to find which option was highlit when enter was pressed
         let realOptionIndex = 0;
         let visibleOptionsIndex = -1;
@@ -549,44 +547,44 @@ export class RouteSelector extends TerrainComponent<Props>
         {
           if (this.shouldShowOption(options.get(realOptionIndex), this.state.searches.get(focusedSetIndex)))
           {
-            visibleOptionsIndex ++;
+            visibleOptionsIndex++;
           }
-          realOptionIndex ++;
+          realOptionIndex++;
         }
         realOptionIndex -= 1;
-        
+
         this.handleOptionClick(focusedSetIndex, options.get(realOptionIndex).value);
       }
-      
-      focusedSetIndex ++;
+
+      focusedSetIndex++;
       focusedOptionIndex = 0;
-      
+
       const nextSet = optionSets.get(focusedSetIndex);
       if (nextSet && nextSet.focusOtherByDefault)
       {
         focusedOptionIndex = -1;
       }
-      
+
       if (focusedSetIndex >= optionSets.size)
       {
         // entered out
         this.close();
       }
     }
-    
+
     // TODO handle tabbing OUT of routeselector
-    
+
     this.setState({
       focusedSetIndex,
       focusedOptionIndex,
     });
-    
+
     // TODO make this more declarative, to avoid forced reflow
     setTimeout(() =>
     {
       const el = document.getElementsByClassName('routeselector-option-focused')[0];
-      
-      if(el)
+
+      if (el)
       {
         el.scrollIntoView({
           behavior: 'smooth',
@@ -596,7 +594,7 @@ export class RouteSelector extends TerrainComponent<Props>
       }
     }, 100);
   }
-  
+
   private renderOption(optionSetIndex: number, visibleOptionCounter: { count: number }, incrementVisibleOptions: () => void,
     option: RouteSelectorOption, index: number)
   {
@@ -605,16 +603,16 @@ export class RouteSelector extends TerrainComponent<Props>
     const search = state.searches.get(optionSetIndex);
     const isShowing = this.shouldShowOption(option, search);
     const isSelected = props.values.get(optionSetIndex) === option.value;
-    
+
     if (isShowing)
     {
       incrementVisibleOptions();
     }
-    
+
     const visibleOptionsIndex = visibleOptionCounter.count;
-    
+
     return (
-      <div 
+      <div
         className='routeselector-option-wrapper'
         key={index}
       >
@@ -632,20 +630,20 @@ export class RouteSelector extends TerrainComponent<Props>
               // 'routeselector-option-picked': this.state.pickedIndex === index, // when it's just been picked
             })}
             onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
-            
+
           >
             <div
               className='routeselector-option-name'
               style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
-              key={'optionz-' + index + '-' + optionSetIndex}
+              key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
             >
               {
                 option.icon !== undefined &&
-                  <div className='routeselector-option-icon'>
-                    {
-                      option.icon
-                    }
-                  </div>
+                <div className='routeselector-option-icon'>
+                  {
+                    option.icon
+                  }
+                </div>
               }
               <div className='routeselector-option-name-inner'>
                 {
@@ -653,99 +651,99 @@ export class RouteSelector extends TerrainComponent<Props>
                 }
               </div>
             </div>
-            
+
             {
               option.sampleData && !optionSet.hideSampleData &&
-                <div className='routeselector-data'>
-                  <div className='routeselector-data-header'>
-                    Sample Data
+              <div className='routeselector-data'>
+                <div className='routeselector-data-header'>
+                  Sample Data
                   </div>
-                  {
-                    option.sampleData.map(this.renderSampleDatum)
-                  }
-                  {
-                    option.sampleData.size === 0 &&
-                      <div
-                      >
-                        {/* TODO styling */}
-                        No data available
+                {
+                  option.sampleData.map(this.renderSampleDatum)
+                }
+                {
+                  option.sampleData.size === 0 &&
+                  <div
+                  >
+                    {/* TODO styling */}
+                    No data available
                       </div>
-                  }
-                </div>
+                }
+              </div>
             }
           </div>
         </FadeInOut>
       </div>
     );
   }
-  
+
   private shouldShowOption(option: RouteSelectorOption, search: string)
   {
     if (!search || search.length === 0)
     {
       return true;
     }
-    
+
     const searchFields = [option.value, option.displayName];
 
     if (
       searchFields.findIndex(
-      (field) => 
-      {
-        if (typeof field === 'string')
+        (field) =>
         {
-          return field.toUpperCase().indexOf(search.toUpperCase()) >= 0;
-        }
-        
-        return false;
-      }
+          if (typeof field === 'string')
+          {
+            return field.toUpperCase().indexOf(search.toUpperCase()) >= 0;
+          }
+
+          return false;
+        },
       ) >= 0)
     {
       return true;
     }
-    
+
     return false;
   }
-  
+
   private handleOptionClick(optionSetIndex: number, value: any)
   {
     const { state, props } = this;
-    
+
     this.handleValueChange(optionSetIndex, value);
-    
+
     this.setState({
       // searches: state.searches.set(optionSetIndex, ''), // this would clear the search when an option is chosen
       focusedSetIndex: optionSetIndex + 1,
       focusedOptionIndex: 0,
     });
-    
-    const option = props.optionSets.get(optionSetIndex).options.find((option) => option.value === value);
-    
+
+    const option = props.optionSets.get(optionSetIndex).options.find((opt) => opt.value === value);
+
     if (optionSetIndex === props.optionSets.size - 1 || (option && option.closeOnPick))
     {
       this.close();
     }
-    
+
     // TODO re-add animations
-    
+
     // if (state.picked)
     // {
     //   // double clicked
     //   return;
     // }
-    
+
     // let animationEl = null;
-    
+
     // if (pickedIndex !== this.getCurrentIndex())
     // {
     //   // animation, if we're changing value
-      
+
     //   const optionBox = ReactDOM.findDOMNode(this.refs['option-' + pickedIndex]).getBoundingClientRect();
     //   const valueEl = ReactDOM.findDOMNode(state.valueRef);
     //   const valueBox = valueEl.getBoundingClientRect();
-      
+
     //   const option = this.props.options.get(pickedIndex);
-      
+
     //   animationEl = $("<div>" + option.displayName + "</div>")
     //     .addClass("routeselector-option-name")
     //     .css("position", "fixed")
@@ -758,9 +756,9 @@ export class RouteSelector extends TerrainComponent<Props>
     //     .css("box-sizing", "border-box")
     //     .css("z-index", 9999)
     //     ;
-        
+
     //   $("body").append(animationEl);
-      
+
     //   animationEl.animate(
     //     {
     //       left: valueBox.left,
@@ -769,8 +767,8 @@ export class RouteSelector extends TerrainComponent<Props>
     //       // height: valueBox.height, // can make it collapse to 0
     //       padding: '20px 18px 4px 18px',
     //       fontSize: props.large ? LARGE_FONT_SIZE : FONT_SIZE,
-    //     }, 
-    //     700, 
+    //     },
+    //     700,
     //     () =>
     //     {
     //       // use a timeout to make the end of the animation smooth
@@ -778,10 +776,10 @@ export class RouteSelector extends TerrainComponent<Props>
     //         $(valueEl).css("opacity", 1);
     //         this.handleValueChange(this.state.pickedIndex);
     //       }, 150);
-          
+
     //     }
     //   );
-      
+
     //   $(valueEl).css("opacity", 1);
     //   $(valueEl).animate({
     //       opacity: 0,
@@ -792,22 +790,22 @@ export class RouteSelector extends TerrainComponent<Props>
     // {
     //   // close without dispatching a value change
     //   setTimeout(() => {
-          // this.close();
+    // this.close();
     //   }, 850);
     // }
-    
+
     // this.setState({
     //   picked: true,
     //   pickedIndex,
     //   animationEl,
     // });
   }
-  
+
   private handlePickAnimationEnd()
   {
-    
+    //
   }
-  
+
   private cleanUpAnimation()
   {
     // if (this.state.animationEl !== null)
@@ -815,14 +813,14 @@ export class RouteSelector extends TerrainComponent<Props>
     //   this.state.animationEl.remove();
     // }
   }
-  
+
   private handleValueChange(optionSetIndex: number, value: any)
   {
     const { props } = this;
     props.onChange(optionSetIndex, value);
     // setTimeout(this.cleanUpAnimation, 150);
   }
-  
+
   private renderSampleDatum(data: any, index: number)
   {
     return (
@@ -839,28 +837,28 @@ export class RouteSelector extends TerrainComponent<Props>
       />
     );
   }
-  
+
   private renderVeil()
   {
     if (this.props.noShadow)
     {
       return null;
     }
-    
+
     const isOpen = this.isOpen();
     return (
-      <div 
-        className={'routeselector-veil' + (isOpen ? '-open' : '')} 
+      <div
+        className={'routeselector-veil' + (isOpen ? '-open' : '')}
         onClick={this.handleVeilClick}
       />
     );
   }
-  
+
   private handleVeilClick()
   {
     this.close();
   }
-  
+
   private handleCloseClick()
   {
     if (this.state.open)
@@ -869,17 +867,17 @@ export class RouteSelector extends TerrainComponent<Props>
     }
     else
     {
-      
+      //
     }
   }
-  
+
   private open()
   {
     this.setState({
       open,
     });
   }
-  
+
   private close()
   {
     this.setState({
@@ -891,7 +889,7 @@ export class RouteSelector extends TerrainComponent<Props>
       focusedOptionIndex: -1,
     });
   }
-  
+
   private toggle()
   {
     if (this.state.open)
@@ -903,30 +901,30 @@ export class RouteSelector extends TerrainComponent<Props>
       this.open();
     }
   }
-  
+
   private handleValueRef(valueRef)
   {
     this.setState({
       valueRef,
     });
   }
-  
+
   private attachColumnRef(optionSetIndex, columnRef)
   {
     this.setState({
       columnRefs: this.state.columnRefs.set(optionSetIndex, columnRef),
     });
   }
-  
+
   // private attachOptionRef(setIndex, optionIndex, optionRef)
   // {
   //   let { optionRefs } = this.state;
-    
+
   //   if (!optionRefs.get(setIndex))
   //   {
   //     optionRefs = optionRefs.set(setIndex, Map({}));
   //   }
-    
+
   //   this.setState({
   //     columnRefs: optionRefs.setIn([setIndex, optionIndex], optionRef),
   //   });
@@ -934,10 +932,10 @@ export class RouteSelector extends TerrainComponent<Props>
 }
 
 const OPTION_NAME_STYLE = {
-  color: Colors().fontColor,
+  'color': Colors().fontColor,
   ':hover': {
     color: Colors().active,
-  }
+  },
 };
 
 const OPTION_NAME_SELECTED_STYLE = {

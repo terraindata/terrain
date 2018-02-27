@@ -113,7 +113,7 @@ interface State
   mouseStartY?: number;
   mapMaxHeight?: number;
   spotlightHits?: Immutable.Map<string, any>;
-  
+
   indexName: string;
   resultsConfig?: any;
 }
@@ -636,7 +636,7 @@ class HitsArea extends TerrainComponent<Props>
               );
             })
           }
-          
+
         </div>
       );
     }
@@ -808,12 +808,12 @@ column if you have customized the results view.');
       </div>
     );
   }
-  
+
   public toggleHitSize()
   {
     this.setState({
       hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
-    })
+    });
   }
 
   public showExport()

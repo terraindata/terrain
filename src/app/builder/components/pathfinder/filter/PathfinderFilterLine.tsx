@@ -61,11 +61,11 @@ import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import DatePicker from 'app/common/components/DatePicker';
 import Dropdown from 'app/common/components/Dropdown';
 import MapComponent, { units } from 'app/common/components/MapComponent';
+import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
-import { RouteSelector, RouteSelectorOptionSet, RouteSelectorOption } from 'app/common/components/RouteSelector';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -138,11 +138,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private renderPicker()
   {
-    const { props, state} = this;
-    
+    const { props, state } = this;
+
     const fieldValue = props.filterLine.field;
     const comparisonValue = props.filterLine.comparison;
     const valueValue = this.shouldShowValue() ? props.filterLine.value : '';
@@ -151,7 +151,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       comparisonValue,
       valueValue,
     ]);
-    
+
     return (
       <RouteSelector
         optionSets={this.getOptionSets() /* TODO store in state? */}
@@ -162,7 +162,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       />
     );
   }
-  
+
   private shouldShowValue(): boolean
   {
     const { filterLine } = this.props;
@@ -171,15 +171,15 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       return false;
     }
-    
+
     if (COMPARISONS_WITHOUT_VALUES.indexOf(filterLine.comparison) !== -1)
     {
       return false;
     }
-    
+
     return true;
   }
-  
+
   private getOptionSets(): List<RouteSelectorOptionSet>
   {
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
@@ -192,7 +192,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
     });
-    
+
     const fieldSet: RouteSelectorOptionSet = {
       key: 'field',
       options: fieldOptions,
@@ -203,13 +203,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       hasSearch: true,
       // hasOther: false,
     };
-    
+
     let comparisonOptions = List<RouteSelectorOption>();
     let comparisonHeader = 'Choose a data field first';
     if (filterLine.field)
     {
       comparisonHeader = '';
-      
+
       comparisonOptions = source.dataSource.getChoiceOptions({
         type: 'comparison',
         field: filterLine.field,
@@ -229,7 +229,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         return option;
       }).toList();
     }
-    
+
     const comparisonSet: RouteSelectorOptionSet = {
       key: 'comparison',
       options: comparisonOptions,
@@ -239,12 +239,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       hideSampleData: true,
       // hasOther: false,
     };
-    
-    
+
     let valueOptions = List<RouteSelectorOption>();
     let valueHeader = '';
     const shouldShowValue = this.shouldShowValue();
-      
+
     if (shouldShowValue)
     {
       // TODO add more value options
@@ -254,11 +253,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         builderState: pathfinderContext.builderState,
       });
     }
-    else if(filterLine.field && !filterLine.comparison)
+    else if (filterLine.field && !filterLine.comparison)
     {
       valueHeader = 'Choose a method next';
     }
-    
+
     const canShowValueInput = filterLine.fieldType !== FieldType.Geopoint;
     // LK
     const valueSet: RouteSelectorOptionSet = {
@@ -274,8 +273,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       getCustomDisplayName: this.getCustomValueDisplayName,
       // otherComponent: TODO,
     };
-    
-    
+
     return List([
       fieldSet,
       comparisonSet,
@@ -283,7 +281,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       // boostSet?
     ]);
   }
-  
+
   private getCustomValueDisplayName(value, setIndex: number)
   {
     switch (this.props.filterLine.fieldType)
@@ -293,18 +291,17 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         {
           return '';
         }
-        
         return Util.formatDate(value, true);
+      default:
+        return undefined;
     }
-    
-    return undefined;
   }
-  
+
   private handleFilterPickerChange(optionSetIndex: number, value: any)
   {
     const { props } = this;
     const { source } = props.pathfinderContext;
-    
+
     switch (optionSetIndex)
     {
       case 0:
@@ -318,17 +315,17 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         const fieldChoice = fieldOptions.find((option) => option.value === value);
         this.handleChange('field', value, fieldChoice.meta.fieldType, true);
         return;
-        
+
       case 1:
         this.handleChange('comparison', value);
         return;
-        
+
       case 2:
         this.handleChange('value', value);
         return;
+      default:
+        throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
     }
-    
-    throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
   }
 
   // private renderField()
@@ -341,7 +338,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   //     source,
   //     schemaState: pathfinderContext.schemaState,
   //   });
-    
+
   //   return (
   //     <RouteSelector
   //       value={filterLine.field}
@@ -395,7 +392,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     );
   }
 
-  // some data types have a better way to enter the value than with a 
+  // some data types have a better way to enter the value than with a
   //  textbox and list of options (e.g., dates and maps)
   // this returns those components for those data types
   private renderValueComponent()
@@ -407,7 +404,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       return null;
     }
-    
+
     const comparisonOptions = source.dataSource.getChoiceOptions({
       type: 'comparison',
       field: filterLine.field,
@@ -416,7 +413,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
     });
-    
+
     switch (filterLine.fieldType)
     {
       case FieldType.Numerical:
@@ -465,7 +462,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   action={this.props.onChange}
                 />
               </div>
-              
+
               <MapComponent
                 geocoder='photon'
                 inputValue={props.value && props.value.address}
@@ -479,7 +476,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               />
             </div>
         );
-        );
+        )
 
       case FieldType.Ip:
         return () => (

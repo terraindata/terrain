@@ -110,9 +110,9 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const { source, step, canEdit } = this.props.pathfinderContext;
     const { dataSourceOptions } = this.state;
-    
+
     const pickerIsForcedOpen = step === PathfinderSteps.Source;
-    
+
     return (
       <div
         className='pf-section'
@@ -137,11 +137,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const { props } = this;
     const keyPath = props.keyPath.push('dataSource');
-    
+
     // BuilderActions.changePath(keyPath, value);
     props.builderActions.changePath(keyPath.push('index'), value);
     // BuilderActions.changePath(keyPath.push('types'), value.tableIds);
-    
+
     if (props.pathfinderContext.step === PathfinderSteps.Source)
     {
       props.onStepChange(props.pathfinderContext.step);

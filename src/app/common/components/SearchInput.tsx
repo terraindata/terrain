@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands
+// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands no-var-requires
 
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
@@ -89,7 +89,7 @@ export class SearchInput extends TerrainComponent<Props>
       this.autoFocus();
     }
   }
-  
+
   public componentDidMount()
   {
     //
@@ -151,9 +151,12 @@ export class SearchInput extends TerrainComponent<Props>
     this.setState({
       isFocused: true,
     });
-    
+
     const { props } = this;
-    props.onFocus && props.onFocus(props.id);
+    if (props.onFocus !== undefined)
+    {
+      props.onFocus(props.id);
+    }
   }
 
   private handleBlur()
@@ -162,14 +165,17 @@ export class SearchInput extends TerrainComponent<Props>
       isFocused: false,
     });
   }
-  
+
   private getValueRef(ref)
   {
     this.setState({
       valueRef: ref,
     });
-    
-    this.props.getValueRef && this.props.getValueRef(ref);
+
+    if (this.props.getValueRef)
+    {
+      this.props.getValueRef(ref);
+    }
   }
 
   private handleKeyDown(e)
@@ -180,15 +186,19 @@ export class SearchInput extends TerrainComponent<Props>
       case 13: // enter
         ReactDOM.findDOMNode(this.state.valueRef)['blur']();
         break;
+      default:
+        break;
     }
-    
-    this.props.onKeyDown && this.props.onKeyDown(e);
+    if (this.props.onKeyDown)
+    {
+      this.props.onKeyDown(e);
+    }
   }
-  
+
   private autoFocus()
   {
     // force focus, needed if component has mounted and autoFocus flag changes
-    let { valueRef } = this.state;
+    const { valueRef } = this.state;
     if (valueRef)
     {
       const valueEl = ReactDOM.findDOMNode(valueRef);
@@ -210,10 +220,10 @@ const INPUT_STYLE = {
   color: Colors().fontColor,
   background: Colors().blockBg,
   borderColor: Colors().blockBg,
-  
+
   // hover sometimes get stuck; also, I'm not sure if we want that
   // ':hover': FOCUSED_INPUT_STYLE,
-}
+};
 
 const FOCUSED_WRAPPER_STYLE = {
   // color needed to trigger the fill: currentColor for SVG
@@ -222,7 +232,7 @@ const FOCUSED_WRAPPER_STYLE = {
 
 const WRAPPER_STYLE = {
   color: Colors().fontColorLightest,
-  
+
   // ':hover': FOCUSED_WRAPPER_STYLE,
 };
 

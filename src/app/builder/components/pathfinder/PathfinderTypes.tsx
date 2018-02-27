@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable no-var-requires
 
 /*
   User Friendly Builder, Codename: Pathfinder
@@ -85,6 +85,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
 import Util from 'app/util/Util';
+import { _Hit, Hit } from 'builder/components/results/ResultTypes';
 // import TerrainTools from 'util/TerrainTools';
 import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
@@ -92,7 +93,6 @@ import { SchemaState } from 'schema/SchemaTypes';
 import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
-import { Hit, _Hit } from 'builder/components/results/ResultTypes';
 
 export enum PathfinderSteps
 {
@@ -469,15 +469,15 @@ type ChoiceContext = {
 class ElasticDataSourceC extends DataSource
 {
   public index: string = '';
-  
+
   // TODO remove
   public types: List<string> = List([]);
-  
+
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
     // TODO this function needs to be refactored
     const server = context.builderState.db.name;
-    
+
     if (context.type === 'source')
     {
       // we need to make it clear what parts of Source are tracked
@@ -515,9 +515,9 @@ class ElasticDataSourceC extends DataSource
       return sources.map((source) =>
       {
         const databaseId = source.value; // String(source.value.serverId) + '/' + String(source.value.name);
-        
-        let sampleData = sourceExamples[databaseId];
-        
+
+        const sampleData = sourceExamples[databaseId];
+
         return _ChoiceOption({
           displayName: source.displayName,
           value: source.value,
@@ -910,18 +910,17 @@ export const AggregationTypes = Map<string, AggregationData>({
     },
 });
 
-
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 // TODO need more icons
 
-const fieldTypeToIcon = 
-{
-  [FieldType.Any]: TextIcon, // TODO
-  [FieldType.Date]: DateIcon,
-  [FieldType.Geopoint]: TextIcon, // TODO
-  [FieldType.Ip]: TextIcon,
-  [FieldType.Numerical]: NumberIcon,
-  [FieldType.Text]: TextIcon,
-}
+const fieldTypeToIcon =
+  {
+    [FieldType.Any]: TextIcon, // TODO
+    [FieldType.Date]: DateIcon,
+    [FieldType.Geopoint]: TextIcon, // TODO
+    [FieldType.Ip]: TextIcon,
+    [FieldType.Numerical]: NumberIcon,
+    [FieldType.Text]: TextIcon,
+  };

@@ -171,7 +171,7 @@ class PathfinderArea extends TerrainComponent<Props>
             onStepChange={this.incrementStep}
             source={path.source}
           />
-          
+
           <FadeInOut
             open={path.step >= PathfinderSteps.Filter}
           >
@@ -183,7 +183,7 @@ class PathfinderArea extends TerrainComponent<Props>
               toSkip={this.props.toSkip}
             />
           </FadeInOut>
-          
+
           <FadeInOut
             open={path.step >= PathfinderSteps.Score}
           >
@@ -194,7 +194,7 @@ class PathfinderArea extends TerrainComponent<Props>
               onStepChange={this.incrementStep}
             />
           </FadeInOut>
-          
+
           <FadeInOut
             open={path.step >= PathfinderSteps.More}
           >

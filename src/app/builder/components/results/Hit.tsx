@@ -53,7 +53,8 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
-import { ResultsConfig, _ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import Draggable from 'react-draggable';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
@@ -65,7 +66,6 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
 import { Hit } from './ResultTypes';
-import Draggable from 'react-draggable';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -73,7 +73,6 @@ const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIco
 
 // TODO REMOVE
 import Actions from '../../data/BuilderActions';
-
 
 const MAX_DEFAULT_FIELDS = 4;
 
@@ -321,7 +320,7 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       );
     }
-    
+
     if (!resultsConfig)
     {
       resultsConfig = _ResultsConfig();
@@ -348,45 +347,45 @@ class HitComponent extends TerrainComponent<Props> {
         >
           {
             thumbnail &&
-              [
-                <div 
-                  className={classNames({
-                    'result-thumbnail-wrapper': true,
-                    'results-are-small': hitSize === 'small',
-                  })}
-                  style={{
-                    backgroundImage: `url(${thumbnail})`,
-                    width: thumbnailWidth,
-                    minWidth: thumbnailWidth,
-                  }}
-                  key={1}
-                >
-                </div>
+            [
+              <div
+                className={classNames({
+                  'result-thumbnail-wrapper': true,
+                  'results-are-small': hitSize === 'small',
+                })}
+                style={{
+                  backgroundImage: `url(${thumbnail})`,
+                  width: thumbnailWidth,
+                  minWidth: thumbnailWidth,
+                }}
+                key={1}
+              >
+              </div>
               ,
               this.state.hovered &&
-                <Draggable
-                  axis='x'
-                  bounds='parent'
-                  position={{
-                    x: thumbnailWidth - 15,
-                    y: 0,
-                  }}
-                  onDrag={this.handleThumbnailResize}
-                  key={2}
-                >
-                  <div
-                    className='result-thumbnail-resizer'
-                  />
-                </Draggable>
+              <Draggable
+                axis='x'
+                bounds='parent'
+                position={{
+                  x: thumbnailWidth - 15,
+                  y: 0,
+                }}
+                onDrag={this.handleThumbnailResize}
+                key={2}
+              >
+                <div
+                  className='result-thumbnail-resizer'
+                />
+              </Draggable>,
             ]
           }
-          <div 
+          <div
             className={classNames({
               'result-details-wrapper': true,
               'results-are-small': hitSize === 'small',
             })}
           >
-            <div 
+            <div
               className={classNames({
                 'result-name': true,
                 'results-are-small': hitSize === 'small',
@@ -436,25 +435,25 @@ class HitComponent extends TerrainComponent<Props> {
       </div>
     ));
   }
-  
+
   private handleHover(hovered: boolean)
   {
     this.setState({
       hovered,
     });
   }
-  
-  private handleThumbnailResize(e, data: { 
+
+  private handleThumbnailResize(e, data: {
     x: number, y: number,
     deltaX: number, deltaY: number,
   })
   {
-    const {x, y} = data;
-    
+    const { x, y } = data;
+
     let config = this.props.resultsConfig;
     const key = this.props.hitSize === 'small' ? 'smallThumbnailWidth' : 'thumbnailWidth';
     config = config.set(key, Math.max(config[key] + data.deltaX, 15));
-    
+
     Actions.changeResultsConfig(config);
   }
 }
@@ -573,11 +572,11 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     {
       case 'image':
         const url = format.template.replace(/\[value\]/g, value as string);
-        if(bgUrlOnly)
+        if (bgUrlOnly)
         {
           return url;
         }
-        
+
         return (
           <div
             className='result-field-value-image-wrapper'

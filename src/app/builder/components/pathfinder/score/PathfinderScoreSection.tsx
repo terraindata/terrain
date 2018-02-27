@@ -261,7 +261,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   public handleStepChange()
   {
     const { step } = this.props.pathfinderContext;
-    
+
     if (step === PathfinderSteps.Score)
     {
       this.props.onStepChange(step);

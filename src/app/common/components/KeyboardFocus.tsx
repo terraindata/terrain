@@ -72,11 +72,11 @@ const STYLE: {
 
 class KeyboardFocus extends TerrainComponent<Props>
 {
-  
+
   handleKeyDown(e)
   {
     const { onIndexChange, onSelect, onKeyDown, index, length } = this.props;
-    
+
     switch (e.keyCode)
     {
       case 40:
@@ -90,7 +90,7 @@ class KeyboardFocus extends TerrainComponent<Props>
       case 13:
         onSelect(index);
     }
-    
+
     if (onKeyDown !== undefined)
     {
       onKeyDown(e);

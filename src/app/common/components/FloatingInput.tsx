@@ -50,8 +50,8 @@ import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
-import * as ReactDOM from 'react-dom';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import styled, { StyledFunction } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -60,7 +60,6 @@ export let LARGE_FONT_SIZE = '52px';
 export let FONT_SIZE = '18px';
 export let LARGE_LABEL_FLOATING_FONT_SIZE = '14px';
 export let LABEL_FLOATING_FONT_SIZE = '10px';
-
 
 const ContainerC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
 const Container = ContainerC`
@@ -74,11 +73,11 @@ const Container = ContainerC`
   box-sizing: border-box;
   min-width: 100px;
   background: ${Colors().textboxBg};
-  
+
   &:hover {
     border-color: ${Colors().active};
   }
-  
+
   ${(props) => props['noBorder'] && (`
     border: none !important;
     background: none;
@@ -97,16 +96,16 @@ const Label = LabelC`
   color: ${Colors().text3};
   cursor: pointer;
   text-transform: uppercase;
-  
-  font-size: ${(props) => 
+
+  font-size: ${(props) =>
+  {
+    if (props.isFloating)
     {
-      if (props.isFloating)
-      {
-        return props.large ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
-      }
-      
-      return props.large ? LARGE_FONT_SIZE : FONT_SIZE;  
-    }};
+      return props.large ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
+    }
+
+    return props.large ? LARGE_FONT_SIZE : FONT_SIZE;
+  }};
 `;
 
 const floatingLabelStyle = {
@@ -207,7 +206,7 @@ export class FloatingInput extends TerrainComponent<Props>
       this.autoFocus();
     }
   }
-  
+
   public componentDidMount()
   {
     //
@@ -253,17 +252,17 @@ export class FloatingInput extends TerrainComponent<Props>
   private isFloating()
   {
     const { value, forceFloat } = this.props;
-    
+
     if (this.state.isFocused || forceFloat)
     {
       return true;
     }
-    
+
     if (value === undefined || value === null)
     {
       return false;
     }
-    
+
     if (('' + value).length > 0)
     {
       return true;
@@ -327,9 +326,12 @@ export class FloatingInput extends TerrainComponent<Props>
     this.setState({
       isFocused: true,
     });
-    
+
     const { props } = this;
-    props.onFocus && props.onFocus(props.id);
+    if (props.onFocus)
+    {
+      props.onFocus(props.id);
+    }
   }
 
   private handleBlur()
@@ -338,14 +340,16 @@ export class FloatingInput extends TerrainComponent<Props>
       isFocused: false,
     });
   }
-  
+
   private getValueRef(ref)
   {
     this.setState({
       valueRef: ref,
     });
-    
-    this.props.getValueRef && this.props.getValueRef(ref);
+    if (this.props.getValueRef)
+    {
+      this.props.getValueRef(ref);
+    }
   }
 
   private handleKeyDown(e)
@@ -356,15 +360,19 @@ export class FloatingInput extends TerrainComponent<Props>
       case 13: // enter
         ReactDOM.findDOMNode(this.state.valueRef)['blur']();
         break;
+      default:
+        break;
     }
-    
-    this.props.onKeyDown && this.props.onKeyDown(e);
+    if (this.props.onKeyDown)
+    {
+      this.props.onKeyDown(e);
+    }
   }
-  
+
   private autoFocus()
   {
     // force focus, needed if component has mounted and autoFocus flag changes
-    let { valueRef } = this.state;
+    const { valueRef } = this.state;
     if (valueRef)
     {
       const valueEl = ReactDOM.findDOMNode(valueRef);

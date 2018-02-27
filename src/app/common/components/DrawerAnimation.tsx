@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
+import { getStyle } from 'app/colors/Colors';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import { getStyle } from 'app/colors/Colors';
 const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
 import './DrawerAnimationStyle.less';
 
@@ -62,23 +62,21 @@ export interface Props
 
 class DrawerAnimation extends TerrainComponent<Props>
 {
-  state = {
+  public state = {
     contentRef: null,
   };
-  
+
   public render()
   {
     const { open, maxHeight, children } = this.props;
-    
-    
+
     // we need to duplicate the children content
     // so that we can get the wrapper to size dynamically
     // to the content (in a hidden copy) and show the real copy
     // pinned to the bottom edge of the wrapper
-    
+
     // TODO consider an optimization that only renders the children when the thing is open
-    
-    
+
     return (
       <div
         className='drawer-animation'
@@ -100,7 +98,7 @@ class DrawerAnimation extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   public componentWillReceiveProps(nextProps: Props)
   {
     if (!this.props.open && nextProps.open)
@@ -109,8 +107,8 @@ class DrawerAnimation extends TerrainComponent<Props>
       setTimeout(() =>
       {
         const el = ReactDOM.findDOMNode(this.state.contentRef);
-      
-        if (el)
+
+        if (el !== undefined)
         {
           el.scrollIntoView({
             behavior: 'smooth',

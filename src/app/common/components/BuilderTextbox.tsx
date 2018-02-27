@@ -189,7 +189,7 @@ class BuilderTextbox extends TerrainComponent<Props>
       });
     }
   }
-  
+
   public getCreatingType(): string
   {
     if (!this.props.language)
