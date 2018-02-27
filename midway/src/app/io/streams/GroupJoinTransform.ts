@@ -69,10 +69,9 @@ export default class GroupJoinTransform extends Readable
 
   private query: string;
 
-  private blockSize = 512;
-  private maxPendingQueries: number = 8;
+  private blockSize: number = 256;
+  private maxPendingQueries: number = 4;
 
-  private pendingQueries: number = 0;
   private maxBufferedInputs: number;
   private bufferedInputs: object[];
   private maxBufferedOutputs: number;
@@ -123,7 +122,6 @@ export default class GroupJoinTransform extends Readable
 
     this.maxBufferedInputs = this.blockSize;
     this.bufferedInputs = [];
-
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
@@ -166,8 +164,8 @@ export default class GroupJoinTransform extends Readable
   public _read(size: number = 1024)
   {
     if (!this.sourceIsEmpty
-      && this.bufferedOutputs.length < this.maxBufferedOutputs
-      && this.pendingQueries < this.maxPendingQueries)
+      && this.bufferedInputs.length < this.maxBufferedInputs
+      && this.bufferedOutputs.length < this.maxBufferedOutputs)
     {
       this.continueReading = true;
     }
@@ -208,7 +206,6 @@ export default class GroupJoinTransform extends Readable
         }
       }
 
-      this.pendingQueries++;
       this.client.msearch(
         {
           body,
@@ -231,10 +228,13 @@ export default class GroupJoinTransform extends Readable
             {
               ticket.results[j][subQuery] = response.responses[j].hits.hits;
             }
+            else
+            {
+              ticket.results[j][subQuery] = [];
+            }
           }
 
           ticket.count--;
-          this.pendingQueries--;
 
           // check if we have anything to push to the output stream
           let done = false;
@@ -245,7 +245,19 @@ export default class GroupJoinTransform extends Readable
             {
               while (front.results.length > 0)
               {
-                this.push(front.results.shift());
+                const obj = front.results.shift();
+                if (obj !== undefined)
+                {
+                  const shouldPass = Object.keys(query).reduce((shouldPass, subQuery) =>
+                    {
+                      return shouldPass && (obj[subQuery] !== undefined && obj[subQuery].length >= this.dropIfLessThan)
+                    }, true);
+
+                  if (shouldPass)
+                  {
+                    this.push(obj);
+                  }
+                }
               }
               this.bufferedOutputs.shift();
             }
@@ -255,11 +267,14 @@ export default class GroupJoinTransform extends Readable
             }
           }
 
-          this.continueReading = false;
-          if (this.sourceIsEmpty)
+          if (this.sourceIsEmpty
+            && this.bufferedOutputs.length === 0
+            && this.bufferedInputs.length === 0)
           {
             this.push(null);
           }
+
+          this.continueReading = false;
         });
     }
   }
