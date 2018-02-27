@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
+import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import
 {
   _ElasticFieldSettings, _TemplateField,
@@ -63,6 +64,7 @@ import
 import { Algorithm } from 'library/LibraryTypes';
 import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
 import { MidwayError } from 'shared/error/MidwayError';
+import { getSampleRows } from 'shared/etl/FileUtil';
 
 import { toInputMap } from 'src/blocks/types/Input';
 import { AllBackendsMap } from 'src/database/AllBackends';
@@ -92,7 +94,7 @@ export function fetchDocumentsFromAlgorithm(
   const handleResponse = (response: MidwayQueryResponse) =>
   {
     let hits = List(_.get(response, ['result', 'hits', 'hits'], []))
-      .map((doc, index) => doc['_source'])
+      .map((doc, index) => doc['_source']);
     if (limit != null && limit > 0)
     {
       hits = hits.slice(0, limit);
@@ -108,3 +110,23 @@ export function fetchDocumentsFromAlgorithm(
   );
 }
 
+export function fetchDocumentsFromFile(
+  file: File,
+  config: FileConfig,
+  onLoad: (documents: List<object>) => void,
+  onError: (ev: string) => void,
+  limit?: number,
+)
+{
+  const handleResponse = (response: object[]) =>
+  {
+    onLoad(List(response));
+  };
+  getSampleRows(
+    file,
+    handleResponse,
+    onError,
+    limit,
+    config.toJS(),
+  );
+}

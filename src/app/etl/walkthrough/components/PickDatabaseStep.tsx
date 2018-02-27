@@ -55,12 +55,12 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import DatabasePicker from 'etl/common/components/DatabasePicker';
-import { _SinkConfig, _SourceConfig, _FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _FileConfig, _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SinkOptionsType, Sinks } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
-import { ETLStepComponent, TransitionParams, StepProps } from './ETLStepComponent';
+import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
 interface Props extends StepProps
@@ -95,10 +95,10 @@ class PickDatabaseStep extends ETLStepComponent
             jsonNewlines: false,
           }),
           options: {
-            language: Languages.Elastic
-          }
+            language: Languages.Elastic,
+          },
         }),
-      }
+      },
     });
   }
 
@@ -123,7 +123,7 @@ class PickDatabaseStep extends ETLStepComponent
           {
             this._renderNextButton(
               serverPicked && databasePicked && tablePicked,
-              serverId !== -1 && database !== '' && table !== ''
+              serverId !== -1 && database !== '' && table !== '',
             )
           }
         </div>

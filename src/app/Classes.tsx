@@ -278,7 +278,7 @@ function injectInstanceMethods(constructor, instance)
 
 type ConfigType<T> = {
   [k in keyof T]?: T[k];
-}
+};
 /**
  * If injectMethods is true, then the resultant object creator will add the Type's instance methods to the object's prototype.
  * You should use configOverride if the immutable record can be rebuilt from a pure js object (e.g. an object returned by recordForSave)

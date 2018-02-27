@@ -67,9 +67,9 @@ export function getFileType(file: File): FileTypes
 
 export function getSampleRows(
   file: File,
-  numRows: number,
   onLoad: (result) => void,
   onError?: (msg: string) => void,
+  numRows?: number,
   opts?: {
     hasCsvHeader?: boolean;
     jsonNewlines?: boolean;
@@ -101,7 +101,7 @@ export function getSampleRows(
 
     Papa.parse(file as any, {
       header: options.hasCsvHeader,
-      preview: numRows,
+      preview: numRows != null ? numRows : 0,
       complete: handleResults,
       error: handleError,
     });

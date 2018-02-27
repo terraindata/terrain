@@ -106,3 +106,5 @@ export function templateForSave(template: ETLTemplate): object
   obj.transformationEngine = JSON.stringify(obj.transformationEngine.json());
   return obj;
 }
+
+export const DefaultDocumentLimit = 10;

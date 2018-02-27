@@ -195,7 +195,8 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
         const graphNode = graph[link as any];
         if (graphNode != null)
         {
-          graphNode.options.forEach((option, i) => {
+          graphNode.options.forEach((option, i) =>
+          {
             if (option.onArrive != null)
             {
               option.onArrive(this.props.transitionParams);

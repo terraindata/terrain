@@ -97,7 +97,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
           stepIndex={currentStep}
           stepHistory={walkthrough.stepHistory}
           setSteps={this.handleStepsChange}
-          transitionParams={{act: this.props.act, walkthrough: this.props.walkthrough}}
+          transitionParams={{ act: this.props.act, walkthrough: this.props.walkthrough }}
         />
         <div className='etl-walkthrough-spacer' />
       </div>

@@ -154,9 +154,9 @@ class DatabasePicker extends TerrainComponent<Props>
     return databases
       .filter(
         (database, k) => database.serverId === serverId,
-      ).map(
-        (database, k) => database.name,
-      ).toList();
+    ).map(
+      (database, k) => database.name,
+    ).toList();
   }
 
   public getDatabaseOptions(state: FormState): List<string>
@@ -183,9 +183,9 @@ class DatabasePicker extends TerrainComponent<Props>
     return tables
       .filter(
         (table, k) => table.databaseId === currentDatabase.id,
-      ).map(
-        (table, k) => table.name,
-      ).toList();
+    ).map(
+      (table, k) => table.name,
+    ).toList();
   }
 
   public getTableOptions(state: FormState): List<string>
@@ -218,7 +218,7 @@ class DatabasePicker extends TerrainComponent<Props>
         inputMap={this.inputMap}
         inputState={this.computeFormState()}
         onStateChange={this.handleStateChange}
-        style={{minHeight: this.props.constantHeight ? minHeight : '0px'}}
+        style={{ minHeight: this.props.constantHeight ? minHeight : '0px' }}
       />
     );
   }

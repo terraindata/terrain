@@ -117,8 +117,8 @@ class TemplateEditorPreviewControl extends TerrainComponent<Props>
       this.props.act({
         actionType: 'setDisplayState',
         state: {
-          previewIndex:  previewIndex - 1,
-        }
+          previewIndex: previewIndex - 1,
+        },
       });
     }
   }
@@ -134,8 +134,8 @@ class TemplateEditorPreviewControl extends TerrainComponent<Props>
       this.props.act({
         actionType: 'setDisplayState',
         state: {
-          previewIndex:  previewIndex + 1,
-        }
+          previewIndex: previewIndex + 1,
+        },
       });
     }
   }

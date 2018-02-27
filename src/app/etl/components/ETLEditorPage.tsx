@@ -54,14 +54,16 @@ import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 
 const { List } = Immutable;
 import './ETLEditorPage.less';
@@ -72,8 +74,8 @@ export interface Props
     algorithmId?: number,
     templateId?: number;
   };
-  algorithms: IMMap<ID, Algorithm>;
-
+  algorithms?: IMMap<ID, Algorithm>;
+  walkthrough?: WalkthroughState;
   act?: typeof TemplateEditorActions;
 }
 
@@ -98,7 +100,6 @@ function initialTemplateFromDocs(documents: List<object>): { template: ETLTempla
       rootField: _TemplateField(),
     };
   }
-
   const firstDoc = documents.get(0);
   const engine = new TransformationEngine(firstDoc);
   const rootField = createTreeFromEngine(engine);
@@ -121,7 +122,6 @@ class ETLEditorPage extends TerrainComponent<Props>
   {
     const { algorithms, params, act } = this.props;
     const algorithmId = getAlgorithmId(params);
-    const algorithm = (algorithms != null && algorithms.has(algorithmId)) ? algorithms.get(algorithmId) : null;
 
     const onFetched = (hits: List<object>) =>
     {
@@ -135,12 +135,45 @@ class ETLEditorPage extends TerrainComponent<Props>
         rootField,
       });
     };
+
+    const source = _SourceConfig({
+      type: Sources.Algorithm,
+      fileConfig: _FileConfig({
+        fileType: FileTypes.Json,
+      }),
+      options: {
+        algorithmId,
+      },
+    });
     act({
       actionType: 'fetchDocuments',
-      source: {
-        type: Sources.Algorithm,
-        algorithm,
-      },
+      source,
+      algorithms,
+      onFetched,
+    });
+  }
+
+  public initFromFile()
+  {
+    const { act, walkthrough } = this.props;
+    const onFetched = (hits: List<object>) =>
+    {
+      const { template, rootField } = initialTemplateFromDocs(hits);
+      act({
+        actionType: 'setTemplate',
+        template,
+      });
+      act({
+        actionType: 'setRoot',
+        rootField,
+      });
+    };
+
+    const source = walkthrough.source;
+    act({
+      actionType: 'fetchDocuments',
+      source,
+      file: walkthrough.file,
       onFetched,
     });
   }
@@ -157,6 +190,10 @@ class ETLEditorPage extends TerrainComponent<Props>
     else if (this.props.params.templateId !== undefined)
     {
       // TODO
+    }
+    else // TODO check if its walkthrough
+    {
+      this.initFromFile();
     }
   }
 
@@ -176,6 +213,9 @@ class ETLEditorPage extends TerrainComponent<Props>
 
 export default Util.createContainer(
   ETLEditorPage,
-  [['library', 'algorithms']],
+  [
+    ['library', 'algorithms'],
+    ['walkthrough'],
+  ],
   { act: TemplateEditorActions },
 );

@@ -153,7 +153,7 @@ class DocumentPreview extends TerrainComponent<Props>
       actionType: 'setDisplayState',
       state: {
         previewIndex: this.props.index,
-      }
+      },
     });
   }
 

@@ -63,7 +63,7 @@ import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes
 import { getFileType } from 'shared/etl/FileUtil';
 import { Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { ETLStepComponent, TransitionParams, StepProps } from './ETLStepComponent';
+import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 import SourceFileTypeOptions from './SourceFileTypeOptions';
 
@@ -91,7 +91,7 @@ class ETLUploadStep extends ETLStepComponent
         source: _SourceConfig({
           type: Sources.Upload,
         }),
-      }
+      },
     });
   }
 

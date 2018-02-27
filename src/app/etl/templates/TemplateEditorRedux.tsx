@@ -56,16 +56,17 @@ import
 import
 {
   _TemplateEditorState,
+  DefaultDocumentLimit,
   EditorDisplayState,
   ETLTemplate,
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
 import { Algorithm } from 'library/LibraryTypes';
 import { MidwayError } from 'shared/error/MidwayError';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
-import { fetchDocumentsFromAlgorithm } from 'etl/templates/DocumentRetrievalUtil';
+import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
 
 const { List, Map } = Immutable;
 
@@ -91,11 +92,10 @@ export interface TemplateEditorActionTypes
   };
   fetchDocuments: {
     actionType: 'fetchDocuments';
-    source: {
-      type: Sources,
-      algorithm: Algorithm;
-    };
-    mergeKey?: string;
+    source: SourceConfig;
+    algorithms?: IMMap<ID, Algorithm>; // if its an algorithm TODO replace this with a better midway route
+    file?: File; // if its an uploaded file
+    mergeKey?: string; // TODO implement
     onFetched?: (hits: List<object>) => void;
   };
   setDisplayState: {
@@ -186,7 +186,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       actionType: 'setDisplayState',
       state: {
         loading: true,
-      }
+      },
     });
     const onLoad = (documents: List<object>) =>
     {
@@ -199,7 +199,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         actionType: 'setDisplayState',
         state: {
           documents,
-        }
+        },
       });
       if (action.onFetched != null)
       {
@@ -209,9 +209,9 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         actionType: 'setDisplayState',
         state: {
           loading: false,
-        }
+        },
       });
-    }
+    };
     const onError = (ev: string | MidwayError) =>
     {
       // tslint:disable-next-line
@@ -221,20 +221,30 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         actionType: 'setDisplayState',
         state: {
           loading: false,
-        }
+        },
       });
-    }
-
+    };
     switch (action.source.type)
     {
-      case Sources.Algorithm:
-        const algorithm = action.source.algorithm;
-        fetchDocumentsFromAlgorithm(algorithm, onLoad, onError);
+      case Sources.Algorithm: {
+        const options: SourceOptionsType<Sources.Algorithm> = action.source.options as any;
+        const algorithms = action.algorithms;
+        const algorithmId = options.algorithmId;
+        const algorithm = (algorithms != null && algorithms.has(algorithmId)) ? algorithms.get(algorithmId) : null;
+        // TODO errors if algorithm is null
+        fetchDocumentsFromAlgorithm(algorithm, onLoad, onError, DefaultDocumentLimit);
         break;
+      }
+      case Sources.Upload: {
+        const file = action.file;
+        const config = action.source.fileConfig;
+        fetchDocumentsFromFile(file, config, onLoad, onError, DefaultDocumentLimit);
+        break;
+      }
       default:
         // tslint:disable-next-line
         console.error('Failed to retrieve documents. Unknown source type');
-        // TODO modal message?
+      // TODO modal message?
     }
   }
 }

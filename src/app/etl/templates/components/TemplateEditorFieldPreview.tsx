@@ -130,7 +130,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
         state: {
           settingsKeyPath: this.props.keyPath,
           settingsDisplayKeyPath: this.props.displayKeyPath,
-        }
+        },
       });
     }
   }

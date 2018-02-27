@@ -58,9 +58,9 @@ import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/Endpoi
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';
-import { Sinks, Sources, SourceOptionsType, SinkOptionsType  } from 'shared/etl/types/EndpointTypes';
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { ETLStepComponent, TransitionParams, StepProps } from './ETLStepComponent';
+import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
 class ETLReviewStep extends ETLStepComponent
@@ -102,12 +102,12 @@ class ETLReviewStep extends ETLStepComponent
     const options = sink.options as SinkOptionsType<Sinks.Database>;
     return [
       this.renderRow('Sink Type', sink.type),
-      ... sink.type !== Sinks.Database ? [] :
-      [
-        this.renderRow('Server', options.serverId ), // TODO show the server name
-        this.renderRow('Database', options.database ),
-        this.renderRow('Table', options.table)
-      ],
+      ...sink.type !== Sinks.Database ? [] :
+        [
+          this.renderRow('Server', options.serverId), // TODO show the server name
+          this.renderRow('Database', options.database),
+          this.renderRow('Table', options.table),
+        ],
     ];
   }
 
@@ -118,9 +118,9 @@ class ETLReviewStep extends ETLStepComponent
     return (
       <div className='etl-review-column'>
         {this.renderRow('Type', this.isImport() ? 'Import' : 'Export')}
-        <div className='etl-review-gap' style={gapStyle}/>
+        <div className='etl-review-gap' style={gapStyle} />
         {... this.renderSourceInfo()}
-        <div className='etl-review-gap' style={gapStyle}/>
+        <div className='etl-review-gap' style={gapStyle} />
         {... this.renderSinkInfo()}
       </div>
     );
@@ -143,7 +143,7 @@ class ETLReviewStep extends ETLStepComponent
             this.renderSummary()
         }
         <div className='etl-step-next-button-spacer'>
-          { this._renderNextButton() }
+          {this._renderNextButton()}
         </div>
       </div>
     );
@@ -152,7 +152,7 @@ class ETLReviewStep extends ETLStepComponent
 
 const labelStyle = fontColor(Colors().text2);
 const valueStyle = fontColor(Colors().text2);
-const gapStyle = { borderBottom: `1px solid ${Colors().border1}`}
+const gapStyle = { borderBottom: `1px solid ${Colors().border1}` };
 
 export default Util.createTypedContainer(
   ETLReviewStep,
