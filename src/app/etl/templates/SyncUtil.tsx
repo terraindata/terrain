@@ -145,8 +145,7 @@ export function initialTemplateFromDocs(documents: List<object>)
       rootField: _TemplateField(),
     };
   }
-  const firstDoc = documents.get(0);
-  const engine = new TransformationEngine(firstDoc);
+  const engine = createEngineFromDocs(documents);
   const rootField = createTreeFromEngine(engine);
 
   const template = _ETLTemplate({
@@ -159,43 +158,6 @@ export function initialTemplateFromDocs(documents: List<object>)
     rootField,
   };
 }
-
-// const TestDoc1 =
-// {
-//   name: 'Doge',
-//   foo: [1, 2, 3],
-//   nested: [
-//     {key1: 'bye'},
-//     {key2: 'yo'},
-//     {key3:  true},
-//   ],
-//   doubleNested: [[1, 2, 3], [3, 2, 1]],
-// };
-// const TestDoc2 =
-// {
-//   name: 'Bruhh',
-//   nested: [
-//     {key2: 100, key3: true},
-//     {key3: false},
-//     {key4: [1, 2, 3]}
-//   ],
-//   doubleNested: [],
-// }
-/* merged types:
-  "[\"name\"]": "string",
-  "[\"foo\"]": "array",
-  "[\"foo\",\"*\"]": "number",
-  "[\"nested\"]": "array",
-  "[\"nested\",\"*\"]": "object",
-  "[\"nested\",\"*\",\"key1\"]": "string",
-  "[\"nested\",\"*\",\"key2\"]": "string", // string and number get coerced into string
-  "[\"nested\",\"*\",\"key3\"]": "boolean",
-  "[\"doubleNested\"]": "array",
-  "[\"doubleNested\",\"*\"]": "array", // the empty array in TestDoc2 doesn't break TestDoc1's types!
-  "[\"doubleNested\",\"*\",\"*\"]": "number",
-  "[\"nested\",\"*\",\"key4\"]": "array", // nice! complex structures!
-  "[\"nested\",\"*\",\"key4\",\"*\"]": "number"
-*/
 
 export function createEngineFromDocs(documents: List<object>)
 {
@@ -250,6 +212,26 @@ function createPathToIdMap(engine: TransformationEngine): {[k: string]: number}
   return mapping;
 }
 
+// takes an engine path and the path type mapping and returns true if
+// all of the path's parent paths represent array or object types
+function isAValidField(keypath: EnginePath, pathTypes: {[k: string]: FieldTypes}): boolean
+{
+  if (keypath.size === 0)
+  {
+    return true;
+  }
+  for (const i of _.range(1, keypath.size))
+  {
+    const parentPath = keypath.slice(0, i).toList();
+    const parentType = pathTypes[hashPath(parentPath)];
+    if (parentType !== undefined && parentType !== 'object' && parentType !== 'array')
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 function createMergedEngine(documents: List<object>): TransformationEngine
 {
   const warnings: string[] = [];
@@ -299,7 +281,15 @@ function createMergedEngine(documents: List<object>): TransformationEngine
   });
 
   const engine = new TransformationEngine();
-  List(Object.keys(pathTypes)).map((hashedPath) => unhashPath(hashedPath));
+  const hashedPaths = List(Object.keys(pathTypes));
+  hashedPaths.forEach((hashedPath, i) => {
+    if (isAValidField(unhashPath(hashedPath), pathTypes))
+    {
+      const fieldType = pathTypes[hashedPath];
+      engine.addField(unhashPath(hashedPath), fieldType);
+    }
+  });
+  return engine;
 }
 
 const CompatibilityMatrix: {

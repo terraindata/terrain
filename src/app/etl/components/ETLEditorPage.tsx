@@ -115,7 +115,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   public initFromAlgorithm()
   {
     const { algorithms, params, act } = this.props;
-    createEngineFromDocs(); // testing
+
     const algorithmId = getAlgorithmId(params);
     const onFetched = createFetchHandler(act);
     const source = _SourceConfig({
