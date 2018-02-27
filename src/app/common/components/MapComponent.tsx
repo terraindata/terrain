@@ -562,14 +562,14 @@ class MapComponent extends TerrainComponent<Props>
           value={location[0]}
           onChange={this._fn(this.handleCoordinateChange, 'latitude')}
           canEdit={this.props.canEdit}
-          placeholder='Latitude'
+          placeholder='Lat'
           className='input-map-coordinates-latitude'
         />
         <BuilderTextbox
           value={location[1]}
           onChange={this._fn(this.handleCoordinateChange, 'longitude')}
           canEdit={this.props.canEdit}
-          placeholder='Longitude'
+          placeholder='Long'
           className='input-map-coordinates-longitude'
         />
       </div>

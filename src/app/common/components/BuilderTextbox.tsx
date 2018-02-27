@@ -174,18 +174,22 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.builder-tb input &::placeholder',
-      style: { color: Colors().text3 + '!important' },
-    });
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.builder-tb input',
-      style: { color: Colors().text1 },
-    });
+    if (!hasSetColors)
+    {
+      hasSetColors = true;
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.builder-tb input &::placeholder',
+        style: { color: Colors().text3 + '!important' },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.builder-tb input',
+        style: { color: Colors().text1 },
+      });
+    }
   }
-
+  
   public getCreatingType(): string
   {
     if (!this.props.language)
@@ -598,6 +602,8 @@ class BuilderTextbox extends TerrainComponent<Props>
     return isNaN(value as number);
   }
 }
+
+let hasSetColors = false;
 
 // const btbTarget =
 // {

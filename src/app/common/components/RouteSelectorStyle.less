@@ -1,6 +1,6 @@
 @import "../../common/Common.less";
 
-@br: 6px;
+@br: 4px;
 @option-max-height: 350px;
 @option-max-width: calc(~"50% - 16px");
 @close-width: 35px;
@@ -19,8 +19,48 @@
 		box-sizing: border-box;
 	}
 	
-	.routeselector-box-value {
+	&.routeselector-open {
+		z-index: 1000;
+		box-shadow: 0 6px 23px 0 rgba(0,0,0,0.16);
+	}
+	
+	.routeselector-box-values {
+		position: relative;
+		overflow: hidden;
+		
+	  &.routeselector-box-value-open {
+	    z-index: 1;
+		}
+			
+	  .transition;
+	    
+		display: flex;
+		width: 100%;
+		background: #fff;
+		
+		padding-right: 24px;
+		
 		border-bottom: 1px solid #eee;
+		
+		cursor: pointer;
+		
+		&.routeselector-box-values-open {
+			z-index: 1004;
+		}
+		
+		&:hover:not(.routeselector-box-values-open) {
+			background: #f5f5f5;
+		}
+		
+    &.routeselector-box-values-open:not(.routeselector-box-values-force-open) {
+    	border-top-left-radius: @br;
+    	border-top-right-radius: @br;
+    }
+	}
+
+	
+	.routeselector-box-value {
+    flex-grow: 1;
 		padding: 12px;
 		box-sizing: border-box;
 		
@@ -31,21 +71,9 @@
 		
     .transition;
     
-    background: #fff;
-    
     display: flex;
     align-items: center;
-    
-    
-    &.routeselector-box-value-open:not(.routeselector-box-value-force-open) {
-    	border-top-left-radius: @br;
-    	border-top-right-radius: @br;
-    }
-    &:hover {
-    	&:not(.routeselector-box-value-open) {
-	    	background: #f5f5f5;
-    	}
-    }
+		border-radius: 0px;
 	}
 	
 	.routeselector-close {
@@ -69,7 +97,6 @@
 	
 	.routeselector-picker {
 		box-sizing: border-box;
-		border-top: 1px solid #eee;
 		padding: 0px;
 		border-bottom-left-radius: @br;
 		border-bottom-right-radius: @br;
@@ -89,6 +116,10 @@
 		.routeselector-header {
 			margin: 6px;
 			font-size: 16px;
+		}
+		
+		.routeselector-search {
+			padding: 0px 12px;
 		}
 		
 		.routeselector-option-set {
@@ -357,47 +388,4 @@
 	// 	}
 	// }
 	
-}
-
-.routeselector-box-values {
-	position: relative;
-	overflow: hidden;
-	
-  &.routeselector-box-value-open {
-    z-index: 1;
-	}
-		
-  .transition;
-    
-	display: flex;
-	width: 100%;
-	background: #fff;
-	
-	padding-right: 24px;
-	
-	border-bottom: 1px solid #eee;
-	
-	cursor: pointer;
-	
-	.routeselector-box-value {
-		flex-grow: 1;
-		border-bottom: none;
-	}
-	
-	&.routeselector-box-values-open {
-		z-index: 1001;
-	}
-	
-	&:hover:not(.routeselector-box-values-open) {
-		background: #f5f5f5;
-	}
-	
-	.routeselector-box-value,
-	.routeselector-box-value:hover {
-		background: none;
-	}
-	
-	.routeselector-box-value {
-		border-radius: 0px;
-	}
 }

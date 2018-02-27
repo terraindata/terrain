@@ -58,6 +58,7 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } f
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RouteSelectorStyle.less';
 import { FloatingInput, LARGE_FONT_SIZE, FONT_SIZE } from './FloatingInput';
+import SearchInput from './SearchInput';
 import FadeInOut from './FadeInOut';
 import DrawerAnimation from './DrawerAnimation';
 import { ResultsConfig, _ResultsConfig } from 'shared/results/types/ResultsConfig';
@@ -91,7 +92,7 @@ export interface RouteSelectorOptionSet
   hideSampleData?: boolean; // hide sample data, even if it's present
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
   
-  valueComponent?: React.Component;
+  getValueComponent?: (props: { value: any }) => Element;
 }
 
 export interface Props
@@ -153,6 +154,7 @@ export class RouteSelector extends TerrainComponent<Props>
           className={classNames({
             'routeselector': true,
             'routeselector-large': props.large,
+            'routeselector-open': this.isOpen(),
             // 'routeselector-picked': state.picked,
           })}
         >
@@ -213,6 +215,7 @@ export class RouteSelector extends TerrainComponent<Props>
         }
         <div
           className='routeselector-close'
+          onClick={this.close}
         >
           Close
         </div>
@@ -267,24 +270,6 @@ export class RouteSelector extends TerrainComponent<Props>
     this.setState({
       open,
     });
-    
-    if (open)
-    {
-      // scroll the picker into view
-      setTimeout(() =>
-      {
-        const el = ReactDOM.findDOMNode(this.state.pickerRef);
-      
-        if (el && false) // TODO LK
-        {
-          el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'nearest',
-          });
-        }
-      }, 200);
-    }
   }
   
   private handleSingleBoxValueClick(optionSetIndex)
@@ -340,41 +325,48 @@ export class RouteSelector extends TerrainComponent<Props>
     
     const showTextbox = optionSet.hasSearch || optionSet.hasOther;
     
-    let textboxProps;
+    let textboxContent = null;
     if (optionSet.hasSearch)
     {
-      textboxProps = {
-        value: state.searches.get(index),
-        label: 'Search Options',
-        onChange: this._fn(this.handleOptionSearch, index),
-        autoFocus: state.focusedSetIndex === index,
-      };
+      textboxContent = (
+        <SearchInput
+          value={state.searches.get(index)}
+          onChange={this._fn(this.handleOptionSearch, index)}
+          autoFocus={state.focusedSetIndex === index}
+          canEdit={true}
+          onKeyDown={this.handleInputKeyDown}
+          onFocus={this.handleOptionSearchFocus}
+          id={index}
+        />
+      );
     }
     if (optionSet.hasOther)
     {
-      textboxProps = {
-        value,
-        label: 'Value', // TODO confirm copy
-        onChange: this._fn(this.handleOtherChange, index),
-        autoFocus: state.focusedSetIndex === index && optionSet.focusOtherByDefault,
-      };
+      textboxContent = (
+        <FloatingInput
+          value={value}
+          label={'Value' /* TODO confirm copy */ }
+          onChange={this._fn(this.handleOtherChange, index)}
+          autoFocus={state.focusedSetIndex === index && optionSet.focusOtherByDefault}
+          isTextInput={true}
+          canEdit={this.props.canEdit}
+          onKeyDown={this.handleInputKeyDown}
+          onFocus={this.handleOptionSearchFocus}
+          id={index}
+        />
+      );
     }
     
-    let valueComponentContent = null;
-    if (optionSet.valueComponent)
+    let getValueComponentContent = null;
+    if (optionSet.getValueComponent)
     {
-      let ValueComp = optionSet.valueComponent;
-      
-      valueComponentContent = (
+      getValueComponentContent = (
         <div className='routeselector-value-component'>
-          <ValueComp
-            value={value}
-          />
+          {
+            optionSet.getValueComponent({ value })
+          }
         </div>
       );
-      // ({
-      //   value,
-      // });
     }
     
     return (
@@ -399,14 +391,9 @@ export class RouteSelector extends TerrainComponent<Props>
               <div
                 className='routeselector-search'
               >
-                <FloatingInput
-                  {...textboxProps}
-                  isTextInput={true}
-                  canEdit={this.props.canEdit}
-                  onKeyDown={this.handleInputKeyDown}
-                  onFocus={this.handleOptionSearchFocus}
-                  id={index}
-                />
+                { 
+                  textboxContent
+                }
               </div>
             :
               <KeyboardFocus
@@ -422,7 +409,7 @@ export class RouteSelector extends TerrainComponent<Props>
           }
         </div>
         {
-          valueComponentContent
+          getValueComponentContent
         }
         <div
           className={classNames({

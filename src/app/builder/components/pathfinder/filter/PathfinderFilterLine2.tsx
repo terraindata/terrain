@@ -258,6 +258,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       valueHeader = 'Choose a method next';
     }
+    
+    const canShowValueInput = filterLine.fieldType !== FieldType.Geopoint;
     // LK
     const valueSet: RouteSelectorOptionSet = {
       key: 'value',
@@ -266,9 +268,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       headerText: valueHeader,
       column: true,
       hideSampleData: true,
-      hasOther: shouldShowValue ? true : false, // for now, hide other manually
+      hasOther: shouldShowValue && canShowValueInput ? true : false, // for now, hide other manually
       focusOtherByDefault: true,
-      valueComponent: this.renderValueComponent(),
+      getValueComponent: this.renderValueComponent(),
       getCustomDisplayName: this.getCustomValueDisplayName,
       // otherComponent: TODO,
     };
@@ -445,45 +447,43 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         }
         return ( // value will be injected by RouteSelector
           (props: { value: any }) =>
-            <MapComponent
-              geocoder='photon'
-              inputValue={props.value && props.value.address}
-              coordinates={props.value && props.value.location !== undefined ? props.value.location : [0, 0]}
-              distance={props.value && props.value.distance}
-              distanceUnit={props.value && props.value.units}
-              wrapperClassName={'pf-filter-map-component-wrapper'}
-              fadeInOut={true}
-              onChange={this.handleMapChange}
-              canEdit={pathfinderContext.canEdit}
-            />
+            <div className='pf-filter-map-input-wrapper'>
+              <div className='pf-filter-map-inputs'>
+                <BuilderTextbox
+                  value={value.distance}
+                  canEdit={pathfinderContext.canEdit}
+                  keyPath={this.props.keyPath.push('value').push('distance')}
+                  action={this.props.onChange}
+                  placeholder={'Distance'}
+                />
+                <Dropdown
+                  options={List(_.keys(units))}
+                  selectedIndex={_.keys(units).indexOf(value.units)}
+                  canEdit={pathfinderContext.canEdit}
+                  optionsDisplayName={Map(units)}
+                  keyPath={this.props.keyPath.push('value').push('units')}
+                  action={this.props.onChange}
+                />
+              </div>
+              
+              <MapComponent
+                geocoder='photon'
+                inputValue={props.value && props.value.address}
+                coordinates={props.value && props.value.location !== undefined ? props.value.location : [0, 0]}
+                distance={props.value && props.value.distance}
+                distanceUnit={props.value && props.value.units}
+                wrapperClassName={'pf-filter-map-component-wrapper'}
+                fadeInOut={true}
+                onChange={this.handleMapChange}
+                canEdit={pathfinderContext.canEdit}
+              />
+            </div>
         );
-        // previously there was:
-              // <div className='pf-filter-map-input-wrapper'>
-              //   <BuilderTextbox
-              //     value={value.distance}
-              //     canEdit={pathfinderContext.canEdit}
-              //     keyPath={this.props.keyPath.push('value').push('distance')}
-              //     action={this.props.onChange}
-              //   />
-              //   <Dropdown
-              //     options={List(_.keys(units))}
-              //     selectedIndex={_.keys(units).indexOf(value.units)}
-              //     canEdit={pathfinderContext.canEdit}
-              //     optionsDisplayName={Map(units)}
-              //     keyPath={this.props.keyPath.push('value').push('units')}
-              //     action={this.props.onChange}
-              //   />
-              // </div>
         );
 
       case FieldType.Ip:
-        return (
+        return () => (
           <div>IP not supported yet</div>
-        );
-
-      case null:
-        return (
-          <div>Error: no field type (null)</div>
         );
 
       default:
