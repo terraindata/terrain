@@ -55,7 +55,7 @@ import ElasticClient from '../../../database/elastic/client/ElasticClient';
 interface Ticket
 {
   count: number;
-  results: Deque<object>;
+  results: object[];
 }
 
 /**
@@ -74,7 +74,7 @@ export default class GroupJoinTransform extends Readable
 
   private pendingQueries: number = 0;
   private maxBufferedInputs: number;
-  private bufferedInputs: Deque<object>;
+  private bufferedInputs: object[];
   private maxBufferedOutputs: number;
   private bufferedOutputs: Deque<Ticket>;
 
@@ -122,7 +122,7 @@ export default class GroupJoinTransform extends Readable
     }
 
     this.maxBufferedInputs = this.blockSize;
-    this.bufferedInputs = new Deque<object>(this.maxBufferedInputs);
+    this.bufferedInputs = [];
 
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
@@ -151,8 +151,8 @@ export default class GroupJoinTransform extends Readable
       if (this.bufferedInputs.length > this.blockSize ||
         this.sourceIsEmpty && this.bufferedInputs.length > 0)
       {
-        const inputs = new Deque(this.bufferedInputs.toArray());
-        this.bufferedInputs.clear();
+        const inputs = this.bufferedInputs;
+        this.bufferedInputs = [];
         this.dispatchSubqueryBlock(inputs);
       }
     });
@@ -173,7 +173,7 @@ export default class GroupJoinTransform extends Readable
     }
   }
 
-  private dispatchSubqueryBlock(inputs: Deque<object>): void
+  private dispatchSubqueryBlock(inputs: object[]): void
   {
     const query = this.query;
     const numInputs = inputs.length;
@@ -243,7 +243,7 @@ export default class GroupJoinTransform extends Readable
             const front = this.bufferedOutputs.peekFront();
             if (front !== undefined && front.count === 0)
             {
-              while (!front.results.isEmpty())
+              while (front.results.length > 0)
               {
                 this.push(front.results.shift());
               }
