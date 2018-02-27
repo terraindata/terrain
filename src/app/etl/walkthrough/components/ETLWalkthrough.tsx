@@ -56,6 +56,8 @@ import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughT
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 
@@ -74,6 +76,8 @@ export interface Props
   // injected props
   act?: typeof WalkthroughActions;
   walkthrough?: WalkthroughState;
+  templateEditor?: TemplateEditorState;
+  editorAct?: typeof TemplateEditorActions;
 }
 
 class ETLWalkthrough extends TerrainComponent<Props>
@@ -107,7 +111,15 @@ class ETLWalkthrough extends TerrainComponent<Props>
 
     if (newHistory.last() === ViewState.Finish)
     {
-      // TODO: create a template and change the route
+      if (walkthrough.chosenTemplateId !== -1)
+      {
+        browserHistory.push(`/etl/edit/templateId=${walkthrough.chosenTemplateId}`);
+      }
+      else
+      {
+        browserHistory.push(`/etl/edit/new`);
+      }
+      return;
     }
     if (walkthrough.stepHistory !== newHistory)
     {
@@ -124,7 +136,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
     }
   }
 
-  // if the step is invalid or doesn't exist then return 0
+  // if the step is invalid or doesn't exist then return 0 and move the route
   public getStepFromRoute(fixBadRoute = false)
   {
     const { params, walkthrough } = this.props;
@@ -148,8 +160,11 @@ class ETLWalkthrough extends TerrainComponent<Props>
 
 export default Util.createContainer(
   ETLWalkthrough,
-  ['walkthrough'],
-  { act: WalkthroughActions },
+  [
+    ['walkthrough'],
+    ['templateEditor'],
+  ],
+  { act: WalkthroughActions, editorAct: TemplateEditorActions },
 );
 
 export const walkthroughGraph: WalkthroughGraphType<ViewState> =

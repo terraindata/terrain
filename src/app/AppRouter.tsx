@@ -138,7 +138,9 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/etl' component={ETLPage}>
             <IndexRoute component={ETLWalkthrough} />
             <Route path='new/:step' component={ETLWalkthrough} />
+            <Route path='edit/new' component={ETLEditorPage} />
             <Route path='edit/algorithmId=:algorithmId' component={ETLEditorPage} />
+            <Route path='edit/templateId=:templateId' component={ETLEditorPage} />
           </Route>
           <Route path='/analytics'>
             <IndexRoute component={analyticsLibrary} />
