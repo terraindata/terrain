@@ -195,7 +195,11 @@ export class RouteSelector extends TerrainComponent<Props>
                 'routeselector-box-value-force-open': props.forceOpen,
               })}
               key={optionSet.key}
-              onClick={this._fn(this.handleSingleBoxValueClick, index)}
+              onClick={
+                this._fn(this.handleSingleBoxValueClick, index) 
+                /* could try Mousedown to make it slightly snappier,
+                but this led to weird issues with closing it */
+              }
               style={getStyle('width', String(100 / props.optionSets.size) + '%')}
             >
               <FloatingInput
@@ -279,14 +283,6 @@ export class RouteSelector extends TerrainComponent<Props>
   {
     const { props, state } = this;
 
-    const pickerInnerContent = (
-      <div className='routeselector-picker-inner'>
-        {
-          props.optionSets.map(this.renderOptionSet)
-        }
-      </div>
-    );
-
     return (
       <DrawerAnimation
         open={this.isOpen()}
@@ -300,9 +296,11 @@ export class RouteSelector extends TerrainComponent<Props>
           })}
           ref={this._fn(this._saveRefToState, 'pickerRef')}
         >
-          {
-            pickerInnerContent
-          }
+          <div className='routeselector-picker-inner'>
+            {
+              props.optionSets.map(this.renderOptionSet)
+            }
+          </div>
         </div>
       </DrawerAnimation>
     );
@@ -594,6 +592,35 @@ export class RouteSelector extends TerrainComponent<Props>
       }
     }, 100);
   }
+  
+  private divWrapper(isShowing, children)
+  {
+    if (!isShowing)
+    {
+      return null;
+    }
+    
+    return (
+      <div>
+        {
+          children
+        }
+      </div>
+    );
+  }
+  
+  private fadeInOutWrapper(isShowing, children)
+  {
+    return (
+      <FadeInOut
+        open={isShowing}
+      >
+        {
+          children
+        }
+      </FadeInOut>
+    );
+  }
 
   private renderOption(optionSetIndex: number, visibleOptionCounter: { count: number }, incrementVisibleOptions: () => void,
     option: RouteSelectorOption, index: number)
@@ -610,69 +637,75 @@ export class RouteSelector extends TerrainComponent<Props>
     }
 
     const visibleOptionsIndex = visibleOptionCounter.count;
+    
+    // We only want to render the FadeInOuts when we are searching a list
+    // otherwise, render in a plain div
+    // this is a performance improvement
+    const wrapperFn = this.state.focusedSetIndex === optionSetIndex
+     ? this.fadeInOutWrapper : this.divWrapper;
 
     return (
       <div
         className='routeselector-option-wrapper'
         key={index}
       >
-        <FadeInOut
-          open={isShowing}
-        >
-          <div
-            className={classNames({
-              'routeselector-option': true,
-              'routeselector-option-selected': isSelected,
-              'routeselector-option-focused': state.focusedOptionIndex === visibleOptionsIndex
-                && optionSetIndex === state.focusedSetIndex
-                && state.focusedOptionIndex !== -1
-                && state.focusedSetIndex !== -1,
-              // 'routeselector-option-picked': this.state.pickedIndex === index, // when it's just been picked
-            })}
-            onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
-
-          >
+        {
+          wrapperFn(isShowing,
             <div
-              className='routeselector-option-name'
-              style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
-              key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
+              className={classNames({
+                'routeselector-option': true,
+                'routeselector-option-selected': isSelected,
+                'routeselector-option-focused': state.focusedOptionIndex === visibleOptionsIndex
+                  && optionSetIndex === state.focusedSetIndex
+                  && state.focusedOptionIndex !== -1
+                  && state.focusedSetIndex !== -1,
+                // 'routeselector-option-picked': this.state.pickedIndex === index, // when it's just been picked
+              })}
+              onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
+
             >
-              {
-                option.icon !== undefined &&
-                <div className='routeselector-option-icon'>
+              <div
+                className='routeselector-option-name'
+                style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
+                key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
+              >
+                {
+                  option.icon !== undefined &&
+                  <div className='routeselector-option-icon'>
+                    {
+                      option.icon
+                    }
+                  </div>
+                }
+                <div className='routeselector-option-name-inner'>
                   {
-                    option.icon
+                    option.displayName
+                  }
+                </div>
+              </div>
+
+              {
+                option.sampleData && !optionSet.hideSampleData &&
+                <div className='routeselector-data'>
+                  <div className='routeselector-data-header'>
+                    Sample Data
+                    </div>
+                  {
+                    option.sampleData.map(this.renderSampleDatum)
+                  }
+                  {
+                    option.sampleData.size === 0 &&
+                    <div
+                    >
+                      {/* TODO styling */}
+                      No data available
+                        </div>
                   }
                 </div>
               }
-              <div className='routeselector-option-name-inner'>
-                {
-                  option.displayName
-                }
-              </div>
             </div>
-
-            {
-              option.sampleData && !optionSet.hideSampleData &&
-              <div className='routeselector-data'>
-                <div className='routeselector-data-header'>
-                  Sample Data
-                  </div>
-                {
-                  option.sampleData.map(this.renderSampleDatum)
-                }
-                {
-                  option.sampleData.size === 0 &&
-                  <div
-                  >
-                    {/* TODO styling */}
-                    No data available
-                      </div>
-                }
-              </div>
-            }
-          </div>
-        </FadeInOut>
+          )
+        }
       </div>
     );
   }
