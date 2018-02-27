@@ -1,7 +1,6 @@
 
 .drag-drop-item {
 	width: 100%;
-	position: relative;
 	border-radius: 3px;
 	border: 1px solid transparent;
 	padding: 1px;
@@ -9,7 +8,15 @@
 	transition: height .3s linear .5s;
 	
 	&.drag-drop-item-dragging {
+		// These help the item be displayed on top of other components
+		// but, don't apply them when not dragging, or it will
+		// cause the item to appear on top of thigns it shoudln't
 		z-index: 9;
+		position: relative;
+	}
+	
+	&.drag-drop-item-neighbor-dragging {
+		position: relative; // Need this for dropping to work properly
 	}
 	
 	.drag-drop-item-drop-zone {

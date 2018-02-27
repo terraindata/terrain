@@ -101,6 +101,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
               onBlur={this._toggle('editingName')}
               onKeyDown={this.handleKeyDown}
               autoFocus={true}
+              autoDisabled={true}
             />
             :
             <div className='pf-filter-group-name-wrapper'>
