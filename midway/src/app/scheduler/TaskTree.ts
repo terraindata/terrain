@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as stream from 'stream';
+import * as winston from 'winston';
 
 import { TaskConfig, TaskOutputConfig } from './TaskConfig';
 import { TaskEnum, TaskTreeNode } from './TaskTreeNode';
@@ -58,10 +59,20 @@ export class TaskTree
     this.tasks = [];
   }
 
-  public async create(taskConfigs: TaskConfig[]): Promise<boolean>
+  public async create(taskConfigs: TaskConfig[]): Promise<boolean | string>
   {
-    taskConfigs = this._appendDefaults(taskConfigs);
+    // verify that each task has a unique id
+    const idSet: Set<number> = new Set<number>();
+    taskConfigs.forEach((task) =>
+    {
+      idSet.add(task.id);
+    });
+    if (taskConfigs.length !== idSet.size) // there were duplicates
+    {
+      return Promise.resolve('All tasks must have unique IDs');
+    }
 
+    taskConfigs = this._appendDefaults(taskConfigs);
     for (let i = 0; i < taskConfigs.length - 2; ++i)
     {
       if (i < taskConfigs.length - 3) // not the last original task
@@ -87,12 +98,37 @@ export class TaskTree
     {
       this.tasks.push(new TaskTreeNode(taskConfig));
     });
-    return this.isValid();
+    return this.isValid() as Promise<boolean>;
   }
 
   public async isValid(): Promise<boolean> // checks if tree is a valid DAG
   {
     return this.tasks[0].recurse(this.tasks, []);
+  }
+
+  public async printTree(): Promise<void> // iterate through tree and execute tasks
+  {
+    if (this.tasks.length === 0)
+    {
+      return;
+    }
+
+    let ind: number = 0;
+    let result: TaskOutputConfig = await this.tasks[ind].printTree();
+    while (result.exit !== true)
+    {
+      winston.info('-->');
+      if (result.status === true)
+      {
+        ind = this.tasks[ind].getValue().onSuccess;
+        result = await this.tasks[ind].printTree();
+      }
+      else if (result.status === false)
+      {
+        ind = this.tasks[ind].getValue().onFailure;
+        result = await this.tasks[ind].printTree();
+      }
+    }
   }
 
   public async visit(): Promise<TaskOutputConfig> // iterate through tree and execute tasks
@@ -156,7 +192,7 @@ export class TaskTree
           type: 'default',
         },
       ];
-    tasks.concat(defaults);
+    tasks = tasks.concat(defaults);
     return tasks;
   }
 

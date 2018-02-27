@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as stream from 'stream';
+import * as winston from 'winston';
+
 import { Task } from './Task';
 import { TaskConfig, TaskOutputConfig } from './TaskConfig';
 import { TaskDefaultExit } from './tasks/TaskDefaultExit';
@@ -78,6 +81,34 @@ export class TaskTreeNode
     return this.value;
   }
 
+  public async printTree(): Promise<TaskOutputConfig>
+  {
+    const basicTaskOutputConfig: TaskOutputConfig =
+      {
+        exit: false,
+        status: true,
+      };
+
+    winston.info(JSON.stringify(this.value as object));
+    switch (this.value.taskId)
+    {
+      case TaskEnum.taskDefaultExit:
+        basicTaskOutputConfig.exit = true;
+        return Promise.resolve(basicTaskOutputConfig);
+      case TaskEnum.taskDefaultFailure:
+        basicTaskOutputConfig.exit = true;
+        basicTaskOutputConfig.status = false;
+        return Promise.resolve(basicTaskOutputConfig);
+      case TaskEnum.taskExport:
+        return Promise.resolve(basicTaskOutputConfig);
+      case TaskEnum.taskImport:
+        return Promise.resolve(basicTaskOutputConfig);
+      default:
+        winston.info('Default case found!');
+        return Promise.resolve(basicTaskOutputConfig);
+    }
+  }
+
   public async recurse(taskNodes: TaskTreeNode[], traversedNodes: number[]): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
@@ -99,7 +130,7 @@ export class TaskTreeNode
 
   public setValueOptions(taskOutputConfig: TaskOutputConfig): void
   {
-    this.value.params.options = taskOutputConfig.options;
+    this.value.params['options'] = taskOutputConfig['options'];
   }
 
   public async visit(): Promise<TaskOutputConfig>

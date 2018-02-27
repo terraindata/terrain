@@ -61,10 +61,6 @@ export class TaskDefaultExit extends Task
         {
           status: true,
           exit: true,
-          options:
-            {
-              stream: new stream.PassThrough(),
-            },
         };
       resolve(taskOutputConfig);
     });

@@ -62,13 +62,10 @@ import { imprt } from '../io/ImportRouter';
 import { Sources } from '../io/sources/Sources';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
-import { Job } from './Job';
 import SchedulerConfig from './SchedulerConfig';
 
 export const credentials: Credentials = new Credentials();
 const sources = new Sources();
-
-export const jobSchedulerRework: Job = new Job();
 
 export class Scheduler
 {

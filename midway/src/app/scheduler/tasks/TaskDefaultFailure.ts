@@ -61,10 +61,6 @@ export class TaskDefaultFailure extends Task
         {
           status: false,
           exit: true,
-          options:
-            {
-              stream: new stream.PassThrough(),
-            },
         };
       resolve(taskOutputConfig);
     });

@@ -59,14 +59,13 @@ export interface TaskConfig
 
 export interface TaskInputConfig
 {
-  options: TaskInputConfigTypes;
+  options?: TaskInputConfigTypes;
 }
 
-export interface TaskOutputConfig
+export interface TaskOutputConfig extends TaskInputConfig
 {
   exit: boolean;
   status: boolean;
-  options: TaskInputConfigTypes;
 }
 
 interface TaskInputConfigTypes
