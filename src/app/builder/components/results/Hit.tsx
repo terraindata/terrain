@@ -97,6 +97,7 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 
   locations?: { [field: string]: any };
+  isNested?: boolean;
 
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
@@ -108,9 +109,11 @@ class HitComponent extends TerrainComponent<Props> {
 
   public state: {
     hovered: boolean;
+    nestedStates: Immutable.Map<string, string>
   } =
     {
       hovered: false,
+      nestedStates: Map<string, string>({}),
     };
 
   public constructor(props: Props)
@@ -147,6 +150,13 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
+  public changeNestedState(state, field)
+  {
+    this.setState({
+      nestedStates: this.state.nestedStates.set(field, state),
+    });
+  }
+
   public renderNestedField(field)
   {
     const config = this.props.resultsConfig;
@@ -154,39 +164,118 @@ class HitComponent extends TerrainComponent<Props> {
     format = _Format(Util.asJS(format));
     if (format && format.config !== undefined)
     {
-      console.log(field);
-      console.log(this.props.hit);
-      const allValues = Util.asJS(this.props.hit.fields.get(field));
-      let fields = allValues !== undefined ? allValues[0] : {};
-      // TODO KEEP OLD NESTED INFO
-      if (fields['_source'])
+      let allValues = Util.asJS(this.props.hit.fields.get(field));
+      if (allValues === undefined)
       {
-        fields = fields['_source'];
+        return null;
+      }
+      const expandState = this.state.nestedStates.get(field);
+      if (expandState === 'normal' || !expandState)
+      {
+        allValues = allValues.slice(0, 1);
       }
       return (
-        <HitComponent
-          {...this.props}
-          resultsConfig={format.config}
-          index={0}
-          primaryKey={''}
-          expanded={false}
-          allowSpotlights={false}
+        <div
+          className='hit-nested-content'
           key={field}
-          hit={_Hit({
-            fields: Map(fields),
-          })}
-        />
+        >
+          {field}
+          <div
+            className='hit-nested-content-header'
+            onClick={this._fn(
+              this.changeNestedState,
+              expandState !== 'collapsed' ? 'collapsed' : 'normal',
+              field)}
+          >
+              {expandState !== 'collapsed' ? 'Collapse' : 'Expand'}
+          </div>
+          {
+            expandState === 'expanded' &&
+           <div
+            className='hit-nested-content-header'
+            onClick={this._fn(
+              this.changeNestedState,
+              'normal',
+              field)}
+          >
+              Show Less
+          </div>
+          }
+          {
+            expandState !== 'collapsed' &&
+            allValues.map((fields, i) =>
+            {
+              if (fields['_source'])
+              {
+                fields = _.extend({}, fields, fields['_source']);
+              }
+              return (
+                <HitComponent
+                  {...this.props}
+                  resultsConfig={format.config}
+                  index={0}
+                  primaryKey={''}
+                  expanded={false}
+                  allowSpotlights={false}
+                  key={field + String(i)}
+                  isNested={true}
+                  hitSize='small'
+                  hit={_Hit({
+                    fields: Map(fields),
+                  })}
+                />)
+              }
+            )
+          }
+          {
+            (expandState === 'normal' || !expandState) &&
+            <div
+              className='hit-nested-content-footer'
+              onClick={this._fn(
+                this.changeNestedState,
+                'expanded',
+                field)}
+            >
+                Show More
+            </div>
+           }
+
+        </div>
       );
+    }
+    const allValues = Util.asJS(this.props.hit.fields.get(field));
+    if (allValues === undefined)
+    {
+      return null;
+    }
+    console.log(allValues);
+    if (!allValues.length)
+    {
+      // TODO
+      return null;
     }
     return (
       <div key={field}>
-         {String(this.props.hit.fields.get(field))}
+        {
+          allValues.map((value, i) =>
+            <div key={i}>
+              {
+                _.keys(value).map((key, j) =>
+                  <div key={j}>
+                    {key}: {String(value[key])}
+                  </div>
+                )
+              }
+            </div>
+          )
+        }
       </div>
-    )
+    );
   }
 
   public renderField(field, index?, fields?, overrideFormat?)
   {
+    // console.log('RENDER FIELDS', field);
     if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
     {
       return null;
@@ -303,7 +392,6 @@ class HitComponent extends TerrainComponent<Props> {
       'result-dragging': isDragging,
       'result-drag-over': isOver,
     });
-
     let score: any = null;
 
     if (resultsConfig && resultsConfig.score && resultsConfig.enabled)
@@ -322,7 +410,6 @@ class HitComponent extends TerrainComponent<Props> {
     const nestedFields = getResultNestedFields(hit, resultsConfig);
     const fields = getResultFields(hit, resultsConfig, nestedFields);
     const configHasFields = resultsConfigHasFields(resultsConfig);
-
     let bottomContent: any;
     if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
     {
@@ -454,9 +541,6 @@ class HitComponent extends TerrainComponent<Props> {
                 _.map(fields, this.renderField)
               }
               {
-                _.map(nestedFields, this.renderNestedField)
-              }
-              {
                 expandedContent
               }
             </div>
@@ -464,6 +548,11 @@ class HitComponent extends TerrainComponent<Props> {
               bottomContent
             }
           </div>
+        </div>
+        <div className='hit-nested-content'>
+        {
+          _.map(nestedFields, this.renderNestedField)
+        }
         </div>
       </div>
     ));
@@ -520,7 +609,9 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
   }
   else
   {
-    fields = hit.fields.keySeq().toArray();
+    fields = hit.fields.keySeq().filter((field) =>
+      nested.indexOf(field) === -1
+    ).toArray();
   }
 
   return fields;
@@ -539,9 +630,9 @@ export function getResultNestedFields(hit: Hit, config: ResultsConfig): string [
     ).toArray();
     const unconfigNested = config.fields.filter((field) =>
     {
-      return typeof (hit.fields.get(field) === 'object' ||
+      return (typeof hit.fields.get(field) === 'object' ||
       List.isList(hit.fields.get(field))) &&
-      configuredNested.indexOf(field) === -1
+      configuredNested.indexOf(field) === -1;
     }).toArray();
     return unconfigNested.concat(configuredNested);
   }
@@ -611,47 +702,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   {
     value = 'null';
     italics = true;
-  }
-  if ((format && format.config !== undefined))
-  {
-    const thumbnail = format.config.thumbnail;
-    if (thumbnail === undefined || format.config.formats.get(thumbnail) === undefined)
-    {
-      return null;
-    }
-    const template = format.config.formats.get(thumbnail).template;
-    return (
-      <div className='hit-nested-value'>
-        {
-          value.slice(0, 5).map((nested, i) =>
-          {
-            if (nested['_source'] || nested.get('_source')) // groupjoin
-            {
-              nested = nested['_source'] || nested.get('_source');
-            }
-            const image = nested.get(thumbnail);
-            const url = template.replace(/\[value\]/g, image as string);
-            return (
-              <div
-                className='result-field-value-image-wrapper-nested'
-                key={i}
-              >
-                <div
-                  className='result-field-value-nested-image'
-                  style={{
-                    backgroundImage: `url(${url})`,
-                    // give the div the background image, to make use of the "cover" CSS positioning,
-                    // but also include the <img> tag below (with opacity 0) so that right-click options still work
-                  }}
-                >
-                  {/*<img src={url} />*/}
-                </div>
-              </div>
-            );
-          })
-        }
-      </div>
-    );
   }
   if ((format && format.type !== 'map') || !format)
   {
