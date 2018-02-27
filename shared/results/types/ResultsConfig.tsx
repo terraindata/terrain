@@ -63,7 +63,7 @@ export class Format
 const Format_Record = createRecordType(new Format(), 'FormatC');
 export const _Format = (config?: any) =>
 {
-  if (config['config'])
+  if (config && config['config'])
   {
     config['config'] = _ResultsConfig(config['config']);
   }

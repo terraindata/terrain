@@ -54,7 +54,7 @@ import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
 import Draggable from 'react-draggable';
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { _Format, _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
@@ -300,12 +300,11 @@ class HitComponent extends TerrainComponent<Props> {
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
-    const fields = getResultFields(hit, resultsConfig);
     const nestedFields = getResultNestedFields(hit, resultsConfig);
+    const fields = getResultFields(hit, resultsConfig, nestedFields);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
     let bottomContent: any;
-
     if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
     {
       bottomContent = (
@@ -489,15 +488,15 @@ export function resultsConfigHasFields(config: ResultsConfig): boolean
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(hit: Hit, config: ResultsConfig): string[]
+// return any fields that are NOT nested fields
+export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[]): string[]
 {
   let fields: string[];
 
   if (resultsConfigHasFields(config))
   {
     fields = config.fields.filter((field) =>
-      config.formats.get(field) === undefined ||
-      config.formats.get(field).config === undefined
+      nested.indexOf(field) === -1
     ).toArray();
   }
   else
@@ -508,16 +507,30 @@ export function getResultFields(hit: Hit, config: ResultsConfig): string[]
   return fields;
 }
 
+// Return a list of fields that have nested configurations, as well as fields
+// that are nested objects that may not be configured
 export function getResultNestedFields(hit: Hit, config: ResultsConfig): string []
 {
   if (resultsConfigHasFields(config))
   {
-    return config.fields.filter((field) =>
+    const configuredNested = config.fields.filter((field) =>
       config.formats.get(field) !== undefined &&
-      config.formats.get(field).config !== undefined
+      config.formats.get(field).config !== undefined &&
+      config.formats.get(field).config.enabled
     ).toArray();
+    const unconfigNested = config.fields.filter((field) =>
+    {
+      return typeof (hit.fields.get(field) === 'object' ||
+      List.isList(hit.fields.get(field))) &&
+      configuredNested.indexOf(field) === -1
+    }).toArray();
+    return unconfigNested.concat(configuredNested);
   }
-  return [];
+  return _.keys(hit.fields.toJS()).filter((field) =>
+  {
+    return typeof hit.fields.get(field) === 'object' ||
+    List.isList(hit.fields.get(field))
+  });
 }
 
 export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
@@ -530,7 +543,7 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
   }
   else
   {
-    thumbnailField = _.first(getResultFields(hit, config));
+    thumbnailField = _.first(getResultFields(hit, config, []));
   }
 
   return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color, true);
@@ -546,7 +559,7 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
   }
   else
   {
-    nameField = _.first(getResultFields(hit, config));
+    nameField = _.first(getResultFields(hit, config, []));
   }
 
   return getResultValue(hit, nameField, config, true, expanded, null, locations, color);
@@ -555,7 +568,8 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
 export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean, expanded: boolean,
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false): any
 {
-  const format = config && config.enabled && config.formats && config.formats.get(field);
+  let format = config && config.enabled && config.formats && config.formats.get(field);
+  format = _Format(Util.asJS(format));
   const { showRaw } = overrideFormat || format || { showRaw: false };
   let italics = false;
   let tooltipText = '';
