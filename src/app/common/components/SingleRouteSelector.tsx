@@ -83,16 +83,6 @@ export class SingleRouteSelector extends TerrainComponent<Props>
     values: List([this.props.value]),
     optionSets: this.getOptionSets(this.props),
   };
-  public optionSetKeys = [
-    'options',
-    'hasOther',
-    'focusOtherByDefault',
-    'shortNameText',
-    'headerText',
-    'hasSearch',
-    'column',
-    'hideSampleData',
-  ];
 
   // keys that play a factor in the option set
   public optionSetKeys = [

@@ -228,7 +228,7 @@ export class FloatingInput extends TerrainComponent<Props>
       <Container
         large={props.large}
         noBorder={props.noBorder}
-        onClick={props.onClick}
+        onClick={this._fn(props.onClick)}
         className={props.className}
       >
         {

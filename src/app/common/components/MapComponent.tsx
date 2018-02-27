@@ -90,8 +90,8 @@ export interface Props
   // When the text box is selected, the map will expand below it, otherwise it will be hidden
   fadeInOut?: boolean;
 
-  disableOnClickOutside?: () => void;
-  enableOnClickOutside?: () => void;
+  disableOnClickOutside: () => void;
+  enableOnClickOutside: () => void;
 }
 
 interface LocationMarker
