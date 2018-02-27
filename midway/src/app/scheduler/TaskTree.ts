@@ -44,8 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as stream from 'stream';
+
 import { TaskConfig, TaskOutputConfig } from './TaskConfig';
-import { TaskTreeNode } from './TaskTreeNode';
+import { TaskEnum, TaskTreeNode } from './TaskTreeNode';
 
 export class TaskTree
 {
@@ -58,7 +60,7 @@ export class TaskTree
 
   public async create(taskConfigs: TaskConfig[]): Promise<boolean>
   {
-    taskConfigs = this._appendDefaults(args);
+    taskConfigs = this._appendDefaults(taskConfigs);
 
     for (let i = 0; i < taskConfigs.length - 2; ++i)
     {
@@ -93,7 +95,7 @@ export class TaskTree
     return this.tasks[0].recurse(this.tasks, []);
   }
 
-  public async visit(): Promise<TaskOutputConfig>
+  public async visit(): Promise<TaskOutputConfig> // iterate through tree and execute tasks
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
@@ -103,14 +105,14 @@ export class TaskTree
       {
         if (result.status === true)
         {
-          ind = this.tasks[ind].value.onSuccess;
-          this.tasks[ind] = this._setInputConfigFromOutputConfig(this.tasks[ind], result);
+          ind = this.tasks[ind].getValue().onSuccess;
+          this._setInputConfigFromOutputConfig(this.tasks[ind], result);
           result = await this.tasks[ind].visit();
         }
         else if (result.status === false)
         {
-          ind = this.tasks[ind].value.onFailure;
-          this.tasks[ind] = this._setInputConfigFromOutputConfig(this.tasks[ind], result);
+          ind = this.tasks[ind].getValue().onFailure;
+          this._setInputConfigFromOutputConfig(this.tasks[ind], result);
           result = await this.tasks[ind].visit();
         }
       }
@@ -123,7 +125,7 @@ export class TaskTree
     let maxId = 0;
     tasks.forEach((task) =>
     {
-      maxId = max(maxId, task.id);
+      maxId = Math.max(maxId, task.id);
     });
     const defaults: TaskConfig[] =
       [
@@ -132,8 +134,12 @@ export class TaskTree
           name: 'Default Exit',
           params:
             {
-
+              options:
+                {
+                  stream: new stream.PassThrough(),
+                },
             },
+          taskId: TaskEnum.taskDefaultExit,
           type: 'default',
         },
         {
@@ -141,8 +147,12 @@ export class TaskTree
           name: 'Default Failure',
           params:
             {
-
+              options:
+                {
+                  stream: new stream.PassThrough(),
+                },
             },
+          taskId: TaskEnum.taskDefaultFailure,
           type: 'default',
         },
       ];
@@ -150,9 +160,8 @@ export class TaskTree
     return tasks;
   }
 
-  private _setInputConfigFromOutputConfig(taskConfig: TaskConfig, taskOutputConfig: TaskOutputConfig): TaskConfig
+  private _setInputConfigFromOutputConfig(taskConfig: TaskTreeNode, taskOutputConfig: TaskOutputConfig): void
   {
-    taskConfig.options = taskOutputConfig.options;
-    return taskConfig;
+    taskConfig.setValueOptions(taskOutputConfig);
   }
 }

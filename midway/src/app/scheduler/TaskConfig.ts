@@ -45,33 +45,31 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as stream from 'stream';
-import * as winston from 'winston';
 
-import { Task } from '../Task';
-import { TaskConfig, TaskOutputConfig } from '../TaskConfig';
-
-export class TaskExport extends Task
+export interface TaskConfig
 {
-  public async run(task: TaskConfig): Promise<TaskOutputConfig>
-  {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
-    {
-      // TODO: call other functions (needs to wrap in Promise for later)
-      // example stub for export returning a stream.Readable
-      const returnStream: stream.Readable = new stream.Readable();
-      const writeStream: stream.Writable = new stream.Writable();
-      returnStream.pipe(writeStream);
-      writeStream.write('Export stream test\n');
-      const taskOutputConfig: TaskOutputConfig =
-        {
-          status: true,
-          exit: false,
-          options:
-            {
-              stream: returnStream,
-            },
-        };
-      resolve(taskOutputConfig);
-    });
-  }
+  id: number; // unique id that identifies the task to other tasks
+  name: string; // name of the task i.e. 'magento'
+  onFailure?: number; // id of task to execute on failure
+  onSuccess?: number; // id of next task to execute (default should be next in array)
+  params: TaskInputConfig; // input parameters for the task
+  taskId: number; // maps to a statically declared task
+  type: string; // what type of task i.e. source/process/sink
+}
+
+export interface TaskInputConfig
+{
+  options: TaskInputConfigTypes;
+}
+
+export interface TaskOutputConfig
+{
+  exit: boolean;
+  status: boolean;
+  options: TaskInputConfigTypes;
+}
+
+interface TaskInputConfigTypes
+{
+  stream: stream.Readable;
 }

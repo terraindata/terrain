@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { Task } from './Task';
 import { TaskConfig, TaskOutputConfig } from './TaskConfig';
-import { Task } from './tasks/Task';
 import { TaskDefaultExit } from './tasks/TaskDefaultExit';
 import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
 import { TaskExport } from './tasks/TaskExport';
@@ -53,6 +53,8 @@ import { TaskImport } from './tasks/TaskImport';
 
 const taskDefaultExit: TaskDefaultExit = new TaskDefaultExit();
 const taskDefaultFailure: TaskDefaultFailure = new TaskDefaultFailure();
+const taskExport: TaskExport = new TaskExport();
+const taskImport: TaskImport = new TaskImport();
 
 export enum TaskEnum
 {
@@ -71,21 +73,9 @@ export class TaskTreeNode
     this.value = arg;
   }
 
-  public async visit(): Promise<TaskOutputConfig>
+  public getValue(): TaskConfig
   {
-    switch (this.value.taskId)
-    {
-      case TaskEnum.taskDefaultExit:
-        return taskDefaultExit.run(this.value);
-      case TaskEnum.taskDefaultFailure:
-        return taskDefaultFailure.run(this.value);
-      case TaskEnum.taskExport:
-        return taskExport.run(this.value);
-      case TaskEnum.taskImport:
-        return taskImport.run(this.value);
-      default:
-        return TaskDefaultExit.run(this.value);
-    }
+    return this.value;
   }
 
   public async recurse(taskNodes: TaskTreeNode[], traversedNodes: number[]): Promise<boolean>
@@ -105,5 +95,27 @@ export class TaskTreeNode
       resolve(await taskNodes[this.value.onSuccess].recurse(taskNodes, traversedNodes.concat(this.value.id))
         && await taskNodes[this.value.onFailure].recurse(taskNodes, traversedNodes.concat(this.value.id)));
     });
+  }
+
+  public setValueOptions(taskOutputConfig: TaskOutputConfig): void
+  {
+    this.value.params.options = taskOutputConfig.options;
+  }
+
+  public async visit(): Promise<TaskOutputConfig>
+  {
+    switch (this.value.taskId)
+    {
+      case TaskEnum.taskDefaultExit:
+        return taskDefaultExit.run(this.value);
+      case TaskEnum.taskDefaultFailure:
+        return taskDefaultFailure.run(this.value);
+      case TaskEnum.taskExport:
+        return taskExport.run(this.value);
+      case TaskEnum.taskImport:
+        return taskImport.run(this.value);
+      default:
+        return taskDefaultExit.run(this.value);
+    }
   }
 }

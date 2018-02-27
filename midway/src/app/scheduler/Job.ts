@@ -48,7 +48,7 @@ import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import { Task } from './Task';
-import { TaskConfig } from './TaskConfig';
+import { TaskConfig, TaskOutputConfig } from './TaskConfig';
 import { TaskTree } from './TaskTree';
 
 export class Job
@@ -116,7 +116,7 @@ export class Job
 
   public async run(): Promise<TaskOutputConfig>
   {
-    return this.taskTree.visit(this.taskTree);
+    return this.taskTree.visit();
   }
 }
 

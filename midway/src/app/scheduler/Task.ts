@@ -44,30 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface TaskConfig
+import { TaskConfig, TaskOutputConfig } from './TaskConfig';
+
+export abstract class Task
 {
-  id: number; // unique id that identifies the task to other tasks
-  name: string; // name of the task i.e. 'magento'
-  onFailure?: number; // id of task to execute on failure
-  onSuccess?: number; // id of next task to execute (default should be next in array)
-  params: TaskInputConfig; // input parameters for the task
-  taskId: number; // maps to a statically declared task
-  type: string; // what type of task i.e. source/process/sink
+  constructor()
+  {
+    // do nothing
+  }
+  public async abstract run(task: TaskConfig): Promise<TaskOutputConfig>;
 }
 
-export interface TaskInputConfig
-{
-  options: TaskInputConfigTypes;
-}
-
-export interface TaskOutputConfig
-{
-  exit: boolean;
-  status: boolean;
-  options: TaskInputConfigTypes;
-}
-
-interface TaskInputConfigTypes
-{
-  stream: stream.Readable;
-}
+export default Task;

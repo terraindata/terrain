@@ -47,8 +47,8 @@ THE SOFTWARE.
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { Task } from './Task';
-import { TaskConfig, TaskOutputConfig } from './TaskConfig';
+import { Task } from '../Task';
+import { TaskConfig, TaskOutputConfig } from '../TaskConfig';
 
 export class TaskDefaultExit extends Task
 {
@@ -63,7 +63,7 @@ export class TaskDefaultExit extends Task
           exit: true,
           options:
             {
-              stream: new stream.passThrough(),
+              stream: new stream.PassThrough(),
             },
         };
       resolve(taskOutputConfig);
