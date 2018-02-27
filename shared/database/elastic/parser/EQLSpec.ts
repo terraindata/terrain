@@ -2255,12 +2255,27 @@ const EQLSpec: ESClause[] =
         weight: 'function_score_weight',
         random_score: 'random_score',
         field_value_factor: 'field_value_factor',
+        boost_mode: 'boost_mode',
       },
       {
         path: ['score', 'function'],
         desc: 'Customizes the scoring of a subquery using a built-in function score.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#query-dsl-function-score-query',
         required: [],
+      }),
+    new ESEnumClause('boost_mode',
+      [
+        'multiply',
+        'replace',
+        'sum',
+        'avg',
+        'max',
+        'min'
+      ],
+      {
+        path: ['score', 'function', 'function_score'],
+        desc: 'Defines how the score function interacts with the elastic _score.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html',
       }),
     new ESNumberClause('function_score_weight',
       {
