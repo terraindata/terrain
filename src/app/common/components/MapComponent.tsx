@@ -90,6 +90,8 @@ export interface Props
   // When the text box is selected, the map will expand below it, otherwise it will be hidden
   fadeInOut?: boolean;
 
+  disableOnClickOutside?: () => void;
+  enableOnClickOutside?: () => void;
 }
 
 interface LocationMarker
@@ -560,14 +562,14 @@ class MapComponent extends TerrainComponent<Props>
           value={location[0]}
           onChange={this._fn(this.handleCoordinateChange, 'latitude')}
           canEdit={this.props.canEdit}
-          placeholder='Latitude'
+          placeholder='Lat'
           className='input-map-coordinates-latitude'
         />
         <BuilderTextbox
           value={location[1]}
           onChange={this._fn(this.handleCoordinateChange, 'longitude')}
           canEdit={this.props.canEdit}
-          placeholder='Longitude'
+          placeholder='Long'
           className='input-map-coordinates-longitude'
         />
       </div>
@@ -649,4 +651,4 @@ class MapComponent extends TerrainComponent<Props>
   }
 }
 
-export default onClickOutside(MapComponent);
+export default onClickOutside(MapComponent as any);

@@ -220,7 +220,7 @@ const Util = {
   },
 
   // for displaying in the app
-  formatDate(date: string): string
+  formatDate(date: string, withTime?: boolean): string
   {
     const then = moment(date);
     const now = moment();
@@ -232,13 +232,15 @@ const Util = {
       return 'Today, ' + hour;
     }
 
+    const timeStr = withTime ? ' h:mma' : '';
+
     if (then.format('YYYY') === now.format('YYYY'))
     {
       // same year
-      return then.format('MM/DD/YY');
+      return then.format('MM/DD/YY' + timeStr);
     }
 
-    return then.format('MM/DD/YY');
+    return then.format('MM/DD/YY' + timeStr);
   },
 
   roundNumber(num, decimalPoints)

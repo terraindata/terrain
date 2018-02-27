@@ -455,6 +455,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
         className={this.props.classNames !== undefined ? this.props.classNames.root : ''}
       >
         <input
+          placeholder='Address'
           {...inputProps}
         />
         {

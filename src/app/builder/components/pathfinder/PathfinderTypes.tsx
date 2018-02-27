@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable no-var-requires
 
 /*
   User Friendly Builder, Codename: Pathfinder
@@ -85,6 +85,8 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
 import Util from 'app/util/Util';
+import { _Hit, Hit } from 'builder/components/results/ResultTypes';
+// import TerrainTools from 'util/TerrainTools';
 import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
@@ -417,7 +419,7 @@ abstract class DataSource extends BaseClass
 class PathfinderContextC extends BaseClass
 {
   public source: Source = null;
-  public step: string = null;
+  public step: PathfinderSteps = null;
   public canEdit: boolean = null;
   public schemaState: SchemaState = null;
   public builderState: BuilderState = null;
@@ -467,12 +469,18 @@ type ChoiceContext = {
 class ElasticDataSourceC extends DataSource
 {
   public index: string = '';
+
+  // TODO remove
   public types: List<string> = List([]);
+
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
+    // TODO this function needs to be refactored
     const server = context.builderState.db.name;
+
     if (context.type === 'source')
     {
+      // we need to make it clear what parts of Source are tracked
       const sources = context.schemaState.databases.toList().filter(
         (db) => db.serverId === server,
       ).map(
@@ -480,7 +488,7 @@ class ElasticDataSourceC extends DataSource
         {
           return _ChoiceOption({
             displayName: db.name,
-            value: db,
+            value: db.id,
           });
         },
       ).toList();
@@ -488,7 +496,7 @@ class ElasticDataSourceC extends DataSource
       const sourceExamples = {};
       sources.forEach((source) =>
       {
-        const databaseId = String(source.value.serverId) + '/' + String(source.value.name);
+        const databaseId = source.value; // String(source.value.serverId) + '/' + String(source.value.name);
         const types = context.schemaState.tables.toList().filter((table) =>
           table.databaseId === databaseId,
         );
@@ -506,11 +514,14 @@ class ElasticDataSourceC extends DataSource
       });
       return sources.map((source) =>
       {
-        const databaseId = String(source.value.serverId) + '/' + String(source.value.name);
+        const databaseId = source.value; // String(source.value.serverId) + '/' + String(source.value.name);
+
+        const sampleData = sourceExamples[databaseId];
+
         return _ChoiceOption({
           displayName: source.displayName,
           value: source.value,
-          sampleData: List(sourceExamples[databaseId]),
+          sampleData: List(sampleData),
         });
       }).toList();
     }
@@ -543,26 +554,23 @@ class ElasticDataSourceC extends DataSource
       const { index, types } = dataSource as any;
       if (index)
       {
-        if (types && types.size)
+        const transformableCols = context.schemaState.columns.filter(
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(index) &&
+            transformableTypes.indexOf(column.datatype) !== -1,
+        );
+        let transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
         {
-          const transformableCols = context.schemaState.columns.filter(
-            (column) => column.serverId === String(server) &&
-              column.databaseId === String(index) &&
-              transformableTypes.indexOf(column.datatype) !== -1,
-          );
-          let transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
-          {
-            return _ChoiceOption({
-              displayName: col.name,
-              value: col.name,
-              sampleData: col.sampleData,
-            });
-          }).toList();
-          let fieldNames = transformableOptions.map((f) => f.value).toList();
-          fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
-          transformableOptions = transformableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
-          return transformableOptions.concat(defaultOptions).toList();
-        }
+          return _ChoiceOption({
+            displayName: col.name,
+            value: col.name,
+            sampleData: col.sampleData,
+          });
+        }).toList();
+        let fieldNames = transformableOptions.map((f) => f.value).toList();
+        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+        transformableOptions = transformableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
+        return transformableOptions.concat(defaultOptions).toList();
       }
       return defaultOptions;
     }
@@ -580,34 +588,34 @@ class ElasticDataSourceC extends DataSource
           displayName: option,
           value: option,
           sampleData: List([]),
+          icon: fieldTypeToIcon[FieldType.Any], // TODO
         });
       }));
       const { dataSource } = context.source;
-      const { index, types } = dataSource as any;
+      const { index } = dataSource as any;
       if (index)
       {
-        if (types && types.size)
+        const cols = context.schemaState.columns.filter(
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(index));
+        let fields = cols.map((col) =>
         {
-          const cols = context.schemaState.columns.filter(
-            (column) => column.serverId === String(server) &&
-              column.databaseId === String(index));
-          let fields = cols.map((col) =>
-          {
-            return _ChoiceOption({
-              displayName: col.name,
-              value: col.name,
-              sampleData: col.sampleData,
-              meta: {
-                fieldType: dataSource.dataTypeToFieldType(col.datatype),
-              },
-            });
-          }).toList();
-          // Sort fields (Sort their names, then use that to sort the choice options)
-          let fieldNames = fields.map((f) => f.value).toList();
-          fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
-          fields = fields.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
-          return fields.concat(defaultOptions).toList();
-        }
+          const fieldType = dataSource.dataTypeToFieldType(col.datatype);
+          return _ChoiceOption({
+            displayName: col.name,
+            value: col.name,
+            sampleData: col.sampleData,
+            icon: fieldTypeToIcon[fieldType],
+            meta: {
+              fieldType,
+            },
+          });
+        }).toList();
+        // Sort fields (Sort their names, then use that to sort the choice options)
+        let fieldNames = fields.map((f) => f.value).toList();
+        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+        fields = fields.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
+        return fields.concat(defaultOptions).toList();
       }
       return defaultOptions;
     }
@@ -650,7 +658,7 @@ export const _ElasticDataSource = (config?: { [key: string]: any }) =>
   elasticSource = elasticSource.set('types', List(elasticSource['types']));
   return elasticSource;
 };
-
+≈
 const ElasticComparisons = [
   {
     value: 'exists',
@@ -664,7 +672,7 @@ const ElasticComparisons = [
   },
   {
     value: 'equal',
-    displayName: 'equals',
+    displayName: '=', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
     fieldTypes: List([FieldType.Numerical, FieldType.Text]),
   },
   {
@@ -674,7 +682,7 @@ const ElasticComparisons = [
   },
   {
     value: 'notequal',
-    displayName: 'does not equal',
+    displayName: '≠', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
     fieldTypes: List([FieldType.Text, FieldType.Numerical]),
   },
   {
@@ -684,22 +692,22 @@ const ElasticComparisons = [
   },
   {
     value: 'greater',
-    displayName: 'is greater than',
+    displayName: '>', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than' : '>',
     fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'less',
-    displayName: 'is less than',
+    displayName: '<', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than' : '<',
     fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'greaterequal',
-    displayName: 'is greater than or equal to',
+    displayName: '≥', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than or equal to' : '≥',
     fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'lessequal',
-    displayName: 'is less than or equal to',
+    displayName: '≤', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than or equal to' : '≤',
     fieldTypes: List([FieldType.Numerical]),
   },
   {
@@ -739,7 +747,7 @@ class ChoiceOptionC extends BaseClass
   public displayName: string | number | El = '';
   public color: string = null;
   public tooltipContent: string | El = null;
-  public sampleData: List<any> = List([]);
+  public sampleData: List<Hit> = List([]);
   public meta: any = null; // metadata, no specific shape, used for helper functions
 }
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
@@ -901,3 +909,18 @@ export const AggregationTypes = Map<string, AggregationData>({
       }),
     },
 });
+
+const TextIcon = require('./../../../../images/icon_textDropdown.svg');
+const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
+const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
+// TODO need more icons
+
+const fieldTypeToIcon =
+  {
+    [FieldType.Any]: TextIcon, // TODO
+    [FieldType.Date]: DateIcon,
+    [FieldType.Geopoint]: TextIcon, // TODO
+    [FieldType.Ip]: TextIcon,
+    [FieldType.Numerical]: NumberIcon,
+    [FieldType.Text]: TextIcon,
+  };

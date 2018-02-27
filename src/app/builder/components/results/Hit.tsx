@@ -53,7 +53,8 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import Draggable from 'react-draggable';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
@@ -70,6 +71,9 @@ const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
+// TODO REMOVE
+import Actions from '../../data/BuilderActions';
+
 const MAX_DEFAULT_FIELDS = 4;
 
 export interface Props
@@ -84,6 +88,7 @@ export interface Props
   allowSpotlights: boolean;
   onSpotlightAdded: (id, spotlightData) => void;
   onSpotlightRemoved: (id) => void;
+  hitSize?: 'large' | 'small';
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -102,9 +107,11 @@ export interface Props
 class HitComponent extends TerrainComponent<Props> {
 
   public state: {
+    hovered: boolean;
     // spotlights: IMMap<string, any>;
   } =
     {
+      hovered: false,
       // spotlights: SpotlightStore.getState().spotlights,
     };
 
@@ -149,7 +156,7 @@ class HitComponent extends TerrainComponent<Props> {
 
   public renderField(field, index?, fields?, overrideFormat?)
   {
-    if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS)
+    if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
     {
       return null;
     }
@@ -162,7 +169,10 @@ class HitComponent extends TerrainComponent<Props> {
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div
-        className='result-field'
+        className={classNames({
+          'result-field': true,
+          'results-are-small': this.props.hitSize === 'small',
+        })}
         key={field}
       >
         {
@@ -254,7 +264,9 @@ class HitComponent extends TerrainComponent<Props> {
 
   public render()
   {
-    const { isDragging, connectDragSource, isOver, resultsConfig, connectDropTarget, hit } = this.props;
+    const { isDragging, connectDragSource, isOver, connectDropTarget, hit, hitSize, expanded } = this.props;
+    let { resultsConfig } = this.props;
+
     const classes = classNames({
       'result': true,
       'result-expanded': this.props.expanded,
@@ -272,7 +284,8 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
-    const thumbnail = resultsConfig && resultsConfig.thumbnail !== null ?
+
+    const thumbnail = resultsConfig && resultsConfig.thumbnail ?
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
@@ -281,7 +294,7 @@ class HitComponent extends TerrainComponent<Props> {
 
     let bottomContent: any;
 
-    if (!configHasFields && fields.length > 4 && !this.props.expanded)
+    if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
     {
       bottomContent = (
         <div className='result-bottom' onClick={this.expand}>
@@ -307,27 +320,77 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       );
     }
+
+    if (!resultsConfig)
+    {
+      resultsConfig = _ResultsConfig();
+    }
+    const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
+      resultsConfig.thumbnailWidth;
+
     return ((
       <div
         className={classes}
         onDoubleClick={this.expand}
+        onMouseEnter={this._fn(this.handleHover, true)}
+        onMouseLeave={this._fn(this.handleHover, false)}
       >
         <div
-          className='result-inner'
+          className={classNames({
+            'result-inner': true,
+            'results-are-small': hitSize === 'small',
+          })}
           style={[
             borderColor(Colors().resultLine),
             backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
-          {thumbnail !== null ? (
-            <div className='result-thumbnail-wrapper'>
-              <div className='result-thumbnail'>
-                {thumbnail}
+          {
+            thumbnail &&
+            [
+              <div
+                className={classNames({
+                  'result-thumbnail-wrapper': true,
+                  'results-are-small': hitSize === 'small',
+                })}
+                style={{
+                  backgroundImage: `url(${thumbnail})`,
+                  width: thumbnailWidth,
+                  minWidth: thumbnailWidth,
+                }}
+                key={1}
+              >
               </div>
-            </div>
-          ) : null}
-          <div className='result-details-wrapper'>
-            <div className='result-name'>
+              ,
+              this.state.hovered &&
+              <Draggable
+                axis='x'
+                bounds='parent'
+                position={{
+                  x: thumbnailWidth - 15,
+                  y: 0,
+                }}
+                onDrag={this.handleThumbnailResize}
+                key={2}
+              >
+                <div
+                  className='result-thumbnail-resizer'
+                />
+              </Draggable>,
+            ]
+          }
+          <div
+            className={classNames({
+              'result-details-wrapper': true,
+              'results-are-small': hitSize === 'small',
+            })}
+          >
+            <div
+              className={classNames({
+                'result-name': true,
+                'results-are-small': hitSize === 'small',
+              })}
+            >
               <div
                 className='result-name-inner'
                 style={fontColor(Colors().text.baseLight)}
@@ -350,34 +413,60 @@ class HitComponent extends TerrainComponent<Props> {
                 }
               </div>
             </div>
-            <div className='result-fields-wrapper'>
+            <div
+              className={classNames({
+                'result-fields-wrapper': true,
+                'results-are-small': hitSize === 'small',
+              })}
+            >
               {score}
               {
                 _.map(fields, this.renderField)
               }
               {
-                bottomContent
-              }
-              {
                 expandedContent
               }
             </div>
+            {
+              bottomContent
+            }
           </div>
         </div>
       </div>
     ));
   }
+
+  private handleHover(hovered: boolean)
+  {
+    this.setState({
+      hovered,
+    });
+  }
+
+  private handleThumbnailResize(e, data: {
+    x: number, y: number,
+    deltaX: number, deltaY: number,
+  })
+  {
+    const { x, y } = data;
+
+    let config = this.props.resultsConfig;
+    const key = this.props.hitSize === 'small' ? 'smallThumbnailWidth' : 'thumbnailWidth';
+    config = config.set(key, Math.max(config[key] + data.deltaX, 15));
+
+    Actions.changeResultsConfig(config);
+  }
 }
 
 export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean, expanded: boolean,
-  overrideFormat?: any, locations?: { [field: string]: any }, color?: string)
+  overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false)
 {
   let value: any;
   if (hit)
   {
     value = hit.fields.get(field);
   }
-  return ResultFormatValue(field, value, config, isTitle, expanded, overrideFormat, locations, color);
+  return ResultFormatValue(field, value, config, isTitle, expanded, overrideFormat, locations, color, bgUrlOnly);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -413,7 +502,8 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
   {
     thumbnailField = _.first(getResultFields(hit, config));
   }
-  return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color);
+
+  return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color, true);
 }
 
 export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
@@ -433,7 +523,7 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
 }
 
 export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean, expanded: boolean,
-  overrideFormat?: any, locations?: { [field: string]: any }, color?: string): any
+  overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -482,6 +572,11 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     {
       case 'image':
         const url = format.template.replace(/\[value\]/g, value as string);
+        if (bgUrlOnly)
+        {
+          return url;
+        }
+
         return (
           <div
             className='result-field-value-image-wrapper'
@@ -494,7 +589,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
                 // but also include the <img> tag below (with opacity 0) so that right-click options still work
               }}
             >
-              <img src={url} />
+              {/*<img src={url} />*/}
             </div>
             <div className='result-field-value'>
               {

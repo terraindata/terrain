@@ -77,21 +77,7 @@ const NTColors =
     blue4: '#157eb0',
   };
 
-// Need to type these as strings
-interface Theme
-{
-  fontColor: string;
-  fontColor2: string;
-  fontColorLightest: string;
-  fontWhite: string;
-
-  active: string;
-  blockBg: string;
-  blockOutline: string;
-  sidebarBg: string;
-}
-
-const NewTheme: Theme =
+const NewTheme =
   {
     fontColor: NTColors.dark3,
     fontColor2: '#606262',
@@ -100,10 +86,13 @@ const NewTheme: Theme =
 
     active: NTColors.mainBlue,
 
+    bg: NTColors.light1,
     blockBg: NTColors.light2, // e.g., in Pathfinder, behind block elements
     blockOutline: NTColors.grey1,
 
     sidebarBg: NTColors.light1,
+
+    textboxBg: NTColors.light1,
   };
 
 // Will be deprecated
@@ -656,7 +645,7 @@ const LIGHT: OldTheme =
     inactiveHoverText: '#fff',
     activeHover: Color(darkActive).fade(0.75).string(),
 
-    scrollbarBG: '#fff',
+    scrollbarBG: 'rgba(0,0,0,0.1)',
     scrollbarPiece: 'rgb(180, 182, 186)',
 
     altScrollbarPiece: 'rgba(0, 0, 0, 0.25)',
@@ -1120,10 +1109,10 @@ const newTheme = NewTheme;
 
 // contains the mash of the old theme and the new theme
 // only initialized once, as we need to reload browser anyway for theme changes
-const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme);
+const themeMash: (typeof NewTheme) & OldTheme = _.extend({}, oldTheme, newTheme);
 // ^ new theme comes second, overrides old theme's properties
 
-export function Colors(): Theme & OldTheme
+export function Colors(): (typeof NewTheme) & OldTheme
 {
   return themeMash;
 }

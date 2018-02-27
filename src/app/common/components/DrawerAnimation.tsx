@@ -44,85 +44,83 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands
+// tslint:disable:no-var-requires
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
+import { getStyle } from 'app/colors/Colors';
 import * as React from 'react';
-const moment = require('moment');
-import OnClickOut from 'react-onclickoutside';
-import TerrainComponent from '../../common/components/TerrainComponent';
-import Util from '../../util/Util';
-import Dropdown from './Dropdown';
-
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
-import DatePicker from './DatePicker';
-import './DatePicker.less';
-import FadeInOut from './FadeInOut';
-
-const CalendarIcon = require('images/icon_calendar.svg');
+import * as ReactDOM from 'react-dom';
+import TerrainComponent from './../../common/components/TerrainComponent';
+const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
+import './DrawerAnimationStyle.less';
 
 export interface Props
 {
-  date: string;
-  onChange: (newDate: string) => void;
-  canEdit: boolean;
-  language: string;
-  format?: string;
+  open: boolean;
+  children?: any;
+  maxHeight: number;
 }
 
-class DatePickerWrapper extends TerrainComponent<Props>
+class DrawerAnimation extends TerrainComponent<Props>
 {
-  public state: {
-    expanded: boolean;
-  } = {
-      expanded: false,
-    };
-
-  public getDate(): Date
-  {
-    let date = new Date(this.props.date);
-    if (isNaN(date.getTime()))
-    {
-      // not a valid date
-      date = new Date();
-      date.setMinutes(0);
-    }
-
-    return date;
-  }
-
-  public handleClickOutside()
-  {
-    this.setState({
-      expanded: false,
-    });
-  }
+  public state = {
+    contentRef: null,
+  };
 
   public render()
   {
-    const { language } = this.props;
-    const date = this.getDate();
-    const dateText = this.props.format === undefined ? Util.formatInputDate(date, language) :
-      moment(date).format(this.props.format);
-    const dateStyle = _.extend({}, fontColor(Colors().text1), backgroundColor(Colors().inputBg), borderColor(Colors().inputBorder));
+    const { open, maxHeight, children } = this.props;
+
+    // we need to duplicate the children content
+    // so that we can get the wrapper to size dynamically
+    // to the content (in a hidden copy) and show the real copy
+    // pinned to the bottom edge of the wrapper
+
+    // TODO consider an optimization that only renders the children when the thing is open
+
     return (
-      <div className='date-picker-wrapper'>
-        <div
-          onClick={this._toggle('expanded')}
-          className='date-picker-wrapper-date'
-          style={dateStyle}
-        >
-          <CalendarIcon style={getStyle('fill', Colors().iconColor)} />
-          <span>{dateText}</span>
+      <div
+        className='drawer-animation'
+        style={getStyle('maxHeight', open ? maxHeight : 0)}
+      >
+        <div className='drawer-animation-content-copy'>
+          {
+            children
+          }
         </div>
-        <FadeInOut
-          children={<DatePicker {...this.props} />}
-          open={this.state.expanded}
-        />
+        <div
+          className='drawer-animation-content'
+          ref={this._fn(this._saveRefToState, 'contentRef')}
+        >
+          {
+            children
+          }
+        </div>
       </div>
     );
   }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (!this.props.open && nextProps.open)
+    {
+      // scroll the content into view
+      setTimeout(() =>
+      {
+        const el = ReactDOM.findDOMNode(this.state.contentRef);
+
+        if (el !== undefined)
+        {
+          el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest',
+          });
+        }
+      }, 350); // coordinate this value with LESS
+      // in the future you could consider a ghost element down at the bottom
+      // of the position, so the window can scroll before the content has opened
+    }
+  }
 }
 
-export default OnClickOut(DatePickerWrapper);
+export default DrawerAnimation;

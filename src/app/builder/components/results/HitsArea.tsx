@@ -100,6 +100,7 @@ interface State
 {
   hitFormat: string;
   showingConfig?: boolean;
+  hitSize: 'large' | 'small';
 
   expanded?: boolean;
   expandedHitIndex?: number;
@@ -112,6 +113,7 @@ interface State
   mouseStartY?: number;
   mapMaxHeight?: number;
   spotlightHits?: Immutable.Map<string, any>;
+
   indexName: string;
   resultsConfig?: any;
 }
@@ -138,6 +140,7 @@ class HitsArea extends TerrainComponent<Props>
     mouseStartY: 0,
     mapMaxHeight: undefined,
     spotlightHits: Immutable.Map<string, any>({}),
+    hitSize: 'large',
     indexName: '',
     resultsConfig: undefined,
   };
@@ -246,7 +249,7 @@ class HitsArea extends TerrainComponent<Props>
 
   public renderExpandedHit()
   {
-    const { expandedHitIndex } = this.state;
+    const { expandedHitIndex, hitSize } = this.state;
     const { hits } = this.props.resultsState;
 
     let hit: HitClass;
@@ -278,6 +281,7 @@ class HitsArea extends TerrainComponent<Props>
           primaryKey={hit.primaryKey}
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
+          hitSize={hitSize}
         />
       </div>
     );
@@ -501,7 +505,7 @@ class HitsArea extends TerrainComponent<Props>
     {
       hitsAreOutdated = true;
       infoAreaContent = <InfoArea
-        large='The database is empty, please select the database.'
+        large='The database is empty, please select a database.'
       />;
     }
     else if (this.isQueryEmpty())
@@ -601,12 +605,11 @@ class HitsArea extends TerrainComponent<Props>
       catch (e)
       { }
       hitsContent = (
-        <InfiniteScroll
+        <div
           className={classNames({
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
-          onRequestMoreItems={this.handleRequestMoreHits}
         >
           {
             hits.map((hit, index) =>
@@ -628,17 +631,13 @@ class HitsArea extends TerrainComponent<Props>
                   locations={this.locations}
                   onSpotlightAdded={this.handleSpotlightAdded}
                   onSpotlightRemoved={this.handleSpotlightRemoved}
+                  hitSize={this.state.hitSize}
                 />
               );
             })
           }
-          {
-            this.hitsFodderRange.map(
-              (i) =>
-                <div className='results-area-fodder' key={i} />,
-            )
-          }
-        </InfiniteScroll>
+
+        </div>
       );
     }
 
@@ -762,7 +761,7 @@ column if you have customized the results view.');
     return (
       <div
         className='results-top'
-        style={getStyle('boxShadow', '0px 3px 12px ' + Colors().boxShadow)}
+        style={backgroundColor(Colors().bg)}
       >
         <div className='results-top-summary'>
           {
@@ -792,15 +791,29 @@ column if you have customized the results view.');
         </div>
         }
 
-        <Switch
+        {/*<Switch
           first='Icons'
           second='Table'
           onChange={this.toggleView}
           selected={this.state.hitFormat === 'icon' ? 1 : 2}
           small={true}
-        />
+        />*/}
+        {<Switch
+          first='Large'
+          second='Small'
+          onChange={this.toggleHitSize}
+          selected={this.state.hitSize === 'large' ? 1 : 2}
+          small={true}
+        />}
       </div>
     );
+  }
+
+  public toggleHitSize()
+  {
+    this.setState({
+      hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
+    });
   }
 
   public showExport()
@@ -902,6 +915,7 @@ column if you have customized the results view.');
         })}
         ref='resultsarea'
       >
+        {this.renderTopbar()}
         {this.renderHits()}
         {this.renderHitsMap()}
         {this.renderExpandedHit()}

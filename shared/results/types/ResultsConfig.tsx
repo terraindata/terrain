@@ -74,6 +74,8 @@ export class ResultsConfig
   enabled: boolean = false;
   formats: IMMap<string, Format> = Map<string, Format>({});
   primaryKeys: List<string> = List(['_id']);
+  thumbnailWidth: number = 200;
+  smallThumbnailWidth: number = 55;
 
   set: (f: string, v: any) => ResultsConfig;
   setIn: (f: string[], v: any) => ResultsConfig;

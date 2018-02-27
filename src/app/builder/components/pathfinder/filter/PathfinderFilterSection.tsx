@@ -61,7 +61,7 @@ import Util from 'util/Util';
 import { FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
-import PathfinderFilterLine from './PathfinderFilterLine2';
+import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
 
 export interface Props
@@ -69,7 +69,6 @@ export interface Props
   pathfinderContext: PathfinderContext;
   filterGroup: FilterGroup;
   keyPath: KeyPath;
-  step?: PathfinderSteps;
   onStepChange?: (oldStep: PathfinderSteps) => void;
   toSkip?: number; // how many keys in key path to skip (sometimes paths may be nested)
   builderActions?: typeof BuilderActions;
@@ -91,6 +90,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     // flatten tree
     const entries: FilterEntry[] = [];
     this.buildFilterTree(filterGroup, entries, 0, this.props.keyPath);
+
     return (
       <div
         className='pf-section'
@@ -99,7 +99,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           entries.map(this.renderFilterEntry)
         }
         {
-          this.props.step === PathfinderSteps.Filter &&
+          step === PathfinderSteps.Filter &&
           <div
             onClick={this.handleStepChange}
             className='pf-step-button'
@@ -113,9 +113,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   private handleStepChange()
   {
-    if (this.props.step === PathfinderSteps.Filter)
+    const { step } = this.props.pathfinderContext;
+
+    if (step === PathfinderSteps.Filter)
     {
-      this.props.onStepChange(this.props.step);
+      this.props.onStepChange(step);
     }
   }
 
@@ -144,11 +146,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   private buildFilterTree(filterGroup: FilterGroup, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
   {
 
-    entries.push({
-      filterGroup,
-      depth,
-      keyPath,
-    });
+    if (depth > 0)
+    {
+      // no group UI for first depth
+      entries.push({
+        filterGroup,
+        depth,
+        keyPath,
+      });
+    }
 
     keyPath = keyPath.push('lines');
     filterGroup.lines.map((filterLine, index) =>
