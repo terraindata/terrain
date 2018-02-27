@@ -251,7 +251,7 @@ export function responseToRecordConfig(response: object): object
 
 // boilerplate generator
 export type WithIRecord<T> = T & IRecord<T>;
-export function makeConstructor<T>(Type: { new(): T; })
+export function makeConstructor<T>(Type: { new(): T; }): (config?: ConfigType<T>) => WithIRecord<T>
 {
   return (config?: { [key: string]: any }) =>
     New<WithIRecord<T>>(new Type(), config);
@@ -276,6 +276,9 @@ function injectInstanceMethods(constructor, instance)
   }
 }
 
+type ConfigType<T> = {
+  [k in keyof T]?: T[k];
+}
 /**
  * If injectMethods is true, then the resultant object creator will add the Type's instance methods to the object's prototype.
  * You should use configOverride if the immutable record can be rebuilt from a pure js object (e.g. an object returned by recordForSave)
@@ -285,7 +288,7 @@ export function makeExtendedConstructor<T>(
   Type: { new(): T; },
   injectMethods: boolean = false,
   configOverride?: overrideMap<T>,
-): (config?: any, deep?: boolean) => WithIRecord<T>
+): (config?: ConfigType<T>, deep?: boolean) => WithIRecord<T>
 {
   if (injectMethods)
   {
