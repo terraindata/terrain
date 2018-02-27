@@ -834,6 +834,7 @@ export class RouteSelector extends TerrainComponent<Props>
         onSpotlightAdded={_.noop}
         onSpotlightRemoved={_.noop}
         key={index}
+        hideNested={true}
       />
     );
   }

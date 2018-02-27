@@ -314,7 +314,7 @@ class HitsArea extends TerrainComponent<Props>
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
           hitSize={hitSize}
-          nestedFields={this.state.nestedFields}
+          nestedFields={List([])}
         />
       </div>
     );
@@ -665,7 +665,7 @@ class HitsArea extends TerrainComponent<Props>
                   onSpotlightAdded={this.handleSpotlightAdded}
                   onSpotlightRemoved={this.handleSpotlightRemoved}
                   hitSize={this.state.hitSize}
-                  nestedFields={this.state.nestedFields}
+                  nestedFields={List([])}
                 />
               );
             })

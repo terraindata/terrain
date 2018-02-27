@@ -93,6 +93,7 @@ export interface Props
   style?: any;
   depth?: any;
   nestedFields?: List<string>;
+  hideNested?: boolean;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -125,6 +126,7 @@ class HitComponent extends TerrainComponent<Props> {
   public constructor(props: Props)
   {
     super(props);
+    console.log('HIT CONSTRUCTOR');
   }
 
   public componentWillMount()
@@ -205,9 +207,9 @@ class HitComponent extends TerrainComponent<Props> {
     }
     const height = NESTED_RESULT_HEIGHT * allValues.length;
     const depth = this.props.depth ? this.props.depth : 0;
-    console.log(this.state.nestedFields);
-    console.log('field', field);
-    console.log('ALL VALUES', allValues);
+    // console.log(this.state.nestedFields);
+    // console.log('field', field);
+    // console.log('ALL VALUES', allValues);
     return (
       <div
         className='hit-nested-content'
@@ -264,9 +266,9 @@ class HitComponent extends TerrainComponent<Props> {
                   isNested={true}
                   style={borderColor(Colors().blockOutline)}
                   hitSize='small'
-                  hit={_Hit({
-                    fields: Map(fields),
-                  })}
+                  // hit={_Hit({
+                  //   fields: Map(fields),
+                  // })}
                   depth={depth + 1}
                   nestedFields={undefined}
                 />)
@@ -559,6 +561,7 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
         <div>
         {
+          this.props.hideNested !== true &&
           _.map(nestedFields, this.renderNestedField)
         }
         </div>
