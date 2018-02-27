@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
+import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import
 {
   _ElasticFieldSettings, _TemplateField,
@@ -60,15 +61,11 @@ import
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
 import { Algorithm } from 'library/LibraryTypes';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
 import { MidwayError } from 'shared/error/MidwayError';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
-import { toInputMap } from 'src/blocks/types/Input';
-import { AllBackendsMap } from 'src/database/AllBackends';
-import BackendInstance from 'src/database/types/BackendInstance';
-import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
-import { _Query, Query, queryForSave } from 'src/items/types/Query';
-import { Ajax } from 'util/Ajax';
+
+import { fetchDocumentsFromAlgorithm } from 'etl/templates/DocumentRetrievalUtil';
 
 const { List, Map } = Immutable;
 
@@ -95,9 +92,10 @@ export interface TemplateEditorActionTypes
   fetchDocuments: {
     actionType: 'fetchDocuments';
     source: {
-      type: 'algorithm',
+      type: Sources,
       algorithm: Algorithm;
     };
+    mergeKey?: string;
     onFetched?: (hits: List<object>) => void;
   };
   setDisplayState: {
@@ -175,13 +173,13 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
     switch (action.actionType)
     {
       case 'fetchDocuments':
-        return this.fetchDocumentsAction.bind(this, action);
+        return this.fetchDocuments.bind(this, action);
       default:
         return undefined;
     }
   }
 
-  public fetchDocumentsAction(action: TemplateEditorActionType<'fetchDocuments'>, dispatch)
+  public fetchDocuments(action: TemplateEditorActionType<'fetchDocuments'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
@@ -190,51 +188,53 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         loading: true,
       }
     });
-
-    if (action.source.type === 'algorithm' && action.source.algorithm != null)
+    const onLoad = (documents: List<object>) =>
     {
-      const algorithm = action.source.algorithm;
-      let query = algorithm.query;
-      query = query.set('parseTree', new ESInterpreter(query.tql, toInputMap(query.inputs)));
-
-      const eql = AllBackendsMap[query.language].parseTreeToQueryString(
-        query,
-        {
-          replaceInputs: true,
-        },
-      );
-      const handleResponse = (response: MidwayQueryResponse) =>
+      if (action.mergeKey != null)
       {
-        const hits = List(_.get(response, ['result', 'hits', 'hits'], [])).map((doc, index) => doc['_source']).toList();
-        directDispatch({
-          actionType: 'setDisplayState',
-          state: {
-            documents: hits,
-          }
-        });
-        if (action.onFetched != null)
-        {
-          action.onFetched(hits);
+        // tslint:disable-next-line
+        console.error('TODO implement this');
+      }
+      directDispatch({
+        actionType: 'setDisplayState',
+        state: {
+          documents,
         }
-        directDispatch({
-          actionType: 'setDisplayState',
-          state: {
-            loading: false,
-          }
-        });
-      };
-
-      const handleError = (ev: string | MidwayError) =>
+      });
+      if (action.onFetched != null)
       {
-        // TODO
-      };
+        action.onFetched(documents);
+      }
+      directDispatch({
+        actionType: 'setDisplayState',
+        state: {
+          loading: false,
+        }
+      });
+    }
+    const onError = (ev: string | MidwayError) =>
+    {
+      // tslint:disable-next-line
+      console.error(ev);
+      // TODO add a modal message?
+      directDispatch({
+        actionType: 'setDisplayState',
+        state: {
+          loading: false,
+        }
+      });
+    }
 
-      const { queryId, xhr } = Ajax.query(
-        eql,
-        algorithm.db,
-        handleResponse,
-        handleError,
-      );
+    switch (action.source.type)
+    {
+      case Sources.Algorithm:
+        const algorithm = action.source.algorithm;
+        fetchDocumentsFromAlgorithm(algorithm, onLoad, onError);
+        break;
+      default:
+        // tslint:disable-next-line
+        console.error('Failed to retrieve documents. Unknown source type');
+        // TODO modal message?
     }
   }
 }

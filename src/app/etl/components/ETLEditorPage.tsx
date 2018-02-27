@@ -58,6 +58,7 @@ import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
@@ -137,7 +138,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     act({
       actionType: 'fetchDocuments',
       source: {
-        type: 'algorithm',
+        type: Sources.Algorithm,
         algorithm,
       },
       onFetched,

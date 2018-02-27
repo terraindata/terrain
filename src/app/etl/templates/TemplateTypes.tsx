@@ -68,6 +68,7 @@ export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
 class EditorDisplayStateC
 {
   public documents: List<object> = List([]);
+  public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = -1;
   public loading: boolean = false;
