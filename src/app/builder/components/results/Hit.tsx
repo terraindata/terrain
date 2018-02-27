@@ -116,7 +116,6 @@ class HitComponent extends TerrainComponent<Props> {
   public constructor(props: Props)
   {
     super(props);
-    console.log(props.hit);
   }
 
   public shouldComponentUpdate(nextProps: Props, nextState)

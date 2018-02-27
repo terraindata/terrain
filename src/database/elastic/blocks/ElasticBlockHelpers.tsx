@@ -251,7 +251,6 @@ export const ElasticBlockHelpers = {
       {
         return '';
       }
-
       const dataType = col.datatype;
       if (returnDatatype)
       {

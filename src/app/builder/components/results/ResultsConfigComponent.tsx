@@ -142,7 +142,8 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     let nestedFields;
     // When columns is defined, we already are in a nested results config
     // and need to look at these columns to see what fields are nested
-    const { columns } = props;
+    const { columns, builder, schema, dataSource } = props;
+    console.log(props);
     if (columns !== undefined)
     {
       if (List.isList(columns))
@@ -164,15 +165,16 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       nestedFields = props.fields.filter((field) =>
       {
         const type = ElasticBlockHelpers.getTypeOfField(
-          props.schema,
-          props.builder,
+          schema,
+          builder,
           field,
-          props.dataSource,
+          dataSource,
           true,
         );
         return type === 'nested' || type === '';
       }).toList();
     }
+    console.log('nested fields ', nestedFields);
     this.setState({
       nestedFields,
     });

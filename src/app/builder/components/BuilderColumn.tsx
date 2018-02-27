@@ -467,11 +467,11 @@ const BuilderColumn = createReactClass<any, any>(
               >
                 <div
                   className='builder-resize-handle-line'
-                  style={borderColor(Colors().stroke)}
+                  style={borderColor('rgba(0,0, 0, 0.15)')}
                 ></div>
                 <div
                   className='builder-resize-handle-line'
-                  style={borderColor(Colors().stroke)}
+                  style={borderColor('rgba(0,0, 0, 0.15)')}
                 ></div>
               </div>
             )

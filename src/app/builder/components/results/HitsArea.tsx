@@ -627,7 +627,7 @@ class HitsArea extends TerrainComponent<Props>
                   resultsConfig={resultsConfig}
                   onExpand={this.handleExpand}
                   index={index}
-                  key={index}
+                  key={hit.primaryKey}
                   primaryKey={hit.primaryKey}
                   allowSpotlights={this.props.allowSpotlights}
                   locations={this.locations}
@@ -897,6 +897,7 @@ column if you have customized the results view.');
   {
     if (this.state.showingConfig)
     {
+      console.log(this.props);
       return <ResultsConfigComponent
         config={this.props.query.resultsConfig}
         fields={this.props.resultsState.fields}

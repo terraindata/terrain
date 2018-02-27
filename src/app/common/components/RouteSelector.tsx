@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access
+// tslint:disable:strict-boolean-expressions member-access no-console
 
 import Hit from 'builder/components/results/Hit.tsx';
 import * as classNames from 'classnames';
@@ -59,10 +59,12 @@ import { _ResultsConfig, ResultsConfig } from 'shared/results/types/ResultsConfi
 import Util from 'util/Util';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import DrawerAnimation from './DrawerAnimation';
 import FadeInOut from './FadeInOut';
 import { FloatingInput, FONT_SIZE, LARGE_FONT_SIZE } from './FloatingInput';
 import KeyboardFocus from './KeyboardFocus';
 import './RouteSelectorStyle.less';
+import SearchInput from './SearchInput';
 
 export interface RouteSelectorOption
 {
@@ -89,7 +91,7 @@ export interface RouteSelectorOptionSet
   hideSampleData?: boolean; // hide sample data, even if it's present
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
 
-  valueComponent?: React.Component | null;
+  getValueComponent?: (props: { value: any }) => Element;
 }
 
 export interface Props
@@ -116,8 +118,8 @@ export class RouteSelector extends TerrainComponent<Props>
     focusedOptionIndex: 0,
 
     columnRefs: Map<number, any>({}),
-    optionRefs: Map({}),
     pickerRef: null,
+    // optionRefs: Map({}), // not needed for now, but keeping some logic around
 
     // TODO re-add animation / picked logic
     // picked: false,
@@ -151,6 +153,7 @@ export class RouteSelector extends TerrainComponent<Props>
           className={classNames({
             'routeselector': true,
             'routeselector-large': props.large,
+            'routeselector-open': this.isOpen(),
             // 'routeselector-picked': state.picked,
           })}
         >
@@ -211,6 +214,7 @@ export class RouteSelector extends TerrainComponent<Props>
         }
         <div
           className='routeselector-close'
+          onClick={this.toggle}
         >
           Close
         </div>
@@ -251,6 +255,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
     if (option === undefined || option === null)
     {
+      console.warn(`WARNING, non-existent option display name queried: ${optionIndex} from ${optionSetIndex}`);
       return '';
     }
 
@@ -259,29 +264,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private handleBoxValueClick()
   {
-    const open = !this.state.open;
-
-    this.setState({
-      open,
-    });
-
-    if (open)
-    {
-      // scroll the picker into view
-      setTimeout(() =>
-      {
-        const el = ReactDOM.findDOMNode(this.state.pickerRef);
-
-        if (el)
-        {
-          el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'nearest',
-          });
-        }
-      }, 200);
-    }
+    this.toggle();
   }
 
   private handleSingleBoxValueClick(optionSetIndex)
@@ -296,26 +279,32 @@ export class RouteSelector extends TerrainComponent<Props>
   {
     const { props, state } = this;
 
-    if (!this.isOpen())
-    {
-      return null;
-    }
+    const pickerInnerContent = (
+      <div className='routeselector-picker-inner'>
+        {
+          props.optionSets.map(this.renderOptionSet)
+        }
+      </div>
+    );
 
     return (
-      <div
-        className={classNames({
-          'routeselector-picker': true,
-          'routeselector-multi-picker': true,
-          'routeselector-picker-no-shadow': props.noShadow,
-        })}
-        ref={this._fn(this._saveRefToState, 'pickerRef')}
+      <DrawerAnimation
+        open={this.isOpen()}
+        maxHeight={400 /* coordinate this with LESS */}
       >
-        <div className='routeselector-picker-inner routeselector-multi-picker-inner'>
+        <div
+          className={classNames({
+            'routeselector-picker': true,
+            'routeselector-picker-closed': !this.isOpen(),
+            'routeselector-picker-no-shadow': props.noShadow,
+          })}
+          ref={this._fn(this._saveRefToState, 'pickerRef')}
+        >
           {
-            props.optionSets.map(this.renderOptionSet)
+            pickerInnerContent
           }
         </div>
-      </div>
+      </DrawerAnimation>
     );
   }
 
@@ -331,41 +320,48 @@ export class RouteSelector extends TerrainComponent<Props>
 
     const showTextbox = optionSet.hasSearch || optionSet.hasOther;
 
-    let textboxProps;
+    let textboxContent = null;
     if (optionSet.hasSearch)
     {
-      textboxProps = {
-        value: state.searches.get(index),
-        label: 'Search Options',
-        onChange: this._fn(this.handleOptionSearch, index),
-        autoFocus: state.focusedSetIndex === index,
-      };
+      textboxContent = (
+        <SearchInput
+          value={state.searches.get(index)}
+          onChange={this._fn(this.handleOptionSearch, index)}
+          autoFocus={state.focusedSetIndex === index}
+          canEdit={true}
+          onKeyDown={this.handleInputKeyDown}
+          onFocus={this.handleOptionSearchFocus}
+          id={index}
+        />
+      );
     }
     if (optionSet.hasOther)
     {
-      textboxProps = {
-        value,
-        label: 'Value', // TODO confirm copy
-        onChange: this._fn(this.handleOtherChange, index),
-        autoFocus: state.focusedSetIndex === index && optionSet.focusOtherByDefault,
-      };
+      textboxContent = (
+        <FloatingInput
+          value={value}
+          label={'Value' /* TODO confirm copy */}
+          onChange={this._fn(this.handleOtherChange, index)}
+          autoFocus={state.focusedSetIndex === index && optionSet.focusOtherByDefault}
+          isTextInput={true}
+          canEdit={this.props.canEdit}
+          onKeyDown={this.handleInputKeyDown}
+          onFocus={this.handleOptionSearchFocus}
+          id={index}
+        />
+      );
     }
 
-    let valueComponentContent = null;
-    if (optionSet.valueComponent)
+    let getValueComponentContent = null;
+    if (optionSet.getValueComponent)
     {
-      const ValueComp = optionSet.valueComponent;
-
-      valueComponentContent = (
+      getValueComponentContent = (
         <div className='routeselector-value-component'>
-          <ValueComp
-            value={value}
-          />
+          {
+            optionSet.getValueComponent({ value })
+          }
         </div>
       );
-      // ({
-      //   value,
-      // });
     }
 
     return (
@@ -390,14 +386,9 @@ export class RouteSelector extends TerrainComponent<Props>
               <div
                 className='routeselector-search'
               >
-                <FloatingInput
-                  {...textboxProps}
-                  isTextInput={true}
-                  canEdit={this.props.canEdit}
-                  onKeyDown={this.handleInputKeyDown}
-                  onFocus={this.handleOptionSearchFocus}
-                  id={index}
-                />
+                {
+                  textboxContent
+                }
               </div>
               :
               <KeyboardFocus
@@ -413,7 +404,7 @@ export class RouteSelector extends TerrainComponent<Props>
           }
         </div>
         {
-          valueComponentContent
+          getValueComponentContent
         }
         <div
           className={classNames({
@@ -611,6 +602,7 @@ export class RouteSelector extends TerrainComponent<Props>
     const optionSet = props.optionSets.get(optionSetIndex);
     const search = state.searches.get(optionSetIndex);
     const isShowing = this.shouldShowOption(option, search);
+    const isSelected = props.values.get(optionSetIndex) === option.value;
 
     if (isShowing)
     {
@@ -630,7 +622,7 @@ export class RouteSelector extends TerrainComponent<Props>
           <div
             className={classNames({
               'routeselector-option': true,
-              'routeselector-option-selected': props.values.get(optionSetIndex) === option.value,
+              'routeselector-option-selected': isSelected,
               'routeselector-option-focused': state.focusedOptionIndex === visibleOptionsIndex
                 && optionSetIndex === state.focusedSetIndex
                 && state.focusedOptionIndex !== -1
@@ -642,8 +634,8 @@ export class RouteSelector extends TerrainComponent<Props>
           >
             <div
               className='routeselector-option-name'
-              style={OPTION_NAME_STYLE}
-              ref={'option-' + String(index)}
+              style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
+              key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
             >
               {
                 option.icon !== undefined &&
@@ -724,7 +716,9 @@ export class RouteSelector extends TerrainComponent<Props>
       focusedSetIndex: optionSetIndex + 1,
       focusedOptionIndex: 0,
     });
-    const option = props.optionSets.get(optionSetIndex).options.find((option) => option.value === value);
+
+    const option = props.optionSets.get(optionSetIndex).options.find((opt) => opt.value === value);
+
     if (optionSetIndex === props.optionSets.size - 1 || (option && option.closeOnPick))
     {
       this.close();
@@ -865,6 +859,25 @@ export class RouteSelector extends TerrainComponent<Props>
     this.close();
   }
 
+  private handleCloseClick()
+  {
+    if (this.state.open)
+    {
+      this.close();
+    }
+    else
+    {
+      //
+    }
+  }
+
+  private open()
+  {
+    this.setState({
+      open,
+    });
+  }
+
   private close()
   {
     this.setState({
@@ -875,6 +888,18 @@ export class RouteSelector extends TerrainComponent<Props>
       focusedSetIndex: -1,
       focusedOptionIndex: -1,
     });
+  }
+
+  private toggle()
+  {
+    if (this.state.open)
+    {
+      this.close();
+    }
+    else
+    {
+      this.open();
+    }
   }
 
   private handleValueRef(valueRef)
@@ -891,23 +916,29 @@ export class RouteSelector extends TerrainComponent<Props>
     });
   }
 
-  private attachOptionRef(setIndex, optionIndex, optionRef)
-  {
-    let { optionRefs } = this.state;
+  // private attachOptionRef(setIndex, optionIndex, optionRef)
+  // {
+  //   let { optionRefs } = this.state;
 
-    if (!optionRefs.get(setIndex))
-    {
-      optionRefs = optionRefs.set(setIndex, Map({}));
-    }
+  //   if (!optionRefs.get(setIndex))
+  //   {
+  //     optionRefs = optionRefs.set(setIndex, Map({}));
+  //   }
 
-    this.setState({
-      columnRefs: optionRefs.setIn([setIndex, optionIndex], optionRef),
-    });
-  }
+  //   this.setState({
+  //     columnRefs: optionRefs.setIn([setIndex, optionIndex], optionRef),
+  //   });
+  // }
 }
 
 const OPTION_NAME_STYLE = {
-  fontSize: 24,
+  'color': Colors().fontColor,
+  ':hover': {
+    color: Colors().active,
+  },
+};
+
+const OPTION_NAME_SELECTED_STYLE = {
   color: Colors().active,
 };
 

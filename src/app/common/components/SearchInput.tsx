@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands
+// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands no-var-requires
 
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
@@ -52,128 +52,13 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import styled, { StyledFunction } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-
-export let LARGE_FONT_SIZE = '52px';
-export let FONT_SIZE = '18px';
-export let LARGE_LABEL_FLOATING_FONT_SIZE = '14px';
-export let LABEL_FLOATING_FONT_SIZE = '10px';
-
-const ContainerC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
-const Container = ContainerC`
-  position: relative;
-  flex-grow: 1;
-  line-height: normal;
-  border: 1px solid ${Colors().inputBorder};
-  border-radius: 3px;
-  height: ${(props) => props.large ? '86px' : '48px'};
-  width: 100%;
-  box-sizing: border-box;
-  min-width: 100px;
-  background: ${Colors().textboxBg};
-
-  &:hover {
-    border-color: ${Colors().active};
-  }
-
-  ${(props) => props['noBorder'] && (`
-    border: none !important;
-    background: none;
-  `)}
-`;
-
-const LEFT = (props) => props.large ? '18px' : '12px';
-
-const LabelC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = styled.label;
-const Label = LabelC`
-  position: absolute;
-  left: ${LEFT};
-  top: 14px;
-  font-size: 16px;
-  transition: all 0.15s;
-  color: ${Colors().text3};
-  cursor: pointer;
-  text-transform: uppercase;
-
-  font-size: ${(props) =>
-  {
-    if (props.isFloating)
-    {
-      return props.large ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
-    }
-
-    return props.large ? LARGE_FONT_SIZE : FONT_SIZE;
-  }};
-`;
-
-const floatingLabelStyle = {
-  top: 6,
-};
-
-const inputStyle = `
-  padding-top: 20px;
-  padding-bottom: 4px;
-  border-radius: 3px;
-  width: 100%;
-  box-sizing: border-box;
-  border: none;
-  outline: none;
-  color: ${Colors().text1};
-  transition: all 0.15s;
-  color: ${Colors().active};
-
-  &:hover {
-    border-color: ${Colors().active};
-  }
-`;
-
-const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : FONT_SIZE;
-
-// duplication of code because the functions don't work if you put them
-//  in inputStyle
-const InputC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = styled.input;
-const Input = InputC`
-  ${inputStyle}
-  padding-left: ${LEFT};
-  padding-right: ${LEFT};
-  font-size: ${fontSizeFn};
-`;
-
-const InputDivC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
-const InputDiv = InputDivC`
-  ${inputStyle}
-  padding-left: ${LEFT};
-  padding-right: ${LEFT};
-  font-size: ${fontSizeFn};
-  cursor: pointer;
-`;
-
-interface InputProps
-{
-  noBorder?: boolean;
-  id?: string;
-  onChange?: (value) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  value?: any;
-  large?: boolean;
-  isFloating?: boolean;
-}
-
-interface InputDivProps
-{
-  noBorder?: boolean;
-  onClick?: () => void;
-  large?: boolean;
-  isFloating?: boolean;
-}
+import './SearchInputStyle.less';
+const SearchIcon = require('./../../../images/icon_search.svg');
 
 export interface Props
 {
-  label: string;
-  isTextInput: boolean;
   value: any;
 
   id?: any; // a unique identifier, pass to props handlers
@@ -181,20 +66,18 @@ export interface Props
   onClick?: (id: any) => void;
   onFocus?: (id: any) => void;
   canEdit?: boolean;
-  noBorder?: boolean;
-  large?: boolean;
-  forceFloat?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   autoFocus?: boolean;
   getValueRef?: (ref) => void;
   className?: string;
 }
 
-export class FloatingInput extends TerrainComponent<Props>
+@Radium
+export class SearchInput extends TerrainComponent<Props>
 {
   state = {
     isFocused: false,
-    myId: String(Math.random()) + '-floatinginput',
+    myId: String(Math.random()) + '-searchinput',
     valueRef: null,
   };
 
@@ -222,92 +105,34 @@ export class FloatingInput extends TerrainComponent<Props>
     const { props, state } = this;
     const { value, onClick } = props;
 
-    const isFloating = this.isFloating();
-
     return (
-      <Container
-        large={props.large}
-        noBorder={props.noBorder}
-        onClick={this._fn(props.onClick)}
-        className={props.className}
+      <div
+        onClick={props.onClick}
+        className={'search-input-wrapper ' + props.className}
+        style={state.isFocused ? FOCUSED_WRAPPER_STYLE : WRAPPER_STYLE}
+        key={'wrapper' + state.myId}
       >
-        {
-          this.renderValue()
-        }
-        <Label
-          large={props.large}
-          noBorder={props.noBorder}
-          isFloating={isFloating}
+        <label
           htmlFor={state.myId}
-          style={isFloating ? floatingLabelStyle : undefined}
+          className='search-input-label'
         >
-          {
-            props.label
-          }
-        </Label>
-      </Container>
-    );
-  }
-
-  private isFloating()
-  {
-    const { value, forceFloat } = this.props;
-
-    if (this.state.isFocused || forceFloat)
-    {
-      return true;
-    }
-
-    if (value === undefined || value === null)
-    {
-      return false;
-    }
-
-    if (('' + value).length > 0)
-    {
-      return true;
-    }
-
-    return false;
-  }
-
-  private renderValue()
-  {
-    const { props, state } = this;
-    const { value } = props;
-
-    if (props.isTextInput)
-    {
-      // Return a text input
-      return (
-        <Input
+          <SearchIcon />
+        </label>
+        <input
+          className='search-input'
+          style={state.isFocused ? FOCUSED_INPUT_STYLE : INPUT_STYLE}
           type='text'
-          large={props.large}
           value={value === null || value === undefined ? '' : value}
           onChange={this.handleChange}
           autoFocus={props.autoFocus}
-          noBorder={props.noBorder}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           id={state.myId}
           ref={this.getValueRef}
           onKeyDown={this.handleKeyDown}
+          key={'input' + state.myId}
         />
-      );
-    }
-
-    // Return a normal div, uneditable
-    return (
-      <InputDiv
-        {...props as any}
-        ref={props.getValueRef}
-        onClick={this.handleClick}
-        noBorder={props.noBorder}
-      >
-        {
-          value
-        }
-      </InputDiv>
+      </div>
     );
   }
 
@@ -328,7 +153,7 @@ export class FloatingInput extends TerrainComponent<Props>
     });
 
     const { props } = this;
-    if (props.onFocus)
+    if (props.onFocus !== undefined)
     {
       props.onFocus(props.id);
     }
@@ -346,6 +171,7 @@ export class FloatingInput extends TerrainComponent<Props>
     this.setState({
       valueRef: ref,
     });
+
     if (this.props.getValueRef)
     {
       this.props.getValueRef(ref);
@@ -384,4 +210,30 @@ export class FloatingInput extends TerrainComponent<Props>
   }
 }
 
-export default FloatingInput;
+const FOCUSED_INPUT_STYLE = {
+  color: Colors().active,
+  borderColor: Colors().active,
+  background: Colors().bg,
+};
+
+const INPUT_STYLE = {
+  color: Colors().fontColor,
+  background: Colors().blockBg,
+  borderColor: Colors().blockBg,
+
+  // hover sometimes get stuck; also, I'm not sure if we want that
+  // ':hover': FOCUSED_INPUT_STYLE,
+};
+
+const FOCUSED_WRAPPER_STYLE = {
+  // color needed to trigger the fill: currentColor for SVG
+  color: Colors().active,
+};
+
+const WRAPPER_STYLE = {
+  color: Colors().fontColorLightest,
+
+  // ':hover': FOCUSED_WRAPPER_STYLE,
+};
+
+export default SearchInput;

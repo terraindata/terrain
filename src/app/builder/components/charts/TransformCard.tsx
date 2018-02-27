@@ -340,7 +340,7 @@ class TransformCard extends TerrainComponent<Props>
       bars.push({
         id: '' + j,
         count: theHist[j].doc_count,
-        percentage: totalDoc ? (theHist[j].doc_count / totalDoc) : '',
+        percentage: totalDoc ? (theHist[j].doc_count / totalDoc) : 0,
         range: {
           min: theHist[j].key,
           max: theHist[j + 1].key,

@@ -85,7 +85,11 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
 import Util from 'app/util/Util';
+<<<<<<< HEAD
 import { Hit } from 'builder/components/results/ResultTypes';
+=======
+import { _Hit, Hit } from 'builder/components/results/ResultTypes';
+>>>>>>> 1186-simple-builder
 // import TerrainTools from 'util/TerrainTools';
 >>>>>>> 1186-path-picker-2
 import { BuilderState } from 'builder/data/BuilderState';
@@ -160,7 +164,7 @@ export const _Score = (config?: { [key: string]: any }) =>
 
 class LineC extends BaseClass
 {
-  public weight: number = 1;
+  public weight: number = 20;
   public weightSet: boolean = false;
 }
 export type Line = LineC & IRecord<LineC>;

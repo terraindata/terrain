@@ -1,10 +1,10 @@
 @import "../../common/Common.less";
 
-@br: 6px;
+@br: 4px;
 @option-max-height: 350px;
 @option-max-width: calc(~"50% - 16px");
 @close-width: 35px;
-@picker-height: 450px;
+@picker-height: 400px;
 
 .routeselector-wrapper {
 	width: 100%;
@@ -19,8 +19,49 @@
 		box-sizing: border-box;
 	}
 	
-	.routeselector-box-value {
+	&.routeselector-open {
+		z-index: 1000;
+		box-shadow: 0 6px 23px 0 rgba(0,0,0,0.16);
+	}
+	
+	.routeselector-box-values {
+		position: relative;
+		overflow: hidden;
+		
+	  &.routeselector-box-value-open {
+	    z-index: 1;
+		}
+			
+	  .transition;
+	    
+		display: flex;
+		align-items: center;
+		width: 100%;
+		background: #fff;
+		
+		padding-right: 24px;
+		
 		border-bottom: 1px solid #eee;
+		
+		cursor: pointer;
+		
+		&.routeselector-box-values-open {
+			z-index: 1004;
+		}
+		
+		&:hover:not(.routeselector-box-values-open) {
+			background: #f5f5f5;
+		}
+		
+    &.routeselector-box-values-open:not(.routeselector-box-values-force-open) {
+    	border-top-left-radius: @br;
+    	border-top-right-radius: @br;
+    }
+	}
+
+	
+	.routeselector-box-value {
+    flex-grow: 1;
 		padding: 12px;
 		box-sizing: border-box;
 		
@@ -31,21 +72,9 @@
 		
     .transition;
     
-    background: #fff;
-    
     display: flex;
     align-items: center;
-    
-    
-    &.routeselector-box-value-open:not(.routeselector-box-value-force-open) {
-    	border-top-left-radius: @br;
-    	border-top-right-radius: @br;
-    }
-    &:hover {
-    	&:not(.routeselector-box-value-open) {
-	    	background: #f5f5f5;
-    	}
-    }
+		border-radius: 0px;
 	}
 	
 	.routeselector-close {
@@ -56,6 +85,7 @@
   	opacity: 0;
   	margin: 12px;
   	width: @close-width;
+  	.noselect;
   }
   
 	.routeselector-box-values-open:not(.routeselector-box-values-force-open),
@@ -68,48 +98,30 @@
     
 	
 	.routeselector-picker {
-		position: absolute;
-		@LEFT: 0px;
-		left: @LEFT;
-		width: calc(~"100% - 2 * @{LEFT}");
 		box-sizing: border-box;
-		border-top: 1px solid #eee;
-		padding: 12px;
+		padding: 0px;
 		border-bottom-left-radius: @br;
 		border-bottom-right-radius: @br;
-		&:not(.routeselector-picker-no-shadow) {
-			box-shadow: 0px 0px 24px rgba(0,0,0,0.25);
-		}
 		background: #fff;
 
-		z-index: 1002;
-		opacity: 1;
-		
 		max-height: @picker-height;
-		overflow: auto;
-		
-		.transition;
-		
+
 		.routeselector-picker-inner {
-			opacity: 1;
-	    height: 100%;
-	    max-height: @picker-height;
-		}
-		
-		.routeselector-multi-picker-inner {
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: top;
 			padding-right: @close-width;
-		}
-		
-		&.routeselector-multi-picker {
-			padding: 0px;
+
+	    max-height: @picker-height;
 		}
 		
 		.routeselector-header {
 			margin: 6px;
 			font-size: 16px;
+		}
+		
+		.routeselector-search {
+			padding: 0px 12px;
 		}
 		
 		.routeselector-option-set {
@@ -150,8 +162,12 @@
 			
 			.routeselector-option {
 				max-height: @option-max-height;
-				border-bottom: 1px solid #eee;
+				border: 1px solid rgba(255,255,255,0);
+				border-radius: 4px;
 				padding: 6px;
+				.transition;
+				
+				margin-right: 6px; // TODO remove when scorebars are removed
 				
 				// used in original, may still be needed for Sources
 		    //  max-width: @option-max-width;
@@ -163,10 +179,6 @@
 				
 				display: flex;
 				flex-direction: column;
-				
-				&:hover {
-					border-color: #1eb4fa;
-				}
 				
 				&.routeselector-option-focused {
 					&:before {
@@ -267,7 +279,7 @@
 
 .routeselector-option-name {
 	padding: 6px 12px;
-	font-size: 24px;
+	font-size: 18px;
 	max-width: 100%;
   // overflow: hidden; // TODO figure out how to make this work without making the name smaller
   //  current turning this on will clip the name
@@ -275,7 +287,7 @@
 }
 
 .routeselector-veil, .routeselector-veil-open {
-	.transition;
+	.transition(~"all 0.25s");
 	position: absolute;
 	left: 0px;
 	top: 0px;
@@ -290,7 +302,8 @@
 }
 
 .routeselector-veil-open {
-	background: rgba(0,0,0,0.25);
+	background: rgba(255,255,255,0.65);
+	.transition(~"all 1s");
 }
 
 .routeselector.routeselector-picked .routeselector-veil,
@@ -377,46 +390,4 @@
 	// 	}
 	// }
 	
-}
-
-.routeselector-box-values {
-	position: relative;
-	
-  &.routeselector-box-value-open {
-    z-index: 1;
-	}
-		
-  .transition;
-    
-	display: flex;
-	width: 100%;
-	background: #fff;
-	
-	padding-right: 24px;
-	
-	border-bottom: 1px solid #eee;
-	
-	cursor: pointer;
-	
-	.routeselector-box-value {
-		flex-grow: 1;
-		border-bottom: none;
-	}
-	
-	&.routeselector-box-values-open {
-		z-index: 1001;
-	}
-	
-	&:hover:not(.routeselector-box-values-open) {
-		// background: #f5f5f5;
-	}
-	
-	.routeselector-box-value,
-	.routeselector-box-value:hover {
-		background: none;
-	}
-	
-	.routeselector-box-value {
-		border-radius: 0px;
-	}
 }
