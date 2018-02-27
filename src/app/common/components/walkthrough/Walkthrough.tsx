@@ -190,7 +190,20 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
       {
         const nextHistory = stepHistory.push(link);
         this.props.setSteps(stepIndex + 1, nextHistory);
+
+        // call onArrive for next options
+        const graphNode = graph[link as any];
+        if (graphNode != null)
+        {
+          graphNode.options.forEach((option, i) => {
+            if (option.onArrive != null)
+            {
+              option.onArrive(this.props.transitionParams);
+            }
+          });
+        }
       }
+
     }
 
     public handleMoveToNextFactory(link: ViewEnum)

@@ -55,11 +55,11 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import DatabasePicker from 'etl/common/components/DatabasePicker';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _SinkConfig, _SourceConfig, _FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SinkOptionsType, Sinks } from 'shared/etl/types/EndpointTypes';
-import { Languages } from 'shared/etl/types/ETLTypes';
+import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, TransitionParams, StepProps } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
@@ -90,6 +90,13 @@ class PickDatabaseStep extends ETLStepComponent
       state: {
         sink: _SinkConfig({
           type: Sinks.Database,
+          fileConfig: _FileConfig({
+            fileType: FileTypes.Json,
+            jsonNewlines: false,
+          }),
+          options: {
+            language: Languages.Elastic
+          }
         }),
       }
     });

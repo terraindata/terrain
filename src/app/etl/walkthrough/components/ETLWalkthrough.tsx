@@ -59,6 +59,7 @@ import Util from 'util/Util';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 
+import ETLReviewStep from './ETLReviewStep';
 import ETLUploadStep from './ETLUploadStep';
 import './ETLWalkthrough.less';
 import PickDatabaseStep from './PickDatabaseStep';
@@ -307,7 +308,7 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.Finish,
-          component: null,
+          component: ETLReviewStep,
         },
       ],
     },

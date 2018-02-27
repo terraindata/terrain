@@ -123,15 +123,24 @@ class DatabasePicker extends TerrainComponent<Props>
   }
 
   @memoizeOne
+  public _getSortedServers(servers: ServerMap): List<Server>
+  {
+    return servers.map((server, k) => server)
+      .sort((s1, s2) => s1.name.localeCompare(s2.name)).toList();
+  }
+
+  @memoizeOne
   public _getServerIds(servers: ServerMap): List<ID>
   {
-    return servers.map((server, k) => server.id).toList();
+    return this._getSortedServers(servers)
+      .map((server, k) => server.id).toList();
   }
 
   @memoizeOne
   public _getServerOptions(servers: ServerMap): List<string>
   {
-    return servers.map((server, k) => server.name).toList();
+    return this._getSortedServers(servers)
+      .map((server, k) => server.name).toList();
   }
 
   public getServerOptions(state: FormState): List<string>
@@ -188,7 +197,8 @@ class DatabasePicker extends TerrainComponent<Props>
   @memoizeOne
   public _getServerIndex(servers: ServerMap, serverId: ID): number
   {
-    const index = servers.toList().findIndex((server, k) => server.id === serverId);
+    const index = this._getSortedServers(servers)
+      .findIndex((server, k) => server.id === serverId);
     return index != null ? index : -1;
   }
 
@@ -221,7 +231,7 @@ class DatabasePicker extends TerrainComponent<Props>
   }
 }
 
-const minHeight = '160px';
+const minHeight = '175px';
 
 export default Util.createTypedContainer(
   DatabasePicker,

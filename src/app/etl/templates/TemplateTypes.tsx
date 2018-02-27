@@ -52,11 +52,7 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import
-{
-  Languages, TemplateTypes,
-  Template as TemplateI,
-} from 'shared/etl/types/ETLTypes';
+import { Languages, Template as TemplateI } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class TemplateEditorStateC
@@ -86,7 +82,6 @@ class ETLTemplateC implements TemplateI
 {
   public id = -1;
   public templateName = '';
-  public type = TemplateTypes.Import;
   public transformationEngine = new TransformationEngine();
   public transformationConfig = null;
   public sources = null;

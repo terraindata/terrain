@@ -69,7 +69,6 @@ export interface Template
 {
   id: ID;
   templateName: string;
-  type: TemplateTypes; // TODO get rid of?
   transformationEngine: TransformationEngine;
   transformationConfig: any; // terrain rank, what to do on failures
   sources: {

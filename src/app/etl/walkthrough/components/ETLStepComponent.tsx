@@ -112,7 +112,7 @@ export abstract class ETLStepComponent<Props extends StepProps = StepProps> exte
     return 'etl-alt-button';
   }
 
-  public _renderNextButton(shown = true, enabled = true)
+  public _renderNextButton(shown = true, enabled = true, text = 'Next')
   {
     return (
       <span
@@ -128,7 +128,7 @@ export abstract class ETLStepComponent<Props extends StepProps = StepProps> exte
             onClick={enabled ? this.props.onDone : () => null}
             style={this._getButtonStyle(enabled)}
           >
-            Next
+            {text}
           </div>
         </Quarantine>
       </span>

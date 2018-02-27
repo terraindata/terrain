@@ -52,12 +52,10 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig }
   from 'etl/EndpointTypes';
-import { TemplateTypes } from 'shared/etl/types/ETLTypes';
 
 class WalkthroughStateC
 {
-  public stepHistory: List<ViewState> = List([ViewState.PickLocalFile]);
-  public type: TemplateTypes = null;
+  public stepHistory: List<ViewState> = List([ViewState.NewImport]);
   public source: SourceConfig = _SourceConfig();
   public file: File = null;
   public sink: SinkConfig = _SinkConfig();

@@ -63,8 +63,6 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-import { TemplateTypes } from 'shared/etl/types/ETLTypes';
-
 /*
  *  This class defines a base class with useful functions that are used by components
  *  that handle UI for template editor fields.
@@ -208,12 +206,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _noopIfDisabled<F>(fn: F): F | undefined
   {
     return this._inputDisabled() ? undefined : fn;
-  }
-
-  protected _isExport(): boolean
-  {
-    return this._template !== undefined &&
-      this._template.type === TemplateTypes.Export;
   }
 
   private onRootMutation(field: TemplateField)

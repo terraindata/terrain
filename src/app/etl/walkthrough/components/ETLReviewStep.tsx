@@ -51,9 +51,6 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import FadeInOut from 'common/components/FadeInOut';
-import FilePicker from 'common/components/FilePicker';
-
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -61,119 +58,104 @@ import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/Endpoi
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';
-import { Sources } from 'shared/etl/types/EndpointTypes';
+import { Sinks, Sources, SourceOptionsType, SinkOptionsType  } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, TransitionParams, StepProps } from './ETLStepComponent';
 import './ETLStepComponent.less';
-import SourceFileTypeOptions from './SourceFileTypeOptions';
 
-const UploadIcon = require('images/icon_export.svg');
-
-class ETLUploadStep extends ETLStepComponent
+class ETLReviewStep extends ETLStepComponent
 {
-  public static onRevert(params: TransitionParams)
+  public isImport()
   {
-    params.act({
-      actionType: 'setState',
-      state: {
-        file: null,
-        source: _SourceConfig(),
-      },
-    });
+    const { walkthrough } = this.props;
+    return walkthrough.sink.type === Sinks.Database;
   }
 
-  public static onArrive(params: TransitionParams)
+  public renderRow(label, value)
   {
-    params.act({
-      actionType: 'setState',
-      state: {
-        file: null,
-        source: _SourceConfig({
-          type: Sources.Upload,
-        }),
-      }
-    });
-  }
-
-  public renderUploadSection()
-  {
-    const button = (
-      <div
-        className={this._altButtonClass()}
-        style={this._altButtonStyle()}
-      >
-        <UploadIcon />
-        <div className='alt-button-text'>
-          Choose a File
+    return (
+      <div className='etl-review-step-row' key={label}>
+        <div className='etl-review-step-label' style={labelStyle}>
+          {label}
+        </div>
+        <div className='etl-review-step-value' style={valueStyle}>
+          {value}
         </div>
       </div>
     );
+  }
 
-    const file = this.props.walkthrough.file;
-    const showFileName = file != null;
+  public renderSourceInfo() // TODO should info for other sources
+  {
+    const { walkthrough } = this.props;
+    const { source, file } = walkthrough;
+    return [
+      this.renderRow('Source Type', source.type),
+      source.type === Sources.Upload ? this.renderRow('File Name', file.name) : null,
+    ];
+  }
+
+  public renderSinkInfo() // TODO show info for other sinks
+  {
+    const { walkthrough } = this.props;
+    const { sink } = walkthrough;
+    const options = sink.options as SinkOptionsType<Sinks.Database>;
+    return [
+      this.renderRow('Sink Type', sink.type),
+      ... sink.type !== Sinks.Database ? [] :
+      [
+        this.renderRow('Server', options.serverId ), // TODO show the server name
+        this.renderRow('Database', options.database ),
+        this.renderRow('Table', options.table)
+      ],
+    ];
+  }
+
+  public renderSummary()
+  {
+    const { walkthrough } = this.props;
+    const { source, sink, file, chosenTemplateId } = walkthrough;
     return (
-      <div className='etl-transition-column'>
-        <FilePicker
-          large={true}
-          onChange={this.handleChangeFile}
-          accept={'.csv,.json'}
-          customButton={button}
-        />
-        <span
-          style={{
-            minHeight: transitionRowHeight,
-            marginTop: '6px',
-          }}
-        >
-          <div
-            className='etl-transition-element step-upload-filename'
-            style={{ height: showFileName ? transitionRowHeight : '0px' }}
-          >
-            {showFileName ? file.name : 'Invalid File'}
-          </div>
-        </span>
+      <div className='etl-review-column'>
+        {this.renderRow('Type', this.isImport() ? 'Import' : 'Export')}
+        <div className='etl-review-gap' style={gapStyle}/>
+        {... this.renderSourceInfo()}
+        <div className='etl-review-gap' style={gapStyle}/>
+        {... this.renderSinkInfo()}
       </div>
     );
+  }
+
+  public renderSummaryChosenTemplate()
+  {
+    return null; // TODO
   }
 
   public render()
   {
-    const filePicked = this.props.walkthrough.file != null;
+    const { walkthrough } = this.props;
     return (
-      <div className='etl-transition-column etl-upload-step'>
-        {this.renderUploadSection()}
-        <SourceFileTypeOptions
-          hide={!filePicked}
-        />
+      <div className='etl-transition-column etl-review-step'>
+        {
+          walkthrough.chosenTemplateId !== -1 ?
+            this.renderSummaryChosenTemplate()
+            :
+            this.renderSummary()
+        }
         <div className='etl-step-next-button-spacer'>
-          {this._renderNextButton(filePicked)}
+          { this._renderNextButton() }
         </div>
       </div>
     );
   }
-
-  public handleChangeFile(file: File)
-  {
-    const walkthrough = this.props.walkthrough;
-    this.props.act({
-      actionType: 'setState',
-      state: {
-        file,
-      },
-    });
-    if (getFileType(file) === FileTypes.Json)
-    {
-      this.props.act({
-        actionType: 'autodetectJsonOptions',
-        file,
-      });
-    }
-  }
 }
 
-const transitionRowHeight = '28px';
+const labelStyle = fontColor(Colors().text2);
+const valueStyle = fontColor(Colors().text2);
+const gapStyle = { borderBottom: `1px solid ${Colors().border1}`}
+
 export default Util.createTypedContainer(
-  ETLUploadStep,
+  ETLReviewStep,
   ['walkthrough'],
   { act: WalkthroughActions },
 );
