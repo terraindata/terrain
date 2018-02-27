@@ -53,7 +53,8 @@ import * as React from 'react';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Quarantine from 'util/RadiumQuarantine';
-import {
+import
+{
   ComponentProps,
   WalkthroughComponentClass,
   WalkthroughGraphNode,
@@ -107,17 +108,17 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
               context={this.props.context}
               onDone={this.handleMoveToNextFactory(option.link)}
             />
-            { option.componentNeedsButton ? buttonComponent : null }
+            {option.componentNeedsButton ? buttonComponent : null}
           </div>
         );
         // TODO style the container
         return (
-          [ orText, customComponent ]
+          [orText, customComponent]
         );
       }
       else
       {
-        return ([ orText, buttonComponent ]);
+        return ([orText, buttonComponent]);
       }
     }
 
@@ -126,13 +127,13 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
       return (
         <div className='walkthrough-step-view'>
           <div className='walkthrough-step-prompt'>
-            { node.prompt }
+            {node.prompt}
           </div>
           <div className='walkthrough-additional-text'>
-            { node.additionalText }
+            {node.additionalText}
           </div>
           <div className='walkthrough-options'>
-            { node.options.map(this.renderOption) }
+            {node.options.map(this.renderOption)}
           </div>
         </div>
       );
@@ -171,9 +172,11 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
           // 2: call onRevert for each option that has it defined
           const nextHistory = stepHistory.slice(0, stepIndex + 1).toList().push(link);
           const removedSteps = stepHistory.slice(stepIndex + 1);
-          removedSteps.forEach((step, i) => {
+          removedSteps.forEach((step, i) =>
+          {
             const graphNode = graph[step as any];
-            graphNode.options.forEach((option, j) => {
+            graphNode.options.forEach((option, j) =>
+            {
               if (option.onRevert != null)
               {
                 option.onRevert(this.props.revertParams);

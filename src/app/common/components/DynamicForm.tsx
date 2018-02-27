@@ -171,7 +171,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     return (
       <div className='dynamic-form-pick-block' key={index}>
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
-        <span style={{marginLeft: '0px'}}>
+        <span style={{ marginLeft: '0px' }}>
           <Dropdown
             className='dynamic-form-pick'
             selectedIndex={this.props.inputState[stateName]}
@@ -181,7 +181,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           />
         </span>
       </div>
-    ); 
+    );
   }
 
   public renderInputElement(inputInfo: InputDeclarationType<S>, stateName, state: S, index): any
@@ -192,7 +192,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       <FadeInOut
         key={index}
         open={displayState !== DisplayState.Hidden}
-        style={{flexGrow: inputInfo.dontFillSpace ? '0': '1'}}
+        style={{ flexGrow: inputInfo.dontFillSpace ? '0' : '1' }}
       >
         <div className={inputInfo.className} style={inputInfo.style}>
           {renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive)}

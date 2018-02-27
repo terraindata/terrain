@@ -88,7 +88,7 @@ class ETLUploadStep extends ETLStepComponent
         className={this._altButtonClass()}
         style={this._altButtonStyle()}
       >
-        <UploadIcon/>
+        <UploadIcon />
         <div className='alt-button-text'>
           Choose a File
         </div>
@@ -113,9 +113,9 @@ class ETLUploadStep extends ETLStepComponent
         >
           <div
             className='etl-transition-element step-upload-filename'
-            style={{height: showFileName ? transitionRowHeight : '0px'}}
+            style={{ height: showFileName ? transitionRowHeight : '0px' }}
           >
-            { showFileName ? file.name : 'Invalid File' }
+            {showFileName ? file.name : 'Invalid File'}
           </div>
         </span>
       </div>
@@ -127,12 +127,12 @@ class ETLUploadStep extends ETLStepComponent
     const filePicked = this.props.walkthrough.file != null;
     return (
       <div className='etl-transition-column etl-upload-step'>
-        { this.renderUploadSection() }
+        {this.renderUploadSection()}
         <SourceFileTypeOptions
           hide={!filePicked}
         />
         <div className='etl-step-next-button-spacer'>
-          { this._renderNextButton(filePicked) }
+          {this._renderNextButton(filePicked)}
         </div>
       </div>
     );

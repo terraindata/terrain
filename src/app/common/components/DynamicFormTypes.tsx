@@ -63,7 +63,7 @@ export type InputDeclarationMap<State extends { [k: string]: any }> =
 export interface InputDeclarationOptionTypes<S = any>
 {
   TextBox: {
-    acOptions?: (state: S) => List<string>
+    acOptions?: (state: S) => List<string>,
   };
   NumberBox: {
     acOptions?: (state: S) => List<string>;
@@ -73,7 +73,7 @@ export interface InputDeclarationOptionTypes<S = any>
     large?: boolean;
   };
   Pick: {
-    pickOptions: (state: S) => List<string>
+    pickOptions: (state: S) => List<string>,
   };
 }
 

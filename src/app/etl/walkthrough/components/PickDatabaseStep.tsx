@@ -54,12 +54,12 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { SinkOptionsType } from 'shared/etl/types/EndpointTypes';
-import { Languages } from 'shared/etl/types/ETLTypes';
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { SinkOptionsType } from 'shared/etl/types/EndpointTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, RevertParams, StepProps } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
@@ -69,6 +69,8 @@ interface Props extends StepProps
   walkthrough?: WalkthroughState;
 }
 
+type DbOptions = SinkOptionsType<'Database'>;
+
 class PickDatabaseStep extends ETLStepComponent
 {
   public static onRevert(params: RevertParams)
@@ -77,31 +79,14 @@ class PickDatabaseStep extends ETLStepComponent
       actionType: 'setState',
       state: {
         sink: _SinkConfig(),
-      }
+      },
     });
-  }
-
-  public renderPickDbSection()
-  {
-    return (
-      <DatabasePicker
-        language={Languages.Elastic}
-        serverId={-1}
-        database={''}
-        table={''}
-      />
-    );
-  }
-
-  public renderPickIndexSection(show: boolean)
-  {
-
   }
 
   public render()
   {
     const { walkthrough } = this.props;
-    const { serverId, database, table } = walkthrough.sink.options as SinkOptionsType<'Database'>;
+    const { serverId, database, table } = walkthrough.sink.options as DbOptions;
     const serverPicked = serverId != null;
     const databasePicked = database != null;
     const tablePicked = table != null;
@@ -111,15 +96,33 @@ class PickDatabaseStep extends ETLStepComponent
       <div className='etl-transition-column etl-walkthrough-db-step'>
         <DatabasePicker
           language={Languages.Elastic}
-          serverId={-1}
-          database={''}
-          table={''}
+          serverId={serverId != null ? serverId : -1}
+          database={database != null ? database : ''}
+          table={table != null ? table : ''}
+          onChange={this.handleDbPickerChange}
         />
         <div className='etl-step-next-button-spacer'>
-          { this._renderNextButton(optionsAreGood) }
+          {this._renderNextButton(optionsAreGood)}
         </div>
       </div>
     );
+  }
+
+  public handleDbPickerChange(serverId: ID, database: string, table: string)
+  {
+    const changedOptions: Partial<DbOptions> = {
+      serverId,
+      database,
+      table,
+    };
+    const updater = (options: DbOptions) =>
+    {
+      return _.extend({}, options, changedOptions);
+    };
+    this.props.act({
+      actionType: 'setEndpointOptions',
+      sinkOptions: updater,
+    });
   }
 }
 

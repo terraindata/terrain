@@ -59,12 +59,12 @@ const { List, Map } = Immutable;
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
-import { DatabaseMap, Database, ServerMap, Server, TableMap, Table} from 'schema/SchemaTypes';
+import { Database, DatabaseMap, Server, ServerMap, Table, TableMap } from 'schema/SchemaTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
 interface FormState
 {
-  serverIdIndex: number;
+  serverIndex: number;
   database: string;
   table: string;
 }
@@ -75,6 +75,7 @@ interface Props
   serverId: ID;
   database: string;
   table: string;
+  onChange: (server: ID, database: string, table: string) => void;
   // injected props
   servers?: ServerMap;
   databases?: DatabaseMap;
@@ -85,36 +86,118 @@ class DatabasePicker extends TerrainComponent<Props>
 {
   private inputMap: InputDeclarationMap<FormState>;
 
-  public state: FormState = 
-  {
-    serverIdIndex: -1,
-    database: '',
-    table: '',
-  };
+  // public state: FormState =
+  // {
+  //   serverIndex: -1,
+  //   database: '',
+  //   table: '',
+  // };
 
   constructor(props)
   {
     super(props);
     this.inputMap = {
-      serverIdIndex: {
+      serverIndex: {
         type: DisplayType.Pick,
         displayName: 'Server',
         options: {
           pickOptions: this.getServerOptions,
-        }
+        },
       },
       database: {
         type: DisplayType.TextBox,
         displayName: 'Database',
+        options: {
+          acOptions: this.getDatabaseOptions,
+        },
       },
-    }
+      table: {
+        type: DisplayType.TextBox,
+        displayName: 'Table',
+        options: {
+          acOptions: this.getTableOptions,
+        },
+      },
+    };
+  }
+
+  @memoizeOne
+  public _getServerIds(servers: ServerMap): List<ID>
+  {
+    return servers.map((server, k) => server.id).toList();
+  }
+
+  @memoizeOne
+  public _getServerOptions(servers: ServerMap): List<string>
+  {
+    return servers.map((server, k) => server.name).toList();
   }
 
   public getServerOptions(state: FormState): List<string>
   {
-    return this.props.servers.map(
-      (server, index) => server.name
-    ).toList();
+    return this._getServerOptions(this.props.servers);
+  }
+
+  @memoizeOne
+  public _getDatabaseOptions(databases: DatabaseMap, serverId: ID): List<string>
+  {
+    return databases
+      .filter(
+        (database, k) => database.serverId === serverId,
+      ).map(
+        (database, k) => database.name,
+      ).toList();
+  }
+
+  public getDatabaseOptions(state: FormState): List<string>
+  {
+    return this._getDatabaseOptions(this.props.databases, this.props.serverId);
+  }
+
+  @memoizeOne
+  public _getDatabaseByName(databases: DatabaseMap, name: string): Database
+  {
+    return databases.find((database, k) => database.name === name);
+  }
+
+  @memoizeOne
+  public _getTableOptions(tables: TableMap,
+    databases: DatabaseMap,
+    databaseName: string): List<string>
+  {
+    const currentDatabase = this._getDatabaseByName(databases, databaseName);
+    if (currentDatabase == null)
+    {
+      return List([]);
+    }
+    return tables
+      .filter(
+        (table, k) => table.databaseId === currentDatabase.id,
+      ).map(
+        (table, k) => table.name,
+      ).toList();
+  }
+
+  public getTableOptions(state: FormState): List<string>
+  {
+    // database is a string...
+    return this._getTableOptions(this.props.tables, this.props.databases, this.props.database);
+  }
+
+  @memoizeOne
+  public _getServerIndex(servers: ServerMap, serverId: ID): number
+  {
+    const index = servers.toList().findIndex((server, k) => server.id === serverId);
+    return index != null ? index : -1;
+  }
+
+  public computeFormState()
+  {
+    return {
+      serverIndex: this._getServerIndex(this.props.servers, this.props.serverId),
+      database: this.props.database,
+      table: this.props.table,
+    };
   }
 
   public render()
@@ -122,15 +205,17 @@ class DatabasePicker extends TerrainComponent<Props>
     return (
       <DynamicForm
         inputMap={this.inputMap}
-        inputState={this.state}
+        inputState={this.computeFormState()}
         onStateChange={this.handleStateChange}
       />
-    )
+    );
   }
 
   public handleStateChange(state: FormState)
   {
-    this.setState(state);
+    const serverId = state.serverIndex !== -1 ?
+      this._getServerIds(this.props.servers).get(state.serverIndex) : -1;
+    this.props.onChange(serverId, state.database, state.table);
   }
 }
 
@@ -141,5 +226,5 @@ export default Util.createTypedContainer(
     ['schema', 'databases'],
     ['schema', 'tables'],
   ],
-  { },
+  {},
 );

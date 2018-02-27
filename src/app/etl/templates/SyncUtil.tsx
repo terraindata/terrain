@@ -49,8 +49,11 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
-import { _TemplateField, _TransformationNode,
-  TemplateField, TransformationNode }
+import
+{
+  _TemplateField, _TransformationNode,
+  TemplateField, TransformationNode,
+}
   from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 

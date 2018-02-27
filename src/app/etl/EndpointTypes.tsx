@@ -50,7 +50,8 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import {
+import
+{
   FileConfig as FileConfigI,
   SinkConfig as SinkConfigI,
   SinkOptionsType, Sinks,

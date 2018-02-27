@@ -60,8 +60,8 @@ import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 
 import ETLUploadStep from './ETLUploadStep';
-import PickDatabaseStep from './PickDatabaseStep';
 import './ETLWalkthrough.less';
+import PickDatabaseStep from './PickDatabaseStep';
 
 const { List } = Immutable;
 
@@ -93,7 +93,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
           stepHistory={walkthrough.stepHistory}
           setSteps={this.handleStepsChange}
         />
-        <div className='etl-walkthrough-spacer'/>
+        <div className='etl-walkthrough-spacer' />
       </div>
     );
   }
@@ -151,161 +151,161 @@ export default Util.createContainer(
 );
 
 export const walkthroughGraph: WalkthroughGraphType<ViewState> =
-{
-  [ViewState.Start]: {
-    prompt: 'What Would You Like to Do?',
-    options: [
-      {
-        link: ViewState.Export,
-        buttonText: 'Export a File',
-      },
-      {
-        link: ViewState.Import,
-        buttonText: 'Import a File',
-      },
-    ],
-  },
-  // Export
-  [ViewState.Export]: {
-    prompt: 'Export a File',
-    crumbText: 'Export',
-    options: [
-      {
-        link: ViewState.PickExportAlgorithm,
-        buttonText: 'Start a New Export',
-      },
-      {
-        link: ViewState.PickExportTemplate,
-        buttonText: 'Use an Existing Export',
-      },
-    ],
-  },
-  [ViewState.PickExportTemplate]: {
-    prompt: 'Select a Saved Export Template',
-    crumbText: 'Select Template',
-    options: [
-      {
-        link: ViewState.Review,
-        component: null,
-      },
-    ],
-  },
-  [ViewState.PickExportAlgorithm]: {
-    prompt: 'Select an Algorithm to Export From',
-    crumbText: 'Select Algorithm',
-    options: [
-      {
-        link: ViewState.ExportDestination,
-        component: null,
-      },
-    ],
-  },
-  [ViewState.ExportDestination]: {
-    prompt: 'Where Would You Like the Results?',
-    crumbText: 'Destination Type',
-    additionalText: 'You can always change this later',
-    options: [
-      {
-        link: ViewState.Review,
-        buttonText: 'Download The Results',
-        default: true,
-      },
-      {
-        link: ViewState.PickExportDestination,
-        buttonText: 'Send to a Custom Destination',
-      },
-    ],
-  },
-  [ViewState.PickExportDestination]: {
-    prompt: 'Select an Export Destination',
-    crumbText: 'Export Destination',
-    options: [
-      {
-        link: ViewState.Review,
-        component: null,
-      },
-    ],
-  },
-  // Import
-  [ViewState.Import]: {
-    prompt: 'Import a File',
-    crumbText: 'Import',
-    options: [
-      {
-        link: ViewState.NewImport,
-        buttonText: 'Start a New Import',
-      },
-      {
-        link: ViewState.PickImportTemplate,
-        buttonText: 'Use an Existing Import',
-      },
-    ],
-  },
-  [ViewState.PickImportTemplate]: {
-    prompt: 'Select a Saved Import Template',
-    crumbText: 'Select Template',
-    options: [
-      {
-        link: ViewState.Review,
-        component: null,
-      },
-    ],
-  },
-  [ViewState.NewImport]: {
-    prompt: 'What Would You Like to Import?',
-    crumbText: 'Source Type',
-    options: [
-      {
-        link: ViewState.PickLocalFile,
-        buttonText: 'Upload a File to Import',
-        default: true,
-      },
-      {
-        link: ViewState.PickImportSource,
-        buttonText: 'Import From an External Source',
-      },
-    ],
-  },
-  [ViewState.PickLocalFile]: {
-    prompt: '',
-    crumbText: 'Upload File',
-    options: [
-      {
-        link: ViewState.PickDatabase,
-        component: ETLUploadStep,
-        onRevert: ETLUploadStep.onRevert,
-      },
-    ],
-  },
-  [ViewState.PickImportSource]: {
-    prompt: 'Select a Source to Import From',
-    crumbText: 'Select Source',
-    options: [
-      {
-        link: ViewState.PickDatabase,
-        component: null,
-      },
-    ],
-  },
-  [ViewState.PickDatabase]: {
-    prompt: 'Choose a Database to Import Into',
-    crumbText: 'Select Database',
-    options: [
-      {
-        link: ViewState.Review,
-        component: PickDatabaseStep,
-      },
-    ],
-  },
-  [ViewState.Review]: {
-    prompt: 'Review Details',
-    crumbText: 'Review',
-    options: [
-      {
-        link: ViewState.Finish,
-        component: null,
-      },
-    ],
-  },
-};
+  {
+    [ViewState.Start]: {
+      prompt: 'What Would You Like to Do?',
+      options: [
+        {
+          link: ViewState.Export,
+          buttonText: 'Export a File',
+        },
+        {
+          link: ViewState.Import,
+          buttonText: 'Import a File',
+        },
+      ],
+    },
+    // Export
+    [ViewState.Export]: {
+      prompt: 'Export a File',
+      crumbText: 'Export',
+      options: [
+        {
+          link: ViewState.PickExportAlgorithm,
+          buttonText: 'Start a New Export',
+        },
+        {
+          link: ViewState.PickExportTemplate,
+          buttonText: 'Use an Existing Export',
+        },
+      ],
+    },
+    [ViewState.PickExportTemplate]: {
+      prompt: 'Select a Saved Export Template',
+      crumbText: 'Select Template',
+      options: [
+        {
+          link: ViewState.Review,
+          component: null,
+        },
+      ],
+    },
+    [ViewState.PickExportAlgorithm]: {
+      prompt: 'Select an Algorithm to Export From',
+      crumbText: 'Select Algorithm',
+      options: [
+        {
+          link: ViewState.ExportDestination,
+          component: null,
+        },
+      ],
+    },
+    [ViewState.ExportDestination]: {
+      prompt: 'Where Would You Like the Results?',
+      crumbText: 'Destination Type',
+      additionalText: 'You can always change this later',
+      options: [
+        {
+          link: ViewState.Review,
+          buttonText: 'Download The Results',
+          default: true,
+        },
+        {
+          link: ViewState.PickExportDestination,
+          buttonText: 'Send to a Custom Destination',
+        },
+      ],
+    },
+    [ViewState.PickExportDestination]: {
+      prompt: 'Select an Export Destination',
+      crumbText: 'Export Destination',
+      options: [
+        {
+          link: ViewState.Review,
+          component: null,
+        },
+      ],
+    },
+    // Import
+    [ViewState.Import]: {
+      prompt: 'Import a File',
+      crumbText: 'Import',
+      options: [
+        {
+          link: ViewState.NewImport,
+          buttonText: 'Start a New Import',
+        },
+        {
+          link: ViewState.PickImportTemplate,
+          buttonText: 'Use an Existing Import',
+        },
+      ],
+    },
+    [ViewState.PickImportTemplate]: {
+      prompt: 'Select a Saved Import Template',
+      crumbText: 'Select Template',
+      options: [
+        {
+          link: ViewState.Review,
+          component: null,
+        },
+      ],
+    },
+    [ViewState.NewImport]: {
+      prompt: 'What Would You Like to Import?',
+      crumbText: 'Source Type',
+      options: [
+        {
+          link: ViewState.PickLocalFile,
+          buttonText: 'Upload a File to Import',
+          default: true,
+        },
+        {
+          link: ViewState.PickImportSource,
+          buttonText: 'Import From an External Source',
+        },
+      ],
+    },
+    [ViewState.PickLocalFile]: {
+      prompt: '',
+      crumbText: 'Upload File',
+      options: [
+        {
+          link: ViewState.PickDatabase,
+          component: ETLUploadStep,
+          onRevert: ETLUploadStep.onRevert,
+        },
+      ],
+    },
+    [ViewState.PickImportSource]: {
+      prompt: 'Select a Source to Import From',
+      crumbText: 'Select Source',
+      options: [
+        {
+          link: ViewState.PickDatabase,
+          component: null,
+        },
+      ],
+    },
+    [ViewState.PickDatabase]: {
+      prompt: 'Choose a Database to Import Into',
+      crumbText: 'Select Database',
+      options: [
+        {
+          link: ViewState.Review,
+          component: PickDatabaseStep,
+        },
+      ],
+    },
+    [ViewState.Review]: {
+      prompt: 'Review Details',
+      crumbText: 'Review',
+      options: [
+        {
+          link: ViewState.Finish,
+          component: null,
+        },
+      ],
+    },
+  };
 const WalkthroughComponentClass = walkthroughFactory<ViewState>(walkthroughGraph);

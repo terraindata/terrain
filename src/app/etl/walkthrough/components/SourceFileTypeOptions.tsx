@@ -133,10 +133,10 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
     const { file } = this.props.walkthrough;
     const type = file != null ? FileUtil.getFileType(file) : null;
     return (
-      <span style={{height: transitionRowHeight}}>
+      <span style={{ height: transitionRowHeight }}>
         <div
           className='etl-transition-element field-type-q'
-          style={{height: !this.props.hide ? transitionRowHeight : '0px'}}
+          style={{ height: !this.props.hide ? transitionRowHeight : '0px' }}
         >
           <div className='source-file-type-options'>
             {type === FileTypes.Csv ? this.renderCsvOptions() : null}
@@ -157,7 +157,7 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
       actionType: 'setState',
       state: {
         source: newSource,
-      }; , , , ,
+      }; , , , ,,
     });
   }
 

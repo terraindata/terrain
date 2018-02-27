@@ -60,7 +60,7 @@ interface Props
   accept?: string;
   large?: boolean;
   customButton?: any; // if specified, disabled and large have no effect
-  onChange: ( file ) => void;
+  onChange: (file) => void;
 }
 
 @Radium
@@ -77,7 +77,7 @@ export default class FilePicker extends TerrainComponent<Props>
         accept={this.props.accept}
         name='file-picker'
         onChange={this.handleChange}
-        style={{display: 'none'}}
+        style={{ display: 'none' }}
       />
     );
   }

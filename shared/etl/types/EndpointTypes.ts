@@ -94,7 +94,7 @@ interface SourceOptionsTypes // TODO check that these are right
     algorithmId: ID;
   };
   Sftp: SftpOptions;
-  Http: HttpOptions
+  Http: HttpOptions;
 }
 
 interface SinkOptionsTypes

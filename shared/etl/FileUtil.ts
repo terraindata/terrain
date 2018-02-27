@@ -86,14 +86,16 @@ export function getSampleRows(
 
   if (getFileType(file) === FileTypes.Csv)
   {
-    const handleError = (err) => {
+    const handleError = (err) =>
+    {
       if (onError)
       {
         onError(JSON.stringify(err));
       }
     };
 
-    const handleResults = (results) => {
+    const handleResults = (results) =>
+    {
       onLoad(results.data);
     };
 
@@ -151,7 +153,8 @@ export function guessJsonFileOptions(
 {
   const fileChunk = file.slice(0, GuessChunkSize);
   const fr = new FileReader();
-  fr.onloadend = () => {
+  fr.onloadend = () =>
+  {
     onComplete({
       jsonNewlines: detectJsonNewlines(fr.result),
     });

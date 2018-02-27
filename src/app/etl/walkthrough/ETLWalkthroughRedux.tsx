@@ -58,6 +58,7 @@ import { getFileType, getSampleRows, guessJsonFileOptions } from 'shared/etl/Fil
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 type CfgOrHandler = (cfg: FileConfig) => FileConfig | FileConfig;
+type OptionsOrHandler = (options: object) => object | object;
 
 export interface WalkthroughActionTypes
 {
@@ -67,10 +68,17 @@ export interface WalkthroughActionTypes
       [k in keyof WalkthroughState]: WalkthroughState[k];
     }>;
   };
+  // provide a value to set, or a function that calculates what value to set
   setFileConfig: {
     actionType: 'setFileConfig';
     sourceConfig?: CfgOrHandler;
     sinkConfig?: CfgOrHandler;
+  };
+  // reminder: options is not an immutable object, unlike fileConfig
+  setEndpointOptions: {
+    actionType: 'setEndpointOptions';
+    sourceOptions?: OptionsOrHandler;
+    sinkOptions?: OptionsOrHandler;
   };
   loadFileSample: {
     actionType: 'loadFileSample';
@@ -90,63 +98,93 @@ export interface WalkthroughActionTypes
 class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughState>
 {
   public reducers: ConstrainedMap<WalkthroughActionTypes, WalkthroughState> =
-  {
-    setState: (state, action) =>
     {
-      let newState = state;
-      const toUpdate = action.payload.state;
-      for (const k of Object.keys(toUpdate))
+      setState: (state, action) =>
       {
-        newState = newState.set(k, toUpdate[k]);
-      }
-      return newState;
-    },
-    setFileConfig: (state, action) =>
-    {
-      let newState = state;
-      const { sourceConfig, sinkConfig } = action.payload;
-      if (sourceConfig != null)
+        let newState = state;
+        const toUpdate = action.payload.state;
+        for (const k of Object.keys(toUpdate))
+        {
+          newState = newState.set(k, toUpdate[k]);
+        }
+        return newState;
+      },
+      setFileConfig: (state, action) =>
       {
-        if (typeof sourceConfig === 'function')
+        let newState = state;
+        const { sourceConfig, sinkConfig } = action.payload;
+        if (sourceConfig != null)
         {
-          newState = newState.updateIn(['source', 'fileConfig'], sourceConfig);
+          if (typeof sourceConfig === 'function')
+          {
+            newState = newState.updateIn(['source', 'fileConfig'], sourceConfig);
+          }
+          else
+          {
+            newState = newState.setIn(['source', 'fileConfig'], sourceConfig);
+          }
         }
-        else
+        if (sinkConfig != null)
         {
-          newState = newState.setIn(['source', 'fileConfig'], sourceConfig);
+          if (typeof sinkConfig === 'function')
+          {
+            newState = newState.updateIn(['sink', 'fileConfig'], sinkConfig);
+          }
+          else
+          {
+            newState = newState.setIn(['sink', 'fileConfig'], sinkConfig);
+          }
         }
-      }
-      if (sinkConfig != null)
+        return newState;
+      },
+      setEndpointOptions: (state, action) =>
       {
-        if (typeof sinkConfig === 'function')
+        let newState = state;
+        const { sourceOptions, sinkOptions } = action.payload;
+        if (sourceOptions != null)
         {
-          newState = newState.updateIn(['sink', 'fileConfig'], sinkConfig);
+          if (typeof sourceOptions === 'function')
+          {
+            newState = newState.updateIn(['source', 'options'], sourceOptions);
+          }
+          else
+          {
+            newState = newState.setIn(['source', 'options'], sourceOptions);
+          }
         }
-        else
+        if (sinkOptions != null)
         {
-          newState = newState.setIn(['sink', 'fileConfig'], sinkConfig);
+          if (typeof sinkOptions === 'function')
+          {
+            newState = newState.updateIn(['sink', 'options'], sinkOptions);
+          }
+          else
+          {
+            newState = newState.setIn(['sink', 'options'], sinkOptions);
+          }
         }
-      }
-      return newState;
-    },
-    setPreviewDocuments: (state, action) =>
-    {
-      return state.set('previewDocuments', action.payload.documents);
-    },
-    autodetectJsonOptions: (state, action) => state, // overriden
-    loadFileSample: (state, action) => state, // overriden
-  };
+        return newState;
+      },
+      setPreviewDocuments: (state, action) =>
+      {
+        return state.set('previewDocuments', action.payload.documents);
+      },
+      autodetectJsonOptions: (state, action) => state, // overriden
+      loadFileSample: (state, action) => state, // overriden
+    };
 
   public loadFileSample(action: WalkthroughActionType<'loadFileSample'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
-    const handleResult = (result) => {
+    const handleResult = (result) =>
+    {
       directDispatch({
         actionType: 'setPreviewDocuments',
         documents: result,
       });
     };
-    const handleError = (error) => {
+    const handleError = (error) =>
+    {
       // tslint:disable-next-line
       console.error(error);
     };
@@ -161,7 +199,8 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
   public autodetectJsonOptions(action: WalkthroughActionType<'autodetectJsonOptions'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
-    const setOptions = (options) => {
+    const setOptions = (options) =>
+    {
       directDispatch({
         actionType: 'setFileConfig',
         sourceConfig: (cfg) =>
