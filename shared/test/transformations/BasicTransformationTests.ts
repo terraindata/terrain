@@ -46,9 +46,11 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import nestedProperty = require('nested-property');
-import { KeyPath, TransformationEngine } from '../../transformations/TransformationEngine';
+import { KeyPath } from '../../transformations/KeyPath';
+import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
+import * as yadeep from '../../transformations/yadeep';
 
 const doc1 = {
   name: 'Bob',
@@ -69,7 +71,8 @@ const doc2 = {
 
 const doc3 = {
   name: 'Bob',
-  arr: [5, ['a', 'b'], { xkcd: 1270 }],
+  arr: ['sled', [{ a: 'dog' }, { a: 'fren', b: 'doggo' }]],
+  hardarr: [['a'], ['b', ['c']]],
 };
 
 test('add fields manually', () =>
@@ -78,7 +81,7 @@ test('add fields manually', () =>
   e.addField(KeyPath(['meta', 'school']), 'string');
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
   const r = e.transform(doc1);
-  expect(nestedProperty.get(r, 'meta.school')).toBe('STANFORD');
+  expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
 test('capitalization', () =>
@@ -249,8 +252,70 @@ test('rename a field (an object with subkeys)', () =>
   expect(e.transform(doc2)['sport']).toBe('bobsled');
 });
 
-test('process array types', () =>
+test('transform of deeply nested value', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
-  // console.dir(e, {colors: true, depth: null});
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]));
+  expect(e.transform(doc3)).toEqual(
+    {
+      name: 'Bob',
+      arr: [
+        'sled',
+        [
+          {
+            a: 'dog',
+          },
+          {
+            b: 'doggo',
+            a: 'fren',
+          },
+        ],
+      ],
+      hardarr: [
+        [
+          'a',
+        ],
+        [
+          'b',
+          [
+            'C',
+          ],
+        ],
+      ],
+    },
+  );
+});
+
+test('nested transform with wildcard', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc3);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]));
+  expect(e.transform(doc3)).toEqual(
+    {
+      name: 'Bob',
+      arr: [
+        'sled',
+        [
+          {
+            a: 'DOG',
+          },
+          {
+            a: 'FREN',
+            b: 'doggo',
+          },
+        ],
+      ],
+      hardarr: [
+        [
+          'a',
+        ],
+        [
+          'b',
+          [
+            'c',
+          ],
+        ],
+      ],
+    },
+  );
 });

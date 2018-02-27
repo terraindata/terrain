@@ -44,26 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// tslint:disable-next-line
-const arrayTypeOfValues = require('array-typeof-values');
-
+import arrayTypeOfValues = require('array-typeof-values');
 import GraphLib = require('graphlib');
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
-import nestedProperty = require('nested-property');
-import deepGet = require('utils-deep-get');
-import deepSet = require('utils-deep-set');
+import objectify from './deepObjectify';
+import { KeyPath, WayPoint } from './KeyPath';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+import * as yadeep from './yadeep';
 
 const Graph = GraphLib.Graph;
-export type KeyPath = List<string>;
-export const KeyPath = (args: string[] = []) => List<string>(args);
 
 export class TransformationEngine
 {
@@ -336,7 +332,7 @@ export class TransformationEngine
 
   public getFieldProp(fieldID: number, prop: KeyPath): any
   {
-    return deepGet(this.fieldProps.get(fieldID), prop.toArray());
+    return yadeep.get(this.fieldProps.get(fieldID), prop);
   }
 
   public getFieldProps(fieldID: number): object
@@ -352,7 +348,7 @@ export class TransformationEngine
   public setFieldProp(fieldID: number, prop: KeyPath, value: any): void
   {
     const newProps: object = this.fieldProps.get(fieldID);
-    deepSet(newProps, prop.toArray(), value, { create: true });
+    yadeep.set(newProps, prop, value, { create: true });
     this.fieldProps = this.fieldProps.set(fieldID, newProps);
   }
 
@@ -378,9 +374,43 @@ export class TransformationEngine
 
   private parseFieldIDs(fieldNamesOrIDs: List<KeyPath> | List<number>): List<number>
   {
-    return fieldNamesOrIDs.size > 0 ?
-      (typeof fieldNamesOrIDs.first() === 'number' ? fieldNamesOrIDs as List<number> :
-        (fieldNamesOrIDs as List<KeyPath>).map((name: KeyPath) => this.fieldNameToIDMap.get(name)).toList()) : List<number>();
+    let ids: List<number> = List<number>();
+
+    if (fieldNamesOrIDs.size > 0)
+    {
+      if (typeof fieldNamesOrIDs.first() === 'number')
+      {
+        ids = fieldNamesOrIDs as List<number>;
+      }
+      else
+      {
+        (fieldNamesOrIDs as List<KeyPath>).map((name: KeyPath) =>
+        {
+          // Replace wildcards with explicit field IDs
+          if (name.contains('*'))
+          {
+            const upto: KeyPath = name.slice(0, name.indexOf('*')).toList();
+            if (this.fieldNameToIDMap.has(upto))
+            {
+              for (let i: number = 0; i <= this.getFieldProp(this.fieldNameToIDMap.get(upto), KeyPath(['arrayLength'])); i++)
+              {
+                ids = ids.concat(this.parseFieldIDs(List<KeyPath>([name.set(name.indexOf('*'), i.toString())]))).toList();
+              }
+            }
+          }
+          else
+          {
+            // Fully explicit KeyPath now (no *'s)
+            if (this.fieldNameToIDMap.has(name))
+            {
+              ids = ids.push(this.fieldNameToIDMap.get(name));
+            }
+          }
+        });
+      }
+    }
+
+    return ids;
   }
 
   private addPrimitiveField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
@@ -390,14 +420,19 @@ export class TransformationEngine
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
+    // const arrayKey: any = [key.toString()];
+    // const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
     const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
     ids = ids.push(arrayID);
     this.setFieldProp(arrayID, KeyPath(['valueType']), arrayTypeOfValues(obj[key]));
+    this.setFieldProp(arrayID, KeyPath(['arrayLength']), obj[key].length);
     for (let i: number = 0; i < obj[key].length; i++)
     {
+      // const arrayKey_i: any = arrayKey.push(i.toString());
       if (isPrimitive(obj[key][i]))
       {
         ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
+        // ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
         ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i);
@@ -417,7 +452,7 @@ export class TransformationEngine
       if (isPrimitive(obj[key]))
       {
         ids = this.addPrimitiveField(ids, obj, currentKeyPath, key);
-      } else if (Array.isArray(obj[key]))
+      } else if (obj[key].constructor === Array)
       {
         ids = this.addArrayField(ids, obj, currentKeyPath, key);
       } else
@@ -438,19 +473,18 @@ export class TransformationEngine
 
   private flatten(obj: object): object
   {
+    const objectified: object = objectify(obj);
     const output: object = {};
     this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
     {
-      if (deepGet(obj, keyPath.toArray()) !== undefined)
+      const ref: any = yadeep.get(objectified, keyPath);
+      if (ref !== undefined)
       {
-        const ref: any = deepGet(obj, keyPath.toArray());
         if (isPrimitive(ref))
         {
           output[value] = ref;
-        } else if (Array.isArray(ref))
-        {
-          // TODO arrays
-        } else
+        }
+        else
         {
           output[value] = Object.assign({}, ref);
         }
@@ -466,7 +500,20 @@ export class TransformationEngine
     {
       if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
       {
-        deepSet(output, value.toArray(), obj[key], { create: true });
+        yadeep.set(output, value, obj[key], { create: true });
+      }
+    });
+    // if (this.fieldTypes.get(key) === 'array')
+    this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
+    {
+      if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
+      {
+        if (this.fieldTypes.get(key) === 'array')
+        {
+          const x = yadeep.get(output, value);
+          x['length'] = Object.keys(x).length;
+          yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
+        }
       }
     });
     return output;
