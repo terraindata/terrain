@@ -47,11 +47,10 @@ THE SOFTWARE.
 import * as Deque from 'double-ended-queue';
 import { Readable } from 'stream';
 
-import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import { setTimeout } from 'timers';
 
 /**
  * Applies a group join to an output stream
@@ -62,13 +61,12 @@ export default class GroupJoinTransform extends Readable
 
   private source: Readable;
 
-  private query: object;
+  private query: string;
 
   private blockSize = 512;
   private maxPendingQueries: number = 8;
 
-  private pendingQueries: Deque<Promise<any>>;
-
+  private pendingQueries: number = 0;
   private maxBufferedOutputs: number;
   private bufferedInputs: Deque<object>;
   private bufferedOutputs: Deque<object>;
@@ -81,7 +79,7 @@ export default class GroupJoinTransform extends Readable
 
   private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
-  constructor(client: ElasticClient, source: Readable, query: object)
+  constructor(client: ElasticClient, source: Readable, queryStr: string)
   {
     super({
       objectMode: true,
@@ -90,6 +88,13 @@ export default class GroupJoinTransform extends Readable
     this.client = client;
     this.source = source;
 
+    const parser = new ESJSONParser(queryStr, true);
+    if (parser.hasError())
+    {
+      throw parser.getErrors();
+    }
+
+    const query = parser.getValue();
     // determine other groupJoin settings from the query
     if (query['dropIfLessThan'] !== undefined)
     {
@@ -103,19 +108,12 @@ export default class GroupJoinTransform extends Readable
       delete query['parentAlias'];
     }
 
-    const parser = new ESJSONParser(JSON.stringify(query), true);
-    if (parser.hasError())
-    {
-      throw parser.getErrors();
-    }
-
     this.query = query;
     for (const k of Object.keys(query))
     {
       this.subqueryValueInfos[k] = parser.getValueInfo().objectChildren[k].propertyValue;
     }
 
-    this.pendingQueries = new Deque<Promise<any>>(this.maxPendingQueries);
     this.maxBufferedOutputs = this.blockSize * this.maxPendingQueries;
     this.bufferedInputs = new Deque<object>(this.maxBufferedOutputs);
     this.bufferedOutputs = new Deque<object>(this.maxBufferedOutputs);
@@ -140,7 +138,9 @@ export default class GroupJoinTransform extends Readable
       if (this.bufferedInputs.length > this.blockSize ||
         this.sourceIsEmpty && this.bufferedInputs.length > 0)
       {
-        this.dispatchSubqueryBlock();
+        const inputs = this.bufferedInputs;
+        this.dispatchSubqueryBlock(inputs);
+        this.bufferedInputs.clear();
       }
     });
 
@@ -154,21 +154,20 @@ export default class GroupJoinTransform extends Readable
   {
     if (!this.sourceIsEmpty
       && this.bufferedOutputs.length < this.maxBufferedOutputs
-      && this.pendingQueries.length < this.maxPendingQueries)
+      && this.pendingQueries < this.maxPendingQueries)
     {
       this.continueReading = true;
     }
   }
 
-  private dispatchSubqueryBlock(): void
+  private dispatchSubqueryBlock(inputs: Deque<object>): void
   {
+    const numInputs = inputs.length;
     const query = this.query;
-    const inputs: object[] = [];
-
     for (const subQuery of Object.keys(query))
     {
       const body: any[] = [];
-      for (const input of inputs)
+      for (let i = 0; i < numInputs; ++i)
       {
         const vi = this.subqueryValueInfos[subQuery];
         if (vi !== null)
@@ -180,46 +179,42 @@ export default class GroupJoinTransform extends Readable
           const queryStr = ESParameterFiller.generate(
             vi,
             {
-              [this.parentAlias]: input['_source'],
+              [this.parentAlias]: inputs[i]['_source'],
             });
           body.push(queryStr);
         }
       }
 
-      // this.pendingQueries.push(new Promise((resolve, reject) =>
-      // {
-      //   this.client.msearch(
-      //     {
-      //       body,
-      //     },
-      //     (error: Error | null, response: any) =>
-      //     {
-      //       if (error !== null && error !== undefined)
-      //       {
-      //         return reject(error);
-      //       }
+      this.pendingQueries++;
+      this.client.msearch(
+        {
+          body,
+        },
+        (error: Error | null, response: any) =>
+        {
+          if (error !== null && error !== undefined)
+          {
+            throw error;
+          }
 
-      //       for (let j = 0; j < inputs.length; ++j)
-      //       {
-      //         if (response.error !== undefined)
-      //         {
-      //           return reject(response.error);
-      //         }
+    //       for (let j = 0; j < inputs.length; ++j)
+    //       {
+    //         if (response.error !== undefined)
+    //         {
+    //           return reject(response.error);
+    //         }
 
-      //         if (response.responses[j].hits !== undefined)
-      //         {
-      //           inputs[j][subQuery] = response.responses[j].hits.hits;
-      //         }
-      //       }
-      //       resolve();
-      //     });
-      // }));
+    //         if (response.responses[j].hits !== undefined)
+    //         {
+    //           inputs[j][subQuery] = response.responses[j].hits.hits;
+    //         }
+    //       }
+        });
     }
 
-    const numInputs = this.bufferedInputs.length;
     for (let i = 0; i < numInputs; i++)
     {
-      const obj = this.bufferedInputs.shift();
+      const obj = inputs[i];
       if (obj !== undefined)
       {
         this.push(obj);

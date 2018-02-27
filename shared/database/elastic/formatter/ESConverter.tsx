@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESJSONParser from '../parser/ESJSONParser';
+import ESValueInfo from '../parser/ESValueInfo';
 import ESFormatter from './ESFormatter';
 
 /**
@@ -56,8 +57,13 @@ class ESConverter
 
   public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
   {
+    return this.formatValueInfo(query.getValueInfo());
+  }
+
+  public static formatValueInfo(source: ESValueInfo, previousQuery?: ESJSONParser): string
+  {
     const formatter = new ESFormatter(ESConverter.defaultIndentSize, true);
-    return formatter.formatQuery(query);
+    return formatter.formatQuery(source);
   }
 }
 export default ESConverter;

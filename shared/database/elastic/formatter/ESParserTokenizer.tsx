@@ -103,9 +103,9 @@ function* traverseTokens(valueInfo: ESValueInfo, tokenDepth = 0, parentClause?: 
 
 export class ESParserTokenizer
 {
-  public static getTokens(parser: ESJSONParser, sort = false): FlaggedToken[]
+  public static getTokens(valueInfo: ESValueInfo, sort = false): FlaggedToken[]
   {
-    const fTokens: FlaggedToken[] = Array.from(traverseTokens(parser.getValueInfo()));
+    const fTokens: FlaggedToken[] = Array.from(traverseTokens(valueInfo));
     if (sort)
     {
       fTokens.sort((a: FlaggedToken, b: FlaggedToken) =>

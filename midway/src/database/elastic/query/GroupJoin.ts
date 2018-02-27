@@ -48,6 +48,7 @@ import * as Elastic from 'elasticsearch';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
+import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
@@ -78,10 +79,17 @@ export async function handleGroupJoin(client: ElasticClient, request: QueryReque
     throw new Error('Expecting body parameter in the groupJoin query');
   }
 
+  const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
+  if (valueInfo === null)
+  {
+    throw new Error('Error finding groupJoin clause in the query');
+  }
+
   if (request.streaming === true)
   {
+    const childQueryStr = ESConverter.formatValueInfo(valueInfo);
     const elasticStream = new ElasticStream(client, parentQuery);
-    return new GroupJoinTransform(client, elasticStream, childQuery);
+    return new GroupJoinTransform(client, elasticStream, childQueryStr);
   }
 
   // determine other groupJoin settings from the query
@@ -90,12 +98,6 @@ export async function handleGroupJoin(client: ElasticClient, request: QueryReque
 
   const parentAlias = (childQuery['parentAlias'] !== undefined) ? childQuery['parentAlias'] : 'parent';
   delete childQuery['parentAlias'];
-
-  const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
-  if (valueInfo === null)
-  {
-    throw new Error('Error finding groupJoin clause in the query');
-  }
 
   const handleSubQueries = async (error, response) =>
   {
