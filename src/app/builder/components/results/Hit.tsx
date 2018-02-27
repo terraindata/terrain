@@ -65,7 +65,7 @@ import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
-import { Hit } from './ResultTypes';
+import { Hit, _Hit } from './ResultTypes';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -108,21 +108,15 @@ class HitComponent extends TerrainComponent<Props> {
 
   public state: {
     hovered: boolean;
-    // spotlights: IMMap<string, any>;
   } =
     {
       hovered: false,
-      // spotlights: SpotlightStore.getState().spotlights,
     };
 
   public constructor(props: Props)
   {
     super(props);
-    // this._subscribe(SpotlightStore, {
-    //   isMounted: false,
-    //   storeKeyPath: ['spotlights'],
-    //   stateKey: 'spotlights',
-    // });
+    console.log(props.hit);
   }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
@@ -156,12 +150,38 @@ class HitComponent extends TerrainComponent<Props> {
 
   public renderNestedField(field)
   {
-    const value = getResultValue(this.props.hit, field, this.props.resultsConfig,
-      false, this.props.expanded);
+    const config = this.props.resultsConfig;
+    let format = config && config.enabled && config.formats && config.formats.get(field);
+    format = _Format(Util.asJS(format));
+    if (format && format.config !== undefined)
+    {
+      console.log(field);
+      console.log(this.props.hit);
+      const allValues = Util.asJS(this.props.hit.fields.get(field));
+      let fields = allValues !== undefined ? allValues[0] : {};
+      // TODO KEEP OLD NESTED INFO
+      if (fields['_source'])
+      {
+        fields = fields['_source'];
+      }
+      return (
+        <HitComponent
+          {...this.props}
+          resultsConfig={format.config}
+          index={0}
+          primaryKey={''}
+          expanded={false}
+          allowSpotlights={false}
+          key={field}
+          hit={_Hit({
+            fields: Map(fields),
+          })}
+        />
+      );
+    }
     return (
       <div key={field}>
-         <div>NESTED TOP BAR GOES HERE</div>
-         {value}
+         {String(this.props.hit.fields.get(field))}
       </div>
     )
   }
