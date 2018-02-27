@@ -62,7 +62,7 @@ import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { ETLStepComponent, RevertParams, StepProps } from './ETLStepComponent';
+import { ETLStepComponent, TransitionParams, StepProps } from './ETLStepComponent';
 import './ETLStepComponent.less';
 import SourceFileTypeOptions from './SourceFileTypeOptions';
 
@@ -70,7 +70,7 @@ const UploadIcon = require('images/icon_export.svg');
 
 class ETLUploadStep extends ETLStepComponent
 {
-  public static onRevert(params: RevertParams)
+  public static onRevert(params: TransitionParams)
   {
     params.act({
       actionType: 'setState',

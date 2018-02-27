@@ -57,8 +57,8 @@ import { _WalkthroughState, ViewState, WalkthroughState } from './ETLWalkthrough
 import { getFileType, getSampleRows, guessJsonFileOptions } from 'shared/etl/FileUtil';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
-type CfgOrHandler = (cfg: FileConfig) => FileConfig | FileConfig;
-type OptionsOrHandler = (options: object) => object | object;
+type CfgOrHandler = ((cfg: FileConfig) => FileConfig) | FileConfig;
+type OptionsOrHandler = ((options: object) => object) | object;
 
 export interface WalkthroughActionTypes
 {

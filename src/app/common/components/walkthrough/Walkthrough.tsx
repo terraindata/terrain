@@ -179,7 +179,7 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
             {
               if (option.onRevert != null)
               {
-                option.onRevert(this.props.revertParams);
+                option.onRevert(this.props.transitionParams);
               }
             });
           });

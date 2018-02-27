@@ -92,6 +92,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
           stepIndex={currentStep}
           stepHistory={walkthrough.stepHistory}
           setSteps={this.handleStepsChange}
+          transitionParams={{act: this.props.act, walkthrough: this.props.walkthrough}}
         />
         <div className='etl-walkthrough-spacer' />
       </div>
@@ -274,6 +275,7 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
           link: ViewState.PickDatabase,
           component: ETLUploadStep,
           onRevert: ETLUploadStep.onRevert,
+          onArrive: ETLUploadStep.onArrive,
         },
       ],
     },
@@ -294,6 +296,8 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
         {
           link: ViewState.Review,
           component: PickDatabaseStep,
+          onRevert: PickDatabaseStep.onRevert,
+          onArrive: PickDatabaseStep.onArrive,
         },
       ],
     },

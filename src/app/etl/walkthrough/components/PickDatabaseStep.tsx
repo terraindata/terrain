@@ -58,9 +58,9 @@ import DatabasePicker from 'etl/common/components/DatabasePicker';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { SinkOptionsType } from 'shared/etl/types/EndpointTypes';
+import { SinkOptionsType, Sinks } from 'shared/etl/types/EndpointTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
-import { ETLStepComponent, RevertParams, StepProps } from './ETLStepComponent';
+import { ETLStepComponent, TransitionParams, StepProps } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
 interface Props extends StepProps
@@ -73,13 +73,25 @@ type DbOptions = SinkOptionsType<'Database'>;
 
 class PickDatabaseStep extends ETLStepComponent
 {
-  public static onRevert(params: RevertParams)
+  public static onRevert(params: TransitionParams)
   {
     params.act({
       actionType: 'setState',
       state: {
         sink: _SinkConfig(),
       },
+    });
+  }
+
+  public static onArrive(params: TransitionParams)
+  {
+    params.act({
+      actionType: 'setState',
+      state: {
+        sink: _SinkConfig({
+          type: Sinks.Database,
+        }),
+      }
     });
   }
 
@@ -90,8 +102,6 @@ class PickDatabaseStep extends ETLStepComponent
     const serverPicked = serverId != null;
     const databasePicked = database != null;
     const tablePicked = table != null;
-    const optionsAreGood = serverPicked && databasePicked && tablePicked &&
-      serverId !== -1 && database !== '' && table !== '';
     return (
       <div className='etl-transition-column etl-walkthrough-db-step'>
         <DatabasePicker
@@ -103,7 +113,12 @@ class PickDatabaseStep extends ETLStepComponent
           constantHeight={true}
         />
         <div className='etl-step-next-button-spacer'>
-          {this._renderNextButton(optionsAreGood)}
+          {
+            this._renderNextButton(
+              serverPicked && databasePicked && tablePicked,
+              serverId !== -1 && database !== '' && table !== ''
+            )
+          }
         </div>
       </div>
     );
@@ -116,13 +131,11 @@ class PickDatabaseStep extends ETLStepComponent
       database,
       table,
     };
-    const updater = (options: DbOptions) =>
-    {
-      return _.extend({}, options, changedOptions);
-    };
+    const options = this.props.walkthrough.sink.options;
+
     this.props.act({
       actionType: 'setEndpointOptions',
-      sinkOptions: updater,
+      sinkOptions: _.extend({}, options, changedOptions),
     });
   }
 }

@@ -51,7 +51,6 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import './Walkthrough.less';
 
 export interface WalkthroughProps<ViewEnum, Context>
@@ -59,7 +58,7 @@ export interface WalkthroughProps<ViewEnum, Context>
   context?: Context; // passed to custom components
   stepIndex: number; // current position in the step history
   stepHistory: List<ViewEnum>;
-  revertParams?: object;
+  transitionParams?: object;
   setSteps: (newStep: number, newHistory: List<ViewEnum>) => void;
 }
 
@@ -78,6 +77,7 @@ export interface WalkthroughNodeOption<ViewEnum, Context>
   buttonText?: string; // if it's a simple button, what does it say?
   component?: WalkthroughComponentClass<Context>; // if it's a custom ui interaction, what component to use
   onRevert?: (params: object) => void; // called when the step gets reverted (if a user goes to a previous crumb and changes the path)
+  onArrive?: (params: object) => void; // called when we arrive at the step containing this option
   componentNeedsButton?: boolean;
   default?: boolean; // TODO
 }

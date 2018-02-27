@@ -62,7 +62,7 @@ import { FileTypes, TemplateTypes } from 'shared/etl/types/ETLTypes';
 
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { ETLStepComponent, RevertParams } from './ETLStepComponent';
+import { ETLStepComponent, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
 interface Props

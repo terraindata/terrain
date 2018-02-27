@@ -68,7 +68,7 @@ export interface StepProps
   act?: typeof WalkthroughActions;
 }
 
-export interface RevertParams
+export interface TransitionParams
 {
   act: typeof WalkthroughActions;
   walkthrough: WalkthroughState;
@@ -78,7 +78,13 @@ export abstract class ETLStepComponent<Props extends StepProps = StepProps> exte
 {
   // called when a user arrives at this step, but later
   // chooses a different path
-  public static onRevert(params: RevertParams)
+  public static onRevert(params: TransitionParams)
+  {
+    // do nothing by default
+  }
+
+  // called when a user arrives at this step
+  public static onArrive(params: TransitionParams)
   {
     // do nothing by default
   }

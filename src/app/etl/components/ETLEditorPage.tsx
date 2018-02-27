@@ -97,7 +97,7 @@ function initialTemplateFromDocs(documents: List<object>): { template: ETLTempla
   const rootField = createTreeFromEngine(engine);
 
   const template = _ETLTemplate({
-    templateId: -1,
+    id: -1,
     templateName: name,
     transformationEngine: engine,
   });
