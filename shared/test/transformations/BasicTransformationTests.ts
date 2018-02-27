@@ -45,9 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
-import isPrimitive = require('is-primitive');
 import nestedProperty = require('nested-property');
-import objectify from '../../transformations/deepObjectify';
 import { KeyPath } from '../../transformations/KeyPath';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
@@ -73,7 +71,7 @@ const doc2 = {
 
 const doc3 = {
   name: 'Bob',
-  arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
+  arr: ['sled', [{ a: 'dog' }, { a: 'fren', b: 'doggo' }]],
   hardarr: [['a'], ['b', ['c']]],
 };
 
@@ -254,22 +252,70 @@ test('rename a field (an object with subkeys)', () =>
   expect(e.transform(doc2)['sport']).toBe('bobsled');
 });
 
-test('process array types', () =>
+test('transform of deeply nested value', () =>
 {
-  // console.dir(doc3, {depth: null, colors: true});
-  // console.dir(objectify(doc3), {depth: null, colors: true});
-  // console.log(yadeep.get(objectify(doc3), KeyPath(['arr', '1', '*', 'a'])));
-  // console.log(yadeep.get(doc3, KeyPath([['arr', 1, '*'], 'a'])));
-  // console.log(yadeep.get(doc3, KeyPath([['hardarr', '0', '*']])));
-  // console.log(yadeep.get(doc3, KeyPath([['arr', 1], 'a'])));
-  // yadeep.set(doc3, KeyPath(['arr', '1', '*', 'a']), 'jim', { create: true });
-  // console.dir(doc3, {depth: null, colors: true});
-  // console.log(doc3['arr'][1][0]['a']);
-  // console.log(doc3);
   const e: TransformationEngine = new TransformationEngine(doc3);
-  // //console.dir(e.flatten(doc3), {color: true, depth: null});
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]));
+  expect(e.transform(doc3)).toEqual(
+    {
+      name: 'Bob',
+      arr: [
+        'sled',
+        [
+          {
+            a: 'dog',
+          },
+          {
+            b: 'doggo',
+            a: 'fren',
+          },
+        ],
+      ],
+      hardarr: [
+        [
+          'a',
+        ],
+        [
+          'b',
+          [
+            'C',
+          ],
+        ],
+      ],
+    },
+  );
+});
+
+test('nested transform with wildcard', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc3);
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]));
-  const t: object = e.transform(doc3);
-  // console.log('FINAL RESULT:');
-  // console.dir(t, {depth: null, colors: true});
+  expect(e.transform(doc3)).toEqual(
+    {
+      name: 'Bob',
+      arr: [
+        'sled',
+        [
+          {
+            a: 'DOG',
+          },
+          {
+            a: 'FREN',
+            b: 'doggo',
+          },
+        ],
+      ],
+      hardarr: [
+        [
+          'a',
+        ],
+        [
+          'b',
+          [
+            'c',
+          ],
+        ],
+      ],
+    },
+  );
 });
