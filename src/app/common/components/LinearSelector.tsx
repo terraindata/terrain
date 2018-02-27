@@ -47,8 +47,10 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions member-access
 
 import * as classNames from 'classnames';
+import { List, Map } from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Util from 'util/Util';
@@ -62,6 +64,7 @@ import './LinearSelector.less';
 export interface Props
 {
   options: List<string | number>;
+  displayNames?: Map<string | number, string>;
   selected: string | number;
   keyPath?: KeyPath;
   onChange?: (value: string | number) => void;
@@ -74,6 +77,7 @@ export interface Props
   builderActions?: typeof BuilderActions;
 }
 
+@Radium
 class LinearSelector extends TerrainComponent<Props>
 {
 
@@ -81,16 +85,10 @@ class LinearSelector extends TerrainComponent<Props>
     usingCustomValue: boolean,
     showCustomTextbox: boolean,
     customInput: string,
-    selectorLeft: number,
-    selectorWidth: number,
-    selectorHeight: number,
   } = {
       usingCustomValue: false,
       showCustomTextbox: false,
       customInput: '',
-      selectorLeft: 0,
-      selectorHeight: 0,
-      selectorWidth: 0,
     };
 
   // Determine whether using custom input
@@ -103,13 +101,6 @@ class LinearSelector extends TerrainComponent<Props>
       customInput: usingCustomValue ? this.props.selected : this.state.customInput,
     });
   }
-
-  // Set the position of the selector
-  public componentDidMount()
-  {
-    this.setSelectedPosition(this.props.selected);
-  }
-
   // Determine whether using custom input
   // Set position of the selector if selected option has changed
   public componentWillReceiveProps(nextProps)
@@ -120,10 +111,6 @@ class LinearSelector extends TerrainComponent<Props>
       usingCustomValue,
       customInput: usingCustomValue ? nextProps.selected : this.state.customInput,
     });
-    if (this.props.selected !== nextProps.selected || this.props.options !== nextProps.options)
-    {
-      this.setSelectedPosition(nextProps.selected, usingCustomValue);
-    }
   }
 
   public selectOption(option, customOption)
@@ -152,45 +139,23 @@ class LinearSelector extends TerrainComponent<Props>
     });
   }
 
-  // Select the height, width, and position to put the selector at
-  public setSelectedPosition(overrideSelected?, usingCustomValue?)
-  {
-    usingCustomValue = usingCustomValue !== undefined
-      ? usingCustomValue : this.state.usingCustomValue;
-    const key = usingCustomValue ? 'custom'
-      : String(overrideSelected || this.props.selected);
-    if (this.state.showCustomTextbox ||
-      !(this.refs && this.refs[key] && this.refs['all-options']))
-    {
-      this.setState({
-        selectorLeft: 0,
-        selectorHeight: 0,
-        selectorWidth: 0,
-      });
-      return;
-    }
-    const cr = this.refs[key]['getBoundingClientRect']();
-    const parentCr = this.refs['all-options']['getBoundingClientRect']();
-    this.setState({
-      selectorLeft: cr.left - parentCr.left,
-      selectorHeight: cr.height,
-      selectorWidth: cr.width,
-    });
-  }
-
   public renderOption(option, i)
   {
+    const selected = this.props.selected === option;
     return (
       <div
         className={classNames({
           'linear-selector-option': true,
-          'linear-selector-option-selected': this.props.selected === option,
+          'linear-selector-option-selected': selected,
         })}
         onClick={this._fn(this.selectOption, option, false)}
         key={i}
         ref={String(option)}
+        style={[fontColor(selected ? Colors().fontWhite : ''),
+        backgroundColor(selected ? Colors().active : ''),
+        ]}
       >
-        {option}
+        {this.props.displayNames ? this.props.displayNames.get(option) : option}
       </div>
     );
   }
@@ -214,7 +179,7 @@ class LinearSelector extends TerrainComponent<Props>
     this.setState({
       showCustomTextbox: false,
       usingCustomValue: this.state.customInput !== '',
-    }, () => this.setSelectedPosition());
+    });
   }
 
   public onInputChange(value)
@@ -228,19 +193,6 @@ class LinearSelector extends TerrainComponent<Props>
   {
     return (
       <div className='linear-selector-wrapper'>
-        {
-          !this.state.showCustomTextbox ?
-            <div
-              className='linear-selector-selected-marker'
-              style={{
-                left: this.state.selectorLeft,
-                width: this.state.selectorWidth,
-                height: this.state.selectorHeight,
-                background: Colors().active,
-              }}
-            />
-            : null
-        }
         <div
           className='linear-selector-options'
           ref='all-options'

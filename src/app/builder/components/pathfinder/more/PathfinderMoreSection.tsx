@@ -250,16 +250,18 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             text={PathfinderText.moreSectionSubtitle}
           />
         }
-        <DragAndDrop
-          draggableItems={this.getAggregationLines()}
-          onDrop={this.handleLinesReorder}
-          className='more-aggregations-drag-drop'
-        />
-        <PathfinderCreateLine
-          canEdit={canEdit}
-          onCreate={this.handleAddLine}
-          text={PathfinderText.createAggregationLine}
-        />
+        {
+          // <DragAndDrop
+          //   draggableItems={this.getAggregationLines()}
+          //   onDrop={this.handleLinesReorder}
+          //   className='more-aggregations-drag-drop'
+          // />
+          // <PathfinderCreateLine
+          //   canEdit={canEdit}
+          //   onCreate={this.handleAddLine}
+          //   text={PathfinderText.createAggregationLine}
+          // />
+        }
         <div>
           {this.renderNestedPaths()}
           {

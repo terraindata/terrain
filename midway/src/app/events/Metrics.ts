@@ -46,8 +46,6 @@ THE SOFTWARE.
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
 import MetricConfig from './MetricConfig';
 
 export class Metrics

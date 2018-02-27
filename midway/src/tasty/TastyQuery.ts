@@ -180,6 +180,7 @@ export class TastyQuery
     return node instanceof TastyNode;
   }
 
+  // tslint:disable-next-line:no-unused-variable
   private ensureTastyNode(node: TastyNode): void
   {
     if (!this.isTastyNode(node))

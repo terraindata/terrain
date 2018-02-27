@@ -88,6 +88,11 @@ class PathfinderColumn extends TerrainComponent<Props>
       selector: '.pf-step-button:hover',
       style: { color: Colors().active },
     });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-score-line-transform .linear-selector-option',
+      style: { color: Colors().fontColorLightest },
+    });
   }
 
   public render()

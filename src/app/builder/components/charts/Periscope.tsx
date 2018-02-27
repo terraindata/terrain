@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this no-var-requires no-shadowed-variable restrict-plus-operands
+// tslint:disable:no-invalid-this no-var-requires no-shadowed-variable restrict-plus-operands only-arrow-functions
 
 import './Periscope.less';
 
@@ -95,9 +95,14 @@ const Periscope = {
 
     svg.append('rect')
       .attr('class', 'line')
-      .attr('fill', state.colors[0]);
+      .attr('fill', state.colors[0])
+      .attr('opacity', 0.3);
     svg.append('g')
       .attr('class', 'handles');
+
+    d3.select(el)
+      .append('div')
+      .attr('class', 'inputs');
 
     this.update(el, state);
 
@@ -109,7 +114,7 @@ const Periscope = {
       fill: ${Colors().text2} !important;
     }
     .periscope .handle {
-      stroke: ${Colors().altHighlight} !important;
+      stroke: ${Colors().active} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -127,7 +132,7 @@ const Periscope = {
     state.numBars = 10;
     const scales = this._scales(el, state.maxDomain, state.domain, state.barsData, state.width, state.height);
     this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart, state.colors,
-      state.inputKey, state.schema, state.builder);
+      state.onDomainLowChange, state.onDomainHighChange);
   },
 
   destroy(el)
@@ -140,40 +145,22 @@ const Periscope = {
   _drawBg(el, scales)
   {
     d3.select(el).select('.bg')
-      .attr('x', scaleMin(scales.x))
-      .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
+      .attr('x', scaleMin(scales.x) - 20)
+      .attr('width', scaleMax(scales.x) - scaleMin(scales.x) + 40)
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', Colors().transformChartBg);
+      .attr('fill', Colors().blockBg)
+      .attr('ry', (scaleMin(scales.pointY) - scaleMax(scales.pointY)) / 2);
   },
 
-  _drawAxes(el, scales, inputKey, schema, builder)
-  {
-    const isDate = ElasticBlockHelpers.getColumnType(schema, builder, inputKey) === 'date';
-    const numTicks = isDate ? 3 : 6;
-    const tickFormatFn = isDate ?
-      ((n: number): string => moment(new Date(n)).format('YYYY-MM-DD')) : Util.formatNumber;
-
-    const bottomAxis = d3.svg.axis()
-      .scale(scales.x)
-      .ticks(numTicks)
-      .tickSize(10)
-      .tickFormat(tickFormatFn)
-      .orient('bottom');
-    d3.select(el).select('.bottomAxis')
-      .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
-      .attr('style', 'stroke: ' + Colors().transformChartBg)
-      .call(bottomAxis);
-  },
-
-  _drawBars(el, scales, barsData, colors)
+  _drawBars(el, scales, domain, barsData, colors)
   {
     const g = d3.select(el).selectAll('.bars');
 
     const bar = g.selectAll('.bar')
       .data(barsData, (d) => d['id']);
 
-    const xPadding = 0;
+    const xPadding = 1;
 
     const barWidth = (d) =>
     {
@@ -185,32 +172,37 @@ const Periscope = {
       return width;
     };
 
+    const barColor = (d) =>
+    {
+      if (d['range']['min'] > domain.x[0] && d['range']['max'] < domain.x[1])
+      {
+        return Colors().active;
+      }
+      return Colors().blockOutline;
+    };
+
     bar.enter()
       .append('rect')
       .attr('class', 'bar')
-      .attr('fill', colors[0]);
+      ;
 
     bar
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
       .attr('width', barWidth)
       .attr('y', (d) => scales.realBarY(d['percentage']))
-      .attr('height', (d) => scaleMin(scales.realBarY) - scales.realBarY(d['percentage']));
+      .attr('height', (d) => scaleMin(scales.realBarY) - scales.realBarY(d['percentage']))
+      .attr('fill', barColor);
 
     bar.exit().remove();
   },
 
   _drawLine(el, scales, domain)
   {
-    const lineFunction = d3.svg.line()
-      .x((d) => scales.x(d))
-      .y((d) => scaleMin(scales.barY));
-
-    const height = 4;
     d3.select(el).select('.line')
       .attr('x', scales.x(domain.x[0]))
       .attr('width', scales.x(domain.x[1]) - scales.x(domain.x[0]))
-      .attr('y', scaleMin(scales.barY)) // - height / 2) // don't center, actually, so that it doesn't cover up the histogram
-      .attr('height', height);
+      .attr('y', 0) // - height / 2) // don't center, actually, so that it doesn't cover up the histogram
+      .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
   },
 
   // needs to be "function" for d3.mouse(this)
@@ -254,16 +246,15 @@ const Periscope = {
     handle.enter()
       .append('circle')
       .attr('class', 'handle')
-      .attr('style', 'stroke: ' + Colors().altHighlight)
-      .attr('fill', Colors().transformChartBg);
+      .attr('fill', Colors().transformChartBg)
+      ;
 
     handle
       .attr('cx', (d) => scales.x(d))
-      .attr('cy', scaleMin(scales.barY))
+      .attr('cy', scaleMin(scales.barY) / 2)
       .attr('fill', Colors().transformChartBg)
-      .attr('style', 'stroke: ' + Colors().altHighlight)
-      .attr('stroke-width', '3px')
-      .attr('r', 10);
+      .attr('stroke-width', '2px')
+      .attr('r', 20);
 
     handle
       .attr('_id', (d, i) => i);
@@ -274,17 +265,63 @@ const Periscope = {
     handle.exit().remove();
   },
 
-  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors, inputKey, schema, builder)
+  _drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange)
+  {
+    d3.select(el).selectAll('.domain-input').remove();
+    const div = d3.select(el).selectAll('.inputs');
+    const handles = d3.select(el).selectAll('.handle');
+    const cCr = d3.select(el)[0][0]['getBoundingClientRect']();
+    // Get the first handle to find the position where the input should go
+    if (handles[0][0] !== undefined)
+    {
+      const cr = handles[0][0]['getBoundingClientRect']();
+      const left = (cr.left - cCr.left) - 16;
+      div.append('input')
+        .attr('class', 'domain-input')
+        .attr('id', 'input-0')
+        .attr('value', Util.formatNumber(domain.x[0]).replace(/\s/g, ''))
+        .style('left', left + 'px')
+        .style('color', Colors().active)
+        .on('change', function()
+        {
+          let value = d3.select(el).select('#input-0').node().value;
+          value = Util.formattedToNumber(value);
+          onDomainLowChange(value);
+        }.bind(this))
+        ;
+    }
+    // get the second handle
+    if (handles[0][1] !== undefined)
+    {
+      const cr2 = handles[0][1]['getBoundingClientRect']();
+      const left2 = (cr2.left - cCr.left) - 16;
+      div.append('input')
+        .attr('class', 'domain-input')
+        .attr('id', 'input-1')
+        .attr('value', Util.formatNumber(domain.x[1]).replace(/\s/g, ''))
+        .style('left', left2 + 'px')
+        .style('color', Colors().active)
+        .on('change', function()
+        {
+          let value = d3.select(el).select('#input-1').node().value;
+          value = Util.formattedToNumber(value);
+          onDomainHighChange(value);
+        }.bind(this))
+        ;
+    }
+  },
+
+  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors, onDomainLowChange, onDomainHighChange)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    this._drawAxes(el, scales, inputKey, schema, builder);
-    this._drawBars(el, scales, barsData, colors);
+    this._drawBars(el, scales, domain, barsData, colors);
     this._drawLine(el, scales, domain);
     this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);
+    this._drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange);
   },
 
   _scales(el, maxDomain, domainAndRange, barsData, stateWidth, stateHeight)

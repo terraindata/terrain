@@ -65,8 +65,10 @@ import { BuilderState } from 'app/builder/data/BuilderState';
 import Util from 'app/util/Util';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
+import { isInput } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
 
@@ -137,9 +139,9 @@ class TransformCard extends TerrainComponent<Props>
   {
     if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
       nextProps.builder.query.inputs !== this.props.builder.query.inputs)
-      && !this.props.data.closed)
+      && !this.props.data.closed && nextProps.data.input === '_score')
     {
-      this.computeBars(this.props.data.input, this.state.maxDomain, true, nextProps.builder.query);
+      this.computeBars(nextProps.data.input, this.state.maxDomain, true, nextProps.builder.query);
     }
 
     // nextProps.data.domain is list<string>
@@ -268,6 +270,7 @@ class TransformCard extends TerrainComponent<Props>
           builder={this.props.builder}
         />
         <TransformCardPeriscope
+          onChange={this.props.onChange}
           onDomainChange={this.handleChartDomainChange}
           barsData={this.state.bars}
           domain={this.state.chartDomain}
@@ -279,7 +282,6 @@ class TransformCard extends TerrainComponent<Props>
           width={width}
           language={this.props.language}
           colors={this.props.data.static.colors}
-          builder={this.props.builder}
         />
       </div>
     );
@@ -325,7 +327,7 @@ class TransformCard extends TerrainComponent<Props>
       totalDoc = hits.total;
     }
     let theHist;
-    if (totalDoc > 0 && elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+    if (elasticHistogram.transformCard.buckets.length >= NUM_BARS)
     {
       theHist = elasticHistogram.transformCard.buckets;
     } else
@@ -338,7 +340,7 @@ class TransformCard extends TerrainComponent<Props>
       bars.push({
         id: '' + j,
         count: theHist[j].doc_count,
-        percentage: theHist[j].doc_count / totalDoc,
+        percentage: totalDoc ? (theHist[j].doc_count / totalDoc) : '',
         range: {
           min: theHist[j].key,
           max: theHist[j + 1].key,
@@ -393,12 +395,7 @@ class TransformCard extends TerrainComponent<Props>
   private computeScoreElasticBars(maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
     const query = overrideQuery || this.props.builder.query;
-    const tqlString = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {
-        replaceInputs: true,
-      },
-    );
+    const tqlString = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
     const tql = JSON.parse(tqlString);
     tql['size'] = 0;
     tql['sort'] = {};
@@ -505,19 +502,19 @@ class TransformCard extends TerrainComponent<Props>
             },
           },
         };
-        Ajax.query(
-          JSON.stringify(domainQuery),
-          db,
-          (resp) =>
-          {
-            this.handleElasticDomainAggregationResponse(resp);
-          },
-          (err) =>
-          {
-            this.handleElasticAggregationError(err);
-          },
-        );
       }
+      Ajax.query(
+        JSON.stringify(domainQuery),
+        db,
+        (resp) =>
+        {
+          this.handleElasticDomainAggregationResponse(resp);
+        },
+        (err) =>
+        {
+          this.handleElasticAggregationError(err);
+        },
+      );
     }
     else
     {
@@ -555,20 +552,20 @@ class TransformCard extends TerrainComponent<Props>
           },
           size: 0,
         };
-        this.setState(
-          Ajax.query(
-            JSON.stringify(aggQuery),
-            db,
-            (resp) =>
-            {
-              this.handleElasticAggregationResponse(resp);
-            },
-            (err) =>
-            {
-              this.handleElasticAggregationError(err);
-            }),
-        );
       }
+      this.setState(
+        Ajax.query(
+          JSON.stringify(aggQuery),
+          db,
+          (resp) =>
+          {
+            this.handleElasticAggregationResponse(resp);
+          },
+          (err) =>
+          {
+            this.handleElasticAggregationError(err);
+          }),
+      );
     }
   }
 

@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
-import * as http from 'http';
 import * as request from 'request';
 import * as rimraf from 'rimraf';
 
@@ -202,8 +201,6 @@ export async function writeFile(fileName: string, data: string, options: object)
 export function getParsedQuery(body: string): ESParser
 {
   const parser = new ESJSONParser(body, true);
-  const valueInfo = parser.getValueInfo();
-
   if (parser.hasError())
   {
     const es = parser.getErrors();

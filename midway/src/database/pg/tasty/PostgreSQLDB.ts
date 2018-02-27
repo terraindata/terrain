@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as pg from 'pg';
-
 import PostgreSQLGenerator from '../../../tasty/PostgreSQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
@@ -83,6 +81,7 @@ export class PostgreSQLDB implements TastyDB
 
   public generate(query: TastyQuery): string[]
   {
+    // tslint:disable-next-line:no-unused-variable
     const [statements, values] = this.generateQuery(query, false);
     return statements;
   }

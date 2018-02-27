@@ -83,6 +83,7 @@ export class MySQLDB implements TastyDB
 
   public generate(query: TastyQuery): string[]
   {
+    // tslint:disable-next-line:no-unused-variable
     const [statements, values] = this.generateQuery(query, false);
     return statements;
   }
@@ -172,6 +173,7 @@ export class MySQLDB implements TastyDB
     throw new Error('update() is currently only supported for Elastic databases.');
   }
 
+  // tslint:disable-next-line:no-unused-variable
   private async getConnection(): Promise<mysql.Connection>
   {
     return new Promise<mysql.Connection>((resolve, reject) =>

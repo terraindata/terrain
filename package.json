@@ -34,7 +34,8 @@
     "diff-style": "git ls-files -m  \\*.ts\\* | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
     "rr": "./node_modules/.bin/ts-node ./rr/RecordReplay.ts",
     "test-fullstack-login": "jest ./rr/test/login --forceExit",
-    "test-rr-builder": "jest ./rr/test/builder --forceExit"
+    "test-rr-builder": "jest ./rr/test/builder --forceExit",
+    "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
   },
   "repository": {
     "type": "git",
@@ -193,8 +194,8 @@
     "sha1": "^1.1.1",
     "sqlite3": "^3.1.13",
     "ssh2-sftp-client": "^2.0.1",
-    "styled-components": "^3.1.5",
     "strong-soap": "^1.5.0",
+    "styled-components": "^3.1.5",
     "then-request": "^5.0.0",
     "transit-immutable-js": "^0.7.0",
     "transit-js": "^0.8.846",
@@ -228,7 +229,7 @@
     "@types/node-schedule": "^1.2.1",
     "@types/passport-local": "^1.0.30",
     "@types/pg": "7.4.2",
-    "@types/puppeteer":"^0.13.9",
+    "@types/puppeteer": "^0.13.9",
     "@types/react": "^16.0.38",
     "@types/react-beautiful-dnd": "^3.0.0",
     "@types/react-onclickoutside": "^6.0.2",
