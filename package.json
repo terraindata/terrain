@@ -156,6 +156,7 @@
     "promise-queue": "^2.2.3",
     "prop-types": "^15.6.0",
     "radium": "^0.19.6",
+    "rc-slider": "^8.6.0",
     "react": "15.6.2",
     "react-addons-perf": "^15.4.2",
     "react-addons-shallow-compare": "^15.0.1",

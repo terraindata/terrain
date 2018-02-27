@@ -80,6 +80,7 @@ export interface Props
   action?: (keyPath, value) => void | string;
   floatingLabel?: string;
   builderActions?: typeof BuilderActions;
+  width?: string;
 }
 
 @Radium
@@ -218,9 +219,9 @@ class SearchableDropdown extends TerrainComponent<Props>
     const selected = i === this.props.selectedIndex;
     const style = {
       ':hover': {
-        backgroundColor: Colors().inactiveHover,
-        color: Colors().activeText,
-        stroke: Colors().activeText,
+        backgroundColor: 'transparent',
+        color: Colors().active,
+        stroke: Colors().active,
       },
     };
 
@@ -262,7 +263,7 @@ class SearchableDropdown extends TerrainComponent<Props>
         className='dropdown-option-inner'
       >
         {
-          this.props.options.get(index)
+          _.upperFirst(this.props.options.get(index))
         }
       </div>
     </div>
@@ -444,30 +445,6 @@ class SearchableDropdown extends TerrainComponent<Props>
 
     const { selectedIndex, options } = this.props;
 
-    const dropdownValueStyle = [
-      this.props.canEdit ?
-        backgroundColor(
-          !this.state.open ? Colors().inputBg : Colors().active,
-          Colors().inactiveHover,
-        )
-        :
-        backgroundColor(Colors().darkerHighlight)
-      ,
-      this.state.open ?
-        fontColor(Colors().activeText) :
-        fontColor(
-          Colors().text1,
-          this.props.canEdit ? Colors().activeText : (Colors().text1),
-        ),
-      this.state.open ?
-        getStyle('stroke', Colors().activeText) :
-        getStyle('stroke',
-          Colors().text1,
-          this.props.canEdit ? Colors().activeText : (Colors().text1),
-        ),
-      borderColor(Colors().inputBorder),
-    ];
-
     const closeStyle = _.extend({},
       getStyle('fill', Colors().iconColor),
       getStyle('stroke', Colors().iconColor));
@@ -484,6 +461,7 @@ class SearchableDropdown extends TerrainComponent<Props>
           [this.props.className]: !!this.props.className,
         })}
         key='dropdown-body'
+        style={{ width: this.props.width }}
       >
         {
           this.state.up && this.state.open
@@ -492,9 +470,6 @@ class SearchableDropdown extends TerrainComponent<Props>
         <div
           className='dropdown-value'
           ref='value'
-          style={[
-            ...dropdownValueStyle,
-          ]}
           key='dropdown-value'
           onClick={this._fn(this.toggleOpen, false)}
         >
@@ -510,7 +485,7 @@ class SearchableDropdown extends TerrainComponent<Props>
                 })}
               >
                 {
-                  this.props.options.get(index)
+                  _.upperFirst(this.props.options.get(index))
                 }
               </div>,
             )
@@ -526,15 +501,6 @@ class SearchableDropdown extends TerrainComponent<Props>
               disabled={!this.props.canEdit}
               onClick={(e) => { e.stopPropagation(); }}
             />
-            {
-              this.state.inputValue &&
-              <div
-                onClick={this.clearInput}
-                className='searchable-dropdown-input-clear'
-              >
-                <CloseIcon style={closeStyle} />
-              </div>
-            }
           </div>
         </div>
         {

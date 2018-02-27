@@ -94,6 +94,18 @@ export class SingleRouteSelector extends TerrainComponent<Props>
     'hideSampleData',
   ];
 
+  // keys that play a factor in the option set
+  public optionSetKeys = [
+    'options',
+    'hasOther',
+    'focusOtherByDefault',
+    'shortNameText',
+    'headerText',
+    'hasSearch',
+    'column',
+    'hideSampleData',
+  ];
+
   componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.value !== this.props.value)
@@ -111,8 +123,6 @@ export class SingleRouteSelector extends TerrainComponent<Props>
       });
     }
   }
-
-  // keys that play a factor in the option se
 
   public getOptionSets(props: Props): List<RouteSelectorOptionSet>
   {

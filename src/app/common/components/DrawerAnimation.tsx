@@ -44,74 +44,83 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands
+// tslint:disable:no-var-requires
 
-import BuilderActions from 'builder/data/BuilderActions';
-import * as classNames from 'classnames';
+import { getStyle } from 'app/colors/Colors';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
-import TerrainComponent from './../../../common/components/TerrainComponent';
-import './ScoreBar.less';
-import ScoreWeightSlider from './ScoreWeightSlider';
+import * as ReactDOM from 'react-dom';
+import TerrainComponent from './../../common/components/TerrainComponent';
+const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
+import './DrawerAnimationStyle.less';
 
-const BORDER_RADIUS = '5px';
-const SCORE_COLORS =
-  {
-    // POSITIVE: ['#DFDE52', '#AFD364', '#9DCF66', '#4ef9ab'],
-    POSITIVE: ['#4ef9ab'],
-    NEGATIVE: ['#d14f42'],
-  };
-
-interface Props
+export interface Props
 {
-  parentData: {
-    weights: Array<{ weight: number }>;
-  };
-  data: {
-    weight: number;
-  };
-  keyPath: KeyPath;
-  noAnimation?: boolean;
-  builderActions: typeof BuilderActions;
-  onBeforeChange: (value: number) => void;
-  onChange: (value: number) => void;
-  onAfterChange: (value: number) => void;
+  open: boolean;
+  children?: any;
+  maxHeight: number;
 }
 
-class ScoreBar extends TerrainComponent<Props>
+class DrawerAnimation extends TerrainComponent<Props>
 {
-  public handleWeightBeforeChange(value: number)
-  {
-    this.props.onBeforeChange(value);
-  }
-
-  public handleWeightChange(value: number)
-  {
-    this.props.onChange(value);
-  }
-
-  public handleWeightAfterChange(value: number)
-  {
-    this.props.onAfterChange(value);
-  }
+  public state = {
+    contentRef: null,
+  };
 
   public render()
   {
-    const { weight } = this.props.data;
+    const { open, maxHeight, children } = this.props;
+
+    // we need to duplicate the children content
+    // so that we can get the wrapper to size dynamically
+    // to the content (in a hidden copy) and show the real copy
+    // pinned to the bottom edge of the wrapper
+
+    // TODO consider an optimization that only renders the children when the thing is open
 
     return (
-      <ScoreWeightSlider
-        value={weight}
-        onBeforeChange={this.handleWeightBeforeChange}
-        onChange={this.handleWeightChange}
-        onAfterChange={this.handleWeightAfterChange}
-        min={0}
-        max={100}
-        color={'rgb(30, 180, 250)'}
-        height={34}
-      />
+      <div
+        className='drawer-animation'
+        style={getStyle('maxHeight', open ? maxHeight : 0)}
+      >
+        <div className='drawer-animation-content-copy'>
+          {
+            children
+          }
+        </div>
+        <div
+          className='drawer-animation-content'
+          ref={this._fn(this._saveRefToState, 'contentRef')}
+        >
+          {
+            children
+          }
+        </div>
+      </div>
     );
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (!this.props.open && nextProps.open)
+    {
+      // scroll the content into view
+      setTimeout(() =>
+      {
+        const el = ReactDOM.findDOMNode(this.state.contentRef);
+
+        if (el !== undefined)
+        {
+          el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest',
+          });
+        }
+      }, 350); // coordinate this value with LESS
+      // in the future you could consider a ghost element down at the bottom
+      // of the position, so the window can scroll before the content has opened
+    }
   }
 }
 
-export default ScoreBar;
+export default DrawerAnimation;

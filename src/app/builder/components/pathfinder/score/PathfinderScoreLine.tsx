@@ -93,16 +93,23 @@ export interface Props
   colorsActions?: typeof ColorsActions;
 }
 
+const EditableField = (props) =>
+  props.editing ? props.editComponent : props.readOnlyComponent;
+
 class PathfinderScoreLine extends TerrainComponent<Props>
 {
   public state: {
     weight: number;
     expanded: boolean;
     fieldIndex: number;
+    editingField: boolean;
+    editingWeight: boolean;
   } = {
       weight: this.props.line.weight,
       expanded: this.props.line.expanded,
       fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
+      editingField: false,
+      editingWeight: false,
     };
 
   public componentWillMount()
@@ -118,9 +125,10 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     if (this.props.line !== nextProps.line)
     {
+      const weight = nextProps.line.weight;
       this.setState({
         fieldIndex: nextProps.dropdownOptions.map((v) => v.displayName).toList().indexOf(nextProps.line.field),
-        weight: nextProps.line.weight,
+        weight: weight !== '' ? parseInt(weight, 10) : 0,
         expanded: nextProps.line.expanded,
       });
     }
@@ -141,6 +149,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     const value = this.props.dropdownOptions.map((v) => v.displayName).toList().get(index);
     this.props.builderActions.changePath(this.props.keyPath.push('field'), value, false, true);
+    this.setState((state) => ({ editingField: false }));
   }
 
   public renderTransformChart()
@@ -208,49 +217,102 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     );
   }
 
+  public editingField()
+  {
+    this.setState((state) => ({ editingField: true }));
+  }
+
+  public editingWeight()
+  {
+    this.setState((state) => ({ editingWeight: true }));
+  }
+
+  public handleWeightBeforeChange(value: number)
+  {
+    if (this.state.editingWeight)
+    {
+      this.setState((state) => ({ editingWeight: false }));
+    }
+  }
+
+  public handleWeightChange(value: number)
+  {
+    this.setState((state) => ({ weight: value }));
+  }
+
+  public handleWeightAfterChange(value: number)
+  {
+    const { keyPath } = this.props;
+
+    this.props.builderActions.changePath(this.props.keyPath.push('weight'), value);
+  }
+
   public renderLineContents()
   {
+    const { fieldIndex } = this.state;
+
     return (
       <div className='pf-line pf-score-line-inner'>
-        <ScoreBar
-          parentData={{ weights: this.props.allWeights }}
-          data={{ weight: this.state.weight }}
-          keyPath={this.props.keyPath.push('weight')}
-          noAnimation={!this.props.animateScoreBars}
-        />
-        <BuilderTextbox
-          keyPath={this.props.keyPath.push('weight')}
-          value={this.props.line.weight}
-          language={'elastic'}
-          canEdit={this.props.pathfinderContext.canEdit}
-          placeholder={'weight'}
-          isNumber={true}
-          autoDisabled={true}
-          onChange={this.props.onAnimateScoreBars}
-          action={this.props.builderActions.changePath}
-        />
-        <span className='pf-score-line-text'>times</span>
-        <SearchableDropdown
-          options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
-          selectedIndex={this.state.fieldIndex}
-          canEdit={this.props.pathfinderContext.canEdit}
-          placeholder={'Field...'}
-          onChange={this.handleFieldChange}
-        />
-        {
-          this.props.line.field &&
-          <div
-            className={this.props.line.expanded ?
-              'pf-score-line-transform-arrow-open' :
-              'pf-score-line-transform-arrow-closed'}
-          >
-            <div
-              className={this.props.line.expanded ?
-                'pf-score-line-transform-arrow-inner-open' :
-                'pf-score-line-transform-arrow-inner-closed'}
+        <EditableField
+          editing={this.state.editingField || fieldIndex === -1}
+          editComponent={
+            <SearchableDropdown
+              options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
+              selectedIndex={fieldIndex}
+              canEdit={this.props.pathfinderContext.canEdit}
+              placeholder={'Field...'}
+              onChange={this.handleFieldChange}
+              width={fieldIndex > -1 ? '33.33%' : '100%'}
             />
-          </div>
+          }
+          readOnlyComponent={
+            <div className='field-name' onClick={this.editingField}>
+              {_.upperFirst(this.props.dropdownOptions.get(fieldIndex).displayName as string)}
+            </div>
+          }
+        />
+
+        {
+          fieldIndex > -1 ?
+            (
+              <div style={{ width: '66.66%', display: 'flex' }} >
+                <ScoreBar
+                  parentData={{ weights: this.props.allWeights }}
+                  data={{ weight: this.state.weight }}
+                  keyPath={this.props.keyPath.push('weight')}
+                  noAnimation={!this.props.animateScoreBars}
+                  builderActions={this.props.builderActions}
+                  onBeforeChange={this.handleWeightBeforeChange}
+                  onChange={this.handleWeightChange}
+                  onAfterChange={this.handleWeightAfterChange}
+                />
+                <EditableField
+                  editing={this.state.editingWeight}
+                  editComponent={
+                    <BuilderTextbox
+                      keyPath={this.props.keyPath.push('weight')}
+                      value={this.props.line.weight}
+                      language={'elastic'}
+                      canEdit={this.props.pathfinderContext.canEdit}
+                      placeholder={'weight'}
+                      isNumber={true}
+                      autoDisabled={true}
+                      onChange={this.props.onAnimateScoreBars}
+                      action={this.props.builderActions.changePath}
+                    />
+                  }
+                  readOnlyComponent={
+                    <div className='field-weight' onClick={this.editingWeight}>
+                      <div className='field-weight-value'>
+                        {this.state.weight}
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
+            ) : null
         }
+
         {
           !this.props.line.expanded ?
             this.renderTransformChartPreview() :
