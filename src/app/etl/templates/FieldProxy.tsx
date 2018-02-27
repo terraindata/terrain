@@ -51,9 +51,9 @@ const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
-import { KeyPath as EngineKeypath, TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-
 /*
  *  The FieldProxy structures act as the binding between the TemplateEditorField
  *  tree structure and the flattened structure of the transformation engine
@@ -187,7 +187,7 @@ export class FieldNodeProxy
     this.syncWithEngine();
   }
 
-  public addTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<EngineKeypath> | List<number>,
+  public addTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<EnginePath> | List<number>,
     options?: object)
   {
     this.tree.getEngine().appendTransformation(nodeType, fieldNamesOrIDs, options);

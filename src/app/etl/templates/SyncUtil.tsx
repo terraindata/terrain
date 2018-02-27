@@ -55,6 +55,7 @@ import
   TemplateField, TransformationNode,
 } from 'etl/templates/FieldTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
+import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export function createTreeFromEngine(engine: TransformationEngine): TemplateField
@@ -157,4 +158,191 @@ export function initialTemplateFromDocs(documents: List<object>)
     template,
     rootField,
   };
+}
+
+// const TestDoc1 =
+// {
+//   name: 'Doge',
+//   foo: [1, 2, 3],
+//   nested: [
+//     {key1: 'bye'},
+//     {key2: 'yo'},
+//     {key3:  true},
+//   ],
+//   doubleNested: [[1, 2, 3], [3, 2, 1]],
+// };
+// const TestDoc2 =
+// {
+//   name: 'Bruhh',
+//   nested: [
+//     {key2: 100, key3: true},
+//     {key3: false},
+//     {key4: [1, 2, 3]}
+//   ],
+//   doubleNested: [],
+// }
+/* merged types:
+  "[\"name\"]": "string",
+  "[\"foo\"]": "array",
+  "[\"foo\",\"*\"]": "number",
+  "[\"nested\"]": "array",
+  "[\"nested\",\"*\"]": "object",
+  "[\"nested\",\"*\",\"key1\"]": "string",
+  "[\"nested\",\"*\",\"key2\"]": "string", // string and number get coerced into string
+  "[\"nested\",\"*\",\"key3\"]": "boolean",
+  "[\"doubleNested\"]": "array",
+  "[\"doubleNested\",\"*\"]": "array", // the empty array in TestDoc2 doesn't break TestDoc1's types!
+  "[\"doubleNested\",\"*\",\"*\"]": "number",
+  "[\"nested\",\"*\",\"key4\"]": "array", // nice! complex structures!
+  "[\"nested\",\"*\",\"key4\",\"*\"]": "number"
+*/
+
+export function createEngineFromDocs(documents: List<object>)
+{
+  return createMergedEngine(documents);
+}
+
+type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+function hashPath(keypath: EnginePath)
+{
+  return JSON.stringify(keypath.toJS());
+}
+
+function unhashPath(keypath: string)
+{
+  return EnginePath(JSON.parse(keypath));
+}
+
+function turnIndicesIntoWildcards(
+  keypath: EnginePath,
+  engine: TransformationEngine,
+  mapping: {[k: string]: number}
+): EnginePath
+{
+  if (keypath.size === 0)
+  {
+    return keypath;
+  }
+  const arrayIndices = {};
+  for (const i of _.range(1, keypath.size))
+  {
+    const parentPath = keypath.slice(0, i).toList();
+    const parentId = mapping[hashPath(parentPath)];
+
+    if (parentId !== undefined && engine.getFieldType(parentId) === 'array')
+    {
+      arrayIndices[i] = true;
+    }
+  }
+  return keypath.map((key, i) => {
+    return arrayIndices[i] === true ? '*' : key
+  }).toList();
+}
+
+// creates a mapping from hashed keypath to fieldId
+function createPathToIdMap(engine: TransformationEngine): {[k: string]: number}
+{
+  const fieldIds = engine.getAllFieldIDs();
+  const mapping = {};
+  fieldIds.forEach((id, i) => {
+    mapping[hashPath(engine.getOutputKeyPath(id))] = id;
+  });
+  return mapping;
+}
+
+function createMergedEngine(documents: List<object>): TransformationEngine
+{
+  const warnings: string[] = [];
+  const softWarnings: string[] = [];
+  const pathTypes: {[k: string]: FieldTypes } = {};
+  documents.forEach((doc, i) => {
+    const e: TransformationEngine = new TransformationEngine(doc);
+    const fieldIds = e.getAllFieldIDs();
+    const pathToIdMap = createPathToIdMap(e);
+    // fieldIds = fieldIds.sortBy((a, b) => e.getOutputKeyPath(a).size - e.getOutputKeyPath(b).size);
+    fieldIds.forEach((id, j) => {
+      const currentType: FieldTypes = e.getFieldType(id) as FieldTypes;
+      const wildCardedPath = turnIndicesIntoWildcards(e.getOutputKeyPath(id), e, pathToIdMap)
+      const path = hashPath(wildCardedPath);
+      if (pathTypes[path] !== undefined)
+      {
+        const existingType = pathTypes[path];
+        const newType = mergeTypes(currentType, existingType);
+        if (newType === 'warning' || newType === 'softWarning')
+        {
+          if (newType === 'warning')
+          {
+            warnings.push(
+              `path: ${path} has incompatible types. \
+              Interpreted types ${currentType} and ${existingType} are incompatible. \
+              The resultant type will be coerced to a string. \
+              Details: document ${i}`
+            );
+          }
+          else
+          {
+            softWarnings.push(
+              `path: ${path} has different types, but can be resolved. \
+              Interpreted types ${currentType} and ${existingType} are different. \
+              The resultant type will be coerced to a string. \
+              Details: document ${i}`
+            );
+          }
+          pathTypes[path] = 'string';
+        }
+      }
+      else
+      {
+        pathTypes[path] = currentType;
+      }
+    });
+  });
+
+  const engine = new TransformationEngine();
+  List(Object.keys(pathTypes)).map((hashedPath) => unhashPath(hashedPath));
+}
+
+const CompatibilityMatrix: {
+  [x in FieldTypes]: {
+    [y in FieldTypes]?: FieldTypes | 'warning' | 'softWarning'
+  }
+} = {
+  array: {
+    array: 'array',
+    object: 'warning',
+    string: 'warning',
+    number: 'warning',
+    boolean: 'warning',
+  },
+  object: {
+    object: 'object',
+    string: 'warning',
+    number: 'warning',
+    boolean: 'warning',
+  },
+  string: {
+    string: 'string',
+    number: 'softWarning',
+    boolean: 'softWarning',
+  },
+  number: {
+    number: 'number',
+    boolean: 'softWarning',
+  },
+  boolean: {
+    boolean: 'boolean',
+  },
+}
+
+// warning types get typed as strings, but should emit a warning
+function mergeTypes(type1: FieldTypes, type2: FieldTypes): FieldTypes | 'warning' | 'softWarning'
+{
+  if (CompatibilityMatrix[type1][type2] !== undefined)
+  {
+    return CompatibilityMatrix[type1][type2];
+  }
+  else
+  {
+    return CompatibilityMatrix[type2][type1];
+  }
 }

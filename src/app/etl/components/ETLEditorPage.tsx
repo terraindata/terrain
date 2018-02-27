@@ -58,7 +58,7 @@ import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createTreeFromEngine, initialTemplateFromDocs } from 'etl/templates/SyncUtil';
+import { createEngineFromDocs, createTreeFromEngine, initialTemplateFromDocs } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
@@ -115,7 +115,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   public initFromAlgorithm()
   {
     const { algorithms, params, act } = this.props;
-
+    createEngineFromDocs(); // testing
     const algorithmId = getAlgorithmId(params);
     const onFetched = createFetchHandler(act);
     const source = _SourceConfig({
