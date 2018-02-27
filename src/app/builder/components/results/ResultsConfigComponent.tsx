@@ -148,7 +148,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       if (List.isList(columns))
       {
         nestedFields = columns.filter((col) =>
-          col.type === 'nested'
+          col.datatype === 'nested'
         ).map((col) => col.name).toList();
       }
       else
@@ -173,7 +173,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         return type === 'nested' || type === '';
       }).toList();
     }
-    console.log('nested fields are ', nestedFields);
     this.setState({
       nestedFields,
     });
@@ -240,7 +239,9 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
 
   public handleNestedConfigChange(field, config, builderActions)
   {
-    builderActions.changeResultsConfig(config, field);
+    const newConfig = this.state.config.setIn(['formats', field, 'config'], config);
+    this.changeConfig(newConfig);
+    // builderActions.changeResultsConfig(config, field);
   }
 
   public handleNestedConfigClose(field, config)
@@ -267,7 +268,15 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     let columns;
     if (this.props.columns)
     {
-      columns = this.props.columns.get(field).properties;
+      if (List.isList(this.props.columns))
+      {
+        columns = this.props.columns.filter((col) => col.name === field)
+          .toList().get(0).properties;
+      }
+      else
+      {
+        columns = Util.asJS(this.props.columns)[field].properties;
+      }
     }
     else
     {
@@ -297,17 +306,17 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       ).toList();
 
       // it was actually a group join, need to extract data differently.
-      // console.log(this.props.hit.get(field));
       fields = columns.map((col) => col.name).toList();
     }
     return (
       <ResultsConfigComponent
         {...this.props}
         fields={fields}
-        config={format !== undefined ? format.config : _ResultsConfig()}
+        config={format !== undefined ? _ResultsConfig(Util.asJS(format)['config']) : _ResultsConfig()}
         onConfigChange={this._fn(this.handleNestedConfigChange, field)}
         onClose={this._fn(this.handleNestedConfigClose, field)}
         columns={columns}
+        dataSource={{index}}
       />
     );
   }
