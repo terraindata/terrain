@@ -53,8 +53,8 @@ import
 {
   _TemplateField, _TransformationNode,
   TemplateField, TransformationNode,
-}
-  from 'etl/templates/FieldTypes';
+} from 'etl/templates/FieldTypes';
+import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export function createTreeFromEngine(engine: TransformationEngine): TemplateField
@@ -132,4 +132,29 @@ export function updateFieldFromEngine(
 {
   const updatedField = createFieldFromEngine(engine, id);
   return updatedField.set('children', oldField.children);
+}
+
+export function initialTemplateFromDocs(documents: List<object>)
+  : { template: ETLTemplate, rootField: TemplateField }
+{
+  if (documents.size === 0)
+  {
+    return {
+      template: _ETLTemplate(),
+      rootField: _TemplateField(),
+    };
+  }
+  const firstDoc = documents.get(0);
+  const engine = new TransformationEngine(firstDoc);
+  const rootField = createTreeFromEngine(engine);
+
+  const template = _ETLTemplate({
+    id: -1,
+    templateName: name,
+    transformationEngine: engine,
+  });
+  return {
+    template,
+    rootField,
+  };
 }

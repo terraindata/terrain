@@ -55,12 +55,14 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
+import { createTreeFromEngine, initialTemplateFromDocs } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -91,28 +93,20 @@ function getTemplateId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-function initialTemplateFromDocs(documents: List<object>): { template: ETLTemplate, rootField: TemplateField }
+function createFetchHandler(act): (hits: List<object>) => void
 {
-  if (documents.size === 0)
+  return (hits) =>
   {
-    return {
-      template: _ETLTemplate(),
-      rootField: _TemplateField(),
-    };
+    const { template, rootField } = initialTemplateFromDocs(hits);
+    act({
+      actionType: 'setTemplate',
+      template,
+    });
+    act({
+      actionType: 'setRoot',
+      rootField,
+    });
   }
-  const firstDoc = documents.get(0);
-  const engine = new TransformationEngine(firstDoc);
-  const rootField = createTreeFromEngine(engine);
-
-  const template = _ETLTemplate({
-    id: -1,
-    templateName: name,
-    transformationEngine: engine,
-  });
-  return {
-    template,
-    rootField,
-  };
 }
 
 @Radium
@@ -121,21 +115,9 @@ class ETLEditorPage extends TerrainComponent<Props>
   public initFromAlgorithm()
   {
     const { algorithms, params, act } = this.props;
+
     const algorithmId = getAlgorithmId(params);
-
-    const onFetched = (hits: List<object>) =>
-    {
-      const { template, rootField } = initialTemplateFromDocs(hits);
-      act({
-        actionType: 'setTemplate',
-        template,
-      });
-      act({
-        actionType: 'setRoot',
-        rootField,
-      });
-    };
-
+    const onFetched = createFetchHandler(act);
     const source = _SourceConfig({
       type: Sources.Algorithm,
       fileConfig: _FileConfig({
@@ -145,6 +127,7 @@ class ETLEditorPage extends TerrainComponent<Props>
         algorithmId,
       },
     });
+
     act({
       actionType: 'fetchDocuments',
       source,
@@ -191,9 +174,13 @@ class ETLEditorPage extends TerrainComponent<Props>
     {
       // TODO
     }
-    else // TODO check if its walkthrough
+    else if (this.props.walkthrough.source.type != null) // TODO check if its walkthrough
     {
       this.initFromFile();
+    }
+    else
+    {
+      ETLRouteUtil.gotoWalkthroughStep(0);
     }
   }
 
