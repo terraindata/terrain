@@ -119,8 +119,8 @@ export class RouteSelector extends TerrainComponent<Props>
     focusedOptionIndex: 0,
     
     columnRefs: Map<number, any>({}),
-    optionRefs: Map({}),
     pickerRef: null,
+    // optionRefs: Map({}), // not needed for now, but keeping some logic around
     
     // TODO re-add animation / picked logic
     // picked: false,
@@ -215,7 +215,7 @@ export class RouteSelector extends TerrainComponent<Props>
         }
         <div
           className='routeselector-close'
-          onClick={this.close}
+          onClick={this.toggle}
         >
           Close
         </div>
@@ -265,11 +265,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private handleBoxValueClick()
   {
-    let open = !this.state.open;
-    
-    this.setState({
-      open,
-    });
+    this.toggle();
   }
   
   private handleSingleBoxValueClick(optionSetIndex)
@@ -608,6 +604,7 @@ export class RouteSelector extends TerrainComponent<Props>
     const optionSet = props.optionSets.get(optionSetIndex);
     const search = state.searches.get(optionSetIndex);
     const isShowing = this.shouldShowOption(option, search);
+    const isSelected = props.values.get(optionSetIndex) === option.value;
     
     if (isShowing)
     {
@@ -627,7 +624,7 @@ export class RouteSelector extends TerrainComponent<Props>
           <div
             className={classNames({
               'routeselector-option': true,
-              'routeselector-option-selected': props.values.get(optionSetIndex) === option.value,
+              'routeselector-option-selected': isSelected,
               'routeselector-option-focused': state.focusedOptionIndex === visibleOptionsIndex
                 && optionSetIndex === state.focusedSetIndex
                 && state.focusedOptionIndex !== -1
@@ -639,8 +636,8 @@ export class RouteSelector extends TerrainComponent<Props>
           >
             <div
               className='routeselector-option-name'
-              style={OPTION_NAME_STYLE}
-              ref={'option-'+index}
+              style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
+              key={'optionz-' + index + '-' + optionSetIndex}
             >
               {
                 option.icon !== undefined &&
@@ -864,6 +861,25 @@ export class RouteSelector extends TerrainComponent<Props>
     this.close();
   }
   
+  private handleCloseClick()
+  {
+    if (this.state.open)
+    {
+      this.close();
+    }
+    else
+    {
+      
+    }
+  }
+  
+  private open()
+  {
+    this.setState({
+      open,
+    });
+  }
+  
   private close()
   {
     this.setState({
@@ -874,6 +890,18 @@ export class RouteSelector extends TerrainComponent<Props>
       focusedSetIndex: -1,
       focusedOptionIndex: -1,
     });
+  }
+  
+  private toggle()
+  {
+    if (this.state.open)
+    {
+      this.close();
+    }
+    else
+    {
+      this.open();
+    }
   }
   
   private handleValueRef(valueRef)
@@ -890,23 +918,29 @@ export class RouteSelector extends TerrainComponent<Props>
     });
   }
   
-  private attachOptionRef(setIndex, optionIndex, optionRef)
-  {
-    let { optionRefs } = this.state;
+  // private attachOptionRef(setIndex, optionIndex, optionRef)
+  // {
+  //   let { optionRefs } = this.state;
     
-    if (!optionRefs.get(setIndex))
-    {
-      optionRefs = optionRefs.set(setIndex, Map({}));
-    }
+  //   if (!optionRefs.get(setIndex))
+  //   {
+  //     optionRefs = optionRefs.set(setIndex, Map({}));
+  //   }
     
-    this.setState({
-      columnRefs: optionRefs.setIn([setIndex, optionIndex], optionRef),
-    });
-  }
+  //   this.setState({
+  //     columnRefs: optionRefs.setIn([setIndex, optionIndex], optionRef),
+  //   });
+  // }
 }
 
 const OPTION_NAME_STYLE = {
-  fontSize: 24,
+  color: Colors().fontColor,
+  ':hover': {
+    color: Colors().active,
+  }
+};
+
+const OPTION_NAME_SELECTED_STYLE = {
   color: Colors().active,
 };
 
