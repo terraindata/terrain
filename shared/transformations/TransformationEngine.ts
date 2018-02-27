@@ -184,12 +184,9 @@ export class TransformationEngine
       const toTraverse: string[] = GraphLib.alg.preorder(this.dag, nodeKey);
       for (let i = 0; i < toTraverse.length; i++)
       {
-        console.log('before one T:');
-        console.log(output);
         const transformationResult: TransformationVisitResult = TransformationNodeVisitor.visit(this.dag.node(toTraverse[i]), output);
         if (transformationResult.errors !== undefined)
         {
-          console.log('BGGEGEGEG');
           // winston.error('Transformation encountered errors!:');
           transformationResult.errors.forEach((error: TransformationVisitError) =>
           {
@@ -198,8 +195,6 @@ export class TransformationEngine
           // TODO abort transforming if errors occur?
         }
         output = transformationResult.document;
-        console.log('after one T:');
-        console.log(output);
       }
     }
     return this.unflatten(output);
@@ -389,7 +384,8 @@ export class TransformationEngine
       }
       else
       {
-        (fieldNamesOrIDs as List<KeyPath>).map((name: KeyPath) => {
+        (fieldNamesOrIDs as List<KeyPath>).map((name: KeyPath) =>
+        {
           // Replace wildcards with explicit field IDs
           if (name.contains('*'))
           {
@@ -424,19 +420,19 @@ export class TransformationEngine
 
   private addArrayField(ids: List<number>, obj: object, currentKeyPath: KeyPath, key: any): List<number>
   {
-    //const arrayKey: any = [key.toString()];
-    //const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
+    // const arrayKey: any = [key.toString()];
+    // const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
     const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
     ids = ids.push(arrayID);
     this.setFieldProp(arrayID, KeyPath(['valueType']), arrayTypeOfValues(obj[key]));
     this.setFieldProp(arrayID, KeyPath(['arrayLength']), obj[key].length);
     for (let i: number = 0; i < obj[key].length; i++)
     {
-      //const arrayKey_i: any = arrayKey.push(i.toString());
+      // const arrayKey_i: any = arrayKey.push(i.toString());
       if (isPrimitive(obj[key][i]))
       {
         ids = this.addPrimitiveField(ids, obj[key], currentKeyPath.push(key.toString()), i);
-        //ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
+        // ids = ids.push(this.addField(currentKeyPath.push(arrayKey_i), typeof obj[key]));
       } else if (Array.isArray(obj[key][i]))
       {
         ids = this.addArrayField(ids, obj[key], currentKeyPath.push(key.toString()), i);
@@ -475,13 +471,12 @@ export class TransformationEngine
     return ids;
   }
 
-  public flatten(obj: object): object
+  private flatten(obj: object): object
   {
     const objectified: object = objectify(obj);
     const output: object = {};
     this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
     {
-      console.log('CALLING GET ON KP: ', keyPath);
       const ref: any = yadeep.get(objectified, keyPath);
       if (ref !== undefined)
       {
@@ -500,34 +495,24 @@ export class TransformationEngine
 
   private unflatten(obj: object): object
   {
-    console.log('unflatten');
-    console.log(obj);
     const output: object = {};
     this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
     {
-      console.log('try to set ',value,' to ',key);
       if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
       {
-        console.log('setting ',value,' to ',obj[key]);
         yadeep.set(output, value, obj[key], { create: true });
       }
     });
     // if (this.fieldTypes.get(key) === 'array')
     this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
     {
-      console.log('1111try to set ',value,' to ',key);
       if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
       {
-        if(this.fieldTypes.get(key) === 'array'){
+        if (this.fieldTypes.get(key) === 'array')
+        {
           const x = yadeep.get(output, value);
           x['length'] = Object.keys(x).length;
-          console.log('11111x');
-          console.log(x);
-        console.log('11111setting ',value,' to ',Array.prototype.slice.call(x));
-        yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
-        console.log('1111output now');
-        console.log(output);
-        //throw 'did one';
+          yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
         }
       }
     });

@@ -47,37 +47,26 @@ THE SOFTWARE.
 // Yet another deep JSON getter/setter module
 
 import { KeyPath, WayPoint } from './KeyPath';
-// import isPrimitive = require('is-primitive');
 
 export function find(obj: object, path: KeyPath, next: (found) => any, options: object = {}): void
 {
   if (path.size === 0 || obj === undefined)
   {
-    //console.log('obj:');
-    //console.log(obj);
     obj = next(obj);
-    //console.log(obj);
     return;
   }
 
   const waypoint: WayPoint = path.get(0);
-  console.log('waypoint');
-  console.log(waypoint);
-  console.log(options);
 
   const keys: string[] = Object.keys(obj);
 
   if (waypoint === '*')
   {
     const results: any[] = [];
-    //console.log(keys);
     for (let j: number = 0; j < keys.length; j++)
     {
-      console.log(obj[keys[j]]);
       find(obj[keys[j]], path.shift(), (found) =>
       {
-        //console.log('rj = ');
-        //console.log(found);
         results[j] = found;
         return next(found);
       }, options);
@@ -88,22 +77,9 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
 
   if (options['create'] === true && !obj.hasOwnProperty(waypoint))
   {
-      console.log('hh2');
-      obj[waypoint] = {};
-      keys.push(waypoint);
+    obj[waypoint] = {};
+    keys.push(waypoint);
   }
-
-  /*if (obj.constructor === Array)
-  {
-    console.log('fffff');
-    console.log(keys);
-    console.log(obj);
-    console.log(waypoint);
-    throw new Error('yadeep expects nested objects without arrays.  ' +
-      'Please objectify your doc before transforming (see deepObjectify).');
-    // obj = next(undefined);
-    // return;
-  }*/
 
   for (let i: number = 0; i < keys.length; ++i)
   {
@@ -112,79 +88,13 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
       // Don't be fooled, this is the real base case...
       if (path.size === 1)
       {
-        console.log('aaaaobj:');
-        console.log(obj);
         obj[keys[i]] = next(obj[keys[i]]);
-        //console.log(obj);
         return;
-      } else {
+      } else
+      {
         return find(obj[keys[i]], path.shift(), next, options);
       }
     }
-    /*else if (waypoint.constructor === Array && keys[i] === waypoint[0])
-    {
-      let lastNestedArray = obj[keys[i]];
-      const recall: any[] = [...waypoint];
-      let spliced: number = 0;
-
-      while (waypoint.length > 1)
-      {
-        const firstWildcard = (waypoint as any[]).indexOf('*');
-        if (firstWildcard === 1)
-        {
-          //(waypoint as any[]).splice(1, 1);
-          //console.log('waypoint:');
-          //console.log(waypoint);
-          const results: any[] = [];
-          for (let j: number = 0; j < lastNestedArray.length; j++)
-          {
-            //console.log('waypoint: ');
-            //console.log(waypoint);
-            //const recall = [...waypoint];
-            //console.log('HAHA');
-            //console.log(lastNestedArray[j]);
-            //console.log(path.set(0, waypoint));
-            recall[spliced + firstWildcard] = j.toString();
-            // waypoint cloned here
-            const newPath = waypoint.length === 1 ? path.shift() : path.set(0, [...recall]);
-            //console.log('newpath ');
-            //console.log(newPath);
-            find(obj, newPath, (found) =>
-            {
-              //console.log('rj = ');
-              //console.log(found);
-              results[j] = found;
-              next(found);
-            }, options);
-            //console.log('recall: ');
-            //console.log(recall);
-            //waypoint = recall;
-          }
-          //console.log('r here:');
-          //console.log(results);
-          obj = next(results);
-          return;
-        }
-        else
-        {
-          if ((waypoint as any[]).length === 2)
-          {
-            lastNestedArray[waypoint[1]] = next(lastNestedArray[waypoint[1]]);
-            return;
-          } else
-          {
-            lastNestedArray = lastNestedArray[waypoint[1]];
-            (waypoint as any[]).splice(1, 1);
-            spliced++;
-          }
-        }
-      }
-
-      //console.log('lastNestedArray:');
-      //console.log(lastNestedArray);
-
-      return find(lastNestedArray, path.shift(), next, options);
-    }*/
   }
 
   return next(undefined);

@@ -46,7 +46,8 @@ THE SOFTWARE.
 
 import isPrimitive = require('is-primitive');
 
-export default function objectify(arr) {
+export default function objectify(arr)
+{
   if (isPrimitive(arr))
   {
     return arr;
@@ -54,9 +55,10 @@ export default function objectify(arr) {
   let obj: object = Object.assign({}, arr);
   if (arr.constructor === Array)
   {
-    obj = {...arr};
+    obj = { ...arr };
   }
-  for (const key in obj) {
+  for (const key in obj)
+  {
     if (obj.hasOwnProperty(key))
     {
       obj[key] = objectify(obj[key]);
@@ -65,7 +67,8 @@ export default function objectify(arr) {
   return obj;
 }
 
-export default function objectify(arr) {
+export default function objectify(arr)
+{
   if (isPrimitive(arr))
   {
     return arr;
@@ -73,9 +76,10 @@ export default function objectify(arr) {
   let obj: object = Object.assign({}, arr);
   if (arr.constructor === Array)
   {
-    obj = {...arr};
+    obj = { ...arr };
   }
-  for (const key in obj) {
+  for (const key in obj)
+  {
     if (obj.hasOwnProperty(key))
     {
       obj[key] = objectify(obj[key]);
