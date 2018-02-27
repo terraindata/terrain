@@ -80,14 +80,14 @@ export interface WalkthroughActionTypes
     sourceOptions?: OptionsOrHandler;
     sinkOptions?: OptionsOrHandler;
   };
-  loadFileSample: {
-    actionType: 'loadFileSample';
-    numRows: number;
-    file: File;
-  };
+  // loadFileSample: {
+  //   actionType: 'loadFileSample';
+  //   numRows: number;
+  //   file: File;
+  // };
   setPreviewDocuments: {
     actionType: 'setPreviewDocuments';
-    documents: object[];
+    documents: List<object>;
   };
   autodetectJsonOptions: {
     actionType: 'autodetectJsonOptions';
@@ -170,31 +170,31 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
         return state.set('previewDocuments', action.payload.documents);
       },
       autodetectJsonOptions: (state, action) => state, // overriden
-      loadFileSample: (state, action) => state, // overriden
+      // loadFileSample: (state, action) => state, // overriden
     };
 
-  public loadFileSample(action: WalkthroughActionType<'loadFileSample'>, dispatch)
-  {
-    const directDispatch = this._dispatchReducerFactory(dispatch);
-    const handleResult = (result) =>
-    {
-      directDispatch({
-        actionType: 'setPreviewDocuments',
-        documents: result,
-      });
-    };
-    const handleError = (error) =>
-    {
-      // tslint:disable-next-line
-      console.error(error);
-    };
-    getSampleRows(
-      action.file,
-      action.numRows,
-      handleResult,
-      handleError,
-    );
-  }
+  // public loadFileSample(action: WalkthroughActionType<'loadFileSample'>, dispatch)
+  // {
+  //   const directDispatch = this._dispatchReducerFactory(dispatch);
+  //   const handleResult = (result) =>
+  //   {
+  //     directDispatch({
+  //       actionType: 'setPreviewDocuments',
+  //       documents: List(result),
+  //     });
+  //   };
+  //   const handleError = (error) =>
+  //   {
+  //     // tslint:disable-next-line
+  //     console.error(error); // TODO improve this
+  //   };
+  //   getSampleRows(
+  //     action.file,
+  //     action.numRows,
+  //     handleResult,
+  //     handleError,
+  //   );
+  // }
 
   public autodetectJsonOptions(action: WalkthroughActionType<'autodetectJsonOptions'>, dispatch)
   {
@@ -214,8 +214,8 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
   {
     switch (action.actionType)
     {
-      case 'loadFileSample':
-        return this.loadFileSample.bind(this, action);
+      // case 'loadFileSample':
+      //   return this.loadFileSample.bind(this, action);
       case 'autodetectJsonOptions':
         return this.autodetectJsonOptions.bind(this, action);
       default:

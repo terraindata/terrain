@@ -55,6 +55,7 @@ import
 import
 {
   _TemplateEditorState,
+  EditorDisplayState,
   ETLTemplate,
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
@@ -91,10 +92,6 @@ export interface TemplateEditorActionTypes
     actionType: 'setModalRequests';
     requests: List<ModalProps>;
   };
-  setDocuments: {
-    actionType: 'setDocuments';
-    documents: List<object>
-  };
   fetchDocuments: {
     actionType: 'fetchDocuments';
     source: {
@@ -103,18 +100,11 @@ export interface TemplateEditorActionTypes
     };
     onFetched?: (hits: List<object>) => void;
   };
-  setLoading: {
-    actionType: 'setLoading';
-    loading: boolean;
-  };
-  setPreviewIndex: {
-    actionType: 'setPreviewIndex';
-    index: number;
-  };
-  setSettingsKeyPath: {
-    actionType: 'setSettingsKeyPath';
-    keyPath: KeyPath;
-    displayKeyPath: KeyPath;
+  setDisplayState: {
+    actionType: 'setDisplayState';
+    state: Partial<{
+      [k in keyof EditorDisplayState]: EditorDisplayState[k];
+    }>;
   };
   closeSettings: {
     actionType: 'closeSettings';
@@ -151,26 +141,19 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       {
         return state.setIn(['uiState', 'modalRequests'], action.payload.requests);
       },
-      setDocuments: (state, action) =>
-      {
-        return state.setIn(['uiState', 'documents'], action.payload.documents);
-      },
       fetchDocuments: (state, action) =>
       {
         return state; // do nothing
       },
-      setLoading: (state, action) =>
+      setDisplayState: (state, action) =>
       {
-        return state.setIn(['uiState', 'loading'], action.payload.loading);
-      },
-      setPreviewIndex: (state, action) =>
-      {
-        return state.setIn(['uiState', 'previewIndex'], action.payload.index);
-      },
-      setSettingsKeyPath: (state, action) =>
-      {
-        return state.setIn(['uiState', 'settingsKeyPath'], action.payload.keyPath)
-          .setIn(['uiState', 'settingsDisplayKeyPath'], action.payload.displayKeyPath);
+        let newState = state.uiState;
+        const toUpdate = action.payload.state;
+        for (const k of Object.keys(toUpdate))
+        {
+          newState = newState.set(k, toUpdate[k]);
+        }
+        return state.set('uiState', newState);
       },
       closeSettings: (state, action) =>
       {
@@ -202,9 +185,11 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
-      actionType: 'setLoading',
-      loading: true,
-    }); // set loading to true
+      actionType: 'setDisplayState',
+      state: {
+        loading: true,
+      }
+    });
 
     if (action.source.type === 'algorithm' && action.source.algorithm != null)
     {
@@ -222,16 +207,20 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       {
         const hits = List(_.get(response, ['result', 'hits', 'hits'], [])).map((doc, index) => doc['_source']).toList();
         directDispatch({
-          actionType: 'setDocuments',
-          documents: hits,
+          actionType: 'setDisplayState',
+          state: {
+            documents: hits,
+          }
         });
         if (action.onFetched != null)
         {
           action.onFetched(hits);
         }
         directDispatch({
-          actionType: 'setLoading',
-          loading: false,
+          actionType: 'setDisplayState',
+          state: {
+            loading: false,
+          }
         });
       };
 

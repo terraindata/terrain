@@ -150,8 +150,10 @@ class DocumentPreview extends TerrainComponent<Props>
       actionType: 'closeSettings',
     });
     this.props.act({
-      actionType: 'setPreviewIndex',
-      index: this.props.index,
+      actionType: 'setDisplayState',
+      state: {
+        previewIndex: this.props.index,
+      }
     });
   }
 

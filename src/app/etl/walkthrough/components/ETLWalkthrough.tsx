@@ -49,13 +49,13 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 
 import { walkthroughFactory } from 'common/components/walkthrough/Walkthrough';
 import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
@@ -113,11 +113,11 @@ class ETLWalkthrough extends TerrainComponent<Props>
     {
       if (walkthrough.chosenTemplateId !== -1)
       {
-        browserHistory.push(`/etl/edit/templateId=${walkthrough.chosenTemplateId}`);
+        ETLRouteUtil.gotoEditTemplate(walkthrough.chosenTemplateId);
       }
       else
       {
-        browserHistory.push(`/etl/edit/new`);
+        ETLRouteUtil.gotoNewTemplate();
       }
       return;
     }
@@ -132,7 +132,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
     }
     if (newStep !== currentStep)
     {
-      browserHistory.push(`/etl/new/${newStep}`);
+      ETLRouteUtil.gotoWalkthroughStep(newStep);
     }
   }
 
@@ -151,7 +151,7 @@ class ETLWalkthrough extends TerrainComponent<Props>
     }
     if (fixBadRoute)
     {
-      browserHistory.push(`/etl/new/0`);
+      ETLRouteUtil.gotoWalkthroughStep(0);
     }
     return 0;
 

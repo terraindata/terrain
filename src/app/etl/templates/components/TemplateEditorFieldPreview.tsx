@@ -126,12 +126,13 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
     else
     {
       this.props.act({
-        actionType: 'setSettingsKeyPath',
-        keyPath: this.props.keyPath,
-        displayKeyPath: this.props.displayKeyPath,
+        actionType: 'setDisplayState',
+        state: {
+          settingsKeyPath: this.props.keyPath,
+          settingsDisplayKeyPath: this.props.displayKeyPath,
+        }
       });
     }
-
   }
 }
 

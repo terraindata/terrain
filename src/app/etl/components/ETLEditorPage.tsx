@@ -82,6 +82,12 @@ function getAlgorithmId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
+function getTemplateId(params): number
+{
+  const asNumber = (params != null && params.templateId != null) ? Number(params.templateId) : NaN;
+  return Number.isNaN(asNumber) ? -1 : asNumber;
+}
+
 function initialTemplateFromDocs(documents: List<object>): { template: ETLTemplate, rootField: TemplateField }
 {
   if (documents.size === 0)

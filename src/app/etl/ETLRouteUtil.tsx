@@ -43,43 +43,30 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing max-classes-per-file
+// tslint:disable:no-var-requires
 
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { browserHistory } from 'react-router';
 
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig }
-  from 'etl/EndpointTypes';
-
-class WalkthroughStateC
+export default class ETLRouteUtil
 {
-  public stepHistory: List<ViewState> = List([ViewState.NewImport]);
-  public source: SourceConfig = _SourceConfig();
-  public file: File = null;
-  public sink: SinkConfig = _SinkConfig();
-  public chosenTemplateId: ID = -1;
-  public previewDocuments: List<object> = List([]);
-}
-export type WalkthroughState = WithIRecord<WalkthroughStateC>;
-export const _WalkthroughState = makeConstructor(WalkthroughStateC);
+  public static gotoWalkthroughStep(step)
+  {
+    browserHistory.push(`/etl/new/${step}`);
+  }
 
-export enum ViewState
-{
-  Start = 'Start',
-  Import = 'Import',
-  Export = 'Export',
-  PickExportTemplate = 'PickExportTemplate',
-  PickExportAlgorithm = 'PickExportAlgorithm',
-  PickExportDestination = 'PickExportDestination',
-  ExportDestination = 'ExportDestination',
-  NewImport = 'NewImport',
-  PickImportTemplate = 'PickImportTemplate',
-  PickLocalFile = 'PickLocalFile',
-  PickImportSource = 'PickImportSource',
-  ImportDestination = 'ImportDestination',
-  PickDatabase = 'PickDatabase',
-  Review = 'Review',
-  Finish = 'Finish', // unreachable view state
+  public static gotoNewTemplate()
+  {
+    browserHistory.push(`/etl/edit/new`);
+  }
+
+  public static gotoEditAlgorithm(algorithmId)
+  {
+    browserHistory.push(`/etl/edit/algorithmId=${algorithmId}`);
+  }
+
+  public static gotoEditTemplate(templateId)
+  {
+    browserHistory.push(`/etl/edit/templateId=${templateId}`);
+  }
 }

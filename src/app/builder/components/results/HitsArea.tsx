@@ -53,7 +53,6 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
@@ -78,6 +77,8 @@ import MapComponent from '../../../common/components/MapComponent';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
+
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
@@ -690,7 +691,7 @@ class HitsArea extends TerrainComponent<Props>
 
   public showExport()
   {
-    browserHistory.push(`/etl/edit/algorithmId=${this.props.algorithmId}`);
+    ETLRouteUtil.gotoEditAlgorithm(this.props.algorithmId);
   }
 
   public showConfig()
