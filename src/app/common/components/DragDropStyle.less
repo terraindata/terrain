@@ -7,17 +7,23 @@
 	padding: 1px;
 	cursor: pointer;
 	transition: height .3s linear .5s;
-	z-index: 9;
+	
+	&.drag-drop-item-dragging {
+		z-index: 9;
+	}
+	
 	.drag-drop-item-drop-zone {
 		position: absolute;
 		height: 40px;
 		width: 100%;
 		top: 21px;
 	}
+	
 	.drag-drop-item-header {
 		overflow: hidden;
 		transition: height .3s linear .5s;
 		height: 0px;
+		
 		&.drag-drop-item-header-visible {
 			height: 22px;
 		}

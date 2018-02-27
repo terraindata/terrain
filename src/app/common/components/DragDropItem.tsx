@@ -159,6 +159,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
         )}
         className={classNames({
           'drag-drop-item': true,
+          'drag-drop-item-dragging': isDragging,
           'drag-drop-item-is-over': isOver,
         })}>
         <div
