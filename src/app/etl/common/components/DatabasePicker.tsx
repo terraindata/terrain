@@ -76,6 +76,7 @@ interface Props
   database: string;
   table: string;
   onChange: (server: ID, database: string, table: string) => void;
+  constantHeight?: boolean; // if true, applies a pre-calculated minHeight
   // injected props
   servers?: ServerMap;
   databases?: DatabaseMap;
@@ -85,13 +86,6 @@ interface Props
 class DatabasePicker extends TerrainComponent<Props>
 {
   private inputMap: InputDeclarationMap<FormState>;
-
-  // public state: FormState =
-  // {
-  //   serverIndex: -1,
-  //   database: '',
-  //   table: '',
-  // };
 
   constructor(props)
   {
@@ -107,6 +101,7 @@ class DatabasePicker extends TerrainComponent<Props>
       database: {
         type: DisplayType.TextBox,
         displayName: 'Database',
+        shouldShow: this.shouldShowBoxes,
         options: {
           acOptions: this.getDatabaseOptions,
         },
@@ -114,11 +109,17 @@ class DatabasePicker extends TerrainComponent<Props>
       table: {
         type: DisplayType.TextBox,
         displayName: 'Table',
+        shouldShow: this.shouldShowBoxes,
         options: {
           acOptions: this.getTableOptions,
         },
       },
     };
+  }
+
+  public shouldShowBoxes(state: FormState)
+  {
+    return state.serverIndex === -1 ? DisplayState.Hidden : DisplayState.Active;
   }
 
   @memoizeOne
@@ -191,7 +192,7 @@ class DatabasePicker extends TerrainComponent<Props>
     return index != null ? index : -1;
   }
 
-  public computeFormState()
+  public computeFormState(): FormState
   {
     return {
       serverIndex: this._getServerIndex(this.props.servers, this.props.serverId),
@@ -207,6 +208,7 @@ class DatabasePicker extends TerrainComponent<Props>
         inputMap={this.inputMap}
         inputState={this.computeFormState()}
         onStateChange={this.handleStateChange}
+        style={{minHeight: this.props.constantHeight ? minHeight : '0px'}}
       />
     );
   }
@@ -218,6 +220,8 @@ class DatabasePicker extends TerrainComponent<Props>
     this.props.onChange(serverId, state.database, state.table);
   }
 }
+
+const minHeight = '160px';
 
 export default Util.createTypedContainer(
   DatabasePicker,

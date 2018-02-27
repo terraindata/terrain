@@ -100,6 +100,7 @@ class PickDatabaseStep extends ETLStepComponent
           database={database != null ? database : ''}
           table={table != null ? table : ''}
           onChange={this.handleDbPickerChange}
+          constantHeight={true}
         />
         <div className='etl-step-next-button-spacer'>
           {this._renderNextButton(optionsAreGood)}
