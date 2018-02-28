@@ -281,7 +281,7 @@ class HitsArea extends TerrainComponent<Props>
           primaryKey={hit.primaryKey}
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
-          hitSize={hitSize}          
+          hitSize={hitSize}
           builder={this.props.builder}
         />
       </div>
