@@ -248,10 +248,10 @@ export default class GroupJoinTransform extends Readable
                 const obj = front.results.shift();
                 if (obj !== undefined)
                 {
-                  const shouldPass = Object.keys(query).reduce((shouldPass, subQuery) =>
-                    {
-                      return shouldPass && (obj[subQuery] !== undefined && obj[subQuery].length >= this.dropIfLessThan)
-                    }, true);
+                  const shouldPass = Object.keys(query).reduce((acc, q) =>
+                  {
+                    return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
+                  }, true);
 
                   if (shouldPass)
                   {
