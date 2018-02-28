@@ -272,6 +272,8 @@ class HitComponent extends TerrainComponent<Props> {
         style={[
           { left: depth > 0 ? 15 : 0 },
           { width: `calc(100% - ${depth > 0 ? 15 : 0}px` },
+          backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+          borderColor(Colors().blockOutline)
       ]}
       >
         {
@@ -287,7 +289,7 @@ class HitComponent extends TerrainComponent<Props> {
           <div
             onClick={this._fn(this.handleScroll, field, -1)}
             className='hit-content-scroll-back'
-            style={getStyle('fill', Colors().iconColor, Colors().activeHover)}
+            style={getStyle('fill', Colors().iconColor)}
             key='forward-icon'
           >
             <CarrotIcon />
@@ -298,7 +300,7 @@ class HitComponent extends TerrainComponent<Props> {
           <div
             onClick={this._fn(this.handleScroll, field, 1)}
             className='hit-content-scroll-forward'
-            style={getStyle('fill', Colors().iconColor, Colors().activeHover)}
+            style={getStyle('fill', Colors().iconColor)}
             key='back-icon'
           >
             <CarrotIcon />
