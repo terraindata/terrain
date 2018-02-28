@@ -58,6 +58,7 @@ import { BuilderState } from 'app/builder/data/BuilderState';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import Ajax from 'app/util/Ajax';
 import Util from 'app/util/Util';
+import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Radium = require('radium');
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
@@ -77,7 +78,6 @@ import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
-import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 
 const HITS_PAGE_SIZE = 20;
 
@@ -220,19 +220,15 @@ class HitsArea extends TerrainComponent<Props>
     if (resultsState.hits && resultsState.hits.size)
     {
       nestedFields = nestedFields.filter((field) =>
-         List.isList(resultsState.hits.get(0).fields.get(field))
+        List.isList(resultsState.hits.get(0).fields.get(field)),
       ).toList();
     }
     // If there is a results config in use, only use nested fields in that config
     if (props.query.resultsConfig && props.query.resultsConfig.enabled)
     {
-      console.log('here');
-      console.log(props.query.resultsConfig);
-      console.log(nestedFields);
       nestedFields = nestedFields.filter((field) =>
-        props.query.resultsConfig.fields.indexOf(field) !== -1
+        props.query.resultsConfig.fields.indexOf(field) !== -1,
       ).toList();
-      console.log(nestedFields);
     }
     this.setState({
       nestedFields,

@@ -144,12 +144,12 @@ class DragAndDrop extends TerrainComponent<Props>
       );
     }
     return (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}>
-            {item.content}
-        </div>
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}>
+        {item.content}
+      </div>
     );
   }
 

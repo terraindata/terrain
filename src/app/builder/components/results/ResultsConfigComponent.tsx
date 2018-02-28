@@ -52,6 +52,7 @@ import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
 import { BuilderState } from 'app/builder/data/BuilderState';
+import FloatingInput from 'app/common/components/FloatingInput';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
@@ -65,7 +66,6 @@ import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import FloatingInput from 'app/common/components/FloatingInput';
 
 const Color = require('color');
 
@@ -151,7 +151,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       if (List.isList(columns))
       {
         nestedFields = columns.filter((col) =>
-          col.datatype === 'nested'
+          col.datatype === 'nested',
         ).map((col) => col.name).toList();
       }
       else
@@ -298,14 +298,14 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     {
       // Figure out the index of the inner query (NOTE ONLY WORKS W/ PATHFINDER FOR NOW)
       // Based on that, extract the columns of that index
-      const {path} = this.props.builder.query;
+      const { path } = this.props.builder.query;
       const referenceIndex = path.more.references.indexOf(field);
       index = (path.nested.get(referenceIndex).source.dataSource as any).index;
       index = index && index.split('/')[1];
       indexId = `${builder.db.name}/${String(index)}`;
       columns = schema.columns.filter((col) =>
         col.serverId === String(server) &&
-        col.databaseId === String(indexId)
+        col.databaseId === String(indexId),
       ).toList();
 
       // it was actually a group join, need to extract data differently.
@@ -319,7 +319,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         onConfigChange={this._fn(this.handleNestedConfigChange, field)}
         onClose={this._fn(this.handleNestedConfigClose, field)}
         columns={columns}
-        dataSource={{index}}
+        dataSource={{ index }}
       />
     );
   }
@@ -410,13 +410,13 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
   {
     this.setState({
       searchTerm: value,
-    })
+    });
   }
 
   public getAvailableFields(fields, term)
   {
     return fields.filter((field) =>
-      field.toLowerCase().indexOf(term.toLowerCase()) !== -1
+      field.toLowerCase().indexOf(term.toLowerCase()) !== -1,
     );
   }
 

@@ -196,7 +196,7 @@ export class RouteSelector extends TerrainComponent<Props>
               })}
               key={optionSet.key}
               onClick={
-                this._fn(this.handleSingleBoxValueClick, index) 
+                this._fn(this.handleSingleBoxValueClick, index)
                 /* could try Mousedown to make it slightly snappier,
                 but this led to weird issues with closing it */
               }
@@ -592,14 +592,14 @@ export class RouteSelector extends TerrainComponent<Props>
       }
     }, 100);
   }
-  
+
   private divWrapper(isShowing, children)
   {
     if (!isShowing)
     {
       return null;
     }
-    
+
     return (
       <div>
         {
@@ -608,7 +608,7 @@ export class RouteSelector extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private fadeInOutWrapper(isShowing, children)
   {
     return (
@@ -637,12 +637,12 @@ export class RouteSelector extends TerrainComponent<Props>
     }
 
     const visibleOptionsIndex = visibleOptionCounter.count;
-    
+
     // We only want to render the FadeInOuts when we are searching a list
     // otherwise, render in a plain div
     // this is a performance improvement
     const wrapperFn = this.state.focusedSetIndex === optionSetIndex
-     ? this.fadeInOutWrapper : this.divWrapper;
+      ? this.fadeInOutWrapper : this.divWrapper;
 
     return (
       <div
@@ -703,7 +703,7 @@ export class RouteSelector extends TerrainComponent<Props>
                   }
                 </div>
               }
-            </div>
+            </div>,
           )
         }
       </div>

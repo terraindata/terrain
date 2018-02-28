@@ -58,7 +58,7 @@ export interface Props
   open: boolean;
   children?: any;
   maxHeight: number;
-  
+
   // TODO could consider a prop here to force shouldRender, which you could trigger
   //  on hover, to try to improve responsiveness of opening the drawer
 }
@@ -67,7 +67,7 @@ class DrawerAnimation extends TerrainComponent<Props>
 {
   public state = {
     contentRef: null,
-    
+
     // needing these state overrides to optimize the component:
     //  don't render when open is false, but still do the animation
     shouldRender: this.props.open,
@@ -75,10 +75,10 @@ class DrawerAnimation extends TerrainComponent<Props>
     closingTimeout: null,
     openingInterval: null,
   };
-  
+
   // tracking if it was rendered; anti-pattern, I know, but I don't have anything better
-  hasRendered: boolean = false;
-  
+  public hasRendered: boolean = false;
+
   public render()
   {
     const { open, maxHeight, children } = this.props;
@@ -96,7 +96,7 @@ class DrawerAnimation extends TerrainComponent<Props>
       this.hasRendered = false;
       return null;
     }
-    
+
     this.hasRendered = true;
 
     return (
@@ -127,12 +127,12 @@ class DrawerAnimation extends TerrainComponent<Props>
     {
       this.close();
     }
-    
+
     if (!this.props.open && nextProps.open)
     {
       this.open();
     }
-    
+
     if (nextProps.maxHeight !== this.props.maxHeight && nextProps.open && this.props.open)
     {
       // update the rendered max height
@@ -141,7 +141,7 @@ class DrawerAnimation extends TerrainComponent<Props>
       });
     }
   }
-  
+
   public componentDidMount()
   {
     if (this.props.open)
@@ -149,58 +149,57 @@ class DrawerAnimation extends TerrainComponent<Props>
       this.open();
     }
   }
-  
+
   private open()
   {
     // open
     this.clearTimeouts();
-    
+
     this.setState({
       shouldRender: true, // render now
       renderMaxHeight: 0, // but in a closed state
-      openingInterval: setInterval(() => 
+      openingInterval: setInterval(() =>
+      {
+        if (this.hasRendered)
         {
-          console.log('Render MH');
-          if (this.hasRendered)
-          {
-            // make sure we've already rendered, so we get that animation
-            this.setState({
-              renderMaxHeight: this.props.maxHeight,
-            });
-            this.clearTimeouts();
-            
-            // scroll the content into view
-            setTimeout(() =>
-            {
-              const el = ReactDOM.findDOMNode(this.state.contentRef);
+          // make sure we've already rendered, so we get that animation
+          this.setState({
+            renderMaxHeight: this.props.maxHeight,
+          });
+          this.clearTimeouts();
 
-              if (el !== undefined)
-              {
-                el.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'nearest',
-                  inline: 'nearest',
-                });
-              }
-            }, 350); // coordinate this value with LESS
-            // in the future you could consider a ghost element down at the bottom
-            // of the position, so the window can scroll before the content has opened
-          }
-        }, 
+          // scroll the content into view
+          setTimeout(() =>
+          {
+            const el = ReactDOM.findDOMNode(this.state.contentRef);
+
+            if (el !== undefined)
+            {
+              el.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest',
+              });
+            }
+          }, 350); // coordinate this value with LESS
+          // in the future you could consider a ghost element down at the bottom
+          // of the position, so the window can scroll before the content has opened
+        }
+      },
         20), // quick delay
     });
-    
+
   }
-  
+
   private close()
   {
     this.clearTimeouts();
-      
+
     this.setState({
       shouldRender: true, // should be unchanged
       renderMaxHeight: 0, // tell it we're closing
-      closingTimeout: setTimeout(() => {
-        console.log('Dont render');
+      closingTimeout: setTimeout(() =>
+      {
         this.setState({
           shouldRender: false,
         });
@@ -208,7 +207,7 @@ class DrawerAnimation extends TerrainComponent<Props>
       }, 500),
     });
   }
-  
+
   private clearTimeouts()
   {
     if (this.state.closingTimeout)
@@ -216,7 +215,7 @@ class DrawerAnimation extends TerrainComponent<Props>
       // clear the timeout, so nothing weird happens
       clearTimeout(this.state.closingTimeout);
     }
-    
+
     if (this.state.openingInterval)
     {
       // clear the timeout, so nothing weird happens

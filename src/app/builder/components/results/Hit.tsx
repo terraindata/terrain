@@ -65,7 +65,7 @@ import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
-import { Hit, _Hit } from './ResultTypes';
+import { _Hit, Hit } from './ResultTypes';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -117,11 +117,11 @@ class HitComponent extends TerrainComponent<Props> {
     nestedStates: Immutable.Map<string, string>,
     nestedFields: string[]
   } =
-  {
-    hovered: false,
-    nestedStates: Map<string, string>({}),
-    nestedFields: undefined,
-  };
+    {
+      hovered: false,
+      nestedStates: Map<string, string>({}),
+      nestedFields: undefined,
+    };
 
   public constructor(props: Props)
   {
@@ -138,11 +138,11 @@ class HitComponent extends TerrainComponent<Props> {
   public componentWillReceiveProps(nextProps)
   {
     if (!_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS())
-     || !_.isEqual(Util.asJS(this.props.resultsConfig), Util.asJS(nextProps.resultsConfig)))
+      || !_.isEqual(Util.asJS(this.props.resultsConfig), Util.asJS(nextProps.resultsConfig)))
     {
       this.setState({
         nestedFields: getResultNestedFields(nextProps.hit, nextProps.resultsConfig),
-      })
+      });
     }
   }
 
@@ -150,16 +150,19 @@ class HitComponent extends TerrainComponent<Props> {
   {
     for (const key in nextProps)
     {
-      if (key === 'resultsConfig' && !_.isEqual(
-        Util.asJS(this.props.resultsConfig),
-        Util.asJS(nextProps.resultsConfig)))
+      if (nextProps.hasOwnProperty(key))
       {
-        return true;
-      }
-      if (key !== 'hit' && key !== 'resultsConfig'
-        && this.props[key] !== nextProps[key])
-      {
-        return true;
+        if (key === 'resultsConfig' && !_.isEqual(
+          Util.asJS(this.props.resultsConfig),
+          Util.asJS(nextProps.resultsConfig)))
+        {
+          return true;
+        }
+        if (key !== 'hit' && key !== 'resultsConfig'
+          && this.props[key] !== nextProps[key])
+        {
+          return true;
+        }
       }
     }
 
@@ -211,16 +214,16 @@ class HitComponent extends TerrainComponent<Props> {
         className='hit-nested-content'
         key={field}
         style={[
-          {left: depth > 0 ? 15 : 0},
-          {width: `calc(100% - ${depth > 0 ? 15 : 0}px`}
+          { left: depth > 0 ? 15 : 0 },
+          { width: `calc(100% - ${depth > 0 ? 15 : 0}px` },
         ]}
       >
-       <div
-         className='hit-nested-content-header'
-         style={[borderColor(Colors().blockOutline),
-           backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)
-         ]}
-       >
+        <div
+          className='hit-nested-content-header'
+          style={[borderColor(Colors().blockOutline),
+          backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+          ]}
+        >
           <div
             className='hit-nested-content-title'
             onClick={this._fn(
@@ -232,14 +235,14 @@ class HitComponent extends TerrainComponent<Props> {
           </div>
           {
             size > 1 &&
-             <div
+            <div
               className='hit-nested-content-expand'
               onClick={this._fn(
                 this.changeNestedState,
                 expandState !== 'expanded' ? 'expanded' : 'normal',
                 field)}
             >
-                {expandState === 'expanded' ? 'Show Less' : 'Show More'}
+              {expandState === 'expanded' ? 'Show Less' : 'Show More'}
             </div>
           }
         </div>
@@ -277,8 +280,8 @@ class HitComponent extends TerrainComponent<Props> {
                   })}
                   depth={depth + 1}
                   nestedFields={undefined}
-                />)
-              }
+                />);
+            },
             )
           }
         </div>
@@ -428,8 +431,8 @@ class HitComponent extends TerrainComponent<Props> {
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const nestedFields = this.props.nestedFields !== undefined
-        ? this.props.nestedFields.toJS()
-        : this.state.nestedFields !== undefined ?
+      ? this.props.nestedFields.toJS()
+      : this.state.nestedFields !== undefined ?
         this.state.nestedFields : [];
     const fields = getResultFields(hit, resultsConfig, nestedFields);
     const configHasFields = resultsConfigHasFields(resultsConfig);
@@ -574,10 +577,10 @@ class HitComponent extends TerrainComponent<Props> {
           </div>
         </div>
         <div>
-        {
-          (this.props.hideNested !== true) &&
-          _.map(nestedFields, this.renderNestedField)
-        }
+          {
+            (this.props.hideNested !== true) &&
+            _.map(nestedFields, this.renderNestedField)
+          }
         </div>
       </div>
     ));
@@ -629,13 +632,13 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
   if (resultsConfigHasFields(config))
   {
     fields = config.fields.filter((field) =>
-      nested.indexOf(field) === -1
+      nested.indexOf(field) === -1,
     ).toArray();
   }
   else
   {
     fields = hit.fields.keySeq().filter((field) =>
-      nested.indexOf(field) === -1
+      nested.indexOf(field) === -1,
     ).toArray();
   }
 
@@ -644,27 +647,27 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
 
 // Return a list of fields that have nested configurations, as well as fields
 // that are nested objects that may not be configured
-export function getResultNestedFields(hit: Hit, config: ResultsConfig): string []
+export function getResultNestedFields(hit: Hit, config: ResultsConfig): string[]
 {
   if (resultsConfigHasFields(config))
   {
     const configuredNested = config.fields.filter((field) =>
       config.formats.get(field) !== undefined &&
       config.formats.get(field).config !== undefined &&
-      config.formats.get(field).config.enabled
+      config.formats.get(field).config.enabled,
     ).toArray();
     const unconfigNested = config.fields.filter((field) =>
     {
       return (typeof hit.fields.get(field) === 'object' ||
-      List.isList(hit.fields.get(field))) &&
-      configuredNested.indexOf(field) === -1;
+        List.isList(hit.fields.get(field))) &&
+        configuredNested.indexOf(field) === -1;
     }).toArray();
     return unconfigNested.concat(configuredNested);
   }
   return _.keys(hit.fields.toJS()).filter((field) =>
   {
     return typeof hit.fields.get(field) === 'object' ||
-    List.isList(hit.fields.get(field))
+      List.isList(hit.fields.get(field));
   });
 }
 
@@ -745,8 +748,11 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     let valueString = '';
     for (const key in Util.asJS(value))
     {
-      valueString += key + ': ' + JSON.stringify(Util.asJS(value)[key]) + ', ';
-    };
+      if (value.hasOwnProperty(key))
+      {
+        valueString += key + ': ' + JSON.stringify(Util.asJS(value)[key]) + ', ';
+      }
+    }
     value = valueString.slice(0, -2);
   }
 

@@ -2270,7 +2270,7 @@ const EQLSpec: ESClause[] =
         'sum',
         'avg',
         'max',
-        'min'
+        'min',
       ],
       {
         path: ['score', 'function', 'function_score'],

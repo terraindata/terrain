@@ -59,6 +59,7 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
 import Dropdown from 'app/common/components/Dropdown';
+import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
@@ -67,7 +68,6 @@ import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 import './PathfinderScoreStyle.less';
-import { RouteSelector, RouteSelectorOptionSet, RouteSelectorOption } from 'app/common/components/RouteSelector';
 
 export interface Props
 {
@@ -164,14 +164,14 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       hasSearch: true,
     };
     const orderOptions = List([
-    {
-      displayName: 'ascending',
-      value: 'asc',
-    },
-    {
-      displayName: 'descending',
-      value: 'desc',
-    }
+      {
+        displayName: 'ascending',
+        value: 'asc',
+      },
+      {
+        displayName: 'descending',
+        value: 'desc',
+      },
     ]);
     const orderSet: RouteSelectorOptionSet = {
       key: 'sortOrder',
