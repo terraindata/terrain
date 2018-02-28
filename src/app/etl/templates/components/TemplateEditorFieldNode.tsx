@@ -77,6 +77,14 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   } = {
       expandableViewOpen: true,
     };
+  constructor(props)
+  {
+    super(props);
+    if (props.noInteract)
+    {
+      this.state.expandableViewOpen = false;
+    }
+  }
 
   public renderChildFields()
   {
@@ -174,60 +182,58 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   {
     const { canEdit, preview, displayKeyPath, previewLabel } = this.props;
     const field = this._field();
-
-    let children = null;
-    let content = null;
     const injectedContent = this.renderSettingsContainer();
+    const style = (canEdit === true && field.isIncluded === false) ?
+      getStyle('opacity', '0.5') : {};
 
-    if (field.isArray())
+    if (field.isArray() || field.isNested())
     {
-      children = this.renderArrayChildren();
-      content = (
+      const content = (
         <TemplateEditorFieldPreview
           hidePreviewValue={true}
           labelOverride={previewLabel}
           {...this._passProps()}
         />
       );
-    }
-    else if (field.isNested())
-    {
-      children = this.renderChildFields();
-      content = (
-        <TemplateEditorFieldPreview
-          hidePreviewValue={true}
-          labelOverride={previewLabel}
-          {...this._passProps()}
+      const childrenComponent = (
+        <div className='template-editor-children-container'>
+          {
+            field.isArray() ?
+            this.renderArrayChildren() :
+            this.renderChildFields()
+          }
+        </div>
+      );
+      return (
+        <ExpandableView
+          content={content}
+          open={this.state.expandableViewOpen}
+          onToggle={this.handleExpandArrowClicked}
+          children={childrenComponent}
+          injectedContent={injectedContent}
+          style={style}
         />
       );
     }
     else
     {
-      content = (
+      const content = (
         <TemplateEditorFieldPreview
           labelOverride={previewLabel}
           {...this._passProps()}
         />
       );
+      return (
+        <ExpandableView
+          content={content}
+          open={false}
+          onToggle={doNothing}
+          children={null}
+          injectedContent={injectedContent}
+          style={style}
+        />
+      );
     }
-    const childrenComponent = children === null ? null :
-      <div className='template-editor-children-container'>
-        {children}
-      </div>;
-
-    const childrenStyle = (canEdit === true && field.isIncluded === false) ?
-      getStyle('opacity', '0.5') : {};
-
-    return (
-      <ExpandableView
-        content={content}
-        open={this.state.expandableViewOpen}
-        onToggle={this.handleExpandArrowClicked}
-        children={childrenComponent}
-        injectedContent={injectedContent}
-        style={childrenStyle}
-      />
-    );
   }
 
   public handleExpandArrowClicked()
@@ -237,6 +243,8 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     });
   }
 }
+
+const doNothing = () => null;
 
 const TemplateEditorFieldNode = Util.createTypedContainer(
   TemplateEditorFieldNodeC,
