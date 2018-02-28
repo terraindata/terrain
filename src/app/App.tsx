@@ -95,6 +95,7 @@ import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import { AuthActions } from './auth/data/AuthRedux';
 import LibraryActions from './library/data/LibraryActions';
+import ContainerDimensions from 'react-container-dimensions';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
@@ -153,6 +154,8 @@ injectGlobal`
       font-style: normal;
   }
 `;
+
+const RESOLUTION_BREAKPOINT_1 = 980; // First resolution breakpoint is 980px
 
 const links =
   [
@@ -437,7 +440,7 @@ class App extends TerrainComponent<Props>
     // && this.state.rolessLoaded
   }
 
-  public renderApp()
+  public renderApp(width)
   {
     if (!this.state.loggedInAndLoaded)
     {
@@ -450,7 +453,8 @@ class App extends TerrainComponent<Props>
       );
     }
 
-    const sidebarWidth = this.state.sidebarExpanded ? 150 : 36;
+    const sidebarWidth = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1 ? 150 : 36;
+    const sidebarExpanded = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1;
     const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
     const style = {
       backgroundImage: `url(${BackgroundImage})`,
@@ -466,7 +470,7 @@ class App extends TerrainComponent<Props>
                 links={links}
                 selectedIndex={selectedIndex}
                 expandable={true}
-                expanded={this.state.sidebarExpanded}
+                expanded={sidebarExpanded}
                 onExpand={this.toggleSidebar}
               />,
             },
@@ -506,29 +510,35 @@ class App extends TerrainComponent<Props>
     }
 
     return (
-      <div
-        className='app'
-        onMouseMove={this.handleMouseMove}
-        key='app'
-        style={APP_STYLE}
-      >
-        <div
-          className='app-wrapper'
-        >
-          {
-            this.renderApp()
-          }
-        </div>
+      <ContainerDimensions>
+        {({ width, height }) => (
+          <div
+            className='app'
+            onMouseMove={this.handleMouseMove}
+            key='app'
+            style={APP_STYLE}
+          >
 
-        <DeployModal />
-        <StyleTag
-          style={this.props.colors.styles}
-        />
+            <div
+              className='app-wrapper'
+            >
+              {
+                this.renderApp(width)
+              }
+            </div>
 
-        <InAppNotification />
+            <DeployModal />
+            <StyleTag
+              style={this.props.colors.styles}
+            />
 
-        <EasterEggs />
-      </div>
+            <InAppNotification />
+
+            <EasterEggs />
+          </div>
+        )}
+      </ContainerDimensions>
+
     );
   }
 }
