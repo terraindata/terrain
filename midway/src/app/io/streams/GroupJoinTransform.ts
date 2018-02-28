@@ -64,9 +64,7 @@ interface Ticket
 export default class GroupJoinTransform extends Readable
 {
   private client: ElasticClient;
-
   private source: Readable;
-
   private query: string;
 
   private blockSize: number = 256;
@@ -125,40 +123,8 @@ export default class GroupJoinTransform extends Readable
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
-    this.source.on('readable', () =>
-    {
-      // should we keep reading from the source stream?
-      if (!this.continueReading)
-      {
-        return;
-      }
-
-      // if yes, keep buffering inputs from the source stream
-      const obj = this.source.read();
-      if (obj === null)
-      {
-        this.sourceIsEmpty = true;
-      }
-      else
-      {
-        this.bufferedInputs.push(obj);
-      }
-
-      // if we have data buffered up to blockSize, swap the input buffer list out
-      // and dispatch a subquery block
-      if (this.bufferedInputs.length >= this.blockSize ||
-        this.sourceIsEmpty && this.bufferedInputs.length > 0)
-      {
-        const inputs = this.bufferedInputs;
-        this.bufferedInputs = [];
-        this.dispatchSubqueryBlock(inputs);
-      }
-    });
-
-    this.source.on('end', () =>
-    {
-      this.sourceIsEmpty = true;
-    });
+    this.source.on('readable', this.readFromStream);
+    this.source.on('end', this._final);
   }
 
   public _read(size: number = 1024)
@@ -168,6 +134,51 @@ export default class GroupJoinTransform extends Readable
       && this.bufferedOutputs.length < this.maxBufferedOutputs)
     {
       this.continueReading = true;
+    }
+  }
+
+  public _destroy(error, callback)
+  {
+    this._final(callback);
+  }
+
+  public _final(callback)
+  {
+    this.source.removeListener('readable', this.readFromStream);
+    this.source.removeListener('end', this._final);
+
+    this.continueReading = false;
+    this.sourceIsEmpty = true;
+    callback();
+  }
+
+  private readFromStream(): void
+  {
+    // should we keep reading from the source stream?
+    if (!this.continueReading)
+    {
+      return;
+    }
+
+    // if yes, keep buffering inputs from the source stream
+    const obj = this.source.read();
+    if (obj === null)
+    {
+      this.sourceIsEmpty = true;
+    }
+    else
+    {
+      this.bufferedInputs.push(obj);
+    }
+
+    // if we have data buffered up to blockSize, swap the input buffer list out
+    // and dispatch a subquery block
+    if (this.bufferedInputs.length >= this.blockSize ||
+      this.sourceIsEmpty && this.bufferedInputs.length > 0)
+    {
+      const inputs = this.bufferedInputs;
+      this.bufferedInputs = [];
+      this.dispatchSubqueryBlock(inputs);
     }
   }
 
