@@ -103,7 +103,6 @@ export enum PathfinderSteps
   More, // remove
 }
 
-
 /**
  * Section: Classes representing parts of the view
  */
@@ -120,8 +119,6 @@ class ChoiceOptionC extends BaseClass
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
 export const _ChoiceOption = (config?: { [key: string]: any }) =>
   New<ChoiceOption>(new ChoiceOptionC(config), config);
-
-  
 
 class PathC extends BaseClass
 {
@@ -170,8 +167,8 @@ export enum ScoreType
   linear = 'linear',
   elastic = 'elastic',
   random = 'random',
-  none = 'none', 
-};
+  none = 'none',
+}
 
 export const ScoreTypesList =
 [
@@ -188,14 +185,14 @@ export const ScoreTypesChoices = List(ScoreTypesList.map(
     const textConfig = PathfinderText.scoreSectionTypes[type] || {
       title: type,
       tooltip: '',
-    }; 
-    
+    };
+
     return _ChoiceOption({
       value: type,
       displayName: textConfig.title,
       tooltipContent: textConfig.tooltip,
     });
-  }
+  },
 ));
 
 class ScoreC extends BaseClass
@@ -796,9 +793,6 @@ const ElasticComparisons = [
     fieldTypes: List([FieldType.Geopoint]),
   },
 ];
-
-
-
 
 /*
   Aggregation Types:

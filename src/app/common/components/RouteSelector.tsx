@@ -196,7 +196,7 @@ export class RouteSelector extends TerrainComponent<Props>
               })}
               key={optionSet.key}
               onClick={
-                this._fn(this.handleSingleBoxValueClick, index) 
+                this._fn(this.handleSingleBoxValueClick, index)
                 /* could try Mousedown to make it slightly snappier,
                 but this led to weird issues with closing it */
               }
@@ -375,7 +375,7 @@ export class RouteSelector extends TerrainComponent<Props>
             optionSet.headerText
           }
         </div>
-        
+
         {
           showTextbox ?
             <div
@@ -401,11 +401,11 @@ export class RouteSelector extends TerrainComponent<Props>
               focusOverride={this.state.focusedSetIndex === index}
             />
         }
-        
+
         {
           getValueComponentContent
         }
-        
+
         <div
           className={classNames({
             'routeselector-options': true,
@@ -416,7 +416,7 @@ export class RouteSelector extends TerrainComponent<Props>
           {
             optionSet.options.map(this._fn(this.renderOption, index, visibleOptionCounter, incrementVisibleOptions))
           }
-          
+
           {/*Add fodder, to help items space horizontally evenly. These will not appear*/}
           <div className='routeselector-option-wrapper' />
           <div className='routeselector-option-wrapper' />
@@ -599,14 +599,14 @@ export class RouteSelector extends TerrainComponent<Props>
       }
     }, 100);
   }
-  
+
   private divWrapper(isShowing, children)
   {
     if (!isShowing)
     {
       return null;
     }
-    
+
     return (
       <div>
         {
@@ -615,7 +615,7 @@ export class RouteSelector extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private fadeInOutWrapper(isShowing, children)
   {
     return (
@@ -644,7 +644,7 @@ export class RouteSelector extends TerrainComponent<Props>
     }
 
     const visibleOptionsIndex = visibleOptionCounter.count;
-    
+
     // We only want to render the FadeInOuts when we are searching a list
     // otherwise, render in a plain div
     // this is a performance improvement
@@ -710,7 +710,7 @@ export class RouteSelector extends TerrainComponent<Props>
                   }
                 </div>
               }
-            </div>
+            </div>,
           )
         }
       </div>

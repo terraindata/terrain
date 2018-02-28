@@ -59,17 +59,17 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
 import Dropdown from 'app/common/components/Dropdown';
+import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
+import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
 import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, Source,
-  ScoreType, ScoreTypesChoices } from '../PathfinderTypes';
+import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
+  ScoreTypesChoices, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 import './PathfinderScoreStyle.less';
-import { RouteSelector, RouteSelectorOptionSet, RouteSelectorOption } from 'app/common/components/RouteSelector';
-import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
 
 export interface Props
 {
@@ -173,7 +173,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     {
       displayName: 'descending',
       value: 'desc',
-    }
+    },
     ]);
     const orderSet: RouteSelectorOptionSet = {
       key: 'sortOrder',
@@ -323,7 +323,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   {
     const { pathfinderContext, score } = this.props;
     const { source, step, canEdit } = this.props.pathfinderContext;
-    
+
     return (
       <div
         className='pf-section'
@@ -332,7 +332,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           title={PathfinderText.scoreSectionTitle}
           text={PathfinderText.scoreSectionSubtitle}
         />
-        
+
         <SingleRouteSelector
           options={ScoreTypesChoices}
           value={score.type}
@@ -344,7 +344,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           large={false}
           hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
         />
-        
+
         {
           score.type === 'terrain' || score.type === 'linear' ?
             <DragAndDrop
@@ -384,12 +384,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private handleScoreTypeChange(value: ScoreType)
   {
     this.props.builderActions.changePath(
       this.props.keyPath.push('type'),
-      value
+      value,
     );
   }
 }

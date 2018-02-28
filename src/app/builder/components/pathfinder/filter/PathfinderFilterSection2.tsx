@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import Colors from 'app/colors/Colors';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
@@ -59,11 +60,10 @@ import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
 import Util from 'app/util/Util';
 import PathfinderCreateLine from '../PathfinderCreateLine';
+import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
-import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import PathfinderSectionTitle from '../PathfinderSectionTitle';
 
 export interface Props
 {
@@ -167,14 +167,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public renderFilterLine(filterLine, keyPath: List<string | number>)
   {
     const { pathfinderContext } = this.props;
-    
+
     const successorKeyPath = keyPath.unshift('lines').set(keyPath.size, (keyPath.last() as number) + 1);
     const successor = this.props.filterGroup.getIn(successorKeyPath);
-    
+
     // make key path relative to entire Path object
     keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
-    
-    
+
     return (
       <PathfinderFilterLine
         filterLine={filterLine}
@@ -363,7 +362,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           title={PathfinderText.hardFilterSectionTitle}
           text={PathfinderText.hardFilterSectionSubtitle}
         />
-        
+
         <CustomDragLayer />
         <DropZone
           keyPath={List([0])}

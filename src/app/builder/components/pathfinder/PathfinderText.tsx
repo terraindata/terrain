@@ -60,14 +60,14 @@ export const PathfinderText = {
   hardFilterSectionSubtitle: '',
   softFilterSectionTitle: 'Text Match Qualities',
   softFilterSectionSubtitle: '',
-  
+
   nestedFilterIntro: '',
   filterGroupPost: 'of the following:',
   createFilterLine: 'criteria',
   createFilterGroup: 'group of filter conditions',
-  
+
   softFilterLine: 'text match quality',
-  
+
   createScoreLine: 'score factor',
   createAggregationLine: 'metadata',
   createNestedLine: 'nested algorithm',
@@ -78,7 +78,7 @@ export const PathfinderText = {
    // `Score your results, so that the best picks show up in the top spots.`,
   scoreTypeLabel: 'Method',
   scoreTypeExplanation: 'Choose how to score your algorithm',
-  
+
   scoreSectionTypes: {
     terrain: {
       title: 'Terrain',
@@ -106,7 +106,7 @@ export const PathfinderText = {
   moreSectionTitle: 'Advanced',
   moreSectionSubtitle: '',
    // `Add nested algorithms to create a set of results for each result of your parent algorithm.`,
-   
+
   referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',
   nestedExplanation: 'Add another algorithm that uses the results of this one as input',
 
