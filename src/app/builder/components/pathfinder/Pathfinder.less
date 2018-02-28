@@ -78,12 +78,13 @@
 					font-size: @small-font-size;
 					position: relative;
 					fill: currentColor;
-					padding: 12px;
+					padding: 18px;
 					
 					@svg-width: 14px;
-					@svg-left: 12px;
+					@svg-left: 0px;
 					
 					padding-left: @svg-width + @svg-left + 12px;
+					margin-left: 32px;
 					
 					svg {
 						width: @svg-width;
@@ -106,8 +107,9 @@
 				.pf-line {
 					display: flex;
 					align-items: center;
-					padding: @half-spacing 0px;
-				.pf-piece {
+					padding: 0px;
+					
+					.pf-piece {
 						margin: 0px @half-spacing;
 						display: block;
 						position: relative;
