@@ -44,13 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { TaskConfig, TaskInputConfig, TaskOutputConfig } from './TaskConfig';
-
-export abstract class Task
+export abstract class TreeVisitor
 {
-  public static async abstract printNode(task: TaskConfig): Promise<TaskOutputConfig>;
-
-  public static async abstract run(task: TaskConfig): Promise<TaskOutputConfig>;
+  constructor()
+  {
+    // do nothing
+  }
 }
-
-export default Task;

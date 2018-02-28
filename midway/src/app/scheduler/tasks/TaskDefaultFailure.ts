@@ -50,19 +50,26 @@ import * as winston from 'winston';
 import { Task } from '../Task';
 import { TaskConfig, TaskOutputConfig } from '../TaskConfig';
 
+const taskOutputConfig: TaskOutputConfig =
+  {
+    status: false,
+    exit: true,
+  };
+
 export class TaskDefaultFailure extends Task
 {
-  public async run(task: TaskConfig): Promise<TaskOutputConfig>
+  public static async run(taskConfig: TaskConfig): Promise<TaskOutputConfig>
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
       // TODO: call other functions (needs to wrap in Promise for later)
-      const taskOutputConfig: TaskOutputConfig =
-        {
-          status: false,
-          exit: true,
-        };
       resolve(taskOutputConfig);
     });
+  }
+
+  public static async printNode(taskConfig: TaskConfig): Promise<TaskOutputConfig>
+  {
+    winston.info('Printing Default Failure, params: ' + JSON.stringify(taskOutputConfig as object));
+    return Promise.resolve(taskOutputConfig);
   }
 }

@@ -48,13 +48,21 @@ import * as stream from 'stream';
 
 export interface TaskConfig
 {
-  id: number; // unique id that identifies the task to other tasks
-  name: string; // name of the task i.e. 'magento'
+  id: number; // unique id that identifies this task to other tasks in the input array of TaskConfigs
+  name: string; // name of the task i.e. 'import'
   onFailure?: number; // id of task to execute on failure
   onSuccess?: number; // id of next task to execute (default should be next in array)
   params: TaskInputConfig; // input parameters for the task
   taskId: number; // maps to a statically declared task
-  type: string; // what type of task i.e. source/process/sink
+  type: number; // enum TaskTypes
+}
+
+export enum TaskEnum
+{
+  taskDefaultExit,
+  taskDefaultFailure,
+  taskExport, // TODO implement this
+  taskImport, // TODO implement this
 }
 
 export interface TaskInputConfig

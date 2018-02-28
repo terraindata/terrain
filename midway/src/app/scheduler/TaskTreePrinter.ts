@@ -42,15 +42,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import { TaskConfig, TaskInputConfig, TaskOutputConfig } from './TaskConfig';
+import { TaskOutputConfig, TaskTypes } from './TaskConfig';
+import { TreeVisitor } from './TreeVisitor';
 
-export abstract class Task
+import { TaskDefaultExit } from './tasks/TaskDefaultExit';
+import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
+import { TaskExport } from './tasks/TaskExport';
+import { TaskImport } from './tasks/TaskImport';
+
+export class TaskTreePrinter extends TreeVisitor
 {
-  public static async abstract printNode(task: TaskConfig): Promise<TaskOutputConfig>;
 
-  public static async abstract run(task: TaskConfig): Promise<TaskOutputConfig>;
+  public static async visitDefaultExitNode(node: TaskConfig): Promise<TaskOutputConfig>
+  {
+    return TaskDefaultExit.printNode(node);
+  }
+
+  public static async visitDefaultFailureNode(node: TaskConfig): Promise<TaskOutputConfig>
+  {
+    return TaskDefaultFailure.printNode(node);
+  }
+
+  public static async visitExportNode(node: TaskConfig): Promise<TaskOutputConfig>
+  {
+    return TaskExport.printNode(node);
+  }
+
+  public static async visitImportNode(node: TaskConfig): Promise<TaskOutputConfig>
+  {
+    return TaskImport.printNode(node);
+  }
 }
-
-export default Task;

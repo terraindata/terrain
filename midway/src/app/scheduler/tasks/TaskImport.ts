@@ -52,7 +52,7 @@ import { TaskConfig, TaskOutputConfig } from '../TaskConfig';
 
 export class TaskImport extends Task
 {
-  public async run(task: TaskConfig): Promise<TaskOutputConfig>
+  public static async run(taskConfig: TaskConfig): Promise<TaskOutputConfig>
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
@@ -73,5 +73,19 @@ export class TaskImport extends Task
         };
       resolve(taskOutputConfig);
     });
+  }
+
+  public static async printNode(taskConfig: TaskConfig): Promise<TaskOutputConfig>
+  {
+    winston.info('Printing Import, params: ' + JSON.stringify(taskConfig.params as object));
+    return Promise.resolve(
+      {
+        status: true,
+        exit: false,
+        options:
+          {
+            stream: new stream.PassThrough(),
+          },
+      } as TaskOutputConfig);
   }
 }

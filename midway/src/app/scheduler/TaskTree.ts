@@ -47,19 +47,21 @@ THE SOFTWARE.
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { TaskConfig, TaskOutputConfig } from './TaskConfig';
-import { TaskEnum, TaskTreeNode } from './TaskTreeNode';
+import { Task } from './Task';
+import { TaskConfig, TaskEnum, TaskOutputConfig } from './TaskConfig';
+import { TaskTreeNode } from './TaskTreeNode';
+import { TaskTreePrinter } from './TaskTreePrinter';
 
 export class TaskTree
 {
-  private tasks: TaskTreeNode[];
+  private tasks: TaskConfig[];
 
   constructor()
   {
     this.tasks = [];
   }
 
-  public async create(taskConfigs: TaskConfig[]): Promise<boolean | string>
+  public create(taskConfigs: TaskConfig[]): boolean | string
   {
     // verify that each task has a unique id
     const idSet: Set<number> = new Set<number>();
@@ -69,7 +71,7 @@ export class TaskTree
     });
     if (taskConfigs.length !== idSet.size) // there were duplicates
     {
-      return Promise.resolve('All tasks must have unique IDs');
+      return 'All tasks must have unique IDs';
     }
 
     taskConfigs = this._appendDefaults(taskConfigs);
@@ -89,45 +91,37 @@ export class TaskTree
           taskConfigs[i].onSuccess = taskConfigs[taskConfigs.length - 2].id;
         }
       }
-      if (taskConfigs[i].onFailure === undefined)
+      if (taskConfigs[i].onFailure === undefined) // default failure
       {
         taskConfigs[i].onFailure = taskConfigs[taskConfigs.length - 1].id;
       }
     }
     taskConfigs.forEach((taskConfig) =>
     {
-      this.tasks.push(new TaskTreeNode(taskConfig));
+      this.tasks.push(taskConfig);
     });
-    return this.isValid() as Promise<boolean>;
+
+    return this.isValid() as boolean;
   }
 
-  public async isValid(): Promise<boolean> // checks if tree is a valid DAG
+  public isValid(): boolean // checks if tree is a valid DAG
   {
-    return this.tasks[0].recurse(this.tasks, []);
+    return this._isValidHelper(this.tasks[0], this.tasks, []);
   }
 
-  public async printTree(): Promise<void> // iterate through tree and execute tasks
+  public async printTree(): void // iterate through tree and print tasks
   {
     if (this.tasks.length === 0)
     {
       return;
     }
-
     let ind: number = 0;
-    let result: TaskOutputConfig = await this.tasks[ind].printTree();
+    let result: TaskOutputConfig = await TaskTreeNode.accept(TaskTreePrinter, this.tasks[ind]);
     while (result.exit !== true)
     {
       winston.info('-->');
-      if (result.status === true)
-      {
-        ind = this.tasks[ind].getValue().onSuccess;
-        result = await this.tasks[ind].printTree();
-      }
-      else if (result.status === false)
-      {
-        ind = this.tasks[ind].getValue().onFailure;
-        result = await this.tasks[ind].printTree();
-      }
+      ind = this.tasks[ind].onSuccess;
+      result = await TaskTreeNode.accept(TaskTreePrinter, this.tasks[ind]);
     }
   }
 
@@ -136,20 +130,20 @@ export class TaskTree
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
       let ind: number = 0;
-      let result: TaskOutputConfig = await this.tasks[ind].visit();
+      let result: TaskOutputConfig = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
       while (result.exit !== true)
       {
         if (result.status === true)
         {
-          ind = this.tasks[ind].getValue().onSuccess;
+          ind = this.tasks[ind].onSuccess;
           this._setInputConfigFromOutputConfig(this.tasks[ind], result);
-          result = await this.tasks[ind].visit();
+          result = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
         }
         else if (result.status === false)
         {
-          ind = this.tasks[ind].getValue().onFailure;
+          ind = this.tasks[ind].onFailure;
           this._setInputConfigFromOutputConfig(this.tasks[ind], result);
-          result = await this.tasks[ind].visit();
+          result = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
         }
       }
       return resolve(result);
@@ -194,6 +188,22 @@ export class TaskTree
       ];
     tasks = tasks.concat(defaults);
     return tasks;
+  }
+
+  private _isValidHelper(currTask: TaskConfig, tasks: TaskConfig[], traversedTasks: number[]): boolean
+  {
+    if (currTask.type === 'default')
+    {
+      return true;
+    }
+    if (traversedTasks.includes(currTask.id)
+      || currTask.onSuccess === undefined || currTask.onFailure === undefined
+      || tasks[currTask.onSuccess] === undefined || tasks[currTask.onFailure] === undefined)
+    {
+      return false;
+    }
+    return this._isValidHelper(tasks[currTask.onSuccess], tasks, traversedTasks.concat(currTask.id))
+      && this._isValidHelper(tasks[currTask.onFailure], tasks, traversedTasks.concat(currTask.id));
   }
 
   private _setInputConfigFromOutputConfig(taskConfig: TaskTreeNode, taskOutputConfig: TaskOutputConfig): void

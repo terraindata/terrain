@@ -62,11 +62,11 @@ export class Job
     this.taskTree = new TaskTree();
   }
 
-  public async create(args: TaskConfig[]): Promise<boolean | string>
+  public create(args: TaskConfig[]): boolean | string
   {
     if (args === undefined || (Array.isArray(args) && args.length === 0))
     {
-      return Promise.resolve(false);
+      return false;
     }
     this.tasks = args;
     return this.taskTree.create(args);

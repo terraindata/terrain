@@ -44,109 +44,25 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as stream from 'stream';
-import * as winston from 'winston';
+import { TaskConfig, TaskEnum, TaskOutputConfig } from './TaskConfig';
+import { TreeVisitor } from './TreeVisitor';
 
-import { Task } from './Task';
-import { TaskConfig, TaskOutputConfig } from './TaskConfig';
-import { TaskDefaultExit } from './tasks/TaskDefaultExit';
-import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
-import { TaskExport } from './tasks/TaskExport';
-import { TaskImport } from './tasks/TaskImport';
-
-const taskDefaultExit: TaskDefaultExit = new TaskDefaultExit();
-const taskDefaultFailure: TaskDefaultFailure = new TaskDefaultFailure();
-const taskExport: TaskExport = new TaskExport();
-const taskImport: TaskImport = new TaskImport();
-
-export enum TaskEnum
+export abstract class TaskTreeNode
 {
-  taskDefaultExit,
-  taskDefaultFailure,
-  taskExport, // TODO implement this
-  taskImport, // TODO implement this
-}
-
-export class TaskTreeNode
-{
-  private value: TaskConfig;
-
-  constructor(arg: TaskConfig)
+  public static async accept(v: TreeVisitor, node: TaskConfig): Promise<TaskOutputConfig>
   {
-    this.value = arg;
-  }
-
-  public getValue(): TaskConfig
-  {
-    return this.value;
-  }
-
-  public async printTree(): Promise<TaskOutputConfig>
-  {
-    const basicTaskOutputConfig: TaskOutputConfig =
-      {
-        exit: false,
-        status: true,
-      };
-
-    winston.info(JSON.stringify(this.value as object));
-    switch (this.value.taskId)
+    switch (node.taskId)
     {
       case TaskEnum.taskDefaultExit:
-        basicTaskOutputConfig.exit = true;
-        return Promise.resolve(basicTaskOutputConfig);
+        return v.visitDefaultExitNode(node);
       case TaskEnum.taskDefaultFailure:
-        basicTaskOutputConfig.exit = true;
-        basicTaskOutputConfig.status = false;
-        return Promise.resolve(basicTaskOutputConfig);
+        return v.visitDefaultFailureNode(node);
       case TaskEnum.taskExport:
-        return Promise.resolve(basicTaskOutputConfig);
+        return v.visitExportNode(node);
       case TaskEnum.taskImport:
-        return Promise.resolve(basicTaskOutputConfig);
+        return v.visitImportNode(node);
       default:
-        winston.info('Default case found!');
-        return Promise.resolve(basicTaskOutputConfig);
-    }
-  }
-
-  public async recurse(taskNodes: TaskTreeNode[], traversedNodes: number[]): Promise<boolean>
-  {
-    return new Promise<boolean>(async (resolve, reject) =>
-    {
-      if (this.value.type === 'default')
-      {
-        return resolve(true);
-      }
-      if (traversedNodes.includes(this.value.id)
-        || this.value.onSuccess === undefined || this.value.onFailure === undefined
-        || taskNodes[this.value.onSuccess] === undefined || taskNodes[this.value.onFailure] === undefined)
-      {
-        return resolve(false);
-      }
-      resolve(await taskNodes[this.value.onSuccess].recurse(taskNodes, traversedNodes.concat(this.value.id))
-        && await taskNodes[this.value.onFailure].recurse(taskNodes, traversedNodes.concat(this.value.id)));
-    });
-  }
-
-  public setValueOptions(taskOutputConfig: TaskOutputConfig): void
-  {
-    this.value.params['options'] = taskOutputConfig['options'];
-  }
-
-  public async visit(): Promise<TaskOutputConfig>
-  {
-    switch (this.value.taskId)
-    {
-      case TaskEnum.taskDefaultExit:
-        return taskDefaultExit.run(this.value);
-      case TaskEnum.taskDefaultFailure:
-        return taskDefaultFailure.run(this.value);
-      case TaskEnum.taskExport:
-        return taskExport.run(this.value);
-      case TaskEnum.taskImport:
-        return taskImport.run(this.value);
-      default:
-        return taskDefaultExit.run(this.value);
+        return v.visitDefaultExitNode(n);
     }
   }
 }
