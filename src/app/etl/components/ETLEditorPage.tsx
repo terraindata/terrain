@@ -58,7 +58,7 @@ import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createEngineFromDocs, createTreeFromEngine, initialTemplateFromDocs } from 'etl/templates/SyncUtil';
+import { createInitialTemplate } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
@@ -97,7 +97,7 @@ function createFetchHandler(act): (hits: List<object>) => void
 {
   return (hits) =>
   {
-    const { template, rootField } = initialTemplateFromDocs(hits);
+    const { template, rootField } = createInitialTemplate(hits);
     act({
       actionType: 'setTemplate',
       template,
@@ -139,19 +139,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   public initFromFile()
   {
     const { act, walkthrough } = this.props;
-    const onFetched = (hits: List<object>) =>
-    {
-      const { template, rootField } = initialTemplateFromDocs(hits);
-      act({
-        actionType: 'setTemplate',
-        template,
-      });
-      act({
-        actionType: 'setRoot',
-        rootField,
-      });
-    };
-
+    const onFetched = createFetchHandler(act);
     const source = walkthrough.source;
     act({
       actionType: 'fetchDocuments',

@@ -51,12 +51,40 @@ const { List, Map } = Immutable;
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import
 {
-  _TemplateField, _TransformationNode,
+  _TemplateField, _TransformationNode, FieldTypes,
   TemplateField, TransformationNode,
 } from 'etl/templates/FieldTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
+export function createInitialTemplate(documents: List<object>)
+  : { template: ETLTemplate, rootField: TemplateField, warnings: string[], softWarnings: string[] }
+{
+  if (documents == null || documents.size === 0)
+  {
+    return {
+      template: _ETLTemplate(),
+      rootField: _TemplateField(),
+      warnings: ['No documents provided for initial Template construction'],
+      softWarnings: [],
+    };
+  }
+  const { engine, warnings, softWarnings } = createMergedEngine(documents)
+  const rootField = createTreeFromEngine(engine);
+
+  const template = _ETLTemplate({
+    id: -1,
+    templateName: name,
+    transformationEngine: engine,
+  });
+  return {
+    template,
+    rootField,
+    warnings,
+    softWarnings,
+  };
+}
 
 export function createTreeFromEngine(engine: TransformationEngine): TemplateField
 {
@@ -81,17 +109,18 @@ export function createTreeFromEngine(engine: TransformationEngine): TemplateFiel
     {
       return;
     }
-    const parentPath = enginePath.slice(0, -1); // TODO update this when arrays become a thing
+    const parentPath = enginePath.slice(0, -1);
     const parentNode: FieldNodeProxy = enginePathToNode[JSON.stringify(parentPath)];
     const newField = createFieldFromEngine(engine, id);
 
     const newNode = parentNode.discoverChild(newField);
     enginePathToNode[JSON.stringify(enginePath)] = newNode;
   });
-
+  console.log(JSON.stringify(tree.getRootField().toJS(), null, 2));
   return tree.getRootField();
 }
 
+// takes a field id and and engine and constructs a TemplateField object (does not construct children)
 export function createFieldFromEngine(
   engine: TransformationEngine,
   id: number,
@@ -110,16 +139,11 @@ export function createFieldFromEngine(
       meta: transformNode.meta,
     });
   }).toList();
-  const result = _TemplateField({
-    isIncluded: engine.getFieldEnabled(id),
-    fieldId: id,
-    transformations,
-    name: enginePath[enginePath.length - 1],
-  });
 
   return _TemplateField({
     isIncluded: engine.getFieldEnabled(id),
     fieldId: id,
+    type: engine.getFieldType(id),
     transformations,
     name: enginePath[enginePath.length - 1],
   });
@@ -135,36 +159,7 @@ export function updateFieldFromEngine(
   return updatedField.set('children', oldField.children);
 }
 
-export function initialTemplateFromDocs(documents: List<object>)
-  : { template: ETLTemplate, rootField: TemplateField }
-{
-  if (documents.size === 0)
-  {
-    return {
-      template: _ETLTemplate(),
-      rootField: _TemplateField(),
-    };
-  }
-  const engine = createEngineFromDocs(documents);
-  const rootField = createTreeFromEngine(engine);
-
-  const template = _ETLTemplate({
-    id: -1,
-    templateName: name,
-    transformationEngine: engine,
-  });
-  return {
-    template,
-    rootField,
-  };
-}
-
-export function createEngineFromDocs(documents: List<object>)
-{
-  return createMergedEngine(documents);
-}
-
-type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+// document merge logic
 function hashPath(keypath: EnginePath)
 {
   return JSON.stringify(keypath.toJS());
@@ -232,7 +227,12 @@ function isAValidField(keypath: EnginePath, pathTypes: {[k: string]: FieldTypes}
   return true;
 }
 
-function createMergedEngine(documents: List<object>): TransformationEngine
+function createMergedEngine(documents: List<object>):
+  {
+    engine: TransformationEngine,
+    warnings: string[],
+    softWarnings: string[],
+  }
 {
   const warnings: string[] = [];
   const softWarnings: string[] = [];
@@ -289,7 +289,11 @@ function createMergedEngine(documents: List<object>): TransformationEngine
       engine.addField(unhashPath(hashedPath), fieldType);
     }
   });
-  return engine;
+  return {
+    engine,
+    warnings,
+    softWarnings,
+  };
 }
 
 const CompatibilityMatrix: {

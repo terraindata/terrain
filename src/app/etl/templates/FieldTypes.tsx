@@ -67,11 +67,14 @@ export const _ElasticFieldSettings = makeExtendedConstructor(ElasticFieldSetting
   arrayType: List,
 });
 
+export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
 {
   public readonly isIncluded: boolean = true;
-  public readonly langSettings: ElasticFieldSettings = _ElasticFieldSettings();
+  public readonly langSettings: ElasticFieldSettings = null;
+  public readonly type: FieldTypes = 'object';
   public readonly fieldId: number = 0;
   public readonly name: string = '';
   public readonly children: List<TemplateField> = List([]);
