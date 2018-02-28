@@ -90,7 +90,7 @@ test('capitalization', () =>
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
   const r = e.transform(doc1);
   expect(r['name']).toBe('BOB');
-  expect(yadeep.get(r, KeyPath(['meta.school']))).toBe('STANFORD');
+  expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
 test('serialize to JSON', () =>
