@@ -78,7 +78,7 @@ export default class CSVExportTransform extends AExportTransform
       headerObject[name] = name;
     }
 
-    return this.transform(headerObject, 0);
+    return this.transform(headerObject, 0) + this.delimiter();
   }
 
   protected transform(input: object, chunkNumber: number): string

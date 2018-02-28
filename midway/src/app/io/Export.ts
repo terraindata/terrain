@@ -44,18 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
-import sha1 = require('sha1');
-
 import * as equal from 'deep-equal';
 import * as _ from 'lodash';
+import sha1 = require('sha1');
 import * as stream from 'stream';
 import * as winston from 'winston';
 
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import * as SharedUtil from '../../../../shared/Util';
-
 import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -63,6 +60,7 @@ import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
+import CSVExportTransform from './streams/CSVExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
@@ -164,10 +162,17 @@ export class Export
         return reject(mapping);
       }
 
+      // get list of export column names
+      const columnNames: string[] = Object.keys(mapping);
+      if (exprt.rank === true && columnNames.indexOf('TERRAINRANK') === -1)
+      {
+        columnNames.push('TERRAINRANK');
+      }
+
       let writer: any;
       if (exprt.filetype === 'csv')
       {
-        writer = csvWriter();
+        writer = new CSVExportTransform(columnNames);
       }
       else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
       {
