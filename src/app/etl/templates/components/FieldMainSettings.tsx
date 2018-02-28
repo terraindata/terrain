@@ -63,8 +63,9 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import
 {
   _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, FieldTypes, TemplateField,
+  ElasticFieldSettings, TemplateField,
 } from 'etl/templates/FieldTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';

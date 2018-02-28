@@ -65,16 +65,26 @@ export enum FileTypes
   Csv = 'csv',
 }
 
-export interface Template
+// Need to do this since turning this into an immutable requires overrideing the sources and sinks type
+export interface TemplateBase
 {
   id: ID;
   templateName: string;
   transformationEngine: TransformationEngine;
-  transformationConfig: any; // terrain rank, what to do on failures
+  transformationConfig: any; // terrain rank, what to do on failures TODO figure out the exact type
+  sources: any;
+  sinks: any;
+}
+export interface Template extends TemplateBase
+{
   sources: {
+    primary?: SourceConfig;
     [k: string]: SourceConfig;
   };
   sinks: {
+    primary?: SinkConfig;
     [k: string]: SinkConfig;
   };
 }
+
+export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';

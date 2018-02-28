@@ -49,9 +49,10 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { FieldTypes, TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
