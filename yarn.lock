@@ -462,6 +462,12 @@
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.5.1.tgz#a38f69c62528d56ba7bd1f91335a8004988d72f7"
 
+"@types/rc-slider@^8.2.3":
+  version "8.2.3"
+  resolved "https://registry.yarnpkg.com/@types/rc-slider/-/rc-slider-8.2.3.tgz#61eadafbb999f8ff11388ef9d0054accb20a7640"
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-beautiful-dnd@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/react-beautiful-dnd/-/react-beautiful-dnd-3.0.0.tgz#3208649c48ef6673defd339d8c6b130da28199db"

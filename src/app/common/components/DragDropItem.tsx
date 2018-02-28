@@ -74,6 +74,7 @@ interface ItemProps
   // injected props
   connectDragSource: (El) => El;
   isDragging: boolean;
+  neighborIsBeingDragged: boolean;
   isOver: boolean;
   connectDropTarget: (El) => El;
   connectDragPreview: (El, options) => El;
@@ -103,6 +104,7 @@ function itemDragCollect(connect, monitor)
   return {
     connectDragSource: connect.dragSource(),
     isDragging: monitor.isDragging(),
+    neighborIsBeingDragged: !monitor.isDragging() && monitor.getItem() !== null,
     connectDragPreview: connect.dragPreview(),
   };
 }
@@ -149,7 +151,7 @@ class ItemComponent extends TerrainComponent<ItemProps>
 
   public render()
   {
-    const { children, isDragging, isOver, hoverHeader } = this.props;
+    const { children, isDragging, isOver, hoverHeader, neighborIsBeingDragged } = this.props;
     const draggable = this.props.connectDragSource(
       <div
         style={_.extend({},
@@ -159,6 +161,8 @@ class ItemComponent extends TerrainComponent<ItemProps>
         )}
         className={classNames({
           'drag-drop-item': true,
+          'drag-drop-item-dragging': isDragging,
+          'drag-drop-item-neighbor-dragging': neighborIsBeingDragged,
           'drag-drop-item-is-over': isOver,
         })}>
         <div
