@@ -51,13 +51,13 @@ import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import objectify from '../util/deepObjectify';
 import { KeyPath, WayPoint } from '../util/KeyPath';
+import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
-import * as yadeep from '../util/yadeep';
 
 const Graph = GraphLib.Graph;
 
