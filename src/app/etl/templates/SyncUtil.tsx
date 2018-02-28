@@ -48,6 +48,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import
 {
@@ -56,10 +57,11 @@ import
 } from 'etl/templates/FieldTypes';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-export function createInitialTemplate(documents: List<object>)
+export function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig)
   : { template: ETLTemplate, fieldMap: FieldMap, warnings: string[], softWarnings: string[] }
 {
   if (documents == null || documents.size === 0)
@@ -74,11 +76,30 @@ export function createInitialTemplate(documents: List<object>)
   const { engine, warnings, softWarnings } = createMergedEngine(documents);
   const fieldMap = createTreeFromEngine(engine);
 
-  const template = _ETLTemplate({
+  let template = _ETLTemplate({
     id: -1,
     templateName: name,
     transformationEngine: engine,
   });
+
+  // default source and sink is upload and download
+  template = template.setIn(['sources', 'primary'],
+    source !== undefined ?
+      source
+      :
+      _SourceConfig({
+        type: Sources.Upload,
+      })
+  );
+  template = template.setIn(['sinks', 'primary'],
+    sink !== undefined ?
+      sink
+      :
+      _SinkConfig({
+        type: Sinks.Download,
+      })
+  );
+
   return {
     template,
     fieldMap,

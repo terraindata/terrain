@@ -44,15 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing ordered-imports
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { Languages, Template as TemplateI } from 'shared/etl/types/ETLTypes';
+import { Languages, TemplateBase as TemplateI } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
@@ -80,31 +81,62 @@ class EditorDisplayStateC
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
-class ETLTemplateC implements TemplateI
+interface ETLTemplateI extends TemplateI
+{
+  sources: Immutable.Map<string, SourceConfig>;
+  sinks: Immutable.Map<string, SinkConfig>;
+}
+
+class ETLTemplateC implements ETLTemplateI
 {
   public id = -1;
   public templateName = '';
   public transformationEngine = new TransformationEngine();
   public transformationConfig = null;
-  public sources = null;
-  public sinks = null;
+  public sources = Map<string, SourceConfig>();
+  public sinks = Map<string, SinkConfig>();
 }
 export type ETLTemplate = WithIRecord<ETLTemplateC>;
 export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
   transformationEngine: TransformationEngine.load,
+  // transformationConfig // todo
+  sources: (sources) => Map<string, SourceConfig>(sources)
+    .map((obj, key) => _SourceConfig(obj, true))
+    .toMap(),
+  sinks: (sinks) => Map<string, SinkConfig>(sinks)
+    .map((obj, key) => _SinkConfig(obj, true))
+    .toMap(),
 });
 
-export function destringifySavedTemplate(obj: object): object
+type TemplateObject = {
+  [k in keyof ETLTemplateC]: any
+};
+
+export function destringifySavedTemplate(obj: TemplateObject): TemplateObject
 {
-  const newObj: any = _.extend({}, obj);
-  newObj.transformationEngine = JSON.parse(newObj.transformationEngine);
+  const newObj = _.extend({}, obj);
+  if (newObj.transformationConfig != null)
+  {
+    newObj.transformationConfig = JSON.parse(newObj.transformationConfig);
+  }
+  if (newObj.sources != null)
+  {
+    newObj.sources = JSON.parse(newObj.sources);
+  }
+  if (newObj.sinks != null)
+  {
+    newObj.sinks = JSON.parse(newObj.sinks);
+  }
   return newObj;
 }
 
 export function templateForSave(template: ETLTemplate): object
 {
-  const obj = (template as any).toObject();
+  const obj: TemplateObject = (template as any).toObject(); // shallow js object
   obj.transformationEngine = JSON.stringify(obj.transformationEngine.json());
+  obj.transformationConfig = JSON.stringify(recordForSave(obj.transformationConfig));
+  obj.sources = JSON.stringify(recordForSave(obj.sources));
+  obj.sinks = JSON.stringify(recordForSave(obj.sinks));
   return obj;
 }
 

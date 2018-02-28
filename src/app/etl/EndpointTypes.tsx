@@ -76,7 +76,9 @@ class SourceConfigC implements SourceConfigI
   public options = {};
 }
 export type SourceConfig = WithIRecord<SourceConfigC>;
-export const _SourceConfig = makeConstructor(SourceConfigC);
+export const _SourceConfig = makeExtendedConstructor(SourceConfigC, false, {
+  fileConfig: _FileConfig,
+});
 
 class SinkConfigC implements SinkConfigI
 {
@@ -85,4 +87,6 @@ class SinkConfigC implements SinkConfigI
   public options = {};
 }
 export type SinkConfig = WithIRecord<SinkConfigC>;
-export const _SinkConfig = makeConstructor(SinkConfigC);
+export const _SinkConfig = makeExtendedConstructor(SinkConfigC, false, {
+  fileConfig: _FileConfig,
+});

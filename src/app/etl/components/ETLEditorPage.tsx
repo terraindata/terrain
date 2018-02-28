@@ -93,11 +93,15 @@ function getTemplateId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-function createFetchHandler(act: typeof TemplateEditorActions): (hits: List<object>) => void
+function createInitialTemplateFn(
+  act: typeof TemplateEditorActions,
+  source?: SourceConfig,
+  sink?: SinkConfig,
+): (hits: List<object>) => void
 {
   return (hits) =>
   {
-    const { template, fieldMap } = createInitialTemplate(hits);
+    const { template, fieldMap } = createInitialTemplate(hits, source, sink);
     act({
       actionType: 'setTemplate',
       template,
@@ -115,9 +119,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   public initFromAlgorithm()
   {
     const { algorithms, params, act } = this.props;
-
     const algorithmId = getAlgorithmId(params);
-    const onFetched = createFetchHandler(act);
     const source = _SourceConfig({
       type: Sources.Algorithm,
       fileConfig: _FileConfig({
@@ -127,6 +129,7 @@ class ETLEditorPage extends TerrainComponent<Props>
         algorithmId,
       },
     });
+    const onFetched = createInitialTemplateFn(act, source);
 
     act({
       actionType: 'fetchDocuments',
@@ -136,17 +139,26 @@ class ETLEditorPage extends TerrainComponent<Props>
     });
   }
 
-  public initFromFile()
+  public initFromWalkthrough()
   {
     const { act, walkthrough } = this.props;
-    const onFetched = createFetchHandler(act);
     const source = walkthrough.source;
-    act({
-      actionType: 'fetchDocuments',
-      source,
-      file: walkthrough.file,
-      onFetched,
-    });
+    const sink = walkthrough.sink;
+    const onFetched = createInitialTemplateFn(act, source, sink);
+
+    if (source.type === Sources.Upload)
+    {
+      act({
+        actionType: 'fetchDocuments',
+        source,
+        file: walkthrough.file,
+        onFetched,
+      });
+    }
+    else
+    {
+      // TODO other types
+    }
   }
 
   public componentWillMount()
@@ -160,11 +172,11 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
     else if (this.props.params.templateId !== undefined)
     {
-      // TODO
+      // TODO pull from midway
     }
     else if (this.props.walkthrough.source.type != null) // TODO check if its walkthrough
     {
-      this.initFromFile();
+      this.initFromWalkthrough();
     }
     else
     {
