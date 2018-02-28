@@ -595,7 +595,10 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
             </div>
           </div>
           <div>
-            <div className='results-config-input'>
+            <div
+              className='results-config-input'
+              style={backgroundColor(Colors().bg1)}
+            >
               <FloatingInput
                 value={this.state.searchTerm}
                 onChange={this.handleSearchTermChange}

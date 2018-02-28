@@ -205,19 +205,21 @@ class HitComponent extends TerrainComponent<Props> {
       allValues = allValues.slice(0, 1);
     }
     const height = NESTED_RESULT_HEIGHT * allValues.length;
-    const depth = this.props.depth ? 1 : 0;
+    const depth = this.props.depth ? this.props.depth : 0;
     return (
       <div
         className='hit-nested-content'
         key={field}
         style={[
-          {left: depth * 15},
-          {width: `calc(100% - ${depth * 15}px`}
+          {left: depth > 0 ? 15 : 0},
+          {width: `calc(100% - ${depth > 0 ? 15 : 0}px`}
         ]}
       >
        <div
          className='hit-nested-content-header'
-         style={[borderColor(Colors().blockOutline), backgroundColor(Colors().blockBg)]}
+         style={[borderColor(Colors().blockOutline),
+           backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)
+         ]}
        >
           <div
             className='hit-nested-content-title'
@@ -243,6 +245,7 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
         <div
           className='hit-nested-content-values'
+          style={backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)}
         >
           {
             expandState !== 'collapsed' &&
@@ -464,7 +467,7 @@ class HitComponent extends TerrainComponent<Props> {
     }
     const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
       resultsConfig.thumbnailWidth;
-
+    const depth = this.props.depth !== undefined ? this.props.depth : 0;
     return ((
       <div
         className={classes}
@@ -480,7 +483,7 @@ class HitComponent extends TerrainComponent<Props> {
           })}
           style={[
             borderColor(Colors().resultLine),
-            backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
+            backgroundColor((depth + 1) % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
           ]}
         >
           {

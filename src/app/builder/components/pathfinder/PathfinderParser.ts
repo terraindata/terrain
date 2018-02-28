@@ -71,7 +71,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     sort: Map({}),
     aggs: Map({}),
     from: 0,
-    size: 5,
+    size: 1,
     track_scores: true,
   });
   const sourceInfo = parseSource(path.source);
@@ -124,7 +124,7 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(count) ? count : 5, // if it is all results, just default to 1000 ? change...
+    size: !isNaN(count) ? count : 1, // if it is all results, just default to 1000 ? change...
     index: (source.dataSource as any).index,
   };
 }
