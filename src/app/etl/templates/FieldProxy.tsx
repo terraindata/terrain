@@ -197,13 +197,6 @@ export class FieldNodeProxy
     this.syncWithEngine();
   }
 
-  public addTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<EnginePath> | List<number>,
-    options?: object)
-  {
-    this.tree.getEngine().appendTransformation(nodeType, fieldNamesOrIDs, options);
-    this.syncWithEngine();
-  }
-
   public syncWithEngine() // This function will mutate the field from which it was called
   {
     if (this.pauseSync === false)

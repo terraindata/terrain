@@ -61,6 +61,8 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
 import { TransformationNode } from 'etl/templates/FieldTypes';
+import { createPathToIdMap, turnIndicesIntoValue } from 'etl/templates/SyncUtil';
+import { KeyPath as EnginePath } from 'shared/transformations/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -214,7 +216,13 @@ export function transformationFormFactory<State extends object, Type extends Tra
       const payload = fnToUse(this.state, this.props.engine, this.props.fieldID, transformID);
       if (this.props.isCreate)
       {
-        this.props.engine.appendTransformation(args.type, payload.fieldNamesOrIDs, payload.options);
+        const { engine } = this.props;
+        const pathToIdMap = createPathToIdMap(engine);
+        const strippedPaths = payload.fieldNamesOrIDs.map((id, i) => {
+          return turnIndicesIntoValue(engine.getOutputKeyPath(id), engine, pathToIdMap);
+        }).toList();
+        this.props.engine.appendTransformation(args.type, strippedPaths, payload.options);
+        // this.props.engine.appendTransformation(args.type, payload.fieldNamesOrIDs, payload.options)
         this.props.onEditOrCreate(false); // TODO figure out if structural changes happen
         this.props.onClose();
       }

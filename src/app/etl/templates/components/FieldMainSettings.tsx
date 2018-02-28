@@ -98,7 +98,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
 
   public getFormStateFromField(props)
   {
-    const field = this._field();
+    const field = this._fieldMap(props).get(props.fieldId);
     return {
       fieldName: field.name,
       isIncluded: field.isIncluded,

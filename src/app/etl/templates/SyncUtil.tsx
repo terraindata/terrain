@@ -169,7 +169,9 @@ function unhashPath(keypath: string)
   return EnginePath(JSON.parse(keypath));
 }
 
-function turnIndicesIntoValue(
+// turn all indices into a particular value, based on
+// an existing engine that has fields with indices in them
+export function turnIndicesIntoValue(
   keypath: EnginePath,
   engine: TransformationEngine,
   pathToIdMap: { [k: string]: number },
@@ -198,7 +200,7 @@ function turnIndicesIntoValue(
 }
 
 // creates a mapping from hashed keypath to fieldId
-function createPathToIdMap(engine: TransformationEngine): { [k: string]: number }
+export function createPathToIdMap(engine: TransformationEngine): { [k: string]: number }
 {
   const fieldIds = engine.getAllFieldIDs();
   const mapping = {};
@@ -210,7 +212,7 @@ function createPathToIdMap(engine: TransformationEngine): { [k: string]: number 
 }
 
 // takes an engine path and the path type mapping and returns true if
-// all of the path's parent paths represent array or object types
+// all of the path's parent paths represent array or object types and if it doesnt exist already
 function isAValidField(keypath: EnginePath, pathTypes: { [k: string]: FieldTypes }): boolean
 {
   if (keypath.size === 0)
@@ -307,6 +309,7 @@ function createMergedEngine(documents: List<object>):
     warnings,
     softWarnings,
   };
+
 }
 
 const CompatibilityMatrix: {

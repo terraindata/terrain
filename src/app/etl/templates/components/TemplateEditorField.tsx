@@ -147,9 +147,9 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return (this.props as Props & Injected).template;
   }
 
-  public _fieldMap(): FieldMap
+  public _fieldMap(props = this.props): FieldMap
   {
-    return (this.props as Props & Injected).fieldMap;
+    return (props as Props & Injected).fieldMap;
   }
 
   public _field(id = this.props.fieldId): TemplateField
