@@ -59,6 +59,7 @@ const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 
 import ExpandableView from 'common/components/ExpandableView';
+import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -69,9 +70,12 @@ import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
 interface Props
 {
+  preview: object;
+  noInteract: boolean;
   // injected props
   fieldMap?: FieldMap;
   transformationEngine?: TransformationEngine;
+  engineVersion?: number;
 }
 
 class RootFieldNode extends TerrainComponent<Props>
@@ -83,34 +87,37 @@ class RootFieldNode extends TerrainComponent<Props>
     };
 
   @memoizeOne
-  public computeRootFields(fieldMap: FieldMap): List<TemplateField>
+  public computeRootFields(
+    fieldMap: FieldMap,
+    engine: TransformationEngine,
+    engineVersion: number,
+  ): List<TemplateField>
   {
-
+    return fieldMap.filter((field, id) =>
+    {
+      return engine.getOutputKeyPath(id).size === 1;
+    }).toList();
   }
 
   public renderChildFields()
   {
-    const { fieldMap } = this.props;
-    const rootFields = this.computeRootFields(fieldMap);
-    // return field.getSubfields().map((childField, index) =>
-    // {
-    //   const childPaths = this._getChildPaths(index);
-    //   const childPreview = preview != null ? preview[childField.name] : null;
-    //   return (
-    //     <TemplateEditorFieldNode
-    //       {...this._passProps({
-    //         keyPath: childPaths.keyPath,
-    //         field: childField,
-    //         canEdit: field.isIncluded && canEdit,
-    //         preview: childPreview,
-    //         displayKeyPath: childPaths.displayKeyPath,
-    //       })}
-    //       key={index}
-    //     />
-    //   );
-    // }).toList();
+    const { fieldMap, transformationEngine, engineVersion, preview, noInteract } = this.props;
+    const rootFields = this.computeRootFields(fieldMap, transformationEngine, engineVersion);
+    return rootFields.map((childField, index) =>
+    {
+      const childPreview = preview != null ? preview[childField.name] : null;
+      return (
+        <TemplateEditorFieldNode
+          fieldId={childField.fieldId}
+          noInteract={noInteract}
+          canEdit={true}
+          preview={childPreview}
+          displayKeyPath={emptyList}
+          key={childField.fieldId}
+        />
+      );
+    }).toList();
   }
-
 
   public render()
   {
@@ -122,11 +129,14 @@ class RootFieldNode extends TerrainComponent<Props>
   }
 }
 
+const emptyList = List([]);
+
 export default Util.createTypedContainer(
   RootFieldNode,
   [
     ['templateEditor', 'fieldMap'],
-    ['templateEditor', 'template', 'transformationEngine']
+    ['templateEditor', 'template', 'transformationEngine'],
+    ['templateEditor', 'uiState', 'engineVersion'],
   ],
   {},
 );

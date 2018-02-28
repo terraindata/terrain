@@ -71,7 +71,7 @@ export function createInitialTemplate(documents: List<object>)
       softWarnings: [],
     };
   }
-  const { engine, warnings, softWarnings } = createMergedEngine(documents)
+  const { engine, warnings, softWarnings } = createMergedEngine(documents);
   const fieldMap = createTreeFromEngine(engine);
 
   const template = _ETLTemplate({
@@ -172,7 +172,7 @@ function unhashPath(keypath: string)
 function turnIndicesIntoWildcards(
   keypath: EnginePath,
   engine: TransformationEngine,
-  mapping: {[k: string]: number}
+  mapping: { [k: string]: number },
 ): EnginePath
 {
   if (keypath.size === 0)
@@ -190,17 +190,19 @@ function turnIndicesIntoWildcards(
       arrayIndices[i] = true;
     }
   }
-  return keypath.map((key, i) => {
-    return arrayIndices[i] === true ? '*' : key
+  return keypath.map((key, i) =>
+  {
+    return arrayIndices[i] === true ? '*' : key;
   }).toList();
 }
 
 // creates a mapping from hashed keypath to fieldId
-function createPathToIdMap(engine: TransformationEngine): {[k: string]: number}
+function createPathToIdMap(engine: TransformationEngine): { [k: string]: number }
 {
   const fieldIds = engine.getAllFieldIDs();
   const mapping = {};
-  fieldIds.forEach((id, i) => {
+  fieldIds.forEach((id, i) =>
+  {
     mapping[hashPath(engine.getOutputKeyPath(id))] = id;
   });
   return mapping;
@@ -208,7 +210,7 @@ function createPathToIdMap(engine: TransformationEngine): {[k: string]: number}
 
 // takes an engine path and the path type mapping and returns true if
 // all of the path's parent paths represent array or object types
-function isAValidField(keypath: EnginePath, pathTypes: {[k: string]: FieldTypes}): boolean
+function isAValidField(keypath: EnginePath, pathTypes: { [k: string]: FieldTypes }): boolean
 {
   if (keypath.size === 0)
   {
@@ -235,15 +237,17 @@ function createMergedEngine(documents: List<object>):
 {
   const warnings: string[] = [];
   const softWarnings: string[] = [];
-  const pathTypes: {[k: string]: FieldTypes } = {};
-  documents.forEach((doc, i) => {
+  const pathTypes: { [k: string]: FieldTypes } = {};
+  documents.forEach((doc, i) =>
+  {
     const e: TransformationEngine = new TransformationEngine(doc);
     const fieldIds = e.getAllFieldIDs();
     const pathToIdMap = createPathToIdMap(e);
     // fieldIds = fieldIds.sortBy((a, b) => e.getOutputKeyPath(a).size - e.getOutputKeyPath(b).size);
-    fieldIds.forEach((id, j) => {
+    fieldIds.forEach((id, j) =>
+    {
       const currentType: FieldTypes = e.getFieldType(id) as FieldTypes;
-      const wildCardedPath = turnIndicesIntoWildcards(e.getOutputKeyPath(id), e, pathToIdMap)
+      const wildCardedPath = turnIndicesIntoWildcards(e.getOutputKeyPath(id), e, pathToIdMap);
       const path = hashPath(wildCardedPath);
       if (pathTypes[path] !== undefined)
       {
@@ -257,7 +261,7 @@ function createMergedEngine(documents: List<object>):
               `path: ${path} has incompatible types. \
               Interpreted types ${currentType} and ${existingType} are incompatible. \
               The resultant type will be coerced to a string. \
-              Details: document ${i}`
+              Details: document ${i}`,
             );
           }
           else
@@ -266,7 +270,7 @@ function createMergedEngine(documents: List<object>):
               `path: ${path} has different types, but can be resolved. \
               Interpreted types ${currentType} and ${existingType} are different. \
               The resultant type will be coerced to a string. \
-              Details: document ${i}`
+              Details: document ${i}`,
             );
           }
           pathTypes[path] = 'string';
@@ -281,7 +285,8 @@ function createMergedEngine(documents: List<object>):
 
   const engine = new TransformationEngine();
   const hashedPaths = List(Object.keys(pathTypes));
-  hashedPaths.forEach((hashedPath, i) => {
+  hashedPaths.forEach((hashedPath, i) =>
+  {
     if (isAValidField(unhashPath(hashedPath), pathTypes))
     {
       const fieldType = pathTypes[hashedPath];
@@ -300,32 +305,32 @@ const CompatibilityMatrix: {
     [y in FieldTypes]?: FieldTypes | 'warning' | 'softWarning'
   }
 } = {
-  array: {
-    array: 'array',
-    object: 'warning',
-    string: 'warning',
-    number: 'warning',
-    boolean: 'warning',
-  },
-  object: {
-    object: 'object',
-    string: 'warning',
-    number: 'warning',
-    boolean: 'warning',
-  },
-  string: {
-    string: 'string',
-    number: 'softWarning',
-    boolean: 'softWarning',
-  },
-  number: {
-    number: 'number',
-    boolean: 'softWarning',
-  },
-  boolean: {
-    boolean: 'boolean',
-  },
-}
+    array: {
+      array: 'array',
+      object: 'warning',
+      string: 'warning',
+      number: 'warning',
+      boolean: 'warning',
+    },
+    object: {
+      object: 'object',
+      string: 'warning',
+      number: 'warning',
+      boolean: 'warning',
+    },
+    string: {
+      string: 'string',
+      number: 'softWarning',
+      boolean: 'softWarning',
+    },
+    number: {
+      number: 'number',
+      boolean: 'softWarning',
+    },
+    boolean: {
+      boolean: 'boolean',
+    },
+  };
 
 // warning types get typed as strings, but should emit a warning
 function mergeTypes(type1: FieldTypes, type2: FieldTypes): FieldTypes | 'warning' | 'softWarning'

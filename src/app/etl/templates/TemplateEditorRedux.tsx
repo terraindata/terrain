@@ -58,8 +58,8 @@ import
   _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
-  FieldMap,
   ETLTemplate,
+  FieldMap,
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
 import { Algorithm } from 'library/LibraryTypes';

@@ -50,8 +50,8 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { FieldMap } from 'etl/templates/TemplateTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
+import { FieldMap } from 'etl/templates/TemplateTypes';
 import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
@@ -105,7 +105,7 @@ export class FieldTreeProxy
       .set(childId, childField)
       .set(parentId, parentField);
     this.onMutate(this.fieldMap);
-    return new FieldNodeProxy(this, childId)
+    return new FieldNodeProxy(this, childId);
   }
 
   public setField(fieldId: number, newField: TemplateField)

@@ -131,7 +131,10 @@ class TemplateEditor extends TerrainComponent<Props>
             tabIndex={-1}
           >
             <div className='template-editor-full-area'>
-              <RootFieldNode />
+              <RootFieldNode
+                preview={transformedPreviewDocument}
+                noInteract={false}
+              />
             </div>
           </div>
         </div>

@@ -118,7 +118,10 @@ class DocumentPreview extends TerrainComponent<Props>
         onClick={this.handleDocumentClicked}
       >
         <div className='preview-document-spacer'>
-          <RootFieldNode />
+          <RootFieldNode
+            preview={transformedPreviewDocument}
+            noInteract={true}
+          />
         </div>
         <div
           key='fader'

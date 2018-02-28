@@ -106,7 +106,7 @@ function createFetchHandler(act: typeof TemplateEditorActions): (hits: List<obje
       actionType: 'setFieldMap',
       fieldMap,
     });
-  }
+  };
 }
 
 @Radium

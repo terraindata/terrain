@@ -77,22 +77,22 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
   public renderChildFields()
   {
-    const { canEdit, preview, keyPath, displayKeyPath } = this.props;
+    const { canEdit, preview, displayKeyPath } = this.props;
     const field = this._field;
-    return field.getSubfields().map((childField, index) =>
+    const childFieldIds = field.childrenIds;
+    return childFieldIds.map((childId, index) =>
     {
-      const childPaths = this._getChildPaths(index);
+      // const childPaths = this._getChildPaths(index);
+      const childField = this._fieldMap.get(childId);
       const childPreview = preview != null ? preview[childField.name] : null;
       return (
         <TemplateEditorFieldNode
           {...this._passProps({
-            keyPath: childPaths.keyPath,
-            field: childField,
+            fieldId: childId,
             canEdit: field.isIncluded && canEdit,
             preview: childPreview,
-            displayKeyPath: childPaths.displayKeyPath,
           })}
-          key={index}
+          key={childId}
         />
       );
     }).toList();
