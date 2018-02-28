@@ -68,6 +68,7 @@ export interface Props extends TemplateEditorFieldProps
 {
   hidePreviewValue?: boolean;
   displayValueOverride?: any;
+  labelOverride?: string;
 }
 
 @Radium
@@ -75,7 +76,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 {
   public render()
   {
-    const { canEdit, preview, hidePreviewValue, displayValueOverride } = this.props;
+    const { canEdit, preview, hidePreviewValue, displayValueOverride, labelOverride } = this.props;
     const field = this._field();
     const settingsOpen = this._settingsAreOpen();
     const labelStyle = settingsOpen ?
@@ -96,7 +97,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             })}
               onClick={this.handleLabelClicked}
             >
-              {field.name}
+              {labelOverride != null ? labelOverride : field.name}
             </div>
           </div>
           {

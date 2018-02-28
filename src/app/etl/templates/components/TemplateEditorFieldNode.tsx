@@ -64,7 +64,10 @@ import './TemplateEditorField.less';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  previewLabel?: string;
+}
 
 @Radium
 class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
@@ -105,12 +108,19 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     return placeholderId;
   }
 
-  public renderArrayChild(value, index)
+  // -1 if there is no available preview
+  // previewExists true if preview exists (not null)
+  public renderArrayChild(value, index: number, previewExists: boolean = true)
   {
     const { canEdit } = this.props;
     const field = this._field();
     const displayKeyPath = this._getPreviewChildPath(index);
     const childField = this._field(this.getAppropriateChild(index));
+    let previewLabel = `${index}`;
+    if (index === -1)
+    {
+      previewLabel = previewExists ? '(List Empty)' : '(0 of 0)';
+    }
     return (
       <TemplateEditorFieldNode
         {...this._passProps({
@@ -119,6 +129,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
           preview: value,
           displayKeyPath,
         })}
+        previewLabel={previewLabel}
         key={index}
       />
     );
@@ -127,10 +138,13 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   public renderArrayChildren()
   {
     const { preview } = this.props;
-    // const childFieldIds = field.childrenIds;
     if (preview == null || !Array.isArray(preview))
     {
-      return this.renderArrayChild(null, -1);
+      return this.renderArrayChild(null, -1, false);
+    }
+    if (preview.length === 0)
+    {
+      return this.renderArrayChild(null, -1, true);
     }
     return List(preview.map((value, index) =>
     {
@@ -158,7 +172,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
   public render()
   {
-    const { canEdit, preview, displayKeyPath } = this.props;
+    const { canEdit, preview, displayKeyPath, previewLabel } = this.props;
     const field = this._field();
 
     let children = null;
@@ -167,11 +181,11 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
     if (field.isArray())
     {
-      // tslint:disable-next-line
       children = this.renderArrayChildren();
       content = (
         <TemplateEditorFieldPreview
           hidePreviewValue={true}
+          labelOverride={previewLabel}
           {...this._passProps()}
         />
       );
@@ -182,6 +196,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       content = (
         <TemplateEditorFieldPreview
           hidePreviewValue={true}
+          labelOverride={previewLabel}
           {...this._passProps()}
         />
       );
@@ -190,6 +205,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     {
       content = (
         <TemplateEditorFieldPreview
+          labelOverride={previewLabel}
           {...this._passProps()}
         />
       );
