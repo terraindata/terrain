@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
@@ -66,6 +67,7 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
 import { _Hit, Hit } from './ResultTypes';
+import ExpandIcon from 'app/common/components/ExpandIcon';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -214,12 +216,15 @@ class HitComponent extends TerrainComponent<Props> {
           size > 1 &&
           <div
             className='hit-nested-content-expand'
-            onClick={this._fn(
-              this.changeNestedState,
-              expandState !== 'expanded' ? 'expanded' : 'normal',
-              field)}
           >
-            {expandState === 'expanded' ? 'Less' : 'More'}
+            <ExpandIcon
+              open={expandState === 'expanded'}
+              onClick={this._fn(
+                this.changeNestedState,
+                expandState !== 'expanded' ? 'expanded' : 'normal',
+                field
+              )}
+            />
           </div>
         }
       </div>
@@ -300,12 +305,13 @@ class HitComponent extends TerrainComponent<Props> {
     );
   }
 
-  public renderField(field, index?, fields?, overrideFormat?)
+  public renderField(field, i?, fields?, overrideFormat?)
   {
-    if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
+    if (!resultsConfigHasFields(this.props.resultsConfig) && i >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
     {
       return null;
     }
+    const {hideFieldNames, index} = this.props;
     const spotlights = this.props.spotlights.spotlights;
     const isSpotlit = spotlights.get(this.props.primaryKey);
     const color = isSpotlit ? spotlights.get(this.props.primaryKey).color : 'black';
@@ -313,6 +319,11 @@ class HitComponent extends TerrainComponent<Props> {
       false, this.props.expanded, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
+    let style = {};
+    if (hideFieldNames &&index !== 0)
+    {
+      style = {width: $(`#${field}-header`).width()};
+    }
     return (
       <div
         className={classNames({
@@ -320,6 +331,7 @@ class HitComponent extends TerrainComponent<Props> {
           'results-are-small': this.props.hitSize === 'small',
           'result-field-hide-field': this.props.hideFieldNames,
         })}
+        style={style}
         key={field}
       >
         {
@@ -327,9 +339,9 @@ class HitComponent extends TerrainComponent<Props> {
           <div
             className={classNames({
               'result-field-name': true,
-              'result-field-name-header': this.props.hideFieldNames && this.props.index === 0
+              'result-field-name-header': hideFieldNames && index === 0
             })}
-            style={this.props.hideFieldNames && this.props.index !== 0 ? {opacity: 0} : {}} // Keep them there to make sizing work
+            style={hideFieldNames && index !== 0 ? {opacity: 0} : {}} // Keep them there to make sizing work
           >
             {
               field
@@ -342,8 +354,9 @@ class HitComponent extends TerrainComponent<Props> {
             'result-field-value-short': (field + value).length < 0,
             'result-field-value-number': typeof value === 'number',
             'result-field-value-show-overflow': format && format.type === 'map',
-            'result-field-value-header': this.props.hideFieldNames && this.props.index === 0,
+            'result-field-value-header': hideFieldNames && index === 0,
           })}
+          id={hideFieldNames && index === 0 ? String(field) + '-header' : ''}
         >
           {
             value
