@@ -256,6 +256,11 @@ function createMergedEngine(documents: List<object>):
 {
   const warnings: string[] = [];
   const softWarnings: string[] = [];
+  // return {
+  //   engine: new TransformationEngine(documents.get(0)),
+  //   warnings,
+  //   softWarnings,
+  // }
   const pathTypes: { [k: string]: FieldTypes } = {};
   documents.forEach((doc, i) =>
   {

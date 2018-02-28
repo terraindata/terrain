@@ -168,15 +168,28 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   public renderPick(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
   {
     const options: OptionType<DisplayType.Pick> = inputInfo.options || {};
+    let selectedIndex;
+    let onChange;
+    const pickOptions = options.pickOptions != null ? options.pickOptions(state) : emptyList;
+    if (options.indexResolver != null)
+    {
+      selectedIndex = options.indexResolver(this.props.inputState[stateName]);
+      onChange = (value) => { this.setStateHOC(stateName)(pickOptions.get(value)) }
+    }
+    else
+    {
+      selectedIndex = this.props.inputState[stateName];
+      onChange = this.setStateHOC(stateName);
+    }
     return (
       <div className='dynamic-form-pick-block' key={index}>
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
         <span style={{ marginLeft: '0px' }}>
           <Dropdown
             className='dynamic-form-pick'
-            selectedIndex={this.props.inputState[stateName]}
-            onChange={this.setStateHOC(stateName)}
-            options={options.pickOptions != null ? options.pickOptions(state) : emptyList}
+            selectedIndex={selectedIndex}
+            onChange={onChange}
+            options={pickOptions}
             canEdit={!disabled}
           />
         </span>

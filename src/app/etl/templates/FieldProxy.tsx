@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { TemplateField } from 'etl/templates/FieldTypes';
+import { FieldTypes, TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
@@ -195,6 +195,16 @@ export class FieldNodeProxy
     outputPath = outputPath.set(outputPath.size - 1, value);
     engine.setOutputKeyPath(field.fieldId, outputPath);
     this.syncWithEngine();
+  }
+
+  public changeType(newType: FieldTypes)
+  {
+    const field = this.field();
+    const engine = this.tree.getEngine();
+    if (field.childrenIds.size === 0)
+    {
+      // TODO once this gets added to transform engine
+    }
   }
 
   public syncWithEngine() // This function will mutate the field from which it was called

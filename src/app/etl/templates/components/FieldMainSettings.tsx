@@ -63,7 +63,7 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import
 {
   _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, TemplateField,
+  ElasticFieldSettings, FieldTypes, TemplateField,
 } from 'etl/templates/FieldTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -102,6 +102,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
     return {
       fieldName: field.name,
       isIncluded: field.isIncluded,
+      type: field.type,
     };
   }
 
@@ -147,6 +148,10 @@ class FieldMainSettings extends TemplateEditorField<Props>
       {
         proxy.changeName(formState.fieldName);
       }
+      if (field.type !== formState.type)
+      {
+        proxy.changeType(formState.type);
+      }
     });
   }
 
@@ -162,6 +167,7 @@ interface SettingsState
 {
   fieldName: string;
   isIncluded: boolean;
+  type: FieldTypes;
 }
 
 const settingsInputMap: InputDeclarationMap<SettingsState> = {
@@ -175,7 +181,17 @@ const settingsInputMap: InputDeclarationMap<SettingsState> = {
     displayName: 'Include this field',
     group: 'row',
   },
+  type: {
+    type: DisplayType.Pick,
+    displayName: 'Field Type',
+    options: {
+      pickOptions: (s: SettingsState) => typeOptions,
+      indexResolver: (value) => typeOptions.indexOf(value)
+    }
+  }
 };
+
+const typeOptions = List(['array', 'object', 'string', 'number', 'boolean']);
 
 export default Util.createTypedContainer(
   FieldMainSettings,

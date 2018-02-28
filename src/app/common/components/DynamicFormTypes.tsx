@@ -74,6 +74,7 @@ export interface InputDeclarationOptionTypes<S = any>
   };
   Pick: {
     pickOptions: (state: S) => List<string>,
+    indexResolver?: (option) => number,
   };
 }
 
