@@ -53,11 +53,11 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
-import BuilderStore from 'app/builder/data/BuilderStore';
-import { SchemaState } from 'app/schema/SchemaTypes';
-import { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Draggable from 'react-draggable';
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { BuilderState } from 'app/builder/data/BuilderState';
+import { SchemaState } from 'app/schema/SchemaTypes';
+import { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
@@ -105,6 +105,7 @@ export interface Props
   spotlights?: SpotlightTypes.SpotlightState;
   spotlightActions?: typeof SpotlightActions;
   schema?: SchemaState;
+  builder?: BuilderState;
 }
 
 @Radium
@@ -270,6 +271,7 @@ class HitComponent extends TerrainComponent<Props> {
   {
     const { isDragging, connectDragSource, isOver, connectDropTarget, hit, hitSize, expanded } = this.props;
     let { resultsConfig } = this.props;
+
     const classes = classNames({
       'result': true,
       'result-expanded': this.props.expanded,
@@ -287,11 +289,13 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
+
     const thumbnail = resultsConfig && resultsConfig.thumbnail ?
-      getResultThumbnail(hit, resultsConfig, this.props.expanded) :
+      getResultThumbnail(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder) :
       null;
-    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.locations, color);
-    const fields = getResultFields(hit, resultsConfig, this.props.schema);
+    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder,
+      this.props.locations, color);
+    const fields = getResultFields(hit, resultsConfig, this.props.schema, this.props.builder);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
     let bottomContent: any;
@@ -322,6 +326,7 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       );
     }
+
     if (!resultsConfig)
     {
       resultsConfig = _ResultsConfig();
@@ -475,7 +480,7 @@ export function resultsConfigHasFields(config: ResultsConfig): boolean
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(hit: Hit, config: ResultsConfig, schema?: SchemaState): string[]
+export function getResultFields(hit: Hit, config: ResultsConfig, schema?: SchemaState, builder?: BuilderState): string[]
 {
   let fields: string[];
 
@@ -485,7 +490,11 @@ export function getResultFields(hit: Hit, config: ResultsConfig, schema?: Schema
   }
   else
   {
-    const builderState = BuilderStore.getState();
+    const builderState = builder;
+    if (builderState === undefined)
+    {
+      return [];
+    }
     // If there is a path
     const server: string = builderState.db.name;
     let serverIndex = server + '/' + getIndex();
@@ -501,8 +510,8 @@ export function getResultFields(hit: Hit, config: ResultsConfig, schema?: Schema
   return fields;
 }
 
-<<<<<<< HEAD
-export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
+export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean,
+  schema?: SchemaState, builder?: BuilderState, locations?: { [field: string]: any }, color?: string)
 {
   let thumbnailField: string;
 
@@ -512,13 +521,13 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
   }
   else
   {
-    thumbnailField = _.first(getResultFields(hit, config));
+    thumbnailField = _.first(getResultFields(hit, config, schema, builder));
   }
 
   return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color, true);
 }
 
-export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState,
+export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
   locations?: { [field: string]: any }, color?: string)
 {
   let nameField: string;
@@ -529,7 +538,7 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
   }
   else
   {
-    nameField = _.first(getResultFields(hit, config, schema));
+    nameField = _.first(getResultFields(hit, config, schema, builder));
   }
 
   return getResultValue(hit, nameField, config, true, expanded, null, locations, color);
