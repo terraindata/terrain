@@ -73,7 +73,8 @@ class TemplateFieldC
   public readonly type: FieldTypes = 'object';
   public readonly fieldId: number = -1;
   public readonly name: string = '';
-  public readonly children: List<TemplateField> = List([]);
+  // public readonly children: List<TemplateField> = List([]);
+  public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
 
   public isArray(): boolean
@@ -84,16 +85,6 @@ class TemplateFieldC
   public isNested(): boolean
   {
     return this.type === 'object';
-  }
-
-  public getSubfields() // TODO: if nothing fancy needs to happen, just directly access children
-  {
-    return this.children;
-  }
-
-  public isRoot(keyPath): boolean
-  {
-    return keyPath.size === 0;
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;

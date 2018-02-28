@@ -55,10 +55,11 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Languages, Template as TemplateI } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
+export type FieldMap = Immutable.Map<number, TemplateField>;
 class TemplateEditorStateC
 {
   public template: ETLTemplate = _ETLTemplate();
-  public rootField: TemplateField = _TemplateField();
+  public fieldMap: FieldMap = Map();
   public isDirty: boolean = true;
   public uiState: EditorDisplayState = _EditorDisplayState();
 }
@@ -72,7 +73,7 @@ class EditorDisplayStateC
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = -1;
   public loading: boolean = false;
-  public settingsKeyPath: KeyPath = null;
+  public settingsFieldId: number = null;
   public settingsDisplayKeyPath: KeyPath = null;
   public engineVersion: number = 0;
 }

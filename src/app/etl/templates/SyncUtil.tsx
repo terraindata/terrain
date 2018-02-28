@@ -54,24 +54,25 @@ import
   _TemplateField, _TransformationNode, FieldTypes,
   TemplateField, TransformationNode,
 } from 'etl/templates/FieldTypes';
+import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export function createInitialTemplate(documents: List<object>)
-  : { template: ETLTemplate, rootField: TemplateField, warnings: string[], softWarnings: string[] }
+  : { template: ETLTemplate, fieldMap: FieldMap, warnings: string[], softWarnings: string[] }
 {
   if (documents == null || documents.size === 0)
   {
     return {
       template: _ETLTemplate(),
-      rootField: _TemplateField(),
+      fieldMap: Map(),
       warnings: ['No documents provided for initial Template construction'],
       softWarnings: [],
     };
   }
   const { engine, warnings, softWarnings } = createMergedEngine(documents)
-  const rootField = createTreeFromEngine(engine);
+  const fieldMap = createTreeFromEngine(engine);
 
   const template = _ETLTemplate({
     id: -1,
@@ -80,26 +81,24 @@ export function createInitialTemplate(documents: List<object>)
   });
   return {
     template,
-    rootField,
+    fieldMap,
     warnings,
     softWarnings,
   };
 }
 
-export function createTreeFromEngine(engine: TransformationEngine): TemplateField
+export function createTreeFromEngine(engine: TransformationEngine): FieldMap
 {
   const ids = engine.getAllFieldIDs();
   // sort the paths to ensure we visit parents before children
   const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
-  // const rootId = sortedIds.get(0);
-  const rootField = _TemplateField({ })
-  const tree = new FieldTreeProxy(rootField, engine);
-  const rootNode = tree.getRootNode();
+  const fieldMap = Map() as FieldMap;
+  const tree = new FieldTreeProxy(fieldMap, engine);
 
   const enginePathToNode: {
     [kp: string]: FieldNodeProxy,
   } = {
-      [JSON.stringify([])]: rootNode,
+
     };
 
   sortedIds.forEach((id, index) =>
@@ -112,13 +111,12 @@ export function createTreeFromEngine(engine: TransformationEngine): TemplateFiel
     const parentPath = enginePath.slice(0, -1);
     const parentNode: FieldNodeProxy = enginePathToNode[JSON.stringify(parentPath)];
     const newField = createFieldFromEngine(engine, id);
-
-    const newNode = parentNode.discoverChild(newField);
+    const newNode = parentNode != null ?
+      parentNode.discoverChild(newField) :
+      tree.createParentlessField(newField);
     enginePathToNode[JSON.stringify(enginePath)] = newNode;
   });
-  console.log(JSON.stringify(tree.getRootField().toJS(), null, 2));
-  console.log(engine);
-  return tree.getRootField();
+  return tree.getFieldMap();
 }
 
 // takes a field id and and engine and constructs a TemplateField object (does not construct children)
@@ -157,7 +155,7 @@ export function updateFieldFromEngine(
 ): TemplateField
 {
   const updatedField = createFieldFromEngine(engine, id);
-  return updatedField.set('children', oldField.children);
+  return updatedField.set('childrenIds', oldField.childrenIds);
 }
 
 // document merge logic

@@ -138,7 +138,8 @@ export class PropertyTracker<T>
     return this.getItem()[key];
   }
 
-  public getSeen()
+  // returns null if the value has been viewed, or an array of keys that have been viewed
+  public getSeen(): Array<string | number>
   {
     return Object.keys(this.seen);
   }

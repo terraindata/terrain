@@ -61,7 +61,7 @@ import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from '
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { EditorDisplayState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { EditorDisplayState, ETLTemplate, FieldMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 /*
  *  This class defines a base class with useful functions that are used by components
@@ -70,9 +70,9 @@ import { EditorDisplayState, ETLTemplate, TemplateEditorState } from 'etl/templa
 
 export interface TemplateEditorFieldProps
 {
-  keyPath: KeyPath; // keyPath from the root field to this field
-  field: TemplateField;
-
+  // keyPath: KeyPath; // keyPath from the root field to this field
+  // field: TemplateField;
+  fieldId: number;
   canEdit: boolean;
   noInteract: boolean; // determines if the template editor is not interactable (e.g. the side preview)
   preview: any;
@@ -88,19 +88,19 @@ export const mapDispatchKeys = {
 export const mapStateKeys = [
   ['templateEditor', 'template'],
   ['templateEditor', 'uiState'],
-  ['templateEditor', 'rootField'],
+  ['templateEditor', 'fieldMap'],
 ];
 
 interface Injected
 {
   template: ETLTemplate;
   uiState: EditorDisplayState;
-  rootField: TemplateField;
+  fieldMap: Immutable.Map<number, TemplateField>;
 }
 
 export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
 {
-  private onRootMutationBound: (f: TemplateField) => void;
+  private onRootMutationBound: (fieldMap: FieldMap) => void;
   private updateEngineVersionBound: () => void;
   private uiStateTracker: PropertyTracker<EditorDisplayState> = new PropertyTracker(this.getUIStateValue.bind(this));
   private updateChecker: UpdateChecker = new UpdateChecker();
@@ -110,7 +110,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     super(props);
     this.onRootMutationBound = this.onRootMutation.bind(this);
     this.updateEngineVersionBound = this.updateEngineVersion.bind(this);
-    this.getKPCachedFn = memoizeOne(this.getKPCachedFn);
     this.getDKPCachedFn = memoizeOne(this.getDKPCachedFn);
   }
 
@@ -134,11 +133,11 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       return true;
     }
     // check props
-    const seen = this.uiStateTracker.getSeen();
+    const uiStateKeysSeen = this.uiStateTracker.getSeen();
     const customComparatorMap = {
       uiState: (value, nextValue) =>
       {
-        return isVisiblyEqual(value, nextValue, seen);
+        return isVisiblyEqual(value, nextValue, uiStateKeysSeen);
       },
     };
     return !compareObjects(this.props, nextProps, customComparatorMap);
@@ -149,9 +148,14 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return (this.props as Props & Injected).template;
   }
 
-  get _rootField(): TemplateField
+  get _fieldMap(): FieldMap
   {
-    return (this.props as Props & Injected).rootField;
+    return (this.props as Props & Injected).fieldMap;
+  }
+
+  get _field(): TemplateField
+  {
+    return this._fieldMap.get(this.props.fieldId);
   }
 
   get _uiState(): PropertyTracker<EditorDisplayState>
@@ -159,42 +163,27 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.uiStateTracker;
   }
 
-  protected _getChildPaths(index, cacheKey = this.props.field.children): { displayKeyPath: KeyPath, keyPath: KeyPath }
-  {
-    const keyPath = this.getKPCachedFn(this.props.keyPath, cacheKey)(index);
-    const displayKeyPath = this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
-    return {
-      keyPath,
-      displayKeyPath,
-    };
-  }
-
   // for array types
-  protected _getPreviewChildPaths(index, cacheKey = this.props.preview): { displayKeyPath: KeyPath, keyPath: KeyPath }
+  protected _getPreviewChildPath(index, cacheKey = this.props.preview): KeyPath
   {
-    const keyPath = this.getKPCachedFn(this.props.keyPath, cacheKey)(index);
-    const displayKeyPath = this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
-    return {
-      keyPath,
-      displayKeyPath,
-    };
+    return this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
   }
 
   protected _proxy(): FieldNodeProxy
   {
     const engine = this._template.transformationEngine;
-    const tree = new FieldTreeProxy(this._rootField, engine, this.onRootMutationBound, this.updateEngineVersionBound);
-    return new FieldNodeProxy(tree, this.props.keyPath);
+    const tree = new FieldTreeProxy(this._fieldMap, engine, this.onRootMutationBound, this.updateEngineVersionBound);
+    return new FieldNodeProxy(tree, this.props.fieldId);
   }
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps
   {
-    return _.extend(_.pick(this.props, ['keyPath', 'field', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);
+    return _.extend(_.pick(this.props, ['fieldId', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);
   }
 
   protected _inputDisabled(): boolean
   {
-    return !this.props.field.isIncluded || !this.props.canEdit;
+    return !this._field.isIncluded || !this.props.canEdit;
   }
 
   protected _settingsAreOpen(): boolean
@@ -203,17 +192,23 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return settingsAreOpen(this.props);
   }
 
+  protected _willFieldChange(nextProps)
+  {
+    return this._fieldMap.get(this.props.fieldId) !==
+      (nextProps as Props & Injected).fieldMap.get(this.props.fieldId);
+  }
+
   // Returns the given function if input is not disabled. Otherwise returns undefined.
   protected _noopIfDisabled<F>(fn: F): F | undefined
   {
     return this._inputDisabled() ? undefined : fn;
   }
 
-  private onRootMutation(field: TemplateField)
+  private onRootMutation(fieldMap: FieldMap)
   {
     this.props.act({
-      actionType: 'setRoot',
-      rootField: field,
+      actionType: 'setFieldMap',
+      fieldMap,
     });
   }
 
@@ -221,15 +216,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     this.props.act({
       actionType: 'updateEngineVersion',
-    });
-  }
-
-  // gets memoizeOne'd
-  private getKPCachedFn(keyPath, cacheDependency)
-  {
-    return _.memoize((index) =>
-    {
-      return keyPath.push('children', index);
     });
   }
 
@@ -242,6 +228,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     });
   }
 
+  // ignores property tracker
   private getUIStateValue(): EditorDisplayState
   {
     return (this.props as Props & Injected).uiState;
@@ -255,14 +242,14 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
 function settingsAreOpen(props: TemplateEditorFieldProps)
 {
-  const { displayKeyPath, keyPath, noInteract } = props;
+  const { displayKeyPath, noInteract, fieldId } = props;
   if (noInteract)
   {
     return false;
   }
   else
   {
-    return keyPath.equals((props as TemplateEditorFieldProps & Injected).uiState.settingsKeyPath) &&
+    return fieldId === ((props as TemplateEditorFieldProps & Injected).uiState.settingsFieldId) &&
       displayKeyPath.equals((props as TemplateEditorFieldProps & Injected).uiState.settingsDisplayKeyPath);
   }
 }

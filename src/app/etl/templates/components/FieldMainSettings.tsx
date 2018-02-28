@@ -88,7 +88,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.field.isIncluded !== this.props.field.isIncluded || nextProps.field.name !== this.props.field.name)
+    if (this._willFieldChange(nextProps))
     {
       this.setState({
         formState: this.getFormStateFromField(nextProps),
@@ -98,7 +98,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
 
   public getFormStateFromField(props)
   {
-    const { field } = props;
+    const field = this._field;
     return {
       fieldName: field.name,
       isIncluded: field.isIncluded,
@@ -135,7 +135,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
 
   public handleSettingsApplied()
   {
-    const { field } = this.props;
+    const field = this._field;
     const { formState } = this.state;
     this._proxy().withEngineMutations((proxy) =>
     {

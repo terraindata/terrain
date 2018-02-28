@@ -56,8 +56,7 @@ import Util from 'util/Util';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorDocumentsPreview from 'etl/templates/components/preview/TemplateEditorDocumentsPreview';
 import TemplateEditorPreviewControl from 'etl/templates/components/preview/TemplateEditorPreviewControl';
-import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
-import TemplateEditorFieldSettings from 'etl/templates/components/TemplateEditorFieldSettings';
+import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
@@ -105,7 +104,6 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public renderEditorSection(showEditor: boolean = true)
   {
-    const { rootField } = this.props.templateEditor;
     const transformedPreviewDocument = this.getDocument();
     if (!showEditor)
     {
@@ -133,14 +131,7 @@ class TemplateEditor extends TerrainComponent<Props>
             tabIndex={-1}
           >
             <div className='template-editor-full-area'>
-              <TemplateEditorFieldNode
-                keyPath={emptyList}
-                field={rootField}
-                canEdit={true}
-                noInteract={false}
-                preview={transformedPreviewDocument}
-                displayKeyPath={emptyList}
-              />
+              <RootFieldNode />
             </div>
           </div>
         </div>

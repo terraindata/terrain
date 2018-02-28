@@ -77,7 +77,8 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
   public renderChildFields()
   {
-    const { field, canEdit, preview, keyPath, displayKeyPath } = this.props;
+    const { canEdit, preview, keyPath, displayKeyPath } = this.props;
+    const field = this._field;
     return field.getSubfields().map((childField, index) =>
     {
       const childPaths = this._getChildPaths(index);
@@ -159,15 +160,16 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
   public render()
   {
-    const { field, keyPath, canEdit, preview, displayKeyPath } = this.props;
-    if (field.isRoot(keyPath))
-    {
-      return (
-        <div className='template-editor-children-container'>
-          {this.renderChildFields()}
-        </div>
-      );
-    }
+    const { canEdit, preview, displayKeyPath } = this.props;
+    const field = this._field;
+    // if (field.isRoot(keyPath))
+    // {
+    //   return (
+    //     <div className='template-editor-children-container'>
+    //       {this.renderChildFields()}
+    //     </div>
+    //   );
+    // }
 
     let children = null;
     let content = null;

@@ -50,6 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { FieldMap } from 'etl/templates/TemplateTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -62,13 +63,17 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
  */
 export class FieldTreeProxy
 {
-  private onMutate: (root: TemplateField) => void;
+  private onMutate: (fieldMap: FieldMap) => void;
   private updateVersion: () => void;
-  constructor(private root: TemplateField,
-    private engine: TransformationEngine,
-    onMutate?: (f: TemplateField) => void,
+  private fieldMap: FieldMap;
+  private engine: TransformationEngine;
+  constructor(fieldMap: FieldMap,
+    engine: TransformationEngine,
+    onMutate?: (fieldMap: FieldMap) => void,
     updateVersion?: () => void)
   {
+    this.fieldMap = fieldMap;
+    this.engine = engine;
     this.onMutate = onMutate !== undefined ? onMutate : doNothing;
     this.updateVersion = updateVersion !== undefined ? updateVersion : doNothing;
   }
@@ -83,48 +88,53 @@ export class FieldTreeProxy
     this.updateVersion();
   }
 
-  public createField(pathToField: KeyPath, field: TemplateField): FieldNodeProxy
+  public createParentlessField(field: TemplateField): FieldNodeProxy
   {
-    const creatingField = this.root.getIn(pathToField);
-    const nextIndex = creatingField.children.size;
-    const pathToChildField = pathToField.push('children', nextIndex);
-    this.root = this.root.setIn(pathToChildField, field);
-    this.onMutate(this.root);
-    return new FieldNodeProxy(this, pathToChildField);
+    this.fieldMap = this.fieldMap.set(field.fieldId, field);
+    this.onMutate(this.fieldMap);
+    return new FieldNodeProxy(this, field.fieldId);
   }
 
-  public setField(pathToField: KeyPath, newField: TemplateField)
+  // create a 'field' as a child under parentId
+  public createField(parentId: number, childField: TemplateField): FieldNodeProxy
   {
-    this.root = this.root.setIn(pathToField, newField);
-    this.onMutate(this.root);
+    const childId = childField.fieldId;
+    const parentField: TemplateField = this.fieldMap.get(parentId)
+      .update('childrenIds', (ids) => ids.push(childId));
+    this.fieldMap = this.fieldMap
+      .set(childId, childField)
+      .set(parentId, parentField);
+    this.onMutate(this.fieldMap);
+    return new FieldNodeProxy(this, childId)
   }
 
-  public updateField(pathToField: KeyPath, key: string | number, value: any)
+  public setField(fieldId: number, newField: TemplateField)
   {
-    const keyPath = pathToField.push(key);
-    this.root = this.root.setIn(keyPath, value);
-    this.onMutate(this.root);
+    this.fieldMap = this.fieldMap.set(fieldId, newField);
+    this.onMutate(this.fieldMap);
   }
 
-  public deleteField(pathToField: KeyPath)
+  public updateField<K extends keyof TemplateField>(fieldId: number, key: K, value: TemplateField[K])
   {
-    this.root = this.root.deleteIn(pathToField);
-    this.onMutate(this.root);
+    const newField = this.fieldMap.get(fieldId).set(key, value);
+    this.fieldMap = this.fieldMap.set(fieldId, newField);
+    this.onMutate(this.fieldMap);
   }
 
-  public getRootField(): TemplateField
+  public deleteField(fieldId: number)
   {
-    return this.root;
+    this.fieldMap = this.fieldMap.delete(fieldId);
+    this.onMutate(this.fieldMap);
   }
 
-  public getField(path: KeyPath): TemplateField
+  public getFieldMap(): FieldMap
   {
-    return this.root.getIn(path);
+    return this.fieldMap;
   }
 
-  public getRootNode(): FieldNodeProxy
+  public getField(fieldId: number): TemplateField
   {
-    return new FieldNodeProxy(this, List([]));
+    return this.fieldMap.get(fieldId);
   }
 }
 
@@ -133,29 +143,29 @@ export class FieldNodeProxy
   private pauseSync = false;
   private shouldSync = false;
 
-  constructor(private tree: FieldTreeProxy, private path: KeyPath)
+  constructor(private tree: FieldTreeProxy, private fieldId: number)
   {
 
   }
 
   public exists()
   {
-    return this.tree.getRootField().hasIn(this.path);
+    return this.tree.getFieldMap().has(this.fieldId);
   }
 
   public id(): number
   {
-    return this.tree.getField(this.path).fieldId;
+    return this.fieldId;
   }
 
   public field(): TemplateField
   {
-    return this.tree.getField(this.path);
+    return this.tree.getField(this.fieldId);
   }
 
   public discoverChild(field: TemplateField): FieldNodeProxy
   {
-    return this.tree.createField(this.path, field);
+    return this.tree.createField(this.fieldId, field);
   }
 
   public setFieldEnabled(enabled: boolean)
@@ -199,7 +209,7 @@ export class FieldNodeProxy
     if (this.pauseSync === false)
     {
       const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.id(), this.field());
-      this.tree.setField(this.path, updatedField);
+      this.tree.setField(this.fieldId, updatedField);
       this.tree.updateEngineVersion();
       this.shouldSync = false;
     }
@@ -223,12 +233,12 @@ export class FieldNodeProxy
 
   public deleteSelf()
   {
-    this.tree.deleteField(this.path);
+    this.tree.deleteField(this.fieldId);
   }
 
   public clearChildren()
   {
-    this.tree.updateField(this.path, 'children', List([]));
+    this.tree.updateField(this.fieldId, 'childrenIds', List([]));
   }
 }
 

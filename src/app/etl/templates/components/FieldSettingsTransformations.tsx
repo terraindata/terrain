@@ -107,7 +107,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
   public renderEditTransformationSection()
   {
     const { currentIndex } = this.state;
-    const { field } = this.props;
+    const field = this._field;
 
     if (currentIndex >= 0 && currentIndex < field.transformations.size)
     {
@@ -116,7 +116,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
           key={currentIndex}
           transformation={field.transformations.get(currentIndex)}
           engine={this._template.transformationEngine}
-          fieldID={this.props.field.fieldId}
+          fieldID={this._field.fieldId}
           onTransformationChange={this.handleTransformationChange}
           onClose={this.handleUIClose}
         />
@@ -129,7 +129,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     return (
       <TransformationCreator
         engine={this._template.transformationEngine}
-        fieldID={this.props.field.fieldId}
+        fieldID={this._field.fieldId}
         onTransformationCreated={this.handleTransformationChange}
         onClose={this.handleUIClose}
       />
@@ -170,10 +170,10 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
   public renderNewTransformationButton()
   {
-    const buttonText = this.props.field.transformations.size === 0 ?
+    const buttonText = this._field.transformations.size === 0 ?
       'Add a Transformation' :
       'Add Another Transformation';
-    const buttonStyle = this.props.field.transformations.size === 0 ?
+    const buttonStyle = this._field.transformations.size === 0 ?
       [fontColor(Colors().activeText, Colors().activeText), backgroundColor(Colors().active, Colors().activeHover)] :
       [fontColor(Colors().text3, Colors().active)];
     return (
@@ -193,7 +193,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
   public renderTransformationsList()
   {
-    const transformations = this.props.field.transformations;
+    const transformations = this._field.transformations;
     if (transformations.size !== 0)
     {
       return transformations.map(this.renderTransformationListItem);
@@ -230,7 +230,8 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
   public render()
   {
-    const { keyPath, field, canEdit, preview } = this.props;
+    const { canEdit, preview } = this.props;
+    const field = this._field;
     const transformations = field.transformations;
     return (
       <div className='template-editor-field-transformations'>

@@ -93,18 +93,18 @@ function getTemplateId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-function createFetchHandler(act): (hits: List<object>) => void
+function createFetchHandler(act: typeof TemplateEditorActions): (hits: List<object>) => void
 {
   return (hits) =>
   {
-    const { template, rootField } = createInitialTemplate(hits);
+    const { template, fieldMap } = createInitialTemplate(hits);
     act({
       actionType: 'setTemplate',
       template,
     });
     act({
-      actionType: 'setRoot',
-      rootField,
+      actionType: 'setFieldMap',
+      fieldMap,
     });
   }
 }

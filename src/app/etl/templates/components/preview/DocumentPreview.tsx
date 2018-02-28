@@ -53,8 +53,7 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
-import { TemplateField } from 'etl/templates/FieldTypes';
+import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
@@ -99,7 +98,7 @@ class DocumentPreview extends TerrainComponent<Props>
 
   public render()
   {
-    const { rootField, uiState } = this.props.templateEditor;
+    const { uiState } = this.props.templateEditor;
     const transformedPreviewDocument = this.getDocument();
 
     const isCurrentPreview = this.props.index === uiState.previewIndex;
@@ -119,14 +118,7 @@ class DocumentPreview extends TerrainComponent<Props>
         onClick={this.handleDocumentClicked}
       >
         <div className='preview-document-spacer'>
-          <TemplateEditorFieldNode
-            keyPath={emptyList}
-            field={rootField}
-            canEdit={false}
-            noInteract={true}
-            preview={transformedPreviewDocument}
-            displayKeyPath={emptyList}
-          />
+          <RootFieldNode />
         </div>
         <div
           key='fader'

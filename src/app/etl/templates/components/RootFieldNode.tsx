@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
+// tslint:disable:no-var-requires
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
@@ -56,91 +56,77 @@ import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import FadeInOut from 'common/components/FadeInOut';
 
-import { tooltip } from 'common/components/tooltip/Tooltips';
+import ExpandableView from 'common/components/ExpandableView';
 import { TemplateField } from 'etl/templates/FieldTypes';
-
-import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import { FieldMap } from 'etl/templates/TemplateTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import './TemplateEditorField.less';
+import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
+import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
-export interface Props extends TemplateEditorFieldProps
+interface Props
 {
-  hidePreviewValue?: boolean;
-  displayValueOverride?: any;
+  // injected props
+  fieldMap?: FieldMap;
+  transformationEngine?: TransformationEngine;
 }
 
-@Radium
-class TemplateEditorFieldPreview extends TemplateEditorField<Props>
+class RootFieldNode extends TerrainComponent<Props>
 {
+  public state: {
+    expandableViewOpen: boolean;
+  } = {
+      expandableViewOpen: false,
+    };
+
+  @memoizeOne
+  public computeRootFields(fieldMap: FieldMap): List<TemplateField>
+  {
+
+  }
+
+  public renderChildFields()
+  {
+    const { fieldMap } = this.props;
+    const rootFields = this.computeRootFields(fieldMap);
+    // return field.getSubfields().map((childField, index) =>
+    // {
+    //   const childPaths = this._getChildPaths(index);
+    //   const childPreview = preview != null ? preview[childField.name] : null;
+    //   return (
+    //     <TemplateEditorFieldNode
+    //       {...this._passProps({
+    //         keyPath: childPaths.keyPath,
+    //         field: childField,
+    //         canEdit: field.isIncluded && canEdit,
+    //         preview: childPreview,
+    //         displayKeyPath: childPaths.displayKeyPath,
+    //       })}
+    //       key={index}
+    //     />
+    //   );
+    // }).toList();
+  }
+
+
   public render()
   {
-    const { canEdit, preview, hidePreviewValue, displayValueOverride } = this.props;
-    const field = this._field;
-    const settingsOpen = this._settingsAreOpen();
-    const labelStyle = settingsOpen ?
-      fontColor(Colors().active, Colors().active)
-      :
-      fontColor(Colors().text2, Colors().text1);
-
-    const previewText = preview === undefined || preview === null ? 'N/A' : preview.toString();
-    const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
-      previewText : displayValueOverride;
-
     return (
-      <div className='template-editor-field-block'>
-        <div className='field-preview-row'>
-          <div className='field-preview-label-group' style={labelStyle}>
-            <div className={classNames({
-              'field-preview-label': true,
-            })}
-              onClick={this.handleLabelClicked}
-            >
-              {field.name}
-            </div>
-          </div>
-          {
-            !hidePreviewValue &&
-            <div
-              className={classNames({
-                'field-preview-value': true,
-                /*'field-preview-value-settings-open': settingsOpen,*/
-              })}
-              style={fontColor(Colors().text2)}
-            >
-              {previewContent}
-            </div>
-          }
-        </div>
+      <div className='template-editor-children-container'>
+        {this.renderChildFields()}
       </div>
     );
   }
-
-  public handleLabelClicked()
-  {
-    if (this._settingsAreOpen())
-    {
-      this.props.act({
-        actionType: 'closeSettings',
-      });
-    }
-    else
-    {
-      this.props.act({
-        actionType: 'setDisplayState',
-        state: {
-          settingsFieldId: this.props.fieldId,
-          settingsDisplayKeyPath: this.props.displayKeyPath,
-        },
-      });
-    }
-  }
 }
 
-const emptyOptions = List([]);
-
 export default Util.createTypedContainer(
-  TemplateEditorFieldPreview,
-  mapStateKeys,
-  mapDispatchKeys,
+  RootFieldNode,
+  [
+    ['templateEditor', 'fieldMap'],
+    ['templateEditor', 'template', 'transformationEngine']
+  ],
+  {},
 );

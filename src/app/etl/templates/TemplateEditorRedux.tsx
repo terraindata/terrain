@@ -58,6 +58,7 @@ import
   _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
+  FieldMap,
   ETLTemplate,
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
@@ -78,9 +79,9 @@ export interface TemplateEditorActionTypes
     actionType: 'setTemplate';
     template: ETLTemplate;
   };
-  setRoot: { // this should be the only way to edit the template tree
-    actionType: 'setRoot';
-    rootField: TemplateField;
+  setFieldMap: { // this should be the only way to edit the template tree
+    actionType: 'setFieldMap';
+    fieldMap: FieldMap;
   };
   addModalConfirmation: {
     actionType: 'addModalConfirmation';
@@ -115,8 +116,6 @@ export interface TemplateEditorActionTypes
   };
 }
 
-const ROOT_PATH = List(['rootField']);
-
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
 {
   public reducers: ConstrainedMap<TemplateEditorActionTypes, TemplateEditorState> =
@@ -126,9 +125,9 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         return state.set('isDirty', false).
           set('template', action.payload.template);
       },
-      setRoot: (state, action) =>
+      setFieldMap: (state, action) =>
       {
-        return state.set('isDirty', true).setIn(ROOT_PATH, action.payload.rootField);
+        return state.set('isDirty', true).set('fieldMap', action.payload.fieldMap);
       },
       addModalConfirmation: (state, action) =>
       {
@@ -155,7 +154,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       },
       closeSettings: (state, action) =>
       {
-        return state.setIn(['uiState', 'settingsKeyPath'], null).setIn(['uiState', 'settingsDisplayKeyPath'], null);
+        return state.setIn(['uiState', 'settingsFieldId'], null).setIn(['uiState', 'settingsDisplayKeyPath'], null);
       },
       updateEngineVersion: (state, action) =>
       {
