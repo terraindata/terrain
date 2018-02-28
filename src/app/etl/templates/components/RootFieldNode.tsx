@@ -59,14 +59,14 @@ const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 
 import ExpandableView from 'common/components/ExpandableView';
-import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
+import EditorFieldNode from 'etl/templates/components/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import './TemplateEditorField.less';
-import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
-import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
+import EditorFieldPreview from './EditorFieldPreview';
+import EditorFieldSettings from './EditorFieldSettings';
 
 interface Props
 {
@@ -107,7 +107,7 @@ class RootFieldNode extends TerrainComponent<Props>
     {
       const childPreview = preview != null ? preview[childField.name] : null;
       return (
-        <TemplateEditorFieldNode
+        <EditorFieldNode
           fieldId={childField.fieldId}
           noInteract={noInteract}
           canEdit={true}

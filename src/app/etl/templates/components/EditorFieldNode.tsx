@@ -61,8 +61,8 @@ import ExpandableView from 'common/components/ExpandableView';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
-import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
-import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
+import EditorFieldPreview from './EditorFieldPreview';
+import EditorFieldSettings from './EditorFieldSettings';
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -70,7 +70,7 @@ export interface Props extends TemplateEditorFieldProps
 }
 
 @Radium
-class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
+class EditorFieldNodeC extends TemplateEditorField<Props>
 {
   public state: {
     expandableViewOpen: boolean;
@@ -96,7 +96,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       const childField = this._field(childId);
       const childPreview = preview != null ? preview[childField.name] : null;
       return (
-        <TemplateEditorFieldNode
+        <EditorFieldNode
           {...this._passProps({
             fieldId: childId,
             canEdit: field.isIncluded && canEdit,
@@ -130,7 +130,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       previewLabel = previewExists ? '(List Empty)' : '(0 of 0)';
     }
     return (
-      <TemplateEditorFieldNode
+      <EditorFieldNode
         {...this._passProps({
           fieldId: childField.fieldId,
           canEdit: field.isIncluded && canEdit,
@@ -168,7 +168,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
         <div className='injected-content-container'>
           {showSettings ?
             <div className='injected-content-content' style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}>
-              <TemplateEditorFieldSettings
+              <EditorFieldSettings
                 {...this._passProps()}
               />
             </div> : null
@@ -189,7 +189,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     if (field.isArray() || field.isNested())
     {
       const content = (
-        <TemplateEditorFieldPreview
+        <EditorFieldPreview
           hidePreviewValue={true}
           labelOverride={previewLabel}
           {...this._passProps()}
@@ -218,7 +218,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     else
     {
       const content = (
-        <TemplateEditorFieldPreview
+        <EditorFieldPreview
           labelOverride={previewLabel}
           {...this._passProps()}
         />
@@ -246,10 +246,10 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
 const doNothing = () => null;
 
-const TemplateEditorFieldNode = Util.createTypedContainer(
-  TemplateEditorFieldNodeC,
+const EditorFieldNode = Util.createTypedContainer(
+  EditorFieldNodeC,
   mapStateKeys,
   mapDispatchKeys,
 );
 
-export default TemplateEditorFieldNode;
+export default EditorFieldNode;

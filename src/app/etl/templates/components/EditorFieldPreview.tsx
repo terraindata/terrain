@@ -43,107 +43,104 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
+// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
+
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-import './TemplateEditorPreviewControl.less';
-const { List } = Immutable;
-const ArrowIcon = require('images/icon_arrow.svg');
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
-export interface Props
+import './TemplateEditorField.less';
+
+export interface Props extends TemplateEditorFieldProps
 {
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
+  hidePreviewValue?: boolean;
+  displayValueOverride?: any;
+  labelOverride?: string;
 }
 
 @Radium
-class TemplateEditorPreviewControl extends TerrainComponent<Props>
+class EditorFieldPreview extends TemplateEditorField<Props>
 {
   public render()
   {
-    const { documents, previewIndex } = this.props.templateEditor.uiState;
-    const indexSelectorText = documents.size > 0 ?
-      `${previewIndex + 1} of ${documents.size}` :
-      'no preview available';
+    const { canEdit, preview, hidePreviewValue, displayValueOverride, labelOverride } = this.props;
+    const field = this._field();
+    const settingsOpen = this._settingsAreOpen();
+    const labelStyle = settingsOpen ?
+      fontColor(Colors().active, Colors().active)
+      :
+      fontColor(Colors().text2, Colors().text1);
 
-    const arrowStylerStyle = _.extend({}, fontColor(Colors().text2, Colors().text1));
+    const previewText = preview === undefined || preview === null ? 'N/A' : preview.toString();
+    const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
+      previewText : displayValueOverride;
 
     return (
-      <div className='template-editor-preview-control'>
-        <div className='preview-control-row' >
-          <div
-            className='preview-control-arrow-styler'
-            style={arrowStylerStyle}
-            onClick={this.handleDecrementDocument}
-            key='left-arrow'
-          >
-            <ArrowIcon className='preview-control-arrow-icon arrow-icon-left' />
+      <div className='template-editor-field-block'>
+        <div className='field-preview-row'>
+          <div className='field-preview-label-group' style={labelStyle}>
+            <div className={classNames({
+              'field-preview-label': true,
+            })}
+              onClick={this.handleLabelClicked}
+            >
+              {labelOverride != null ? labelOverride : field.name}
+            </div>
           </div>
-          <div className='preview-control-document-number' style={fontColor(Colors().text2)}>
-            {indexSelectorText}
-          </div>
-          <div
-            className='preview-control-arrow-styler'
-            style={arrowStylerStyle}
-            onClick={this.handleIncrementDocument}
-            key='right-arrow'
-          >
-            <ArrowIcon className='preview-control-arrow-icon arrow-icon-right' />
-          </div>
+          {
+            !hidePreviewValue &&
+            <div
+              className={classNames({
+                'field-preview-value': true,
+              })}
+              style={fontColor(Colors().text2)}
+            >
+              {previewContent}
+            </div>
+          }
         </div>
       </div>
     );
   }
 
-  public handleDecrementDocument()
+  public handleLabelClicked()
   {
-    const { documents, previewIndex } = this.props.templateEditor.uiState;
-    if (previewIndex > 0)
+    if (this._settingsAreOpen())
     {
       this.props.act({
         actionType: 'closeSettings',
       });
-      this.props.act({
-        actionType: 'setDisplayState',
-        state: {
-          previewIndex: previewIndex - 1,
-        },
-      });
     }
-  }
-
-  public handleIncrementDocument()
-  {
-    const { documents, previewIndex } = this.props.templateEditor.uiState;
-    if (previewIndex + 1 < documents.size)
+    else
     {
       this.props.act({
-        actionType: 'closeSettings',
-      });
-      this.props.act({
         actionType: 'setDisplayState',
         state: {
-          previewIndex: previewIndex + 1,
+          settingsFieldId: this.props.fieldId,
+          settingsDisplayKeyPath: this.props.displayKeyPath,
         },
       });
     }
   }
-
 }
 
-export default Util.createContainer(
-  TemplateEditorPreviewControl,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+const emptyOptions = List([]);
+
+export default Util.createTypedContainer(
+  EditorFieldPreview,
+  mapStateKeys,
+  mapDispatchKeys,
 );

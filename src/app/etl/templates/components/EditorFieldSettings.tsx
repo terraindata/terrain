@@ -77,7 +77,7 @@ enum ViewCategory
 }
 
 @Radium
-class TemplateEditorFieldSettings extends TemplateEditorField<Props>
+class EditorFieldSettings extends TemplateEditorField<Props>
 {
   public state: {
     currentCategory: ViewCategory,
@@ -187,7 +187,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 }
 
 export default Util.createTypedContainer(
-  TemplateEditorFieldSettings,
+  EditorFieldSettings,
   mapStateKeys,
   mapDispatchKeys,
 );

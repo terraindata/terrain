@@ -54,8 +54,8 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
-import TemplateEditorDocumentsPreview from 'etl/templates/components/preview/TemplateEditorDocumentsPreview';
-import TemplateEditorPreviewControl from 'etl/templates/components/preview/TemplateEditorPreviewControl';
+import EditorDocumentsPreview from 'etl/templates/components/preview/EditorDocumentsPreview';
+import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
@@ -119,7 +119,7 @@ class TemplateEditor extends TerrainComponent<Props>
               Preview
             </div>
             <div className='template-editor-preview-control-spacer'>
-              <TemplateEditorPreviewControl />
+              <EditorPreviewControl />
             </div>
           </div>
           <div
@@ -147,7 +147,7 @@ class TemplateEditor extends TerrainComponent<Props>
     return (
       <div className='template-editor-column preview-documents-column'>
         <div className='template-editor-title-bar' />
-        <TemplateEditorDocumentsPreview />
+        <EditorDocumentsPreview />
       </div>
     );
   }
