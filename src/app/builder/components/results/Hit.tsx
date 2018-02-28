@@ -126,7 +126,6 @@ class HitComponent extends TerrainComponent<Props> {
   public constructor(props: Props)
   {
     super(props);
-    console.log('HIT CONSTRUCTOR');
   }
 
   public componentWillMount()
@@ -207,9 +206,6 @@ class HitComponent extends TerrainComponent<Props> {
     }
     const height = NESTED_RESULT_HEIGHT * allValues.length;
     const depth = this.props.depth ? this.props.depth : 0;
-    // console.log(this.state.nestedFields);
-    // console.log('field', field);
-    // console.log('ALL VALUES', allValues);
     return (
       <div
         className='hit-nested-content'
@@ -266,9 +262,9 @@ class HitComponent extends TerrainComponent<Props> {
                   isNested={true}
                   style={borderColor(Colors().blockOutline)}
                   hitSize='small'
-                  // hit={_Hit({
-                  //   fields: Map(fields),
-                  // })}
+                  hit={_Hit({
+                    fields: Map(fields),
+                  })}
                   depth={depth + 1}
                   nestedFields={undefined}
                 />)
@@ -561,7 +557,7 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
         <div>
         {
-          this.props.hideNested !== true &&
+          (this.props.hideNested !== true) &&
           _.map(nestedFields, this.renderNestedField)
         }
         </div>
@@ -719,6 +715,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     if (List.isList(value))
     {
       value = JSON.stringify(value);
+      value = value.replace(/\"/g, '').replace(/,/g, ', ').replace(/\[/g, '').replace(/\]/g, '');
       tooltipText = JSON.stringify(value, null, 2);
       tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
     }
@@ -727,7 +724,12 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   {
     tooltipText = JSON.stringify(value, null, 2);
     tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
-    value = JSON.stringify(value);
+    let valueString = '';
+    for (const key in Util.asJS(value))
+    {
+      valueString += key + ': ' + JSON.stringify(Util.asJS(value)[key]) + ', ';
+    };
+    value = valueString.slice(0, -2);
   }
 
   if (format && !isTitle)

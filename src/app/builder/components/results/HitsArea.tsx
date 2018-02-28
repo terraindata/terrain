@@ -201,11 +201,10 @@ class HitsArea extends TerrainComponent<Props>
 
   public getNestedFields(props)
   {
-    console.log('GET NESTED FIELDS', props);
     // Get the fields that are nested
     const { builder, schema, resultsState } = props;
     const dataSource = props.query.path.source.dataSource;
-    const nestedFields = resultsState.fields.filter((field) =>
+    let nestedFields = resultsState.fields.filter((field) =>
     {
       const type = ElasticBlockHelpers.getTypeOfField(
         schema,
@@ -216,7 +215,15 @@ class HitsArea extends TerrainComponent<Props>
       );
       return type === 'nested' || type === '';
     }).toList();
-    console.log('nested fields are', nestedFields);
+    // Filter out anything that it is a single object, not a list of objects
+    if (resultsState.hits && resultsState.hits.size)
+    {
+      nestedFields = nestedFields.filter((field) =>
+        {
+          return List.isList(resultsState.hits.get(0).fields.get(field))
+        }
+      );
+    }
     this.setState({
       nestedFields,
     });
@@ -314,7 +321,7 @@ class HitsArea extends TerrainComponent<Props>
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
           hitSize={hitSize}
-          nestedFields={List([])}
+          nestedFields={this.state.nestedFields}
         />
       </div>
     );
@@ -665,7 +672,7 @@ class HitsArea extends TerrainComponent<Props>
                   onSpotlightAdded={this.handleSpotlightAdded}
                   onSpotlightRemoved={this.handleSpotlightRemoved}
                   hitSize={this.state.hitSize}
-                  nestedFields={List([])}
+                  nestedFields={this.state.nestedFields}
                 />
               );
             })
