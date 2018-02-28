@@ -61,6 +61,7 @@ import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
 import CSVExportTransform from './streams/CSVExportTransform';
+import JSONExportTransform from './streams/JSONExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
@@ -99,12 +100,6 @@ export class Export
         return reject('Filetype must be either CSV or JSON.');
       }
 
-      let objectKeyValue: string | undefined;
-      if (exprt.filetype === 'json [type object]' && exprt.objectKey !== undefined)
-      {
-        objectKeyValue = exprt.objectKey;
-      }
-
       if (headless)
       {
         // get a template given the template ID
@@ -127,10 +122,6 @@ export class Export
       if (exprt.columnTypes === undefined)
       {
         return reject('Must provide export template column types.');
-      }
-      if (exprt.filetype === 'json [type object]' && objectKeyValue !== undefined)
-      {
-        exprt.objectKey = objectKeyValue;
       }
 
       // get query data from algorithmId or query (or variant Id if necessary)
@@ -176,18 +167,7 @@ export class Export
       }
       else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
       {
-        writer = new stream.PassThrough();
-      }
-
-      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        if (exprt.filetype === 'json [type object]')
-        {
-          writer.write('{ \"');
-          writer.write(exprt.objectKey);
-          writer.write('\":');
-        }
-        writer.write('[');
+        writer = new JSONExportTransform();
       }
 
       const originalMapping: object = {};
@@ -235,7 +215,6 @@ export class Export
           mapping: originalMapping,
         };
 
-        let isFirstJSONObj: boolean = true;
         respStream.on('data', (doc) =>
         {
           if (doc === undefined || doc === null)
@@ -246,24 +225,7 @@ export class Export
           try
           {
             doc = this._postProcessDoc(doc, cfg);
-            if (exprt.filetype === 'csv')
-            {
-              writer.write(doc);
-            }
-            else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-            {
-              isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-              writer.write(JSON.stringify(doc));
-            }
-
-            if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-            {
-              writer.write(']');
-              if (exprt.filetype === 'json [type object]')
-              {
-                writer.write('}');
-              }
-            }
+            writer.write(doc);
           }
           catch (e)
           {
