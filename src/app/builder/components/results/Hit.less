@@ -47,7 +47,7 @@
 .result {
   // margin-top: @standard-margin;
 
-  position: relative;
+  // position: relative;
   z-index: 400;
   &:hover {
     .result-inner .result-name {
@@ -84,7 +84,7 @@
     border-top-left-radius: 5px;
     // background: @result-name-bg;
     box-sizing: border-box;
-    position: relative;
+   // position: relative;
     display: flex;
     margin-bottom: 6px;
     
@@ -123,7 +123,7 @@
 
   .result-inner {
     .normal-text;
-    position: relative;
+  //  position: relative;
     border-radius: 4px;
     display: flex;
     // overflow: hidden;
@@ -209,7 +209,7 @@
       &:not(.results-are-small) {
         border-bottom: 1px solid @light-black;
       }
-      padding: 2px 1%;
+      padding: 2px;
       width: 46%;
 
       &.result-field-hide-field {
@@ -232,7 +232,7 @@
         color: @light-black;
         &.result-field-name-header {
           position: absolute;
-          top: -24px;
+          top: 20px;
           width: auto;
         }
       }
@@ -467,6 +467,24 @@
 // Nested results styling (can move later)
 .hit-nested-content {
     position: relative;
+    ::-webkit-scrollbar {
+        width: 0px;  /* remove scrollbar space */
+        background: transparent;  /* optional: just make scrollbar invisible */
+    }
+  .hit-content-scroll-forward, .hit-content-scroll-back {
+    position: absolute;
+    top: 24px;
+    cursor: pointer;
+    height: 12px;
+    width: 12px;
+  }
+  .hit-content-scroll-back {
+    left: 246px;
+    .rotate180;
+  }
+  .hit-content-scroll-forward {
+    right: 28px;
+  }
   .result {
     margin: 0px;
     &:not(:last-child) {
@@ -475,8 +493,12 @@
   }
   .hit-column-names {
     height: 15px;
-    border-bottom: 1px solid;
-  }
+    border: 1px solid;
+      border-top: none;
+    }
+    .hit-nested-content-values {
+       overflow-y: scroll;
+    } 
   .hit-nested-content-header {
     display: flex;
     position: relative;
@@ -489,6 +511,12 @@
     .hit-nested-content-expand {
       position: absolute;
       right: 4px;
+    }
+    .result-fields-wrapper 
+      {
+        &.results-are-small {
+          overflow: hidden;
+      }
     }
     .hit-nested-content-expand, .hit-nested-content-title {
       &:hover {

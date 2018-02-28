@@ -56,7 +56,7 @@ import './Hit.less';
 const { List, Map } = Immutable;
 import Draggable from 'react-draggable';
 import { _Format, _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import MapUtil from '../../../util/MapUtil';
@@ -72,11 +72,11 @@ import ExpandIcon from 'app/common/components/ExpandIcon';
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
+const CarrotIcon = require('images/icon_carrot?name=CarrotIcon');
 
 // TODO REMOVE
 import Actions from '../../data/BuilderActions';
 
-const NESTED_RESULT_HEIGHT = 55;
 const MAX_DEFAULT_FIELDS = 4;
 
 export interface Props
@@ -97,6 +97,7 @@ export interface Props
   nestedFields?: List<string>;
   hideNested?: boolean;
   hideFieldNames?: boolean;
+  firstVisibleField?: number;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -105,11 +106,15 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 
   locations?: { [field: string]: any };
-  isNested?: boolean;
-
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
   spotlightActions?: typeof SpotlightActions;
+}
+
+enum NestedState {
+  Normal,
+  Collapsed,
+  Expanded,
 }
 
 @Radium
@@ -117,13 +122,15 @@ class HitComponent extends TerrainComponent<Props> {
 
   public state: {
     hovered: boolean;
-    nestedStates: Immutable.Map<string, string>,
-    nestedFields: string[]
+    nestedStates: Immutable.Map<string, NestedState>,
+    nestedFields: string[],
+    scrollState: Immutable.Map<string, number>,
   } =
     {
       hovered: false,
-      nestedStates: Map<string, string>({}),
+      nestedStates: Map<string, NestedState>({}),
       nestedFields: undefined,
+      scrollState: Map<string, number>({}),
     };
 
   public constructor(props: Props)
@@ -187,14 +194,14 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
-  public changeNestedState(state, field)
+  public changeNestedState(state: NestedState, field: string)
   {
     this.setState({
       nestedStates: this.state.nestedStates.set(field, state),
     });
   }
 
-  public renderNestedFieldHeader(field, depth, size, expandState)
+  public renderNestedFieldHeader(field, depth, size, expandState: NestedState)
   {
     return (
       <div
@@ -207,7 +214,8 @@ class HitComponent extends TerrainComponent<Props> {
           className='hit-nested-content-title'
           onClick={this._fn(
             this.changeNestedState,
-            expandState !== 'collapsed' ? 'collapsed' : 'normal',
+            expandState !== NestedState.Collapsed ?
+                NestedState.Collapsed : NestedState.Normal,
             field)}
         >
           {field} ({size})
@@ -218,10 +226,11 @@ class HitComponent extends TerrainComponent<Props> {
             className='hit-nested-content-expand'
           >
             <ExpandIcon
-              open={expandState === 'expanded'}
+              open={expandState === NestedState.Expanded}
               onClick={this._fn(
                 this.changeNestedState,
-                expandState !== 'expanded' ? 'expanded' : 'normal',
+                expandState !== NestedState.Expanded ?
+                    NestedState.Expanded : NestedState.Normal,
                 field
               )}
             />
@@ -229,6 +238,14 @@ class HitComponent extends TerrainComponent<Props> {
         }
       </div>
     );
+  }
+
+  public handleScroll(field, change)
+  {
+    const prevState = this.state.scrollState.get(field) || 0;
+    this.setState({
+      scrollState: this.state.scrollState.set(field, prevState + change);
+    })
   }
 
   public renderNestedField(field)
@@ -243,11 +260,10 @@ class HitComponent extends TerrainComponent<Props> {
     }
     const expandState = this.state.nestedStates.get(field);
     const size = allValues.length;
-    if (expandState === 'normal' || !expandState)
+    if (expandState === NestedState.Normal || !expandState)
     {
       allValues = allValues.slice(0, 1);
     }
-    const height = NESTED_RESULT_HEIGHT * allValues.length;
     const depth = this.props.depth ? this.props.depth : 0;
     return (
       <div
@@ -256,17 +272,43 @@ class HitComponent extends TerrainComponent<Props> {
         style={[
           { left: depth > 0 ? 15 : 0 },
           { width: `calc(100% - ${depth > 0 ? 15 : 0}px` },
-        ]}
+      ]}
       >
+        {
+          this.renderNestedFieldHeader(field, depth, size, expandState)
+        }
+        <div
+          className='hit-column-names'
+          style={[borderColor(Colors().blockOutline),
+            backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
+        />
+        {
+          this.state.scrollState.get(field) ?
+          <div
+            onClick={this._fn(this.handleScroll, field, -1)}
+            className='hit-content-scroll-back'
+            style={getStyle('fill', Colors().iconColor, Colors().activeHover)}
+            key='forward-icon'
+          >
+            <CarrotIcon />
+          </div>
+          :
+          null
+        }
+          <div
+            onClick={this._fn(this.handleScroll, field, 1)}
+            className='hit-content-scroll-forward'
+            style={getStyle('fill', Colors().iconColor, Colors().activeHover)}
+            key='back-icon'
+          >
+            <CarrotIcon />
+          </div>
         <div
           className='hit-nested-content-values'
-          style={backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)}
+          style={{height: expandState === NestedState.Expanded ? '100%' : 'auto'}}
         >
           {
-            this.renderNestedFieldHeader(field, depth, size, expandState)
-          }
-          {
-            expandState !== 'collapsed' &&
+            expandState !== NestedState.Collapsed &&
             allValues.map((fields, i) =>
             {
               if (fields['_source'])
@@ -287,7 +329,6 @@ class HitComponent extends TerrainComponent<Props> {
                   expanded={false}
                   allowSpotlights={false}
                   key={field + String(i)}
-                  isNested={true}
                   style={borderColor(Colors().blockOutline)}
                   hitSize='small'
                   hit={_Hit({
@@ -296,6 +337,7 @@ class HitComponent extends TerrainComponent<Props> {
                   depth={depth + 1}
                   nestedFields={undefined}
                   hideFieldNames={true}
+                  firstVisibleField={this.state.scrollState.get(field)}
                 />);
             },
             )
@@ -320,9 +362,9 @@ class HitComponent extends TerrainComponent<Props> {
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     let style = {};
-    if (hideFieldNames &&index !== 0)
+    if (hideFieldNames && index !== 0)
     {
-      style = {width: $(`#${field}-header`).width()};
+      style = {minWidth: $(`#${field}-header`).width()};
     }
     return (
       <div
@@ -333,6 +375,7 @@ class HitComponent extends TerrainComponent<Props> {
         })}
         style={style}
         key={field}
+        id={hideFieldNames && index === 0 ? String(field) + '-header' : ''}
       >
         {
           showField &&
@@ -348,6 +391,18 @@ class HitComponent extends TerrainComponent<Props> {
             }
           </div>
         }
+        {
+          // Need to duplicate the above, when we are rendering a header to make it's width count towards the parent
+          hideFieldNames && index === 0 &&
+          <div
+            className='result-field-name'
+            style={{visibility: 'hidden', height: 0, overflow: 'hidden', padding: 0}}
+          >
+            {
+              field
+            }
+          </div>
+        }
         <div
           className={classNames({
             'result-field-value': true,
@@ -356,7 +411,6 @@ class HitComponent extends TerrainComponent<Props> {
             'result-field-value-show-overflow': format && format.type === 'map',
             'result-field-value-header': hideFieldNames && index === 0,
           })}
-          id={hideFieldNames && index === 0 ? String(field) + '-header' : ''}
         >
           {
             value
@@ -464,7 +518,14 @@ class HitComponent extends TerrainComponent<Props> {
       ? this.props.nestedFields.toJS()
       : this.state.nestedFields !== undefined ?
         this.state.nestedFields : [];
-    const fields = getResultFields(hit, resultsConfig, nestedFields);
+    let fields = getResultFields(hit, resultsConfig, nestedFields);
+    if (this.props.hideFieldNames)
+    {
+      // Only show a set number of fields, starting at firstVisibleField (which is controlled by
+      // scroll buttons in the header)
+      const start = this.props.firstVisibleField || 0;
+      fields = fields.slice(start, start + 2)
+    }
     const configHasFields = resultsConfigHasFields(resultsConfig);
     let bottomContent: any;
     if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
@@ -507,14 +568,13 @@ class HitComponent extends TerrainComponent<Props> {
         style={this.props.style}
       >
         {
-          this.props.isNested &&
-          this.props.hideFieldNames &&
-          !this.props.hideNested &&
-          this.props.index === 0 &&
-          <div
-            className='hit-column-names'
-            style={borderColor(Colors().blockOutline)}
-          />
+          // this.props.hideFieldNames &&
+          // !this.props.hideNested &&
+          // this.props.index === 0 &&
+          // <div
+          //   className='hit-column-names'
+          //   style={borderColor(Colors().blockOutline)}
+          // />
         }
         <div
           onDoubleClick={this.expand}
