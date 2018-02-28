@@ -219,7 +219,7 @@ class HitComponent extends TerrainComponent<Props> {
               expandState !== 'expanded' ? 'expanded' : 'normal',
               field)}
           >
-            {expandState === 'expanded' ? 'Show Less' : 'Show More'}
+            {expandState === 'expanded' ? 'Less' : 'More'}
           </div>
         }
       </div>
