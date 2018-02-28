@@ -169,6 +169,7 @@ class PathfinderArea extends TerrainComponent<Props>
             />
           </div>
         </FadeInOut>
+        
         <div className='pathfinder-column-content'>
           <PathfinderSourceSection
             pathfinderContext={pathfinderContext}
@@ -180,6 +181,13 @@ class PathfinderArea extends TerrainComponent<Props>
           <FadeInOut
             open={path.step >= PathfinderSteps.Filter}
           >
+            <PathfinderScoreSection
+              pathfinderContext={pathfinderContext}
+              score={path.score}
+              keyPath={keyPath.push('score')}
+              onStepChange={this.incrementStep}
+            />
+            
             <PathfinderFilterSection
               pathfinderContext={pathfinderContext}
               filterGroup={path.filterGroup}
@@ -187,22 +195,7 @@ class PathfinderArea extends TerrainComponent<Props>
               onStepChange={this.incrementStep}
               toSkip={this.props.toSkip}
             />
-          </FadeInOut>
-
-          <FadeInOut
-            open={path.step >= PathfinderSteps.Score}
-          >
-            <PathfinderScoreSection
-              pathfinderContext={pathfinderContext}
-              score={path.score}
-              keyPath={keyPath.push('score')}
-              onStepChange={this.incrementStep}
-            />
-          </FadeInOut>
-
-          <FadeInOut
-            open={path.step >= PathfinderSteps.More}
-          >
+            
             <PathfinderMoreSection
               pathfinderContext={pathfinderContext}
               more={path.more}

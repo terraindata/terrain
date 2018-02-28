@@ -52,7 +52,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
@@ -77,6 +77,8 @@ export interface Props
   pathfinderContext: PathfinderContext;
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
+  comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
+  // so that we can make the according UI adjustments
 }
 
 const pieceStyle = {
@@ -104,26 +106,19 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
-
+    
     return (
       <div
-        className='pf-filter-line flex-container'
-        style={{
-          alignItems: 'flex-start',
-        }}
+        className={classNames({
+          'pf-filter-line': true,
+          'pf-filter-line-pre-group': this.props.comesBeforeAGroup,
+          'flex-container': true,
+        })}
+        style={getStyle('alignItems', 'flex-start')}
       >
         {
           this.renderPicker()
         }
-        {/*{
-          this.renderField()
-        }
-        {
-          this.renderMethod()
-        }
-        {
-          this.renderValue()
-        }*/}
         {/*{
           this.renderBoost()
         }

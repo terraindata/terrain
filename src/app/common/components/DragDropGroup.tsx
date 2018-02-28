@@ -209,11 +209,14 @@ class GroupComponent extends TerrainComponent<GroupProps>
           'drag-drop-group-collapsed': data.collapsed,
         })}
         style={_.extend(
-          {},
+          { 
+            width: `calc(100% - 12px)`,
+            margin: '0px 6px',
+            boxSizing: 'border-box',
+          },
           backgroundColor(Colors().blockBg),
           draggingStyle,
           droppingStyle,
-          { width: depth !== undefined ? `calc(100% - 12px)` : '100%' },
           this.props.style,
         )}
       >

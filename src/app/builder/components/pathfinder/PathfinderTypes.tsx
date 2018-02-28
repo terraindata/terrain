@@ -93,14 +93,35 @@ import { SchemaState } from 'schema/SchemaTypes';
 import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
+import PathfinderText from './PathfinderText';
 
 export enum PathfinderSteps
 {
   Source,
-  Filter,
-  Score,
-  More,
+  Filter, // rename
+  Score, // remove
+  More, // remove
 }
+
+
+/**
+ * Section: Classes representing parts of the view
+ */
+
+class ChoiceOptionC extends BaseClass
+{
+  public value: any = null; // a value to distinguish it to the parser
+  public displayName: string | number | El = '';
+  public color: string = null;
+  public tooltipContent: string | El = null;
+  public sampleData: List<Hit> = List([]);
+  public meta: any = null; // metadata, no specific shape, used for helper functions
+}
+export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
+export const _ChoiceOption = (config?: { [key: string]: any }) =>
+  New<ChoiceOption>(new ChoiceOptionC(config), config);
+
+  
 
 class PathC extends BaseClass
 {
@@ -143,10 +164,44 @@ export const _FilterGroup = (config?: { [key: string]: any }) =>
   return filterGroup;
 };
 
+export enum ScoreType
+{
+  terrain = 'terrain',
+  linear = 'linear',
+  elastic = 'elastic',
+  random = 'random',
+  none = 'none', 
+};
+
+export const ScoreTypesList =
+[
+  ScoreType.terrain,
+  ScoreType.linear,
+  ScoreType.elastic,
+  ScoreType.random,
+  ScoreType.none,
+];
+
+export const ScoreTypesChoices = List(ScoreTypesList.map(
+  (type) =>
+  {
+    const textConfig = PathfinderText.scoreSectionTypes[type] || {
+      title: type,
+      tooltip: '',
+    }; 
+    
+    return _ChoiceOption({
+      value: type,
+      displayName: textConfig.title,
+      tooltipContent: textConfig.tooltip,
+    });
+  }
+));
+
 class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
-  public type: 'terrain' | 'linear' | 'elastic' | 'random' | 'none' = 'terrain';
+  public type: ScoreType = ScoreType.terrain;
   public seed: number = 10; // For random scoring
 }
 export type Score = ScoreC & IRecord<ScoreC>;
@@ -742,22 +797,8 @@ const ElasticComparisons = [
   },
 ];
 
-/**
- * Section: Classes representing parts of the view
- */
 
-class ChoiceOptionC extends BaseClass
-{
-  public value: any = null; // a value to distinguish it to the parser
-  public displayName: string | number | El = '';
-  public color: string = null;
-  public tooltipContent: string | El = null;
-  public sampleData: List<Hit> = List([]);
-  public meta: any = null; // metadata, no specific shape, used for helper functions
-}
-export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
-export const _ChoiceOption = (config?: { [key: string]: any }) =>
-  New<ChoiceOption>(new ChoiceOptionC(config), config);
+
 
 /*
   Aggregation Types:

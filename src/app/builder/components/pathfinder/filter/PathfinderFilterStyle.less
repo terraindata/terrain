@@ -1,12 +1,11 @@
 @import "../../../../common/Common.less";
 
-.pf-filter-section
-{
-	margin-bottom: 45px;
-	padding: 0px 12px;
+.pf-filter-section {
+	
 	.pf-create {
 		margin-top: 12px;
 	}
+	
 	.pf-filter-line {
 		padding-top: 6px;
 		padding-left: 6px;
@@ -21,7 +20,15 @@
 				opacity: 1;
 			}
 		}
+		
+		&.pf-filter-line-pre-group {
+			// if it comes before a group, hide the line
+			.routeselector .routeselector-box-values {
+				border-color: rgba(255,255,255,0) !important;
+			}
+		}
 	}
+	
 	.pf-filter-group-header
 	{
 		height: 15px;

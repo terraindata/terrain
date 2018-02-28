@@ -375,12 +375,12 @@ export class RouteSelector extends TerrainComponent<Props>
             optionSet.headerText
           }
         </div>
-        <div
-          className='routeselector-util-row'
-        >
-          {/*TODO could hide this if it is not needed*/}
-          {
-            showTextbox ?
+        
+        {
+          showTextbox ?
+            <div
+              className='routeselector-util-row'
+            >
               <div
                 className='routeselector-search'
               >
@@ -388,22 +388,24 @@ export class RouteSelector extends TerrainComponent<Props>
                   textboxContent
                 }
               </div>
-              :
-              <KeyboardFocus
-                index={0 /* we handle index manipulation internally in this class */}
-                length={0}
-                onIndexChange={_.noop}
-                onSelect={_.noop}
-                onKeyDown={this.handleInputKeyDown}
-                onFocus={this._fn(this.handleOptionSearchFocus, index)}
-                onFocusLost={this._fn(this.handleOptionSearchFocusLost, index)}
-                focusOverride={this.state.focusedSetIndex === index}
-              />
-          }
-        </div>
+            </div>
+          :
+            <KeyboardFocus
+              index={0 /* we handle index manipulation internally in this class */}
+              length={0}
+              onIndexChange={_.noop}
+              onSelect={_.noop}
+              onKeyDown={this.handleInputKeyDown}
+              onFocus={this._fn(this.handleOptionSearchFocus, index)}
+              onFocusLost={this._fn(this.handleOptionSearchFocusLost, index)}
+              focusOverride={this.state.focusedSetIndex === index}
+            />
+        }
+        
         {
           getValueComponentContent
         }
+        
         <div
           className={classNames({
             'routeselector-options': true,
@@ -414,6 +416,11 @@ export class RouteSelector extends TerrainComponent<Props>
           {
             optionSet.options.map(this._fn(this.renderOption, index, visibleOptionCounter, incrementVisibleOptions))
           }
+          
+          {/*Add fodder, to help items space horizontally evenly. These will not appear*/}
+          <div className='routeselector-option-wrapper' />
+          <div className='routeselector-option-wrapper' />
+          <div className='routeselector-option-wrapper' />
         </div>
       </div>
     );

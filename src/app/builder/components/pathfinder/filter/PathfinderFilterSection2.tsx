@@ -61,7 +61,9 @@ import Util from 'app/util/Util';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
-import PathfinderFilterLine from './PathfinderFilterLine2';
+import PathfinderFilterLine from './PathfinderFilterLine';
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import PathfinderSectionTitle from '../PathfinderSectionTitle';
 
 export interface Props
 {
@@ -162,11 +164,17 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     // TODO consider 'removeIn' instead
   }
 
-  public renderFilterLine(filterLine, keyPath)
+  public renderFilterLine(filterLine, keyPath: List<string | number>)
   {
     const { pathfinderContext } = this.props;
+    
+    const successorKeyPath = keyPath.unshift('lines').set(keyPath.size, (keyPath.last() as number) + 1);
+    const successor = this.props.filterGroup.getIn(successorKeyPath);
+    
     // make key path relative to entire Path object
     keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
+    
+    
     return (
       <PathfinderFilterLine
         filterLine={filterLine}
@@ -175,6 +183,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         onChange={this.handleFilterChange}
         onDelete={this.handleFilterDelete}
         pathfinderContext={pathfinderContext}
+        comesBeforeAGroup={successor && this.isGroup(successor)}
       />
     );
   }
@@ -350,6 +359,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       <div
         className='pf-section pf-filter-section'
       >
+        <PathfinderSectionTitle
+          title={PathfinderText.hardFilterSectionTitle}
+          text={PathfinderText.hardFilterSectionSubtitle}
+        />
+        
         <CustomDragLayer />
         <DropZone
           keyPath={List([0])}
@@ -406,15 +420,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           text={'Filter Condition'}
           onCreate={this.handleAddFilter}
         />
-        {
-          this.props.pathfinderContext.step === PathfinderSteps.Filter &&
-          <div
-            onClick={this.handleStepChange}
-            className='pf-step-button'
-          >
-            Filters look good for now
-          </div>
-        }
       </div>
     );
   }

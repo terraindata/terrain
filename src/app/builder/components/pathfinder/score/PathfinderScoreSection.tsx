@@ -64,10 +64,12 @@ import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, Source } from '../PathfinderTypes';
+import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, Source,
+  ScoreType, ScoreTypesChoices } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 import './PathfinderScoreStyle.less';
 import { RouteSelector, RouteSelectorOptionSet, RouteSelectorOption } from 'app/common/components/RouteSelector';
+import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
 
 export interface Props
 {
@@ -319,38 +321,35 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
   public render()
   {
+    const { pathfinderContext, score } = this.props;
     const { source, step, canEdit } = this.props.pathfinderContext;
-    const types = _.keys(PathfinderText.scoreSectionTypes);
-    const typeDisplayNames = {};
-    types.forEach((type) =>
-    {
-      typeDisplayNames[type] = PathfinderText.scoreSectionTypes[type].title;
-    });
+    
     return (
       <div
         className='pf-section'
       >
-        {/*<PathfinderSectionTitle
+        <PathfinderSectionTitle
           title={PathfinderText.scoreSectionTitle}
           text={PathfinderText.scoreSectionSubtitle}
-        />*/}
-        <div className='pf-score-section-type'>
-          Score Type:
-          <Dropdown
-            options={List(types)}
-            optionsDisplayName={Map(typeDisplayNames)}
-            selectedIndex={types.indexOf(this.props.score.type)}
-            keyPath={this.props.keyPath.push('type')}
-            tooltips={List(types.map((type) => PathfinderText.scoreSectionTypes[type].tooltip))}
-            canEdit={canEdit}
-            action={this.props.builderActions.changePath}
-          />
-        </div>
+        />
+        
+        <SingleRouteSelector
+          options={ScoreTypesChoices}
+          value={score.type}
+          onChange={this.handleScoreTypeChange}
+          canEdit={canEdit}
+          shortNameText={PathfinderText.scoreTypeLabel}
+          headerText={PathfinderText.scoreTypeExplanation}
+          hasOther={false}
+          large={false}
+          hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
+        />
+        
         {
-          this.props.score.type === 'terrain' || this.props.score.type === 'linear' ?
+          score.type === 'terrain' || score.type === 'linear' ?
             <DragAndDrop
-              draggableItems={this.props.score.type === 'terrain' ?
-                this.getScoreLines(this.props.score.lines) : this.getLinearScoreLines(this.props.score.lines)
+              draggableItems={score.type === 'terrain' ?
+                this.getScoreLines(score.lines) : this.getLinearScoreLines(score.lines)
               }
               onDrop={this.handleLinesReorder}
               onDragStart={this.handleDragStart}
@@ -360,7 +359,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             null
         }
         {
-          this.props.score.type === 'terrain' || this.props.score.type === 'linear' ?
+          score.type === 'terrain' || score.type === 'linear' ?
             <PathfinderCreateLine
               canEdit={canEdit}
               onCreate={this.handleAddScoreLine}
@@ -370,7 +369,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             null
         }
         {
-          this.props.score.type === 'random' &&
+          score.type === 'random' &&
           <div
             className='pf-score-randomize-button'
             onClick={this.randomizeScore}
@@ -382,18 +381,15 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             Randomize
           </div>
         }
-
-        {
-          this.props.pathfinderContext.step === PathfinderSteps.Score &&
-          <div
-            onClick={this.handleStepChange}
-            style={[]}
-            className='pf-step-button'
-          >
-            Scoring looks good for now
-          </div>
-        }
       </div>
+    );
+  }
+  
+  private handleScoreTypeChange(value: ScoreType)
+  {
+    this.props.builderActions.changePath(
+      this.props.keyPath.push('type'),
+      value
     );
   }
 }

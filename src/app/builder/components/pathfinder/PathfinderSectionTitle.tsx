@@ -68,11 +68,11 @@ class PathfinderSectionTitle extends TerrainComponent<Props>
     return (
       <div
         className='pf-section-title'
-        style={backgroundColor(Colors().bg2)}
+        style={backgroundColor(Colors().bg)}
       >
         <div
           className='pf-section-title-title'
-          style={fontColor(Colors().text2)}
+          style={fontColor(Colors().text3)}
         >
           {
             title
