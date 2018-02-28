@@ -266,7 +266,7 @@ export class Export
     return this._getAllFieldsAndTypesFromQuery(database, qry, dbid);
   }
 
-  private _postProcessDoc(doc: object, cfg: any): object
+  public _postProcessDoc(doc: object, cfg: any): object
   {
     // merge groupJoins with _source if necessary
     doc = this._mergeGroupJoin(doc);

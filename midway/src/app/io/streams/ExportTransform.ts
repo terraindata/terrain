@@ -64,6 +64,6 @@ export default abstract class ExportTransform extends ADocumentTransform
 
   protected transform(input: object, chunkNumber: number): object
   {
-    return this.export_._postProcessDoc(input, this.configuration);
+    return this.exportt._postProcessDoc(input, this.configuration);
   }
 }
