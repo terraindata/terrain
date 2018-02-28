@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import Transform from 'stream';
+import { Transform } from 'stream';
 
 /**
  * Abstract class for transforming a result stream
