@@ -243,7 +243,6 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
         <div
           className='hit-nested-content-values'
-          style={{height: expandState === 'collapsed' ? 0 : height}}
         >
           {
             expandState !== 'collapsed' &&
@@ -333,6 +332,10 @@ class HitComponent extends TerrainComponent<Props> {
 
   public spotlight(e, overrideId?, overrideColor?)
   {
+    if (!this.props.allowSpotlights)
+    {
+      return;
+    }
     const id = overrideId || this.props.primaryKey;
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     const spotlightData = this.props.hit.toJS();
@@ -351,6 +354,10 @@ class HitComponent extends TerrainComponent<Props> {
 
   public unspotlight()
   {
+    if (!this.props.allowSpotlights)
+    {
+      return;
+    }
     this.props.onSpotlightRemoved(this.props.primaryKey);
     this.props.spotlightActions({
       actionType: 'clearSpotlightAction',

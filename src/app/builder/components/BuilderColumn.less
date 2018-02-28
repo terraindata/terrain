@@ -3,7 +3,7 @@
 @title-bar-height: 48px;
 @handle-width: 20px;
 @side-border-color: rgba(255,255,255,0.15);
-
+@margin-top: 38px;
 
 .builder-column {
   height: 100%;
@@ -170,7 +170,7 @@
     margin-left: 4px;
     z-index: 0;
     position: relative;
-    height: calc(~"100% - @{title-bar-height} - @{margin-top}");
+    height: calc(~"100% - @{title-bar-height} - @margin-top");
     padding-left: 12px !important;
     cursor: auto;
     overflow: hidden;

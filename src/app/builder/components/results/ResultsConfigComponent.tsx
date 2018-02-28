@@ -65,6 +65,7 @@ import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+import FloatingInput from 'app/common/components/FloatingInput';
 
 const Color = require('color');
 
@@ -98,12 +99,14 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     nestedFields: List<string>,
     showingNestedConfig: boolean,
     nestedField: string,
+    searchTerm: string,
   } = {
       lastHover: { index: null, field: null },
       config: null,
       nestedFields: List([]),
       showingNestedConfig: false,
       nestedField: '',
+      searchTerm: '',
     };
 
   constructor(props: Props)
@@ -403,6 +406,20 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     );
   }
 
+  public handleSearchTermChange(value)
+  {
+    this.setState({
+      searchTerm: value,
+    })
+  }
+
+  public getAvailableFields(fields, term)
+  {
+    return fields.filter((field) =>
+      field.toLowerCase().indexOf(term.toLowerCase()) !== -1
+    );
+  }
+
   public render()
   {
     const { config } = this.state;
@@ -416,6 +433,8 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       borderColor(Colors().border1),
       backgroundColor(Colors().bg1),
     ];
+
+    const availableFields = this.getAvailableFields(this.props.fields, this.state.searchTerm);
 
     return (
       <div className='results-config-wrapper'>
@@ -575,29 +594,39 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               </CRTarget>
             </div>
           </div>
-          <CRTarget
-            className='results-config-available-fields'
-            type={null}
-            onDrop={this.handleDrop}
-          >
-            {
-              this.props.fields.map((field) =>
-                <ResultsConfigResult
-                  key={field}
-                  field={field}
-                  is={this.fieldType(field)}
-                  isAvailableField={true}
-                  onRemove={this.handleRemove}
-                  format={formats.get(field)}
-                  onFormatChange={this.handleFormatChange}
-                  primaryKeys={config.primaryKeys}
-                  onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                  openConfig={this.handleOpenConfig}
-                  nested={this.state.nestedFields.indexOf(field) !== -1}
-                />,
-              )
-            }
-          </CRTarget>
+          <div>
+            <div className='results-config-input'>
+              <FloatingInput
+                value={this.state.searchTerm}
+                onChange={this.handleSearchTermChange}
+                label={'Search'}
+                isTextInput={true}
+              />
+            </div>
+            <CRTarget
+              className='results-config-available-fields'
+              type={null}
+              onDrop={this.handleDrop}
+            >
+              {
+                availableFields.map((field) =>
+                  <ResultsConfigResult
+                    key={field}
+                    field={field}
+                    is={this.fieldType(field)}
+                    isAvailableField={true}
+                    onRemove={this.handleRemove}
+                    format={formats.get(field)}
+                    onFormatChange={this.handleFormatChange}
+                    primaryKeys={config.primaryKeys}
+                    onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                    openConfig={this.handleOpenConfig}
+                    nested={this.state.nestedFields.indexOf(field) !== -1}
+                  />,
+                )
+              }
+            </CRTarget>
+          </div>
           <div className='results-config-disabled-veil'
             style={backgroundColor(Colors().fadedOutBg)}
           >
