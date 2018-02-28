@@ -219,9 +219,7 @@ class HitsArea extends TerrainComponent<Props>
     if (resultsState.hits && resultsState.hits.size)
     {
       nestedFields = nestedFields.filter((field) =>
-        {
-          return List.isList(resultsState.hits.get(0).fields.get(field))
-        }
+         List.isList(resultsState.hits.get(0).fields.get(field))
       );
     }
     this.setState({
@@ -320,7 +318,7 @@ class HitsArea extends TerrainComponent<Props>
           primaryKey={hit.primaryKey}
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
-          hitSize={hitSize}
+          hitSize={'large'}
           nestedFields={this.state.nestedFields}
         />
       </div>

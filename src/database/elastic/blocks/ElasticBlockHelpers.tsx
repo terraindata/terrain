@@ -274,6 +274,10 @@ export const ElasticBlockHelpers = {
 export function findCardType(name: string, builderState: BuilderState): List<Block>
 {
   let theCards = List([]);
+  if (!builderState.query)
+  {
+    return theCards;
+  }
   forAllCards(builderState.query.cards, (card) =>
   {
     if (card.type === name)

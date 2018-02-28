@@ -241,11 +241,18 @@
     .result-expanded-fields {
       margin-top: 10px;
       padding-top: 10px;
-
+      width: 100%;
+      margin-right: 16px;
+      .result-field {
+        width: 100%;
+      }
       .result-expanded-fields-title {
         text-align: center;
         font-size: 12px;
         margin-bottom: 10px;
+      }
+      .result-field {
+
       }
     }
 
@@ -370,10 +377,11 @@
   .transition;
 
   .result {
+    height: calc(~"100% - 86px");
     margin: 40px 0px;
-
+  
     .result-inner {
-      height: auto;
+      height: 100%;
       overflow: hidden;
 
       .result-field-value {

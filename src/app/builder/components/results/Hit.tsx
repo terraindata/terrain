@@ -205,7 +205,7 @@ class HitComponent extends TerrainComponent<Props> {
       allValues = allValues.slice(0, 1);
     }
     const height = NESTED_RESULT_HEIGHT * allValues.length;
-    const depth = this.props.depth ? this.props.depth : 0;
+    const depth = this.props.depth ? 1 : 0;
     return (
       <div
         className='hit-nested-content'
@@ -228,15 +228,18 @@ class HitComponent extends TerrainComponent<Props> {
           >
             {field} ({size})
           </div>
-           <div
-            className='hit-nested-content-expand'
-            onClick={this._fn(
-              this.changeNestedState,
-              expandState !== 'expanded' ? 'expanded' : 'normal',
-              field)}
-          >
-              {expandState === 'expanded' ? 'Show Less' : 'Show More'}
-          </div>
+          {
+            size > 1 &&
+             <div
+              className='hit-nested-content-expand'
+              onClick={this._fn(
+                this.changeNestedState,
+                expandState !== 'expanded' ? 'expanded' : 'normal',
+                field)}
+            >
+                {expandState === 'expanded' ? 'Show Less' : 'Show More'}
+            </div>
+          }
         </div>
         <div
           className='hit-nested-content-values'
@@ -249,6 +252,11 @@ class HitComponent extends TerrainComponent<Props> {
               if (fields['_source'])
               {
                 fields = _.extend({}, fields, fields['_source']);
+              }
+              // This happens when the source isn't properly set, such as in the Schema Browser
+              if (typeof fields !== 'object')
+              {
+                return null;
               }
               return (
                 <HitComponent
