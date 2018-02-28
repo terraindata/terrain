@@ -48,18 +48,20 @@ import * as Elastic from 'elasticsearch';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
+import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import QueryRequest from '../../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../../shared/database/types/QueryResponse';
+import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
+
 import ElasticStream from './ElasticStream';
-import { handleGroupJoin } from './GroupJoin';
 import { handleMergeJoin } from './MergeJoin';
 
 /**
@@ -147,7 +149,13 @@ export class ElasticQueryHandler extends QueryHandler
 
         if (query['groupJoin'] !== undefined)
         {
-          return handleGroupJoin(client, request, parser, query);
+          const groupJoinQuery = query['groupJoin'];
+          query['groupJoin'] = undefined;
+
+          const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
+          const childQueryStr = ESConverter.formatValueInfo(valueInfo);
+          const elasticStream = new ElasticStream(client, query);
+          return new GroupJoinTransform(client, elasticStream, childQueryStr);
         }
         else if (query['mergeJoin'] !== undefined)
         {
