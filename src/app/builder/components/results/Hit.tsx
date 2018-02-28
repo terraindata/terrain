@@ -94,6 +94,7 @@ export interface Props
   depth?: any;
   nestedFields?: List<string>;
   hideNested?: boolean;
+  hideFieldNames?: boolean;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -191,6 +192,40 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
+  public renderNestedFieldHeader(field, depth, size, expandState)
+  {
+    return (
+      <div
+        className='hit-nested-content-header'
+        style={[borderColor(Colors().blockOutline),
+        backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+        ]}
+      >
+        <div
+          className='hit-nested-content-title'
+          onClick={this._fn(
+            this.changeNestedState,
+            expandState !== 'collapsed' ? 'collapsed' : 'normal',
+            field)}
+        >
+          {field} ({size})
+        </div>
+        {
+          size > 1 &&
+          <div
+            className='hit-nested-content-expand'
+            onClick={this._fn(
+              this.changeNestedState,
+              expandState !== 'expanded' ? 'expanded' : 'normal',
+              field)}
+          >
+            {expandState === 'expanded' ? 'Show Less' : 'Show More'}
+          </div>
+        }
+      </div>
+    );
+  }
+
   public renderNestedField(field)
   {
     const config = this.props.resultsConfig;
@@ -219,37 +254,12 @@ class HitComponent extends TerrainComponent<Props> {
         ]}
       >
         <div
-          className='hit-nested-content-header'
-          style={[borderColor(Colors().blockOutline),
-          backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
-          ]}
-        >
-          <div
-            className='hit-nested-content-title'
-            onClick={this._fn(
-              this.changeNestedState,
-              expandState !== 'collapsed' ? 'collapsed' : 'normal',
-              field)}
-          >
-            {field} ({size})
-          </div>
-          {
-            size > 1 &&
-            <div
-              className='hit-nested-content-expand'
-              onClick={this._fn(
-                this.changeNestedState,
-                expandState !== 'expanded' ? 'expanded' : 'normal',
-                field)}
-            >
-              {expandState === 'expanded' ? 'Show Less' : 'Show More'}
-            </div>
-          }
-        </div>
-        <div
           className='hit-nested-content-values'
           style={backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)}
         >
+          {
+            this.renderNestedFieldHeader(field, depth, size, expandState)
+          }
           {
             expandState !== 'collapsed' &&
             allValues.map((fields, i) =>
@@ -280,6 +290,7 @@ class HitComponent extends TerrainComponent<Props> {
                   })}
                   depth={depth + 1}
                   nestedFields={undefined}
+                  hideFieldNames={true}
                 />);
             },
             )
@@ -307,13 +318,18 @@ class HitComponent extends TerrainComponent<Props> {
         className={classNames({
           'result-field': true,
           'results-are-small': this.props.hitSize === 'small',
+          'result-field-hide-field': this.props.hideFieldNames,
         })}
         key={field}
       >
         {
           showField &&
           <div
-            className='result-field-name'
+            className={classNames({
+              'result-field-name': true,
+              'result-field-name-header': this.props.hideFieldNames && this.props.index === 0
+            })}
+            style={this.props.hideFieldNames && this.props.index !== 0 ? {opacity: 0} : {}} // Keep them there to make sizing work
           >
             {
               field
@@ -326,6 +342,7 @@ class HitComponent extends TerrainComponent<Props> {
             'result-field-value-short': (field + value).length < 0,
             'result-field-value-number': typeof value === 'number',
             'result-field-value-show-overflow': format && format.type === 'map',
+            'result-field-value-header': this.props.hideFieldNames && this.props.index === 0,
           })}
         >
           {
@@ -474,113 +491,126 @@ class HitComponent extends TerrainComponent<Props> {
     return ((
       <div
         className={classes}
-        onDoubleClick={this.expand}
-        // onMouseEnter={this._fn(this.handleHover, true)}
-        // onMouseLeave={this._fn(this.handleHover, false)}
         style={this.props.style}
       >
+        {
+          this.props.isNested &&
+          this.props.hideFieldNames &&
+          !this.props.hideNested &&
+          this.props.index === 0 &&
+          <div
+            className='hit-column-names'
+            style={borderColor(Colors().blockOutline)}
+          />
+        }
         <div
-          className={classNames({
-            'result-inner': true,
-            'results-are-small': hitSize === 'small',
-          })}
-          style={[
-            borderColor(Colors().resultLine),
-            backgroundColor((depth + 1) % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
-          ]}
+          onDoubleClick={this.expand}
+          // onMouseEnter={this._fn(this.handleHover, true)}
+          // onMouseLeave={this._fn(this.handleHover, false)}
         >
-          {
-            thumbnail &&
-            [
-              <div
-                className={classNames({
-                  'result-thumbnail-wrapper': true,
-                  'results-are-small': hitSize === 'small',
-                })}
-                style={{
-                  backgroundImage: `url(${thumbnail})`,
-                  width: thumbnailWidth,
-                  minWidth: thumbnailWidth,
-                }}
-                key={1}
-              >
-              </div>
-              ,
-              this.state.hovered &&
-              <Draggable
-                axis='x'
-                bounds='parent'
-                position={{
-                  x: thumbnailWidth - 15,
-                  y: 0,
-                }}
-                onDrag={this.handleThumbnailResize}
-                key={2}
-              >
-                <div
-                  className='result-thumbnail-resizer'
-                />
-              </Draggable>,
-            ]
-          }
           <div
             className={classNames({
-              'result-details-wrapper': true,
+              'result-inner': true,
               'results-are-small': hitSize === 'small',
             })}
+            style={[
+              borderColor(Colors().resultLine),
+              backgroundColor((depth + 1) % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+            ]}
           >
+            {
+              thumbnail &&
+              [
+                <div
+                  className={classNames({
+                    'result-thumbnail-wrapper': true,
+                    'results-are-small': hitSize === 'small',
+                  })}
+                  style={{
+                    backgroundImage: `url(${thumbnail})`,
+                    width: thumbnailWidth,
+                    minWidth: thumbnailWidth,
+                  }}
+                  key={1}
+                >
+                </div>
+                ,
+                this.state.hovered &&
+                <Draggable
+                  axis='x'
+                  bounds='parent'
+                  position={{
+                    x: thumbnailWidth - 15,
+                    y: 0,
+                  }}
+                  onDrag={this.handleThumbnailResize}
+                  key={2}
+                >
+                  <div
+                    className='result-thumbnail-resizer'
+                  />
+                </Draggable>,
+              ]
+            }
             <div
               className={classNames({
-                'result-name': true,
+                'result-details-wrapper': true,
                 'results-are-small': hitSize === 'small',
               })}
             >
               <div
-                className='result-name-inner'
-                style={fontColor(Colors().text.baseLight)}
+                className={classNames({
+                  'result-name': true,
+                  'results-are-small': hitSize === 'small',
+                })}
               >
-                {
-                  this.renderSpotlight()
-                }
-                <div className='result-pin-icon'>
-                  <PinIcon />
-                </div>
-                <span className='result-name-label'>{name}</span>
-                {
-                  this.props.expanded &&
-                  <div
-                    onClick={this.expand}
-                    className='result-expanded-close-button'
-                  >
-                    <CloseIcon className='close close-icon' />
+                <div
+                  className='result-name-inner'
+                  style={fontColor(Colors().text.baseLight)}
+                >
+                  {
+                    this.renderSpotlight()
+                  }
+                  <div className='result-pin-icon'>
+                    <PinIcon />
                   </div>
+                  <span className='result-name-label'>{name}</span>
+                  {
+                    this.props.expanded &&
+                    <div
+                      onClick={this.expand}
+                      className='result-expanded-close-button'
+                    >
+                      <CloseIcon className='close close-icon' />
+                    </div>
+                  }
+                </div>
+              </div>
+              <div
+                className={classNames({
+                  'result-fields-wrapper': true,
+                  'results-are-small': hitSize === 'small',
+                })}
+              >
+                {score}
+                {
+                  _.map(fields, this.renderField)
+                }
+                {
+                  expandedContent
                 }
               </div>
-            </div>
-            <div
-              className={classNames({
-                'result-fields-wrapper': true,
-                'results-are-small': hitSize === 'small',
-              })}
-            >
-              {score}
               {
-                _.map(fields, this.renderField)
-              }
-              {
-                expandedContent
+                bottomContent
               }
             </div>
+          </div>
+          <div>
             {
-              bottomContent
+              (this.props.hideNested !== true) &&
+              _.map(nestedFields, this.renderNestedField)
             }
           </div>
-        </div>
-        <div>
-          {
-            (this.props.hideNested !== true) &&
-            _.map(nestedFields, this.renderNestedField)
-          }
         </div>
       </div>
     ));
