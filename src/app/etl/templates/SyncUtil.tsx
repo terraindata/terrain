@@ -91,8 +91,8 @@ export function createTreeFromEngine(engine: TransformationEngine): TemplateFiel
   const ids = engine.getAllFieldIDs();
   // sort the paths to ensure we visit parents before children
   const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
-  const rootId = sortedIds.get(0);
-  const rootField = createFieldFromEngine(engine, rootId);
+  // const rootId = sortedIds.get(0);
+  const rootField = _TemplateField({ })
   const tree = new FieldTreeProxy(rootField, engine);
   const rootNode = tree.getRootNode();
 
@@ -117,6 +117,7 @@ export function createTreeFromEngine(engine: TransformationEngine): TemplateFiel
     enginePathToNode[JSON.stringify(enginePath)] = newNode;
   });
   console.log(JSON.stringify(tree.getRootField().toJS(), null, 2));
+  console.log(engine);
   return tree.getRootField();
 }
 
@@ -143,7 +144,7 @@ export function createFieldFromEngine(
   return _TemplateField({
     isIncluded: engine.getFieldEnabled(id),
     fieldId: id,
-    type: engine.getFieldType(id),
+    type: engine.getFieldType(id) as FieldTypes,
     transformations,
     name: enginePath[enginePath.length - 1],
   });

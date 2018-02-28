@@ -59,13 +59,9 @@ class ElasticFieldSettingsC
   public langType: Languages = Languages.Elastic;
   public isAnalyzed: boolean = true;
   public analyzer: string = '';
-  public type: ElasticTypes = ElasticTypes.TEXT;
-  public arrayType: List<ElasticTypes> = List([ElasticTypes.TEXT]);
 }
 export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
-export const _ElasticFieldSettings = makeExtendedConstructor(ElasticFieldSettingsC, false, {
-  arrayType: List,
-});
+export const _ElasticFieldSettings = makeConstructor(ElasticFieldSettingsC);
 
 export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
 
@@ -75,39 +71,24 @@ class TemplateFieldC
   public readonly isIncluded: boolean = true;
   public readonly langSettings: ElasticFieldSettings = null;
   public readonly type: FieldTypes = 'object';
-  public readonly fieldId: number = 0;
+  public readonly fieldId: number = -1;
   public readonly name: string = '';
   public readonly children: List<TemplateField> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
 
   public isArray(): boolean
   {
-    const type = this.langSettings.type;
-    return type === ElasticTypes.ARRAY;
-  }
-
-  // returns how deep the array type is. For example, if the field's type is array of array of text, then the depth is 2.
-  public arrayDepth(): number
-  {
-    const { arrayType } = this.langSettings;
-    return this.isArray() ? arrayType.size : 0;
+    return this.type === 'array';
   }
 
   public isNested(): boolean
   {
-    const { type, arrayType } = this.langSettings;
-    return type === ElasticTypes.NESTED ||
-      (type === ElasticTypes.ARRAY && arrayType.size > 0 && arrayType.last() === ElasticTypes.NESTED);
+    return this.type === 'object';
   }
 
   public getSubfields() // TODO: if nothing fancy needs to happen, just directly access children
   {
     return this.children;
-  }
-
-  public getName(): string
-  {
-    return this.name;
   }
 
   public isRoot(keyPath): boolean

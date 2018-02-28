@@ -169,9 +169,10 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     };
   }
 
+  // for array types
   protected _getPreviewChildPaths(index, cacheKey = this.props.preview): { displayKeyPath: KeyPath, keyPath: KeyPath }
   {
-    const keyPath = this.props.keyPath;
+    const keyPath = this.getKPCachedFn(this.props.keyPath, cacheKey)(index);
     const displayKeyPath = this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
     return {
       keyPath,

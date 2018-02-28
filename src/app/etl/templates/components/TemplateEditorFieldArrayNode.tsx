@@ -73,141 +73,141 @@ export interface Props extends TemplateEditorFieldProps
   injectedContent?: any;
 }
 
-@Radium
-class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
-{
-  public state: {
-    expandableViewOpen: boolean;
-  } = {
-      expandableViewOpen: false,
-    };
+// @Radium
+// class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
+// {
+//   public state: {
+//     expandableViewOpen: boolean;
+//   } = {
+//       expandableViewOpen: false,
+//     };
 
-  public renderArrayChildren()
-  {
-    const { field, preview, depth, displayKeyPath } = this.props;
-    if (!Array.isArray(preview))
-    {
-      return (
-        <TemplateEditorFieldArrayNode
-          {...this._passProps({
-            preview: null,
-            displayKeyPath: displayKeyPath.push(0),
-          })}
-          renderNestedFields={this.props.renderNestedFields}
-          depth={depth + 1}
-          label={`N/A`}
-        />
-      );
-    }
-    else if (preview.length === 0)
-    {
-      return (
-        <TemplateEditorFieldArrayNode
-          {...this._passProps({
-            preview: null,
-            displayKeyPath: displayKeyPath.push(0),
-          })}
-          renderNestedFields={this.props.renderNestedFields}
-          depth={depth + 1}
-          label={`List Empty`}
-        />
-      );
-    }
-    else
-    {
-      const previewList = List(preview);
-      return previewList.map((value, index) =>
-      {
-        return (
-          <TemplateEditorFieldArrayNode
-            {...this._passProps({
-              preview: value,
-              displayKeyPath: displayKeyPath.push(index),
-            })}
-            key={index}
-            renderNestedFields={this.props.renderNestedFields}
-            depth={depth + 1}
-            label={`${index + 1} of ${previewList.size}`}
-          />
-        );
-      }).toList();
-    }
-  }
+//   public renderArrayChildren()
+//   {
+//     const { field, preview, depth, displayKeyPath } = this.props;
+//     if (!Array.isArray(preview))
+//     {
+//       return (
+//         <TemplateEditorFieldArrayNode
+//           {...this._passProps({
+//             preview: null,
+//             displayKeyPath: displayKeyPath.push(0),
+//           })}
+//           renderNestedFields={this.props.renderNestedFields}
+//           depth={depth + 1}
+//           label={`N/A`}
+//         />
+//       );
+//     }
+//     else if (preview.length === 0)
+//     {
+//       return (
+//         <TemplateEditorFieldArrayNode
+//           {...this._passProps({
+//             preview: null,
+//             displayKeyPath: displayKeyPath.push(0),
+//           })}
+//           renderNestedFields={this.props.renderNestedFields}
+//           depth={depth + 1}
+//           label={`List Empty`}
+//         />
+//       );
+//     }
+//     else
+//     {
+//       const previewList = List(preview);
+//       return previewList.map((value, index) =>
+//       {
+//         return (
+//           <TemplateEditorFieldArrayNode
+//             {...this._passProps({
+//               preview: value,
+//               displayKeyPath: displayKeyPath.push(index),
+//             })}
+//             key={index}
+//             renderNestedFields={this.props.renderNestedFields}
+//             depth={depth + 1}
+//             label={`${index + 1} of ${previewList.size}`}
+//           />
+//         );
+//       }).toList();
+//     }
+//   }
 
-  public render()
-  {
-    const { field, canEdit, preview, depth, label, displayKeyPath, injectedContent } = this.props;
-    let content = null;
-    const simpleArrayDisplay: boolean = !field.isNested() && depth + 1 === field.arrayDepth();
+//   public render()
+//   {
+//     const { field, canEdit, preview, depth, label, displayKeyPath, injectedContent } = this.props;
+//     let content = null;
+//     const simpleArrayDisplay: boolean = !field.isNested() && depth + 1 === field.arrayDepth();
 
-    if (depth === field.arrayDepth() && field.isNested())
-    {
-      content = this.props.renderNestedFields(preview, displayKeyPath);
-    }
-    else if (simpleArrayDisplay)
-    {
-      content = (
-        <div className='editor-array-item'>
-          <ArrayPreview items={preview} style={fontColor(Colors().text2)} />
-        </div>
-      );
-    }
-    else
-    {
-      content = (
-        <div style={depth !== 0 ? getStyle('marginLeft', '24px') : null}>
-          {this.renderArrayChildren()}
-        </div>
-      );
-    }
+//     if (depth === field.arrayDepth() && field.isNested())
+//     {
+//       content = this.props.renderNestedFields(preview, displayKeyPath);
+//     }
+//     else if (simpleArrayDisplay)
+//     {
+//       content = (
+//         <div className='editor-array-item'>
+//           <ArrayPreview items={preview} style={fontColor(Colors().text2)} />
+//         </div>
+//       );
+//     }
+//     else
+//     {
+//       content = (
+//         <div style={depth !== 0 ? getStyle('marginLeft', '24px') : null}>
+//           {this.renderArrayChildren()}
+//         </div>
+//       );
+//     }
 
-    const childrenComponent = content !== null ?
-      <div className='editor-array-children'>
-        {depth !== 0 ? <div className='editor-array-seperator'> {label} </div > : null}
-        {content}
-      </div> : null;
+//     const childrenComponent = content !== null ?
+//       <div className='editor-array-children'>
+//         {depth !== 0 ? <div className='editor-array-seperator'> {label} </div > : null}
+//         {content}
+//       </div> : null;
 
-    if (depth === 0)
-    {
-      const previewComponent = (
-        <TemplateEditorFieldPreview
-          hidePreviewValue={!simpleArrayDisplay}
-          displayValueOverride={simpleArrayDisplay ? content : null}
-          {...this._passProps()}
-        />
-      );
-      const childrenStyle = (canEdit === true && field.isIncluded === false) ?
-        getStyle('opacity', '0.5') : {};
-      return (
-        <ExpandableView
-          content={previewComponent}
-          open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
-          injectedContent={injectedContent}
-          children={simpleArrayDisplay ? null : childrenComponent}
-          style={childrenStyle}
-        />
-      );
-    }
-    else
-    {
-      return childrenComponent;
-    }
-  }
+//     if (depth === 0)
+//     {
+//       const previewComponent = (
+//         <TemplateEditorFieldPreview
+//           hidePreviewValue={!simpleArrayDisplay}
+//           displayValueOverride={simpleArrayDisplay ? content : null}
+//           {...this._passProps()}
+//         />
+//       );
+//       const childrenStyle = (canEdit === true && field.isIncluded === false) ?
+//         getStyle('opacity', '0.5') : {};
+//       return (
+//         <ExpandableView
+//           content={previewComponent}
+//           open={this.state.expandableViewOpen}
+//           onToggle={this.handleExpandArrowClicked}
+//           injectedContent={injectedContent}
+//           children={simpleArrayDisplay ? null : childrenComponent}
+//           style={childrenStyle}
+//         />
+//       );
+//     }
+//     else
+//     {
+//       return childrenComponent;
+//     }
+//   }
 
-  public handleExpandArrowClicked()
-  {
-    this.setState({
-      expandableViewOpen: !this.state.expandableViewOpen,
-    });
-  }
+//   public handleExpandArrowClicked()
+//   {
+//     this.setState({
+//       expandableViewOpen: !this.state.expandableViewOpen,
+//     });
+//   }
 
-}
+// }
 
-const TemplateEditorFieldArrayNode = Util.createTypedContainer(
-  TemplateEditorFieldArrayNodeC,
-  mapStateKeys,
-  mapDispatchKeys,
-);
+// const TemplateEditorFieldArrayNode = Util.createTypedContainer(
+//   TemplateEditorFieldArrayNodeC,
+//   mapStateKeys,
+//   mapDispatchKeys,
+// );
 
-export default TemplateEditorFieldArrayNode;
+// export default TemplateEditorFieldArrayNode;

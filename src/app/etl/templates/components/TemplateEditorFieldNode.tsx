@@ -61,7 +61,6 @@ import ExpandableView from 'common/components/ExpandableView';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
-import TemplateEditorFieldArrayNode from './TemplateEditorFieldArrayNode';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
@@ -76,18 +75,18 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       expandableViewOpen: false,
     };
 
-  public renderChildFields(preview: any, displayKeyPath: KeyPath)
+  public renderChildFields()
   {
-    const { field, keyPath, canEdit } = this.props;
-    return field.getSubfields().map((value, index) =>
+    const { field, canEdit, preview, keyPath, displayKeyPath } = this.props;
+    return field.getSubfields().map((childField, index) =>
     {
       const childPaths = this._getChildPaths(index);
-      const childPreview = preview !== undefined && preview !== null ? preview[value.name] : null;
+      const childPreview = preview != null ? preview[childField.name] : null;
       return (
         <TemplateEditorFieldNode
           {...this._passProps({
             keyPath: childPaths.keyPath,
-            field: value,
+            field: childField,
             canEdit: field.isIncluded && canEdit,
             preview: childPreview,
             displayKeyPath: childPaths.displayKeyPath,
@@ -97,6 +96,48 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       );
     }).toList();
   }
+
+  // public renderArrayChildren()
+  // {
+  //   const { field, canEdit, preview, keyPath, displayKeyPath } = this.props;
+
+  //   const childField = field.getSubfields().get(0);
+  //   const childFieldKeyPath = this._getChildPaths(0).keyPath;
+
+  //   if (!Array.isArray(preview) || preview.length === 0)
+  //   {
+  //     const childDisplayKeyPath = this._getPreviewChildPaths(0).displayKeyPath;
+  //     return (
+  //       <TemplateEditorFieldNode
+  //         {...this._passProps({
+  //           field: childField,
+  //           preview: null,
+  //           keyPath: childFieldKeyPath,
+  //           displayKeyPath: childDisplayKeyPath,
+  //         })}
+  //       />
+  //     );
+  //   }
+  //   else
+  //   {
+  //     const previewList = List(preview);
+  //     return previewList.map((value, index) =>
+  //     {
+  //       const childDisplayKeyPath = this._getPreviewChildPaths(index).displayKeyPath;
+  //       return (
+  //         <TemplateEditorFieldNode
+  //           {...this._passProps({
+  //             field: childField,
+  //             preview: value,
+  //             keyPath: childFieldKeyPath,
+  //             displayKeyPath: childDisplayKeyPath,
+  //           })}
+  //           key={index}
+  //         />
+  //       );
+  //     }).toList();
+  //   }
+  // }
 
   public renderSettingsContainer()
   {
@@ -123,7 +164,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     {
       return (
         <div className='template-editor-children-container'>
-          {this.renderChildFields(preview, displayKeyPath)}
+          {this.renderChildFields()}
         </div>
       );
     }
@@ -134,18 +175,12 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
     if (field.isArray())
     {
-      return (
-        <TemplateEditorFieldArrayNode
-          depth={0}
-          renderNestedFields={this.renderChildFields}
-          injectedContent={injectedContent}
-          {...this._passProps()}
-        />
-      );
+      // tslint:disable-next-line
+      console.error('arrays are not supported'); // TODO
     }
     else if (field.isNested())
     {
-      children = this.renderChildFields(preview, displayKeyPath);
+      children = this.renderChildFields();
       content = (
         <TemplateEditorFieldPreview
           hidePreviewValue={true}
@@ -165,6 +200,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       <div className='template-editor-children-container'>
         {children}
       </div>;
+
     const childrenStyle = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.5') : {};
 
