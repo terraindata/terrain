@@ -71,7 +71,6 @@ import { EditorDisplayState, ETLTemplate, FieldMap, TemplateEditorState } from '
 export interface TemplateEditorFieldProps
 {
   // keyPath: KeyPath; // keyPath from the root field to this field
-  // field: TemplateField;
   fieldId: number;
   canEdit: boolean;
   noInteract: boolean; // determines if the template editor is not interactable (e.g. the side preview)
@@ -143,22 +142,22 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return !compareObjects(this.props, nextProps, customComparatorMap);
   }
 
-  get _template(): ETLTemplate
+  public _template(): ETLTemplate
   {
     return (this.props as Props & Injected).template;
   }
 
-  get _fieldMap(): FieldMap
+  public _fieldMap(): FieldMap
   {
     return (this.props as Props & Injected).fieldMap;
   }
 
-  get _field(): TemplateField
+  public _field(id = this.props.fieldId): TemplateField
   {
-    return this._fieldMap.get(this.props.fieldId);
+    return this._fieldMap().get(id);
   }
 
-  get _uiState(): PropertyTracker<EditorDisplayState>
+  public _uiState(): PropertyTracker<EditorDisplayState>
   {
     return this.uiStateTracker;
   }
@@ -171,8 +170,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _proxy(): FieldNodeProxy
   {
-    const engine = this._template.transformationEngine;
-    const tree = new FieldTreeProxy(this._fieldMap, engine, this.onRootMutationBound, this.updateEngineVersionBound);
+    const engine = this._template().transformationEngine;
+    const tree = new FieldTreeProxy(this._fieldMap(), engine, this.onRootMutationBound, this.updateEngineVersionBound);
     return new FieldNodeProxy(tree, this.props.fieldId);
   }
 
@@ -183,7 +182,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _inputDisabled(): boolean
   {
-    return !this._field.isIncluded || !this.props.canEdit;
+    return !this._field().isIncluded || !this.props.canEdit;
   }
 
   protected _settingsAreOpen(): boolean
@@ -194,7 +193,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _willFieldChange(nextProps)
   {
-    return this._fieldMap.get(this.props.fieldId) !==
+    return this._fieldMap().get(this.props.fieldId) !==
       (nextProps as Props & Injected).fieldMap.get(this.props.fieldId);
   }
 

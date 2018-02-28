@@ -169,10 +169,11 @@ function unhashPath(keypath: string)
   return EnginePath(JSON.parse(keypath));
 }
 
-function turnIndicesIntoWildcards(
+function turnIndicesIntoValue(
   keypath: EnginePath,
   engine: TransformationEngine,
-  mapping: { [k: string]: number },
+  pathToIdMap: { [k: string]: number },
+  value = '*',
 ): EnginePath
 {
   if (keypath.size === 0)
@@ -183,7 +184,7 @@ function turnIndicesIntoWildcards(
   for (const i of _.range(1, keypath.size))
   {
     const parentPath = keypath.slice(0, i).toList();
-    const parentId = mapping[hashPath(parentPath)];
+    const parentId = pathToIdMap[hashPath(parentPath)];
 
     if (parentId !== undefined && engine.getFieldType(parentId) === 'array')
     {
@@ -192,7 +193,7 @@ function turnIndicesIntoWildcards(
   }
   return keypath.map((key, i) =>
   {
-    return arrayIndices[i] === true ? '*' : key;
+    return arrayIndices[i] === true ? value : key;
   }).toList();
 }
 
@@ -228,6 +229,22 @@ function isAValidField(keypath: EnginePath, pathTypes: { [k: string]: FieldTypes
   return true;
 }
 
+function addFieldsToEngine(
+  pathTypes: { [k: string]: FieldTypes },
+  engine: TransformationEngine
+)
+{
+  const hashedPaths = List(Object.keys(pathTypes));
+  hashedPaths.forEach((hashedPath, i) =>
+  {
+    if (isAValidField(unhashPath(hashedPath), pathTypes))
+    {
+      const fieldType = pathTypes[hashedPath];
+      engine.addField(unhashPath(hashedPath), fieldType);
+    }
+  });
+}
+
 function createMergedEngine(documents: List<object>):
   {
     engine: TransformationEngine,
@@ -243,12 +260,12 @@ function createMergedEngine(documents: List<object>):
     const e: TransformationEngine = new TransformationEngine(doc);
     const fieldIds = e.getAllFieldIDs();
     const pathToIdMap = createPathToIdMap(e);
-    // fieldIds = fieldIds.sortBy((a, b) => e.getOutputKeyPath(a).size - e.getOutputKeyPath(b).size);
+
     fieldIds.forEach((id, j) =>
     {
       const currentType: FieldTypes = e.getFieldType(id) as FieldTypes;
-      const wildCardedPath = turnIndicesIntoWildcards(e.getOutputKeyPath(id), e, pathToIdMap);
-      const path = hashPath(wildCardedPath);
+      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), e, pathToIdMap, '0');
+      const path = hashPath(deIndexedPath);
       if (pathTypes[path] !== undefined)
       {
         const existingType = pathTypes[path];
@@ -284,15 +301,7 @@ function createMergedEngine(documents: List<object>):
   });
 
   const engine = new TransformationEngine();
-  const hashedPaths = List(Object.keys(pathTypes));
-  hashedPaths.forEach((hashedPath, i) =>
-  {
-    if (isAValidField(unhashPath(hashedPath), pathTypes))
-    {
-      const fieldType = pathTypes[hashedPath];
-      engine.addField(unhashPath(hashedPath), fieldType);
-    }
-  });
+  addFieldsToEngine(pathTypes, engine);
   return {
     engine,
     warnings,

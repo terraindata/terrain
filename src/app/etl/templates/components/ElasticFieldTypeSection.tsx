@@ -89,17 +89,17 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
 
   // public getDataTypeListIndex(): number
   // {
-  //   return this._getTypeListIndex(this._field.langSettings.type);
+  //   return this._getTypeListIndex(this._field().langSettings.type);
   // }
 
   // public getArrayTypeListIndex(arrayTypeIndex): number
   // {
-  //   return this._getTypeListIndex(this._field.langSettings.arrayType.get(arrayTypeIndex));
+  //   return this._getTypeListIndex(this._field().langSettings.arrayType.get(arrayTypeIndex));
   // }
 
   // // public setLangSettings<K extends keyof ElasticFieldSettings>(key: K, value: ElasticFieldSettings[K])
   // // {
-  // //   this._proxy().set('langSettings', this._field.langSettings.set(key, value));
+  // //   this._proxy().set('langSettings', this._field().langSettings.set(key, value));
   // // }
 
   // public renderAnalyzerSection()
@@ -192,7 +192,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
   //   // }
   //   // const { field, act } = this.props;
   //   // const nextType = elasticTypeOptions.get(index);
-  //   // const currentType = this._field.langSettings.type;
+  //   // const currentType = this._field().langSettings.type;
   //   // if (currentType === ElasticTypes.ARRAY && nextType !== ElasticTypes.ARRAY)
   //   // { // if user changes type from array, clear the array type
   //   //   this.setLangSettings('arrayType', List([ElasticTypes.TEXT]));
@@ -227,7 +227,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
   // {
   //   return (index: number) =>
   //   {
-  //     // if (arrayTypeIndex >= this._field.langSettings.arrayType.size
+  //     // if (arrayTypeIndex >= this._field().langSettings.arrayType.size
   //     //   || arrayTypeIndex < 0
   //     //   || index >= elasticTypeOptions.size
   //     //   || index < 0)
@@ -265,7 +265,7 @@ class ElasticFieldTypeSection extends TemplateEditorField<Props>
 
   // public handleAnalyzedCheckboxClicked()
   // {
-  //   // this.setLangSettings('isAnalyzed', !this._field.langSettings.isAnalyzed);
+  //   // this.setLangSettings('isAnalyzed', !this._field().langSettings.isAnalyzed);
   // }
 
 }

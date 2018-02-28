@@ -76,7 +76,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
   public render()
   {
     const { canEdit, preview, hidePreviewValue, displayValueOverride } = this.props;
-    const field = this._field;
+    const field = this._field();
     const settingsOpen = this._settingsAreOpen();
     const labelStyle = settingsOpen ?
       fontColor(Colors().active, Colors().active)
@@ -104,7 +104,6 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             <div
               className={classNames({
                 'field-preview-value': true,
-                /*'field-preview-value-settings-open': settingsOpen,*/
               })}
               style={fontColor(Colors().text2)}
             >

@@ -78,12 +78,11 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   public renderChildFields()
   {
     const { canEdit, preview, displayKeyPath } = this.props;
-    const field = this._field;
+    const field = this._field();
     const childFieldIds = field.childrenIds;
     return childFieldIds.map((childId, index) =>
     {
-      // const childPaths = this._getChildPaths(index);
-      const childField = this._fieldMap.get(childId);
+      const childField = this._field(childId);
       const childPreview = preview != null ? preview[childField.name] : null;
       return (
         <TemplateEditorFieldNode
@@ -98,47 +97,46 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
-  // public renderArrayChildren()
-  // {
-  //   const { field, canEdit, preview, keyPath, displayKeyPath } = this.props;
+  // placeholder logic. just gets the first child
+  public getAppropriateChild(arrayIndex): number
+  {
+    const field = this._field();
+    const placeholderId = field.childrenIds.get(0);
+    return placeholderId;
+  }
 
-  //   const childField = field.getSubfields().get(0);
-  //   const childFieldKeyPath = this._getChildPaths(0).keyPath;
+  public renderArrayChild(value, index)
+  {
+    const { canEdit } = this.props;
+    const field = this._field();
+    const displayKeyPath = this._getPreviewChildPath(index);
+    const childField = this._field(this.getAppropriateChild(index));
+    return (
+      <TemplateEditorFieldNode
+        {...this._passProps({
+          fieldId: childField.fieldId,
+          canEdit: field.isIncluded && canEdit,
+          preview: value,
+          displayKeyPath,
+        })}
+        key={index}
+      />
+    );
+  }
 
-  //   if (!Array.isArray(preview) || preview.length === 0)
-  //   {
-  //     const childDisplayKeyPath = this._getPreviewChildPaths(0).displayKeyPath;
-  //     return (
-  //       <TemplateEditorFieldNode
-  //         {...this._passProps({
-  //           field: childField,
-  //           preview: null,
-  //           keyPath: childFieldKeyPath,
-  //           displayKeyPath: childDisplayKeyPath,
-  //         })}
-  //       />
-  //     );
-  //   }
-  //   else
-  //   {
-  //     const previewList = List(preview);
-  //     return previewList.map((value, index) =>
-  //     {
-  //       const childDisplayKeyPath = this._getPreviewChildPaths(index).displayKeyPath;
-  //       return (
-  //         <TemplateEditorFieldNode
-  //           {...this._passProps({
-  //             field: childField,
-  //             preview: value,
-  //             keyPath: childFieldKeyPath,
-  //             displayKeyPath: childDisplayKeyPath,
-  //           })}
-  //           key={index}
-  //         />
-  //       );
-  //     }).toList();
-  //   }
-  // }
+  public renderArrayChildren()
+  {
+    const { preview } = this.props;
+    // const childFieldIds = field.childrenIds;
+    if (preview == null || !Array.isArray(preview))
+    {
+      return this.renderArrayChild(null, -1);
+    }
+    return List(preview.map((value, index) =>
+    {
+      return this.renderArrayChild(value, index);
+    }));
+  }
 
   public renderSettingsContainer()
   {
@@ -161,15 +159,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   public render()
   {
     const { canEdit, preview, displayKeyPath } = this.props;
-    const field = this._field;
-    // if (field.isRoot(keyPath))
-    // {
-    //   return (
-    //     <div className='template-editor-children-container'>
-    //       {this.renderChildFields()}
-    //     </div>
-    //   );
-    // }
+    const field = this._field();
 
     let children = null;
     let content = null;
@@ -178,7 +168,13 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     if (field.isArray())
     {
       // tslint:disable-next-line
-      console.error('arrays are not supported'); // TODO
+      children = this.renderArrayChildren();
+      content = (
+        <TemplateEditorFieldPreview
+          hidePreviewValue={true}
+          {...this._passProps()}
+        />
+      );
     }
     else if (field.isNested())
     {
