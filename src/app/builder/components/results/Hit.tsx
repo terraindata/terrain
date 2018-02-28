@@ -204,38 +204,66 @@ class HitComponent extends TerrainComponent<Props> {
   public renderNestedFieldHeader(field, depth, size, expandState: NestedState)
   {
     return (
-      <div
-        className='hit-nested-content-header'
-        style={[borderColor(Colors().blockOutline),
-        backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
-        ]}
-      >
+      <div>
         <div
-          className='hit-nested-content-title'
-          onClick={this._fn(
-            this.changeNestedState,
-            expandState !== NestedState.Collapsed ?
-                NestedState.Collapsed : NestedState.Normal,
-            field)}
+          className='hit-nested-content-header'
+          style={[borderColor(Colors().blockOutline),
+          backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+          ]}
         >
-          {field} ({size})
-        </div>
-        {
-          size > 1 &&
           <div
-            className='hit-nested-content-expand'
+            className='hit-nested-content-title'
+            onClick={this._fn(
+              this.changeNestedState,
+              expandState !== NestedState.Collapsed ?
+                  NestedState.Collapsed : NestedState.Normal,
+              field)}
           >
-            <ExpandIcon
-              open={expandState === NestedState.Expanded}
-              onClick={this._fn(
-                this.changeNestedState,
-                expandState !== NestedState.Expanded ?
-                    NestedState.Expanded : NestedState.Normal,
-                field
-              )}
-            />
+            {field} ({size})
           </div>
+          {
+            size > 1 &&
+            <div
+              className='hit-nested-content-expand'
+            >
+              <ExpandIcon
+                open={expandState === NestedState.Expanded}
+                onClick={this._fn(
+                  this.changeNestedState,
+                  expandState !== NestedState.Expanded ?
+                      NestedState.Expanded : NestedState.Normal,
+                  field
+                )}
+              />
+            </div>
+          }
+        </div>
+        <div
+          className='hit-column-names'
+          style={[borderColor(Colors().blockOutline),
+            backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
+        />
+        {
+          this.state.scrollState.get(field) ?
+          <div
+            onClick={this._fn(this.handleScroll, field, -1)}
+            className='hit-content-scroll-back'
+            style={getStyle('fill', Colors().iconColor)}
+            key='forward-icon'
+          >
+            <CarrotIcon />
+          </div>
+          :
+          null
         }
+        <div
+          onClick={this._fn(this.handleScroll, field, 1)}
+          className='hit-content-scroll-forward'
+          style={getStyle('fill', Colors().iconColor)}
+          key='back-icon'
+        >
+          <CarrotIcon />
+        </div>
       </div>
     );
   }
@@ -279,32 +307,6 @@ class HitComponent extends TerrainComponent<Props> {
         {
           this.renderNestedFieldHeader(field, depth, size, expandState)
         }
-        <div
-          className='hit-column-names'
-          style={[borderColor(Colors().blockOutline),
-            backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
-        />
-        {
-          this.state.scrollState.get(field) ?
-          <div
-            onClick={this._fn(this.handleScroll, field, -1)}
-            className='hit-content-scroll-back'
-            style={getStyle('fill', Colors().iconColor)}
-            key='forward-icon'
-          >
-            <CarrotIcon />
-          </div>
-          :
-          null
-        }
-          <div
-            onClick={this._fn(this.handleScroll, field, 1)}
-            className='hit-content-scroll-forward'
-            style={getStyle('fill', Colors().iconColor)}
-            key='back-icon'
-          >
-            <CarrotIcon />
-          </div>
         <div
           className='hit-nested-content-values'
           style={{height: expandState === NestedState.Expanded ? '100%' : 'auto'}}
