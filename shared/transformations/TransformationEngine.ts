@@ -200,7 +200,7 @@ export class TransformationEngine
     return this.unflatten(output);
   }
 
-  public json(): object
+  public toJSON(): object
   {
     return {
       dag: GraphLib.json.write(this.dag),

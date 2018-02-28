@@ -98,7 +98,7 @@ test('serialize to JSON', () =>
   const e: TransformationEngine = new TransformationEngine(doc1);
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
-  expect(e.json()).toEqual({
+  expect(e.toJSON()).toEqual({
     dag: {
       options: {
         directed: true,
@@ -164,7 +164,7 @@ test('JSON serialize/deserialize round trip', () =>
   const e: TransformationEngine = new TransformationEngine(doc1);
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
-  const j = e.json();
+  const j = e.toJSON();
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
   e2.addField(KeyPath(['i']), 'number');
@@ -176,7 +176,7 @@ test('String serialize/deserialize round trip', () =>
   const e: TransformationEngine = new TransformationEngine(doc1);
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
-  const j: string = JSON.stringify(e.json());
+  const j: string = JSON.stringify(e.toJSON());
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
   expect(e2.transform(doc1)['name']).toBe('BOB');
