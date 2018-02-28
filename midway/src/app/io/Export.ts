@@ -80,55 +80,56 @@ export class Export
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
   private MAX_ROW_THRESHOLD: number = 2000;
 
-  public async export(exportConfig: ExportConfig, headless: boolean): Promise<stream.Readable | string>
+  public async export(exportConfig: ExportConfig, headless: boolean): Promise<stream.Readable>
   {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
+    const database: DatabaseController | undefined = DatabaseRegistry.get(exportConfig.dbid);
+    if (database === undefined)
     {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(exportConfig.dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + exportConfig.dbid.toString() + '" not found.');
-      }
+      throw Error('Database "' + exportConfig.dbid.toString() + '" not found.');
+    }
 
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
+    if (database.getType() !== 'ElasticController')
+    {
+      throw Error('File export currently is only supported for Elastic databases.');
+    }
 
-      if (exportConfig.filetype !== 'csv' && exportConfig.filetype !== 'json' && exportConfig.filetype !== 'json [type object]')
-      {
-        return reject('Filetype must be either CSV or JSON.');
-      }
+    if (exportConfig.filetype !== 'csv' && exportConfig.filetype !== 'json' && exportConfig.filetype !== 'json [type object]')
+    {
+      throw Error('Filetype must be either CSV or JSON.');
+    }
 
-      if (headless)
+    if (headless)
+    {
+      // get a template given the template ID
+      const templates: ExportTemplateConfig[] = await exportTemplates.get(exportConfig.templateId);
+      if (templates.length === 0)
       {
-        // get a template given the template ID
-        const templates: ExportTemplateConfig[] = await exportTemplates.get(exportConfig.templateId);
-        if (templates.length === 0)
-        {
-          return reject('Template not found. Did you supply an export template ID?');
-        }
-        const template = templates[0] as object;
-        if (exportConfig.dbid !== template['dbid'])
-        {
-          return reject('Template database ID does not match supplied database ID.');
-        }
-        for (const templateKey of Object.keys(template))
-        {
-          exportConfig[templateKey] = template[templateKey];
-        }
+        throw Error('Template not found. Did you supply an export template ID?');
       }
-
-      if (exportConfig.columnTypes === undefined)
+      const template = templates[0] as object;
+      if (exportConfig.dbid !== template['dbid'])
       {
-        return reject('Must provide export template column types.');
+        throw Error('Template database ID does not match supplied database ID.');
       }
+      for (const templateKey of Object.keys(template))
+      {
+        exportConfig[templateKey] = template[templateKey];
+      }
+    }
 
+    const mapping: object = exportConfig.columnTypes;
+    if (mapping === undefined)
+    {
+      throw Error('Must provide export template column types.');
+    }
+
+    return new Promise<stream.Readable>(async (resolve, reject) =>
+    {
       // get query data from algorithmId or query (or variant Id if necessary)
       let qry: string = '';
-      if ((exportConfig as any).variantId !== undefined && exportConfig.algorithmId === undefined)
+      if (exportConfig['variantId'] !== undefined && exportConfig.algorithmId === undefined)
       {
-        exportConfig.algorithmId = (exportConfig as any).variantId;
+        exportConfig.algorithmId = exportConfig['variantId'];
       }
       if (exportConfig.algorithmId !== undefined && exportConfig.query === undefined)
       {
@@ -140,17 +141,12 @@ export class Export
       }
       else
       {
-        return reject('Must provide either algorithm ID or query, not both or neither.');
-      }
-      if (qry === '')
-      {
-        return reject('Empty query provided.');
+        throw Error('Must provide either algorithm ID or query, not both or neither.');
       }
 
-      const mapping: object = exportConfig.columnTypes;
-      if (typeof mapping === 'string')
+      if (qry === '')
       {
-        return reject(mapping);
+        throw Error('Empty query provided.');
       }
 
       // get list of export column names
@@ -172,7 +168,7 @@ export class Export
 
       const originalMapping: object = {};
       // generate original mapping if there were any renames
-      const allNames = Object.keys(exportConfig.columnTypes);
+      const allNames = Object.keys(mapping);
       allNames.forEach((value, i) =>
       {
         originalMapping[value] = value;
@@ -198,7 +194,7 @@ export class Export
       if (respStream === undefined || (respStream.hasError !== undefined && respStream.hasError()))
       {
         writer.end();
-        return reject('Nothing to export.');
+        throw Error('Nothing to export.');
       }
 
       try
