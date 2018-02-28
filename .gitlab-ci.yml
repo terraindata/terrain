@@ -22,6 +22,7 @@ stages:
   - test-sigint
   - build
   - deploy
+  - fullstack
 
 lint:
   script:
@@ -77,6 +78,27 @@ build-frontend-prod:
    - master
   stage: build
 
+fullstack:
+  script:
+    - rm -rf ./midway/src/assets/.cache || true;
+    - MIDWAY_HOST=`hostname`:3000 yarn run build
+    - yarn run test-fullstack-setup
+    - killall node || true;
+    - NODE_ENV=production yarn run start-midway > ./midwayConsole.log 2>&1&
+    - sleep 20
+    - yarn run test-fullstack-login
+    - yarn run test-rr-builder
+    - killall node || true;
+    - yarn run test-fullstack-teardown
+  stage: fullstack
+  when: always
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths:
+    - rr/test/builder/__image_snapshots__/__diff_output__
+    - rr/test/login/__image_snapshots__/__diff_output__
+
 deploy:
   script:
    - MIDWAY_HOST=pa-terraformer01.terrain.int:33000 yarn run build-prod
@@ -94,3 +116,6 @@ deploy:
     name: production
     url: http://pa-terraformer01.terrain.int:3000
 
+after_script:
+  - killall node || true;
+  - ./midway/test/scripts/copy_screenshot.sh || true;

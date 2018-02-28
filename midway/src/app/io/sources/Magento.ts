@@ -44,15 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
 import jsonStream = require('JSONStream');
 import soap = require('strong-soap');
 
 import * as _ from 'lodash';
-import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { CredentialConfig } from '../../credentials/CredentialConfig';
 import { Credentials } from '../../credentials/Credentials';
 import { ExportSourceConfig } from './Sources';
 

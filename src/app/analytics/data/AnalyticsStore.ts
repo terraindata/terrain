@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
 import Util from 'util/Util';
+import { createRecordType } from '../../Classes';
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
 class AnalyticsStateC
@@ -62,7 +63,7 @@ class AnalyticsStateC
   public availableMetrics: Immutable.List<any> = Immutable.List<any>([]);
 }
 
-const AnalyticsState_Record = Immutable.Record(new AnalyticsStateC());
+const AnalyticsState_Record = createRecordType(new AnalyticsStateC(), 'AnalyticsState_Record');
 export interface AnalyticsState extends AnalyticsStateC, IRecord<AnalyticsState> { }
 export const _AnalyticsState = (config?: any) =>
 {

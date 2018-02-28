@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import objectify from '../../transformations/deepObjectify';
-import { KeyPath } from '../../transformations/KeyPath';
-import * as yadeep from '../../transformations/yadeep';
+import objectify from '../../util/deepObjectify';
+import { KeyPath } from '../../util/KeyPath';
+import * as yadeep from '../../util/yadeep';
 
 const doc3: object = {
   name: 'Bob',

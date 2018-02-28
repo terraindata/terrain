@@ -246,7 +246,7 @@ class _CardComponent extends TerrainComponent<Props>
         hovering: true,
       });
     }
-    else if (this.state.hovering)
+    else if (nextProps.builderCards.hoveringCardId !== this.props.card.id && this.state.hovering)
     {
       this.setState({
         hovering: false,

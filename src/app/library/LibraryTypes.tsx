@@ -53,6 +53,7 @@ import Util from 'util/Util';
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
 import { _Query, Query, queryForSave } from '../../items/types/Query';
+import { createRecordType } from '../Classes';
 
 class LibraryStateC
 {
@@ -81,7 +82,8 @@ class LibraryStateC
   // Keep track of versioning
   public modelVersion: number = 3;
 }
-const LibraryState_Record = Immutable.Record(new LibraryStateC());
+
+const LibraryState_Record = createRecordType(new LibraryStateC(), 'LibraryStateC');
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
 export const _LibraryState = (config?: any) =>
 {
@@ -127,7 +129,7 @@ class AlgorithmC extends ItemC
   public query: Query = null;
 }
 export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
-const Algorithm_Record = Immutable.Record(new AlgorithmC());
+const Algorithm_Record = createRecordType(new AlgorithmC(), 'AlgorithmC');
 export const _Algorithm = (config?: any) =>
 {
   // NOTE: we do not want a default value for the config param because
@@ -206,7 +208,8 @@ class GroupC extends ItemC
   public excludeFields = ['dbFields', 'excludeFields', 'categoryId'];
   public modelVersion = 3;
 }
-const Group_Record = Immutable.Record(new GroupC());
+
+const Group_Record = createRecordType(new GroupC(), 'GroupC');
 export interface Group extends GroupC, IRecord<Group> { }
 export const _Group = (config?: any) =>
 {
@@ -253,7 +256,8 @@ class CategoryC extends ItemC
   public defaultLanguage = 'elastic';
   public modelVersion = 3;
 }
-const Category_Record = Immutable.Record(new CategoryC());
+
+const Category_Record = createRecordType(new CategoryC(), 'CategoryC');
 export interface Category extends CategoryC, IRecord<Category> { }
 export const _Category = (config: any = {}) =>
 {

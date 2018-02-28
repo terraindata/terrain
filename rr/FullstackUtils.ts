@@ -42,58 +42,72 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import objectify from '../../util/deepObjectify';
-import { KeyPath } from '../../util/KeyPath';
-import * as yadeep from '../../util/yadeep';
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
 
-const doc3: object = {
-  name: 'Bob',
-  arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
-  hardarr: [['a'], ['b', ['c']]],
-};
+import readline from 'readline-promise';
+import * as sleep from 'sleep';
 
-const objd: object = objectify(doc3);
-
-test('simple top-level get', () =>
+function ignoreBuilderAction(action: string): boolean
 {
-  expect(yadeep.get(objd, KeyPath(['name']))).toBe('Bob');
-});
+  if (action.startsWith('{"type":"builderCards.hoverCard"') || action.startsWith('{"type":"colors.setStyle"')
+    || action.startsWith('{"type":"builder.results"'))
+  {
+    return true;
+  }
+  return false;
+}
 
-test('primitive get one layer deep', () =>
+export async function waitForInput(msg: string)
 {
-  expect(yadeep.get(objd, KeyPath(['arr', '0']))).toBe('sled');
-});
+  const rl = readline.createInterface(
+    {
+      input: process.stdin,
+      output: process.stdout,
+      terminal: true,
+    });
+  await rl.questionAsync(msg);
+  rl.close();
+}
 
-test('nested array get', () =>
+export async function replayBuilderActions(page, url, actions, records, actionCallBack?)
 {
-  expect(yadeep.get(objd, KeyPath(['hardarr', '1', '1']))).toEqual({ 0: 'c' });
-});
+  const loadRecords = await page.evaluate((recordNames) =>
+  {
+    // window['TerrainTools'].setLogLevel();
+    return window['TerrainTools'].terrainStoreLogger.resetSerializeRecordArray(recordNames);
+  }, records);
+  if (loadRecords === false)
+  {
+    console.log('Failed to load the serialization records: ' + records);
+    return;
+  }
+  // replay the log
+  for (let i = 0; i < actions.length; i = i + 1)
+  {
+    const action = actions[i];
+    console.log('Replaying Action ' + typeof action + ':' + action);
 
-test('wildcard nested get', () =>
-{
-  expect(yadeep.get(objd, KeyPath(['arr', '1', '*', 'a']))).toEqual(['dog', 'fren']);
-});
+    if (ignoreBuilderAction(action))
+    {
+      console.log('Ignoring action: ' + String(action));
+      continue;
+    }
+    await page.mouse.move(0, 0);
+    await page.evaluate((act) =>
+    {
+      return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);
+    }, action);
+    sleep.sleep(1);
+    if (actionCallBack)
+    {
+      await actionCallBack();
+    }
+  }
+}
 
-test('simple top-level set', () =>
+export function filteringRecordBuilderActions(actions: string[])
 {
-  const copy: object = { ...objd };
-  yadeep.set(copy, KeyPath(['name']), 'jim');
-  expect(copy['name']).toBe('jim');
-});
-
-test('a deep set', () =>
-{
-  const copy: object = { ...objd };
-  yadeep.set(copy, KeyPath(['arr', '1', '0', 'a']), 'jim');
-  expect(copy['arr']['1']['0']['a']).toBe('jim');
-});
-
-test('a deep set with a wildcard', () =>
-{
-  const copy: object = { ...objd };
-  yadeep.set(copy, KeyPath(['arr', '1', '*', 'a']), 'jim');
-  expect(copy['arr']['1']['0']['a']).toBe('jim');
-  expect(copy['arr']['1']['1']['a']).toBe('jim');
-});
+  return actions.filter((action) => ignoreBuilderAction(action) === false);
+}

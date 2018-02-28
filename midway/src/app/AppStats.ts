@@ -42,10 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import { List } from 'immutable';
+class AppStats
+{
+  public numRequests: number = 0;
+  public numRequestsThatThrew: number = 0;
+  public numRequestsCompleted: number = 0;
+  public startTime: Date = new Date();
 
-export type WayPoint = string;
-export type KeyPath = List<WayPoint>;
-export const KeyPath = (args: WayPoint[] = []) => List<WayPoint>(args);
+  public getRequestCounts(): number[]
+  {
+    return [this.numRequests, this.numRequests - this.numRequestsCompleted, this.numRequestsThatThrew];
+  }
+}
+
+const appStats: AppStats = new AppStats();
+
+export default appStats;

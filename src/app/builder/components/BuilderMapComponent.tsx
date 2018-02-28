@@ -91,6 +91,11 @@ class BuilderMapComponent extends TerrainComponent<Props>
     }
   }
 
+  public handleZoomChange(zoom)
+  {
+    this.props.builderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapZoomValue'), zoom);
+  }
+
   public handleChange(coordinates, inputValue)
   {
     if (coordinates !== undefined)
@@ -122,19 +127,21 @@ class BuilderMapComponent extends TerrainComponent<Props>
 
   public render()
   {
-    const { distance, distanceUnit, locationValue, mapInputValue } = this.props.data;
+    const { distance, distanceUnit, locationValue, mapInputValue, mapZoomValue } = this.props.data;
     return (
       <div className='cards-builder-map-component'>
         <MapComponent
           geocoder='photon'
           inputValue={mapInputValue}
-          coordinates={locationValue}
+          coordinates={locationValue !== undefined ? locationValue : [0, 0]}
           distance={distance}
           distanceUnit={distanceUnit}
           inputs={this.state.inputs}
           onChange={this.handleChange}
           canEdit={this.props.canEdit}
           markers={this.spotlightsToMarkers()}
+          onZoomChange={this.handleZoomChange}
+          zoom={mapZoomValue}
         />
       </div>
     );
