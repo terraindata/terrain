@@ -44,55 +44,56 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import objectify from '../../util/deepObjectify';
+import objectify from '../../transformations/deepObjectify';
+import { KeyPath } from '../../transformations/KeyPath';
+import * as yadeep from '../../transformations/yadeep';
 
-const simple = ['a', 'b', 'c'];
-
-const hard = {
+const doc3: object = {
   name: 'Bob',
   arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
   hardarr: [['a'], ['b', ['c']]],
 };
 
-test('simple', () =>
+const objd: object = objectify(doc3);
+
+test('simple top-level get', () =>
 {
-  expect(objectify(simple)).toEqual(
-    {
-      0: 'a',
-      1: 'b',
-      2: 'c',
-    },
-  );
+  expect(yadeep.get(objd, KeyPath(['name']))).toBe('Bob');
 });
 
-test('hard', () =>
+test('primitive get one layer deep', () =>
 {
-  expect(objectify(hard)).toEqual(
-    {
-      name: 'Bob',
-      arr: {
-        0: 'sled',
-        1: {
-          0: {
-            a: 'dog',
-          },
-          1: {
-            a: 'fren',
-            b: 'doggo',
-          },
-        },
-      },
-      hardarr: {
-        0: {
-          0: 'a',
-        },
-        1: {
-          0: 'b',
-          1: {
-            0: 'c',
-          },
-        },
-      },
-    },
-  );
+  expect(yadeep.get(objd, KeyPath(['arr', '0']))).toBe('sled');
+});
+
+test('nested array get', () =>
+{
+  expect(yadeep.get(objd, KeyPath(['hardarr', '1', '1']))).toEqual({ 0: 'c' });
+});
+
+test('wildcard nested get', () =>
+{
+  expect(yadeep.get(objd, KeyPath(['arr', '1', '*', 'a']))).toEqual(['dog', 'fren']);
+});
+
+test('simple top-level set', () =>
+{
+  const copy: object = { ...objd };
+  yadeep.set(copy, KeyPath(['name']), 'jim');
+  expect(copy['name']).toBe('jim');
+});
+
+test('a deep set', () =>
+{
+  const copy: object = { ...objd };
+  yadeep.set(copy, KeyPath(['arr', '1', '0', 'a']), 'jim');
+  expect(copy['arr']['1']['0']['a']).toBe('jim');
+});
+
+test('a deep set with a wildcard', () =>
+{
+  const copy: object = { ...objd };
+  yadeep.set(copy, KeyPath(['arr', '1', '*', 'a']), 'jim');
+  expect(copy['arr']['1']['0']['a']).toBe('jim');
+  expect(copy['arr']['1']['1']['a']).toBe('jim');
 });

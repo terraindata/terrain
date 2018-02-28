@@ -45,12 +45,11 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
-import nestedProperty = require('nested-property');
-import { KeyPath } from '../../transformations/KeyPath';
+import { KeyPath } from '../../util/KeyPath';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
-import * as yadeep from '../../transformations/yadeep';
+import * as yadeep from '../../util/yadeep';
 
 const doc1 = {
   name: 'Bob',
@@ -91,7 +90,7 @@ test('capitalization', () =>
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
   const r = e.transform(doc1);
   expect(r['name']).toBe('BOB');
-  expect(nestedProperty.get(r, 'meta.school')).toBe('STANFORD');
+  expect(yadeep.get(r, KeyPath(['meta.school']))).toBe('STANFORD');
 });
 
 test('serialize to JSON', () =>
