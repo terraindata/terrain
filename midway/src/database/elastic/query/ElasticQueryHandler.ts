@@ -54,6 +54,7 @@ import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import QueryRequest from '../../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../../shared/database/types/QueryResponse';
+import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { getParsedQuery } from '../../../app/Util';
@@ -155,7 +156,26 @@ export class ElasticQueryHandler extends QueryHandler
           const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
           const childQueryStr = ESConverter.formatValueInfo(valueInfo);
           const elasticStream = new ElasticStream(client, query);
-          return new GroupJoinTransform(client, elasticStream, childQueryStr);
+          const groupJoinStream = new GroupJoinTransform(client, elasticStream, childQueryStr);
+          if (request.streaming === true)
+          {
+            return groupJoinStream;
+          }
+          else
+          {
+            return new Promise<QueryResponse>((resolve, reject) =>
+            {
+              const bufferTransform = new BufferTransform(groupJoinStream,
+                (err, res) =>
+                {
+                  ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, {
+                    hits: {
+                      hits: res,
+                    },
+                  });
+                });
+            });
+          }
         }
         else if (query['mergeJoin'] !== undefined)
         {

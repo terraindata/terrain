@@ -114,7 +114,10 @@ export class ElasticStream extends Stream.Readable
   {
     this.doneReading = true;
     this.continueScrolling();
-    callback();
+    if (callback !== undefined)
+    {
+      callback();
+    }
   }
 
   private scrollCallback(error, response): void

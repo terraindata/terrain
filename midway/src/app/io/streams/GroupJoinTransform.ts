@@ -83,6 +83,9 @@ export default class GroupJoinTransform extends Readable
 
   private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
+  private _onRead: () => void;
+  private _onEnd: () => void;
+
   constructor(client: ElasticClient, source: Readable, queryStr: string)
   {
     super({
@@ -123,8 +126,10 @@ export default class GroupJoinTransform extends Readable
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
-    this.source.on('readable', this.readFromStream);
-    this.source.on('end', this._final);
+    this._onRead = this.readFromStream.bind(this);
+    this._onEnd = this._final.bind(this);
+    this.source.on('readable', this._onRead);
+    this.source.on('end', this._onEnd);
   }
 
   public _read(size: number = 1024)
@@ -144,12 +149,15 @@ export default class GroupJoinTransform extends Readable
 
   public _final(callback)
   {
-    this.source.removeListener('readable', this.readFromStream);
-    this.source.removeListener('end', this._final);
+    this.source.removeListener('readable', this._onRead);
+    this.source.removeListener('end', this._onEnd);
 
     this.continueReading = false;
     this.sourceIsEmpty = true;
-    callback();
+    if (callback !== undefined)
+    {
+      callback();
+    }
   }
 
   private readFromStream(): void
