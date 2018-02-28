@@ -218,7 +218,8 @@ export function transformationFormFactory<State extends object, Type extends Tra
       {
         const { engine } = this.props;
         const pathToIdMap = createPathToIdMap(engine);
-        const strippedPaths = payload.fieldNamesOrIDs.map((id, i) => {
+        const strippedPaths = payload.fieldNamesOrIDs.map((id, i) =>
+        {
           return turnIndicesIntoValue(engine.getOutputKeyPath(id), engine, pathToIdMap);
         }).toList();
         this.props.engine.appendTransformation(args.type, strippedPaths, payload.options);

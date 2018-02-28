@@ -59,10 +59,10 @@ import FadeInOut from 'common/components/FadeInOut';
 
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import './TemplateEditorField.less';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -199,8 +199,8 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         <div className='template-editor-children-container'>
           {
             field.isArray() ?
-            this.renderArrayChildren() :
-            this.renderChildFields()
+              this.renderArrayChildren() :
+              this.renderChildFields()
           }
         </div>
       );

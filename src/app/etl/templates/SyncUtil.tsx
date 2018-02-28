@@ -233,7 +233,7 @@ function isAValidField(keypath: EnginePath, pathTypes: { [k: string]: FieldTypes
 
 function addFieldsToEngine(
   pathTypes: { [k: string]: FieldTypes },
-  engine: TransformationEngine
+  engine: TransformationEngine,
 )
 {
   const hashedPaths = List(Object.keys(pathTypes));

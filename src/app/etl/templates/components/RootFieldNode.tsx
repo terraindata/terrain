@@ -64,9 +64,9 @@ import { TemplateField } from 'etl/templates/FieldTypes';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import './TemplateEditorField.less';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
+import './TemplateEditorField.less';
 
 interface Props
 {

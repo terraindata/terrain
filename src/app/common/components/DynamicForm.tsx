@@ -174,7 +174,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     if (options.indexResolver != null)
     {
       selectedIndex = options.indexResolver(this.props.inputState[stateName]);
-      onChange = (value) => { this.setStateHOC(stateName)(pickOptions.get(value)) }
+      onChange = (value) => { this.setStateHOC(stateName)(pickOptions.get(value)); };
     }
     else
     {

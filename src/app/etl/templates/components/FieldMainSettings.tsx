@@ -186,9 +186,9 @@ const settingsInputMap: InputDeclarationMap<SettingsState> = {
     displayName: 'Field Type',
     options: {
       pickOptions: (s: SettingsState) => typeOptions,
-      indexResolver: (value) => typeOptions.indexOf(value)
-    }
-  }
+      indexResolver: (value) => typeOptions.indexOf(value),
+    },
+  },
 };
 
 const typeOptions = List(['array', 'object', 'string', 'number', 'boolean']);
