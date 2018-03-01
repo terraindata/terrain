@@ -124,6 +124,7 @@ class PathC extends BaseClass
 {
   public source: Source = _Source();
   public filterGroup: FilterGroup = _FilterGroup();
+  public softFilterGroup: FilterGroup = _FilterGroup();
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
@@ -137,6 +138,7 @@ export const _Path = (config?: { [key: string]: any }) =>
   let path = New<Path>(new PathC(config || {}), config);
   path = path.set('source', _Source(path.source));
   path = path.set('filterGroup', _FilterGroup(path.filterGroup));
+  path = path.set('softFilterGroup', _FilterGroup(path.softFilterGroup));
   path = path.set('score', _Score(path.score));
   path = path.set('more', _More(path.more));
   path = path.set('nested', List(path.nested.map((n) => _Path(n))));
@@ -176,7 +178,7 @@ export const ScoreTypesList =
     ScoreType.linear,
     ScoreType.elastic,
     ScoreType.random,
-    ScoreType.none,
+    // ScoreType.none, // disabling
   ];
 
 export const ScoreTypesChoices = List(ScoreTypesList.map(
@@ -494,15 +496,11 @@ type ChoiceContext = {
   schemaState: SchemaState,
   builderState: BuilderState,
 } | {
-    type: 'transformFields',
-    source: Source,
-    schemaState: SchemaState,
-    builderState: BuilderState,
-  } | {
     type: 'fields',
     source: Source,
     schemaState: SchemaState,
     builderState: BuilderState,
+    subtype?: 'transform' | 'match',
   } | {
     type: 'comparison',
     source: Source,
@@ -583,40 +581,61 @@ class ElasticDataSourceC extends DataSource
       }).toList();
     }
 
-    if (context.type === 'transformFields')
+
+    if (context.type === 'fields')
     {
-      const defaultOptions: List<ChoiceOption> = List([
-        _ChoiceOption({
-          displayName: '_score',
-          value: '_score',
-          sampleData: List([]),
-        }),
-        _ChoiceOption({
-          displayName: '_size',
-          value: '_size',
-          sampleData: List([]),
-        }),
-      ]);
-      const transformableTypes =
-        [
-          'long',
-          'double',
-          'short',
-          'byte',
-          'integer',
-          'half_float',
-          'float',
-        ];
-      const { dataSource } = context.source;
-      const { index, types } = dataSource as any;
-      if (index)
+      if (context.subtype === 'transform' || context.subtype === 'match')
       {
-        const transformableCols = context.schemaState.columns.filter(
+        let defaultOptions: List<ChoiceOption>;
+        let acceptableFieldTypes: string[];
+        
+        if (context.subtype === 'transform')
+        {
+          // TODO when reorganizing, move these to some better, constant space
+          defaultOptions = List([
+            _ChoiceOption({
+              displayName: '_score',
+              value: '_score',
+              sampleData: List([]),
+            }),
+            _ChoiceOption({
+              displayName: '_size',
+              value: '_size',
+              sampleData: List([]),
+            }),
+          ]);
+          acceptableFieldTypes =
+            [ // TODO shouldn't these be FieldTypes?
+              'long',
+              'double',
+              'short',
+              'byte',
+              'integer',
+              'half_float',
+              'float',
+            ];
+        }
+        else if (context.subtype === 'match')
+        {
+          defaultOptions = List();
+          acceptableFieldTypes = ['text'];
+        }
+          
+        const { dataSource } = context.source;
+        const { index, types } = dataSource as any;
+        
+        if (!index)
+        {
+          return defaultOptions;
+        }
+        
+        const acceptableCols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === String(index) &&
-            transformableTypes.indexOf(column.datatype) !== -1,
+            acceptableFieldTypes.indexOf(column.datatype) !== -1,
         );
-        let transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
+        
+        let acceptableOptions: List<ChoiceOption> = acceptableCols.map((col) =>
         {
           return _ChoiceOption({
             displayName: col.name,
@@ -624,16 +643,16 @@ class ElasticDataSourceC extends DataSource
             sampleData: col.sampleData,
           });
         }).toList();
-        let fieldNames = transformableOptions.map((f) => f.value).toList();
+        
+        let fieldNames = acceptableOptions.map((f) => f.value).toList();
         fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
-        transformableOptions = transformableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
-        return transformableOptions.concat(defaultOptions).toList();
+        acceptableOptions = acceptableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
+        
+        return acceptableOptions.concat(defaultOptions).toList();
       }
-      return defaultOptions;
-    }
-
-    if (context.type === 'fields')
-    {
+      
+      // Else, regular fields, include everything
+      
       const metaFields = ['_index', '_type', '_uid', '_id',
         '_source', '_size',
         '_all', '_field_names',

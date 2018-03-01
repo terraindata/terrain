@@ -72,13 +72,14 @@ export interface Props
 {
   filterLine: FilterLine;
   canEdit: boolean;
-  depth: number;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
   comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
   // so that we can make the according UI adjustments
+  
+  isSoftFilter?: boolean; // does this section apply to soft filters?
 }
 
 const pieceStyle = {
@@ -104,7 +105,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   public render()
   {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
+    const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
 
     return (
@@ -176,7 +177,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private getOptionSets(): List<RouteSelectorOptionSet>
   {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
+    const { filterLine, canEdit, pathfinderContext, isSoftFilter } = this.props;
     const { source } = pathfinderContext;
 
     // TODO save to state for better runtime?
@@ -185,6 +186,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       source,
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
+      subtype: isSoftFilter ? 'match' : undefined,
     });
 
     const fieldSet: RouteSelectorOptionSet = {
@@ -324,30 +326,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
     }
   }
-
-  // private renderField()
-  // {
-  //   const { filterLine, canEdit, pathfinderContext, depth } = this.props;
-  //   const { source } = pathfinderContext;
-
-  //   const options = source.dataSource.getChoiceOptions({
-  //     type: 'fields',
-  //     source,
-  //     schemaState: pathfinderContext.schemaState,
-  //   });
-
-  //   return (
-  //     <RouteSelector
-  //       value={filterLine.field}
-  //       onChange={this.handleFieldChange}
-  //       options={options}
-  //       canEdit={canEdit}
-  //       shortNameText={'Field'}
-  //       headerText={'Pick the field on which you want to impose some condition'}
-  //       hasOther={false}
-  //     />
-  //   );
-  // }
 
   private addBoost()
   {

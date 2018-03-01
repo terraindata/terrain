@@ -434,7 +434,9 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       try
       {
-        eql = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
+        // eql = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
+        const parser: ESJSONParser = new ESJSONParser(query.tql, true);
+        eql = ESParseTreeToCode(parser, {replaceInputs: true}, query.inputs);
       }
       catch (e)
       {
