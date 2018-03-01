@@ -342,12 +342,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 className='pf-more-nested'
                 key={i}
               >
-                {
-                  nested.get(i) !== undefined &&
-                  <div className={'pf-nested-line'}>
-                    <div className={'pf-nested-line-inner'} />
-                  </div>
-                }
                 <div className='pf-more-nested-reference'>
                   {
                     tooltip(
@@ -358,6 +352,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         onChange={this._fn(this.handleReferenceChange, i)}
                         canEdit={canEdit}
                         className='pf-more-nested-reference-input'
+                        noBg={true}
                       />,
                       PathfinderText.referenceExplanation,
                     )
@@ -372,6 +367,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       isTextInput={true}
                       canEdit={canEdit}
                       className='pf-more-nested-name-input'
+                      noBg={true}
                     />
                   </FadeInOut>
                   <RemoveIcon
