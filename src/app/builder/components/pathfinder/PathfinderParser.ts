@@ -278,17 +278,13 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
       {
         should = should.push(lineInfo);
       }
-      else if (line.comparison === 'notequal' || line.comparison === 'notcontain')
+      else if (line.comparison === 'notequal' || line.comparison === 'notcontain' || line.comparison === 'isnotin')
       {
         mustNot = mustNot.push(lineInfo);
       }
-      else if (line.comparison === 'located' || line.comparison === 'exists') // TODO MAYBE ADD NON-TEXT FILTERS HERE AS WELL
-      {
-        filter = filter.push(lineInfo);
-      }
       else
       {
-        must = must.push(lineInfo);
+        filter = filter.push(lineInfo);
       }
     }
     else
@@ -460,6 +456,29 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
     //     [line.field]: [distanceObj.location[1], distanceObj.location[0]],
     //   }),
     // });
+    case 'isin':
+    case 'isnotin':
+      try {
+        return Map({
+          terms : { [line.field] : JSON.parse(String(value).toLowerCase())}
+        });
+      }
+      catch {
+       // Try to split it along commas and create own value
+       if (typeof value === 'string' && value[0] !== '@')
+       {
+       value = value.replace(/\s/g, '').replace(/\[/g, '').replace(/\]/g, '');
+         let pieces = value.split(',');
+         pieces = pieces.map((piece) => piece.toLowerCase());
+         return Map({
+           terms: {[line.field]: pieces}
+         });
+       }
+       return Map({
+          terms : { [line.field] : value}
+        });
+      }
+
     default:
       return Map({});
   }

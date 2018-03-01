@@ -743,6 +743,16 @@ const ElasticComparisons = [
     fieldTypes: List([FieldType.Text, FieldType.Numerical]),
   },
   {
+    value: 'isin',
+    displayName: 'is in',
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date])
+  },
+  {
+    value: 'isnotin',
+    displayName: 'is not in',
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date])
+  },
+  {
     value: 'notcontain',
     displayName: 'does not contain',
     fieldTypes: List([FieldType.Text]),
