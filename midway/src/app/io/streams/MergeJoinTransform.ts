@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Deque from 'double-ended-queue';
 import { Readable } from 'stream';
 
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
@@ -53,10 +52,19 @@ import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueIn
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
 import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
 
-interface Ticket
+interface Source
 {
-  count: number;
-  results: object[];
+  query: object;
+  stream: Readable;
+
+  maxBufferSize: number;
+  buffer: object[];
+
+  _continue: boolean;
+  _empty: boolean;
+
+  _onRead: () => void;
+  _onEnd: () => void;
 }
 
 /**
@@ -65,25 +73,11 @@ interface Ticket
 export default class MergeJoinTransform extends Readable
 {
   private client: ElasticClient;
-  private query: object;
-  private mergeJoinQuery: object;
-  private source: Readable;
 
-  private blockSize: number = 256;
-  private maxPendingQueries: number = 4;
-
-  private maxBufferedInputs: number;
-  private bufferedInputs: object[];
-  private maxBufferedOutputs: number;
-  private bufferedOutputs: Deque<Ticket>;
-
-  private sourceIsEmpty: boolean = false;
-  private continueReading: boolean = false;
+  private leftSource: Source;
+  private rightSource: Source;
 
   private joinKey: string;
-
-  private _onRead: () => void;
-  private _onEnd: () => void;
 
   constructor(client: ElasticClient, queryStr: string)
   {
@@ -100,37 +94,71 @@ export default class MergeJoinTransform extends Readable
     }
 
     const query = parser.getValue();
-    this.mergeJoinQuery = query['mergeJoin'];
+    const mergeJoinQuery = query['mergeJoin'];
     delete query['mergeJoin'];
 
     // read merge join options from the query
-    if (this.mergeJoinQuery['joinKey'] !== undefined)
+    if (mergeJoinQuery['joinKey'] !== undefined)
     {
-      this.joinKey = this.mergeJoinQuery['joinKey'];
-      delete this.mergeJoinQuery['joinKey'];
+      this.joinKey = mergeJoinQuery['joinKey'];
+      delete mergeJoinQuery['joinKey'];
     }
 
-    this.query = this.setSortClause(query);
-    this.source = new ElasticStream(this.client, this.query);
+    const innerQueries = Object.keys(mergeJoinQuery);
+    if (innerQueries.length > 1)
+    {
+      throw Error('Only one inner query currently supported for merge joins.');
+    }
 
-    this._onRead = this.readFromStream.bind(this);
-    this._onEnd = this._final.bind(this);
-    this.source.on('readable', this._onRead);
-    this.source.on('end', this._onEnd);
+    const leftQuery = this.setSortClause(query);
+    this.leftSource = {
+      query: leftQuery,
+      stream: new ElasticStream(this.client, leftQuery),
 
-    this.maxBufferedInputs = this.blockSize;
-    this.bufferedInputs = [];
-    this.maxBufferedOutputs = this.maxPendingQueries;
-    this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
+      maxBufferSize: 512,
+      buffer: [],
+
+      _continue: true,
+      _empty: false,
+
+      _onRead: this.readFromStream.bind(this, this.leftSource),
+      _onEnd: this._final.bind(this, this.leftSource),
+    };
+
+    const rightQuery = this.setSortClause(mergeJoinQuery[innerQueries[0]]);
+    this.rightSource = {
+      query: rightQuery,
+      stream: new ElasticStream(this.client, rightQuery),
+
+      maxBufferSize: 512,
+      buffer: [],
+
+      _continue: true,
+      _empty: false,
+
+      _onRead: this.readFromStream.bind(this, this.rightSource),
+      _onEnd: this._final.bind(this, this.rightSource),
+    };
+
+    // prepare stream event handlers
+    this.leftSource.stream.on('readable', this.leftSource._onRead);
+    this.leftSource.stream.on('end', this.leftSource._onEnd);
+    this.rightSource.stream.on('readable', this.rightSource._onRead);
+    this.rightSource.stream.on('end', this.rightSource._onEnd);
   }
 
   public _read(size: number = 1024)
   {
-    if (!this.sourceIsEmpty
-      && this.bufferedInputs.length < this.maxBufferedInputs
-      && this.bufferedOutputs.length < this.maxBufferedOutputs)
+    if (!this.leftSourceIsEmpty
+      && this.leftBufferedInputs.length < this.maxBufferedInputs)
     {
-      this.continueReading = true;
+      this.continueLeft = true;
+    }
+
+    if (!this.rightSourceIsEmpty
+      && this.rightBufferedInputs.length < this.maxBufferedInputs)
+    {
+      this.continueRight = true;
     }
   }
 
@@ -141,11 +169,16 @@ export default class MergeJoinTransform extends Readable
 
   public _final(callback)
   {
-    this.source.removeListener('readable', this._onRead);
-    this.source.removeListener('end', this._onEnd);
+    this.leftSource.removeListener('readable', this._onReadLeft);
+    this.leftSource.removeListener('end', this._onEndLeft);
 
-    this.continueReading = false;
-    this.sourceIsEmpty = true;
+    this.rightSource.removeListener('readable', this._onReadRight);
+    this.rightSource.removeListener('end', this._onEndRight);
+
+    this.continueLeft = false;
+    this.continueRight = false;
+    this.leftSourceIsEmpty = true;
+    this.rightSourceIsEmpty = true;
     if (callback !== undefined)
     {
       callback();
@@ -154,21 +187,22 @@ export default class MergeJoinTransform extends Readable
 
   private readFromStream(): void
   {
-    // should we keep reading from the source stream?
-    if (!this.continueReading)
+    // should we keep reading from the source streams?
+    if (!_continue)
     {
       return;
     }
 
     // if yes, keep buffering inputs from the source stream
-    const obj = this.source.read();
+
+    const obj = source.read();
     if (obj === null)
     {
-      this.sourceIsEmpty = true;
+      _empty = true;
     }
     else
     {
-      this.bufferedInputs.push(obj);
+      this.leftBufferedInputs.push(obj);
     }
 
     // if we have data buffered up to blockSize, swap the input buffer list out
