@@ -59,9 +59,9 @@ import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
+import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 export function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig)
   : { template: ETLTemplate, fieldMap: FieldMap, warnings: string[], softWarnings: string[] }

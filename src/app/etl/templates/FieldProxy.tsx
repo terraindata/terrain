@@ -53,9 +53,9 @@ import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 /*
  *  The FieldProxy structures act as the binding between the TemplateEditorField
  *  tree structure and the flattened structure of the transformation engine
@@ -201,10 +201,16 @@ export class FieldNodeProxy
   public changeType(newType: FieldTypes)
   {
     const field = this.field();
-    const engine = this.tree.getEngine();
-    if (field.childrenIds.size === 0)
+    const engine: TransformationEngine = this.tree.getEngine();
+    const existingType = engine.getFieldType(field.fieldId);
+    if (existingType !== 'array' && existingType !== 'object')
     {
-      // TODO once this gets added to transform engine
+      engine.setFieldType(field.fieldId, newType);
+      this.syncWithEngine();
+    }
+    else
+    {
+      // TODO say no
     }
   }
 

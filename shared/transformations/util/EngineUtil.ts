@@ -48,8 +48,8 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import { KeyPath } from 'shared/util/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { KeyPath } from 'shared/util/KeyPath';
 
 export type PathHash = string;
 export interface PathHashMap<T>

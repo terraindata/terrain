@@ -61,10 +61,10 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
 import { TransformationNode } from 'etl/templates/FieldTypes';
-import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import { TransformationsInfo } from 'shared/transformations/TransformationsInfo';
 

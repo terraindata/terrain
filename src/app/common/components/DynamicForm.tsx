@@ -85,7 +85,7 @@ export interface Props<FState>
   style?: any; // gets applied to root container
   actionBarStyle?: any; // gets applied to the bottom container style
   children?: any; // children get rendered between the buttons and the form components
-  centerForm?: boolean // if true, the form content gets centered in the container
+  centerForm?: boolean; // if true, the form content gets centered in the container
 }
 // if we want to allow immutable state objects, add an optional state mutator to each input declaration type
 
@@ -275,7 +275,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     return (
       <div className='dynamic-form' style={this.props.style}>
         { this.props.centerForm ?
-          <div style={{flexGrow: '1'}}/> : null
+          <div style={{flexGrow: 1}}/> : null
         }
         {renderMatrix.map(this.renderMatrixRow)}
         {this.props.children !== undefined ? this.props.children : null}

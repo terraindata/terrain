@@ -97,7 +97,7 @@ export default class Templates
     const { sources, sinks, transformationEngine } = template;
     let valid = true;
     const messages: string[] = [];
-    if (requireExistingId)
+    if (requireExistingId === true)
     {
       if (template.id == null || typeof template.id !== 'number')
       {

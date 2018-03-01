@@ -200,13 +200,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     }
     else
     {
-      return (
-        <div className='transformation-row' key={'none'}>
-          <div className='transformation-row-text'>
-            This Field Has No Transformations
-          </div>
-        </div>
-      );
+      return null;
     }
   }
 
