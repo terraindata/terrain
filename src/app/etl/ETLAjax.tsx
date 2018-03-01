@@ -61,9 +61,19 @@ class ETLAjax
 {
   public templatesToImmutable(templates: TemplateBase[]): List<ETLTemplate>
   {
-    return List(templates)
-      .map((template, index) => _ETLTemplate(template as TemplateBase, true))
-      .toList();
+    try
+    {
+      return List(templates)
+        .map((template, index) => _ETLTemplate(template as TemplateBase, true))
+        .toList();
+    }
+    catch (e)
+    {
+      // todo better error handleing
+      // tslint:disable-next-line
+      console.error(`Error trying to parse templates ${String(e)}`);
+      return List([]);
+    }
   }
 
   public fetchTemplates(
@@ -77,7 +87,7 @@ class ETLAjax
     };
     return Ajax.req(
       'get',
-      'etl/templates/',
+      'etl/templates',
       {},
       handleResponse,
       {

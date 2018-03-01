@@ -100,16 +100,18 @@ export type ETLTemplate = WithIRecord<ETLTemplateC>;
 export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
   transformationEngine: TransformationEngine.load,
   // transformationConfig // todo
-  sources: (sources) => {
+  sources: (sources) =>
+  {
     return Map<string, SourceConfig>(sources)
-    .map((obj, key) => _SourceConfig(obj, true))
-    .toMap();
+      .map((obj, key) => _SourceConfig(obj, true))
+      .toMap();
   },
-  sinks: (sinks) => {
+  sinks: (sinks) =>
+  {
     return Map<string, SinkConfig>(sinks)
-    .map((obj, key) => _SinkConfig(obj, true))
-    .toMap();
-  }
+      .map((obj, key) => _SinkConfig(obj, true))
+      .toMap();
+  },
 });
 
 export function templateForBackend(template: ETLTemplate): TemplateBase

@@ -96,6 +96,10 @@ class TemplateEditor extends TerrainComponent<Props>
   // gets memoizedOne'd
   public transformDocument(previewDocument, engine, engineVersion)
   {
+    if (previewDocument == null)
+    {
+      return {};
+    }
     return engine.transform(previewDocument);
   }
 
@@ -206,7 +210,8 @@ class TemplateEditor extends TerrainComponent<Props>
     const { template } = this.props.templateEditor;
     const { etlAct, editorAct } = this.props;
 
-    const handleLoad = (savedTemplates: List<ETLTemplate>) => {
+    const handleLoad = (savedTemplates: List<ETLTemplate>) =>
+    {
       if (savedTemplates.size > 0)
       {
         const savedTemplate = savedTemplates.get(0);
@@ -226,11 +231,12 @@ class TemplateEditor extends TerrainComponent<Props>
     const handleError = (ev) =>
     {
       // TODO
-    }
+    };
 
     let templateForSave = template;
     if (template.id === -1) // then its a new template
     {
+      // temp stuff get rid of this TODO
       const randstring = Math.random().toString(36).substring(2, 7);
       templateForSave = templateForSave.set('templateName', `Test Template${randstring}`);
 

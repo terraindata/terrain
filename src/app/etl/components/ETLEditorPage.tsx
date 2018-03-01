@@ -55,6 +55,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
@@ -62,7 +63,6 @@ import { createInitialTemplate } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -76,9 +76,12 @@ export interface Props
     algorithmId?: number,
     templateId?: number;
   };
+  // injected
   algorithms?: IMMap<ID, Algorithm>;
   walkthrough?: WalkthroughState;
-  act?: typeof TemplateEditorActions;
+  templates?: List<ETLTemplate>;
+  editorAct?: typeof TemplateEditorActions;
+  etlAct?: typeof ETLActions;
 }
 
 function getAlgorithmId(params): number
@@ -94,7 +97,7 @@ function getTemplateId(params): number
 }
 
 function createInitialTemplateFn(
-  act: typeof TemplateEditorActions,
+  editorAct: typeof TemplateEditorActions,
   source?: SourceConfig,
   sink?: SinkConfig,
 ): (hits: List<object>) => void
@@ -102,11 +105,11 @@ function createInitialTemplateFn(
   return (hits) =>
   {
     const { template, fieldMap } = createInitialTemplate(hits, source, sink);
-    act({
+    editorAct({
       actionType: 'setTemplate',
       template,
     });
-    act({
+    editorAct({
       actionType: 'setFieldMap',
       fieldMap,
     });
@@ -118,7 +121,7 @@ class ETLEditorPage extends TerrainComponent<Props>
 {
   public initFromAlgorithm()
   {
-    const { algorithms, params, act } = this.props;
+    const { algorithms, params, editorAct } = this.props;
     const algorithmId = getAlgorithmId(params);
     const source = _SourceConfig({
       type: Sources.Algorithm,
@@ -129,9 +132,9 @@ class ETLEditorPage extends TerrainComponent<Props>
         algorithmId,
       },
     });
-    const onFetched = createInitialTemplateFn(act, source);
+    const onFetched = createInitialTemplateFn(editorAct, source);
 
-    act({
+    editorAct({
       actionType: 'fetchDocuments',
       source,
       algorithms,
@@ -141,14 +144,14 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public initFromWalkthrough()
   {
-    const { act, walkthrough } = this.props;
+    const { editorAct, walkthrough } = this.props;
     const source = walkthrough.source;
     const sink = walkthrough.sink;
-    const onFetched = createInitialTemplateFn(act, source, sink);
+    const onFetched = createInitialTemplateFn(editorAct, source, sink);
 
     if (source.type === Sources.Upload)
     {
-      act({
+      editorAct({
         actionType: 'fetchDocuments',
         source,
         file: walkthrough.file,
@@ -161,9 +164,56 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
   }
 
+  public loadExisting()
+  {
+    const onLoad = (response: List<ETLTemplate>) =>
+    {
+      const { params, editorAct, templates, algorithms } = this.props;
+      const templateId = getTemplateId(params);
+      const index = templates.findIndex((template) => template.id === templateId);
+      // TODO what happens if the algorithms haven't loaded in yet?
+      if (index === -1)
+      {
+        // TODO error
+      }
+      else
+      {
+        const template = templates.get(index);
+        const onFetched = () =>
+        {
+          // do nothing
+        };
+        editorAct({
+          actionType: 'setTemplate',
+          template,
+        });
+        editorAct({
+          actionType: 'rebuildFieldMap',
+        });
+        editorAct({
+          actionType: 'fetchDocuments',
+          source: template.sources.get('primary'),
+          algorithms,
+          onFetched,
+        });
+      }
+    };
+    const onError = (response) =>
+    {
+      // TODO
+    };
+    const { etlAct } = this.props;
+    etlAct({
+      actionType: 'fetchTemplates',
+      onLoad,
+      onError,
+    });
+
+  }
+
   public componentWillMount()
   {
-    this.props.act({
+    this.props.editorAct({
       actionType: 'resetState',
     });
     if (this.props.params.algorithmId !== undefined)
@@ -172,7 +222,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
     else if (this.props.params.templateId !== undefined)
     {
-      // TODO pull from midway
+      this.loadExisting();
     }
     else if (this.props.walkthrough.source.type != null) // TODO check if its walkthrough
     {
@@ -203,6 +253,7 @@ export default Util.createContainer(
   [
     ['library', 'algorithms'],
     ['walkthrough'],
+    ['etl', 'templates'],
   ],
-  { act: TemplateEditorActions },
+  { editorAct: TemplateEditorActions, etlAct: ETLActions },
 );

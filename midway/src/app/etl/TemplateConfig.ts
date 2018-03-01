@@ -91,7 +91,7 @@ export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfi
   {
     newObj.sinks = JSON.parse(newObj.sinks as string);
   }
-  return newObj;
+  return new TemplateConfig(newObj);
 }
 
 export function templateForSave(template: TemplateObject): TemplateInDatabase

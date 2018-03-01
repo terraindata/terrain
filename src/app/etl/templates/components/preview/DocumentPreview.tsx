@@ -84,6 +84,10 @@ class DocumentPreview extends TerrainComponent<Props>
   // gets memoizedOne'd
   public transformDocument(previewDocument, engine, engineVersion)
   {
+    if (previewDocument == null)
+    {
+      return {};
+    }
     return engine.transform(previewDocument);
   }
 

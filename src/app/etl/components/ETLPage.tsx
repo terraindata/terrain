@@ -74,6 +74,7 @@ class ETLPage extends TerrainComponent<Props>
     this.props.act({
       actionType: 'fetchTemplates',
     });
+    // TODO lock UI until done?
   }
 
   public render()
