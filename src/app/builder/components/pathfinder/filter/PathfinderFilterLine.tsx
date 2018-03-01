@@ -286,7 +286,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           return '';
         }
         return Util.formatDate(value, true);
-      default:
+      case FieldType.Geopoint:
+        value = _DistanceValue(Util.asJS(value));
+        return value.distance + units[value.units] + ' of ' + value.address;
+     default:
         return undefined;
     }
   }
@@ -430,45 +433,46 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         );
 
       case FieldType.Geopoint:
-        let value = filterLine.value as DistanceValue;
-        if (filterLine.value === null)
-        {
-          value = _DistanceValue();
-          this.handleChange('value', value);
-        }
         return ( // value will be injected by RouteSelector
           (props: { value: any }) =>
-            <div className='pf-filter-map-input-wrapper'>
-              <div className='pf-filter-map-inputs'>
-                <BuilderTextbox
-                  value={value.distance}
+          {
+            const value = _DistanceValue(Util.asJS(props.value));
+            return (
+              <div className='pf-filter-map-input-wrapper'>
+                <div className='pf-filter-map-inputs'>
+                  <BuilderTextbox
+                    value={value.distance}
+                    canEdit={pathfinderContext.canEdit}
+                    onChange={this._fn(this.handleMapValueChange, 'distance')}
+                    placeholder={'Distance'}
+                  />
+                  <Dropdown
+                    options={List(_.keys(units))}
+                    selectedIndex={_.keys(units).indexOf(value.units)}
+                    canEdit={pathfinderContext.canEdit}
+                    optionsDisplayName={Map(units)}
+                    onChange={this._fn(this.handleMapValueChange,  'units')}
+                    openDown={true}
+                    // keyPath={this.props.keyPath.push('value').push('units')}
+                    // action={this.props.onChange}
+                  />
+                </div>
+
+                <MapComponent
+                  geocoder='google'
+                  inputValue={props.value && props.value.address || ''}
+                  coordinates={props.value && props.value.location !== undefined ? props.value.location : [0, 0]}
+                  distance={props.value && props.value.distance || 0}
+                  distanceUnit={props.value && props.value.units || 'miles'}
+                  wrapperClassName={'pf-filter-map-component-wrapper'}
+                  fadeInOut={true}
+                  onChange={this.handleMapChange}
                   canEdit={pathfinderContext.canEdit}
-                  keyPath={this.props.keyPath.push('value').push('distance')}
-                  action={this.props.onChange}
-                  placeholder={'Distance'}
-                />
-                <Dropdown
-                  options={List(_.keys(units))}
-                  selectedIndex={_.keys(units).indexOf(value.units)}
-                  canEdit={pathfinderContext.canEdit}
-                  optionsDisplayName={Map(units)}
-                  keyPath={this.props.keyPath.push('value').push('units')}
-                  action={this.props.onChange}
                 />
               </div>
+            );
+          }
 
-              <MapComponent
-                geocoder='photon'
-                inputValue={props.value && props.value.address}
-                coordinates={props.value && props.value.location !== undefined ? props.value.location : [0, 0]}
-                distance={props.value && props.value.distance}
-                distanceUnit={props.value && props.value.units}
-                wrapperClassName={'pf-filter-map-component-wrapper'}
-                fadeInOut={true}
-                onChange={this.handleMapChange}
-                canEdit={pathfinderContext.canEdit}
-              />
-            </div>
         );
       )
       case FieldType.Ip:
@@ -481,6 +485,26 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         // Nested
         throw new Error('No value type handler for ' + filterLine.valueType);
     }
+  }
+
+  private handleMapValueChange(key, value)
+  {
+    if (key === 'units')
+    {
+      value = _.keys(units)[value];
+    }
+    let filterLine;
+    if (this.props.filterLine.value[key] !== undefined)
+    {
+      filterLine = this.props.filterLine
+        .setIn(['value', key],  value);
+    }
+    else
+    {
+      filterLine = this.props.filterLine
+        .setIn(['value'], _DistanceValue({[key]: value}));
+    }
+    this.props.onChange(this.props.keyPath, filterLine, false, false);
   }
 
   private handleMapChange(coordinates, inputValue)

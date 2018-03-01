@@ -315,7 +315,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
   {
     value = Util.formatInputDate(new Date(value), 'elastic');
   }
-  if (line.field && line.field.indexOf('.') !== undefined && !ignoreNested)
+  if (line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
   {
     // In this case it is a nested query, disguised as a normal filter line
     const path = line.field.split('.')[0];
@@ -470,13 +470,13 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         }),
       });
     case 'located':
-    // const distanceObj = line.value as DistanceValue;
-    // return Map({
-    //   geo_distance: Map({
-    //     distance: String(distanceObj.distance) + distanceObj.units,
-    //     [line.field]: [distanceObj.location[1], distanceObj.location[0]],
-    //   }),
-    // });
+    const distanceObj = line.value as DistanceValue;
+    return Map({
+      geo_distance: Map({
+        distance: String(distanceObj.distance) + distanceObj.units,
+        [line.field]: distanceObj.location,
+      }),
+    });
     case 'isin':
     case 'isnotin':
       try
