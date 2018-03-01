@@ -44,25 +44,32 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import * as _ from 'lodash';
+import ConfigType from '../ConfigType';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
 import { TemplateBase, TemplateObject} from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-export interface TemplateConfig extends TemplateBase
+export class TemplateConfig extends ConfigType implements TemplateBase
 {
-  id?: number;
-  templateName: string;
-  transformationEngine: TransformationEngine;
-  transformationConfig: any;
-  sources: {
+  public id?: number = undefined;
+  public templateName: string = '';
+  public transformationEngine: TransformationEngine = undefined;
+  public transformationConfig: any = undefined;
+  public sources: {
     primary?: SourceConfig;
     [k: string]: SourceConfig;
-  };
-  sinks: {
+  } = { };
+  public sinks: {
     primary?: SinkConfig;
     [k: string]: SinkConfig;
-  };
+  } = { };
+
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
 }
 
 export type TemplateInDatabase = {

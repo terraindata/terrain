@@ -76,4 +76,19 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
   ctx.body = await templates.create(template);
 });
 
+Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const template: TemplateConfig = ctx.request.body.body;
+  const requiredParams = [
+    'id', 'templateName', 'transformationEngine',
+    'transformationConfig', 'sources', 'sinks',
+  ];
+  if (template.id !== Number(ctx.params.id))
+  {
+    throw new Error('Template ID does not match the supplied id in the URL');
+  }
+  Util.verifyParameters(template, requiredParams);
+  ctx.body = await templates.update(template);
+});
+
 export default Router;

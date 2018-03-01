@@ -178,5 +178,4 @@ export default class Templates
     const toUpsert = templateForSave(newTemplate);
     return App.DB.upsert(this.templateTable, toUpsert) as Promise<TemplateConfig>;
   }
-
 }
