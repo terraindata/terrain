@@ -56,9 +56,9 @@ export const PathfinderText = {
     // `Choose where your data are located and filter out everything that isn't a match.`,
 
   // Filter sections
-  hardFilterSectionTitle: 'Necessary Criteria',
+  hardFilterSectionTitle: 'Filters',
   hardFilterSectionSubtitle: '',
-  softFilterSectionTitle: 'Text Match Qualities',
+  softFilterSectionTitle: 'Match Qualities',
   softFilterSectionSubtitle: '',
   
   nestedFilterIntro: '',
@@ -85,21 +85,21 @@ export const PathfinderText = {
       tooltip: 'The score will be determined by the weighted sum of factors',
     },
     linear: {
-      title: 'Linear',
+      title: 'Field',
       tooltip: 'The results will be sorted linearly by the following factors',
     },
     elastic: {
-      title: 'Text Match Quality',
+      title: 'Match Quality',
       tooltip: 'The results will be sorted based on how well the match any text filters from above',
     },
     random: {
       title: 'Random',
       tooltip: 'A diverse set of results will be returned',
     },
-    none: {
-      title: 'None',
-      tooltip: 'The results will not be sorted in any way',
-    },
+    // none: {
+    //   title: 'None',
+    //   tooltip: 'The results will not be sorted in any way',
+    // },
   },
 
   // More section

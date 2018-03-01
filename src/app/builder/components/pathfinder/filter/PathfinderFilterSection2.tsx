@@ -72,6 +72,7 @@ export interface Props
   keyPath: KeyPath;
   onStepChange?: (oldStep: PathfinderSteps) => void;
   toSkip?: number;
+  isSoftFilter?: boolean; // does this section apply to soft filters?
 
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
@@ -166,14 +167,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public renderFilterLine(filterLine, keyPath: List<string | number>)
   {
-    const { pathfinderContext } = this.props;
+    const { pathfinderContext, isSoftFilter } = this.props;
     
     const successorKeyPath = keyPath.unshift('lines').set(keyPath.size, (keyPath.last() as number) + 1);
     const successor = this.props.filterGroup.getIn(successorKeyPath);
     
     // make key path relative to entire Path object
     keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
-    
     
     return (
       <PathfinderFilterLine
@@ -184,15 +184,17 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         onDelete={this.handleFilterDelete}
         pathfinderContext={pathfinderContext}
         comesBeforeAGroup={successor && this.isGroup(successor)}
+        isSoftFilter={isSoftFilter}
       />
     );
   }
 
   public renderGroupHeader(group, keyPath)
   {
-    const { pathfinderContext } = this.props;
+    const { pathfinderContext, isSoftFilter } = this.props;
     // make key path relative to entire Path object
     keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
+    
     return (
       <PathfinderFilterGroup
         filterGroup={group}
@@ -200,6 +202,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         keyPath={keyPath}
         onChange={this.handleFilterChange}
         onDelete={this.handleFilterDelete}
+        isSoftFilter={isSoftFilter}
       />
     );
   }
@@ -350,18 +353,27 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public render()
   {
-    const { filterGroup, pathfinderContext } = this.props;
+    const { filterGroup, pathfinderContext, isSoftFilter } = this.props;
     const { dragging } = this.state;
     const dropZoneStyle = { zIndex: dragging ? 20 : -1 };
     const itemStyle = { opacity: dragging ? 0.7 : 1 };
     const groupStyle = { opacity: dragging ? 0.7 : 1, zIndex: dragging ? 99 : 5 };
+    
+    let title = PathfinderText.hardFilterSectionTitle;
+    let subtitle = PathfinderText.hardFilterSectionSubtitle;
+    if (isSoftFilter)
+    {
+      title = PathfinderText.softFilterSectionTitle;
+      subtitle = PathfinderText.softFilterSectionSubtitle;
+    }
+    
     return (
       <div
         className='pf-section pf-filter-section'
       >
         <PathfinderSectionTitle
-          title={PathfinderText.hardFilterSectionTitle}
-          text={PathfinderText.hardFilterSectionSubtitle}
+          title={title}
+          text={subtitle}
         />
         
         <CustomDragLayer />

@@ -160,7 +160,6 @@ class DrawerAnimation extends TerrainComponent<Props>
       renderMaxHeight: 0, // but in a closed state
       openingInterval: setInterval(() => 
         {
-          console.log('Render MH');
           if (this.hasRendered)
           {
             // make sure we've already rendered, so we get that animation
@@ -200,7 +199,6 @@ class DrawerAnimation extends TerrainComponent<Props>
       shouldRender: true, // should be unchanged
       renderMaxHeight: 0, // tell it we're closing
       closingTimeout: setTimeout(() => {
-        console.log('Dont render');
         this.setState({
           shouldRender: false,
         });

@@ -150,7 +150,8 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     const { source } = pathfinderContext;
 
     const fieldOptions = source.dataSource.getChoiceOptions({
-      type: 'transformFields',
+      type: 'fields',
+      subtype: 'transform',
       source,
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
@@ -251,7 +252,8 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     if (source.dataSource.getChoiceOptions !== undefined)
     {
       dropdownOptions = source.dataSource.getChoiceOptions({
-        type: 'transformFields',
+        type: 'fields',
+        subtype: 'transform',
         source,
         schemaState,
         builderState,
