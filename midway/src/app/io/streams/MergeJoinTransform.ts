@@ -141,9 +141,6 @@ export default class MergeJoinTransform extends Readable
     let l = left[this.leftSource.position][this.joinKey];
     let r = right[this.rightSource.position][this.joinKey];
 
-    console.log(l);
-    console.log(r);
-
     // advance left and right streams
     while (this.leftSource.position < left.length
       && this.rightSource.position < right.length)
@@ -152,7 +149,6 @@ export default class MergeJoinTransform extends Readable
       {
         if (l < r)
         {
-          console.log('advancing left...');
           this.leftSource.position++;
           l = left[this.leftSource.position][this.joinKey];
 
@@ -164,12 +160,10 @@ export default class MergeJoinTransform extends Readable
         }
         else if (r < l)
         {
-          console.log('advancing right...');
           this.rightSource.position++;
           r = right[this.rightSource.position][this.joinKey];
         }
 
-        console.log('must be equal...!!!??');
         // if either of the streams went dry, request more
         if (this.leftSource.position === left.length)
         {
