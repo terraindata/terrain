@@ -269,7 +269,7 @@ function parseTerrainScore(score: Score)
   return sortObj;
 }
 
-function parseFilters(filterGroup: FilterGroup, inputs, forceShould = false): any
+function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = false): any
 {
   // init must, mustNot, filter, should
   // If the minMatches is all of the above
@@ -294,7 +294,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, forceShould = false): an
   let filter = List([]);
   let should = List([]);
   let useShould = false;
-  if (filterGroup.minMatches !== 'all' || forceShould)
+  if (filterGroup.minMatches !== 'all' || inMatchQualityContext)
   {
     useShould = true;
   }
@@ -318,7 +318,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, forceShould = false): an
     }
     else
     {
-      const nestedFilter = parseFilters(line.filterGroup, inputs, forceShould);
+      const nestedFilter = parseFilters(line.filterGroup, inputs, inMatchQualityContext);
       must = must.push(nestedFilter);
     }
   });
@@ -326,7 +326,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, forceShould = false): an
   {
     filterObj = filterObj.updateIn(['bool', 'minimum_should_match'], (MSM) =>
     {
-      if (forceShould)
+      if (inMatchQualityContext)
       {
         return 0; // forcing should for match quality
       }
@@ -334,14 +334,31 @@ function parseFilters(filterGroup: FilterGroup, inputs, forceShould = false): an
       return filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches));
     });
   }
+  
   filterObj = filterObj.setIn(['bool', 'must'], must);
+  if (inMatchQualityContext)
+  {
+    // need to add a useless Must check, so that the Should does not
+    // convert to a "must" because of the filter context
+    // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
+    filterObj = filterObj.updateIn(['bool', 'must'], 
+      (must) => 
+      {
+        return must.push(Map({
+          exists: Map({
+            field: '_id',
+          }),
+        }));
+      });
+  }
+  
   filterObj = filterObj.setIn(['bool', 'must_not'], mustNot);
   filterObj = filterObj.setIn(['bool', 'should'], should);
   filterObj = filterObj.setIn(['bool', 'filter'], filter);
   return filterObj;
 }
 
-function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNested)
+function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNested = false)
 {
   const lineValue = String(line.value);
   let value: any = String(line.value || '');

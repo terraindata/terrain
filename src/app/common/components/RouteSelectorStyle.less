@@ -227,6 +227,7 @@
 			background: #eee;
 			padding: 6px;
 			overflow-y: auto;
+			flex-shrink: 1; // allow this to shrink, with higher priority than the name
 			
 			.routeselector-data-header {
 				text-align: center;
@@ -282,11 +283,16 @@
 			margin: 18px 32px;
 		}
 		
+		.routeselector-picker .routeselector-options .routeselector-option-wrapper {
+			min-width: 150px;
+		}
+		
 		.routeselector-option-name {
 			padding: 12px 18px;
 			font-size: 24px;
 			display: flex;
 			align-items: center;
+			flex-shrink: 0; // don't actually want this to shrink, so set low priority
 			
 			.routeselector-option-icon {
 				margin-right: 12px;

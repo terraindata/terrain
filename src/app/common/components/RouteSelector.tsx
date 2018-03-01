@@ -430,10 +430,15 @@ export class RouteSelector extends TerrainComponent<Props>
             optionSet.options.map(this._fn(this.renderOption, index, visibleOptionCounter, incrementVisibleOptions))
           }
 
-          {/*Add fodder, to help items space horizontally evenly. These will not appear*/}
-          <div className='routeselector-option-wrapper' />
-          <div className='routeselector-option-wrapper' />
-          <div className='routeselector-option-wrapper' />
+          {
+            optionSet.options.size > 3 &&
+            [
+              /*Add fodder, to help items space horizontally evenly. These will not appear*/
+              <div key='1' className='routeselector-option-wrapper' />,
+              <div key='2' className='routeselector-option-wrapper' />,
+              <div key='3' className='routeselector-option-wrapper' />,
+            ]
+          }
         </div>
       </div>
     );
