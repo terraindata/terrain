@@ -233,7 +233,7 @@ export default class MergeJoinTransform extends Readable
             while (k < response.hits.hits.length &&
               (ticket.results[i]['_source'][this.joinKey] === response.hits.hits[k]._source[this.joinKey]))
             {
-              ticket.results[k][subQuery].push(response.hits.hits[k]);
+              ticket.results[i][subQuery].push(response.hits.hits[k]);
               k++;
             }
           }
