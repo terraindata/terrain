@@ -236,13 +236,13 @@ export default class GroupJoinTransform extends Readable
             throw error;
           }
 
+          if (response.error !== undefined)
+          {
+            throw response.error;
+          }
+
           for (let j = 0; j < numInputs; ++j)
           {
-            if (response.error !== undefined)
-            {
-              throw response.error;
-            }
-
             if (response.responses[j].hits !== undefined)
             {
               ticket.results[j][subQuery] = response.responses[j].hits.hits;
