@@ -44,26 +44,37 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESJSONParser from '../parser/ESJSONParser';
-import ESValueInfo from '../parser/ESValueInfo';
-import ESFormatter from './ESFormatter';
+import AExportTransform from './AExportTransform';
 
 /**
- * WIP - currently nothing happens with previousQuery
+ * Converts result stream to JSON text stream
+ *
+ * Could add additional config options.
  */
-class ESConverter
+export default class JSONExportTransform extends AExportTransform
 {
-  public static defaultIndentSize = 2;
-
-  public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
+  constructor()
   {
-    return this.formatValueInfo(query.getValueInfo());
+    super();
   }
 
-  public static formatValueInfo(source: ESValueInfo, previousQuery?: ESJSONParser): string
+  protected preamble(): string
   {
-    const formatter = new ESFormatter(ESConverter.defaultIndentSize, true);
-    return formatter.formatQuery(source);
+    return '[\n';
+  }
+
+  protected transform(input: object, chunkNumber: number): string
+  {
+    return JSON.stringify(input);
+  }
+
+  protected delimiter(): string
+  {
+    return ',\n';
+  }
+
+  protected conclusion(chunkNumber: number): string
+  {
+    return '\n]\n';
   }
 }
-export default ESConverter;

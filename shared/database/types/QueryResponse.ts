@@ -42,28 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.QueryResponse
 
-import ESJSONParser from '../parser/ESJSONParser';
-import ESValueInfo from '../parser/ESValueInfo';
-import ESFormatter from './ESFormatter';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+import AQueryResponse from './AQueryResponse';
+import QueryRequest from './QueryRequest';
+import QueryResult from './QueryResult';
 
-/**
- * WIP - currently nothing happens with previousQuery
- */
-class ESConverter
+export default class QueryResponse extends AQueryResponse
 {
-  public static defaultIndentSize = 2;
+  public result: QueryResult;
 
-  public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
+  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request?: QueryRequest)
   {
-    return this.formatValueInfo(query.getValueInfo());
-  }
+    super(errors, request);
 
-  public static formatValueInfo(source: ESValueInfo, previousQuery?: ESJSONParser): string
-  {
-    const formatter = new ESFormatter(ESConverter.defaultIndentSize, true);
-    return formatter.formatQuery(source);
+    this.result = result;
   }
 }
-export default ESConverter;
