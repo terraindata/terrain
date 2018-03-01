@@ -44,26 +44,60 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESJSONParser from '../parser/ESJSONParser';
-import ESValueInfo from '../parser/ESValueInfo';
-import ESFormatter from './ESFormatter';
+import { Transform } from 'stream';
 
 /**
- * WIP - currently nothing happens with previousQuery
+ * Abstract class for converting a result stream to a string stream for export formatting
  */
-class ESConverter
+export default abstract class AExportTransform extends Transform
 {
-  public static defaultIndentSize = 2;
+  private chunkNumber: number = 0;
 
-  public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
+  constructor()
   {
-    return this.formatValueInfo(query.getValueInfo());
+    super({
+      writableObjectMode: true,
+      readableObjectMode: false,
+    });
   }
 
-  public static formatValueInfo(source: ESValueInfo, previousQuery?: ESJSONParser): string
+  public _transform(chunk, encoding, callback)
   {
-    const formatter = new ESFormatter(ESConverter.defaultIndentSize, true);
-    return formatter.formatQuery(source);
+    let result: string;
+    const chunkNumber = this.chunkNumber++;
+    if (chunkNumber === 0)
+    {
+      result = this.preamble();
+    }
+    else
+    {
+      result = this.delimiter();
+    }
+
+    result += this.transform(chunk as object, chunkNumber);
+    callback(null, result);
   }
+
+  public _flush(callback)
+  {
+    let result: string;
+    if (this.chunkNumber === 0)
+    {
+      result = this.preamble() + this.conclusion(this.chunkNumber);
+    }
+    else
+    {
+      result = this.conclusion(this.chunkNumber);
+    }
+
+    callback(null, result);
+  }
+
+  protected abstract preamble(): string;
+
+  protected abstract transform(input: object, chunkNumber: number): string;
+
+  protected abstract delimiter(): string;
+
+  protected abstract conclusion(chunkNumber: number): string;
 }
-export default ESConverter;

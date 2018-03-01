@@ -44,18 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
-import sha1 = require('sha1');
-
 import * as equal from 'deep-equal';
 import * as _ from 'lodash';
+import sha1 = require('sha1');
 import * as stream from 'stream';
 import * as winston from 'winston';
 
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import * as SharedUtil from '../../../../shared/Util';
-
 import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -63,6 +60,8 @@ import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
+import CSVExportTransform from './streams/CSVExportTransform';
+import JSONExportTransform from './streams/JSONExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
@@ -81,119 +80,101 @@ export class Export
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
   private MAX_ROW_THRESHOLD: number = 2000;
 
-  public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
+  public async export(exportConfig: ExportConfig, headless: boolean): Promise<stream.Readable>
   {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
+    const database: DatabaseController | undefined = DatabaseRegistry.get(exportConfig.dbid);
+    if (database === undefined)
     {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(exprt.dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + exprt.dbid.toString() + '" not found.');
-      }
+      throw Error('Database "' + exportConfig.dbid.toString() + '" not found.');
+    }
 
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
+    if (database.getType() !== 'ElasticController')
+    {
+      throw Error('File export currently is only supported for Elastic databases.');
+    }
 
-      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
-      {
-        return reject('Filetype must be either CSV or JSON.');
-      }
+    if (exportConfig.filetype !== 'csv' && exportConfig.filetype !== 'json' && exportConfig.filetype !== 'json [type object]')
+    {
+      throw Error('Filetype must be either CSV or JSON.');
+    }
 
-      let objectKeyValue: string | undefined;
-      if (exprt.filetype === 'json [type object]' && exprt.objectKey !== undefined)
+    if (headless)
+    {
+      // get a template given the template ID
+      const templates: ExportTemplateConfig[] = await exportTemplates.get(exportConfig.templateId);
+      if (templates.length === 0)
       {
-        objectKeyValue = exprt.objectKey;
+        throw Error('Template not found. Did you supply an export template ID?');
       }
+      const template = templates[0] as object;
+      if (exportConfig.dbid !== template['dbid'])
+      {
+        throw Error('Template database ID does not match supplied database ID.');
+      }
+      for (const templateKey of Object.keys(template))
+      {
+        exportConfig[templateKey] = template[templateKey];
+      }
+    }
 
-      if (headless)
-      {
-        // get a template given the template ID
-        const templates: ExportTemplateConfig[] = await exportTemplates.get(exprt.templateId);
-        if (templates.length === 0)
-        {
-          return reject('Template not found. Did you supply an export template ID?');
-        }
-        const template = templates[0] as object;
-        if (exprt.dbid !== template['dbid'])
-        {
-          return reject('Template database ID does not match supplied database ID.');
-        }
-        for (const templateKey of Object.keys(template))
-        {
-          exprt[templateKey] = template[templateKey];
-        }
-      }
+    const mapping: object = exportConfig.columnTypes;
+    if (mapping === undefined)
+    {
+      throw Error('Must provide export template column types.');
+    }
 
-      if (exprt.columnTypes === undefined)
-      {
-        return reject('Must provide export template column types.');
-      }
-      if (exprt.filetype === 'json [type object]' && objectKeyValue !== undefined)
-      {
-        exprt.objectKey = objectKeyValue;
-      }
-
+    return new Promise<stream.Readable>(async (resolve, reject) =>
+    {
       // get query data from algorithmId or query (or variant Id if necessary)
       let qry: string = '';
-      if ((exprt as any).variantId !== undefined && exprt.algorithmId === undefined)
+      if (exportConfig['variantId'] !== undefined && exportConfig.algorithmId === undefined)
       {
-        exprt.algorithmId = (exprt as any).variantId;
+        exportConfig.algorithmId = exportConfig['variantId'];
       }
-      if (exprt.algorithmId !== undefined && exprt.query === undefined)
+      if (exportConfig.algorithmId !== undefined && exportConfig.query === undefined)
       {
-        qry = await this._getQueryFromAlgorithm(exprt.algorithmId);
+        qry = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
       }
-      else if (exprt.algorithmId === undefined && exprt.query !== undefined)
+      else if (exportConfig.algorithmId === undefined && exportConfig.query !== undefined)
       {
-        qry = exprt.query;
+        qry = exportConfig.query;
       }
       else
       {
-        return reject('Must provide either algorithm ID or query, not both or neither.');
-      }
-      if (qry === '')
-      {
-        return reject('Empty query provided.');
+        throw Error('Must provide either algorithm ID or query, not both or neither.');
       }
 
-      const mapping: object = exprt.columnTypes;
-      if (typeof mapping === 'string')
+      if (qry === '')
       {
-        return reject(mapping);
+        throw Error('Empty query provided.');
+      }
+
+      // get list of export column names
+      const columnNames: string[] = Object.keys(mapping);
+      if (exportConfig.rank === true && columnNames.indexOf('TERRAINRANK') === -1)
+      {
+        columnNames.push('TERRAINRANK');
       }
 
       let writer: any;
-      if (exprt.filetype === 'csv')
+      if (exportConfig.filetype === 'csv')
       {
-        writer = csvWriter();
+        writer = new CSVExportTransform(columnNames);
       }
-      else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+      else if (exportConfig.filetype === 'json' || exportConfig.filetype === 'json [type object]')
       {
-        writer = new stream.PassThrough();
-      }
-
-      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        if (exprt.filetype === 'json [type object]')
-        {
-          writer.write('{ \"');
-          writer.write(exprt.objectKey);
-          writer.write('\":');
-        }
-        writer.write('[');
+        writer = new JSONExportTransform();
       }
 
       const originalMapping: object = {};
       // generate original mapping if there were any renames
-      const allNames = Object.keys(exprt.columnTypes);
+      const allNames = Object.keys(mapping);
       allNames.forEach((value, i) =>
       {
         originalMapping[value] = value;
       });
 
-      const renameTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'rename');
+      const renameTransformations: object[] = exportConfig.transformations.filter((transformation) => transformation['name'] === 'rename');
       renameTransformations.forEach((transformation) =>
       {
         originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
@@ -202,7 +183,7 @@ export class Export
       // TODO add transformation check for addcolumn and update mapping accordingly
       const qh: QueryHandler = database.getQueryHandler();
       const payload = {
-        database: exprt.dbid,
+        database: exportConfig.dbid,
         type: 'search',
         streaming: true,
         databasetype: 'elastic',
@@ -213,55 +194,34 @@ export class Export
       if (respStream === undefined || (respStream.hasError !== undefined && respStream.hasError()))
       {
         writer.end();
-        return reject('Nothing to export.');
+        throw Error('Nothing to export.');
       }
 
       try
       {
-        const extractTransformations = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
-        exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
+        const extractTransformations = exportConfig.transformations.filter((transformation) => transformation['name'] === 'extract');
+        exportConfig.transformations = exportConfig.transformations.filter((transformation) => transformation['name'] !== 'extract');
 
         winston.info('Beginning export transformations.');
         const cfg = {
           extractTransformations,
-          exprt,
+          exportConfig,
           fieldArrayDepths: {},
           id: 1,
           mapping: originalMapping,
         };
 
-        let isFirstJSONObj: boolean = true;
-        respStream.on('data', (docs) =>
+        respStream.on('data', (doc) =>
         {
-          if (docs === undefined || docs === null)
+          if (doc === undefined || doc === null)
           {
             writer.end();
           }
 
           try
           {
-            for (let doc of docs)
-            {
-              doc = this._postProcessDoc(doc, cfg);
-              if (exprt.filetype === 'csv')
-              {
-                writer.write(doc);
-              }
-              else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-              {
-                isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-                writer.write(JSON.stringify(doc));
-              }
-
-              if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-              {
-                writer.write(']');
-                if (exprt.filetype === 'json [type object]')
-                {
-                  writer.write('}');
-                }
-              }
-            }
+            doc = this._postProcessDoc(doc, cfg);
+            writer.write(doc);
           }
           catch (e)
           {
@@ -306,7 +266,7 @@ export class Export
     return this._getAllFieldsAndTypesFromQuery(database, qry, dbid);
   }
 
-  private _postProcessDoc(doc: object, cfg: any): object
+  public _postProcessDoc(doc: object, cfg: any): object
   {
     // merge groupJoins with _source if necessary
     doc = this._mergeGroupJoin(doc);
@@ -342,15 +302,15 @@ export class Export
           cfg.fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
         }
 
-        if (Array.isArray(doc[field]) && cfg.exprt.filetype === 'csv')
+        if (Array.isArray(doc[field]) && cfg.exportConfig.filetype === 'csv')
         {
           doc[field] = this._convertArrayToCSVArray(doc[field]);
         }
       }
     }
 
-    doc = this._transformAndCheck(doc, cfg.exprt, false);
-    if (cfg.exprt.rank === true)
+    doc = this._transformAndCheck(doc, cfg.exportConfig, false);
+    if (cfg.exportConfig.rank === true)
     {
       if (doc['TERRAINRANK'] !== undefined)
       {
@@ -773,16 +733,16 @@ export class Export
   /* checks whether obj has the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _checkTypes(obj: object, exprt: ExportConfig): void
+  private _checkTypes(obj: object, exportConfig: ExportConfig): void
   {
-    const targetHash: string = this._buildDesiredHash(exprt.columnTypes);
-    const targetKeys: string = JSON.stringify(Object.keys(exprt.columnTypes).sort());
+    const targetHash: string = this._buildDesiredHash(exportConfig.columnTypes);
+    const targetKeys: string = JSON.stringify(Object.keys(exportConfig.columnTypes).sort());
 
     // parse dates
     const dateColumns: string[] = [];
-    for (const colName of Object.keys(exprt.columnTypes))
+    for (const colName of Object.keys(exportConfig.columnTypes))
     {
-      if (exprt.columnTypes.hasOwnProperty(colName) && this._getESType(exprt.columnTypes[colName]) === 'date')
+      if (exportConfig.columnTypes.hasOwnProperty(colName) && this._getESType(exportConfig.columnTypes[colName]) === 'date')
       {
         dateColumns.push(colName);
       }
@@ -805,19 +765,19 @@ export class Export
       {
         if (obj.hasOwnProperty(key))
         {
-          if (!this._jsonCheckTypesHelper(obj[key], exprt.columnTypes[key]))
+          if (!this._jsonCheckTypesHelper(obj[key], exportConfig.columnTypes[key]))
           {
             throw new Error('Encountered an object whose field "' + key + '"does not match the specified type (' +
-              JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj));
+              JSON.stringify(exportConfig.columnTypes[key]) + '): ' + JSON.stringify(obj));
           }
         }
       }
     }
 
     // check that all elements of arrays are of the same type
-    for (const field of Object.keys(exprt.columnTypes))
+    for (const field of Object.keys(exportConfig.columnTypes))
     {
-      if (exprt.columnTypes[field]['type'] === 'array')
+      if (exportConfig.columnTypes[field]['type'] === 'array')
       {
         if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
         {
@@ -981,11 +941,11 @@ export class Export
   }
 
   // asynchronously perform transformations on each item to upsert, and check against expected resultant types
-  private _transformAndCheck(doc: object, exprt: ExportConfig, dontCheck?: boolean): object
+  private _transformAndCheck(doc: object, exportConfig: ExportConfig, dontCheck?: boolean): object
   {
     try
     {
-      doc = this._applyTransforms(doc, exprt.transformations);
+      doc = this._applyTransforms(doc, exportConfig.transformations);
     }
     catch (e)
     {
@@ -994,9 +954,9 @@ export class Export
     // only include the specified columns
     // NOTE: unclear if faster to copy everything over or delete the unused ones
     const trimmedDoc: object = {};
-    for (const name of Object.keys(exprt.columnTypes))
+    for (const name of Object.keys(exportConfig.columnTypes))
     {
-      if (exprt.columnTypes.hasOwnProperty(name))
+      if (exportConfig.columnTypes.hasOwnProperty(name))
       {
         if (typeof doc[name] === 'string')
         {
@@ -1012,7 +972,7 @@ export class Export
     {
       try
       {
-        this._checkTypes(trimmedDoc, exprt);
+        this._checkTypes(trimmedDoc, exportConfig);
       }
       catch (e)
       {

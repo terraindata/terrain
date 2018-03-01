@@ -44,26 +44,37 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESJSONParser from '../parser/ESJSONParser';
-import ESValueInfo from '../parser/ESValueInfo';
-import ESFormatter from './ESFormatter';
+import { Transform } from 'stream';
 
 /**
- * WIP - currently nothing happens with previousQuery
+ * Abstract class for transforming a result stream
  */
-class ESConverter
+export default abstract class ADocumentTransform extends Transform
 {
-  public static defaultIndentSize = 2;
+  private chunkNumber: number = 0;
 
-  public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
+  constructor()
   {
-    return this.formatValueInfo(query.getValueInfo());
+    super({
+      writableObjectMode: true,
+      readableObjectMode: true,
+    });
   }
 
-  public static formatValueInfo(source: ESValueInfo, previousQuery?: ESJSONParser): string
+  public _transform(chunk, encoding, callback)
   {
-    const formatter = new ESFormatter(ESConverter.defaultIndentSize, true);
-    return formatter.formatQuery(source);
+    callback(null, this.transform(chunk as object, this.chunkNumber++));
+  }
+
+  public _flush(callback)
+  {
+    this.conclusion(this.chunkNumber);
+    callback();
+  }
+
+  protected abstract transform(input: object, chunkNumber: number): object;
+
+  protected conclusion(chunkNumber: number): void
+  {
   }
 }
-export default ESConverter;

@@ -44,35 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
-import QueryRequest from './QueryRequest';
+import Export from '../Export';
+import ADocumentTransform from './ADocumentTransform';
 
-export interface QueryResult
+/**
+ * Applies export transformations to a result stream
+ */
+export default abstract class ExportTransform extends ADocumentTransform
 {
-  [key: string]: any;
-}
+  private exportt: Export;
+  private configuration: object;
 
-export default class QueryResponse
-{
-  public request?: QueryRequest;
-  public result: QueryResult;
-  public errors: MidwayErrorItem[];
-
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request?: QueryRequest)
+  constructor(exportt: Export, configuration: object)
   {
-    // QueryResult can't be null
-    this.result = result;
-    this.errors = errors;
-    this.request = request;
+    super();
+    this.exportt = exportt;
+    this.configuration = configuration;
   }
 
-  public setQueryRequest(req: QueryRequest)
+  protected transform(input: object, chunkNumber: number): object
   {
-    this.request = req;
-  }
-
-  public hasError(): boolean
-  {
-    return this.errors.length > 0;
+    return this.exportt._postProcessDoc(input, this.configuration);
   }
 }
