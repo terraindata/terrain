@@ -43,36 +43,56 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
 import * as _ from 'lodash';
 
+import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
+import { TemplateBase, TemplateObject} from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { SinkConfig, SourceConfig } from './EndpointTypes';
 
-export enum Languages
+export interface TemplateConfig extends TemplateBase
 {
-  Elastic = 'elastic',
-}
-
-export enum FileTypes
-{
-  Json = 'json',
-  JsonTypeObject = 'json [type object]',
-  Csv = 'csv',
-}
-
-export interface TemplateBase
-{
-  id?: ID;
+  id?: number;
   templateName: string;
   transformationEngine: TransformationEngine;
-  transformationConfig: any; // terrain rank, what to do on failures TODO figure out the exact type
-  sources: any;
-  sinks: any;
+  transformationConfig: any;
+  sources: {
+    primary?: SourceConfig;
+    [k: string]: SourceConfig;
+  };
+  sinks: {
+    primary?: SinkConfig;
+    [k: string]: SinkConfig;
+  };
 }
 
-export type TemplateObject = {
-  [k in keyof TemplateBase]: any;
+export type TemplateInDatabase = {
+  [k in keyof TemplateBase]: string | number | boolean;
 };
 
-export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfig
+{
+  const newObj: TemplateObject = _.extend({}, obj);
+  if (newObj.transformationConfig != null)
+  {
+    newObj.transformationConfig = JSON.parse(newObj.transformationConfig as string);
+  }
+  if (newObj.sources != null)
+  {
+    newObj.sources = JSON.parse(newObj.sources as string);
+  }
+  if (newObj.sinks != null)
+  {
+    newObj.sinks = JSON.parse(newObj.sinks as string);
+  }
+  return newObj;
+}
+
+export function templateForSave(template: TemplateObject): TemplateInDatabase
+{
+  const obj = _.extend({}, template);
+  obj.transformationEngine = JSON.stringify(template.transformationEngine);
+  // obj.transformationConfig = JSON.stringify(template.transformationConfig); TODO
+  obj.sources = JSON.stringify(template.sources);
+  obj.sinks = JSON.stringify(template.sinks);
+  return obj;
+}

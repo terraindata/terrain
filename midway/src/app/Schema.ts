@@ -134,6 +134,13 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      database integer NOT NULL,
      label text NOT NULL,
      events text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS templates
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     templateName text NOT NULL,
+     transformationEngine text NOT NULL,
+     transformationConfig text NOT NULL,
+     sources text NOT NULL,
+     sinks text NOT NULL); `,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)

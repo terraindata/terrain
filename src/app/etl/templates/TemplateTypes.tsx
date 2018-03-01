@@ -53,7 +53,7 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { Languages, TemplateBase as TemplateI } from 'shared/etl/types/ETLTypes';
+import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
@@ -81,7 +81,7 @@ class EditorDisplayStateC
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
-interface ETLTemplateI extends TemplateI
+interface ETLTemplateI extends TemplateBase
 {
   sources: Immutable.Map<string, SourceConfig>;
   sinks: Immutable.Map<string, SinkConfig>;
@@ -108,35 +108,13 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
     .toMap(),
 });
 
-type TemplateObject = {
-  [k in keyof ETLTemplateC]: any
-};
-
-export function destringifySavedTemplate(obj: TemplateObject): TemplateObject
-{
-  const newObj = _.extend({}, obj);
-  if (newObj.transformationConfig != null)
-  {
-    newObj.transformationConfig = JSON.parse(newObj.transformationConfig);
-  }
-  if (newObj.sources != null)
-  {
-    newObj.sources = JSON.parse(newObj.sources);
-  }
-  if (newObj.sinks != null)
-  {
-    newObj.sinks = JSON.parse(newObj.sinks);
-  }
-  return newObj;
-}
-
-export function templateForSave(template: ETLTemplate): TemplateObject
+export function templateForBackend(template: ETLTemplate): TemplateBase
 {
   const obj: TemplateObject = (template as any).toObject(); // shallow js object
-  obj.transformationEngine = JSON.stringify(obj.transformationEngine.json());
-  // obj.transformationConfig = JSON.stringify(recordForSave(obj.transformationConfig)); TODO
-  obj.sources = JSON.stringify(recordForSave(obj.sources));
-  obj.sinks = JSON.stringify(recordForSave(obj.sinks));
+  obj.transformationEngine = obj.transformationEngine.json();
+  // obj.transformationConfig = recordForSave(obj.transformationConfig); TODO
+  obj.sources = recordForSave(obj.sources);
+  obj.sinks = recordForSave(obj.sinks);
   return obj;
 }
 

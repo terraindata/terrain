@@ -42,37 +42,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-import * as _ from 'lodash';
+// Copyright 2017 Terrain Data, Inc.
 
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { SinkConfig, SourceConfig } from './EndpointTypes';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
 
-export enum Languages
+import Credentials from '../credentials/Credentials';
+import { Permissions } from '../permissions/Permissions';
+import UserConfig from '../users/UserConfig';
+import * as Util from '../Util';
+
+import { TemplateConfig } from './TemplateConfig';
+import Templates from './Templates';
+
+const Router = new KoaRouter();
+
+export const templates: Templates = new Templates();
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  Elastic = 'elastic',
-}
+  ctx.body = await templates.get();
+});
 
-export enum FileTypes
+// Create a new template
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  Json = 'json',
-  JsonTypeObject = 'json [type object]',
-  Csv = 'csv',
-}
+  const template: TemplateConfig = ctx.request.body.body;
+  const requiredParams = [
+    'templateName', 'transformationEngine',
+    'transformationConfig', 'sources', 'sinks',
+  ];
+  Util.verifyParameters(template, requiredParams);
+  ctx.body = await templates.create(template);
+});
 
-export interface TemplateBase
-{
-  id?: ID;
-  templateName: string;
-  transformationEngine: TransformationEngine;
-  transformationConfig: any; // terrain rank, what to do on failures TODO figure out the exact type
-  sources: any;
-  sinks: any;
-}
-
-export type TemplateObject = {
-  [k in keyof TemplateBase]: any;
-};
-
-export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+export default Router;

@@ -51,6 +51,7 @@ import * as send from 'koa-send';
 import AuthRouter from './auth/AuthRouter';
 import CredentialRouter from './credentials/CredentialRouter';
 import DatabaseRouter from './database/DatabaseRouter';
+import TemplateRouter from './etl/TemplateRouter';
 import EventRouter from './events/EventRouter';
 import ExportRouter from './io/ExportRouter';
 import ImportRouter from './io/ImportRouter';
@@ -78,6 +79,7 @@ AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
 AppRouter.use('/export', ExportRouter.routes(), ExportRouter.allowedMethods());
 AppRouter.use('/credentials', CredentialRouter.routes(), CredentialRouter.allowedMethods());
+AppRouter.use('/etl/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
 // Add future routes here.
 
 AppRouter.get('/time', (ctx, next) =>
