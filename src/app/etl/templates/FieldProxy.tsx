@@ -53,7 +53,7 @@ import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import { KeyPath as EnginePath, WayPoint } from 'shared/transformations/KeyPath';
+import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 /*

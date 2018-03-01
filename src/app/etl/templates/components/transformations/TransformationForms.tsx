@@ -64,8 +64,8 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
 {
   switch (type)
   {
-    case TransformationNodeType.CapitalizeNode:
-      return CapitalizeClass as any;
+    case TransformationNodeType.UppercaseNode:
+      return UppercaseClass as any;
     case TransformationNodeType.SubstringNode:
       return SubstringClass;
     default:
@@ -89,24 +89,24 @@ function determineAvailableTransformations(): List<TransformationNodeType>
   return typeList;
 }
 
-// CAPITALIZE
-interface CapitalizeState
+// UPPERCASE
+interface UppercaseState
 {
 
 }
 
-const capitalizeInputMap = {
+const uppercaseInputMap = {
 
 };
 
-const capitalizeArgs: FactoryArgs<CapitalizeState, TransformationNodeType.CapitalizeNode> = {
-  inputMap: capitalizeInputMap,
-  type: TransformationNodeType.CapitalizeNode,
+const uppercaseArgs: FactoryArgs<UppercaseState, TransformationNodeType.UppercaseNode> = {
+  inputMap: uppercaseInputMap,
+  type: TransformationNodeType.UppercaseNode,
   initialState: {},
 };
 
-const CapitalizeClass =
-  transformationFormFactory<CapitalizeState, TransformationNodeType.CapitalizeNode>(capitalizeArgs);
+const UppercaseClass =
+  transformationFormFactory<UppercaseState, TransformationNodeType.UppercaseNode>(uppercaseArgs);
 
 // SUBSTRING
 interface SubstringState

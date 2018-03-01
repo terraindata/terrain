@@ -115,6 +115,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
           inputMap={settingsInputMap}
           inputState={this.state.formState}
           onStateChange={this._setStateWrapper('formState')}
+          centerForm={true}
           mainButton={{
             name: 'Apply',
             onClicked: this.handleSettingsApplied,

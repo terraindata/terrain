@@ -48,7 +48,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import { KeyPath } from 'shared/transformations/KeyPath';
+import { KeyPath } from 'shared/util/KeyPath';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export type PathHash = string;
