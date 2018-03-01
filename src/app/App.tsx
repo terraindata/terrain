@@ -453,7 +453,7 @@ class App extends TerrainComponent<Props>
       );
     }
 
-    const sidebarWidth = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1 ? 205 : 36;
+    const sidebarWidth = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1 ? 205 : 50;
     const sidebarExpanded = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1;
     const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
     const style = {

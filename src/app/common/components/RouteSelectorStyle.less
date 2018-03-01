@@ -231,7 +231,20 @@
 			
 			.routeselector-data-header {
 				text-align: center;
+				font-size: 12px;
 				// padding-top: 6px;
+			}
+			.result {
+				height: 230px;
+				overflow: hidden;
+				.result-inner {
+					display: block;
+					height: 100%;
+					.result-thumbnail-wrapper {
+						height: 100px;
+						width: 80px;
+					}
+				}
 			}
 		}
 		
@@ -307,6 +320,10 @@
 			
 			.routeselector-option-name-inner {
 				flex-grow: 1;
+				max-height: 31px;
+			    overflow: hidden;
+			    white-space: nowrap;
+			    text-overflow: ellipsis;
 			}
 		}
 	}

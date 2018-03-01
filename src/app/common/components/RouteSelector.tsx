@@ -65,6 +65,8 @@ import { FloatingInput, FONT_SIZE, LARGE_FONT_SIZE } from './FloatingInput';
 import KeyboardFocus from './KeyboardFocus';
 import './RouteSelectorStyle.less';
 import SearchInput from './SearchInput';
+import Ajax from 'app/util/Ajax';
+
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface RouteSelectorOption
@@ -124,6 +126,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
     columnRefs: Map<number, any>({}),
     pickerRef: null,
+    resultsConfig: Map({}),
     // optionRefs: Map({}), // not needed for now, but keeping some logic around
 
     // TODO re-add animation / picked logic
@@ -136,6 +139,14 @@ export class RouteSelector extends TerrainComponent<Props>
   shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+  }
+
+  public componentWillMount()
+  {
+    if (this.props.optionSets && !this.props.optionSets.get(0).hideSampleData)
+    {
+      this.getResultConfigs(this.props.optionSets.get(0).options);
+    }
   }
 
   public componentDidUpdate(prevProps: Props, prevState)
@@ -666,8 +677,9 @@ export class RouteSelector extends TerrainComponent<Props>
     // We only want to render the FadeInOuts when we are searching a list
     // otherwise, render in a plain div
     // this is a performance improvement
-    const wrapperFn = this.state.focusedSetIndex === optionSetIndex
-      ? this.fadeInOutWrapper : this.divWrapper;
+    // const wrapperFn = this.state.focusedSetIndex === optionSetIndex
+    //   ? this.fadeInOutWrapper : this.divWrapper;
+    const wrapperFn = this.divWrapper;
 
     return (
       <div
@@ -716,7 +728,9 @@ export class RouteSelector extends TerrainComponent<Props>
                     Sample Data
                     </div>
                   {
-                    option.sampleData.map(this.renderSampleDatum)
+                    option.sampleData.slice(0, 1).map((data, i) =>
+                      this.renderSampleDatum(data, i, String(option.value))
+                    )
                   }
                   {
                     option.sampleData.size === 0 &&
@@ -879,13 +893,35 @@ export class RouteSelector extends TerrainComponent<Props>
     // setTimeout(this.cleanUpAnimation, 150);
   }
 
-  private renderSampleDatum(data: any, index: number)
+  private getResultConfigs(options)
+  {
+    console.log(options);
+    options.forEach((option) =>
+    {
+      Ajax.getResultsConfig(option.value, (resp) =>
+      {
+        if (resp.length > 0)
+        {
+          resp[0]['fields'] = JSON.parse(resp[0]['fields']);
+          resp[0]['formats'] = JSON.parse(resp[0]['formats']);
+          resp[0]['primaryKeys'] = JSON.parse(resp[0]['primaryKeys']);
+          resp[0]['enabled'] = true;
+          this.setState({
+            resultsConfig: this.state.resultsConfig.set(option.value, _ResultsConfig(resp[0])),
+          });
+        }
+      })
+    })
+  }
+
+  private renderSampleDatum(data: any, index: number, dataIndex: string)
   {
     return (
       <Hit
         hit={data}
-        resultsConfig={_ResultsConfig() /* TODO, use a suitable results config here */}
+        resultsConfig={_ResultsConfig(this.state.resultsConfig.get(dataIndex))}
         index={index}
+        dataIndex={dataIndex}
         primaryKey={data._id}
         onExpand={_.noop}
         allowSpotlights={false}

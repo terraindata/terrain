@@ -100,7 +100,7 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 
   locations?: { [field: string]: any };
-
+  dataIndex?: string; // What index (elastic index) this hit comes from
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
   spotlightActions?: typeof SpotlightActions;
@@ -291,11 +291,11 @@ class HitComponent extends TerrainComponent<Props> {
     const color = spotlight ? spotlight.color : 'black';
 
     const thumbnail = resultsConfig && resultsConfig.thumbnail ?
-      getResultThumbnail(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder) :
+      getResultThumbnail(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder, this.props.dataIndex) :
       null;
-    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder,
+    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder, this.props.dataIndex
       this.props.locations, color);
-    const fields = getResultFields(hit, resultsConfig, this.props.schema, this.props.builder);
+    const fields = getResultFields(hit, resultsConfig, this.props.schema, this.props.builder, this.props.dataIndex);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
     let bottomContent: any;
@@ -480,7 +480,7 @@ export function resultsConfigHasFields(config: ResultsConfig): boolean
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(hit: Hit, config: ResultsConfig, schema?: SchemaState, builder?: BuilderState): string[]
+export function getResultFields(hit: Hit, config: ResultsConfig, schema?: SchemaState, builder?: BuilderState, overrideIndex?: string): string[]
 {
   let fields: string[];
 
@@ -493,11 +493,11 @@ export function getResultFields(hit: Hit, config: ResultsConfig, schema?: Schema
     const builderState = builder;
     if (builderState === undefined)
     {
-      return [];
+      return _.keys(hit.fields.toJS());
     }
     // If there is a path
     const server: string = builderState.db.name;
-    let serverIndex = server + '/' + getIndex();
+    let serverIndex = overrideIndex || server + '/' + getIndex('', builder);
     if (builderState.query.path !== undefined &&
       builderState.query.path.source !== undefined &&
       builderState.query.path.source.dataSource !== undefined)
@@ -511,7 +511,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig, schema?: Schema
 }
 
 export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean,
-  schema?: SchemaState, builder?: BuilderState, locations?: { [field: string]: any }, color?: string)
+  schema?: SchemaState, builder?: BuilderState, overrideIndex?: string, locations?: { [field: string]: any }, color?: string)
 {
   let thumbnailField: string;
 
@@ -521,14 +521,14 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
   }
   else
   {
-    thumbnailField = _.first(getResultFields(hit, config, schema, builder));
+    thumbnailField = _.first(getResultFields(hit, config, schema, builder, overrideIndex));
   }
 
   return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color, true);
 }
 
 export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
-  locations?: { [field: string]: any }, color?: string)
+  overrideIndex?: string, locations?: { [field: string]: any }, color?: string)
 {
   let nameField: string;
 
