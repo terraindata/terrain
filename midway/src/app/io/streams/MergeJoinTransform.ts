@@ -138,21 +138,21 @@ export default class MergeJoinTransform extends Readable
       return;
     }
 
-    let l = left[this.leftSource.position][this.joinKey];
-    let r = right[this.rightSource.position][this.joinKey];
-
     // advance left and right streams
     while (this.leftSource.position < left.length
       && this.rightSource.position < right.length)
     {
+      let l = left[this.leftSource.position]['_source'][this.joinKey];
+      let r = right[this.rightSource.position]['_source'][this.joinKey];
+
       while (l !== r)
       {
         if (l < r)
         {
           this.leftSource.position++;
-          l = left[this.leftSource.position][this.joinKey];
+          l = left[this.leftSource.position]['_source'][this.joinKey];
 
-          if (this.type === MergeJoinType.LEFT_OUTER_JOIN)
+          if (l < r && this.type === MergeJoinType.LEFT_OUTER_JOIN)
           {
             left[this.leftSource.position][this.mergeJoinName] = [];
             this.push(left[this.leftSource.position]);
@@ -161,7 +161,7 @@ export default class MergeJoinTransform extends Readable
         else if (r < l)
         {
           this.rightSource.position++;
-          r = right[this.rightSource.position][this.joinKey];
+          r = right[this.rightSource.position]['_source'][this.joinKey];
         }
 
         // if either of the streams went dry, request more
@@ -181,11 +181,11 @@ export default class MergeJoinTransform extends Readable
       // start merging
       left[this.leftSource.position][this.mergeJoinName] = [];
       let j = this.rightSource.position;
-      while (l === r && j < right.length - 1)
+      while (l === r && j < right.length)
       {
         left[this.leftSource.position][this.mergeJoinName].push(right[j]);
         j++;
-        r = right[j][this.joinKey];
+        r = right[j]['_source'][this.joinKey];
       }
 
       if (j === right.length)
@@ -196,13 +196,14 @@ export default class MergeJoinTransform extends Readable
 
       // push the merged result out to the stream
       this.push(left[this.leftSource.position]);
+      this.rightSource.position++;
       this.leftSource.position++;
     }
 
     this.leftSource.resetBuffer();
 
     // check if we are done
-    if (this.leftSource.isEmpty() && this.rightSource.isEmpty())
+    if (this.leftSource.isEmpty())
     {
       this.push(null);
     }

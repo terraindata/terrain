@@ -51,6 +51,7 @@ import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQL
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
+import BufferedElasticStream from './BufferedElasticStream';
 
 interface Ticket
 {
@@ -64,8 +65,8 @@ interface Ticket
 export default class GroupJoinTransform extends Readable
 {
   private client: ElasticClient;
-  private source: Readable;
-  private query: string;
+  private source: BufferedElasticStream;
+  private query: object;
 
   private blockSize: number = 256;
   private maxPendingQueries: number = 4;
@@ -75,25 +76,18 @@ export default class GroupJoinTransform extends Readable
   private maxBufferedOutputs: number;
   private bufferedOutputs: Deque<Ticket>;
 
-  private sourceIsEmpty: boolean = false;
-  private continueReading: boolean = false;
-
   private dropIfLessThan: number = 0;
   private parentAlias: string = 'parent';
 
   private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
-  private _onRead: () => void;
-  private _onEnd: () => void;
-
-  constructor(client: ElasticClient, source: Readable, queryStr: string)
+  constructor(client: ElasticClient, queryStr: string)
   {
     super({
       objectMode: true,
     });
 
     this.client = client;
-    this.source = source;
 
     const parser = new ESJSONParser(queryStr, true);
     if (parser.hasError())
@@ -116,6 +110,13 @@ export default class GroupJoinTransform extends Readable
     }
 
     this.query = query;
+    this.source = new BufferedElasticStream(client, query, (() =>
+      {
+        const inputs = this.source.buffer;
+        this.source.resetBuffer();
+        this.dispatchSubqueryBlock(inputs);
+      }).bind(this));
+
     for (const k of Object.keys(query))
     {
       this.subqueryValueInfos[k] = parser.getValueInfo().objectChildren[k].propertyValue;
@@ -125,69 +126,19 @@ export default class GroupJoinTransform extends Readable
     this.bufferedInputs = [];
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
-
-    this._onRead = this.readFromStream.bind(this);
-    this._onEnd = this._final.bind(this);
-    this.source.on('readable', this._onRead);
-    this.source.on('end', this._onEnd);
   }
 
   public _read(size: number = 1024)
   {
-    if (!this.sourceIsEmpty
-      && this.bufferedInputs.length < this.maxBufferedInputs
-      && this.bufferedOutputs.length < this.maxBufferedOutputs)
+    if (this.bufferedOutputs.length < this.maxBufferedOutputs)
     {
-      this.continueReading = true;
+      this.source._read();
     }
   }
 
   public _destroy(error, callback)
   {
-    this._final(callback);
-  }
-
-  public _final(callback)
-  {
-    this.source.removeListener('readable', this._onRead);
-    this.source.removeListener('end', this._onEnd);
-
-    this.continueReading = false;
-    this.sourceIsEmpty = true;
-    if (callback !== undefined)
-    {
-      callback();
-    }
-  }
-
-  private readFromStream(): void
-  {
-    // should we keep reading from the source stream?
-    if (!this.continueReading)
-    {
-      return;
-    }
-
-    // if yes, keep buffering inputs from the source stream
-    const obj = this.source.read();
-    if (obj === null)
-    {
-      this.sourceIsEmpty = true;
-    }
-    else
-    {
-      this.bufferedInputs.push(obj);
-    }
-
-    // if we have data buffered up to blockSize, swap the input buffer list out
-    // and dispatch a subquery block
-    if (this.bufferedInputs.length >= this.blockSize ||
-      this.sourceIsEmpty && this.bufferedInputs.length > 0)
-    {
-      const inputs = this.bufferedInputs;
-      this.bufferedInputs = [];
-      this.dispatchSubqueryBlock(inputs);
-    }
+    this.source._destroy(error, callback);
   }
 
   private dispatchSubqueryBlock(inputs: object[]): void
