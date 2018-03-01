@@ -243,10 +243,12 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     const {line} = this.props;
     return (
-      <ExpandIcon
-        open={line.expanded && line.field !== undefined && line.field !== ''}
-        onClick={this._fn(this.handleExpandedChange, !line.expanded)}
-      />
+      <div style={line.field ? {} : {opacity: 0}}>
+        <ExpandIcon
+          open={line.expanded && line.field !== undefined && line.field !== ''}
+          onClick={this._fn(this.handleExpandedChange, !line.expanded)}
+        />
+      </div>
     );
   }
 
@@ -319,9 +321,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         }
 
         {
-          !this.props.line.expanded ?
-            this.renderTransformChartPreview() :
-            null
+          this.renderTransformChartPreview()
         }
       </div>
     );
