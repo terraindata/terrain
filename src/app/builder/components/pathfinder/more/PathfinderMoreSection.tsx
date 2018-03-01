@@ -319,18 +319,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       canEdit={canEdit}
                       className='pf-more-nested-name-input'
                     />
-                    <RouteSelector
-                      optionSets={this.getSizeOptionSets() /* TODO store in state? */}
-                      values={List(
-                          nested.get(i) !== undefined &&  nested.get(i).source !== undefined ?
-                            [nested.get(i).source.count] : []
-                        )
-                      }
-                      onChange={this._fn(this.handleNestedSizePickerChange, i)}
-                      canEdit={canEdit}
-                      defaultOpen={false}
-                      autoFocus={true}
-                    />
                   </FadeInOut>
                   <RemoveIcon
                     onClick={this._fn(this.handleDeleteNested, i)}
@@ -384,15 +372,16 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         <div>
           {this.renderNestedPaths()}
           {
-            tooltip(
-              <PathfinderCreateLine
-                canEdit={canEdit}
-                onCreate={this.handleAddNested}
-                text={PathfinderText.createNestedLine}
-                style={{ marginTop: 12 }}
-              />,
-              PathfinderText.nestedExplanation,
-            )
+            !this.props.keyPath.includes('nested') ?
+              tooltip(
+                <PathfinderCreateLine
+                  canEdit={canEdit}
+                  onCreate={this.handleAddNested}
+                  text={PathfinderText.createNestedLine}
+                  style={{ marginTop: 12 }}
+                />,
+                PathfinderText.nestedExplanation,
+              ) : null
           }
         </div>
       </div>
