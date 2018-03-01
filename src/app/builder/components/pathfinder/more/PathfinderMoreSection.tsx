@@ -241,6 +241,53 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     ]);
   }
 
+  public getMinMatchesOptionSets()
+  {
+    return List([
+      {
+        key: 'value',
+        options: List([
+          {
+            value: '1',
+            displayName: '1',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '2',
+            displayName: '2',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '3',
+            displayName: '3',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '5',
+            displayName: '5',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '10',
+            displayName: '10',
+            hasOther: true,
+            sampleData: List([])
+          },
+        ]),
+        hasOther: true,
+        shortNameText: 'Drop If Less Than',
+        headerText: 'Drop If Less Than',
+        column: true,
+        hideSampleData: true,
+        // hasOther: false,
+      }
+    ]);
+  }
+
   public handleSizePickerChange(optionSetIndex: number, value: any)
   {
     if (value !== '')
@@ -271,6 +318,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
     this.props.builderActions.changePath(nestedKeyPath.push('name'), value);
+  }
+
+  public handleMinMatchesChange(optionSetIndex: number, value: any)
+  {
+    const { keyPath } = this.props;
+
+    this.props.builderActions.changePath(keyPath.butLast().toList().push('minMatches'), value);
   }
 
   public renderNestedPaths()
@@ -357,6 +411,17 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           defaultOpen={false}
           autoFocus={true}
         />
+        {
+          this.props.keyPath.includes('nested') ?
+            <RouteSelector
+              optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
+              values={List([this.props.path.minMatches])}
+              onChange={this.handleMinMatchesChange}
+              canEdit={canEdit}
+              defaultOpen={false}
+              autoFocus={true}
+            /> : null
+        }
         {
           // <DragAndDrop
           //   draggableItems={this.getAggregationLines()}
