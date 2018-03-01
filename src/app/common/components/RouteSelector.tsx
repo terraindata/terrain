@@ -895,7 +895,6 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private getResultConfigs(options)
   {
-    console.log(options);
     options.forEach((option) =>
     {
       Ajax.getResultsConfig(option.value, (resp) =>

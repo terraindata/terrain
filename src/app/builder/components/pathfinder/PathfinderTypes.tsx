@@ -676,11 +676,10 @@ class ElasticDataSourceC extends DataSource
         let fields = List([]);
         cols.forEach((col) =>
         {
-          const fieldType = dataSource.dataTypeToFieldType(col.datatype);
+          const fieldType = ReverseFieldTypeMapping[col.datatype];
           // If a column is nested, pull out the properties of that column to be filtered on
           if (fieldType === FieldType.Nested)
           {
-            console.log('doing nested shiz');
             _.keys(col.properties).forEach((property) =>
             {
               const { type } = col.properties[property];
