@@ -151,13 +151,7 @@ export class ElasticQueryHandler extends QueryHandler
         let stream;
         if (query['groupJoin'] !== undefined)
         {
-          const groupJoinQuery = query['groupJoin'];
-          query['groupJoin'] = undefined;
-
-          const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
-          const childQueryStr = ESConverter.formatValueInfo(valueInfo);
-          const elasticStream = new ElasticStream(client, query);
-          stream = new GroupJoinTransform(client, elasticStream, childQueryStr);
+          stream = new GroupJoinTransform(client, request.body);
         }
         else if (query['mergeJoin'] !== undefined)
         {

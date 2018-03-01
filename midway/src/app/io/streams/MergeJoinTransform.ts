@@ -54,7 +54,8 @@ import BufferedElasticStream from './BufferedElasticStream';
 /**
  * Types of merge joins
  */
-export enum MergeJoinType {
+export enum MergeJoinType
+{
   LEFT_OUTER_JOIN,
   INNER_JOIN,
 }

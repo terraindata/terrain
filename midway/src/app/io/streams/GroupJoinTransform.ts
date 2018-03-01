@@ -68,11 +68,7 @@ export default class GroupJoinTransform extends Readable
   private source: BufferedElasticStream;
   private query: object;
 
-  private blockSize: number = 256;
   private maxPendingQueries: number = 4;
-
-  private maxBufferedInputs: number;
-  private bufferedInputs: object[];
   private maxBufferedOutputs: number;
   private bufferedOutputs: Deque<Ticket>;
 
@@ -96,36 +92,42 @@ export default class GroupJoinTransform extends Readable
     }
 
     const query = parser.getValue();
+    const groupJoinQuery = query['groupJoin'];
+    delete query['groupJoin'];
+
     // read groupJoin options from the query
-    if (query['dropIfLessThan'] !== undefined)
+    if (groupJoinQuery['dropIfLessThan'] !== undefined)
     {
-      this.dropIfLessThan = query['dropIfLessThan'];
-      delete query['dropIfLessThan'];
+      this.dropIfLessThan = groupJoinQuery['dropIfLessThan'];
+      delete groupJoinQuery['dropIfLessThan'];
     }
 
-    if (query['parentAlias'] !== undefined)
+    if (groupJoinQuery['parentAlias'] !== undefined)
     {
-      this.parentAlias = query['parentAlias'];
-      delete query['parentAlias'];
+      this.parentAlias = groupJoinQuery['parentAlias'];
+      delete groupJoinQuery['parentAlias'];
     }
 
-    this.query = query;
-    this.source = new BufferedElasticStream(client, query, (() =>
+    this.query = groupJoinQuery;
+    for (const k of Object.keys(groupJoinQuery))
+    {
+      const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
+      if (valueInfo !== null)
       {
-        const inputs = this.source.buffer;
-        this.source.resetBuffer();
-        this.dispatchSubqueryBlock(inputs);
-      }).bind(this));
-
-    for (const k of Object.keys(query))
-    {
-      this.subqueryValueInfos[k] = parser.getValueInfo().objectChildren[k].propertyValue;
+        this.subqueryValueInfos[k] = valueInfo.objectChildren[k].propertyValue;
+      }
     }
 
-    this.maxBufferedInputs = this.blockSize;
-    this.bufferedInputs = [];
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
+
+    this.source = new BufferedElasticStream(client, query, (() =>
+    {
+      const inputs = this.source.buffer;
+      this.source.resetBuffer();
+      this.dispatchSubqueryBlock(inputs);
+    }).bind(this));
+
   }
 
   public _read(size: number = 1024)
@@ -237,14 +239,11 @@ export default class GroupJoinTransform extends Readable
             }
           }
 
-          if (this.sourceIsEmpty
-            && this.bufferedOutputs.length === 0
-            && this.bufferedInputs.length === 0)
+          if (this.source.isEmpty()
+            && this.bufferedOutputs.length === 0)
           {
             this.push(null);
           }
-
-          this.continueReading = false;
         });
     }
   }
