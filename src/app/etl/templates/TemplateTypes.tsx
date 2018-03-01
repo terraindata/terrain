@@ -92,7 +92,7 @@ class ETLTemplateC implements ETLTemplateI
   public id = -1;
   public templateName = '';
   public transformationEngine = new TransformationEngine();
-  public transformationConfig = null;
+  public transformationConfig = '';
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
 }
@@ -130,11 +130,11 @@ export function destringifySavedTemplate(obj: TemplateObject): TemplateObject
   return newObj;
 }
 
-export function templateForSave(template: ETLTemplate): object
+export function templateForSave(template: ETLTemplate): TemplateObject
 {
   const obj: TemplateObject = (template as any).toObject(); // shallow js object
   obj.transformationEngine = JSON.stringify(obj.transformationEngine.json());
-  obj.transformationConfig = JSON.stringify(recordForSave(obj.transformationConfig));
+  // obj.transformationConfig = JSON.stringify(recordForSave(obj.transformationConfig)); TODO
   obj.sources = JSON.stringify(recordForSave(obj.sources));
   obj.sinks = JSON.stringify(recordForSave(obj.sinks));
   return obj;
