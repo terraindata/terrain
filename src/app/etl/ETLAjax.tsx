@@ -43,38 +43,112 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
-import ETLAjax from 'etl/ETLAjax';
-import { _ETLState, ETLState } from './ETLTypes';
+import MidwayError from 'shared/error/MidwayError';
+import { Ajax } from 'util/Ajax';
 
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
+import { TemplateBase } from 'shared/etl/types/ETLTypes';
 
-export interface ETLActionTypes
+export type ErrorHandler = (response: string | MidwayError ) => void;
+// making this an instance in case we want stateful things like cancelling ajax requests
+class ETLAjax
 {
-  placeholder: {
-    actionType: 'placeholder';
-  };
-}
+  public templatesToImmutable(templates: TemplateBase[]): List<ETLTemplate>
+  {
+    return List(templates)
+      .map((template, index) => _ETLTemplate(template as TemplateBase, true))
+      .toList();
+  }
 
-class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
-{
-  public reducers: ConstrainedMap<ETLActionTypes, ETLState> =
+  public fetchTemplates(
+    onLoad: (response: List<ETLTemplate>) => void,
+    onError: ErrorHandler,
+  )
+  {
+    const handleResponse = (templates: TemplateBase[]) =>
     {
-      placeholder: (state, action) =>
+      onLoad(this.templatesToImmutable(templates));
+    }
+    return Ajax.req(
+      'get',
+      'etl/templates/',
+      { },
+      handleResponse,
       {
-        return state;
-      },
-    };
+        onError
+      }
+    );
+  }
+
+  public getTemplate(
+    id: number,
+    onLoad: (response: List<ETLTemplate>) => void,
+    onError: ErrorHandler,
+  )
+  {
+    const handleResponse = (templates: TemplateBase[]) =>
+    {
+      onLoad(this.templatesToImmutable(templates));
+    }
+    return Ajax.req(
+      'get',
+      `etl/templates/${id}`,
+      { },
+      handleResponse,
+      {
+        onError
+      }
+    );
+  }
+
+  public createTemplate(
+    template: ETLTemplate,
+    onLoad: (response: ETLTemplate) => void,
+    onError: ErrorHandler,
+  )
+  {
+    const templateToSave = templateForBackend(template);
+    const handleResponse = (responseTemplate: TemplateBase) =>
+    {
+      onLoad(_ETLTemplate(responseTemplate, true));
+    }
+    return Ajax.req(
+      'get',
+      `etl/templates/create`,
+      templateToSave,
+      handleResponse,
+      {
+        onError
+      }
+    );
+  }
+
+  public saveTemplate(
+    template: ETLTemplate,
+    onLoad: (response: ETLTemplate) => void,
+    onError: ErrorHandler,
+  )
+  {
+    const templateToSave = templateForBackend(template);
+    const handleResponse = (responseTemplate: TemplateBase) =>
+    {
+      onLoad(_ETLTemplate(responseTemplate, true));
+    }
+    return Ajax.req(
+      'get',
+      `etl/templates/create`,
+      templateToSave,
+      handleResponse,
+      {
+        onError
+      }
+    );
+  }
 }
 
-const ReduxInstance = new ETLRedux();
-export const ETLActions = ReduxInstance._actionsForExport();
-export const ETLReducers = ReduxInstance._reducersForExport(_ETLState);
-export declare type ETLActionType<K extends keyof ETLActionTypes> =
-  GetType<K, ETLActionTypes>;
+export default new ETLAjax();

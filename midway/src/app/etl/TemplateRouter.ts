@@ -59,9 +59,11 @@ const Router = new KoaRouter();
 
 export const templates: Templates = new Templates();
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+// return all templates
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await templates.get();
+  const id = ctx.params.id !== undefined ? ctx.params.id : undefined;
+  ctx.body = await templates.get(id);
 });
 
 // Create a new template
