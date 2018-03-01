@@ -243,8 +243,28 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleSizePickerChange(optionSetIndex: number, value: any)
   {
+    if (value !== '')
+    {
+      this.props.builderActions.changePath(
+        this
+          .props
+          .keyPath
+          .butLast()
+          .toList()
+          .concat(
+            List(['source', 'count']
+          )).toList(),
+        value
+      );
+    }
+  }
+
+  public handleNestedSizePickerChange(i: number, optionSetIndex: number, value: any)
+  {
+    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
+
     this.props.builderActions.changePath
-      (this.props.keyPath.butLast().toList().concat(List(['source', 'count'])).toList(), value);
+      (nestedKeyPath.concat(List(['source', 'count'])).toList(), value);
   }
 
   public handleAlgorithmNameChange(i: number, value: any)
@@ -298,6 +318,18 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       isTextInput={true}
                       canEdit={canEdit}
                       className='pf-more-nested-name-input'
+                    />
+                    <RouteSelector
+                      optionSets={this.getSizeOptionSets() /* TODO store in state? */}
+                      values={List(
+                          nested.get(i) !== undefined &&  nested.get(i).source !== undefined ?
+                            [nested.get(i).source.count] : []
+                        )
+                      }
+                      onChange={this._fn(this.handleNestedSizePickerChange, i)}
+                      canEdit={canEdit}
+                      defaultOpen={false}
+                      autoFocus={true}
                     />
                   </FadeInOut>
                   <RemoveIcon
