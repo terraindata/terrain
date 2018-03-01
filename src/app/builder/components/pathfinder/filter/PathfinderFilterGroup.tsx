@@ -133,15 +133,18 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             onClick={this.handleDelete}
           />
         }
-        <LinearSelector
-          options={filterDropdownOptions}
-          keyPath={this.props.keyPath.push('minMatches')}
-          selected={this.props.filterGroup.minMatches}
-          allowCustomInput={false}
-          canEdit={canEdit}
-          action={this.props.onChange}
-          hideOptions={true}
-        />
+        {
+          !this.props.isSoftFilter &&
+          <LinearSelector
+            options={filterDropdownOptions}
+            keyPath={this.props.keyPath.push('minMatches')}
+            selected={this.props.filterGroup.minMatches}
+            allowCustomInput={false}
+            canEdit={canEdit}
+            action={this.props.onChange}
+            hideOptions={true}
+          />
+        }
       </div>
 
     );

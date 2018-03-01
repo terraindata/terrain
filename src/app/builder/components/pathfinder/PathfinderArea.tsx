@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as _ from 'lodash';
 import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List } = Immutable;
@@ -63,7 +64,7 @@ import { BuilderState } from 'builder/data/BuilderState';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
-import PathfinderFilterSection from './filter/PathfinderFilterSection2';
+import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
@@ -93,12 +94,26 @@ class PathfinderArea extends TerrainComponent<Props>
     pathfinderContext: _PathfinderContext(this.getPathfinderContext(this.props)),
   };
 
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(nextProps, this.props) || !_.isEqual(this.state, nextState);
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
-    this.setState({
-      pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
-        this.getPathfinderContext(nextProps)),
-    });
+    const {pathfinderContext} = this.state;
+    if (pathfinderContext.canEdit !== nextProps.canEdit ||
+       pathfinderContext.source !== nextProps.path.source ||
+       pathfinderContext.step !== nextProps.path.step ||
+       pathfinderContext.schemaState !== nextProps.schema ||
+       pathfinderContext.builderState.db !== nextProps.builder.db
+      )
+    {
+      this.setState({
+        pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
+          this.getPathfinderContext(nextProps)),
+      });
+    }
   }
 
   public getPathfinderContext(props: Props)
@@ -146,7 +161,6 @@ class PathfinderArea extends TerrainComponent<Props>
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
-
     return (
       <ScrollingComponent
         className='pf-area'

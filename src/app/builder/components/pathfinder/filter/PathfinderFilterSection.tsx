@@ -46,23 +46,25 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import * as _ from 'lodash';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
-import DragAndDrop from 'app/common/components/DragAndDrop';
-import DragHandle from 'app/common/components/DragHandle';
-import Util from 'util/Util';
-import { FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
-import PathfinderFilterCreate from './PathfinderFilterCreate';
+import Colors from 'app/colors/Colors';
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
+import CustomDragLayer from 'app/common/components/CustomDragLayer';
+import DragDropGroup from 'app/common/components/DragDropGroup';
+import DragDropItem from 'app/common/components/DragDropItem';
+import DropZone from 'app/common/components/DropZone';
+import Util from 'app/util/Util';
+import PathfinderCreateLine from '../PathfinderCreateLine';
+import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
-import './PathfinderFilterStyle.less';
 
 export interface Props
 {
@@ -70,70 +72,96 @@ export interface Props
   filterGroup: FilterGroup;
   keyPath: KeyPath;
   onStepChange?: (oldStep: PathfinderSteps) => void;
-  toSkip?: number; // how many keys in key path to skip (sometimes paths may be nested)
+  toSkip?: number;
+  isSoftFilter?: boolean; // does this section apply to soft filters?
+
   builderActions?: typeof BuilderActions;
+  colorsActions?: typeof ColorsActions;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
 {
-  public state: {
-
-  } = {
-
+  public state:
+    {
+      dragging: boolean,
+    } = {
+      dragging: false,
     };
 
-  public render()
+  public componentWillMount()
   {
-    const { source, step, canEdit } = this.props.pathfinderContext;
-    const { filterGroup } = this.props;
-
-    // flatten tree
-    const entries: FilterEntry[] = [];
-    this.buildFilterTree(filterGroup, entries, 0, this.props.keyPath);
-
-    return (
-      <div
-        className='pf-section'
-      >
-        {
-          entries.map(this.renderFilterEntry)
-        }
-        {
-          step === PathfinderSteps.Filter &&
-          <div
-            onClick={this.handleStepChange}
-            className='pf-step-button'
-          >
-            Filters look good for now
-          </div>
-        }
-      </div>
-    );
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-drop-item-header .pf-filter-group-header',
+      style: { background: Colors().blockBg, border: 'none' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-drop-item-header .pf-filter-group-header .close',
+      style: { display: 'none' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-drop-item-is-over',
+      style: { background: Colors().blockBg },
+    });
   }
 
-  private handleStepChange()
+  public shouldComponentUpdate(nextProps, nextState)
   {
-    const { step } = this.props.pathfinderContext;
+    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
+  }
 
-    if (step === PathfinderSteps.Filter)
+  public handleAddFilter()
+  {
+    const newLines = this.props.filterGroup.lines.push(_FilterLine());
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
+  }
+
+  public insertIn(items, keyPath, item): List<any>
+  {
+    // If key path is just a single value, do a normal insert
+    if (keyPath.size === 1)
     {
-      this.props.onStepChange(step);
+      return items.insert(keyPath.first(), item);
+    }
+    // get the sub-list that item will be inserted into
+    let listToInsert = items.getIn(keyPath.butLast());
+    // Insert the item into the list at the position that is the last value of keypath
+    listToInsert = listToInsert.insert(keyPath.last(), item);
+    // Update the whole list of items to have the inserted list
+    return items.setIn(keyPath.butLast(), listToInsert);
+  }
+
+  // Check if something in a nested list moved "down" (visually moved to a lower position on the screen)
+  public movedDown(oldKeyPath, newKeyPath): boolean
+  {
+    let i = 0;
+    while (i < oldKeyPath.size && i < newKeyPath.size)
+    {
+      if (oldKeyPath.get(i) < newKeyPath.get(i))
+      {
+        return true;
+      }
+      if (oldKeyPath.get(i) > newKeyPath.get(i))
+      {
+        return false;
+      }
+      i++;
     }
   }
 
-  private handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean)
+  public handleFilterChange(
+    keyPath: KeyPath,
+    filter: FilterGroup | FilterLine,
+    notDirty?: boolean,
+    fieldChange?: boolean,
+  )
   {
     this.props.builderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
 
-  private handleAddFilter(keyPath, filter: FilterGroup | FilterLine)
-  {
-    const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
-    const oldLines = this.props.filterGroup.getIn(keyPath.skip(skip).toList());
-    this.props.builderActions.changePath(keyPath, oldLines.push(filter));
-  }
-
-  private handleFilterDelete(keyPath: KeyPath)
+  public handleFilterDelete(keyPath: KeyPath)
   {
     const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
     const parentKeyPath = keyPath.butLast().toList();
@@ -143,107 +171,283 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     // TODO consider 'removeIn' instead
   }
 
-  private buildFilterTree(filterGroup: FilterGroup, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
+  public renderFilterLine(filterLine, keyPath: List<string | number>)
   {
+    const { pathfinderContext, isSoftFilter } = this.props;
 
-    if (depth > 0)
+    const successorKeyPath = keyPath.unshift('lines').set(keyPath.size, (keyPath.last() as number) + 1);
+    const successor = this.props.filterGroup.getIn(successorKeyPath);
+
+    // make key path relative to entire Path object
+    keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
+
+    return (
+      <PathfinderFilterLine
+        filterLine={filterLine}
+        canEdit={pathfinderContext.canEdit}
+        keyPath={keyPath}
+        onChange={this.handleFilterChange}
+        onDelete={this.handleFilterDelete}
+        pathfinderContext={pathfinderContext}
+        comesBeforeAGroup={successor && this.isGroup(successor)}
+        isSoftFilter={isSoftFilter}
+      />
+    );
+  }
+
+  public renderGroupHeader(group, keyPath)
+  {
+    const { pathfinderContext, isSoftFilter } = this.props;
+    // make key path relative to entire Path object
+    keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
+
+    return (
+      <PathfinderFilterGroup
+        filterGroup={group}
+        canEdit={pathfinderContext.canEdit}
+        keyPath={keyPath}
+        onChange={this.handleFilterChange}
+        onDelete={this.handleFilterDelete}
+        isSoftFilter={isSoftFilter}
+      />
+    );
+  }
+
+  public changeCollapsed(keyPath, value)
+  {
+    const kp = this.props.keyPath
+      .push('lines')
+      .concat(keyPath).toList()
+      .push('filterGroup')
+      .push('collapsed');
+    this.props.builderActions.changePath(
+      kp,
+      value);
+  }
+
+  // When something is dropped into a drop zone (to reorder)
+  public handleDrop(itemKeyPath, dropKeyPath, keepCollapse?)
+  {
+    // If the item did not move up or down, do nothing
+    if (itemKeyPath.equals(dropKeyPath))
     {
-      // no group UI for first depth
-      entries.push({
-        filterGroup,
-        depth,
-        keyPath,
+      return;
+    }
+    let lines = this.props.filterGroup.lines;
+    let item = lines.getIn(itemKeyPath);
+    // When dropping a group into another group, keep it collapsed
+    if (dropKeyPath.indexOf('filterGroup') !== undefined && this.isGroup(item))
+    {
+      item = item.setIn(['filterGroup', 'collapsed'], true);
+    }
+    else if (this.isGroup(item) && !keepCollapse)
+    {
+      item = item.setIn(['filterGroup', 'collapsed'], false);
+    }
+    lines = this.updateLines(lines, itemKeyPath, dropKeyPath, item, true);
+    // Update the lines
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), lines);
+  }
+
+  // When something is dropped into a group
+  public handleGroupDrop(dropKeyPath, dragKeyPath)
+  {
+    if (dropKeyPath.equals(dragKeyPath))
+    {
+      return;
+    }
+    let lines = this.props.filterGroup.lines;
+    const droppedInto = lines.getIn(dropKeyPath);
+    let dropped = lines.getIn(dragKeyPath);
+    if (this.isGroup(dropped))
+    {
+      dropped = dropped.setIn(['filterGroup', 'collapsed'], true);
+    }
+    // if you dropped into a group, just do a normal "Reordering" because a new group isn't being created
+    if (this.isGroup(droppedInto))
+    {
+      // act as if it was dropped into the last slot of droppedInto
+      const lineSize = droppedInto.filterGroup.lines.size;
+      this.handleDrop(dragKeyPath,
+        dropKeyPath.concat(List(['filterGroup', 'lines', lineSize]).toList()), true);
+      return;
+    }
+    let group;
+    // If they were both single filters, create a new group
+    if (!this.isGroup(dropped) && !this.isGroup(droppedInto))
+    {
+      const { groupCount } = this.props.filterGroup;
+      const groupNumber: string = groupCount < 10 ? '0' + String(groupCount) : String(groupCount);
+      group = _FilterGroup({
+        lines: List([droppedInto, dropped]),
+        name: 'Group ' + groupNumber,
+      });
+      this.props.builderActions.changePath(this.props.keyPath.push('groupCount'), groupCount + 1, true);
+    }
+    // If the dropped item was already a group, keep it's name and minMatches and append the line it was dropped onto
+    else
+    {
+      group = _FilterGroup({
+        lines: dropped.filterGroup.lines.insert(0, droppedInto),
+        minMatches: dropped.filterGroup.minMatches,
+        name: dropped.filterGroup.name,
       });
     }
+    dropKeyPath = dropKeyPath.push('filterGroup');
+    lines = this.updateLines(lines, dragKeyPath, dropKeyPath, group);
+    // Look for the thing that you dropped, if it is somewhere other than keyPath, remove it
+    this.props.builderActions.changePath(this.props.keyPath.push('lines'), lines);
+  }
 
-    keyPath = keyPath.push('lines');
-    filterGroup.lines.map((filterLine, index) =>
+  // Given the lines and the new item, move the item from the dragKeyPath to the dropKeyPath
+  public updateLines(lines, dragKeyPath, dropKeyPath, item, insert?)
+  {
+    // If the item moved down, insert it and then remove it
+    if (this.movedDown(dragKeyPath, dropKeyPath))
     {
-      if (filterLine.filterGroup)
+      // If the group that the item left is now empty, remove it too
+      if (insert)
       {
-        // it is a filter group
-        this.buildFilterTree(filterLine.filterGroup, entries, depth + 1, keyPath.push(index).push('filterGroup'));
+        lines = this.insertIn(lines, dropKeyPath, item);
       }
       else
       {
-        entries.push({
-          filterLine,
-          depth,
-          keyPath: keyPath.push(index),
-        });
+        lines = lines.setIn(dropKeyPath, item);
       }
-    });
-
-    entries.push({
-      isCreateSection: true,
-      depth,
-      keyPath: keyPath.push(filterGroup.lines.size),
-    });
+      lines = lines.deleteIn(dragKeyPath);
+      const oldGroup = lines.getIn(dragKeyPath.butLast());
+      if (oldGroup.size === 0)
+      {
+        lines = lines.removeIn(dragKeyPath.slice(0, -3));
+      }
+    }
+    // If it moved up, remove it and then insert it
+    else
+    {
+      lines = lines.deleteIn(dragKeyPath);
+      const oldGroup = lines.getIn(dragKeyPath.butLast());
+      // If the group that the item left is now empty, remove it too
+      if (oldGroup.size === 0)
+      {
+        lines = lines.removeIn(dragKeyPath.slice(0, -3));
+      }
+      if (insert)
+      {
+        lines = this.insertIn(lines, dropKeyPath, item);
+      }
+      else
+      {
+        lines = lines.setIn(dropKeyPath, item);
+      }
+    }
+    return lines;
   }
 
-  private renderFilterEntry(filterEntry: FilterEntry, index: number): El
+  public isGroup(item)
   {
-    const { pathfinderContext } = this.props;
-    const { source, canEdit } = pathfinderContext;
-    if (filterEntry.filterGroup)
-    {
-      return (
-        <PathfinderFilterGroup
-          filterGroup={filterEntry.filterGroup}
-          canEdit={canEdit}
-          depth={filterEntry.depth}
-          keyPath={filterEntry.keyPath}
-          onChange={this.handleFilterChange}
-          key={index}
-          onDelete={this.handleFilterDelete}
-        />
-      );
-    }
-
-    if (filterEntry.filterLine)
-    {
-      return (
-        <PathfinderFilterLine
-          filterLine={filterEntry.filterLine}
-          canEdit={canEdit}
-          depth={filterEntry.depth}
-          keyPath={filterEntry.keyPath}
-          onChange={this.handleFilterChange}
-          onDelete={this.handleFilterDelete}
-          key={index}
-          pathfinderContext={pathfinderContext}
-        />
-      );
-    }
-
-    if (filterEntry.isCreateSection)
-    {
-      return (
-        <PathfinderFilterCreate
-          canEdit={canEdit}
-          depth={filterEntry.depth}
-          keyPath={filterEntry.keyPath.butLast().toList()}
-          onChange={this.handleAddFilter}
-          key={index}
-        />
-      );
-    }
-
-    throw new Error('Uncrecognized filter entry: ' + JSON.stringify(filterEntry));
+    return item.filterGroup;
   }
-}
 
-interface FilterEntry
-{
-  filterGroup?: FilterGroup;
-  filterLine?: FilterLine;
-  isCreateSection?: boolean;
-  depth: number;
-  keyPath: KeyPath;
+  public handleStepChange()
+  {
+    const { step } = this.props.pathfinderContext;
+    if (step === PathfinderSteps.Filter)
+    {
+      this.props.onStepChange(step);
+    }
+  }
+
+  public render()
+  {
+    const { filterGroup, pathfinderContext, isSoftFilter } = this.props;
+    const { dragging } = this.state;
+    const dropZoneStyle = { zIndex: dragging ? 20 : -1 };
+    const itemStyle = { opacity: dragging ? 0.7 : 1 };
+    const groupStyle = { opacity: dragging ? 0.7 : 1, zIndex: dragging ? 99 : 5 };
+
+    let title = PathfinderText.hardFilterSectionTitle;
+    let subtitle = PathfinderText.hardFilterSectionSubtitle;
+    if (isSoftFilter)
+    {
+      title = PathfinderText.softFilterSectionTitle;
+      subtitle = PathfinderText.softFilterSectionSubtitle;
+    }
+
+    return (
+      <div
+        className='pf-section pf-filter-section'
+      >
+        <PathfinderSectionTitle
+          title={title}
+          text={subtitle}
+        />
+
+        <CustomDragLayer />
+        <DropZone
+          keyPath={List([0])}
+          onDrop={this.handleDrop}
+          style={dropZoneStyle}
+        />
+        {
+          filterGroup.lines.map((line, i) =>
+            <div key={i}>
+              {
+                !this.isGroup(line) ?
+                  <DragDropItem
+                    children={this.renderFilterLine(line, List([i]))}
+                    keyPath={List([i])}
+                    onDrop={this.handleGroupDrop}
+                    canDrop={true}
+                    data={line}
+                    hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
+                    style={itemStyle}
+                    onDragStart={this._toggle('dragging')}
+                    onDragStop={this._toggle('dragging')}
+                    dropZoneStyle={dropZoneStyle}
+                  />
+                  :
+                  <DragDropGroup
+                    items={line.filterGroup.lines}
+                    data={line.filterGroup}
+                    onDrop={this.handleGroupDrop}
+                    keyPath={List([i])}
+                    onReorder={this.handleDrop}
+                    isGroup={this.isGroup}
+                    keyPathStarter={List(['filterGroup', 'lines'])}
+                    renderChildren={this.renderFilterLine}
+                    renderHeader={this.renderGroupHeader}
+                    setCollapsed={this.changeCollapsed}
+                    hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
+                    onDragStart={this._toggle('dragging')}
+                    onDragStop={this._toggle('dragging')}
+                    style={groupStyle}
+                    dropZoneStyle={dropZoneStyle}
+                    itemStyle={itemStyle}
+                  />
+              }
+              <DropZone
+                keyPath={List([i + 1])}
+                onDrop={this.handleDrop}
+                style={dropZoneStyle}
+              />
+            </div>,
+          )
+        }
+        <PathfinderCreateLine
+          canEdit={pathfinderContext.canEdit}
+          text={'Filter Condition'}
+          onCreate={this.handleAddFilter}
+        />
+      </div>
+    );
+  }
 }
 
 export default Util.createTypedContainer(
   PathfinderFilterSection,
   [],
-  { builderActions: BuilderActions },
+  {
+    builderActions: BuilderActions,
+    colorsActions: ColorsActions,
+  },
 );

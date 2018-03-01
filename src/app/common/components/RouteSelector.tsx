@@ -129,9 +129,9 @@ export class RouteSelector extends TerrainComponent<Props>
     // animationEl: null,
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  shouldComponentUpdate(nextProps, nextState)
   {
-    //
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
   public componentDidUpdate(prevProps: Props, prevState)
@@ -142,7 +142,6 @@ export class RouteSelector extends TerrainComponent<Props>
   public render()
   {
     const { props, state } = this;
-
     return (
       <div
         className='routeselector-wrapper'

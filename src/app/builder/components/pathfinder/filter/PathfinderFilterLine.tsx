@@ -75,11 +75,10 @@ export interface Props
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
   comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
+  isSoftFilter?: boolean; // does this section apply to soft filters?
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
   // so that we can make the according UI adjustments
-
-  isSoftFilter?: boolean; // does this section apply to soft filters?
 }
 
 const pieceStyle = {

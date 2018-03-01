@@ -167,7 +167,6 @@ class DrawerAnimation extends TerrainComponent<Props>
             renderMaxHeight: this.props.maxHeight,
           });
           this.clearTimeouts();
-
           // scroll the content into view
           setTimeout(() =>
           {

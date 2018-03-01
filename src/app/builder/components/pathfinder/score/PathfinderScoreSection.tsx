@@ -94,6 +94,11 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       animateScoreBars: true,
     };
 
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
+  }
+
   public componentWillMount()
   {
     this.updateWeights(this.props.score.lines);
