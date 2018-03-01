@@ -61,7 +61,7 @@ import Modal from './Modal';
 const CommitLog = require('../../../commitlog.txt');
 const VersionLog = require('../../../versionlog.txt');
 
-const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
+const ArrowIcon = require('./../../../images/icon_carrot?name=ArrowIcon');
 
 const LogoutIcon = require('./../../../images/icon_logout.svg');
 const EditIcon = require('./../../../images/icon_edit.svg');

@@ -52,7 +52,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
-import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
@@ -62,8 +62,8 @@ const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandI
 const linkHeight = 36; // Coordinate with Sidebar.less
 const TerrainIcon = require('images/logo_terrainLong_blue@2x.png');
 const TerrainSmallIcon = require('images/logo_terrain_mountain.png');
-const linkOffsetExpanded = 174;
-const linkOffsetCollapsed = 100;
+const linkOffsetExpanded = 207;
+const linkOffsetCollapsed = 133;
 export interface ILink
 {
   icon: any;
@@ -122,12 +122,12 @@ export class Sidebar extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.sidebar-link svg',
-      style: { fill: Colors().iconColor },
+      style: { fill: Colors().iconColor, stroke: Colors().iconColor},
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.sidebar-link .sidebar-link-inner-selected svg',
-      style: { fill: Colors().activeText },
+      style: { fill: Colors().active, stroke: Colors().active },
     });
     this.setState({
       linkOffset: this.props.expanded ? linkOffsetExpanded : linkOffsetCollapsed,
@@ -175,16 +175,18 @@ export class Sidebar extends TerrainComponent<Props>
             />
         }
         <AccountDropdown small={!this.props.expanded} />
-        <div
-          className={classNames({
-            'sidebar-selected-square': true,
-            'sidebar-selected-square-hidden': this.props.selectedIndex === -1,
-          })}
-          style={{
-            top: (this.props.selectedIndex * linkHeight + this.state.linkOffset) + 'px',
-            backgroundColor: Colors().active,
-          }}
-        />
+       {
+        // <div
+        //        className={classNames({
+        //          'sidebar-selected-square': true,
+        //          'sidebar-selected-square-hidden': this.props.selectedIndex === -1,
+        //        })}
+        //        style={{
+        //          top: (this.props.selectedIndex * linkHeight + this.state.linkOffset) + 'px',
+        //          backgroundColor: Colors().active,
+        //        }}
+        //      />
+           }
         {
           this.props.links.map((link, index) =>
             <Link
@@ -198,19 +200,15 @@ export class Sidebar extends TerrainComponent<Props>
                   'xr': index === this.props.selectedIndex,
                 })}
                 key={'sidebar-link-' + index}
-                style={{
-                  ':hover': {
-                    background: Colors().inactiveHover,
-                  },
-                }}
               >
 
                 {tooltip(<div
                   className={classNames({
                     'sidebar-link-inner': true,
                     'sidebar-link-inner-selected': index === this.props.selectedIndex,
-                  })}
-
+                  })
+                }
+                  style={getStyle('fill', index === this.props.selectedIndex ? Colors().active : Colors().text1)}
                 >
                   {
                     link.icon
@@ -220,7 +218,7 @@ export class Sidebar extends TerrainComponent<Props>
                       'sidebar-link-text': true,
                       'sidebar-link-text-hidden': !this.props.expanded,
                     })}
-                    style={fontColor(Colors().text1)}
+                    style={fontColor(index === this.props.selectedIndex ? Colors().active : Colors().text1)}
                   >
                     {
                       link.text
@@ -240,7 +238,7 @@ export class Sidebar extends TerrainComponent<Props>
             (
               <div
                 className='sidebar-expand' onClick={this.props.onExpand}
-                style={backgroundColor(Colors().bg1, Colors().inactiveHover)}
+                // style={backgroundColor(Colors().bg1, Colors().inactiveHover)}
               >
                 <div className='dead-center'>
                   <ExpandIcon
@@ -248,7 +246,7 @@ export class Sidebar extends TerrainComponent<Props>
                     style={{
                       'fill': Colors().text2,
                       ':active': {
-                        fill: Colors().text1,
+                        fill: Colors().active,
                       },
                     }}
                   />

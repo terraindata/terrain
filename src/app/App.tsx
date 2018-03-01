@@ -108,12 +108,12 @@ const GilroySemiBoldSrc = require('app/common/fonts/Gilroy-SemiBold.woff');
 
 // Icons
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
-const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
-const BuilderIcon = require('./../images/icon_bldr-3.svg');
-const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
-const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
-const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
-const ControlIcon = require('./../images/icon_gear.svg');
+const LibraryIcon = require('./../images/icon-manage.svg?name=LibraryIcon');
+const BuilderIcon = require('./../images/icon-build.svg');
+const ReportingIcon = require('./../images/icon-analytics?name=ReportingIcon');
+const SchemaIcon = require('./../images/icon-schema.svg?name=SchemaIcon');
+const ImportIcon = require('./../images/icon-import.svg?name=ImportIcon');
+const ControlIcon = require('./../images/icon-control.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
 const BackgroundImage = require('./../images/background.png');
@@ -453,7 +453,7 @@ class App extends TerrainComponent<Props>
       );
     }
 
-    const sidebarWidth = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1 ? 150 : 36;
+    const sidebarWidth = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1 ? 205 : 36;
     const sidebarExpanded = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1;
     const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
     const style = {
