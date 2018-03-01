@@ -52,16 +52,29 @@ import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueIn
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
 import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
 
+/**
+ * Types of merge joins
+ */
+enum MergeJoinType {
+  LEFT_OUTER_JOIN,
+  FULL_OUTER_JOIN,
+  INNER_JOIN,
+}
+
+/**
+ * Merge join source
+ */
 interface Source
 {
   query: object;
   stream: Readable;
 
   maxBufferSize: number;
+  position: number;
   buffer: object[];
 
-  _continue: boolean;
-  _empty: boolean;
+  shouldContinue: boolean;
+  isEmpty: boolean;
 
   _onRead: () => void;
   _onEnd: () => void;
@@ -77,9 +90,10 @@ export default class MergeJoinTransform extends Readable
   private leftSource: Source;
   private rightSource: Source;
 
+  private mergeJoinName: string;
   private joinKey: string;
 
-  constructor(client: ElasticClient, queryStr: string)
+  constructor(client: ElasticClient, queryStr: string, type: MergeJoinType = MergeJoinType.INNER_JOIN)
   {
     super({
       objectMode: true,
@@ -109,38 +123,44 @@ export default class MergeJoinTransform extends Readable
     {
       throw Error('Only one inner query currently supported for merge joins.');
     }
+    this.mergeJoinName = innerQueries[0];
 
+    // set up the left source
     const leftQuery = this.setSortClause(query);
     this.leftSource = {
       query: leftQuery,
       stream: new ElasticStream(this.client, leftQuery),
 
       maxBufferSize: 512,
+      position: 0,
       buffer: [],
 
-      _continue: true,
-      _empty: false,
+      shouldContinue: true,
+      isEmpty: false,
 
       _onRead: this.readFromStream.bind(this, this.leftSource),
       _onEnd: this._final.bind(this, this.leftSource),
     };
 
-    const rightQuery = this.setSortClause(mergeJoinQuery[innerQueries[0]]);
+    // set up the right source
+    delete mergeJoinQuery[this.mergeJoinName]['size'];
+    const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
     this.rightSource = {
       query: rightQuery,
       stream: new ElasticStream(this.client, rightQuery),
 
       maxBufferSize: 512,
+      position: 0,
       buffer: [],
 
-      _continue: true,
-      _empty: false,
+      shouldContinue: true,
+      isEmpty: false,
 
       _onRead: this.readFromStream.bind(this, this.rightSource),
       _onEnd: this._final.bind(this, this.rightSource),
     };
 
-    // prepare stream event handlers
+    // prepare stream event handlers for both sources
     this.leftSource.stream.on('readable', this.leftSource._onRead);
     this.leftSource.stream.on('end', this.leftSource._onEnd);
     this.rightSource.stream.on('readable', this.rightSource._onRead);
@@ -149,16 +169,16 @@ export default class MergeJoinTransform extends Readable
 
   public _read(size: number = 1024)
   {
-    if (!this.leftSourceIsEmpty
-      && this.leftBufferedInputs.length < this.maxBufferedInputs)
+    if (!this.leftSource.isEmpty
+      && this.leftSource.buffer.length < this.leftSource.maxBufferSize)
     {
-      this.continueLeft = true;
+      this.leftSource.shouldContinue = true;
     }
 
-    if (!this.rightSourceIsEmpty
-      && this.rightBufferedInputs.length < this.maxBufferedInputs)
+    if (!this.rightSource.isEmpty
+      && this.rightSource.buffer.length < this.rightSource.maxBufferSize)
     {
-      this.continueRight = true;
+      this.rightSource.shouldContinue = true;
     }
   }
 
@@ -169,144 +189,141 @@ export default class MergeJoinTransform extends Readable
 
   public _final(callback)
   {
-    this.leftSource.removeListener('readable', this._onReadLeft);
-    this.leftSource.removeListener('end', this._onEndLeft);
+    this.leftSource.stream.removeListener('readable', this.leftSource._onRead);
+    this.leftSource.stream.removeListener('end', this.leftSource._onEnd);
 
-    this.rightSource.removeListener('readable', this._onReadRight);
-    this.rightSource.removeListener('end', this._onEndRight);
+    this.rightSource.stream.removeListener('readable', this.rightSource._onRead);
+    this.rightSource.stream.removeListener('end', this.rightSource._onEnd);
 
-    this.continueLeft = false;
-    this.continueRight = false;
-    this.leftSourceIsEmpty = true;
-    this.rightSourceIsEmpty = true;
+    this.leftSource.shouldContinue = false;
+    this.rightSource.shouldContinue = false;
+    this.leftSource.isEmpty = true;
+    this.rightSource.isEmpty = true;
+
     if (callback !== undefined)
     {
       callback();
     }
   }
 
-  private readFromStream(): void
+  private readFromStream(source: Source): void
   {
     // should we keep reading from the source streams?
-    if (!_continue)
+    if (!source.shouldContinue)
     {
       return;
     }
 
     // if yes, keep buffering inputs from the source stream
 
-    const obj = source.read();
+    const obj = source.stream.read();
     if (obj === null)
     {
-      _empty = true;
+      source.isEmpty = true;
     }
     else
     {
-      this.leftBufferedInputs.push(obj);
+      source.buffer.push(obj);
     }
 
     // if we have data buffered up to blockSize, swap the input buffer list out
     // and dispatch a subquery block
-    if (this.bufferedInputs.length >= this.blockSize ||
-      this.sourceIsEmpty && this.bufferedInputs.length > 0)
+    if (source.buffer.length >= source.maxBufferSize ||
+      source.isEmpty && source.buffer.length > 0)
     {
-      const inputs = this.bufferedInputs;
-      this.bufferedInputs = [];
-      this.dispatchSubqueryBlock(inputs);
+      const inputs = source.buffer;
+      source.buffer = [];
+      this.mergeJoin();
     }
   }
 
-  private dispatchSubqueryBlock(inputs: object[]): void
+  private mergeJoin(): void
   {
-    const numInputs = inputs.length;
-    const numQueries = Object.keys(this.mergeJoinQuery).length;
+    const left = this.leftSource.buffer;
+    const right = this.rightSource.buffer;
 
-    // issue a ticket to track the progress of this query; count indicates the number of subqueries
-    // associated with this query
-    const ticket: Ticket = {
-      count: numQueries,
-      results: inputs,
-    };
-    this.bufferedOutputs.push(ticket);
+    const numLeft = left.length;
+    const numRight = right.length;
 
-    for (const subQuery of Object.keys(this.mergeJoinQuery))
+    let l = left[this.leftSource.position]['_source'][this.joinKey];
+    let r = right[this.rightSource.position]['_source'][this.joinKey];
+
+    while (l < r && this.leftSource.position < numLeft)
     {
-      const query = this.setSortClause(this.mergeJoinQuery[subQuery]);
-      delete query['size'];
-
-      this.client.search(
-        {
-          body: query,
-        },
-        (error: Error | null, response: any) =>
-        {
-          if (error !== null && error !== undefined)
-          {
-            throw error;
-          }
-
-          for (let i = 0, j = 0; i < numInputs; ++i)
-          {
-            if (ticket.results[i][subQuery] === undefined)
-            {
-              ticket.results[i][subQuery] = [];
-            }
-
-            while (j < response.hits.hits.length &&
-              (ticket.results[i]['_source'][this.joinKey] !== response.hits.hits[j]._source[this.joinKey]))
-            {
-              j++;
-            }
-
-            if (j === response.hits.hits.length)
-            {
-              continue;
-            }
-
-            let k = j;
-            while (k < response.hits.hits.length &&
-              (ticket.results[i]['_source'][this.joinKey] === response.hits.hits[k]._source[this.joinKey]))
-            {
-              ticket.results[i][subQuery].push(response.hits.hits[k]);
-              k++;
-            }
-          }
-
-          ticket.count--;
-
-          // check if we have anything to push to the output stream
-          let done = false;
-          while (!done && this.bufferedOutputs.length > 0)
-          {
-            const front = this.bufferedOutputs.peekFront();
-            if (front !== undefined && front.count === 0)
-            {
-              while (front.results.length > 0)
-              {
-                const obj = front.results.shift();
-                if (obj !== undefined)
-                {
-                  this.push(obj);
-                }
-              }
-              this.bufferedOutputs.shift();
-            }
-            else
-            {
-              done = true;
-            }
-          }
-
-          if (this.sourceIsEmpty
-            && this.bufferedOutputs.length === 0
-            && this.bufferedInputs.length === 0)
-          {
-            this.push(null);
-          }
-
-          this.continueReading = false;
-        });
+      this.leftSource.position++;
+      l = left[this.leftSource.position]['_source'][this.joinKey];
     }
+
+    if (this.leftSource.position === numLeft)
+    {
+      this.leftSource.shouldContinue = true;
+      return;
+    }
+
+    while (r < l && this.rightSource.position < numRight)
+    {
+      this.rightSource.position++;
+      r = right[this.rightSource.position]['_source'][this.joinKey];
+    }
+
+    if (this.rightSource.position === numRight)
+    {
+      this.rightSource.shouldContinue = true;
+      return;
+    }
+
+    while (r === l)
+    {
+
+      j++;
+      r = right[i]['_source'][this.joinKey];
+    }
+
+
+    for (let i = 0, j = 0; i < numInputs; ++i)
+    {
+
+
+      let k = j;
+      while (k < response.hits.hits.length &&
+        (ticket.results[i]['_source'][this.joinKey] === response.hits.hits[k]._source[this.joinKey]))
+      {
+        ticket.results[i][subQuery].push(response.hits.hits[k]);
+        k++;
+      }
+
+
+    // check if we have anything to push to the output stream
+    let done = false;
+    while (!done && this.bufferedOutputs.length > 0)
+    {
+      const front = this.bufferedOutputs.peekFront();
+      if (front !== undefined && front.count === 0)
+      {
+        while (front.results.length > 0)
+        {
+          const obj = front.results.shift();
+          if (obj !== undefined)
+          {
+            this.push(obj);
+          }
+        }
+        this.bufferedOutputs.shift();
+      }
+      else
+      {
+        done = true;
+      }
+    }
+
+    if (this.sourceIsEmpty
+      && this.bufferedOutputs.length === 0
+      && this.bufferedInputs.length === 0)
+    {
+      this.push(null);
+    }
+
+    this.continueReading = false;
   }
 
   private setSortClause(query: object)
