@@ -46,38 +46,17 @@ THE SOFTWARE.
 
 import { Readable } from 'stream';
 
-import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
+import BufferedElasticStream from './BufferedElasticStream';
 
 /**
  * Types of merge joins
  */
-enum MergeJoinType {
+export enum MergeJoinType {
   LEFT_OUTER_JOIN,
-  FULL_OUTER_JOIN,
   INNER_JOIN,
-}
-
-/**
- * Merge join source
- */
-interface Source
-{
-  query: object;
-  stream: Readable;
-
-  maxBufferSize: number;
-  position: number;
-  buffer: object[];
-
-  shouldContinue: boolean;
-  isEmpty: boolean;
-
-  _onRead: () => void;
-  _onEnd: () => void;
 }
 
 /**
@@ -86,20 +65,22 @@ interface Source
 export default class MergeJoinTransform extends Readable
 {
   private client: ElasticClient;
+  private type: MergeJoinType;
 
-  private leftSource: Source;
-  private rightSource: Source;
+  private leftSource: BufferedElasticStream;
+  private rightSource: BufferedElasticStream;
 
   private mergeJoinName: string;
   private joinKey: string;
 
-  constructor(client: ElasticClient, queryStr: string, type: MergeJoinType = MergeJoinType.INNER_JOIN)
+  constructor(client: ElasticClient, queryStr: string, type: MergeJoinType = MergeJoinType.LEFT_OUTER_JOIN)
   {
     super({
       objectMode: true,
     });
 
     this.client = client;
+    this.type = type;
 
     const parser = new ESJSONParser(queryStr, true);
     if (parser.hasError())
@@ -127,203 +108,103 @@ export default class MergeJoinTransform extends Readable
 
     // set up the left source
     const leftQuery = this.setSortClause(query);
-    this.leftSource = {
-      query: leftQuery,
-      stream: new ElasticStream(this.client, leftQuery),
-
-      maxBufferSize: 512,
-      position: 0,
-      buffer: [],
-
-      shouldContinue: true,
-      isEmpty: false,
-
-      _onRead: this.readFromStream.bind(this, this.leftSource),
-      _onEnd: this._final.bind(this, this.leftSource),
-    };
+    this.leftSource = new BufferedElasticStream(client, leftQuery, this.mergeJoin);
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
-    this.rightSource = {
-      query: rightQuery,
-      stream: new ElasticStream(this.client, rightQuery),
-
-      maxBufferSize: 512,
-      position: 0,
-      buffer: [],
-
-      shouldContinue: true,
-      isEmpty: false,
-
-      _onRead: this.readFromStream.bind(this, this.rightSource),
-      _onEnd: this._final.bind(this, this.rightSource),
-    };
-
-    // prepare stream event handlers for both sources
-    this.leftSource.stream.on('readable', this.leftSource._onRead);
-    this.leftSource.stream.on('end', this.leftSource._onEnd);
-    this.rightSource.stream.on('readable', this.rightSource._onRead);
-    this.rightSource.stream.on('end', this.rightSource._onEnd);
+    this.rightSource = new BufferedElasticStream(client, rightQuery, this.mergeJoin);
   }
 
   public _read(size: number = 1024)
   {
-    if (!this.leftSource.isEmpty
-      && this.leftSource.buffer.length < this.leftSource.maxBufferSize)
-    {
-      this.leftSource.shouldContinue = true;
-    }
-
-    if (!this.rightSource.isEmpty
-      && this.rightSource.buffer.length < this.rightSource.maxBufferSize)
-    {
-      this.rightSource.shouldContinue = true;
-    }
+    this.leftSource._read();
+    this.rightSource._read();
   }
 
   public _destroy(error, callback)
   {
-    this._final(callback);
-  }
-
-  public _final(callback)
-  {
-    this.leftSource.stream.removeListener('readable', this.leftSource._onRead);
-    this.leftSource.stream.removeListener('end', this.leftSource._onEnd);
-
-    this.rightSource.stream.removeListener('readable', this.rightSource._onRead);
-    this.rightSource.stream.removeListener('end', this.rightSource._onEnd);
-
-    this.leftSource.shouldContinue = false;
-    this.rightSource.shouldContinue = false;
-    this.leftSource.isEmpty = true;
-    this.rightSource.isEmpty = true;
-
-    if (callback !== undefined)
-    {
-      callback();
-    }
-  }
-
-  private readFromStream(source: Source): void
-  {
-    // should we keep reading from the source streams?
-    if (!source.shouldContinue)
-    {
-      return;
-    }
-
-    // if yes, keep buffering inputs from the source stream
-
-    const obj = source.stream.read();
-    if (obj === null)
-    {
-      source.isEmpty = true;
-    }
-    else
-    {
-      source.buffer.push(obj);
-    }
-
-    // if we have data buffered up to blockSize, swap the input buffer list out
-    // and dispatch a subquery block
-    if (source.buffer.length >= source.maxBufferSize ||
-      source.isEmpty && source.buffer.length > 0)
-    {
-      const inputs = source.buffer;
-      source.buffer = [];
-      this.mergeJoin();
-    }
+    this.leftSource._destroy(error, callback);
+    this.rightSource._destroy(error, callback);
   }
 
   private mergeJoin(): void
   {
+    this.leftSource.shouldContinue = false;
+    this.rightSource.shouldContinue = false;
+
     const left = this.leftSource.buffer;
     const right = this.rightSource.buffer;
 
-    const numLeft = left.length;
-    const numRight = right.length;
+    let l = left[this.leftSource.position][this.joinKey];
+    let r = right[this.rightSource.position][this.joinKey];
 
-    let l = left[this.leftSource.position]['_source'][this.joinKey];
-    let r = right[this.rightSource.position]['_source'][this.joinKey];
-
-    while (l < r && this.leftSource.position < numLeft)
+    // advance left and right streams
+    while (this.leftSource.position < left.length
+      && this.rightSource.position < right.length)
     {
-      this.leftSource.position++;
-      l = left[this.leftSource.position]['_source'][this.joinKey];
-    }
-
-    if (this.leftSource.position === numLeft)
-    {
-      this.leftSource.shouldContinue = true;
-      return;
-    }
-
-    while (r < l && this.rightSource.position < numRight)
-    {
-      this.rightSource.position++;
-      r = right[this.rightSource.position]['_source'][this.joinKey];
-    }
-
-    if (this.rightSource.position === numRight)
-    {
-      this.rightSource.shouldContinue = true;
-      return;
-    }
-
-    while (r === l)
-    {
-
-      j++;
-      r = right[i]['_source'][this.joinKey];
-    }
-
-
-    for (let i = 0, j = 0; i < numInputs; ++i)
-    {
-
-
-      let k = j;
-      while (k < response.hits.hits.length &&
-        (ticket.results[i]['_source'][this.joinKey] === response.hits.hits[k]._source[this.joinKey]))
+      while (l !== r)
       {
-        ticket.results[i][subQuery].push(response.hits.hits[k]);
-        k++;
-      }
-
-
-    // check if we have anything to push to the output stream
-    let done = false;
-    while (!done && this.bufferedOutputs.length > 0)
-    {
-      const front = this.bufferedOutputs.peekFront();
-      if (front !== undefined && front.count === 0)
-      {
-        while (front.results.length > 0)
+        if (l < r)
         {
-          const obj = front.results.shift();
-          if (obj !== undefined)
+          this.leftSource.position++;
+          l = left[this.leftSource.position][this.joinKey];
+
+          if (this.type === MergeJoinType.LEFT_OUTER_JOIN)
           {
-            this.push(obj);
+            left[this.leftSource.position][this.mergeJoinName] = [];
+            this.push(left[this.leftSource.position]);
           }
         }
-        this.bufferedOutputs.shift();
+        else if (r < l)
+        {
+          this.rightSource.position++;
+          r = right[this.rightSource.position][this.joinKey];
+        }
+
+        // if either of the streams went dry, request more
+        if (this.leftSource.position === left.length)
+        {
+          this.leftSource.shouldContinue = true;
+          return;
+        }
+
+        if (this.rightSource.position === right.length)
+        {
+          this.rightSource.shouldContinue = true;
+          return;
+        }
       }
-      else
+
+      // start merging
+      left[this.leftSource.position][this.mergeJoinName] = [];
+      let j = this.rightSource.position;
+      while (l === r && j < right.length)
       {
-        done = true;
+        left[this.leftSource.position][this.mergeJoinName].push(right[j]);
+        j++;
+        r = right[j][this.joinKey];
       }
+
+      if (j === right.length)
+      {
+        this.rightSource.shouldContinue = true;
+        return;
+      }
+
+      // push the merged result out to the stream
+      this.push(left[this.leftSource.position]);
+      this.leftSource.position++;
     }
 
-    if (this.sourceIsEmpty
-      && this.bufferedOutputs.length === 0
-      && this.bufferedInputs.length === 0)
+    // check if we are done
+    if (this.leftSource.isEmpty
+      && this.rightSource.isEmpty
+      && this.leftSource.buffer.length === 0
+      && this.rightSource.buffer.length === 0)
     {
       this.push(null);
     }
-
-    this.continueReading = false;
   }
 
   private setSortClause(query: object)
