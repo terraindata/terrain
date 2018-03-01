@@ -65,34 +65,33 @@ import ElasticStream from './ElasticStream';
 export async function handleMergeJoin(client: ElasticClient, request: QueryRequest,
   parser: ESParser, query: object): Promise<QueryResponse | Readable>
 {
-  const childQuery = query['mergeJoin'];
+  const mergeJoinQuery = query['mergeJoin'];
   delete query['mergeJoin'];
 
-  if (childQuery['joinKey'] === undefined)
+  if (mergeJoinQuery['joinKey'] === undefined)
   {
     throw new Error('joinKey must be specified for a merge join');
   }
 
-  const joinKey = childQuery['joinKey'];
-  delete childQuery['joinKey'];
+  const joinKey = mergeJoinQuery['joinKey'];
+  delete mergeJoinQuery['joinKey'];
 
-  const parentQuery: Elastic.SearchParams | undefined = query;
-  if (parentQuery === undefined)
+  if (query === undefined)
   {
     throw new Error('Expecting body parameter in the mergeJoin query');
   }
 
-  if (parentQuery['sort'] !== undefined)
+  if (query['sort'] !== undefined)
   {
     throw new Error('Sort clause(s) not allowed in a mergeJoin parent query');
   }
 
-  parentQuery.sort = { [joinKey]: 'asc' } as any;
+  query['sort'] = { [joinKey]: 'asc' } as any;
   const handleSubQueries = async (error, response) =>
   {
     try
     {
-      await handleMergeJoinSubQueries(client, childQuery, response, joinKey);
+      await handleMergeJoinSubQueries(client, mergeJoinQuery, response, joinKey);
     }
     catch (e)
     {
@@ -104,7 +103,7 @@ export async function handleMergeJoin(client: ElasticClient, request: QueryReque
   // TODO: request.streaming
   return new Promise<QueryResponse>((resolve, reject) =>
   {
-    client.search({ body: parentQuery } as Elastic.SearchParams,
+    client.search({ body: query } as Elastic.SearchParams,
       async (error, response) =>
       {
         const r = await handleSubQueries(null, response);
