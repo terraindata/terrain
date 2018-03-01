@@ -143,9 +143,10 @@ class PathfinderArea extends TerrainComponent<Props>
 
   public render()
   {
-    const { path } = this.props;
+    const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
+    
     return (
       <ScrollingComponent
         className='pf-area'
@@ -189,11 +190,20 @@ class PathfinderArea extends TerrainComponent<Props>
             />
 
             <PathfinderFilterSection
+              isSoftFilter={true}
+              pathfinderContext={pathfinderContext}
+              filterGroup={path.softFilterGroup}
+              keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
+              onStepChange={this.incrementStep}
+              toSkip={toSkip}
+            />
+            
+            <PathfinderFilterSection
               pathfinderContext={pathfinderContext}
               filterGroup={path.filterGroup}
               keyPath={keyPath.push('filterGroup')}
               onStepChange={this.incrementStep}
-              toSkip={this.props.toSkip}
+              toSkip={toSkip}
             />
 
             <PathfinderMoreSection
@@ -201,7 +211,7 @@ class PathfinderArea extends TerrainComponent<Props>
               more={path.more}
               path={path}
               keyPath={keyPath.push('more')}
-              toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
+              toSkip={toSkip !== undefined ? toSkip : 3}
             />
           </FadeInOut>
         </div>

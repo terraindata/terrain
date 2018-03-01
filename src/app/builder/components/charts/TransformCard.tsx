@@ -395,7 +395,17 @@ class TransformCard extends TerrainComponent<Props>
   private computeScoreElasticBars(maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
     const query = overrideQuery || this.props.builder.query;
-    const tqlString = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
+    let tqlString = '';
+    
+    try {
+      tqlString = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
+    } catch (e)
+    {
+      // couldn't parse the JSON
+      // TODO clear bars
+      return;
+    }
+    
     const tql = JSON.parse(tqlString);
     tql['size'] = 0;
     tql['sort'] = {};

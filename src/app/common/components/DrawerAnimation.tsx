@@ -201,7 +201,6 @@ class DrawerAnimation extends TerrainComponent<Props>
       renderMaxHeight: 0, // tell it we're closing
       closingTimeout: setTimeout(() =>
       {
-        console.log('Dont render');
         this.setState({
           shouldRender: false,
         });
