@@ -55,6 +55,7 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import FloatingInput from 'app/common/components/FloatingInput';
+import FadeInOut from 'app/common/components/FadeInOut';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import Util from 'app/util/Util';
 import BuilderActions from '../../../data/BuilderActions';
@@ -246,6 +247,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       (this.props.keyPath.butLast().toList().concat(List(['source', 'count'])).toList(), value);
   }
 
+  public handleAlgorithmNameChange(i: number, value: any)
+  {
+    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
+    this.props.builderActions.changePath(nestedKeyPath.push('name'), value);
+  }
+
   public renderNestedPaths()
   {
     const { references } = this.props.more;
@@ -281,6 +288,18 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       PathfinderText.referenceExplanation,
                     )
                   }
+                  <FadeInOut
+                    open={nested.get(i) !== undefined && nested.get(i).name !== undefined}
+                  >
+                    <FloatingInput
+                      value={nested.get(i) != undefined ? nested.get(i).name : undefined}
+                      onChange={this._fn(this.handleAlgorithmNameChange, i)}
+                      label={'Algorithm Name'}
+                      isTextInput={true}
+                      canEdit={canEdit}
+                      className='pf-more-nested-name-input'
+                    />
+                  </FadeInOut>
                   <RemoveIcon
                     onClick={this._fn(this.handleDeleteNested, i)}
                     className='pf-more-nested-remove close'
