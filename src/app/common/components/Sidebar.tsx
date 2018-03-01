@@ -187,6 +187,7 @@ export class Sidebar extends TerrainComponent<Props>
         //        }}
         //      />
            }
+        <div className='sidebar-links'>
         {
           this.props.links.map((link, index) =>
             <Link
@@ -233,6 +234,7 @@ export class Sidebar extends TerrainComponent<Props>
             </Link>,
           )
         }
+        </div>
         {
           this.props.expandable ?
             (
