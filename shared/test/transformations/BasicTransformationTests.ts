@@ -45,12 +45,11 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
-import nestedProperty = require('nested-property');
-import { KeyPath } from '../../transformations/KeyPath';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
-import * as yadeep from '../../transformations/yadeep';
+import { KeyPath } from '../../util/KeyPath';
+import * as yadeep from '../../util/yadeep';
 
 const doc1 = {
   name: 'Bob',
@@ -79,27 +78,27 @@ test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   e.addField(KeyPath(['meta', 'school']), 'string');
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
   const r = e.transform(doc1);
   expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
-test('capitalization', () =>
+test('make a field uppercase', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
   const r = e.transform(doc1);
   expect(r['name']).toBe('BOB');
-  expect(nestedProperty.get(r, 'meta.school')).toBe('STANFORD');
+  expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
 test('serialize to JSON', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
-  expect(e.json()).toEqual({
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  expect(e.toJSON()).toEqual({
     dag: {
       options: {
         directed: true,
@@ -109,11 +108,11 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new TransformationNode(0, TransformationNodeType.CapitalizeNode, List<number>([0])),
+          value: new TransformationNode(0, TransformationNodeType.UppercaseNode, List<number>([0])),
         },
         {
           v: '1',
-          value: new TransformationNode(1, TransformationNodeType.CapitalizeNode, List<number>([3])),
+          value: new TransformationNode(1, TransformationNodeType.UppercaseNode, List<number>([3])),
         },
       ],
       edges: [],
@@ -163,9 +162,9 @@ test('serialize to JSON', () =>
 test('JSON serialize/deserialize round trip', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
-  const j = e.json();
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  const j = e.toJSON();
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
   e2.addField(KeyPath(['i']), 'number');
@@ -175,9 +174,9 @@ test('JSON serialize/deserialize round trip', () =>
 test('String serialize/deserialize round trip', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
-  const j: string = JSON.stringify(e.json());
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  const j: string = JSON.stringify(e.toJSON());
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
   expect(e2.transform(doc1)['name']).toBe('BOB');
@@ -188,7 +187,7 @@ test('String serialize/deserialize round trip', () =>
 test('linear chain of transformations', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
   const t = e.transform(doc1);
   expect(t['name']).toBe('BO');
@@ -199,9 +198,9 @@ test('get transformations for a field', () =>
   const e: TransformationEngine = new TransformationEngine();
   const id1: number = e.addField(KeyPath(['name']), 'string');
   e.addField(KeyPath(['meta', 'school']), 'string');
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['name'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
   expect(e.getTransformations(id1)).toEqual(List<number>([0, 1]));
 });
 
@@ -255,7 +254,7 @@ test('rename a field (an object with subkeys)', () =>
 test('transform of deeply nested value', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]));
   expect(e.transform(doc3)).toEqual(
     {
       name: 'Bob',
@@ -289,7 +288,7 @@ test('transform of deeply nested value', () =>
 test('nested transform with wildcard', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]));
   expect(e.transform(doc3)).toEqual(
     {
       name: 'Bob',

@@ -132,12 +132,12 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: `Add text after this field's value`,
       },
-    [TransformationNodeType.CapitalizeNode]:
+    [TransformationNodeType.UppercaseNode]:
       {
-        humanName: 'Capitalize',
+        humanName: 'Uppercase',
         editable: true,
         creatable: true,
-        description: 'Capitalize the text in this field',
+        description: 'Make all the text in this field uppercase',
         isAvailable: (engine, fieldId) =>
         {
           return engine.getFieldType(fieldId) === 'string';

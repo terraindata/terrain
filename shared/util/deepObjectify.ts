@@ -43,60 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable no-unused-expression
-enum TransformationNodeType
+
+/**
+ * This is a simple, general-purpose module that traverses
+ * a nested object and turns any arrays encountered
+ * into equivalent objects (arrays and objects are equivalent
+ * in JS).
+ */
+
+import isPrimitive = require('is-primitive');
+
+/**
+ * Converts any arrays in a deeply nested object
+ * into equivalent objects.
+ *
+ * @param arr A deeply nested object or array to convert.
+ * @returns   A copy of arr where all arrays are replaced
+ *            by their equivalent object representations.
+ */
+export default function objectify(arr)
 {
-  LoadNode = 'LoadNode',
-  StoreNode = 'StoreNode',
-  PutNode = 'PutNode',
-  GetNode = 'GetNode',
-  SplitNode = 'SplitNode',
-  JoinNode = 'JoinNode',
-  FilterNode = 'FilterNode',
-  DuplicateNode = 'DuplicateNode',
-  RenameNode = 'RenameNode',
-  PlusNode = 'PlusNode',
-  PrependNode = 'PrependNode',
-  AppendNode = 'AppendNode',
-  UppercaseNode = 'UppercaseNode',
-  SubstringNode = 'SubstringNode',
+  if (isPrimitive(arr))
+  {
+    return arr;
+  }
+  let obj: object = Object.assign({}, arr);
+  if (arr.constructor === Array)
+  {
+    obj = { ...arr };
+  }
+  for (const key in obj)
+  {
+    if (obj.hasOwnProperty(key))
+    {
+      obj[key] = objectify(obj[key]);
+    }
+  }
+  return obj;
 }
-
-// if this has errors, double check TransformationNodeType's keys are equal to its values
-type AssertEnumValuesEqualKeys = {
-  [K in keyof typeof TransformationNodeType]: K
-};
-TransformationNodeType as AssertEnumValuesEqualKeys;
-
-// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
-type AssertOptionTypesExhaustive = {
-  [K in TransformationNodeType]: TransformationOptionTypes[K]
-};
-
-interface TransformationOptionTypes
-{
-  LoadNode: any;
-  StoreNode: any;
-  PutNode: any;
-  GetNode: any;
-  SplitNode: any;
-  JoinNode: any;
-  FilterNode: any;
-  DuplicateNode: any;
-  RenameNode: any;
-  PlusNode: any;
-  PrependNode: any;
-  AppendNode: any;
-  UppercaseNode: {
-
-  };
-  SubstringNode: {
-    from: number;
-    length: number;
-  };
-}
-
-export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
-
-export default TransformationNodeType;

@@ -43,60 +43,57 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable no-unused-expression
-enum TransformationNodeType
-{
-  LoadNode = 'LoadNode',
-  StoreNode = 'StoreNode',
-  PutNode = 'PutNode',
-  GetNode = 'GetNode',
-  SplitNode = 'SplitNode',
-  JoinNode = 'JoinNode',
-  FilterNode = 'FilterNode',
-  DuplicateNode = 'DuplicateNode',
-  RenameNode = 'RenameNode',
-  PlusNode = 'PlusNode',
-  PrependNode = 'PrependNode',
-  AppendNode = 'AppendNode',
-  UppercaseNode = 'UppercaseNode',
-  SubstringNode = 'SubstringNode',
-}
 
-// if this has errors, double check TransformationNodeType's keys are equal to its values
-type AssertEnumValuesEqualKeys = {
-  [K in keyof typeof TransformationNodeType]: K
-};
-TransformationNodeType as AssertEnumValuesEqualKeys;
+import objectify from '../../util/deepObjectify';
+import { KeyPath } from '../../util/KeyPath';
+import * as yadeep from '../../util/yadeep';
 
-// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
-type AssertOptionTypesExhaustive = {
-  [K in TransformationNodeType]: TransformationOptionTypes[K]
+const doc3: object = {
+  name: 'Bob',
+  arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
+  hardarr: [['a'], ['b', ['c']]],
 };
 
-interface TransformationOptionTypes
+const objd: object = objectify(doc3);
+
+test('simple top-level get', () =>
 {
-  LoadNode: any;
-  StoreNode: any;
-  PutNode: any;
-  GetNode: any;
-  SplitNode: any;
-  JoinNode: any;
-  FilterNode: any;
-  DuplicateNode: any;
-  RenameNode: any;
-  PlusNode: any;
-  PrependNode: any;
-  AppendNode: any;
-  UppercaseNode: {
+  expect(yadeep.get(objd, KeyPath(['name']))).toBe('Bob');
+});
 
-  };
-  SubstringNode: {
-    from: number;
-    length: number;
-  };
-}
+test('primitive get one layer deep', () =>
+{
+  expect(yadeep.get(objd, KeyPath(['arr', '0']))).toBe('sled');
+});
 
-export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
+test('nested array get', () =>
+{
+  expect(yadeep.get(objd, KeyPath(['hardarr', '1', '1']))).toEqual({ 0: 'c' });
+});
 
-export default TransformationNodeType;
+test('wildcard nested get', () =>
+{
+  expect(yadeep.get(objd, KeyPath(['arr', '1', '*', 'a']))).toEqual(['dog', 'fren']);
+});
+
+test('simple top-level set', () =>
+{
+  const copy: object = { ...objd };
+  yadeep.set(copy, KeyPath(['name']), 'jim');
+  expect(copy['name']).toBe('jim');
+});
+
+test('a deep set', () =>
+{
+  const copy: object = { ...objd };
+  yadeep.set(copy, KeyPath(['arr', '1', '0', 'a']), 'jim');
+  expect(copy['arr']['1']['0']['a']).toBe('jim');
+});
+
+test('a deep set with a wildcard', () =>
+{
+  const copy: object = { ...objd };
+  yadeep.set(copy, KeyPath(['arr', '1', '*', 'a']), 'jim');
+  expect(copy['arr']['1']['0']['a']).toBe('jim');
+  expect(copy['arr']['1']['1']['a']).toBe('jim');
+});

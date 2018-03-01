@@ -44,56 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import objectify from '../../transformations/deepObjectify';
-import { KeyPath } from '../../transformations/KeyPath';
-import * as yadeep from '../../transformations/yadeep';
+import { TransformationNode } from '../TransformationNode';
+import TransformationVisitResult from '../TransformationVisitResult';
+import ANodeVisitor from './ANodeVisitor';
 
-const doc3: object = {
-  name: 'Bob',
-  arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
-  hardarr: [['a'], ['b', ['c']]],
-};
-
-const objd: object = objectify(doc3);
-
-test('simple top-level get', () =>
+export default class StoreNodeVisitor extends ANodeVisitor
 {
-  expect(yadeep.get(objd, KeyPath(['name']))).toBe('Bob');
-});
-
-test('primitive get one layer deep', () =>
-{
-  expect(yadeep.get(objd, KeyPath(['arr', '0']))).toBe('sled');
-});
-
-test('nested array get', () =>
-{
-  expect(yadeep.get(objd, KeyPath(['hardarr', '1', '1']))).toEqual({ 0: 'c' });
-});
-
-test('wildcard nested get', () =>
-{
-  expect(yadeep.get(objd, KeyPath(['arr', '1', '*', 'a']))).toEqual(['dog', 'fren']);
-});
-
-test('simple top-level set', () =>
-{
-  const copy: object = { ...objd };
-  yadeep.set(copy, KeyPath(['name']), 'jim');
-  expect(copy['name']).toBe('jim');
-});
-
-test('a deep set', () =>
-{
-  const copy: object = { ...objd };
-  yadeep.set(copy, KeyPath(['arr', '1', '0', 'a']), 'jim');
-  expect(copy['arr']['1']['0']['a']).toBe('jim');
-});
-
-test('a deep set with a wildcard', () =>
-{
-  const copy: object = { ...objd };
-  yadeep.set(copy, KeyPath(['arr', '1', '*', 'a']), 'jim');
-  expect(copy['arr']['1']['0']['a']).toBe('jim');
-  expect(copy['arr']['1']['1']['a']).toBe('jim');
-});
+  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+  {
+    // TODO
+    return {} as TransformationVisitResult;
+  }
+}

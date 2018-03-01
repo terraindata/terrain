@@ -43,60 +43,56 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable no-unused-expression
-enum TransformationNodeType
-{
-  LoadNode = 'LoadNode',
-  StoreNode = 'StoreNode',
-  PutNode = 'PutNode',
-  GetNode = 'GetNode',
-  SplitNode = 'SplitNode',
-  JoinNode = 'JoinNode',
-  FilterNode = 'FilterNode',
-  DuplicateNode = 'DuplicateNode',
-  RenameNode = 'RenameNode',
-  PlusNode = 'PlusNode',
-  PrependNode = 'PrependNode',
-  AppendNode = 'AppendNode',
-  UppercaseNode = 'UppercaseNode',
-  SubstringNode = 'SubstringNode',
-}
 
-// if this has errors, double check TransformationNodeType's keys are equal to its values
-type AssertEnumValuesEqualKeys = {
-  [K in keyof typeof TransformationNodeType]: K
-};
-TransformationNodeType as AssertEnumValuesEqualKeys;
+import objectify from '../../util/deepObjectify';
 
-// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
-type AssertOptionTypesExhaustive = {
-  [K in TransformationNodeType]: TransformationOptionTypes[K]
+const simple = ['a', 'b', 'c'];
+
+const hard = {
+  name: 'Bob',
+  arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
+  hardarr: [['a'], ['b', ['c']]],
 };
 
-interface TransformationOptionTypes
+test('simple', () =>
 {
-  LoadNode: any;
-  StoreNode: any;
-  PutNode: any;
-  GetNode: any;
-  SplitNode: any;
-  JoinNode: any;
-  FilterNode: any;
-  DuplicateNode: any;
-  RenameNode: any;
-  PlusNode: any;
-  PrependNode: any;
-  AppendNode: any;
-  UppercaseNode: {
+  expect(objectify(simple)).toEqual(
+    {
+      0: 'a',
+      1: 'b',
+      2: 'c',
+    },
+  );
+});
 
-  };
-  SubstringNode: {
-    from: number;
-    length: number;
-  };
-}
-
-export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
-
-export default TransformationNodeType;
+test('hard', () =>
+{
+  expect(objectify(hard)).toEqual(
+    {
+      name: 'Bob',
+      arr: {
+        0: 'sled',
+        1: {
+          0: {
+            a: 'dog',
+          },
+          1: {
+            a: 'fren',
+            b: 'doggo',
+          },
+        },
+      },
+      hardarr: {
+        0: {
+          0: 'a',
+        },
+        1: {
+          0: 'b',
+          1: {
+            0: 'c',
+          },
+        },
+      },
+    },
+  );
+});

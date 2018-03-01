@@ -44,25 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import isPrimitive = require('is-primitive');
+import { TransformationNode } from '../TransformationNode';
+import TransformationVisitResult from '../TransformationVisitResult';
+import ANodeVisitor from './ANodeVisitor';
 
-export default function objectify(arr)
+export default class PutNodeVisitor extends ANodeVisitor
 {
-  if (isPrimitive(arr))
+  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return arr;
+    // TODO
+    return {} as TransformationVisitResult;
   }
-  let obj: object = Object.assign({}, arr);
-  if (arr.constructor === Array)
-  {
-    obj = { ...arr };
-  }
-  for (const key in obj)
-  {
-    if (obj.hasOwnProperty(key))
-    {
-      obj[key] = objectify(obj[key]);
-    }
-  }
-  return obj;
 }

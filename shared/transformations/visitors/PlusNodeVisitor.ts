@@ -44,55 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import objectify from '../../transformations/deepObjectify';
+import { TransformationNode } from '../TransformationNode';
+import TransformationVisitResult from '../TransformationVisitResult';
+import ANodeVisitor from './ANodeVisitor';
 
-const simple = ['a', 'b', 'c'];
-
-const hard = {
-  name: 'Bob',
-  arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
-  hardarr: [['a'], ['b', ['c']]],
-};
-
-test('simple', () =>
+export default class PlusNodeVisitor extends ANodeVisitor
 {
-  expect(objectify(simple)).toEqual(
-    {
-      0: 'a',
-      1: 'b',
-      2: 'c',
-    },
-  );
-});
-
-test('hard', () =>
-{
-  expect(objectify(hard)).toEqual(
-    {
-      name: 'Bob',
-      arr: {
-        0: 'sled',
-        1: {
-          0: {
-            a: 'dog',
-          },
-          1: {
-            a: 'fren',
-            b: 'doggo',
-          },
-        },
-      },
-      hardarr: {
-        0: {
-          0: 'a',
-        },
-        1: {
-          0: 'b',
-          1: {
-            0: 'c',
-          },
-        },
-      },
-    },
-  );
-});
+  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+  {
+    // TODO
+    return {} as TransformationVisitResult;
+  }
+}

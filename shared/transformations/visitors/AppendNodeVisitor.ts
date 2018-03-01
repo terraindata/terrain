@@ -44,77 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// Yet another deep JSON getter/setter module
+import { TransformationNode } from '../TransformationNode';
+import TransformationVisitResult from '../TransformationVisitResult';
+import ANodeVisitor from './ANodeVisitor';
 
-import { KeyPath, WayPoint } from './KeyPath';
-
-export function find(obj: object, path: KeyPath, next: (found) => any, options: object = {}): void
+export default class AppendNodeVisitor extends ANodeVisitor
 {
-  if (path.size === 0 || obj === undefined)
+  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    obj = next(obj);
-    return;
+    // TODO
+    return {} as TransformationVisitResult;
   }
-
-  const waypoint: WayPoint = path.get(0);
-
-  const keys: string[] = Object.keys(obj);
-
-  if (waypoint === '*')
-  {
-    const results: any[] = [];
-    for (let j: number = 0; j < keys.length; j++)
-    {
-      find(obj[keys[j]], path.shift(), (found) =>
-      {
-        results[j] = found;
-        return next(found);
-      }, options);
-    }
-    obj = next(results);
-    return;
-  }
-
-  if (options['create'] === true && !obj.hasOwnProperty(waypoint))
-  {
-    obj[waypoint] = {};
-    keys.push(waypoint);
-  }
-
-  for (let i: number = 0; i < keys.length; ++i)
-  {
-    if (keys[i] === waypoint)
-    {
-      // Don't be fooled, this is the real base case...
-      if (path.size === 1)
-      {
-        obj[keys[i]] = next(obj[keys[i]]);
-        return;
-      } else
-      {
-        return find(obj[keys[i]], path.shift(), next, options);
-      }
-    }
-  }
-
-  return next(undefined);
-}
-
-export function get(obj: object, path: KeyPath): any
-{
-  let result: any;
-  find(obj, path, (found) =>
-  {
-    result = found;
-    return found;
-  });
-  return result;
-}
-
-export function set(obj: object, path: KeyPath, value: any, options: object = {}): any
-{
-  find(obj, path, (found) =>
-  {
-    return value;
-  }, options);
 }

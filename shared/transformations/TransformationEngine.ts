@@ -49,15 +49,15 @@ import GraphLib = require('graphlib');
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
-import objectify from './deepObjectify';
-import { KeyPath, WayPoint } from './KeyPath';
+import objectify from '../util/deepObjectify';
+import { KeyPath } from '../util/KeyPath';
+import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
-import * as yadeep from './yadeep';
 
 const Graph = GraphLib.Graph;
 
@@ -148,6 +148,17 @@ export class TransformationEngine
     // allow construction without example doc (manually add fields)
   }
 
+  /**
+   * Checks whether a provides `TransformationEngine` is equal to the current `TransformationEngine` (`this`).
+   * Performs a "deep equals" due to the complex nature of this type.
+   *
+   * NOTE: This feels rather inefficient and should be optimized in the future if it's used frequently
+   *       (for example, if many checks are misses, then consider using a hash code comparison first).
+   *       Currently this is only used for testing.
+   *
+   * @param {TransformationEngine} other The `TransformationEngine` against which to compare
+   * @returns {boolean} Whether `this` is the same as `other`
+   */
   public equals(other: TransformationEngine): boolean
   {
     return JSON.stringify(GraphLib.json.write(this.dag)) === JSON.stringify(GraphLib.json.write(other.dag))
@@ -200,7 +211,7 @@ export class TransformationEngine
     return this.unflatten(output);
   }
 
-  public json(): object
+  public toJSON(): object
   {
     return {
       dag: GraphLib.json.write(this.dag),
@@ -323,6 +334,11 @@ export class TransformationEngine
   public getFieldType(fieldID: number): string
   {
     return this.fieldTypes.get(fieldID);
+  }
+
+  public setFieldType(fieldID: number, typename: string): void
+  {
+    this.fieldTypes = this.fieldTypes.set(fieldID, typename);
   }
 
   public getFieldEnabled(fieldID: number): boolean
@@ -503,7 +519,8 @@ export class TransformationEngine
         yadeep.set(output, value, obj[key], { create: true });
       }
     });
-    // if (this.fieldTypes.get(key) === 'array')
+    // If a field is supposed to be arary but is an object in its flattened
+    // representation, convert it back to an array
     this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
     {
       if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
