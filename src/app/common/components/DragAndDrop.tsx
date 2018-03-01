@@ -89,7 +89,14 @@ class DragAndDrop extends TerrainComponent<Props>
   {
     let result = List(list);
     const moved = result.get(startIndex);
-    result = result.delete(startIndex).insert(endIndex, moved);
+    if (startIndex < endIndex)
+    {
+      result = result.delete(startIndex).insert(endIndex, moved);
+    }
+    else
+    {
+      result = result.insert(endIndex, moved).delete(startIndex);
+    }
     return result;
   }
 
@@ -100,7 +107,6 @@ class DragAndDrop extends TerrainComponent<Props>
     {
       return;
     }
-
     const items = this.reorder(
       this.props.draggableItems,
       result.source.index,
@@ -173,7 +179,7 @@ class DragAndDrop extends TerrainComponent<Props>
                     key={item.key}
                     draggableId={item.key}
                     isDragDisabled={!item.draggable}
-                  // index={index}
+                    index={index}
                   >
                     {(provided2, snapshot2) => (
                       <div>

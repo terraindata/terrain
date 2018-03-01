@@ -160,7 +160,6 @@ class DrawerAnimation extends TerrainComponent<Props>
       renderMaxHeight: 0, // but in a closed state
       openingInterval: setInterval(() =>
       {
-        if (this.hasRendered)
         {
           // make sure we've already rendered, so we get that animation
           this.setState({
@@ -185,7 +184,7 @@ class DrawerAnimation extends TerrainComponent<Props>
           // of the position, so the window can scroll before the content has opened
         }
       },
-        20), // quick delay
+        0), // quick delay
     });
 
   }

@@ -107,6 +107,7 @@ export interface Props
   large?: boolean;
   noShadow?: boolean;
   autoFocus?: boolean;
+  hideLine?: boolean;
   // Be able to get rid of it
   canDelete?: boolean;
   onDelete?: () => void;
@@ -188,6 +189,7 @@ export class RouteSelector extends TerrainComponent<Props>
           'routeselector-box-values-open': this.isOpen(),
           'routeselector-box-values-force-open': props.forceOpen,
         })}
+        style={this.props.hideLine ? {border: 'none'} : {}}
       >
         {
           props.optionSets.map((optionSet, index) => (
@@ -661,8 +663,9 @@ export class RouteSelector extends TerrainComponent<Props>
     // We only want to render the FadeInOuts when we are searching a list
     // otherwise, render in a plain div
     // this is a performance improvement
-    const wrapperFn = this.state.focusedSetIndex === optionSetIndex
-      ? this.fadeInOutWrapper : this.divWrapper;
+    // const wrapperFn = this.state.focusedSetIndex === optionSetIndex
+    //   ? this.fadeInOutWrapper : this.divWrapper;
+    const wrapperFn = this.divWrapper;
 
     return (
       <div

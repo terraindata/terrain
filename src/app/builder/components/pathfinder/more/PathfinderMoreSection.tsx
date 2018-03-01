@@ -316,6 +316,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           onChange={this.handleSizePickerChange}
           canEdit={canEdit}
           defaultOpen={false}
+          hideLine={true}
           autoFocus={true}
         />
         {
