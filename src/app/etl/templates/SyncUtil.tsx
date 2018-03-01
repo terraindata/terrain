@@ -91,7 +91,7 @@ export function createInitialTemplate(documents: List<object>, source?: SourceCo
       :
       _SourceConfig({
         type: Sources.Upload,
-      })
+      }),
   );
   template = template.setIn(['sinks', 'primary'],
     sink !== undefined ?
@@ -99,7 +99,7 @@ export function createInitialTemplate(documents: List<object>, source?: SourceCo
       :
       _SinkConfig({
         type: Sinks.Download,
-      })
+      }),
   );
 
   return {

@@ -129,7 +129,8 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         return state.set('isDirty', false).
           set('template', action.payload.template);
       },
-      rebuildFieldMap: (state, action) => {
+      rebuildFieldMap: (state, action) =>
+      {
         const newFieldMap = createTreeFromEngine(state.template.transformationEngine);
         return state.set('fieldMap', newFieldMap);
       },

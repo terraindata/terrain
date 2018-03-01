@@ -54,7 +54,7 @@ import { Ajax } from 'util/Ajax';
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
 import { TemplateBase } from 'shared/etl/types/ETLTypes';
 
-export type ErrorHandler = (response: string | MidwayError ) => void;
+export type ErrorHandler = (response: string | MidwayError) => void;
 
 // making this an instance in case we want stateful things like cancelling ajax requests
 class ETLAjax
@@ -74,15 +74,15 @@ class ETLAjax
     const handleResponse = (templates: TemplateBase[]) =>
     {
       onLoad(this.templatesToImmutable(templates));
-    }
+    };
     return Ajax.req(
       'get',
-      'templates/',
-      { },
+      'etl/templates/',
+      {},
       handleResponse,
       {
-        onError
-      }
+        onError,
+      },
     );
   }
 
@@ -95,15 +95,15 @@ class ETLAjax
     const handleResponse = (templates: TemplateBase[]) =>
     {
       onLoad(this.templatesToImmutable(templates));
-    }
+    };
     return Ajax.req(
       'get',
-      `templates/${id}`,
-      { },
+      `etl/templates/${id}`,
+      {},
       handleResponse,
       {
-        onError
-      }
+        onError,
+      },
     );
   }
 
@@ -117,15 +117,15 @@ class ETLAjax
     const handleResponse = (templates: TemplateBase[]) =>
     {
       onLoad(this.templatesToImmutable(templates));
-    }
+    };
     return Ajax.req(
       'post',
-      `templates/create`,
+      `etl/templates/create`,
       templateToSave,
       handleResponse,
       {
-        onError
-      }
+        onError,
+      },
     );
   }
 
@@ -140,19 +140,19 @@ class ETLAjax
     const handleResponse = (templates: TemplateBase[]) =>
     {
       onLoad(this.templatesToImmutable(templates));
-    }
+    };
     if (typeof id !== 'number')
     {
       onError(`id "${id}" is invalid`);
     }
     return Ajax.req(
       'post',
-      `templates/update/${id}`,
+      `etl/templates/update/${id}`,
       templateToSave,
       handleResponse,
       {
-        onError
-      }
+        onError,
+      },
     );
   }
 }

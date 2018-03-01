@@ -57,7 +57,7 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 class ETLStateC
 {
   public templates: List<ETLTemplate> = List([]);
-  public loading: {[k: string]: number} = {}; // a tracker to verify if we are waiting on queries
+  public loading: { [k: string]: number } = {}; // a tracker to verify if we are waiting on queries
 }
 export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor(ETLStateC);

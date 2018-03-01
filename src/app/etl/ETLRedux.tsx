@@ -102,47 +102,51 @@ export interface ETLActionTypes
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 {
   public reducers: ConstrainedMap<ETLActionTypes, ETLState> =
-  {
-    getTemplate: (state, action) => state, // overriden reducers
-    fetchTemplates: (state, action) => state,
-    createTemplate: (state, action) => state,
-    saveTemplate: (state, action) => state,
-    setLoading: (state, action) => {
-      let value = _.get(state.loading, action.payload.key, 0);
-      if (action.payload.isLoading)
+    {
+      getTemplate: (state, action) => state, // overriden reducers
+      fetchTemplates: (state, action) => state,
+      createTemplate: (state, action) => state,
+      saveTemplate: (state, action) => state,
+      setLoading: (state, action) =>
       {
-        value++;
-      }
-      else if (value !== 0)
+        let value = _.get(state.loading, action.payload.key, 0);
+        if (action.payload.isLoading)
+        {
+          value++;
+        }
+        else if (value !== 0)
+        {
+          value--;
+        }
+        else
+        {
+          // TODO throw an error?
+        }
+        const newLoading = _.extend({}, state.loading,
+          { [action.payload.key]: value },
+        );
+        return state.set('loading', newLoading);
+      },
+      setTemplates: (state, action) =>
       {
-        value--;
-      }
-      else
+        return state.set('templates', action.payload.templates);
+      },
+      updateLocalTemplates: (state, action) =>
       {
-        // TODO throw an error?
-      }
-      const newLoading = _.extend({}, state.loading,
-        {[action.payload.key]: value}
-      );
-      return state.set('loading', newLoading);
-    },
-    setTemplates: (state, action) => {
-      return state.set('templates', action.payload.templates);
-    },
-    updateLocalTemplates: (state, action) => {
-      const index = state.templates.findIndex((template) => {
-        return template.id === action.payload.template.id;
-      });
-      if (index === -1)
-      {
-        return state.update('templates', (templates) => templates.push(action.payload.template));
-      }
-      else
-      {
-        return state.set('templates', action.payload.template);
-      }
-    },
-  };
+        const index = state.templates.findIndex((template) =>
+        {
+          return template.id === action.payload.template.id;
+        });
+        if (index === -1)
+        {
+          return state.update('templates', (templates) => templates.push(action.payload.template));
+        }
+        else
+        {
+          return state.set('templates', action.payload.template);
+        }
+      },
+    };
 
   // TODO, add a thing to the state where we can log errors?
   public onErrorFactory(onError: ErrorHandler, directDispatch: typeof ETLActions, key: string): ErrorHandler
@@ -158,7 +162,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       {
         onError(response);
       }
-    }
+    };
   }
 
   // creates a function that updates the loading map, and also runs all the onLoads
@@ -175,7 +179,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       {
         onLoad(response);
       }
-    }
+    };
   }
 
   public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch)
@@ -187,12 +191,13 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       isLoading: true,
       key: name,
     });
-    const setTemplates = (templates: List<ETLTemplate>) => {
+    const setTemplates = (templates: List<ETLTemplate>) =>
+    {
       directDispatch({
         actionType: 'setTemplates',
         templates,
       });
-    }
+    };
     const loadFunctions = [
       setTemplates,
     ];
@@ -232,7 +237,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       isLoading: true,
       key: name,
     });
-    const updateTemplate = (templates: List<ETLTemplate>) => {
+    const updateTemplate = (templates: List<ETLTemplate>) =>
+    {
       if (templates.size > 0)
       {
         const template = templates.get(0);
@@ -262,7 +268,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       isLoading: true,
       key: name,
     });
-    const updateTemplate = (templates: List<ETLTemplate>) => {
+    const updateTemplate = (templates: List<ETLTemplate>) =>
+    {
       if (templates.size > 0)
       {
         const template = templates.get(0);

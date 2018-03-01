@@ -216,7 +216,7 @@ export function transformationFormFactory<State extends object, Type extends Tra
       if (this.props.isCreate)
       {
         const { engine } = this.props;
-        this.props.engine.appendTransformation(args.type, payload.fieldNamesOrIDs, payload.options)
+        this.props.engine.appendTransformation(args.type, payload.fieldNamesOrIDs, payload.options);
         this.props.onEditOrCreate(false); // TODO figure out if structural changes happen
         this.props.onClose();
       }

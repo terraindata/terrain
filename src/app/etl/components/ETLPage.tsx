@@ -72,7 +72,7 @@ class ETLPage extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.props.act({
-      actionType: 'fetchTemplates'
+      actionType: 'fetchTemplates',
     });
   }
 

@@ -210,7 +210,6 @@ class TemplateEditor extends TerrainComponent<Props>
       if (savedTemplates.size > 0)
       {
         const savedTemplate = savedTemplates.get(0);
-        console.log(savedTemplate);
         editorAct({
           actionType: 'setTemplate',
           template: savedTemplate,
@@ -226,7 +225,7 @@ class TemplateEditor extends TerrainComponent<Props>
     };
     const handleError = (ev) =>
     {
-      console.log('error');
+      // TODO
     }
 
     let templateForSave = template;
@@ -234,8 +233,6 @@ class TemplateEditor extends TerrainComponent<Props>
     {
       const randstring = Math.random().toString(36).substring(2, 7);
       templateForSave = templateForSave.set('templateName', `Test Template${randstring}`);
-      console.log(randstring);
-      console.log(templateForSave);
 
       etlAct({
         actionType: 'createTemplate',
