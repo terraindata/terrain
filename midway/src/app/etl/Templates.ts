@@ -92,7 +92,7 @@ export default class Templates
   }
 
   public async validateTemplate(template: TemplateConfig, requireExistingId?: boolean):
-    Promise<{ valid: boolean, message: string}>
+    Promise<{ valid: boolean, message: string }>
   {
     const { sources, sinks, transformationEngine } = template;
     let valid = true;
@@ -129,7 +129,7 @@ export default class Templates
       valid = false;
       messages.push(`transformation engine is missing or invalid type: ${transformationEngine} .`);
     }
-    return { valid, message: `${messages}`};
+    return { valid, message: `${messages}` };
   }
 
   public async create(template: TemplateConfig): Promise<TemplateConfig[]>
@@ -178,7 +178,8 @@ export default class Templates
     return new Promise<TemplateConfig[]>(async (resolve, reject) =>
     {
       let toUpsert;
-      try {
+      try
+      {
         toUpsert = templateForSave(newTemplate);
       }
       catch (e)
@@ -186,7 +187,8 @@ export default class Templates
         return reject(`Failed to prepare template for save: ${String(e)}`);
       }
       const rawTemplates = await App.DB.upsert(this.templateTable, toUpsert) as TemplateInDatabase[];
-      try {
+      try
+      {
         const templates = rawTemplates.map((value, index) =>
           destringifySavedTemplate(value as TemplateInDatabase));
         resolve(templates);
