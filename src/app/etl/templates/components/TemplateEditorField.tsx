@@ -62,6 +62,8 @@ import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, ETLTemplate, FieldMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { Sinks, SinkConfig, Sources, SourceConfig, SinkOptionsType, SourceOptionsType } from 'shared/etl/types/EndpointTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 
 /*
  *  This class defines a base class with useful functions that are used by components
@@ -178,6 +180,20 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _passProps(config: object = {}): TemplateEditorFieldProps
   {
     return _.extend(_.pick(this.props, ['fieldId', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);
+  }
+
+  protected _getSinkLanguage(): Languages
+  {
+    const { sinks } = this._template();
+    if (sinks.has('primary'))
+    {
+      const sink: SinkConfig = sinks.get('primary');
+      if (sink.type === Sinks.Database)
+      {
+        return (sink.options as SinkOptionsType<Sinks.Database>).language;
+      }
+    }
+    return Languages.JavaScript;
   }
 
   protected _inputDisabled(): boolean

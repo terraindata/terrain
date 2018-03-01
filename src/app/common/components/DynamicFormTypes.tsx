@@ -87,7 +87,7 @@ export interface InputDeclarationType<S>
   style?: any; // applied to the wrapper around the input element
   className?: string; // applied to the wrapper around the input element
   shouldShow?: (state: S) => DisplayState;
-  dontFillSpace?: boolean; // if true, input elements won't grow to fit their row
+  fillSpace?: boolean; // if true, input elements will grow to fit their row
 }
 
 export type OptionType<K extends keyof InputDeclarationOptionTypes, S = any> = InputDeclarationOptionTypes<S>[K];

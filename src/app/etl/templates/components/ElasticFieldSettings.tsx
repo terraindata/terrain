@@ -42,38 +42,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires
+
+import * as classNames from 'classnames';
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import Util from 'util/Util';
 
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { SinkConfig, SourceConfig } from './EndpointTypes';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 
-export enum Languages
+import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
+
+import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+
+import './FieldSettings.less';
+
+export type Props = TemplateEditorFieldProps;
+
+class ElasticFieldSettings extends TemplateEditorField<Props>
 {
-  Elastic = 'elastic',
-  JavaScript = 'JavaScript',
+  public render()
+  {
+    return null
+  }
 }
 
-export enum FileTypes
-{
-  Json = 'json',
-  JsonTypeObject = 'json [type object]',
-  Csv = 'csv',
-}
-
-export interface TemplateBase
-{
-  id?: number;
-  templateName: string;
-  transformationEngine: TransformationEngine;
-  transformationConfig: any; // terrain rank, what to do on failures TODO figure out the exact type
-  sources: any; // difficult to type, but sources should always have a source under the key 'primary'
-  sinks: any; // likewise with sinks
-}
-
-export type TemplateObject = {
-  [k in keyof TemplateBase]: any;
-};
-
-export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+export default Util.createTypedContainer(
+  ElasticFieldSettings,
+  mapStateKeys,
+  mapDispatchKeys,
+);

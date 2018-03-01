@@ -58,7 +58,9 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { Languages } from 'shared/etl/types/ETLTypes';
 
+import ElasticFieldSettings from './ElasticFieldSettings';
 import FieldMainSettings from './FieldMainSettings';
 import FieldSettingsTransformations from './FieldSettingsTransformations';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -71,9 +73,9 @@ const CloseIcon = require('images/icon_close.svg');
 
 enum ViewCategory
 {
-  SETTINGS,
-  TRANSFORMATIONS,
-  ADVANCED,
+  Settings,
+  Transformations,
+  Elastic,
 }
 
 @Radium
@@ -82,7 +84,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
   public state: {
     currentCategory: ViewCategory,
   } = {
-      currentCategory: ViewCategory.SETTINGS,
+      currentCategory: ViewCategory.Settings,
     };
 
   constructor(props)
@@ -91,41 +93,32 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     this.changeViewFactory = _.memoize(this.changeViewFactory);
   }
 
+  public renderCategory(category: ViewCategory, title: string)
+  {
+    return (
+      <div
+        className='field-settings-category'
+        key={category}
+        style={this.state.currentCategory === category ? activeStyle : inactiveStyle}
+        onClick={this.changeViewFactory(category)}
+      >
+        { title }
+      </div>
+    );
+  }
+
   public renderTitleBar()
   {
-    const activeStyle = fontColor(Colors().active, Colors().active);
-    const inactiveStyle = fontColor(Colors().text2, Colors().inactiveHover);
     return (
       <div
         className='field-settings-title-bar'
         style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}
       >
         <div className='field-settings-title-filler' />
-        <div
-          className='field-settings-category'
-          key='settings'
-          style={this.state.currentCategory === ViewCategory.SETTINGS ? activeStyle : inactiveStyle}
-          onClick={this.changeViewFactory(ViewCategory.SETTINGS)}
-        >
-          Settings
-        </div>
-        <div
-          className='field-settings-category'
-          key='transforms'
-          style={this.state.currentCategory === ViewCategory.TRANSFORMATIONS ? activeStyle : inactiveStyle}
-          onClick={this.changeViewFactory(ViewCategory.TRANSFORMATIONS)}
-        >
-          Transform
-        </div>
+        { this.renderCategory(ViewCategory.Settings, 'Settings') }
+        { this.renderCategory(ViewCategory.Transformations, 'Transform') }
         {
-          /*<div
-            className='field-settings-category'
-            key='advanced'
-            style={this.state.currentCategory === ViewCategory.ADVANCED ? activeStyle : inactiveStyle}
-            onClick={this.changeViewFactory(ViewCategory.ADVANCED)}
-          >
-            Advanced
-          </div>*/
+          ... this.renderExtraCategories()
         }
         <div className='field-settings-title-filler' />
         <div
@@ -140,6 +133,17 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     );
   }
 
+  public renderExtraCategories(): any[]
+  {
+    const language = this._getSinkLanguage();
+    const categories = [];
+    if (language === Languages.Elastic)
+    {
+      categories.push(this.renderCategory(ViewCategory.Elastic, 'Elastic'));
+    }
+    return categories;
+  }
+
   public render()
   {
     return (
@@ -147,21 +151,23 @@ class EditorFieldSettings extends TemplateEditorField<Props>
         {this.renderTitleBar()}
         <div className='field-settings-section'>
           {
-            this.state.currentCategory === ViewCategory.SETTINGS ?
+            this.state.currentCategory === ViewCategory.Settings ?
               <FieldMainSettings
                 {...this._passProps()}
               />
               : null
           }
           {
-            this.state.currentCategory === ViewCategory.TRANSFORMATIONS ?
+            this.state.currentCategory === ViewCategory.Transformations ?
               <FieldSettingsTransformations
                 {...this._passProps()}
               /> : null
           }
-          { // todo, re-add advanced settings
-            this.state.currentCategory === ViewCategory.ADVANCED ?
-              'nothing here' : null
+          {
+            this.state.currentCategory === ViewCategory.Elastic ?
+              <ElasticFieldSettings
+                {...this._passProps()}
+              /> : null
           }
         </div>
       </div>
@@ -185,6 +191,9 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     });
   }
 }
+
+const activeStyle = fontColor(Colors().active, Colors().active);
+const inactiveStyle = fontColor(Colors().text2, Colors().inactiveHover);
 
 export default Util.createTypedContainer(
   EditorFieldSettings,

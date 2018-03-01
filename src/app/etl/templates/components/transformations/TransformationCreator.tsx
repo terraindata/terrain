@@ -57,6 +57,9 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+
 import { availableTransformations, getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -64,6 +67,12 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import { InfoType, TransformationsInfo } from 'shared/transformations/TransformationsInfo';
 
 import './TransformationEditor.less';
+
+interface FormState
+{
+  transformationIndex: number;
+  applyToAll: boolean;
+}
 
 export interface Props
 {
@@ -76,65 +85,79 @@ export interface Props
 @Radium
 export class TransformationCreator extends TerrainComponent<Props>
 {
-  public state: {
-    creatingType: TransformationNodeType | null,
-  } = {
-      creatingType: null,
-    };
+  public state: FormState = {
+    transformationIndex: -1,
+    applyToAll: true,
+  };
 
-  constructor(props)
+  private inputMap: InputDeclarationMap<FormState> =
   {
-    super(props);
-    this.handleOptionClickedFactory = _.memoize(this.handleOptionClickedFactory);
+    transformationIndex: {
+      type: DisplayType.Pick;
+      displayName: 'Transformation',
+      group: 'main',
+      options: {
+        pickOptions: this.getOptionNames,
+      },
+    },
+    applyToAll: {
+      type: DisplayType.CheckBox,
+      displayName: 'Apply to All',
+      shouldShow: this.shouldApplyAllShow,
+    },
+  };
+
+  public shouldApplyAllShow(s: FormState)
+  {
+    // todo Figure out if this is a child inside an array
+    return DisplayState.Hidden;
+  }
+
+  public getValidOptions(): List<TransformationNodeType>
+  {
+    return availableTransformations.filter(
+      (type, index) => {
+        const info = TransformationsInfo.getInfo(type);
+        return info.isAvailable(this.props.engine, this.props.fieldID);
+      },
+    ).toList();
+  }
+
+  public getOptionNames(s: FormState)
+  {
+    const transformations = this.getValidOptions();
+    return transformations.map((type) => TransformationsInfo.getReadableName(type)).toList();
   }
 
   public renderCreateTransformation()
   {
-    const CompClass = getTransformationForm(this.state.creatingType);
+    const { transformationIndex } = this.state;
+    let compComponent = null;
+    if (transformationIndex !== -1)
+    {
+      const type = this.getValidOptions().get(transformationIndex);
+      const CompClass = getTransformationForm(type);
+      compComponent = (
+        <CompClass
+          isCreate={true}
+          engine={this.props.engine}
+          fieldID={this.props.fieldID}
+          onEditOrCreate={this.props.onTransformationCreated}
+          onClose={this.props.onClose}
+        />
+      );
+    }
 
     return (
       <div className='create-transformation-container'>
-        <div className='create-transformation-title' style={borderColor(Colors().border1)}>
-          Create a {TransformationsInfo.getReadableName(this.state.creatingType)} Transformation
-        </div>
+        <DynamicForm
+          inputMap={this.inputMap}
+          inputState={this.state}
+          onStateChange={this.handleStateChange}
+        />
         <div className='create-transformation-component'>
-          <CompClass
-            isCreate={true}
-            engine={this.props.engine}
-            fieldID={this.props.fieldID}
-            onEditOrCreate={this.props.onTransformationCreated}
-            onClose={this.props.onClose}
-          />
+          { compComponent }
         </div>
-      </div>
-
-    );
-  }
-
-  public renderTransformOption(type: TransformationNodeType, index)
-  {
-    return (
-      <div
-        className='transformation-option'
-        key={index}
-        onClick={this.handleOptionClickedFactory(type)}
-      >
-        {TransformationsInfo.getReadableName(type)}
-      </div>
-    );
-  }
-
-  public renderAvailableTransformations()
-  {
-    const transformOptions = availableTransformations.filter((type, index) =>
-      TransformationsInfo.getInfo(type).isAvailable(this.props.engine, this.props.fieldID),
-    );
-    return (
-      <div className='available-transformations-list'>
-        {
-          transformOptions.size === 0 ? 'This Field Cannot be Transformed' :
-            transformOptions.map(this.renderTransformOption)
-        }
       </div>
     );
   }
@@ -143,20 +166,14 @@ export class TransformationCreator extends TerrainComponent<Props>
   {
     return (
       <div className='transformation-editor'>
-        {this.state.creatingType === null ? <div className='transformation-editor-title'> Choose a Transformation </div> : null}
-        {this.state.creatingType === null ? this.renderAvailableTransformations() : null}
-        {this.state.creatingType !== null ? this.renderCreateTransformation() : null}
+        {this.renderCreateTransformation()}
       </div>
     );
   }
 
-  public handleOptionClickedFactory(type: TransformationNodeType)
+  public handleStateChange(s: FormState)
   {
-    return () =>
-    {
-      this.setState({
-        creatingType: type,
-      });
-    };
+    this.setState(s);
   }
+
 }

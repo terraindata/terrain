@@ -206,7 +206,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       <FadeInOut
         key={index}
         open={displayState !== DisplayState.Hidden}
-        style={{ flexGrow: inputInfo.dontFillSpace ? '0' : '1' }}
+        style={{ flexGrow: inputInfo.fillSpace === true ? '1' : '0' }}
       >
         <div className={inputInfo.className} style={inputInfo.style}>
           {renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive)}

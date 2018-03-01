@@ -206,13 +206,9 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
   public renderTransformations()
   {
-
     return (
       <div
-        className={classNames({
-          'transformations-list-column': true,
-          'side-column-active': this.state.viewState !== ViewState.LIST_ALL,
-        })}
+        className='transformations-list-column'
       >
         <div className='transformations-list'>
           {this.renderTransformationsList()}
@@ -230,23 +226,17 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     return (
       <div className='template-editor-field-transformations'>
         {
-          this.renderTransformations()
+          this.state.viewState === ViewState.LIST_ALL ?
+          this.renderTransformations() : null
         }
-        <div
-          className={classNames({
-            'transformations-side-column': true,
-            'side-column-active': this.state.viewState !== ViewState.LIST_ALL,
-          })}
-        >
-          {
-            this.state.viewState === ViewState.CREATE_NEW ?
-              this.renderCreateTransformationSection() : null
-          }
-          {
-            this.state.viewState === ViewState.EDIT ?
-              this.renderEditTransformationSection() : null
-          }
-        </div>
+        {
+          this.state.viewState === ViewState.CREATE_NEW ?
+            this.renderCreateTransformationSection() : null
+        }
+        {
+          this.state.viewState === ViewState.EDIT ?
+            this.renderEditTransformationSection() : null
+        }
       </div>
     );
   }
