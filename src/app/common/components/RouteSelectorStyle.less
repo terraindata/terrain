@@ -28,7 +28,11 @@
 		position: relative;
 		overflow: hidden;
 		
-		
+		&:hover {
+		.routeselector-delete {
+			opacity: 1;
+			}
+		}
 	  &.routeselector-box-value-open {
 	    z-index: 1;
 		}
@@ -88,6 +92,15 @@
   	width: @close-width;
   	.noselect;
   }
+
+  	.routeselector-delete {
+  		opacity: 0;
+  		  svg {
+		    height: 12px;
+		    width: 12px;
+		  }
+  		.transition;
+  	}
   
 	.routeselector-box-values-open:not(.routeselector-box-values-force-open),
 	.routeselector-box-value-open:not(.routeselector-box-value-force-open) {

@@ -65,6 +65,7 @@ import { FloatingInput, FONT_SIZE, LARGE_FONT_SIZE } from './FloatingInput';
 import KeyboardFocus from './KeyboardFocus';
 import './RouteSelectorStyle.less';
 import SearchInput from './SearchInput';
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface RouteSelectorOption
 {
@@ -106,6 +107,9 @@ export interface Props
   large?: boolean;
   noShadow?: boolean;
   autoFocus?: boolean;
+  // Be able to get rid of it
+  canDelete?: boolean;
+  onDelete?: () => void;
 }
 
 @Radium
@@ -222,6 +226,15 @@ export class RouteSelector extends TerrainComponent<Props>
         >
           Close
         </div>
+        {
+          (this.props.canDelete && this.props.canEdit && !this.state.open) &&
+          <div
+            onClick={this.props.onDelete}
+            className='routeselector-delete close'
+          >
+            <RemoveIcon />
+          </div>
+        }
       </div>
     );
   }
@@ -913,6 +926,10 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private open()
   {
+    if (!this.props.canEdit)
+    {
+      return;
+    }
     this.setState({
       open,
     });

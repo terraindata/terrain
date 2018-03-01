@@ -119,16 +119,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           this.renderPicker()
         }
         {/*{
-          this.renderBoost()
+          this.renderBoost() */
         }
-        {
-          <div
-            className='close'
-            onClick={this.props.onDelete && this._fn(this.props.onDelete, this.props.keyPath)}
-          >
-            <RemoveIcon />
-          </div>
-        }*/}
       </div>
     );
   }
@@ -153,6 +145,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         onChange={this.handleFilterPickerChange}
         canEdit={props.canEdit}
         defaultOpen={fieldValue === null}
+        canDelete={true}
+        onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
       />
     );
   }
@@ -311,7 +305,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           builderState: props.pathfinderContext.builderState,
         });
         const fieldChoice = fieldOptions.find((option) => option.value === value);
-        this.handleChange('field', value, fieldChoice.meta.fieldType, true);
+        this.handleChange('field', value, (fieldChoice.meta && fieldChoice.meta.fieldType) || FieldType.Any, true);
         return;
 
       case 1:
@@ -457,10 +451,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           <div>IP not supported yet</div>
         );
       case FieldType.Nested:
-        return (() => <div></div>); // Nested, can only handle exists, so there is no value
       default:
-        // Nested
-        throw new Error('No value type handler for ' + filterLine.valueType);
+        return (() => <div></div>); // Nested, can only handle exists, so there is no value
     }
   }
 
