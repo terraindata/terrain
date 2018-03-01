@@ -241,7 +241,6 @@ const BuilderColumn = createReactClass<any, any>(
       }
       const query: Query = this.props.query;
       const { canEdit } = this.props;
-
       switch (this.state.column)
       {
         case COLUMNS.Cards:
@@ -260,9 +259,9 @@ const BuilderColumn = createReactClass<any, any>(
             inputs={query.inputs}
             canEdit={canEdit}
             language={query.language}
-            action={query.path !== undefined ?
-              this.props.builderActions.changePath :
-              this.props.builderActions.change
+            action={query.path === undefined ?
+              this.props.builderActions.change :
+              this.props.builderActions.changePath
             }
           />;
 

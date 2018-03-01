@@ -42,18 +42,20 @@
 			.pf-section {
 				
 				.pf-section-title {
-					padding: @spacing;
-					margin: 0px -2 * @spacing;
-					margin-bottom: @spacing;
+					box-sizing: border-box;
+					padding: 12px 32px;
+					margin-top: 12px;
 
 					.pf-section-title-title {
-						font-size: @large-font-size;
+						font-size: 20px;
+						text-transform: uppercase;
 					}
 
 					.pf-section-title-text {
 						font-size: @font-size;
 					}
 				}
+				
 				.pf-step-button {
 					font-size: 24px;
 					margin-top: 12px;
@@ -76,12 +78,13 @@
 					font-size: @small-font-size;
 					position: relative;
 					fill: currentColor;
-					padding: 12px;
+					padding: 18px;
 					
 					@svg-width: 14px;
-					@svg-left: 12px;
+					@svg-left: 0px;
 					
 					padding-left: @svg-width + @svg-left + 12px;
+					margin-left: 32px;
 					
 					svg {
 						width: @svg-width;
@@ -104,8 +107,9 @@
 				.pf-line {
 					display: flex;
 					align-items: center;
-					padding: @half-spacing 0px;
-				.pf-piece {
+					padding: 0px;
+					
+					.pf-piece {
 						margin: 0px @half-spacing;
 						display: block;
 						position: relative;

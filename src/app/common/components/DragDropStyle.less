@@ -6,7 +6,8 @@
 	padding: 1px;
 	cursor: pointer;
 	transition: height .3s linear .5s;
-	&.drag-drop-item-dragging {
+	box-sizing: border-box;
+		&.drag-drop-item-dragging {
 		// These help the item be displayed on top of other components
 		// but, don't apply them when not dragging, or it will
 		// cause the item to appear on top of thigns it shoudln't
@@ -69,9 +70,9 @@
 		padding-bottom: 9px;
 	}
 }
-.drag-drop-group-preview, .drag-drop-item-preview
-{
-	box-shadow: 1px 3px 15px #606262;
+
+.drag-drop-group-preview, .drag-drop-item-preview {
+	box-shadow: 5px 10px 20px rgba(66,66,66,0.15);
 	opacity: 1;
 	position: relative;
 }
@@ -94,11 +95,11 @@
 		top: 20px;
 		.drag-drop-item-field-value, .drag-drop-item-comparison-value, .drag-drop-item-value-value {
 			font-size: 18px;
-			top: 12px;
+			top: 16px;
 		}
 		.drag-drop-item-field-header, .drag-drop-item-comparison-header, .drag-drop-item-value-header {
 			text-transform: uppercase;
-			font-size: 10px;
+			font-size: 12px;
 		}
 	}
 }

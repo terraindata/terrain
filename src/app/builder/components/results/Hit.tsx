@@ -54,6 +54,9 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
+import { BuilderState } from 'app/builder/data/BuilderState';
+import { SchemaState } from 'app/schema/SchemaTypes';
+import { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Draggable from 'react-draggable';
 import { _Format, _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
@@ -110,6 +113,8 @@ export interface Props
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
   spotlightActions?: typeof SpotlightActions;
+  schema?: SchemaState;
+  builder?: BuilderState;
 }
 
 enum NestedState {
@@ -239,32 +244,37 @@ class HitComponent extends TerrainComponent<Props> {
             </div>
           }
         </div>
-        <div
-          className='hit-column-names'
-          style={[borderColor(Colors().blockOutline),
-            backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
-        />
         {
-          this.state.scrollState.get(field) ?
-          <div
-            onClick={this._fn(this.handleScroll, field, -1)}
-            className='hit-content-scroll-back'
-            style={getStyle('fill', Colors().iconColor)}
-            key='forward-icon'
-          >
-            <CarrotIcon />
+          expandState !== NestedState.Collapsed &&
+          <div>
+            <div
+              className='hit-column-names'
+              style={[borderColor(Colors().blockOutline),
+                backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
+            />
+            {
+              this.state.scrollState.get(field) ?
+              <div
+                onClick={this._fn(this.handleScroll, field, -1)}
+                className='hit-content-scroll-back'
+                style={getStyle('fill', Colors().iconColor)}
+                key='forward-icon'
+              >
+                <CarrotIcon />
+              </div>
+              :
+              null
+            }
+            <div
+              onClick={this._fn(this.handleScroll, field, 1)}
+              className='hit-content-scroll-forward'
+              style={getStyle('fill', Colors().iconColor)}
+              key='back-icon'
+            >
+              <CarrotIcon />
+            </div>
           </div>
-          :
-          null
         }
-        <div
-          onClick={this._fn(this.handleScroll, field, 1)}
-          className='hit-content-scroll-forward'
-          style={getStyle('fill', Colors().iconColor)}
-          key='back-icon'
-        >
-          <CarrotIcon />
-        </div>
       </div>
     );
   }
@@ -350,23 +360,23 @@ class HitComponent extends TerrainComponent<Props> {
         {
           this.renderNestedFieldHeader(field, depth, size, expandState)
         }
-          <FadeInOut
-            open={expandState !== NestedState.Collapsed}
+          <div
+            className='hit-nested-content-values'
+            style={{height: expandState === NestedState.Expanded ? '100%' : 'auto'}}
           >
-            {this.renderNestedItems(allValues.slice(0, 1), format, field, depth)}
-          </FadeInOut>
-          <FadeInOut
-            open={expandState === NestedState.Expanded}
-          >
-            <div
-              className='hit-nested-content-values'
-              style={{height: expandState === NestedState.Expanded ? '100%' : 'auto'}}
+            <FadeInOut
+              open={expandState !== NestedState.Collapsed}
             >
-            {
-              this.renderNestedItems(allValues.slice(1), format, field, depth)
-            }
-            </div>
-          </FadeInOut>
+              {this.renderNestedItems(allValues.slice(0, 1), format, field, depth)}
+            </FadeInOut>
+            <FadeInOut
+              open={expandState === NestedState.Expanded}
+            >
+              {
+                this.renderNestedItems(allValues.slice(1), format, field, depth)
+              }
+            </FadeInOut>
+          </div>
       </div>
     );
   }
@@ -454,7 +464,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     const spotlightData = this.props.hit.toJS();
     spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig,
-      this.props.expanded, this.props.locations, spotlightColor);
+      this.props.expanded, this.props.schema, this.props.locations, spotlightColor);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = this.props.index;
@@ -535,14 +545,15 @@ class HitComponent extends TerrainComponent<Props> {
     const color = spotlight ? spotlight.color : 'black';
 
     const thumbnail = resultsConfig && resultsConfig.thumbnail ?
-      getResultThumbnail(hit, resultsConfig, this.props.expanded) :
+      getResultThumbnail(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder) :
       null;
-    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
+    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder,
+      this.props.locations, color);
     const nestedFields = this.props.nestedFields !== undefined
       ? this.props.nestedFields.toJS()
       : this.state.nestedFields !== undefined ?
         this.state.nestedFields : [];
-    let fields = getResultFields(hit, resultsConfig, nestedFields);
+    let fields = getResultFields(hit, resultsConfig, nestedFields, this.props.schema, this.props.builder);
     if (this.props.hideFieldNames)
     {
       // Only show a set number of fields, starting at firstVisibleField (which is controlled by
@@ -740,7 +751,8 @@ export function resultsConfigHasFields(config: ResultsConfig): boolean
 }
 
 // return any fields that are NOT nested fields
-export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[]): string[]
+export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[],
+  schema?: SchemaState, builder?: BuilderState): string[]
 {
   let fields: string[];
 
@@ -752,9 +764,26 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
   }
   else
   {
-    fields = hit.fields.keySeq().filter((field) =>
-      nested.indexOf(field) === -1,
-    ).toArray();
+    const builderState = builder;
+    if (builderState === undefined)
+    {
+      return [];
+    }
+    // If there is a path
+    const server: string = builderState.db.name;
+    let serverIndex = server + '/' + getIndex();
+    if (builderState.query.path !== undefined &&
+      builderState.query.path.source !== undefined &&
+      builderState.query.path.source.dataSource !== undefined)
+    {
+      serverIndex = (builderState.query.path.source.dataSource as any).index;
+    }
+
+    fields = Util.orderFields(List(_.keys(hit.fields.toJS())), schema, -1, serverIndex).toArray();
+     fields = fields.filter((field) =>
+        nested.indexOf(field) === -1,
+     );
+
   }
 
   return fields;
@@ -786,7 +815,8 @@ export function getResultNestedFields(hit: Hit, config: ResultsConfig): string[]
   });
 }
 
-export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
+export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
+  locations?: { [field: string]: any }, color?: string)
 {
   let thumbnailField: string;
 
@@ -796,13 +826,14 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
   }
   else
   {
-    thumbnailField = _.first(getResultFields(hit, config, []));
+    thumbnailField = _.first(getResultFields(hit, config, [], schema, builder));
   }
 
   return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color, true);
 }
 
-export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
+export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
+  locations?: { [field: string]: any }, color?: string)
 {
   let nameField: string;
 
@@ -812,7 +843,7 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
   }
   else
   {
-    nameField = _.first(getResultFields(hit, config, []));
+    nameField = _.first(getResultFields(hit, config, [], schema, builder));
   }
 
   return getResultValue(hit, nameField, config, true, expanded, null, locations, color);
@@ -974,7 +1005,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
 
 export default Util.createTypedContainer(
   HitComponent,
-  ['spotlights'],
+  ['spotlights', 'schema'],
   { spotlightActions: SpotlightActions },
 );
 

@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // Centralized place for text used in Pathfinder
-import { ADVANCED } from './PathfinderTypes';
 
 export const PathfinderText = {
 
@@ -53,52 +52,61 @@ export const PathfinderText = {
   firstWord: 'Find',
   chooseDataSourceDropdownPrompt: 'Choose a data source',
   findSectionTitle: 'Find',
-  findSectionSubtitle: `
-    Choose where your data are located and filter out everything that isn't a match.`,
+  findSectionSubtitle: '',
+  // `Choose where your data are located and filter out everything that isn't a match.`,
 
-  // Filter section
-  firstFilterIntro: 'With',
+  // Filter sections
+  hardFilterSectionTitle: 'Filters',
+  hardFilterSectionSubtitle: '',
+  softFilterSectionTitle: 'Match Qualities',
+  softFilterSectionSubtitle: '',
+
   nestedFilterIntro: '',
   filterGroupPost: 'of the following:',
-  createFilterLine: 'filter condition',
+  createFilterLine: 'criteria',
   createFilterGroup: 'group of filter conditions',
+
+  softFilterLine: 'text match quality',
+
   createScoreLine: 'score factor',
   createAggregationLine: 'metadata',
   createNestedLine: 'nested algorithm',
 
   // Score section
   scoreSectionTitle: 'Score',
-  scoreSectionSubtitle: `
-  Score your results, so that the best picks show up in the top spots.
-  `,
+  scoreSectionSubtitle: '',
+  // `Score your results, so that the best picks show up in the top spots.`,
+  scoreTypeLabel: 'Method',
+  scoreTypeExplanation: 'Choose how to score your algorithm',
+
   scoreSectionTypes: {
     terrain: {
       title: 'Terrain',
       tooltip: 'The score will be determined by the weighted sum of factors',
     },
     linear: {
-      title: 'Linear',
+      title: 'Field',
       tooltip: 'The results will be sorted linearly by the following factors',
     },
     elastic: {
-      title: 'Text Match Quality',
+      title: 'Match Quality',
       tooltip: 'The results will be sorted based on how well the match any text filters from above',
     },
     random: {
       title: 'Random',
       tooltip: 'A diverse set of results will be returned',
     },
-    none: {
-      title: 'None',
-      tooltip: 'The results will not be sorted in any way',
-    },
+    // none: {
+    //   title: 'None',
+    //   tooltip: 'The results will not be sorted in any way',
+    // },
   },
 
   // More section
   moreSectionTitle: 'Advanced',
-  moreSectionSubtitle: `
-  Add nested algorithms to create a set of results for each result of your parent algorithm.
-  `,
+  moreSectionSubtitle: '',
+  // `Add nested algorithms to create a set of results for each result of your parent algorithm.`,
+
   referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',
   nestedExplanation: 'Add another algorithm that uses the results of this one as input',
 

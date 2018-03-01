@@ -1,27 +1,34 @@
 @import "../../../../common/Common.less";
 
-.pf-filter-section
-{
-	margin-bottom: 45px;
-	padding: 0px 12px;
+.pf-filter-section {
+	
 	.pf-create {
 		margin-top: 12px;
 	}
+	
 	.pf-filter-line {
-		padding-top: 6px;
-		padding-left: 6px;
+
 		.close {
 			margin-top: 8px;
 			margin-left: 3px;
 			opacity: 0;
 			.transition;
 		}
+		
 		&:hover {
 			.close {
 				opacity: 1;
 			}
 		}
+		
+		&.pf-filter-line-pre-group {
+			// if it comes before a group, hide the line
+			.routeselector .routeselector-box-values {
+				border-color: rgba(255,255,255,0) !important;
+			}
+		}
 	}
+	
 	.pf-filter-group-header
 	{
 		height: 15px;
@@ -91,7 +98,7 @@
   	flex-basis: 60px;
   	flex-grow: 1;
   	margin: 0px;
-  	margin-right: 12px;
+  	margin-right: 2px;
   }
   
   .dropdown-wrapper {
@@ -108,9 +115,11 @@
   	
   	.leaflet-container {
     	position: absolute;
-			width: 100%;
+		width: 100%;
+		height: 0px;
     	min-height: 0px !important;
-    	max-height: 100px !important;
+    	// max-height: 100px !important;
+    	padding-top: 100%;
 	    border-bottom-left-radius: 6px;
 	    border-bottom-right-radius: 6px;
     }

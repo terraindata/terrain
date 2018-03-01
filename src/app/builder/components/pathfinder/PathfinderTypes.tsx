@@ -90,22 +90,41 @@ import { _Hit, Hit } from 'builder/components/results/ResultTypes';
 import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
-import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
+import { FieldType, FieldTypeMapping, ReverseFieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
+import PathfinderText from './PathfinderText';
 
 export enum PathfinderSteps
 {
   Source,
-  Filter,
-  Score,
-  More,
+  Filter, // rename
+  Score, // remove
+  More, // remove
 }
+
+/**
+ * Section: Classes representing parts of the view
+ */
+
+class ChoiceOptionC extends BaseClass
+{
+  public value: any = null; // a value to distinguish it to the parser
+  public displayName: string | number | El = '';
+  public color: string = null;
+  public tooltipContent: string | El = null;
+  public sampleData: List<Hit> = List([]);
+  public meta: any = null; // metadata, no specific shape, used for helper functions
+}
+export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
+export const _ChoiceOption = (config?: { [key: string]: any }) =>
+  New<ChoiceOption>(new ChoiceOptionC(config), config);
 
 class PathC extends BaseClass
 {
   public source: Source = _Source();
   public filterGroup: FilterGroup = _FilterGroup();
+  public softFilterGroup: FilterGroup = _FilterGroup();
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
@@ -119,6 +138,7 @@ export const _Path = (config?: { [key: string]: any }) =>
   let path = New<Path>(new PathC(config || {}), config);
   path = path.set('source', _Source(path.source));
   path = path.set('filterGroup', _FilterGroup(path.filterGroup));
+  path = path.set('softFilterGroup', _FilterGroup(path.softFilterGroup));
   path = path.set('score', _Score(path.score));
   path = path.set('more', _More(path.more));
   path = path.set('nested', List(path.nested.map((n) => _Path(n))));
@@ -143,10 +163,44 @@ export const _FilterGroup = (config?: { [key: string]: any }) =>
   return filterGroup;
 };
 
+export enum ScoreType
+{
+  terrain = 'terrain',
+  linear = 'linear',
+  elastic = 'elastic',
+  random = 'random',
+  none = 'none',
+}
+
+export const ScoreTypesList =
+  [
+    ScoreType.terrain,
+    ScoreType.linear,
+    ScoreType.elastic,
+    ScoreType.random,
+    // ScoreType.none, // disabling
+  ];
+
+export const ScoreTypesChoices = List(ScoreTypesList.map(
+  (type) =>
+  {
+    const textConfig = PathfinderText.scoreSectionTypes[type] || {
+      title: type,
+      tooltip: '',
+    };
+
+    return _ChoiceOption({
+      value: type,
+      displayName: textConfig.title,
+      tooltipContent: textConfig.tooltip,
+    });
+  },
+));
+
 class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
-  public type: 'terrain' | 'linear' | 'elastic' | 'random' | 'none' = 'terrain';
+  public type: ScoreType = ScoreType.terrain;
   public seed: number = 10; // For random scoring
 }
 export type Score = ScoreC & IRecord<ScoreC>;
@@ -442,15 +496,11 @@ type ChoiceContext = {
   schemaState: SchemaState,
   builderState: BuilderState,
 } | {
-    type: 'transformFields',
-    source: Source,
-    schemaState: SchemaState,
-    builderState: BuilderState,
-  } | {
     type: 'fields',
     source: Source,
     schemaState: SchemaState,
     builderState: BuilderState,
+    subtype?: 'transform' | 'match',
   } | {
     type: 'comparison',
     source: Source,
@@ -531,40 +581,60 @@ class ElasticDataSourceC extends DataSource
       }).toList();
     }
 
-    if (context.type === 'transformFields')
+    if (context.type === 'fields')
     {
-      const defaultOptions: List<ChoiceOption> = List([
-        _ChoiceOption({
-          displayName: '_score',
-          value: '_score',
-          sampleData: List([]),
-        }),
-        _ChoiceOption({
-          displayName: '_size',
-          value: '_size',
-          sampleData: List([]),
-        }),
-      ]);
-      const transformableTypes =
-        [
-          'long',
-          'double',
-          'short',
-          'byte',
-          'integer',
-          'half_float',
-          'float',
-        ];
-      const { dataSource } = context.source;
-      const { index, types } = dataSource as any;
-      if (index)
+      if (context.subtype === 'transform' || context.subtype === 'match')
       {
-        const transformableCols = context.schemaState.columns.filter(
+        let defaultOptions: List<ChoiceOption>;
+        let acceptableFieldTypes: string[];
+
+        if (context.subtype === 'transform')
+        {
+          // TODO when reorganizing, move these to some better, constant space
+          defaultOptions = List([
+            _ChoiceOption({
+              displayName: '_score',
+              value: '_score',
+              sampleData: List([]),
+            }),
+            _ChoiceOption({
+              displayName: '_size',
+              value: '_size',
+              sampleData: List([]),
+            }),
+          ]);
+          acceptableFieldTypes =
+            [ // TODO shouldn't these be FieldTypes?
+              'long',
+              'double',
+              'short',
+              'byte',
+              'integer',
+              'half_float',
+              'float',
+            ];
+        }
+        else if (context.subtype === 'match')
+        {
+          defaultOptions = List();
+          acceptableFieldTypes = ['text'];
+        }
+
+        const { dataSource } = context.source;
+        const { index, types } = dataSource as any;
+
+        if (!index)
+        {
+          return defaultOptions;
+        }
+
+        const acceptableCols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === String(index) &&
-            transformableTypes.indexOf(column.datatype) !== -1,
+            acceptableFieldTypes.indexOf(column.datatype) !== -1,
         );
-        let transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
+
+        let acceptableOptions: List<ChoiceOption> = acceptableCols.map((col) =>
         {
           return _ChoiceOption({
             displayName: col.name,
@@ -572,16 +642,16 @@ class ElasticDataSourceC extends DataSource
             sampleData: col.sampleData,
           });
         }).toList();
-        let fieldNames = transformableOptions.map((f) => f.value).toList();
-        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
-        transformableOptions = transformableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
-        return transformableOptions.concat(defaultOptions).toList();
-      }
-      return defaultOptions;
-    }
 
-    if (context.type === 'fields')
-    {
+        let fieldNames = acceptableOptions.map((f) => f.value).toList();
+        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+        acceptableOptions = acceptableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
+
+        return acceptableOptions.concat(defaultOptions).toList();
+      }
+
+      // Else, regular fields, include everything
+
       const metaFields = ['_index', '_type', '_uid', '_id',
         '_source', '_size',
         '_all', '_field_names',
@@ -603,10 +673,31 @@ class ElasticDataSourceC extends DataSource
         const cols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === String(index));
-        let fields = cols.map((col) =>
+        let fields = List([]);
+        cols.forEach((col) =>
         {
           const fieldType = dataSource.dataTypeToFieldType(col.datatype);
-          return _ChoiceOption({
+          // If a column is nested, pull out the properties of that column to be filtered on
+          if (fieldType === FieldType.Nested)
+          {
+            console.log('doing nested shiz');
+            _.keys(col.properties).forEach((property) =>
+            {
+              const { type } = col.properties[property];
+              fields = fields.push(
+                _ChoiceOption({
+                  displayName: col.name + '.' + property,
+                  value: col.name + '.' + property,
+                  sampleData: List([]),
+                  icon: fieldTypeToIcon[type],
+                  meta: {
+                    fieldType: ReverseFieldTypeMapping[type],
+                  },
+                }),
+              );
+            });
+          }
+          fields = fields.push(_ChoiceOption({
             displayName: col.name,
             value: col.name,
             sampleData: col.sampleData,
@@ -614,8 +705,8 @@ class ElasticDataSourceC extends DataSource
             meta: {
               fieldType,
             },
-          });
-        }).toList();
+          }));
+        });
         // Sort fields (Sort their names, then use that to sort the choice options)
         let fieldNames = fields.map((f) => f.value).toList();
         fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
@@ -673,7 +764,9 @@ const ElasticComparisons = [
       FieldType.Text,
       FieldType.Date,
       FieldType.Geopoint,
-      FieldType.Ip]),
+      FieldType.Ip,
+      FieldType.Nested,
+      ]),
   },
   {
     value: 'equal',
@@ -689,6 +782,16 @@ const ElasticComparisons = [
     value: 'notequal',
     displayName: '≠', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
     fieldTypes: List([FieldType.Text, FieldType.Numerical]),
+  },
+  {
+    value: 'isin',
+    displayName: 'is in',
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
+  },
+  {
+    value: 'isnotin',
+    displayName: 'is not in',
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
   },
   {
     value: 'notcontain',
@@ -741,23 +844,6 @@ const ElasticComparisons = [
     fieldTypes: List([FieldType.Geopoint]),
   },
 ];
-
-/**
- * Section: Classes representing parts of the view
- */
-
-class ChoiceOptionC extends BaseClass
-{
-  public value: any = null; // a value to distinguish it to the parser
-  public displayName: string | number | El = '';
-  public color: string = null;
-  public tooltipContent: string | El = null;
-  public sampleData: List<Hit> = List([]);
-  public meta: any = null; // metadata, no specific shape, used for helper functions
-}
-export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
-export const _ChoiceOption = (config?: { [key: string]: any }) =>
-  New<ChoiceOption>(new ChoiceOptionC(config), config);
 
 /*
   Aggregation Types:

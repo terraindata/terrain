@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import * as _ from 'lodash';
 import { Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
@@ -65,6 +66,7 @@ import { _AggregationLine, _Path, More, Path, PathfinderContext, Source } from '
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
+import RouteSelector from 'common/components/RouteSelector';
 import './PathfinderMoreStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -99,6 +101,11 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       selector: '.pf-aggregation-arrow-advanced',
       style: getStyle('fill', Colors().iconColor),
     });
+  }
+
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
   }
 
   public handleReferenceChange(i, value)
@@ -186,6 +193,59 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     );
   }
 
+  public getSizeOptionSets()
+  {
+    return List([
+      {
+        key: 'value',
+        options: List([
+          {
+            value: 'all',
+            displayName: 'All',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '1',
+            displayName: '1',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '3',
+            displayName: '3',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '10',
+            displayName: '10',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '100',
+            displayName: '100',
+            hasOther: true,
+            sampleData: List([])
+          },
+        ]),
+        hasOther: true,
+        shortNameText: 'Size',
+        headerText: 'Size',
+        column: true,
+        hideSampleData: true,
+        // hasOther: false,
+      }
+    ]);
+  }
+
+  public handleSizePickerChange(optionSetIndex: number, value: any)
+  {
+    this.props.builderActions.changePath
+      (this.props.keyPath.butLast().toList().concat(List(['source', 'count'])).toList(), value);
+  }
+
   public renderNestedPaths()
   {
     const { references } = this.props.more;
@@ -250,6 +310,14 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             text={PathfinderText.moreSectionSubtitle}
           />
         }
+        <RouteSelector
+          optionSets={this.getSizeOptionSets() /* TODO store in state? */}
+          values={List([this.props.path.source.count])}
+          onChange={this.handleSizePickerChange}
+          canEdit={canEdit}
+          defaultOpen={false}
+          autoFocus={true}
+        />
         {
           // <DragAndDrop
           //   draggableItems={this.getAggregationLines()}

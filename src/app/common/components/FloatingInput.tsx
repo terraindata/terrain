@@ -58,8 +58,8 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 
 export let LARGE_FONT_SIZE = '52px';
 export let FONT_SIZE = '18px';
-export let LARGE_LABEL_FLOATING_FONT_SIZE = '14px';
-export let LABEL_FLOATING_FONT_SIZE = '10px';
+export let LARGE_LABEL_FLOATING_FONT_SIZE = '16px';
+export let LABEL_FLOATING_FONT_SIZE = '12px';
 
 const ContainerC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
 const Container = ContainerC`
@@ -109,7 +109,7 @@ const Label = LabelC`
 `;
 
 const floatingLabelStyle = {
-  top: 6,
+  top: 4,
 };
 
 const inputStyle = `

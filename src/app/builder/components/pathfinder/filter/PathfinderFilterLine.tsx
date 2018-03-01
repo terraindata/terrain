@@ -52,7 +52,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
@@ -72,11 +72,13 @@ export interface Props
 {
   filterLine: FilterLine;
   canEdit: boolean;
-  depth: number;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
+  comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
+  isSoftFilter?: boolean; // does this section apply to soft filters?
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
+  // so that we can make the according UI adjustments
 }
 
 const pieceStyle = {
@@ -102,39 +104,23 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   public render()
   {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
+    const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
 
     return (
       <div
-        className='pf-filter-line flex-container'
-        style={{
-          alignItems: 'flex-start',
-        }}
+        className={classNames({
+          'pf-filter-line': true,
+          'pf-filter-line-pre-group': this.props.comesBeforeAGroup,
+        })}
+        style={getStyle('alignItems', 'flex-start')}
       >
         {
           this.renderPicker()
         }
         {/*{
-          this.renderField()
+          this.renderBoost() */
         }
-        {
-          this.renderMethod()
-        }
-        {
-          this.renderValue()
-        }*/}
-        {/*{
-          this.renderBoost()
-        }
-        {
-          <div
-            className='close'
-            onClick={this.props.onDelete && this._fn(this.props.onDelete, this.props.keyPath)}
-          >
-            <RemoveIcon />
-          </div>
-        }*/}
       </div>
     );
   }
@@ -159,6 +145,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         onChange={this.handleFilterPickerChange}
         canEdit={props.canEdit}
         defaultOpen={fieldValue === null}
+        canDelete={true}
+        onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
       />
     );
   }
@@ -182,7 +170,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private getOptionSets(): List<RouteSelectorOptionSet>
   {
-    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
+    const { filterLine, canEdit, pathfinderContext, isSoftFilter } = this.props;
     const { source } = pathfinderContext;
 
     // TODO save to state for better runtime?
@@ -191,6 +179,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       source,
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
+      subtype: isSoftFilter ? 'match' : undefined,
     });
 
     const fieldSet: RouteSelectorOptionSet = {
@@ -292,6 +281,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           return '';
         }
         return Util.formatDate(value, true);
+      case FieldType.Geopoint:
+        value = _DistanceValue(Util.asJS(value));
+        return value.distance + units[value.units] + ' of ' + value.address;
       default:
         return undefined;
     }
@@ -313,7 +305,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           builderState: props.pathfinderContext.builderState,
         });
         const fieldChoice = fieldOptions.find((option) => option.value === value);
-        this.handleChange('field', value, fieldChoice.meta.fieldType, true);
+        this.handleChange('field', value, (fieldChoice.meta && fieldChoice.meta.fieldType) || FieldType.Any, true);
         return;
 
       case 1:
@@ -327,30 +319,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
     }
   }
-
-  // private renderField()
-  // {
-  //   const { filterLine, canEdit, pathfinderContext, depth } = this.props;
-  //   const { source } = pathfinderContext;
-
-  //   const options = source.dataSource.getChoiceOptions({
-  //     type: 'fields',
-  //     source,
-  //     schemaState: pathfinderContext.schemaState,
-  //   });
-
-  //   return (
-  //     <RouteSelector
-  //       value={filterLine.field}
-  //       onChange={this.handleFieldChange}
-  //       options={options}
-  //       canEdit={canEdit}
-  //       shortNameText={'Field'}
-  //       headerText={'Pick the field on which you want to impose some condition'}
-  //       hasOther={false}
-  //     />
-  //   );
-  // }
 
   private addBoost()
   {
@@ -436,56 +404,76 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         );
 
       case FieldType.Geopoint:
-        let value = filterLine.value as DistanceValue;
-        if (filterLine.value === null)
-        {
-          value = _DistanceValue();
-          this.handleChange('value', value);
-        }
         return ( // value will be injected by RouteSelector
           (props: { value: any }) =>
-            <div className='pf-filter-map-input-wrapper'>
-              <div className='pf-filter-map-inputs'>
-                <BuilderTextbox
-                  value={value.distance}
+          {
+            const value = _DistanceValue(Util.asJS(props.value));
+            return (
+              <div className='pf-filter-map-input-wrapper'>
+                <div className='pf-filter-map-inputs'>
+                  <BuilderTextbox
+                    value={value.distance}
+                    canEdit={pathfinderContext.canEdit}
+                    onChange={this._fn(this.handleMapValueChange, 'distance')}
+                    placeholder={'Distance'}
+                  />
+                  <Dropdown
+                    options={List(_.keys(units))}
+                    selectedIndex={_.keys(units).indexOf(value.units)}
+                    canEdit={pathfinderContext.canEdit}
+                    optionsDisplayName={Map(units)}
+                    onChange={this._fn(this.handleMapValueChange, 'units')}
+                    openDown={true}
+                  // keyPath={this.props.keyPath.push('value').push('units')}
+                  // action={this.props.onChange}
+                  />
+                </div>
+
+                <MapComponent
+                  geocoder='google'
+                  inputValue={props.value && props.value.address || ''}
+                  coordinates={props.value && props.value.location !== undefined ? props.value.location : [0, 0]}
+                  distance={props.value && props.value.distance || 0}
+                  distanceUnit={props.value && props.value.units || 'miles'}
+                  wrapperClassName={'pf-filter-map-component-wrapper'}
+                  fadeInOut={true}
+                  onChange={this.handleMapChange}
                   canEdit={pathfinderContext.canEdit}
-                  keyPath={this.props.keyPath.push('value').push('distance')}
-                  action={this.props.onChange}
-                  placeholder={'Distance'}
-                />
-                <Dropdown
-                  options={List(_.keys(units))}
-                  selectedIndex={_.keys(units).indexOf(value.units)}
-                  canEdit={pathfinderContext.canEdit}
-                  optionsDisplayName={Map(units)}
-                  keyPath={this.props.keyPath.push('value').push('units')}
-                  action={this.props.onChange}
                 />
               </div>
+            );
+          }
 
-              <MapComponent
-                geocoder='photon'
-                inputValue={props.value && props.value.address}
-                coordinates={props.value && props.value.location !== undefined ? props.value.location : [0, 0]}
-                distance={props.value && props.value.distance}
-                distanceUnit={props.value && props.value.units}
-                wrapperClassName={'pf-filter-map-component-wrapper'}
-                fadeInOut={true}
-                onChange={this.handleMapChange}
-                canEdit={pathfinderContext.canEdit}
-              />
-            </div>
         );
-        )
-
+      )
       case FieldType.Ip:
         return () => (
           <div>IP not supported yet</div>
         );
-
+      case FieldType.Nested:
       default:
-        throw new Error('No value type handler for ' + filterLine.valueType);
+        return (() => <div></div>); // Nested, can only handle exists, so there is no value
     }
+  }
+
+  private handleMapValueChange(key, value)
+  {
+    if (key === 'units')
+    {
+      value = _.keys(units)[value];
+    }
+    let filterLine;
+    if (this.props.filterLine.value[key] !== undefined)
+    {
+      filterLine = this.props.filterLine
+        .setIn(['value', key], value);
+    }
+    else
+    {
+      filterLine = this.props.filterLine
+        .setIn(['value'], _DistanceValue({ [key]: value }));
+    }
+    this.props.onChange(this.props.keyPath, filterLine, false, false);
   }
 
   private handleMapChange(coordinates, inputValue)

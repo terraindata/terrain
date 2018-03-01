@@ -58,8 +58,6 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
-import PathfinderFilterSection from './filter/PathfinderFilterSection2';
-import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
 import PathfinderArea from './PathfinderArea';
 import { Path } from './PathfinderTypes';

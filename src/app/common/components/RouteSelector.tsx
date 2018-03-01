@@ -65,6 +65,7 @@ import { FloatingInput, FONT_SIZE, LARGE_FONT_SIZE } from './FloatingInput';
 import KeyboardFocus from './KeyboardFocus';
 import './RouteSelectorStyle.less';
 import SearchInput from './SearchInput';
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface RouteSelectorOption
 {
@@ -105,6 +106,10 @@ export interface Props
   defaultOpen?: boolean; // default to open when the component mounts (but don't force open)
   large?: boolean;
   noShadow?: boolean;
+  autoFocus?: boolean;
+  // Be able to get rid of it
+  canDelete?: boolean;
+  onDelete?: () => void;
 }
 
 @Radium
@@ -128,9 +133,9 @@ export class RouteSelector extends TerrainComponent<Props>
     // animationEl: null,
   };
 
-  componentWillReceiveProps(nextProps: Props)
+  shouldComponentUpdate(nextProps, nextState)
   {
-    //
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
   public componentDidUpdate(prevProps: Props, prevState)
@@ -141,7 +146,6 @@ export class RouteSelector extends TerrainComponent<Props>
   public render()
   {
     const { props, state } = this;
-
     return (
       <div
         className='routeselector-wrapper'
@@ -222,6 +226,15 @@ export class RouteSelector extends TerrainComponent<Props>
         >
           Close
         </div>
+        {
+          (this.props.canDelete && this.props.canEdit && !this.state.open) &&
+          <div
+            onClick={this.props.onDelete}
+            className='routeselector-delete close'
+          >
+            <RemoveIcon />
+          </div>
+        }
       </div>
     );
   }
@@ -325,7 +338,7 @@ export class RouteSelector extends TerrainComponent<Props>
         <SearchInput
           value={state.searches.get(index)}
           onChange={this._fn(this.handleOptionSearch, index)}
-          autoFocus={state.focusedSetIndex === index}
+          autoFocus={state.focusedSetIndex === index || props.autoFocus}
           canEdit={true}
           onKeyDown={this.handleInputKeyDown}
           onFocus={this.handleOptionSearchFocus}
@@ -340,7 +353,7 @@ export class RouteSelector extends TerrainComponent<Props>
           value={value}
           label={'Value' /* TODO confirm copy */}
           onChange={this._fn(this.handleOtherChange, index)}
-          autoFocus={state.focusedSetIndex === index && optionSet.focusOtherByDefault}
+          autoFocus={(state.focusedSetIndex === index && optionSet.focusOtherByDefault) || props.autoFocus}
           isTextInput={true}
           canEdit={this.props.canEdit}
           onKeyDown={this.handleInputKeyDown}
@@ -375,12 +388,12 @@ export class RouteSelector extends TerrainComponent<Props>
             optionSet.headerText
           }
         </div>
-        <div
-          className='routeselector-util-row'
-        >
-          {/*TODO could hide this if it is not needed*/}
-          {
-            showTextbox ?
+
+        {
+          showTextbox ?
+            <div
+              className='routeselector-util-row'
+            >
               <div
                 className='routeselector-search'
               >
@@ -388,22 +401,24 @@ export class RouteSelector extends TerrainComponent<Props>
                   textboxContent
                 }
               </div>
-              :
-              <KeyboardFocus
-                index={0 /* we handle index manipulation internally in this class */}
-                length={0}
-                onIndexChange={_.noop}
-                onSelect={_.noop}
-                onKeyDown={this.handleInputKeyDown}
-                onFocus={this._fn(this.handleOptionSearchFocus, index)}
-                onFocusLost={this._fn(this.handleOptionSearchFocusLost, index)}
-                focusOverride={this.state.focusedSetIndex === index}
-              />
-          }
-        </div>
+            </div>
+            :
+            <KeyboardFocus
+              index={0 /* we handle index manipulation internally in this class */}
+              length={0}
+              onIndexChange={_.noop}
+              onSelect={_.noop}
+              onKeyDown={this.handleInputKeyDown}
+              onFocus={this._fn(this.handleOptionSearchFocus, index)}
+              onFocusLost={this._fn(this.handleOptionSearchFocusLost, index)}
+              focusOverride={this.state.focusedSetIndex === index}
+            />
+        }
+
         {
           getValueComponentContent
         }
+
         <div
           className={classNames({
             'routeselector-options': true,
@@ -414,6 +429,11 @@ export class RouteSelector extends TerrainComponent<Props>
           {
             optionSet.options.map(this._fn(this.renderOption, index, visibleOptionCounter, incrementVisibleOptions))
           }
+
+          {/*Add fodder, to help items space horizontally evenly. These will not appear*/}
+          <div className='routeselector-option-wrapper' />
+          <div className='routeselector-option-wrapper' />
+          <div className='routeselector-option-wrapper' />
         </div>
       </div>
     );
@@ -907,6 +927,10 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private open()
   {
+    if (!this.props.canEdit)
+    {
+      return;
+    }
     this.setState({
       open,
     });

@@ -66,6 +66,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
         must: List([]),
         should: List([]),
         must_not: List([]),
+        minimum_should_match: 0,
       }),
     }),
     sort: Map({}),
@@ -74,6 +75,8 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     size: 1,
     track_scores: true,
   });
+
+  // Sources
   const sourceInfo = parseSource(path.source);
   baseQuery = baseQuery.set('from', sourceInfo.from);
   baseQuery = baseQuery.set('size', sourceInfo.size);
@@ -84,11 +87,31 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
       }),
     }),
   ]));
-  let filterObj = parseFilters(path.filterGroup, inputs);
-  filterObj = filterObj.setIn(['bool', 'filter'],
-    filterObj.getIn(['bool', 'filter'])
-      .concat(baseQuery.getIn(['query', 'bool', 'filter'])));
-  baseQuery = baseQuery.set('query', filterObj);
+
+  // Filters
+  const filterObj = parseFilters(path.filterGroup, inputs);
+
+  // filterObj = filterObj.updateIn(['bool', 'filter'],
+  // (originalFilter) => originalFilter.concat(baseQuery.getIn(['query', 'bool', 'filter'])));
+  baseQuery = baseQuery.updateIn(['query', 'bool', 'filter'],
+    (originalFilterArr) => originalFilterArr.push(filterObj),
+  );
+
+  const softFiltersObj = parseFilters(path.softFilterGroup, inputs, true);
+
+  baseQuery = baseQuery.updateIn(['query', 'bool', 'must'],
+    (originalMustArr) => originalMustArr.push(Map({
+      bool: Map({
+        should: softFiltersObj,
+        minimum_should_match: 0,
+      }),
+    })),
+  );
+
+  // filterObj = filterObj.setIn(['bool', 'should'], softFiltersObj);
+  // (originalShould) => originalShould.concat(baseQuery.getIn(['query', 'bool', 'should'])));
+
+  // Scores
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
     let sortObj = parseScore(path.score);
@@ -103,6 +126,8 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
       baseQuery = baseQuery.delete('sort');
     }
   }
+
+  // More
   const moreObj = parseAggregations(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
   const groupJoin = parseNested(path.more, path.nested, inputs);
@@ -110,10 +135,14 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   {
     baseQuery = baseQuery.set('groupJoin', groupJoin);
   }
+
+  // Export, without inputs
   if (ignoreInputs)
   {
     return baseQuery;
   }
+
+  // Export, with inputs
   const text = stringifyWithParameters(baseQuery.toJS(), (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
@@ -240,7 +269,7 @@ function parseTerrainScore(score: Score)
   return sortObj;
 }
 
-function parseFilters(filterGroup: FilterGroup, inputs): any
+function parseFilters(filterGroup: FilterGroup, inputs, forceShould = false): any
 {
   // init must, mustNot, filter, should
   // If the minMatches is all of the above
@@ -265,7 +294,7 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
   let filter = List([]);
   let should = List([]);
   let useShould = false;
-  if (filterGroup.minMatches !== 'all')
+  if (filterGroup.minMatches !== 'all' || forceShould)
   {
     useShould = true;
   }
@@ -278,29 +307,32 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
       {
         should = should.push(lineInfo);
       }
-      else if (line.comparison === 'notequal' || line.comparison === 'notcontain')
+      else if (line.comparison === 'notequal' || line.comparison === 'notcontain' || line.comparison === 'isnotin')
       {
         mustNot = mustNot.push(lineInfo);
       }
-      else if (line.comparison === 'located' || line.comparison === 'exists') // TODO MAYBE ADD NON-TEXT FILTERS HERE AS WELL
-      {
-        filter = filter.push(lineInfo);
-      }
       else
       {
-        must = must.push(lineInfo);
+        filter = filter.push(lineInfo);
       }
     }
     else
     {
-      const nestedFilter = parseFilters(line.filterGroup, inputs);
+      const nestedFilter = parseFilters(line.filterGroup, inputs, forceShould);
       must = must.push(nestedFilter);
     }
   });
   if (useShould)
   {
-    filterObj = filterObj.setIn(['bool', 'minimum_should_match'],
-      filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches)));
+    filterObj = filterObj.updateIn(['bool', 'minimum_should_match'], (MSM) =>
+    {
+      if (forceShould)
+      {
+        return 0; // forcing should for match quality
+      }
+
+      return filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches));
+    });
   }
   filterObj = filterObj.setIn(['bool', 'must'], must);
   filterObj = filterObj.setIn(['bool', 'must_not'], mustNot);
@@ -309,7 +341,7 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
   return filterObj;
 }
 
-function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
+function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNested)
 {
   const lineValue = String(line.value);
   let value: any = String(line.value || '');
@@ -318,6 +350,27 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
   if (line.comparison === 'datebefore' || line.comparison === 'dateafter')
   {
     value = Util.formatInputDate(new Date(value), 'elastic');
+  }
+  if (line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
+  {
+    // In this case it is a nested query, disguised as a normal filter line
+    const path = line.field.split('.')[0];
+    const negatives = ['notcontain', 'noteequal', 'notisin'];
+    const boolQueryType = negatives.indexOf(line.comparison) !== -1 ? 'must_not' :
+      useShould ? 'should' : 'must';
+    const innerLine = parseFilterLine(line, useShould, inputs, true).toJS();
+    return Map({
+      nested: {
+        path,
+        score_mode: 'avg',
+        query: {
+          bool: {
+            [boolQueryType]: innerLine,
+          },
+        },
+      },
+
+    });
   }
   switch (line.comparison)
   {
@@ -453,13 +506,37 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
         }),
       });
     case 'located':
-    // const distanceObj = line.value as DistanceValue;
-    // return Map({
-    //   geo_distance: Map({
-    //     distance: String(distanceObj.distance) + distanceObj.units,
-    //     [line.field]: [distanceObj.location[1], distanceObj.location[0]],
-    //   }),
-    // });
+      const distanceObj = line.value as DistanceValue;
+      return Map({
+        geo_distance: Map({
+          distance: String(distanceObj.distance) + distanceObj.units,
+          [line.field]: distanceObj.location,
+        }),
+      });
+    case 'isin':
+    case 'isnotin':
+      try
+      {
+        return Map({
+          terms: { [line.field]: JSON.parse(String(value).toLowerCase()) },
+        });
+      }
+      catch {
+        // Try to split it along commas and create own value
+        if (typeof value === 'string' && value[0] !== '@')
+        {
+          value = value.replace(/\s/g, '').replace(/\[/g, '').replace(/\]/g, '');
+          let pieces = value.split(',');
+          pieces = pieces.map((piece) => piece.toLowerCase());
+          return Map({
+            terms: { [line.field]: pieces },
+          });
+        }
+        return Map({
+          terms: { [line.field]: value },
+        });
+      }
+
     default:
       return Map({});
   }

@@ -274,7 +274,7 @@ export const ElasticBlockHelpers = {
 export function findCardType(name: string, builderState: BuilderState): List<Block>
 {
   let theCards = List([]);
-  if (!builderState.query)
+  if (!builderState || !builderState.query)
   {
     return theCards;
   }

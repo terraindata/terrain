@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as _ from 'lodash';
 import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List } = Immutable;
@@ -63,7 +64,7 @@ import { BuilderState } from 'builder/data/BuilderState';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
-import PathfinderFilterSection from './filter/PathfinderFilterSection2';
+import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
@@ -93,12 +94,26 @@ class PathfinderArea extends TerrainComponent<Props>
     pathfinderContext: _PathfinderContext(this.getPathfinderContext(this.props)),
   };
 
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    return !_.isEqual(nextProps, this.props) || !_.isEqual(this.state, nextState);
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
-    this.setState({
-      pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
-        this.getPathfinderContext(nextProps)),
-    });
+    const {pathfinderContext} = this.state;
+    if (pathfinderContext.canEdit !== nextProps.canEdit ||
+       pathfinderContext.source !== nextProps.path.source ||
+       pathfinderContext.step !== nextProps.path.step ||
+       pathfinderContext.schemaState !== nextProps.schema ||
+       pathfinderContext.builderState.db !== nextProps.builder.db
+      )
+    {
+      this.setState({
+        pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
+          this.getPathfinderContext(nextProps)),
+      });
+    }
   }
 
   public getPathfinderContext(props: Props)
@@ -143,7 +158,7 @@ class PathfinderArea extends TerrainComponent<Props>
 
   public render()
   {
-    const { path } = this.props;
+    const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
     return (
@@ -169,6 +184,7 @@ class PathfinderArea extends TerrainComponent<Props>
             />
           </div>
         </FadeInOut>
+
         <div className='pathfinder-column-content'>
           <PathfinderSourceSection
             pathfinderContext={pathfinderContext}
@@ -180,35 +196,36 @@ class PathfinderArea extends TerrainComponent<Props>
           <FadeInOut
             open={path.step >= PathfinderSteps.Filter}
           >
-            <PathfinderFilterSection
-              pathfinderContext={pathfinderContext}
-              filterGroup={path.filterGroup}
-              keyPath={keyPath.push('filterGroup')}
-              onStepChange={this.incrementStep}
-              toSkip={this.props.toSkip}
-            />
-          </FadeInOut>
-
-          <FadeInOut
-            open={path.step >= PathfinderSteps.Score}
-          >
             <PathfinderScoreSection
               pathfinderContext={pathfinderContext}
               score={path.score}
               keyPath={keyPath.push('score')}
               onStepChange={this.incrementStep}
             />
-          </FadeInOut>
 
-          <FadeInOut
-            open={path.step >= PathfinderSteps.More}
-          >
+            <PathfinderFilterSection
+              isSoftFilter={true}
+              pathfinderContext={pathfinderContext}
+              filterGroup={path.softFilterGroup}
+              keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
+              onStepChange={this.incrementStep}
+              toSkip={toSkip}
+            />
+
+            <PathfinderFilterSection
+              pathfinderContext={pathfinderContext}
+              filterGroup={path.filterGroup}
+              keyPath={keyPath.push('filterGroup')}
+              onStepChange={this.incrementStep}
+              toSkip={toSkip}
+            />
+
             <PathfinderMoreSection
               pathfinderContext={pathfinderContext}
               more={path.more}
               path={path}
               keyPath={keyPath.push('more')}
-              toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
+              toSkip={toSkip !== undefined ? toSkip : 3}
             />
           </FadeInOut>
         </div>
