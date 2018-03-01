@@ -108,12 +108,12 @@ export default class MergeJoinTransform extends Readable
 
     // set up the left source
     const leftQuery = this.setSortClause(query);
-    this.leftSource = new BufferedElasticStream(client, leftQuery, this.mergeJoin);
+    this.leftSource = new BufferedElasticStream(client, leftQuery, this.mergeJoin.bind(this));
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
-    this.rightSource = new BufferedElasticStream(client, rightQuery, this.mergeJoin);
+    this.rightSource = new BufferedElasticStream(client, rightQuery, this.mergeJoin.bind(this));
   }
 
   public _read(size: number = 1024)
