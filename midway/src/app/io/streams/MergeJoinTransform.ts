@@ -130,14 +130,19 @@ export default class MergeJoinTransform extends Readable
 
   private mergeJoin(): void
   {
-    this.leftSource.shouldContinue = false;
-    this.rightSource.shouldContinue = false;
-
     const left = this.leftSource.buffer;
     const right = this.rightSource.buffer;
 
+    if (left.length === 0 || right.length === 0)
+    {
+      return;
+    }
+
     let l = left[this.leftSource.position][this.joinKey];
     let r = right[this.rightSource.position][this.joinKey];
+
+    console.log(l);
+    console.log(r);
 
     // advance left and right streams
     while (this.leftSource.position < left.length
@@ -147,6 +152,7 @@ export default class MergeJoinTransform extends Readable
       {
         if (l < r)
         {
+          console.log('advancing left...');
           this.leftSource.position++;
           l = left[this.leftSource.position][this.joinKey];
 
@@ -158,20 +164,22 @@ export default class MergeJoinTransform extends Readable
         }
         else if (r < l)
         {
+          console.log('advancing right...');
           this.rightSource.position++;
           r = right[this.rightSource.position][this.joinKey];
         }
 
+        console.log('must be equal...!!!??');
         // if either of the streams went dry, request more
         if (this.leftSource.position === left.length)
         {
-          this.leftSource.shouldContinue = true;
+          this.leftSource.resetBuffer();
           return;
         }
 
         if (this.rightSource.position === right.length)
         {
-          this.rightSource.shouldContinue = true;
+          this.rightSource.resetBuffer();
           return;
         }
       }
@@ -179,7 +187,7 @@ export default class MergeJoinTransform extends Readable
       // start merging
       left[this.leftSource.position][this.mergeJoinName] = [];
       let j = this.rightSource.position;
-      while (l === r && j < right.length)
+      while (l === r && j < right.length - 1)
       {
         left[this.leftSource.position][this.mergeJoinName].push(right[j]);
         j++;
@@ -188,7 +196,7 @@ export default class MergeJoinTransform extends Readable
 
       if (j === right.length)
       {
-        this.rightSource.shouldContinue = true;
+        this.rightSource.resetBuffer();
         return;
       }
 
@@ -197,11 +205,10 @@ export default class MergeJoinTransform extends Readable
       this.leftSource.position++;
     }
 
+    this.leftSource.resetBuffer();
+
     // check if we are done
-    if (this.leftSource.isEmpty
-      && this.rightSource.isEmpty
-      && this.leftSource.buffer.length === 0
-      && this.rightSource.buffer.length === 0)
+    if (this.leftSource.isEmpty() && this.rightSource.isEmpty())
     {
       this.push(null);
     }

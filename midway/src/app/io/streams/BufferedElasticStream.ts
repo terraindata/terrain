@@ -54,15 +54,15 @@ import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
  */
 export default class BufferedElasticStream extends Readable
 {
-  public shouldContinue: boolean = true;
-  public isEmpty: boolean = false;
-
   public maxBufferSize: number = 512;
   public position: number = 0;
   public buffer: object[] = [];
 
   private query: any;
   private stream: Readable;
+
+  private _shouldContinue: boolean = true;
+  private _isSourceEmpty: boolean = false;
 
   private _onBufferFull: (stream: BufferedElasticStream) => void;
   private _onRead: () => void;
@@ -86,10 +86,10 @@ export default class BufferedElasticStream extends Readable
 
   public _read(): void
   {
-    if (!this.isEmpty
+    if (!this._isSourceEmpty
       && this.buffer.length < this.maxBufferSize)
     {
-      this.shouldContinue = true;
+      this._shouldContinue = true;
     }
   }
 
@@ -103,8 +103,8 @@ export default class BufferedElasticStream extends Readable
     this.stream.removeListener('readable', this._onRead);
     this.stream.removeListener('end', this._onEnd);
 
-    this.shouldContinue = false;
-    this.isEmpty = true;
+    this._shouldContinue = false;
+    this._isSourceEmpty = true;
 
     if (callback !== undefined)
     {
@@ -112,20 +112,31 @@ export default class BufferedElasticStream extends Readable
     }
   }
 
-  public readStream(): void
+  public resetBuffer(): void
+  {
+    this.buffer = [];
+    this.position = 0;
+    this._shouldContinue = true;
+  }
+
+  public isEmpty(): boolean
+  {
+    return this._isSourceEmpty && (this.buffer.length === 0);
+  }
+
+  private readStream(): void
   {
     // should we keep reading from the source streams?
-    if (!this.shouldContinue)
+    if (!this._shouldContinue)
     {
       return;
     }
 
     // if yes, keep buffering inputs from the source stream
-
     const obj = this.stream.read();
     if (obj === null)
     {
-      this.isEmpty = true;
+      this._isSourceEmpty = true;
     }
     else
     {
@@ -135,9 +146,9 @@ export default class BufferedElasticStream extends Readable
     // if we have data buffered up to maxBufferSize, swap the buffer list out
     // and dispatch the onBufferFull callback
     if (this.buffer.length >= this.maxBufferSize ||
-      this.isEmpty && this.buffer.length > 0)
+      this._isSourceEmpty && this.buffer.length > 0)
     {
-      this.position = 0;
+      this._shouldContinue = false;
       this._onBufferFull(this);
     }
   }
