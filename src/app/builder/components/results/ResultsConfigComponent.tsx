@@ -244,7 +244,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
   {
     const newConfig = this.state.config.setIn(['formats', field, 'config'], config);
     this.changeConfig(newConfig);
-    // builderActions.changeResultsConfig(config, field);
   }
 
   public handleNestedConfigClose(field, config)

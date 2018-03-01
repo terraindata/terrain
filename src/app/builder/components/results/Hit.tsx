@@ -590,17 +590,6 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className={classes}
         style={this.props.style}
-      >
-        {
-          // this.props.hideFieldNames &&
-          // !this.props.hideNested &&
-          // this.props.index === 0 &&
-          // <div
-          //   className='hit-column-names'
-          //   style={borderColor(Colors().blockOutline)}
-          // />
-        }
-        <div
           onDoubleClick={this.expand}
           // onMouseEnter={this._fn(this.handleHover, true)}
           // onMouseLeave={this._fn(this.handleHover, false)}
@@ -709,7 +698,6 @@ class HitComponent extends TerrainComponent<Props> {
             }
           </div>
         </div>
-      </div>
     ));
   }
 
