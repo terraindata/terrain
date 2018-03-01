@@ -246,6 +246,7 @@ export function parseElasticDb(elasticServer: object,
                 databaseId,
                 tableId,
                 datatype: fieldProperties['type'],
+                properties: fieldProperties['properties'],
               });
 
               column = column.set(

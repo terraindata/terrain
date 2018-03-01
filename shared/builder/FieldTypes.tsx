@@ -53,6 +53,7 @@ export const enum FieldType
   Geopoint,
   Ip,
   Any,
+  Nested,
 }
 
 export const FieldTypeMapping =
@@ -74,4 +75,21 @@ export const FieldTypeMapping =
       'half_float',
       'float',
       'geo_point'],
+    [FieldType.Nested]: ['nested'],
+  };
+
+export const ReverseFieldTypeMapping =
+  {
+    long: FieldType.Numerical,
+    double: FieldType.Numerical,
+    short: FieldType.Numerical,
+    byte: FieldType.Numerical,
+    integer: FieldType.Numerical,
+    float: FieldType.Numerical,
+    boolean: FieldType.Numerical,
+    text: FieldType.Text,
+    date: FieldType.Date,
+    geo_point: FieldType.Geopoint,
+    ip: FieldType.Geopoint,
+    nested: FieldType.Nested,
   };

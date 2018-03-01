@@ -75,9 +75,9 @@ export interface Props
   depth: number;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
+  comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
-  comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
   // so that we can make the according UI adjustments
 }
 
@@ -470,14 +470,15 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               />
             </div>
         );
-        )
-
+      )
       case FieldType.Ip:
         return () => (
           <div>IP not supported yet</div>
         );
-
+      case FieldType.Nested:
+        return (() => <div></div>); // Nested, can only handle exists, so there is no value
       default:
+        // Nested
         throw new Error('No value type handler for ' + filterLine.valueType);
     }
   }

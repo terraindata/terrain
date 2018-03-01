@@ -389,7 +389,7 @@ export class RouteSelector extends TerrainComponent<Props>
                 }
               </div>
             </div>
-          :
+            :
             <KeyboardFocus
               index={0 /* we handle index manipulation internally in this class */}
               length={0}
@@ -649,7 +649,7 @@ export class RouteSelector extends TerrainComponent<Props>
     // otherwise, render in a plain div
     // this is a performance improvement
     const wrapperFn = this.state.focusedSetIndex === optionSetIndex
-     ? this.fadeInOutWrapper : this.divWrapper;
+      ? this.fadeInOutWrapper : this.divWrapper;
 
     return (
       <div

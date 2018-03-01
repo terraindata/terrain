@@ -53,7 +53,7 @@ export const PathfinderText = {
   chooseDataSourceDropdownPrompt: 'Choose a data source',
   findSectionTitle: 'Find',
   findSectionSubtitle: '',
-    // `Choose where your data are located and filter out everything that isn't a match.`,
+  // `Choose where your data are located and filter out everything that isn't a match.`,
 
   // Filter sections
   hardFilterSectionTitle: 'Necessary Criteria',
@@ -75,7 +75,7 @@ export const PathfinderText = {
   // Score section
   scoreSectionTitle: 'Score',
   scoreSectionSubtitle: '',
-   // `Score your results, so that the best picks show up in the top spots.`,
+  // `Score your results, so that the best picks show up in the top spots.`,
   scoreTypeLabel: 'Method',
   scoreTypeExplanation: 'Choose how to score your algorithm',
 
@@ -105,7 +105,7 @@ export const PathfinderText = {
   // More section
   moreSectionTitle: 'Advanced',
   moreSectionSubtitle: '',
-   // `Add nested algorithms to create a set of results for each result of your parent algorithm.`,
+  // `Add nested algorithms to create a set of results for each result of your parent algorithm.`,
 
   referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',
   nestedExplanation: 'Add another algorithm that uses the results of this one as input',

@@ -253,7 +253,7 @@ class Menu extends TerrainComponent<Props>
 }
 
 const MenuContainer = Util.createContainer(
-onClickOutside(Menu),
+  onClickOutside(Menu),
   [],
   {
     colorsActions: ColorsActions,

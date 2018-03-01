@@ -66,8 +66,11 @@ import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
-  ScoreTypesChoices, Source } from '../PathfinderTypes';
+import
+{
+  _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
+  ScoreTypesChoices, Source
+} from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 import './PathfinderScoreStyle.less';
 
@@ -166,14 +169,14 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       hasSearch: true,
     };
     const orderOptions = List([
-    {
-      displayName: 'ascending',
-      value: 'asc',
-    },
-    {
-      displayName: 'descending',
-      value: 'desc',
-    },
+      {
+        displayName: 'ascending',
+        value: 'asc',
+      },
+      {
+        displayName: 'descending',
+        value: 'desc',
+      },
     ]);
     const orderSet: RouteSelectorOptionSet = {
       key: 'sortOrder',

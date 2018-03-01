@@ -90,7 +90,7 @@ import { _Hit, Hit } from 'builder/components/results/ResultTypes';
 import { BuilderState } from 'builder/data/BuilderState';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
-import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
+import { FieldType, FieldTypeMapping, ReverseFieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
 import PathfinderText from './PathfinderText';
@@ -171,13 +171,13 @@ export enum ScoreType
 }
 
 export const ScoreTypesList =
-[
-  ScoreType.terrain,
-  ScoreType.linear,
-  ScoreType.elastic,
-  ScoreType.random,
-  ScoreType.none,
-];
+  [
+    ScoreType.terrain,
+    ScoreType.linear,
+    ScoreType.elastic,
+    ScoreType.random,
+    ScoreType.none,
+  ];
 
 export const ScoreTypesChoices = List(ScoreTypesList.map(
   (type) =>
@@ -655,10 +655,30 @@ class ElasticDataSourceC extends DataSource
         const cols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === String(index));
-        let fields = cols.map((col) =>
+        let fields = List([]);
+        cols.forEach((col) =>
         {
           const fieldType = dataSource.dataTypeToFieldType(col.datatype);
-          return _ChoiceOption({
+          // If a column is nested, pull out the properties of that column to be filtered on
+          if (fieldType === FieldType.Nested)
+          {
+            _.keys(col.properties).forEach((property) =>
+            {
+              const { type } = col.properties[property];
+              fields = fields.push(
+                _ChoiceOption({
+                  displayName: col.name + '.' + property,
+                  value: col.name + '.' + property,
+                  sampleData: List([]),
+                  icon: fieldTypeToIcon[type],
+                  meta: {
+                    fieldType: ReverseFieldTypeMapping[type],
+                  },
+                }),
+              );
+            });
+          }
+          fields = fields.push(_ChoiceOption({
             displayName: col.name,
             value: col.name,
             sampleData: col.sampleData,
@@ -666,8 +686,8 @@ class ElasticDataSourceC extends DataSource
             meta: {
               fieldType,
             },
-          });
-        }).toList();
+          }));
+        });
         // Sort fields (Sort their names, then use that to sort the choice options)
         let fieldNames = fields.map((f) => f.value).toList();
         fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
@@ -725,7 +745,9 @@ const ElasticComparisons = [
       FieldType.Text,
       FieldType.Date,
       FieldType.Geopoint,
-      FieldType.Ip]),
+      FieldType.Ip,
+      FieldType.Nested,
+      ]),
   },
   {
     value: 'equal',
@@ -745,12 +767,12 @@ const ElasticComparisons = [
   {
     value: 'isin',
     displayName: 'is in',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date])
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
   },
   {
     value: 'isnotin',
     displayName: 'is not in',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date])
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
   },
   {
     value: 'notcontain',

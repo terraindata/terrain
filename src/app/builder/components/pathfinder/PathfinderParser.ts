@@ -305,7 +305,7 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
   return filterObj;
 }
 
-function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
+function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNested)
 {
   const lineValue = String(line.value);
   let value: any = String(line.value || '');
@@ -314,6 +314,27 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
   if (line.comparison === 'datebefore' || line.comparison === 'dateafter')
   {
     value = Util.formatInputDate(new Date(value), 'elastic');
+  }
+  if (line.field && line.field.indexOf('.') !== undefined && !ignoreNested)
+  {
+    // In this case it is a nested query, disguised as a normal filter line
+    const path = line.field.split('.')[0];
+    const negatives = ['notcontain', 'noteequal', 'notisin'];
+    const boolQueryType = negatives.indexOf(line.comparison) !== -1 ? 'must_not' :
+      useShould ? 'should' : 'must';
+    const innerLine = parseFilterLine(line, useShould, inputs, true).toJS();
+    return Map({
+      nested: {
+        path,
+        score_mode: 'avg',
+        query: {
+          bool: {
+            [boolQueryType]: innerLine,
+          },
+        },
+      },
+
+    });
   }
   switch (line.comparison)
   {
@@ -458,24 +479,25 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
     // });
     case 'isin':
     case 'isnotin':
-      try {
+      try
+      {
         return Map({
-          terms : { [line.field] : JSON.parse(String(value).toLowerCase())}
+          terms: { [line.field]: JSON.parse(String(value).toLowerCase()) },
         });
       }
       catch {
-       // Try to split it along commas and create own value
-       if (typeof value === 'string' && value[0] !== '@')
-       {
-       value = value.replace(/\s/g, '').replace(/\[/g, '').replace(/\]/g, '');
-         let pieces = value.split(',');
-         pieces = pieces.map((piece) => piece.toLowerCase());
-         return Map({
-           terms: {[line.field]: pieces}
-         });
-       }
-       return Map({
-          terms : { [line.field] : value}
+        // Try to split it along commas and create own value
+        if (typeof value === 'string' && value[0] !== '@')
+        {
+          value = value.replace(/\s/g, '').replace(/\[/g, '').replace(/\]/g, '');
+          let pieces = value.split(',');
+          pieces = pieces.map((piece) => piece.toLowerCase());
+          return Map({
+            terms: { [line.field]: pieces },
+          });
+        }
+        return Map({
+          terms: { [line.field]: value },
         });
       }
 

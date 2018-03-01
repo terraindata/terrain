@@ -159,34 +159,34 @@ class DrawerAnimation extends TerrainComponent<Props>
       shouldRender: true, // render now
       renderMaxHeight: 0, // but in a closed state
       openingInterval: setInterval(() =>
+      {
+        console.log('Render MH');
+        if (this.hasRendered)
         {
-          console.log('Render MH');
-          if (this.hasRendered)
+          // make sure we've already rendered, so we get that animation
+          this.setState({
+            renderMaxHeight: this.props.maxHeight,
+          });
+          this.clearTimeouts();
+
+          // scroll the content into view
+          setTimeout(() =>
           {
-            // make sure we've already rendered, so we get that animation
-            this.setState({
-              renderMaxHeight: this.props.maxHeight,
-            });
-            this.clearTimeouts();
+            const el = ReactDOM.findDOMNode(this.state.contentRef);
 
-            // scroll the content into view
-            setTimeout(() =>
+            if (el !== undefined)
             {
-              const el = ReactDOM.findDOMNode(this.state.contentRef);
-
-              if (el !== undefined)
-              {
-                el.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'nearest',
-                  inline: 'nearest',
-                });
-              }
-            }, 350); // coordinate this value with LESS
-            // in the future you could consider a ghost element down at the bottom
-            // of the position, so the window can scroll before the content has opened
-          }
-        },
+              el.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest',
+              });
+            }
+          }, 350); // coordinate this value with LESS
+          // in the future you could consider a ghost element down at the bottom
+          // of the position, so the window can scroll before the content has opened
+        }
+      },
         20), // quick delay
     });
 
@@ -199,7 +199,8 @@ class DrawerAnimation extends TerrainComponent<Props>
     this.setState({
       shouldRender: true, // should be unchanged
       renderMaxHeight: 0, // tell it we're closing
-      closingTimeout: setTimeout(() => {
+      closingTimeout: setTimeout(() =>
+      {
         console.log('Dont render');
         this.setState({
           shouldRender: false,
