@@ -43,60 +43,34 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable no-unused-expression
-enum TransformationNodeType
+
+import { TransformationNode } from '../TransformationNode';
+import TransformationNodeVisitor from '../TransformationNodeVisitor';
+import TransformationVisitError from '../TransformationVisitError';
+import TransformationVisitResult from '../TransformationVisitResult';
+import ANodeVisitor from './ANodeVisitor';
+
+export default class UppercaseNodeVisitor extends ANodeVisitor
 {
-  LoadNode = 'LoadNode',
-  StoreNode = 'StoreNode',
-  PutNode = 'PutNode',
-  GetNode = 'GetNode',
-  SplitNode = 'SplitNode',
-  JoinNode = 'JoinNode',
-  FilterNode = 'FilterNode',
-  DuplicateNode = 'DuplicateNode',
-  RenameNode = 'RenameNode',
-  PlusNode = 'PlusNode',
-  PrependNode = 'PrependNode',
-  AppendNode = 'AppendNode',
-  UppercaseNode = 'UppercaseNode',
-  SubstringNode = 'SubstringNode',
+  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+  {
+    for (const fieldID of node.fieldIDs.toJS())
+    {
+      if (typeof doc[fieldID] !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to capitalize a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      doc[fieldID] = doc[fieldID].toUpperCase();
+    }
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
 }
-
-// if this has errors, double check TransformationNodeType's keys are equal to its values
-type AssertEnumValuesEqualKeys = {
-  [K in keyof typeof TransformationNodeType]: K
-};
-TransformationNodeType as AssertEnumValuesEqualKeys;
-
-// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
-type AssertOptionTypesExhaustive = {
-  [K in TransformationNodeType]: TransformationOptionTypes[K]
-};
-
-interface TransformationOptionTypes
-{
-  LoadNode: any;
-  StoreNode: any;
-  PutNode: any;
-  GetNode: any;
-  SplitNode: any;
-  JoinNode: any;
-  FilterNode: any;
-  DuplicateNode: any;
-  RenameNode: any;
-  PlusNode: any;
-  PrependNode: any;
-  AppendNode: any;
-  UppercaseNode: {
-
-  };
-  SubstringNode: {
-    from: number;
-    length: number;
-  };
-}
-
-export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
-
-export default TransformationNodeType;

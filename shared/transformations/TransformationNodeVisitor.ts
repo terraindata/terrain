@@ -47,14 +47,27 @@ THE SOFTWARE.
 // import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
-import { NodeOptionsType } from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
+import ANodeVisitor from './visitors/ANodeVisitor';
+import AppendNodeVisitor from './visitors/AppendNodeVisitor';
+import DuplicateNodeVisitor from './visitors/DuplicateNodeVisitor';
+import FilterNodeVisitor from './visitors/FilterNodeVisitor';
+import GetNodeVisitor from './visitors/GetNodeVisitor';
+import JoinNodeVisitor from './visitors/JoinNodeVisitor';
+import LoadNodeVisitor from './visitors/LoadNodeVisitor';
+import PlusNodeVisitor from './visitors/PlusNodeVisitor';
+import PrependNodeVisitor from './visitors/PrependNodeVisitor';
+import PutNodeVisitor from './visitors/PutNodeVisitor';
+import SplitNodeVisitor from './visitors/SplitNodeVisitor';
+import StoreNodeVisitor from './visitors/StoreNodeVisitor';
+import SubstringNodeVisitor from './visitors/SubstringNodeVisitor';
+import UppercaseNodeVisitor from './visitors/UppercaseNodeVisitor';
 
 /**
  * A visitor should be stateless; thus, visiting methods should be static.
  */
-class TransformationNodeVisitor
+export default class TransformationNodeVisitor extends ANodeVisitor
 {
   public static visit(node: TransformationNode, doc: object): TransformationVisitResult
   {
@@ -62,33 +75,31 @@ class TransformationNodeVisitor
     switch (node.typeCode)
     {
       case TransformationNodeType.LoadNode:
-        return TransformationNodeVisitor.visitLoadNode(node, docCopy);
+        return LoadNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.StoreNode:
-        return TransformationNodeVisitor.visitStoreNode(node, docCopy);
+        return StoreNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.PutNode:
-        return TransformationNodeVisitor.visitPutNode(node, docCopy);
+        return PutNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.GetNode:
-        return TransformationNodeVisitor.visitGetNode(node, docCopy);
+        return GetNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.SplitNode:
-        return TransformationNodeVisitor.visitSplitNode(node, docCopy);
+        return SplitNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.JoinNode:
-        return TransformationNodeVisitor.visitJoinNode(node, docCopy);
+        return JoinNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.FilterNode:
-        return TransformationNodeVisitor.visitFilterNode(node, docCopy);
+        return FilterNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.DuplicateNode:
-        return TransformationNodeVisitor.visitDuplicateNode(node, docCopy);
-      case TransformationNodeType.RenameNode:
-        return TransformationNodeVisitor.visitRenameNode(node, docCopy);
+        return DuplicateNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.PlusNode:
-        return TransformationNodeVisitor.visitPlusNode(node, docCopy);
+        return PlusNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.PrependNode:
-        return TransformationNodeVisitor.visitPrependNode(node, docCopy);
+        return PrependNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.AppendNode:
-        return TransformationNodeVisitor.visitAppendNode(node, docCopy);
-      case TransformationNodeType.CapitalizeNode:
-        return TransformationNodeVisitor.visitCapitalizeNode(node, docCopy);
+        return AppendNodeVisitor.visit(node, docCopy);
+      case TransformationNodeType.UppercaseNode:
+        return UppercaseNodeVisitor.visit(node, docCopy);
       case TransformationNodeType.SubstringNode:
-        return TransformationNodeVisitor.visitSubstringNode(node, docCopy);
+        return SubstringNodeVisitor.visit(node, docCopy);
       default:
         return {
           errors: [
@@ -99,132 +110,4 @@ class TransformationNodeVisitor
         } as TransformationVisitResult;
     }
   }
-
-  public static visitLoadNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitStoreNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitPutNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitGetNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitSplitNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitJoinNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitFilterNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitDuplicateNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitRenameNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitPlusNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitPrependNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitAppendNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    return {} as TransformationVisitResult;
-  }
-
-  public static visitCapitalizeNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    for (const fieldID of node.fieldIDs.toJS())
-    {
-      if (typeof doc[fieldID] !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to capitalize a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      doc[fieldID] = doc[fieldID].toUpperCase();
-    }
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
-  }
-
-  public static visitSubstringNode(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
-    for (const fieldID of node.fieldIDs.toJS())
-    {
-      if (typeof doc[fieldID] !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to take a substring of a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      if (!opts.hasOwnProperty('from') || opts['from'] < 0)
-      {
-        return {
-          errors: [
-            {
-              message: 'Substring node: "from" property is missing or invalid',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      if (!opts.hasOwnProperty('length') || opts['length'] < 0)
-      {
-        return {
-          errors: [
-            {
-              message: 'Substring node: "length" property is missing or invalid',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      // Currently assumes a single from and length for all fieldIDs
-      doc[fieldID] = doc[fieldID].substr(opts['from'], opts['length']);
-    }
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
-  }
 }
-
-export default TransformationNodeVisitor;
