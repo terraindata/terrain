@@ -55,6 +55,7 @@ import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/Tem
 import { TemplateBase } from 'shared/etl/types/ETLTypes';
 
 export type ErrorHandler = (response: string | MidwayError ) => void;
+
 // making this an instance in case we want stateful things like cancelling ajax requests
 class ETLAjax
 {

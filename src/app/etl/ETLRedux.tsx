@@ -48,29 +48,208 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import MidwayError from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
 import ETLAjax from 'etl/ETLAjax';
+import { ErrorHandler } from 'etl/ETLAjax';
+
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
 import { _ETLState, ETLState } from './ETLTypes';
 
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 export interface ETLActionTypes
 {
-  placeholder: {
-    actionType: 'placeholder';
+  setLoading: {
+    actionType: 'setLoading';
+    key: string;
+    isLoading: boolean;
   };
+  getTemplate: {
+    actionType: 'getTemplate';
+    id: number;
+    onLoad: (response: List<ETLTemplate>) => void;
+    onError?: ErrorHandler;
+  };
+  fetchTemplates: {
+    actionType: 'fetchTemplates';
+    onLoad: (response: List<ETLTemplate>) => void;
+    onError?: ErrorHandler;
+  };
+  setTemplates: {
+    actionType: 'setTemplates';
+    templates: List<ETLTemplate>;
+  };
+  createTemplate: {
+    actionType: 'createTemplate';
+    template: ETLTemplate;
+    onLoad: (response: ETLTemplate) => void;
+    onError?: ErrorHandler;
+  };
+  saveTemplate: {
+    actionType: 'saveTemplate';
+    template: ETLTemplate;
+    onLoad: (response: ETLTemplate) => void;
+    onError?: ErrorHandler;
+  }
 }
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 {
   public reducers: ConstrainedMap<ETLActionTypes, ETLState> =
-    {
-      placeholder: (state, action) =>
+  {
+    getTemplate: (state, action) => state, // overriden reducers
+    fetchTemplates: (state, action) => state,
+    createTemplate: (state, action) => state,
+    saveTemplate: (state, action) => state,
+    setLoading: (state, action) => {
+      let value = _.get(state.loading, action.payload.key, 0);
+      if (action.payload.isLoading)
       {
-        return state;
-      },
-    };
+        value++;
+      }
+      else if (value !== 0)
+      {
+        value--;
+      }
+      else
+      {
+        // TODO throw an error?
+      }
+      const newLoading = _.extend({}, state.loading,
+        {[action.payload.key]: value}
+      );
+      return state.set('loading', newLoading);
+    },
+    setTemplates: (state, action) => {
+      return state.set('templates', action.payload.templates);
+    },
+  };
+
+  // TODO, add a thing to the state where we can log errors?
+  public onErrorFactory(onError: ErrorHandler, directDispatch: typeof ETLActions, key: string): ErrorHandler
+  {
+    return (response: string | MidwayError) =>
+    {
+      directDispatch({
+        actionType: 'setLoading',
+        isLoading: false,
+        key,
+      });
+      if (onError !== undefined)
+      {
+        onError(response);
+      }
+    }
+  }
+
+  // creates a function that updates the loading map, and also runs all the onLoads
+  public onLoadFactory<T>(onLoads: Array<(response: T) => void>, directDispatch, key: string)
+  {
+    return (response: T) =>
+    {
+      directDispatch({
+        actionType: 'setLoading',
+        isLoading: false,
+        key,
+      });
+      for (const onLoad of onLoads)
+      {
+        onLoad(response);
+      }
+    }
+  }
+
+  public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
+    const setTemplates = (templates: List<ETLTemplate>) => {
+      directDispatch({
+        actionType: 'setTemplates',
+        templates,
+      });
+    }
+    const loadFunctions = [
+      setTemplates,
+      action.onLoad
+    ];
+    ETLAjax.fetchTemplates(
+      this.onLoadFactory(loadFunctions, directDispatch, name),
+      this.onErrorFactory(action.onError, directDispatch, name),
+    );
+  }
+
+  public getTemplate(action: ETLActionType<'getTemplate'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
+    ETLAjax.getTemplate(
+      action.id,
+      this.onLoadFactory([action.onLoad], directDispatch, name),
+      this.onErrorFactory(action.onError, directDispatch, name),
+    );
+  }
+
+  public createTemplate(action: ETLActionType<'createTemplate'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
+    ETLAjax.createTemplate(
+      action.template,
+      this.onLoadFactory([action.onLoad], directDispatch, name),
+      this.onErrorFactory(action.onError, directDispatch, name),
+    );
+  }
+
+  public saveTemplate(action: ETLActionType<'saveTemplate'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
+    ETLAjax.saveTemplate(
+      action.template,
+      this.onLoadFactory([action.onLoad], directDispatch, name),
+      this.onErrorFactory(action.onError, directDispatch, name),
+    );
+  }
+
+  public overrideAct(action: Unroll<ETLActionTypes>)
+  {
+    switch (action.actionType)
+    {
+      case 'fetchTemplates':
+        return this.fetchTemplates.bind(this, action);
+      case 'getTemplate':
+        return this.getTemplate.bind(this, action);
+      case 'createTemplate':
+        return this.createTemplate.bind(this, action);
+      case 'saveTemplate':
+        return this.saveTemplate.bind(this, action);
+      default:
+        return undefined;
+    }
+  }
 }
 
 const ReduxInstance = new ETLRedux();

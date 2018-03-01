@@ -48,13 +48,16 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 class ETLStateC
 {
-  // public walkthrough: WalkthroughState = _WalkthroughState();
+  public templates: List<ETLTemplate> = List([]);
+  public loading: {[k: string]: number} = {}; // a tracker to verify if we are waiting on queries
 }
 export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor(ETLStateC);
