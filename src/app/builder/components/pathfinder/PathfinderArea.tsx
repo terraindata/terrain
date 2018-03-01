@@ -146,7 +146,7 @@ class PathfinderArea extends TerrainComponent<Props>
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
-    
+
     return (
       <ScrollingComponent
         className='pf-area'
@@ -197,7 +197,7 @@ class PathfinderArea extends TerrainComponent<Props>
               onStepChange={this.incrementStep}
               toSkip={toSkip}
             />
-            
+
             <PathfinderFilterSection
               pathfinderContext={pathfinderContext}
               filterGroup={path.filterGroup}

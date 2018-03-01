@@ -66,10 +66,9 @@ export interface Props
   canEdit: boolean;
   depth?: number;
   keyPath: KeyPath;
+  isSoftFilter?: boolean; // does this section apply to soft filters?
   onChange(keyPath: KeyPath, filterGroup: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
-  
-  isSoftFilter?: boolean; // does this section apply to soft filters?
 }
 
 const filterDropdownOptions = List(

@@ -105,6 +105,7 @@ export interface Props
   defaultOpen?: boolean; // default to open when the component mounts (but don't force open)
   large?: boolean;
   noShadow?: boolean;
+  autoFocus?: boolean;
 }
 
 @Radium
@@ -325,7 +326,7 @@ export class RouteSelector extends TerrainComponent<Props>
         <SearchInput
           value={state.searches.get(index)}
           onChange={this._fn(this.handleOptionSearch, index)}
-          autoFocus={state.focusedSetIndex === index}
+          autoFocus={state.focusedSetIndex === index || props.autoFocus}
           canEdit={true}
           onKeyDown={this.handleInputKeyDown}
           onFocus={this.handleOptionSearchFocus}
@@ -340,7 +341,7 @@ export class RouteSelector extends TerrainComponent<Props>
           value={value}
           label={'Value' /* TODO confirm copy */}
           onChange={this._fn(this.handleOtherChange, index)}
-          autoFocus={state.focusedSetIndex === index && optionSet.focusOtherByDefault}
+          autoFocus={(state.focusedSetIndex === index && optionSet.focusOtherByDefault) || props.autoFocus}
           isTextInput={true}
           canEdit={this.props.canEdit}
           onKeyDown={this.handleInputKeyDown}

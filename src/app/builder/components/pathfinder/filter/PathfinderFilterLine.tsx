@@ -78,7 +78,7 @@ export interface Props
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
   // so that we can make the according UI adjustments
-  
+
   isSoftFilter?: boolean; // does this section apply to soft filters?
 }
 
@@ -291,7 +291,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       case FieldType.Geopoint:
         value = _DistanceValue(Util.asJS(value));
         return value.distance + units[value.units] + ' of ' + value.address;
-     default:
+      default:
         return undefined;
     }
   }
@@ -429,10 +429,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                     selectedIndex={_.keys(units).indexOf(value.units)}
                     canEdit={pathfinderContext.canEdit}
                     optionsDisplayName={Map(units)}
-                    onChange={this._fn(this.handleMapValueChange,  'units')}
+                    onChange={this._fn(this.handleMapValueChange, 'units')}
                     openDown={true}
-                    // keyPath={this.props.keyPath.push('value').push('units')}
-                    // action={this.props.onChange}
+                  // keyPath={this.props.keyPath.push('value').push('units')}
+                  // action={this.props.onChange}
                   />
                 </div>
 
@@ -475,12 +475,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     if (this.props.filterLine.value[key] !== undefined)
     {
       filterLine = this.props.filterLine
-        .setIn(['value', key],  value);
+        .setIn(['value', key], value);
     }
     else
     {
       filterLine = this.props.filterLine
-        .setIn(['value'], _DistanceValue({[key]: value}));
+        .setIn(['value'], _DistanceValue({ [key]: value }));
     }
     this.props.onChange(this.props.keyPath, filterLine, false, false);
   }

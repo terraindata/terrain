@@ -75,7 +75,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     size: 1000,
     track_scores: true,
   });
-  
+
   // Sources
   const sourceInfo = parseSource(path.source);
   baseQuery = baseQuery.set('from', sourceInfo.from);
@@ -87,33 +87,30 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
       }),
     }),
   ]));
-  
+
   // Filters
-  let filterObj = parseFilters(path.filterGroup, inputs);
-  
+  const filterObj = parseFilters(path.filterGroup, inputs);
+
   // filterObj = filterObj.updateIn(['bool', 'filter'],
-    // (originalFilter) => originalFilter.concat(baseQuery.getIn(['query', 'bool', 'filter'])));
+  // (originalFilter) => originalFilter.concat(baseQuery.getIn(['query', 'bool', 'filter'])));
   baseQuery = baseQuery.updateIn(['query', 'bool', 'filter'],
-    (originalFilterArr) => originalFilterArr.push(filterObj)
+    (originalFilterArr) => originalFilterArr.push(filterObj),
   );
-  
-  
-  let softFiltersObj = parseFilters(path.softFilterGroup, inputs, true);
-  
+
+  const softFiltersObj = parseFilters(path.softFilterGroup, inputs, true);
+
   baseQuery = baseQuery.updateIn(['query', 'bool', 'must'],
     (originalMustArr) => originalMustArr.push(Map({
       bool: Map({
         should: softFiltersObj,
-        minimum_should_match: 0
+        minimum_should_match: 0,
       }),
-    }))
+    })),
   );
-  
+
   // filterObj = filterObj.setIn(['bool', 'should'], softFiltersObj);
-    // (originalShould) => originalShould.concat(baseQuery.getIn(['query', 'bool', 'should'])));
-  
-  
-  
+  // (originalShould) => originalShould.concat(baseQuery.getIn(['query', 'bool', 'should'])));
+
   // Scores
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
@@ -129,7 +126,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
       baseQuery = baseQuery.delete('sort');
     }
   }
-  
+
   // More
   const moreObj = parseAggregations(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
@@ -138,13 +135,13 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   {
     baseQuery = baseQuery.set('groupJoin', groupJoin);
   }
-  
+
   // Export, without inputs
   if (ignoreInputs)
   {
     return baseQuery;
   }
-  
+
   // Export, with inputs
   const text = stringifyWithParameters(baseQuery.toJS(), (name) => isInput(name, inputs));
   const parser: ESJSONParser = new ESJSONParser(text, true);
@@ -333,7 +330,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, forceShould = false): an
       {
         return 0; // forcing should for match quality
       }
-      
+
       return filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches));
     });
   }
@@ -509,13 +506,13 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         }),
       });
     case 'located':
-    const distanceObj = line.value as DistanceValue;
-    return Map({
-      geo_distance: Map({
-        distance: String(distanceObj.distance) + distanceObj.units,
-        [line.field]: distanceObj.location,
-      }),
-    });
+      const distanceObj = line.value as DistanceValue;
+      return Map({
+        geo_distance: Map({
+          distance: String(distanceObj.distance) + distanceObj.units,
+          [line.field]: distanceObj.location,
+        }),
+      });
     case 'isin':
     case 'isnotin':
       try

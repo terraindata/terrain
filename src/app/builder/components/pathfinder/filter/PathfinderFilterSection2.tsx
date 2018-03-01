@@ -168,7 +168,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public renderFilterLine(filterLine, keyPath: List<string | number>)
   {
     const { pathfinderContext, isSoftFilter } = this.props;
-    
+
     const successorKeyPath = keyPath.unshift('lines').set(keyPath.size, (keyPath.last() as number) + 1);
     const successor = this.props.filterGroup.getIn(successorKeyPath);
 
@@ -194,7 +194,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const { pathfinderContext, isSoftFilter } = this.props;
     // make key path relative to entire Path object
     keyPath = this.props.keyPath.push('lines').concat(keyPath).toList();
-    
+
     return (
       <PathfinderFilterGroup
         filterGroup={group}
@@ -358,7 +358,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const dropZoneStyle = { zIndex: dragging ? 20 : -1 };
     const itemStyle = { opacity: dragging ? 0.7 : 1 };
     const groupStyle = { opacity: dragging ? 0.7 : 1, zIndex: dragging ? 99 : 5 };
-    
+
     let title = PathfinderText.hardFilterSectionTitle;
     let subtitle = PathfinderText.hardFilterSectionSubtitle;
     if (isSoftFilter)
@@ -366,7 +366,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       title = PathfinderText.softFilterSectionTitle;
       subtitle = PathfinderText.softFilterSectionSubtitle;
     }
-    
+
     return (
       <div
         className='pf-section pf-filter-section'

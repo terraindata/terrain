@@ -581,14 +581,13 @@ class ElasticDataSourceC extends DataSource
       }).toList();
     }
 
-
     if (context.type === 'fields')
     {
       if (context.subtype === 'transform' || context.subtype === 'match')
       {
         let defaultOptions: List<ChoiceOption>;
         let acceptableFieldTypes: string[];
-        
+
         if (context.subtype === 'transform')
         {
           // TODO when reorganizing, move these to some better, constant space
@@ -620,21 +619,21 @@ class ElasticDataSourceC extends DataSource
           defaultOptions = List();
           acceptableFieldTypes = ['text'];
         }
-          
+
         const { dataSource } = context.source;
         const { index, types } = dataSource as any;
-        
+
         if (!index)
         {
           return defaultOptions;
         }
-        
+
         const acceptableCols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === String(index) &&
             acceptableFieldTypes.indexOf(column.datatype) !== -1,
         );
-        
+
         let acceptableOptions: List<ChoiceOption> = acceptableCols.map((col) =>
         {
           return _ChoiceOption({
@@ -643,16 +642,16 @@ class ElasticDataSourceC extends DataSource
             sampleData: col.sampleData,
           });
         }).toList();
-        
+
         let fieldNames = acceptableOptions.map((f) => f.value).toList();
         fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
         acceptableOptions = acceptableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
-        
+
         return acceptableOptions.concat(defaultOptions).toList();
       }
-      
+
       // Else, regular fields, include everything
-      
+
       const metaFields = ['_index', '_type', '_uid', '_id',
         '_source', '_size',
         '_all', '_field_names',

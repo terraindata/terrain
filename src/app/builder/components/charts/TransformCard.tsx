@@ -396,8 +396,9 @@ class TransformCard extends TerrainComponent<Props>
   {
     const query = overrideQuery || this.props.builder.query;
     let tqlString = '';
-    
-    try {
+
+    try
+    {
       tqlString = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
     } catch (e)
     {
@@ -405,7 +406,7 @@ class TransformCard extends TerrainComponent<Props>
       // TODO clear bars
       return;
     }
-    
+
     const tql = JSON.parse(tqlString);
     tql['size'] = 0;
     tql['sort'] = {};

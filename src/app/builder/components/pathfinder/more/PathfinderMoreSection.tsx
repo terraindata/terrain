@@ -56,6 +56,7 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import Util from 'app/util/Util';
+import RouteSelector from 'common/components/RouteSelector';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
@@ -65,7 +66,6 @@ import { _AggregationLine, _Path, More, Path, PathfinderContext, Source } from '
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
-import RouteSelector from 'common/components/RouteSelector';
 import './PathfinderMoreStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -197,31 +197,31 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             value: 'all',
             displayName: 'All',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '1',
             displayName: '1',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '3',
             displayName: '3',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '10',
             displayName: '10',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '100',
             displayName: '100',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
         ]),
         hasOther: true,
@@ -230,13 +230,14 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         column: true,
         hideSampleData: true,
         // hasOther: false,
-      }
+      },
     ]);
   }
 
   public handleSizePickerChange(optionSetIndex: number, value: any)
   {
-    this.props.builderActions.changePath(this.props.keyPath.butLast().toList().concat(List(['source', 'count'])).toList(), value);
+    this.props.builderActions.changePath
+      (this.props.keyPath.butLast().toList().concat(List(['source', 'count'])).toList(), value);
   }
 
   public renderNestedPaths()
@@ -254,13 +255,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 className='pf-more-nested'
                 key={i}
               >
-              <RouteSelector
-                optionSets={this.getSizeOptionSets() /* TODO store in state? */}
-                values={List([this.props.path.source.count])}
-                onChange={this.handleSizePickerChange}
-                canEdit={canEdit}
-                defaultOpen={false}
-              />
                 {
                   nested.get(i) !== undefined &&
                   <div className={'pf-nested-line'}>
@@ -310,6 +304,14 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             text={PathfinderText.moreSectionSubtitle}
           />
         }
+        <RouteSelector
+          optionSets={this.getSizeOptionSets() /* TODO store in state? */}
+          values={List([this.props.path.source.count])}
+          onChange={this.handleSizePickerChange}
+          canEdit={canEdit}
+          defaultOpen={false}
+          autoFocus={true}
+        />
         {
           // <DragAndDrop
           //   draggableItems={this.getAggregationLines()}
