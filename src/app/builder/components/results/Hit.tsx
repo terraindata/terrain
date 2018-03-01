@@ -68,6 +68,7 @@ import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
 import { _Hit, Hit } from './ResultTypes';
 import ExpandIcon from 'app/common/components/ExpandIcon';
+import FadeInOut from 'app/common/components/FadeInOut';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -276,6 +277,48 @@ class HitComponent extends TerrainComponent<Props> {
     })
   }
 
+  public renderNestedItems(items, format, field, depth)
+  {
+     return (
+       <div>
+        {
+          items.map((fields, i) =>
+          {
+            if (fields['_source'])
+            {
+              fields = _.extend({}, fields, fields['_source']);
+            }
+            // This happens when the source isn't properly set, such as in the Schema Browser
+            if (typeof fields !== 'object')
+            {
+              return null;
+            }
+            return (
+              <HitComponent
+                {...this.props}
+                resultsConfig={format && format.config}
+                index={i}
+                primaryKey={''}
+                expanded={false}
+                allowSpotlights={false}
+                key={field + String(i)}
+                style={borderColor(Colors().blockOutline)}
+                hitSize='small'
+                hit={_Hit({
+                  fields: Map(fields),
+                })}
+                depth={depth + 1}
+                nestedFields={undefined}
+                hideFieldNames={true}
+                firstVisibleField={this.state.scrollState.get(field)}
+              />);
+          },
+         )
+        }
+      </div>
+    );
+  }
+
   public renderNestedField(field)
   {
     const config = this.props.resultsConfig;
@@ -307,46 +350,23 @@ class HitComponent extends TerrainComponent<Props> {
         {
           this.renderNestedFieldHeader(field, depth, size, expandState)
         }
-        <div
-          className='hit-nested-content-values'
-          style={{height: expandState === NestedState.Expanded ? '100%' : 'auto'}}
-        >
-          {
-            expandState !== NestedState.Collapsed &&
-            allValues.map((fields, i) =>
+          <FadeInOut
+            open={expandState !== NestedState.Collapsed}
+          >
+            {this.renderNestedItems(allValues.slice(0, 1), format, field, depth)}
+          </FadeInOut>
+          <FadeInOut
+            open={expandState === NestedState.Expanded}
+          >
+            <div
+              className='hit-nested-content-values'
+              style={{height: expandState === NestedState.Expanded ? '100%' : 'auto'}}
+            >
             {
-              if (fields['_source'])
-              {
-                fields = _.extend({}, fields, fields['_source']);
-              }
-              // This happens when the source isn't properly set, such as in the Schema Browser
-              if (typeof fields !== 'object')
-              {
-                return null;
-              }
-              return (
-                <HitComponent
-                  {...this.props}
-                  resultsConfig={format && format.config}
-                  index={i}
-                  primaryKey={''}
-                  expanded={false}
-                  allowSpotlights={false}
-                  key={field + String(i)}
-                  style={borderColor(Colors().blockOutline)}
-                  hitSize='small'
-                  hit={_Hit({
-                    fields: Map(fields),
-                  })}
-                  depth={depth + 1}
-                  nestedFields={undefined}
-                  hideFieldNames={true}
-                  firstVisibleField={this.state.scrollState.get(field)}
-                />);
-            },
-            )
-          }
-        </div>
+              this.renderNestedItems(allValues.slice(1), format, field, depth)
+            }
+            </div>
+          </FadeInOut>
       </div>
     );
   }
