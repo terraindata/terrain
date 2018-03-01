@@ -325,6 +325,11 @@ export class TransformationEngine
     return this.fieldTypes.get(fieldID);
   }
 
+  public setFieldType(fieldID: number, typename: string): void
+  {
+    this.fieldTypes = this.fieldTypes.set(fieldID, typename);
+  }
+
   public getFieldEnabled(fieldID: number): boolean
   {
     return this.fieldEnabled.get(fieldID) === true;
@@ -503,7 +508,8 @@ export class TransformationEngine
         yadeep.set(output, value, obj[key], { create: true });
       }
     });
-    // if (this.fieldTypes.get(key) === 'array')
+    // If a field is supposed to be arary but is an object in its flattened
+    // representation, convert it back to an array
     this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
     {
       if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)

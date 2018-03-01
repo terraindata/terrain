@@ -44,14 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// Yet another deep JSON getter/setter module
+/**
+ * Yet another deep JSON getter/setter module.
+ * The point of the module is to allow getting and
+ * setting values in a deeply nested object via
+ * `KeyPath`s, including wildcards for operating
+ * on all children.
+ */
 
 import { KeyPath, WayPoint } from './KeyPath';
 
+/**
+ * Generic traversal method for a deeply-nested object.
+ * A stand-out feature is that it supports wildcards in
+ * paths, so the traversal may split into many branches
+ * of sub-traversals and operate on a number of leaves.
+ * The method is designed to take a callback that operates
+ * on any target values (e.g. get or set those values).
+ *
+ * NOTE that this is tested primarily against objectified
+ * documents (see `deepObjectify`).  Deeply nested objects
+ * with true arrays may result in undesired behavior sometimes.
+ * This function is much simpler not having to worry about
+ * processing true arrays.
+ *
+ * @param obj     The object to traverse / on which to operate.
+ * @param path    The path specifying which elements of `obj`
+ *                need to be acted upon.
+ * @param next    A callback function that specifies what to
+ *                do once a target element in `obj` has been
+ *                found.  Could return void (think get)
+ *                or a value (think set).
+ * @param options Any options for the traversal.  Currently
+ *                only `create` (bool) is used: whether to
+ *                create a target path in the doc if it
+ *                doesn't already exist.
+ */
 export function find(obj: object, path: KeyPath, next: (found) => any, options: object = {}): void
 {
   if (path.size === 0 || obj === undefined)
   {
+    // In all these kinds of statements, if next returns void, obj isn't modified
     obj = next(obj);
     return;
   }
@@ -60,6 +93,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
 
   const keys: string[] = Object.keys(obj);
 
+  // Handle the case of encountering a wildcard
   if (waypoint === '*')
   {
     const results: any[] = [];
@@ -75,6 +109,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
     return;
   }
 
+  // Create a field if it doesn't exist
   if (options['create'] === true && !obj.hasOwnProperty(waypoint))
   {
     obj[waypoint] = {};
@@ -92,6 +127,7 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
         return;
       } else
       {
+        // Recursively search down the document...
         return find(obj[keys[i]], path.shift(), next, options);
       }
     }
@@ -100,6 +136,14 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
   return next(undefined);
 }
 
+/**
+ * Gets the value(s) specified by the provided
+ * `KeyPath` in the document `obj`.
+ *
+ * @param obj  The deeply-nested doc to search.
+ * @param path The path of value(s) to get.
+ * @returns    The value(s) of `obj` at `path`.
+ */
 export function get(obj: object, path: KeyPath): any
 {
   let result: any;
@@ -111,7 +155,19 @@ export function get(obj: object, path: KeyPath): any
   return result;
 }
 
-export function set(obj: object, path: KeyPath, value: any, options: object = {}): any
+/**
+ * Sets the value(s) specified by the provided
+ * `KeyPath` in the document `obj`.
+ *
+ * NOTE: this modifies `obj`.
+ *
+ * @param obj     The object to modify.
+ * @param path    The path of the value(s) to set.
+ * @param value   The value to assign to all elements matching `path`.
+ * @param options Any options.  Currently supports only `create` (bool)
+ *                which specifies whether to create a field if it doesn't exist.
+ */
+export function set(obj: object, path: KeyPath, value: any, options: object = {}): void
 {
   find(obj, path, (found) =>
   {
