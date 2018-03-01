@@ -186,6 +186,7 @@ class InputComponent extends TerrainComponent<Props>
             onChange={this.changeValue}
             canEdit={true}
             language={this.props.language}
+            action={this.props.action}
           />
         </div>
       );
@@ -206,6 +207,7 @@ class InputComponent extends TerrainComponent<Props>
           inputValue={this.props.input.meta}
           coordinates={value}
           allowSearchByCoordinate={true}
+          action={this.props.action}
         />
       );
     }
@@ -224,6 +226,7 @@ class InputComponent extends TerrainComponent<Props>
         onFocus={this.focus}
         onBlur={this.blur}
         textStyle={fontColor(colorForInputType(this.props.input.inputType))}
+        action={this.props.action}
       />
     );
   }
@@ -288,6 +291,7 @@ class InputComponent extends TerrainComponent<Props>
               language={null}
               onFocus={this.focus}
               onBlur={this.blur}
+              action={this.props.action}
               textStyle={fontColor(inputColor)}
             />
             <Dropdown
