@@ -74,7 +74,7 @@ export interface ETLActionTypes
   };
   fetchTemplates: {
     actionType: 'fetchTemplates';
-    onLoad: (response: List<ETLTemplate>) => void;
+    onLoad?: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
   };
   setTemplates: {
@@ -178,8 +178,12 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     }
     const loadFunctions = [
       setTemplates,
-      action.onLoad
     ];
+    if (action.onLoad !== undefined)
+    {
+      loadFunctions.push(action.onLoad);
+    }
+
     ETLAjax.fetchTemplates(
       this.onLoadFactory(loadFunctions, directDispatch, name),
       this.onErrorFactory(action.onError, directDispatch, name),
