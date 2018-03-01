@@ -79,7 +79,7 @@ AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
 AppRouter.use('/export', ExportRouter.routes(), ExportRouter.allowedMethods());
 AppRouter.use('/credentials', CredentialRouter.routes(), CredentialRouter.allowedMethods());
-AppRouter.use('/etl/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
+AppRouter.use('/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
 // Add future routes here.
 
 AppRouter.get('/time', (ctx, next) =>

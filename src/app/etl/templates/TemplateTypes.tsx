@@ -73,7 +73,7 @@ class EditorDisplayStateC
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = -1;
-  public loading: boolean = false;
+  public loadingDocuments: boolean = false;
   public settingsFieldId: number = null;
   public settingsDisplayKeyPath: KeyPath = null;
   public engineVersion: number = 0;
@@ -100,12 +100,18 @@ export type ETLTemplate = WithIRecord<ETLTemplateC>;
 export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
   transformationEngine: TransformationEngine.load,
   // transformationConfig // todo
-  sources: (sources) => Map<string, SourceConfig>(sources)
+  sources: (sources) => {
+    console.log(sources);
+    return Map<string, SourceConfig>(sources)
     .map((obj, key) => _SourceConfig(obj, true))
-    .toMap(),
-  sinks: (sinks) => Map<string, SinkConfig>(sinks)
+    .toMap();
+  },
+  sinks: (sinks) => {
+    console.log(sinks);
+    return Map<string, SinkConfig>(sinks)
     .map((obj, key) => _SinkConfig(obj, true))
-    .toMap(),
+    .toMap();
+  }
 });
 
 export function templateForBackend(template: ETLTemplate): TemplateBase

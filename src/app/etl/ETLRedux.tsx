@@ -84,15 +84,19 @@ export interface ETLActionTypes
   createTemplate: {
     actionType: 'createTemplate';
     template: ETLTemplate;
-    onLoad: (response: ETLTemplate) => void;
+    onLoad: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
   };
   saveTemplate: {
     actionType: 'saveTemplate';
     template: ETLTemplate;
-    onLoad: (response: ETLTemplate) => void;
+    onLoad: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
-  }
+  };
+  updateLocalTemplates: {
+    actionType: 'updateLocalTemplates';
+    template: ETLTemplate;
+  };
 }
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
@@ -124,6 +128,19 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     },
     setTemplates: (state, action) => {
       return state.set('templates', action.payload.templates);
+    },
+    updateLocalTemplates: (state, action) => {
+      const index = state.templates.findIndex((template) => {
+        return template.id === action.payload.template.id;
+      });
+      if (index === -1)
+      {
+        return state.update('templates', (templates) => templates.push(action.payload.template));
+      }
+      else
+      {
+        return state.set('templates', action.payload.template);
+      }
     },
   };
 
@@ -215,9 +232,23 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       isLoading: true,
       key: name,
     });
+    const updateTemplate = (templates: List<ETLTemplate>) => {
+      if (templates.size > 0)
+      {
+        const template = templates.get(0);
+        directDispatch({
+          actionType: 'updateLocalTemplates',
+          template,
+        });
+      }
+      else
+      {
+        // TODO error?
+      }
+    };
     ETLAjax.createTemplate(
       action.template,
-      this.onLoadFactory([action.onLoad], directDispatch, name),
+      this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name),
       this.onErrorFactory(action.onError, directDispatch, name),
     );
   }
@@ -231,9 +262,23 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       isLoading: true,
       key: name,
     });
+    const updateTemplate = (templates: List<ETLTemplate>) => {
+      if (templates.size > 0)
+      {
+        const template = templates.get(0);
+        directDispatch({
+          actionType: 'updateLocalTemplates',
+          template,
+        });
+      }
+      else
+      {
+        // TODO error?
+      }
+    };
     ETLAjax.saveTemplate(
       action.template,
-      this.onLoadFactory([action.onLoad], directDispatch, name),
+      this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name),
       this.onErrorFactory(action.onError, directDispatch, name),
     );
   }

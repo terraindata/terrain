@@ -79,10 +79,10 @@ export type TemplateInDatabase = {
 export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfig
 {
   const newObj: TemplateObject = _.extend({}, obj);
-  if (newObj.transformationConfig != null)
-  {
-    newObj.transformationConfig = JSON.parse(newObj.transformationConfig as string);
-  }
+  // if (newObj.transformationConfig != null) // TODO
+  // {
+  //   newObj.transformationConfig = JSON.parse(newObj.transformationConfig as string);
+  // }
   if (newObj.sources != null)
   {
     newObj.sources = JSON.parse(newObj.sources as string);

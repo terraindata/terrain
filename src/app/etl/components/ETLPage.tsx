@@ -54,15 +54,28 @@ import FilePicker from 'common/components/FilePicker';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { ETLActions, ETLReducers } from 'etl/ETLRedux';
+import { ETLState } from 'etl/ETLTypes';
 import './ETLPage.less';
 
 export interface Props
 {
   children?: any;
+
+  // injected props
+  act?: typeof ETLActions;
+  etl?: ETLState;
 }
 
-export default class ETLPage extends TerrainComponent<Props>
+class ETLPage extends TerrainComponent<Props>
 {
+  public componentWillMount()
+  {
+    this.props.act({
+      actionType: 'fetchTemplates'
+    });
+  }
+
   public render()
   {
     return (
@@ -73,5 +86,10 @@ export default class ETLPage extends TerrainComponent<Props>
       </div>
     );
   }
-
 }
+
+export default Util.createContainer(
+  ETLPage,
+  ['etl'],
+  { act: ETLActions },
+);

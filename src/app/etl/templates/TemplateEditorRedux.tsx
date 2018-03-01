@@ -68,6 +68,7 @@ import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointType
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
 import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
+import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 
 const { List, Map } = Immutable;
 
@@ -78,6 +79,9 @@ export interface TemplateEditorActionTypes
   setTemplate: {
     actionType: 'setTemplate';
     template: ETLTemplate;
+  };
+  rebuildFieldMap: {
+    actionType: 'rebuildFieldMap';
   };
   setFieldMap: { // this should be the only way to edit the template tree
     actionType: 'setFieldMap';
@@ -124,6 +128,10 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       {
         return state.set('isDirty', false).
           set('template', action.payload.template);
+      },
+      rebuildFieldMap: (state, action) => {
+        const newFieldMap = createTreeFromEngine(state.template.transformationEngine);
+        return state.set('fieldMap', newFieldMap);
       },
       setFieldMap: (state, action) =>
       {
@@ -184,7 +192,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
     directDispatch({
       actionType: 'setDisplayState',
       state: {
-        loading: true,
+        loadingDocuments: true,
       },
     });
     const onLoad = (documents: List<object>) =>
@@ -207,7 +215,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       directDispatch({
         actionType: 'setDisplayState',
         state: {
-          loading: false,
+          loadingDocuments: false,
         },
       });
     };
@@ -219,7 +227,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       directDispatch({
         actionType: 'setDisplayState',
         state: {
-          loading: false,
+          loadingDocuments: false,
         },
       });
     };

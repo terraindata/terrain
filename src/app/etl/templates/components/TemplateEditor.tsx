@@ -53,13 +53,16 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import MidwayError from 'shared/error/MidwayError';
+
 import { MultiModal } from 'common/components/overlay/MultiModal';
+import { ETLActions } from 'etl/ETLRedux';
+import { ETLState } from 'etl/ETLTypes';
 import EditorDocumentsPreview from 'etl/templates/components/preview/EditorDocumentsPreview';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
 const { List } = Immutable;
@@ -68,7 +71,9 @@ export interface Props
 {
   // below from container
   templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
+  editorAct?: typeof TemplateEditorActions;
+  etl?: ETLState;
+  etlAct?: typeof ETLActions;
 }
 
 @Radium
@@ -82,7 +87,7 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public setModalRequests(requests)
   {
-    this.props.act({
+    this.props.editorAct({
       actionType: 'setModalRequests',
       requests,
     });
@@ -163,7 +168,12 @@ class TemplateEditor extends TerrainComponent<Props>
         <div className='editor-top-bar-item' style={itemStyle} key='redo'>
           Redo
         </div>
-        <div className='editor-top-bar-item' style={itemStyle} key='save'>
+        <div
+          className='editor-top-bar-item'
+          style={itemStyle}
+          onClick={this.handleSaveClicked}
+          key='save'
+        >
           Save
         </div>
       </div>
@@ -190,12 +200,72 @@ class TemplateEditor extends TerrainComponent<Props>
       </div>
     );
   }
+
+  public handleSaveClicked()
+  {
+    const { template } = this.props.templateEditor;
+    const { etlAct, editorAct } = this.props;
+
+    const handleLoad = (savedTemplates: List<ETLTemplate>) => {
+      if (savedTemplates.size > 0)
+      {
+        const savedTemplate = savedTemplates.get(0);
+        console.log(savedTemplate);
+        editorAct({
+          actionType: 'setTemplate',
+          template: savedTemplate,
+        });
+        editorAct({
+          actionType: 'rebuildFieldMap',
+        });
+      }
+      else
+      {
+        // todo handle error
+      }
+    };
+    const handleError = (ev) =>
+    {
+      console.log('error');
+    }
+
+    let templateForSave = template;
+    if (template.id === -1) // then its a new template
+    {
+      const randstring = Math.random().toString(36).substring(2, 7);
+      templateForSave = templateForSave.set('templateName', `Test Template${randstring}`);
+      console.log(randstring);
+      console.log(templateForSave);
+
+      etlAct({
+        actionType: 'createTemplate',
+        template: templateForSave,
+        onLoad: handleLoad,
+        onError: handleError,
+      });
+    }
+    else
+    {
+      etlAct({
+        actionType: 'saveTemplate',
+        template: templateForSave,
+        onLoad: handleLoad,
+        onError: handleError,
+      });
+    }
+  }
 }
 
 const emptyList = List([]);
 
 export default Util.createContainer(
   TemplateEditor,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
+  [
+    ['templateEditor'],
+    ['etl'],
+  ],
+  {
+    editorAct: TemplateEditorActions,
+    etlAct: ETLActions,
+  },
 );

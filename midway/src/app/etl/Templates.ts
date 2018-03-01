@@ -132,9 +132,9 @@ export default class Templates
     return { valid, message: `${messages}`};
   }
 
-  public async create(template: TemplateConfig): Promise<TemplateConfig>
+  public async create(template: TemplateConfig): Promise<TemplateConfig[]>
   {
-    return new Promise<TemplateConfig>(async (resolve, reject) =>
+    return new Promise<TemplateConfig[]>(async (resolve, reject) =>
     {
       const { valid, message } = await this.validateTemplate(template);
       if (!valid)
@@ -152,9 +152,9 @@ export default class Templates
     });
   }
 
-  public async update(template: TemplateConfig): Promise<TemplateConfig>
+  public async update(template: TemplateConfig): Promise<TemplateConfig[]>
   {
-    return new Promise<TemplateConfig>(async (resolve, reject) =>
+    return new Promise<TemplateConfig[]>(async (resolve, reject) =>
     {
       const { valid, message } = await this.validateTemplate(template, true);
       if (!valid)
@@ -173,9 +173,28 @@ export default class Templates
     });
   }
 
-  public async upsert(newTemplate: TemplateConfig): Promise<TemplateConfig>
+  public async upsert(newTemplate: TemplateConfig): Promise<TemplateConfig[]>
   {
-    const toUpsert = templateForSave(newTemplate);
-    return App.DB.upsert(this.templateTable, toUpsert) as Promise<TemplateConfig>;
+    return new Promise<TemplateConfig[]>(async (resolve, reject) =>
+    {
+      let toUpsert;
+      try {
+        toUpsert = templateForSave(newTemplate);
+      }
+      catch (e)
+      {
+        return reject(`Failed to prepare template for save: ${String(e)}`);
+      }
+      const rawTemplates = await App.DB.upsert(this.templateTable, toUpsert) as TemplateInDatabase[];
+      try {
+        const templates = rawTemplates.map((value, index) =>
+          destringifySavedTemplate(value as TemplateInDatabase));
+        resolve(templates);
+      }
+      catch (e)
+      {
+        return reject(`Failed to destringify saved templates: ${String(e)}`);
+      }
+    });
   }
 }

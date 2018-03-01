@@ -77,7 +77,7 @@ class ETLAjax
     }
     return Ajax.req(
       'get',
-      'etl/templates/',
+      'templates/',
       { },
       handleResponse,
       {
@@ -98,7 +98,7 @@ class ETLAjax
     }
     return Ajax.req(
       'get',
-      `etl/templates/${id}`,
+      `templates/${id}`,
       { },
       handleResponse,
       {
@@ -109,18 +109,18 @@ class ETLAjax
 
   public createTemplate(
     template: ETLTemplate,
-    onLoad: (response: ETLTemplate) => void,
+    onLoad: (response: List<ETLTemplate>) => void,
     onError: ErrorHandler,
   )
   {
     const templateToSave = templateForBackend(template);
-    const handleResponse = (responseTemplate: TemplateBase) =>
+    const handleResponse = (templates: TemplateBase[]) =>
     {
-      onLoad(_ETLTemplate(responseTemplate, true));
+      onLoad(this.templatesToImmutable(templates));
     }
     return Ajax.req(
-      'get',
-      `etl/templates/create`,
+      'post',
+      `templates/create`,
       templateToSave,
       handleResponse,
       {
@@ -131,18 +131,23 @@ class ETLAjax
 
   public saveTemplate(
     template: ETLTemplate,
-    onLoad: (response: ETLTemplate) => void,
+    onLoad: (response: List<ETLTemplate>) => void,
     onError: ErrorHandler,
   )
   {
+    const id = template.id;
     const templateToSave = templateForBackend(template);
-    const handleResponse = (responseTemplate: TemplateBase) =>
+    const handleResponse = (templates: TemplateBase[]) =>
     {
-      onLoad(_ETLTemplate(responseTemplate, true));
+      onLoad(this.templatesToImmutable(templates));
+    }
+    if (typeof id !== 'number')
+    {
+      onError(`id "${id}" is invalid`);
     }
     return Ajax.req(
-      'get',
-      `etl/templates/create`,
+      'post',
+      `templates/update/${id}`,
       templateToSave,
       handleResponse,
       {
