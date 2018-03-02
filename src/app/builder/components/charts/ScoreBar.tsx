@@ -153,7 +153,7 @@ class ScoreBar extends TerrainComponent<Props>
       });
     }
 
-    this.props.onBeforeChange(value);
+    this.props.onBeforeChange && this.props.onBeforeChange(value);
   }
 
   private handleWeightChange(value: number)

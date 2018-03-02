@@ -176,7 +176,7 @@ class HitComponent extends TerrainComponent<Props> {
         {
           return true;
         }
-        if (key !== 'hit' && key !== 'resultsConfig'
+        else if (key !== 'hit' && key !== 'builder'
           && this.props[key] !== nextProps[key])
         {
           return true;
@@ -337,7 +337,7 @@ class HitComponent extends TerrainComponent<Props> {
     let format = config && config.enabled && config.formats && config.formats.get(field);
     format = _Format(Util.asJS(format));
     let allValues = Util.asJS(this.props.hit.fields.get(field));
-    if (allValues === undefined || allValues.length === undefined)
+    if (!allValues|| allValues.length === undefined)
     {
       return null;
     }

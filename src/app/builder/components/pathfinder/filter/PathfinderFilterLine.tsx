@@ -126,13 +126,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           // Somestimes comesbeforeagroup changes from undefined => null => false, causes unnecessary rerender
           return true;
         }
-        else if (!_.isEqual(nextProps[key], this.props[key]))
-        {
-          return true;
-        }
+      }
+      else if (!_.isEqual(nextProps[key], this.props[key]))
+      {
+        return true;
       }
     }
-    return false;
+    return this.state !== nextState;
   }
 
   public render()
@@ -563,7 +563,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         filterLine = filterLine.set('comparison', null); // comparisonOptions.get(0).value);
       }
     }
-
     this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }
 }

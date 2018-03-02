@@ -352,7 +352,7 @@ class SearchableDropdown extends TerrainComponent<Props>
     if (!filteredOptions || !filteredOptions.size)
     {
       // still be able to hit enter when there are no options
-      if (event.keyCode === 13)
+      if (event.keyCode === 1)
       {
         this.clickHandler(-1);
         this.refs['input']['blur']();

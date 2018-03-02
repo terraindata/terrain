@@ -105,60 +105,6 @@
 				margin: 0px 4px;
 			}
 			@t: 6px;
-			.pf-score-line-transform-arrow-open {
-			    border-top: 2px solid #47a7ff;
-			    border-right: 2px solid #47a7ff;
-			    position: absolute;
-			    z-index: 9;
-			    -webkit-transition: all 0.15s;
-			    transition: all 0.15s;
-			    height: 30px;
-			    width: 10;
-			    right: 4px;
-			    top: 16px;
-			    .pf-score-line-transform-arrow-inner-open {
-			    	.transition;
-			      	position: absolute;
-			      	left: 5px;
-			      	bottom: -7px;
-			      	width: 0px;
-			      	height: 0px;
-			      	// http://html-tuts.com/css-arrows-up-down-left-right-triangle/
-			      	border-top: @t solid transparent; // change this one to the card color
-			      	border-bottom: @t solid transparent;
-			      	border-right: @t solid transparent;
-			      	border-left: @t solid transparent;
-			      	border-top-color: #46a7ff;
-			    }
-		 	}
-		 	.pf-score-line-transform-arrow-closed {
-				border-top: 2px solid #47a7ff;
-			    border-right: 2px solid #47a7ff;
-			    position: absolute;
-			    z-index: 9;
-			    .transition;
-			    width: 10;
-			    right: 50px;
-			    top: 16px;
-			    .pf-score-line-transform-arrow-inner-closed {
-			    	.transition;
-						.transition;
-					    position: absolute;
-					    left: 10px;
-					    bottom: -5px;
-					    width: 0px;
-					    height: 0px;
-				      	border-top: @t solid transparent; // change this one to the card color
-				      	border-bottom: @t solid transparent;
-				      	border-right: @t solid transparent;
-				      	border-left: @t solid transparent;
-					    border-top-color: #46a7ff;
-					    .rotate(-90deg);
-			    }
-		 	}
-		 	.pf-score-line-expand {
-		 		margin-left: 12px;
-		 	}
 		}
 		.pf-score-line-text {
 			font-size: @font-size;
@@ -187,6 +133,9 @@
 				font-size: 16px;
 				width: 33.33%;
 				padding-left: 10px;
+			}
+			.field-weight {
+				display: none;
 			}
 
 			.dropdown-wrapper {
