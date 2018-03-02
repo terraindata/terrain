@@ -200,8 +200,6 @@ const BuilderReducers =
           Ajax.countColumn(index + '/' + value, state.query.algorithmId);
         }
       }
-      console.log('BUILDER REDUCER CHANGE PATH');
-      console.log(action.payload.keyPath);
       return state.setIn(
         action.payload.keyPath,
         action.payload.value,

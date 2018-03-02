@@ -158,7 +158,6 @@ class PathfinderArea extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('HERE');
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;

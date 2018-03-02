@@ -66,6 +66,7 @@ import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderCon
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
+import './PathfinderFilterStyle.less';
 
 export interface Props
 {
