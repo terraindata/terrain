@@ -50,7 +50,7 @@ import ADocumentTransform from './ADocumentTransform';
 /**
  * Applies export transformations to a result stream
  */
-export default abstract class ExportTransform extends ADocumentTransform
+export default class ExportTransform extends ADocumentTransform
 {
   private exportt: Export;
   private configuration: object;

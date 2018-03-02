@@ -60,7 +60,9 @@ import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
+import AExportTransform from './streams/AExportTransform';
 import CSVExportTransform from './streams/CSVExportTransform';
+import ExportTransform from './streams/ExportTransform';
 import JSONExportTransform from './streams/JSONExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
@@ -156,16 +158,6 @@ export class Export
         columnNames.push('TERRAINRANK');
       }
 
-      let writer: any;
-      if (exportConfig.filetype === 'csv')
-      {
-        writer = new CSVExportTransform(columnNames);
-      }
-      else if (exportConfig.filetype === 'json' || exportConfig.filetype === 'json [type object]')
-      {
-        writer = new JSONExportTransform();
-      }
-
       const originalMapping: object = {};
       // generate original mapping if there were any renames
       const allNames = Object.keys(mapping);
@@ -193,7 +185,6 @@ export class Export
       const respStream: any = await qh.handleQuery(payload);
       if (respStream === undefined || (respStream.hasError !== undefined && respStream.hasError()))
       {
-        writer.end();
         throw Error('Nothing to export.');
       }
 
@@ -203,7 +194,7 @@ export class Export
         exportConfig.transformations = exportConfig.transformations.filter((transformation) => transformation['name'] !== 'extract');
 
         winston.info('Beginning export transformations.');
-        const cfg = {
+        const exportTransformConfig = {
           extractTransformations,
           exportConfig,
           fieldArrayDepths: {},
@@ -211,37 +202,21 @@ export class Export
           mapping: originalMapping,
         };
 
-        respStream.on('data', (doc) =>
+        const documentTransform: ExportTransform = new ExportTransform(this, exportTransformConfig);
+        let exportTransform: AExportTransform;
+        switch (exportConfig.filetype)
         {
-          if (doc === undefined || doc === null)
-          {
-            writer.end();
-          }
+          case 'json:':
+            exportTransform = new JSONExportTransform();
+            break;
+          case 'csv:':
+            exportTransform = new CSVExportTransform(columnNames);
+            break;
+          default:
+            throw Error('File type must be either CSV or JSON.');
+        }
 
-          try
-          {
-            doc = this._postProcessDoc(doc, cfg);
-            writer.write(doc);
-          }
-          catch (e)
-          {
-            winston.error(e);
-            throw e;
-          }
-        });
-
-        respStream.on('end', () =>
-        {
-          writer.end();
-        });
-
-        respStream.on('error', (err) =>
-        {
-          winston.error(err);
-          throw err;
-        });
-
-        return resolve(writer);
+        return respStream.pipe(documentTransform).pipe(exportTransform);
       }
       catch (e)
       {
