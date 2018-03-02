@@ -58,6 +58,7 @@ import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { PathfinderLine } from '../PathfinderLine';
 import { FilterGroup, FilterLine } from '../PathfinderTypes';
+import ExpandIcon from 'common/components/ExpandIcon';
 const CarrotIcon = require('images/icon_carrot.svg?name=CarrotIcon');
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 export interface Props
@@ -106,24 +107,20 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             />
             :
             <div className='pf-filter-group-name-wrapper'>
+            <ExpandIcon
+                onClick={this._fn(
+                  this.props.onChange,
+                  this._ikeyPath(this.props.keyPath, 'collapsed'),
+                  !filterGroup.collapsed)
+                }
+                open={!filterGroup.collapsed}
+              />
               <div
                 onClick={this._toggle('editingName')}
                 className='pf-filter-group-name'
               >
                 {filterGroup.name}
               </div>
-              <CarrotIcon
-                className={classNames({
-                  'pf-filter-group-carrot': true,
-                  'pf-filter-group-carrot-open': !filterGroup.collapsed,
-                })}
-                onClick={this._fn(
-                  this.props.onChange,
-                  this._ikeyPath(this.props.keyPath, 'collapsed'),
-                  !filterGroup.collapsed)
-                }
-                style={getStyle('fill', Colors().iconColor)}
-              />
             </div>
         }
         {
