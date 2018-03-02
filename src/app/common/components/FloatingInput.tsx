@@ -207,7 +207,7 @@ export class FloatingInput extends TerrainComponent<Props>
   {
     super(props);
     
-    this.debouncedExecuteChange = _.debounce(this.executeChange, 1000);
+    this.debouncedExecuteChange = _.debounce(this.executeChange, 750);
   }
 
   public componentWillReceiveProps(nextProps: Props)
