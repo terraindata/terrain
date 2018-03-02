@@ -57,20 +57,131 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { Languages } from 'shared/etl/types/ETLTypes';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
+import { ElasticTypes, JsToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
+import
+{
+  _TemplateField,
+  TemplateField,
+} from 'etl/templates/FieldTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
 
 export type Props = TemplateEditorFieldProps;
 
+interface SettingsState
+{
+  elasticType: ElasticTypes;
+  analyzed: boolean;
+  analyzer: string;
+}
+
 class ElasticFieldSettings extends TemplateEditorField<Props>
 {
+  public state: SettingsState;
+
+  private inputMap: InputDeclarationMap<SettingsState> = {
+    elasticType: {
+      type: DisplayType.Pick,
+      displayName: 'Elastic Type',
+      options: {
+        pickOptions: this.getTypeOptions,
+        indexResolver: this.resolveTypeIndex,
+      }
+    },
+    analyzed: {
+      type: DisplayType.CheckBox,
+      displayName: 'Analyze This Field',
+      group: 'analyzer row',
+    },
+    analyzer: {
+      type: DisplayType.Pick,
+      displayName: 'Analyzer',
+      group: 'analyzer row',
+      options: {
+        pickOptions: this.getAnalyzerOptions,
+        indexResolver: this.resolveAnalyzerIndex,
+      },
+      shouldShow: this.shouldShowAnalyzer,
+    },
+  };
+
+  constructor(props)
+  {
+    super(props);
+    this.state = {
+      elasticType: ElasticTypes.Auto,
+      analyzed: false,
+      analyzer: 'standard',
+    }
+  }
+
+  @memoizeOne
+  public _getTypeOptions(jsType: FieldTypes)
+  {
+    return List(JsToElasticOptions[jsType]);
+  }
+
+  public getTypeOptions()
+  {
+    const { fieldId } = this.props;
+    const jsType = this._engine().getFieldType(fieldId);
+    return this._getTypeOptions(jsType as FieldTypes);
+  }
+
+  public resolveTypeIndex(option)
+  {
+    const { fieldId } = this.props;
+    const jsType = this._engine().getFieldType(fieldId);
+    return JsToElasticOptions[jsType].indexOf(option);
+  }
+
+  public shouldShowAnalyzer(s: SettingsState)
+  {
+    return s.analyzed ? DisplayState.Active : DisplayState.Hidden;
+  }
+
+  @memoizeOne
+  public getAnalyzerOptions()
+  {
+    return List(['standard']);
+  }
+
+  public resolveAnalyzerIndex()
+  {
+    return 0;
+  }
+
   public render()
   {
-    return null
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        inputState={this.state}
+        onStateChange={this.setState}
+        centerForm={true}
+        mainButton={{
+          name: 'Apply',
+          onClicked: this.handleSettingsApplied,
+        }}
+        style={{
+          flexGrow: 1,
+          padding: '12px',
+        }}
+        actionBarStyle={{
+          justifyContent: 'center',
+        }}
+      />
+    )
+  }
+
+  public handleSettingsApplied()
+  {
+
   }
 }
 

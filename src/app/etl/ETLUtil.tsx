@@ -112,6 +112,8 @@ export class UpdateChecker
  *  This enables you to tell if two objects are "visibly" equal to each other.
  *  Two objects a and b are visibly equal to each other if and only if
  *  For each property K of the objects that you've seen, a[K] === b[K]
+ *
+ *  todo: look into ES6 proxies?
  */
 
 export class PropertyTracker<T>

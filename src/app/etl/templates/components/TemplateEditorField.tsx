@@ -64,6 +64,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, ETLTemplate, FieldMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, SinkConfig, Sources, SourceConfig, SinkOptionsType, SourceOptionsType } from 'shared/etl/types/EndpointTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 /*
  *  This class defines a base class with useful functions that are used by components
@@ -149,6 +150,11 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return (this.props as Props & Injected).template;
   }
 
+  public _engine(): TransformationEngine
+  {
+    return this._template().transformationEngine;
+  }
+
   public _fieldMap(props = this.props): FieldMap
   {
     return (props as Props & Injected).fieldMap;
@@ -172,7 +178,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _proxy(): FieldNodeProxy
   {
-    const engine = this._template().transformationEngine;
+    const engine = this._engine();
     const tree = new FieldTreeProxy(this._fieldMap(), engine, this.onRootMutationBound, this.updateEngineVersionBound);
     return new FieldNodeProxy(tree, this.props.fieldId);
   }

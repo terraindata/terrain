@@ -50,8 +50,8 @@ import * as _ from 'lodash';
 import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import
 {
-  _ElasticFieldSettings, _TemplateField,
-  ElasticFieldSettings, TemplateField,
+  _TemplateField,
+  TemplateField,
 } from 'etl/templates/FieldTypes';
 import
 {

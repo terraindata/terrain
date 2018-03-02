@@ -47,27 +47,17 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationNode as TransformationNodeBase } from 'shared/transformations/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-class ElasticFieldSettingsC
-{
-  public langType: Languages = Languages.Elastic;
-  public isAnalyzed: boolean = true;
-  public analyzer: string = '';
-}
-export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
-export const _ElasticFieldSettings = makeConstructor(ElasticFieldSettingsC);
-
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
 {
   public readonly isIncluded: boolean = true;
-  public readonly langSettings: ElasticFieldSettings = null;
+  public readonly langSettings = null;
   public readonly type: FieldTypes = 'object';
   public readonly fieldId: number = -1;
   public readonly name: string = '';
@@ -86,9 +76,7 @@ class TemplateFieldC
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
-export const _TemplateField = makeExtendedConstructor(TemplateFieldC, true, {
-  langSettings: _ElasticFieldSettings,
-});
+export const _TemplateField = makeExtendedConstructor(TemplateFieldC, true);
 
 // recordized version of transformationNode.
 // This had to be copied due to how Typescript treats inherited members

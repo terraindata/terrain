@@ -44,36 +44,39 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
-
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
+// string values for this enum are how elastic expects them
 export enum ElasticTypes
 {
-  TEXT = 'text',
-  LONG = 'long',
-  BOOLEAN = 'boolean',
-  DATE = 'date',
-  ARRAY = 'array',
-  NESTED = 'nested',
-  DOUBLE = 'double',
-  SHORT = 'short',
-  BYTE = 'byte',
-  INTEGER = 'integer',
-  HALF_FLOAT = 'half_float',
-  FLOAT = 'float',
-  GEO_POINT = 'geo_point',
+  Auto = 'auto', // this is not actually an elastic type
+  Text = 'text',
+  Long = 'long',
+  Boolean = 'boolean',
+  Date = 'date',
+  Array = 'array',
+  Nested = 'nested',
+  Double = 'double',
+  Short = 'short',
+  Byte = 'byte',
+  Integer = 'integer',
+  HalfFloat = 'half_float',
+  Float = 'float',
+  GeoPoint = 'geo_point',
 }
 
-export const JS_TO_ES = {
-  array: ElasticTypes.ARRAY,
-  object: ElasticTypes.NESTED,
-  string: ElasticTypes.TEXT,
-  number: ElasticTypes.DOUBLE,
-  boolean: ElasticTypes.BOOLEAN,
-  null: ElasticTypes.TEXT,
-  undefined: ElasticTypes.TEXT,
+export const JsToElasticOptions: {
+  [k in FieldTypes]: ElasticTypes[]
+} = {
+  array: [ElasticTypes.Auto, ElasticTypes.Array],
+  object: [ElasticTypes.Auto, ElasticTypes.Nested],
+  string: [ElasticTypes.Auto, ElasticTypes.Text, ElasticTypes.Date, ElasticTypes.GeoPoint],
+  number: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Long, ElasticTypes.Short, ElasticTypes.Byte,
+    ElasticTypes.Integer, ElasticTypes.HalfFloat, ElasticTypes.Float],
+  boolean: [ElasticTypes.Auto, ElasticTypes.Boolean],
 };
 
 export function jsToElastic(type): ElasticTypes
 {
-  const eType = JS_TO_ES[type];
-  return eType !== undefined ? eType : ElasticTypes.TEXT;
+  const eType = JsToElasticOptions[type][0];
+  return eType !== undefined ? eType : ElasticTypes.Text;
 }
