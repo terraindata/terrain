@@ -44,56 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { TransformationNode } from '../TransformationNode';
-import { NodeOptionsType } from '../TransformationNodeType';
 import TransformationNodeType from '../TransformationNodeType';
-import TransformationVisitError from '../TransformationVisitError';
-import TransformationVisitResult from '../TransformationVisitResult';
-import ANodeVisitor from './ANodeVisitor';
+import TransformationNode from './TransformationNode';
 
-export default class SubstringNodeVisitor extends ANodeVisitor
+export default class SubstringTransformationNode extends TransformationNode
 {
-  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+  public constructor(id: number,
+    fieldIDs: List<number>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.SubstringNode)
   {
-    const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
-    for (const fieldID of node.fieldIDs.toJS())
-    {
-      if (typeof doc[fieldID] !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to take a substring of a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      if (!opts.hasOwnProperty('from') || opts['from'] < 0)
-      {
-        return {
-          errors: [
-            {
-              message: 'Substring node: "from" property is missing or invalid',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      if (!opts.hasOwnProperty('length') || opts['length'] < 0)
-      {
-        return {
-          errors: [
-            {
-              message: 'Substring node: "length" property is missing or invalid',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      // Currently assumes a single from and length for all fieldIDs
-      doc[fieldID] = doc[fieldID].substr(opts['from'], opts['length']);
-    }
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+    super(id, fieldIDs, options, typeCode);
   }
 }

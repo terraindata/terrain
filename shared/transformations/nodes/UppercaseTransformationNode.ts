@@ -44,15 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { TransformationNode } from '../TransformationNode';
-import TransformationVisitResult from '../TransformationVisitResult';
-import ANodeVisitor from './ANodeVisitor';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
 
-export default class LoadNodeVisitor extends ANodeVisitor
+export default class UppercaseTransformationNode extends TransformationNode
 {
-  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+  public constructor(id: number,
+    fieldIDs: List<number>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.UppercaseNode)
   {
-    // TODO
-    return {} as TransformationVisitResult;
+    super(id, fieldIDs, options, typeCode);
   }
 }

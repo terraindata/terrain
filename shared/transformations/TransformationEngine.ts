@@ -53,9 +53,9 @@ import objectify from '../util/deepObjectify';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
-import { TransformationNode } from './TransformationNode';
+import TransformationNode from './nodes/TransformationNode';
+import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
 import TransformationNodeType from './TransformationNodeType';
-import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
@@ -89,7 +89,7 @@ export class TransformationEngine
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
       parsed['dag']['nodes'][i]['value'] =
-        new TransformationNode(raw['id'], raw['typeCode'], List<number>(raw['fieldIDs']), raw['options']);
+        TransformationNode.make(raw['id'], raw['typeCode'], List<number>(raw['fieldIDs']), raw['options']);
     }
     return parsed;
   }
@@ -195,7 +195,8 @@ export class TransformationEngine
       const toTraverse: string[] = GraphLib.alg.preorder(this.dag, nodeKey);
       for (let i = 0; i < toTraverse.length; i++)
       {
-        const transformationResult: TransformationVisitResult = TransformationNodeVisitor.visit(this.dag.node(toTraverse[i]), output);
+        const visitor: TransformationEngineNodeVisitor = new TransformationEngineNodeVisitor();
+        const transformationResult: TransformationVisitResult = visitor.applyTransformationNode(this.dag.node(toTraverse[i]), output);
         if (transformationResult.errors !== undefined)
         {
           // winston.error('Transformation encountered errors!:');

@@ -44,33 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { TransformationNode } from '../TransformationNode';
-import TransformationNodeVisitor from '../TransformationNodeVisitor';
-import TransformationVisitError from '../TransformationVisitError';
-import TransformationVisitResult from '../TransformationVisitResult';
-import ANodeVisitor from './ANodeVisitor';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
 
-export default class UppercaseNodeVisitor extends ANodeVisitor
+export default class PrependTransformationNode extends TransformationNode
 {
-  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+  public constructor(id: number,
+    fieldIDs: List<number>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.PrependNode)
   {
-    for (const fieldID of node.fieldIDs.toJS())
-    {
-      if (typeof doc[fieldID] !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to capitalize a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      doc[fieldID] = doc[fieldID].toUpperCase();
-    }
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
+    super(id, fieldIDs, options, typeCode);
   }
 }

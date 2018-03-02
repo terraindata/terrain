@@ -44,20 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import TransformationVisitError from 'sharedtransformations/TransformationVisitError';
-import { TransformationNode } from '../TransformationNode';
-import TransformationVisitResult from '../TransformationVisitResult';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
 
-export default abstract class ANodeVisitor
+export default class SplitTransformationNode extends TransformationNode
 {
-  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+  public constructor(id: number,
+    fieldIDs: List<number>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.SplitNode)
   {
-    return {
-      errors: [
-        {
-          message: 'Cannot visit abstract visitor class.  Visit a non-abstract inheritor instead.',
-        } as TransformationVisitError,
-      ],
-    } as TransformationVisitResult;
+    super(id, fieldIDs, options, typeCode);
   }
 }

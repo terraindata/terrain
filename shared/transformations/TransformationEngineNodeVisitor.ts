@@ -59,76 +59,157 @@ import StoreTransformationNode from './nodes/StoreTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
-import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
+import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
-export default abstract class TransformationNodeVisitor
+export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
-  public abstract visitDefault(node: TransformationNode, doc: object): TransformationVisitResult;
+  public applyTransformationNode(node: TransformationNode, doc: object): TransformationVisitResult
+  {
+    if (node === undefined)
+    {
+      return {} as TransformationVisitResult;
+    }
+
+    return node.accept(this, doc);
+  }
+
+  public visitDefault(node: TransformationNode, doc: object): TransformationVisitResult
+  {
+    return {} as TransformationVisitResult;
+  }
 
   public visitAppendNode(node: AppendTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitDuplicateNode(node: DuplicateTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitFilterNode(node: FilterTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitGetNode(node: GetTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitJoinNode(node: JoinTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitLoadNode(node: LoadTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitPlusNode(node: PlusTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitPrependNode(node: PrependTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitPutNode(node: PutTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitSplitNode(node: SplitTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitStoreNode(node: StoreTransformationNode, doc: object): TransformationVisitResult
   {
+    // TODO
     return this.visitDefault(node, doc);
   }
 
   public visitSubstringNode(node: SubstringTransformationNode, doc: object): TransformationVisitResult
   {
-    return this.visitDefault(node, doc);
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
+    for (const fieldID of node.fieldIDs.toJS())
+    {
+      if (typeof doc[fieldID] !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to take a substring of a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      if (!opts.hasOwnProperty('from') || opts['from'] < 0)
+      {
+        return {
+          errors: [
+            {
+              message: 'Substring node: "from" property is missing or invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      if (!opts.hasOwnProperty('length') || opts['length'] < 0)
+      {
+        return {
+          errors: [
+            {
+              message: 'Substring node: "length" property is missing or invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      // Currently assumes a single from and length for all fieldIDs
+      doc[fieldID] = doc[fieldID].substr(opts['from'], opts['length']);
+    }
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object): TransformationVisitResult
   {
-    return this.visitDefault(node, doc);
+    for (const fieldID of node.fieldIDs.toJS())
+    {
+      if (typeof doc[fieldID] !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to capitalize a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      doc[fieldID] = doc[fieldID].toUpperCase();
+    }
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 }
