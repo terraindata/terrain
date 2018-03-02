@@ -57,11 +57,10 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 class TemplateFieldC
 {
   public readonly isIncluded: boolean = true;
-  public readonly langSettings = null;
+  public readonly fieldProps: object = {};
   public readonly type: FieldTypes = 'object';
   public readonly fieldId: number = -1;
   public readonly name: string = '';
-  // public readonly children: List<TemplateField> = List([]);
   public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
 

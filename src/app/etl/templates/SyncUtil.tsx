@@ -165,6 +165,7 @@ export function createFieldFromEngine(
   return _TemplateField({
     isIncluded: engine.getFieldEnabled(id),
     fieldId: id,
+    fieldProps: engine.getFieldProps(id),
     type: engine.getFieldType(id) as FieldTypes,
     transformations,
     name: enginePath[enginePath.length - 1],

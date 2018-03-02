@@ -65,38 +65,39 @@ import
   _TemplateField,
   TemplateField,
 } from 'etl/templates/FieldTypes';
-import { ElasticTypes, JsToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { defaultProps, ElasticFieldProps, ElasticTypes, JsToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './FieldSettings.less';
 
 export type Props = TemplateEditorFieldProps;
 
-interface SettingsState
-{
-  elasticType: ElasticTypes;
-  analyzed: boolean;
-  analyzer: string;
-}
-
 class ElasticFieldSettings extends TemplateEditorField<Props>
 {
-  public state: SettingsState;
+  public state: ElasticFieldProps;
 
-  private inputMap: InputDeclarationMap<SettingsState> = {
+  private inputMap: InputDeclarationMap<ElasticFieldProps> = {
     elasticType: {
       type: DisplayType.Pick,
       displayName: 'Elastic Type',
+      group: 'first row',
       options: {
         pickOptions: this.getTypeOptions,
         indexResolver: this.resolveTypeIndex,
       },
     },
-    analyzed: {
+    isPrimaryKey: {
+      type: DisplayType.CheckBox,
+      displayName: 'Primary Key',
+      group: 'first row',
+      shouldShow: this.showPrimaryKey,
+    },
+    isAnalyzed: {
       type: DisplayType.CheckBox,
       displayName: 'Analyze This Field',
       group: 'analyzer row',
+      shouldShow: this.showIsAnalyzed,
     },
     analyzer: {
       type: DisplayType.Pick,
@@ -106,18 +107,34 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
         pickOptions: this.getAnalyzerOptions,
         indexResolver: this.resolveAnalyzerIndex,
       },
-      shouldShow: this.shouldShowAnalyzer,
+      shouldShow: this.showAnalyzer,
     },
   };
 
   constructor(props)
   {
     super(props);
-    this.state = {
-      elasticType: ElasticTypes.Auto,
-      analyzed: false,
-      analyzer: 'standard',
-    };
+    this.state = this.getFormState(props);
+  }
+
+  public showPrimaryKey(s: ElasticFieldProps)
+  {
+    const jsType = this._field().type;
+    return (jsType !== 'array' && jsType !== 'object' && jsType !== 'boolean') ?
+      DisplayState.Active : DisplayState.Inactive;
+  }
+
+  public showIsAnalyzed(s: ElasticFieldProps)
+  {
+    const jsType = this._field().type;
+    return (jsType === 'string' && !s.isPrimaryKey) ?
+      DisplayState.Active : DisplayState.Inactive;
+  }
+
+  public showAnalyzer(s: ElasticFieldProps)
+  {
+    return (this.showIsAnalyzed(s) === DisplayState.Active && s.isAnalyzed) ?
+      DisplayState.Active : DisplayState.Inactive;
   }
 
   @memoizeOne
@@ -128,21 +145,12 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public getTypeOptions()
   {
-    const { fieldId } = this.props;
-    const jsType = this._engine().getFieldType(fieldId);
-    return this._getTypeOptions(jsType as FieldTypes);
+    return this._getTypeOptions(this._field().type);
   }
 
   public resolveTypeIndex(option)
   {
-    const { fieldId } = this.props;
-    const jsType = this._engine().getFieldType(fieldId);
-    return JsToElasticOptions[jsType].indexOf(option);
-  }
-
-  public shouldShowAnalyzer(s: SettingsState)
-  {
-    return s.analyzed ? DisplayState.Active : DisplayState.Hidden;
+    return JsToElasticOptions[this._field().type].indexOf(option);
   }
 
   @memoizeOne
@@ -156,32 +164,69 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
     return 0;
   }
 
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this._willFieldChange(nextProps))
+    {
+      this.setState({
+        formState: this.getFormState(nextProps),
+      });
+    }
+  }
+
+  public getFormState(props): ElasticFieldProps
+  {
+    const field = this._fieldMap(props).get(props.fieldId);
+    const { type, fieldProps } = field;
+    const elasticFieldProps = fieldProps['elastic'];
+    return defaultProps(type, elasticFieldProps);
+  }
+
   public render()
   {
     return (
-      <DynamicForm
-        inputMap={this.inputMap}
-        inputState={this.state}
-        onStateChange={this.setState}
-        centerForm={true}
-        mainButton={{
-          name: 'Apply',
-          onClicked: this.handleSettingsApplied,
-        }}
-        style={{
-          flexGrow: 1,
-          padding: '12px',
-        }}
-        actionBarStyle={{
-          justifyContent: 'center',
-        }}
-      />
+      <div className='field-advanced-settings'>
+        <DynamicForm
+          inputMap={this.inputMap}
+          inputState={this.state}
+          onStateChange={this.handleStateChange}
+          centerForm={true}
+          mainButton={{
+            name: 'Apply',
+            onClicked: this.handleSettingsApplied,
+          }}
+          secondButton={{
+            name: 'Close',
+            onClicked: this.handleCloseSettings,
+          }}
+          style={{
+            flexGrow: 1,
+            padding: '12px',
+          }}
+          actionBarStyle={{
+            justifyContent: 'center',
+          }}
+        />
+      </div>
     );
   }
 
   public handleSettingsApplied()
   {
+    const field = this._field();
+    this._proxy().setFieldProps(this.state, Languages.Elastic);
+  }
 
+  public handleCloseSettings()
+  {
+    this.props.act({
+      actionType: 'closeSettings',
+    });
+  }
+
+  public handleStateChange(state)
+  {
+    this.setState(state);
   }
 }
 

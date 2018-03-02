@@ -44,8 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
+import * as _ from 'lodash';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 // string values for this enum are how elastic expects them
+
 export enum ElasticTypes
 {
   Auto = 'auto', // this is not actually an elastic type
@@ -62,6 +64,31 @@ export enum ElasticTypes
   HalfFloat = 'half_float',
   Float = 'float',
   GeoPoint = 'geo_point',
+}
+
+// field props for each transformation engine field
+export interface ElasticFieldProps
+{
+  isAnalyzed: boolean;
+  analyzer: string;
+  elasticType: ElasticTypes;
+  isPrimaryKey: boolean;
+}
+
+// compute smart defaults for a given props object and js field type. Could be undefined or empty
+export function defaultProps(type: FieldTypes, obj: any = {}): ElasticFieldProps
+{
+  // in case the passed object is undefined or not an object
+  const config = (obj == null || typeof obj !== 'object') ? {} : obj;
+  return _.extend(
+    {
+      isAnalyzed: type === 'string',
+      isPrimaryKey: false,
+      analyzer: 'standard',
+      elasticType: ElasticTypes.Auto,
+    },
+    config,
+  );
 }
 
 export const JsToElasticOptions: {

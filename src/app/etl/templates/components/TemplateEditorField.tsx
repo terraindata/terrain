@@ -145,27 +145,22 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return !compareObjects(this.props, nextProps, customComparatorMap);
   }
 
-  public _template(): ETLTemplate
+  protected _template(): ETLTemplate
   {
     return (this.props as Props & Injected).template;
   }
 
-  public _engine(): TransformationEngine
-  {
-    return this._template().transformationEngine;
-  }
-
-  public _fieldMap(props = this.props): FieldMap
+  protected _fieldMap(props = this.props): FieldMap
   {
     return (props as Props & Injected).fieldMap;
   }
 
-  public _field(id = this.props.fieldId): TemplateField
+  protected _field(id = this.props.fieldId): TemplateField
   {
     return this._fieldMap().get(id);
   }
 
-  public _uiState(): PropertyTracker<EditorDisplayState>
+  protected _uiState(): PropertyTracker<EditorDisplayState>
   {
     return this.uiStateTracker;
   }
@@ -178,7 +173,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _proxy(): FieldNodeProxy
   {
-    const engine = this._engine();
+    const engine = this._template().transformationEngine;
     const tree = new FieldTreeProxy(this._fieldMap(), engine, this.onRootMutationBound, this.updateEngineVersionBound);
     return new FieldNodeProxy(tree, this.props.fieldId);
   }

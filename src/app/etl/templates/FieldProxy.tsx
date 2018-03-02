@@ -52,7 +52,7 @@ const { List, Map } = Immutable;
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateTypes';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
@@ -201,17 +201,18 @@ export class FieldNodeProxy
   public changeType(newType: FieldTypes)
   {
     const field = this.field();
-    const engine: TransformationEngine = this.tree.getEngine();
+    const engine = this.tree.getEngine();
     const existingType = engine.getFieldType(field.fieldId);
-    if (existingType !== 'array' && existingType !== 'object')
-    {
-      engine.setFieldType(field.fieldId, newType);
-      this.syncWithEngine();
-    }
-    else
-    {
-      // TODO say no
-    }
+    engine.setFieldType(field.fieldId, newType);
+    this.syncWithEngine();
+  }
+
+  public setFieldProps(newFormState: object, language: Languages)
+  {
+    const field = this.field();
+    const engine = this.tree.getEngine();
+    engine.setFieldProp(field.fieldId, EnginePath([language]), newFormState);
+    this.syncWithEngine();
   }
 
   public syncWithEngine() // This function will mutate the field from which it was called

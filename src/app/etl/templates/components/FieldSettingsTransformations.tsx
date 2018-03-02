@@ -115,7 +115,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         <TransformationEditor
           key={currentIndex}
           transformation={field.transformations.get(currentIndex)}
-          engine={this._engine()}
+          engine={this._template().transformationEngine}
           fieldID={this._field().fieldId}
           onTransformationChange={this.handleTransformationChange}
           onClose={this.handleUIClose}
@@ -128,7 +128,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
   {
     return (
       <TransformationCreator
-        engine={this._engine()}
+        engine={this._template().transformationEngine}
         fieldID={this._field().fieldId}
         onTransformationCreated={this.handleTransformationChange}
         onClose={this.handleUIClose}
