@@ -624,11 +624,17 @@ class ElasticDataSourceC extends DataSource
               displayName: '_score',
               value: '_score',
               sampleData: List([]),
+              meta: {
+                fieldType: FieldType.Numerical,
+              }
             }),
             _ChoiceOption({
               displayName: '_size',
               value: '_size',
               sampleData: List([]),
+              meta: {
+                fieldType: FieldType.Numerical,
+              }
             }),
           ]);
           acceptableFieldTypes =
@@ -684,13 +690,16 @@ class ElasticDataSourceC extends DataSource
         '_source', '_size',
         '_all', '_field_names',
         '_parent', '_routing',
-        '_meta'];
+        '_meta', '_score'];
       const defaultOptions = List(metaFields.map((option) =>
       {
         return _ChoiceOption({
           displayName: option,
           value: option,
           sampleData: List([]),
+          meta: {
+            fieldType: ['_score', '_size'].indexOf(option) !== -1 ? FieldType.Numerical : FieldType.Text,
+          },
           icon: fieldTypeToIcon[FieldType.Any], // TODO
         });
       }));
