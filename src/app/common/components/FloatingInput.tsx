@@ -82,6 +82,11 @@ const Container = ContainerC`
     border: none !important;
     background: none;
   `)}
+
+  ${(props) => props['noBg'] && (`
+    border: none !important;
+    background: transparent;
+  `)}
 `;
 
 const LEFT = (props) => props.large ? '18px' : '12px';
@@ -125,7 +130,13 @@ const inputStyle = `
   color: ${Colors().active};
 
   &:hover {
-    border-color: ${Colors().active};
+    background-color: transparent;
+    border: 1px solid ${Colors().active} !important;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border: 1px solid ${Colors().active} !important;
   }
 `;
 
@@ -139,6 +150,10 @@ const Input = InputC`
   padding-left: ${LEFT};
   padding-right: ${LEFT};
   font-size: ${fontSizeFn};
+  ${(props) => props['noBg'] && (`
+    border: none !important;
+    background-color: transparent;
+  `)}
 `;
 
 const InputDivC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
@@ -156,6 +171,7 @@ const InputDiv = InputDivC`
 interface InputProps
 {
   noBorder?: boolean;
+  noBg?: boolean;
   id?: string;
   onChange?: (value) => void;
   onFocus?: () => void;
@@ -168,6 +184,7 @@ interface InputProps
 interface InputDivProps
 {
   noBorder?: boolean;
+  noBg?: boolean;
   onClick?: () => void;
   large?: boolean;
   isFloating?: boolean;
@@ -185,6 +202,7 @@ export interface Props
   onFocus?: (id: any) => void;
   canEdit?: boolean;
   noBorder?: boolean;
+  noBg?: boolean;
   large?: boolean;
   forceFloat?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -252,6 +270,7 @@ export class FloatingInput extends TerrainComponent<Props>
       <Container
         large={props.large}
         noBorder={props.noBorder}
+        noBg={props.noBg}
         onClick={this._fn(props.onClick)}
         className={props.className}
       >
@@ -261,6 +280,7 @@ export class FloatingInput extends TerrainComponent<Props>
         <Label
           large={props.large}
           noBorder={props.noBorder}
+          noBg={props.noBg}
           isFloating={isFloating}
           htmlFor={state.myId}
           style={isFloating ? floatingLabelStyle : undefined}
@@ -311,6 +331,7 @@ export class FloatingInput extends TerrainComponent<Props>
           onChange={this.handleChange}
           autoFocus={props.autoFocus}
           noBorder={props.noBorder}
+          noBg={props.noBg}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           id={state.myId}
@@ -327,6 +348,7 @@ export class FloatingInput extends TerrainComponent<Props>
         ref={props.getValueRef}
         onClick={this.handleClick}
         noBorder={props.noBorder}
+        noBg={props.noBg}
       >
         {
           value

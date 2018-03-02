@@ -55,6 +55,7 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import FloatingInput from 'app/common/components/FloatingInput';
+import FadeInOut from 'app/common/components/FadeInOut';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import Util from 'app/util/Util';
 import BuilderActions from '../../../data/BuilderActions';
@@ -240,10 +241,90 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     ]);
   }
 
+  public getMinMatchesOptionSets()
+  {
+    return List([
+      {
+        key: 'value',
+        options: List([
+          {
+            value: '1',
+            displayName: '1',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '2',
+            displayName: '2',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '3',
+            displayName: '3',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '5',
+            displayName: '5',
+            hasOther: true,
+            sampleData: List([])
+          },
+          {
+            value: '10',
+            displayName: '10',
+            hasOther: true,
+            sampleData: List([])
+          },
+        ]),
+        hasOther: true,
+        shortNameText: 'Drop If Less Than',
+        headerText: 'Drop If Less Than',
+        column: true,
+        hideSampleData: true,
+        // hasOther: false,
+      }
+    ]);
+  }
+
   public handleSizePickerChange(optionSetIndex: number, value: any)
   {
+    if (value !== '')
+    {
+      this.props.builderActions.changePath(
+        this
+          .props
+          .keyPath
+          .butLast()
+          .toList()
+          .concat(
+            List(['source', 'count']
+          )).toList(),
+        value
+      );
+    }
+  }
+
+  public handleNestedSizePickerChange(i: number, optionSetIndex: number, value: any)
+  {
+    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
+
     this.props.builderActions.changePath
-      (this.props.keyPath.butLast().toList().concat(List(['source', 'count'])).toList(), value);
+      (nestedKeyPath.concat(List(['source', 'count'])).toList(), value);
+  }
+
+  public handleAlgorithmNameChange(i: number, value: any)
+  {
+    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
+    this.props.builderActions.changePath(nestedKeyPath.push('name'), value);
+  }
+
+  public handleMinMatchesChange(optionSetIndex: number, value: any)
+  {
+    const { keyPath } = this.props;
+
+    this.props.builderActions.changePath(keyPath.butLast().toList().push('minMatches'), value);
   }
 
   public renderNestedPaths()
@@ -261,12 +342,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 className='pf-more-nested'
                 key={i}
               >
-                {
-                  nested.get(i) !== undefined &&
-                  <div className={'pf-nested-line'}>
-                    <div className={'pf-nested-line-inner'} />
-                  </div>
-                }
                 <div className='pf-more-nested-reference'>
                   {
                     tooltip(
@@ -277,10 +352,24 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         onChange={this._fn(this.handleReferenceChange, i)}
                         canEdit={canEdit}
                         className='pf-more-nested-reference-input'
+                        noBg={true}
                       />,
                       PathfinderText.referenceExplanation,
                     )
                   }
+                  <FadeInOut
+                    open={nested.get(i) !== undefined && nested.get(i).name !== undefined}
+                  >
+                    <FloatingInput
+                      value={nested.get(i) != undefined ? nested.get(i).name : undefined}
+                      onChange={this._fn(this.handleAlgorithmNameChange, i)}
+                      label={'Algorithm Name'}
+                      isTextInput={true}
+                      canEdit={canEdit}
+                      className='pf-more-nested-name-input'
+                      noBg={true}
+                    />
+                  </FadeInOut>
                   <RemoveIcon
                     onClick={this._fn(this.handleDeleteNested, i)}
                     className='pf-more-nested-remove close'
@@ -319,6 +408,17 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           autoFocus={true}
         />
         {
+          this.props.keyPath.includes('nested') ?
+            <RouteSelector
+              optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
+              values={List([this.props.path.minMatches])}
+              onChange={this.handleMinMatchesChange}
+              canEdit={canEdit}
+              defaultOpen={false}
+              autoFocus={true}
+            /> : null
+        }
+        {
           // <DragAndDrop
           //   draggableItems={this.getAggregationLines()}
           //   onDrop={this.handleLinesReorder}
@@ -333,15 +433,16 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         <div>
           {this.renderNestedPaths()}
           {
-            tooltip(
-              <PathfinderCreateLine
-                canEdit={canEdit}
-                onCreate={this.handleAddNested}
-                text={PathfinderText.createNestedLine}
-                style={{ marginTop: 12 }}
-              />,
-              PathfinderText.nestedExplanation,
-            )
+            !this.props.keyPath.includes('nested') ?
+              tooltip(
+                <PathfinderCreateLine
+                  canEdit={canEdit}
+                  onCreate={this.handleAddNested}
+                  text={PathfinderText.createNestedLine}
+                  style={{ marginTop: 12 }}
+                />,
+                PathfinderText.nestedExplanation,
+              ) : null
           }
         </div>
       </div>

@@ -161,30 +161,13 @@ class PathfinderArea extends TerrainComponent<Props>
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
+
     return (
       <ScrollingComponent
         className='pf-area'
         horizontalStrength={this.hStrength}
         verticalStrength={this.vStrength}
       >
-        <FadeInOut
-          open={path.name !== undefined}
-        >
-          <div
-            className='pf-column-name-background'
-            style={backgroundColor(Colors().sidebarBg)}
-          >
-            <FloatingInput
-              value={path.name}
-              onChange={this._fn(this.changePathData, 'name')}
-              label={'Algorithm Name'}
-              isTextInput={true}
-              canEdit={pathfinderContext.canEdit}
-              className='pf-column-name'
-            />
-          </div>
-        </FadeInOut>
-
         <div className='pathfinder-column-content'>
           <PathfinderSourceSection
             pathfinderContext={pathfinderContext}
