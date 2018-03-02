@@ -100,7 +100,6 @@ export interface TemplateEditorActionTypes
     source: SourceConfig;
     algorithms?: IMMap<ID, Algorithm>; // if its an algorithm TODO replace this with a better midway route
     file?: File; // if its an uploaded file
-    mergeKey?: string; // TODO implement
     onFetched?: (hits: List<object>) => void;
   };
   setDisplayState: {
@@ -198,11 +197,6 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
     });
     const onLoad = (documents: List<object>) =>
     {
-      if (action.mergeKey != null)
-      {
-        // tslint:disable-next-line
-        console.error('TODO implement this');
-      }
       directDispatch({
         actionType: 'setDisplayState',
         state: {
@@ -237,14 +231,29 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       case Sources.Algorithm: {
         const options: SourceOptionsType<Sources.Algorithm> = action.source.options as any;
         const algorithms = action.algorithms;
+        if (algorithms == null)
+        {
+          onError('Algorithms not provided');
+          return;
+        }
         const algorithmId = options.algorithmId;
         const algorithm = (algorithms != null && algorithms.has(algorithmId)) ? algorithms.get(algorithmId) : null;
+        if (algorithm == null)
+        {
+          onError('Could not find algorithm');
+          return;
+        }
         // TODO errors if algorithm is null
         fetchDocumentsFromAlgorithm(algorithm, onLoad, onError, DefaultDocumentLimit);
         break;
       }
       case Sources.Upload: {
         const file = action.file;
+        if (file == null)
+        {
+          onError('File not provided');
+          return;
+        }
         const config = action.source.fileConfig;
         fetchDocumentsFromFile(file, config, onLoad, onError, DefaultDocumentLimit);
         break;

@@ -69,4 +69,9 @@ export default class ETLRouteUtil
   {
     browserHistory.push(`/etl/edit/templateId=${templateId}`);
   }
+
+  public static isRouteNewTemplate(location)
+  {
+    return location.pathname === '/etl/edit/new';
+  }
 }

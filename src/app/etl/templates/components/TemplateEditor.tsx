@@ -57,6 +57,7 @@ import MidwayError from 'shared/error/MidwayError';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
+import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
 import EditorDocumentsPreview from 'etl/templates/components/preview/EditorDocumentsPreview';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
@@ -222,6 +223,10 @@ class TemplateEditor extends TerrainComponent<Props>
         editorAct({
           actionType: 'rebuildFieldMap',
         });
+        if (savedTemplate.id !== template.id) // if its a save, or something weird happens
+        {
+          ETLRouteUtil.gotoEditTemplate(savedTemplate.id);
+        }
       }
       else
       {

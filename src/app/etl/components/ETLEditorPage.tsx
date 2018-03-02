@@ -49,6 +49,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { withRouter } from 'react-router';
 
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
@@ -72,11 +73,12 @@ import './ETLEditorPage.less';
 
 export interface Props
 {
+  // injected
+  location?: any;
   params?: {
     algorithmId?: number,
     templateId?: number;
   };
-  // injected
   algorithms?: IMMap<ID, Algorithm>;
   walkthrough?: WalkthroughState;
   templates?: List<ETLTemplate>;
@@ -164,14 +166,13 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
   }
 
-  public loadExisting()
+  public loadExisting(templateId: number)
   {
     const onLoad = (response: List<ETLTemplate>) =>
     {
-      const { params, editorAct, templates, algorithms } = this.props;
-      const templateId = getTemplateId(params);
+      const { editorAct, templates, algorithms } = this.props;
       const index = templates.findIndex((template) => template.id === templateId);
-      // TODO what happens if the algorithms haven't loaded in yet?
+      // TODO what happens if algorithms haven't loaded in yet?
       if (index === -1)
       {
         // TODO error
@@ -208,23 +209,58 @@ class ETLEditorPage extends TerrainComponent<Props>
       onLoad,
       onError,
     });
-
   }
 
-  public componentWillMount()
+  public componentWillReceiveProps(nextProps)
   {
-    this.props.editorAct({
+    const { params } = this.props;
+    const { nextParams } = nextProps;
+    if (
+      ETLRouteUtil.isRouteNewTemplate(this.props.location) &&
+      getTemplateId(nextParams) !== -1
+    )
+    {
+      // then we went from new template to saved template
+    }
+    else if (
+      getAlgorithmId(params) !== -1 &&
+      getTemplateId(nextParams) !== -1
+    )
+    {
+      // then we went from an algorithm export to saved template
+    }
+    else if (params.algorithmId !== nextParams.algorithmId)
+    {
+      this.initFromRoute();
+    }
+    else if (params.templateId !== nextParams.templateId)
+    {
+      this.initFromRoute();
+    }
+    else if (ETLRouteUtil.isRouteNewTemplate(this.props.location) !==
+      ETLRouteUtil.isRouteNewTemplate(nextProps.location))
+    {
+      this.initFromRoute();
+    }
+  }
+
+  public initFromRoute()
+  {
+    const { params, editorAct } = this.props;
+    editorAct({
       actionType: 'resetState',
     });
-    if (this.props.params.algorithmId !== undefined)
+    if (params.algorithmId !== undefined)
     {
       this.initFromAlgorithm();
     }
-    else if (this.props.params.templateId !== undefined)
+    else if (params.templateId !== undefined)
     {
-      this.loadExisting();
+      const templateId = getTemplateId(params);
+      this.loadExisting(templateId);
     }
-    else if (this.props.walkthrough.source.type != null) // TODO check if its walkthrough
+    else if (ETLRouteUtil.isRouteNewTemplate(this.props.location) &&
+      this.props.walkthrough.source.type != null)
     {
       this.initFromWalkthrough();
     }
@@ -232,6 +268,14 @@ class ETLEditorPage extends TerrainComponent<Props>
     {
       ETLRouteUtil.gotoWalkthroughStep(0);
     }
+  }
+
+  public componentWillMount()
+  {
+    this.props.editorAct({
+      actionType: 'resetState',
+    });
+    this.initFromRoute();
   }
 
   public render()
@@ -248,7 +292,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default withRouter(Util.createContainer(
   ETLEditorPage,
   [
     ['library', 'algorithms'],
@@ -256,4 +300,4 @@ export default Util.createContainer(
     ['etl', 'templates'],
   ],
   { editorAct: TemplateEditorActions, etlAct: ETLActions },
-);
+));

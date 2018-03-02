@@ -117,7 +117,7 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
 export function templateForBackend(template: ETLTemplate): TemplateBase
 {
   const obj: TemplateObject = (template as any).toObject(); // shallow js object
-  obj.transformationEngine = obj.transformationEngine.json();
+  obj.transformationEngine = obj.transformationEngine.toJSON();
   // obj.transformationConfig = recordForSave(obj.transformationConfig); TODO
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
