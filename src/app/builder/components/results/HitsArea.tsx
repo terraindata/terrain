@@ -889,7 +889,10 @@ column if you have customized the results view.');
   public hideConfig(config: ResultsConfig)
   {
     // Update the default config for this index
-    Ajax.updateResultsConfig(this.state.indexName, config);
+    if (config.enabled)
+    {
+      Ajax.updateResultsConfig(this.state.indexName, config);
+    }
     this.setState({
       showingConfig: false,
     });

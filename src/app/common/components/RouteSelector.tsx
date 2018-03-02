@@ -172,7 +172,6 @@ export class RouteSelector extends TerrainComponent<Props>
   {
     if (!_.isEqual(this.props.relevantData, nextProps.relevantData))
     {
-      console.log(this.props.relevantData, nextProps.relevantData);
       this.setState({
         optionSets: this.props.getOptionSets(),
       });

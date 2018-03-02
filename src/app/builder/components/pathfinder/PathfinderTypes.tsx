@@ -646,6 +646,7 @@ class ElasticDataSourceC extends DataSource
               'integer',
               'half_float',
               'float',
+              'date',
             ];
         }
         else if (context.subtype === 'match')

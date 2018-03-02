@@ -224,7 +224,10 @@ const Util = {
   {
     const then = moment(date);
     const now = moment();
-
+    if (then.format('MM/DD/YY') === 'Invalid date')
+    {
+      return date;
+    }
     if (then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
     {
       // it was today
@@ -298,6 +301,10 @@ const Util = {
     {
       const day = moment(date).format('YYYY-MM-DD');
       const time = moment(date).format('HH:mm:ssZ');
+      if (day === 'Invalid date' || time === 'Invalid date')
+      {
+        return '';
+      }
       return day + 'T' + time;
     }
     return moment(date).format('YYYY-MM-DD HH:mm:ss');

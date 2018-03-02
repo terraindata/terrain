@@ -219,16 +219,6 @@ class HitComponent extends TerrainComponent<Props> {
           backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
           ]}
         >
-          <div
-            className='hit-nested-content-title'
-            onClick={this._fn(
-              this.changeNestedState,
-              expandState !== NestedState.Collapsed ?
-                NestedState.Collapsed : NestedState.Normal,
-              field)}
-          >
-            {field} ({size})
-          </div>
           {
             size > 1 &&
             <div
@@ -245,15 +235,20 @@ class HitComponent extends TerrainComponent<Props> {
               />
             </div>
           }
+          <div
+            className='hit-nested-content-title'
+            onClick={this._fn(
+              this.changeNestedState,
+              expandState !== NestedState.Collapsed ?
+                NestedState.Collapsed : NestedState.Normal,
+              field)}
+          >
+            {field} ({size})
+          </div>
         </div>
         {
           expandState !== NestedState.Collapsed &&
           <div>
-            <div
-              className='hit-column-names'
-              style={[borderColor(Colors().blockOutline),
-              backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
-            />
             {
               this.state.scrollState.get(field) ?
                 <div
