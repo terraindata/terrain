@@ -62,7 +62,7 @@ import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, ETLTemplate, FieldMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { Sinks, SinkConfig, Sources, SourceConfig, SinkOptionsType, SourceOptionsType } from 'shared/etl/types/EndpointTypes';
+import { SinkConfig, SinkOptionsType, Sinks, SourceConfig, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 

@@ -60,12 +60,12 @@ const { List, Map } = Immutable;
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
-import { ElasticTypes, JsToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
 import
 {
   _TemplateField,
   TemplateField,
 } from 'etl/templates/FieldTypes';
+import { ElasticTypes, JsToElasticOptions } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -91,7 +91,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
       options: {
         pickOptions: this.getTypeOptions,
         indexResolver: this.resolveTypeIndex,
-      }
+      },
     },
     analyzed: {
       type: DisplayType.CheckBox,
@@ -117,7 +117,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
       elasticType: ElasticTypes.Auto,
       analyzed: false,
       analyzer: 'standard',
-    }
+    };
   }
 
   @memoizeOne
@@ -176,7 +176,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
           justifyContent: 'center',
         }}
       />
-    )
+    );
   }
 
   public handleSettingsApplied()
