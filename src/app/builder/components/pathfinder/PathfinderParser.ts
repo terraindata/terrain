@@ -530,6 +530,15 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       });
     case 'located':
       const distanceObj = line.value as DistanceValue;
+      if (!line.value)
+      {
+        return Map({
+        geo_distance: Map({
+          distance: '10mi',
+          [line.field]: '',
+        }),
+      })
+      }
       return Map({
         geo_distance: Map({
           distance: String(distanceObj.distance) + distanceObj.units,
