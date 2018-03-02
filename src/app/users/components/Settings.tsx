@@ -104,6 +104,7 @@ class Settings extends TerrainComponent<Props>
       modalOpen: false,
       modalMessage: '',
       errorModal: false,
+      advancedResultsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS)),
       analyticsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS)),
     };
   }
@@ -484,6 +485,24 @@ class Settings extends TerrainComponent<Props>
     }
   }
 
+  public handleAdvancedResultsSwitch(selected)
+  {
+    this.setState((state) =>
+    {
+      return { advancedResultsEnabled: selected };
+    });
+
+    if (TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS))
+    {
+      TerrainTools.deactivate(TerrainTools.ADVANCED_RESULTS);
+    }
+    else
+    {
+      TerrainTools.activate(TerrainTools.ADVANCED_RESULTS);
+    }
+  }
+
+
   public renderTerrainSettingsContent()
   {
     const terrainSettingsAnalyticsContent = TerrainTools.isAdmin() ? (
@@ -503,6 +522,24 @@ class Settings extends TerrainComponent<Props>
       </div>
     ) : undefined;
 
+    const terrainSettingsAdvancedResultsContent = TerrainTools.isAdmin() ? (
+      <div>
+        <div className='settings-field-title'>
+          Advanced Results (Aggregations and Raw Results)
+        </div>
+        <div className='settings-row'>
+          <Switch
+            medium={true}
+            first='On'
+            second='Off'
+            selected={this.state.advancedResultsEnabled}
+            onChange={this.handleAdvancedResultsSwitch}
+          />
+        </div>
+      </div>
+
+    ) : undefined;
+
     return (
       <div>
         <div className='settings-field-title'>
@@ -519,6 +556,7 @@ class Settings extends TerrainComponent<Props>
         </div>
         <br />
         {terrainSettingsAnalyticsContent}
+        {terrainSettingsAdvancedResultsContent}
       </div>
     );
   }
