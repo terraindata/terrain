@@ -182,8 +182,8 @@ export class Export
         body: qry,
       };
 
-      const respStream: any = await qh.handleQuery(payload);
-      if (respStream === undefined || (respStream.hasError !== undefined && respStream.hasError()))
+      const respStream: stream.Readable = await qh.handleQuery(payload) as stream.Readable;
+      if (respStream === undefined)
       {
         throw Error('Nothing to export.');
       }
@@ -206,22 +206,21 @@ export class Export
         let exportTransform: AExportTransform;
         switch (exportConfig.filetype)
         {
-          case 'json:':
+          case 'json':
             exportTransform = new JSONExportTransform();
             break;
-          case 'csv:':
+          case 'csv':
             exportTransform = new CSVExportTransform(columnNames);
             break;
           default:
             throw Error('File type must be either CSV or JSON.');
         }
 
-        return respStream.pipe(documentTransform).pipe(exportTransform);
+        resolve(respStream.pipe(documentTransform).pipe(exportTransform));
       }
       catch (e)
       {
-        respStream.close();
-        return reject(e);
+        reject(e);
       }
     });
   }
