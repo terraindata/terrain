@@ -105,6 +105,7 @@ interface SinkOptionsTypes
     serverId: ID;
     database: string;
     table: string;
+    elasticConfig?: any; // if Language is elastic
   };
   Sftp: SftpOptions;
   Http: HttpOptions;
