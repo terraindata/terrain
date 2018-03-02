@@ -92,6 +92,7 @@ fullstack:
     - yarn run test-fullstack-teardown
   stage: fullstack
   when: always
+  allow_failure: true
   artifacts:
     when: on_failure
     expire_in: 1 week
