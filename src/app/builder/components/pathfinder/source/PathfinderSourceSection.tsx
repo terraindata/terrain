@@ -67,7 +67,6 @@ import
   Source, sourceCountDropdownOptions, sourceCountOptions,
 } from '../PathfinderTypes';
 
-import FloatingInput from 'app/common/components/FloatingInput';
 import Util from 'util/Util';
 
 export interface Props

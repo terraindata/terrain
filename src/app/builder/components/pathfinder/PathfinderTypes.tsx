@@ -129,6 +129,7 @@ class PathC extends BaseClass
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
   public nested: List<Path> = List([]);
+  public expanded?: boolean = true;
   public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
   public minMatches?: number = 0; // also helpful for inner-queries of groupjoins
 }
