@@ -447,7 +447,7 @@ const BuilderReducers =
         resultsConfig: any,
         field: string,
       }>) =>
-        state
+      state
         .update('query',
           (query) =>
             query.set('resultsConfig', action.payload.resultsConfig),

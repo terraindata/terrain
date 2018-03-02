@@ -226,9 +226,9 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public renderExpandIcon()
   {
-    const {line} = this.props;
+    const { line } = this.props;
     return (
-      <div style={line.field ? {} : {opacity: 0}}>
+      <div style={line.field ? {} : { opacity: 0 }}>
         <ExpandIcon
           open={line.expanded && line.field !== undefined && line.field !== ''}
           onClick={this._fn(this.handleExpandedChange, !line.expanded)}

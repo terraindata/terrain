@@ -66,8 +66,11 @@ import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
-import { _DistanceValue, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
-  Source } from '../PathfinderTypes';
+import
+{
+  _DistanceValue, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
+  Source
+} from '../PathfinderTypes';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -118,7 +121,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       if (key === 'comesBeforeAGroup')
       {
         if ((!nextProps.comesBeforeAGroup && this.props.comesBeforeAGroup) ||
-            (nextProps.comesBeforeAGroup && !this.props.comesBeforeAGroup))
+          (nextProps.comesBeforeAGroup && !this.props.comesBeforeAGroup))
         {
           // Somestimes comesbeforeagroup changes from undefined => null => false, causes unnecessary rerender
           return true;
@@ -525,13 +528,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     if (this.props.filterLine.value && this.props.filterLine.value['location'] !== undefined)
     {
       filterLine = this.props.filterLine
-      .setIn(List(['value', 'location']), coordinates)
-      .setIn(List(['value', 'address']), inputValue);
+        .setIn(List(['value', 'location']), coordinates)
+        .setIn(List(['value', 'address']), inputValue);
     }
     else
     {
       filterLine = this.props.filterLine
-        .set('value', _DistanceValue({location: coordinates, address: inputValue}));
+        .set('value', _DistanceValue({ location: coordinates, address: inputValue }));
     }
     this.props.onChange(this.props.keyPath, filterLine, false, false);
   }

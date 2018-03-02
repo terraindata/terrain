@@ -173,7 +173,7 @@ class DragAndDrop extends TerrainComponent<Props>
                     key={item.key}
                     draggableId={item.key}
                     isDragDisabled={!item.draggable}
-                   index={index}
+                    index={index}
                   >
                     {(provided2, snapshot2) => (
                       <div>

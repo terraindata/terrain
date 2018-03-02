@@ -122,7 +122,7 @@ export class Sidebar extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.sidebar-link svg',
-      style: { fill: Colors().iconColor, stroke: Colors().iconColor},
+      style: { fill: Colors().iconColor, stroke: Colors().iconColor },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
@@ -175,72 +175,72 @@ export class Sidebar extends TerrainComponent<Props>
             />
         }
         <AccountDropdown small={!this.props.expanded} />
-       {
-        // <div
-        //        className={classNames({
-        //          'sidebar-selected-square': true,
-        //          'sidebar-selected-square-hidden': this.props.selectedIndex === -1,
-        //        })}
-        //        style={{
-        //          top: (this.props.selectedIndex * linkHeight + this.state.linkOffset) + 'px',
-        //          backgroundColor: Colors().active,
-        //        }}
-        //      />
-           }
-        <div className='sidebar-links'>
         {
-          this.props.links.map((link, index) =>
-            <Link
-              to={link.route}
-              key={index}
-              onClick={link.enabled === false ? this.handleLinkDisabled(link) : null}
-            >
-              <div
-                className={Util.objToClassname({
-                  'sidebar-link': true,
-                  'xr': index === this.props.selectedIndex,
-                })}
-                key={'sidebar-link-' + index}
+          // <div
+          //        className={classNames({
+          //          'sidebar-selected-square': true,
+          //          'sidebar-selected-square-hidden': this.props.selectedIndex === -1,
+          //        })}
+          //        style={{
+          //          top: (this.props.selectedIndex * linkHeight + this.state.linkOffset) + 'px',
+          //          backgroundColor: Colors().active,
+          //        }}
+          //      />
+        }
+        <div className='sidebar-links'>
+          {
+            this.props.links.map((link, index) =>
+              <Link
+                to={link.route}
+                key={index}
+                onClick={link.enabled === false ? this.handleLinkDisabled(link) : null}
               >
-
-                {tooltip(<div
-                  className={classNames({
-                    'sidebar-link-inner': true,
-                    'sidebar-link-inner-selected': index === this.props.selectedIndex,
-                  })
-                }
-                  style={getStyle('fill', index === this.props.selectedIndex ? Colors().active : Colors().text1)}
+                <div
+                  className={Util.objToClassname({
+                    'sidebar-link': true,
+                    'xr': index === this.props.selectedIndex,
+                  })}
+                  key={'sidebar-link-' + index}
                 >
-                  {
-                    link.icon
-                  }
-                  <div
+
+                  {tooltip(<div
                     className={classNames({
-                      'sidebar-link-text': true,
-                      'sidebar-link-text-hidden': !this.props.expanded,
-                    })}
-                    style={fontColor(index === this.props.selectedIndex ? Colors().active : Colors().text1)}
+                      'sidebar-link-inner': true,
+                      'sidebar-link-inner-selected': index === this.props.selectedIndex,
+                    })
+                    }
+                    style={getStyle('fill', index === this.props.selectedIndex ? Colors().active : Colors().text1)}
                   >
                     {
-                      link.text
+                      link.icon
                     }
-                  </div>
-                </div>,
-                  {
-                    title: (!this.props.expanded ? link.text : ''),
-                    position: 'right',
-                  })}
-              </div>
-            </Link>,
-          )
-        }
+                    <div
+                      className={classNames({
+                        'sidebar-link-text': true,
+                        'sidebar-link-text-hidden': !this.props.expanded,
+                      })}
+                      style={fontColor(index === this.props.selectedIndex ? Colors().active : Colors().text1)}
+                    >
+                      {
+                        link.text
+                      }
+                    </div>
+                  </div>,
+                    {
+                      title: (!this.props.expanded ? link.text : ''),
+                      position: 'right',
+                    })}
+                </div>
+              </Link>,
+            )
+          }
         </div>
         {
           this.props.expandable ?
             (
               <div
                 className='sidebar-expand' onClick={this.props.onExpand}
-                // style={backgroundColor(Colors().bg1, Colors().inactiveHover)}
+              // style={backgroundColor(Colors().bg1, Colors().inactiveHover)}
               >
                 <div className='dead-center'>
                   <ExpandIcon

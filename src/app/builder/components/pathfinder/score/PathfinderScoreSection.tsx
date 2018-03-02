@@ -82,7 +82,7 @@ export interface Props
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
   builderActions?: typeof BuilderActions;
-    colorsActions?: typeof ColorsActions;
+  colorsActions?: typeof ColorsActions;
 }
 
 @Radium
@@ -118,17 +118,17 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-wrapper',
-      style: {background: Colors().blockBg},
+      style: { background: Colors().blockBg },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper',
-      style: {background: Colors().blockBg},
+      style: { background: Colors().blockBg },
     });
-      this.props.colorsActions({
+    this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper .dropdown-option',
-      style: {background: Colors().blockBg},
+      style: { background: Colors().blockBg },
     });
   }
 
@@ -415,7 +415,8 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderScoreSection,
   [],
-  { builderActions: BuilderActions,
+  {
+    builderActions: BuilderActions,
     colorsActions: ColorsActions,
   },
 );

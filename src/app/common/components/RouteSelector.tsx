@@ -159,12 +159,13 @@ export class RouteSelector extends TerrainComponent<Props>
       optionSets: this.props.optionSets !== undefined ?
         this.props.optionSets : this.props.getOptionSets(),
     },
-    () => {
-      if (this.state.optionSets.get(0) && !this.state.optionSets.get(0).hideSampleData)
+      () =>
       {
-        this.getResultConfigs(this.state.optionSets.get(0).options);
-      }
-    });
+        if (this.state.optionSets.get(0) && !this.state.optionSets.get(0).hideSampleData)
+        {
+          this.getResultConfigs(this.state.optionSets.get(0).options);
+        }
+      });
   }
 
   public componentWillReceiveProps(nextProps: Props)

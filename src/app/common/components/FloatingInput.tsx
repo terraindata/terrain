@@ -220,6 +220,8 @@ export class FloatingInput extends TerrainComponent<Props>
     value: this.props.value, // for debouncing
   };
 
+  private debouncedExecuteChange;
+
   constructor(props)
   {
     super(props);
@@ -291,8 +293,6 @@ export class FloatingInput extends TerrainComponent<Props>
       </Container>
     );
   }
-
-  private debouncedExecuteChange;
 
   private isFloating()
   {

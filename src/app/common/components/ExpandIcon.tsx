@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Colors, {backgroundColor} from 'app/colors/Colors';
+import Colors, { backgroundColor } from 'app/colors/Colors';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -61,26 +61,26 @@ class ExpandIcon extends TerrainComponent<Props>
   {
     const barStyle = backgroundColor(Colors().iconColor);
     return (
+      <div
+        className={classNames({
+          'expand-icon': true,
+          'expand-icon-open': this.props.open,
+        })}
+        onClick={this.props.onClick}
+      >
         <div
-          className={classNames({
-            'expand-icon': true,
-            'expand-icon-open': this.props.open,
-          })}
-          onClick={this.props.onClick}
-        >
-          <div
-            className='expand-icon-line'
-            style={barStyle}
-          />
-          <div
-            className='expand-icon-line'
-            style={barStyle}
-          />
-          <div
-            className='expand-icon-line'
-            style={barStyle}
-          />
-        </div>
+          className='expand-icon-line'
+          style={barStyle}
+        />
+        <div
+          className='expand-icon-line'
+          style={barStyle}
+        />
+        <div
+          className='expand-icon-line'
+          style={barStyle}
+        />
+      </div>
     );
   }
 }

@@ -118,7 +118,8 @@ export interface Props
   builder?: BuilderState;
 }
 
-enum NestedState {
+enum NestedState
+{
   Normal,
   Collapsed,
   Expanded,
@@ -223,7 +224,7 @@ class HitComponent extends TerrainComponent<Props> {
             onClick={this._fn(
               this.changeNestedState,
               expandState !== NestedState.Collapsed ?
-                  NestedState.Collapsed : NestedState.Normal,
+                NestedState.Collapsed : NestedState.Normal,
               field)}
           >
             {field} ({size})
@@ -238,7 +239,7 @@ class HitComponent extends TerrainComponent<Props> {
                 onClick={this._fn(
                   this.changeNestedState,
                   expandState !== NestedState.Expanded ?
-                      NestedState.Expanded : NestedState.Normal,
+                    NestedState.Expanded : NestedState.Normal,
                   field,
                 )}
               />
@@ -251,20 +252,20 @@ class HitComponent extends TerrainComponent<Props> {
             <div
               className='hit-column-names'
               style={[borderColor(Colors().blockOutline),
-                backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
+              backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
             />
             {
               this.state.scrollState.get(field) ?
-              <div
-                onClick={this._fn(this.handleScroll, field, -1)}
-                className='hit-content-scroll-back'
-                style={getStyle('fill', Colors().iconColor)}
-                key='forward-icon'
-              >
-                <CarrotIcon />
-              </div>
-              :
-              null
+                <div
+                  onClick={this._fn(this.handleScroll, field, -1)}
+                  className='hit-content-scroll-back'
+                  style={getStyle('fill', Colors().iconColor)}
+                  key='forward-icon'
+                >
+                  <CarrotIcon />
+                </div>
+                :
+                null
             }
             <div
               onClick={this._fn(this.handleScroll, field, 1)}
@@ -290,8 +291,8 @@ class HitComponent extends TerrainComponent<Props> {
 
   public renderNestedItems(items, format, field, depth)
   {
-     return (
-       <div>
+    return (
+      <div>
         {
           items.map((fields, i) =>
           {
@@ -324,7 +325,7 @@ class HitComponent extends TerrainComponent<Props> {
                 firstVisibleField={this.state.scrollState.get(field)}
               />);
           },
-         )
+          )
         }
       </div>
     );
@@ -356,28 +357,28 @@ class HitComponent extends TerrainComponent<Props> {
           { width: `calc(100% - ${depth > 0 ? 15 : 0}px` },
           backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
           borderColor(Colors().blockOutline),
-      ]}
+        ]}
       >
         {
           this.renderNestedFieldHeader(field, depth, size, expandState)
         }
-          <div
-            className='hit-nested-content-values'
-            style={{height: expandState === NestedState.Expanded ? '100%' : 'auto'}}
+        <div
+          className='hit-nested-content-values'
+          style={{ height: expandState === NestedState.Expanded ? '100%' : 'auto' }}
+        >
+          <FadeInOut
+            open={expandState !== NestedState.Collapsed}
           >
-            <FadeInOut
-              open={expandState !== NestedState.Collapsed}
-            >
-              {this.renderNestedItems(allValues.slice(0, 1), format, field, depth)}
-            </FadeInOut>
-            <FadeInOut
-              open={expandState === NestedState.Expanded}
-            >
-              {
-                this.renderNestedItems(allValues.slice(1), format, field, depth)
-              }
-            </FadeInOut>
-          </div>
+            {this.renderNestedItems(allValues.slice(0, 1), format, field, depth)}
+          </FadeInOut>
+          <FadeInOut
+            open={expandState === NestedState.Expanded}
+          >
+            {
+              this.renderNestedItems(allValues.slice(1), format, field, depth)
+            }
+          </FadeInOut>
+        </div>
       </div>
     );
   }
@@ -388,7 +389,7 @@ class HitComponent extends TerrainComponent<Props> {
     {
       return null;
     }
-    const {hideFieldNames, index} = this.props;
+    const { hideFieldNames, index } = this.props;
     const spotlights = this.props.spotlights.spotlights;
     const isSpotlit = spotlights.get(this.props.primaryKey);
     const color = isSpotlit ? spotlights.get(this.props.primaryKey).color : 'black';
@@ -399,7 +400,7 @@ class HitComponent extends TerrainComponent<Props> {
     let style = {};
     if (hideFieldNames && index !== 0)
     {
-      style = {minWidth: $(`#${field}-header`).width()};
+      style = { minWidth: $(`#${field}-header`).width() };
     }
     return (
       <div
@@ -419,7 +420,7 @@ class HitComponent extends TerrainComponent<Props> {
               'result-field-name': true,
               'result-field-name-header': hideFieldNames && index === 0,
             })}
-            style={hideFieldNames && index !== 0 ? {opacity: 0} : {}} // Keep them there to make sizing work
+            style={hideFieldNames && index !== 0 ? { opacity: 0 } : {}} // Keep them there to make sizing work
           >
             {
               field
@@ -431,7 +432,7 @@ class HitComponent extends TerrainComponent<Props> {
           hideFieldNames && index === 0 &&
           <div
             className='result-field-name'
-            style={{visibility: 'hidden', height: 0, overflow: 'hidden', padding: 0}}
+            style={{ visibility: 'hidden', height: 0, overflow: 'hidden', padding: 0 }}
           >
             {
               field
@@ -602,114 +603,114 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className={classes}
         style={this.props.style}
-          onDoubleClick={this.expand}
-          // onMouseEnter={this._fn(this.handleHover, true)}
-          // onMouseLeave={this._fn(this.handleHover, false)}
+        onDoubleClick={this.expand}
+      // onMouseEnter={this._fn(this.handleHover, true)}
+      // onMouseLeave={this._fn(this.handleHover, false)}
+      >
+        <div
+          className={classNames({
+            'result-inner': true,
+            'results-are-small': hitSize === 'small',
+          })}
+          style={[
+            borderColor(Colors().resultLine),
+            backgroundColor((depth + 1) % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+          ]}
         >
+          {
+            thumbnail &&
+            [
+              <div
+                className={classNames({
+                  'result-thumbnail-wrapper': true,
+                  'results-are-small': hitSize === 'small',
+                })}
+                style={{
+                  backgroundImage: `url(${thumbnail})`,
+                  width: thumbnailWidth,
+                  minWidth: thumbnailWidth,
+                }}
+                key={1}
+              >
+              </div>
+              ,
+              this.state.hovered &&
+              <Draggable
+                axis='x'
+                bounds='parent'
+                position={{
+                  x: thumbnailWidth - 15,
+                  y: 0,
+                }}
+                onDrag={this.handleThumbnailResize}
+                key={2}
+              >
+                <div
+                  className='result-thumbnail-resizer'
+                />
+              </Draggable>,
+            ]
+          }
           <div
             className={classNames({
-              'result-inner': true,
+              'result-details-wrapper': true,
               'results-are-small': hitSize === 'small',
             })}
-            style={[
-              borderColor(Colors().resultLine),
-              backgroundColor((depth + 1) % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
-            ]}
           >
-            {
-              thumbnail &&
-              [
-                <div
-                  className={classNames({
-                    'result-thumbnail-wrapper': true,
-                    'results-are-small': hitSize === 'small',
-                  })}
-                  style={{
-                    backgroundImage: `url(${thumbnail})`,
-                    width: thumbnailWidth,
-                    minWidth: thumbnailWidth,
-                  }}
-                  key={1}
-                >
-                </div>
-                ,
-                this.state.hovered &&
-                <Draggable
-                  axis='x'
-                  bounds='parent'
-                  position={{
-                    x: thumbnailWidth - 15,
-                    y: 0,
-                  }}
-                  onDrag={this.handleThumbnailResize}
-                  key={2}
-                >
-                  <div
-                    className='result-thumbnail-resizer'
-                  />
-                </Draggable>,
-              ]
-            }
             <div
               className={classNames({
-                'result-details-wrapper': true,
+                'result-name': true,
                 'results-are-small': hitSize === 'small',
               })}
             >
               <div
-                className={classNames({
-                  'result-name': true,
-                  'results-are-small': hitSize === 'small',
-                })}
+                className='result-name-inner'
+                style={fontColor(Colors().text.baseLight)}
               >
-                <div
-                  className='result-name-inner'
-                  style={fontColor(Colors().text.baseLight)}
-                >
-                  {
-                    this.renderSpotlight()
-                  }
-                  <div className='result-pin-icon'>
-                    <PinIcon />
-                  </div>
-                  <span className='result-name-label'>{name}</span>
-                  {
-                    this.props.expanded &&
-                    <div
-                      onClick={this.expand}
-                      className='result-expanded-close-button'
-                    >
-                      <CloseIcon className='close close-icon' />
-                    </div>
-                  }
+                {
+                  this.renderSpotlight()
+                }
+                <div className='result-pin-icon'>
+                  <PinIcon />
                 </div>
-              </div>
-              <div
-                className={classNames({
-                  'result-fields-wrapper': true,
-                  'results-are-small': hitSize === 'small',
-                })}
-              >
-                {score}
+                <span className='result-name-label'>{name}</span>
                 {
-                  _.map(fields, this.renderField)
-                }
-                {
-                  expandedContent
+                  this.props.expanded &&
+                  <div
+                    onClick={this.expand}
+                    className='result-expanded-close-button'
+                  >
+                    <CloseIcon className='close close-icon' />
+                  </div>
                 }
               </div>
+            </div>
+            <div
+              className={classNames({
+                'result-fields-wrapper': true,
+                'results-are-small': hitSize === 'small',
+              })}
+            >
+              {score}
               {
-                bottomContent
+                _.map(fields, this.renderField)
+              }
+              {
+                expandedContent
               }
             </div>
-          </div>
-          <div>
             {
-              (this.props.hideNested !== true) &&
-              _.map(nestedFields, this.renderNestedField)
+              bottomContent
             }
           </div>
         </div>
+        <div>
+          {
+            (this.props.hideNested !== true) &&
+            _.map(nestedFields, this.renderNestedField)
+          }
+        </div>
+      </div>
     ));
   }
 
@@ -751,7 +752,7 @@ export function resultsConfigHasFields(config: ResultsConfig): boolean
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(hit: Hit, config: ResultsConfig,  nested: string[],
+export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[],
   schema?: SchemaState, builder?: BuilderState): string[]
 {
   let fields: string[];
@@ -780,9 +781,9 @@ export function getResultFields(hit: Hit, config: ResultsConfig,  nested: string
     }
 
     fields = Util.orderFields(List(_.keys(hit.fields.toJS())), schema, -1, serverIndex).toArray();
-     fields = fields.filter((field) =>
-        nested.indexOf(field) === -1,
-     );
+    fields = fields.filter((field) =>
+      nested.indexOf(field) === -1,
+    );
 
   }
 

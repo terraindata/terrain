@@ -101,13 +101,13 @@ class PathfinderArea extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    const {pathfinderContext} = this.state;
+    const { pathfinderContext } = this.state;
     if (pathfinderContext.canEdit !== nextProps.canEdit ||
-       pathfinderContext.source !== nextProps.path.source ||
-       pathfinderContext.step !== nextProps.path.step ||
-       pathfinderContext.schemaState !== nextProps.schema ||
-       pathfinderContext.builderState.db !== nextProps.builder.db
-      )
+      pathfinderContext.source !== nextProps.path.source ||
+      pathfinderContext.step !== nextProps.path.step ||
+      pathfinderContext.schemaState !== nextProps.schema ||
+      pathfinderContext.builderState.db !== nextProps.builder.db
+    )
     {
       this.setState({
         pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,

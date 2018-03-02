@@ -129,7 +129,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   {
     const { pathfinderContext, isSoftFilter } = props;
     const { source } = pathfinderContext;
-     const fieldOptions = source.dataSource.getChoiceOptions({
+    const fieldOptions = source.dataSource.getChoiceOptions({
       type: 'fields',
       source,
       schemaState: pathfinderContext.schemaState,

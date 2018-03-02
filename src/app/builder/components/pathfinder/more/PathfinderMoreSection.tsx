@@ -122,7 +122,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleAddNested()
   {
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'nested'), this.props.more.references.push(''));
-      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
+    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
     this.props.builderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
   }
 
@@ -300,7 +300,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           .toList()
           .concat(
             List(['source', 'count'],
-          )).toList(),
+            )).toList(),
         value,
       );
     }
@@ -322,7 +322,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleMinMatchesChange(optionSetIndex: number, value: any)
   {
-    const { keyPath } = this.props;
+    const  { keyPath } = this.props;
     const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'minMatches');
     this.props.builderActions.changePath(nestedKeyPath, value);
   }

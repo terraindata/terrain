@@ -142,9 +142,10 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
         <div style={{ width: `calc(100% - ${height}px)`, position: 'relative', marginLeft: 14 }}>
           {
             !noLeftLine &&
-              <div style={{
-                zIndex: 2, top: -3, position: 'absolute', height: height + 6, borderLeft: '1px solid rgba(30, 180, 250, .5)' }}
-              />
+            <div style={{
+              zIndex: 2, top: -3, position: 'absolute', height: height + 6, borderLeft: '1px solid rgba(30, 180, 250, .5)'
+            }}
+            />
           }
           <Slider
             min={min}

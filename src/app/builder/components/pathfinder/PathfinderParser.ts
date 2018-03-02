@@ -155,7 +155,7 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : MAX_COUNT, 
+    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : MAX_COUNT,
     index: (source.dataSource as any).index,
   };
 }
@@ -533,11 +533,11 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       if (!line.value)
       {
         return Map({
-        geo_distance: Map({
-          distance: '10mi',
-          [line.field]: '',
-        }),
-      });
+          geo_distance: Map({
+            distance: '10mi',
+            [line.field]: '',
+          }),
+        });
       }
       return Map({
         geo_distance: Map({
