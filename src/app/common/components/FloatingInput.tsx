@@ -131,7 +131,6 @@ const inputStyle = `
 
   &:hover {
     background-color: transparent;
-    border: 1px solid ${Colors().active} !important;
   }
 
   &:focus {
