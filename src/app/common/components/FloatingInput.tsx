@@ -148,6 +148,9 @@ const InputDiv = InputDivC`
   padding-right: ${LEFT};
   font-size: ${fontSizeFn};
   cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `;
 
 interface InputProps
@@ -188,6 +191,7 @@ export interface Props
   autoFocus?: boolean;
   getValueRef?: (ref) => void;
   className?: string;
+  debounce?: boolean;
 }
 
 export class FloatingInput extends TerrainComponent<Props>
@@ -196,7 +200,15 @@ export class FloatingInput extends TerrainComponent<Props>
     isFocused: false,
     myId: String(Math.random()) + '-floatinginput',
     valueRef: null,
+    value: this.props.value, // for debouncing
   };
+  
+  constructor(props)
+  {
+    super(props);
+    
+    this.debouncedExecuteChange = _.debounce(this.executeChange, 1000);
+  }
 
   public componentWillReceiveProps(nextProps: Props)
   {
@@ -204,6 +216,18 @@ export class FloatingInput extends TerrainComponent<Props>
     {
       // needed because the autoFocus prop is only checked on mount
       this.autoFocus();
+    }
+    
+    if (nextProps.value !== this.props.value)
+    {
+      // update local state value
+      if (!nextProps.debounce || !this.state.isFocused)
+      {
+        // don't update the value if we're debouncing & we're currently focused
+        this.setState({
+          value: nextProps.value,
+        });
+      }
     }
   }
 
@@ -274,7 +298,7 @@ export class FloatingInput extends TerrainComponent<Props>
   private renderValue()
   {
     const { props, state } = this;
-    const { value } = props;
+    const { value } = state;
 
     if (props.isTextInput)
     {
@@ -318,8 +342,28 @@ export class FloatingInput extends TerrainComponent<Props>
 
   private handleChange(e)
   {
-    this.props.onChange(e.target.value, this.props.id);
+    const value = e.target.value;
+    
+    this.setState({
+      value,
+    });
+    
+    if (this.props.debounce)
+    {
+      this.debouncedExecuteChange(value);
+    }
+    else
+    {
+      this.executeChange(value);
+    }
   }
+  
+  private executeChange(value)
+  {
+    this.props.onChange(value, this.props.id);
+  }
+  
+  private debouncedExecuteChange;
 
   private handleFocus()
   {
@@ -339,6 +383,7 @@ export class FloatingInput extends TerrainComponent<Props>
     this.setState({
       isFocused: false,
     });
+    this.debouncedExecuteChange.flush();
   }
 
   private getValueRef(ref)

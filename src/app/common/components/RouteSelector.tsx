@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions member-access no-console
 
 import Hit from 'builder/components/results/Hit.tsx';
+import * as _ from 'underscore';
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import { List, Map } from 'immutable';
@@ -135,6 +136,11 @@ export class RouteSelector extends TerrainComponent<Props>
     // valueRef: null,
     // animationEl: null,
   };
+  
+  constructor(props)
+  {
+    super(props);    
+  }
 
   shouldComponentUpdate(nextProps, nextState)
   {
@@ -364,6 +370,7 @@ export class RouteSelector extends TerrainComponent<Props>
           value={value}
           label={'Value' /* TODO confirm copy */}
           onChange={this._fn(this.handleOtherChange, index)}
+          debounce={true}
           autoFocus={(state.focusedSetIndex === index && optionSet.focusOtherByDefault) || props.autoFocus}
           isTextInput={true}
           canEdit={this.props.canEdit}
