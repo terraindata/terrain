@@ -305,7 +305,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           builderState: props.pathfinderContext.builderState,
         });
         const fieldChoice = fieldOptions.find((option) => option.value === value);
-        this.handleChange('field', value, (fieldChoice.meta && fieldChoice.meta.fieldType) || FieldType.Any, true);
+        this.handleChange('field', value, fieldChoice.meta !== undefined ? fieldChoice.meta.fieldType : FieldType.Any, true);
         return;
 
       case 1:
