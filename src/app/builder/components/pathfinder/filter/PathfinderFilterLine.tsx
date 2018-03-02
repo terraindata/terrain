@@ -299,7 +299,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         return Util.formatDate(value, true);
       case FieldType.Geopoint:
         value = _DistanceValue(Util.asJS(value));
-        return value.distance + units[value.units] + ' of ' + value.address;
+        return value.distance + ' ' + units[value.units] + ' of ' + value.address;
       default:
         return undefined;
     }
@@ -492,16 +492,25 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     else
     {
       filterLine = this.props.filterLine
-        .setIn(['value'], _DistanceValue({ [key]: value }));
+        .set('value', _DistanceValue({ [key]: value }));
     }
     this.props.onChange(this.props.keyPath, filterLine, false, false);
   }
 
   private handleMapChange(coordinates, inputValue)
   {
-    const filterLine = this.props.filterLine
+    let filterLine
+    if (this.props.filterLine.value && this.props.filterLine.value['location'] !== undefined)
+    {
+      filterLine = this.props.filterLine
       .setIn(List(['value', 'location']), coordinates)
       .setIn(List(['value', 'address']), inputValue);
+    }
+    else
+    {
+      filterLine = this.props.filterLine
+        .set('value', _DistanceValue({location: coordinates, address: inputValue}));
+    }
     this.props.onChange(this.props.keyPath, filterLine, false, false);
   }
 

@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { createRecordType } from 'src/app/Classes';
 const { List, Map } = Immutable;
+import Util from 'app/util/Util';
 
 export class Format
 {
@@ -63,6 +64,7 @@ export class Format
 const Format_Record = createRecordType(new Format(), 'FormatC');
 export const _Format = (config?: any) =>
 {
+  config = Util.asJS(config);
   if (config && config['config'])
   {
     config['config'] = _ResultsConfig(config['config']);
