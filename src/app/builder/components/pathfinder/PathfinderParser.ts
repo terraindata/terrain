@@ -57,6 +57,8 @@ import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 
+const MAX_COUNT = 101;
+
 export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
   let baseQuery = Map({
@@ -72,7 +74,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     sort: Map({}),
     aggs: Map({}),
     from: 0,
-    size: 1000,
+    size: MAX_COUNT,
     track_scores: true,
   });
 
@@ -153,7 +155,7 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(count) ? count : 1000, // if it is all results, just default to 1000 ? change...
+    size: !isNaN(count) ? count : MAX_COUNT,
     index: (source.dataSource as any).index,
   };
 }
@@ -362,7 +364,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
 {
   const lineValue = String(line.value);
   let value: any = String(line.value || '');
-  const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight;
+  const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
   // Parse date
   if (line.comparison === 'datebefore' || line.comparison === 'dateafter')
   {
@@ -395,6 +397,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       return Map({
         exists: Map({
           field: line.field,
+          boost,
         }),
       });
     case 'equal':
@@ -411,6 +414,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         match: Map({
           [line.field]: Map({
             query: String(line.value || ''),
+            boost,
           }),
         }),
       });
@@ -448,6 +452,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
                 [line.field]: Map({
                   query: String(line.value || ''),
                 }),
+                boost,
               }),
             }),
           }),
@@ -457,6 +462,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         match: Map({
           [line.field]: Map({
             query: String(line.value || ''),
+            boost,
           }),
         }),
       });

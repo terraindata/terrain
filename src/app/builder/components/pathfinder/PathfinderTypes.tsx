@@ -365,6 +365,7 @@ class FilterLineC extends LineC
   public comparison: string = null; // autocomplete
   public value: string | number | DistanceValue = null;
   public valueType: ValueType = null;
+  public boost: number = 1;
 
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
@@ -383,6 +384,33 @@ export const _FilterLine = (config?: { [key: string]: any }) =>
   }
   return filterLine;
 };
+
+export const BoostOptions = List([
+  _ChoiceOption({
+    value: 0,
+    displayName: 0,
+  }),
+  _ChoiceOption({
+    value: 1,
+    displayName: 1,
+  }),
+  _ChoiceOption({
+    value: 2,
+    displayName: 2,
+  }),
+  _ChoiceOption({
+    value: 3,
+    displayName: 3,
+  }),
+  _ChoiceOption({
+    value: 5,
+    displayName: 5,
+  }),
+  _ChoiceOption({
+    value: 10,
+    displayName: 10,
+  }),
+]);
 
 class DistanceValueC extends BaseClass
 {

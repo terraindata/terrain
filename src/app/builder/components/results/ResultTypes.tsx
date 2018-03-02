@@ -50,7 +50,7 @@ import { List, Map } from 'immutable';
 import { BaseClass, New } from '../../../Classes';
 import { DISPLAY_TYPES } from './Aggregation';
 
-export const MAX_HITS = 200;
+export const MAX_HITS = 100;
 
 class HitClass extends BaseClass
 {

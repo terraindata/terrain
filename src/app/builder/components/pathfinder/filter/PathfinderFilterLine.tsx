@@ -65,7 +65,8 @@ import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
-import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source,
+  BoostOptions } from '../PathfinderTypes';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -132,10 +133,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const fieldValue = props.filterLine.field;
     const comparisonValue = props.filterLine.comparison;
     const valueValue = this.shouldShowValue() ? props.filterLine.value : '';
+    const boostValue = props.filterLine.boost;
     const values = List([
       fieldValue,
       comparisonValue,
       valueValue,
+      boostValue,
     ]);
 
     return (
@@ -248,7 +251,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     }
 
     const canShowValueInput = filterLine.fieldType !== FieldType.Geopoint;
-    // LK
     const valueSet: RouteSelectorOptionSet = {
       key: 'value',
       options: valueOptions,
@@ -260,15 +262,29 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       focusOtherByDefault: true,
       getValueComponent: this.renderValueComponent(),
       getCustomDisplayName: this.getCustomValueDisplayName,
-      // otherComponent: TODO,
     };
-
-    return List([
+    
+    let sets = [
       fieldSet,
       comparisonSet,
       valueSet,
-      // boostSet?
-    ]);
+    ];
+    
+    if (this.props.isSoftFilter)
+    {
+      const boostSet: RouteSelectorOptionSet = {
+        key: 'boost',
+        options: BoostOptions, //lk
+        shortNameText: 'Boost',
+        headerText: 'Weight this match criteria',
+        column: true,
+        hideSampleData: true,
+        hasOther: true,
+      };
+      sets.push(boostSet);
+    }
+
+    return List(sets);
   }
 
   private getCustomValueDisplayName(value, setIndex: number)
@@ -315,6 +331,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       case 2:
         this.handleChange('value', value);
         return;
+        
+      case 3:
+        this.handleChange('boost', value);
+        return;
+        
       default:
         throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
     }
