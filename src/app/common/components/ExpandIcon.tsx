@@ -43,62 +43,46 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import * as React from 'react';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import Colors, {backgroundColor} from 'app/colors/Colors';
+import './ExpandIcon.less';
 
-// tslint:disable:variable-name max-classes-per-file member-access strict-boolean-expressions
-
-import * as Immutable from 'immutable';
-import { createRecordType } from 'src/app/Classes';
-const { List, Map } = Immutable;
-
-export class Format
+export interface Props
 {
-  type: string = '';
-  template: string = '';
-  showRaw: boolean = false;
-  showField: boolean = false;
-  config?: ResultsConfig = undefined; // For nested results
-  set: (f: string, v: any) => Format;
-  setIn: (f: string[], v: any) => Format;
+  open: boolean;
+  onClick: () => void;
 }
-const Format_Record = createRecordType(new Format(), 'FormatC');
-export const _Format = (config?: any) =>
+
+class ExpandIcon extends TerrainComponent<Props>
 {
-  if (config && config['config'])
+  public render()
   {
-    config['config'] = _ResultsConfig(config['config']);
+    const barStyle = backgroundColor(Colors().iconColor);
+    return (
+        <div
+          className={classNames({
+            'expand-icon': true,
+            'expand-icon-open': this.props.open,
+          })}
+          onClick={this.props.onClick}
+        >
+          <div
+            className='expand-icon-line'
+            style={barStyle}
+          />
+          <div
+            className='expand-icon-line'
+            style={barStyle}
+          />
+          <div
+            className='expand-icon-line'
+            style={barStyle}
+          />
+        </div>
+    );
   }
-  return new Format_Record(config || {}) as any as Format;
-};
-
-export class ResultsConfig
-{
-  thumbnail: string = '';
-  name: string = '';
-  score: string = '_score';
-  fields: List<string> = List([]);
-  enabled: boolean = false;
-  formats: IMMap<string, Format> = Map<string, Format>({});
-  primaryKeys: List<string> = List(['_id']);
-  thumbnailWidth: number = 200;
-  smallThumbnailWidth: number = 55;
-
-  set: (f: string, v: any) => ResultsConfig;
-  setIn: (f: string[], v: any) => ResultsConfig;
-  toJS: () => any;
 }
-const ResultsConfig_Record = createRecordType(new ResultsConfig(), 'ResultsConfig');
-export const _ResultsConfig = (config?: any) =>
-{
-  let conf = new ResultsConfig_Record(config || {}) as any as ResultsConfig;
 
-  conf = conf.set('formats', Map<string, Format>(conf.formats));
-  conf = conf
-    .set('formats', conf.formats.map((format) => _Format(format)))
-    .set('fields', List(conf.fields))
-    .set('primaryKeys', List(conf.primaryKeys));
-
-  return conf;
-};
-export const DefaultResultsConfig = _ResultsConfig();
-
-export default ResultsConfig;
+export default ExpandIcon;

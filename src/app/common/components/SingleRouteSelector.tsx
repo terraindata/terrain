@@ -75,6 +75,7 @@ export interface Props
   hasSearch?: boolean;
   hideSampleData?: boolean;
   column?: boolean;
+  hideLine?: boolean;
 }
 
 export class SingleRouteSelector extends TerrainComponent<Props>
@@ -144,6 +145,7 @@ export class SingleRouteSelector extends TerrainComponent<Props>
         defaultOpen={props.defaultOpen}
         large={props.large}
         noShadow={props.noShadow}
+        hideLine={this.props.hideLine}
       />
     );
   }

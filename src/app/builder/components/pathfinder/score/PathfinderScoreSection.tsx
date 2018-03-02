@@ -66,6 +66,7 @@ import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import
 {
   _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
@@ -81,6 +82,7 @@ export interface Props
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
   builderActions?: typeof BuilderActions;
+    colorsActions?: typeof ColorsActions;
 }
 
 @Radium
@@ -88,10 +90,8 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 {
   public state: {
     allWeights: Array<{ weight: number }>;
-    animateScoreBars: boolean;
   } = {
       allWeights: [],
-      animateScoreBars: true,
     };
 
   public shouldComponentUpdate(nextProps, nextState)
@@ -102,6 +102,34 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.updateWeights(this.props.score.lines);
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: `.pf-section .pf-score-line-transform
+      .linear-selector-wrapper .linear-selector-options .linear-selector-option`,
+      style: fontColor(Colors().fontColorLightest + ' !important'),
+    });
+    this.updateWeights(this.props.score.lines);
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: `.pf-section .pf-score-line-transform .linear-selector-wrapper
+      .linear-selector-options .linear-selector-option-selected`,
+      style: fontColor(Colors().fontWhite + ' !important'),
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-section .pf-score-line-inner .dropdown-wrapper',
+      style: {background: Colors().blockBg},
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper',
+      style: {background: Colors().blockBg},
+    });
+      this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper .dropdown-option',
+      style: {background: Colors().blockBg},
+    });
   }
 
   public componentWillReceiveProps(nextProps)
@@ -125,31 +153,21 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
   public handleDeleteLine(index)
   {
-    this.handleAnimateScoreBars();
     const newLines = this.props.score.lines.delete(index);
     this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleAddScoreLine()
   {
-    this.handleAnimateScoreBars();
     const newLines = this.props.score.lines.push(_ScoreLine());
     this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleValueChange(key, index, value)
   {
-    this.handleAnimateScoreBars();
     const newLine = this.props.score.lines.get(index).set(key, value);
     const newLines = this.props.score.lines.set(index, newLine);
     this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
-  }
-
-  public handleAnimateScoreBars()
-  {
-    this.setState({
-      animateScoreBars: true,
-    });
   }
 
   public getOptionSets(): List<RouteSelectorOptionSet>
@@ -283,14 +301,10 @@ class PathfinderScoreSection extends TerrainComponent<Props>
               keyPath={keyPath.push(index)}
               allWeights={this.state.allWeights}
               dropdownOptions={dropdownOptions}
-              animateScoreBars={this.state.animateScoreBars}
-              onAnimateScoreBars={this.handleAnimateScoreBars}
               pathfinderContext={this.props.pathfinderContext}
             />,
             key: String(index),
-            draggable: true,
-            dragHandle: <DragHandle />,
-            dragHandleStyle: { 'padding-top': '8px' },
+            draggable: !line.expanded || !line.field,
           }
         );
       }).toList()
@@ -305,13 +319,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       return this.props.score.lines.get(index);
     });
     this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
-  }
-
-  public handleDragStart()
-  {
-    this.setState({
-      animateScoreBars: false,
-    });
   }
 
   public handleStepChange()
@@ -352,6 +359,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           headerText={PathfinderText.scoreTypeExplanation}
           hasOther={false}
           large={false}
+          hideLine={true}
           hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
         />
 
@@ -407,5 +415,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   PathfinderScoreSection,
   [],
-  { builderActions: BuilderActions },
+  { builderActions: BuilderActions,
+    colorsActions: ColorsActions,
+  },
 );

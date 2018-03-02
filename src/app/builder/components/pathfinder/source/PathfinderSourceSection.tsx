@@ -133,6 +133,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           noShadow={pickerIsForcedOpen}
           hasOther={false}
           large={true}
+          hideLine={true}
         />
       </div>
     );

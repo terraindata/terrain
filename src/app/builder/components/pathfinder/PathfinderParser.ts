@@ -155,7 +155,7 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(count) ? count : MAX_COUNT,
+    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : MAX_COUNT, // if it is all results, just default to 1000 ? change...
     index: (source.dataSource as any).index,
   };
 }

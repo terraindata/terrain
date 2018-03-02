@@ -1,0 +1,18 @@
+.expand-icon {
+  cursor: pointer;
+  .expand-icon-line {
+    width: 18px;
+    height: 1px;
+    transition: margin .2s ease-in-out;
+    &:not(:first-child) {
+      margin-top: 3px;
+    }
+  }
+  &.expand-icon-open {
+    .expand-icon-line {
+      &:not(:first-child) {
+        margin-top: 6px;
+      }
+    }
+  }
+}

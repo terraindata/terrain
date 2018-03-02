@@ -54,7 +54,6 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { BuilderState } from 'builder/data/BuilderState';
 import Util from 'util/Util';
@@ -67,6 +66,7 @@ import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrap
 import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
+import ExpandIcon from 'app/common/components/ExpandIcon';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
 const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
@@ -83,14 +83,11 @@ export interface Props
   onValueChange: (key: string, index: number, newValue: any) => void;
   allWeights: Array<{ weight: number }>;
   keyPath: KeyPath;
-  animateScoreBars?: boolean;
-  onAnimateScoreBars?: () => void;
   dropdownOptions: List<ChoiceOption>;
   pathfinderContext: PathfinderContext;
 
   builder?: BuilderState;
   builderActions?: typeof BuilderActions;
-  colorsActions?: typeof ColorsActions;
 }
 
 const EditableField = (props) =>
@@ -112,15 +109,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       editingWeight: false,
     };
 
-  public componentWillMount()
-  {
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.pf-score-line-transform .linear-selector-wrapper .linear-selector-option',
-      style: fontColor(Colors().fontColorLightest),
-    });
-  }
-
   public componentWillReceiveProps(nextProps)
   {
     if (this.props.line !== nextProps.line)
@@ -136,6 +124,10 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public handleExpandedChange(expanded)
   {
+    if (!this.props.line.field)
+    {
+      return;
+    }
     this.props.onValueChange('expanded', this.props.index, expanded);
   }
 
@@ -247,12 +239,29 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     this.props.builderActions.changePath(this.props.keyPath.push('weight'), value);
   }
 
+  public renderExpandIcon()
+  {
+    const {line} = this.props;
+    return (
+      <div style={line.field ? {} : {opacity: 0}}>
+        <ExpandIcon
+          open={line.expanded && line.field !== undefined && line.field !== ''}
+          onClick={this._fn(this.handleExpandedChange, !line.expanded)}
+        />
+      </div>
+    );
+  }
+
   public renderLineContents()
   {
     const { fieldIndex } = this.state;
 
     return (
-      <div className='pf-line pf-score-line-inner'>
+      <div
+        className='pf-line pf-score-line-inner'
+        style={backgroundColor(Colors().blockBg)}
+      >
+        {this.renderExpandIcon()}
         <EditableField
           editing={this.state.editingField || fieldIndex === -1}
           editComponent={
@@ -280,7 +289,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                   parentData={{ weights: this.props.allWeights }}
                   data={{ weight: this.state.weight }}
                   keyPath={this.props.keyPath.push('weight')}
-                  noAnimation={!this.props.animateScoreBars}
                   builderActions={this.props.builderActions}
                   onBeforeChange={this.handleWeightBeforeChange}
                   onChange={this.handleWeightChange}
@@ -297,7 +305,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                       placeholder={'weight'}
                       isNumber={true}
                       autoDisabled={true}
-                      onChange={this.props.onAnimateScoreBars}
                       action={this.props.builderActions.changePath}
                     />
                   }
@@ -314,9 +321,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         }
 
         {
-          !this.props.line.expanded ?
-            this.renderTransformChartPreview() :
-            null
+          this.renderTransformChartPreview()
         }
       </div>
     );
@@ -334,19 +339,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         children={this.renderLineContents()}
         onDelete={this.props.onDelete}
         index={this.props.index}
-        onExpand={this.handleExpandedChange}
         expanded={this.props.line.expanded}
         expandableContent={expandableContent}
-        expandButton={<div
-          className={classNames({
-            'pf-score-line-arrow': true,
-            'pf-score-line-arrow-open': this.props.line.expanded,
-          })}
-          style={this.props.line.expanded ? getStyle('fill', Colors().active)
-            : getStyle('fill', Colors().iconColor)}
-        >
-          <ArrowIcon />
-        </div>}
       />
     );
   }
@@ -357,6 +351,5 @@ export default Util.createTypedContainer(
   ['builder'],
   {
     builderActions: BuilderActions,
-    colorsActions: ColorsActions,
   },
 );

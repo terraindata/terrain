@@ -75,7 +75,7 @@ export const TransformableTypes =
   ];
 
 const metaFields = ['_index', '_type', '_uid', '_id',
-  '_source', '_size',
+  '_source', '_size', '_score',
   '_all', '_field_names',
   '_parent', '_routing',
   '_meta'];
@@ -212,17 +212,24 @@ export const ElasticBlockHelpers = {
 
   // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
   // If the field is a metaField, return string / number accrodingly
-  getTypeOfField(schemaState, builderState, field, dataSource): FieldType
+  getTypeOfField(schemaState, builderState, field, dataSource, returnDatatype?): FieldType | string
   {
     if (metaFields.indexOf(field) !== -1)
     {
       if (field === '_score' || field === '_size')
       {
+        if (returnDatatype)
+        {
+          return 'float';
+        }
         return FieldType.Numerical;
+      }
+      if (returnDatatype)
+      {
+        return 'text';
       }
       return FieldType.Text;
     }
-
     const index = dataSource && dataSource.index.split('/')[1] || getIndex('', builderState);
     const server = builderState.db.name;
 
@@ -239,9 +246,16 @@ export const ElasticBlockHelpers = {
         (column) => column.serverId === String(server) &&
           column.databaseId === String(indexId) &&
           column.name === field,
-
       ).toList().get(0);
+      if (col === undefined)
+      {
+        return '';
+      }
       const dataType = col.datatype;
+      if (returnDatatype)
+      {
+        return dataType;
+      }
       let fieldType: any = 0;
       _.keys(FieldTypeMapping).forEach((ft) =>
       {

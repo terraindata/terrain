@@ -110,6 +110,7 @@ export interface Props
   large?: boolean;
   noShadow?: boolean;
   autoFocus?: boolean;
+  hideLine?: boolean;
   // Be able to get rid of it
   canDelete?: boolean;
   onDelete?: () => void;
@@ -205,6 +206,7 @@ export class RouteSelector extends TerrainComponent<Props>
           'routeselector-box-values-open': this.isOpen(),
           'routeselector-box-values-force-open': props.forceOpen,
         })}
+        style={this.props.hideLine ? {border: 'none'} : {}}
       >
         {
           props.optionSets.map((optionSet, index) => (
@@ -934,6 +936,7 @@ export class RouteSelector extends TerrainComponent<Props>
         onSpotlightAdded={_.noop}
         onSpotlightRemoved={_.noop}
         key={index}
+        hideNested={true}
       />
     );
   }

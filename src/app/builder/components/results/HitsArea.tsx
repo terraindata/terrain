@@ -55,12 +55,13 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { BuilderState } from 'app/builder/data/BuilderState';
+import { SchemaState } from 'app/schema/SchemaTypes';
 import Ajax from 'app/util/Ajax';
 import Util from 'app/util/Util';
+import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Radium = require('radium');
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { getIndex } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
@@ -85,6 +86,7 @@ export interface Props
   resultsState: ResultsState;
   exportState?: FileImportState;
   builder?: BuilderState;
+  schema?: SchemaState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -116,6 +118,7 @@ interface State
 
   indexName: string;
   resultsConfig?: any;
+  nestedFields: List<string>;
 }
 
 const MAP_MAX_HEIGHT = 300;
@@ -143,6 +146,7 @@ class HitsArea extends TerrainComponent<Props>
     hitSize: 'large',
     indexName: '',
     resultsConfig: undefined,
+    nestedFields: List([]),
   };
 
   public hitsFodderRange = _.range(0, 25);
@@ -151,6 +155,7 @@ class HitsArea extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.setIndexAndResultsConfig(this.props);
+    this.getNestedFields(this.props);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -160,6 +165,11 @@ class HitsArea extends TerrainComponent<Props>
       this.props.query.resultsConfig !== nextProps.query.resultsConfig)
     {
       this.setIndexAndResultsConfig(nextProps);
+    }
+    if (this.props.query.resultsConfig !== nextProps.query.resultsConfig ||
+      this.props.resultsState.fields !== nextProps.resultsState.fields)
+    {
+      this.getNestedFields(nextProps);
     }
     if (nextProps.query.cards !== this.props.query.cards
       || nextProps.query.inputs !== this.props.query.inputs)
@@ -188,6 +198,41 @@ class HitsArea extends TerrainComponent<Props>
         spotlightHits,
       });
     }
+  }
+
+  public getNestedFields(props: Props)
+  {
+    // Get the fields that are nested
+    const { builder, schema, resultsState } = props;
+    const dataSource = props.query.path.source.dataSource;
+    let nestedFields = resultsState.fields.filter((field) =>
+    {
+      const type = ElasticBlockHelpers.getTypeOfField(
+        schema,
+        builder,
+        field,
+        dataSource,
+        true,
+      );
+      return type === 'nested' || type === '';
+    }).toList();
+    // Filter out anything that it is a single object, not a list of objects
+    if (resultsState.hits && resultsState.hits.size)
+    {
+      nestedFields = nestedFields.filter((field) =>
+        List.isList(resultsState.hits.get(0).fields.get(field)),
+      ).toList();
+    }
+    // If there is a results config in use, only use nested fields in that config
+    if (props.query.resultsConfig && props.query.resultsConfig.enabled)
+    {
+      nestedFields = nestedFields.filter((field) =>
+        props.query.resultsConfig.fields.indexOf(field) !== -1,
+      ).toList();
+    }
+    this.setState({
+      nestedFields,
+    });
   }
 
   public setIndexAndResultsConfig(props: Props)
@@ -281,7 +326,8 @@ class HitsArea extends TerrainComponent<Props>
           primaryKey={hit.primaryKey}
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
-          hitSize={hitSize}
+          hitSize={'large'}
+          nestedFields={this.state.nestedFields}
           builder={this.props.builder}
         />
       </div>
@@ -633,6 +679,7 @@ class HitsArea extends TerrainComponent<Props>
                   onSpotlightAdded={this.handleSpotlightAdded}
                   onSpotlightRemoved={this.handleSpotlightRemoved}
                   hitSize={this.state.hitSize}
+                  nestedFields={this.state.nestedFields}
                   builder={this.props.builder}
                 />
               );
@@ -902,6 +949,9 @@ column if you have customized the results view.');
         fields={this.props.resultsState.fields}
         onClose={this.hideConfig}
         onConfigChange={HitsArea.handleConfigChange}
+        builder={this.props.builder}
+        schema={this.props.schema}
+        dataSource={this.props.query.path.source.dataSource}
       />;
     }
   }
@@ -935,7 +985,7 @@ column if you have customized the results view.');
 
 export default Util.createContainer(
   HitsArea,
-  ['builder'],
+  ['builder', 'schema'],
   {
   },
 );

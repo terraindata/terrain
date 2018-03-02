@@ -240,6 +240,7 @@
     "@types/react-dnd": "^2.0.34",
     "@types/react-dom": "^16.0.4",
     "@types/react-modal": "^1.6.6",
+    "@types/react-onclickoutside": "^6.0.2",
     "@types/react-router": "3.0.2",
     "@types/redux-actions": "^1.2.3",
     "@types/request": "^2.47.0",

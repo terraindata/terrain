@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
@@ -57,8 +58,8 @@ import { BuilderState } from 'app/builder/data/BuilderState';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Draggable from 'react-draggable';
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
+import { _Format, _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import MapUtil from '../../../util/MapUtil';
@@ -68,11 +69,14 @@ import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
-import { Hit } from './ResultTypes';
+import { _Hit, Hit } from './ResultTypes';
+import ExpandIcon from 'app/common/components/ExpandIcon';
+import FadeInOut from 'app/common/components/FadeInOut';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
+const CarrotIcon = require('images/icon_carrot?name=CarrotIcon');
 
 // TODO REMOVE
 import Actions from '../../data/BuilderActions';
@@ -92,6 +96,12 @@ export interface Props
   onSpotlightAdded: (id, spotlightData) => void;
   onSpotlightRemoved: (id) => void;
   hitSize?: 'large' | 'small';
+  style?: any;
+  depth?: any;
+  nestedFields?: List<string>;
+  hideNested?: boolean;
+  hideFieldNames?: boolean;
+  firstVisibleField?: number;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -108,35 +118,68 @@ export interface Props
   builder?: BuilderState;
 }
 
+enum NestedState {
+  Normal,
+  Collapsed,
+  Expanded,
+}
+
 @Radium
 class HitComponent extends TerrainComponent<Props> {
 
   public state: {
     hovered: boolean;
-    // spotlights: IMMap<string, any>;
+    nestedStates: Immutable.Map<string, NestedState>,
+    nestedFields: string[],
+    scrollState: Immutable.Map<string, number>,
   } =
     {
       hovered: false,
-      // spotlights: SpotlightStore.getState().spotlights,
+      nestedStates: Map<string, NestedState>({}),
+      nestedFields: undefined,
+      scrollState: Map<string, number>({}),
     };
 
   public constructor(props: Props)
   {
     super(props);
-    // this._subscribe(SpotlightStore, {
-    //   isMounted: false,
-    //   storeKeyPath: ['spotlights'],
-    //   stateKey: 'spotlights',
-    // });
+  }
+
+  public componentWillMount()
+  {
+    this.setState({
+      nestedFields: getResultNestedFields(this.props.hit, this.props.resultsConfig),
+    });
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (!_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS())
+      || !_.isEqual(Util.asJS(this.props.resultsConfig), Util.asJS(nextProps.resultsConfig)))
+    {
+      this.setState({
+        nestedFields: getResultNestedFields(nextProps.hit, nextProps.resultsConfig),
+      });
+    }
   }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
     for (const key in nextProps)
     {
-      if (key !== 'hit' && this.props[key] !== nextProps[key])
+      if (nextProps.hasOwnProperty(key))
       {
-        return true;
+        if (key === 'resultsConfig' && !_.isEqual(
+          Util.asJS(this.props.resultsConfig),
+          Util.asJS(nextProps.resultsConfig)))
+        {
+          return true;
+        }
+        if (key !== 'hit' && key !== 'resultsConfig'
+          && this.props[key] !== nextProps[key])
+        {
+          return true;
+        }
       }
     }
 
@@ -147,7 +190,6 @@ class HitComponent extends TerrainComponent<Props> {
         return true;
       }
     }
-
     return !_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS());
   }
 
@@ -159,12 +201,194 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
-  public renderField(field, index?, fields?, overrideFormat?)
+  public changeNestedState(state: NestedState, field: string)
   {
-    if (!resultsConfigHasFields(this.props.resultsConfig) && index >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
+    this.setState({
+      nestedStates: this.state.nestedStates.set(field, state),
+    });
+  }
+
+  public renderNestedFieldHeader(field, depth, size, expandState: NestedState)
+  {
+    return (
+      <div>
+        <div
+          className='hit-nested-content-header'
+          style={[borderColor(Colors().blockOutline),
+          backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+          ]}
+        >
+          <div
+            className='hit-nested-content-title'
+            onClick={this._fn(
+              this.changeNestedState,
+              expandState !== NestedState.Collapsed ?
+                  NestedState.Collapsed : NestedState.Normal,
+              field)}
+          >
+            {field} ({size})
+          </div>
+          {
+            size > 1 &&
+            <div
+              className='hit-nested-content-expand'
+            >
+              <ExpandIcon
+                open={expandState === NestedState.Expanded}
+                onClick={this._fn(
+                  this.changeNestedState,
+                  expandState !== NestedState.Expanded ?
+                      NestedState.Expanded : NestedState.Normal,
+                  field
+                )}
+              />
+            </div>
+          }
+        </div>
+        {
+          expandState !== NestedState.Collapsed &&
+          <div>
+            <div
+              className='hit-column-names'
+              style={[borderColor(Colors().blockOutline),
+                backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg)]}
+            />
+            {
+              this.state.scrollState.get(field) ?
+              <div
+                onClick={this._fn(this.handleScroll, field, -1)}
+                className='hit-content-scroll-back'
+                style={getStyle('fill', Colors().iconColor)}
+                key='forward-icon'
+              >
+                <CarrotIcon />
+              </div>
+              :
+              null
+            }
+            <div
+              onClick={this._fn(this.handleScroll, field, 1)}
+              className='hit-content-scroll-forward'
+              style={getStyle('fill', Colors().iconColor)}
+              key='back-icon'
+            >
+              <CarrotIcon />
+            </div>
+          </div>
+        }
+      </div>
+    );
+  }
+
+  public handleScroll(field, change)
+  {
+    const prevState = this.state.scrollState.get(field) || 0;
+    this.setState({
+      scrollState: this.state.scrollState.set(field, prevState + change);
+    })
+  }
+
+  public renderNestedItems(items, format, field, depth)
+  {
+     return (
+       <div>
+        {
+          items.map((fields, i) =>
+          {
+            if (fields['_source'])
+            {
+              fields = _.extend({}, fields, fields['_source']);
+            }
+            // This happens when the source isn't properly set, such as in the Schema Browser
+            if (typeof fields !== 'object')
+            {
+              return null;
+            }
+            return (
+              <HitComponent
+                {...this.props}
+                resultsConfig={format && format.config}
+                index={i}
+                primaryKey={''}
+                expanded={false}
+                allowSpotlights={false}
+                key={field + String(i)}
+                style={borderColor(Colors().blockOutline)}
+                hitSize='small'
+                hit={_Hit({
+                  fields: Map(fields),
+                })}
+                depth={depth + 1}
+                nestedFields={undefined}
+                hideFieldNames={true}
+                firstVisibleField={this.state.scrollState.get(field)}
+              />);
+          },
+         )
+        }
+      </div>
+    );
+  }
+
+  public renderNestedField(field)
+  {
+    const config = this.props.resultsConfig;
+    let format = config && config.enabled && config.formats && config.formats.get(field);
+    format = _Format(Util.asJS(format));
+    let allValues = Util.asJS(this.props.hit.fields.get(field));
+    if (allValues === undefined || allValues.length === undefined)
     {
       return null;
     }
+    const expandState = this.state.nestedStates.get(field);
+    const size = allValues.length;
+    if (expandState === NestedState.Normal || !expandState)
+    {
+      allValues = allValues.slice(0, 1);
+    }
+    const depth = this.props.depth ? this.props.depth : 0;
+    return (
+      <div
+        className='hit-nested-content'
+        key={field}
+        style={[
+          { left: depth > 0 ? 15 : 0 },
+          { width: `calc(100% - ${depth > 0 ? 15 : 0}px` },
+          backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+          borderColor(Colors().blockOutline)
+      ]}
+      >
+        {
+          this.renderNestedFieldHeader(field, depth, size, expandState)
+        }
+          <div
+            className='hit-nested-content-values'
+            style={{height: expandState === NestedState.Expanded ? '100%' : 'auto'}}
+          >
+            <FadeInOut
+              open={expandState !== NestedState.Collapsed}
+            >
+              {this.renderNestedItems(allValues.slice(0, 1), format, field, depth)}
+            </FadeInOut>
+            <FadeInOut
+              open={expandState === NestedState.Expanded}
+            >
+              {
+                this.renderNestedItems(allValues.slice(1), format, field, depth)
+              }
+            </FadeInOut>
+          </div>
+      </div>
+    );
+  }
+
+  public renderField(field, i?, fields?, overrideFormat?)
+  {
+    if (!resultsConfigHasFields(this.props.resultsConfig) && i >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
+    {
+      return null;
+    }
+    const {hideFieldNames, index} = this.props;
     const spotlights = this.props.spotlights.spotlights;
     const isSpotlit = spotlights.get(this.props.primaryKey);
     const color = isSpotlit ? spotlights.get(this.props.primaryKey).color : 'black';
@@ -172,18 +396,42 @@ class HitComponent extends TerrainComponent<Props> {
       false, this.props.expanded, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
+    let style = {};
+    if (hideFieldNames && index !== 0)
+    {
+      style = {minWidth: $(`#${field}-header`).width()};
+    }
     return (
       <div
         className={classNames({
           'result-field': true,
           'results-are-small': this.props.hitSize === 'small',
+          'result-field-hide-field': this.props.hideFieldNames,
         })}
+        style={style}
         key={field}
+        id={hideFieldNames && index === 0 ? String(field) + '-header' : ''}
       >
         {
           showField &&
           <div
+            className={classNames({
+              'result-field-name': true,
+              'result-field-name-header': hideFieldNames && index === 0
+            })}
+            style={hideFieldNames && index !== 0 ? {opacity: 0} : {}} // Keep them there to make sizing work
+          >
+            {
+              field
+            }
+          </div>
+        }
+        {
+          // Need to duplicate the above, when we are rendering a header to make it's width count towards the parent
+          hideFieldNames && index === 0 &&
+          <div
             className='result-field-name'
+            style={{visibility: 'hidden', height: 0, overflow: 'hidden', padding: 0}}
           >
             {
               field
@@ -196,6 +444,7 @@ class HitComponent extends TerrainComponent<Props> {
             'result-field-value-short': (field + value).length < 0,
             'result-field-value-number': typeof value === 'number',
             'result-field-value-show-overflow': format && format.type === 'map',
+            'result-field-value-header': hideFieldNames && index === 0,
           })}
         >
           {
@@ -208,6 +457,10 @@ class HitComponent extends TerrainComponent<Props> {
 
   public spotlight(e, overrideId?, overrideColor?)
   {
+    if (!this.props.allowSpotlights)
+    {
+      return;
+    }
     const id = overrideId || this.props.primaryKey;
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     const spotlightData = this.props.hit.toJS();
@@ -226,6 +479,10 @@ class HitComponent extends TerrainComponent<Props> {
 
   public unspotlight()
   {
+    if (!this.props.allowSpotlights)
+    {
+      return;
+    }
     this.props.onSpotlightRemoved(this.props.primaryKey);
     this.props.spotlightActions({
       actionType: 'clearSpotlightAction',
@@ -271,14 +528,12 @@ class HitComponent extends TerrainComponent<Props> {
   {
     const { isDragging, connectDragSource, isOver, connectDropTarget, hit, hitSize, expanded } = this.props;
     let { resultsConfig } = this.props;
-
     const classes = classNames({
       'result': true,
       'result-expanded': this.props.expanded,
       'result-dragging': isDragging,
       'result-drag-over': isOver,
     });
-
     let score: any = null;
 
     if (resultsConfig && resultsConfig.score && resultsConfig.enabled)
@@ -291,15 +546,24 @@ class HitComponent extends TerrainComponent<Props> {
     const color = spotlight ? spotlight.color : 'black';
 
     const thumbnail = resultsConfig && resultsConfig.thumbnail ?
-      getResultThumbnail(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder, this.props.dataIndex) :
+      getResultThumbnail(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder) :
       null;
-    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder, this.props.dataIndex
+    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.schema, this.props.builder,
       this.props.locations, color);
-    const fields = getResultFields(hit, resultsConfig, this.props.schema, this.props.builder, this.props.dataIndex);
+    const nestedFields = this.props.nestedFields !== undefined
+      ? this.props.nestedFields.toJS()
+      : this.state.nestedFields !== undefined ?
+        this.state.nestedFields : [];
+    let fields = getResultFields(hit, resultsConfig, nestedFields, this.props.schema, this.props.builder);
+    if (this.props.hideFieldNames)
+    {
+      // Only show a set number of fields, starting at firstVisibleField (which is controlled by
+      // scroll buttons in the header)
+      const start = this.props.firstVisibleField || 0;
+      fields = fields.slice(start, start + 2)
+    }
     const configHasFields = resultsConfigHasFields(resultsConfig);
-
     let bottomContent: any;
-
     if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
     {
       bottomContent = (
@@ -333,112 +597,119 @@ class HitComponent extends TerrainComponent<Props> {
     }
     const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
       resultsConfig.thumbnailWidth;
-
+    const depth = this.props.depth !== undefined ? this.props.depth : 0;
     return ((
       <div
         className={classes}
-        onDoubleClick={this.expand}
-        onMouseEnter={this._fn(this.handleHover, true)}
-        onMouseLeave={this._fn(this.handleHover, false)}
-      >
-        <div
-          className={classNames({
-            'result-inner': true,
-            'results-are-small': hitSize === 'small',
-          })}
-          style={[
-            borderColor(Colors().resultLine),
-            backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
-          ]}
+        style={this.props.style}
+          onDoubleClick={this.expand}
+          // onMouseEnter={this._fn(this.handleHover, true)}
+          // onMouseLeave={this._fn(this.handleHover, false)}
         >
-          {
-            thumbnail &&
-            [
-              <div
-                className={classNames({
-                  'result-thumbnail-wrapper': true,
-                  'results-are-small': hitSize === 'small',
-                })}
-                style={{
-                  backgroundImage: `url(${thumbnail})`,
-                  width: thumbnailWidth,
-                  minWidth: thumbnailWidth,
-                }}
-                key={1}
-              >
-              </div>
-              ,
-              this.state.hovered &&
-              <Draggable
-                axis='x'
-                bounds='parent'
-                position={{
-                  x: thumbnailWidth - 15,
-                  y: 0,
-                }}
-                onDrag={this.handleThumbnailResize}
-                key={2}
-              >
-                <div
-                  className='result-thumbnail-resizer'
-                />
-              </Draggable>,
-            ]
-          }
           <div
             className={classNames({
-              'result-details-wrapper': true,
+              'result-inner': true,
               'results-are-small': hitSize === 'small',
             })}
+            style={[
+              borderColor(Colors().resultLine),
+              backgroundColor((depth + 1) % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+            ]}
           >
+            {
+              thumbnail &&
+              [
+                <div
+                  className={classNames({
+                    'result-thumbnail-wrapper': true,
+                    'results-are-small': hitSize === 'small',
+                  })}
+                  style={{
+                    backgroundImage: `url(${thumbnail})`,
+                    width: thumbnailWidth,
+                    minWidth: thumbnailWidth,
+                  }}
+                  key={1}
+                >
+                </div>
+                ,
+                this.state.hovered &&
+                <Draggable
+                  axis='x'
+                  bounds='parent'
+                  position={{
+                    x: thumbnailWidth - 15,
+                    y: 0,
+                  }}
+                  onDrag={this.handleThumbnailResize}
+                  key={2}
+                >
+                  <div
+                    className='result-thumbnail-resizer'
+                  />
+                </Draggable>,
+              ]
+            }
             <div
               className={classNames({
-                'result-name': true,
+                'result-details-wrapper': true,
                 'results-are-small': hitSize === 'small',
               })}
             >
               <div
-                className='result-name-inner'
-                style={fontColor(Colors().text.baseLight)}
+                className={classNames({
+                  'result-name': true,
+                  'results-are-small': hitSize === 'small',
+                })}
               >
-                {
-                  this.renderSpotlight()
-                }
-                <div className='result-pin-icon'>
-                  <PinIcon />
-                </div>
-                <span className='result-name-label'>{name}</span>
-                {
-                  this.props.expanded &&
-                  <div
-                    onClick={this.expand}
-                    className='result-expanded-close-button'
-                  >
-                    <CloseIcon className='close close-icon' />
+                <div
+                  className='result-name-inner'
+                  style={fontColor(Colors().text.baseLight)}
+                >
+                  {
+                    this.renderSpotlight()
+                  }
+                  <div className='result-pin-icon'>
+                    <PinIcon />
                   </div>
+                  <span className='result-name-label'>{name}</span>
+                  {
+                    this.props.expanded &&
+                    <div
+                      onClick={this.expand}
+                      className='result-expanded-close-button'
+                    >
+                      <CloseIcon className='close close-icon' />
+                    </div>
+                  }
+                </div>
+              </div>
+              <div
+                className={classNames({
+                  'result-fields-wrapper': true,
+                  'results-are-small': hitSize === 'small',
+                })}
+              >
+                {score}
+                {
+                  _.map(fields, this.renderField)
+                }
+                {
+                  expandedContent
                 }
               </div>
-            </div>
-            <div
-              className={classNames({
-                'result-fields-wrapper': true,
-                'results-are-small': hitSize === 'small',
-              })}
-            >
-              {score}
               {
-                _.map(fields, this.renderField)
-              }
-              {
-                expandedContent
+                bottomContent
               }
             </div>
+          </div>
+          <div>
             {
-              bottomContent
+              (this.props.hideNested !== true) &&
+              _.map(nestedFields, this.renderNestedField)
             }
           </div>
         </div>
-      </div>
     ));
   }
 
@@ -480,13 +751,16 @@ export function resultsConfigHasFields(config: ResultsConfig): boolean
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(hit: Hit, config: ResultsConfig, schema?: SchemaState, builder?: BuilderState, overrideIndex?: string): string[]
+export function getResultFields(hit: Hit, config: ResultsConfig,  nested: string[],
+  schema?: SchemaState, builder?: BuilderState): string[]
 {
   let fields: string[];
 
   if (resultsConfigHasFields(config))
   {
-    fields = config.fields.toArray();
+    fields = config.fields.filter((field) =>
+      nested.indexOf(field) === -1,
+    ).toArray();
   }
   else
   {
@@ -497,21 +771,52 @@ export function getResultFields(hit: Hit, config: ResultsConfig, schema?: Schema
     }
     // If there is a path
     const server: string = builderState.db.name;
-    let serverIndex = overrideIndex || server + '/' + getIndex('', builder);
+    let serverIndex = server + '/' + getIndex('', builder);
     if (builderState.query.path !== undefined &&
       builderState.query.path.source !== undefined &&
       builderState.query.path.source.dataSource !== undefined)
     {
       serverIndex = (builderState.query.path.source.dataSource as any).index;
     }
+
     fields = Util.orderFields(List(_.keys(hit.fields.toJS())), schema, -1, serverIndex).toArray();
+     fields = fields.filter((field) =>
+        nested.indexOf(field) === -1,
+     );
+
   }
 
   return fields;
 }
 
-export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean,
-  schema?: SchemaState, builder?: BuilderState, overrideIndex?: string, locations?: { [field: string]: any }, color?: string)
+// Return a list of fields that have nested configurations, as well as fields
+// that are nested objects that may not be configured
+export function getResultNestedFields(hit: Hit, config: ResultsConfig): string[]
+{
+  if (resultsConfigHasFields(config))
+  {
+    const configuredNested = config.fields.filter((field) =>
+      config.formats.get(field) !== undefined &&
+      config.formats.get(field).config !== undefined &&
+      config.formats.get(field).config.enabled,
+    ).toArray();
+    const unconfigNested = config.fields.filter((field) =>
+    {
+      return (typeof hit.fields.get(field) === 'object' ||
+        List.isList(hit.fields.get(field))) &&
+        configuredNested.indexOf(field) === -1;
+    }).toArray();
+    return unconfigNested.concat(configuredNested);
+  }
+  return _.keys(hit.fields.toJS()).filter((field) =>
+  {
+    return typeof hit.fields.get(field) === 'object' ||
+      List.isList(hit.fields.get(field));
+  });
+}
+
+export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
+  locations?: { [field: string]: any }, color?: string)
 {
   let thumbnailField: string;
 
@@ -521,14 +826,14 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
   }
   else
   {
-    thumbnailField = _.first(getResultFields(hit, config, schema, builder, overrideIndex));
+    thumbnailField = _.first(getResultFields(hit, config, [], schema, builder));
   }
 
   return getResultValue(hit, thumbnailField, config, false, expanded, null, locations, color, true);
 }
 
 export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
-  overrideIndex?: string, locations?: { [field: string]: any }, color?: string)
+  locations?: { [field: string]: any }, color?: string)
 {
   let nameField: string;
 
@@ -538,7 +843,7 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
   }
   else
   {
-    nameField = _.first(getResultFields(hit, config, schema, builder));
+    nameField = _.first(getResultFields(hit, config, [], schema, builder));
   }
 
   return getResultValue(hit, nameField, config, true, expanded, null, locations, color);
@@ -547,7 +852,8 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
 export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean, expanded: boolean,
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string, bgUrlOnly = false): any
 {
-  const format = config && config.enabled && config.formats && config.formats.get(field);
+  let format = config && config.enabled && config.formats && config.formats.get(field);
+  format = _Format(Util.asJS(format));
   const { showRaw } = overrideFormat || format || { showRaw: false };
   let italics = false;
   let tooltipText = '';
@@ -571,12 +877,12 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     value = 'null';
     italics = true;
   }
-
   if ((format && format.type !== 'map') || !format)
   {
     if (List.isList(value))
     {
       value = JSON.stringify(value);
+      value = value.replace(/\"/g, '').replace(/,/g, ', ').replace(/\[/g, '').replace(/\]/g, '');
       tooltipText = JSON.stringify(value, null, 2);
       tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
     }
@@ -585,7 +891,15 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   {
     tooltipText = JSON.stringify(value, null, 2);
     tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
-    value = JSON.stringify(value);
+    let valueString = '';
+    for (const key in Util.asJS(value))
+    {
+      if (value.hasOwnProperty(key))
+      {
+        valueString += key + ': ' + JSON.stringify(Util.asJS(value)[key]) + ', ';
+      }
+    }
+    value = valueString.slice(0, -2);
   }
 
   if (format && !isTitle)

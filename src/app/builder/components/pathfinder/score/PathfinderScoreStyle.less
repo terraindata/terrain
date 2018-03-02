@@ -12,6 +12,9 @@
 	.drag-drop-pf-score {
 		.pf-line-wrapper
 		{
+			margin-top: 6px;
+			margin-bottom: 6px;
+			margin-left: 30px;
 			.close{
 				opacity: 0;
 				.transition;
@@ -22,6 +25,18 @@
 				}
 			}
 		}
+		.expand-icon {
+			margin-top: 2px;
+			float: left;
+			opacity: 0.7;
+			margin-left: 8px;
+			&.hover {
+				opacity: 1;
+			}
+			.expand-icon-line {
+				width: 25px;
+			}
+		}
 	}
 	
 	.pf-linear-score-line {
@@ -29,12 +44,10 @@
 	}
 	
 	.pf-score-line-transform {
-		padding-bottom: 10px;
-		position: relative;
-		.menu-wrapper {
-			top: 12px;
-			right: 9px;
-		}
+	    left: 12px;
+	    margin-right: 38px;
+	    margin-top: 12px;
+	    position: relative;
 		.transform-card-inner {
 			margin-left: -17px;
 			width: 100%;
@@ -51,6 +64,7 @@
 		.linear-selector-wrapper {
 			width: 100%;
 			margin-bottom: 12px;
+			margin-left: 12px;
 			.linear-selector-options {
 				width: 100%;
 				.linear-selector-option {
@@ -86,7 +100,6 @@
 		}
 		.pf-score-line-inner {
 			position: relative;
-			background-color: #e9e9e9;
 			.builder-tb {
 				flex-basis: 50px;
 				margin: 0px 4px;
@@ -159,10 +172,10 @@
 			.builder-tb {
 				width: 50%;
 				input {
-					background-color: #e9e9e9;
 					border: none;
 					text-align: right;
 					color: #1eb4fa;
+					background: #f8f8f8;
 				}
 				flex-basis: unset;
 				flex-grow: unset;
@@ -195,11 +208,7 @@
 					background-color: transparent;
 				}
 				.dropdown-options-wrapper {
-					background-color: #e9e9e9;
 					border: none;
-				}
-				.dropdown-option {
-					background-color: #e9e9e9;
 				}
 			}
 		}

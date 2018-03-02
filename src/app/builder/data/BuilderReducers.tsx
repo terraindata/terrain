@@ -445,8 +445,9 @@ const BuilderReducers =
     [ActionTypes.changeResultsConfig]: (state: BuilderState,
       action: Action<{
         resultsConfig: any,
+        field: string,
       }>) =>
-      state
+        state
         .update('query',
           (query) =>
             query.set('resultsConfig', action.payload.resultsConfig),
