@@ -118,9 +118,66 @@ function createInitialTemplateFn(
   };
 }
 
+// Some of this logic could be put in redux using some neat features of Thunk (particularly getState)
 @Radium
 class ETLEditorPage extends TerrainComponent<Props>
 {
+  public saveTemplate(template: ETLTemplate)
+  {
+    const { etlAct, editorAct } = this.props;
+
+    const handleLoad = (savedTemplates: List<ETLTemplate>) =>
+    {
+      if (savedTemplates.size > 0)
+      {
+        const savedTemplate = savedTemplates.get(0);
+        editorAct({
+          actionType: 'setTemplate',
+          template: savedTemplate,
+        });
+        editorAct({
+          actionType: 'rebuildFieldMap',
+        });
+        editorAct({ // todo need to lock the ui during a save
+          actionType: 'setIsDirty',
+          isDirty: false,
+        });
+        if (savedTemplate.id !== template.id) // check if its a save
+        {
+          ETLRouteUtil.gotoEditTemplate(savedTemplate.id);
+        }
+      }
+      else
+      {
+        // todo handle error
+      }
+    };
+    const handleError = (ev) =>
+    {
+      // TODO
+    };
+
+    if (template.id === -1) // then its a new template
+    {
+      etlAct({
+        actionType: 'createTemplate',
+        template,
+        onLoad: handleLoad,
+        onError: handleError,
+      });
+    }
+    else
+    {
+      etlAct({
+        actionType: 'saveTemplate',
+        template,
+        onLoad: handleLoad,
+        onError: handleError,
+      });
+    }
+  }
+
+  // create a new template from the results of an algorithm
   public initFromAlgorithm()
   {
     const { algorithms, params, editorAct } = this.props;
@@ -144,6 +201,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     });
   }
 
+  // create a new template from thewalkthrough process
   public initFromWalkthrough()
   {
     const { editorAct, walkthrough } = this.props;
@@ -166,7 +224,8 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
   }
 
-  public loadExisting(templateId: number)
+  // is there a way to cleanly put this in redux?
+  public loadExistingTemplate(templateId: number)
   {
     const onLoad = (response: List<ETLTemplate>) =>
     {
@@ -211,10 +270,15 @@ class ETLEditorPage extends TerrainComponent<Props>
     });
   }
 
+  // is there a better pattern for this?
   public componentWillReceiveProps(nextProps)
   {
     const { params } = this.props;
     const { nextParams } = nextProps;
+    if (params == null || nextParams == null)
+    {
+      return;
+    }
     if (
       ETLRouteUtil.isRouteNewTemplate(this.props.location) &&
       getTemplateId(nextParams) !== -1
@@ -257,7 +321,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     else if (params.templateId !== undefined)
     {
       const templateId = getTemplateId(params);
-      this.loadExisting(templateId);
+      this.loadExistingTemplate(templateId);
     }
     else if (ETLRouteUtil.isRouteNewTemplate(this.props.location) &&
       this.props.walkthrough.source.type != null)
@@ -286,7 +350,7 @@ class ETLEditorPage extends TerrainComponent<Props>
         style={[fontColor(Colors().text1)]}
       >
         <div className='export-display-logo-bg' />
-        <TemplateEditor />
+        <TemplateEditor onSave={this.saveTemplate} />
       </div>
     );
   }

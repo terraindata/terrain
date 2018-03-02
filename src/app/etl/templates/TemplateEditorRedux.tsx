@@ -76,6 +76,10 @@ import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 
 export interface TemplateEditorActionTypes
 {
+  setIsDirty: {
+    actionType: 'setIsDirty';
+    isDirty: boolean;
+  };
   setTemplate: {
     actionType: 'setTemplate';
     template: ETLTemplate;
@@ -87,8 +91,8 @@ export interface TemplateEditorActionTypes
     actionType: 'setFieldMap';
     fieldMap: FieldMap;
   };
-  addModalConfirmation: {
-    actionType: 'addModalConfirmation';
+  addModal: {
+    actionType: 'addModal';
     props: ModalProps;
   };
   setModalRequests: {
@@ -123,10 +127,13 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
 {
   public reducers: ConstrainedMap<TemplateEditorActionTypes, TemplateEditorState> =
     {
+      setIsDirty: (state, action) =>
+      {
+        return state.set('isDirty', action.payload.isDirty);
+      },
       setTemplate: (state, action) =>
       {
-        return state.set('isDirty', false).
-          set('template', action.payload.template);
+        return state.set('template', action.payload.template);
       },
       rebuildFieldMap: (state, action) =>
       {
@@ -135,9 +142,9 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       },
       setFieldMap: (state, action) =>
       {
-        return state.set('isDirty', true).set('fieldMap', action.payload.fieldMap);
+        return state.set('fieldMap', action.payload.fieldMap);
       },
-      addModalConfirmation: (state, action) =>
+      addModal: (state, action) =>
       {
         return state.setIn(['uiState', 'modalRequests'],
           MultiModal.addRequest(state.uiState.modalRequests, action.payload.props));
@@ -167,7 +174,8 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       updateEngineVersion: (state, action) =>
       {
         const oldVersion = state.uiState.engineVersion;
-        return state.setIn(['uiState', 'engineVersion'], oldVersion + 1);
+        return state.setIn(['uiState', 'engineVersion'], oldVersion + 1)
+          .set('isDirty', true);
       },
       resetState: (state, action) =>
       {

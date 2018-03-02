@@ -61,7 +61,7 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 export interface ETLActionTypes
 {
-  setLoading: {
+  setLoading: { // sort of a semaphore to track if there are pending requests for a given query
     actionType: 'setLoading';
     key: string;
     isLoading: boolean;
@@ -182,7 +182,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     };
   }
 
-  public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch)
+  public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch, getState?)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;

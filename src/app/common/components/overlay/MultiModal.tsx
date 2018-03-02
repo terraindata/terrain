@@ -55,9 +55,12 @@ import Modal from 'common/components/Modal';
 import { Props as _ModalProps } from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 
-export type ModalProps = {
+export type ModalPropsObject = {
   [key in keyof _ModalProps]?: _ModalProps[key];
 };
+export type ModalProps = ModalPropsObject & {
+  computeProps?: () => ModalPropsObject;
+}
 // ModalProps is the same as the Props type from Modal.tsx, however all the props are optional.
 // This is important because MultiModal overrides the open prop.
 // MultiModal also wraps around the onClose prop if it is provided;
@@ -65,6 +68,8 @@ export type ModalProps = {
 export interface Props
 {
   requests: List<ModalProps>;
+  // MultiModal doesn't care about state, but change this if elements that use computeProps need to be rerendered
+  state?: any;
   setRequests: (newRequests: List<ModalProps>) => void;
   // a function that allows MultiModal to change requests - it's like onChange for a textbox
 }
@@ -103,9 +108,14 @@ export class MultiModal extends TerrainComponent<Props>
     }
     else
     {
+      let props = firstProps;
+      if (firstProps.computeProps !== undefined && typeof firstProps.computeProps === 'function')
+      {
+        props = firstProps.computeProps();
+      }
       return (
         <Modal
-          {...firstProps}
+          {...props}
           onClose={this.handleCloseModal}
           open={true}
         />

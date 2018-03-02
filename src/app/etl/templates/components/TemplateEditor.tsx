@@ -66,10 +66,13 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
+import Quarantine from 'util/RadiumQuarantine';
+
 const { List } = Immutable;
 
 export interface Props
 {
+  onSave: (template: ETLTemplate) => void;
   // below from container
   templateEditor?: TemplateEditorState;
   editorAct?: typeof TemplateEditorActions;
@@ -77,9 +80,14 @@ export interface Props
   etlAct?: typeof ETLActions;
 }
 
-@Radium
 class TemplateEditor extends TerrainComponent<Props>
 {
+  public state: {
+    newTemplateName: string,
+  } = {
+    newTemplateName: 'New Template',
+  };
+
   constructor(props)
   {
     super(props);
@@ -134,10 +142,10 @@ class TemplateEditor extends TerrainComponent<Props>
           </div>
           <div
             className='template-editor'
-            style={[
+            style={_.extend({},
               backgroundColor(Colors().bg3),
               getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
-            ]}
+            )}
             tabIndex={-1}
           >
             <div className='template-editor-full-area'>
@@ -164,24 +172,42 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public renderTopBar()
   {
-    const itemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
+    const { template, isDirty } = this.props.templateEditor;
+    let titleName = template.id === -1 ?
+      'Unsaved Template' :
+      template.templateName;
+    if (isDirty)
+    {
+      titleName += '*';
+    }
     return (
-      <div className='template-editor-top-bar'>
-        <div className='editor-top-bar-item' style={itemStyle} key='undo'>
-          Undo
+      <Quarantine>
+        <div className='template-editor-top-bar'>
+          <div
+            className='editor-top-bar-name'
+            style={topBarNameStyle}
+            key='title'
+          >
+            {titleName}
+          </div>
+          <div
+            className='editor-top-bar-item'
+            style={topBarItemStyle}
+            onClick={this.handleOpenClicked}
+            key='undo'
+          >
+            Open
+          </div>
+          <div
+            className='editor-top-bar-item'
+            style={topBarItemStyle}
+            onClick={this.handleSaveClicked}
+            key='save'
+          >
+            Save
+          </div>
         </div>
-        <div className='editor-top-bar-item' style={itemStyle} key='redo'>
-          Redo
-        </div>
-        <div
-          className='editor-top-bar-item'
-          style={itemStyle}
-          onClick={this.handleSaveClicked}
-          key='save'
-        >
-          Save
-        </div>
-      </div>
+      </Quarantine>
     );
   }
 
@@ -200,72 +226,95 @@ class TemplateEditor extends TerrainComponent<Props>
         </div>
         <MultiModal
           requests={modalRequests}
+          state={this.state}
           setRequests={this.setModalRequests}
         />
       </div>
     );
   }
 
+  public handleOpenClicked()
+  {
+
+  }
+
+  public handleSave()
+  {
+    const { template } = this.props.templateEditor;
+    this.props.onSave(template.set('templateName', this.state.newTemplateName));
+  }
+
+  public handleCloseSave()
+  {
+    this.setState({
+      newTemplateName: 'New Template',
+    });
+  }
+
+  // @memoizeOne
+  // public _computeSaveModalProps(newTemplateName)
+  // {
+  //   return ({
+  //     onConfirm: this.handleSave.bind(this),
+  //     onClose: this.handleCloseSave.bind(this),
+  //     confirmDisabled: newTemplateName === '',
+  //     title: 'Save New Template',
+  //     showTextbox: true,
+  //     confirm: true,
+  //     textboxValue: newTemplateName,
+  //     onTextboxValueChange: this.handleNewTemplateNameChange.bind(this),
+  //     textboxPlaceholderValue: 'Template Name',
+  //     closeOnConfirm: true,
+  //   });
+  // }
+
+  public computeSaveModalProps()
+  {
+    return ({
+      onConfirm: this.handleSave,
+      onClose: this.handleCloseSave,
+      confirmDisabled: this.state.newTemplateName === '',
+      title: 'Save New Template',
+      showTextbox: true,
+      confirm: true,
+      textboxValue: this.state.newTemplateName,
+      onTextboxValueChange: this.handleNewTemplateNameChange,
+      textboxPlaceholderValue: 'Template Name',
+      closeOnConfirm: true,
+    });
+    // return this._computeSaveModalProps(this.state.newTemplateName);
+  }
+
+  public handleNewTemplateNameChange(newValue: string)
+  {
+    this.setState({
+      newTemplateName: newValue,
+    });
+  }
+
   public handleSaveClicked()
   {
     const { template } = this.props.templateEditor;
-    const { etlAct, editorAct } = this.props;
-
-    const handleLoad = (savedTemplates: List<ETLTemplate>) =>
+    const { editorAct } = this.props;
+    if (template.id === -1)
     {
-      if (savedTemplates.size > 0)
-      {
-        const savedTemplate = savedTemplates.get(0);
-        editorAct({
-          actionType: 'setTemplate',
-          template: savedTemplate,
-        });
-        editorAct({
-          actionType: 'rebuildFieldMap',
-        });
-        if (savedTemplate.id !== template.id) // if its a save, or something weird happens
-        {
-          ETLRouteUtil.gotoEditTemplate(savedTemplate.id);
+      editorAct({
+        actionType: 'addModal',
+        props: {
+          computeProps: this.computeSaveModalProps,
         }
-      }
-      else
-      {
-        // todo handle error
-      }
-    };
-    const handleError = (ev) =>
-    {
-      // TODO
-    };
-
-    let templateForSave = template;
-    if (template.id === -1) // then its a new template
-    {
-      // temp stuff get rid of this TODO
-      const randstring = Math.random().toString(36).substring(2, 7);
-      templateForSave = templateForSave.set('templateName', `Test Template${randstring}`);
-
-      etlAct({
-        actionType: 'createTemplate',
-        template: templateForSave,
-        onLoad: handleLoad,
-        onError: handleError,
       });
     }
     else
     {
-      etlAct({
-        actionType: 'saveTemplate',
-        template: templateForSave,
-        onLoad: handleLoad,
-        onError: handleError,
-      });
+      this.props.onSave(template);
     }
   }
 }
 
 const emptyList = List([]);
-
+const topBarItemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
+const topBarNameStyle = [fontColor(Colors().text2)];
 export default Util.createContainer(
   TemplateEditor,
   [
