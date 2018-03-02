@@ -77,6 +77,7 @@ export interface Props
   pathfinderContext: PathfinderContext;
   comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
   isSoftFilter?: boolean; // does this section apply to soft filters?
+  fieldOptionSet: RouteSelectorOptionSet;
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
   // so that we can make the according UI adjustments
@@ -102,6 +103,27 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   } = {
 
     };
+
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
+    for (const key in nextProps)
+    {
+      if (key === 'comesBeforeAGroup')
+      {
+        if ((!nextProps.comesBeforeAGroup && this.props.comesBeforeAGroup) ||
+            (nextProps.comesBeforeAGroup && !this.props.comesBeforeAGroup))
+        {
+          // Somestimes comesbeforeagroup changes from undefined => null => false, causes unnecessary rerender
+          return true;
+        }
+        else if (!_.isEqual(nextProps[key], this.props[key]))
+        {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   public render()
   {
@@ -129,21 +151,27 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   private renderPicker()
   {
     const { props, state } = this;
-
     const fieldValue = props.filterLine.field;
     const comparisonValue = props.filterLine.comparison;
     const valueValue = this.shouldShowValue() ? props.filterLine.value : '';
     const boostValue = props.filterLine.boost;
+
+
     const values = List([
       fieldValue,
       comparisonValue,
       valueValue,
       boostValue,
     ]);
-
     return (
       <RouteSelector
-        optionSets={this.getOptionSets() /* TODO store in state? */}
+        getOptionSets={this.getOptionSets}
+        relevantData={{
+          index: (props.pathfinderContext.source.dataSource as any).index,
+          fieldValue,
+          comparisonValue,
+        }}
+        // optionSets={this.getOptionSets() /* TODO store in state? */}
         values={values}
         onChange={this.handleFilterPickerChange}
         canEdit={props.canEdit}
@@ -177,25 +205,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const { source } = pathfinderContext;
 
     // TODO save to state for better runtime?
-    const fieldOptions = source.dataSource.getChoiceOptions({
-      type: 'fields',
-      source,
-      schemaState: pathfinderContext.schemaState,
-      builderState: pathfinderContext.builderState,
-      subtype: isSoftFilter ? 'match' : undefined,
-    });
-
-    const fieldSet: RouteSelectorOptionSet = {
-      key: 'field',
-      options: fieldOptions,
-      shortNameText: 'Data Field',
-      headerText: '', // 'Choose on which field to impose a condition',
-      column: true,
-      hideSampleData: true,
-      hasSearch: true,
-      // hasOther: false,
-    };
-
+    const fieldSet = this.props.fieldOptionSet;
     let comparisonOptions = List<RouteSelectorOption>();
     let comparisonHeader = 'Choose a data field first';
     if (filterLine.field)
@@ -445,8 +455,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                     optionsDisplayName={Map(units)}
                     onChange={this._fn(this.handleMapValueChange, 'units')}
                     openDown={true}
-                  // keyPath={this.props.keyPath.push('value').push('units')}
-                  // action={this.props.onChange}
                   />
                 </div>
 

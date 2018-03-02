@@ -142,19 +142,14 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   private handleSourcePathChange(value)
   {
     const { props } = this;
-    const keyPath = props.keyPath.push('dataSource');
+    const keyPath = this._ikeyPath(props.keyPath, 'dataSource');
 
-    props.builderActions.changePath(keyPath.push('index'), value);
+    props.builderActions.changePath(this._ikeyPath(keyPath, 'index'), value);
 
     if (props.pathfinderContext.step === PathfinderSteps.Source)
     {
       props.onStepChange(props.pathfinderContext.step);
     }
-  }
-
-  private handleCountChange(value: string | number)
-  {
-    this.props.builderActions.changePath(this.props.keyPath.push('count'), value);
   }
 
   private getDataSourceOptions(overrideContext?: PathfinderContext): List<ChoiceOption>

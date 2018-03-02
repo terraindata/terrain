@@ -111,28 +111,28 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleReferenceChange(i, value)
   {
-    this.props.builderActions.changePath(this.props.keyPath.push('references').push(i), value);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references', i), value);
     if (this.props.path.nested.get(i) === undefined)
     {
-      const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
+      const nestedKeyPath = this._ikeyPath(this.props.keyPath, 'aggregations');
       this.props.builderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
     }
   }
 
   public handleAddNested()
   {
-    this.props.builderActions.changePath(this.props.keyPath.push('references'), this.props.more.references.push(''));
-    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested');
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'nested'), this.props.more.references.push(''));
+      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
     this.props.builderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
   }
 
   public handleDeleteNested(i)
   {
     this.props.builderActions.changePath(
-      this.props.keyPath.push('references'),
+      this._ikeyPath(this.props.keyPath, 'references'),
       this.props.more.references.splice(i, 1),
     );
-    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested');
+    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
     this.props.builderActions.changePath(
       nestedKeyPath,
       this.props.path.nested.splice(i, 1), true);
@@ -141,13 +141,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleAddLine()
   {
     const newLines = this.props.more.aggregations.push(_AggregationLine());
-    this.props.builderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'aggregations'), newLines);
   }
 
   public handleDeleteLine(index)
   {
     const newLines = this.props.more.aggregations.delete(index);
-    this.props.builderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'aggregations'), newLines);
   }
 
   public handleLinesReorder(items)
@@ -157,7 +157,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     {
       return this.props.more.aggregations.get(index);
     });
-    this.props.builderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'aggregations'), newLines);
   }
 
   public getAggregationLines()
@@ -168,7 +168,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         content: <PathfinderAggregationLine
           pathfinderContext={this.props.pathfinderContext}
           aggregation={agg}
-          keyPath={this.props.keyPath.push('aggregations').push(i)}
+          keyPath={this._ikeyPath(this.props.keyPath, 'aggregations').push(i)}
           onDelete={this.handleDeleteLine}
           index={i}
           key={i}
@@ -308,7 +308,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleNestedSizePickerChange(i: number, optionSetIndex: number, value: any)
   {
-    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
+    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i);
 
     this.props.builderActions.changePath
       (nestedKeyPath.concat(List(['source', 'count'])).toList(), value);
@@ -316,15 +316,15 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleAlgorithmNameChange(i: number, value: any)
   {
-    const nestedKeyPath = this.props.keyPath.butLast().toList().push('nested').push(i);
-    this.props.builderActions.changePath(nestedKeyPath.push('name'), value);
+    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i, 'name');
+    this.props.builderActions.changePath(nestedKeyPath, value);
   }
 
   public handleMinMatchesChange(optionSetIndex: number, value: any)
   {
     const { keyPath } = this.props;
-
-    this.props.builderActions.changePath(keyPath.butLast().toList().push('minMatches'), value);
+    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'minMatches');
+    this.props.builderActions.changePath(nestedKeyPath, value);
   }
 
   public renderNestedPaths()

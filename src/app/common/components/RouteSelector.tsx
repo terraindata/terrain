@@ -52,7 +52,6 @@ import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import { List, Map } from 'immutable';
 import * as $ from 'jquery';
-import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -100,8 +99,10 @@ export interface RouteSelectorOptionSet
 
 export interface Props
 {
-  optionSets: List<RouteSelectorOptionSet>;
+  optionSets?: List<RouteSelectorOptionSet>;
   values: List<any>;
+  getOptionSets?: () => List<RouteSelectorOptionSet>;
+  relevantData?: any; // If this data changes, have to recalculate option sets
   onChange: (key: number, value: any) => void;
   canEdit: boolean;
 
@@ -129,6 +130,7 @@ export class RouteSelector extends TerrainComponent<Props>
     columnRefs: Map<number, any>({}),
     pickerRef: null,
     resultsConfig: Map({}),
+    optionSets: List<RouteSelectorOptionSet>([]),
     // optionRefs: Map({}), // not needed for now, but keeping some logic around
 
     // TODO re-add animation / picked logic
@@ -150,9 +152,36 @@ export class RouteSelector extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    if (this.props.optionSets && !this.props.optionSets.get(0).hideSampleData)
+    // if (this.props.optionSets && !this.props.optionSets.get(0).hideSampleData)
+    // {
+    //   this.getResultConfigs(this.props.optionSets.get(0).options);
+    // }
+    this.setState({
+      optionSets: this.props.optionSets !== undefined ?
+        this.props.optionSets : this.props.getOptionSets(),
+    },
+    () => {
+      if (this.state.optionSets.get(0) && !this.state.optionSets.get(0).hideSampleData)
+      {
+        this.getResultConfigs(this.state.optionSets.get(0).options)
+      }
+    });
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (!_.isEqual(this.props.relevantData, nextProps.relevantData))
     {
-      this.getResultConfigs(this.props.optionSets.get(0).options);
+      console.log(this.props.relevantData, nextProps.relevantData);
+      this.setState({
+        optionSets: this.props.getOptionSets(),
+      });
+    }
+    else if (this.props.optionSets !== nextProps.optionSets)
+    {
+      this.setState({
+        optionSets: nextProps.optionSets,
+      });
     }
   }
 
@@ -209,7 +238,7 @@ export class RouteSelector extends TerrainComponent<Props>
         style={this.props.hideLine ? {border: 'none'} : {}}
       >
         {
-          props.optionSets.map((optionSet, index) => (
+          state.optionSets.map((optionSet, index) => (
             <div
               className={classNames({
                 'routeselector-box-value': true,
@@ -223,7 +252,7 @@ export class RouteSelector extends TerrainComponent<Props>
                 /* could try Mousedown to make it slightly snappier,
                 but this led to weird issues with closing it */
               }
-              style={getStyle('width', String(100 / props.optionSets.size) + '%')}
+              style={getStyle('width', String(100 / state.optionSets.size) + '%')}
             >
               <FloatingInput
                 label={optionSet.shortNameText}
@@ -260,7 +289,8 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private getDisplayName(optionSetIndex: number, optionIndex?: number)
   {
-    const { values, optionSets } = this.props;
+    const { values } = this.props;
+    const { optionSets } = this.state;
     const optionSet = optionSets.get(optionSetIndex);
     const options = optionSet.options;
     const wantsCurrentValue = optionIndex === undefined;
@@ -330,7 +360,7 @@ export class RouteSelector extends TerrainComponent<Props>
         >
           <div className='routeselector-picker-inner'>
             {
-              props.optionSets.map(this.renderOptionSet)
+              state.optionSets.map(this.renderOptionSet)
             }
           </div>
         </div>
@@ -399,7 +429,7 @@ export class RouteSelector extends TerrainComponent<Props>
       <div
         className='routeselector-option-set'
         key={optionSet.key}
-        style={getStyle('width', String(100 / props.optionSets.size) + '%')}
+        style={getStyle('width', String(100 / state.optionSets.size) + '%')}
       >
         <div
           className='routeselector-header'
@@ -480,7 +510,7 @@ export class RouteSelector extends TerrainComponent<Props>
   {
     let focusedOptionIndex = 0;
 
-    const focusedSet = this.props.optionSets.get(optionSetIndex);
+    const focusedSet = this.state.optionSets.get(optionSetIndex);
     if (focusedSet && focusedSet.focusOtherByDefault)
     {
       focusedOptionIndex = -1;
@@ -508,7 +538,7 @@ export class RouteSelector extends TerrainComponent<Props>
   private handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>)
   {
     const { keyCode } = e;
-    const { optionSets } = this.props;
+    const { optionSets } = this.state;
 
     let { focusedOptionIndex, focusedSetIndex } = this.state;
     let tabbed = false;
@@ -671,7 +701,7 @@ export class RouteSelector extends TerrainComponent<Props>
     option: RouteSelectorOption, index: number)
   {
     const { props, state } = this;
-    const optionSet = props.optionSets.get(optionSetIndex);
+    const optionSet = state.optionSets.get(optionSetIndex);
     const search = state.searches.get(optionSetIndex);
     const isShowing = this.shouldShowOption(option, search);
     const isSelected = props.values.get(optionSetIndex) === option.value;
@@ -798,9 +828,9 @@ export class RouteSelector extends TerrainComponent<Props>
       focusedOptionIndex: 0,
     });
 
-    const option = props.optionSets.get(optionSetIndex).options.find((opt) => opt.value === value);
+    const option = state.optionSets.get(optionSetIndex).options.find((opt) => opt.value === value);
 
-    if (optionSetIndex === props.optionSets.size - 1 || (option && option.closeOnPick))
+    if (optionSetIndex === state.optionSets.size - 1 || (option && option.closeOnPick))
     {
       this.close();
     }

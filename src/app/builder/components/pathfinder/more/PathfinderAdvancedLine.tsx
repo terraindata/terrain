@@ -120,7 +120,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           <BuilderTextbox
             value={this.props.advancedData.get(item.key)}
             canEdit={this.props.canEdit && !disabled}
-            keyPath={this.props.keyPath.push(item.key)}
+            keyPath={this._ikeyPath(this.props.keyPath, item.key)}
             language='elastic'
             placeholder={item.placeholder}
             action={this.props.builderActions.changePath}
@@ -130,7 +130,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         content =
           <MultiInput
             items={this.props.advancedData.get(item.key)}
-            keyPath={this.props.keyPath.push(item.key)}
+            keyPath={this._ikeyPath(this.props.keyPath, item.key)}
             action={this.props.builderActions.changePath}
             isNumber={item.isNumber}
             canEdit={this.props.canEdit && !disabled}
@@ -140,7 +140,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         content =
           <RangesInput
             ranges={this.props.advancedData.get(item.key)}
-            keyPath={this.props.keyPath.push(item.key)}
+            keyPath={this._ikeyPath(this.props.keyPath, item.key)}
             action={this.props.builderActions.changePath}
             canEdit={this.props.canEdit && !disabled}
           />;
@@ -150,7 +150,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         content =
           <Dropdown
             canEdit={this.props.canEdit && !disabled}
-            keyPath={this.props.keyPath.push(item.key)}
+            keyPath={this._ikeyPath(this.props.keyPath, item.key)}
             options={options}
             selectedIndex={options.indexOf(this.props.advancedData.get(item.key))}
             optionsDisplayName={item.optionDisplayNames}
@@ -168,8 +168,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
               zoomControl={true}
               keepAddressInSync={false}
               geocoder='google'
-              keyPath={this.props.keyPath.push(item.key)}
-              textKeyPath={this.props.keyPath.push(item.textKey)}
+              keyPath={this._ikeyPath(this.props.keyPath, item.key)}
+              textKeyPath={this._ikeyPath(this.props.keyPath, item.key)}
               hideSearchSettings={true}
               action={this.props.builderActions.changePath}
             />
@@ -208,7 +208,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         <RadioButtons
           selected={selected}
           options={options}
-          keyPath={this.props.keyPath.push(radioKey)}
+          keyPath={this._ikeyPath(this.props.keyPath, radioKey)}
           onSelectOption={this.props.onRadioChange}
           radioKey={radioKey}
           action={this.props.builderActions.changePath}

@@ -158,6 +158,7 @@ class PathfinderArea extends TerrainComponent<Props>
 
   public render()
   {
+    console.log('HERE');
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
@@ -171,7 +172,7 @@ class PathfinderArea extends TerrainComponent<Props>
         <div className='pathfinder-column-content'>
           <PathfinderSourceSection
             pathfinderContext={pathfinderContext}
-            keyPath={keyPath.push('source')}
+            keyPath={this._ikeyPath(keyPath, 'source')}
             onStepChange={this.incrementStep}
             source={path.source}
           />
@@ -182,7 +183,7 @@ class PathfinderArea extends TerrainComponent<Props>
             <PathfinderScoreSection
               pathfinderContext={pathfinderContext}
               score={path.score}
-              keyPath={keyPath.push('score')}
+              keyPath={this._ikeyPath(keyPath, 'score')}
               onStepChange={this.incrementStep}
             />
 
@@ -198,7 +199,7 @@ class PathfinderArea extends TerrainComponent<Props>
             <PathfinderFilterSection
               pathfinderContext={pathfinderContext}
               filterGroup={path.filterGroup}
-              keyPath={keyPath.push('filterGroup')}
+              keyPath={this._ikeyPath(keyPath, 'filterGroup')}
               onStepChange={this.incrementStep}
               toSkip={toSkip}
             />
@@ -207,7 +208,7 @@ class PathfinderArea extends TerrainComponent<Props>
               pathfinderContext={pathfinderContext}
               more={path.more}
               path={path}
-              keyPath={keyPath.push('more')}
+              keyPath={this._ikeyPath(keyPath, 'more')}
               toSkip={toSkip !== undefined ? toSkip : 3}
             />
           </FadeInOut>

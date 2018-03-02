@@ -96,7 +96,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             ?
             <BuilderTextbox
               value={filterGroup.name}
-              keyPath={this.props.keyPath.push('name')}
+              keyPath={this._ikeyPath(this.props.keyPath, 'name')}
               canEdit={canEdit}
               action={this.props.onChange}
               onBlur={this._toggle('editingName')}
@@ -119,7 +119,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
                 })}
                 onClick={this._fn(
                   this.props.onChange,
-                  this.props.keyPath.push('collapsed'),
+                  this._ikeyPath(this.props.keyPath, 'collapsed'),
                   !filterGroup.collapsed)
                 }
                 style={getStyle('fill', Colors().iconColor)}
@@ -137,7 +137,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
           !this.props.isSoftFilter &&
           <LinearSelector
             options={filterDropdownOptions}
-            keyPath={this.props.keyPath.push('minMatches')}
+            keyPath={this._ikeyPath(this.props.keyPath, 'minMatches')}
             selected={this.props.filterGroup.minMatches}
             allowCustomInput={false}
             canEdit={canEdit}

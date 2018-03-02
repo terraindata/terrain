@@ -154,20 +154,20 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   public handleDeleteLine(index)
   {
     const newLines = this.props.score.lines.delete(index);
-    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
   }
 
   public handleAddScoreLine()
   {
     const newLines = this.props.score.lines.push(_ScoreLine());
-    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
   }
 
   public handleValueChange(key, index, value)
   {
     const newLine = this.props.score.lines.get(index).set(key, value);
     const newLines = this.props.score.lines.set(index, newLine);
-    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
   }
 
   public getOptionSets(): List<RouteSelectorOptionSet>
@@ -223,11 +223,11 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     const { source } = props.pathfinderContext;
     if (optionSetIndex === 0)
     {
-      this.props.builderActions.changePath(this.props.keyPath.push('lines').push(i).push('field'), value);
+      this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines', i, 'field'), value);
     }
     else
     {
-      this.props.builderActions.changePath(this.props.keyPath.push('lines').push(i).push('sortOrder'), value);
+      this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines', i, 'sortOrder'), value);
     }
   }
 
@@ -285,7 +285,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
         builderState,
       });
     }
-    const keyPath = this.props.keyPath.push('lines');
+    const keyPath = this._ikeyPath(this.props.keyPath, 'lines');
 
     return (
       scoreLines.map((line, index) =>
@@ -298,7 +298,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
               onDelete={this.handleDeleteLine}
               index={index}
               onValueChange={this.handleValueChange}
-              keyPath={keyPath.push(index)}
+              keyPath={this._ikeyPath(keyPath, index)}
               allWeights={this.state.allWeights}
               dropdownOptions={dropdownOptions}
               pathfinderContext={this.props.pathfinderContext}
@@ -318,7 +318,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     {
       return this.props.score.lines.get(index);
     });
-    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
   }
 
   public handleStepChange()
@@ -332,7 +332,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
   public randomizeScore()
   {
-    this.props.builderActions.changePath(this.props.keyPath.push('seed'),
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'seed'),
       Math.round(Math.random() * 100));
   }
 
@@ -406,7 +406,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   private handleScoreTypeChange(value: ScoreType)
   {
     this.props.builderActions.changePath(
-      this.props.keyPath.push('type'),
+      this._ikeyPath(this.props.keyPath, 'type'),
       value,
     );
   }

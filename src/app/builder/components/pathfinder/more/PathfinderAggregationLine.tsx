@@ -119,7 +119,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 
   public toggleExpanded()
   {
-    this.props.builderActions.changePath(this.props.keyPath.push('expanded'), !this.props.aggregation.expanded);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'expanded'), !this.props.aggregation.expanded);
   }
 
   public handleTypeChange(index)
@@ -131,14 +131,14 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleFieldChange(index: number)
   {
     const newField = this.state.fieldOptions.get(index);
-    this.props.builderActions.changePath(this.props.keyPath.push('field'), newField, false, true);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'field'), newField, false, true);
     const fieldType = ElasticBlockHelpers.getTypeOfField(
       this.props.pathfinderContext.schemaState,
       this.props.pathfinderContext.builderState,
       newField,
       this.props.pathfinderContext.source.dataSource,
     );
-    this.props.builderActions.changePath(this.props.keyPath.push('fieldType'), fieldType);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'fieldType'), fieldType);
     this.updateAggregation(this.props.aggregation.type, newField);
   }
 
@@ -155,13 +155,13 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     {
       elasticType = this.getElasticType(type, field);
     }
-    this.props.builderActions.changePath(this.props.keyPath.push('elasticType'), elasticType);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'elasticType'), elasticType);
 
     // Update the advanced section of the aggregation
     const advancedTypes = this.getAdvancedOptions(type, elasticType);
     const advancedObj = this.createAdvancedObject(advancedTypes, field);
-    this.props.builderActions.changePath(this.props.keyPath.push('advanced'), Map(advancedObj));
-    this.props.builderActions.changePath(this.props.keyPath.push('advanced').push('name'), type + ' ' + field);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'advanced'), Map(advancedObj));
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'advanced', 'name'), type + ' ' + field);
   }
 
   // This function, given a type of aggregation, returns a list of the advanced settings for that
@@ -252,9 +252,9 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
             const min = resp.result.aggregations.minimum.value;
             const max = resp.result.aggregations.maximum.value;
             const interval = (max - min) / 10;
-            this.props.builderActions.changePath(this.props.keyPath.push('advanced').push('min'), min);
-            this.props.builderActions.changePath(this.props.keyPath.push('advanced').push('max'), max);
-            this.props.builderActions.changePath(this.props.keyPath.push('advanced').push('interval'), interval);
+            this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'advanced', 'min'), min);
+            this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'advanced', 'max'), max);
+            this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'minMatches', 'interval'), interval);
           }
 
         },
@@ -379,7 +379,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         <Dropdown
           options={this.typeOptions}
           selectedIndex={this.typeOptions.indexOf(this.props.aggregation.type)}
-          keyPath={this.props.keyPath.push('type')}
+          keyPath={this._ikeyPath(this.props.keyPath, 'type')}
           onChange={this.handleTypeChange}
           canEdit={canEdit}
           action={this.props.builderActions.changePath}
@@ -404,7 +404,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     return <PathfinderAdvancedLine
       key={i}
       advancedType={type}
-      keyPath={this.props.keyPath.push('advanced')}
+      keyPath={this._ikeyPath(this.props.keyPath, 'advanced')}
       canEdit={canEdit}
       advancedData={this.props.aggregation.advanced}
       fieldName={this.props.aggregation.field}
@@ -423,12 +423,12 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       return;
     }
     elasticType = this.getElasticType(type, undefined, key);
-    this.props.builderActions.changePath(this.props.keyPath.push('elasticType'), elasticType);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'elasticType'), elasticType);
     // If switching from ranges to uniform interval, auto-fill the interval values
     if (radioKey === 'rangeType')
     {
       const advancedTypes = this.getAdvancedOptions(this.props.aggregation.type, elasticType);
-      this.props.builderActions.changePath(this.props.keyPath.push('advanced'),
+      this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'advanced'),
         this.createAdvancedObject(advancedTypes, this.props.aggregation.field));
     }
   }

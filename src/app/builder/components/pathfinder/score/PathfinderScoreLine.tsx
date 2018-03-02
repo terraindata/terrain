@@ -134,13 +134,13 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public handleTransformModeChange(index)
   {
     const options = ['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'];
-    this.props.builderActions.changePath(this.props.keyPath.push('transformData').push('mode'), options[index]);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'transformData', 'mode'), options[index]);
   }
 
   public handleFieldChange(index)
   {
     const value = this.props.dropdownOptions.map((v) => v.displayName).toList().get(index);
-    this.props.builderActions.changePath(this.props.keyPath.push('field'), value, false, true);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'field'), value, false, true);
     this.setState((state) => ({ editingField: false }));
   }
 
@@ -164,7 +164,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         <LinearSelector
           options={List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'])}
           selected={line.transformData.mode}
-          keyPath={this.props.keyPath.push('transformData').push('mode')}
+          keyPath={this._ikeyPath(this.props.keyPath, 'transformData', 'mode')}
           action={this.props.builderActions.changePath}
           canEdit={pathfinderContext.canEdit}
           displayNames={Map({
@@ -182,7 +182,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           data={data}
           handleCardDrop={undefined}
           helpOn={undefined}
-          keyPath={this.props.keyPath.push('transformData')}
+          keyPath={this._ikeyPath(this.props.keyPath, 'transformData')}
           language={'elastic'}
           onChange={this.props.builderActions.changePath}
           parentData={undefined}
@@ -236,7 +236,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     const { keyPath } = this.props;
 
-    this.props.builderActions.changePath(this.props.keyPath.push('weight'), value);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'weight'), value);
   }
 
   public renderExpandIcon()
@@ -288,7 +288,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                 <ScoreBar
                   parentData={{ weights: this.props.allWeights }}
                   data={{ weight: this.state.weight }}
-                  keyPath={this.props.keyPath.push('weight')}
+                  keyPath={this._ikeyPath(this.props.keyPath, 'weight')}
                   builderActions={this.props.builderActions}
                   onBeforeChange={this.handleWeightBeforeChange}
                   onChange={this.handleWeightChange}
@@ -298,7 +298,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                   editing={this.state.editingWeight}
                   editComponent={
                     <BuilderTextbox
-                      keyPath={this.props.keyPath.push('weight')}
+                      keyPath={this._ikeyPath(this.props.keyPath, 'weight')}
                       value={this.props.line.weight}
                       language={'elastic'}
                       canEdit={this.props.pathfinderContext.canEdit}

@@ -65,6 +65,7 @@ import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
+import { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 
 export interface Props
 {
@@ -84,8 +85,10 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public state:
     {
       dragging: boolean,
+      fieldOptionSet: RouteSelectorOptionSet,
     } = {
       dragging: false,
+      fieldOptionSet: undefined,
     };
 
   public componentWillMount()
@@ -105,6 +108,45 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       selector: '.drag-drop-item-is-over',
       style: { background: Colors().blockBg },
     });
+    this.setState({
+      fieldOptionSet: this.getFieldOptionSet(this.props)
+    })
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if ((this.props.pathfinderContext.source.dataSource as any).index !== 
+      (nextProps.pathfinderContext.source.dataSource as any).index)
+    {
+      this.setState({
+        fieldOptionSet: this.getFieldOptionSet(nextProps),
+      })
+    }
+  }
+
+  public getFieldOptionSet(props: Props)
+  {
+    const { pathfinderContext, isSoftFilter } = props;
+    const { source } = pathfinderContext;
+     const fieldOptions = source.dataSource.getChoiceOptions({
+      type: 'fields',
+      source,
+      schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
+      subtype: isSoftFilter ? 'match' : undefined,
+    });
+
+    const fieldSet: RouteSelectorOptionSet = {
+      key: 'field',
+      options: fieldOptions,
+      shortNameText: 'Data Field',
+      headerText: '', // 'Choose on which field to impose a condition',
+      column: true,
+      hideSampleData: true,
+      hasSearch: true,
+      // hasOther: false,
+    };
+    return fieldSet;
   }
 
   public shouldComponentUpdate(nextProps, nextState)
@@ -114,8 +156,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public handleAddFilter()
   {
+    console.log('here add filter');
     const newLines = this.props.filterGroup.lines.push(_FilterLine());
-    this.props.builderActions.changePath(this.props.keyPath.push('lines'), newLines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
   }
 
   public insertIn(items, keyPath, item): List<any>
@@ -191,6 +234,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         pathfinderContext={pathfinderContext}
         comesBeforeAGroup={successor && this.isGroup(successor)}
         isSoftFilter={isSoftFilter}
+        fieldOptionSet={this.state.fieldOptionSet}
       />
     );
   }
@@ -246,7 +290,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
     lines = this.updateLines(lines, itemKeyPath, dropKeyPath, item, true);
     // Update the lines
-    this.props.builderActions.changePath(this.props.keyPath.push('lines'), lines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), lines);
   }
 
   // When something is dropped into a group
@@ -282,7 +326,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         lines: List([droppedInto, dropped]),
         name: 'Group ' + groupNumber,
       });
-      this.props.builderActions.changePath(this.props.keyPath.push('groupCount'), groupCount + 1, true);
+      this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'groupCount'), groupCount + 1, true);
     }
     // If the dropped item was already a group, keep it's name and minMatches and append the line it was dropped onto
     else
@@ -296,7 +340,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     dropKeyPath = dropKeyPath.push('filterGroup');
     lines = this.updateLines(lines, dragKeyPath, dropKeyPath, group);
     // Look for the thing that you dropped, if it is somewhere other than keyPath, remove it
-    this.props.builderActions.changePath(this.props.keyPath.push('lines'), lines);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), lines);
   }
 
   // Given the lines and the new item, move the item from the dragKeyPath to the dropKeyPath
