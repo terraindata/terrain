@@ -100,13 +100,11 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     expanded: boolean;
     fieldIndex: number;
     editingField: boolean;
-    editingWeight: boolean;
   } = {
       weight: this.props.line.weight,
       expanded: this.props.line.expanded,
       fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
       editingField: false,
-      editingWeight: false,
     };
 
   public componentWillReceiveProps(nextProps)
@@ -214,17 +212,9 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     this.setState((state) => ({ editingField: true }));
   }
 
-  public editingWeight()
-  {
-    this.setState((state) => ({ editingWeight: true }));
-  }
-
   public handleWeightBeforeChange(value: number)
   {
-    if (this.state.editingWeight)
-    {
-      this.setState((state) => ({ editingWeight: false }));
-    }
+    
   }
 
   public handleWeightChange(value: number)
@@ -284,37 +274,12 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         {
           fieldIndex > -1 ?
             (
-              <div style={{ width: '66.66%', display: 'flex' }} >
+              <div style={getStyle('width', '66.66%')} >
                 <ScoreBar
-                  parentData={{ weights: this.props.allWeights }}
-                  data={{ weight: this.state.weight }}
-                  keyPath={this.props.keyPath.push('weight')}
-                  builderActions={this.props.builderActions}
+                  weight={this.state.weight}
                   onBeforeChange={this.handleWeightBeforeChange}
                   onChange={this.handleWeightChange}
                   onAfterChange={this.handleWeightAfterChange}
-                />
-                <EditableField
-                  editing={this.state.editingWeight}
-                  editComponent={
-                    <BuilderTextbox
-                      keyPath={this.props.keyPath.push('weight')}
-                      value={this.props.line.weight}
-                      language={'elastic'}
-                      canEdit={this.props.pathfinderContext.canEdit}
-                      placeholder={'weight'}
-                      isNumber={true}
-                      autoDisabled={true}
-                      action={this.props.builderActions.changePath}
-                    />
-                  }
-                  readOnlyComponent={
-                    <div className='field-weight' onClick={this.editingWeight}>
-                      <div className='field-weight-value'>
-                        {this.state.weight}
-                      </div>
-                    </div>
-                  }
                 />
               </div>
             ) : null

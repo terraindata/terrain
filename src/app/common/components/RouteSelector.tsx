@@ -95,7 +95,7 @@ export interface RouteSelectorOptionSet
   hideSampleData?: boolean; // hide sample data, even if it's present
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
 
-  getValueComponent?: (props: { value: any }) => React.ReactElement;
+  getValueComponent?: (props: { value: any }) => React.ReactElement<any>;
 }
 
 export interface Props
@@ -111,7 +111,6 @@ export interface Props
   noShadow?: boolean;
   autoFocus?: boolean;
   hideLine?: boolean;
-  // Be able to get rid of it
   canDelete?: boolean;
   onDelete?: () => void;
 }
@@ -206,7 +205,7 @@ export class RouteSelector extends TerrainComponent<Props>
           'routeselector-box-values-open': this.isOpen(),
           'routeselector-box-values-force-open': props.forceOpen,
         })}
-        style={this.props.hideLine ? {border: 'none'} : {}}
+        style={getStyle('border', props.hideLine ? 'none' : undefined)}
       >
         {
           props.optionSets.map((optionSet, index) => (

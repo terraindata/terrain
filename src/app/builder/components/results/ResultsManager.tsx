@@ -411,7 +411,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (postprocessed.hasOwnProperty('size'))
     {
-      postprocessed['size'] = Math.min(postprocessed['size'], 200);
+      postprocessed['size'] = Math.min(postprocessed['size'], MAX_HITS);
     }
 
     return ESConverter.formatES(new ESJSONParser(JSON.stringify(postprocessed)));
