@@ -48,16 +48,17 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as React from 'react';
 import * as _ from 'lodash';
+import * as React from 'react';
 import { Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
-import FloatingInput from 'app/common/components/FloatingInput';
 import FadeInOut from 'app/common/components/FadeInOut';
+import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import Util from 'app/util/Util';
+import RouteSelector from 'common/components/RouteSelector';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
@@ -67,7 +68,6 @@ import { _AggregationLine, _Path, More, Path, PathfinderContext, Source } from '
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
-import RouteSelector from 'common/components/RouteSelector';
 import './PathfinderMoreStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -204,31 +204,31 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             value: 'all',
             displayName: 'All',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '1',
             displayName: '1',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '3',
             displayName: '3',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '10',
             displayName: '10',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '100',
             displayName: '100',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
         ]),
         hasOther: true,
@@ -237,7 +237,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         column: true,
         hideSampleData: true,
         // hasOther: false,
-      }
+      },
     ]);
   }
 
@@ -251,31 +251,31 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             value: '1',
             displayName: '1',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '2',
             displayName: '2',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '3',
             displayName: '3',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '5',
             displayName: '5',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
           {
             value: '10',
             displayName: '10',
             hasOther: true,
-            sampleData: List([])
+            sampleData: List([]),
           },
         ]),
         hasOther: true,
@@ -284,7 +284,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         column: true,
         hideSampleData: true,
         // hasOther: false,
-      }
+      },
     ]);
   }
 
@@ -299,9 +299,9 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           .butLast()
           .toList()
           .concat(
-            List(['source', 'count']
+            List(['source', 'count'],
           )).toList(),
-        value
+        value,
       );
     }
   }
@@ -361,7 +361,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                     open={nested.get(i) !== undefined && nested.get(i).name !== undefined}
                   >
                     <FloatingInput
-                      value={nested.get(i) != undefined ? nested.get(i).name : undefined}
+                      value={nested.get(i) !== undefined ? nested.get(i).name : undefined}
                       onChange={this._fn(this.handleAlgorithmNameChange, i)}
                       label={'Algorithm Name'}
                       isTextInput={true}

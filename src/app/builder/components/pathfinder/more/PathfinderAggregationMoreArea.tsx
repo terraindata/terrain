@@ -182,7 +182,8 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
 
   public handleAddLine()
   {
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'nested'), this.props.aggregation.nested.push(_AggregationLine()));
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'nested'),
+      this.props.aggregation.nested.push(_AggregationLine()));
   }
 
   public renderNestedAggregations()

@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access no-console
+// tslint:disable:strict-boolean-expressions member-access no-console no-var-requires
 
+import Ajax from 'app/util/Ajax';
 import Hit from 'builder/components/results/Hit.tsx';
-import * as _ from 'underscore';
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import { List, Map } from 'immutable';
@@ -56,6 +56,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { _ResultsConfig, ResultsConfig } from 'shared/results/types/ResultsConfig';
+import * as _ from 'underscore';
 import Util from 'util/Util';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -65,7 +66,6 @@ import { FloatingInput, FONT_SIZE, LARGE_FONT_SIZE } from './FloatingInput';
 import KeyboardFocus from './KeyboardFocus';
 import './RouteSelectorStyle.less';
 import SearchInput from './SearchInput';
-import Ajax from 'app/util/Ajax';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -94,7 +94,7 @@ export interface RouteSelectorOptionSet
   hideSampleData?: boolean; // hide sample data, even if it's present
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
 
-  getValueComponent?: (props: { value: any }) => React.ReactElement;
+  getValueComponent?: (props: { value: any }) => React.ReactElement<any>;
 }
 
 export interface Props
@@ -112,7 +112,6 @@ export interface Props
   noShadow?: boolean;
   autoFocus?: boolean;
   hideLine?: boolean;
-  // Be able to get rid of it
   canDelete?: boolean;
   onDelete?: () => void;
 }
@@ -139,10 +138,10 @@ export class RouteSelector extends TerrainComponent<Props>
     // valueRef: null,
     // animationEl: null,
   };
-  
+
   constructor(props)
   {
-    super(props);    
+    super(props);
   }
 
   shouldComponentUpdate(nextProps, nextState)
@@ -163,7 +162,7 @@ export class RouteSelector extends TerrainComponent<Props>
     () => {
       if (this.state.optionSets.get(0) && !this.state.optionSets.get(0).hideSampleData)
       {
-        this.getResultConfigs(this.state.optionSets.get(0).options)
+        this.getResultConfigs(this.state.optionSets.get(0).options);
       }
     });
   }
@@ -235,7 +234,7 @@ export class RouteSelector extends TerrainComponent<Props>
           'routeselector-box-values-open': this.isOpen(),
           'routeselector-box-values-force-open': props.forceOpen,
         })}
-        style={this.props.hideLine ? {border: 'none'} : {}}
+        style={getStyle('border', props.hideLine ? 'none' : undefined)}
       >
         {
           state.optionSets.map((optionSet, index) => (
@@ -768,7 +767,7 @@ export class RouteSelector extends TerrainComponent<Props>
                     </div>
                   {
                     option.sampleData.slice(0, 1).map((data, i) =>
-                      this.renderSampleDatum(data, i, String(option.value))
+                      this.renderSampleDatum(data, i, String(option.value)),
                     )
                   }
                   {
@@ -948,8 +947,8 @@ export class RouteSelector extends TerrainComponent<Props>
             resultsConfig: this.state.resultsConfig.set(option.value, _ResultsConfig(resp[0])),
           });
         }
-      })
-    })
+      });
+    });
   }
 
   private renderSampleDatum(data: any, index: number, dataIndex: string)

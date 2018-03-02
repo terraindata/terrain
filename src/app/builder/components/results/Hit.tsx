@@ -48,13 +48,15 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
 import { BuilderState } from 'app/builder/data/BuilderState';
+import ExpandIcon from 'app/common/components/ExpandIcon';
+import FadeInOut from 'app/common/components/FadeInOut';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Draggable from 'react-draggable';
@@ -70,8 +72,6 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
 import { _Hit, Hit } from './ResultTypes';
-import ExpandIcon from 'app/common/components/ExpandIcon';
-import FadeInOut from 'app/common/components/FadeInOut';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -239,7 +239,7 @@ class HitComponent extends TerrainComponent<Props> {
                   this.changeNestedState,
                   expandState !== NestedState.Expanded ?
                       NestedState.Expanded : NestedState.Normal,
-                  field
+                  field,
                 )}
               />
             </div>
@@ -284,8 +284,8 @@ class HitComponent extends TerrainComponent<Props> {
   {
     const prevState = this.state.scrollState.get(field) || 0;
     this.setState({
-      scrollState: this.state.scrollState.set(field, prevState + change);
-    })
+      scrollState: this.state.scrollState.set(field, prevState + change),
+    });
   }
 
   public renderNestedItems(items, format, field, depth)
@@ -355,7 +355,7 @@ class HitComponent extends TerrainComponent<Props> {
           { left: depth > 0 ? 15 : 0 },
           { width: `calc(100% - ${depth > 0 ? 15 : 0}px` },
           backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
-          borderColor(Colors().blockOutline)
+          borderColor(Colors().blockOutline),
       ]}
       >
         {
@@ -417,7 +417,7 @@ class HitComponent extends TerrainComponent<Props> {
           <div
             className={classNames({
               'result-field-name': true,
-              'result-field-name-header': hideFieldNames && index === 0
+              'result-field-name-header': hideFieldNames && index === 0,
             })}
             style={hideFieldNames && index !== 0 ? {opacity: 0} : {}} // Keep them there to make sizing work
           >
@@ -560,7 +560,7 @@ class HitComponent extends TerrainComponent<Props> {
       // Only show a set number of fields, starting at firstVisibleField (which is controlled by
       // scroll buttons in the header)
       const start = this.props.firstVisibleField || 0;
-      fields = fields.slice(start, start + 2)
+      fields = fields.slice(start, start + 2);
     }
     const configHasFields = resultsConfigHasFields(resultsConfig);
     let bottomContent: any;

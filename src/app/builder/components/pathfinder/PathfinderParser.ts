@@ -155,7 +155,7 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : MAX_COUNT, // if it is all results, just default to 1000 ? change...
+    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : MAX_COUNT, 
     index: (source.dataSource as any).index,
   };
 }
@@ -336,24 +336,24 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
       return filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches));
     });
   }
-  
+
   filterObj = filterObj.setIn(['bool', 'must'], must);
   if (inMatchQualityContext)
   {
     // need to add a useless Must check, so that the Should does not
     // convert to a "must" because of the filter context
     // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
-    filterObj = filterObj.updateIn(['bool', 'must'], 
-      (must) => 
+    filterObj = filterObj.updateIn(['bool', 'must'],
+      (m) =>
       {
-        return must.push(Map({
+        return m.push(Map({
           exists: Map({
             field: '_id',
           }),
         }));
       });
   }
-  
+
   filterObj = filterObj.setIn(['bool', 'must_not'], mustNot);
   filterObj = filterObj.setIn(['bool', 'should'], should);
   filterObj = filterObj.setIn(['bool', 'filter'], filter);
@@ -537,7 +537,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
           distance: '10mi',
           [line.field]: '',
         }),
-      })
+      });
       }
       return Map({
         geo_distance: Map({

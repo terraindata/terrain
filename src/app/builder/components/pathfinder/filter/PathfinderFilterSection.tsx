@@ -47,8 +47,8 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import * as React from 'react';
 import * as _ from 'lodash';
+import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
@@ -59,13 +59,13 @@ import CustomDragLayer from 'app/common/components/CustomDragLayer';
 import DragDropGroup from 'app/common/components/DragDropGroup';
 import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
+import { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
-import { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import './PathfinderFilterStyle.less';
 
 export interface Props
@@ -110,18 +110,18 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       style: { background: Colors().blockBg },
     });
     this.setState({
-      fieldOptionSet: this.getFieldOptionSet(this.props)
-    })
+      fieldOptionSet: this.getFieldOptionSet(this.props),
+    });
   }
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if ((this.props.pathfinderContext.source.dataSource as any).index !== 
+    if ((this.props.pathfinderContext.source.dataSource as any).index !==
       (nextProps.pathfinderContext.source.dataSource as any).index)
     {
       this.setState({
         fieldOptionSet: this.getFieldOptionSet(nextProps),
-      })
+      });
     }
   }
 
@@ -157,7 +157,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public handleAddFilter()
   {
-    console.log('here add filter');
     const newLines = this.props.filterGroup.lines.push(_FilterLine());
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
   }

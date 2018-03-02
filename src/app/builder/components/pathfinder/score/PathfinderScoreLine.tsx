@@ -54,6 +54,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import ExpandIcon from 'app/common/components/ExpandIcon';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { BuilderState } from 'builder/data/BuilderState';
 import Util from 'util/Util';
@@ -66,7 +67,6 @@ import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrap
 import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
-import ExpandIcon from 'app/common/components/ExpandIcon';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
 const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
@@ -100,13 +100,11 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     expanded: boolean;
     fieldIndex: number;
     editingField: boolean;
-    editingWeight: boolean;
   } = {
       weight: this.props.line.weight,
       expanded: this.props.line.expanded,
       fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
       editingField: false,
-      editingWeight: false,
     };
 
   public componentWillReceiveProps(nextProps)
@@ -214,19 +212,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     this.setState((state) => ({ editingField: true }));
   }
 
-  public editingWeight()
-  {
-    this.setState((state) => ({ editingWeight: true }));
-  }
-
-  public handleWeightBeforeChange(value: number)
-  {
-    if (this.state.editingWeight)
-    {
-      this.setState((state) => ({ editingWeight: false }));
-    }
-  }
-
   public handleWeightChange(value: number)
   {
     this.setState((state) => ({ weight: value }));
@@ -284,12 +269,9 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         {
           fieldIndex > -1 ?
             (
-              <div style={{ width: '66.66%', display: 'flex' }} >
+              <div style={getStyle('width', '66.66%')} >
                 <ScoreBar
-                  parentData={{ weights: this.props.allWeights }}
-                  data={{ weight: this.state.weight }}
-                  keyPath={this._ikeyPath(this.props.keyPath, 'weight')}
-                  builderActions={this.props.builderActions}
+                  weight={this.state.weight}
                   onBeforeChange={this.handleWeightBeforeChange}
                   onChange={this.handleWeightChange}
                   onAfterChange={this.handleWeightAfterChange}

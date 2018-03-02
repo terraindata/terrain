@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import Slider from 'rc-slider';
 // We can just import Slider or Range to reduce bundle size
@@ -64,6 +65,7 @@ interface ScoreWeightSliderProps
   onChange: (value: number) => void;
   onAfterChange: (value: number) => void;
   height: number;
+  noLeftLine?: boolean;
 }
 
 export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSliderProps>
@@ -128,6 +130,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       max,
       height,
       value,
+      noLeftLine,
     } = this.props;
     const handleStyle = this.getHandleStyle();
     const trackStyle = this.getTrackStyle();
@@ -137,7 +140,12 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       <div style={{ width: '100%', position: 'relative', height: 33 }}>
         <div style={railStyle} />
         <div style={{ width: `calc(100% - ${height}px)`, position: 'relative', marginLeft: 14 }}>
-          <div style={{ zIndex: 2, top: -3, position: 'absolute', height: height + 6, borderLeft: '1px solid rgba(30, 180, 250, .5)' }} />
+          {
+            !noLeftLine &&
+              <div style={{
+                zIndex: 2, top: -3, position: 'absolute', height: height + 6, borderLeft: '1px solid rgba(30, 180, 250, .5)' }}
+              />
+          }
           <Slider
             min={min}
             max={max}

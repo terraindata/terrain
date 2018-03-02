@@ -43,10 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import Colors, {backgroundColor} from 'app/colors/Colors';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Colors, {backgroundColor} from 'app/colors/Colors';
 import './ExpandIcon.less';
 
 export interface Props

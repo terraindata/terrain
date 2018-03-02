@@ -55,6 +55,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import ScoreBar from 'app/builder/components/charts/ScoreBar';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
@@ -65,8 +66,9 @@ import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
-import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source,
-  BoostOptions } from '../PathfinderTypes';
+import { _DistanceValue, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
+  Source } from '../PathfinderTypes';
+
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -98,11 +100,16 @@ const pieceStyle = {
 @Radium
 class PathfinderFilterLine extends TerrainComponent<Props>
 {
-  public state: {
+  public state = {
+    boost: this.props.filterLine.boost,
+  };
 
-  } = {
-
-    };
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    this.setState({
+      boost: nextProps.filterLine && nextProps.filterLine.boost,
+    });
+  }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
@@ -141,8 +148,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         {
           this.renderPicker()
         }
-        {/*{
-          this.renderBoost() */
+        {
+          this.renderBoost()
         }
       </div>
     );
@@ -154,14 +161,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const fieldValue = props.filterLine.field;
     const comparisonValue = props.filterLine.comparison;
     const valueValue = this.shouldShowValue() ? props.filterLine.value : '';
-    const boostValue = props.filterLine.boost;
-
-
+    // const boostValue = props.filterLine.boost;
     const values = List([
       fieldValue,
       comparisonValue,
       valueValue,
-      boostValue,
+      // boostValue,
     ]);
     return (
       <RouteSelector
@@ -178,6 +183,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         defaultOpen={fieldValue === null}
         canDelete={true}
         onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
+        hideLine={true}
       />
     );
   }
@@ -273,26 +279,26 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       getValueComponent: this.renderValueComponent(),
       getCustomDisplayName: this.getCustomValueDisplayName,
     };
-    
-    let sets = [
+
+    const sets = [
       fieldSet,
       comparisonSet,
       valueSet,
     ];
-    
-    if (this.props.isSoftFilter)
-    {
-      const boostSet: RouteSelectorOptionSet = {
-        key: 'boost',
-        options: BoostOptions, //lk
-        shortNameText: 'Boost',
-        headerText: 'Weight this match criteria',
-        column: true,
-        hideSampleData: true,
-        hasOther: true,
-      };
-      sets.push(boostSet);
-    }
+
+    // if (this.props.isSoftFilter)
+    // {
+    //   const boostSet: RouteSelectorOptionSet = {
+    //     key: 'boost',
+    //     options: BoostOptions, //lk
+    //     shortNameText: 'Boost',
+    //     headerText: 'Weight this match criteria',
+    //     column: true,
+    //     hideSampleData: true,
+    //     hasOther: true,
+    //   };
+    //   sets.push(boostSet);
+    // }
 
     return List(sets);
   }
@@ -341,11 +347,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       case 2:
         this.handleChange('value', value);
         return;
-        
+
       case 3:
         this.handleChange('boost', value);
         return;
-        
+
       default:
         throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
     }
@@ -356,37 +362,45 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     this.props.onChange(this.props.keyPath, this.props.filterLine.set('weightSet', true));
   }
 
-  private handleBoostChange(e)
+  private handleBoostChange(value)
   {
-    this.props.onChange(this.props.keyPath, this.props.filterLine.set('weight', e.target.value));
+    this.setState({
+      boost: value,
+    });
+  }
+
+  private handleBoostFinish(value)
+  {
+    this.setState({
+      boost: value,
+    });
+    this.props.onChange(this.props.keyPath, this.props.filterLine.set('boost', value));
   }
 
   private renderBoost()
   {
-    const { filterLine, pathfinderContext } = this.props;
-    if (filterLine.field === null || filterLine.fieldType === null || filterLine.comparison === null)
+    if (!this.props.isSoftFilter)
     {
       return null;
     }
+    const { filterLine, pathfinderContext } = this.props;
+
+    // if (filterLine.field === null || filterLine.fieldType === null || filterLine.comparison === null)
+    // {
+    //   return null;
+    // }
+
     return (
-      <div>
-        {
-          !filterLine.weightSet ?
-            <div onClick={this.addBoost} className='pf-filter-add-boost'>
-              Add Boost
-          </div>
-            :
-            <div className='pf-filter-boost'>
-              <span>Boost:</span>
-              <input
-                value={filterLine.weight}
-                type='number'
-                min={0}
-                step={1}
-                onChange={this.handleBoostChange}
-              />
-            </div>
-        }
+      <div className='pathfinder-filter-boost'>
+        <ScoreBar
+          weight={this.state.boost}
+          onBeforeChange={_.noop}
+          onChange={this.handleBoostChange}
+          onAfterChange={this.handleBoostFinish}
+          altStyle={true}
+          max={5}
+          min={0}
+        />
       </div>
     );
   }
@@ -507,7 +521,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleMapChange(coordinates, inputValue)
   {
-    let filterLine
+    let filterLine;
     if (this.props.filterLine.value && this.props.filterLine.value['location'] !== undefined)
     {
       filterLine = this.props.filterLine

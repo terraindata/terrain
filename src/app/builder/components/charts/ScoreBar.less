@@ -1,5 +1,35 @@
 @import "../../../common/Common.less";
 
+.score-bar {
+  display: flex;
+  align-items: center;
+  
+  &.score-bar-alt {
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  
+  .score-bar-text {
+    width: 50px;
+  }
+  
+  .score-bar-field-weight {
+    // position: relative;
+    padding: 0;
+    text-align: right;
+    width: 50px;
+    font-size: 16px;
+    padding-right: 12px;
+    width: 20px;
+    
+    .score-bar-field-weight-value {
+      // position: absolute;
+      // right: 6px;
+      // top: 6px;
+    }
+  }
+}
+
 .score-weight-key {
   text-align: left;
   background: #fff;

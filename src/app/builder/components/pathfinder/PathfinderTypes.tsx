@@ -626,7 +626,7 @@ class ElasticDataSourceC extends DataSource
               sampleData: List([]),
               meta: {
                 fieldType: FieldType.Numerical,
-              }
+              },
             }),
             _ChoiceOption({
               displayName: '_size',
@@ -634,7 +634,7 @@ class ElasticDataSourceC extends DataSource
               sampleData: List([]),
               meta: {
                 fieldType: FieldType.Numerical,
-              }
+              },
             }),
           ]);
           acceptableFieldTypes =

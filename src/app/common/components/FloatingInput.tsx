@@ -219,11 +219,11 @@ export class FloatingInput extends TerrainComponent<Props>
     valueRef: null,
     value: this.props.value, // for debouncing
   };
-  
+
   constructor(props)
   {
     super(props);
-    
+
     this.debouncedExecuteChange = _.debounce(this.executeChange, 750);
   }
 
@@ -234,7 +234,7 @@ export class FloatingInput extends TerrainComponent<Props>
       // needed because the autoFocus prop is only checked on mount
       this.autoFocus();
     }
-    
+
     if (nextProps.value !== this.props.value)
     {
       // update local state value
@@ -291,6 +291,8 @@ export class FloatingInput extends TerrainComponent<Props>
       </Container>
     );
   }
+
+  private debouncedExecuteChange;
 
   private isFloating()
   {
@@ -364,11 +366,11 @@ export class FloatingInput extends TerrainComponent<Props>
   private handleChange(e)
   {
     const value = e.target.value;
-    
+
     this.setState({
       value,
     });
-    
+
     if (this.props.debounce)
     {
       this.debouncedExecuteChange(value);
@@ -378,13 +380,11 @@ export class FloatingInput extends TerrainComponent<Props>
       this.executeChange(value);
     }
   }
-  
+
   private executeChange(value)
   {
     this.props.onChange(value, this.props.id);
   }
-  
-  private debouncedExecuteChange;
 
   private handleFocus()
   {

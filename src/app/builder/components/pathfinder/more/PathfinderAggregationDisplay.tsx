@@ -396,7 +396,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
               replace ?
                 <BuilderTextbox
                   value={value}
-                  keyPath={this._ikeyPath(keyPath, key)}
+                  keyPath={keyPath.push(key)}
                   canEdit={canEdit}
                   action={BuilderActions.changePath}
                 />

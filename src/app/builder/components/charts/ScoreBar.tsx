@@ -44,15 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
 import ScoreWeightSlider from './ScoreWeightSlider';
+
+const EditableField = (props) =>
+  props.editing ? props.editComponent : props.readOnlyComponent;
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
@@ -64,54 +67,134 @@ const SCORE_COLORS =
 
 interface Props
 {
-  parentData: {
-    weights: Array<{ weight: number }>;
-  };
-  data: {
-    weight: number;
-  };
-  keyPath: KeyPath;
-  noAnimation?: boolean;
-  builderActions: typeof BuilderActions;
+  weight: number;
   onBeforeChange: (value: number) => void;
   onChange: (value: number) => void;
   onAfterChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  height?: number;
+  canEdit?: boolean;
+  altStyle?: boolean;
 }
 
+@Radium
 class ScoreBar extends TerrainComponent<Props>
 {
-  public handleWeightBeforeChange(value: number)
+  public state = {
+    editingWeight: false,
+  };
+
+  public render()
   {
+    const { weight, min, max, height, canEdit, altStyle } = this.props;
+
+    return (
+      <div
+        className={classNames({
+          'score-bar': true,
+          'score-bar-alt': altStyle,
+        })}
+        style={backgroundColor(altStyle ? Colors().blockBg : undefined)}
+      >
+        <ScoreWeightSlider
+          value={weight}
+          onBeforeChange={this.handleWeightBeforeChange}
+          onChange={this.handleWeightChange}
+          onAfterChange={this.handleWeightAfterChange}
+          min={min || 0}
+          max={max || 100}
+          color={Colors().active}
+          height={height || (altStyle && 22) || 34}
+          noLeftLine={altStyle}
+        />
+        <EditableField
+          editing={this.state.editingWeight}
+          editComponent={
+            <input
+              type='text'
+              className='score-bar-text'
+              value={weight}
+              onChange={this.handleWeightTextChange}
+              onBlur={this.handleTextBlur}
+              onKeyDown={this.handleTextKeyDown}
+              style={[
+                fontColor(Colors().active),
+                borderColor(Colors().active),
+              ]}
+            />
+          }
+          readOnlyComponent={
+            <div
+              className='score-bar-field-weight'
+              onClick={this.editingWeight}
+            >
+              <div
+                className='score-bar-field-weight-value'
+                style={fontColor(Colors().active)}
+              >
+                {
+                  weight
+                }
+              </div>
+            </div>
+          }
+        />
+      </div>
+    );
+  }
+
+  private handleWeightBeforeChange(value: number)
+  {
+    if (this.state.editingWeight)
+    {
+      this.setState({
+        editingWeight: false,
+      });
+    }
+
     this.props.onBeforeChange(value);
   }
 
-  public handleWeightChange(value: number)
+  private handleWeightChange(value: number)
   {
     this.props.onChange(value);
   }
 
-  public handleWeightAfterChange(value: number)
+  private handleWeightAfterChange(value: number)
   {
     this.props.onAfterChange(value);
   }
 
-  public render()
+  private handleWeightTextChange(e)
   {
-    const { weight } = this.props.data;
-
-    return (
-      <ScoreWeightSlider
-        value={weight}
-        onBeforeChange={this.handleWeightBeforeChange}
-        onChange={this.handleWeightChange}
-        onAfterChange={this.handleWeightAfterChange}
-        min={0}
-        max={100}
-        color={'rgb(30, 180, 250)'}
-        height={34}
-      />
-    );
+    this.props.onChange(e.target.value);
   }
+
+  private handleTextBlur()
+  {
+    this.setState({
+      editingWeight: false,
+    });
+  }
+
+  private handleTextKeyDown(e)
+  {
+    if (e.keyCode === 13)
+    {
+      this.setState({
+        editingWeight: false,
+      });
+    }
+  }
+
+  private editingWeight()
+  {
+    this.setState({
+      editingWeight: true,
+    });
+  }
+
 }
 
 export default ScoreBar;
