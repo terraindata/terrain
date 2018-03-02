@@ -77,37 +77,37 @@ export default abstract class TransformationNode
     this.typeCode = typeCode;
   }
 
-  public accept(visitor: TransformationNodeVisitor, doc: object): TransformationVisitResult
+  public accept(visitor: TransformationNodeVisitor, doc: object, options: object = {}): TransformationVisitResult
   {
     const docCopy = Object.assign({}, doc); // Preserve original doc in case of errors that would mangle it
     switch (this.typeCode)
     {
       case TransformationNodeType.LoadNode:
-        return visitor.visitLoadNode(this as any as LoadTransformationNode, docCopy);
+        return visitor.visitLoadNode(this as any as LoadTransformationNode, docCopy, options);
       case TransformationNodeType.StoreNode:
-        return visitor.visitStoreNode(this as any as StoreTransformationNode, docCopy);
+        return visitor.visitStoreNode(this as any as StoreTransformationNode, docCopy, options);
       case TransformationNodeType.PutNode:
-        return visitor.visitPutNode(this as any as PutTransformationNode, docCopy);
+        return visitor.visitPutNode(this as any as PutTransformationNode, docCopy, options);
       case TransformationNodeType.GetNode:
-        return visitor.visitGetNode(this as any as GetTransformationNode, docCopy);
+        return visitor.visitGetNode(this as any as GetTransformationNode, docCopy, options);
       case TransformationNodeType.SplitNode:
-        return visitor.visitSplitNode(this as any as SplitTransformationNode, docCopy);
+        return visitor.visitSplitNode(this as any as SplitTransformationNode, docCopy, options);
       case TransformationNodeType.JoinNode:
-        return visitor.visitJoinNode(this as any as JoinTransformationNode, docCopy);
+        return visitor.visitJoinNode(this as any as JoinTransformationNode, docCopy, options);
       case TransformationNodeType.FilterNode:
-        return visitor.visitFilterNode(this as any as FilterTransformationNode, docCopy);
+        return visitor.visitFilterNode(this as any as FilterTransformationNode, docCopy, options);
       case TransformationNodeType.DuplicateNode:
-        return visitor.visitDuplicateNode(this as any as DuplicateTransformationNode, docCopy);
+        return visitor.visitDuplicateNode(this as any as DuplicateTransformationNode, docCopy, options);
       case TransformationNodeType.PlusNode:
-        return visitor.visitPlusNode(this as any as PlusTransformationNode, docCopy);
+        return visitor.visitPlusNode(this as any as PlusTransformationNode, docCopy, options);
       case TransformationNodeType.PrependNode:
-        return visitor.visitPrependNode(this as any as PrependTransformationNode, docCopy);
+        return visitor.visitPrependNode(this as any as PrependTransformationNode, docCopy, options);
       case TransformationNodeType.AppendNode:
-        return visitor.visitAppendNode(this as any as AppendTransformationNode, docCopy);
+        return visitor.visitAppendNode(this as any as AppendTransformationNode, docCopy, options);
       case TransformationNodeType.UppercaseNode:
-        return visitor.visitUppercaseNode(this as any as UppercaseTransformationNode, docCopy);
+        return visitor.visitUppercaseNode(this as any as UppercaseTransformationNode, docCopy, options);
       case TransformationNodeType.SubstringNode:
-        return visitor.visitSubstringNode(this as any as SubstringTransformationNode, docCopy);
+        return visitor.visitSubstringNode(this as any as SubstringTransformationNode, docCopy, options);
       default:
         return {
           errors: [

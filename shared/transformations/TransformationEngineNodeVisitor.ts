@@ -66,88 +66,88 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
-  public applyTransformationNode(node: TransformationNode, doc: object): TransformationVisitResult
+  public applyTransformationNode(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     if (node === undefined)
     {
       return {} as TransformationVisitResult;
     }
 
-    return node.accept(this, doc);
+    return node.accept(this, doc, options);
   }
 
-  public visitDefault(node: TransformationNode, doc: object): TransformationVisitResult
+  public visitDefault(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return {} as TransformationVisitResult;
   }
 
-  public visitAppendNode(node: AppendTransformationNode, doc: object): TransformationVisitResult
+  public visitAppendNode(node: AppendTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitDuplicateNode(node: DuplicateTransformationNode, doc: object): TransformationVisitResult
+  public visitDuplicateNode(node: DuplicateTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitFilterNode(node: FilterTransformationNode, doc: object): TransformationVisitResult
+  public visitFilterNode(node: FilterTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitGetNode(node: GetTransformationNode, doc: object): TransformationVisitResult
+  public visitGetNode(node: GetTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitJoinNode(node: JoinTransformationNode, doc: object): TransformationVisitResult
+  public visitJoinNode(node: JoinTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitLoadNode(node: LoadTransformationNode, doc: object): TransformationVisitResult
+  public visitLoadNode(node: LoadTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitPlusNode(node: PlusTransformationNode, doc: object): TransformationVisitResult
+  public visitPlusNode(node: PlusTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitPrependNode(node: PrependTransformationNode, doc: object): TransformationVisitResult
+  public visitPrependNode(node: PrependTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitPutNode(node: PutTransformationNode, doc: object): TransformationVisitResult
+  public visitPutNode(node: PutTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitSplitNode(node: SplitTransformationNode, doc: object): TransformationVisitResult
+  public visitSplitNode(node: SplitTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitStoreNode(node: StoreTransformationNode, doc: object): TransformationVisitResult
+  public visitStoreNode(node: StoreTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
-    return this.visitDefault(node, doc);
+    return this.visitDefault(node, doc, options);
   }
 
-  public visitSubstringNode(node: SubstringTransformationNode, doc: object): TransformationVisitResult
+  public visitSubstringNode(node: SubstringTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
     for (const fieldID of node.fieldIDs.toJS())
@@ -191,7 +191,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     } as TransformationVisitResult;
   }
 
-  public visitUppercaseNode(node: UppercaseTransformationNode, doc: object): TransformationVisitResult
+  public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     for (const fieldID of node.fieldIDs.toJS())
     {
