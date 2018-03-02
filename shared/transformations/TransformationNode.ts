@@ -45,6 +45,22 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeVisitor from "sharedtransformations/TransformationNodeVisitor";
+import TransformationVisitResult from "sharedtransformations/TransformationVisitResult";
+import LoadNodeVisitor from "sharedtransformations/visitors/LoadNodeVisitor";
+import SplitNodeVisitor from "sharedtransformations/visitors/SplitNodeVisitor";
+import FilterNodeVisitor from "sharedtransformations/visitors/FilterNodeVisitor";
+import TransformationVisitError from "sharedtransformations/TransformationVisitError";
+import PrependNodeVisitor from "sharedtransformations/visitors/PrependNodeVisitor";
+import PutNodeVisitor from "sharedtransformations/visitors/PutNodeVisitor";
+import GetNodeVisitor from "sharedtransformations/visitors/GetNodeVisitor";
+import AppendNodeVisitor from "sharedtransformations/visitors/AppendNodeVisitor";
+import StoreNodeVisitor from "sharedtransformations/visitors/StoreNodeVisitor";
+import DuplicateNodeVisitor from "sharedtransformations/visitors/DuplicateNodeVisitor";
+import PlusNodeVisitor from "sharedtransformations/visitors/PlusNodeVisitor";
+import SubstringNodeVisitor from "sharedtransformations/visitors/SubstringNodeVisitor";
+import UppercaseNodeVisitor from "sharedtransformations/visitors/UppercaseNodeVisitor";
+import JoinNodeVisitor from "sharedtransformations/visitors/JoinNodeVisitor";
 
 export class TransformationNode
 {
@@ -59,6 +75,48 @@ export class TransformationNode
     this.typeCode = typeCode;
     this.fieldIDs = fieldIDs;
     this.meta = options;
+  }
+
+  public accept(visitor: TransformationNodeVisitor, doc: object): TransformationVisitResult
+  {
+      const docCopy = Object.assign({}, doc); // Preserve original doc in case of errors that would mangle it
+      switch (this.typeCode)
+      {
+          case TransformationNodeType.LoadNode:
+              return visitor.visitLoadNode(this, docCopy);
+          case TransformationNodeType.StoreNode:
+              return visitor.visitStoreNode(this, docCopy);
+          case TransformationNodeType.PutNode:
+              return visitor.visitPutNode(this, docCopy);
+          case TransformationNodeType.GetNode:
+              return visitor.visitGetNode(this, docCopy);
+          case TransformationNodeType.SplitNode:
+              return visitor.visitSplitNode(this, docCopy);
+          case TransformationNodeType.JoinNode:
+              return visitor.visitJoinNode(this, docCopy);
+          case TransformationNodeType.FilterNode:
+              return visitor.visitFilterNode(this, docCopy);
+          case TransformationNodeType.DuplicateNode:
+              return visitor.visitDuplicateNode(this, docCopy);
+          case TransformationNodeType.PlusNode:
+              return visitor.visitPlusNode(this, docCopy);
+          case TransformationNodeType.PrependNode:
+              return visitor.visitPrependNode(this, docCopy);
+          case TransformationNodeType.AppendNode:
+              return visitor.visitAppendNode(this, docCopy);
+          case TransformationNodeType.UppercaseNode:
+              return visitor.visitUppercaseNode(this, docCopy);
+          case TransformationNodeType.SubstringNode:
+              return visitor.visitSubstringNode(this, docCopy);
+          default:
+              return {
+                  errors: [
+                      {
+                          message: `Attempted to visit an unsupported transformation node type: ${this.typeCode}`,
+                      } as TransformationVisitError,
+                  ],
+              } as TransformationVisitResult;
+      }
   }
 }
 

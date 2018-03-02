@@ -67,47 +67,72 @@ import UppercaseNodeVisitor from './visitors/UppercaseNodeVisitor';
 /**
  * A visitor should be stateless; thus, visiting methods should be static.
  */
-export default class TransformationNodeVisitor extends ANodeVisitor
+export default abstract class TransformationNodeVisitor
 {
-  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+    public abstract visitDefault(node: TransformationNode, doc: object): TransformationVisitResult;
+
+  public visitAppendNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    const docCopy = Object.assign({}, doc); // Preserve original doc in case of errors that would mangle it
-    switch (node.typeCode)
-    {
-      case TransformationNodeType.LoadNode:
-        return LoadNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.StoreNode:
-        return StoreNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.PutNode:
-        return PutNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.GetNode:
-        return GetNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.SplitNode:
-        return SplitNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.JoinNode:
-        return JoinNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.FilterNode:
-        return FilterNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.DuplicateNode:
-        return DuplicateNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.PlusNode:
-        return PlusNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.PrependNode:
-        return PrependNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.AppendNode:
-        return AppendNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.UppercaseNode:
-        return UppercaseNodeVisitor.visit(node, docCopy);
-      case TransformationNodeType.SubstringNode:
-        return SubstringNodeVisitor.visit(node, docCopy);
-      default:
-        return {
-          errors: [
-            {
-              message: `Attempted to visit an unsupported transformation node type: ${node.typeCode}`,
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-    }
+      return this.visitDefault(node, doc);
   }
+
+    public visitDuplicateNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitFilterNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitGetNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitJoinNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitLoadNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitPlusNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitPrependNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitPutNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitSplitNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitStoreNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitSubstringNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
+
+    public visitUppercaseNode(node: TransformationNode, doc: object): TransformationVisitResult
+    {
+        return this.visitDefault(node, doc);
+    }
 }
