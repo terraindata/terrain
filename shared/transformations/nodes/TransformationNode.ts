@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from '../TransformationNodeType';
+import TransformationNodeVisitor from '../TransformationNodeVisitor';
 import TransformationVisitError from '../TransformationVisitError';
 import TransformationVisitResult from '../TransformationVisitResult';
 
@@ -69,6 +71,3 @@ export default abstract class TransformationNode
     return TransformationInfo.applyTargetedVisitor(visitor, this, docCopy, options);
   }
 }
-
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
-import TransformationNodeVisitor from '../TransformationNodeVisitor';

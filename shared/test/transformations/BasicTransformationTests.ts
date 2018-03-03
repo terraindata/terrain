@@ -48,6 +48,7 @@ import { List } from 'immutable';
 import UppercaseTransformationNode from 'shared/transformations/nodes/UppercaseTransformationNode';
 import TransformationNode from '../../transformations/nodes/TransformationNode';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
+import { TransformationInfo } from '../../transformations/TransformationInfo';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 import { KeyPath } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
@@ -109,11 +110,13 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new UppercaseTransformationNode(0, List<number>([0]), {}, TransformationNodeType.UppercaseNode),
+          value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
+            (0, List<number>([0]), {}, TransformationNodeType.UppercaseNode),
         },
         {
           v: '1',
-          value: new UppercaseTransformationNode(1, List<number>([3]), {}, TransformationNodeType.UppercaseNode),
+          value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
+            (1, List<number>([3]), {}, TransformationNodeType.UppercaseNode),
         },
       ],
       edges: [],
