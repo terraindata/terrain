@@ -472,7 +472,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
               <DropZone
                 keyPath={List([i + 1])}
                 onDrop={this.handleDrop}
-                style={dropZoneStyle}
+                style={_.extend(
+                  {},
+                  dropZoneStyle,
+                  i === filterGroup.lines.size - 1 ? {top: 20} : {}
+                }
               />
             </div>,
           )

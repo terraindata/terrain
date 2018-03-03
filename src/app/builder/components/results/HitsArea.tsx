@@ -951,7 +951,7 @@ column if you have customized the results view.');
       const fields = Util.orderFields(props.resultsState.fields, props.schema,
         props.query.algorithmId, state.indexName);
       return <ResultsConfigComponent
-        config={this.props.query.resultsConfig}
+        config={this.state.resultsConfig}
         fields={fields}
         onClose={this.hideConfig}
         onConfigChange={HitsArea.handleConfigChange}
