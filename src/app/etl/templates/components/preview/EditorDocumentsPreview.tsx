@@ -76,10 +76,10 @@ export interface Props
 class EditorDocumentsPreview extends TerrainComponent<Props>
 {
   public state: {
-    file: File
+    file: File,
   } = {
-    file: null,
-  };
+      file: null,
+    };
 
   public renderDocument(document, index)
   {
@@ -113,7 +113,7 @@ class EditorDocumentsPreview extends TerrainComponent<Props>
         <div className='no-documents-section'>
           Unable to Load Documents
         </div>
-        { fixPrompt }
+        {fixPrompt}
       </div>
     );
   }
@@ -140,7 +140,8 @@ class EditorDocumentsPreview extends TerrainComponent<Props>
   public onDocumentsFetchedFactory(newConfig: SourceConfig)
   {
     const { act, templateEditor } = this.props;
-    return (documents: List<object>) => {
+    return (documents: List<object>) =>
+    {
       const newTemplate = templateEditor.template.setIn(['sources', 'primary'], newConfig);
       act({
         actionType: 'setTemplate',
@@ -149,10 +150,10 @@ class EditorDocumentsPreview extends TerrainComponent<Props>
       act({
         actionType: 'setDisplayState',
         state: {
-          documents
-        }
+          documents,
+        },
       });
-    }
+    };
   }
 
   public onDocumentsFetchError()
@@ -169,7 +170,7 @@ class EditorDocumentsPreview extends TerrainComponent<Props>
       type: Sources.Upload,
       fileConfig: _FileConfig({
         fileType,
-      })
+      }),
     });
     act({
       actionType: 'fetchDocuments',

@@ -103,7 +103,7 @@ class ETLUploadStep extends ETLStepComponent
         file={this.props.walkthrough.file}
         onChange={this.handleChangeFile}
       />
-    )
+    );
   }
 
   public render()

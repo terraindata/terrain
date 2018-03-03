@@ -57,7 +57,8 @@ import Quarantine from 'util/RadiumQuarantine';
 import './ItemList.less';
 
 // configure each column
-export interface HeaderConfigItem<T> {
+export interface HeaderConfigItem<T>
+{
   name: string;
   render: (rowElem: T, index) => any;
 }
@@ -68,7 +69,7 @@ export interface Props<T>
   items: List<T>;
   columnConfig: HeaderConfig<T>;
   onRowClicked?: (index) => void; // callback for when a row is clicked
-  rowStyle?: any;
+  getRowStyle?: (index) => object[] | object;
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
   state?: any; // for specifying dependencies so ItemList knows when to rerender
 }
@@ -85,7 +86,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
   @memoizeOne
   public rowClickedMemoized(onRowClicked)
   {
-    return _.memoize((index) => () => {onRowClicked(index)});
+    return _.memoize((index) => () => { onRowClicked(index); });
   }
 
   public getRowClickedFn(index): () => void
@@ -110,19 +111,17 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
       {
         return [tableRowStyle, style];
       }
-      
     }
     else
     {
       return tableRowStyle;
     }
-    
   }
 
   public renderRow(item: T, index: number)
   {
     const onClick = this.getRowClickedFn(index);
-    const style = this.getRowStyle(this.props.rowStyle);
+    const style = this.getRowStyle(this.props.getRowStyle(index));
     return (
       <Quarantine key={index}>
         <div

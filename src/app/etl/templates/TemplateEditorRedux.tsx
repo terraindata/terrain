@@ -105,7 +105,7 @@ export interface TemplateEditorActionTypes
     algorithms?: IMMap<ID, Algorithm>; // if its an algorithm TODO replace this with a better midway route
     file?: File; // if its an uploaded file
     onFetched?: (docs: List<object>) => void;
-    onError?: (ev: string | MidwayError ) => void;
+    onError?: (ev: string | MidwayError) => void;
   };
   setDisplayState: {
     actionType: 'setDisplayState';

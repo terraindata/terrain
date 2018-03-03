@@ -68,7 +68,8 @@ import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 export interface Props
 {
-  onClick?: (template: ETLTemplate, index: number) => void;
+  onClick?: (template: ETLTemplate) => void;
+  getRowStyle?: (template: ETLTemplate) => object | object[];
   // injected props
   templates: List<ETLTemplate>;
 }
@@ -94,6 +95,19 @@ class TemplateList extends TerrainComponent<Props>
     },
   ];
 
+  public getRowStyle(index)
+  {
+    const { templates, getRowStyle } = this.props;
+    if (getRowStyle !== undefined)
+    {
+      return getRowStyle(templates.get(index));
+    }
+    else
+    {
+      return templateListItemStyle;
+    }
+  }
+
   public render()
   {
     return (
@@ -101,7 +115,7 @@ class TemplateList extends TerrainComponent<Props>
         items={this.props.templates}
         columnConfig={this.displayConfig}
         onRowClicked={this.handleOnClick}
-        rowStyle={templateListItemStyle}
+        getRowStyle={this.getRowStyle}
       />
     );
   }
@@ -112,15 +126,12 @@ class TemplateList extends TerrainComponent<Props>
     {
       const { templates } = this.props;
       const template = templates.get(index);
-      this.props.onClick(template, index);
+      this.props.onClick(template);
     }
   }
 }
 
-const templateListItemStyle = [
-  { cursor: 'pointer' },
-  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
-];
+const templateListItemStyle = {};
 
 export default Util.createContainer(
   TemplateList,

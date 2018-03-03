@@ -171,7 +171,7 @@ class TemplateEditor extends TerrainComponent<Props>
     return (
       <div className='template-editor-column preview-documents-column'>
         <div className='template-editor-title-bar'>
-          <DocumentsPreviewControl/>
+          <DocumentsPreviewControl />
         </div>
         <EditorDocumentsPreview />
       </div>
@@ -238,9 +238,10 @@ class TemplateEditor extends TerrainComponent<Props>
           onClose={this.closeTemplateUI}
           wide={true}
         >
-          <div className='template-list-wrapper'>
+          <div className='template-list-wrapper' style={backgroundColor(Colors().bg2)}>
             <TemplateList
               onClick={this.handleLoadTemplateItemClicked}
+              getRowStyle={this.getTemplateItemStyle}
             />
           </div>
         </Modal>
@@ -253,10 +254,20 @@ class TemplateEditor extends TerrainComponent<Props>
     );
   }
 
-  public handleLoadTemplateItemClicked(template: ETLTemplate, index: number)
+  public getTemplateItemStyle(clickedTemplate: ETLTemplate)
   {
-    this.props.onSwitchTemplate(template);
-    this.closeTemplateUI();
+    const { template } = this.props.templateEditor;
+    return template.id !== clickedTemplate.id ? templateListItemStyle : templateListItemCurrentStyle;
+  }
+
+  public handleLoadTemplateItemClicked(template: ETLTemplate)
+  {
+    const currentTemplate = this.props.templateEditor.template;
+    if (template.id !== currentTemplate.id)
+    {
+      this.props.onSwitchTemplate(template);
+      this.closeTemplateUI();
+    }
   }
 
   public openTemplateUI()
@@ -333,7 +344,15 @@ class TemplateEditor extends TerrainComponent<Props>
 const emptyList = List([]);
 const topBarItemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
 const topBarNameStyle = [fontColor(Colors().text2)];
-
+const templateListItemStyle = [
+  { cursor: 'pointer' },
+  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
+];
+const templateListItemCurrentStyle = [
+  { cursor: 'default' },
+  backgroundColor(Colors().active),
+  fontColor(Colors().activeText),
+];
 export default Util.createContainer(
   TemplateEditor,
   [

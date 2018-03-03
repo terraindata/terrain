@@ -249,6 +249,9 @@ class ETLEditorPage extends TerrainComponent<Props>
           // do nothing
         };
         editorAct({
+          actionType: 'resetState',
+        });
+        editorAct({
           actionType: 'setTemplate',
           template,
         });
