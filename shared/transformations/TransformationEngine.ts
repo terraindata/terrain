@@ -62,8 +62,29 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 const Graph = GraphLib.Graph;
 
+/**
+ * A TransformationEngine performs transformations on complex JSON documents.
+ *
+ * This is used by the ETL import/export system in order to pre-/post-process
+ * data, but is a fairly general-purpose system for manipulating deep objects.
+ *
+ * A TransformationEngine can be initialized from an example document, or fields
+ * can manually be registered with the engine.  In either case, once fields are
+ * registered, transformations can be added (they are represented as a DAG;
+ * transformations may have dependencies).  Once an engine is fully configured,
+ * documents with the same/similar schemas may be transformed using the
+ * engine's `transform` method.
+ */
 export class TransformationEngine
 {
+  /**
+   * Creates a TransformationEngine from a serialized representation
+   * (either a JSON object or stringified JSON object).
+   *
+   * @param {object | string} json   The serialized representation to
+   *                                 deserialize into a working engine.
+   * @returns {TransformationEngine} A deserialized, ready-to-go engine.
+   */
   public static load(json: object | string): TransformationEngine
   {
     const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
@@ -81,6 +102,17 @@ export class TransformationEngine
     return e;
   }
 
+  /**
+   * A helper function to parse a string representation of a
+   * `TransformationEngine` into a working, fully-typed engine
+   * (stringified JS objects lose all type information, so it
+   * must be restored here...).
+   *
+   * @param {string} s The serialized string to parse into an engine.
+   * @returns {object} An intermediate object that undergoes further
+   *                   processing in `load` to finish converting
+   *                   to a `TransformationEngine`.
+   */
   private static parseSerializedString(s: string): object
   {
     const parsed: object = JSON.parse(s);
@@ -110,6 +142,13 @@ export class TransformationEngine
   private fieldEnabled: Map<number, boolean> = Map<number, boolean>();
   private fieldProps: Map<number, object> = Map<number, object>();
 
+  /**
+   * Constructor for `TransformationEngine`.
+   *
+   * @param {object} doc An optional example document that, if
+   *                     passed, is used to generate initial
+   *                     field IDs and mappings
+   */
   constructor(doc?: object)
   {
     if (doc !== undefined)
@@ -134,6 +173,8 @@ export class TransformationEngine
    */
   public equals(other: TransformationEngine): boolean
   {
+    // Note: dealing with a lot of Immutable data structures so some
+    // slightly verbose syntax is required to convert to plain JS arrays
     return JSON.stringify(GraphLib.json.write(this.dag)) === JSON.stringify(GraphLib.json.write(other.dag))
       && JSON.stringify(this.doc) === JSON.stringify(other.doc)
       && this.uidField === other.uidField
@@ -150,6 +191,22 @@ export class TransformationEngine
       JSON.stringify(other.fieldProps.map((v: object, k: number) => [k, v]).toArray());
   }
 
+  /**
+   * This is the method by which one adds transformations to the engine.  Use
+   * after adding the relevant fields to the engine.  The transformation is
+   * appended to the engine's transformation DAG in the appropriate place.
+   *
+   * @param {TransformationNodeType} nodeType The type of transformation to create
+   * @param {Immutable.List<KeyPath> | Immutable.List<number>} fieldNamesOrIDs A
+   *                                          list of field names (or IDs, but not mixed)
+   *                                          on which to apply the new transformation
+   * @param {object} options                  Any options for the transformation;
+   *                                          different transformation types have
+   *                                          various specialized options available
+   * @param {string[]} tags                   Any special tags for the node in the DAG
+   * @param {number} weight                   A weight for new edges in the DAG
+   * @returns {number}                        The ID of the newly-created transformation
+   */
   public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<KeyPath> | List<number>,
     options?: object, tags?: string[], weight?: number): number
   {
@@ -161,6 +218,12 @@ export class TransformationEngine
     return this.uidNode - 1;
   }
 
+  /**
+   * Transform a document according to the current engine configuration.
+   *
+   * @param {object} doc The document to transform.
+   * @returns {object}   The transformed document, or possibly errors.
+   */
   public transform(doc: object): object
   {
     let output: object = this.flatten(doc);
@@ -187,8 +250,15 @@ export class TransformationEngine
     return this.unflatten(output);
   }
 
+  /**
+   * Converts the current engine to an equivalent JSON representation.
+   *
+   * @returns {object} A JSON representation of `this`.
+   */
   public toJSON(): object
   {
+    // Note: dealing with a lot of Immutable data structures so some
+    // slightly verbose syntax is required to convert to plain JS arrays
     return {
       dag: GraphLib.json.write(this.dag),
       doc: this.doc,
@@ -202,6 +272,15 @@ export class TransformationEngine
     };
   }
 
+  /**
+   * Register a field with the current engine.  This enables adding
+   * transformations to the field.
+   *
+   * @param {KeyPath} fullKeyPath The path of the field to add
+   * @param {string} typeName     The JS type of the field
+   * @param {object} options      Any field options (e.g., Elastic analyzers)
+   * @returns {number}            The ID of the newly-added field
+   */
   public addField(fullKeyPath: KeyPath, typeName: string, options: object = {}): number
   {
     this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
@@ -214,8 +293,18 @@ export class TransformationEngine
     return this.uidField - 1;
   }
 
+  /**
+   * Get the IDs of all transformations that act on a given field.
+   *
+   * @param {KeyPath | number} field   The field whose associated transformations should be identified
+   * @returns {Immutable.List<number>} A list of the associated transformations, sorted properly
+   */
   public getTransformations(field: KeyPath | number): List<number>
   {
+    // Note: This function is O(n) in number of nodes.  Future work
+    // could be adding a map e.g. (field ID => List<transformation ID>)
+    // to make this function O(1), if it's ever a performance issue.
+
     const target: number = typeof field === 'number' ? field : this.fieldNameToIDMap.get(field);
     const nodes: TransformationNode[] = [];
     _.each(this.dag.nodes(), (node) =>
@@ -238,6 +327,12 @@ export class TransformationEngine
     return nodesSorted;
   }
 
+  /**
+   * Returns the actual `TransformationNode` with the specified ID.
+   *
+   * @param {number} transformationID          ID of the node to retrieve
+   * @returns {TransformationNode | undefined} The retrieved node (or undefined if not found)
+   */
   public getTransformationInfo(transformationID: number): TransformationNode | undefined
   {
     if (!this.dag.nodes().includes(transformationID.toString()))
@@ -247,6 +342,13 @@ export class TransformationEngine
     return this.dag.node(transformationID.toString()) as TransformationNode;
   }
 
+  /**
+   * This method allows editing of any/all transformation node properties.
+   *
+   * @param {number} transformationID Which transformation to update
+   * @param {Immutable.List<KeyPath> | Immutable.List<number>} fieldNamesOrIDs New field names/IDs
+   * @param {object} options New options
+   */
   public editTransformation(transformationID: number, fieldNamesOrIDs?: List<KeyPath> | List<number>,
     options?: object): void
   {
@@ -266,12 +368,24 @@ export class TransformationEngine
     }
   }
 
+  /**
+   * Delete a transformation from the engine/DAG.
+   *
+   * @param {number} transformationID Which transformation to delete.
+   */
   public deleteTransformation(transformationID: number): void
   {
     this.dag.removeNode(transformationID);
     // TODO need to handle case where transformation is not at the top of the stack (add new edges etc.)
   }
 
+  /**
+   * Rename an input field to the engine (e.g. if the input document schema has changed).
+   *
+   * @param {number} fieldID     The ID of the field to rename
+   * @param {KeyPath} newKeyPath The new path for the field
+   * @param source               (Optional) Which source this field is from.
+   */
   public setInputKeyPath(fieldID: number, newKeyPath: KeyPath, source?: any): void
   {
     const oldName: KeyPath = this.fieldNameToIDMap.keyOf(fieldID);
@@ -285,6 +399,14 @@ export class TransformationEngine
     });
   }
 
+  /**
+   * Rename an output field to the engine (this is how we rename fields and do
+   * promotion/hoisting of nested fields, for instance).
+   *
+   * @param {number} fieldID     The ID of the field to rename
+   * @param {KeyPath} newKeyPath The new path for the field
+   * @param dest                 (Optional) Which sink this field is going to.
+   */
   public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any): void
   {
     const oldName: KeyPath = this.IDToFieldNameMap.get(fieldID);
@@ -364,6 +486,14 @@ export class TransformationEngine
     this.fieldEnabled = this.fieldEnabled.set(fieldID, false);
   }
 
+  /**
+   * Internal helper method to convert a list of KeyPaths into a list of
+   * field IDs (including situations with wildcards in KeyPaths).
+   *
+   * @param {Immutable.List<KeyPath> | Immutable.List<number>} fieldNamesOrIDs The
+   *                                   list of KeyPaths or IDs to parse
+   * @returns {Immutable.List<number>} An equivalent list of field IDs
+   */
   private parseFieldIDs(fieldNamesOrIDs: List<KeyPath> | List<number>): List<number>
   {
     let ids: List<number> = List<number>();
@@ -456,6 +586,14 @@ export class TransformationEngine
     return ids;
   }
 
+  /**
+   * Private helper that parses an example document and registers all its fields,
+   * using the above helper functions.  Recursive.
+   *
+   * @param {object} obj               The document to parse
+   * @param {KeyPath} currentKeyPath   Recursive parameter; what path you've built up so far
+   * @returns {Immutable.List<number>} A list of field IDs added
+   */
   private generateInitialFieldMaps(obj: object, currentKeyPath: KeyPath = List<string>()): List<number>
   {
     let ids: List<number> = List<number>();
@@ -463,6 +601,17 @@ export class TransformationEngine
     return ids;
   }
 
+  /**
+   * Takes a deeply nested object and flattens it into a map of
+   * field names/IDs to values.  This makes it convenient for
+   * the engine to perform transformations without worrying about
+   * nesting etc. -- nesting and complicated hierarchical document
+   * structures only exist at the fringes of the `TransformationEngine`.
+   * Within the engine documents enjoy serene flatness.
+   *
+   * @param {object} obj The document to flatten
+   * @returns {object} The flattened document
+   */
   private flatten(obj: object): object
   {
     const objectified: object = objectify(obj);
@@ -485,6 +634,14 @@ export class TransformationEngine
     return output;
   }
 
+  /**
+   * The inverse of `flatten` (above).  Using engine knowledge, take
+   * a flattened document and restore it to the correct deeply nested
+   * structure that the document should have.
+   *
+   * @param {object} obj A flattened document
+   * @returns {object}   The unflattened, maybe deeply nested, result
+   */
   private unflatten(obj: object): object
   {
     const output: object = {};
