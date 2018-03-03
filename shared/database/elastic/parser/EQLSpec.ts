@@ -286,6 +286,7 @@ const EQLSpec: ESClause[] =
         ignore_failure: 'boolean',
         all_fields: 'boolean',
         groupJoin: 'groupjoin_clause',
+        mergeJoin: 'mergejoin_clause',
         // ext: 'ext', not much documents about the usage of this ext
         //        _name: 'query_name',
         //        inner_hits: 'inner_hits',
@@ -357,6 +358,35 @@ const EQLSpec: ESClause[] =
       },
       {
         path: ['groupjoin'],
+      }),
+    // merge join
+    new ESStringClause('joinKey',
+      {
+        path: ['mergejoin'],
+        desc: 'Common key to join on for the merge join.',
+      }),
+    new ESMapClause('mergejoin_clause',
+      'mergejoin_name',
+      'mergejoin_body',
+      {
+        path: ['mergejoin'],
+        name: 'mergeJoin query',
+        desc: 'Create and name a mergeJoin query.',
+        url: '',
+      }),
+    new ESStringClause('mergejoin_name',
+      {
+        path: ['mergejoin'],
+        desc: 'names this mergeJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
+        url: '',
+      }),
+    new ESVariantClause('mergejoin_body',
+      {
+        string: 'joinKey',
+        object: 'body',
+      },
+      {
+        path: ['mergejoin'],
       }),
     // aggregation
     // AggregatorFactories.java

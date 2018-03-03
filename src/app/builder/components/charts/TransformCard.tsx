@@ -168,8 +168,16 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    this.state.queryXhr && this.state.queryXhr.abort();
+    this.state.queryXhr && this.state.queryXhr.abort(); // M1 mysql
+    this.killXHR('domainAggregationAjax');
+    this.killXHR('aggregationAjax');
     this.killQuery();
+  }
+
+  public killXHR(stateKey)
+  {
+    this.state[stateKey] && this.state[stateKey].xhr &&
+      this.state[stateKey].xhr.abort();
   }
 
   public killQuery()
@@ -181,6 +189,7 @@ class TransformCard extends TerrainComponent<Props>
     }
   }
 
+  // M1 (mysql)
   public handleQueryError(error: any)
   {
     this.setState({
@@ -304,16 +313,20 @@ class TransformCard extends TerrainComponent<Props>
     this.setState({
       bars: List([]),
       error: true,
-      queryXhr: null,
-      queryId: null,
+      aggregationAjax: {
+        xhr: null,
+        queryId: null,
+      },
     });
   }
 
   private handleElasticAggregationResponse(resp: MidwayQueryResponse)
   {
     this.setState({
-      queryXhr: null,
-      queryId: null,
+      aggregationAjax: {
+        xhr: null,
+        queryId: null,
+      },
     });
 
     const min = this.state.maxDomain.get(0);
@@ -353,11 +366,24 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
+  private handleElasticDomainAggregationError(err: MidwayError | string)
+  {
+    this.setState({
+      error: true,
+      domainAggregationAjax: {
+        xhr: null,
+        queryId: null,
+      },
+    });
+  }
+
   private handleElasticDomainAggregationResponse(resp: MidwayQueryResponse)
   {
     this.setState({
-      queryXhr: null,
-      queryId: null,
+      domainAggregationAjax: {
+        xhr: null,
+        queryId: null,
+      },
     });
     const agg = (resp.result as ElasticQueryResult).aggregations;
     if (agg === undefined || agg['minimum'] === undefined || agg['maximum'] === undefined)
@@ -514,7 +540,7 @@ class TransformCard extends TerrainComponent<Props>
           },
         };
       }
-      Ajax.query(
+      const domainAggregationAjax = Ajax.query(
         JSON.stringify(domainQuery),
         db,
         (resp) =>
@@ -523,9 +549,12 @@ class TransformCard extends TerrainComponent<Props>
         },
         (err) =>
         {
-          this.handleElasticAggregationError(err);
+          this.handleElasticDomainAggregationError(err);
         },
       );
+      this.setState({
+        domainAggregationAjax,
+      });
     }
     else
     {
@@ -564,19 +593,20 @@ class TransformCard extends TerrainComponent<Props>
           size: 0,
         };
       }
-      this.setState(
-        Ajax.query(
-          JSON.stringify(aggQuery),
-          db,
-          (resp) =>
-          {
-            this.handleElasticAggregationResponse(resp);
-          },
-          (err) =>
-          {
-            this.handleElasticAggregationError(err);
-          }),
-      );
+      const aggregationAjax = Ajax.query(
+        JSON.stringify(aggQuery),
+        db,
+        (resp) =>
+        {
+          this.handleElasticAggregationResponse(resp);
+        },
+        (err) =>
+        {
+          this.handleElasticAggregationError(err);
+        });
+      this.setState({
+        aggregationAjax,
+      });
     }
   }
 
