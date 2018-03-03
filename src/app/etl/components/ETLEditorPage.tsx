@@ -58,9 +58,9 @@ import Util from 'util/Util';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
+import Initializers from 'etl/helpers/TemplateInitializers';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createInitialTemplateFn } from 'etl/helpers/TemplateInitializers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
@@ -70,11 +70,6 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 
 const { List } = Immutable;
 import './ETLEditorPage.less';
-
-
-import TerrainStore from 'src/app/store/TerrainStore';
-console.log(TerrainStore);
-console.log(TemplateEditorActions);
 
 export interface Props
 {
@@ -101,26 +96,6 @@ function getTemplateId(params): number
   const asNumber = (params != null && params.templateId != null) ? Number(params.templateId) : NaN;
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
-
-// function createInitialTemplateFn(
-//   editorAct: typeof TemplateEditorActions,
-//   source?: SourceConfig,
-//   sink?: SinkConfig,
-// ): (hits: List<object>) => void
-// {
-//   return (hits) =>
-//   {
-//     const { template, fieldMap } = createInitialTemplate(hits, source, sink);
-//     editorAct({
-//       actionType: 'setTemplate',
-//       template,
-//     });
-//     editorAct({
-//       actionType: 'setFieldMap',
-//       fieldMap,
-//     });
-//   };
-// }
 
 // Some of this logic could be put in redux using some neat features of Thunk (particularly getState)
 @Radium
@@ -183,105 +158,7 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public switchTemplate(template: ETLTemplate)
   {
-    this.loadExistingTemplate(template.id);
-  }
-
-  // create a new template from the results of an algorithm
-  public initFromAlgorithm()
-  {
-    const { params, editorAct } = this.props;
-    const algorithmId = getAlgorithmId(params);
-    const source = _SourceConfig({
-      type: Sources.Algorithm,
-      fileConfig: _FileConfig({
-        fileType: FileTypes.Json,
-      }),
-      options: {
-        algorithmId,
-      },
-    });
-    const onFetched = createInitialTemplateFn(editorAct, source);
-
-    editorAct({
-      actionType: 'fetchDocuments',
-      source,
-      onFetched,
-    });
-  }
-
-  // create a new template from thewalkthrough process
-  public initFromWalkthrough()
-  {
-    const { editorAct, walkthrough } = this.props;
-    const source = walkthrough.source;
-    const sink = walkthrough.sink;
-    const onFetched = createInitialTemplateFn(editorAct, source, sink);
-
-    if (source.type === Sources.Upload)
-    {
-      editorAct({
-        actionType: 'fetchDocuments',
-        source,
-        file: walkthrough.file,
-        onFetched,
-      });
-    }
-    else
-    {
-      // TODO other types
-    }
-  }
-
-  // is there a way to cleanly put this in redux?
-  public loadExistingTemplate(templateId: number)
-  {
-    const onLoad = (response: List<ETLTemplate>) =>
-    {
-      const { editorAct, templates } = this.props;
-      const index = templates.findIndex((template) => template.id === templateId);
-      if (index === -1)
-      {
-        // TODO error
-      }
-      else
-      {
-        const template = templates.get(index);
-        const onFetched = () =>
-        {
-          // do nothing
-        };
-        editorAct({
-          actionType: 'resetState',
-        });
-        editorAct({
-          actionType: 'setTemplate',
-          template,
-        });
-        editorAct({
-          actionType: 'rebuildFieldMap',
-        });
-        editorAct({
-          actionType: 'fetchDocuments',
-          source: template.sources.get('primary'),
-          onFetched,
-        });
-        editorAct({
-          actionType: 'setIsDirty',
-          isDirty: false,
-        });
-        ETLRouteUtil.gotoEditTemplate(template.id);
-      }
-    };
-    const onError = (response) =>
-    {
-      // TODO
-    };
-    const { etlAct } = this.props;
-    etlAct({
-      actionType: 'fetchTemplates',
-      onLoad,
-      onError,
-    });
+    Initializers.loadExistingTemplate(template.id);
   }
 
   // is there a better pattern for this?
@@ -330,17 +207,19 @@ class ETLEditorPage extends TerrainComponent<Props>
     });
     if (params.algorithmId !== undefined)
     {
-      this.initFromAlgorithm();
+      // this.initFromAlgorithm();
+      Initializers.initNewFromAlgorithm(params.algorithmId);
     }
     else if (params.templateId !== undefined)
     {
       const templateId = getTemplateId(params);
-      this.loadExistingTemplate(templateId);
+      Initializers.loadExistingTemplate(templateId);
     }
     else if (ETLRouteUtil.isRouteNewTemplate(this.props.location) &&
       this.props.walkthrough.source.type != null)
     {
-      this.initFromWalkthrough();
+      // this.initFromWalkthrough();
+      Initializers.initNewFromWalkthrough();
     }
     else
     {

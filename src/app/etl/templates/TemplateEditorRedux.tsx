@@ -104,7 +104,7 @@ export interface TemplateEditorActionTypes
     actionType: 'fetchDocuments';
     source: SourceConfig;
     file?: File; // if its an uploaded file
-    onFetched?: (docs: List<object>) => void;
+    onLoad?: (docs: List<object>) => void;
     onError?: (ev: string | MidwayError) => void;
   };
   setDisplayState: {
@@ -124,8 +124,10 @@ export interface TemplateEditorActionTypes
   };
 }
 
-class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
+class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
 {
+  public namespace: string = 'templateEditor';
+
   public reducers: ConstrainedMap<TemplateEditorActionTypes, TemplateEditorState> =
     {
       setIsDirty: (state, action) =>
@@ -197,7 +199,8 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
 
   public fetchDocuments(action: TemplateEditorActionType<'fetchDocuments'>, dispatch)
   {
-    try {
+    try
+    {
       const directDispatch = this._dispatchReducerFactory(dispatch);
       directDispatch({
         actionType: 'setDisplayState',
@@ -219,9 +222,9 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
             loadingDocuments: false,
           },
         });
-        if (action.onFetched != null)
+        if (action.onLoad != null)
         {
-          action.onFetched(documents);
+          action.onLoad(documents);
         }
       };
       const onError = (ev: string | MidwayError) =>
@@ -245,15 +248,16 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         case Sources.Algorithm: {
           const options: SourceOptionsType<Sources.Algorithm> = action.source.options as any;
           const algorithmId = options.algorithmId;
-          const onLoadAlgorithm = (algorithm: Algorithm) => {
+          const onLoadAlgorithm = (algorithm: Algorithm) =>
+          {
             if (algorithm == null)
             {
               onError('Could not find algorithm');
               return;
             }
             fetchDocumentsFromAlgorithm(algorithm, onLoad, onError, DefaultDocumentLimit);
-          }
-          Ajax.getAlgorithm(algorithmId, onLoadAlgorithm)
+          };
+          Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
           break;
         }
         case Sources.Upload: {
@@ -285,7 +289,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
   }
 }
 
-const ReduxInstance = new TemplateEditorActionsClass();
+const ReduxInstance = new TemplateEditorRedux();
 export const TemplateEditorActions = ReduxInstance._actionsForExport();
 export const TemplateEditorReducers = ReduxInstance._reducersForExport(_TemplateEditorState);
 export declare type TemplateEditorActionType<K extends keyof TemplateEditorActionTypes> =

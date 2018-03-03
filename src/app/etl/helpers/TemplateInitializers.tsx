@@ -52,25 +52,189 @@ import * as React from 'react';
 import { withRouter } from 'react-router';
 
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
+import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
 
-import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { FieldMap } from 'etl/templates/TemplateTypes';
+import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { FieldMap } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
 
-function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig)
-  : { template: ETLTemplate, fieldMap: FieldMap, warnings: string[], softWarnings: string[] }
+class Initializers
+{
+  private editorAct: typeof TemplateEditorActions;
+  private etlAct: typeof ETLActions;
+
+  constructor(private store)
+  {
+    this.editorAct = (action) =>
+    {
+      this.store.dispatch(TemplateEditorActions(action));
+    };
+    this.etlAct = (action) =>
+    {
+      this.store.dispatch(ETLActions(action));
+    };
+  }
+
+  get walkthroughState(): WalkthroughState
+  {
+    const walkthrough: WalkthroughState = (TerrainStore as any).walkthrough;
+    return walkthrough != null ? walkthrough : _WalkthroughState();
+  }
+
+  get currentTemplate(): ETLTemplate
+  {
+    const templateEditorState: TemplateEditorState = (TerrainStore as any).templateEditor;
+    const template: ETLTemplate = templateEditorState.template;
+    return template != null ? template : _ETLTemplate();
+  }
+
+  public loadExistingTemplate(templateId: number)
+  {
+    const onLoad = (template: ETLTemplate) =>
+    {
+      const onDocumentsLoaded = () =>
+      {
+        // do nothing
+      };
+      this.editorAct({
+        actionType: 'resetState',
+      });
+      this.editorAct({
+        actionType: 'setTemplate',
+        template,
+      });
+      this.editorAct({
+        actionType: 'rebuildFieldMap',
+      });
+      this.editorAct({
+        actionType: 'fetchDocuments',
+        source: template.sources.get('primary'),
+        onLoad: onDocumentsLoaded,
+      });
+      this.editorAct({
+        actionType: 'setIsDirty',
+        isDirty: false,
+      });
+      ETLRouteUtil.gotoEditTemplate(template.id);
+      // }
+    };
+    const onError = (response) =>
+    {
+      // TODO
+    };
+
+    this.getTemplate(templateId).then(onLoad).catch(onError);
+  }
+
+  public initNewFromAlgorithm(algorithmId: number)
+  {
+    const source = _SourceConfig({
+      type: Sources.Algorithm,
+      fileConfig: _FileConfig({
+        fileType: FileTypes.Json,
+      }),
+      options: {
+        algorithmId,
+      },
+    });
+    const onLoad = this.createInitialTemplateFn(source);
+
+    this.editorAct({
+      actionType: 'fetchDocuments',
+      source,
+      onLoad,
+    });
+  }
+
+  public initNewFromWalkthrough()
+  {
+    const source = this.walkthroughState.source;
+    const sink = this.walkthroughState.sink;
+    const onLoad = this.createInitialTemplateFn(source, sink);
+
+    if (source.type === Sources.Upload)
+    {
+      this.editorAct({
+        actionType: 'fetchDocuments',
+        source,
+        file: this.walkthroughState.file,
+        onLoad,
+      });
+    }
+    else
+    {
+      // TODO other types
+    }
+  }
+
+  private createInitialTemplateFn(
+    source?: SourceConfig,
+    sink?: SinkConfig,
+  ): (hits: List<object>) => void
+  {
+    return (hits) =>
+    {
+      const { template, fieldMap } = createInitialTemplate(hits, source, sink);
+      this.editorAct({
+        actionType: 'setTemplate',
+        template,
+      });
+      this.editorAct({
+        actionType: 'setFieldMap',
+        fieldMap,
+      });
+    };
+  }
+
+  private grabOne<T>(resolve, reject)
+  {
+    return (response: List<T>) =>
+    {
+      if (response.size === 0)
+      {
+        reject('Return result had no items');
+      }
+      else
+      {
+        resolve(response.get(0));
+      }
+    };
+  }
+
+  private getTemplate(templateId: number): Promise<ETLTemplate>
+  {
+    return new Promise<ETLTemplate>((resolve, reject) =>
+    {
+      this.etlAct({
+        actionType: 'getTemplate',
+        id: templateId,
+        onLoad: this.grabOne(resolve, reject),
+        onError: reject,
+      });
+    });
+  }
+}
+export default new Initializers(TerrainStore);
+
+function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
+  {
+    template: ETLTemplate,
+    fieldMap: FieldMap,
+    warnings: string[],
+    softWarnings: string[],
+  }
 {
   if (documents == null || documents.size === 0)
   {
@@ -113,25 +277,5 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     fieldMap,
     warnings,
     softWarnings,
-  };
-}
-
-export function createInitialTemplateFn(
-  editorAct: typeof TemplateEditorActions,
-  source?: SourceConfig,
-  sink?: SinkConfig,
-): (hits: List<object>) => void
-{
-  return (hits) =>
-  {
-    const { template, fieldMap } = createInitialTemplate(hits, source, sink);
-    editorAct({
-      actionType: 'setTemplate',
-      template,
-    });
-    editorAct({
-      actionType: 'setFieldMap',
-      fieldMap,
-    });
   };
 }

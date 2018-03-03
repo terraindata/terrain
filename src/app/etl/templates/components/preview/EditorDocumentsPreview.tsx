@@ -176,7 +176,7 @@ class EditorDocumentsPreview extends TerrainComponent<Props>
       actionType: 'fetchDocuments',
       source: newSourceConfig,
       file,
-      onFetched: this.onDocumentsFetchedFactory(newSourceConfig),
+      onLoad: this.onDocumentsFetchedFactory(newSourceConfig),
       onError: this.onDocumentsFetchError,
     });
   }
