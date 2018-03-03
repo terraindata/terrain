@@ -675,10 +675,8 @@ class ElasticDataSourceC extends DataSource
           return _ChoiceOption({
             displayName: col.name,
             value: col.name,
-            sampleData: col.sampleData,
           });
-        }).toList();
-
+        }).toSet().toList();
         let fieldNames = acceptableOptions.map((f) => f.value).toList();
         fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
         acceptableOptions = acceptableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
@@ -698,7 +696,6 @@ class ElasticDataSourceC extends DataSource
         return _ChoiceOption({
           displayName: option,
           value: option,
-          sampleData: List([]),
           meta: {
             fieldType: ['_score', '_size'].indexOf(option) !== -1 ? FieldType.Numerical : FieldType.Text,
           },
@@ -726,7 +723,6 @@ class ElasticDataSourceC extends DataSource
                 _ChoiceOption({
                   displayName: col.name + '.' + property,
                   value: col.name + '.' + property,
-                  sampleData: List([]),
                   icon: fieldTypeToIcon[type],
                   meta: {
                     fieldType: ReverseFieldTypeMapping[type],
@@ -738,13 +734,13 @@ class ElasticDataSourceC extends DataSource
           fields = fields.push(_ChoiceOption({
             displayName: col.name,
             value: col.name,
-            sampleData: col.sampleData,
             icon: fieldTypeToIcon[fieldType],
             meta: {
               fieldType,
             },
           }));
         });
+        fields = fields.toSet().toList(); // remove duplicates (can happen w/ multiple types in same index)
         // Sort fields (Sort their names, then use that to sort the choice options)
         let fieldNames = fields.map((f) => f.value).toList();
         fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);

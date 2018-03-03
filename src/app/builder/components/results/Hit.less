@@ -65,10 +65,10 @@
     }
   }
 
-  .result-expanded-close-button:not(.menu-open) {
-    opacity: 0;
-    .transition;
-  }
+  // .result-expanded-close-button:not(.menu-open) {
+  //   opacity: 0;
+  //   .transition;
+  // }
   &:hover {
     .result-expanded-close-button {
       opacity: 1;
@@ -152,7 +152,7 @@
       background-position: center center;
       background-repeat: no-repeat;
       position: relative;
-      border-radius: 4px;
+      border-radius: 4px 0px 0px 4px;
       // height: 100%;
       
       // .result-thumbnail {
@@ -481,6 +481,7 @@
     height: 12px;
     width: 12px;
     opacity: 0.5;
+    z-index: 10;
     &:hover {
       opacity: 1;
     }

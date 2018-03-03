@@ -950,8 +950,9 @@ column if you have customized the results view.');
       const { props, state } = this;
       const fields = Util.orderFields(props.resultsState.fields, props.schema,
         props.query.algorithmId, state.indexName);
+      const { resultsConfig } = this.state;
       return <ResultsConfigComponent
-        config={this.state.resultsConfig}
+        config={resultsConfig !== undefined ? resultsConfig : this.props.query.resultsConfig}
         fields={fields}
         onClose={this.hideConfig}
         onConfigChange={HitsArea.handleConfigChange}

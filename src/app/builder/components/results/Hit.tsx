@@ -208,7 +208,7 @@ class HitComponent extends TerrainComponent<Props> {
       nestedStates: this.state.nestedStates.set(field, state),
     });
   }
-
+  
   public renderNestedFieldHeader(field, depth, size, expandState: NestedState)
   {
     return (
@@ -220,9 +220,9 @@ class HitComponent extends TerrainComponent<Props> {
           ]}
         >
           {
-            size > 1 &&
             <div
               className='hit-nested-content-expand'
+              style={size <= 1 ? {opacity: 0} : {}}
             >
               <ExpandIcon
                 open={expandState === NestedState.Expanded}
@@ -284,7 +284,7 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
-  public renderNestedItems(items, format, field, depth)
+  public renderNestedItems(items, format, field, depth, offset)
   {
     return (
       <div>
@@ -304,7 +304,7 @@ class HitComponent extends TerrainComponent<Props> {
               <HitComponent
                 {...this.props}
                 resultsConfig={format && format.config}
-                index={i}
+                index={i + offset}
                 primaryKey={''}
                 expanded={false}
                 allowSpotlights={false}
@@ -359,18 +359,18 @@ class HitComponent extends TerrainComponent<Props> {
         }
         <div
           className='hit-nested-content-values'
-          style={{ height: expandState === NestedState.Expanded ? '100%' : 'auto' }}
+         // style={{ height: expandState === NestedState.Expanded ? '100%' : 'auto' }}
         >
           <FadeInOut
             open={expandState !== NestedState.Collapsed}
           >
-            {this.renderNestedItems(allValues.slice(0, 1), format, field, depth)}
+            {this.renderNestedItems(allValues.slice(0, 1), format, field, depth, 0)}
           </FadeInOut>
           <FadeInOut
             open={expandState === NestedState.Expanded}
           >
             {
-              this.renderNestedItems(allValues.slice(1), format, field, depth)
+              this.renderNestedItems(allValues.slice(1), format, field, depth, 1)
             }
           </FadeInOut>
         </div>
@@ -598,7 +598,6 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className={classes}
         style={this.props.style}
-        onDoubleClick={this.expand}
       // onMouseEnter={this._fn(this.handleHover, true)}
       // onMouseLeave={this._fn(this.handleHover, false)}
       >
@@ -611,6 +610,7 @@ class HitComponent extends TerrainComponent<Props> {
             borderColor(Colors().resultLine),
             backgroundColor((depth + 1) % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
           ]}
+          onDoubleClick={this.expand}
         >
           {
             thumbnail &&
