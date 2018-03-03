@@ -42,68 +42,83 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions
+
+import * as classNames from 'classnames';
+import cronstrue from 'cronstrue';
+import { List } from 'immutable';
 import * as _ from 'lodash';
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
-// string values for this enum are how elastic expects them
+import * as React from 'react';
+import Util from 'util/Util';
 
-export enum ElasticTypes
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
+import { notificationManager } from 'common/components/InAppNotification';
+import { Menu, MenuOption } from 'common/components/Menu';
+import Modal from 'common/components/Modal';
+import TerrainComponent from 'common/components/TerrainComponent';
+import { tooltip } from 'common/components/tooltip/Tooltips';
+import { MidwayError } from 'shared/error/MidwayError';
+
+import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
+
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+
+export interface Props
 {
-  Auto = 'auto', // this is not actually an elastic type
-  Text = 'text',
-  Long = 'long',
-  Boolean = 'boolean',
-  Date = 'date',
-  Array = 'array',
-  Nested = 'nested',
-  Double = 'double',
-  Short = 'short',
-  Byte = 'byte',
-  Integer = 'integer',
-  HalfFloat = 'half_float',
-  Float = 'float',
-  GeoPoint = 'geo_point',
+  onClick?: (template: ETLTemplate, index: number) => void;
+  // injected props
+  templates: List<ETLTemplate>;
 }
 
-// field props for each transformation engine field
-export interface ElasticFieldProps
+class TemplateList extends TerrainComponent<Props>
 {
-  isAnalyzed: boolean;
-  analyzer: string;
-  elasticType: ElasticTypes;
-  isPrimaryKey: boolean;
-}
-
-// compute smart defaults for a given props object and js field type. Could be undefined or empty
-export function defaultProps(type: FieldTypes, obj: any = {}): ElasticFieldProps
-{
-  // in case the passed object is undefined or not an object
-  const config = (obj == null || typeof obj !== 'object') ? {} : obj;
-  return _.extend(
+  public displayConfig: HeaderConfig<ETLTemplate> = [
     {
-      isAnalyzed: type === 'string',
-      isPrimaryKey: false,
-      analyzer: 'standard',
-      elasticType: ElasticTypes.Auto,
+      name: 'Name',
+      render: (template, index) => template.templateName,
     },
-    config,
-  );
+    {
+      name: 'ID',
+      render: (template, index) => template.id,
+    },
+    {
+      name: 'Source Type',
+      render: (template, index) => template.getIn(['sources', 'primary', 'type'], 'N/A'),
+    },
+    {
+      name: 'Sink Type',
+      render: (template, index) => template.getIn(['sinks', 'primary', 'type'], 'N/A'),
+    },
+  ];
+
+  public render()
+  {
+    return (
+      <ItemList
+        items={this.props.templates}
+        columnConfig={this.displayConfig}
+        onClick={this.handleOnClick}
+      />
+    );
+  }
+
+  public handleOnClick(index)
+  {
+    if (this.props.onClick != null)
+    {
+      const { templates } = this.props;
+      const template = templates.get(index);
+      this.props.onClick(template, index);
+    }
+  }
+
 }
 
-export const JsToElasticOptions: {
-  [k in FieldTypes]: ElasticTypes[]
-} = {
-    array: [ElasticTypes.Auto, ElasticTypes.Array],
-    object: [ElasticTypes.Auto, ElasticTypes.Nested],
-    string: [ElasticTypes.Auto, ElasticTypes.Text, ElasticTypes.Date, ElasticTypes.GeoPoint],
-    number: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Long, ElasticTypes.Short, ElasticTypes.Byte,
-    ElasticTypes.Integer, ElasticTypes.HalfFloat, ElasticTypes.Float],
-    boolean: [ElasticTypes.Auto, ElasticTypes.Boolean],
-  };
-
-export function jsToElastic(type): ElasticTypes
-{
-  const eType = JsToElasticOptions[type][0];
-  return eType !== undefined ? eType : ElasticTypes.Text;
-}
+export default Util.createContainer(
+  TemplateList,
+  [['etl', 'templates']],
+  {},
+);

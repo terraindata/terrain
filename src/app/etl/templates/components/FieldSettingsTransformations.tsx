@@ -227,7 +227,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
       <div className='template-editor-field-transformations'>
         {
           this.state.viewState === ViewState.LIST_ALL ?
-          this.renderTransformations() : null
+            this.renderTransformations() : null
         }
         {
           this.state.viewState === ViewState.CREATE_NEW ?

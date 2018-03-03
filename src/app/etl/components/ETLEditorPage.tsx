@@ -177,6 +177,11 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
   }
 
+  public switchTemplate(template: ETLTemplate)
+  {
+    this.loadExistingTemplate(template.id);
+  }
+
   // create a new template from the results of an algorithm
   public initFromAlgorithm()
   {
@@ -256,6 +261,11 @@ class ETLEditorPage extends TerrainComponent<Props>
           algorithms,
           onFetched,
         });
+        editorAct({
+          actionType: 'setIsDirty',
+          isDirty: false,
+        });
+        ETLRouteUtil.gotoEditTemplate(template.id);
       }
     };
     const onError = (response) =>
@@ -350,7 +360,10 @@ class ETLEditorPage extends TerrainComponent<Props>
         style={[fontColor(Colors().text1)]}
       >
         <div className='export-display-logo-bg' />
-        <TemplateEditor onSave={this.saveTemplate} />
+        <TemplateEditor
+          onSave={this.saveTemplate}
+          onSwitchTemplate={this.switchTemplate}
+        />
       </div>
     );
   }
@@ -362,6 +375,7 @@ export default withRouter(Util.createContainer(
     ['library', 'algorithms'],
     ['walkthrough'],
     ['etl', 'templates'],
+    ['templateEditor', 'template'],
   ],
   { editorAct: TemplateEditorActions, etlAct: ETLActions },
 ));

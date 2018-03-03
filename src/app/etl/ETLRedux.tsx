@@ -143,7 +143,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         }
         else
         {
-          return state.set('templates', action.payload.template);
+          return state.update('templates', (templates) => templates.set(index, action.payload.template));
         }
       },
     };

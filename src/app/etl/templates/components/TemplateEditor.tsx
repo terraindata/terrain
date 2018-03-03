@@ -55,6 +55,7 @@ import Util from 'util/Util';
 
 import MidwayError from 'shared/error/MidwayError';
 
+import Modal from 'common/components/Modal';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
@@ -62,8 +63,10 @@ import { ETLState } from 'etl/ETLTypes';
 import EditorDocumentsPreview from 'etl/templates/components/preview/EditorDocumentsPreview';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
+import TemplateList from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+
 import './TemplateEditor.less';
 
 import Quarantine from 'util/RadiumQuarantine';
@@ -73,6 +76,7 @@ const { List } = Immutable;
 export interface Props
 {
   onSave: (template: ETLTemplate) => void;
+  onSwitchTemplate: (template: ETLTemplate) => void;
   // below from container
   templateEditor?: TemplateEditorState;
   editorAct?: typeof TemplateEditorActions;
@@ -84,9 +88,11 @@ class TemplateEditor extends TerrainComponent<Props>
 {
   public state: {
     newTemplateName: string,
+    loadTemplateOpen: boolean,
   } = {
-    newTemplateName: 'New Template',
-  };
+      newTemplateName: 'New Template',
+      loadTemplateOpen: false,
+    };
 
   constructor(props)
   {
@@ -193,10 +199,10 @@ class TemplateEditor extends TerrainComponent<Props>
           <div
             className='editor-top-bar-item'
             style={topBarItemStyle}
-            onClick={this.handleOpenClicked}
-            key='undo'
+            onClick={this.openTemplateUI}
+            key='load'
           >
-            Open
+            Load
           </div>
           <div
             className='editor-top-bar-item'
@@ -224,6 +230,15 @@ class TemplateEditor extends TerrainComponent<Props>
             {this.renderDocumentsSection()}
           </div>
         </div>
+        <Modal
+          title={'Load a Template'}
+          open={this.state.loadTemplateOpen}
+          onClose={this.closeTemplateUI}
+        >
+          <TemplateList
+            onClick={this.handleLoadTemplateItemClicked}
+          />
+        </Modal>
         <MultiModal
           requests={modalRequests}
           state={this.state}
@@ -233,9 +248,23 @@ class TemplateEditor extends TerrainComponent<Props>
     );
   }
 
-  public handleOpenClicked()
+  public handleLoadTemplateItemClicked(template: ETLTemplate, index: number)
   {
+    this.props.onSwitchTemplate(template);
+  }
 
+  public openTemplateUI()
+  {
+    this.setState({
+      loadTemplateOpen: true,
+    });
+  }
+
+  public closeTemplateUI()
+  {
+    this.setState({
+      loadTemplateOpen: false,
+    });
   }
 
   public handleSave()
@@ -250,23 +279,6 @@ class TemplateEditor extends TerrainComponent<Props>
       newTemplateName: 'New Template',
     });
   }
-
-  // @memoizeOne
-  // public _computeSaveModalProps(newTemplateName)
-  // {
-  //   return ({
-  //     onConfirm: this.handleSave.bind(this),
-  //     onClose: this.handleCloseSave.bind(this),
-  //     confirmDisabled: newTemplateName === '',
-  //     title: 'Save New Template',
-  //     showTextbox: true,
-  //     confirm: true,
-  //     textboxValue: newTemplateName,
-  //     onTextboxValueChange: this.handleNewTemplateNameChange.bind(this),
-  //     textboxPlaceholderValue: 'Template Name',
-  //     closeOnConfirm: true,
-  //   });
-  // }
 
   public computeSaveModalProps()
   {
@@ -302,7 +314,7 @@ class TemplateEditor extends TerrainComponent<Props>
         actionType: 'addModal',
         props: {
           computeProps: this.computeSaveModalProps,
-        }
+        },
       });
     }
     else

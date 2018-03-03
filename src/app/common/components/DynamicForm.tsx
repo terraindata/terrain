@@ -274,8 +274,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     const renderMatrix: MatrixType<S> = this.computeRenderMatrix(this.props.inputMap);
     return (
       <div className='dynamic-form' style={this.props.style}>
-        { this.props.centerForm ?
-          <div style={{flexGrow: 1}}/> : null
+        {this.props.centerForm ?
+          <div style={{ flexGrow: 1 }} /> : null
         }
         {renderMatrix.map(this.renderMatrixRow)}
         {this.props.children !== undefined ? this.props.children : null}

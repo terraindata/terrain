@@ -102,7 +102,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
         style={this.state.currentCategory === category ? activeStyle : inactiveStyle}
         onClick={this.changeViewFactory(category)}
       >
-        { title }
+        {title}
       </div>
     );
   }
@@ -115,8 +115,8 @@ class EditorFieldSettings extends TemplateEditorField<Props>
         style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}
       >
         <div className='field-settings-title-filler' />
-        { this.renderCategory(ViewCategory.Settings, 'Settings') }
-        { this.renderCategory(ViewCategory.Transformations, 'Transform') }
+        {this.renderCategory(ViewCategory.Settings, 'Settings')}
+        {this.renderCategory(ViewCategory.Transformations, 'Transform')}
         {
           ... this.renderExtraCategories()
         }

@@ -60,7 +60,7 @@ export type ModalPropsObject = {
 };
 export type ModalProps = ModalPropsObject & {
   computeProps?: () => ModalPropsObject;
-}
+};
 // ModalProps is the same as the Props type from Modal.tsx, however all the props are optional.
 // This is important because MultiModal overrides the open prop.
 // MultiModal also wraps around the onClose prop if it is provided;

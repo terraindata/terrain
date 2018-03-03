@@ -43,55 +43,98 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// this file has been obsoleted by ItemList and should be cleaned up along with the rest of control
+
 import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
 import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
 import { Menu, MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
+import Quarantine from 'util/RadiumQuarantine';
+import './ItemList.less';
 
-import './ControlList.less';
+// configure each column
+export interface HeaderConfigItem<T> {
+  name: string;
+  render: (rowElem: T, index) => any;
+}
+export type HeaderConfig<T> = Array<HeaderConfigItem<T>>;
 
-export type HeaderConfigItem = [string, (rowElem, index) => any];
-export type HeaderConfig = HeaderConfigItem[];
-
-export interface Props
+export interface Props<T>
 {
-  items: List<any>;
-  config: HeaderConfig;
+  items: List<T>;
+  columnConfig: HeaderConfig<T>;
+  onClick?: (index) => void; // callback for when a row is clicked
+  rowStyle?: any;
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
-  [_dependents: string]: any; // for if the config has functions that depend on values outside of items
+  state?: any; // for specifying dependencies so ItemList knows when to rerender
 }
 
-export class ControlList extends TerrainComponent<Props>
+const memoize = _.memoize;
+
+export class ItemList<T> extends TerrainComponent<Props<T>>
 {
-  public renderRow(item, index: number)
+  constructor(props)
   {
+    super(props);
+  }
+
+  @memoizeOne
+  public rowClickedMemoized(onClick)
+  {
+    return _.memoize((index) => () => onClick(index));
+  }
+
+  public getRowClickedFn(index): () => void
+  {
+    if (this.props.onClick == null)
+    {
+      return undefined;
+    }
+    return this.rowClickedMemoized(this.props.onClick)(index);
+  }
+
+  @memoizeOne
+  public getRowStyle(style)
+  {
+    return [tableRowStyle, style];
+  }
+
+  public renderRow(item: T, index: number)
+  {
+    const onClick = this.getRowClickedFn(index);
+    const style = this.getRowStyle(this.props.rowStyle);
     return (
-      <div className='row-info' key={index} style={tableRowStyle}>
-        {
-          this.props.config.map((headerItem: HeaderConfigItem, i: number) =>
+      <Quarantine key={index}>
+        <div
+          className='row-info'
+          onClick={onClick}
+          style={style}
+        >
           {
-            return (
-              <div className='row-info-data' key={i}>
-                {headerItem[1](item, index)}
+            this.props.columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
+            {
+              return (
+                <div className='row-info-data' key={i}>
+                  {headerItem.render(item, index)}
+                </div>
+              );
+            })
+          }
+          {
+            this.props.getMenuOptions !== undefined ?
+              <div className='row-info-data' key='context-menu'>
+                <div className='item-list-menu-options-wrapper'>
+                  <Menu options={this.props.getMenuOptions(item, index)} />
+                </div>
               </div>
-            );
-          })
-        }
-        {
-          this.props.getMenuOptions !== undefined ?
-            <div className='row-info-data' key='context-menu'>
-              <div className='control-list-menu-options-wrapper'>
-                <Menu options={this.props.getMenuOptions(item, index)} />
-              </div>
-            </div>
-            : undefined
-        }
-      </div>
+              : undefined
+          }
+        </div>
+      </Quarantine>
     );
   }
 
@@ -99,7 +142,7 @@ export class ControlList extends TerrainComponent<Props>
   {
     return (
       this.props.items.size > 0 ?
-        <div className='control-list-table'>
+        <div className='item-list-table'>
           <div
             className={classNames({
               'row-info-header': true,
@@ -107,11 +150,11 @@ export class ControlList extends TerrainComponent<Props>
             key='header'
           >
             {
-              this.props.config.map((headerItem: HeaderConfigItem, i: number) =>
+              this.props.columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
               {
                 return (
                   <div className='row-info-data' key={i}>
-                    {headerItem[0]}
+                    {headerItem.name}
                   </div>
                 );
               })
@@ -123,7 +166,7 @@ export class ControlList extends TerrainComponent<Props>
             }
           </div>
           {
-            this.props.items.map(this.renderRow)
+            this.props.items.map(this.renderRow).toList()
           }
         </div>
         :

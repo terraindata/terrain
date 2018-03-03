@@ -91,21 +91,21 @@ export class TransformationCreator extends TerrainComponent<Props>
   };
 
   private inputMap: InputDeclarationMap<FormState> =
-  {
-    transformationIndex: {
-      type: DisplayType.Pick;
-      displayName: 'Transformation',
-      group: 'main',
-      options: {
-        pickOptions: this.getOptionNames,
+    {
+      transformationIndex: {
+        type: DisplayType.Pick;
+        displayName: 'Transformation',
+        group: 'main',
+        options: {
+          pickOptions: this.getOptionNames,
+        },
       },
-    },
-    applyToAll: {
-      type: DisplayType.CheckBox,
-      displayName: 'Apply to All',
-      shouldShow: this.shouldApplyAllShow,
-    },
-  };
+      applyToAll: {
+        type: DisplayType.CheckBox,
+        displayName: 'Apply to All',
+        shouldShow: this.shouldApplyAllShow,
+      },
+    };
 
   public shouldApplyAllShow(s: FormState)
   {
@@ -116,7 +116,8 @@ export class TransformationCreator extends TerrainComponent<Props>
   public getValidOptions(): List<TransformationNodeType>
   {
     return availableTransformations.filter(
-      (type, index) => {
+      (type, index) =>
+      {
         const info = TransformationsInfo.getInfo(type);
         return info.isAvailable(this.props.engine, this.props.fieldID);
       },
@@ -156,7 +157,7 @@ export class TransformationCreator extends TerrainComponent<Props>
           onStateChange={this.handleStateChange}
         />
         <div className='create-transformation-component'>
-          { compComponent }
+          {compComponent}
         </div>
       </div>
     );
