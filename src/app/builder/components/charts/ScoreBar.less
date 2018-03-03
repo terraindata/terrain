@@ -5,9 +5,53 @@
   align-items: center;
   cursor: pointer;
   
+  .score-weight-slider {
+    flex-shrink: 1
+  }
+  .score-bar-field-weight {
+    flex-shrink: 0;
+  }
+  
   &.score-bar-alt {
-    border-radius: 99px;
-    overflow: hidden;
+    
+    .score-bar-field-weight,
+    .score-bar-text {
+      margin: 2px 0px; // this prevents jittering during hover animation
+      margin-left: 6px;
+    }
+
+    .score-weight-slider {
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 0px;
+      .transition;
+    }
+    
+    &:not(:hover) {
+      .score-weight-slider {
+        height: 10px !important;
+        margin: 6px 0px;
+        
+        .rc-slider-handle {
+          height: 10px !important;
+          padding: 5px !important;
+        }
+        
+        .rc-slider {
+          &-handle:before {
+            opacity: 0;
+          }
+        }
+      }
+    }
+    
+    &:hover {
+      
+      .score-weight-slider {
+        height: 22px;
+      }
+    
+    }
     
     // beginnings of a hover-to-enlarge score bar style
     // height: 10px;
@@ -36,18 +80,24 @@
     }
   }
   
+  .score-bar-text,
+  .score-bar-field-weight-value {
+    width: 30px;
+    box-sizing: border-box;
+    text-align: right;
+    padding: 2px 4px;
+  }
+  
   .score-bar-text {
-    width: 50px;
+    border: none;
+    background: #eee;
+    
   }
   
   .score-bar-field-weight {
     // position: relative;
     padding: 0;
-    text-align: right;
-    width: 50px;
     font-size: 16px;
-    padding-right: 12px;
-    width: 20px;
     
     .score-bar-field-weight-value {
       // position: absolute;
@@ -108,11 +158,14 @@
   
   &-handle:before {
     content: '| |';
+    opacity: 1;
+    .transition;
   }
   &-handle {
     text-align: center;
     color: rgba(255, 255, 255,.5);
     font-size: 12px;
     padding: 6px;
+    .transition(~"height 0.15s, padding 0.15s");
   }
 }
