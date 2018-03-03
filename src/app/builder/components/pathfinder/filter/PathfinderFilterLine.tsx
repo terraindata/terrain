@@ -401,7 +401,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           onChange={this.handleBoostChange}
           onAfterChange={this.handleBoostFinish}
           altStyle={true}
-          max={5}
+          max={10}
           min={0}
         />
       </div>

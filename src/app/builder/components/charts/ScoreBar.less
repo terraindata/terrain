@@ -3,10 +3,37 @@
 .score-bar {
   display: flex;
   align-items: center;
+  cursor: pointer;
   
   &.score-bar-alt {
     border-radius: 99px;
     overflow: hidden;
+    
+    // beginnings of a hover-to-enlarge score bar style
+    // height: 10px;
+    // margin-top: 6px;
+    // margin-bottom: 12px;
+    // .transition;
+    
+    
+    // .score-bar-text {
+    //   font-size: 12px;
+    // }
+    
+    
+    // &:hover {
+    //   height: 22px;
+    //   margin-top: 0px;
+    //   margin-bottom: 6px;
+    // }
+    
+    .rc-slider {
+      padding: 0px;
+      
+      &-handle {
+        font-size: 8px;
+      }
+    }
   }
   
   .score-bar-text {
@@ -76,8 +103,9 @@
   }
 }
 
-.pf-score-line-inner .rc-slider {
+.rc-slider {
   padding: 3px;
+  
   &-handle:before {
     content: '| |';
   }
