@@ -107,7 +107,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             />
             :
             <div className='pf-filter-group-name-wrapper'>
-            <ExpandIcon
+              <ExpandIcon
                 onClick={this._fn(
                   this.props.onChange,
                   this._ikeyPath(this.props.keyPath, 'collapsed'),

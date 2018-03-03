@@ -51,6 +51,7 @@ import Slider from 'rc-slider';
 // import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
 import * as React from 'react';
+import * as classNames from 'classnames';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
 const FIXED_SLIDER_HANDLE_STYLE = { display: 'none' };
@@ -68,6 +69,8 @@ interface ScoreWeightSliderProps
   noLeftLine?: boolean;
   rounded?: boolean;
   noPadding?: boolean;
+  background?: string;
+  growOnHover?: boolean;
 }
 
 export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSliderProps>
@@ -137,6 +140,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       max,
       height,
       value,
+      background,
       noLeftLine,
     } = this.props;
     const handleStyle = this.getHandleStyle();
@@ -144,7 +148,18 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
     const railStyle = this.getCustomRailStyle();
 
     return (
-      <div style={{ width: '100%', position: 'relative', height: height }}>
+      <div
+        style={{
+          width: '100%',
+          position: 'relative',
+          height,
+          background,
+        }}
+        className={classNames({
+          'score-weight-slider': true,
+          'score-weight-slider-grow': this.props.growOnHover,
+        })}
+      >
         <div style={railStyle} />
         <div style={{
           width: `calc(100% - ${height}px)`,

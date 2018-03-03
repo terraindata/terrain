@@ -88,6 +88,13 @@ class ScoreBar extends TerrainComponent<Props>
   public render()
   {
     const { weight, min, max, height, canEdit, altStyle } = this.props;
+    
+    let color = Colors().active;
+    if (altStyle && weight === 1)
+    {
+      // untouched, alt style mode
+      color = Colors().blockOutline;
+    }
 
     return (
       <div
@@ -95,7 +102,6 @@ class ScoreBar extends TerrainComponent<Props>
           'score-bar': true,
           'score-bar-alt': altStyle,
         })}
-        style={backgroundColor(altStyle ? Colors().blockBg : undefined)}
       >
         <ScoreWeightSlider
           value={weight}
@@ -104,11 +110,12 @@ class ScoreBar extends TerrainComponent<Props>
           onAfterChange={this.handleWeightAfterChange}
           min={min || 0}
           max={max || 100}
-          color={Colors().active}
+          color={color}
           height={height || (altStyle && 22) || 34}
           noLeftLine={altStyle}
           rounded={altStyle}
           noPadding={altStyle}
+          background={altStyle ? Colors().blockBg : undefined}
         />
         <EditableField
           editing={this.state.editingWeight}
@@ -124,6 +131,8 @@ class ScoreBar extends TerrainComponent<Props>
                 fontColor(Colors().active),
                 borderColor(Colors().active),
               ]}
+              onFocus={this.handleInputFocus}
+              autoFocus
             />
           }
           readOnlyComponent={
@@ -144,6 +153,12 @@ class ScoreBar extends TerrainComponent<Props>
         />
       </div>
     );
+  }
+  
+  private handleInputFocus(e)
+  {
+    // debugger;
+    e && e.target && e.target.select();
   }
 
   private handleWeightBeforeChange(value: number)
