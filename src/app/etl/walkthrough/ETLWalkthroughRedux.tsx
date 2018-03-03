@@ -68,6 +68,9 @@ export interface WalkthroughActionTypes
       [k in keyof WalkthroughState]: WalkthroughState[k];
     }>;
   };
+  resetState: {
+    actionType: 'resetState',
+  };
   // provide a value to set, or a function that calculates what value to set
   setFileConfig: {
     actionType: 'setFileConfig';
@@ -103,6 +106,10 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
           newState = newState.set(k, toUpdate[k]);
         }
         return newState;
+      },
+      resetState: (state, action) =>
+      {
+        return _WalkthroughState();
       },
       setFileConfig: (state, action) =>
       {

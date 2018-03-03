@@ -151,10 +151,12 @@ class ETLWalkthrough extends TerrainComponent<Props>
     }
     if (fixBadRoute)
     {
+      this.props.act({
+        actionType: 'resetState'
+      });
       ETLRouteUtil.gotoWalkthroughStep(0);
     }
     return 0;
-
   }
 }
 
