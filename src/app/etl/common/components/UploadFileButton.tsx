@@ -42,88 +42,85 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-var-requires
 
-// tslint:disable:no-var-requires strict-boolean-expressions
-
-import * as classNames from 'classnames';
-import cronstrue from 'cronstrue';
-import { List } from 'immutable';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
+
+import FilePicker from 'common/components/FilePicker';
+
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
-import { notificationManager } from 'common/components/InAppNotification';
-import { Menu, MenuOption } from 'common/components/Menu';
-import Modal from 'common/components/Modal';
-import TerrainComponent from 'common/components/TerrainComponent';
-import { tooltip } from 'common/components/tooltip/Tooltips';
-import { MidwayError } from 'shared/error/MidwayError';
-
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
-
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+const UploadIcon = require('images/icon_export.svg');
 
 export interface Props
 {
-  onClick?: (template: ETLTemplate, index: number) => void;
-  // injected props
-  templates: List<ETLTemplate>;
+  file: File;
+  onChange: (file: File) => void;
 }
 
-class TemplateList extends TerrainComponent<Props>
+@Radium
+export default class UploadFileButton extends TerrainComponent<Props>
 {
-  public displayConfig: HeaderConfig<ETLTemplate> = [
-    {
-      name: 'Name',
-      render: (template, index) => template.templateName,
-    },
-    {
-      name: 'ID',
-      render: (template, index) => template.id,
-    },
-    {
-      name: 'Source Type',
-      render: (template, index) => template.getIn(['sources', 'primary', 'type'], 'N/A'),
-    },
-    {
-      name: 'Sink Type',
-      render: (template, index) => template.getIn(['sinks', 'primary', 'type'], 'N/A'),
-    },
-  ];
+  // a bit verbose, but keeping this here to preserve history
+  public _altButtonStyle()
+  {
+    return altButtonStyle;
+  }
+
+  public _altButtonClass()
+  {
+    return 'etl-alt-button';
+  }
 
   public render()
   {
-    return (
-      <ItemList
-        items={this.props.templates}
-        columnConfig={this.displayConfig}
-        onRowClicked={this.handleOnClick}
-        rowStyle={templateListItemStyle}
-      />
+    const button = (
+      <div
+        className={this._altButtonClass()}
+        style={this._altButtonStyle()}
+      >
+        <UploadIcon />
+        <div className='alt-button-text'>
+          Choose a File
+        </div>
+      </div>
     );
-  }
 
-  public handleOnClick(index)
-  {
-    if (this.props.onClick != null)
-    {
-      const { templates } = this.props;
-      const template = templates.get(index);
-      this.props.onClick(template, index);
-    }
+    const { file, onChange } = this.props;
+    const showFileName = file != null;
+    return (
+      <div className='etl-button-column'>
+        <FilePicker
+          large={true}
+          onChange={onChange}
+          accept={'.csv,.json'}
+          customButton={button}
+        />
+        <span
+          style={{
+            marginTop: '6px',
+          }}
+        >
+          <div
+            className='etl-transition-element upload-filename'
+          >
+            {showFileName ? file.name : ''}
+          </div>
+        </span>
+      </div>
+    );
   }
 }
 
-const templateListItemStyle = [
-  { cursor: 'pointer' },
-  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
+const altButtonStyle = [
+  backgroundColor(Colors().bg3),
+  fontColor(Colors().text2, Colors().text2),
+  borderColor(Colors().darkerHighlight, Colors().active),
+  getStyle('boxShadow', `2px 1px 3px ${Colors().boxShadow}`),
 ];
-
-export default Util.createContainer(
-  TemplateList,
-  [['etl', 'templates']],
-  {},
-);

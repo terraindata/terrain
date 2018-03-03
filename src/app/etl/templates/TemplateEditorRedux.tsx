@@ -104,7 +104,8 @@ export interface TemplateEditorActionTypes
     source: SourceConfig;
     algorithms?: IMMap<ID, Algorithm>; // if its an algorithm TODO replace this with a better midway route
     file?: File; // if its an uploaded file
-    onFetched?: (hits: List<object>) => void;
+    onFetched?: (docs: List<object>) => void;
+    onError?: (ev: string | MidwayError ) => void;
   };
   setDisplayState: {
     actionType: 'setDisplayState';
@@ -233,6 +234,10 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
           loadingDocuments: false,
         },
       });
+      if (action.onError != null)
+      {
+        action.onError(ev);
+      }
     };
     switch (action.source.type)
     {

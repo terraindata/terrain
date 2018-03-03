@@ -72,7 +72,7 @@ class EditorDisplayStateC
   public documents: List<object> = List([]);
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
-  public previewIndex: number = -1;
+  public previewIndex: number = 0;
   public loadingDocuments: boolean = false;
   public settingsFieldId: number = null;
   public settingsDisplayKeyPath: KeyPath = null;

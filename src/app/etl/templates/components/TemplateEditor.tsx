@@ -60,6 +60,7 @@ import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
+import DocumentsPreviewControl from 'etl/templates/components/preview/DocumentsPreviewControl';
 import EditorDocumentsPreview from 'etl/templates/components/preview/EditorDocumentsPreview';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
@@ -165,12 +166,13 @@ class TemplateEditor extends TerrainComponent<Props>
       );
     }
   }
-
   public renderDocumentsSection()
   {
     return (
       <div className='template-editor-column preview-documents-column'>
-        <div className='template-editor-title-bar' />
+        <div className='template-editor-title-bar'>
+          <DocumentsPreviewControl/>
+        </div>
         <EditorDocumentsPreview />
       </div>
     );
@@ -220,7 +222,7 @@ class TemplateEditor extends TerrainComponent<Props>
   public render()
   {
     const { previewIndex, documents, modalRequests } = this.props.templateEditor.uiState;
-    const showEditor = previewIndex >= 0 && previewIndex < documents.size;
+    const showEditor = previewIndex >= 0;
     return (
       <div className='template-editor-root-container'>
         <div className='template-editor-width-spacer'>
@@ -234,10 +236,13 @@ class TemplateEditor extends TerrainComponent<Props>
           title={'Load a Template'}
           open={this.state.loadTemplateOpen}
           onClose={this.closeTemplateUI}
+          wide={true}
         >
-          <TemplateList
-            onClick={this.handleLoadTemplateItemClicked}
-          />
+          <div className='template-list-wrapper'>
+            <TemplateList
+              onClick={this.handleLoadTemplateItemClicked}
+            />
+          </div>
         </Modal>
         <MultiModal
           requests={modalRequests}
@@ -251,6 +256,7 @@ class TemplateEditor extends TerrainComponent<Props>
   public handleLoadTemplateItemClicked(template: ETLTemplate, index: number)
   {
     this.props.onSwitchTemplate(template);
+    this.closeTemplateUI();
   }
 
   public openTemplateUI()
@@ -327,6 +333,7 @@ class TemplateEditor extends TerrainComponent<Props>
 const emptyList = List([]);
 const topBarItemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
 const topBarNameStyle = [fontColor(Colors().text2)];
+
 export default Util.createContainer(
   TemplateEditor,
   [

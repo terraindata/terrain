@@ -57,6 +57,7 @@ import FilePicker from 'common/components/FilePicker';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import UploadFileButton from 'etl/common/components/UploadFileButton';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
@@ -97,43 +98,12 @@ class ETLUploadStep extends ETLStepComponent
 
   public renderUploadSection()
   {
-    const button = (
-      <div
-        className={this._altButtonClass()}
-        style={this._altButtonStyle()}
-      >
-        <UploadIcon />
-        <div className='alt-button-text'>
-          Choose a File
-        </div>
-      </div>
-    );
-
-    const file = this.props.walkthrough.file;
-    const showFileName = file != null;
     return (
-      <div className='etl-transition-column'>
-        <FilePicker
-          large={true}
-          onChange={this.handleChangeFile}
-          accept={'.csv,.json'}
-          customButton={button}
-        />
-        <span
-          style={{
-            minHeight: transitionRowHeight,
-            marginTop: '6px',
-          }}
-        >
-          <div
-            className='etl-transition-element step-upload-filename'
-            style={{ height: showFileName ? transitionRowHeight : '0px' }}
-          >
-            {showFileName ? file.name : 'Invalid File'}
-          </div>
-        </span>
-      </div>
-    );
+      <UploadFileButton
+        file={this.props.walkthrough.file}
+        onChange={this.handleChangeFile}
+      />
+    )
   }
 
   public render()

@@ -67,7 +67,7 @@ export interface Props<T>
 {
   items: List<T>;
   columnConfig: HeaderConfig<T>;
-  onClick?: (index) => void; // callback for when a row is clicked
+  onRowClicked?: (index) => void; // callback for when a row is clicked
   rowStyle?: any;
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
   state?: any; // for specifying dependencies so ItemList knows when to rerender
@@ -83,24 +83,40 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
   }
 
   @memoizeOne
-  public rowClickedMemoized(onClick)
+  public rowClickedMemoized(onRowClicked)
   {
-    return _.memoize((index) => () => onClick(index));
+    return _.memoize((index) => () => {onRowClicked(index)});
   }
 
   public getRowClickedFn(index): () => void
   {
-    if (this.props.onClick == null)
+    if (this.props.onRowClicked === undefined)
     {
       return undefined;
     }
-    return this.rowClickedMemoized(this.props.onClick)(index);
+    return this.rowClickedMemoized(this.props.onRowClicked)(index);
   }
 
   @memoizeOne
   public getRowStyle(style)
   {
-    return [tableRowStyle, style];
+    if (style !== undefined)
+    {
+      if (Array.isArray(style))
+      {
+        return [tableRowStyle, ...style];
+      }
+      else
+      {
+        return [tableRowStyle, style];
+      }
+      
+    }
+    else
+    {
+      return tableRowStyle;
+    }
+    
   }
 
   public renderRow(item: T, index: number)

@@ -43,87 +43,45 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires strict-boolean-expressions
-
-import * as classNames from 'classnames';
-import cronstrue from 'cronstrue';
-import { List } from 'immutable';
+// tslint:disable:no-var-requires import-spacing
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
 import * as React from 'react';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
-import { notificationManager } from 'common/components/InAppNotification';
-import { Menu, MenuOption } from 'common/components/Menu';
-import Modal from 'common/components/Modal';
-import TerrainComponent from 'common/components/TerrainComponent';
-import { tooltip } from 'common/components/tooltip/Tooltips';
-import { MidwayError } from 'shared/error/MidwayError';
-
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
-
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+
+import DocumentPreview from './DocumentPreview';
+import './EditorDocumentsPreview.less';
+const { List } = Immutable;
 
 export interface Props
 {
-  onClick?: (template: ETLTemplate, index: number) => void;
-  // injected props
-  templates: List<ETLTemplate>;
+  // below from container
+  templateEditor?: TemplateEditorState;
+  act?: typeof TemplateEditorActions;
 }
 
-class TemplateList extends TerrainComponent<Props>
+@Radium
+class DocumentsPreviewControl extends TerrainComponent<Props>
 {
-  public displayConfig: HeaderConfig<ETLTemplate> = [
-    {
-      name: 'Name',
-      render: (template, index) => template.templateName,
-    },
-    {
-      name: 'ID',
-      render: (template, index) => template.id,
-    },
-    {
-      name: 'Source Type',
-      render: (template, index) => template.getIn(['sources', 'primary', 'type'], 'N/A'),
-    },
-    {
-      name: 'Sink Type',
-      render: (template, index) => template.getIn(['sinks', 'primary', 'type'], 'N/A'),
-    },
-  ];
-
   public render()
   {
     return (
-      <ItemList
-        items={this.props.templates}
-        columnConfig={this.displayConfig}
-        onRowClicked={this.handleOnClick}
-        rowStyle={templateListItemStyle}
-      />
-    );
-  }
+      <div>
 
-  public handleOnClick(index)
-  {
-    if (this.props.onClick != null)
-    {
-      const { templates } = this.props;
-      const template = templates.get(index);
-      this.props.onClick(template, index);
-    }
+      </div>
+    );
   }
 }
 
-const templateListItemStyle = [
-  { cursor: 'pointer' },
-  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
-];
-
 export default Util.createContainer(
-  TemplateList,
-  [['etl', 'templates']],
-  {},
+  DocumentsPreviewControl,
+  ['templateEditor'],
+  { act: TemplateEditorActions },
 );

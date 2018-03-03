@@ -1,4 +1,50 @@
 @import "~common/Common.less";
+
+
+.etl-button-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .etl-transition-element {
+    .transition;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    flex-grow: 0;
+    flex-shrink: 0;
+  } 
+
+  .etl-alt-button {
+    border: 1px solid;
+    padding: @spacing;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    font-size: @pretty-large-font-size;
+
+    svg {
+      margin-bottom: 3px;
+      fill: currentColor;
+      width: 32px;
+    }
+    .alt-button-text {
+      margin: 0px @spacing;
+    }
+
+    .transition;
+    &.button-disabled {
+      cursor: default;
+    }
+
+    .upload-filename {
+      justify-content: center;
+    }
+  }
+}
+
 .etl-walkthrough {
   .etl-step-big-button {
     padding: @half-spacing @spacing;
@@ -28,31 +74,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-
-  .etl-alt-button {
-    border: 1px solid;
-    padding: @spacing;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 3px;
-    font-size: @pretty-large-font-size;
-
-    svg {
-      margin-bottom: 3px;
-      fill: currentColor;
-      width: 32px;
-    }
-    .alt-button-text {
-      margin: 0px @spacing;
-    }
-
-    .transition;
-    &.button-disabled {
-      cursor: default;
-    }
   }
 
   .etl-step-next-button-spacer {
