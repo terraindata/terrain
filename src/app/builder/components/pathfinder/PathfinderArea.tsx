@@ -58,7 +58,6 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import FadeInOut from 'app/common/components/FadeInOut';
-import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { BuilderState } from 'builder/data/BuilderState';
 import withScrolling, { createHorizontalStrength, createVerticalStrength } from 'react-dnd-scrollzone';

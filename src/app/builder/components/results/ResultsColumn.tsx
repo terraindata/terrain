@@ -66,6 +66,7 @@ import { FileImportState } from '../../../fileImport/FileImportTypes';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import { MAX_HITS, ResultsState } from './ResultTypes';
+import TerrainTools from 'util/TerrainTools';
 
 const RESULTS_PAGE_SIZE = 20;
 const ClipboardIcon = require('images/icon_clipboard.svg');
@@ -270,7 +271,7 @@ class ResultsColumn extends TerrainComponent<Props>
   {
     return (
       <div className='results-column-wrapper'>
-        {this.renderTabBar()}
+        {TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS) && this.renderTabBar()}
         {this.renderContent()}
       </div>);
   }

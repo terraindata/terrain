@@ -68,6 +68,7 @@ import { _AggregationLine, _Path, More, Path, PathfinderContext, Source } from '
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
+import ExpandIcon from 'common/components/ExpandIcon';
 import './PathfinderMoreStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -111,17 +112,19 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleReferenceChange(i, value)
   {
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references', i), value);
+    const { keyPath } = this.props;
+    this.props.builderActions.changePath(this._ikeyPath(keyPath, 'references', i), value);
     if (this.props.path.nested.get(i) === undefined)
     {
-      const nestedKeyPath = this._ikeyPath(this.props.keyPath, 'aggregations');
+      const nestedKeyPath = this._ikeyPath(keyPath.butLast().toList(), 'nested', i);
       this.props.builderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
     }
   }
 
   public handleAddNested()
   {
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'nested'), this.props.more.references.push(''));
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references'),
+      this.props.more.references.push(''));
     const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
     this.props.builderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
   }
@@ -327,22 +330,36 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     this.props.builderActions.changePath(nestedKeyPath, value);
   }
 
+  public handleExpandNested(keyPath, expanded)
+  {
+    this.props.builderActions.changePath(keyPath, expanded);
+  }
+
   public renderNestedPaths()
   {
     const { references } = this.props.more;
     const { nested } = this.props.path;
     const { canEdit } = this.props.pathfinderContext;
+    const { keyPath } = this.props;
     return (
       <div>
         {
           references.map((ref, i) =>
           {
+            const expanded = nested.get(i) !== undefined ? nested.get(i).expanded : false;
             return (
               <div
                 className='pf-more-nested'
                 key={i}
               >
                 <div className='pf-more-nested-reference'>
+                  <ExpandIcon
+                    onClick={this._fn(
+                      this.handleExpandNested,
+                      this._ikeyPath(keyPath.butLast().toList(), 'nested', i, 'expanded'),
+                      !expanded)}
+                    open={expanded}
+                  />
                   {
                     tooltip(
                       <FloatingInput
@@ -353,6 +370,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         canEdit={canEdit}
                         className='pf-more-nested-reference-input'
                         noBg={true}
+                        debounce={true}
                       />,
                       PathfinderText.referenceExplanation,
                     )
@@ -368,6 +386,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       canEdit={canEdit}
                       className='pf-more-nested-name-input'
                       noBg={true}
+                      debounce={true}
                     />
                   </FadeInOut>
                   <RemoveIcon
@@ -375,9 +394,11 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                     className='pf-more-nested-remove close'
                   />
                 </div>
-                {
-                  nested.get(i) !== undefined && this.renderPath(nested.get(i), i)
-                }
+                <FadeInOut
+                  open={expanded}
+                >
+                  {this.renderPath(nested.get(i), i)}
+                </FadeInOut>
               </div>
             );
           })

@@ -889,7 +889,10 @@ column if you have customized the results view.');
   public hideConfig(config: ResultsConfig)
   {
     // Update the default config for this index
-    Ajax.updateResultsConfig(this.state.indexName, config);
+    if (config.enabled)
+    {
+      Ajax.updateResultsConfig(this.state.indexName, config);
+    }
     this.setState({
       showingConfig: false,
     });
@@ -944,9 +947,12 @@ column if you have customized the results view.');
   {
     if (this.state.showingConfig)
     {
+      const { props, state } = this;
+      const fields = Util.orderFields(props.resultsState.fields, props.schema,
+        props.query.algorithmId, state.indexName);
       return <ResultsConfigComponent
         config={this.props.query.resultsConfig}
-        fields={this.props.resultsState.fields}
+        fields={fields}
         onClose={this.hideConfig}
         onConfigChange={HitsArea.handleConfigChange}
         builder={this.props.builder}

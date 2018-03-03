@@ -59,7 +59,7 @@ import Util from '../../util/Util';
 import './Sidebar.less';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
-const linkHeight = 36; // Coordinate with Sidebar.less
+const linkHeight = 50; // Coordinate with Sidebar.less
 const TerrainIcon = require('images/logo_terrainLong_blue@2x.png');
 const TerrainSmallIcon = require('images/logo_terrain_mountain.png');
 const linkOffsetExpanded = 207;

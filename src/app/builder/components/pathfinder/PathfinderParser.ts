@@ -368,7 +368,11 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
   // Parse date
   if (line.comparison === 'datebefore' || line.comparison === 'dateafter')
   {
-    value = Util.formatInputDate(new Date(value), 'elastic');
+    const date = Util.formatInputDate(new Date(value), 'elastic');
+    if (date)
+    {
+      value = date;
+    }
   }
   if (line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
   {
