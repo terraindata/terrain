@@ -62,13 +62,14 @@ import
   FieldMap,
   TemplateEditorState,
 } from 'etl/templates/TemplateTypes';
-import { Algorithm } from 'library/LibraryTypes';
+import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
 import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
+import Ajax from 'util/Ajax';
 
 const { List, Map } = Immutable;
 
@@ -102,7 +103,6 @@ export interface TemplateEditorActionTypes
   fetchDocuments: {
     actionType: 'fetchDocuments';
     source: SourceConfig;
-    algorithms?: IMMap<ID, Algorithm>; // if its an algorithm TODO replace this with a better midway route
     file?: File; // if its an uploaded file
     onFetched?: (docs: List<object>) => void;
     onError?: (ev: string | MidwayError) => void;
@@ -197,84 +197,90 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
 
   public fetchDocuments(action: TemplateEditorActionType<'fetchDocuments'>, dispatch)
   {
-    const directDispatch = this._dispatchReducerFactory(dispatch);
-    directDispatch({
-      actionType: 'setDisplayState',
-      state: {
-        loadingDocuments: true,
-      },
-    });
-    const onLoad = (documents: List<object>) =>
-    {
+    try {
+      const directDispatch = this._dispatchReducerFactory(dispatch);
       directDispatch({
         actionType: 'setDisplayState',
         state: {
-          documents,
+          loadingDocuments: true,
         },
       });
-      if (action.onFetched != null)
+      const onLoad = (documents: List<object>) =>
       {
-        action.onFetched(documents);
+        directDispatch({
+          actionType: 'setDisplayState',
+          state: {
+            documents,
+          },
+        });
+        directDispatch({
+          actionType: 'setDisplayState',
+          state: {
+            loadingDocuments: false,
+          },
+        });
+        if (action.onFetched != null)
+        {
+          action.onFetched(documents);
+        }
+      };
+      const onError = (ev: string | MidwayError) =>
+      {
+        // tslint:disable-next-line
+        console.error(ev);
+        // TODO add a modal message?
+        directDispatch({
+          actionType: 'setDisplayState',
+          state: {
+            loadingDocuments: false,
+          },
+        });
+        if (action.onError != null)
+        {
+          action.onError(ev);
+        }
+      };
+      switch (action.source.type)
+      {
+        case Sources.Algorithm: {
+          const options: SourceOptionsType<Sources.Algorithm> = action.source.options as any;
+          const algorithmId = options.algorithmId;
+          const onLoadAlgorithm = (algorithm: Algorithm) => {
+            if (algorithm == null)
+            {
+              onError('Could not find algorithm');
+              return;
+            }
+            fetchDocumentsFromAlgorithm(algorithm, onLoad, onError, DefaultDocumentLimit);
+          }
+          Ajax.getAlgorithm(algorithmId, onLoadAlgorithm)
+          break;
+        }
+        case Sources.Upload: {
+          const file = action.file;
+          if (file == null)
+          {
+            onError('File not provided');
+            return;
+          }
+          const config = action.source.fileConfig;
+          fetchDocumentsFromFile(file, config, onLoad, onError, DefaultDocumentLimit);
+          break;
+        }
+        default:
+          // tslint:disable-next-line
+          console.error('Failed to retrieve documents. Unknown source type');
+        // TODO modal message?
       }
-      directDispatch({
-        actionType: 'setDisplayState',
-        state: {
-          loadingDocuments: false,
-        },
-      });
-    };
-    const onError = (ev: string | MidwayError) =>
+    }
+    catch (e)
     {
       // tslint:disable-next-line
-      console.error(ev);
-      // TODO add a modal message?
-      directDispatch({
-        actionType: 'setDisplayState',
-        state: {
-          loadingDocuments: false,
-        },
-      });
+      console.error(`An unexpected Error Occurred: ${String(e)}`);
       if (action.onError != null)
       {
-        action.onError(ev);
+        action.onError(e);
       }
-    };
-    switch (action.source.type)
-    {
-      case Sources.Algorithm: {
-        const options: SourceOptionsType<Sources.Algorithm> = action.source.options as any;
-        const algorithms = action.algorithms;
-        if (algorithms == null)
-        {
-          onError('Algorithms not provided');
-          return;
-        }
-        const algorithmId = options.algorithmId;
-        const algorithm = (algorithms != null && algorithms.has(algorithmId)) ? algorithms.get(algorithmId) : null;
-        if (algorithm == null)
-        {
-          onError('Could not find algorithm');
-          return;
-        }
-        // TODO errors if algorithm is null
-        fetchDocumentsFromAlgorithm(algorithm, onLoad, onError, DefaultDocumentLimit);
-        break;
-      }
-      case Sources.Upload: {
-        const file = action.file;
-        if (file == null)
-        {
-          onError('File not provided');
-          return;
-        }
-        const config = action.source.fileConfig;
-        fetchDocumentsFromFile(file, config, onLoad, onError, DefaultDocumentLimit);
-        break;
-      }
-      default:
-        // tslint:disable-next-line
-        console.error('Failed to retrieve documents. Unknown source type');
-      // TODO modal message?
     }
   }
 }

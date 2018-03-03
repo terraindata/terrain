@@ -60,55 +60,54 @@ import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-export function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig)
-  : { template: ETLTemplate, fieldMap: FieldMap, warnings: string[], softWarnings: string[] }
-{
-  if (documents == null || documents.size === 0)
-  {
-    return {
-      template: _ETLTemplate(),
-      fieldMap: Map(),
-      warnings: ['No documents provided for initial Template construction'],
-      softWarnings: [],
-    };
-  }
-  const { engine, warnings, softWarnings } = createMergedEngine(documents);
-  const fieldMap = createTreeFromEngine(engine);
+// export function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig)
+//   : { template: ETLTemplate, fieldMap: FieldMap, warnings: string[], softWarnings: string[] }
+// {
+//   if (documents == null || documents.size === 0)
+//   {
+//     return {
+//       template: _ETLTemplate(),
+//       fieldMap: Map(),
+//       warnings: ['No documents provided for initial Template construction'],
+//       softWarnings: [],
+//     };
+//   }
+//   const { engine, warnings, softWarnings } = createMergedEngine(documents);
+//   const fieldMap = createTreeFromEngine(engine);
 
-  let template = _ETLTemplate({
-    id: -1,
-    templateName: name,
-    transformationEngine: engine,
-  });
+//   let template = _ETLTemplate({
+//     id: -1,
+//     templateName: name,
+//     transformationEngine: engine,
+//   });
 
-  // default source and sink is upload and download
-  template = template.setIn(['sources', 'primary'],
-    source !== undefined ?
-      source
-      :
-      _SourceConfig({
-        type: Sources.Upload,
-      }),
-  );
-  template = template.setIn(['sinks', 'primary'],
-    sink !== undefined ?
-      sink
-      :
-      _SinkConfig({
-        type: Sinks.Download,
-      }),
-  );
+//   // default source and sink is upload and download
+//   template = template.setIn(['sources', 'primary'],
+//     source !== undefined ?
+//       source
+//       :
+//       _SourceConfig({
+//         type: Sources.Upload,
+//       }),
+//   );
+//   template = template.setIn(['sinks', 'primary'],
+//     sink !== undefined ?
+//       sink
+//       :
+//       _SinkConfig({
+//         type: Sinks.Download,
+//       }),
+//   );
 
-  return {
-    template,
-    fieldMap,
-    warnings,
-    softWarnings,
-  };
-}
+//   return {
+//     template,
+//     fieldMap,
+//     warnings,
+//     softWarnings,
+//   };
+// }
 
 export function createTreeFromEngine(engine: TransformationEngine): FieldMap
 {

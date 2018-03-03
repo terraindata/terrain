@@ -60,7 +60,7 @@ import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { createInitialTemplate } from 'etl/templates/SyncUtil';
+import { createInitialTemplateFn } from 'etl/helpers/TemplateInitializers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
@@ -71,6 +71,11 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 const { List } = Immutable;
 import './ETLEditorPage.less';
 
+
+import TerrainStore from 'src/app/store/TerrainStore';
+console.log(TerrainStore);
+console.log(TemplateEditorActions);
+
 export interface Props
 {
   // injected
@@ -79,7 +84,6 @@ export interface Props
     algorithmId?: number,
     templateId?: number;
   };
-  algorithms?: IMMap<ID, Algorithm>;
   walkthrough?: WalkthroughState;
   templates?: List<ETLTemplate>;
   editorAct?: typeof TemplateEditorActions;
@@ -98,25 +102,25 @@ function getTemplateId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-function createInitialTemplateFn(
-  editorAct: typeof TemplateEditorActions,
-  source?: SourceConfig,
-  sink?: SinkConfig,
-): (hits: List<object>) => void
-{
-  return (hits) =>
-  {
-    const { template, fieldMap } = createInitialTemplate(hits, source, sink);
-    editorAct({
-      actionType: 'setTemplate',
-      template,
-    });
-    editorAct({
-      actionType: 'setFieldMap',
-      fieldMap,
-    });
-  };
-}
+// function createInitialTemplateFn(
+//   editorAct: typeof TemplateEditorActions,
+//   source?: SourceConfig,
+//   sink?: SinkConfig,
+// ): (hits: List<object>) => void
+// {
+//   return (hits) =>
+//   {
+//     const { template, fieldMap } = createInitialTemplate(hits, source, sink);
+//     editorAct({
+//       actionType: 'setTemplate',
+//       template,
+//     });
+//     editorAct({
+//       actionType: 'setFieldMap',
+//       fieldMap,
+//     });
+//   };
+// }
 
 // Some of this logic could be put in redux using some neat features of Thunk (particularly getState)
 @Radium
@@ -185,7 +189,7 @@ class ETLEditorPage extends TerrainComponent<Props>
   // create a new template from the results of an algorithm
   public initFromAlgorithm()
   {
-    const { algorithms, params, editorAct } = this.props;
+    const { params, editorAct } = this.props;
     const algorithmId = getAlgorithmId(params);
     const source = _SourceConfig({
       type: Sources.Algorithm,
@@ -201,7 +205,6 @@ class ETLEditorPage extends TerrainComponent<Props>
     editorAct({
       actionType: 'fetchDocuments',
       source,
-      algorithms,
       onFetched,
     });
   }
@@ -234,9 +237,8 @@ class ETLEditorPage extends TerrainComponent<Props>
   {
     const onLoad = (response: List<ETLTemplate>) =>
     {
-      const { editorAct, templates, algorithms } = this.props;
+      const { editorAct, templates } = this.props;
       const index = templates.findIndex((template) => template.id === templateId);
-      // TODO what happens if algorithms haven't loaded in yet?
       if (index === -1)
       {
         // TODO error
@@ -261,7 +263,6 @@ class ETLEditorPage extends TerrainComponent<Props>
         editorAct({
           actionType: 'fetchDocuments',
           source: template.sources.get('primary'),
-          algorithms,
           onFetched,
         });
         editorAct({
@@ -375,7 +376,6 @@ class ETLEditorPage extends TerrainComponent<Props>
 export default withRouter(Util.createContainer(
   ETLEditorPage,
   [
-    ['library', 'algorithms'],
     ['walkthrough'],
     ['etl', 'templates'],
     ['templateEditor', 'template'],
