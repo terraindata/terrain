@@ -93,7 +93,7 @@ export interface ETLActionTypes
     onLoad: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
   };
-  updateLocalTemplates: {
+  updateLocalTemplates: { // find the given template and update our list
     actionType: 'updateLocalTemplates';
     template: ETLTemplate;
   };
@@ -102,51 +102,51 @@ export interface ETLActionTypes
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 {
   public reducers: ConstrainedMap<ETLActionTypes, ETLState> =
+  {
+    getTemplate: (state, action) => state, // overriden reducers
+    fetchTemplates: (state, action) => state,
+    createTemplate: (state, action) => state,
+    saveTemplate: (state, action) => state,
+    setLoading: (state, action) =>
     {
-      getTemplate: (state, action) => state, // overriden reducers
-      fetchTemplates: (state, action) => state,
-      createTemplate: (state, action) => state,
-      saveTemplate: (state, action) => state,
-      setLoading: (state, action) =>
+      let value = _.get(state.loading, action.payload.key, 0);
+      if (action.payload.isLoading)
       {
-        let value = _.get(state.loading, action.payload.key, 0);
-        if (action.payload.isLoading)
-        {
-          value++;
-        }
-        else if (value !== 0)
-        {
-          value--;
-        }
-        else
-        {
-          // TODO throw an error?
-        }
-        const newLoading = _.extend({}, state.loading,
-          { [action.payload.key]: value },
-        );
-        return state.set('loading', newLoading);
-      },
-      setTemplates: (state, action) =>
+        value++;
+      }
+      else if (value !== 0)
       {
-        return state.set('templates', action.payload.templates);
-      },
-      updateLocalTemplates: (state, action) =>
+        value--;
+      }
+      else
       {
-        const index = state.templates.findIndex((template) =>
-        {
-          return template.id === action.payload.template.id;
-        });
-        if (index === -1)
-        {
-          return state.update('templates', (templates) => templates.push(action.payload.template));
-        }
-        else
-        {
-          return state.update('templates', (templates) => templates.set(index, action.payload.template));
-        }
-      },
-    };
+        // TODO throw an error?
+      }
+      const newLoading = _.extend({}, state.loading,
+        { [action.payload.key]: value },
+      );
+      return state.set('loading', newLoading);
+    },
+    setTemplates: (state, action) =>
+    {
+      return state.set('templates', action.payload.templates);
+    },
+    updateLocalTemplates: (state, action) =>
+    {
+      const index = state.templates.findIndex((template) =>
+      {
+        return template.id === action.payload.template.id;
+      });
+      if (index === -1)
+      {
+        return state.update('templates', (templates) => templates.push(action.payload.template));
+      }
+      else
+      {
+        return state.update('templates', (templates) => templates.set(index, action.payload.template));
+      }
+    },
+  };
 
   // TODO, add a thing to the state where we can log errors?
   public onErrorFactory(onError: ErrorHandler, directDispatch: typeof ETLActions, key: string): ErrorHandler
