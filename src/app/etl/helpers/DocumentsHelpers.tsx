@@ -52,6 +52,7 @@ import * as React from 'react';
 import { withRouter } from 'react-router';
 
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
+import { MidwayError } from 'shared/error/MidwayError';
 import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
 
@@ -61,150 +62,132 @@ import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, Source
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
+import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { FieldMap } from 'etl/templates/TemplateTypes';
-import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import
+{
+  _TemplateEditorState,
+  DefaultDocumentLimit,
+  EditorDisplayState,
+  ETLTemplate,
+  FieldMap,
+  TemplateEditorState,
+} from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
 
-import DocumentsHelpers from './DocumentsHelpers';
+import Ajax from 'util/Ajax';
 
-class Initializers extends ETLHelpers
+class DocumentsHelpers extends ETLHelpers
 {
-  public loadExistingTemplate(templateId: number)
+  public fetchDocuments(
+    source: SourceConfig,
+    file?: File,
+    onLoad?: (docs: List<object>) => void,
+    onError?: (ev: string | MidwayError) => void,
+  )
   {
-    const onLoad = (template: ETLTemplate) =>
+    const onFetchLoad = (documents: List<object>) =>
+    {
+      this.onLoadDocuments(documents);
+      if (onLoad != null)
+      {
+        onLoad(documents);
+      }
+    };
+    const defaultError = (ev) =>
+    {
+      this.onDocumentsError(ev);
+      if (onError != null)
+      {
+        onError(ev);
+      }
+    };
+    try
     {
       this.editorAct({
-        actionType: 'resetState',
+        actionType: 'setDisplayState',
+        state: {
+          loadingDocuments: true,
+        },
       });
-      this.editorAct({
-        actionType: 'setTemplate',
-        template,
-      });
-      this.editorAct({
-        actionType: 'rebuildFieldMap',
-      });
-      this.editorAct({
-        actionType: 'setIsDirty',
-        isDirty: false,
-      });
-
-      DocumentsHelpers.fetchDocuments(template.sources.get('primary'));
-      ETLRouteUtil.gotoEditTemplate(template.id);
-    };
-    const onError = (response) =>
+      switch (source.type)
+      {
+        case Sources.Algorithm: {
+          const options: SourceOptionsType<Sources.Algorithm> = source.options as any;
+          const algorithmId = options.algorithmId;
+          const onLoadAlgorithm = (algorithm: Algorithm) =>
+          {
+            if (algorithm == null)
+            {
+              defaultError('Could not find algorithm');
+              return;
+            }
+            fetchDocumentsFromAlgorithm(algorithm, DefaultDocumentLimit)
+              .then(onFetchLoad).catch(defaultError);
+          };
+          Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
+          break;
+        }
+        case Sources.Upload: {
+          if (file == null)
+          {
+            defaultError('File not provided');
+            return;
+          }
+          const config = source.fileConfig;
+          fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
+            .then(onFetchLoad).catch(defaultError);
+          break;
+        }
+        default: {
+          if (onError != null)
+          {
+            defaultError('Failed to retrieve documents. Unknown source type');
+          }
+        }
+      }
+    }
+    catch (e)
     {
-      // TODO
-    };
-
-    this.getTemplate(templateId).then(onLoad).catch(onError);
+      // tslint:disable-next-line
+      console.error(`An unexpected Error Occurred: ${String(e)}`);
+      defaultError(e);
+    }
   }
 
-  public initNewFromAlgorithm(algorithmId: number)
+  protected onLoadDocuments(documents: List<object>)
   {
-    const source = _SourceConfig({
-      type: Sources.Algorithm,
-      fileConfig: _FileConfig({
-        fileType: FileTypes.Json,
-      }),
-      options: {
-        algorithmId,
+    this.editorAct({
+      actionType: 'setDisplayState',
+      state: {
+        documents,
       },
     });
-    const onLoad = this.createInitialTemplateFn(source);
-    DocumentsHelpers.fetchDocuments(source, undefined, onLoad);
+    this.editorAct({
+      actionType: 'setDisplayState',
+      state: {
+        loadingDocuments: false,
+      },
+    });
   }
 
-  public initNewFromWalkthrough(walkthrough: WalkthroughState)
+  protected onDocumentsError(ev: string | MidwayError)
   {
-    const source = walkthrough.source;
-    const sink = walkthrough.sink;
-    const onLoad = this.createInitialTemplateFn(source, sink);
-    if (source.type === Sources.Upload)
-    {
-      DocumentsHelpers.fetchDocuments(source, walkthrough.file, onLoad);
-    }
-    else
-    {
-      // TODO other types
-    }
+    // tslint:disable-next-line
+    console.error(ev);
+    // TODO add a modal message?
+    this.editorAct({
+      actionType: 'setDisplayState',
+      state: {
+        loadingDocuments: false,
+      },
+    });
   }
 
-  private createInitialTemplateFn(
-    source?: SourceConfig,
-    sink?: SinkConfig,
-  ): (hits: List<object>) => void
-  {
-    return (hits) =>
-    {
-      const { template, fieldMap } = createInitialTemplate(hits, source, sink);
-      this.editorAct({
-        actionType: 'setTemplate',
-        template,
-      });
-      this.editorAct({
-        actionType: 'setFieldMap',
-        fieldMap,
-      });
-    };
-  }
 }
-export default new Initializers(TerrainStore);
-
-function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
-  {
-    template: ETLTemplate,
-    fieldMap: FieldMap,
-    warnings: string[],
-    softWarnings: string[],
-  }
-{
-  if (documents == null || documents.size === 0)
-  {
-    return {
-      template: _ETLTemplate(),
-      fieldMap: Map(),
-      warnings: ['No documents provided for initial Template construction'],
-      softWarnings: [],
-    };
-  }
-  const { engine, warnings, softWarnings } = createMergedEngine(documents);
-  const fieldMap = createTreeFromEngine(engine);
-
-  let template = _ETLTemplate({
-    id: -1,
-    templateName: name,
-    transformationEngine: engine,
-  });
-
-  // default source and sink is upload and download
-  template = template.setIn(['sources', 'primary'],
-    source !== undefined ?
-      source
-      :
-      _SourceConfig({
-        type: Sources.Upload,
-      }),
-  );
-  template = template.setIn(['sinks', 'primary'],
-    sink !== undefined ?
-      sink
-      :
-      _SinkConfig({
-        type: Sinks.Download,
-      }),
-  );
-
-  return {
-    template,
-    fieldMap,
-    warnings,
-    softWarnings,
-  };
-}
+export default new DocumentsHelpers(TerrainStore);

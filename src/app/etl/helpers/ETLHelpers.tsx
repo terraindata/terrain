@@ -43,92 +43,75 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:import-spacing
+// tslint:disable:max-classes-per-file import-spacing
+
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-
-import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import
-{
-  _TemplateField,
-  TemplateField,
-} from 'etl/templates/FieldTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import
-{
-  _TemplateEditorState,
-  EditorDisplayState,
-  ETLTemplate,
-  TemplateEditorState,
-} from 'etl/templates/TemplateTypes';
-import { Algorithm } from 'library/LibraryTypes';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import { MidwayError } from 'shared/error/MidwayError';
-import { getSampleRows } from 'shared/etl/FileUtil';
-
-import { toInputMap } from 'src/blocks/types/Input';
-import { AllBackendsMap } from 'src/database/AllBackends';
-import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
-
-import { _Query, Query, queryForSave } from 'src/items/types/Query';
-import { Ajax } from 'util/Ajax';
-
 const { List, Map } = Immutable;
+import * as Radium from 'radium';
+import * as React from 'react';
+import { withRouter } from 'react-router';
 
-export function fetchDocumentsFromAlgorithm(
-  algorithm: Algorithm,
-  limit?: number,
-): Promise<List<object>>
+import { Algorithm, LibraryState } from 'library/LibraryTypes';
+import TerrainStore from 'src/app/store/TerrainStore';
+import Util from 'util/Util';
+
+import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { ETLActions } from 'etl/ETLRedux';
+import ETLRouteUtil from 'etl/ETLRouteUtil';
+import TemplateEditor from 'etl/templates/components/TemplateEditor';
+import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { createTreeFromEngine } from 'etl/templates/SyncUtil';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { FieldMap } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
+
+export default abstract class ETLHelpers
 {
-  return new Promise<List<object>>((resolve, reject) =>
-  {
-    let query = algorithm.query;
-    query = query.set('parseTree', new ESInterpreter(query.tql, toInputMap(query.inputs)));
+  protected editorAct: typeof TemplateEditorActions;
+  protected etlAct: typeof ETLActions;
 
-    const eql = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {
-        replaceInputs: true,
-      },
-    );
-    const handleResponse = (response: MidwayQueryResponse) =>
+  constructor(protected store)
+  {
+    this.editorAct = (action) =>
     {
-      let hits = List(_.get(response, ['result', 'hits', 'hits'], []))
-        .map((doc, index) => doc['_source']);
-      if (limit != null && limit > 0)
+      this.store.dispatch(TemplateEditorActions(action));
+    };
+    this.etlAct = (action) =>
+    {
+      this.store.dispatch(ETLActions(action));
+    };
+  }
+
+  protected grabOne<T>(resolve, reject)
+  {
+    return (response: List<T>) =>
+    {
+      if (response.size === 0)
       {
-        hits = hits.slice(0, limit);
+        reject('Return result had no items');
       }
-      resolve(hits.toList());
+      else
+      {
+        resolve(response.get(0));
+      }
     };
+  }
 
-    const { queryId, xhr } = Ajax.query(
-      eql,
-      algorithm.db,
-      handleResponse,
-      reject,
-    );
-  });
-}
-
-export function fetchDocumentsFromFile(
-  file: File,
-  config: FileConfig,
-  limit?: number,
-): Promise<List<object>>
-{
-  return new Promise<List<object>>((resolve, reject) =>
+  protected getTemplate(templateId: number): Promise<ETLTemplate>
   {
-    const handleResponse = (response: object[]) =>
+    return new Promise<ETLTemplate>((resolve, reject) =>
     {
-      resolve(List(response));
-    };
-    getSampleRows(
-      file,
-      handleResponse,
-      reject,
-      limit,
-      config.toJS(),
-    );
-  });
+      this.etlAct({
+        actionType: 'getTemplate',
+        id: templateId,
+        onLoad: this.grabOne(resolve, reject),
+        onError: reject,
+      });
+    });
+  }
 }

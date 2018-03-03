@@ -100,13 +100,6 @@ export interface TemplateEditorActionTypes
     actionType: 'setModalRequests';
     requests: List<ModalProps>;
   };
-  fetchDocuments: {
-    actionType: 'fetchDocuments';
-    source: SourceConfig;
-    file?: File; // if its an uploaded file
-    onLoad?: (docs: List<object>) => void;
-    onError?: (ev: string | MidwayError) => void;
-  };
   setDisplayState: {
     actionType: 'setDisplayState';
     state: Partial<{
@@ -156,10 +149,6 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       {
         return state.setIn(['uiState', 'modalRequests'], action.payload.requests);
       },
-      fetchDocuments: (state, action) =>
-      {
-        return state; // do nothing
-      },
       setDisplayState: (state, action) =>
       {
         let newState = state.uiState;
@@ -185,108 +174,6 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         return _TemplateEditorState();
       },
     };
-
-  public overrideAct(action: Unroll<TemplateEditorActionTypes>)
-  {
-    switch (action.actionType)
-    {
-      case 'fetchDocuments':
-        return this.fetchDocuments.bind(this, action);
-      default:
-        return undefined;
-    }
-  }
-
-  public fetchDocuments(action: TemplateEditorActionType<'fetchDocuments'>, dispatch)
-  {
-    try
-    {
-      const directDispatch = this._dispatchReducerFactory(dispatch);
-      directDispatch({
-        actionType: 'setDisplayState',
-        state: {
-          loadingDocuments: true,
-        },
-      });
-      const onLoad = (documents: List<object>) =>
-      {
-        directDispatch({
-          actionType: 'setDisplayState',
-          state: {
-            documents,
-          },
-        });
-        directDispatch({
-          actionType: 'setDisplayState',
-          state: {
-            loadingDocuments: false,
-          },
-        });
-        if (action.onLoad != null)
-        {
-          action.onLoad(documents);
-        }
-      };
-      const onError = (ev: string | MidwayError) =>
-      {
-        // tslint:disable-next-line
-        console.error(ev);
-        // TODO add a modal message?
-        directDispatch({
-          actionType: 'setDisplayState',
-          state: {
-            loadingDocuments: false,
-          },
-        });
-        if (action.onError != null)
-        {
-          action.onError(ev);
-        }
-      };
-      switch (action.source.type)
-      {
-        case Sources.Algorithm: {
-          const options: SourceOptionsType<Sources.Algorithm> = action.source.options as any;
-          const algorithmId = options.algorithmId;
-          const onLoadAlgorithm = (algorithm: Algorithm) =>
-          {
-            if (algorithm == null)
-            {
-              onError('Could not find algorithm');
-              return;
-            }
-            fetchDocumentsFromAlgorithm(algorithm, onLoad, onError, DefaultDocumentLimit);
-          };
-          Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
-          break;
-        }
-        case Sources.Upload: {
-          const file = action.file;
-          if (file == null)
-          {
-            onError('File not provided');
-            return;
-          }
-          const config = action.source.fileConfig;
-          fetchDocumentsFromFile(file, config, onLoad, onError, DefaultDocumentLimit);
-          break;
-        }
-        default:
-          // tslint:disable-next-line
-          console.error('Failed to retrieve documents. Unknown source type');
-        // TODO modal message?
-      }
-    }
-    catch (e)
-    {
-      // tslint:disable-next-line
-      console.error(`An unexpected Error Occurred: ${String(e)}`);
-      if (action.onError != null)
-      {
-        action.onError(e);
-      }
-    }
-  }
 }
 
 const ReduxInstance = new TemplateEditorRedux();

@@ -55,6 +55,7 @@ import Util from 'util/Util';
 
 import UploadFileButton from 'etl/common/components/UploadFileButton';
 import { _FileConfig, _SourceConfig, FileConfig, SourceConfig } from 'etl/EndpointTypes';
+import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { getFileType, guessJsonFileOptions } from 'shared/etl/FileUtil';
@@ -147,12 +148,6 @@ class EditorDocumentsPreview extends TerrainComponent<Props>
         actionType: 'setTemplate',
         template: newTemplate,
       });
-      act({
-        actionType: 'setDisplayState',
-        state: {
-          documents,
-        },
-      });
     };
   }
 
@@ -172,13 +167,11 @@ class EditorDocumentsPreview extends TerrainComponent<Props>
         fileType,
       }),
     });
-    act({
-      actionType: 'fetchDocuments',
-      source: newSourceConfig,
+    DocumentsHelpers.fetchDocuments(newSourceConfig,
       file,
-      onLoad: this.onDocumentsFetchedFactory(newSourceConfig),
-      onError: this.onDocumentsFetchError,
-    });
+      this.onDocumentsFetchedFactory(newSourceConfig),
+      this.onDocumentsFetchError,
+    );
   }
 }
 

@@ -201,13 +201,12 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public initFromRoute()
   {
-    const { params, editorAct } = this.props;
+    const { params, editorAct, walkthrough } = this.props;
     editorAct({
       actionType: 'resetState',
     });
     if (params.algorithmId !== undefined)
     {
-      // this.initFromAlgorithm();
       Initializers.initNewFromAlgorithm(params.algorithmId);
     }
     else if (params.templateId !== undefined)
@@ -218,8 +217,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     else if (ETLRouteUtil.isRouteNewTemplate(this.props.location) &&
       this.props.walkthrough.source.type != null)
     {
-      // this.initFromWalkthrough();
-      Initializers.initNewFromWalkthrough();
+      Initializers.initNewFromWalkthrough(walkthrough);
     }
     else
     {
