@@ -107,6 +107,8 @@ class ScoreBar extends TerrainComponent<Props>
           color={Colors().active}
           height={height || (altStyle && 22) || 34}
           noLeftLine={altStyle}
+          rounded={altStyle}
+          noPadding={altStyle}
         />
         <EditableField
           editing={this.state.editingWeight}

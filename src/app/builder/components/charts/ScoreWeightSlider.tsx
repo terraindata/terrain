@@ -66,6 +66,8 @@ interface ScoreWeightSliderProps
   onAfterChange: (value: number) => void;
   height: number;
   noLeftLine?: boolean;
+  rounded?: boolean;
+  noPadding?: boolean;
 }
 
 export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSliderProps>
@@ -75,13 +77,14 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
     const {
       value,
       color,
+      rounded,
     } = this.props;
 
     const baseStyle = {
       width: this.getTrackHeight(), // to make the handle a square, we set width === height
       height: this.getTrackHeight(), // the handle height is always the same as the track's
       marginTop: 0,
-      borderRadius: 4,
+      borderRadius: rounded ? 40 : 4,
       border: 0,
       marginLeft: -11,
     };
@@ -96,16 +99,20 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       color,
     } = this.props;
 
-    // The track is always 6 pixels smaller than the height defined for the component
-    // to give the sense of padding.
-    const baseStyle = { height: this.getTrackHeight(), borderRadius: 0 };
+    const baseStyle = {
+      height: this.getTrackHeight(),
+      borderRadius: 0
+    };
 
     return { ...baseStyle, backgroundColor: color };
   }
 
   public getTrackHeight()
   {
-    return this.props.height - 6;
+    const { height, noPadding } = this.props;
+    // The track can be 6 pixels smaller than the height defined for the component
+    // to give the sense of padding.
+    return noPadding ? height : height - 6;
   }
 
   public getCustomRailStyle()
@@ -137,9 +144,13 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
     const railStyle = this.getCustomRailStyle();
 
     return (
-      <div style={{ width: '100%', position: 'relative', height: 33 }}>
+      <div style={{ width: '100%', position: 'relative', height: height }}>
         <div style={railStyle} />
-        <div style={{ width: `calc(100% - ${height}px)`, position: 'relative', marginLeft: 14 }}>
+        <div style={{
+          width: `calc(100% - ${height}px)`,
+          position: 'relative',
+          marginLeft: 0, // not sure why this used to have 14px margin 
+        }}>
           {
             !noLeftLine &&
             <div style={{
