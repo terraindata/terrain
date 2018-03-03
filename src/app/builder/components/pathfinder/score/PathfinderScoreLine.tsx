@@ -241,7 +241,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     this.setState({
       editingField: false,
-    })
+    });
   }
 
   public renderLineContents()

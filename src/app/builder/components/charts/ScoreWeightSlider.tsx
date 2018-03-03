@@ -45,13 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
 
+import * as classNames from 'classnames';
 import Slider from 'rc-slider';
 // We can just import Slider or Range to reduce bundle size
 // import Slider from 'rc-slider/lib/Slider';
 // import Range from 'rc-slider/lib/Range';
 import 'rc-slider/assets/index.css';
 import * as React from 'react';
-import * as classNames from 'classnames';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
 const FIXED_SLIDER_HANDLE_STYLE = { display: 'none' };
@@ -104,7 +104,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
 
     const baseStyle = {
       height: this.getTrackHeight(),
-      borderRadius: 0
+      borderRadius: 0,
     };
 
     return { ...baseStyle, backgroundColor: color };
@@ -164,12 +164,12 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
         <div style={{
           width: `calc(100% - ${height}px)`,
           position: 'relative',
-          marginLeft: 0, // not sure why this used to have 14px margin 
+          marginLeft: 0, // not sure why this used to have 14px margin
         }}>
           {
             !noLeftLine &&
             <div style={{
-              zIndex: 2, top: -3, position: 'absolute', height: height + 6, borderLeft: '1px solid rgba(30, 180, 250, .5)'
+              zIndex: 2, top: -3, position: 'absolute', height: height + 6, borderLeft: '1px solid rgba(30, 180, 250, .5)',
             }}
             />
           }

@@ -154,7 +154,7 @@ class SearchableDropdown extends TerrainComponent<Props>
     {
       this.setState({
         open: nextProps.open,
-      })
+      });
     }
   }
 
@@ -191,7 +191,10 @@ class SearchableDropdown extends TerrainComponent<Props>
   public clickHandler(index)
   {
     const value = index === -1 ? '' : this.props.options.get(index);
-    this.props.onClose && this.props.onClose();
+    if (this.props.onClose)
+    {
+      this.props.onClose();
+    }
     this.setState({
       inputValue: value,
       open: false,
@@ -283,7 +286,10 @@ class SearchableDropdown extends TerrainComponent<Props>
 
   public handleClickOutside()
   {
-    this.props.onClose && this.props.onClose();
+    if (this.props.onClose)
+    {
+      this.props.onClose();
+    }
     this.setState({
       open: false,
       focusedIndex: -1,
@@ -326,7 +332,10 @@ class SearchableDropdown extends TerrainComponent<Props>
     }
     else
     {
-      this.props.onClose && this.props.onClose();
+      if (this.props.onClose)
+      {
+        this.props.onClose();
+      }
       this.setState({
         open: false,
         focusedIndex: -1,
@@ -421,7 +430,10 @@ class SearchableDropdown extends TerrainComponent<Props>
         }
         this.clickHandler(value.index);
         this.refs['input']['blur']();
-        this.props.onClose && this.props.onClose();
+        if (this.props.onClose)
+        {
+          this.props.onClose();
+        }
         this.setState({
           open: false,
           focusedIndex: -1,

@@ -351,6 +351,7 @@ class Dropdown extends TerrainComponent<Props>
       optionsEl =
         <div
           className='dropdown-options-wrapper'
+          style={{ border: '1px solid lightgray' }}
         >
           {
             (this.props.options && this.props.options.size > 0) ?
@@ -408,6 +409,7 @@ class Dropdown extends TerrainComponent<Props>
           [this.props.className]: !!this.props.className,
         })}
         key='dropdown-body'
+        style={borderColor('transparent')}
       >
         {
           this.state.up && this.state.open

@@ -56,6 +56,7 @@ import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';
 import TQLEditor from 'tql/components/TQLEditor';
+import TerrainTools from 'util/TerrainTools';
 import Util from 'util/Util';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
@@ -66,7 +67,6 @@ import { FileImportState } from '../../../fileImport/FileImportTypes';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import { MAX_HITS, ResultsState } from './ResultTypes';
-import TerrainTools from 'util/TerrainTools';
 
 const RESULTS_PAGE_SIZE = 20;
 const ClipboardIcon = require('images/icon_clipboard.svg');

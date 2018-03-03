@@ -475,7 +475,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                 style={_.extend(
                   {},
                   dropZoneStyle,
-                  i === filterGroup.lines.size - 1 ? {top: 20} : {}
+                  i === filterGroup.lines.size - 1 ? { top: 20 } : {}
                 }
               />
             </div>,

@@ -58,6 +58,7 @@ import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import Util from 'app/util/Util';
+import ExpandIcon from 'common/components/ExpandIcon';
 import RouteSelector from 'common/components/RouteSelector';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderArea from '../PathfinderArea';
@@ -68,7 +69,6 @@ import { _AggregationLine, _Path, More, Path, PathfinderContext, Source } from '
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
-import ExpandIcon from 'common/components/ExpandIcon';
 import './PathfinderMoreStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 

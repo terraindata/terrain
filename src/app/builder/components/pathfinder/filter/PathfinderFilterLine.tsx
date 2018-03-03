@@ -69,7 +69,7 @@ import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import
 {
   _DistanceValue, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
-  Source
+  Source,
 } from '../PathfinderTypes';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');

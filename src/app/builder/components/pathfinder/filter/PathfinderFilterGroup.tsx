@@ -56,9 +56,9 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import Colors, { getStyle } from 'app/colors/Colors';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import LinearSelector from 'app/common/components/LinearSelector';
+import ExpandIcon from 'common/components/ExpandIcon';
 import { PathfinderLine } from '../PathfinderLine';
 import { FilterGroup, FilterLine } from '../PathfinderTypes';
-import ExpandIcon from 'common/components/ExpandIcon';
 const CarrotIcon = require('images/icon_carrot.svg?name=CarrotIcon');
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 export interface Props

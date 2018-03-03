@@ -502,7 +502,6 @@ class Settings extends TerrainComponent<Props>
     }
   }
 
-
   public renderTerrainSettingsContent()
   {
     const terrainSettingsAnalyticsContent = TerrainTools.isAdmin() ? (

@@ -88,7 +88,7 @@ class ScoreBar extends TerrainComponent<Props>
   public render()
   {
     const { weight, min, max, height, canEdit, altStyle } = this.props;
-    
+
     let color = Colors().active;
     if (altStyle && weight === 1)
     {
@@ -154,11 +154,14 @@ class ScoreBar extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private handleInputFocus(e)
   {
     // debugger;
-    e && e.target && e.target.select();
+    if (e && e.target)
+    {
+      e.target.select();
+    }
   }
 
   private handleWeightBeforeChange(value: number)
@@ -169,8 +172,10 @@ class ScoreBar extends TerrainComponent<Props>
         editingWeight: false,
       });
     }
-
-    this.props.onBeforeChange && this.props.onBeforeChange(value);
+    if (this.props.onBeforeChange)
+    {
+      this.props.onBeforeChange(value);
+    }
   }
 
   private handleWeightChange(value: number)

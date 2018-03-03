@@ -208,7 +208,7 @@ class HitComponent extends TerrainComponent<Props> {
       nestedStates: this.state.nestedStates.set(field, state),
     });
   }
-  
+
   public renderNestedFieldHeader(field, depth, size, expandState: NestedState)
   {
     return (
@@ -222,7 +222,7 @@ class HitComponent extends TerrainComponent<Props> {
           {
             <div
               className='hit-nested-content-expand'
-              style={size <= 1 ? {opacity: 0} : {}}
+              style={size <= 1 ? { opacity: 0 } : {}}
             >
               <ExpandIcon
                 open={expandState === NestedState.Expanded}
@@ -359,7 +359,7 @@ class HitComponent extends TerrainComponent<Props> {
         }
         <div
           className='hit-nested-content-values'
-         // style={{ height: expandState === NestedState.Expanded ? '100%' : 'auto' }}
+        // style={{ height: expandState === NestedState.Expanded ? '100%' : 'auto' }}
         >
           <FadeInOut
             open={expandState !== NestedState.Collapsed}
