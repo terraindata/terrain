@@ -104,7 +104,7 @@ class ElasticHighlighter extends SyntaxHighlighter
     const params: { [name: string]: any; } = toInputMap(inputs);
     const interpreter = new ESInterpreter(parser, params);
     const rootValueInfo: ESValueInfo = parser.getValueInfo();
-    const tokens = ESParserTokenizer.getTokens(parser);
+    const tokens = ESParserTokenizer.getTokens(rootValueInfo);
     for (const fToken of tokens)
     {
       const token: ESParserToken = fToken.parserToken;

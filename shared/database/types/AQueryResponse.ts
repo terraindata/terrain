@@ -44,26 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESJSONParser from '../parser/ESJSONParser';
-import ESValueInfo from '../parser/ESValueInfo';
-import ESFormatter from './ESFormatter';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+import QueryRequest from './QueryRequest';
 
-/**
- * WIP - currently nothing happens with previousQuery
- */
-class ESConverter
+export default abstract class AQueryResponse
 {
-  public static defaultIndentSize = 2;
+  public request?: QueryRequest;
+  public errors: MidwayErrorItem[];
 
-  public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
+  public constructor(errors: MidwayErrorItem[] = [], request?: QueryRequest)
   {
-    return this.formatValueInfo(query.getValueInfo());
+    this.errors = errors;
+    this.request = request;
   }
 
-  public static formatValueInfo(source: ESValueInfo, previousQuery?: ESJSONParser): string
+  public setQueryRequest(req: QueryRequest)
   {
-    const formatter = new ESFormatter(ESConverter.defaultIndentSize, true);
-    return formatter.formatQuery(source);
+    this.request = req;
+  }
+
+  public hasError(): boolean
+  {
+    return this.errors.length > 0;
   }
 }
-export default ESConverter;

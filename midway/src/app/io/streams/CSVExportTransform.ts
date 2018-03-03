@@ -44,50 +44,106 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-console
-import * as _ from 'lodash';
+import AExportTransform from './AExportTransform';
 
-import ElasticQueryResult from '../../../shared/database/elastic/ElasticQueryResponse';
-import QueryRequest from '../../../shared/database/types/QueryRequest';
-import QueryResponse from '../../../shared/database/types/QueryResponse';
-import QueryResult from '../../../shared/database/types/QueryResult';
-import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
-
-export default class MidwayQueryResponse extends QueryResponse
+/**
+ * Export to CSV format.
+ * Conforms to RFC 4180: https://tools.ietf.org/html/rfc4180
+ *
+ * Additional configuration options are possible.
+ */
+export default class CSVExportTransform extends AExportTransform
 {
-  public static fromJSON(json: string)
+
+  private columnNames: string[];
+  private separator: string = ',';
+  private nullValue: string = 'null';
+
+  constructor(columnNames: string[],
+    separator: string = ',',
+    nullValue: string = 'null')
   {
-    const responseObject = JSON.parse(json);
-    return new MidwayQueryResponse(responseObject.result, responseObject.errors, responseObject.request);
+    super();
+    this.columnNames = columnNames;
+    this.separator = separator;
+    this.nullValue = nullValue;
   }
 
-  public static fromParsedJsonObject(obj: any)
+  protected preamble(): string
   {
-    return new MidwayQueryResponse(obj.result, obj.errors, obj.request);
-  }
-
-  public static formatElasticResult(result: QueryResult): any
-  {
-    return result;
-  }
-
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)
-  {
-    super(result, errors, request);
-  }
-
-  public getResultsData(): any
-  {
-    let result;
-    switch (this.request.databasetype)
+    const headerObject: object = {};
+    for (let i: number = 0; i < this.columnNames.length; ++i)
     {
-      case 'elastic':
-        result = MidwayQueryResponse.formatElasticResult(this.result);
-        break;
-      default:
-        result = [];
-        console.log('Unknown request type when extracting results from midway query response ' + this.request.type);
+      const name: string = this.columnNames[i];
+      headerObject[name] = name;
+    }
+
+    return this.transform(headerObject, 0) + this.delimiter();
+  }
+
+  protected transform(input: object, chunkNumber: number): string
+  {
+    let result: string = '';
+
+    for (let i: number = 0; i < this.columnNames.length; ++i)
+    {
+      const name: string = this.columnNames[i];
+      const value: any = input[name];
+
+      if (i > 0)
+      {
+        result += this.separator;
+      }
+
+      result += this.translation(value);
     }
     return result;
+  }
+
+  protected delimiter(): string
+  {
+    return '\r\n';
+  }
+
+  protected conclusion(chunkNumber: number): string
+  {
+    return this.delimiter();
+  }
+
+  private translation(value: any): string
+  {
+    switch (typeof value)
+    {
+      case 'boolean':
+        return (value === true) ? 'true' : 'false';
+      case 'number':
+        return value.toString();
+      case 'string':
+        return this.escapeString(value as string);
+      case 'object':
+        if (value === null)
+        {
+          return this.nullValue;
+        } else
+        {
+          return this.escapeString(JSON.stringify(value));
+        }
+      case 'undefined':
+        return this.nullValue;
+      default:
+        throw Error('Unable to convert value to valid CSV: ' + JSON.stringify(value));
+    }
+  }
+
+  private escapeString(input: string): string
+  {
+    if (!(/[,\n\r"]/.test(input)))
+    {
+      return input; // no need to escape
+    }
+
+    // CSV escapes quotes by doubling them
+    input = input.replace(/"/g, '""');
+    return '"' + input + '"';
   }
 }

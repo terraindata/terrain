@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import ESJSONParser from '../parser/ESJSONParser';
 import ESJSONType from '../parser/ESJSONType';
+import ESValueInfo from '../parser/ESValueInfo';
 import { ESParserTokenizer, FlaggedToken } from './ESParserTokenizer';
 
 function assertUnreachable(param: never): never
@@ -72,9 +73,9 @@ class ESFormatter
     this.parameterInString = parameterInString;
   }
 
-  public formatQuery(parser: ESJSONParser): string
+  public formatQuery(valueInfo: ESValueInfo): string
   {
-    const tokens: FlaggedToken[] = ESParserTokenizer.getTokens(parser, true);
+    const tokens: FlaggedToken[] = ESParserTokenizer.getTokens(valueInfo, true);
     const accumulation: TokenParts = tokens.map((t) => this.mapTokens(t)).reduce(this.reduceParts.bind(this));
     return accumulation.str;
   }
