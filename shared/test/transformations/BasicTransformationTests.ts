@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import UppercaseTransformationNode from 'shared/transformations/nodes/UppercaseTransformationNode';
 import TransformationNode from '../../transformations/nodes/TransformationNode';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
@@ -83,7 +84,7 @@ test('add fields manually', () =>
   expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
-/*test('make a field uppercase', () =>
+test('make a field uppercase', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
   e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['name'])]));
@@ -108,11 +109,11 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new TransformationNode(0, TransformationNodeType.UppercaseNode, List<number>([0])),
+          value: new UppercaseTransformationNode(0, List<number>([0]), {}, TransformationNodeType.UppercaseNode),
         },
         {
           v: '1',
-          value: new TransformationNode(1, TransformationNodeType.UppercaseNode, List<number>([3])),
+          value: new UppercaseTransformationNode(1, List<number>([3]), {}, TransformationNodeType.UppercaseNode),
         },
       ],
       edges: [],
@@ -317,4 +318,4 @@ test('nested transform with wildcard', () =>
       ],
     },
   );
-});*/
+});

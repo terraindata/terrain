@@ -55,6 +55,7 @@ import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import TransformationNode from './nodes/TransformationNode';
 import TransformationEngineNodeVisitor from './TransformationEngineNodeVisitor';
+import { TransformationInfo } from './TransformationInfo';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
@@ -89,7 +90,12 @@ export class TransformationEngine
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
       parsed['dag']['nodes'][i]['value'] =
-        TransformationNode.make(raw['id'], raw['typeCode'], List<number>(raw['fieldIDs']), raw['options']);
+        new (TransformationInfo.getType(raw['typeCode']))(
+          raw['id'],
+          List<number>(raw['fieldIDs']),
+          raw['options'],
+          raw['typeCode'],
+        ) as TransformationNode;
     }
     return parsed;
   }
@@ -181,7 +187,8 @@ export class TransformationEngine
     options?: object, tags?: string[], weight?: number): number
   {
     const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
-    const node = new TransformationNode(this.uidNode, nodeType, fieldIDs, options);
+    const node: TransformationNode =
+      new (TransformationInfo.getType(nodeType))(this.uidNode, fieldIDs, options, nodeType);
     this.dag.setNode(this.uidNode.toString(), node);
     this.uidNode++;
     return this.uidNode - 1;
@@ -196,7 +203,8 @@ export class TransformationEngine
       for (let i = 0; i < toTraverse.length; i++)
       {
         const visitor: TransformationEngineNodeVisitor = new TransformationEngineNodeVisitor();
-        const transformationResult: TransformationVisitResult = visitor.applyTransformationNode(this.dag.node(toTraverse[i]), output);
+        const transformationResult: TransformationVisitResult =
+          visitor.applyTransformationNode(this.dag.node(toTraverse[i]), output);
         if (transformationResult.errors !== undefined)
         {
           // winston.error('Transformation encountered errors!:');

@@ -54,7 +54,6 @@ enum TransformationNodeType
   JoinNode = 'JoinNode',
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
-  RenameNode = 'RenameNode',
   PlusNode = 'PlusNode',
   PrependNode = 'PrependNode',
   AppendNode = 'AppendNode',
@@ -83,7 +82,6 @@ interface TransformationOptionTypes
   JoinNode: any;
   FilterNode: any;
   DuplicateNode: any;
-  RenameNode: any;
   PlusNode: any;
   PrependNode: any;
   AppendNode: any;
