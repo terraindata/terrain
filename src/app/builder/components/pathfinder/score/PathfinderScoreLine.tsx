@@ -237,6 +237,13 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     );
   }
 
+  public handleDropdownClose()
+  {
+    this.setState({
+      editingField: false,
+    })
+  }
+
   public renderLineContents()
   {
     const { fieldIndex } = this.state;
@@ -257,6 +264,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
               placeholder={'Field...'}
               onChange={this.handleFieldChange}
               width={fieldIndex > -1 ? '33.33%' : '100%'}
+              open={this.state.editingField || fieldIndex === -1}
+              onClose={this.handleDropdownClose}
             />
           }
           readOnlyComponent={

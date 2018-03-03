@@ -50,7 +50,8 @@
  &.dropdown-open {
   position: relative;
   z-index: 99999;
-
+  border: 1px solid;
+  border-bottom: none;
 
   .dropdown-options-wrapper {
     display: block;
@@ -61,12 +62,17 @@
     background: #ffffff;
     border-radius: @border-radius;
     padding: 6px 0px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border: 1px solid;
+    border-top: none;
     // box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.25);
   }
 
   &:not(.dropdown-up) {
     .dropdown-options-wrapper {
-      top: @dropdown-height;
+      top: @dropdown-height -1;
+      left: -1px;
     }
     &.dropdown-wrapper-larger {
       .dropdown-options-wrapper {

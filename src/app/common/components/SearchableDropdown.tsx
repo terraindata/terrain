@@ -81,6 +81,8 @@ export interface Props
   floatingLabel?: string;
   builderActions?: typeof BuilderActions;
   width?: string;
+  open?: boolean; // force it to be open
+  onClose?: () => void;
 }
 
 @Radium
@@ -101,7 +103,7 @@ class SearchableDropdown extends TerrainComponent<Props>
     this.state =
       {
         up: false,
-        open: false,
+        open: false || this.props.open,
         focusedIndex: -1,
         inputValue: '',
         hoveredIndex: -1,
@@ -115,11 +117,13 @@ class SearchableDropdown extends TerrainComponent<Props>
     });
   }
 
-  public clearInput()
+  public clearInput(e)
   {
     this.setState({
       inputValue: '',
     });
+    e.preventDefault();
+    e.stopPropagation();
   }
 
   public componentWillMount()
@@ -145,6 +149,12 @@ class SearchableDropdown extends TerrainComponent<Props>
       this.setState({
         inputValue: '',
       });
+    }
+    if (this.props.open !== nextProps.open)
+    {
+      this.setState({
+        open: nextProps.open,
+      })
     }
   }
 
@@ -181,6 +191,7 @@ class SearchableDropdown extends TerrainComponent<Props>
   public clickHandler(index)
   {
     const value = index === -1 ? '' : this.props.options.get(index);
+    this.props.onClose && this.props.onClose();
     this.setState({
       inputValue: value,
       open: false,
@@ -272,6 +283,7 @@ class SearchableDropdown extends TerrainComponent<Props>
 
   public handleClickOutside()
   {
+    this.props.onClose && this.props.onClose();
     this.setState({
       open: false,
       focusedIndex: -1,
@@ -314,6 +326,7 @@ class SearchableDropdown extends TerrainComponent<Props>
     }
     else
     {
+      this.props.onClose && this.props.onClose();
       this.setState({
         open: false,
         focusedIndex: -1,
@@ -408,6 +421,7 @@ class SearchableDropdown extends TerrainComponent<Props>
         }
         this.clickHandler(value.index);
         this.refs['input']['blur']();
+        this.props.onClose && this.props.onClose();
         this.setState({
           open: false,
           focusedIndex: -1,
@@ -433,6 +447,7 @@ class SearchableDropdown extends TerrainComponent<Props>
         <div
           className='dropdown-options-wrapper'
           ref='dropdown'
+          style={borderColor(Colors().blockOutline)}
         >
           {
             (filteredOptions && filteredOptions.size > 0) ?
@@ -461,7 +476,7 @@ class SearchableDropdown extends TerrainComponent<Props>
           [this.props.className]: !!this.props.className,
         })}
         key='dropdown-body'
-        style={{ width: this.props.width }}
+        style={[{ width: this.props.width }, borderColor(Colors().blockOutline)]}
       >
         {
           this.state.up && this.state.open
@@ -501,6 +516,15 @@ class SearchableDropdown extends TerrainComponent<Props>
               disabled={!this.props.canEdit}
               onClick={(e) => { e.stopPropagation(); }}
             />
+            {
+              this.state.inputValue &&
+              <div
+                onClick={this.clearInput}
+                className='searchable-dropdown-input-clear'
+              >
+                <CloseIcon style={closeStyle} />
+              </div>
+            }
           </div>
         </div>
         {
