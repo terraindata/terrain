@@ -50,7 +50,7 @@ import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import objectify from '../util/deepObjectify';
-import { KeyPath } from '../util/KeyPath';
+import { KeyPath, keyPathPrefixMatch, updateKeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 // import * as winston from 'winston'; // TODO what to do for error logging?
 import TransformationNode from './nodes/TransformationNode';
@@ -98,39 +98,6 @@ export class TransformationEngine
         ) as TransformationNode;
     }
     return parsed;
-  }
-
-  private static keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean
-  {
-    if (toMatch.size === 0)
-    {
-      return true;
-    }
-
-    if (toCheck.size < toMatch.size)
-    {
-      return false;
-    }
-
-    for (let i: number = 0; i < toMatch.size; i++)
-    {
-      if (toMatch.get(i) !== toCheck.get(i))
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private static updateKeyPath(toUpdate: KeyPath, toReplace: KeyPath, replaceWith: KeyPath): KeyPath
-  {
-    let updated: KeyPath = replaceWith;
-    for (let i: number = toReplace.size; i < toUpdate.size; i++)
-    {
-      updated = updated.push(toUpdate.get(i));
-    }
-
-    return updated;
   }
 
   private dag: any = new Graph({ isDirected: true });
@@ -310,10 +277,10 @@ export class TransformationEngine
     const oldName: KeyPath = this.fieldNameToIDMap.keyOf(fieldID);
     this.fieldNameToIDMap.forEach((id: number, field: KeyPath) =>
     {
-      if (TransformationEngine.keyPathPrefixMatch(field, oldName))
+      if (keyPathPrefixMatch(field, oldName))
       {
         this.fieldNameToIDMap = this.fieldNameToIDMap.delete(oldName);
-        this.fieldNameToIDMap = this.fieldNameToIDMap.set(TransformationEngine.updateKeyPath(field, oldName, newKeyPath), id);
+        this.fieldNameToIDMap = this.fieldNameToIDMap.set(updateKeyPath(field, oldName, newKeyPath), id);
       }
     });
   }
@@ -323,9 +290,9 @@ export class TransformationEngine
     const oldName: KeyPath = this.IDToFieldNameMap.get(fieldID);
     this.IDToFieldNameMap.forEach((field: KeyPath, id: number) =>
     {
-      if (TransformationEngine.keyPathPrefixMatch(field, oldName))
+      if (keyPathPrefixMatch(field, oldName))
       {
-        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, TransformationEngine.updateKeyPath(field, oldName, newKeyPath));
+        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldName, newKeyPath));
       }
     });
   }
