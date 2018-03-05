@@ -59,7 +59,7 @@ function ignoreBuilderAction(action: string): boolean
     return true;
   }
   return false;
-} E
+}
 
 export async function getChromeDebugAddress()
 {
