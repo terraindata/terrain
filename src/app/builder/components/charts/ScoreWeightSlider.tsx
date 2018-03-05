@@ -73,6 +73,31 @@ interface ScoreWeightSliderProps
   growOnHover?: boolean;
 }
 
+const styles = {
+  wrapper: (height, background) => ({
+    width: '100%',
+    position: 'relative' as 'relative',
+    height,
+    background: background !== undefined ? background : 'transparent',
+  }),
+  rail: (height) => ({
+    height,
+    backgroundColor: 'transparent'
+  }),
+  innerSliderWrapper: (height) => ({
+    width: `calc(100% - ${height}px)`,
+    position: 'relative' as 'relative',
+    marginLeft: 0, // not sure why this used to have 14px margin
+  }),
+  leftLine: (height) => ({
+    zIndex: 2,
+    top: -3,
+    position: 'absolute' as 'absolute',
+    height: height + 6,
+    borderLeft: '1px solid rgba(30, 180, 250, .5)',
+  })
+}
+
 export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSliderProps>
 {
   public getHandleStyle()
@@ -143,34 +168,24 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       background,
       noLeftLine,
     } = this.props;
+
     const handleStyle = this.getHandleStyle();
     const trackStyle = this.getTrackStyle();
-    const railStyle = this.getCustomRailStyle();
+    const customRailStyle = this.getCustomRailStyle();
 
     return (
       <div
-        style={{
-          width: '100%',
-          position: 'relative',
-          height,
-          background,
-        }}
+        style={styles.wrapper(height, background)}
         className={classNames({
           'score-weight-slider': true,
           'score-weight-slider-grow': this.props.growOnHover,
         })}
       >
-        <div style={railStyle} />
-        <div style={{
-          width: `calc(100% - ${height}px)`,
-          position: 'relative',
-          marginLeft: 0, // not sure why this used to have 14px margin
-        }}>
+        <div style={customRailStyle} />
+        <div style={styles.innerSliderWrapper(height)}>
           {
             !noLeftLine &&
-            <div style={{
-              zIndex: 2, top: -3, position: 'absolute', height: height + 6, borderLeft: '1px solid rgba(30, 180, 250, .5)',
-            }}
+            <div style={styles.leftLine(height)}
             />
           }
           <Slider
@@ -178,7 +193,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
             max={max}
             value={value}
             defaultValue={50}
-            railStyle={{ height, backgroundColor: 'transparent' }}
+            railStyle={styles.rail(height)}
             trackStyle={trackStyle}
             handleStyle={handleStyle}
             onBeforeChange={this.props.onBeforeChange}
