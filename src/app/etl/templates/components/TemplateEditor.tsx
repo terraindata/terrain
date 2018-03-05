@@ -60,13 +60,13 @@ import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
-import EditorColumnBar from 'etl/templates/components/EditorColumnBar';
-import EditorDocumentsPreview from 'etl/templates/components/preview/EditorDocumentsPreview';
+import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
+import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import TemplateList from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ColumnOptions, columnOptions, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 import './TemplateEditor.less';
 
@@ -169,12 +169,16 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public renderDocumentsSection()
   {
+    const { columnState } = this.props.templateEditor.uiState;
     return (
       <div className='template-editor-column preview-documents-column'>
         <div className='template-editor-title-bar'>
           <EditorColumnBar />
         </div>
-        <EditorDocumentsPreview />
+        { columnState === ColumnOptions.Preview ? <DocumentsPreviewColumn /> : null}
+        { columnState === ColumnOptions.Options ? null : null }
+        { columnState === ColumnOptions.Sources ? null : null }
+        { columnState === ColumnOptions.Sinks ? null : null }
       </div>
     );
   }
@@ -312,7 +316,6 @@ class TemplateEditor extends TerrainComponent<Props>
       textboxPlaceholderValue: 'Template Name',
       closeOnConfirm: true,
     });
-    // return this._computeSaveModalProps(this.state.newTemplateName);
   }
 
   public handleNewTemplateNameChange(newValue: string)
@@ -354,6 +357,7 @@ const templateListItemCurrentStyle = [
   backgroundColor(Colors().active),
   fontColor(Colors().activeText),
 ];
+
 export default Util.createContainer(
   TemplateEditor,
   [

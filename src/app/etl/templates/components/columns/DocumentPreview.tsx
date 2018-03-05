@@ -57,7 +57,7 @@ import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-import './EditorDocumentsPreview.less';
+import './DocumentsPreviewColumn.less';
 const { List } = Immutable;
 const Color = require('color');
 const ShowIcon = require('images/icon_search.svg');

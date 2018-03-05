@@ -68,6 +68,21 @@ class TemplateEditorStateC
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
 
+export enum ColumnOptions
+{
+  Preview = 'Preview',
+  Options = 'Options',
+  Sources = 'Sources',
+  Sinks = 'Sinks',
+}
+
+export const columnOptions = List([
+  ColumnOptions.Preview,
+  ColumnOptions.Options,
+  ColumnOptions.Sources,
+  ColumnOptions.Sinks,
+]);
+
 class EditorDisplayStateC
 {
   public documents: List<object> = List([]);
@@ -78,6 +93,7 @@ class EditorDisplayStateC
   public settingsFieldId: number = null;
   public settingsDisplayKeyPath: KeyPath = null;
   public engineVersion: number = 0;
+  public columnState: ColumnOptions = ColumnOptions.Preview;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);

@@ -50,21 +50,18 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+
+import Dropdown from 'common/components/Dropdown';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import UploadFileButton from 'etl/common/components/UploadFileButton';
-import { _FileConfig, _SourceConfig, FileConfig, SourceConfig } from 'etl/EndpointTypes';
-import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { getFileType, guessJsonFileOptions } from 'shared/etl/FileUtil';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { instanceFnDecorator } from 'src/app/Classes';
 
-import DocumentPreview from './DocumentPreview';
-import './EditorDocumentsPreview.less';
 const { List } = Immutable;
+
+import './EditorColumnBar.less';
 
 export interface Props
 {
@@ -74,109 +71,47 @@ export interface Props
 }
 
 @Radium
-class EditorDocumentsPreview extends TerrainComponent<Props>
+class EditorColumnBar extends TerrainComponent<Props>
 {
-  public state: {
-    file: File,
-  } = {
-      file: null,
-    };
-
-  public renderDocument(document, index)
+  @instanceFnDecorator(memoizeOne)
+  public _optionIndex(columnState: ColumnOptions)
   {
-    return (
-      <DocumentPreview index={index} key={index} />
-    );
+    return columnOptions.indexOf(columnState);
   }
 
-  public renderNoDocuments()
+  public optionIndex()
   {
-    const { template } = this.props.templateEditor;
-    const source = template.sources.get('primary');
-    let fixPrompt = null;
-    if (source != null)
-    {
-      if (source.type === Sources.Upload)
-      {
-        fixPrompt = (
-          <div className='no-documents-fix-prompt'>
-            <UploadFileButton
-              file={this.state.file}
-              onChange={this.handleFileChange}
-            />
-          </div>
-        );
-      }
-    }
-
-    return (
-      <div className='template-editor-no-documents'>
-        <div className='no-documents-section'>
-          Unable to Load Documents
-        </div>
-        {fixPrompt}
-      </div>
-    );
+    return this._optionIndex(this.props.templateEditor.uiState.columnState);
   }
 
   public render()
   {
-    const { documents } = this.props.templateEditor.uiState;
-    if (documents.size === 0)
-    {
-      return this.renderNoDocuments();
-    }
-    else
-    {
-      return (
-        <div className='template-editor-documents-container'>
-          <div className='documents-area' tabIndex={-1}>
-            {documents.map(this.renderDocument)}
-          </div>
-        </div>
-      );
-    }
+    return (
+      <div className='editor-column-bar'>
+        <Dropdown
+          options={columnOptions}
+          selectedIndex={this.optionIndex()}
+          onChange={this.handleDropdownChange}
+          canEdit={true}
+        />
+      </div>
+    );
   }
 
-  public onDocumentsFetchedFactory(newConfig: SourceConfig)
+  public handleDropdownChange(columnIndex: number)
   {
     const { act, templateEditor } = this.props;
-    return (documents: List<object>) =>
-    {
-      const newTemplate = templateEditor.template.setIn(['sources', 'primary'], newConfig);
-      act({
-        actionType: 'setTemplate',
-        template: newTemplate,
-      });
-    };
-  }
-
-  public onDocumentsFetchError()
-  {
-    // todo figure out this error
-  }
-
-  public handleFileChange(file: File)
-  {
-    this.setState(file);
-    const fileType = getFileType(file);
-    const { act } = this.props;
-    const newSourceConfig = _SourceConfig({
-      type: Sources.Upload,
-      fileConfig: _FileConfig({
-        fileType,
-      }),
+    act({
+      actionType: 'setDisplayState',
+      state: {
+        columnState: columnOptions.get(columnIndex),
+      }
     });
-    DocumentsHelpers.fetchDocuments(newSourceConfig,
-      file,
-      this.onDocumentsFetchedFactory(newSourceConfig),
-      this.onDocumentsFetchError,
-    );
   }
 }
 
 export default Util.createContainer(
-  EditorDocumentsPreview,
+  EditorColumnBar,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
