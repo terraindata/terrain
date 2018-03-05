@@ -44,87 +44,70 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
-
-import readline from 'readline-promise';
-import * as sleep from 'sleep';
-import * as request from 'then-request';
+import * as fs from 'fs';
+import * as ip from 'ip';
 import * as winston from 'winston';
 
-function ignoreBuilderAction(action: string): boolean
+import * as puppeteer from 'puppeteer';
+import { makePromiseCallback } from '../../../shared/test/Utils';
+import { getChromeDebugAddress } from '../../FullstackUtils';
+
+const USERNAME_SELECTOR = '#login-email';
+
+function getExpectedFile(): string
 {
-  if (action.startsWith('{"type":"builderCards.hoverCard"') || action.startsWith('{"type":"colors.setStyle"')
-    || action.startsWith('{"type":"builder.results"'))
-  {
-    return true;
-  }
-  return false;
+  return __filename.split('.')[0] + '.expected';
 }
 
-export async function getChromeDebugAddress()
+async function loadPage(page, url)
 {
-  try
-  {
-    const res = await (request as any)('GET', 'http://localhost:9222/json');
-    const resBody = JSON.parse(res.getBody());
-    const wsAddress = resBody[resBody.length - 1]['webSocketDebuggerUrl'];
-    return wsAddress;
-  } catch (err)
-  {
-    winston.error(err);
-    return undefined;
-  }
+  await page.goto(url);
 }
 
-export async function waitForInput(msg: string)
+describe('Testing the card parser', () =>
 {
-  const rl = readline.createInterface(
+  let expected;
+  let browser;
+  let page;
+
+  beforeAll(async () =>
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    const contents: any = await new Promise((resolve, reject) =>
     {
-      input: process.stdin,
-      output: process.stdout,
-      terminal: true,
+      fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
     });
-  await rl.questionAsync(msg);
-  rl.close();
-}
 
-export async function replayBuilderActions(page, url, actions, records, actionCallBack?)
-{
-  const loadRecords = await page.evaluate((recordNames) =>
-  {
-    // window['TerrainTools'].setLogLevel();
-    return window['TerrainTools'].terrainStoreLogger.resetSerializeRecordArray(recordNames);
-  }, records);
-  if (loadRecords === false)
-  {
-    console.log('Failed to load the serialization records: ' + records);
-    return;
-  }
-  // replay the log
-  for (let i = 0; i < actions.length; i = i + 1)
-  {
-    const action = actions[i];
-    console.log('Replaying Action ' + typeof action + ':' + action);
+    expected = JSON.parse(contents);
+    const wsAddress = await getChromeDebugAddress();
+    browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
+    winston.info('Connected to the Chrome ' + String(wsAddress));
+  });
 
-    if (ignoreBuilderAction(action))
+  it('parse card', async () =>
+  {
+    page = await browser.newPage();
+    await page.setViewport({ width: 1600, height: 1200 });
+    const url = `http://${ip.address()}:3000`;
+    page.goto(url);
+    await page.waitForSelector(USERNAME_SELECTOR);
+    winston.info('Loaded the page ' + url);
+    for (const testName of Object.keys(expected))
     {
-      console.log('Ignoring action: ' + String(action));
-      continue;
+      const testValue: any = expected[testName];
+      const request = JSON.stringify(testValue);
+      winston.info('Testing request ' + request);
+      const cardResult = await page.evaluate((theRequest, theValue) =>
+      {
+        return window['TerrainTools'].terrainTests.testCardParser(theRequest, theValue);
+      }, request, testValue);
+      expect(cardResult).toMatchObject({ passed: true, message: 'The test is passed' });
     }
-    await page.mouse.move(0, 0);
-    await page.evaluate((act) =>
-    {
-      return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);
-    }, action);
-    sleep.sleep(1);
-    if (actionCallBack)
-    {
-      await actionCallBack();
-    }
-  }
-}
+  }, 30000);
 
-export function filteringRecordBuilderActions(actions: string[])
-{
-  return actions.filter((action) => ignoreBuilderAction(action) === false);
-}
+  afterAll(async () =>
+  {
+    await page.close();
+    winston.info('The page is closed');
+  });
+});

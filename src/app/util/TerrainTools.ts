@@ -48,6 +48,7 @@ import * as TerrainLog from 'loglevel';
 import { LogLevelDesc } from 'loglevel';
 import TerrainStore from 'store/TerrainStore';
 import TerrainStoreLogger from 'store/TerrainStoreLogger';
+import TerrainTests from 'util/TerrainTests';
 
 // Log levels
 const LEVEL_TRACE = 'trace';
@@ -76,6 +77,7 @@ class TerrainTools
 
   public static terrainStoreLogger = TerrainStoreLogger;
   public static terrainStore = TerrainStore;
+  public static terrainTests = TerrainTests;
 
   public static welcome()
   {
