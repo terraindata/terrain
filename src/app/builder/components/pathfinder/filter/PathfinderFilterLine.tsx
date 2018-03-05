@@ -137,7 +137,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('Render filter line');
     const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
 
@@ -404,6 +403,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           altStyle={true}
           max={10}
           min={0}
+          canEdit={pathfinderContext.canEdit}
         />
       </div>
     );

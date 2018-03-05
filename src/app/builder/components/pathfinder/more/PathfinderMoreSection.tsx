@@ -398,7 +398,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       onClick={this._fn(this.handleDeleteNested, i)}
                       className='pf-more-nested-remove close'
                     />
-                 }
+                  }
                 </div>
                 <FadeInOut
                   open={expanded}

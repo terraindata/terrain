@@ -283,6 +283,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
                   weight={this.state.weight}
                   onBeforeChange={this.handleWeightBeforeChange}
                   onChange={this.handleWeightChange}
+                  canEdit={this.props.pathfinderContext.canEdit}
                   onAfterChange={this.handleWeightAfterChange}
                 />
                 <EditableField

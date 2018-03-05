@@ -160,8 +160,9 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         (error) =>
         {
           let readable;
-          try {
-            readable: string = MidwayError.fromJSON(error).getDetail();
+          try
+          {
+            readable = MidwayError.fromJSON(error).getDetail();
           }
           catch {
             readable = error;
