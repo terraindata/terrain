@@ -71,7 +71,7 @@ declare type KeyPath = List<string | number>;
 declare type SetFn<T> = (f: string, v: any) => T & IRecord<T>;
 declare type SetIn<T> = (f: Array<string | number> | KeyPath, v: any) => T & IRecord<T>;
 declare type Get = (f: string | number) => any;
-declare type GetIn = (f: Array<string | number> | KeyPath) => any;
+declare type GetIn = (f: Array<string | number> | KeyPath, nsv?: any) => any;
 declare type HasIn = (f: Array<string | number> | KeyPath) => boolean;
 declare type Delete<T> = (f: string) => T & IRecord<T>;
 declare type DeleteIn<T> = (f: Array<string | number> | KeyPath) => T & IRecord<T>;

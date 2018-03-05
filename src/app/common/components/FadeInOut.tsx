@@ -54,6 +54,7 @@ export interface Props
 {
   open: boolean;
   children?: any;
+  style?: any;
 }
 
 class FadeInOut extends TerrainComponent<Props>
@@ -68,7 +69,7 @@ class FadeInOut extends TerrainComponent<Props>
         }}
         duration={250}
       >
-        <div>
+        <div style={this.props.style}>
           <VelocityTransitionGroup
             enter={
               { animation: 'slideDown', duration: 250, easing: 'easeOut' }
