@@ -55,7 +55,7 @@ import './ScoreBar.less';
 import ScoreWeightSlider from './ScoreWeightSlider';
 
 const EditableField = (props) =>
-  props.editing ? props.editComponent : props.readOnlyComponent;
+  props.editing && props.canEdit ? props.editComponent : props.readOnlyComponent;
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
@@ -119,6 +119,7 @@ class ScoreBar extends TerrainComponent<Props>
         />
         <EditableField
           editing={this.state.editingWeight}
+          canEdit={canEdit}
           editComponent={
             <input
               type='text'
@@ -133,6 +134,7 @@ class ScoreBar extends TerrainComponent<Props>
               ]}
               onFocus={this.handleInputFocus}
               autoFocus
+              disabled={!canEdit}
             />
           }
           readOnlyComponent={
@@ -180,7 +182,10 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleWeightChange(value: number)
   {
-    this.props.onChange(value);
+    if (this.props.canEdit)
+    {
+      this.props.onChange(value);
+    }
   }
 
   private handleWeightAfterChange(value: number)
@@ -190,7 +195,10 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleWeightTextChange(e)
   {
-    this.props.onChange(e.target.value);
+    if (this.props.canEdit)
+    {
+      this.props.onChange(e.target.value);
+    }
   }
 
   private handleTextBlur()

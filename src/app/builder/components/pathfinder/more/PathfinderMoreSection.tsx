@@ -131,14 +131,17 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleDeleteNested(i)
   {
-    this.props.builderActions.changePath(
-      this._ikeyPath(this.props.keyPath, 'references'),
-      this.props.more.references.splice(i, 1),
-    );
-    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
-    this.props.builderActions.changePath(
-      nestedKeyPath,
-      this.props.path.nested.splice(i, 1), true);
+    if (this.props.pathfinderContext.canEdit)
+    {
+      this.props.builderActions.changePath(
+        this._ikeyPath(this.props.keyPath, 'references'),
+        this.props.more.references.splice(i, 1),
+      );
+      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
+      this.props.builderActions.changePath(
+        nestedKeyPath,
+        this.props.path.nested.splice(i, 1), true);
+    }
   }
 
   public handleAddLine()
@@ -389,10 +392,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       debounce={true}
                     />
                   </FadeInOut>
-                  <RemoveIcon
-                    onClick={this._fn(this.handleDeleteNested, i)}
-                    className='pf-more-nested-remove close'
-                  />
+                  {
+                    canEdit &&
+                    <RemoveIcon
+                      onClick={this._fn(this.handleDeleteNested, i)}
+                      className='pf-more-nested-remove close'
+                    />
+                 }
                 </div>
                 <FadeInOut
                   open={expanded}

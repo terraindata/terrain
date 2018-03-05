@@ -77,6 +77,7 @@ interface GroupProps
   style?: any;
   itemStyle?: any;
   dropZoneStyle?: any;
+  canDrag?: boolean;
   // Injected drag drop props
   onDrop: (dropIndex: List<number>, dragIndex: List<number>) => void;
   onReorder: (itemKeyPath: List<number>, dropKeyPath: List<number>) => void;
@@ -236,13 +237,9 @@ class GroupComponent extends TerrainComponent<GroupProps>
 
   public render()
   {
-    return (
-      this.props.connectDropTarget(
-        this.props.connectDragSource(
-          this.renderGroup(),
-        ),
-      )
-    );
+    const { canDrag, connectDropTarget, connectDragSource } = this.props;
+    const el = connectDropTarget(this.renderGroup());
+    return canDrag ? connectDragSource(el) : el;
   }
 }
 

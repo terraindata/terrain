@@ -408,7 +408,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const dropZoneStyle = { zIndex: dragging ? 20 : -1 };
     const itemStyle = { opacity: dragging ? 0.7 : 1 };
     const groupStyle = { opacity: dragging ? 0.7 : 1, zIndex: dragging ? 99 : 5 };
-
+    const { canEdit } = this.props.pathfinderContext;
     let title = PathfinderText.hardFilterSectionTitle;
     let subtitle = PathfinderText.hardFilterSectionSubtitle;
     if (isSoftFilter)
@@ -448,9 +448,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                     onDragStart={this._toggle('dragging')}
                     onDragStop={this._toggle('dragging')}
                     dropZoneStyle={dropZoneStyle}
+                    canDrag={canEdit}
                   />
                   :
                   <DragDropGroup
+                    canDrag={canEdit}
                     items={line.filterGroup.lines}
                     data={line.filterGroup}
                     onDrop={this.handleGroupDrop}

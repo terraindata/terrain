@@ -63,6 +63,7 @@ interface ItemProps
   // data: string;
   keyPath: KeyPath;
   canDrop?: boolean;
+  canDrag?: boolean;
   hoverHeader?: El;
   children?: El | string;
   data?: any;
@@ -151,8 +152,8 @@ class ItemComponent extends TerrainComponent<ItemProps>
 
   public render()
   {
-    const { children, isDragging, isOver, hoverHeader, neighborIsBeingDragged } = this.props;
-    const draggable = this.props.connectDragSource(
+    const { children, isDragging, isOver, hoverHeader, neighborIsBeingDragged, canDrag } = this.props;
+    const el = (
       <div
         style={_.extend({},
           { opacity: isDragging ? 0.3 : 1 },
@@ -182,9 +183,9 @@ class ItemComponent extends TerrainComponent<ItemProps>
           {children}
           {this.props.canDrop && this.renderItemDropZone()}
         </div>
-      </div>,
+      </div>
     );
-    return draggable;
+    return canDrag ? this.props.connectDragSource(el) : el;
   }
 }
 

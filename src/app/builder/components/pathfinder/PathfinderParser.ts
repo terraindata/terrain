@@ -561,9 +561,9 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         // Try to split it along commas and create own value
         if (typeof value === 'string' && value[0] !== '@')
         {
-          value = value.replace(/\s/g, '').replace(/\[/g, '').replace(/\]/g, '');
+          value = value.replace(/\[/g, '').replace(/\]/g, '');
           let pieces = value.split(',');
-          pieces = pieces.map((piece) => piece.toLowerCase());
+          pieces = pieces.map((piece) => piece.toLowerCase().trim());
           return Map({
             terms: { [line.field]: pieces },
           });
