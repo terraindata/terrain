@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { Readable } from 'stream';
-import QueryRequest from '../../../../src/database/types/QueryRequest';
-import QueryResponse from '../../../../src/database/types/QueryResponse';
+import QueryRequest from '../../../../shared/database/types/QueryRequest';
+import QueryResponse from '../../../../shared/database/types/QueryResponse';
 
 export abstract class QueryHandler
 {

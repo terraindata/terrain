@@ -42,37 +42,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-
-import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
-import QueryRequest from './QueryRequest';
-
-export interface QueryResult
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable no-unused-expression
+enum TransformationNodeType
 {
-  [key: string]: any;
+  LoadNode = 'LoadNode',
+  StoreNode = 'StoreNode',
+  PutNode = 'PutNode',
+  GetNode = 'GetNode',
+  SplitNode = 'SplitNode',
+  JoinNode = 'JoinNode',
+  FilterNode = 'FilterNode',
+  DuplicateNode = 'DuplicateNode',
+  PlusNode = 'PlusNode',
+  PrependNode = 'PrependNode',
+  AppendNode = 'AppendNode',
+  UppercaseNode = 'UppercaseNode',
+  SubstringNode = 'SubstringNode',
 }
 
-export default class QueryResponse
+// if this has errors, double check TransformationNodeType's keys are equal to its values
+type AssertEnumValuesEqualKeys = {
+  [K in keyof typeof TransformationNodeType]: K
+};
+TransformationNodeType as AssertEnumValuesEqualKeys;
+
+// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
+type AssertOptionTypesExhaustive = {
+  [K in TransformationNodeType]: TransformationOptionTypes[K]
+};
+
+interface TransformationOptionTypes
 {
-  public request?: QueryRequest;
-  public result: QueryResult;
-  public errors: MidwayErrorItem[];
+  LoadNode: any;
+  StoreNode: any;
+  PutNode: any;
+  GetNode: any;
+  SplitNode: any;
+  JoinNode: any;
+  FilterNode: any;
+  DuplicateNode: any;
+  PlusNode: any;
+  PrependNode: any;
+  AppendNode: any;
+  UppercaseNode: {
 
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request?: QueryRequest)
-  {
-    // QueryResult can't be null
-    this.result = result;
-    this.errors = errors;
-    this.request = request;
-  }
-
-  public setQueryRequest(req: QueryRequest)
-  {
-    this.request = req;
-  }
-
-  public hasError(): boolean
-  {
-    return this.errors.length > 0;
-  }
+  };
+  SubstringNode: {
+    from: number;
+    length: number;
+  };
 }
+
+export type NodeTypes = keyof TransformationOptionTypes;
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
+
+export default TransformationNodeType;

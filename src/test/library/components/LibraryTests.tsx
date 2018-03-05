@@ -85,7 +85,7 @@ describe('Library', () =>
         analyticsType: 'events',
       },
     }),
-  });
+  } as any);
 
   const analyticsActions = {
     selectAnalyticsConnection: (connectionName) => { return; },
