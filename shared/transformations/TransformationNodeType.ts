@@ -42,30 +42,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Util from 'util/Util';
-import { createRecordType } from '../../Classes';
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
-
-class AnalyticsStateC
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable no-unused-expression
+enum TransformationNodeType
 {
-  public loaded = false;
-  public errors: string[] = [];
-  public data: IMMap<ID, any> = Immutable.Map({});
-  // TODO: dynamically populate metrics for each algorithm and select the first metric
-  public selectedMetric: string = 'impression';
-  public selectedInterval: string = 'day';
-  public selectedDateRange: ID = 3;
-  public selectedDateRangeDomain: { start: number, end: number } = { start: 0, end: 0 };
-  public selectedAnalyticsConnection: string = '';
-  public pinnedAlgorithms: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>();
-  public availableMetrics: Immutable.List<any> = Immutable.List<any>([]);
+  LoadNode = 'LoadNode',
+  StoreNode = 'StoreNode',
+  PutNode = 'PutNode',
+  GetNode = 'GetNode',
+  SplitNode = 'SplitNode',
+  JoinNode = 'JoinNode',
+  FilterNode = 'FilterNode',
+  DuplicateNode = 'DuplicateNode',
+  PlusNode = 'PlusNode',
+  PrependNode = 'PrependNode',
+  AppendNode = 'AppendNode',
+  UppercaseNode = 'UppercaseNode',
+  SubstringNode = 'SubstringNode',
 }
 
-const AnalyticsState_Record = createRecordType(new AnalyticsStateC(), 'AnalyticsState_Record');
-export interface AnalyticsState extends AnalyticsStateC, IRecord<AnalyticsState> { }
-export const _AnalyticsState = (config?: any) =>
-{
-  return new AnalyticsState_Record(Util.extendId(config || {})) as any as AnalyticsState;
+// if this has errors, double check TransformationNodeType's keys are equal to its values
+type AssertEnumValuesEqualKeys = {
+  [K in keyof typeof TransformationNodeType]: K
 };
+TransformationNodeType as AssertEnumValuesEqualKeys;
+
+// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
+type AssertOptionTypesExhaustive = {
+  [K in TransformationNodeType]: TransformationOptionTypes[K]
+};
+
+interface TransformationOptionTypes
+{
+  LoadNode: any;
+  StoreNode: any;
+  PutNode: any;
+  GetNode: any;
+  SplitNode: any;
+  JoinNode: any;
+  FilterNode: any;
+  DuplicateNode: any;
+  PlusNode: any;
+  PrependNode: any;
+  AppendNode: any;
+  UppercaseNode: {
+
+  };
+  SubstringNode: {
+    from: number;
+    length: number;
+  };
+}
+
+export type NodeTypes = keyof TransformationOptionTypes;
+export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
+
+export default TransformationNodeType;

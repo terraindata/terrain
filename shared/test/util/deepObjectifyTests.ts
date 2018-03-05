@@ -42,30 +42,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Util from 'util/Util';
-import { createRecordType } from '../../Classes';
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+// Copyright 2018 Terrain Data, Inc.
 
-class AnalyticsStateC
-{
-  public loaded = false;
-  public errors: string[] = [];
-  public data: IMMap<ID, any> = Immutable.Map({});
-  // TODO: dynamically populate metrics for each algorithm and select the first metric
-  public selectedMetric: string = 'impression';
-  public selectedInterval: string = 'day';
-  public selectedDateRange: ID = 3;
-  public selectedDateRangeDomain: { start: number, end: number } = { start: 0, end: 0 };
-  public selectedAnalyticsConnection: string = '';
-  public pinnedAlgorithms: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>();
-  public availableMetrics: Immutable.List<any> = Immutable.List<any>([]);
-}
+import objectify from '../../util/deepObjectify';
 
-const AnalyticsState_Record = createRecordType(new AnalyticsStateC(), 'AnalyticsState_Record');
-export interface AnalyticsState extends AnalyticsStateC, IRecord<AnalyticsState> { }
-export const _AnalyticsState = (config?: any) =>
-{
-  return new AnalyticsState_Record(Util.extendId(config || {})) as any as AnalyticsState;
+const simple = ['a', 'b', 'c'];
+
+const hard = {
+  name: 'Bob',
+  arr: ['sled', [{ a: 'dog' }, { b: 'doggo', a: 'fren' }]],
+  hardarr: [['a'], ['b', ['c']]],
 };
+
+test('simple', () =>
+{
+  expect(objectify(simple)).toEqual(
+    {
+      0: 'a',
+      1: 'b',
+      2: 'c',
+    },
+  );
+});
+
+test('hard', () =>
+{
+  expect(objectify(hard)).toEqual(
+    {
+      name: 'Bob',
+      arr: {
+        0: 'sled',
+        1: {
+          0: {
+            a: 'dog',
+          },
+          1: {
+            a: 'fren',
+            b: 'doggo',
+          },
+        },
+      },
+      hardarr: {
+        0: {
+          0: 'a',
+        },
+        1: {
+          0: 'b',
+          1: {
+            0: 'c',
+          },
+        },
+      },
+    },
+  );
+});

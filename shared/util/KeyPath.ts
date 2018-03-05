@@ -42,30 +42,64 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Util from 'util/Util';
-import { createRecordType } from '../../Classes';
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+// Copyright 2018 Terrain Data, Inc.
 
-class AnalyticsStateC
+import { List } from 'immutable';
+
+export type WayPoint = string;
+export type KeyPath = List<WayPoint>;
+export const KeyPath = (args: WayPoint[] = []) => List<WayPoint>(args);
+
+/**
+ * A utility function to see if two KeyPaths are equal.
+ * Just loops over the waypoints.  "Deep equals."
+ *
+ * @param {KeyPath} toCheck One of two KeyPaths to compare
+ * @param {KeyPath} toMatch The other KeyPath to compare
+ * @returns {boolean} Whether `toCheck` is equal to `toMatch`
+ */
+export function keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean
 {
-  public loaded = false;
-  public errors: string[] = [];
-  public data: IMMap<ID, any> = Immutable.Map({});
-  // TODO: dynamically populate metrics for each algorithm and select the first metric
-  public selectedMetric: string = 'impression';
-  public selectedInterval: string = 'day';
-  public selectedDateRange: ID = 3;
-  public selectedDateRangeDomain: { start: number, end: number } = { start: 0, end: 0 };
-  public selectedAnalyticsConnection: string = '';
-  public pinnedAlgorithms: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>();
-  public availableMetrics: Immutable.List<any> = Immutable.List<any>([]);
+  if (toMatch.size === 0)
+  {
+    return true;
+  }
+
+  if (toCheck.size < toMatch.size)
+  {
+    return false;
+  }
+
+  for (let i: number = 0; i < toMatch.size; i++)
+  {
+    if (toMatch.get(i) !== toCheck.get(i))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
-const AnalyticsState_Record = createRecordType(new AnalyticsStateC(), 'AnalyticsState_Record');
-export interface AnalyticsState extends AnalyticsStateC, IRecord<AnalyticsState> { }
-export const _AnalyticsState = (config?: any) =>
+/**
+ * A utility function for replacing a prefix of a KeyPath
+ * (first few `Waypoint`s) with another KeyPath.  This is
+ * useful, for example, when doing a nested rename of some
+ * deep field, when several `Waypoint`s of the field may
+ * change or be removed.
+ *
+ * @param {KeyPath} toUpdate    The original KeyPath to update
+ * @param {KeyPath} toReplace   The "subset" of `toUpdate` that
+ *                              will be replaced.
+ * @param {KeyPath} replaceWith What to replace `toReplace` with
+ * @returns {KeyPath} The updated `KeyPath`
+ */
+export function updateKeyPath(toUpdate: KeyPath, toReplace: KeyPath, replaceWith: KeyPath): KeyPath
 {
-  return new AnalyticsState_Record(Util.extendId(config || {})) as any as AnalyticsState;
-};
+  let updated: KeyPath = replaceWith;
+  for (let i: number = toReplace.size; i < toUpdate.size; i++)
+  {
+    updated = updated.push(toUpdate.get(i));
+  }
+
+  return updated;
+}

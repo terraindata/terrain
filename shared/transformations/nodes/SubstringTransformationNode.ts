@@ -42,30 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Util from 'util/Util';
-import { createRecordType } from '../../Classes';
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+// Copyright 2018 Terrain Data, Inc.
 
-class AnalyticsStateC
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
+
+export default class SubstringTransformationNode extends TransformationNode
 {
-  public loaded = false;
-  public errors: string[] = [];
-  public data: IMMap<ID, any> = Immutable.Map({});
-  // TODO: dynamically populate metrics for each algorithm and select the first metric
-  public selectedMetric: string = 'impression';
-  public selectedInterval: string = 'day';
-  public selectedDateRange: ID = 3;
-  public selectedDateRangeDomain: { start: number, end: number } = { start: 0, end: 0 };
-  public selectedAnalyticsConnection: string = '';
-  public pinnedAlgorithms: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>();
-  public availableMetrics: Immutable.List<any> = Immutable.List<any>([]);
+  public constructor(id: number,
+    fieldIDs: List<number>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.SubstringNode)
+  {
+    super(id, fieldIDs, options, typeCode);
+  }
 }
-
-const AnalyticsState_Record = createRecordType(new AnalyticsStateC(), 'AnalyticsState_Record');
-export interface AnalyticsState extends AnalyticsStateC, IRecord<AnalyticsState> { }
-export const _AnalyticsState = (config?: any) =>
-{
-  return new AnalyticsState_Record(Util.extendId(config || {})) as any as AnalyticsState;
-};

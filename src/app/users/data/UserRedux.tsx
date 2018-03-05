@@ -130,7 +130,7 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
     });
     Ajax.getUsers((usersObj) =>
     {
-      let users: UserMap = Immutable.Map<any, User>({});
+      let users: UserMap = Immutable.Map<any, User>();
       _.map(usersObj, (userObj, userId) =>
       {
         users = users.set(

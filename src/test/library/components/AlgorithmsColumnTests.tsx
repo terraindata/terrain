@@ -59,9 +59,9 @@ describe('AlgorithmsColumn', () =>
   const groupId = 2;
   const algorithmId = 3;
   let library = _LibraryState({
-    categories: Immutable.Map<number, LibraryTypes.Category>({}),
-    groups: Immutable.Map<number, LibraryTypes.Category>({}),
-    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({}),
+    categories: Immutable.Map<number, LibraryTypes.Category>(),
+    groups: Immutable.Map<number, LibraryTypes.Category>(),
+    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>(),
   });
 
   library = library
@@ -80,7 +80,7 @@ describe('AlgorithmsColumn', () =>
 
   const analytics: AnalyticsState = _AnalyticsState({
     loaded: true,
-    data: Immutable.Map({}),
+    data: Immutable.Map(),
     selectedMetric: 1,
   });
 
