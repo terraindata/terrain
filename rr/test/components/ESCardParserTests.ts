@@ -49,8 +49,8 @@ import * as ip from 'ip';
 import * as winston from 'winston';
 
 import * as puppeteer from 'puppeteer';
-import {makePromiseCallback} from '../../../shared/test/Utils';
-import {getChromeDebugAddress} from '../../FullstackUtils';
+import { makePromiseCallback } from '../../../shared/test/Utils';
+import { getChromeDebugAddress } from '../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 
@@ -72,11 +72,11 @@ describe('Testing the card parser', () =>
 
   beforeAll(async () =>
   {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  const contents: any = await new Promise((resolve, reject) =>
-  {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    const contents: any = await new Promise((resolve, reject) =>
+    {
+      fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+    });
 
     expected = JSON.parse(contents);
     const wsAddress = await getChromeDebugAddress();
@@ -92,16 +92,17 @@ describe('Testing the card parser', () =>
     page.goto(url);
     await page.waitForSelector(USERNAME_SELECTOR);
     winston.info('Loaded the page ' + url);
- for (const testName of Object.keys(expected))
- {
-   const testValue: any = expected[testName];
-   const request = JSON.stringify(testValue);
-   winston.info('Testing request ' + request);
-   const cardResult = await page.evaluate((theRequest, theValue) => {
-      return window['TerrainTools'].terrainTests.testCardParser(theRequest, theValue);
-   }, request, testValue);
-    expect(cardResult).toMatchObject({passed: true, message: 'The test is passed'});
- }
+    for (const testName of Object.keys(expected))
+    {
+      const testValue: any = expected[testName];
+      const request = JSON.stringify(testValue);
+      winston.info('Testing request ' + request);
+      const cardResult = await page.evaluate((theRequest, theValue) =>
+      {
+        return window['TerrainTools'].terrainTests.testCardParser(theRequest, theValue);
+      }, request, testValue);
+      expect(cardResult).toMatchObject({ passed: true, message: 'The test is passed' });
+    }
   }, 30000);
 
   afterAll(async () =>

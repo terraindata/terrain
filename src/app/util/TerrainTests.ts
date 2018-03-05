@@ -51,7 +51,7 @@ import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
 import ESParserError from '../../../shared/database/elastic/parser/ESParserError';
 import CardsToElastic from '../../database/elastic/conversion/CardsToElastic';
 import { ElasticValueInfoToCards } from '../../database/elastic/conversion/ElasticToCards';
-import ESCardParser from '../../database/elastic/conversion/ESCardParser';
+impogrt ESCardParser from '../../database/elastic/conversion/ESCardParser';
 import { _Query } from '../../items/types/Query';
 
 export default class TerrainTests
