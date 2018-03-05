@@ -70,7 +70,7 @@ import { TransformationEditor } from 'etl/templates/components/transformations/T
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
-import { TransformationsInfo } from 'shared/transformations/TransformationsInfo';
+import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 
 import './transformations/TransformationEditor.less';
 
@@ -152,7 +152,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     return (
       <div className='transformation-row' key={index}>
         <div className='transformation-row-text' style={style.textStyle}>
-          {TransformationsInfo.getReadableName(value.typeCode)}
+          {TransformationInfo.getReadableName(value.typeCode)}
         </div>
         <div className='edit-transformation-spacer'>
           <div

@@ -66,7 +66,7 @@ import TransformationNodeType from 'shared/transformations/TransformationNodeTyp
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-import { TransformationsInfo } from 'shared/transformations/TransformationsInfo';
+import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 
 // visitor components must use this
 export interface TransformationFormProps
