@@ -53,6 +53,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 export class TemplateConfig extends ConfigType implements TemplateBase
 {
   public id?: number = undefined;
+  public archived: boolean = false; // TODO, add ability to filter on this in routes
   public templateName: string = '';
   public transformationEngine: TransformationEngine = undefined;
   public transformationConfig: any = undefined;

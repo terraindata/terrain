@@ -166,6 +166,7 @@ class TemplateEditor extends TerrainComponent<Props>
       );
     }
   }
+
   public renderDocumentsSection()
   {
     return (

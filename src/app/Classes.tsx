@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name strict-boolean-expressions no-console
+// tslint:disable:variable-name strict-boolean-expressions no-console no-invalid-this
 
 /**
  * This file provides utility functions for implementing classes
@@ -247,6 +247,19 @@ export function responseToRecordConfig(response: object): object
   }
 
   return response;
+}
+
+export function instanceFnDecorator(fnToApply)
+{
+  return function decoratorFn(target: any, key: string | symbol, descriptor: TypedPropertyDescriptor<any>)
+  {
+    const existingFn = target[key];
+    descriptor.value = function(... args)
+    {
+      this[key] = fnToApply(existingFn);
+      return this[key](... args);
+    }
+  }
 }
 
 // boilerplate generator

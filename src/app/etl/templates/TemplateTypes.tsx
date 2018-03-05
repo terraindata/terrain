@@ -44,12 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable import-spacing
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
@@ -90,12 +91,14 @@ interface ETLTemplateI extends TemplateBase
 class ETLTemplateC implements ETLTemplateI
 {
   public id = -1;
+  public archived = false;
   public templateName = '';
   public transformationEngine = new TransformationEngine();
   public transformationConfig = '';
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
 }
+
 export type ETLTemplate = WithIRecord<ETLTemplateC>;
 export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
   transformationEngine: TransformationEngine.load,

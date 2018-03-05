@@ -65,6 +65,7 @@ export enum FileTypes
 export interface TemplateBase
 {
   id?: number;
+  archived: boolean;
   templateName: string;
   transformationEngine: TransformationEngine;
   transformationConfig: any; // terrain rank, what to do on failures TODO figure out the exact type

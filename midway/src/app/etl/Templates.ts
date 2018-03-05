@@ -70,6 +70,7 @@ export default class Templates
       'templates',
       ['id'],
       [
+        'archived',
         'templateName',
         'transformationEngine',
         'transformationConfig',
@@ -142,6 +143,7 @@ export default class Templates
         return reject(message);
       }
       const newTemplate: TemplateConfig = {
+        archived: false,
         templateName: template.templateName,
         transformationEngine: template.transformationEngine,
         transformationConfig: template.transformationConfig,
@@ -162,6 +164,7 @@ export default class Templates
         return reject(message);
       }
       const newTemplate: TemplateConfig = {
+        archived: template.archived,
         id: template.id,
         templateName: template.templateName,
         transformationEngine: template.transformationEngine,

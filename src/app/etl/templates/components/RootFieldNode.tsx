@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -86,7 +87,7 @@ class RootFieldNode extends TerrainComponent<Props>
       expandableViewOpen: false,
     };
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public computeRootFields(
     fieldMap: FieldMap,
     engine: TransformationEngine,

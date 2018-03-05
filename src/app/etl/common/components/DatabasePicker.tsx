@@ -50,6 +50,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -125,21 +126,21 @@ class DatabasePicker extends TerrainComponent<Props>
     return state.serverIndex === -1 ? DisplayState.Hidden : DisplayState.Active;
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public _getSortedServers(servers: ServerMap): List<Server>
   {
     return servers.map((server, k) => server)
       .sort((s1, s2) => s1.name.localeCompare(s2.name)).toList();
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public _getServerIds(servers: ServerMap): List<ID>
   {
     return this._getSortedServers(servers)
       .map((server, k) => server.id).toList();
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public _getServerOptions(servers: ServerMap): List<string>
   {
     return this._getSortedServers(servers)
@@ -151,7 +152,7 @@ class DatabasePicker extends TerrainComponent<Props>
     return this._getServerOptions(this.props.servers);
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public _getDatabaseOptions(databases: DatabaseMap, serverId: ID): List<string>
   {
     return databases
@@ -167,13 +168,13 @@ class DatabasePicker extends TerrainComponent<Props>
     return this._getDatabaseOptions(this.props.databases, this.props.serverId);
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public _getDatabaseByName(databases: DatabaseMap, name: string): Database
   {
     return databases.find((database, k) => database.name === name);
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public _getTableOptions(tables: TableMap,
     databases: DatabaseMap,
     databaseName: string): List<string>
@@ -197,7 +198,7 @@ class DatabasePicker extends TerrainComponent<Props>
     return this._getTableOptions(this.props.tables, this.props.databases, this.props.database);
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public _getServerIndex(servers: ServerMap, serverId: ID): number
   {
     const index = this._getSortedServers(servers)

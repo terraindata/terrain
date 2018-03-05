@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -137,7 +138,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
       DisplayState.Active : DisplayState.Inactive;
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public _getTypeOptions(jsType: FieldTypes)
   {
     return List(JsToElasticOptions[jsType]);
@@ -153,7 +154,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
     return JsToElasticOptions[this._field().type].indexOf(option);
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public getAnalyzerOptions()
   {
     return List(['standard']);

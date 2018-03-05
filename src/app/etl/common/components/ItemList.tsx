@@ -53,6 +53,7 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
 import { Menu, MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 import './ItemList.less';
 
@@ -83,7 +84,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     super(props);
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public rowClickedMemoized(onRowClicked)
   {
     return _.memoize((index) => () => { onRowClicked(index); });
@@ -98,7 +99,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     return this.rowClickedMemoized(this.props.onRowClicked)(index);
   }
 
-  @memoizeOne
+  @instanceFnDecorator(memoizeOne)
   public getRowStyle(style)
   {
     if (style !== undefined)
