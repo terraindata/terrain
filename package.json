@@ -35,6 +35,7 @@
     "rr": "./node_modules/.bin/ts-node ./rr/RecordReplay.ts",
     "test-fullstack-login": "jest ./rr/test/login --forceExit",
     "test-rr-builder": "jest ./rr/test/builder --forceExit",
+    "test-fullstack-component": "jest ./rr/test/components --forceExit",
     "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
   },
   "repository": {

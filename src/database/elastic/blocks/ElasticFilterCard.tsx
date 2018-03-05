@@ -414,7 +414,11 @@ export class FilterUtils
       return blocks;
     }
     const rangeValue = rangeQuery.objectChildren[field].propertyValue;
-    const boost = rangeValue.objectChildren['boost'] || '';
+    let boost = '';
+    if (rangeValue.objectChildren['boost'])
+    {
+      boost = String(rangeValue.objectChildren['boost'].propertyValue.value);
+    }
     for (const k of Object.keys(rangeValue.objectChildren))
     {
       if (esRangeOperatorMap[k] !== undefined)
@@ -678,15 +682,32 @@ export class FilterUtils
       }
     } else if (block['filterOp'] === '≈')
     {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'match:match': {
+              [templateField]: valueString,
+            },
+          },
+        });
+    } else
+    {
+      // range
       // match
+      const rangeField = String(block['field']) + ':range_value';
+      const rangeOp = String(esFilterOperatorsMap[block['filterOp']]) + ':base';
       if (boost !== '')
       {
         queryCard = BlockUtils.make(ElasticBlocks,
           'eqlquery',
           {
             template: {
-              'match:match': {
-                [templateField]: valueString,
+              'range:range_query': {
+                [rangeField]: {
+                  [rangeOp]: valueString,
+                  'boost:boost': boost,
+                },
               },
             },
           });
@@ -696,30 +717,14 @@ export class FilterUtils
           'eqlquery',
           {
             template: {
-              'match:match': {
-                [templateField]: valueString,
-                'boost:boost': boost,
+              'range:range_query': {
+                [rangeField]: {
+                  [rangeOp]: valueString,
+                },
               },
             },
           });
       }
-    } else
-    {
-      // range
-      // match
-      const rangeField = String(block['field']) + ':range_value';
-      const rangeOp = String(esFilterOperatorsMap[block['filterOp']]) + ':base';
-      queryCard = BlockUtils.make(ElasticBlocks,
-        'eqlquery',
-        {
-          template: {
-            'range:range_query': {
-              [rangeField]: {
-                [rangeOp]: valueString,
-              },
-            },
-          },
-        });
     }
     return queryCard;
   }
@@ -748,9 +753,10 @@ export const elasticFilterBlock = _block(
           ? extraConfig.field : '';
         config['value'] = (extraConfig && extraConfig.value !== undefined && extraConfig.value !== null)
           ? extraConfig.value : '';
+        config['boost'] = (extraConfig && extraConfig.boost !== undefined && extraConfig.value !== null)
+          ? extraConfig.boost : '';
         config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'must';
         config['filterOp'] = (extraConfig && extraConfig.filterOp) || '=';
-        config['boost'] = (extraConfig && extraConfig.boost) || '';
         return config;
       },
     },
