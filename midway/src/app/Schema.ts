@@ -141,6 +141,15 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      transformationConfig text NOT NULL,
      sources text NOT NULL,
      sinks text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS schedulerLogs
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     lastFailure date,
+     lastRun date,
+     lastSuccess date,
+     meta text NOT NULL,
+     numberOfRuns integer NOT NULL,
+     scheduleId integer NOT NULL,
+     status text NOT NULL); `,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)

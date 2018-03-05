@@ -42,24 +42,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import TransformationNodeType from './TransformationNodeType';
+import ConfigType from '../ConfigType';
 
-export class TransformationNode
+export class SchedulerLogConfig extends ConfigType
 {
-  public id: number;
-  public typeCode: TransformationNodeType;
-  public fieldIDs: List<number>;
-  public meta: object;
+  public id?: number = undefined;
+  public lastFailure: Date | null = undefined;
+  public lastRun: Date | null = undefined;
+  public lastSuccess: Date | null = undefined;
+  public meta: string = undefined;
+  public numberOfRuns: number = undefined;
+  public scheduleId: number = undefined;
+  public status: string = undefined;
 
-  constructor(id: number, typeCode: TransformationNodeType, fieldIDs: List<number>, options?: object)
+  constructor(props: object)
   {
-    this.id = id;
-    this.typeCode = typeCode;
-    this.fieldIDs = fieldIDs;
-    this.meta = options;
+    super();
+    ConfigType.initialize(this, props);
   }
 }
 
-export default TransformationNode;
+export default SchedulerLogConfig;

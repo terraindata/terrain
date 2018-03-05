@@ -44,15 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { TransformationNode } from '../TransformationNode';
+import { TransformationInfo } from 'shared/transformations/TransformationInfo';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNodeVisitor from '../TransformationNodeVisitor';
+import TransformationVisitError from '../TransformationVisitError';
 import TransformationVisitResult from '../TransformationVisitResult';
-import ANodeVisitor from './ANodeVisitor';
 
-export default class DuplicateNodeVisitor extends ANodeVisitor
+export default abstract class TransformationNode
 {
-  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
+  public id: number;
+  public typeCode: TransformationNodeType;
+  public fieldIDs: List<number>;
+  public meta: object;
+
+  public constructor(id: number, fieldIDs: List<number>, options: object = {}, typeCode: TransformationNodeType)
   {
-    // TODO
-    return {} as TransformationVisitResult;
+    this.id = id;
+    this.fieldIDs = fieldIDs;
+    this.meta = options;
+    this.typeCode = typeCode;
+  }
+
+  public accept(visitor: TransformationNodeVisitor, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const docCopy = Object.assign({}, doc); // Preserve original doc in case of errors that would mangle it
+    return TransformationInfo.applyTargetedVisitor(visitor, this, docCopy, options);
   }
 }

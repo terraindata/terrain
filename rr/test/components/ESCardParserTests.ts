@@ -42,35 +42,72 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import { TransformationNode } from '../TransformationNode';
-import TransformationNodeVisitor from '../TransformationNodeVisitor';
-import TransformationVisitError from '../TransformationVisitError';
-import TransformationVisitResult from '../TransformationVisitResult';
-import ANodeVisitor from './ANodeVisitor';
+import * as fs from 'fs';
+import * as ip from 'ip';
+import * as winston from 'winston';
 
-export default class UppercaseNodeVisitor extends ANodeVisitor
+import * as puppeteer from 'puppeteer';
+import { makePromiseCallback } from '../../../shared/test/Utils';
+import { getChromeDebugAddress } from '../../FullstackUtils';
+
+const USERNAME_SELECTOR = '#login-email';
+
+function getExpectedFile(): string
 {
-  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
-  {
-    for (const fieldID of node.fieldIDs.toJS())
-    {
-      if (typeof doc[fieldID] !== 'string')
-      {
-        return {
-          errors: [
-            {
-              message: 'Attempted to capitalize a non-string field (this is not supported)',
-            } as TransformationVisitError,
-          ],
-        } as TransformationVisitResult;
-      }
-      doc[fieldID] = doc[fieldID].toUpperCase();
-    }
-
-    return {
-      document: doc,
-    } as TransformationVisitResult;
-  }
+  return __filename.split('.')[0] + '.expected';
 }
+
+async function loadPage(page, url)
+{
+  await page.goto(url);
+}
+
+describe('Testing the card parser', () =>
+{
+  let expected;
+  let browser;
+  let page;
+
+  beforeAll(async () =>
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    const contents: any = await new Promise((resolve, reject) =>
+    {
+      fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+    });
+
+    expected = JSON.parse(contents);
+    const wsAddress = await getChromeDebugAddress();
+    browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
+    winston.info('Connected to the Chrome ' + String(wsAddress));
+  });
+
+  it('parse card', async () =>
+  {
+    page = await browser.newPage();
+    await page.setViewport({ width: 1600, height: 1200 });
+    const url = `http://${ip.address()}:3000`;
+    page.goto(url);
+    await page.waitForSelector(USERNAME_SELECTOR);
+    winston.info('Loaded the page ' + url);
+    for (const testName of Object.keys(expected))
+    {
+      const testValue: any = expected[testName];
+      const request = JSON.stringify(testValue);
+      winston.info('Testing request ' + request);
+      const cardResult = await page.evaluate((theRequest, theValue) =>
+      {
+        return window['TerrainTools'].terrainTests.testCardParser(theRequest, theValue);
+      }, request, testValue);
+      expect(cardResult).toMatchObject({ passed: true, message: 'The test is passed' });
+    }
+  }, 30000);
+
+  afterAll(async () =>
+  {
+    await page.close();
+    winston.info('The page is closed');
+  });
+});

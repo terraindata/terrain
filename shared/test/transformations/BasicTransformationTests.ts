@@ -45,8 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
+import UppercaseTransformationNode from 'shared/transformations/nodes/UppercaseTransformationNode';
+import TransformationNode from '../../transformations/nodes/TransformationNode';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
-import { TransformationNode } from '../../transformations/TransformationNode';
+import { TransformationInfo } from '../../transformations/TransformationInfo';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 import { KeyPath } from '../../util/KeyPath';
 import * as yadeep from '../../util/yadeep';
@@ -108,11 +110,13 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new TransformationNode(0, TransformationNodeType.UppercaseNode, List<number>([0])),
+          value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
+            (0, List<number>([0]), {}, TransformationNodeType.UppercaseNode),
         },
         {
           v: '1',
-          value: new TransformationNode(1, TransformationNodeType.UppercaseNode, List<number>([3])),
+          value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
+            (1, List<number>([3]), {}, TransformationNodeType.UppercaseNode),
         },
       ],
       edges: [],
