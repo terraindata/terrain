@@ -48,9 +48,10 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 
 import ElasticQueryResult from '../../../shared/database/elastic/ElasticQueryResponse';
+import QueryRequest from '../../../shared/database/types/QueryRequest';
+import QueryResponse from '../../../shared/database/types/QueryResponse';
+import QueryResult from '../../../shared/database/types/QueryResult';
 import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
-import QueryRequest from './QueryRequest';
-import QueryResponse, { QueryResult } from './QueryResponse';
 
 export default class MidwayQueryResponse extends QueryResponse
 {

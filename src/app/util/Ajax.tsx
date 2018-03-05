@@ -52,20 +52,18 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 
+import { QueryRequest } from '../../../shared/database/types/QueryRequest';
+import { MidwayError } from '../../../shared/error/MidwayError';
 import BackendInstance from '../../database/types/BackendInstance';
+import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
 import { Item, ItemType } from '../../items/types/Item';
 import Query from '../../items/types/Query';
-import { AuthActions as Actions } from './../auth/data/AuthRedux';
-import * as LibraryTypes from './../library/LibraryTypes';
-import * as UserTypes from './../users/UserTypes';
-
-import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
-
-import { MidwayError } from '../../../shared/error/MidwayError';
-import { QueryRequest } from '../../database/types/QueryRequest';
+import { AuthActions as Actions } from '../auth/data/AuthRedux';
 import { recordForSave, responseToRecordConfig } from '../Classes';
+import * as LibraryTypes from '../library/LibraryTypes';
+import * as UserTypes from '../users/UserTypes';
+
 import AjaxM1 from './AjaxM1';
-// const { List, Map } = Immutable;
 
 export const Ajax =
   {
@@ -380,10 +378,10 @@ export const Ajax =
         {
           const mapping =
             {
-              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}) as any,
-              GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
-              CATEGORY: Immutable.Map<number, LibraryTypes.Category>({}),
-              QUERY: Immutable.Map<number, Query>({}),
+              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>() as any,
+              GROUP: Immutable.Map<number, LibraryTypes.Group>(),
+              CATEGORY: Immutable.Map<number, LibraryTypes.Category>(),
+              QUERY: Immutable.Map<number, Query>(),
             };
           const categoriesOrder = [];
           items.map(

@@ -114,7 +114,7 @@ export class TransformCardChart extends TerrainComponent<Props>
   } = {
       pointsCache: this.props.points,
       pointsBuffer: null,
-      selectedPointIds: Map<string, boolean>({}),
+      selectedPointIds: Map<string, boolean>(),
       moveSeed: 0,
       movedSeed: -1,
       dragging: false,

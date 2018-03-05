@@ -44,14 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
-
 import * as googleoauthjwt from 'google-oauth-jwt';
 import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
 import Credentials from '../../credentials/Credentials';
+import CSVExportTransform from '../streams/CSVExportTransform';
 
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();
@@ -104,9 +103,7 @@ export class GoogleAPI
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const writer = csvWriter();
-      const pass = new stream.PassThrough();
-      writer.pipe(pass);
+      const writer = new CSVExportTransform(Object.keys(values[0]));
       if (values.length > 0)
       {
         for (let i = 1; i < values.length; ++i)
@@ -115,7 +112,7 @@ export class GoogleAPI
         }
       }
       writer.end();
-      resolve(pass);
+      resolve(writer);
     });
   }
 

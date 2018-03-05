@@ -86,12 +86,20 @@ fullstack:
     - killall node || true;
     - NODE_ENV=production yarn run start-midway > ./midwayConsole.log 2>&1&
     - sleep 20
+    - yarn run test-fullstack-component
     - yarn run test-fullstack-login
     - yarn run test-rr-builder
     - killall node || true;
     - yarn run test-fullstack-teardown
   stage: fullstack
   when: always
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths:
+    - rr/test/builder/__image_snapshots__/__diff_output__
+    - rr/test/login/__image_snapshots__/__diff_output__
 
 deploy:
   script:

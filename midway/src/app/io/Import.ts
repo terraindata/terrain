@@ -639,6 +639,7 @@ export class Import
         }
         break;
       case 'date':
+        item[field] = item[field].replace(/\"/g, '');
         const date: number = Date.parse(item[field]);
         if (!isNaN(date))
         {
