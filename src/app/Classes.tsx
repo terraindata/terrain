@@ -254,12 +254,12 @@ export function instanceFnDecorator(fnToApply)
   return function decoratorFn(target: any, key: string | symbol, descriptor: TypedPropertyDescriptor<any>)
   {
     const existingFn = target[key];
-    descriptor.value = function(... args)
+    descriptor.value = function(...args)
     {
       this[key] = fnToApply(existingFn);
-      return this[key](... args);
-    }
-  }
+      return this[key](...args);
+    };
+  };
 }
 
 // boilerplate generator

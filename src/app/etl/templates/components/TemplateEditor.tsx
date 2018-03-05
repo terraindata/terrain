@@ -60,7 +60,7 @@ import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
-import DocumentsPreviewControl from 'etl/templates/components/preview/DocumentsPreviewControl';
+import EditorColumnBar from 'etl/templates/components/EditorColumnBar';
 import EditorDocumentsPreview from 'etl/templates/components/preview/EditorDocumentsPreview';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
@@ -172,7 +172,7 @@ class TemplateEditor extends TerrainComponent<Props>
     return (
       <div className='template-editor-column preview-documents-column'>
         <div className='template-editor-title-bar'>
-          <DocumentsPreviewControl />
+          <EditorColumnBar />
         </div>
         <EditorDocumentsPreview />
       </div>

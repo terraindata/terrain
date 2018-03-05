@@ -63,8 +63,8 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { availableTransformations, getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 
 import './TransformationEditor.less';
 

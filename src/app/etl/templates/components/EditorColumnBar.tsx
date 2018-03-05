@@ -56,8 +56,6 @@ import Util from 'util/Util';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-import DocumentPreview from './DocumentPreview';
-import './EditorDocumentsPreview.less';
 const { List } = Immutable;
 
 export interface Props
@@ -68,7 +66,7 @@ export interface Props
 }
 
 @Radium
-class DocumentsPreviewControl extends TerrainComponent<Props>
+class EditorColumnBar extends TerrainComponent<Props>
 {
   public render()
   {
@@ -81,7 +79,7 @@ class DocumentsPreviewControl extends TerrainComponent<Props>
 }
 
 export default Util.createContainer(
-  DocumentsPreviewControl,
+  EditorColumnBar,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );

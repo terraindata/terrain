@@ -48,7 +48,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import  TransformationNodeBase from 'shared/transformations/nodes/TransformationNode';
+import TransformationNodeBase from 'shared/transformations/nodes/TransformationNode';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
