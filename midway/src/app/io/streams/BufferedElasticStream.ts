@@ -54,7 +54,7 @@ import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
  */
 export default class BufferedElasticStream extends Readable
 {
-  public maxBufferSize: number = 512;
+  public maxBufferSize: number = 8;
   public position: number = 0;
   public buffer: object[] = [];
 
@@ -68,13 +68,14 @@ export default class BufferedElasticStream extends Readable
   private _onRead: () => void;
   private _onEnd: () => void;
 
-  constructor(client: ElasticClient, query: any, onBufferFull: (stream: BufferedElasticStream) => void)
+  constructor(client: ElasticClient, query: any, onBufferFull: (stream: BufferedElasticStream) => void, size: number = 8)
   {
     super({
       objectMode: true,
     });
     this.query = query;
     this.stream = new ElasticStream(client, query);
+    this.maxBufferSize = size;
 
     this._onBufferFull = onBufferFull;
     this._onRead = this.readStream.bind(this);
