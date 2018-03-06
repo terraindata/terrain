@@ -104,7 +104,7 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
       },
       jsonNewlines: {
         type: DisplayType.CheckBox,
-        displayName: 'Objects seperated by newlines',
+        displayName: 'Objects separated by newlines',
         group: 'row1',
         shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
       },

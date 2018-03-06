@@ -55,6 +55,7 @@ import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import ExpandableView from 'common/components/ExpandableView';
 import { instanceFnDecorator } from 'src/app/Classes';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
@@ -67,7 +68,7 @@ import SinkOptions from 'etl/templates/components/endpoints/SinkOptions';
 import SourceOptions from 'etl/templates/components/endpoints/SourceOptions';
 
 import './OptionsColumn.less';
-const { List } = Immutable;
+const { List, Map } = Immutable;
 
 export interface Props
 {
@@ -78,37 +79,67 @@ export interface Props
 
 class OptionsColumn extends TerrainComponent<Props>
 {
+  public state: {
+    expandableState: Immutable.Map<string, boolean>;
+  } = {
+      expandableState: Map(),
+    };
+
   public renderSource(source: SourceConfig, key)
   {
-    return (
+    const endpointHash = this.hashEndpoint(key, true);
+    const content = (
       <div
-        className='endpoint-block'
-        key={key}
+        className='endpoint-name-section'
+        style={fontColor(Colors().text2)}
+        onClick={this.expandableToggleFactory(endpointHash)}
       >
-        <div className='endpoint-name-section'>
-          {key}
-        </div>
-        <SourceOptions
-          sourceKey={key}
-        />
+        {key}
       </div>
+    );
+    const childContent = (
+      <SourceOptions
+        sourceKey={key}
+      />
+    );
+
+    return (
+      <ExpandableView
+        key={key}
+        content={content}
+        open={this.isEndpointOpen(endpointHash)}
+        children={childContent}
+        onToggle={this.expandableToggleFactory(endpointHash)}
+      />
     );
   }
 
   public renderSink(sink: SinkConfig, key)
   {
-    return (
+    const endpointHash = this.hashEndpoint(key, false);
+    const content = (
       <div
-        className='endpoint-block'
-        key={key}
+        className='endpoint-name-section'
+        style={fontColor(Colors().text2)}
+        onClick={this.expandableToggleFactory(endpointHash)}
       >
-        <div className='endpoint-name-section'>
-          {key}
-        </div>
-        <SinkOptions
-          sinkKey={key}
-        />
+        {key}
       </div>
+    );
+    const childContent = (
+      <SinkOptions
+        sinkKey={key}
+      />
+    );
+
+    return (
+      <ExpandableView
+        key={key}
+        content={content}
+        open={this.isEndpointOpen(endpointHash)}
+        children={childContent}
+        onToggle={this.expandableToggleFactory(endpointHash)}
+      />
     );
   }
 
@@ -160,6 +191,29 @@ class OptionsColumn extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  // closed by default, since expandableState is empty
+  public isEndpointOpen(hash: string)
+  {
+    return Boolean(this.state.expandableState.get(hash));
+  }
+
+  public hashEndpoint(key: string, isSource: boolean)
+  {
+    return `${key},${isSource}`;
+  }
+
+  @instanceFnDecorator(_.memoize)
+  public expandableToggleFactory(hash: string)
+  {
+    return () =>
+    {
+      const { expandableState } = this.state;
+      this.setState({
+        expandableState: expandableState.set(hash, !this.isEndpointOpen(hash)),
+      });
+    };
   }
 }
 

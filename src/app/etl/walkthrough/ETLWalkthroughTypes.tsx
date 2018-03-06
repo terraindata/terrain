@@ -78,10 +78,8 @@ class WalkthroughStateC
 {
   public stepHistory: List<ViewState> = List([ViewState.NewImport]);
   public source: SourceConfig = _SourceConfig();
-  // public file: File = null;
   public sink: SinkConfig = _SinkConfig();
   public chosenTemplateId: ID = -1;
-  public previewDocuments: List<object> = List([]);
 
   public getFile()
   {

@@ -83,10 +83,6 @@ export interface WalkthroughActionTypes
     sourceOptions?: OptionsOrHandler;
     sinkOptions?: OptionsOrHandler;
   };
-  setPreviewDocuments: {
-    actionType: 'setPreviewDocuments';
-    documents: List<object>;
-  };
   autodetectJsonOptions: {
     actionType: 'autodetectJsonOptions';
     file: File;
@@ -166,10 +162,6 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
           }
         }
         return newState;
-      },
-      setPreviewDocuments: (state, action) =>
-      {
-        return state.set('previewDocuments', action.payload.documents);
       },
       autodetectJsonOptions: (state, action) => state, // overriden
     };

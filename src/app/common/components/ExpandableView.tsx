@@ -98,7 +98,8 @@ class ExpandableView extends TerrainComponent<Props>
               style={{
                 width: arrowSize,
                 height: arrowSize,
-                padding: `0px ${arrowPadding}px`,
+                padding: `${arrowPadding}px`,
+                margin: `-${arrowPadding}px 0px`,
               }}
             />
             <div
