@@ -105,7 +105,7 @@ class EditorColumnBar extends TerrainComponent<Props>
       actionType: 'setDisplayState',
       state: {
         columnState: columnOptions.get(columnIndex),
-      }
+      },
     });
   }
 }
