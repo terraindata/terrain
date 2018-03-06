@@ -1319,14 +1319,14 @@ describe('File io templates route tests', () =>
           dbname: 'movies',
           tablename: 'data',
           objectKey: '',
-          originalNames: ['pkey', 'column1', 'column2'],
+          originalNames: ['movieid', 'title', 'budget'],
           columnTypes:
             {
-              pkey: { type: 'long' },
-              column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
-              column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              movieid: { type: 'long' },
+              title: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              budget: { type: 'long' },
             },
-          primaryKeys: ['pkey'],
+          primaryKeys: ['movieid'],
           transformations: [],
           persistentAccessToken,
         });
