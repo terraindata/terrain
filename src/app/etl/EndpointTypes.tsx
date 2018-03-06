@@ -54,9 +54,11 @@ import
 {
   FileConfig as FileConfigI,
   SinkConfig as SinkConfigI,
-  SinkOptionsType, Sinks,
+  SinkOptionsDefaults, SinkOptionsType,
+  Sinks,
   SourceConfig as SourceConfigI,
-  SourceOptionsType, Sources,
+  SourceOptionsDefaults, SourceOptionsType,
+  Sources,
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
@@ -78,7 +80,18 @@ class SourceConfigC implements SourceConfigI
 export type SourceConfig = WithIRecord<SourceConfigC>;
 export const _SourceConfig = makeExtendedConstructor(SourceConfigC, false, {
   fileConfig: _FileConfig,
-});
+},
+  (cfg?, deep?) =>
+  {
+    const config = cfg || {};
+    const defaults: Partial<SourceConfig> = {};
+    if (config.type !== undefined)
+    {
+      defaults.options = SourceOptionsDefaults[config.type];
+    }
+    return _.extend(defaults, config);
+  },
+);
 
 class SinkConfigC implements SinkConfigI
 {
@@ -89,4 +102,15 @@ class SinkConfigC implements SinkConfigI
 export type SinkConfig = WithIRecord<SinkConfigC>;
 export const _SinkConfig = makeExtendedConstructor(SinkConfigC, false, {
   fileConfig: _FileConfig,
-});
+},
+  (cfg?, deep?) =>
+  {
+    const config = cfg || {};
+    const defaults: Partial<SourceConfig> = {};
+    if (config.type !== undefined)
+    {
+      defaults.options = SinkOptionsDefaults[config.type];
+    }
+    return _.extend(defaults, config);
+  },
+);

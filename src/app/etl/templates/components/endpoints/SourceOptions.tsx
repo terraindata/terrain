@@ -101,8 +101,8 @@ class SourceOptions extends TerrainComponent<Props>
   public sourceToState(source: SourceConfig)
   {
     return {
-      type: source.type
-    }
+      type: source.type,
+    };
   }
 
   public stateToSource(state: SourceTypeState): SourceConfig
@@ -140,7 +140,7 @@ class SourceOptions extends TerrainComponent<Props>
 
 interface SourceTypeState
 {
-  type: Sources,
+  type: Sources;
 }
 const pickTypeMap: InputDeclarationMap<SourceTypeState> =
   {
@@ -150,9 +150,9 @@ const pickTypeMap: InputDeclarationMap<SourceTypeState> =
       options: {
         pickOptions: (s) => sourceList,
         indexResolver: (value) => sourceList.indexOf(value),
-      }
-    }
-  }
+      },
+    },
+  };
 
 const sourceList = List([Sources.Upload, Sources.Algorithm, Sources.Sftp, Sources.Http]);
 

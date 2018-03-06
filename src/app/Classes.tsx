@@ -292,15 +292,18 @@ function injectInstanceMethods(constructor, instance)
 type ConfigType<T> = {
   [k in keyof T]?: T[k];
 };
+type ConfigTransformer<T> = (config?: ConfigType<T>, deep?: boolean) => ConfigType<T>;
 /**
  * If injectMethods is true, then the resultant object creator will add the Type's instance methods to the object's prototype.
- * You should use configOverride if the immutable record can be rebuilt from a pure js object (e.g. an object returned by recordForSave)
+ * You should use deepConfigOverride if the immutable record can be rebuilt from a pure js object (e.g. an object returned by recordForSave)
  * the overrider is called if the resultant constructor is called with deep = true
+ * A config transformer can also be passed, which is a function that transforms a config into a config of the same type.
  */
 export function makeExtendedConstructor<T>(
   Type: { new(): T; },
   injectMethods: boolean = false,
-  configOverride?: overrideMap<T>,
+  deepConfigOverride?: overrideMap<T>,
+  transformConfig?: ConfigTransformer<T>,
 ): (config?: ConfigType<T>, deep?: boolean) => WithIRecord<T>
 {
   if (injectMethods)
@@ -308,21 +311,23 @@ export function makeExtendedConstructor<T>(
     const instance = new Type();
     injectInstanceMethods(Constructor(instance), instance);
   }
-  if (configOverride)
+  if (deepConfigOverride || transformConfig)
   {
-    return (config?: { [key: string]: any }, deep?: boolean) =>
+    return (config?: ConfigType<T>, deep?: boolean) =>
     {
-      const overrideKeys = Object.keys(configOverride);
-      if (deep)
+      const overrideKeys = Object.keys(deepConfigOverride);
+      let newConfig = config;
+      if (deep && deepConfigOverride)
       {
         const overridenConfig = {};
         for (const key of overrideKeys)
         {
-          overridenConfig[key] = configOverride[key](config[key], true);
+          overridenConfig[key] = deepConfigOverride[key](newConfig[key], true);
         }
-        config = _.defaults(overridenConfig, config);
+        newConfig = _.defaults(overridenConfig, newConfig);
       }
-      return New<WithIRecord<T>>(new Type(), config);
+      newConfig = transformConfig !== undefined ? transformConfig(config, deep) : config;
+      return New<WithIRecord<T>>(new Type(), newConfig);
     };
   }
   else

@@ -105,7 +105,7 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       file: null,
     },
     Algorithm: {
-      algorithmId: -1
+      algorithmId: -1,
     },
     Sftp: {
       ip: '0.0.0.0',
@@ -119,9 +119,9 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       headers: {
         accept: '',
         contentType: 'application/json',
-      }
-    }
-  }
+      },
+    },
+  };
 
 export interface SinkOptionsTypes
 {
@@ -162,9 +162,9 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       headers: {
         accept: '',
         contentType: 'application/json',
-      }
-    }
-  }
+      },
+    },
+  };
 
 export interface SftpOptions
 {

@@ -57,7 +57,7 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'src/app/Classes';
 
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _FileConfig, _SinkConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
@@ -83,14 +83,50 @@ class SinkOptions extends TerrainComponent<Props>
     const sink = sinks.get(sinkKey);
     const FormClass = SinkFormMap[sink.type];
     return (
-      <FormClass
-        endpoint={sink}
-        onChange={this.handleEndpointChange}
-      />
+      <div className='endpoint-block'>
+        <DynamicForm
+          inputMap={pickTypeMap}
+          inputState={this.sinkToState(sink)}
+          onStateChange={this.handleSinkTypeStateChange}
+        />
+        <FormClass
+          endpoint={sink}
+          onChange={this.handleEndpointChange}
+        />
+      </div>
     );
   }
 
-  public handleEndpointChange(newConfig: SinkConfig | SourceConfig)
+  public sinkToState(sink: SinkConfig)
+  {
+    return {
+      type: sink.type,
+    };
+  }
+
+  public stateToSink(state: SinkTypeState): SinkConfig
+  {
+    const { sinks, sinkKey } = this.props;
+    const sink = sinks.get(sinkKey);
+    return sink.set('type', state.type);
+  }
+
+  public handleSinkTypeStateChange(state: SinkTypeState)
+  {
+    const { act, sinks, sinkKey } = this.props;
+    const sink = sinks.get(sinkKey);
+    const newSink = _SinkConfig({ type: state.type });
+    if (state.type !== sink.type)
+    {
+      act({
+        actionType: 'setSink',
+        key: sinkKey,
+        newSink,
+      });
+    }
+  }
+
+  public handleEndpointChange(newConfig: SinkConfig | SinkConfig)
   {
     const { act, sinkKey } = this.props;
     act({
@@ -100,6 +136,24 @@ class SinkOptions extends TerrainComponent<Props>
     });
   }
 }
+
+interface SinkTypeState
+{
+  type: Sinks;
+}
+const pickTypeMap: InputDeclarationMap<SinkTypeState> =
+  {
+    type: {
+      type: DisplayType.Pick,
+      displayName: 'Sink Type',
+      options: {
+        pickOptions: (s) => sinkList,
+        indexResolver: (value) => sinkList.indexOf(value),
+      },
+    },
+  };
+
+const sinkList = List([Sinks.Download, Sinks.Database, Sinks.Sftp, Sinks.Http]);
 
 export default Util.createContainer(
   SinkOptions,

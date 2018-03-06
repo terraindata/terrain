@@ -154,8 +154,10 @@ class OptionsColumn extends TerrainComponent<Props>
           getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
         )}
       >
-        {this.renderSourceOptions()}
-        {this.renderSinkOptions()}
+        <div className='options-column-content'>
+          {this.renderSourceOptions()}
+          {this.renderSinkOptions()}
+        </div>
       </div>
     );
   }

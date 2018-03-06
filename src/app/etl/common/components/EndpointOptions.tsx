@@ -81,30 +81,6 @@ export interface Props
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
 
-function fixUndefined<S>(inputMap: InputDeclarationMap<S>, object: S): S
-{
-  const fixes = {};
-  for (const key of Object.keys(inputMap))
-  {
-    if (object[key] === undefined)
-    {
-      if (inputMap[key].type === DisplayType.CheckBox)
-      {
-        fixes[key] = true;
-      }
-      else if (inputMap[key].type === DisplayType.Pick)
-      {
-        fixes[key] = -1;
-      }
-      else
-      {
-        fixes[key] = '';
-      }
-    }
-  }
-  return _.extend({}, object, fixes);
-}
-
 abstract class EndpointForm<State> extends TerrainComponent<Props>
 {
   public abstract inputMap: InputDeclarationMap<State>;
@@ -169,7 +145,7 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
   public render()
   {
     const { fileConfig, options } = this.props.endpoint;
-    const inputState = fixUndefined(this.inputMap, this.optionsToFormState(options));
+    const inputState = this.optionsToFormState(options);
     return (
       <div>
         <DynamicForm
