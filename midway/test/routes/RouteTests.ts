@@ -1487,6 +1487,45 @@ describe('File io templates route tests', () =>
         fail('POST /midway/v1/export/headless request returned an error: ' + String(error));
       });
   });
+
+  test('Post headless export with 10k+ results: POST /midway/v1/export/headless', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/export/headless')
+      .send({
+        templateId: exportTemplateID,
+        persistentAccessToken: persistentExportAccessToken,
+        body: {
+          dbid: 1,
+          dbname: 'movies',
+          templateId: exportTemplateID,
+          filetype: 'csv',
+          query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+            + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":11000}',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe(undefined);
+        expect(response.body).not.toBe(undefined);
+        let respBuffer = response.body;
+        let numLines: number = 0;
+        const delim: string = ',\n';
+        let indexOfDelim: number = respBuffer.indexOf(delim);
+        while (indexOfDelim !== -1)
+        {
+          respBuffer = respBuffer.slice(indexOfDelim + delim.length);
+          numLines++;
+          indexOfDelim = respBuffer.indexOf(delim);
+        }
+        expect(numLines).toEqual(11000);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/export/headless request (10k+) returned an error: ' + String(error));
+      });
+  });
 });
 
 describe('Credentials tests', () =>

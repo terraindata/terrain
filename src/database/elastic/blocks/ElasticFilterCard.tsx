@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
+import * as TerrainLog from 'loglevel';
 
 import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -58,8 +59,10 @@ import { _card, Card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreateCardTool';
+import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import ESCardParser from '../conversion/ESCardParser';
 import { ElasticBlocks } from './ElasticBlocks';
@@ -237,15 +240,35 @@ export class FilterUtils
     }
     if (queryBlock.cards.find((termBlock) =>
     {
-      const blockValue = new ESCardParser(termBlock);
-      if ((termBlock.key === 'term' && termBlock.type === 'eqlterm_query') ||
-        (termBlock.key === 'match' && termBlock.type === 'eqlmatch'))
+      if (termBlock.key === 'term' && termBlock.type === 'eqlterm_query')
       {
-        return FilterUtils.isTermMatchFilterRow(blockValue.getValue());
+        const blockValue = new ESCardParser(termBlock);
+        const field = this.GetFilterClauseField(blockValue.getValueInfo());
+        if (field === null)
+        {
+          return null;
+        }
+        return this.IsTermClauseFilter(blockValue.getValueInfo().objectChildren[field].propertyValue);
       }
       if (termBlock.key === 'range' && termBlock.type === 'eqlrange_query')
       {
-        return FilterUtils.isRangeFilterRow(blockValue.getValue());
+        const blockValue = new ESCardParser(termBlock);
+        const field = this.GetFilterClauseField(blockValue.getValueInfo());
+        if (field === null)
+        {
+          return null;
+        }
+        return this.IsRangeClauseFilter(blockValue.getValueInfo().objectChildren[field].propertyValue);
+      }
+      if (termBlock.key === 'match' && termBlock.type === 'eqlmatch')
+      {
+        const blockValue = new ESCardParser(termBlock);
+        const field = this.GetFilterClauseField(blockValue.getValueInfo());
+        if (field === null)
+        {
+          return null;
+        }
+        return this.IsMatchClauseFilter(blockValue.getValueInfo().objectChildren[field].propertyValue);
       }
       return false;
     }) === undefined)
@@ -263,7 +286,7 @@ export class FilterUtils
     const filterCards = [];
     rows.map((rowBlock) =>
     {
-      filterCards.push(FilterUtils.filterRowToQueryCard(rowBlock));
+      filterCards.push(this.filterRowToQueryCard(rowBlock));
     });
     return Immutable.List(filterCards).concat(block.cards);
   }
@@ -324,14 +347,14 @@ export class FilterUtils
 
   public static extractFilterBlocks(boolValueInfo: ESValueInfo): Block[]
   {
-    const boolValue = boolValueInfo.value;
+    console.assert(boolValueInfo.clause.type === 'bool_query');
+    const clauseChildren = boolValueInfo.objectChildren;
     let filters = [];
     for (const key of ['filter', 'must', 'should', 'must_not'])
     {
-      if (boolValue[key] !== undefined)
+      if (clauseChildren[key] !== undefined)
       {
-        const filterValueInfo = boolValueInfo.objectChildren[key].propertyValue;
-        const fs = FilterUtils.ParseFilterBlock(key, filterValueInfo.value);
+        const fs = this.ParseFilterBlockFromValueInfo(clauseChildren[key]);
         if (fs)
         {
           filters = filters.concat(fs);
@@ -349,128 +372,273 @@ export class FilterUtils
    * @param obj : a term or match query object
    * @returns {boolean} : true if we can turn this query object to a filter row
    */
-  public static isTermMatchFilterRow(obj): boolean
+  private static GetFilterClauseField(filterValueInfo: ESValueInfo)
   {
-    // { "field" : value } is qualified
-    // { "field" : { } } or {} is not
-    const keys = Object.keys(obj);
-    if (keys.length !== 1)
+    console.assert(filterValueInfo.clause.clauseType === ESClauseType.ESMapClause);
+    const keys = Object.keys(filterValueInfo.objectChildren);
+    if (keys.length > 1)
     {
-      return false;
+      TerrainLog.error(filterValueInfo, ' has more than one fields: ' + keys);
     }
-    const field = keys[0];
-    if (typeof obj[field] !== 'object' || obj[field] === null)
+    if (keys.length === 0)
     {
-      return true;
+      return null;
+    }
+    return keys[0];
+  }
+
+  private static IsRangeClauseFilter(rangeValue: ESValueInfo)
+  {
+    for (const k of Object.keys(rangeValue.objectChildren))
+    {
+      if (esRangeOperatorMap[k] !== undefined)
+      {
+        return true;
+      }
     }
     return false;
   }
 
   /**
    *
-   * @param obj: a range query object
-   * @returns {boolean} : true if we can turn this range object to a filter row
+   * @param {ESPropertyInfo} valueInfo: term or range
+   * @return elasticFilterBlocks generated from the filter clause
    */
-  public static isRangeFilterRow(obj): boolean
+  private static RangeClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
   {
-    // { "field" : { gt/gte/lt/lte} } is qualified.
-    // { "field" : {boost} } or {} is not.
-    const keys = Object.keys(obj);
-    if (keys.length !== 1)
+    const blocks = [];
+    const rangeQuery = rangeClause.propertyValue;
+    const field = this.GetFilterClauseField(rangeQuery);
+    if (field === null)
     {
-      return false;
+      return blocks;
     }
-    const field = keys[0];
-    if (typeof obj[field] !== 'object' || obj[field] === null)
+    const rangeValue = rangeQuery.objectChildren[field].propertyValue;
+    let boost = '';
+    if (rangeValue.objectChildren['boost'])
     {
-      return false;
+      boost = String(rangeValue.objectChildren['boost'].propertyValue.value);
     }
+    for (const k of Object.keys(rangeValue.objectChildren))
+    {
+      if (esRangeOperatorMap[k] !== undefined)
+      {
+        // generating a new block from this range filter
+        const value = String(rangeValue.objectChildren[k].propertyValue.value);
+        blocks.push(
+          BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+            field,
+            value,
+            boost,
+            boolQuery: boolTypeName,
+            filterOp: esRangeOperatorMap[k],
+          }, true),
+        );
+      }
+    }
+    return blocks;
+  }
 
-    if (obj[field]['boost'] !== undefined)
+  private static IsMatchClauseFilter(termValue)
+  {
+    if (termValue.clause.type === 'match_settings')
     {
       return false;
     }
     return true;
   }
 
-  public static ParseFilterBlock(queryName: string, filters: any): Block[]
+  /**
+   *
+   * @param {ESPropertyInfo} valueInfo: term or range
+   * @return elasticFilterBlocks generated from the filter clause
+   */
+  private static MatchClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
   {
-    if (typeof filters !== 'object')
+    // term : {field : term_value}
+    // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
+    // term_settings: { value: 'base', boost: 'boost' }
+    const blocks = [];
+    const termQuery = rangeClause.propertyValue;
+    const field = this.GetFilterClauseField(termQuery);
+    if (field === null)
     {
-      return [];
+      return blocks;
+    }
+    const termValue = termQuery.objectChildren[field].propertyValue;
+    let blockValue;
+    switch (termValue.clause.type)
+    {
+      case 'null':
+        blockValue = String(termValue.value);
+        break;
+      case 'boolean':
+        blockValue = String(termValue.value);
+        break;
+      case 'number':
+        blockValue = String(termValue.value);
+        break;
+      case 'string':
+        blockValue = String(termValue.value);
+        break;
+      default:
+        break;
     }
 
-    if (!Array.isArray(filters))
+    if (blockValue !== undefined)
     {
-      return FilterUtils.ParseFilterBlock(queryName, [filters]);
+      blocks.push(
+        BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+          field,
+          value: blockValue,
+          boolQuery: boolTypeName,
+          filterOp: '≈',
+        }, true),
+      );
     }
-
-    let filterBlocks = [];
-    filters.forEach((obj: object) =>
-    {
-      let field;
-      let filterOp;
-      let value;
-
-      if (obj['range'] !== undefined)
-      {
-        if (FilterUtils.isRangeFilterRow(obj['range']))
-        {
-          field = Object.keys(obj['range'])[0];
-          const filterOps = Object.keys(obj['range'][field]);
-          filterOp = filterOps[0];
-          value = String(obj['range'][field][filterOp]);
-          if (filterOps.length > 1)
-          {
-            delete obj['range'][field][filterOp];
-            filterBlocks = filterBlocks.concat(FilterUtils.ParseFilterBlock(queryName, [obj]));
-          }
-          filterOp = esRangeOperatorMap[filterOp];
-          console.assert(filterOp !== undefined, 'ParseFilterBlock could not parse the object ' + JSON.stringify(obj));
-        }
-      }
-      else if (obj['term'] !== undefined)
-      {
-        if (FilterUtils.isTermMatchFilterRow(obj['term']))
-        {
-          field = Object.keys(obj['term'])[0];
-          filterOp = '=';
-          value = String(obj['term'][field]);
-        }
-      }
-      else if (obj['match'] !== undefined)
-      {
-        if (FilterUtils.isTermMatchFilterRow(obj['match']))
-        {
-          field = Object.keys(obj['match'])[0];
-          filterOp = '≈';
-          value = String(obj['match'][field]);
-        }
-      }
-
-      if (field !== undefined && value !== undefined)
-      {
-        filterBlocks.push(
-          BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
-            field,
-            value,
-            boolQuery: queryName,
-            filterOp,
-          }, true),
-        );
-      }
-    });
-    return filterBlocks;
+    return blocks;
   }
 
+  private static IsTermClauseFilter(termValue)
+  {
+    switch (termValue.clause.type)
+    {
+      case 'term_settings':
+        if (termValue.objectChildren['value'] !== undefined)
+        {
+          return true;
+        } else
+        {
+          return false;
+        }
+      case 'null':
+        return true;
+      case 'boolean':
+        return true;
+      case 'number':
+        return true;
+      case 'string':
+        return true;
+      default:
+        TerrainLog.error('The type of ', termValue, ' is unknown');
+    }
+  }
+
+  /**
+   *
+   * @param {ESPropertyInfo} termClause "term":term_query
+   * @return elasticFilterBlocks generated from the filter clause
+   */
+  private static TermClauseToBlocks(boolTypeName, termClause: ESPropertyInfo): Block[]
+  {
+    // term : {field : term_value}
+    // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
+    // term_settings: { value: 'base', boost: 'boost' }
+    const blocks = [];
+    const termQuery = termClause.propertyValue;
+    const field = this.GetFilterClauseField(termQuery);
+    if (field === null)
+    {
+      return blocks;
+    }
+    const termValue = termQuery.objectChildren[field].propertyValue;
+    let blockValue;
+    let boost = '';
+    switch (termValue.clause.type)
+    {
+      case 'term_settings':
+        if (termValue.objectChildren['value'] !== undefined)
+        {
+          blockValue = String(termValue.value['value']);
+          if (termValue.objectChildren['boost'] !== undefined)
+          {
+            boost = String(termValue.value['boost']);
+          }
+        }
+        break;
+      case 'null':
+        blockValue = String(termValue.value);
+        break;
+      case 'boolean':
+        blockValue = String(termValue.value);
+        break;
+      case 'number':
+        blockValue = String(termValue.value);
+        break;
+      case 'string':
+        blockValue = String(termValue.value);
+        break;
+      default:
+        break;
+    }
+
+    if (blockValue !== undefined)
+    {
+      blocks.push(
+        BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+          field,
+          value: blockValue,
+          boolQuery: boolTypeName,
+          filterOp: '=',
+          boost,
+        }, true),
+      );
+    }
+    return blocks;
+  }
+
+  /**
+   *
+   * @param {string} queryName : must, must_not, filter, should
+   * @param {ESValueInfo} valueInfo
+   * @returns {Block[]}
+   * @constructor
+   */
+  private static ParseFilterBlockFromValueInfo(boolTypeClause: ESPropertyInfo): Block[]
+  {
+    const boolTypeName = boolTypeClause.propertyName.value;
+    // 'query[]' or 'query'
+    const filters = boolTypeClause.propertyValue;
+    let queries: ESValueInfo[];
+    let blocks = [];
+    if (filters.clause.type === 'query[]')
+    {
+      queries = filters.arrayChildren;
+    } else
+    {
+      console.assert(filters.clause.type === 'query');
+      queries = [filters];
+    }
+    for (const query of queries)
+    {
+      let newBlocks = [];
+      if (query.objectChildren['term'])
+      {
+        newBlocks = this.TermClauseToBlocks(boolTypeName, query.objectChildren['term']);
+      } else if (query.objectChildren['range'])
+      {
+        newBlocks = this.RangeClauseToBlocks(boolTypeName, query.objectChildren['range']);
+      } else if (query.objectChildren['match'])
+      {
+        newBlocks = this.MatchClauseToBlocks(boolTypeName, query.objectChildren['match']);
+      }
+      if (newBlocks.length > 0)
+      {
+        TerrainLog.debug(boolTypeClause, 'generates blocks ', newBlocks);
+        blocks = blocks.concat(newBlocks);
+      }
+    }
+    return blocks;
+  }
   // generate matched query cards from filter rows
-  public static filterRowToQueryCard(block: Block): Block
+  private static filterRowToQueryCard(block: Block): Block
   {
     console.assert(block.type === 'elasticFilterBlock', 'Rows of the Elastic filter card must be elasticFilterBlock');
     let queryCard;
     // detect the type of the value string
     let valueType = ':string';
     const valueString = String(block['value']);
+    const boost = block['boost'];
     const valueParser = new ESJSONParser(valueString);
 
     if (valueParser.hasError() === false)
@@ -484,18 +652,36 @@ export class FilterUtils
 
     if (block['filterOp'] === '=')
     {
-      queryCard = BlockUtils.make(ElasticBlocks,
-        'eqlquery',
-        {
-          template: {
-            'term:term_query': {
-              [templateField]: valueString,
+      if (boost !== '')
+      {
+        const termSettingField = String(block['field']) + ':term_settings';
+        const valueField = 'value' + valueType;
+        queryCard = BlockUtils.make(ElasticBlocks,
+          'eqlquery',
+          {
+            template: {
+              'term:term_query': {
+                [termSettingField]: {
+                  [valueField]: valueString,
+                  'boost:boost': boost,
+                },
+              },
             },
-          },
-        });
+          });
+      } else
+      {
+        queryCard = BlockUtils.make(ElasticBlocks,
+          'eqlquery',
+          {
+            template: {
+              'term:term_query': {
+                [templateField]: valueString,
+              },
+            },
+          });
+      }
     } else if (block['filterOp'] === '≈')
     {
-      // match
       queryCard = BlockUtils.make(ElasticBlocks,
         'eqlquery',
         {
@@ -511,17 +697,34 @@ export class FilterUtils
       // match
       const rangeField = String(block['field']) + ':range_value';
       const rangeOp = String(esFilterOperatorsMap[block['filterOp']]) + ':base';
-      queryCard = BlockUtils.make(ElasticBlocks,
-        'eqlquery',
-        {
-          template: {
-            'range:range_query': {
-              [rangeField]: {
-                [rangeOp]: valueString,
+      if (boost !== '')
+      {
+        queryCard = BlockUtils.make(ElasticBlocks,
+          'eqlquery',
+          {
+            template: {
+              'range:range_query': {
+                [rangeField]: {
+                  [rangeOp]: valueString,
+                  'boost:boost': boost,
+                },
               },
             },
-          },
-        });
+          });
+      } else
+      {
+        queryCard = BlockUtils.make(ElasticBlocks,
+          'eqlquery',
+          {
+            template: {
+              'range:range_query': {
+                [rangeField]: {
+                  [rangeOp]: valueString,
+                },
+              },
+            },
+          });
+      }
     }
     return queryCard;
   }
@@ -534,6 +737,7 @@ export const elasticFilterBlock = _block(
     key: 'term',
     boolQuery: 'must',
     filterOp: '=',
+    boost: '',
     static: {
       language: 'elastic',
       tql: null,
@@ -549,6 +753,8 @@ export const elasticFilterBlock = _block(
           ? extraConfig.field : '';
         config['value'] = (extraConfig && extraConfig.value !== undefined && extraConfig.value !== null)
           ? extraConfig.value : '';
+        config['boost'] = (extraConfig && extraConfig.boost !== undefined && extraConfig.value !== null)
+          ? extraConfig.boost : '';
         config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'must';
         config['filterOp'] = (extraConfig && extraConfig.filterOp) || '=';
         return config;
