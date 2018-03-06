@@ -112,8 +112,18 @@ export interface TemplateEditorActionTypes
   updateEngineVersion: {
     actionType: 'updateEngineVersion';
   };
-  resetState: {
+  resetState: { // resets the display state
     actionType: 'resetState';
+  };
+  setSource: {
+    actionType: 'setSource',
+    key: string,
+    newSource: SourceConfig,
+  };
+  setSink: {
+    actionType: 'setSink',
+    key: string,
+    newSink: SinkConfig,
   };
 }
 
@@ -172,6 +182,18 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       resetState: (state, action) =>
       {
         return _TemplateEditorState();
+      },
+      setSource: (state, action) =>
+      {
+        return state.update('sources', (sourceMap) => {
+          sourceMap.set(action.payload.key, action.payload.newSource);
+        });
+      },
+      setSink: (state, action) =>
+      {
+        return state.update('sinks', (sinkMap) => {
+          sinkMap.set(action.payload.key, action.payload.newSink);
+        });
       },
     };
 }

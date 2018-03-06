@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file import-spacing
+// tslint:disable:max-classes-per-file
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -58,6 +58,7 @@ import Util from 'util/Util';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
+import { ETLState } from 'etl/ETLTypes';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
@@ -74,6 +75,26 @@ export default abstract class ETLHelpers
 {
   protected editorAct: typeof TemplateEditorActions;
   protected etlAct: typeof ETLActions;
+
+  get state(): Immutable.Map<string, any>
+  {
+    return TerrainStore.getState() as any;
+  }
+
+  get templateEditor(): TemplateEditorState
+  {
+    return this.state.get('templateEditor');
+  }
+
+  get etl(): ETLState
+  {
+    return this.state.get('etl');
+  }
+
+  get walkthrough(): WalkthroughState
+  {
+    return this.state.get('walkthrough');
+  }
 
   constructor(protected store)
   {

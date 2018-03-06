@@ -62,53 +62,6 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-// export function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig)
-//   : { template: ETLTemplate, fieldMap: FieldMap, warnings: string[], softWarnings: string[] }
-// {
-//   if (documents == null || documents.size === 0)
-//   {
-//     return {
-//       template: _ETLTemplate(),
-//       fieldMap: Map(),
-//       warnings: ['No documents provided for initial Template construction'],
-//       softWarnings: [],
-//     };
-//   }
-//   const { engine, warnings, softWarnings } = createMergedEngine(documents);
-//   const fieldMap = createTreeFromEngine(engine);
-
-//   let template = _ETLTemplate({
-//     id: -1,
-//     templateName: name,
-//     transformationEngine: engine,
-//   });
-
-//   // default source and sink is upload and download
-//   template = template.setIn(['sources', 'primary'],
-//     source !== undefined ?
-//       source
-//       :
-//       _SourceConfig({
-//         type: Sources.Upload,
-//       }),
-//   );
-//   template = template.setIn(['sinks', 'primary'],
-//     sink !== undefined ?
-//       sink
-//       :
-//       _SinkConfig({
-//         type: Sinks.Download,
-//       }),
-//   );
-
-//   return {
-//     template,
-//     fieldMap,
-//     warnings,
-//     softWarnings,
-//   };
-// }
-
 export function createTreeFromEngine(engine: TransformationEngine): FieldMap
 {
   const ids = engine.getAllFieldIDs();

@@ -63,8 +63,6 @@ import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
-import './EndpointOptions.less';
-
 const { List } = Immutable;
 
 export interface Props

@@ -63,14 +63,17 @@ import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
+import { SourceFormMap } from 'etl/common/components/EndpointOptions';
+
 import './EndpointOptions.less';
 
 const { List } = Immutable;
 
 export interface Props
 {
+  sourceKey: string;
   // below from container
-  template?: ETLTemplate;
+  sources: ETLTemplate['sources'];
   act?: typeof TemplateEditorActions;
 }
 
@@ -78,9 +81,31 @@ class SourceOptions extends TerrainComponent<Props>
 {
   public render()
   {
-    return null;
+    const { sources, sourceKey } = this.props;
+    const source = sources.get(sourceKey);
+    const FormClass = SourceFormMap[source.type];
+    return (
+      <FormClass
+        endpoint={source}
+        onChange={this.handleSourceChange}
+      />
+    );
+  }
+
+  public handleSourceChange(newConfig: SinkConfig | SourceConfig)
+  {
+    const { act, sourceKey } = this.props;
+    act({
+      actionType: 'setSource',
+      key: sourceKey,
+      newSource: newConfig,
+    });
   }
 }
+
+  // isSource?: boolean;
+  // endpoint: SinkConfig | SourceConfig;
+  // onChange: (newConfig: SinkConfig | SourceConfig) => void;
 
 export default Util.createContainer(
   SourceOptions,

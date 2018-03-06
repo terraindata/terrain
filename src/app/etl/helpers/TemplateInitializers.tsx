@@ -121,7 +121,7 @@ class Initializers extends ETLHelpers
     DocumentsHelpers.fetchDocuments(source, undefined, onLoad);
   }
 
-  public initNewFromWalkthrough(walkthrough: WalkthroughState)
+  public initNewFromWalkthrough(walkthrough: WalkthroughState = this.walkthrough)
   {
     const source = walkthrough.source;
     const sink = walkthrough.sink;

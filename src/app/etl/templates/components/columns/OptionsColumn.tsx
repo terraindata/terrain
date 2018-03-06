@@ -83,7 +83,6 @@ class OptionsColumn extends TerrainComponent<Props>
     return (
       <div key={key}>
         <SourceOptions
-          source={source}
           sourceKey={key}
         />
       </div>
@@ -95,7 +94,6 @@ class OptionsColumn extends TerrainComponent<Props>
     return (
       <div key={key}>
         <SinkOptions
-          sink={sink}
           sinkKey={key}
         />
       </div>
@@ -126,8 +124,8 @@ class OptionsColumn extends TerrainComponent<Props>
   {
     return (
       <div>
-        {this.renderSourceOptions()}
-        {this.renderSinkOptions()}
+{/*        {this.renderSourceOptions()}
+        {this.renderSinkOptions()}*/}
       </div>
     );
   }
