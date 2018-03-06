@@ -72,15 +72,11 @@ export enum ColumnOptions
 {
   Preview = 'Preview',
   Options = 'Options',
-  Sources = 'Sources',
-  Sinks = 'Sinks',
 }
 
 export const columnOptions = List([
   ColumnOptions.Preview,
   ColumnOptions.Options,
-  ColumnOptions.Sources,
-  ColumnOptions.Sinks,
 ]);
 
 class EditorDisplayStateC

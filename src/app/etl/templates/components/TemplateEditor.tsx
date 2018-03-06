@@ -62,6 +62,7 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
+import OptionsColumn from 'etl/templates/components/columns/OptionsColumn';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import TemplateList from 'etl/templates/components/TemplateList';
@@ -177,8 +178,6 @@ class TemplateEditor extends TerrainComponent<Props>
         </div>
         { columnState === ColumnOptions.Preview ? <DocumentsPreviewColumn /> : null}
         { columnState === ColumnOptions.Options ? null : null }
-        { columnState === ColumnOptions.Sources ? null : null }
-        { columnState === ColumnOptions.Sinks ? null : null }
       </div>
     );
   }
