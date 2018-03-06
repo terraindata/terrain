@@ -55,14 +55,14 @@ export const MAX_HITS = 100;
 class HitClass extends BaseClass
 {
   // all available fields for display
-  public fields: IMMap<string, string> = Map<string, string>({});
+  public fields: IMMap<string, string> = Map<string, string>();
 
   public primaryKey: any = '';
 
   public spotlight: any;
 
-  public rawFields: IMMap<string, string> = Map<string, string>({});
-  public transformFields: IMMap<string, string> = Map<string, string>({});
+  public rawFields: IMMap<string, string> = Map<string, string>();
+  public transformFields: IMMap<string, string> = Map<string, string>();
 }
 export type Hit = HitClass & IRecord<HitClass>;
 export const _Hit = (config: object = {}) =>
@@ -83,13 +83,13 @@ export type Aggregations = List<Aggregation>;
 
 class ResultsStateC extends BaseClass
 {
-  public hits: Hits = List([]);
+  public hits: Hits = List();
   public aggregations: any = {};
-  public fields: List<string> = List([]);
+  public fields: List<string> = List();
   public count: number = 0;
   public rawResult: string = '';
 
-  public primaryKeyToIndex: IMMap<string, number> = Map<string, number>({});
+  public primaryKeyToIndex: IMMap<string, number> = Map<string, number>();
 
   public hasError: boolean = false;
   public errorMessage: string = '';

@@ -142,11 +142,15 @@ class HitsArea extends TerrainComponent<Props>
     mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
     mapMaxHeight: undefined,
+<<<<<<< HEAD
     spotlightHits: Immutable.Map<string, any>({}),
     hitSize: 'large',
     indexName: '',
     resultsConfig: undefined,
     nestedFields: List([]),
+=======
+    spotlightHits: Immutable.Map<string, any>(),
+>>>>>>> origin/new-elasticstream-mergejoin-take-2
   };
 
   public hitsFodderRange = _.range(0, 25);

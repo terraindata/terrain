@@ -37,7 +37,6 @@
       "js",
       "json"
     ],
-    "mapCoverage": true,
     "globals": {
       "DEV": true
     },
