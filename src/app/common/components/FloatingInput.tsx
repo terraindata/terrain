@@ -57,6 +57,7 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } f
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 export let LARGE_FONT_SIZE = '52px';
+export let SEMI_LARGE_FONT_SIZE = '38px';
 export let FONT_SIZE = '18px';
 export let LARGE_LABEL_FLOATING_FONT_SIZE = '16px';
 export let LABEL_FLOATING_FONT_SIZE = '12px';
@@ -68,7 +69,7 @@ const Container = ContainerC`
   line-height: normal;
   border: 1px solid ${Colors().inputBorder};
   border-radius: 3px;
-  height: ${(props) => props.large ? '86px' : '48px'};
+  height: ${(props) => props.large ? '86px' : props.semilarge ? '56px' : '48px'};
   width: 100%;
   box-sizing: border-box;
   min-width: 100px;
@@ -106,10 +107,10 @@ const Label = LabelC`
   {
     if (props.isFloating)
     {
-      return props.large ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
+      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
     }
 
-    return props.large ? LARGE_FONT_SIZE : FONT_SIZE;
+    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE : FONT_SIZE;
   }};
 `;
 
@@ -132,14 +133,9 @@ const inputStyle = `
   &:hover {
     background-color: transparent;
   }
-
-  &:focus {
-    background-color: transparent;
-    border: 1px solid ${Colors().active} !important;
-  }
 `;
 
-const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : FONT_SIZE;
+const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE : FONT_SIZE;
 
 // duplication of code because the functions don't work if you put them
 //  in inputStyle
@@ -177,6 +173,7 @@ interface InputProps
   onBlur?: () => void;
   value?: any;
   large?: boolean;
+  semilarge?: boolean;
   isFloating?: boolean;
 }
 
@@ -186,6 +183,7 @@ interface InputDivProps
   noBg?: boolean;
   onClick?: () => void;
   large?: boolean;
+  semilarge?: boolean;
   isFloating?: boolean;
 }
 
@@ -203,6 +201,7 @@ export interface Props
   noBorder?: boolean;
   noBg?: boolean;
   large?: boolean;
+  semilarge: boolean;
   forceFloat?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   autoFocus?: boolean;
@@ -270,6 +269,7 @@ export class FloatingInput extends TerrainComponent<Props>
     return (
       <Container
         large={props.large}
+        semilarge={props.semilarge}
         noBorder={props.noBorder}
         noBg={props.noBg}
         onClick={this._fn(props.onClick)}
@@ -280,6 +280,7 @@ export class FloatingInput extends TerrainComponent<Props>
         }
         <Label
           large={props.large}
+          semilarge={props.semilarge}
           noBorder={props.noBorder}
           noBg={props.noBg}
           isFloating={isFloating}
@@ -328,6 +329,7 @@ export class FloatingInput extends TerrainComponent<Props>
         <Input
           type='text'
           large={props.large}
+          semilarge={props.semilarge}
           value={value === null || value === undefined ? '' : value}
           onChange={this.handleChange}
           autoFocus={props.autoFocus}

@@ -76,7 +76,7 @@ export const PathfinderText = {
   scoreSectionTitle: 'Score',
   scoreSectionSubtitle: '',
   // `Score your results, so that the best picks show up in the top spots.`,
-  scoreTypeLabel: 'Method',
+  scoreTypeLabel: 'Score',
   scoreTypeExplanation: 'Choose how to score your algorithm',
 
   scoreSectionTypes: {

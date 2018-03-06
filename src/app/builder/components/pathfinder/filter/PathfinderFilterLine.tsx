@@ -132,11 +132,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         return true;
       }
     }
-    return this.state !== nextState;
+    return !_.isEqual(this.state, nextState);;
   }
 
   public render()
   {
+    console.log('RENDER');
     const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
 
@@ -144,7 +145,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       <div
         className={classNames({
           'pf-filter-line': true,
-          'pf-filter-line-pre-group': this.props.comesBeforeAGroup,
+          // 'pf-filter-line-pre-group': this.props.comesBeforeAGroup,
         })}
         style={getStyle('alignItems', 'flex-start')}
       >
@@ -248,6 +249,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       headerText: comparisonHeader,
       column: true,
       hideSampleData: true,
+      forceFloat: true,
       // hasOther: false,
     };
 
@@ -281,6 +283,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       focusOtherByDefault: true,
       getValueComponent: this.renderValueComponent(),
       getCustomDisplayName: this.getCustomValueDisplayName,
+      forceFloat: true,
     };
 
     const sets = [
@@ -403,6 +406,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           altStyle={true}
           max={10}
           min={0}
+          step={0.1}
+          round={true}
           canEdit={pathfinderContext.canEdit}
         />
       </div>

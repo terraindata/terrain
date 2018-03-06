@@ -119,7 +119,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
     return (
       <div
-        className='pf-section'
+        className='pf-section pf-source-section'
       >
         <SingleRouteSelector
           options={dataSourceOptions}

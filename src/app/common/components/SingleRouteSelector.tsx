@@ -70,6 +70,7 @@ export interface Props
   defaultOpen?: boolean;
   hasOther?: boolean;
   large?: boolean;
+  semilarge?: boolean;
   noShadow?: boolean;
   focusOtherByDefault?: boolean;
   hasSearch?: boolean;
@@ -144,6 +145,7 @@ export class SingleRouteSelector extends TerrainComponent<Props>
         forceOpen={props.forceOpen}
         defaultOpen={props.defaultOpen}
         large={props.large}
+        semilarge={props.semilarge}
         noShadow={props.noShadow}
         hideLine={this.props.hideLine}
       />

@@ -88,6 +88,7 @@ export interface RouteSelectorOptionSet
   focusOtherByDefault?: boolean;
   shortNameText: string;
   headerText: string;
+  forceFloat?: boolean;
 
   hasSearch?: boolean; // NOTE not compatible with hasOther
   column?: boolean; // force a column layout
@@ -109,6 +110,7 @@ export interface Props
   forceOpen?: boolean; // force it to be open no matter whwat
   defaultOpen?: boolean; // default to open when the component mounts (but don't force open)
   large?: boolean;
+  semilarge?: boolean;
   noShadow?: boolean;
   autoFocus?: boolean;
   hideLine?: boolean;
@@ -204,6 +206,7 @@ export class RouteSelector extends TerrainComponent<Props>
           className={classNames({
             'routeselector': true,
             'routeselector-large': props.large,
+            'routeselector-semi-large': props.semilarge,
             'routeselector-open': this.isOpen(),
             // 'routeselector-picked': state.picked,
           })}
@@ -235,7 +238,8 @@ export class RouteSelector extends TerrainComponent<Props>
           'routeselector-box-values-open': this.isOpen(),
           'routeselector-box-values-force-open': props.forceOpen,
         })}
-        style={getStyle('border', props.hideLine ? 'none' : undefined)}
+        style={getStyle('borderBottom', this.isOpen() ?
+          '1px solid #eee' : props.hideLine ? 'none' : undefined)}
       >
         {
           state.optionSets.map((optionSet, index) => (
@@ -252,7 +256,7 @@ export class RouteSelector extends TerrainComponent<Props>
                 /* could try Mousedown to make it slightly snappier,
                 but this led to weird issues with closing it */
               }
-              style={getStyle('width', String(100 / state.optionSets.size) + '%')}
+              style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
             >
               <FloatingInput
                 label={optionSet.shortNameText}
@@ -261,7 +265,9 @@ export class RouteSelector extends TerrainComponent<Props>
                 onClick={this.handleBoxValueClick}
                 canEdit={props.canEdit}
                 large={props.large}
+                semilarge={props.semilarge}
                 noBorder={true}
+                forceFloat={optionSet.forceFloat}
               />
               {/*getValueRef={this.handleValueRef}
                 forceFloat={state.picked}*/}
@@ -348,7 +354,7 @@ export class RouteSelector extends TerrainComponent<Props>
     return (
       <DrawerAnimation
         open={this.isOpen()}
-        maxHeight={400 /* coordinate this with LESS */}
+        maxHeight={350 /* coordinate this with LESS */}
       >
         <div
           className={classNames({
@@ -429,7 +435,7 @@ export class RouteSelector extends TerrainComponent<Props>
       <div
         className='routeselector-option-set'
         key={optionSet.key}
-        style={getStyle('width', String(100 / state.optionSets.size) + '%')}
+        style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
       >
         <div
           className='routeselector-header'
@@ -753,7 +759,10 @@ export class RouteSelector extends TerrainComponent<Props>
                     }
                   </div>
                 }
-                <div className='routeselector-option-name-inner'>
+                <div
+                  className='routeselector-option-name-inner'
+                  style={fontColor(Colors().fontColor2)}
+                >
                   {
                     option.displayName
                   }
@@ -872,7 +881,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
     //   animationEl.animate(
     //     {
-    //       left: valueBox.left,
+    //       left: valuBox.left,
     //       top: valueBox.top,
     //       width: valueBox.width,
     //       // height: valueBox.height, // can make it collapse to 0

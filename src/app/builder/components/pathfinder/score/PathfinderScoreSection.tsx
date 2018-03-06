@@ -345,11 +345,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       <div
         className='pf-section'
       >
-        <PathfinderSectionTitle
-          title={PathfinderText.scoreSectionTitle}
-          text={PathfinderText.scoreSectionSubtitle}
-        />
-
         <SingleRouteSelector
           options={ScoreTypesChoices}
           value={score.type}
@@ -358,7 +353,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           shortNameText={PathfinderText.scoreTypeLabel}
           headerText={PathfinderText.scoreTypeExplanation}
           hasOther={false}
-          large={false}
+          semilarge={true}
           hideLine={true}
           hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
         />

@@ -136,11 +136,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       this.props.builderActions.changePath(
         this._ikeyPath(this.props.keyPath, 'references'),
         this.props.more.references.splice(i, 1),
+        true,
       );
       const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
       this.props.builderActions.changePath(
         nestedKeyPath,
-        this.props.path.nested.splice(i, 1), true);
+        this.props.path.nested.splice(i, 1));
     }
   }
 

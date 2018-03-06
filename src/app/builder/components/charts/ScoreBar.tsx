@@ -73,9 +73,11 @@ interface Props
   onAfterChange: (value: number) => void;
   min?: number;
   max?: number;
+  step?: number;
   height?: number;
   canEdit?: boolean;
   altStyle?: boolean;
+  round?: boolean;
 }
 
 @Radium
@@ -87,7 +89,7 @@ class ScoreBar extends TerrainComponent<Props>
 
   public render()
   {
-    const { weight, min, max, height, canEdit, altStyle } = this.props;
+    const { weight, min, max, height, canEdit, altStyle, step, round } = this.props;
 
     let color = Colors().active;
     if (altStyle && weight === 1)
@@ -95,7 +97,6 @@ class ScoreBar extends TerrainComponent<Props>
       // untouched, alt style mode
       color = Colors().blockOutline;
     }
-
     return (
       <div
         className={classNames({
@@ -116,6 +117,7 @@ class ScoreBar extends TerrainComponent<Props>
           rounded={altStyle}
           noPadding={altStyle}
           background={altStyle ? Colors().blockBg : undefined}
+          step={step}
         />
         <EditableField
           editing={this.state.editingWeight}
@@ -124,7 +126,7 @@ class ScoreBar extends TerrainComponent<Props>
             <input
               type='text'
               className='score-bar-text'
-              value={weight}
+              value={round ? Math.round(weight) : weight}
               onChange={this.handleWeightTextChange}
               onBlur={this.handleTextBlur}
               onKeyDown={this.handleTextKeyDown}
@@ -147,7 +149,7 @@ class ScoreBar extends TerrainComponent<Props>
                 style={fontColor(Colors().active)}
               >
                 {
-                  weight
+                  round ? Math.round(weight) : weight
                 }
               </div>
             </div>
@@ -190,6 +192,10 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleWeightAfterChange(value: number)
   {
+    if (this.props.round)
+    {
+      value = Math.round(value);
+    }
     this.props.onAfterChange(value);
   }
 

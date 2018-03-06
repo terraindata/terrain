@@ -4,7 +4,7 @@
 @option-max-height: 350px;
 @option-max-width: calc(~"50% - 16px");
 @close-width: 35px;
-@picker-height: 400px;
+@picker-height: 350px;
 
 .routeselector-wrapper {
 	width: 100%;
@@ -129,7 +129,16 @@
 		background: #fff;
 
 		max-height: @picker-height;
+	    ::-webkit-scrollbar-track {
+			background: rgba(0,0,0,0.05);
+	    }
+	    ::-webkit-scrollbar {
+	    	width: 8px;
+	    }
 
+	    ::-webkit-scrollbar-thumb {
+	    	background: rgba(180, 182, 186, 0.5);
+	    }
 		.routeselector-picker-inner {
 			display: flex;
 			flex-wrap: nowrap;
@@ -150,13 +159,13 @@
 		}
 		
 		.routeselector-option-set {
-	    flex-grow: 1;
-	    flex-basis: 0px;
-      display: flex;
-	    flex-direction: column;
-	    flex-wrap: nowrap;
-	    height: 100%;
-	    max-height: @picker-height;
+		    flex-grow: 1;
+		    flex-basis: 0px;
+	      	display: flex;
+		    flex-direction: column;
+		    flex-wrap: nowrap;
+		    height: 100%;
+		    max-height: @picker-height;
 		}
 		
 		.routeselector-util-row {
@@ -171,14 +180,14 @@
 			display: flex;
 			flex-wrap: wrap;
 			flex-grow: 1;
-	    overflow: auto;
-	    padding: 12px;
-			
+	    	overflow: auto;
+	    	padding: 12px;
 			&.routeselector-options-column {
 				flex-direction: column;
 				padding: 0px;
 				padding-left: 16px; // make space for arrow
 				flex-wrap: nowrap;
+				overflow-x: hidden;
 			}
 			
 			.routeselector-option-wrapper {
@@ -191,7 +200,7 @@
 				max-height: @option-max-height;
 				border: 1px solid rgba(255,255,255,0);
 				border-radius: 4px;
-				padding: 6px;
+				padding: 3px;
 				.transition;
 				
 				margin-right: 6px; // TODO remove when scorebars are removed
@@ -208,21 +217,16 @@
 				flex-direction: column;
 				
 				&.routeselector-option-focused {
-					&:before {
-						content: "";
-						display: block;
-						border: 10px solid transparent;
-						border-left-color: #ccc;
-						
-						position: absolute;
-				    left: -16px;
-				    top: 50%;
-				    transform: translateY(-50%);
-					}
+					border-color: #e3e3e3;
 				}
-				
+				.routeselector-option-name-inner {
+					opacity: 0.6;
+				}
 				&.routeselector-option-selected {
 					border-color: #1eb4fa;
+					.routeselector-option-name-inner {
+						opacity: 1;
+					}
 				}
 			}
 		}
@@ -251,6 +255,9 @@
 					}
 					.result-details-wrapper {
 						overflow: hidden;
+						.result-fields-wrapper {
+							overflow: hidden;
+						}
 					}
 				}
 			}
@@ -291,7 +298,9 @@
 			}
 		}
 	}
-	
+	&.routeselector-semi-large {
+
+	}
 
 	&.routeselector-large {
 		.routeselector-box-values {
@@ -339,7 +348,7 @@
 
 .routeselector-option-name {
 	padding: 6px 12px;
-	font-size: 18px;
+	font-size: 14px;
 	max-width: 100%;
   // overflow: hidden; // TODO figure out how to make this work without making the name smaller
   //  current turning this on will clip the name
@@ -362,7 +371,7 @@
 }
 
 .routeselector-veil-open {
-	background: rgba(255,255,255,0.65);
+	background: rgba(255,255,255,0.9);
 	.transition(~"all 1s");
 }
 

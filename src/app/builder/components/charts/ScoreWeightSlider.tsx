@@ -61,6 +61,7 @@ interface ScoreWeightSliderProps
   color: string;
   min: number;
   max: number;
+  step?: number;
   value: number;
   onBeforeChange: (value: number) => void;
   onChange: (value: number) => void;
@@ -142,6 +143,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       value,
       background,
       noLeftLine,
+      step,
     } = this.props;
     const handleStyle = this.getHandleStyle();
     const trackStyle = this.getTrackStyle();
@@ -184,6 +186,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
             onBeforeChange={this.props.onBeforeChange}
             onChange={this.props.onChange}
             onAfterChange={this.props.onAfterChange}
+            step={step || 1}
           />
         </div>
       </div>

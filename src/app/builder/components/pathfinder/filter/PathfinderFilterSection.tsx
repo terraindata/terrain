@@ -145,6 +145,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       column: true,
       hideSampleData: true,
       hasSearch: true,
+      forceFloat: true,
       // hasOther: false,
     };
     return fieldSet;

@@ -217,31 +217,25 @@ class HitComponent extends TerrainComponent<Props> {
           className='hit-nested-content-header'
           style={[borderColor(Colors().blockOutline),
           backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
+          {opacity: size === 0 ? 0.5 : 1}
           ]}
         >
-          {
-            <div
-              className='hit-nested-content-expand'
-              style={size <= 1 ? { opacity: 0 } : {}}
-            >
-              <ExpandIcon
-                open={expandState === NestedState.Expanded}
-                onClick={this._fn(
-                  this.changeNestedState,
-                  expandState !== NestedState.Expanded ?
-                    NestedState.Expanded : NestedState.Normal,
-                  field,
-                )}
-              />
-            </div>
-          }
-          <div
-            className='hit-nested-content-title'
+          <ExpandIcon
+            open={expandState === NestedState.Expanded}
             onClick={this._fn(
               this.changeNestedState,
-              expandState !== NestedState.Collapsed ?
-                NestedState.Collapsed : NestedState.Normal,
-              field)}
+              expandState !== NestedState.Expanded ?
+                NestedState.Expanded : NestedState.Normal,
+              field,
+            )}
+          />
+          <div
+            className='hit-nested-content-title'
+            // onClick={this._fn(
+            //   this.changeNestedState,
+            //   expandState !== NestedState.Collapsed ?
+            //     NestedState.Collapsed : NestedState.Normal,
+            //   field)}
           >
             {field} ({size})
           </div>
@@ -888,11 +882,12 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     tooltipText = JSON.stringify(value, null, 2);
     tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
     let valueString = '';
-    for (const key in Util.asJS(value))
+    value = Util.asJS(value);
+    for (const key in value)
     {
       if (value.hasOwnProperty(key))
       {
-        valueString += key + ': ' + JSON.stringify(Util.asJS(value)[key]) + ', ';
+        valueString += key + ': ' + JSON.stringify(value[key]) + ', ';
       }
     }
     value = valueString.slice(0, -2);

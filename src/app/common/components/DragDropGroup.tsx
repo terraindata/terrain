@@ -211,8 +211,8 @@ class GroupComponent extends TerrainComponent<GroupProps>
         })}
         style={_.extend(
           {
-            width: `calc(100% - 12px)`,
-            margin: '0px 6px',
+            width: `calc(100% - 32px)`,
+            margin: '10px 0px 6px 20px',
             boxSizing: 'border-box',
           },
           backgroundColor(Colors().blockBg),

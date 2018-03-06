@@ -59,7 +59,7 @@ class ExpandIcon extends TerrainComponent<Props>
 {
   public render()
   {
-    const barStyle = backgroundColor(Colors().iconColor);
+    const barStyle = backgroundColor(Colors().active);
     return (
       <div
         className={classNames({
