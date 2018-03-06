@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as Deque from 'double-ended-queue';
 import { Readable } from 'stream';
 
+import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
@@ -56,7 +57,7 @@ import BufferedElasticStream from './BufferedElasticStream';
 interface Ticket
 {
   count: number;
-  results: object[];
+  response: object;
 }
 
 /**
@@ -123,9 +124,12 @@ export default class GroupJoinTransform extends Readable
 
     this.source = new BufferedElasticStream(client, query, (() =>
     {
-      const inputs = this.source.buffer;
+      const responses = this.source.buffer;
       this.source.resetBuffer();
-      this.dispatchSubqueryBlock(inputs);
+      for (const r of responses)
+      {
+        this.dispatchSubqueryBlock(r);
+      }
     }).bind(this));
 
   }
@@ -143,9 +147,10 @@ export default class GroupJoinTransform extends Readable
     this.source._destroy(error, callback);
   }
 
-  private dispatchSubqueryBlock(inputs: object[]): void
+  private dispatchSubqueryBlock(response: object): void
   {
     const query = this.query;
+    const inputs = response['hits'].hits;
     const numInputs = inputs.length;
     const numQueries = Object.keys(query).length;
 
@@ -153,7 +158,7 @@ export default class GroupJoinTransform extends Readable
     // associated with this query
     const ticket: Ticket = {
       count: numQueries,
-      results: inputs,
+      response,
     };
     this.bufferedOutputs.push(ticket);
 
@@ -182,27 +187,27 @@ export default class GroupJoinTransform extends Readable
         {
           body,
         },
-        (error: Error | null, response: any) =>
+        (error: Error | null, resp: any) =>
         {
           if (error !== null && error !== undefined)
           {
             throw error;
           }
 
-          if (response.error !== undefined)
+          if (resp.error !== undefined)
           {
-            throw response.error;
+            throw resp.error;
           }
 
           for (let j = 0; j < numInputs; ++j)
           {
-            if (response.responses[j].hits !== undefined)
+            if (resp.responses[j].hits !== undefined)
             {
-              ticket.results[j][subQuery] = response.responses[j].hits.hits;
+              ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
             }
             else
             {
-              ticket.results[j][subQuery] = [];
+              ticket.response['hits'].hits[j][subQuery] = [];
             }
           }
 
@@ -215,22 +220,16 @@ export default class GroupJoinTransform extends Readable
             const front = this.bufferedOutputs.peekFront();
             if (front !== undefined && front.count === 0)
             {
-              while (front.results.length > 0)
-              {
-                const obj = front.results.shift();
-                if (obj !== undefined)
+              front.response['hits'].hits = front.response['hits'].hits.filter(
+                (obj) =>
                 {
-                  const shouldPass = Object.keys(query).reduce((acc, q) =>
+                  return Object.keys(query).reduce((acc, q) =>
                   {
                     return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
                   }, true);
-
-                  if (shouldPass)
-                  {
-                    this.push(obj);
-                  }
-                }
-              }
+                },
+              );
+              this.push(front.response);
               this.bufferedOutputs.shift();
             }
             else

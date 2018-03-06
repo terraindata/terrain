@@ -148,7 +148,7 @@ export class ElasticQueryHandler extends QueryHandler
           throw new Error('Specifying multiple join types is not supported at the moment.');
         }
 
-        let stream;
+        let stream: Readable;
         if (query['groupJoin'] !== undefined)
         {
           stream = new GroupJoinTransform(client, request.body);
@@ -173,11 +173,7 @@ export class ElasticQueryHandler extends QueryHandler
             const bufferTransform = new BufferTransform(stream,
               (err, res) =>
               {
-                ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, {
-                  hits: {
-                    hits: res,
-                  },
-                });
+                ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, res[0]);
               });
           });
         }
