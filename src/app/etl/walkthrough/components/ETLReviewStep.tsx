@@ -88,7 +88,8 @@ class ETLReviewStep extends ETLStepComponent
   public renderSourceInfo() // TODO should info for other sources
   {
     const { walkthrough } = this.props;
-    const { source, file } = walkthrough;
+    const { source } = walkthrough;
+    const file = source.getIn(['options', 'file'], {});
     return [
       this.renderRow('Source Type', source.type),
       source.type === Sources.Upload ? this.renderRow('File Name', file.name) : null,
@@ -114,7 +115,7 @@ class ETLReviewStep extends ETLStepComponent
   public renderSummary()
   {
     const { walkthrough } = this.props;
-    const { source, sink, file, chosenTemplateId } = walkthrough;
+    const { chosenTemplateId } = walkthrough;
     return (
       <div className='etl-review-column'>
         {this.renderRow('Type', this.isImport() ? 'Import' : 'Export')}

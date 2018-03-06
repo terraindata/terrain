@@ -192,8 +192,6 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
   {
     switch (action.actionType)
     {
-      // case 'loadFileSample':
-      //   return this.loadFileSample.bind(this, action);
       case 'autodetectJsonOptions':
         return this.autodetectJsonOptions.bind(this, action);
       default:

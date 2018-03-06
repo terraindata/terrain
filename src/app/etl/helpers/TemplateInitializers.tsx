@@ -128,7 +128,8 @@ class Initializers extends ETLHelpers
     const onLoad = this.createInitialTemplateFn(source, sink);
     if (source.type === Sources.Upload)
     {
-      DocumentsHelpers.fetchDocuments(source, walkthrough.file, onLoad);
+      const file = walkthrough.getFile();
+      DocumentsHelpers.fetchDocuments(source, file, onLoad);
     }
     else
     {

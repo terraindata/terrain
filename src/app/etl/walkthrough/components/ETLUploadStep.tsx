@@ -77,7 +77,6 @@ class ETLUploadStep extends ETLStepComponent
     params.act({
       actionType: 'setState',
       state: {
-        file: null,
         source: _SourceConfig(),
       },
     });
@@ -88,7 +87,6 @@ class ETLUploadStep extends ETLStepComponent
     params.act({
       actionType: 'setState',
       state: {
-        file: null,
         source: _SourceConfig({
           type: Sources.Upload,
         }),
@@ -98,9 +96,10 @@ class ETLUploadStep extends ETLStepComponent
 
   public renderUploadSection()
   {
+    const file = this.props.walkthrough.getFile();
     return (
       <UploadFileButton
-        file={this.props.walkthrough.file}
+        file={file}
         onChange={this.handleChangeFile}
       />
     );
@@ -108,7 +107,8 @@ class ETLUploadStep extends ETLStepComponent
 
   public render()
   {
-    const filePicked = this.props.walkthrough.file != null;
+    const file = this.props.walkthrough.getFile();
+    const filePicked = file != null;
     return (
       <div className='etl-transition-column etl-upload-step'>
         {this.renderUploadSection()}
@@ -124,13 +124,13 @@ class ETLUploadStep extends ETLStepComponent
 
   public handleChangeFile(file: File)
   {
-    const walkthrough = this.props.walkthrough;
-    this.props.act({
-      actionType: 'setState',
-      state: {
-        file,
-      },
+    const { act, walkthrough } = this.props;
+
+    act({
+      actionType: 'setEndpointOptions',
+      sourceOptions: (options) => _.extend({}, options, { file }),
     });
+
     if (getFileType(file) === FileTypes.Json)
     {
       this.props.act({
