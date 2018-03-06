@@ -177,7 +177,7 @@ class TemplateEditor extends TerrainComponent<Props>
           <EditorColumnBar />
         </div>
         {columnState === ColumnOptions.Preview ? <DocumentsPreviewColumn /> : null}
-        {columnState === ColumnOptions.Options ? null : null}
+        {columnState === ColumnOptions.Options ? <OptionsColumn /> : null}
       </div>
     );
   }

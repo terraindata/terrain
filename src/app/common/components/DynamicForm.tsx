@@ -259,6 +259,10 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       this.renderButton(this.props.secondButton, { isActive: false, disabled: false }, 'second');
     const thirdButton = this.props.thirdButton === undefined ? null :
       this.renderButton(this.props.thirdButton, { isActive: false, disabled: false }, 'third');
+    if (mainButton === null && secondButton === null && thirdButton === null)
+    {
+      return null;
+    }
 
     return (
       <div className='dynamic-form-confirm-bar' style={this.props.actionBarStyle}>

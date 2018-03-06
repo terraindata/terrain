@@ -84,11 +84,17 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
 {
   public abstract inputMap: InputDeclarationMap<State>;
 
+  constructor(props)
+  {
+    super(props);
+  }
+
   // By default, options state is indentical form to the endpoint options object
   // Override this
   public optionsToFormState(options: SinkOptionsType<any> | SourceOptionsType<any>): State
   {
     return options;
+
   }
 
   public formStateToOptions(newState: State): SinkOptionsType<any> | SourceOptionsType<any>

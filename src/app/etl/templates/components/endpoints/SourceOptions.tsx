@@ -65,8 +65,6 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { SourceFormMap } from 'etl/common/components/EndpointOptions';
 
-import './EndpointOptions.less';
-
 const { List } = Immutable;
 
 export interface Props

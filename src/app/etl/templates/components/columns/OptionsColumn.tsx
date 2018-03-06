@@ -105,7 +105,7 @@ class OptionsColumn extends TerrainComponent<Props>
     const { sources } = this.props.template;
     return (
       <div>
-        {sources.map(this.renderSource)}
+        {sources.map(this.renderSource).toList()}
       </div>
     );
   }
@@ -115,7 +115,7 @@ class OptionsColumn extends TerrainComponent<Props>
     const { sinks } = this.props.template;
     return (
       <div>
-        {sinks.map(this.renderSink)}
+        {sinks.map(this.renderSink).toList()}
       </div>
     );
   }
@@ -123,9 +123,14 @@ class OptionsColumn extends TerrainComponent<Props>
   public render()
   {
     return (
-      <div>
-{/*        {this.renderSourceOptions()}
-        {this.renderSinkOptions()}*/}
+      <div
+        className='template-editor-options-column'
+        style={_.extend({},
+          backgroundColor(Colors().bg3),
+           getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`)
+        )}
+      >
+       {this.renderSourceOptions()}
       </div>
     );
   }

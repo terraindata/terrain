@@ -111,7 +111,7 @@ interface SinkOptionsTypes
   Http: HttpOptions;
 }
 
-interface SftpOptions
+export interface SftpOptions
 {
   ip: string;
   port: number;
@@ -120,7 +120,7 @@ interface SftpOptions
   meta?: any;
 }
 
-interface HttpOptions
+export interface HttpOptions
 {
   url: string;
   methods: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

@@ -58,7 +58,7 @@ export enum Languages
 export enum FileTypes
 {
   Json = 'json',
-  JsonTypeObject = 'json [type object]',
+  JsonTypeObject = 'json [type object]', // deprecate this
   Csv = 'csv',
 }
 
