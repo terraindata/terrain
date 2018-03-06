@@ -201,7 +201,7 @@ export default class GroupJoinTransform extends Readable
 
           for (let j = 0; j < numInputs; ++j)
           {
-            if (resp.responses[j].hits !== undefined)
+            if (resp.responses[j] !== undefined && resp.responses[j].hits !== undefined)
             {
               ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
             }
