@@ -87,7 +87,7 @@ export interface SinkConfig
 }
 
 // so far sources and options are different
-interface SourceOptionsTypes // TODO check that these are right
+export interface SourceOptionsTypes // TODO check that these are right
 {
   Upload: {
     file?: File;
@@ -99,7 +99,31 @@ interface SourceOptionsTypes // TODO check that these are right
   Http: HttpOptions;
 }
 
-interface SinkOptionsTypes
+export const SourceOptionsDefaults: SourceOptionsTypes =
+  {
+    Upload: {
+      file: null,
+    },
+    Algorithm: {
+      algorithmId: -1
+    },
+    Sftp: {
+      ip: '0.0.0.0',
+      port: 22,
+      filepath: 'filename.json',
+      credentialId: -1,
+    },
+    Http: {
+      url: '',
+      methods: 'GET',
+      headers: {
+        accept: '',
+        contentType: 'application/json',
+      }
+    }
+  }
+
+export interface SinkOptionsTypes
 {
   Download: {
     filename?: string;
@@ -114,6 +138,33 @@ interface SinkOptionsTypes
   Sftp: SftpOptions;
   Http: HttpOptions;
 }
+
+export const SinkOptionsDefaults: SinkOptionsTypes =
+  {
+    Download: {
+      filename: '',
+    },
+    Database: {
+      language: Languages.Elastic,
+      serverId: -1,
+      database: '',
+      table: '',
+    },
+    Sftp: {
+      ip: '0.0.0.0',
+      port: 22,
+      filepath: 'filename.json',
+      credentialId: -1,
+    },
+    Http: {
+      url: '',
+      methods: 'POST',
+      headers: {
+        accept: '',
+        contentType: 'application/json',
+      }
+    }
+  }
 
 export interface SftpOptions
 {

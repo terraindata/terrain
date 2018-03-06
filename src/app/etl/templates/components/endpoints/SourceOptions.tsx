@@ -53,6 +53,7 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import Dropdown from 'common/components/Dropdown';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'src/app/Classes';
@@ -83,11 +84,47 @@ class SourceOptions extends TerrainComponent<Props>
     const source = sources.get(sourceKey);
     const FormClass = SourceFormMap[source.type];
     return (
-      <FormClass
-        endpoint={source}
-        onChange={this.handleEndpointChange}
-      />
+      <div className='endpoint-block'>
+        <DynamicForm
+          inputMap={pickTypeMap}
+          inputState={this.sourceToState(source)}
+          onStateChange={this.handleSourceTypeStateChange}
+        />
+        <FormClass
+          endpoint={source}
+          onChange={this.handleEndpointChange}
+        />
+      </div>
     );
+  }
+
+  public sourceToState(source: SourceConfig)
+  {
+    return {
+      type: source.type
+    }
+  }
+
+  public stateToSource(state: SourceTypeState): SourceConfig
+  {
+    const { sources, sourceKey } = this.props;
+    const source = sources.get(sourceKey);
+    return source.set('type', state.type);
+  }
+
+  public handleSourceTypeStateChange(state: SourceTypeState)
+  {
+    const { act, sources, sourceKey } = this.props;
+    const source = sources.get(sourceKey);
+    const newSource = _SourceConfig({ type: state.type });
+    if (state.type !== source.type)
+    {
+      act({
+        actionType: 'setSource',
+        key: sourceKey,
+        newSource,
+      });
+    }
   }
 
   public handleEndpointChange(newConfig: SinkConfig | SourceConfig)
@@ -100,6 +137,24 @@ class SourceOptions extends TerrainComponent<Props>
     });
   }
 }
+
+interface SourceTypeState
+{
+  type: Sources,
+}
+const pickTypeMap: InputDeclarationMap<SourceTypeState> =
+  {
+    type: {
+      type: DisplayType.Pick,
+      displayName: 'Source Type',
+      options: {
+        pickOptions: (s) => sourceList,
+        indexResolver: (value) => sourceList.indexOf(value),
+      }
+    }
+  }
+
+const sourceList = List([Sources.Upload, Sources.Algorithm, Sources.Sftp, Sources.Http]);
 
 export default Util.createContainer(
   SourceOptions,

@@ -81,6 +81,30 @@ export interface Props
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
 
+function fixUndefined<S>(inputMap: InputDeclarationMap<S>, object: S): S
+{
+  const fixes = {};
+  for (const key of Object.keys(inputMap))
+  {
+    if (object[key] === undefined)
+    {
+      if (inputMap[key].type === DisplayType.CheckBox)
+      {
+        fixes[key] = true;
+      }
+      else if (inputMap[key].type === DisplayType.Pick)
+      {
+        fixes[key] = -1;
+      }
+      else
+      {
+        fixes[key] = '';
+      }
+    }
+  }
+  return _.extend({}, object, fixes);
+}
+
 abstract class EndpointForm<State> extends TerrainComponent<Props>
 {
   public abstract inputMap: InputDeclarationMap<State>;
@@ -124,7 +148,6 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
   public optionsToFormState(options: SinkOptionsType<any> | SourceOptionsType<any>): State
   {
     return options;
-
   }
 
   public formStateToOptions(newState: State): SinkOptionsType<any> | SourceOptionsType<any>
@@ -146,11 +169,12 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
   public render()
   {
     const { fileConfig, options } = this.props.endpoint;
+    const inputState = fixUndefined(this.inputMap, this.optionsToFormState(options));
     return (
       <div>
         <DynamicForm
           inputMap={this.inputMap}
-          inputState={this.optionsToFormState(options)}
+          inputState={inputState}
           onStateChange={this.handleOptionsFormChange}
         />
         <DynamicForm
@@ -258,12 +282,13 @@ class HttpEndpoint extends EndpointForm<HttpState>
 
   public optionsToFormState(options: HttpOptions): HttpState
   {
-    const { url, methods, headers } = options;
+    const { url, methods } = options;
+    const headers = _.get(options, 'headers', {});
     return {
       url,
       methods,
-      accept: headers.accept,
-      contentType: headers.contentType,
+      accept: headers['accept'],
+      contentType: headers['contentType'],
     };
   }
 
