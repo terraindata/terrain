@@ -1254,14 +1254,14 @@ describe('File io templates route tests', () =>
           dbid: 1,
           dbname: 'movies',
           tablename: 'data',
-          originalNames: ['pkey', 'column1', 'column2'],
+          originalNames: ['movieid', 'title', 'budget'],
           columnTypes:
             {
-              pkey: { type: 'long' },
-              column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
-              column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              movieid: { type: 'long' },
+              title: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              budget: { type: 'long' },
             },
-          primaryKeys: ['pkey'],
+          primaryKeys: ['movieid'],
           transformations: [],
         },
       })
@@ -1280,14 +1280,14 @@ describe('File io templates route tests', () =>
             dbname: 'movies',
             tablename: 'data',
             objectKey: '',
-            originalNames: ['pkey', 'column1', 'column2'],
+            originalNames: ['movieid', 'title', 'budget'],
             columnTypes:
               {
-                pkey: { type: 'long' },
-                column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
-                column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+                movieid: { type: 'long' },
+                title: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+                budget: { type: 'long' },
               },
-            primaryKeys: ['pkey'],
+            primaryKeys: ['movieid'],
             transformations: [],
             persistentAccessToken: persistentExportAccessToken,
           });
@@ -1474,7 +1474,8 @@ describe('File io templates route tests', () =>
           dbname: 'movies',
           templateId: exportTemplateID,
           filetype: 'csv',
-          query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+          query: '{\"sort\":[{\"movieid\":{\"order\":\"asc\"}}],\"query\":{\"bool\":'
+            + '{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
             + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
         },
       })
@@ -1483,6 +1484,19 @@ describe('File io templates route tests', () =>
       {
         expect(response.text).toBe(undefined);
         expect(response.body).not.toBe(undefined);
+        let respBuffer = response.body;
+        let numLines: number = 0;
+        const delim: string = '\r\n';
+        const firstLine: string = '1,Toy Story (1995),30000000\r\n';
+        let indexOfDelim: number = respBuffer.indexOf(delim);
+        expect(respBuffer.indexOf(firstLine)).toEqual(22);
+        while (indexOfDelim !== -1)
+        {
+          respBuffer = respBuffer.slice(indexOfDelim + delim.length);
+          numLines++;
+          indexOfDelim = respBuffer.indexOf(delim); // don't include header
+        }
+        expect(numLines).toEqual(15 + 1);
       })
       .catch((error) =>
       {
@@ -1502,7 +1516,8 @@ describe('File io templates route tests', () =>
           dbname: 'movies',
           templateId: exportTemplateID,
           filetype: 'csv',
-          query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+          query: '{\"sort\":[{\"movieid\":{\"order\":\"asc\"}}],\"query\":{\"bool\":'
+            + '{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
             + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":11000}',
         },
       })
@@ -1513,15 +1528,17 @@ describe('File io templates route tests', () =>
         expect(response.body).not.toBe(undefined);
         let respBuffer = response.body;
         let numLines: number = 0;
-        const delim: string = ',\n';
+        const delim: string = '\r\n';
+        const firstLine: string = '1,Toy Story (1995),30000000\r\n';
         let indexOfDelim: number = respBuffer.indexOf(delim);
+        expect(respBuffer.indexOf(firstLine)).toEqual(22);
         while (indexOfDelim !== -1)
         {
           respBuffer = respBuffer.slice(indexOfDelim + delim.length);
           numLines++;
           indexOfDelim = respBuffer.indexOf(delim);
         }
-        expect(numLines).toEqual(11000);
+        expect(numLines).toEqual(11000 + 1); // don't include header
       })
       .catch((error) =>
       {
