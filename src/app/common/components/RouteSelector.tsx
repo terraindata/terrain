@@ -118,7 +118,6 @@ export interface Props
   onDelete?: () => void;
 }
 
-@Radium
 export class RouteSelector extends TerrainComponent<Props>
 {
   state = {
@@ -193,7 +192,6 @@ export class RouteSelector extends TerrainComponent<Props>
 
   public render()
   {
-
     const { props, state } = this;
     return (
       <div
@@ -268,6 +266,7 @@ export class RouteSelector extends TerrainComponent<Props>
                 semilarge={props.semilarge}
                 noBorder={true}
                 forceFloat={optionSet.forceFloat}
+                extendRight={true}
               />
               {/*getValueRef={this.handleValueRef}
                 forceFloat={state.picked}*/}
@@ -430,7 +429,6 @@ export class RouteSelector extends TerrainComponent<Props>
         </div>
       );
     }
-
     return (
       <div
         className='routeselector-option-set'
@@ -495,7 +493,11 @@ export class RouteSelector extends TerrainComponent<Props>
               <div key='3' className='routeselector-option-wrapper' />,
             ]
           }
+          <div
+            className='routeselector-options-gradient'
+          />
         </div>
+
       </div>
     );
   }
@@ -725,7 +727,10 @@ export class RouteSelector extends TerrainComponent<Props>
     // const wrapperFn = this.state.focusedSetIndex === optionSetIndex
     //   ? this.fadeInOutWrapper : this.divWrapper;
     const wrapperFn = this.divWrapper;
-
+    const focused = state.focusedOptionIndex === visibleOptionsIndex
+                  && optionSetIndex === state.focusedSetIndex
+                  && state.focusedOptionIndex !== -1
+                  && state.focusedSetIndex !== -1;
     return (
       <div
         className='routeselector-option-wrapper'
@@ -737,14 +742,10 @@ export class RouteSelector extends TerrainComponent<Props>
               className={classNames({
                 'routeselector-option': true,
                 'routeselector-option-selected': isSelected,
-                'routeselector-option-focused': state.focusedOptionIndex === visibleOptionsIndex
-                  && optionSetIndex === state.focusedSetIndex
-                  && state.focusedOptionIndex !== -1
-                  && state.focusedSetIndex !== -1,
+                'routeselector-option-focused': focused,
                 // 'routeselector-option-picked': this.state.pickedIndex === index, // when it's just been picked
               })}
               onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
-
             >
               <div
                 className='routeselector-option-name'
@@ -1079,9 +1080,6 @@ export class RouteSelector extends TerrainComponent<Props>
 
 const OPTION_NAME_STYLE = {
   'color': Colors().fontColor,
-  ':hover': {
-    color: Colors().active,
-  },
 };
 
 const OPTION_NAME_SELECTED_STYLE = {

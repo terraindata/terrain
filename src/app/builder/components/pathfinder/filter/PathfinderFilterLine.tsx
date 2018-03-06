@@ -274,7 +274,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const valueSet: RouteSelectorOptionSet = {
       key: 'value',
       options: valueOptions,
-      shortNameText: shouldShowValue ? 'Value' : '',
+      shortNameText: 'Value',
       headerText: valueHeader,
       column: true,
       hideSampleData: true,
@@ -310,6 +310,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private getCustomValueDisplayName(value, setIndex: number)
   {
+    if (COMPARISONS_WITHOUT_VALUES.indexOf(this.props.filterLine.comparison) !== -1)
+    {
+      return 'N/A';
+    }
     switch (this.props.filterLine.fieldType)
     {
       case FieldType.Date:
@@ -421,9 +425,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const { filterLine, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
 
-    if (filterLine.field === null || filterLine.fieldType === null)
+    if (!this.shouldShowValue())
     {
-      return null;
+      return;
     }
 
     const comparisonOptions = source.dataSource.getChoiceOptions({
@@ -514,7 +518,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       value = _.keys(units)[value];
     }
     let filterLine;
-    if (this.props.filterLine.value[key] !== undefined)
+    if (this.props.filterLine.value !== undefined &&
+      this.props.filterLine.value[key] !== undefined)
     {
       filterLine = this.props.filterLine
         .setIn(['value', key], value);

@@ -380,7 +380,7 @@ class Autocomplete extends TerrainComponent<Props>
     const firstOptions = options.filter((o) => this.showOption(o, 'first'));
     const secondOptions = options.filter((o) => this.showOption(o, 'second'));
     const otherOptions = options.filterNot((o) => this.showOption(o, 'any'));
-    return firstOptions.concat(secondOptions).concat(otherOptions).toList();
+    return firstOptions.concat(secondOptions).concat(otherOptions).toSet().toList();
   }
 
   public render()

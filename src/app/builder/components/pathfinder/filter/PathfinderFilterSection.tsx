@@ -493,7 +493,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         }
         <PathfinderCreateLine
           canEdit={pathfinderContext.canEdit}
-          text={'Filter Condition'}
+          text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
           onCreate={this.handleAddFilter}
         />
       </div>

@@ -166,3 +166,42 @@
 		}
 	}
 }
+
+.pathfinder-column-wrapper {
+	.pf-area {
+		.pathfinder-column-content {
+			.pf-score-section {
+				.pf-create {
+					padding: 0px;
+					height: 33px;
+				    border-radius: 4px;
+				    width: calc(~"100% - 92px");
+					border-radius: 4px;
+					@svg-width: 14px;
+					@svg-left: 12px;
+					margin-top: 0px;
+				    margin-bottom: 6px;
+				    left: -2px;
+					padding-left: 32px;
+					margin-left: 32px;
+					span {
+						position: relative;
+						top: 9px;	
+					}
+					svg {
+					    left: 12px;
+						.transition;
+					}
+					&:hover {
+						svg {
+							@svg-big: 18px;
+							width: @svg-big;
+							left: 12px;
+							top: calc(~"50% - @{svg-big} / 2");
+						}
+					}
+				}
+			}
+		}
+	}
+}

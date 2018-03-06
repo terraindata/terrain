@@ -546,7 +546,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       return Map({
         geo_distance: Map({
           distance: String(distanceObj.distance) + distanceObj.units,
-          [line.field]: distanceObj.location,
+          [line.field]: distanceObj.location || distanceObj.address,
         }),
       });
     case 'isin':

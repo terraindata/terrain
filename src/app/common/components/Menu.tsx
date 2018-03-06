@@ -51,7 +51,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import onClickOutside from 'react-onclickoutside';
+import onClickOutside, { InjectedOnClickOutProps} from 'react-onclickoutside';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
@@ -87,7 +87,7 @@ export interface Props
 }
 
 @Radium
-class Menu extends TerrainComponent<Props>
+class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
   public state: {
     open: boolean;

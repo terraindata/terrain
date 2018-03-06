@@ -91,6 +91,7 @@ const Container = ContainerC`
 `;
 
 const LEFT = (props) => props.large ? '18px' : '12px';
+const RIGHT = (props) => props.extendRight ? '0px' : props.large ? '18px' : '12px';
 
 const LabelC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = styled.label;
 const Label = LabelC`
@@ -143,7 +144,7 @@ const InputC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = s
 const Input = InputC`
   ${inputStyle}
   padding-left: ${LEFT};
-  padding-right: ${LEFT};
+  padding-right: ${RIGHT};
   font-size: ${fontSizeFn};
   ${(props) => props['noBg'] && (`
     border: none !important;
@@ -155,7 +156,7 @@ const InputDivC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement
 const InputDiv = InputDivC`
   ${inputStyle}
   padding-left: ${LEFT};
-  padding-right: ${LEFT};
+  padding-right: ${RIGHT};
   font-size: ${fontSizeFn};
   cursor: pointer;
   white-space: nowrap;
@@ -175,6 +176,7 @@ interface InputProps
   large?: boolean;
   semilarge?: boolean;
   isFloating?: boolean;
+  extendRight?: boolean;
 }
 
 interface InputDivProps
@@ -185,6 +187,7 @@ interface InputDivProps
   large?: boolean;
   semilarge?: boolean;
   isFloating?: boolean;
+  extendRight?: boolean;
 }
 
 export interface Props
@@ -208,6 +211,7 @@ export interface Props
   getValueRef?: (ref) => void;
   className?: string;
   debounce?: boolean;
+  extendRight?: boolean;
 }
 
 export class FloatingInput extends TerrainComponent<Props>
@@ -340,6 +344,7 @@ export class FloatingInput extends TerrainComponent<Props>
           id={state.myId}
           ref={this.getValueRef}
           onKeyDown={this.handleKeyDown}
+          extendRight={props.extendRight}
         />
       );
     }
@@ -352,6 +357,7 @@ export class FloatingInput extends TerrainComponent<Props>
         onClick={this.handleClick}
         noBorder={props.noBorder}
         noBg={props.noBg}
+        extendRight={props.extendRight}
       >
         {
           value

@@ -58,6 +58,8 @@ export const PathfinderText = {
   // Filter sections
   hardFilterSectionTitle: 'Requirements',
   hardFilterSectionSubtitle: '',
+  hardFilterAdd: 'Requirement',
+  softFilterAdd: 'Match Quality',
   softFilterSectionTitle: 'Match Qualities',
   softFilterSectionSubtitle: '',
 

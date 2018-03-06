@@ -503,7 +503,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-onclickoutside@^6.0.2":
+"@types/react-onclickoutside@^6.0.3":
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/@types/react-onclickoutside/-/react-onclickoutside-6.0.3.tgz#0939adbfa175d8350150c34db246ff531b266175"
   dependencies:

@@ -101,14 +101,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.updateWeights(this.props.score.lines);
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: `.pf-section .pf-score-line-transform
       .linear-selector-wrapper .linear-selector-options .linear-selector-option`,
       style: fontColor(Colors().fontColorLightest + ' !important'),
     });
-    this.updateWeights(this.props.score.lines);
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: `.pf-section .pf-score-line-transform .linear-selector-wrapper
@@ -130,14 +128,11 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper .dropdown-option',
       style: { background: Colors().blockBg },
     });
-  }
-
-  public componentWillReceiveProps(nextProps)
-  {
-    if (nextProps.score !== this.props.score)
-    {
-      this.updateWeights(nextProps.score.lines);
-    }
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-score-section .pf-create',
+      style: { background: Colors().blockBg },
+    });
   }
 
   public updateWeights(lines)
@@ -343,7 +338,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
     return (
       <div
-        className='pf-section'
+        className='pf-section pf-score-section'
       >
         <SingleRouteSelector
           options={ScoreTypesChoices}

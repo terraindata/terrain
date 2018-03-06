@@ -239,33 +239,38 @@ class HitComponent extends TerrainComponent<Props> {
           >
             {field} ({size})
           </div>
-        </div>
-        {
-          expandState !== NestedState.Collapsed &&
-          <div>
-            {
-              this.state.scrollState.get(field) ?
-                <div
-                  onClick={this._fn(this.handleScroll, field, -1)}
-                  className='hit-content-scroll-back'
-                  style={getStyle('fill', Colors().iconColor)}
-                  key='forward-icon'
-                >
-                  <CarrotIcon />
-                </div>
-                :
-                null
-            }
-            <div
-              onClick={this._fn(this.handleScroll, field, 1)}
-              className='hit-content-scroll-forward'
-              style={getStyle('fill', Colors().iconColor)}
-              key='back-icon'
-            >
-              <CarrotIcon />
-            </div>
+          <div className='hit-nested-column-names'>
+            <span className='column-name-image'>Image</span>
+            <span className='column-name-number'>No.</span>
+            <span className='column-name-name'>Name</span>
           </div>
-        }
+        </div>
+          {
+            expandState !== NestedState.Collapsed &&
+            <div>
+              {
+                this.state.scrollState.get(field) ?
+                  <div
+                    onClick={this._fn(this.handleScroll, field, -1)}
+                    className='hit-content-scroll-back'
+                    style={getStyle('fill', Colors().iconColor)}
+                    key='forward-icon'
+                  >
+                    <CarrotIcon />
+                  </div>
+                  :
+                  null
+              }
+              <div
+                onClick={this._fn(this.handleScroll, field, 1)}
+                className='hit-content-scroll-forward'
+                style={getStyle('fill', Colors().iconColor)}
+                key='back-icon'
+              >
+                <CarrotIcon />
+              </div>
+            </div>
+          }
       </div>
     );
   }
@@ -695,7 +700,7 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
         <div>
           {
-            (this.props.hideNested !== true) &&
+            (!this.props.hideNested && !this.props.expanded) &&
             _.map(nestedFields, this.renderNestedField)
           }
         </div>

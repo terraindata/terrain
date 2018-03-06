@@ -232,7 +232,7 @@
         color: @light-black;
         &.result-field-name-header {
           position: absolute;
-          top: 4px;
+          top: 19px;
           width: auto;
         }
       }
@@ -398,7 +398,7 @@
   .result {
     height: calc(~"100% - 86px");
     margin: 40px 0px;
-  
+    position: relative;
     .result-inner {
       height: 100%;
       overflow: hidden;
@@ -476,7 +476,7 @@
     }
   .hit-content-scroll-forward, .hit-content-scroll-back {
     position: absolute;
-    top: 7px;
+    top: 22px;
     cursor: pointer;
     height: 12px;
     width: 12px;
@@ -510,6 +510,28 @@
     font-size: 12px;
     border-bottom: 1px solid;
     .hit-nested-content-expand {
+    }
+    .hit-nested-column-names {
+      height: 27px;
+      font-size: 10px;
+      color: @light-black;
+      span {
+        top: 20px;
+        position: absolute;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        padding: 4px 0;
+      }
+      .column-name-image {
+        left: 4px;
+      }
+      .column-name-number {
+        left: 60px;
+      }
+      .column-name-name {
+        left: 90px;
+      }
     }
     .hit-nested-content-title {
       margin-left: 8px;
