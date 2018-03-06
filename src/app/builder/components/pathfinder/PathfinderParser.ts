@@ -302,7 +302,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   }
   filterGroup.lines.forEach((line) =>
   {
-    if (!line.filterGroup)
+    if (!line.filterGroup && line.comparison)
     {
       const lineInfo = parseFilterLine(line, useShould, inputs);
       if (useShould)
@@ -318,7 +318,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
         filter = filter.push(lineInfo);
       }
     }
-    else
+    else if (line.filterGroup)
     {
       const nestedFilter = parseFilters(line.filterGroup, inputs, inMatchQualityContext);
       must = must.push(nestedFilter);

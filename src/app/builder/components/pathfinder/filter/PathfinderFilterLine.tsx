@@ -137,7 +137,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('RENDER');
     const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
 

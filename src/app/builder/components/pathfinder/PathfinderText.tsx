@@ -56,7 +56,7 @@ export const PathfinderText = {
   // `Choose where your data are located and filter out everything that isn't a match.`,
 
   // Filter sections
-  hardFilterSectionTitle: 'Filters',
+  hardFilterSectionTitle: 'Requirements',
   hardFilterSectionSubtitle: '',
   softFilterSectionTitle: 'Match Qualities',
   softFilterSectionSubtitle: '',

@@ -67,6 +67,7 @@ import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderCon
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
+import SingleRouteSelector from 'common/components/SingleRouteSelector';
 
 export interface Props
 {
@@ -134,7 +135,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       source,
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
-      subtype: isSoftFilter ? 'match' : undefined,
+      // subtype: isSoftFilter ? 'match' : undefined,
     });
 
     const fieldSet: RouteSelectorOptionSet = {
@@ -422,9 +423,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       <div
         className='pf-section pf-filter-section'
       >
-        <PathfinderSectionTitle
-          title={title}
-          text={subtitle}
+        <SingleRouteSelector
+          canEdit={false}
+          shortNameText={'Filter'}
+          semilarge={true}
+          value={title}
+          options={List([])}
+          onChange={(value) => {}}
+          headerText={'Filter'}
+          hideLine={true}
         />
 
         <CustomDragLayer />
