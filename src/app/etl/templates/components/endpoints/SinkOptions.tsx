@@ -63,12 +63,15 @@ import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
+import { SinkFormMap } from 'etl/common/components/EndpointOptions';
+
 const { List } = Immutable;
 
 export interface Props
 {
+  sinkKey: string;
   // below from container
-  template?: ETLTemplate;
+  sinks?: ETLTemplate['sinks'];
   act?: typeof TemplateEditorActions;
 }
 
@@ -76,7 +79,25 @@ class SinkOptions extends TerrainComponent<Props>
 {
   public render()
   {
-    return null;
+    const { sinks, sinkKey } = this.props;
+    const sink = sinks.get(sinkKey);
+    const FormClass = SinkFormMap[sink.type];
+    return (
+      <FormClass
+        endpoint={sink}
+        onChange={this.handleEndpointChange}
+      />
+    );
+  }
+
+  public handleEndpointChange(newConfig: SinkConfig | SourceConfig)
+  {
+    const { act, sinkKey } = this.props;
+    act({
+      actionType: 'setSink',
+      key: sinkKey,
+      newSink: newConfig,
+    });
   }
 }
 

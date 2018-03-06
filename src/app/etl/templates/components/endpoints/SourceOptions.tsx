@@ -85,12 +85,12 @@ class SourceOptions extends TerrainComponent<Props>
     return (
       <FormClass
         endpoint={source}
-        onChange={this.handleSourceChange}
+        onChange={this.handleEndpointChange}
       />
     );
   }
 
-  public handleSourceChange(newConfig: SinkConfig | SourceConfig)
+  public handleEndpointChange(newConfig: SinkConfig | SourceConfig)
   {
     const { act, sourceKey } = this.props;
     act({
@@ -100,10 +100,6 @@ class SourceOptions extends TerrainComponent<Props>
     });
   }
 }
-
-  // isSource?: boolean;
-  // endpoint: SinkConfig | SourceConfig;
-  // onChange: (newConfig: SinkConfig | SourceConfig) => void;
 
 export default Util.createContainer(
   SourceOptions,

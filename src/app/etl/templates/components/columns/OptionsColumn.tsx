@@ -81,7 +81,13 @@ class OptionsColumn extends TerrainComponent<Props>
   public renderSource(source: SourceConfig, key)
   {
     return (
-      <div key={key}>
+      <div
+        className='endpoint-block'
+        key={key}
+      >
+        <div className='endpoint-name-section'>
+          {key}
+        </div>
         <SourceOptions
           sourceKey={key}
         />
@@ -92,7 +98,13 @@ class OptionsColumn extends TerrainComponent<Props>
   public renderSink(sink: SinkConfig, key)
   {
     return (
-      <div key={key}>
+      <div
+        className='endpoint-block'
+        key={key}
+      >
+        <div className='endpoint-name-section'>
+          {key}
+        </div>
         <SinkOptions
           sinkKey={key}
         />
@@ -104,7 +116,13 @@ class OptionsColumn extends TerrainComponent<Props>
   {
     const { sources } = this.props.template;
     return (
-      <div>
+      <div className='endpoint-type-block'>
+        <div
+          className='endpoint-type-title'
+          style={getStyle('borderBottom', `1px solid ${Colors().border1}`)}
+        >
+          Sources
+        </div>
         {sources.map(this.renderSource).toList()}
       </div>
     );
@@ -114,7 +132,13 @@ class OptionsColumn extends TerrainComponent<Props>
   {
     const { sinks } = this.props.template;
     return (
-      <div>
+      <div className='endpoint-type-block'>
+        <div
+          className='endpoint-type-title'
+          style={getStyle('borderBottom', `1px solid ${Colors().border1}`)}
+        >
+          Sinks
+        </div>
         {sinks.map(this.renderSink).toList()}
       </div>
     );
@@ -127,10 +151,11 @@ class OptionsColumn extends TerrainComponent<Props>
         className='template-editor-options-column'
         style={_.extend({},
           backgroundColor(Colors().bg3),
-           getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`)
+          getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
         )}
       >
-       {this.renderSourceOptions()}
+        {this.renderSourceOptions()}
+        {this.renderSinkOptions()}
       </div>
     );
   }

@@ -185,14 +185,16 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       setSource: (state, action) =>
       {
-        return state.update('sources', (sourceMap) => {
-          sourceMap.set(action.payload.key, action.payload.newSource);
+        return state.updateIn(['template', 'sources'], (sourceMap) =>
+        {
+          return sourceMap.set(action.payload.key, action.payload.newSource);
         });
       },
       setSink: (state, action) =>
       {
-        return state.update('sinks', (sinkMap) => {
-          sinkMap.set(action.payload.key, action.payload.newSink);
+        return state.updateIn(['template', 'sinks'], (sinkMap) =>
+        {
+          return sinkMap.set(action.payload.key, action.payload.newSink);
         });
       },
     };

@@ -89,7 +89,9 @@ export interface SinkConfig
 // so far sources and options are different
 interface SourceOptionsTypes // TODO check that these are right
 {
-  Upload: {};
+  Upload: {
+    file?: File;
+  };
   Algorithm: {
     algorithmId: ID;
   };
@@ -99,7 +101,9 @@ interface SourceOptionsTypes // TODO check that these are right
 
 interface SinkOptionsTypes
 {
-  Download: {};
+  Download: {
+    filename?: string;
+  };
   Database: {
     language: Languages;
     serverId: ID;

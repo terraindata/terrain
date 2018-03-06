@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -60,10 +60,11 @@ import { instanceFnDecorator } from 'src/app/Classes';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import {
+import
+{
   FileConfig as FileConfigI, HttpOptions,
-  SftpOptions, Sinks, Sources,
-  SinkOptionsType, SourceOptionsType
+  SftpOptions, SinkOptionsType, Sinks,
+  SourceOptionsType, Sources,
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
@@ -84,9 +85,38 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
 {
   public abstract inputMap: InputDeclarationMap<State>;
 
+  public fileConfigInputMap: InputDeclarationMap<FileConfigI> =
+    {
+      fileType: {
+        type: DisplayType.Pick,
+        displayName: 'File Type',
+        group: 'row1',
+        options: {
+          pickOptions: (s: FileConfigI) => fileTypeList,
+          indexResolver: (value) => fileTypeList.indexOf(value),
+        },
+      },
+      hasCsvHeader: {
+        type: DisplayType.CheckBox,
+        displayName: 'File Has CSV Header',
+        group: 'row1',
+        shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
+      },
+      jsonNewlines: {
+        type: DisplayType.CheckBox,
+        displayName: 'Objects seperated by newlines',
+        group: 'row1',
+        shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
+      },
+    };
+
   constructor(props)
   {
     super(props);
+    // this.optionsToFormState = this.optionsToFormState.bind(this);
+    // this.formStateToOptions = this.optionsToFormState.bind(this);
+    this.handleFileConfigChange = this.handleFileConfigChange.bind(this);
+    this.handleOptionsFormChange = this.handleOptionsFormChange.bind(this);
   }
 
   // By default, options state is indentical form to the endpoint options object
@@ -101,31 +131,6 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
   {
     return newState;
   }
-
-  public fileConfigInputMap: InputDeclarationMap<FileConfigI> =
-  {
-    fileType: {
-      type: DisplayType.Pick,
-      displayName: 'File Type',
-      group: 'row1',
-      options: {
-        pickOptions: (s: FileConfigI) => fileTypeList,
-        indexResolver: (value) => fileTypeList.indexOf(value),
-      },
-    },
-    hasCsvHeader: {
-      type: DisplayType.CheckBox,
-      displayName: 'File Has CSV Header',
-      group: 'row1',
-      shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden
-    },
-    jsonNewlines: {
-      type: DisplayType.CheckBox,
-      displayName: 'Objects seperated by newlines',
-      group: 'row1',
-      shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden
-    }
-  };
 
   @instanceFnDecorator(memoizeOne)
   public fileConfigToFormState(config: FileConfig): FileConfigI
@@ -172,7 +177,6 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
   }
 }
 
-
 type UploadState = SourceOptionsType<Sources.Upload>;
 class UploadEndpoint extends EndpointForm<UploadState>
 {
@@ -187,7 +191,7 @@ class AlgorithmEndpoint extends EndpointForm<AlgorithmState>
     algorithmId: {
       type: DisplayType.NumberBox,
       displayName: 'Algorithm Id',
-    }
+    },
   };
 }
 
@@ -213,7 +217,7 @@ class SftpEndpoint extends EndpointForm<SftpState>
     credentialId: {
       type: DisplayType.NumberBox,
       displayName: 'Credential ID',
-    }
+    },
   };
 }
 
@@ -238,7 +242,7 @@ class HttpEndpoint extends EndpointForm<HttpState>
       options: {
         pickOptions: (s) => httpMethods,
         indexResolver: (value) => httpMethods.indexOf(value),
-      }
+      },
     },
     accept: {
       type: DisplayType.TextBox,
@@ -254,13 +258,13 @@ class HttpEndpoint extends EndpointForm<HttpState>
 
   public optionsToFormState(options: HttpOptions): HttpState
   {
-    const { url, methods, headers } = options; 
+    const { url, methods, headers } = options;
     return {
       url,
       methods,
       accept: headers.accept,
       contentType: headers.contentType,
-    }
+    };
   }
 
   public formStateToOptions(newState: HttpState): HttpOptions
@@ -272,34 +276,46 @@ class HttpEndpoint extends EndpointForm<HttpState>
       headers: {
         accept,
         contentType,
-      }
+      },
     };
   }
 }
 
+type DownloadState = SinkOptionsType<Sinks.Download>;
+class DownloadEndpoint extends EndpointForm<DownloadState>
+{
+  public inputMap: InputDeclarationMap<DownloadState> = {
 
+  };
+}
 
+type DatabaseState = SinkOptionsType<Sinks.Database>;
 
+class DatabaseEndpoint extends EndpointForm<DatabaseState>
+{
+  public inputMap: InputDeclarationMap<DatabaseState> = {
+    // todo
+  };
+}
 
-    // fileType: {
-    //   type: DisplayType.Pick,
-    //   displayName: 'File Type',
-    //   group: 'row1',
-    //   options: {
-    //     pickOptions: (s: FileConfigI) => fileTypeList,
-    //     indexResolver: (value) => fileTypeList.indexOf(value),
-    //   },
-    // },
 // exports
 type FormLookupMap<E extends string> =
-{
-  [k in E]: React.ComponentClass<Props>
-}
+  {
+    [k in E]: React.ComponentClass<Props>
+  };
 
 export const SourceFormMap: FormLookupMap<Sources> =
-{
-  [Sources.Upload]: UploadEndpoint,
-  [Sources.Algorithm]: AlgorithmEndpoint,
-  [Sources.Sftp]: SftpEndpoint,
-  [Sources.Http]: HttpEndpoint,
-}
+  {
+    [Sources.Upload]: UploadEndpoint,
+    [Sources.Algorithm]: AlgorithmEndpoint,
+    [Sources.Sftp]: SftpEndpoint,
+    [Sources.Http]: HttpEndpoint,
+  };
+
+export const SinkFormMap: FormLookupMap<Sinks> =
+  {
+    [Sinks.Download]: DownloadEndpoint,
+    [Sinks.Database]: DatabaseEndpoint,
+    [Sinks.Sftp]: SftpEndpoint,
+    [Sinks.Http]: HttpEndpoint,
+  };
