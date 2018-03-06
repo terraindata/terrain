@@ -57,12 +57,12 @@ export const mySQL: MySQL = new MySQL();
 export interface SourceConfig
 {
   type: string;
-  params: object;
+  params: object | object[];
 }
 
 export interface ExportSourceConfig
 {
-  params: object;
+  params: object[];
   stream: stream.Readable;
 }
 
@@ -83,7 +83,7 @@ export class Sources
       let result = '';
       const exprtSourceConfig: ExportSourceConfig | string =
         {
-          params: {},
+          params: [],
           stream: readStream,
         };
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
