@@ -92,9 +92,9 @@ class QueryC
   path: Path = _Path();
 
   resultsViewMode: string = 'Hits';
-  aggregationList: Map<string, Aggregation> = Map<string, Aggregation>({});
+  aggregationList: Map<string, Aggregation> = Map<string, Aggregation>();
 
-  meta: IMMap<string, any> = Map<string, any>({});
+  meta: IMMap<string, any> = Map<string, any>();
 
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
   excludeFields = ['dbFields', 'excludeFields'];
@@ -103,7 +103,7 @@ class QueryC
 
   // what order the cards are in the tuning column
   tuningOrder: List<string> = List([]);
-  cardKeyPaths: Map<ID, KeyPath> = Map<ID, KeyPath>({});
+  cardKeyPaths: Map<ID, KeyPath> = Map<ID, KeyPath>();
 
 }
 export const Query_Record = createRecordType(new QueryC(), 'QueryC');

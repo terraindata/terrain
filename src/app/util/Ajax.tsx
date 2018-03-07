@@ -378,10 +378,10 @@ export const Ajax =
         {
           const mapping =
             {
-              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}) as any,
-              GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
-              CATEGORY: Immutable.Map<number, LibraryTypes.Category>({}),
-              QUERY: Immutable.Map<number, Query>({}),
+              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>() as any,
+              GROUP: Immutable.Map<number, LibraryTypes.Group>(),
+              CATEGORY: Immutable.Map<number, LibraryTypes.Category>(),
+              QUERY: Immutable.Map<number, Query>(),
             };
           const categoriesOrder = [];
           items.map(

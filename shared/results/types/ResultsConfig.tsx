@@ -79,7 +79,7 @@ export class ResultsConfig
   score: string = '_score';
   fields: List<string> = List([]);
   enabled: boolean = false;
-  formats: IMMap<string, Format> = Map<string, Format>({});
+  formats: IMMap<string, Format> = Map<string, Format>();
   primaryKeys: List<string> = List(['_id']);
   thumbnailWidth: number = 200;
   smallThumbnailWidth: number = 55;

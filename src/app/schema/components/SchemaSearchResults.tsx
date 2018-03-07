@@ -67,18 +67,18 @@ export interface Props
   schema?: SchemaState;
 }
 
-let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>({});
+let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>();
 let INIT_ITEMS: IMMap<string, List<SchemaBaseClass>> =
-  Immutable.Map<string, List<SchemaBaseClass>>({});
+  Immutable.Map<string, List<SchemaBaseClass>>();
 let INIT_PREV_ITEMS: IMMap<string, IMMap<string, SchemaBaseClass>> =
-  Immutable.Map<string, IMMap<string, SchemaBaseClass>>({});
+  Immutable.Map<string, IMMap<string, SchemaBaseClass>>();
 
 _.map(SchemaTypes.typeToStoreKey as any,
   (storeKey: string) =>
   {
     INIT_SHOWING_COUNT = INIT_SHOWING_COUNT.set(storeKey, 15);
-    INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List([]));
-    INIT_PREV_ITEMS = INIT_PREV_ITEMS.set(storeKey, Immutable.Map<any, any>({}));
+    INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List());
+    INIT_PREV_ITEMS = INIT_PREV_ITEMS.set(storeKey, Immutable.Map<any, any>());
   },
 );
 const SHOW_MORE_INCREMENT = 50;
