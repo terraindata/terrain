@@ -240,6 +240,7 @@ export default class GroupJoinTransform extends Readable
 
       if (body.length === 0)
       {
+        ticket.count--;
         continue;
       }
 
