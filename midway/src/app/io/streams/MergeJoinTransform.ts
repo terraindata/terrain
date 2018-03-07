@@ -69,7 +69,9 @@ export default class MergeJoinTransform extends Readable
   private type: MergeJoinType;
 
   private leftSource: BufferedElasticStream;
+  private leftPosition: number;
   private rightSource: BufferedElasticStream;
+  private rightPosition: number;
 
   private mergeJoinName: string;
   private joinKey: string;
@@ -110,11 +112,13 @@ export default class MergeJoinTransform extends Readable
     // set up the left source
     const leftQuery = this.setSortClause(query);
     this.leftSource = new BufferedElasticStream(client, leftQuery, this.mergeJoin.bind(this));
+    this.leftPosition = 0;
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
     this.rightSource = new BufferedElasticStream(client, rightQuery, this.mergeJoin.bind(this));
+    this.rightPosition = 0;
   }
 
   public _read(size: number = 1024)
@@ -140,51 +144,53 @@ export default class MergeJoinTransform extends Readable
     }
 
     // advance left and right streams
-    while (this.leftSource.position < left.length
-      && this.rightSource.position < right.length)
+    while (this.leftPosition < left.length
+      && this.rightPosition < right.length)
     {
-      let l = left[this.leftSource.position]['_source'][this.joinKey];
-      let r = right[this.rightSource.position]['_source'][this.joinKey];
+      let l = left[this.leftPosition]['_source'][this.joinKey];
+      let r = right[this.rightPosition]['_source'][this.joinKey];
 
       while (l !== r)
       {
         if (l < r)
         {
-          this.leftSource.position++;
-          l = left[this.leftSource.position]['_source'][this.joinKey];
+          this.leftPosition++;
+          l = left[this.leftPosition]['_source'][this.joinKey];
 
           if (l < r && this.type === MergeJoinType.LEFT_OUTER_JOIN)
           {
-            left[this.leftSource.position][this.mergeJoinName] = [];
-            this.push(left[this.leftSource.position]);
+            left[this.leftPosition][this.mergeJoinName] = [];
+            this.push(left[this.leftPosition]);
           }
         }
         else if (r < l)
         {
-          this.rightSource.position++;
-          r = right[this.rightSource.position]['_source'][this.joinKey];
+          this.rightPosition++;
+          r = right[this.rightPosition]['_source'][this.joinKey];
         }
 
         // if either of the streams went dry, request more
-        if (this.leftSource.position === left.length)
+        if (this.leftPosition === left.length)
         {
           this.leftSource.resetBuffer();
+          this.leftPosition = 0;
           return;
         }
 
-        if (this.rightSource.position === right.length)
+        if (this.rightPosition === right.length)
         {
           this.rightSource.resetBuffer();
+          this.rightPosition = 0;
           return;
         }
       }
 
       // start merging
-      left[this.leftSource.position][this.mergeJoinName] = [];
-      let j = this.rightSource.position;
+      left[this.leftPosition][this.mergeJoinName] = [];
+      let j = this.rightPosition;
       while (l === r && j < right.length)
       {
-        left[this.leftSource.position][this.mergeJoinName].push(right[j]);
+        left[this.leftPosition][this.mergeJoinName].push(right[j]);
         j++;
         r = right[j]['_source'][this.joinKey];
       }
@@ -196,9 +202,9 @@ export default class MergeJoinTransform extends Readable
       }
 
       // push the merged result out to the stream
-      this.push(left[this.leftSource.position]);
-      this.rightSource.position++;
-      this.leftSource.position++;
+      this.push(left[this.leftPosition]);
+      this.rightPosition++;
+      this.leftPosition++;
     }
 
     this.leftSource.resetBuffer();

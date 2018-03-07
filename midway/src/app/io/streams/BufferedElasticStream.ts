@@ -55,7 +55,6 @@ import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
 export default class BufferedElasticStream extends Readable
 {
   public maxBufferSize: number = 8;
-  public position: number = 0;
   public buffer: object[] = [];
 
   private query: any;
@@ -64,24 +63,28 @@ export default class BufferedElasticStream extends Readable
   private _shouldContinue: boolean = true;
   private _isSourceEmpty: boolean = false;
 
-  private _onBufferFull: (stream: BufferedElasticStream) => void;
+  private _onBufferFull: (stream: object[]) => void;
   private _onRead: () => void;
+  private _onError: () => void;
   private _onEnd: () => void;
 
-  constructor(client: ElasticClient, query: any, onBufferFull: (stream: BufferedElasticStream) => void, size: number = 8)
+  constructor(client: ElasticClient, query: any, onBufferFull: (stream: object[]) => void, size: number = 8)
   {
     super({
       objectMode: true,
     });
+
     this.query = query;
     this.stream = new ElasticStream(client, query);
     this.maxBufferSize = size;
 
     this._onBufferFull = onBufferFull;
     this._onRead = this.readStream.bind(this);
+    this._onError = ((e) => this.emit('error', e)).bind(this);
     this._onEnd = this._final.bind(this);
 
     this.stream.on('readable', this._onRead);
+    this.stream.on('error', this._onError);
     this.stream.on('end', this._onEnd);
   }
 
@@ -102,6 +105,7 @@ export default class BufferedElasticStream extends Readable
   public _final(callback)
   {
     this.stream.removeListener('readable', this._onRead);
+    this.stream.removeListener('error', this._onError);
     this.stream.removeListener('end', this._onEnd);
 
     this._shouldContinue = false;
@@ -113,11 +117,12 @@ export default class BufferedElasticStream extends Readable
     }
   }
 
-  public resetBuffer(): void
+  public resetBuffer(): any[]
   {
+    const buffer = this.buffer;
     this.buffer = [];
-    this.position = 0;
     this._shouldContinue = true;
+    return buffer;
   }
 
   public isEmpty(): boolean
@@ -149,8 +154,8 @@ export default class BufferedElasticStream extends Readable
     if (this.buffer.length >= this.maxBufferSize ||
       this._isSourceEmpty && this.buffer.length > 0)
     {
-      this._shouldContinue = false;
-      this._onBufferFull(this);
+      const buffer = this.resetBuffer();
+      this._onBufferFull(buffer);
     }
   }
 }

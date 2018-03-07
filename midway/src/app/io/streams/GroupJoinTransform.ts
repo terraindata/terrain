@@ -122,10 +122,8 @@ export default class GroupJoinTransform extends Readable
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
-    this.source = new BufferedElasticStream(client, query, (() =>
+    this.source = new BufferedElasticStream(client, query, ((responses) =>
     {
-      const responses = this.source.buffer;
-      this.source.resetBuffer();
       for (const r of responses)
       {
         this.dispatchSubqueryBlock(r);
