@@ -240,7 +240,8 @@ export default class GroupJoinTransform extends Readable
 
       if (body.length === 0)
       {
-        return;
+        ticket.count--;
+        continue;
       }
 
       this.client.msearch(
