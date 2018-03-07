@@ -47,17 +47,15 @@ THE SOFTWARE.
 import * as Deque from 'double-ended-queue';
 import { Readable } from 'stream';
 
-import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import BufferedElasticStream from './BufferedElasticStream';
 
 interface Ticket
 {
   count: number;
-  response: object;
+  results: object[];
 }
 
 /**
@@ -66,12 +64,19 @@ interface Ticket
 export default class GroupJoinTransform extends Readable
 {
   private client: ElasticClient;
-  private source: BufferedElasticStream;
-  private query: object;
+  private source: Readable;
+  private query: string;
 
+  private blockSize: number = 256;
   private maxPendingQueries: number = 4;
+
+  private maxBufferedInputs: number;
+  private bufferedInputs: object[];
   private maxBufferedOutputs: number;
   private bufferedOutputs: Deque<Ticket>;
+
+  private sourceIsEmpty: boolean = false;
+  private continueReading: boolean = false;
 
   private dropIfLessThan: number = 0;
   private parentAlias: string = 'parent';
@@ -89,6 +94,7 @@ export default class GroupJoinTransform extends Readable
     });
 
     this.client = client;
+    this.source = source;
 
     const parser = new ESJSONParser(queryStr, true);
     if (parser.hasError())
@@ -97,32 +103,27 @@ export default class GroupJoinTransform extends Readable
     }
 
     const query = parser.getValue();
-    const groupJoinQuery = query['groupJoin'];
-    delete query['groupJoin'];
-
     // read groupJoin options from the query
-    if (groupJoinQuery['dropIfLessThan'] !== undefined)
+    if (query['dropIfLessThan'] !== undefined)
     {
-      this.dropIfLessThan = groupJoinQuery['dropIfLessThan'];
-      delete groupJoinQuery['dropIfLessThan'];
+      this.dropIfLessThan = query['dropIfLessThan'];
+      delete query['dropIfLessThan'];
     }
 
-    if (groupJoinQuery['parentAlias'] !== undefined)
+    if (query['parentAlias'] !== undefined)
     {
-      this.parentAlias = groupJoinQuery['parentAlias'];
-      delete groupJoinQuery['parentAlias'];
+      this.parentAlias = query['parentAlias'];
+      delete query['parentAlias'];
     }
 
-    this.query = groupJoinQuery;
-    for (const k of Object.keys(groupJoinQuery))
+    this.query = query;
+    for (const k of Object.keys(query))
     {
-      const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
-      if (valueInfo !== null)
-      {
-        this.subqueryValueInfos[k] = valueInfo.objectChildren[k].propertyValue;
-      }
+      this.subqueryValueInfos[k] = parser.getValueInfo().objectChildren[k].propertyValue;
     }
 
+    this.maxBufferedInputs = this.blockSize;
+    this.bufferedInputs = [];
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
@@ -141,17 +142,16 @@ export default class GroupJoinTransform extends Readable
       && this.bufferedInputs.length < this.maxBufferedInputs
       && this.bufferedOutputs.length < this.maxBufferedOutputs)
     {
-      const responses = this.source.buffer;
-      this.source.resetBuffer();
-      for (const r of responses)
-      {
-        this.dispatchSubqueryBlock(r);
-      }
-    }).bind(this));
-
+      this.continueReading = true;
+    }
   }
 
-  public _read(size: number = 1024)
+  public _destroy(error, callback)
+  {
+    this._final(callback);
+  }
+
+  public _final(callback)
   {
     this.source.removeListener('readable', this._onRead);
     this.source.removeListener('error', this._onError);
@@ -161,19 +161,43 @@ export default class GroupJoinTransform extends Readable
     this.sourceIsEmpty = true;
     if (callback !== undefined)
     {
-      this.source._read();
+      callback();
     }
   }
 
-  public _destroy(error, callback)
+  private readFromStream(): void
   {
-    this.source._destroy(error, callback);
+    // should we keep reading from the source stream?
+    if (!this.continueReading)
+    {
+      return;
+    }
+
+    // if yes, keep buffering inputs from the source stream
+    const obj = this.source.read();
+    if (obj === null)
+    {
+      this.sourceIsEmpty = true;
+    }
+    else
+    {
+      this.bufferedInputs.push(obj);
+    }
+
+    // if we have data buffered up to blockSize, swap the input buffer list out
+    // and dispatch a subquery block
+    if (this.bufferedInputs.length >= this.blockSize ||
+      this.sourceIsEmpty && this.bufferedInputs.length > 0)
+    {
+      const inputs = this.bufferedInputs;
+      this.bufferedInputs = [];
+      this.dispatchSubqueryBlock(inputs);
+    }
   }
 
-  private dispatchSubqueryBlock(response: object): void
+  private dispatchSubqueryBlock(inputs: object[]): void
   {
     const query = this.query;
-    const inputs = response['hits'].hits;
     const numInputs = inputs.length;
     const numQueries = Object.keys(query).length;
 
@@ -181,7 +205,7 @@ export default class GroupJoinTransform extends Readable
     // associated with this query
     const ticket: Ticket = {
       count: numQueries,
-      response,
+      results: inputs,
     };
     this.bufferedOutputs.push(ticket);
 
@@ -223,27 +247,27 @@ export default class GroupJoinTransform extends Readable
         {
           body,
         },
-        (error: Error | null, resp: any) =>
+        (error: Error | null, response: any) =>
         {
           if (error !== null && error !== undefined)
           {
             throw error;
           }
 
-          if (resp.error !== undefined)
+          if (response.error !== undefined)
           {
-            throw resp.error;
+            throw response.error;
           }
 
           for (let j = 0; j < numInputs; ++j)
           {
             if (response.responses[j] !== undefined && response.responses[j].hits !== undefined)
             {
-              ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
+              ticket.results[j][subQuery] = response.responses[j].hits.hits;
             }
             else
             {
-              ticket.response['hits'].hits[j][subQuery] = [];
+              ticket.results[j][subQuery] = [];
             }
           }
 
@@ -256,16 +280,22 @@ export default class GroupJoinTransform extends Readable
             const front = this.bufferedOutputs.peekFront();
             if (front !== undefined && front.count === 0)
             {
-              front.response['hits'].hits = front.response['hits'].hits.filter(
-                (obj) =>
+              while (front.results.length > 0)
+              {
+                const obj = front.results.shift();
+                if (obj !== undefined)
                 {
-                  return Object.keys(query).reduce((acc, q) =>
+                  const shouldPass = Object.keys(query).reduce((acc, q) =>
                   {
                     return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
                   }, true);
-                },
-              );
-              this.push(front.response);
+
+                  if (shouldPass)
+                  {
+                    this.push(obj);
+                  }
+                }
+              }
               this.bufferedOutputs.shift();
             }
             else
@@ -274,11 +304,14 @@ export default class GroupJoinTransform extends Readable
             }
           }
 
-          if (this.source.isEmpty()
-            && this.bufferedOutputs.length === 0)
+          if (this.sourceIsEmpty
+            && this.bufferedOutputs.length === 0
+            && this.bufferedInputs.length === 0)
           {
             this.push(null);
           }
+
+          this.continueReading = false;
         });
     }
   }
