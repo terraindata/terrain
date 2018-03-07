@@ -789,6 +789,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean)
   {
+    console.log(response);
     this.updateM2ErrorState(response.errors, isAllFields);
   }
 

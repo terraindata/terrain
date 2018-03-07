@@ -111,10 +111,10 @@ class ChoiceOptionC extends BaseClass
 {
   public value: any = null; // a value to distinguish it to the parser
   public displayName: string | number | El = '';
-  public color: string = null;
-  public tooltipContent: string | El = null;
-  public sampleData: List<Hit> = List([]);
-  public meta: any = null; // metadata, no specific shape, used for helper functions
+  public color?: string = null;
+  public tooltipContent?: string | El = null;
+  public sampleData?: List<Hit> = List([]);
+  public meta?: any = null; // metadata, no specific shape, used for helper functions
 }
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
 export const _ChoiceOption = (config?: { [key: string]: any }) =>
