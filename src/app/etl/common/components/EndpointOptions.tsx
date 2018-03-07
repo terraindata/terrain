@@ -57,6 +57,7 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'src/app/Classes';
 
+import UploadFileButton from 'etl/common/components/UploadFileButton';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
@@ -178,7 +179,31 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
 type UploadState = SourceOptionsType<Sources.Upload>;
 class UploadEndpoint extends EndpointForm<UploadState>
 {
-  public inputMap: InputDeclarationMap<UploadState> = {};
+  public inputMap: InputDeclarationMap<UploadState> = {
+    file: {
+      type: DisplayType.Custom,
+      options: {
+        render: this.renderFilePicker,
+      },
+    },
+  };
+
+  public renderFilePicker(state: UploadState, disabled: boolean)
+  {
+    return (
+      <UploadFileButton
+        file={state.file}
+        onChange={this.handleFileChange}
+      />
+    );
+  }
+
+  public handleFileChange(file: File)
+  {
+    const { onChange, endpoint } = this.props;
+    const newOptions = { file };
+    onChange(endpoint.set('options', newOptions));
+  }
 }
 
 type AlgorithmState = SourceOptionsType<Sources.Algorithm>;
