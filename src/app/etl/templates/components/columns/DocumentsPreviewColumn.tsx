@@ -75,12 +75,6 @@ export interface Props
 
 class DocumentsPreviewColumn extends TerrainComponent<Props>
 {
-  public state: {
-    file: File,
-  } = {
-      file: null,
-    };
-
   public renderDocument(document, index)
   {
     return (
@@ -100,7 +94,7 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
         fixPrompt = (
           <div className='no-documents-fix-prompt'>
             <UploadFileButton
-              file={this.state.file}
+              file={source.options['file']}
               onChange={this.handleFileChange}
             />
           </div>
@@ -157,7 +151,6 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
 
   public handleFileChange(file: File)
   {
-    this.setState(file);
     const fileType = getFileType(file);
     const { act } = this.props;
     const newSourceConfig = _SourceConfig({

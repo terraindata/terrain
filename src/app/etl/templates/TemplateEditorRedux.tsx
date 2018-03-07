@@ -106,6 +106,15 @@ export interface TemplateEditorActionTypes
       [k in keyof EditorDisplayState]: EditorDisplayState[k];
     }>;
   };
+  changeLoadingDocuments: {
+    actionType: 'changeLoadingDocuments',
+    increment: boolean,
+  },
+  setInMergeDocuments: {
+    actionType: 'setInMergeDocuments',
+    key: string,
+    documents: List<object>,
+  }
   closeSettings: {
     actionType: 'closeSettings';
   };
@@ -168,6 +177,23 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
           newState = newState.set(k, toUpdate[k]);
         }
         return state.set('uiState', newState);
+      },
+      changeLoadingDocuments: (state, action) =>
+      {
+        let value = state.loadingDocuments;
+        if (action.payload.increment)
+        {
+          value++;
+        }
+        else
+        {
+          value--;
+        }
+        return state.set('loadingDocuments', value);
+      },
+      setInMergeDocuments: (state, action) =>
+      {
+        return state.setIn(['uiState', 'mergeDocuments', action.payload.key], action.payload.documents);
       },
       closeSettings: (state, action) =>
       {

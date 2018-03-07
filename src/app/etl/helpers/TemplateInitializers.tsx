@@ -125,16 +125,13 @@ class Initializers extends ETLHelpers
 
   public initNewFromWalkthrough(walkthrough: WalkthroughState = this.walkthrough)
   {
-    let source = walkthrough.source;
+    const source = walkthrough.source;
     const sink = walkthrough.sink;
     const onLoad = this.createInitialTemplateFn(source, sink);
-    
 
     if (source.type === Sources.Upload)
     {
       const file = walkthrough.getFile();
-      // todo refactor
-      source = source.setInOptions('file', file);
       DocumentsHelpers.fetchDocuments(source, 'primary', onLoad);
     }
     else

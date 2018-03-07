@@ -64,6 +64,7 @@ class TemplateEditorStateC
   public template: ETLTemplate = _ETLTemplate();
   public fieldMap: FieldMap = Map();
   public isDirty: boolean = true;
+  public loadingDocuments: number = 0;
   public uiState: EditorDisplayState = _EditorDisplayState();
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
@@ -86,7 +87,6 @@ class EditorDisplayStateC
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = 0;
-  public loadingDocuments: boolean = false;
   public settingsFieldId: number = null;
   public settingsDisplayKeyPath: KeyPath = null;
   public engineVersion: number = 0;
