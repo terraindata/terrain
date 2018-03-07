@@ -130,6 +130,7 @@ export class ElasticStream extends Stream.Readable
     if (error !== null && error !== undefined)
     {
       this.emit('error', error);
+      return;
     }
 
     let hits: ElasticQueryHit[] = response.hits.hits;
