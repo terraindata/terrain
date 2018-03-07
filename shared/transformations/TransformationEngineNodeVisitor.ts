@@ -193,9 +193,19 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
+    console.log('here!');
+    console.log(node.fieldIDs.toJS());
     for (const fieldID of node.fieldIDs.toJS())
     {
-      if (typeof doc[fieldID] !== 'string')
+      if (true)//doc[fieldID].constructor === Array)
+      {
+        for (let i: number = 0; i < Object.keys(doc[fieldID]).length; i++)
+        {
+          console.log(doc[fieldID][i]);
+          doc[fieldID][i] = doc[fieldID][i].toUpperCase();
+        }
+      }
+      else if (typeof doc[fieldID] !== 'string')
       {
         return {
           errors: [
@@ -205,7 +215,10 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           ],
         } as TransformationVisitResult;
       }
-      doc[fieldID] = doc[fieldID].toUpperCase();
+      else
+      {
+        doc[fieldID] = doc[fieldID].toUpperCase();
+      }
     }
 
     return {
