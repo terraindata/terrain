@@ -95,7 +95,7 @@ class DocumentsHelpers extends ETLHelpers
       actionType: 'setDisplayState',
       state: {
         documents: merged,
-      }
+      },
     });
   }
 

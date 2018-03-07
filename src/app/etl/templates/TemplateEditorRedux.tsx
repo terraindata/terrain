@@ -109,30 +109,32 @@ export interface TemplateEditorActionTypes
   changeLoadingDocuments: {
     actionType: 'changeLoadingDocuments',
     increment: boolean,
-  },
+  };
   setInMergeDocuments: {
     actionType: 'setInMergeDocuments',
     key: string,
     documents: List<object>,
-  }
+  };
+  deleteInMergeDocuments: {
+    actionType: 'deleteInMergeDocuments',
+    key: string,
+  };
   closeSettings: {
     actionType: 'closeSettings';
   };
   updateEngineVersion: {
     actionType: 'updateEngineVersion';
   };
+  setSinks: {
+    actionType: 'setSinks';
+    sinks: ETLTemplate['sinks'];
+  };
+  setSources: {
+    actionType: 'setSources';
+    sources: ETLTemplate['sources'];
+  };
   resetState: { // resets the display state
     actionType: 'resetState';
-  };
-  setSource: {
-    actionType: 'setSource',
-    key: string,
-    newSource: SourceConfig,
-  };
-  setSink: {
-    actionType: 'setSink',
-    key: string,
-    newSink: SinkConfig,
   };
 }
 
@@ -195,6 +197,10 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       {
         return state.setIn(['uiState', 'mergeDocuments', action.payload.key], action.payload.documents);
       },
+      deleteInMergeDocuments: (state, action) =>
+      {
+        return state.deleteIn(['uiState', 'mergeDocuments', action.payload.key]);
+      },
       closeSettings: (state, action) =>
       {
         return state.setIn(['uiState', 'settingsFieldId'], null).setIn(['uiState', 'settingsDisplayKeyPath'], null);
@@ -205,23 +211,17 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         return state.setIn(['uiState', 'engineVersion'], oldVersion + 1)
           .set('isDirty', true);
       },
+      setSinks: (state, action) =>
+      {
+        return state.setIn(['template', 'sinks'], action.payload.sinks);
+      },
+      setSources: (state, action) =>
+      {
+        return state.setIn(['template', 'sources'], action.payload.sources);
+      },
       resetState: (state, action) =>
       {
         return _TemplateEditorState();
-      },
-      setSource: (state, action) =>
-      {
-        return state.updateIn(['template', 'sources'], (sourceMap) =>
-        {
-          return sourceMap.set(action.payload.key, action.payload.newSource);
-        });
-      },
-      setSink: (state, action) =>
-      {
-        return state.updateIn(['template', 'sinks'], (sinkMap) =>
-        {
-          return sinkMap.set(action.payload.key, action.payload.newSink);
-        });
       },
     };
 }

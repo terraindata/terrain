@@ -118,7 +118,7 @@ export default class EndpointForm extends TerrainComponent<Props>
           onChange={this.handleEndpointChange}
         />
       </div>
-    )
+    );
   }
 
   public typeStateToValue(state: SinkFormState | SourceFormState)

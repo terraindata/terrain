@@ -54,8 +54,8 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
@@ -137,7 +137,8 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
   // obj.transformationConfig = recordForSave(obj.transformationConfig); TODO
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
-  _.forOwn(obj.sources, (source, key) => {
+  _.forOwn(obj.sources, (source, key) =>
+  {
     if (source.type === Sources.Upload)
     {
       _.set(obj, ['sources', key, 'options', 'file'], null);

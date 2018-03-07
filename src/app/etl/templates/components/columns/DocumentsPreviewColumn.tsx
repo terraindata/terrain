@@ -159,8 +159,8 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
         fileType,
       }),
       options: {
-        file
-      }
+        file,
+      },
     });
     DocumentsHelpers.fetchDocuments(newSourceConfig,
       'primary',

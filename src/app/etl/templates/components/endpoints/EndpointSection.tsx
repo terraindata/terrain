@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -53,20 +54,22 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+const Color = require('color');
 import Dropdown from 'common/components/Dropdown';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ExpandableView from 'common/components/ExpandableView';
 import { instanceFnDecorator } from 'src/app/Classes';
+import Quarantine from 'util/RadiumQuarantine';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import EndpointForm from 'etl/common/components/EndpointForm';
-// import { SourceFormMap } from 'etl/common/components/EndpointOptions';
 
 const { List, Map } = Immutable;
 
@@ -79,21 +82,21 @@ export interface Props
   act?: typeof TemplateEditorActions;
 }
 
+type EndpointsType = ETLTemplate['sources'] | ETLTemplate['sinks'];
 class EndpointSection extends TerrainComponent<Props>
 {
   public state: {
     expandableState: Immutable.Map<string, boolean>;
-    endpoints: ETLTemplate['sources'] | ETLTemplate['sinks'];
+    endpoints: EndpointsType;
   };
 
   constructor(props)
   {
     super(props);
-
     this.state = {
       expandableState: Map(),
       endpoints: props.isSource ? props.sources : props.sinks,
-    }
+    };
   }
 
   public componentWillReceiveProps(nextProps)
@@ -146,17 +149,96 @@ class EndpointSection extends TerrainComponent<Props>
   {
     const { isSource } = this.props;
     const { endpoints } = this.state;
+
+    const buttonsDisabled = endpoints === (isSource ? this.props.sources : this.props.sinks);
+
     return (
-      <div className='endpoint-type-block'>
-        <div
-          className='endpoint-type-title'
-          style={getStyle('borderBottom', `1px solid ${Colors().border1}`)}
-        >
-          {isSource ? 'Sources' : 'Sinks'}
-        </div>
+      <div className='endpoint-section'>
+        <Quarantine>
+          <div
+            className='endpoint-type-title'
+            style={getStyle('borderBottom', `1px solid ${Colors().border1}`)}
+          >
+            <div className='endpoint-type-title-text'>
+              {isSource ? 'Sources' : 'Sinks'}
+            </div>
+            <div className='endpoint-apply-section'>
+              <div
+                key='cancel'
+                className={classNames({
+                  'options-column-button': true,
+                  'options-column-button-disabled': buttonsDisabled,
+                })}
+                style={getButtonStyle(false, buttonsDisabled)}
+                onClick={this.handleCancelChanges}
+              >
+                Cancel
+              </div>
+              <div
+                key='apply'
+                className={classNames({
+                  'options-column-button': true,
+                  'options-column-button-disabled': buttonsDisabled,
+                })}
+                style={getButtonStyle(true, buttonsDisabled)}
+                onClick={this.handleApplyChanges}
+              >
+                Apply
+              </div>
+            </div>
+          </div>
+        </Quarantine>
         {endpoints.map(this.renderEndpoint).toList()}
       </div>
     );
+  }
+
+  public handleCancelChanges()
+  {
+    const { sources, sinks, isSource } = this.props;
+    const newEndpoints = isSource ? sources : sinks;
+    this.setState({
+      endpoints: newEndpoints,
+    });
+  }
+
+  public handleApplyChanges()
+  {
+    const { sources, sinks, isSource, act } = this.props;
+    const { endpoints } = this.state;
+
+    if (isSource)
+    {
+      const { newKeys, deletedKeys, differentKeys } =
+        getChangedKeys(isSource ? sources : sinks, endpoints);
+
+      act({
+        actionType: 'setSources',
+        sources: endpoints,
+      });
+      deletedKeys.forEach((key) =>
+      {
+        act({
+          actionType: 'deleteInMergeDocuments',
+          key,
+        });
+      });
+      newKeys.forEach((key) =>
+      {
+        DocumentsHelpers.fetchDocuments(endpoints.get(key), key);
+      });
+      differentKeys.forEach((key) =>
+      {
+        DocumentsHelpers.fetchDocuments(endpoints.get(key), key);
+      });
+    }
+    else
+    {
+      act({
+        actionType: 'setSinks',
+        sinks: endpoints,
+      });
+    }
   }
 
   // closed by default, since expandableState is empty
@@ -184,13 +266,78 @@ class EndpointSection extends TerrainComponent<Props>
     {
       const { endpoints } = this.state;
       this.setState({
-        endpoints: endpoints.set(key, endpoint)
+        endpoints: endpoints.set(key, endpoint),
       });
-    }
+    };
   }
-
 }
 
+function getChangedKeys(original: EndpointsType, next: EndpointsType)
+{
+  const differentKeys = [];
+  const deletedKeys = [];
+  const newKeys = [];
+  original.forEach((value, key) =>
+  {
+    if (next.has(key))
+    {
+      if (original.get(key) !== next.get(key))
+      {
+        differentKeys.push(key);
+      }
+    }
+    else
+    {
+      deletedKeys.push(key);
+    }
+  });
+  next.forEach((value, key) =>
+  {
+    if (!original.has(key))
+    {
+      newKeys.push(key);
+    }
+  });
+  return {
+    differentKeys: List(differentKeys),
+    deletedKeys: List(deletedKeys),
+    newKeys: List(newKeys),
+  };
+}
+
+// memoized
+let getButtonStyle = (active: boolean, disabled: boolean)
+{
+  if (active)
+  {
+    return disabled ? [
+      fontColor(Colors().activeText),
+      backgroundColor(Colors().activeHover, Colors().activeHover),
+      borderColor(Colors().altBg2),
+    ] : [
+        backgroundColor(Colors().active, Colors().activeHover),
+        borderColor(Colors().active, Colors().activeHover),
+        fontColor(Colors().activeText),
+      ];
+  }
+  else
+  {
+    return disabled ? [
+      fontColor(Colors().text3, Colors().text3),
+      backgroundColor(Color(Colors().bg2).alpha(0.5).toString(), Color(Colors().bg2).alpha(0.5).toString()),
+      borderColor(Colors().bg2),
+    ] : [
+        fontColor(Colors().text2, Colors().text3),
+        backgroundColor(Colors().bg2, Color(Colors().bg2).alpha(0.5).toString()),
+        borderColor(Colors().bg1),
+      ];
+  }
+};
+function resolveBooleans(a, b)
+{
+  return a ? (b ? 'tt' : 'tf') : (b ? 'ft' : 'ff');
+}
+getButtonStyle = _.memoize(getButtonStyle, resolveBooleans);
 
 export default Util.createContainer(
   EndpointSection,

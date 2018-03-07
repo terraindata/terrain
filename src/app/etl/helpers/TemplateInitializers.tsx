@@ -95,7 +95,8 @@ class Initializers extends ETLHelpers
         isDirty: false,
       });
 
-      template.sources.map((source, key) => {
+      template.sources.map((source, key) =>
+      {
         DocumentsHelpers.fetchDocuments(source, key);
       });
       ETLRouteUtil.gotoEditTemplate(template.id);
