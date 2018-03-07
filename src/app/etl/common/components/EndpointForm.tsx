@@ -57,106 +57,107 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'src/app/Classes';
 
-import { _FileConfig, _SinkConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
-import { SinkFormMap } from 'etl/common/components/EndpointOptions';
+import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointOptions';
 
 const { List } = Immutable;
 
 export interface Props
 {
-  sinkKey: string;
-  // below from container
-  sinks?: ETLTemplate['sinks'];
-  act?: typeof TemplateEditorActions;
+  isSource: boolean;
+  endpoint: SourceConfig | SinkConfig;
+  onChange: (newEndpoint: SourceConfig | SinkConfig) => void;
 }
 
-class SinkOptions extends TerrainComponent<Props>
+export default class EndpointForm extends TerrainComponent<Props>
 {
+  public sinkTypeMap: InputDeclarationMap<SinkFormState> =
+    {
+      type: {
+        type: DisplayType.Pick,
+        displayName: 'Sink Type',
+        options: {
+          pickOptions: (s) => sinkList,
+          indexResolver: (value) => sinkList.indexOf(value),
+        },
+      },
+    };
+
+  public sourceTypeMap: InputDeclarationMap<SourceFormState> =
+    {
+      type: {
+        type: DisplayType.Pick,
+        displayName: 'Source Type',
+        options: {
+          pickOptions: (s) => sourceList,
+          indexResolver: (value) => sourceList.indexOf(value),
+        },
+      },
+    };
+
   public render()
   {
-    const { sinks, sinkKey } = this.props;
-    const sink = sinks.get(sinkKey);
-    const FormClass = SinkFormMap[sink.type];
+    const { isSource, endpoint, onChange } = this.props;
+    const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
+    const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
+
     return (
       <div className='endpoint-block'>
         <DynamicForm
-          inputMap={pickTypeMap}
-          inputState={this.sinkToState(sink)}
-          onStateChange={this.handleSinkTypeStateChange}
+          inputMap={mapToUse}
+          inputState={this.typeValueToState(endpoint)}
+          onStateChange={this.handleTypeChange}
         />
         <FormClass
-          endpoint={sink}
+          endpoint={endpoint}
           onChange={this.handleEndpointChange}
         />
       </div>
-    );
+    )
   }
 
-  public sinkToState(sink: SinkConfig)
+  public typeStateToValue(state: SinkFormState | SourceFormState)
+  {
+    const { endpoint } = this.props;
+    return endpoint.set('type', state.type);
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public typeValueToState(value: SinkConfig | SourceConfig)
   {
     return {
-      type: sink.type,
+      type: value.type,
     };
   }
 
-  public stateToSink(state: SinkTypeState): SinkConfig
+  public handleTypeChange(state: SinkFormState | SourceFormState)
   {
-    const { sinks, sinkKey } = this.props;
-    const sink = sinks.get(sinkKey);
-    return sink.set('type', state.type);
+    const { isSource, endpoint, onChange } = this.props;
+    const constructorToUse = isSource ? _SourceConfig : _SinkConfig;
+    const newEndpoint = constructorToUse({ type: state.type });
+    onChange(newEndpoint);
   }
 
-  public handleSinkTypeStateChange(state: SinkTypeState)
+  public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig)
   {
-    const { act, sinks, sinkKey } = this.props;
-    const sink = sinks.get(sinkKey);
-    const newSink = _SinkConfig({ type: state.type });
-    if (state.type !== sink.type)
-    {
-      act({
-        actionType: 'setSink',
-        key: sinkKey,
-        newSink,
-      });
-    }
-  }
-
-  public handleEndpointChange(newConfig: SinkConfig | SinkConfig)
-  {
-    const { act, sinkKey } = this.props;
-    act({
-      actionType: 'setSink',
-      key: sinkKey,
-      newSink: newConfig,
-    });
+    this.props.onChange(newEndpoint);
   }
 }
 
-interface SinkTypeState
+interface SinkFormState
 {
   type: Sinks;
 }
-const pickTypeMap: InputDeclarationMap<SinkTypeState> =
-  {
-    type: {
-      type: DisplayType.Pick,
-      displayName: 'Sink Type',
-      options: {
-        pickOptions: (s) => sinkList,
-        indexResolver: (value) => sinkList.indexOf(value),
-      },
-    },
-  };
 
+interface SourceFormState
+{
+  type: Sources;
+}
+
+const sourceList = List([Sources.Upload, Sources.Algorithm, Sources.Sftp, Sources.Http]);
 const sinkList = List([Sinks.Download, Sinks.Database, Sinks.Sftp, Sinks.Http]);
-
-export default Util.createContainer(
-  SinkOptions,
-  [['templateEditor', 'template', 'sinks']],
-  { act: TemplateEditorActions },
-);
