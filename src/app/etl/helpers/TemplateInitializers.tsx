@@ -95,7 +95,9 @@ class Initializers extends ETLHelpers
         isDirty: false,
       });
 
-      DocumentsHelpers.fetchDocuments(template.sources.get('primary'));
+      template.sources.map((source, key) => {
+        DocumentsHelpers.fetchDocuments(source, key);
+      });
       ETLRouteUtil.gotoEditTemplate(template.id);
     };
     const onError = (response) =>
@@ -118,18 +120,22 @@ class Initializers extends ETLHelpers
       },
     });
     const onLoad = this.createInitialTemplateFn(source);
-    DocumentsHelpers.fetchDocuments(source, undefined, onLoad);
+    DocumentsHelpers.fetchDocuments(source, 'primary', onLoad);
   }
 
   public initNewFromWalkthrough(walkthrough: WalkthroughState = this.walkthrough)
   {
-    const source = walkthrough.source;
+    let source = walkthrough.source;
     const sink = walkthrough.sink;
     const onLoad = this.createInitialTemplateFn(source, sink);
+    
+
     if (source.type === Sources.Upload)
     {
       const file = walkthrough.getFile();
-      DocumentsHelpers.fetchDocuments(source, file, onLoad);
+      // todo refactor
+      source = source.setInOptions('file', file);
+      DocumentsHelpers.fetchDocuments(source, 'primary', onLoad);
     }
     else
     {

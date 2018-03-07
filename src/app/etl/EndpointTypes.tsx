@@ -76,6 +76,12 @@ class SourceConfigC implements SourceConfigI
   public type = null;
   public fileConfig = _FileConfig();
   public options = {};
+
+  public setInOptions<T extends Sources = any>(key: string, value: any)
+  {
+    const newOptions = _.defaults({key: value});
+    return (this as any).set('options', newOptions);
+  }
 }
 export type SourceConfig = WithIRecord<SourceConfigC>;
 export const _SourceConfig = makeExtendedConstructor(SourceConfigC, false, {
@@ -98,6 +104,12 @@ class SinkConfigC implements SinkConfigI
   public type = null;
   public fileConfig = _FileConfig();
   public options = {};
+
+  public setInOptions<T extends Sinks = any>(key: string, value: any)
+  {
+    const newOptions = _.defaults({key: value});
+    return (this as any).set('options', newOptions);
+  }
 }
 export type SinkConfig = WithIRecord<SinkConfigC>;
 export const _SinkConfig = makeExtendedConstructor(SinkConfigC, false, {

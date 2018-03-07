@@ -113,8 +113,6 @@ abstract class EndpointForm<State> extends TerrainComponent<Props>
   constructor(props)
   {
     super(props);
-    // this.optionsToFormState = this.optionsToFormState.bind(this);
-    // this.formStateToOptions = this.optionsToFormState.bind(this);
     this.handleFileConfigChange = this.handleFileConfigChange.bind(this);
     this.handleOptionsFormChange = this.handleOptionsFormChange.bind(this);
   }

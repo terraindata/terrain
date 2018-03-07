@@ -86,7 +86,7 @@ class DocumentsHelpers extends ETLHelpers
 {
   public fetchDocuments(
     source: SourceConfig,
-    file?: File,
+    key: string,
     onLoad?: (docs: List<object>) => void,
     onError?: (ev: string | MidwayError) => void,
   )
@@ -134,6 +134,7 @@ class DocumentsHelpers extends ETLHelpers
           break;
         }
         case Sources.Upload: {
+          const file = source.options['file'];
           if (file == null)
           {
             defaultError('File not provided');

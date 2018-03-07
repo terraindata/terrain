@@ -165,9 +165,12 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
       fileConfig: _FileConfig({
         fileType,
       }),
+      options: {
+        file
+      }
     });
     DocumentsHelpers.fetchDocuments(newSourceConfig,
-      file,
+      'primary',
       this.onDocumentsFetchedFactory(newSourceConfig),
       this.onDocumentsFetchError,
     );
