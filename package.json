@@ -237,7 +237,7 @@
     "@types/puppeteer": "^0.13.9",
     "@types/rc-slider": "^8.2.3",
     "@types/react": "^16.0.38",
-    "@types/react-beautiful-dnd": "^3.0.0",
+    "@types/react-beautiful-dnd": "^4.0.0",
     "@types/react-day-picker": "^5.3.0",
     "@types/react-dnd": "^2.0.34",
     "@types/react-dom": "^16.0.4",
