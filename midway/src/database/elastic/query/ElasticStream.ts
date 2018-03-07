@@ -42,7 +42,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
 import * as Stream from 'stream';
@@ -133,20 +132,23 @@ export class ElasticStream extends Stream.Readable
       return;
     }
 
-    const hits: ElasticQueryHit[] = response.hits.hits;
+    let hits: ElasticQueryHit[] = response.hits.hits;
     let length: number = hits.length;
 
     // trim off excess results
     if (this.rowsProcessed + length > this.size)
     {
       length = this.size - this.rowsProcessed;
-      response.hits.hits = hits.slice(0, length);
+      hits = hits.slice(0, length);
     }
 
     this.rowsProcessed += length;
     this.numRequested = Math.max(0, this.numRequested - length);
 
-    this.push(response);
+    for (let i = 0; i < hits.length; ++i)
+    {
+      this.push(hits[i]);
+    }
 
     this.querying = false;
     this.doneReading = this.doneReading

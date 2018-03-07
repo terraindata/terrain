@@ -84,7 +84,6 @@ export default class GroupJoinTransform extends Readable
   private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
   private _onRead: () => void;
-  private _onError: () => void;
   private _onEnd: () => void;
 
   constructor(client: ElasticClient, source: Readable, queryStr: string)
@@ -128,11 +127,9 @@ export default class GroupJoinTransform extends Readable
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
     this._onRead = this.readFromStream.bind(this);
-    this._onError = ((e) => this.emit('error', e)).bind(this);
     this._onEnd = this._final.bind(this);
 
     this.source.on('readable', this._onRead);
-    this.source.on('error', this._onError);
     this.source.on('end', this._onEnd);
   }
 
@@ -154,7 +151,6 @@ export default class GroupJoinTransform extends Readable
   public _final(callback)
   {
     this.source.removeListener('readable', this._onRead);
-    this.source.removeListener('error', this._onError);
     this.source.removeListener('end', this._onEnd);
 
     this.continueReading = false;
@@ -221,27 +217,13 @@ export default class GroupJoinTransform extends Readable
           const header = {};
           body.push(header);
 
-          try
-          {
-            const queryStr = ESParameterFiller.generate(
-              vi,
-              {
-                [this.parentAlias]: inputs[i]['_source'],
-              });
-            body.push(queryStr);
-          }
-          catch (e)
-          {
-            this.emit('error', e);
-            return;
-          }
+          const queryStr = ESParameterFiller.generate(
+            vi,
+            {
+              [this.parentAlias]: inputs[i]['_source'],
+            });
+          body.push(queryStr);
         }
-      }
-
-      if (body.length === 0)
-      {
-        ticket.count--;
-        continue;
       }
 
       this.client.msearch(
@@ -262,7 +244,7 @@ export default class GroupJoinTransform extends Readable
 
           for (let j = 0; j < numInputs; ++j)
           {
-            if (response.responses[j] !== undefined && response.responses[j].hits !== undefined)
+            if (response.responses[j].hits !== undefined)
             {
               ticket.results[j][subQuery] = response.responses[j].hits.hits;
             }

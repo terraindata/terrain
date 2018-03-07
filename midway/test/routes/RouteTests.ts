@@ -607,7 +607,9 @@ describe('Query route tests', () =>
         expect(JSON.parse(response.text))
           .toMatchObject({
             result: {
-              hits: { hits: [] },
+              timed_out: false,
+              _shards: { failed: 0 },
+              hits: { max_score: 0, hits: [] },
             }, errors: [],
           });
       })
