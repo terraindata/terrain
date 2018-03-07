@@ -42,6 +42,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 import * as fs from 'fs';
 import * as naturalSort from 'javascript-natural-sort';
 import * as nodeScheduler from 'node-schedule';

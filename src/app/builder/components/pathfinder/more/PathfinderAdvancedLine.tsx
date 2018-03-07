@@ -158,23 +158,23 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           />;
         break;
       case 'map':
-        content =
-          <div className='pf-advanced-map'>
-            <MapComponent
-              address={this.props.advancedData.get(item.textKey)}
-              location={Util.asJS(this.props.advancedData.get(item.key))}
-              markLocation={true}
-              showSearchBar={true}
-              zoomControl={true}
-              keepAddressInSync={false}
-              geocoder='google'
-              keyPath={this._ikeyPath(this.props.keyPath, item.key)}
-              textKeyPath={this._ikeyPath(this.props.keyPath, item.key)}
-              hideSearchSettings={true}
-              action={this.props.builderActions.changePath}
-              canEdit={this.props.canEdit}
-            />
-          </div>;
+        content = null;
+        // <div className='pf-advanced-map'>
+        //   <MapComponent
+        //     address={this.props.advancedData.get(item.textKey)}
+        //     location={Util.asJS(this.props.advancedData.get(item.key))}
+        //     markLocation={true}
+        //     showSearchBar={true}
+        //     zoomControl={true}
+        //     keepAddressInSync={false}
+        //     geocoder='google'
+        //     keyPath={this._ikeyPath(this.props.keyPath, item.key)}
+        //     textKeyPath={this._ikeyPath(this.props.keyPath, item.key)}
+        //     hideSearchSettings={true}
+        //     action={this.props.builderActions.changePath}
+        //     canEdit={this.props.canEdit}
+        //   />
+        // </div>;
         break;
       default:
     }

@@ -74,7 +74,7 @@ export interface RouteSelectorOption
   value: any;
   displayName?: string | number | El;
   color?: string;
-  sampleData: List<any>;
+  sampleData?: List<any>;
   extraContent?: string | El;
   icon?: any;
   closeOnPick?: boolean; // close the picker when this option is picked
@@ -998,7 +998,8 @@ export class RouteSelector extends TerrainComponent<Props>
           height: column.offsetHeight,
           width: column.offsetWidth,
           top: column.offsetTop,
-          left: column.offsetLeft} : {}}
+          left: column.offsetLeft
+        } : {}}
       />
     );
   }

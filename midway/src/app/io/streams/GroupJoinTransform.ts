@@ -243,7 +243,6 @@ export default class GroupJoinTransform extends Readable
         continue;
       }
 
-
       this.client.msearch(
         {
           body,

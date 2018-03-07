@@ -205,7 +205,6 @@ class LinearSelector extends TerrainComponent<Props>
   public render()
   {
     const { usingCustomValue } = this.state;
-                        this.props.selected : this.state.customInput || 'Other');
     return (
       <div className='linear-selector-wrapper'>
         <div
@@ -227,7 +226,7 @@ class LinearSelector extends TerrainComponent<Props>
             <div
               className={classNames({
                 'linear-selector-custom': true,
-                'linear-selector-option-hidden': !usingCustomValue && !this.state.showAllOptions
+                'linear-selector-option-hidden': !usingCustomValue && !this.state.showAllOptions,
               })}
               onClick={this.showCustomTextbox}
               ref={'custom'}
@@ -251,12 +250,12 @@ class LinearSelector extends TerrainComponent<Props>
                       fontColor(usingCustomValue ? Colors().fontWhite : Colors().text3),
                       backgroundColor(usingCustomValue && !this.state.showCustomTextbox ? Colors().active : ''),
                     ]}
-                    >
+                  >
                     {
                       (usingCustomValue && this.props.selected !== undefined && this.props.selected !== '') ?
                         this.props.selected : this.state.customInput || 'Other'
                     }
-                 </div>
+                  </div>
               }
             </div>
           }

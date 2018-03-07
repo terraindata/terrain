@@ -262,7 +262,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     const noneOption = _ChoiceOption({
       value: undefined,
       displayName: 'None',
-    })
+    });
     fieldOptions = List([noneOption]).concat(fieldOptions).toList();
     const fieldSet = {
       key: 'field',
@@ -273,7 +273,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       hideSampleData: true,
       hasSearch: true,
       forceFloat: true,
-      getCustomDisplayName: (value, index) => {return value || 'None'},
+      getCustomDisplayName: (value, index) => value || 'None',
     };
 
     return List([fieldSet]);
@@ -463,25 +463,25 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             text={PathfinderText.moreSectionSubtitle}
           />
         }
-       {
-        // <RouteSelector
-        //   optionSets={this.getSizeOptionSets() /* TODO store in state? */}
-        //   values={List([this.props.path.source.count])}
-        //   onChange={this.handleSizePickerChange}
-        //   canEdit={canEdit}
-        //   defaultOpen={false}
-        //   hideLine={true}
-        //   autoFocus={true}
-        // />
-      }
-         <RouteSelector
-            optionSets={this.getCollapseOptionSets()}
-            values={List([this.props.more.collapse])}
-            onChange={this.handleCollapseChange}
-            canEdit={canEdit}
-            defaultOpen={false}
-            autoFocus={true}
-          />
+        {
+          // <RouteSelector
+          //   optionSets={this.getSizeOptionSets() /* TODO store in state? */}
+          //   values={List([this.props.path.source.count])}
+          //   onChange={this.handleSizePickerChange}
+          //   canEdit={canEdit}
+          //   defaultOpen={false}
+          //   hideLine={true}
+          //   autoFocus={true}
+          // />
+        }
+        <RouteSelector
+          optionSets={this.getCollapseOptionSets()}
+          values={List([this.props.more.collapse])}
+          onChange={this.handleCollapseChange}
+          canEdit={canEdit}
+          defaultOpen={false}
+          autoFocus={true}
+        />
         {
           this.props.keyPath.includes('nested') ?
             <RouteSelector

@@ -60,8 +60,8 @@ import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
 import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
-import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import LinearSelector from 'common/components/LinearSelector';
+import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
   _ElasticDataSource, ChoiceOption, Path, PathfinderContext, PathfinderSteps,

@@ -135,7 +135,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   const collapse = path.more.collapse;
   if (collapse)
   {
-    baseQuery = baseQuery.set('collapse', {field: collapse});
+    baseQuery = baseQuery.set('collapse', { field: collapse });
   }
   const groupJoin = parseNested(path.more, path.nested, inputs);
   if (groupJoin)
