@@ -55,7 +55,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
+import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
 import Util from 'util/Util';
 import BuilderActions from '../../builder/data/BuilderActions';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';

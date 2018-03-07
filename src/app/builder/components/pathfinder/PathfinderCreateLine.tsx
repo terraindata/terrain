@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-import { Colors, fontColor, backgroundColor, getStyle } from 'app/colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as Radium from 'radium';

@@ -61,13 +61,13 @@ import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
 import { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
+import SingleRouteSelector from 'common/components/SingleRouteSelector';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
-import SingleRouteSelector from 'common/components/SingleRouteSelector';
 
 export interface Props
 {
@@ -429,7 +429,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           semilarge={true}
           value={title}
           options={List([])}
-          onChange={(value) => {}}
+          onChange={(value) => { }}
           headerText={'Filter'}
           hideLine={true}
         />

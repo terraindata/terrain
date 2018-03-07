@@ -288,7 +288,7 @@ class HitsArea extends TerrainComponent<Props>
   {
     this.setState({
       expanded: true,
-    expandedHitIndex: hitIndex,
+      expandedHitIndex: hitIndex,
     });
   }
 

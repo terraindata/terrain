@@ -191,12 +191,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       {
         displayName: 'ascending',
         value: 'asc',
-        sampleData: List([])
+        sampleData: List([]),
       },
       {
         displayName: 'descending',
         value: 'desc',
-        sampleData: List([])
+        sampleData: List([]),
       },
     ]);
     const orderSet: RouteSelectorOptionSet = {

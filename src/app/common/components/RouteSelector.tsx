@@ -728,9 +728,9 @@ export class RouteSelector extends TerrainComponent<Props>
     //   ? this.fadeInOutWrapper : this.divWrapper;
     const wrapperFn = this.divWrapper;
     const focused = state.focusedOptionIndex === visibleOptionsIndex
-                  && optionSetIndex === state.focusedSetIndex
-                  && state.focusedOptionIndex !== -1
-                  && state.focusedSetIndex !== -1;
+      && optionSetIndex === state.focusedSetIndex
+      && state.focusedOptionIndex !== -1
+      && state.focusedSetIndex !== -1;
     return (
       <div
         className='routeselector-option-wrapper'
@@ -1079,7 +1079,7 @@ export class RouteSelector extends TerrainComponent<Props>
 }
 
 const OPTION_NAME_STYLE = {
-  'color': Colors().fontColor,
+  color: Colors().fontColor,
 };
 
 const OPTION_NAME_SELECTED_STYLE = {

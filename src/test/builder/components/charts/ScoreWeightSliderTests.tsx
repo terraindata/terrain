@@ -65,8 +65,8 @@ describe('ScoreWeightSlider', () =>
         onChange={(value: number) => 1}
         onAfterChange={(value: number) => 1}
         height={33}
-      />
-    )
+      />,
+    );
   });
 
   describe('#render', () =>
@@ -153,7 +153,7 @@ describe('ScoreWeightSlider', () =>
       it('should return a rounded handle', () =>
       {
         componentWrapper.setProps({ rounded: true });
-        const handleStyle = componentWrapper.instance().getHandleStyle()
+        const handleStyle = componentWrapper.instance().getHandleStyle();
         expect(handleStyle.borderRadius).toEqual(40);
       });
     });
@@ -163,7 +163,7 @@ describe('ScoreWeightSlider', () =>
       it('should return a rounded handle', () =>
       {
         componentWrapper.setProps({ rounded: false });
-        const handleStyle = componentWrapper.instance().getHandleStyle()
+        const handleStyle = componentWrapper.instance().getHandleStyle();
         expect(handleStyle.borderRadius).toEqual(4);
       });
     });
@@ -176,7 +176,7 @@ describe('ScoreWeightSlider', () =>
       it('should return a track with no padding', () =>
       {
         componentWrapper.setProps({ noPadding: true });
-        const trackHeight = componentWrapper.instance().getTrackHeight()
+        const trackHeight = componentWrapper.instance().getTrackHeight();
         expect(trackHeight).toEqual(height);
       });
     });
@@ -186,7 +186,7 @@ describe('ScoreWeightSlider', () =>
       it('should return a track with padding', () =>
       {
         componentWrapper.setProps({ noPadding: false });
-        const trackHeight = componentWrapper.instance().getTrackHeight()
+        const trackHeight = componentWrapper.instance().getTrackHeight();
         expect(trackHeight).toEqual(height - 6);
       });
     });
