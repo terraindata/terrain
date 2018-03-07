@@ -308,7 +308,7 @@ class HitComponent extends TerrainComponent<Props> {
                 index={i + offset}
                 expanded={false}
                 allowSpotlights={canSpotlight}
-                key={field + String(i)}
+                key={fields['_id'] !== undefined ? fields['_id'] : i}
                 style={borderColor(Colors().blockOutline)}
                 hitSize='small'
                 hit={_Hit({
@@ -319,6 +319,7 @@ class HitComponent extends TerrainComponent<Props> {
                 hideFieldNames={true}
                 firstVisibleField={this.state.scrollState.get(field)}
                 primaryKey={fields['_id']}
+                onExpand={undefined}
               />);
           },
           )
@@ -518,7 +519,10 @@ class HitComponent extends TerrainComponent<Props> {
 
   public expand()
   {
-    this.props.onExpand(this.props.index);
+    if (this.props.onExpand !== undefined)
+    {
+      this.props.onExpand(this.props.index);
+    }
   }
 
   public render()

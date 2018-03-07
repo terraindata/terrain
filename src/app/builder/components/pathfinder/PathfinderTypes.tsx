@@ -416,7 +416,7 @@ export const BoostOptions = List([
 
 class DistanceValueC extends BaseClass
 {
-  public location: [number, number] = [0, 0];
+  public location: [number, number] = undefined;
   public address: string = '';
   public distance?: number = 10;
   public units?: string = 'mi';

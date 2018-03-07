@@ -186,13 +186,16 @@ class LinearSelector extends TerrainComponent<Props>
     }
   }
 
-  public submitCustomInput()
+  public submitCustomInput(e)
   {
-    this.setState({
-      showCustomTextbox: false,
-      usingCustomValue: true,
-      showAllOptions: this.props.hideOptions ? false : true,
-    });
+    if (e.keyCode === 13 || e.keyCode === 9)
+    {
+      this.setState({
+        showCustomTextbox: false,
+        usingCustomValue: true,
+        showAllOptions: this.props.hideOptions ? false : true,
+      });
+    }
   }
 
   public onInputChange(value)
@@ -237,10 +240,11 @@ class LinearSelector extends TerrainComponent<Props>
                     value={this.props.selected}
                     keyPath={this.props.keyPath}
                     canEdit={this.props.canEdit}
-                    onBlur={this.submitCustomInput}
+                    onKeyDown={this.submitCustomInput}
                     autoFocus={true}
                     onChange={this.onInputChange}
                     action={this.props.action}
+                    autoDisabled={true}
                   /> :
                   <div className={classNames({
                     'linear-selector-option-selected': usingCustomValue,

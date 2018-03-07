@@ -80,6 +80,7 @@ export interface Props
   boundingRectangles?: List<BoundingRectangle> | List<{}>;
   onZoomChange?: (zoom) => void;
   zoom?: number;
+  debounce?: boolean;
   // Show/Hide certain features
   hideZoomControl?: boolean;
   hideSearchBar?: boolean;
@@ -145,19 +146,27 @@ export const units =
 
 class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
+  private debouncedExecuteChange;
 
   public state: {
     mapExpanded: boolean,
     zoom: number;
     coordinateSearch: boolean;
+    inputValue: string;
   } = {
       mapExpanded: false,
       zoom: 15,
       coordinateSearch: false,
+      inputValue: this.props.inputValue,
     };
-
   public geoCache = {};
   public reverseGeoCache = {};
+
+  constructor(props)
+  {
+    super(props);
+    this.debouncedExecuteChange = _.debounce(this.executeChange, 350);
+  }
 
   public shouldComponentUpdate(nextProps, nextState)
   {
@@ -166,10 +175,18 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 
   public onChange(coordinates, inputValue)
   {
+    this.setState({
+      inputValue,
+      });
     if (this.props.onChange !== undefined)
     {
-      this.props.onChange(coordinates, inputValue);
+      this.debouncedExecuteChange(coordinates, inputValue);
     }
+  }
+
+  public executeChange(coordinates, inputValue)
+  {
+    this.props.onChange(coordinates, inputValue);
   }
 
   // Create a marker icon given style parameters
@@ -224,6 +241,12 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
       && (nextProps.inputValue === undefined || nextProps.inputValue === ''))
     {
       this.reverseGeocode(nextProps.coordinates);
+    }
+    if (nextProps.inputValue !== this.props.inputValue)
+    {
+      this.setState({
+        inputValue: nextProps.inputValue
+      })
     }
   }
 
@@ -483,7 +506,8 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 
   public renderMap()
   {
-    const { coordinates, inputValue, zoom } = this.props;
+    const { coordinates, zoom } = this.props;
+    const { inputValue } = this.state;
     const location = this.parseLocation(coordinates, inputValue);
     return (
       <div className={this.props.className} >
@@ -577,7 +601,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
   public renderSearchBar()
   {
     const inputProps = {
-      value: this.props.inputValue,
+      value: this.state.inputValue,
       onChange: this.handleInputValueChange,
       disabled: this.props.canEdit === false,
     };

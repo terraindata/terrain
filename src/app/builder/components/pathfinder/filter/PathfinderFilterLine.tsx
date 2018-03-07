@@ -493,6 +493,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   wrapperClassName={'pf-filter-map-component-wrapper'}
                   fadeInOut={true}
                   onChange={this.handleMapChange}
+                  debounce={true}
                   canEdit={pathfinderContext.canEdit}
                 />
               </div>
