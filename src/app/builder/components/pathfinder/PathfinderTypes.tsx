@@ -279,6 +279,7 @@ class MoreC extends BaseClass
 {
   public aggregations: List<AggregationLine> = List([]);
   public references: List<string> = List([]); // What should this query be referred to in other queries (@parent in US query)
+  public collapse: string = undefined;
 }
 
 export type More = MoreC & IRecord<MoreC>;

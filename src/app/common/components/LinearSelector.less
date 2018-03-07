@@ -13,7 +13,7 @@
 	    font-size: @small-font-size;
 	    margin-right: 9px;
 	}
-	.linear-selector-option, .linear-selector-custom {
+	.linear-selector-option, {
 		padding: 0px 6px;
 		cursor: pointer;
 		font-size: @small-font-size;
@@ -35,6 +35,14 @@
 			width: 40px;
 			input {
 				font-size: 14px;
+			}
+		}
+		&.linear-selector-option-hidden {
+			width: 0px;
+			padding: 0px;
+			.linear-selector-option {
+				width: 0px;
+				padding: 0px;
 			}
 		}
 	}

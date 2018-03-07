@@ -105,6 +105,7 @@ class PathfinderColumn extends TerrainComponent<Props>
           backgroundColor(Colors().bg3),
           fontColor(Colors().text3),
         ]}
+        id='pf-column'
       >
         <PathfinderArea
           {...this.props}

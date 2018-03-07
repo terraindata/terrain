@@ -142,15 +142,11 @@ class HitsArea extends TerrainComponent<Props>
     mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
     mapMaxHeight: undefined,
-<<<<<<< HEAD
-    spotlightHits: Immutable.Map<string, any>({}),
+    spotlightHits: Immutable.Map<string, any>(),
     hitSize: 'large',
     indexName: '',
     resultsConfig: undefined,
     nestedFields: List([]),
-=======
-    spotlightHits: Immutable.Map<string, any>(),
->>>>>>> origin/new-elasticstream-mergejoin-take-2
   };
 
   public hitsFodderRange = _.range(0, 25);
@@ -401,7 +397,7 @@ class HitsArea extends TerrainComponent<Props>
       hits.forEach((hit, i) =>
       {
         const { resultsConfig } = this.state;
-        const name = resultsConfig.enabled && resultsConfig.name !== undefined ?
+        const name = resultsConfig && resultsConfig.enabled && resultsConfig.name !== undefined ?
           hit.fields.get(resultsConfig.name) : hit.fields.get('_id');
         const spotlight = this.state.spotlightHits.get(hit.primaryKey);
         const color = spotlight !== undefined && spotlight.color !== undefined ? spotlight.color : 'black';

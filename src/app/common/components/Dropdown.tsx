@@ -344,7 +344,6 @@ class Dropdown extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.props.options);
     // Element with options, rendered at the top or bottom of the dropdown
     let optionsEl: El = null;
     if (this.state.open)

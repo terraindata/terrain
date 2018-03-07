@@ -61,6 +61,7 @@ import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
 import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import LinearSelector from 'common/components/LinearSelector';
 import
 {
   _ElasticDataSource, ChoiceOption, Path, PathfinderContext, PathfinderSteps,
@@ -133,6 +134,15 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           hasOther={false}
           large={true}
           hideLine={true}
+        />
+        <LinearSelector
+          options={List(['all', '1', '5', '10', '100'])}
+          selected={source.count}
+          keyPath={this._ikeyPath(this.props.keyPath.push('count'))}
+          action={this.props.builderActions.changePath}
+          canEdit={canEdit}
+          allowCustomInput={true}
+          hideOptions={true}
         />
       </div>
     );

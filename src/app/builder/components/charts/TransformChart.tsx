@@ -790,6 +790,7 @@ const TransformChart = {
       .attr('y', (d) => idToY[d['id']] + 5)
       .attr('x', (d) => getFinalX(d) + SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING + 3)
       .attr('fill', (d) => d['color'])
+      .attr('style', 'font-size: 12px')
       ;
 
     spotlight

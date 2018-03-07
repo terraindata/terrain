@@ -65,7 +65,7 @@ import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
-import { _AggregationLine, _Path, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import { _AggregationLine, _ChoiceOption, _Path, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
@@ -248,6 +248,37 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     ]);
   }
 
+  public getCollapseOptionSets()
+  {
+    const { pathfinderContext } = this.props;
+    const { source } = pathfinderContext;
+    let fieldOptions = source.dataSource.getChoiceOptions({
+      type: 'fields',
+      source,
+      schemaState: pathfinderContext.schemaState,
+      builderState: pathfinderContext.builderState,
+      // subtype: isSoftFilter ? 'match' : undefined,
+    });
+    const noneOption = _ChoiceOption({
+      value: undefined,
+      displayName: 'None',
+    })
+    fieldOptions = List([noneOption]).concat(fieldOptions).toList();
+    const fieldSet = {
+      key: 'field',
+      options: fieldOptions,
+      shortNameText: 'Collapse',
+      headerText: 'Collapse results with the same', // 'Choose on which field to impose a condition',
+      column: true,
+      hideSampleData: true,
+      hasSearch: true,
+      forceFloat: true,
+      getCustomDisplayName: (value, index) => {return value || 'None'},
+    };
+
+    return List([fieldSet]);
+  }
+
   public getMinMatchesOptionSets()
   {
     return List([
@@ -330,8 +361,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleMinMatchesChange(optionSetIndex: number, value: any)
   {
     const { keyPath } = this.props;
-    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'minMatches');
+    const nestedKeyPath = this._ikeyPath(keyPath.butLast().toList(), 'minMatches');
     this.props.builderActions.changePath(nestedKeyPath, value);
+  }
+
+  public handleCollapseChange(optionSetIndex: number, value)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath.push('collapse')), value);
   }
 
   public handleExpandNested(keyPath, expanded)
@@ -427,15 +463,25 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             text={PathfinderText.moreSectionSubtitle}
           />
         }
-        <RouteSelector
-          optionSets={this.getSizeOptionSets() /* TODO store in state? */}
-          values={List([this.props.path.source.count])}
-          onChange={this.handleSizePickerChange}
-          canEdit={canEdit}
-          defaultOpen={false}
-          hideLine={true}
-          autoFocus={true}
-        />
+       {
+        // <RouteSelector
+        //   optionSets={this.getSizeOptionSets() /* TODO store in state? */}
+        //   values={List([this.props.path.source.count])}
+        //   onChange={this.handleSizePickerChange}
+        //   canEdit={canEdit}
+        //   defaultOpen={false}
+        //   hideLine={true}
+        //   autoFocus={true}
+        // />
+      }
+         <RouteSelector
+            optionSets={this.getCollapseOptionSets()}
+            values={List([this.props.more.collapse])}
+            onChange={this.handleCollapseChange}
+            canEdit={canEdit}
+            defaultOpen={false}
+            autoFocus={true}
+          />
         {
           this.props.keyPath.includes('nested') ?
             <RouteSelector

@@ -61,7 +61,7 @@ const MAX_COUNT = 101;
 
 export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
-  let baseQuery = Map({
+  let baseQuery: Map<string, any> = Map({
     query: Map({
       bool: Map({
         filter: List([]),
@@ -130,8 +130,13 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   }
 
   // More
-  const moreObj = parseAggregations(path.more);
-  baseQuery = baseQuery.set('aggs', Map(moreObj));
+  // const moreObj = parseAggregations(path.more);
+  // baseQuery = baseQuery.set('aggs', Map(moreObj));
+  const collapse = path.more.collapse;
+  if (collapse)
+  {
+    baseQuery = baseQuery.set('collapse', {field: collapse});
+  }
   const groupJoin = parseNested(path.more, path.nested, inputs);
   if (groupJoin)
   {

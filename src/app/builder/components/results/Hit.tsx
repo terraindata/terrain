@@ -290,9 +290,11 @@ class HitComponent extends TerrainComponent<Props> {
         {
           items.map((fields, i) =>
           {
+            let canSpotlight = false;
             if (fields['_source'])
             {
               fields = _.extend({}, fields, fields['_source']);
+              canSpotlight = true;
             }
             // This happens when the source isn't properly set, such as in the Schema Browser
             if (typeof fields !== 'object')
@@ -304,9 +306,8 @@ class HitComponent extends TerrainComponent<Props> {
                 {...this.props}
                 resultsConfig={format && format.config}
                 index={i + offset}
-                primaryKey={''}
                 expanded={false}
-                allowSpotlights={false}
+                allowSpotlights={canSpotlight}
                 key={field + String(i)}
                 style={borderColor(Colors().blockOutline)}
                 hitSize='small'
@@ -317,6 +318,7 @@ class HitComponent extends TerrainComponent<Props> {
                 nestedFields={undefined}
                 hideFieldNames={true}
                 firstVisibleField={this.state.scrollState.get(field)}
+                primaryKey={fields['_id']}
               />);
           },
           )

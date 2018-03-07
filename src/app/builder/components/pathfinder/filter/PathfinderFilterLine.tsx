@@ -487,7 +487,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 <MapComponent
                   geocoder='google'
                   inputValue={props.value && props.value.address || ''}
-                  coordinates={props.value && props.value.location !== undefined ? props.value.location : [0, 0]}
+                  coordinates={props.value && props.value.location !== undefined ? props.value.location : undefined}
                   distance={props.value && props.value.distance || 0}
                   distanceUnit={props.value && props.value.units || 'miles'}
                   wrapperClassName={'pf-filter-map-component-wrapper'}
