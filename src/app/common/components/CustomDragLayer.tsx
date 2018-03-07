@@ -94,7 +94,7 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
 
   public renderItemBlock(key: string, header: string, data: any)
   {
-    const headerStyle = fontColor(Colors().fontColor3);
+    const headerStyle = fontColor(Colors().text3);
     const valueStyle = fontColor(Colors().active);
     return (
       <div className={`drag-drop-item-${key}`}>

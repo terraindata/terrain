@@ -55,7 +55,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import onClickOutside from 'react-onclickoutside';
+import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
 import Util from 'util/Util';
 import BuilderActions from '../../builder/data/BuilderActions';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
@@ -86,7 +86,7 @@ export interface Props
 }
 
 @Radium
-class SearchableDropdown extends TerrainComponent<Props>
+class SearchableDropdown extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
   public state: {
     up: boolean,
@@ -96,7 +96,7 @@ class SearchableDropdown extends TerrainComponent<Props>
     inputValue: string,
   };
 
-  constructor(props: Props)
+  constructor(props: Props & InjectedOnClickOutProps)
   {
     super(props);
 

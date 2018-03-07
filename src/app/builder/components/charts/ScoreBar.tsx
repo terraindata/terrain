@@ -68,9 +68,9 @@ const SCORE_COLORS =
 interface Props
 {
   weight: number;
-  onBeforeChange: (value: number) => void;
-  onChange: (value: number) => void;
-  onAfterChange: (value: number) => void;
+  onBeforeChange?: (value: number) => void;
+  onChange?: (value: number) => void;
+  onAfterChange?: (value: number) => void;
   min?: number;
   max?: number;
   step?: number;
@@ -184,7 +184,7 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleWeightChange(value: number)
   {
-    if (this.props.canEdit)
+    if (this.props.canEdit && this.props.onChange)
     {
       this.props.onChange(value);
     }
@@ -192,16 +192,20 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleWeightAfterChange(value: number)
   {
-    if (this.props.round)
+    if (this.props.onAfterChange)
     {
-      value = Math.round(value);
+      if (this.props.round)
+      {
+        value = Math.round(value);
+      }
+
+      this.props.onAfterChange(value);
     }
-    this.props.onAfterChange(value);
   }
 
   private handleWeightTextChange(e)
   {
-    if (this.props.canEdit)
+    if (this.props.canEdit && this.props.onChange)
     {
       this.props.onChange(e.target.value);
     }

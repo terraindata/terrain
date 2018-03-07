@@ -207,7 +207,6 @@ class InputComponent extends TerrainComponent<Props>
           inputValue={this.props.input.meta}
           coordinates={value}
           allowSearchByCoordinate={true}
-          action={this.props.action}
         />
       );
     }

@@ -234,6 +234,7 @@ export const _Column = (config: {
   datatype: string,
   isNullable?: boolean,
   isPrimaryKey?: boolean,
+  properties?: any,
   // fieldProperties?: any,
 
   id?: string,

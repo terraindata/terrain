@@ -460,7 +460,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     const spotlightData = this.props.hit.toJS();
     spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig,
-      this.props.expanded, this.props.schema, this.props.locations, spotlightColor);
+      this.props.expanded, this.props.schema, this.props.builder, this.props.locations, spotlightColor);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = this.props.index;
