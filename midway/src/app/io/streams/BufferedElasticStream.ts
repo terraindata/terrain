@@ -63,12 +63,12 @@ export default class BufferedElasticStream extends Readable
   private _shouldContinue: boolean = true;
   private _isSourceEmpty: boolean = false;
 
-  private _onBufferFull: (stream: object[]) => void;
+  private _onBufferFull: (buffer: object[]) => void;
   private _onRead: () => void;
   private _onError: () => void;
   private _onEnd: () => void;
 
-  constructor(client: ElasticClient, query: any, onBufferFull: (stream: object[]) => void, size: number = 8)
+  constructor(client: ElasticClient, query: any, onBufferFull: (buffer: object[]) => void, size: number = 8)
   {
     super({
       objectMode: true,
