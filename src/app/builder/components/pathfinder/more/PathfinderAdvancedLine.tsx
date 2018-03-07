@@ -172,6 +172,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
               textKeyPath={this._ikeyPath(this.props.keyPath, item.key)}
               hideSearchSettings={true}
               action={this.props.builderActions.changePath}
+              canEdit={this.props.canEdit}
             />
           </div>;
         break;

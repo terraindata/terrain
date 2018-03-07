@@ -280,7 +280,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       this.props.pathfinderContext.builderState,
       field,
       this.props.pathfinderContext.source.dataSource,
-    );
+    ) as FieldType;
     const options = AggregationTypes.get(type).fieldTypesToElasticTypes.get(String(fieldType));
     // If there are no options, it is a meta-field
     if (options === undefined)

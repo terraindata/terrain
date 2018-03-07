@@ -83,7 +83,7 @@ const styles = {
   }),
   rail: (height) => ({
     height,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   }),
   innerSliderWrapper: (height) => ({
     width: `calc(100% - ${height}px)`,
@@ -94,10 +94,10 @@ const styles = {
     zIndex: 2,
     top: -3,
     position: 'absolute' as 'absolute',
-    height: height + 6,
+    height: parseInt(height, 10) + 6,
     borderLeft: '1px solid rgba(30, 180, 250, .5)',
-  })
-}
+  }),
+};
 
 export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSliderProps>
 {

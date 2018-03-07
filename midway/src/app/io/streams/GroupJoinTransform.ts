@@ -208,7 +208,6 @@ export default class GroupJoinTransform extends Readable
       results: inputs,
     };
     this.bufferedOutputs.push(ticket);
-
     for (const subQuery of Object.keys(query))
     {
       const body: any[] = [];
@@ -221,14 +220,29 @@ export default class GroupJoinTransform extends Readable
           const header = {};
           body.push(header);
 
-          const queryStr = ESParameterFiller.generate(
-            vi,
-            {
-              [this.parentAlias]: inputs[i]['_source'],
-            });
-          body.push(queryStr);
+          try
+          {
+            const queryStr = ESParameterFiller.generate(
+              vi,
+              {
+                [this.parentAlias]: inputs[i]['_source'],
+              });
+            body.push(queryStr);
+          }
+          catch (e)
+          {
+            this.emit('error', e);
+            return;
+          }
         }
       }
+
+      if (body.length === 0)
+      {
+        ticket.count--;
+        continue;
+      }
+
 
       this.client.msearch(
         {

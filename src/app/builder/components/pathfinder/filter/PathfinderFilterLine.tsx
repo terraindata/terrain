@@ -132,7 +132,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         return true;
       }
     }
-    return !_.isEqual(this.state, nextState);;
+    return !_.isEqual(this.state, nextState);
   }
 
   public render()
@@ -427,7 +427,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
     if (!this.shouldShowValue())
     {
-      return;
+      return undefined;
     }
 
     const comparisonOptions = source.dataSource.getChoiceOptions({

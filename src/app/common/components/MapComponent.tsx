@@ -51,7 +51,7 @@ import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, ZoomControl } from 'react-leaflet';
-import onClickOutside from 'react-onclickoutside';
+import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
 
 import Switch from 'common/components/Switch';
 import { backgroundColor, Colors } from '../../colors/Colors';
@@ -89,9 +89,6 @@ export interface Props
   wrapperClassName?: string;
   // When the text box is selected, the map will expand below it, otherwise it will be hidden
   fadeInOut?: boolean;
-
-  disableOnClickOutside: () => void;
-  enableOnClickOutside: () => void;
 }
 
 interface LocationMarker
@@ -146,7 +143,7 @@ export const units =
     nmi: 'nautical miles',
   };
 
-class MapComponent extends TerrainComponent<Props>
+class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
 
   public state: {
@@ -220,7 +217,7 @@ class MapComponent extends TerrainComponent<Props>
     return styledIcon;
   }
 
-  public componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props & InjectedOnClickOutProps)
   {
     // If the coordinates change, and the input value is not defined, try to reverse geocode it
     if (!_.isEqual(this.props.coordinates, nextProps.coordinates)

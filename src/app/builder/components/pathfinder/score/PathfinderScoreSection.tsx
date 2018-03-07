@@ -191,10 +191,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       {
         displayName: 'ascending',
         value: 'asc',
+        sampleData: List([]),
       },
       {
         displayName: 'descending',
         value: 'desc',
+        sampleData: List([]),
       },
     ]);
     const orderSet: RouteSelectorOptionSet = {
@@ -360,7 +362,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
                 this.getScoreLines(score.lines) : this.getLinearScoreLines(score.lines)
               }
               onDrop={this.handleLinesReorder}
-              onDragStart={this.handleDragStart}
               className='drag-drop-pf-score'
             />
             :

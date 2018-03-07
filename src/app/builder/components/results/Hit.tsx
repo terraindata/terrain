@@ -217,7 +217,7 @@ class HitComponent extends TerrainComponent<Props> {
           className='hit-nested-content-header'
           style={[borderColor(Colors().blockOutline),
           backgroundColor(depth % 2 === 1 ? Colors().fontWhite : Colors().blockBg),
-          {opacity: size === 0 ? 0.5 : 1}
+          { opacity: size === 0 ? 0.5 : 1 },
           ]}
         >
           <ExpandIcon
@@ -231,11 +231,11 @@ class HitComponent extends TerrainComponent<Props> {
           />
           <div
             className='hit-nested-content-title'
-            // onClick={this._fn(
-            //   this.changeNestedState,
-            //   expandState !== NestedState.Collapsed ?
-            //     NestedState.Collapsed : NestedState.Normal,
-            //   field)}
+          // onClick={this._fn(
+          //   this.changeNestedState,
+          //   expandState !== NestedState.Collapsed ?
+          //     NestedState.Collapsed : NestedState.Normal,
+          //   field)}
           >
             {field} ({size})
           </div>
@@ -245,32 +245,32 @@ class HitComponent extends TerrainComponent<Props> {
             <span className='column-name-name'>Name</span>
           </div>
         </div>
-          {
-            expandState !== NestedState.Collapsed &&
-            <div>
-              {
-                this.state.scrollState.get(field) ?
-                  <div
-                    onClick={this._fn(this.handleScroll, field, -1)}
-                    className='hit-content-scroll-back'
-                    style={getStyle('fill', Colors().iconColor)}
-                    key='forward-icon'
-                  >
-                    <CarrotIcon />
-                  </div>
-                  :
-                  null
-              }
-              <div
-                onClick={this._fn(this.handleScroll, field, 1)}
-                className='hit-content-scroll-forward'
-                style={getStyle('fill', Colors().iconColor)}
-                key='back-icon'
-              >
-                <CarrotIcon />
-              </div>
+        {
+          expandState !== NestedState.Collapsed &&
+          <div>
+            {
+              this.state.scrollState.get(field) ?
+                <div
+                  onClick={this._fn(this.handleScroll, field, -1)}
+                  className='hit-content-scroll-back'
+                  style={getStyle('fill', Colors().iconColor)}
+                  key='forward-icon'
+                >
+                  <CarrotIcon />
+                </div>
+                :
+                null
+            }
+            <div
+              onClick={this._fn(this.handleScroll, field, 1)}
+              className='hit-content-scroll-forward'
+              style={getStyle('fill', Colors().iconColor)}
+              key='back-icon'
+            >
+              <CarrotIcon />
             </div>
-          }
+          </div>
+        }
       </div>
     );
   }
@@ -462,7 +462,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     const spotlightData = this.props.hit.toJS();
     spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig,
-      this.props.expanded, this.props.schema, this.props.locations, spotlightColor);
+      this.props.expanded, this.props.schema, this.props.builder, this.props.locations, spotlightColor);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = this.props.index;

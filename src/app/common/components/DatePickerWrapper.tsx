@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 const moment = require('moment');
-import OnClickOut from 'react-onclickoutside';
+import OnClickOut, { InjectedOnClickOutProps } from 'react-onclickoutside';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import Dropdown from './Dropdown';
@@ -71,7 +71,7 @@ export interface Props
   format?: string;
 }
 
-class DatePickerWrapper extends TerrainComponent<Props>
+class DatePickerWrapper extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
   public state: {
     expanded: boolean;

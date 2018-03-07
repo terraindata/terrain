@@ -204,7 +204,7 @@ export interface Props
   noBorder?: boolean;
   noBg?: boolean;
   large?: boolean;
-  semilarge: boolean;
+  semilarge?: boolean;
   forceFloat?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   autoFocus?: boolean;
@@ -216,6 +216,10 @@ export interface Props
 
 export class FloatingInput extends TerrainComponent<Props>
 {
+  static defaultProps = {
+    semilarge: false,
+  };
+
   state = {
     isFocused: false,
     myId: String(Math.random()) + '-floatinginput',
