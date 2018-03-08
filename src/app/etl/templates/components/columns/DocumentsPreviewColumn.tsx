@@ -53,12 +53,8 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import UploadFileButton from 'etl/common/components/UploadFileButton';
-import { _FileConfig, _SourceConfig, FileConfig, SourceConfig } from 'etl/EndpointTypes';
-import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { getFileType, guessJsonFileOptions } from 'shared/etl/FileUtil';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
@@ -84,30 +80,11 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
 
   public renderNoDocuments()
   {
-    const { template } = this.props.templateEditor;
-    const source = template.sources.get('primary');
-    let fixPrompt = null;
-    if (source != null)
-    {
-      if (source.type === Sources.Upload)
-      {
-        fixPrompt = (
-          <div className='no-documents-fix-prompt'>
-            <UploadFileButton
-              file={source.options['file']}
-              onChange={this.handleFileChange}
-            />
-          </div>
-        );
-      }
-    }
-
     return (
       <div className='template-editor-no-documents'>
         <div className='no-documents-section'>
           Unable to Load Documents
         </div>
-        {fixPrompt}
       </div>
     );
   }
@@ -129,44 +106,6 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
         </div>
       );
     }
-  }
-
-  public onDocumentsFetchedFactory(newConfig: SourceConfig)
-  {
-    const { act, templateEditor } = this.props;
-    return (documents: List<object>) =>
-    {
-      const newTemplate = templateEditor.template.setIn(['sources', 'primary'], newConfig);
-      act({
-        actionType: 'setTemplate',
-        template: newTemplate,
-      });
-    };
-  }
-
-  public onDocumentsFetchError()
-  {
-    // todo figure out this error
-  }
-
-  public handleFileChange(file: File)
-  {
-    const fileType = getFileType(file);
-    const { act } = this.props;
-    const newSourceConfig = _SourceConfig({
-      type: Sources.Upload,
-      fileConfig: _FileConfig({
-        fileType,
-      }),
-      options: {
-        file,
-      },
-    });
-    DocumentsHelpers.fetchDocuments(newSourceConfig,
-      'primary',
-      this.onDocumentsFetchedFactory(newSourceConfig),
-      this.onDocumentsFetchError,
-    );
   }
 }
 

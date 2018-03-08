@@ -326,7 +326,7 @@ export function makeExtendedConstructor<T>(
         }
         newConfig = _.defaults(overridenConfig, newConfig);
       }
-      newConfig = transformConfig !== undefined ? transformConfig(config, deep) : newConfig;
+      newConfig = transformConfig !== undefined ? transformConfig(newConfig, deep) : newConfig;
       return New<WithIRecord<T>>(new Type(), newConfig);
     };
   }
