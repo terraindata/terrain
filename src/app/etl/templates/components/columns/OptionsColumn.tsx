@@ -63,11 +63,10 @@ import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
-import SinkOptions from 'etl/templates/components/endpoints/SinkOptions';
-import SourceOptions from 'etl/templates/components/endpoints/SourceOptions';
+import EndpointSection from 'etl/templates/components/endpoints/EndpointSection';
 
 import './OptionsColumn.less';
-const { List } = Immutable;
+const { List, Map } = Immutable;
 
 export interface Props
 {
@@ -78,59 +77,24 @@ export interface Props
 
 class OptionsColumn extends TerrainComponent<Props>
 {
-  public renderSource(source: SourceConfig, key)
-  {
-    return (
-      <div key={key}>
-        <SourceOptions
-          source={source}
-          sourceKey={key}
-        />
-      </div>
-    );
-  }
-
-  public renderSink(sink: SinkConfig, key)
-  {
-    return (
-      <div key={key}>
-        <SinkOptions
-          sink={sink}
-          sinkKey={key}
-        />
-      </div>
-    );
-  }
-
-  public renderSourceOptions()
-  {
-    const { sources } = this.props.template;
-    return (
-      <div>
-        {sources.map(this.renderSource)}
-      </div>
-    );
-  }
-
-  public renderSinkOptions()
-  {
-    const { sinks } = this.props.template;
-    return (
-      <div>
-        {sinks.map(this.renderSink)}
-      </div>
-    );
-  }
-
   public render()
   {
     return (
-      <div>
-        {this.renderSourceOptions()}
-        {this.renderSinkOptions()}
+      <div
+        className='template-editor-options-column'
+        style={_.extend({},
+          backgroundColor(Colors().bg3),
+          getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
+        )}
+      >
+        <div className='options-column-content'>
+          <EndpointSection isSource={true} />
+          <EndpointSection isSource={false} />
+        </div>
       </div>
     );
   }
+
 }
 
 export default Util.createContainer(

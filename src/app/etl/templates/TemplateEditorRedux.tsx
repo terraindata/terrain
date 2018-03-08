@@ -67,7 +67,6 @@ import { MidwayError } from 'shared/error/MidwayError';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
-import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import Ajax from 'util/Ajax';
 
@@ -106,13 +105,34 @@ export interface TemplateEditorActionTypes
       [k in keyof EditorDisplayState]: EditorDisplayState[k];
     }>;
   };
+  changeLoadingDocuments: {
+    actionType: 'changeLoadingDocuments',
+    increment: boolean,
+  };
+  setInMergeDocuments: {
+    actionType: 'setInMergeDocuments',
+    key: string,
+    documents: List<object>,
+  };
+  deleteInMergeDocuments: {
+    actionType: 'deleteInMergeDocuments',
+    key: string,
+  };
   closeSettings: {
     actionType: 'closeSettings';
   };
   updateEngineVersion: {
     actionType: 'updateEngineVersion';
   };
-  resetState: {
+  setSinks: {
+    actionType: 'setSinks';
+    sinks: ETLTemplate['sinks'];
+  };
+  setSources: {
+    actionType: 'setSources';
+    sources: ETLTemplate['sources'];
+  };
+  resetState: { // resets the display state
     actionType: 'resetState';
   };
 }
@@ -133,7 +153,8 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       rebuildFieldMap: (state, action) =>
       {
-        const newFieldMap = createTreeFromEngine(state.template.transformationEngine);
+        const engine = state.getCurrentEngine();
+        const newFieldMap = createTreeFromEngine(engine);
         return state.set('fieldMap', newFieldMap);
       },
       setFieldMap: (state, action) =>
@@ -159,6 +180,27 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         }
         return state.set('uiState', newState);
       },
+      changeLoadingDocuments: (state, action) =>
+      {
+        let value = state.loadingDocuments;
+        if (action.payload.increment)
+        {
+          value++;
+        }
+        else
+        {
+          value--;
+        }
+        return state.set('loadingDocuments', value);
+      },
+      setInMergeDocuments: (state, action) =>
+      {
+        return state.setIn(['uiState', 'mergeDocuments', action.payload.key], action.payload.documents);
+      },
+      deleteInMergeDocuments: (state, action) =>
+      {
+        return state.deleteIn(['uiState', 'mergeDocuments', action.payload.key]);
+      },
       closeSettings: (state, action) =>
       {
         return state.setIn(['uiState', 'settingsFieldId'], null).setIn(['uiState', 'settingsDisplayKeyPath'], null);
@@ -168,6 +210,14 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         const oldVersion = state.uiState.engineVersion;
         return state.setIn(['uiState', 'engineVersion'], oldVersion + 1)
           .set('isDirty', true);
+      },
+      setSinks: (state, action) =>
+      {
+        return state.setIn(['template', 'sinks'], action.payload.sinks);
+      },
+      setSources: (state, action) =>
+      {
+        return state.setIn(['template', 'sources'], action.payload.sources);
       },
       resetState: (state, action) =>
       {

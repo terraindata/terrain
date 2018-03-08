@@ -58,7 +58,7 @@ export enum Languages
 export enum FileTypes
 {
   Json = 'json',
-  JsonTypeObject = 'json [type object]',
+  JsonTypeObject = 'json [type object]', // deprecate this
   Csv = 'csv',
 }
 
@@ -67,9 +67,8 @@ export interface TemplateBase
   id?: number;
   archived: boolean;
   templateName: string;
-  transformationEngine: TransformationEngine;
   transformationConfig: any; // terrain rank, what to do on failures TODO figure out the exact type
-  sources: any; // difficult to type, but sources should always have a source under the key 'primary'
+  sources: any; // difficult to type, but sources should always have a source under the key '_default'
   sinks: any; // likewise with sinks
 }
 

@@ -99,6 +99,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.NumberBox]: this.renderNumberBox,
       [DisplayType.TextBox]: this.renderTextBox,
       [DisplayType.Pick]: this.renderPick,
+      [DisplayType.Custom]: this.renderCustom,
     };
 
   constructor(props)
@@ -106,6 +107,12 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     super(props);
     this.setStateHOC = _.memoize(this.setStateHOC);
     this.computeRenderMatrix = memoizeOne(this.computeRenderMatrix);
+  }
+
+  public renderCustom(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
+  {
+    const options: OptionType<DisplayType.Custom> = inputInfo.options || {};
+    return options.render(state, disabled);
   }
 
   public renderTextBox(inputInfo: InputDeclarationType<S>, stateName, state: S, index, disabled: boolean)
@@ -259,6 +266,10 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       this.renderButton(this.props.secondButton, { isActive: false, disabled: false }, 'second');
     const thirdButton = this.props.thirdButton === undefined ? null :
       this.renderButton(this.props.thirdButton, { isActive: false, disabled: false }, 'third');
+    if (mainButton === null && secondButton === null && thirdButton === null)
+    {
+      return null;
+    }
 
     return (
       <div className='dynamic-form-confirm-bar' style={this.props.actionBarStyle}>

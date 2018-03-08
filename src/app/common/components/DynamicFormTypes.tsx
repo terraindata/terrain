@@ -52,6 +52,7 @@ export enum DisplayType
   NumberBox = 'NumberBox',
   CheckBox = 'CheckBox',
   Pick = 'Pick',
+  Custom = 'Custom',
 }
 
 export type InputDeclarationMap<State extends { [k: string]: any }> =
@@ -75,6 +76,9 @@ export interface InputDeclarationOptionTypes<S = any>
   Pick: {
     pickOptions: (state: S) => List<string>,
     indexResolver?: (option) => number,
+  };
+  Custom: {
+    render: (state: S, disabled: boolean) => any,
   };
 }
 

@@ -62,7 +62,7 @@ import FadeInOut from 'common/components/FadeInOut';
 import ExpandableView from 'common/components/ExpandableView';
 import EditorFieldNode from 'etl/templates/components/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { FieldMap } from 'etl/templates/TemplateTypes';
+import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import EditorFieldPreview from './EditorFieldPreview';
@@ -74,9 +74,7 @@ interface Props
   preview: object;
   noInteract: boolean;
   // injected props
-  fieldMap?: FieldMap;
-  transformationEngine?: TransformationEngine;
-  engineVersion?: number;
+  templateEditor?: TemplateEditorState;
 }
 
 class RootFieldNode extends TerrainComponent<Props>
@@ -94,6 +92,10 @@ class RootFieldNode extends TerrainComponent<Props>
     engineVersion: number,
   ): List<TemplateField>
   {
+    if (engine == null || fieldMap == null)
+    {
+      return List([]);
+    }
     return fieldMap.filter((field, id) =>
     {
       return engine.getOutputKeyPath(id).size === 1;
@@ -102,8 +104,10 @@ class RootFieldNode extends TerrainComponent<Props>
 
   public renderChildFields()
   {
-    const { fieldMap, transformationEngine, engineVersion, preview, noInteract } = this.props;
-    const rootFields = this.computeRootFields(fieldMap, transformationEngine, engineVersion);
+    const { templateEditor, preview, noInteract } = this.props;
+    const engine = templateEditor.getCurrentEngine();
+    const engineVersion = templateEditor.uiState.engineVersion;
+    const rootFields = this.computeRootFields(templateEditor.fieldMap, engine, engineVersion);
     return rootFields.map((childField, index) =>
     {
       const childPreview = preview != null ? preview[childField.name] : null;
@@ -134,10 +138,6 @@ const emptyList = List([]);
 
 export default Util.createTypedContainer(
   RootFieldNode,
-  [
-    ['templateEditor', 'fieldMap'],
-    ['templateEditor', 'template', 'transformationEngine'],
-    ['templateEditor', 'uiState', 'engineVersion'],
-  ],
+  ['templateEditor'],
   {},
 );

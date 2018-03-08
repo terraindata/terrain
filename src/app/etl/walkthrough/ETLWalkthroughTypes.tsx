@@ -53,17 +53,7 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig }
   from 'etl/EndpointTypes';
 
-class WalkthroughStateC
-{
-  public stepHistory: List<ViewState> = List([ViewState.NewImport]);
-  public source: SourceConfig = _SourceConfig();
-  public file: File = null;
-  public sink: SinkConfig = _SinkConfig();
-  public chosenTemplateId: ID = -1;
-  public previewDocuments: List<object> = List([]);
-}
-export type WalkthroughState = WithIRecord<WalkthroughStateC>;
-export const _WalkthroughState = makeConstructor(WalkthroughStateC);
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
 export enum ViewState
 {
@@ -83,3 +73,21 @@ export enum ViewState
   Review = 'Review',
   Finish = 'Finish', // unreachable view state
 }
+
+class WalkthroughStateC
+{
+  public stepHistory: List<ViewState> = List([ViewState.NewImport]);
+  public source: SourceConfig = _SourceConfig();
+  public sink: SinkConfig = _SinkConfig();
+  public chosenTemplateId: ID = -1;
+
+  public getFile()
+  {
+    return this.source.type === Sources.Upload ?
+      (this.source.options as any).file
+      :
+      null;
+  }
+}
+export type WalkthroughState = WithIRecord<WalkthroughStateC>;
+export const _WalkthroughState = makeExtendedConstructor(WalkthroughStateC, true);

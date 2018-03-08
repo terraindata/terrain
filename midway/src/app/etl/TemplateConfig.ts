@@ -55,14 +55,13 @@ export class TemplateConfig extends ConfigType implements TemplateBase
   public id?: number = undefined;
   public archived: boolean = false; // TODO, add ability to filter on this in routes
   public templateName: string = '';
-  public transformationEngine: TransformationEngine = undefined;
   public transformationConfig: any = undefined;
   public sources: {
-    primary?: SourceConfig;
+    _default?: SourceConfig;
     [k: string]: SourceConfig;
   } = {};
   public sinks: {
-    primary?: SinkConfig;
+    _default?: SinkConfig;
     [k: string]: SinkConfig;
   } = {};
 
@@ -80,10 +79,6 @@ export type TemplateInDatabase = {
 export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfig
 {
   const newObj: TemplateObject = _.extend({}, obj);
-  // if (newObj.transformationConfig != null) // TODO
-  // {
-  //   newObj.transformationConfig = JSON.parse(newObj.transformationConfig as string);
-  // }
   if (newObj.sources != null)
   {
     newObj.sources = JSON.parse(newObj.sources as string);
@@ -98,8 +93,9 @@ export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfi
 export function templateForSave(template: TemplateObject): TemplateInDatabase
 {
   const obj = _.extend({}, template);
-  obj.transformationEngine = JSON.stringify(template.transformationEngine);
-  // obj.transformationConfig = JSON.stringify(template.transformationConfig); TODO
+  // obj.sources = _.forOwn(obj.sources, (source, key) => {
+  //   obj.sources.transformations = JSON.stringify(obj.sources.transformations);
+  // });
   obj.sources = JSON.stringify(template.sources);
   obj.sinks = JSON.stringify(template.sinks);
   return obj;

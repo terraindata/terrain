@@ -1,5 +1,5 @@
-@import "../../../common/Common.less";
-
+@import "~common/Common.less";
+@import "~etl/templates/components/TemplateEditor.less";
 // template editor field node
 .template-editor-children-container {
   display: flex;
@@ -26,7 +26,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    font-size: 18px;
+    .tef-big-text;
   }
 
   .field-preview-value {

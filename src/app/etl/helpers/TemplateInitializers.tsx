@@ -95,7 +95,10 @@ class Initializers extends ETLHelpers
         isDirty: false,
       });
 
-      DocumentsHelpers.fetchDocuments(template.sources.get('primary'));
+      template.sources.map((source, key) =>
+      {
+        DocumentsHelpers.fetchDocuments(source, key);
+      });
       ETLRouteUtil.gotoEditTemplate(template.id);
     };
     const onError = (response) =>
@@ -118,17 +121,19 @@ class Initializers extends ETLHelpers
       },
     });
     const onLoad = this.createInitialTemplateFn(source);
-    DocumentsHelpers.fetchDocuments(source, undefined, onLoad);
+    DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
   }
 
-  public initNewFromWalkthrough(walkthrough: WalkthroughState)
+  public initNewFromWalkthrough(walkthrough: WalkthroughState = this.walkthrough)
   {
     const source = walkthrough.source;
     const sink = walkthrough.sink;
     const onLoad = this.createInitialTemplateFn(source, sink);
+
     if (source.type === Sources.Upload)
     {
-      DocumentsHelpers.fetchDocuments(source, walkthrough.file, onLoad);
+      const file = walkthrough.getFile();
+      DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
     }
     else
     {
@@ -180,19 +185,15 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
   let template = _ETLTemplate({
     id: -1,
     templateName: name,
-    transformationEngine: engine,
+    // transformationEngine: engine,
   });
+  let newSource = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
+  newSource = newSource.set('transformations', engine);
 
   // default source and sink is upload and download
-  template = template.setIn(['sources', 'primary'],
-    source !== undefined ?
-      source
-      :
-      _SourceConfig({
-        type: Sources.Upload,
-      }),
-  );
-  template = template.setIn(['sinks', 'primary'],
+  template = template.setIn(['sources', '_default'], newSource);
+
+  template = template.setIn(['sinks', '_default'],
     sink !== undefined ?
       sink
       :

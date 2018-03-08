@@ -113,7 +113,7 @@ class TemplateEditor extends TerrainComponent<Props>
   // gets memoizedOne'd
   public transformDocument(previewDocument, engine, engineVersion)
   {
-    if (previewDocument == null)
+    if (previewDocument == null || engine == null)
     {
       return {};
     }
@@ -122,10 +122,10 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public getDocument()
   {
-    const { template } = this.props.templateEditor;
-    const { documents, previewIndex, engineVersion } = this.props.templateEditor.uiState;
+    const { templateEditor } = this.props;
+    const { documents, previewIndex, engineVersion } = templateEditor.uiState;
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
-    return this.transformDocument(previewDocument, template.transformationEngine, engineVersion);
+    return this.transformDocument(previewDocument, templateEditor.getCurrentEngine(), engineVersion);
   }
 
   public renderEditorSection(showEditor: boolean = true)
@@ -177,7 +177,7 @@ class TemplateEditor extends TerrainComponent<Props>
           <EditorColumnBar />
         </div>
         {columnState === ColumnOptions.Preview ? <DocumentsPreviewColumn /> : null}
-        {columnState === ColumnOptions.Options ? null : null}
+        {columnState === ColumnOptions.Options ? <OptionsColumn /> : null}
       </div>
     );
   }

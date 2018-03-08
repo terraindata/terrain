@@ -146,7 +146,6 @@ export function transformationFormFactory<State extends object, Type extends Tra
           inputMap={args.inputMap}
           inputState={this.state}
           onStateChange={this.handleStateChange}
-          centerForm={true}
           style={{
             flexGrow: '1',
           }}

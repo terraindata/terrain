@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file no-unused-expression
 
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { FileTypes, Languages } from './ETLTypes';
 
 export enum Sources
@@ -75,6 +76,7 @@ export interface SourceConfig
   type: SourceTypes;
   fileConfig: FileConfig;
   options: SourceOptionsType<SourceTypes>;
+  transformations: TransformationEngine;
   // a union of all possible option types
 }
 
@@ -87,9 +89,11 @@ export interface SinkConfig
 }
 
 // so far sources and options are different
-interface SourceOptionsTypes // TODO check that these are right
+export interface SourceOptionsTypes // TODO check that these are right
 {
-  Upload: {};
+  Upload: {
+    file?: File;
+  };
   Algorithm: {
     algorithmId: ID;
   };
@@ -97,9 +101,35 @@ interface SourceOptionsTypes // TODO check that these are right
   Http: HttpOptions;
 }
 
-interface SinkOptionsTypes
+export const SourceOptionsDefaults: SourceOptionsTypes =
+  {
+    Upload: {
+      file: null,
+    },
+    Algorithm: {
+      algorithmId: -1,
+    },
+    Sftp: {
+      ip: '0.0.0.0',
+      port: 22,
+      filepath: 'filename.json',
+      credentialId: -1,
+    },
+    Http: {
+      url: '',
+      methods: 'GET',
+      headers: {
+        accept: '',
+        contentType: 'application/json',
+      },
+    },
+  };
+
+export interface SinkOptionsTypes
 {
-  Download: {};
+  Download: {
+    filename?: string;
+  };
   Database: {
     language: Languages;
     serverId: ID;
@@ -111,7 +141,34 @@ interface SinkOptionsTypes
   Http: HttpOptions;
 }
 
-interface SftpOptions
+export const SinkOptionsDefaults: SinkOptionsTypes =
+  {
+    Download: {
+      filename: '',
+    },
+    Database: {
+      language: Languages.Elastic,
+      serverId: -1,
+      database: '',
+      table: '',
+    },
+    Sftp: {
+      ip: '0.0.0.0',
+      port: 22,
+      filepath: 'filename.json',
+      credentialId: -1,
+    },
+    Http: {
+      url: '',
+      methods: 'POST',
+      headers: {
+        accept: '',
+        contentType: 'application/json',
+      },
+    },
+  };
+
+export interface SftpOptions
 {
   ip: string;
   port: number;
@@ -120,7 +177,7 @@ interface SftpOptions
   meta?: any;
 }
 
-interface HttpOptions
+export interface HttpOptions
 {
   url: string;
   methods: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

@@ -217,7 +217,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     else if (ETLRouteUtil.isRouteNewTemplate(this.props.location) &&
       this.props.walkthrough.source.type != null)
     {
-      Initializers.initNewFromWalkthrough(walkthrough);
+      Initializers.initNewFromWalkthrough();
     }
     else
     {

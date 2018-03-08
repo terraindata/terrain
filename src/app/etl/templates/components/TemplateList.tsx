@@ -87,11 +87,11 @@ class TemplateList extends TerrainComponent<Props>
     },
     {
       name: 'Source Type',
-      render: (template, index) => template.getIn(['sources', 'primary', 'type'], 'N/A'),
+      render: (template, index) => template.getIn(['sources', '_default', 'type'], 'N/A'),
     },
     {
       name: 'Sink Type',
-      render: (template, index) => template.getIn(['sinks', 'primary', 'type'], 'N/A'),
+      render: (template, index) => template.getIn(['sinks', '_default', 'type'], 'N/A'),
     },
   ];
 

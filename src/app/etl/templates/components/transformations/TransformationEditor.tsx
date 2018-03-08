@@ -81,14 +81,16 @@ export class TransformationEditor extends TerrainComponent<Props>
   {
     const CompClass = getTransformationForm(this.props.transformation.typeCode);
     return (
-      <CompClass
-        isCreate={false}
-        engine={this.props.engine}
-        fieldID={this.props.fieldID}
-        onEditOrCreate={this.props.onTransformationChange}
-        onClose={this.props.onClose}
-        transformation={this.props.transformation}
-      />
+      <div className='edit-transformation-container'>
+        <CompClass
+          isCreate={false}
+          engine={this.props.engine}
+          fieldID={this.props.fieldID}
+          onEditOrCreate={this.props.onTransformationChange}
+          onClose={this.props.onClose}
+          transformation={this.props.transformation}
+        />
+      </div>
     );
   }
 }

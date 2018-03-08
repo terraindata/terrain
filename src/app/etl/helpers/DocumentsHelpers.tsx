@@ -84,16 +84,31 @@ import Ajax from 'util/Ajax';
 
 class DocumentsHelpers extends ETLHelpers
 {
+
+  public computeMergedDocuments()
+  {
+    const mergeDocuments = this.templateEditor.uiState.mergeDocuments;
+    // placeholder TODO
+    const merged = mergeDocuments.get('_default', List([]));
+
+    this.editorAct({
+      actionType: 'setDisplayState',
+      state: {
+        documents: merged,
+      },
+    });
+  }
+
   public fetchDocuments(
     source: SourceConfig,
-    file?: File,
+    key: string,
     onLoad?: (docs: List<object>) => void,
     onError?: (ev: string | MidwayError) => void,
   )
   {
     const onFetchLoad = (documents: List<object>) =>
     {
-      this.onLoadDocuments(documents);
+      this.onLoadDocuments(documents, key);
       if (onLoad != null)
       {
         onLoad(documents);
@@ -110,10 +125,8 @@ class DocumentsHelpers extends ETLHelpers
     try
     {
       this.editorAct({
-        actionType: 'setDisplayState',
-        state: {
-          loadingDocuments: true,
-        },
+        actionType: 'changeLoadingDocuments',
+        increment: true,
       });
       switch (source.type)
       {
@@ -134,6 +147,7 @@ class DocumentsHelpers extends ETLHelpers
           break;
         }
         case Sources.Upload: {
+          const file = source.options['file'];
           if (file == null)
           {
             defaultError('File not provided');
@@ -160,19 +174,17 @@ class DocumentsHelpers extends ETLHelpers
     }
   }
 
-  protected onLoadDocuments(documents: List<object>)
+  protected onLoadDocuments(documents: List<object>, key: string)
   {
     this.editorAct({
-      actionType: 'setDisplayState',
-      state: {
-        documents,
-      },
+      actionType: 'setInMergeDocuments',
+      key,
+      documents,
     });
+    this.computeMergedDocuments();
     this.editorAct({
-      actionType: 'setDisplayState',
-      state: {
-        loadingDocuments: false,
-      },
+      actionType: 'changeLoadingDocuments',
+      increment: false,
     });
   }
 
@@ -182,12 +194,9 @@ class DocumentsHelpers extends ETLHelpers
     console.error(ev);
     // TODO add a modal message?
     this.editorAct({
-      actionType: 'setDisplayState',
-      state: {
-        loadingDocuments: false,
-      },
+      actionType: 'changeLoadingDocuments',
+      increment: false,
     });
   }
-
 }
 export default new DocumentsHelpers(TerrainStore);

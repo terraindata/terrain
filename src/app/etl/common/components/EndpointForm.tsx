@@ -57,33 +57,107 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'src/app/Classes';
 
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
-import './EndpointOptions.less';
+import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointOptions';
 
 const { List } = Immutable;
 
 export interface Props
 {
-  // below from container
-  template?: ETLTemplate;
-  act?: typeof TemplateEditorActions;
+  isSource: boolean;
+  endpoint: SourceConfig | SinkConfig;
+  onChange: (newEndpoint: SourceConfig | SinkConfig) => void;
 }
 
-class SinkOptions extends TerrainComponent<Props>
+export default class EndpointForm extends TerrainComponent<Props>
 {
+  public sinkTypeMap: InputDeclarationMap<SinkFormState> =
+    {
+      type: {
+        type: DisplayType.Pick,
+        displayName: 'Sink Type',
+        options: {
+          pickOptions: (s) => sinkList,
+          indexResolver: (value) => sinkList.indexOf(value),
+        },
+      },
+    };
+
+  public sourceTypeMap: InputDeclarationMap<SourceFormState> =
+    {
+      type: {
+        type: DisplayType.Pick,
+        displayName: 'Source Type',
+        options: {
+          pickOptions: (s) => sourceList,
+          indexResolver: (value) => sourceList.indexOf(value),
+        },
+      },
+    };
+
   public render()
   {
-    return null;
+    const { isSource, endpoint, onChange } = this.props;
+    const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
+    const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
+
+    return (
+      <div className='endpoint-block'>
+        <DynamicForm
+          inputMap={mapToUse}
+          inputState={this.typeValueToState(endpoint)}
+          onStateChange={this.handleTypeChange}
+        />
+        <FormClass
+          endpoint={endpoint}
+          onChange={this.handleEndpointChange}
+        />
+      </div>
+    );
+  }
+
+  public typeStateToValue(state: SinkFormState | SourceFormState)
+  {
+    const { endpoint } = this.props;
+    return endpoint.set('type', state.type);
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public typeValueToState(value: SinkConfig | SourceConfig)
+  {
+    return {
+      type: value.type,
+    };
+  }
+
+  public handleTypeChange(state: SinkFormState | SourceFormState)
+  {
+    const { isSource, endpoint, onChange } = this.props;
+    const constructorToUse = isSource ? _SourceConfig : _SinkConfig;
+    const newEndpoint = constructorToUse({ type: state.type });
+    onChange(newEndpoint);
+  }
+
+  public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig)
+  {
+    this.props.onChange(newEndpoint);
   }
 }
 
-export default Util.createContainer(
-  SinkOptions,
-  [['templateEditor', 'template', 'sinks']],
-  { act: TemplateEditorActions },
-);
+interface SinkFormState
+{
+  type: Sinks;
+}
+
+interface SourceFormState
+{
+  type: Sources;
+}
+
+const sourceList = List([Sources.Upload, Sources.Algorithm, Sources.Sftp, Sources.Http]);
+const sinkList = List([Sinks.Download, Sinks.Database, Sinks.Sftp, Sinks.Http]);

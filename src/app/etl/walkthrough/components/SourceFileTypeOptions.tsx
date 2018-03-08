@@ -62,6 +62,8 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { SourceOptionsType } from 'shared/etl/types/EndpointTypes';
+import { Sources } from 'shared/etl/types/EndpointTypes';
 import { ETLStepComponent, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
@@ -130,7 +132,8 @@ class SourceFileTypeOptions extends TerrainComponent<Props>
 
   public render()
   {
-    const { file } = this.props.walkthrough;
+    // const { file } = this.props.walkthrough;
+    const { file } = this.props.walkthrough.source.options as SourceOptionsType<Sources.Upload>;
     const type = file != null ? FileUtil.getFileType(file) : null;
     return (
       <span style={{ height: transitionRowHeight }}>
