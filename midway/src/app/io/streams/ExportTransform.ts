@@ -62,8 +62,14 @@ export default class ExportTransform extends ADocumentTransform
     this.configuration = configuration;
   }
 
-  protected transform(input: object, chunkNumber: number): object
+  protected transform(input: object, chunkNumber: number): object | object[]
   {
-    return this.exportt._postProcessDoc(input, this.configuration);
+    if (input['hits'] === undefined)
+    {
+      return input;
+    }
+
+    const hits = input['hits'].hits;
+    return hits.map((hit) => this.exportt._postProcessDoc(hit, this.configuration));
   }
 }
