@@ -111,19 +111,19 @@ export default class EndpointForm extends TerrainComponent<Props>
       <div className='endpoint-block'>
         {
           hideTypePicker === true ? null :
-          <DynamicForm
-            inputMap={mapToUse}
-            inputState={this.typeValueToState(endpoint)}
-            onStateChange={this.handleTypeChange}
-          />
+            <DynamicForm
+              inputMap={mapToUse}
+              inputState={this.typeValueToState(endpoint)}
+              onStateChange={this.handleTypeChange}
+            />
         }
         {
           FormClass != null ?
-          <FormClass
-            endpoint={endpoint}
-            onChange={this.handleEndpointChange}
-          />
-          : null
+            <FormClass
+              endpoint={endpoint}
+              onChange={this.handleEndpointChange}
+            />
+            : null
         }
 
       </div>

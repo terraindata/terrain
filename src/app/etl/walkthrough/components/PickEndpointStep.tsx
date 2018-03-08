@@ -76,12 +76,12 @@ interface Props extends StepProps
 
 class PickEndpointStep extends ETLStepComponent<Props>
 {
-  public static onRevert(isSource: boolean, params: TransitionParams, )
+  public static onRevert(isSource: boolean, params: TransitionParams )
   {
     if (isSource)
     {
       params.act({
-      actionType: 'setState',
+        actionType: 'setState',
         state: {
           source: _SourceConfig(),
         },
@@ -90,11 +90,11 @@ class PickEndpointStep extends ETLStepComponent<Props>
     else
     {
       params.act({
-      actionType: 'setState',
+        actionType: 'setState',
         state: {
           sink: _SinkConfig(),
         },
-      });      
+      });
     }
   }
 
@@ -103,7 +103,7 @@ class PickEndpointStep extends ETLStepComponent<Props>
     if (isSource)
     {
       params.act({
-      actionType: 'setState',
+        actionType: 'setState',
         state: {
           source: _SourceConfig(),
         },
@@ -112,11 +112,11 @@ class PickEndpointStep extends ETLStepComponent<Props>
     else
     {
       params.act({
-      actionType: 'setState',
+        actionType: 'setState',
         state: {
           sink: _SinkConfig(),
         },
-      });      
+      });
     }
   }
 
@@ -150,8 +150,8 @@ class PickEndpointStep extends ETLStepComponent<Props>
       act({
         actionType: 'setState',
         state: {
-          source: endpoint as SourceConfig, 
-        }
+          source: endpoint as SourceConfig,
+        },
       });
     }
     else
@@ -160,8 +160,8 @@ class PickEndpointStep extends ETLStepComponent<Props>
         actionType: 'setState',
         state: {
           sink: endpoint as SinkConfig,
-        }
-      });      
+        },
+      });
     }
 
   }

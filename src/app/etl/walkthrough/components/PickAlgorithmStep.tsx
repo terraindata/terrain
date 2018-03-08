@@ -120,7 +120,7 @@ class PickAlgorithmStep extends ETLStepComponent
       actionType: 'setState',
       state: {
         source,
-      }
+      },
     });
   }
 

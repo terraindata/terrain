@@ -105,7 +105,7 @@ class PickTemplateStep extends ETLStepComponent
       actionType: 'setState',
       state: {
         chosenTemplateId: template.id,
-      }
+      },
     });
     onDone();
   }

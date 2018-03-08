@@ -78,13 +78,13 @@ export abstract class ETLStepComponent<Props extends StepProps = StepProps> exte
 {
   // called when a user arrives at this step, but later
   // chooses a different path
-  public static onRevert(... args: any[])
+  public static onRevert(...args: any[])
   {
     // do nothing by default
   }
 
   // called when a user arrives at this step
-  public static onArrive(... args: any[])
+  public static onArrive(...args: any[])
   {
     // do nothing by default
   }

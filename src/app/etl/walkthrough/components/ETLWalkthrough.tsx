@@ -55,18 +55,22 @@ import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughT
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
+import { TransitionParams } from './ETLStepComponent';
+
+import ETLReviewStep from './ETLReviewStep';
+import ETLUploadStep from './ETLUploadStep';
 import PickAlgorithmStep from './PickAlgorithmStep';
 import PickDatabaseStep from './PickDatabaseStep';
 import PickEndpointStep from './PickEndpointStep';
 import PickTemplateStep from './PickTemplateStep';
-import ETLReviewStep from './ETLReviewStep';
-import ETLUploadStep from './ETLUploadStep';
 
 import './ETLWalkthrough.less';
 
@@ -231,6 +235,12 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.Review,
+          onArrive: (params: TransitionParams) => params.act({
+            actionType: 'setState',
+            state: {
+              sink: _SinkConfig({ type: Sinks.Download }),
+            },
+          }),
           buttonText: 'Download The Results',
           default: true,
         },
