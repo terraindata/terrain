@@ -76,7 +76,7 @@ interface Props extends StepProps
 
 class PickEndpointStep extends ETLStepComponent<Props>
 {
-  public static onRevert(isSource: boolean, params: TransitionParams )
+  public static onRevert(isSource: boolean, params: TransitionParams)
   {
     if (isSource)
     {
