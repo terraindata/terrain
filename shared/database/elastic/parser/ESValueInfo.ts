@@ -123,6 +123,11 @@ export default class ESValueInfo
     return (this._objectChildren === undefined) ? {} : this._objectChildren;
   }
 
+  public childrenSize(): number
+  {
+    return Object.keys(this.objectChildren).length;
+  }
+
   public addObjectChild(name: string, info: ESPropertyInfo): void
   {
     this._objectChildren = this.objectChildren;

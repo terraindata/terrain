@@ -203,10 +203,18 @@ class ResultsColumn extends TerrainComponent<Props>
 
     if (resultsState.hasError)
     {
+      let detailMessage = resultsState.errorMessage;
+      if (detailMessage.startsWith('Route'))
+      {
+        if (resultsState.subErrorMessage)
+        {
+          detailMessage += ` (details: "${resultsState.subErrorMessage}")`;
+        }
+      }
       return (
         <InfoArea
           large='There was an error with your query.'
-          small={resultsState.errorMessage}
+          small={detailMessage}
         />
       );
     }

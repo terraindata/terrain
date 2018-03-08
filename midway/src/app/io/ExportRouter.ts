@@ -52,11 +52,13 @@ import * as stream from 'stream';
 import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
 import { Export, ExportConfig } from './Export';
+import { ExportTypes } from './ExportTypes';
 import * as Auth from './templates/Authenticate';
 import ExportTemplateRouter from './templates/ExportTemplateRouter';
 
 const Router = new KoaRouter();
 export const exprt: Export = new Export();
+export const exprtTypes: ExportTypes = new ExportTypes();
 const perm: Permissions = new Permissions();
 
 Router.use('/templates', ExportTemplateRouter.routes(), ExportTemplateRouter.allowedMethods());
@@ -80,7 +82,7 @@ Router.post('/types', passport.authenticate('access-token-local'), async (ctx, n
 {
   const typeObj: object = ctx.request.body.body;
   Util.verifyParameters(typeObj, ['dbid', 'query']);
-  ctx.body = await exprt.getNamesAndTypesFromQuery(typeObj['dbid'], typeObj['query']);
+  ctx.body = await exprtTypes.getNamesAndTypesFromQuery(typeObj['dbid'], typeObj['query']);
 });
 
 Router.post('/headless', async (ctx, next) =>
