@@ -71,7 +71,7 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 {
   const template: TemplateConfig = ctx.request.body.body;
   const requiredParams = [
-    'templateName', 'transformationEngine',
+    'templateName', /*'transformationEngine'*/,
     'transformationConfig', 'sources', 'sinks',
   ];
   Util.verifyParameters(template, requiredParams);
@@ -82,7 +82,7 @@ Router.post('/update/:id', passport.authenticate('access-token-local'), async (c
 {
   const template: TemplateConfig = ctx.request.body.body;
   const requiredParams = [
-    'id', 'templateName', 'transformationEngine',
+    'id', 'templateName', /*'transformationEngine'*/,
     'transformationConfig', 'sources', 'sinks',
   ];
   if (template.id !== Number(ctx.params.id))

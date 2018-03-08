@@ -61,6 +61,7 @@ import
   Sources,
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 class FileConfigC implements FileConfigI
 {
@@ -76,10 +77,12 @@ class SourceConfigC implements SourceConfigI
   public type = null;
   public fileConfig = _FileConfig();
   public options = {};
+  public transformations = new TransformationEngine();
 }
 export type SourceConfig = WithIRecord<SourceConfigC>;
 export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
   fileConfig: _FileConfig,
+  transformations: TransformationEngine.load,
 },
   (cfg?, deep?) =>
   {

@@ -121,7 +121,7 @@ class Initializers extends ETLHelpers
       },
     });
     const onLoad = this.createInitialTemplateFn(source);
-    DocumentsHelpers.fetchDocuments(source, 'primary', onLoad);
+    DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
   }
 
   public initNewFromWalkthrough(walkthrough: WalkthroughState = this.walkthrough)
@@ -133,7 +133,7 @@ class Initializers extends ETLHelpers
     if (source.type === Sources.Upload)
     {
       const file = walkthrough.getFile();
-      DocumentsHelpers.fetchDocuments(source, 'primary', onLoad);
+      DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
     }
     else
     {
@@ -185,19 +185,15 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
   let template = _ETLTemplate({
     id: -1,
     templateName: name,
-    transformationEngine: engine,
+    // transformationEngine: engine,
   });
+  let newSource = source !== undefined ? source : _SourceConfig({type: Sources.Upload});
+  newSource = newSource.set('transformations', engine);
 
   // default source and sink is upload and download
-  template = template.setIn(['sources', 'primary'],
-    source !== undefined ?
-      source
-      :
-      _SourceConfig({
-        type: Sources.Upload,
-      }),
-  );
-  template = template.setIn(['sinks', 'primary'],
+  template = template.setIn(['sources', '_default'], newSource);
+
+  template = template.setIn(['sinks', '_default'],
     sink !== undefined ?
       sink
       :

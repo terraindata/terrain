@@ -136,7 +136,7 @@ export default Util.createTypedContainer(
   RootFieldNode,
   [
     ['templateEditor', 'fieldMap'],
-    ['templateEditor', 'template', 'transformationEngine'],
+    // ['templateEditor', 'template', 'transformationEngine'],
     ['templateEditor', 'uiState', 'engineVersion'],
   ],
   {},

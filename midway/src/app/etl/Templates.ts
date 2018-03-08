@@ -72,7 +72,7 @@ export default class Templates
       [
         'archived',
         'templateName',
-        'transformationEngine',
+        // 'transformationEngine',
         'transformationConfig',
         'sources',
         'sinks',
@@ -95,7 +95,7 @@ export default class Templates
   public async validateTemplate(template: TemplateConfig, requireExistingId?: boolean):
     Promise<{ valid: boolean, message: string }>
   {
-    const { sources, sinks, transformationEngine } = template;
+    const { sources, sinks, /*transformationEngine*/ } = template;
     let valid = true;
     const messages: string[] = [];
     if (requireExistingId === true)
@@ -125,11 +125,11 @@ export default class Templates
       valid = false;
       messages.push(`sinks is missing or invalid type: ${sinks}`);
     }
-    else if (transformationEngine == null || typeof transformationEngine !== 'object')
-    {
-      valid = false;
-      messages.push(`transformation engine is missing or invalid type: ${transformationEngine} .`);
-    }
+    // else if (transformationEngine == null || typeof transformationEngine !== 'object')
+    // {
+    //   valid = false;
+    //   messages.push(`transformation engine is missing or invalid type: ${transformationEngine} .`);
+    // }
     return { valid, message: `${messages}` };
   }
 
@@ -145,7 +145,7 @@ export default class Templates
       const newTemplate: TemplateConfig = {
         archived: false,
         templateName: template.templateName,
-        transformationEngine: template.transformationEngine,
+        // transformationEngine: template.transformationEngine,
         transformationConfig: template.transformationConfig,
         sources: template.sources,
         sinks: template.sinks,
@@ -167,7 +167,7 @@ export default class Templates
         archived: template.archived,
         id: template.id,
         templateName: template.templateName,
-        transformationEngine: template.transformationEngine,
+        // transformationEngine: template.transformationEngine,
         transformationConfig: template.transformationConfig,
         sources: template.sources,
         sinks: template.sinks,

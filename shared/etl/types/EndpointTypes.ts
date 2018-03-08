@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file no-unused-expression
 
 import { FileTypes, Languages } from './ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export enum Sources
 {
@@ -75,6 +76,7 @@ export interface SourceConfig
   type: SourceTypes;
   fileConfig: FileConfig;
   options: SourceOptionsType<SourceTypes>;
+  transformations: TransformationEngine;
   // a union of all possible option types
 }
 

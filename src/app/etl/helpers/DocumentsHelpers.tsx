@@ -89,7 +89,7 @@ class DocumentsHelpers extends ETLHelpers
   {
     const mergeDocuments = this.templateEditor.uiState.mergeDocuments;
     // placeholder TODO
-    const merged = mergeDocuments.get('primary', List([]));
+    const merged = mergeDocuments.get('_default', List([]));
 
     this.editorAct({
       actionType: 'setDisplayState',

@@ -122,10 +122,10 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public getDocument()
   {
-    const { template } = this.props.templateEditor;
-    const { documents, previewIndex, engineVersion } = this.props.templateEditor.uiState;
+    const { templateEditor } = this.props;
+    const { documents, previewIndex, engineVersion } = templateEditor.uiState;
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
-    return this.transformDocument(previewDocument, template.transformationEngine, engineVersion);
+    return this.transformDocument(previewDocument, templateEditor.getCurrentEngine(), engineVersion);
   }
 
   public renderEditorSection(showEditor: boolean = true)

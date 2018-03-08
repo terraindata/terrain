@@ -58,6 +58,34 @@ import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
+class ETLTemplateC implements ETLTemplateI
+{
+  public id = -1;
+  public archived = false;
+  public templateName = '';
+  // public transformationEngine = new TransformationEngine();
+  public transformationConfig = '';
+  public sources = Map<string, SourceConfig>();
+  public sinks = Map<string, SinkConfig>();
+}
+
+export type ETLTemplate = WithIRecord<ETLTemplateC>;
+export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
+  // transformationEngine: TransformationEngine.load,
+  sources: (sources) =>
+  {
+    return Map<string, SourceConfig>(sources)
+      .map((obj, key) => _SourceConfig(obj, true))
+      .toMap();
+  },
+  sinks: (sinks) =>
+  {
+    return Map<string, SinkConfig>(sinks)
+      .map((obj, key) => _SinkConfig(obj, true))
+      .toMap();
+  },
+});
+
 export type FieldMap = Immutable.Map<number, TemplateField>;
 class TemplateEditorStateC
 {
@@ -66,9 +94,15 @@ class TemplateEditorStateC
   public isDirty: boolean = true;
   public loadingDocuments: number = 0;
   public uiState: EditorDisplayState = _EditorDisplayState();
+
+  public getCurrentEngine(): TransformationEngine
+  {
+    const key = this.uiState.currentView;
+    return this.template.getIn(['sources', key, 'transformations']);
+  }
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
-export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
+export const _TemplateEditorState = makeExtendedConstructor(TemplateEditorStateC, true);
 
 export enum ColumnOptions
 {
@@ -89,6 +123,7 @@ class EditorDisplayStateC
   public previewIndex: number = 0;
   public settingsFieldId: number = null;
   public settingsDisplayKeyPath: KeyPath = null;
+  public currentView: string = '_default';
   public engineVersion: number = 0;
   public columnState: ColumnOptions = ColumnOptions.Preview;
 }
@@ -101,40 +136,13 @@ interface ETLTemplateI extends TemplateBase
   sinks: Immutable.Map<string, SinkConfig>;
 }
 
-class ETLTemplateC implements ETLTemplateI
-{
-  public id = -1;
-  public archived = false;
-  public templateName = '';
-  public transformationEngine = new TransformationEngine();
-  public transformationConfig = '';
-  public sources = Map<string, SourceConfig>();
-  public sinks = Map<string, SinkConfig>();
-}
-
-export type ETLTemplate = WithIRecord<ETLTemplateC>;
-export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
-  transformationEngine: TransformationEngine.load,
-  // transformationConfig // todo
-  sources: (sources) =>
-  {
-    return Map<string, SourceConfig>(sources)
-      .map((obj, key) => _SourceConfig(obj, true))
-      .toMap();
-  },
-  sinks: (sinks) =>
-  {
-    return Map<string, SinkConfig>(sinks)
-      .map((obj, key) => _SinkConfig(obj, true))
-      .toMap();
-  },
-});
-
 export function templateForBackend(template: ETLTemplate): TemplateBase
 {
   const obj: TemplateObject = (template as any).toObject(); // shallow js object
-  obj.transformationEngine = obj.transformationEngine.toJSON();
-  // obj.transformationConfig = recordForSave(obj.transformationConfig); TODO
+  // obj.transformationEngine = obj.transformationEngine.toJSON();
+  obj.sources = obj.sources.map((source, key) => {
+    return source.set('transformations', source.transformations.toJSON());
+  });
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
   _.forOwn(obj.sources, (source, key) =>

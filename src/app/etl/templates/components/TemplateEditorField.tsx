@@ -165,6 +165,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.uiStateTracker;
   }
 
+  protected _currentEngine(): TransformationEngine
+  {
+    const key = this._uiState().get('currentView');
+    return this._template().getIn(['sources', key, 'transformations']);
+  }
+
   // for array types
   protected _getPreviewChildPath(index, cacheKey = this.props.preview): KeyPath
   {
@@ -173,7 +179,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _proxy(): FieldNodeProxy
   {
-    const engine = this._template().transformationEngine;
+    const engine = this._currentEngine();
     const tree = new FieldTreeProxy(this._fieldMap(), engine, this.onRootMutationBound, this.updateEngineVersionBound);
     return new FieldNodeProxy(tree, this.props.fieldId);
   }
@@ -186,9 +192,9 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _getSinkLanguage(): Languages
   {
     const { sinks } = this._template();
-    if (sinks.has('primary'))
+    if (sinks.has('_default'))
     {
-      const sink: SinkConfig = sinks.get('primary');
+      const sink: SinkConfig = sinks.get('_default');
       if (sink.type === Sinks.Database)
       {
         return (sink.options as SinkOptionsType<Sinks.Database>).language;

@@ -93,11 +93,10 @@ class DocumentPreview extends TerrainComponent<Props>
 
   public getDocument()
   {
-    const { index } = this.props;
-    const { template, uiState } = this.props.templateEditor;
-    const { previewIndex, documents, engineVersion } = uiState;
+    const { index, templateEditor } = this.props;
+    const { previewIndex, documents, engineVersion } = templateEditor.uiState;
     const previewDocument = index < documents.size && documents.size > 0 ? documents.get(index) : null;
-    return this.transformDocument(previewDocument, template.transformationEngine, engineVersion);
+    return this.transformDocument(previewDocument, templateEditor.getCurrentEngine(), engineVersion);
   }
 
   public render()
