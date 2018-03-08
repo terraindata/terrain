@@ -493,11 +493,12 @@ export class RouteSelector extends TerrainComponent<Props>
               <div key='3' className='routeselector-option-wrapper' />,
             ]
           }
+         {
           <div
-            className='routeselector-options-gradient'
+           className='routeselector-options-gradient'
           />
+          }
         </div>
-
       </div>
     );
   }
