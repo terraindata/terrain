@@ -61,10 +61,12 @@ import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 
+import PickDatabaseStep from './PickDatabaseStep';
+import ETLPickTemplateStep from './ETLPickTemplateStep';
 import ETLReviewStep from './ETLReviewStep';
 import ETLUploadStep from './ETLUploadStep';
+
 import './ETLWalkthrough.less';
-import PickDatabaseStep from './PickDatabaseStep';
 
 const { List } = Immutable;
 
@@ -171,41 +173,41 @@ export default Util.createContainer(
 
 export const walkthroughGraph: WalkthroughGraphType<ViewState> =
   {
-    [ViewState.Start]: {
-      prompt: 'What Would You Like to Do?',
+    [ViewState.Begin]: {
+      prompt: '',
       options: [
         {
-          link: ViewState.Export,
-          buttonText: 'Export a File',
+          link: ViewState.StartNew,
+          buttonText: 'Start a New Import or Export',
         },
         {
-          link: ViewState.Import,
-          buttonText: 'Import a File',
+          link: ViewState.PickTemplate,
+          buttonText: 'Edit an Existing Process',
         },
       ],
     },
-    // Export
-    [ViewState.Export]: {
-      prompt: 'Export a File',
-      crumbText: 'Export',
+    [ViewState.StartNew]: {
+      prompt: 'What Would You Like to Do?',
       options: [
+        {
+          link: ViewState.NewImport,
+          buttonText: 'Start a New Import',
+        },
         {
           link: ViewState.PickExportAlgorithm,
           buttonText: 'Start a New Export',
         },
-        {
-          link: ViewState.PickExportTemplate,
-          buttonText: 'Use an Existing Export',
-        },
       ],
     },
-    [ViewState.PickExportTemplate]: {
-      prompt: 'Select a Saved Export Template',
+    [ViewState.PickTemplate]: {
+      prompt: 'Select a Saved Template',
       crumbText: 'Select Template',
       options: [
         {
           link: ViewState.Review,
-          component: null,
+          component: ETLPickTemplateStep,
+          onRevert: ETLPickTemplateStep.onRevert,
+          onArrive: ETLPickTemplateStep.onArrive,
         },
       ],
     },
@@ -238,31 +240,6 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
     [ViewState.PickExportDestination]: {
       prompt: 'Select an Export Destination',
       crumbText: 'Export Destination',
-      options: [
-        {
-          link: ViewState.Review,
-          component: null,
-        },
-      ],
-    },
-    // Import
-    [ViewState.Import]: {
-      prompt: 'Import a File',
-      crumbText: 'Import',
-      options: [
-        {
-          link: ViewState.NewImport,
-          buttonText: 'Start a New Import',
-        },
-        {
-          link: ViewState.PickImportTemplate,
-          buttonText: 'Use an Existing Import',
-        },
-      ],
-    },
-    [ViewState.PickImportTemplate]: {
-      prompt: 'Select a Saved Import Template',
-      crumbText: 'Select Template',
       options: [
         {
           link: ViewState.Review,

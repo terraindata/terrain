@@ -52,7 +52,6 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import FadeInOut from 'common/components/FadeInOut';
-import FilePicker from 'common/components/FilePicker';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';

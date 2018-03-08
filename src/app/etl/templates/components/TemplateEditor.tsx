@@ -258,10 +258,10 @@ class TemplateEditor extends TerrainComponent<Props>
     );
   }
 
-  public getTemplateItemStyle(clickedTemplate: ETLTemplate)
+  public getTemplateItemStyle(templateInList: ETLTemplate)
   {
     const { template } = this.props.templateEditor;
-    return template.id !== clickedTemplate.id ? templateListItemStyle : templateListItemCurrentStyle;
+    return template.id !== templateInList.id ? templateListItemStyle : templateListItemCurrentStyle;
   }
 
   public handleLoadTemplateItemClicked(template: ETLTemplate)
