@@ -243,76 +243,86 @@ export default class GroupJoinTransform extends Readable
         continue;
       }
 
-      this.client.msearch(
-        {
-          body,
-        },
-        (error: Error | null, response: any) =>
-        {
-          if (error !== null && error !== undefined)
+      try
+      {
+        this.client.msearch(
           {
-            throw error;
-          }
-
-          if (response.error !== undefined)
+            body,
+          },
+          (error: Error | null, response: any) =>
           {
-            throw response.error;
-          }
-
-          for (let j = 0; j < numInputs; ++j)
-          {
-            if (response.responses[j] !== undefined && response.responses[j].hits !== undefined)
+            if (error !== null && error !== undefined)
             {
-              ticket.results[j][subQuery] = response.responses[j].hits.hits;
+              this.emit('error', error);
+              return;
             }
-            else
+
+            if (response.error !== undefined)
             {
-              ticket.results[j][subQuery] = [];
+              this.emit('error', response.error);
+              return;
             }
-          }
 
-          ticket.count--;
-
-          // check if we have anything to push to the output stream
-          let done = false;
-          while (!done && this.bufferedOutputs.length > 0)
-          {
-            const front = this.bufferedOutputs.peekFront();
-            if (front !== undefined && front.count === 0)
+            for (let j = 0; j < numInputs; ++j)
             {
-              while (front.results.length > 0)
+              if (response.responses[j] !== undefined && response.responses[j].hits !== undefined)
               {
-                const obj = front.results.shift();
-                if (obj !== undefined)
-                {
-                  const shouldPass = Object.keys(query).reduce((acc, q) =>
-                  {
-                    return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
-                  }, true);
+                ticket.results[j][subQuery] = response.responses[j].hits.hits;
+              }
+              else
+              {
+                ticket.results[j][subQuery] = [];
+              }
+            }
 
-                  if (shouldPass)
+            ticket.count--;
+
+            // check if we have anything to push to the output stream
+            let done = false;
+            while (!done && this.bufferedOutputs.length > 0)
+            {
+              const front = this.bufferedOutputs.peekFront();
+              if (front !== undefined && front.count === 0)
+              {
+                while (front.results.length > 0)
+                {
+                  const obj = front.results.shift();
+                  if (obj !== undefined)
                   {
-                    this.push(obj);
+                    const shouldPass = Object.keys(query).reduce((acc, q) =>
+                    {
+                      return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
+                    }, true);
+
+                    if (shouldPass)
+                    {
+                      this.push(obj);
+                    }
                   }
                 }
+                this.bufferedOutputs.shift();
               }
-              this.bufferedOutputs.shift();
+              else
+              {
+                done = true;
+              }
             }
-            else
+
+            if (this.sourceIsEmpty
+              && this.bufferedOutputs.length === 0
+              && this.bufferedInputs.length === 0)
             {
-              done = true;
+              this.push(null);
             }
-          }
 
-          if (this.sourceIsEmpty
-            && this.bufferedOutputs.length === 0
-            && this.bufferedInputs.length === 0)
-          {
-            this.push(null);
-          }
-
-          this.continueReading = false;
-        });
+            this.continueReading = false;
+          });
+      }
+      catch (e)
+      {
+        this.emit('error', e);
+        return;
+      }
     }
   }
 }
