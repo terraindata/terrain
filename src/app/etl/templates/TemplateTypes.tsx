@@ -63,7 +63,6 @@ class ETLTemplateC implements ETLTemplateI
   public id = -1;
   public archived = false;
   public templateName = '';
-  // public transformationEngine = new TransformationEngine();
   public transformationConfig = '';
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
@@ -71,7 +70,6 @@ class ETLTemplateC implements ETLTemplateI
 
 export type ETLTemplate = WithIRecord<ETLTemplateC>;
 export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
-  // transformationEngine: TransformationEngine.load,
   sources: (sources) =>
   {
     return Map<string, SourceConfig>(sources)
@@ -139,10 +137,10 @@ interface ETLTemplateI extends TemplateBase
 export function templateForBackend(template: ETLTemplate): TemplateBase
 {
   const obj: TemplateObject = (template as any).toObject(); // shallow js object
-  // obj.transformationEngine = obj.transformationEngine.toJSON();
-  obj.sources = obj.sources.map((source, key) => {
-    return source.set('transformations', source.transformations.toJSON());
-  });
+  obj.sources = obj.sources.map((source, key) =>
+  {
+    return source.set('transformations', JSON.stringify(source.transformations.toJSON()));
+  }).toMap();
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
   _.forOwn(obj.sources, (source, key) =>

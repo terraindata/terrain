@@ -113,7 +113,7 @@ class TemplateEditor extends TerrainComponent<Props>
   // gets memoizedOne'd
   public transformDocument(previewDocument, engine, engineVersion)
   {
-    if (previewDocument == null)
+    if (previewDocument == null || engine == null)
     {
       return {};
     }

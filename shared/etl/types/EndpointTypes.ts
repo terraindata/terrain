@@ -45,8 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file no-unused-expression
 
-import { FileTypes, Languages } from './ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { FileTypes, Languages } from './ETLTypes';
 
 export enum Sources
 {

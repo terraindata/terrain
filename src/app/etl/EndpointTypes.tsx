@@ -82,7 +82,7 @@ class SourceConfigC implements SourceConfigI
 export type SourceConfig = WithIRecord<SourceConfigC>;
 export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
   fileConfig: _FileConfig,
-  transformations: TransformationEngine.load,
+  transformations: (engine) => TransformationEngine.load(engine),
 },
   (cfg?, deep?) =>
   {

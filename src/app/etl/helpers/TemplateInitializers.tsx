@@ -187,7 +187,7 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     templateName: name,
     // transformationEngine: engine,
   });
-  let newSource = source !== undefined ? source : _SourceConfig({type: Sources.Upload});
+  let newSource = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
   newSource = newSource.set('transformations', engine);
 
   // default source and sink is upload and download

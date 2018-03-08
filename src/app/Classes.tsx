@@ -306,14 +306,10 @@ export function makeExtendedConstructor<T>(
   transformConfig?: ConfigTransformer<T>,
 ): (config?: ConfigType<T>, deep?: boolean) => WithIRecord<T>
 {
-  if (injectMethods)
-  {
-    const instance = new Type();
-    injectInstanceMethods(Constructor(instance), instance);
-  }
+  let constructorFn = null;
   if (deepConfigOverride || transformConfig)
   {
-    return (config?: ConfigType<T>, deep?: boolean) =>
+    constructorFn = (config?: ConfigType<T>, deep?: boolean) =>
     {
       const overrideKeys = Object.keys(deepConfigOverride);
       let newConfig = config;
@@ -332,8 +328,23 @@ export function makeExtendedConstructor<T>(
   }
   else
   {
-    return (config?: { [key: string]: any }) => New<WithIRecord<T>>(new Type(), config);
+    constructorFn = (config?: ConfigType<T>) => New<WithIRecord<T>>(new Type(), config);
   }
+
+  const runOnce = _.once(() =>
+  {
+    if (injectMethods)
+    {
+      const instance = new Type();
+      injectInstanceMethods(Constructor(instance), instance);
+    }
+    return constructorFn;
+  });
+
+  return (config?: ConfigType<T>, deep?: boolean) =>
+  {
+    return runOnce()(config, deep);
+  };
 }
 
 /*** Example Usage ***/

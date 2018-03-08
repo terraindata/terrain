@@ -108,32 +108,44 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
   {
     const { currentIndex } = this.state;
     const field = this._field();
-
-    if (currentIndex >= 0 && currentIndex < field.transformations.size)
+    const engine = this._currentEngine();
+    if (currentIndex >= 0 && currentIndex < field.transformations.size && engine != null)
     {
       return (
         <TransformationEditor
           key={currentIndex}
           transformation={field.transformations.get(currentIndex)}
-          engine={this._currentEngine()}
+          engine={engine}
           fieldID={this._field().fieldId}
           onTransformationChange={this.handleTransformationChange}
           onClose={this.handleUIClose}
         />
       );
     }
+    else
+    {
+      return null;
+    }
   }
 
   public renderCreateTransformationSection()
   {
-    return (
-      <TransformationCreator
-        engine={this._currentEngine()}
-        fieldID={this._field().fieldId}
-        onTransformationCreated={this.handleTransformationChange}
-        onClose={this.handleUIClose}
-      />
-    );
+    const engine = this._currentEngine();
+    if (engine != null)
+    {
+      return (
+        <TransformationCreator
+          engine={engine}
+          fieldID={this._field().fieldId}
+          onTransformationCreated={this.handleTransformationChange}
+          onClose={this.handleUIClose}
+        />
+      );
+    }
+    else
+    {
+      return null;
+    }
   }
 
   public transformationListItemStyle(isActive: boolean): { textStyle: object, buttonStyle: object }
