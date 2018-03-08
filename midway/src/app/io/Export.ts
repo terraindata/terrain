@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as equal from 'deep-equal';
 import * as _ from 'lodash';
 import sha1 = require('sha1');
 import * as stream from 'stream';
@@ -60,7 +59,9 @@ import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
+import AExportTransform from './streams/AExportTransform';
 import CSVExportTransform from './streams/CSVExportTransform';
+import ExportTransform from './streams/ExportTransform';
 import JSONExportTransform from './streams/JSONExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
@@ -77,8 +78,37 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 
 export class Export
 {
+  public static mergeGroupJoin(doc: object): object
+  {
+    if (doc['_source'] !== undefined)
+    {
+      const sourceKeys = Object.keys(doc['_source']);
+      const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
+      if (rootKeys.length > 0) // there were group join objects
+      {
+        const duplicateRootKeys: string[] = [];
+        rootKeys.forEach((rootKey) =>
+        {
+          if (sourceKeys.indexOf(rootKey) > -1)
+          {
+            duplicateRootKeys.push(rootKey);
+          }
+        });
+        if (duplicateRootKeys.length !== 0)
+        {
+          throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+        }
+        rootKeys.forEach((rootKey) =>
+        {
+          doc['_source'][rootKey] = doc[rootKey];
+          delete doc[rootKey];
+        });
+      }
+    }
+    return doc;
+  }
+
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
-  private MAX_ROW_THRESHOLD: number = 2000;
 
   public async export(exportConfig: ExportConfig, headless: boolean): Promise<stream.Readable>
   {
@@ -156,16 +186,6 @@ export class Export
         columnNames.push('TERRAINRANK');
       }
 
-      let writer: any;
-      if (exportConfig.filetype === 'csv')
-      {
-        writer = new CSVExportTransform(columnNames);
-      }
-      else if (exportConfig.filetype === 'json' || exportConfig.filetype === 'json [type object]')
-      {
-        writer = new JSONExportTransform();
-      }
-
       const originalMapping: object = {};
       // generate original mapping if there were any renames
       const allNames = Object.keys(mapping);
@@ -190,10 +210,9 @@ export class Export
         body: qry,
       };
 
-      const respStream: any = await qh.handleQuery(payload);
-      if (respStream === undefined || (respStream.hasError !== undefined && respStream.hasError()))
+      const respStream: stream.Readable = await qh.handleQuery(payload) as stream.Readable;
+      if (respStream === undefined)
       {
-        writer.end();
         throw Error('Nothing to export.');
       }
 
@@ -203,7 +222,7 @@ export class Export
         exportConfig.transformations = exportConfig.transformations.filter((transformation) => transformation['name'] !== 'extract');
 
         winston.info('Beginning export transformations.');
-        const cfg = {
+        const exportTransformConfig = {
           extractTransformations,
           exportConfig,
           fieldArrayDepths: {},
@@ -211,65 +230,33 @@ export class Export
           mapping: originalMapping,
         };
 
-        respStream.on('data', (doc) =>
+        const documentTransform: ExportTransform = new ExportTransform(this, exportTransformConfig);
+        let exportTransform: AExportTransform;
+        switch (exportConfig.filetype)
         {
-          if (doc === undefined || doc === null)
-          {
-            writer.end();
-          }
+          case 'json':
+            exportTransform = new JSONExportTransform();
+            break;
+          case 'csv':
+            exportTransform = new CSVExportTransform(columnNames);
+            break;
+          default:
+            throw Error('File type must be either CSV or JSON.');
+        }
 
-          try
-          {
-            doc = this._postProcessDoc(doc, cfg);
-            writer.write(doc);
-          }
-          catch (e)
-          {
-            winston.error(e);
-            throw e;
-          }
-        });
-
-        respStream.on('end', () =>
-        {
-          writer.end();
-        });
-
-        respStream.on('error', (err) =>
-        {
-          winston.error(err);
-          throw err;
-        });
-
-        return resolve(writer);
+        resolve(respStream.pipe(documentTransform).pipe(exportTransform));
       }
       catch (e)
       {
-        respStream.close();
-        return reject(e);
+        reject(e);
       }
     });
-  }
-
-  public async getNamesAndTypesFromQuery(dbid: number, qry: string): Promise<object | string>
-  {
-    qry = this._shouldRandomSample(qry);
-    const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-    if (database === undefined)
-    {
-      throw new Error('Database "' + dbid.toString() + '" not found.');
-    }
-    if (database.getType() !== 'ElasticController')
-    {
-      throw new Error('File export currently is only supported for Elastic databases.');
-    }
-    return this._getAllFieldsAndTypesFromQuery(database, qry, dbid);
   }
 
   public _postProcessDoc(doc: object, cfg: any): object
   {
     // merge groupJoins with _source if necessary
-    doc = this._mergeGroupJoin(doc);
+    doc = Export.mergeGroupJoin(doc);
 
     // extract field after doing all merge joins
     cfg.extractTransformations.forEach((transform) =>
@@ -322,28 +309,6 @@ export class Export
     return doc;
   }
 
-  private _shouldRandomSample(qry: string): string
-  {
-    let parser = getParsedQuery(qry);
-    const query = parser.getValue();
-    if (query['size'] !== undefined)
-    {
-      if (typeof query['size'] === 'number' && query['size'] > this.MAX_ROW_THRESHOLD)
-      {
-        query['size'] = this.MAX_ROW_THRESHOLD;
-      }
-    }
-
-    query.query = {
-      function_score: {
-        random_score: {},
-        query: query.query,
-      },
-    };
-    parser = new ESJSONParser(JSON.stringify(query), true);
-    return ESConverter.formatES(parser as ESJSONParser);
-  }
-
   private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
@@ -366,210 +331,6 @@ export class Export
         return reject('Malformed algorithm');
       }
     });
-  }
-
-  private async _getAllFieldsAndTypesFromQuery(database: DatabaseController, qry: string,
-    dbid?: number, maxSize?: number): Promise<object | string>
-  {
-    return new Promise<object | string>(async (resolve, reject) =>
-    {
-      const fieldObj: object = {};
-      let fieldsAndTypes: object = {};
-      const qh: QueryHandler = database.getQueryHandler();
-      const payload = {
-        database: dbid as number,
-        type: 'search',
-        streaming: false,
-        databasetype: 'elastic',
-        body: qry,
-      };
-      const qryResponse: any = await qh.handleQuery(payload);
-      if (qryResponse === undefined || qryResponse.hasError())
-      {
-        return resolve(fieldObj);
-      }
-      const resp = qryResponse.result;
-      if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
-      {
-        return resolve(fieldObj);
-      }
-      const newDocs: object[] = resp.hits.hits as object[];
-      if (newDocs.length === undefined)
-      {
-        return resolve('Something was wrong with the query.');
-      }
-      if (newDocs.length === 0)
-      {
-        return resolve(fieldObj);
-      }
-      fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
-      for (const field of Object.keys(fieldsAndTypes))
-      {
-        fieldObj[field] = this._getPriorityType(fieldsAndTypes[field]);
-      }
-      return resolve(fieldObj);
-    });
-  }
-
-  // boolean, long, double, string, array, object ({...})
-  // returns an object with keys as the fields and values as arrays of the detected types
-  private async _getFieldsAndTypesFromDocuments(docs: object[], fieldObj: object): Promise<object>
-  {
-    if (fieldObj === undefined)
-    {
-      fieldObj = {};
-    }
-    return new Promise<object>(async (resolve, reject) =>
-    {
-      for (let doc of docs)
-      {
-        doc = this._mergeGroupJoin(doc);
-        const fields: string[] = Object.keys(doc['_source']);
-        for (const field of fields)
-        {
-          const fullTypeObj = { type: 'text', index: 'not_analyzed', analyzer: null as (string | null) };
-          switch (typeof doc['_source'][field])
-          {
-            case 'number':
-              fullTypeObj.type = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
-              if (!fieldObj.hasOwnProperty(field))
-              {
-                fieldObj[field] = [fullTypeObj];
-              }
-              else
-              {
-                if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
-                  .indexOf(true) > -1)
-                {
-                  fieldObj[field].concat(fullTypeObj);
-                }
-              }
-              break;
-            case 'boolean':
-              fullTypeObj.type = 'boolean';
-              if (!fieldObj.hasOwnProperty(field))
-              {
-                fieldObj[field] = [fullTypeObj];
-              }
-              else
-              {
-                if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
-                  .indexOf(true) < 0)
-                {
-                  fieldObj[field].concat(fullTypeObj);
-                }
-              }
-              break;
-            case 'object':
-              fullTypeObj.type = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
-              if (!fieldObj.hasOwnProperty(field))
-              {
-                fieldObj[field] = [fullTypeObj.type === 'array' ?
-                  this._recursiveArrayTypeHelper(doc['_source'][field]) : fullTypeObj];
-              }
-              else
-              {
-                if (fullTypeObj.type === 'array')
-                {
-                  const fullArrayObj: object = this._recursiveArrayTypeHelper(doc['_source'][field]);
-                  if (fieldObj[field].indexOf(fullArrayObj) < 0)
-                  {
-                    fieldObj[field].concat(fullArrayObj);
-                  }
-                }
-                else
-                {
-                  if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
-                    .indexOf(true) < 0)
-                  {
-                    fieldObj[field].concat(fullTypeObj);
-                  }
-                }
-              }
-              break;
-            default:
-              fullTypeObj.index = 'analyzed';
-              fullTypeObj.analyzer = 'standard';
-              if (!fieldObj.hasOwnProperty(field))
-              {
-                fieldObj[field] = [fullTypeObj];
-              }
-              else
-              {
-                fieldObj[field].concat(fullTypeObj);
-              }
-          }
-        }
-      }
-      return resolve(fieldObj);
-    });
-  }
-
-  private _recursiveArrayTypeHelper(fieldValue: any): object
-  {
-    if (Array.isArray(fieldValue))
-    {
-      return { type: 'array', innerType: this._recursiveArrayTypeHelper(fieldValue[0]) };
-    }
-    else
-    {
-      switch (typeof fieldValue)
-      {
-        case 'number':
-          return { type: fieldValue % 1 === 0 ? 'long' : 'double', innerType: null, index: 'not_analyzed', analyzer: null };
-        case 'boolean':
-          return { type: 'boolean', innerType: null, index: 'not_analyzed', analyzer: null };
-        case 'object':
-          return { type: 'object', innerType: null, index: 'not_analyzed', analyzer: null };
-        default:
-          return { type: 'text', innerType: null, index: 'analyzed', analyzer: 'standard' };
-      }
-    }
-  }
-
-  private _getInnermostType(arrayType: object): string
-  {
-    while (arrayType['type'] === 'array' && arrayType['innerType'] !== undefined && typeof arrayType['innerType'] === 'object')
-    {
-      arrayType = arrayType['innerType'];
-    }
-    return arrayType['type'];
-  }
-
-  private _getPriorityType(types: object[]): object
-  {
-    if (types.length === 1)
-    {
-      return types[0];
-    }
-
-    if (types.map((typesObj) => typesObj['type']).indexOf('array') >= 0)
-    {
-      const arrayTypes: object[] = types.filter((typeObj) => typeObj['type'] === 'array');
-      const innermostTypes: string[] = arrayTypes.map((arrayType) =>
-      {
-        return this._getInnermostType(arrayType);
-      });
-      if (types.length === 1)
-      {
-        return arrayTypes[0];
-      }
-      if (equal(innermostTypes.sort(), ['double', 'long']))
-      {
-        return { type: 'double', index: 'not_analyzed', analyzer: null };
-      }
-      return { type: 'text', index: 'analyzed', analyzer: 'standard' };
-    }
-    else if (types.map((typesObj) => typesObj['type']).indexOf('object') >= 0)
-    {
-      return { type: 'object', index: 'not_analyzed', analyzer: null };
-    }
-
-    if (equal(types.map((typeObj) => typeObj['type']).sort(), ['double', 'long']))
-    {
-      return { type: 'double', index: 'not_analyzed', analyzer: null };
-    }
-    return { type: 'text', index: 'analyzed', analyzer: 'standard' };
   }
 
   private _applyTransforms(obj: object, transforms: object[]): object
@@ -886,36 +647,6 @@ export class Export
       return this._jsonCheckTypesHelper(item[0], typeObj['innerType']);
     }
     return true;
-  }
-
-  private _mergeGroupJoin(doc: object): object
-  {
-    if (doc['_source'] !== undefined)
-    {
-      const sourceKeys = Object.keys(doc['_source']);
-      const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
-      if (rootKeys.length > 0) // there were group join objects
-      {
-        const duplicateRootKeys: string[] = [];
-        rootKeys.forEach((rootKey) =>
-        {
-          if (sourceKeys.indexOf(rootKey) > -1)
-          {
-            duplicateRootKeys.push(rootKey);
-          }
-        });
-        if (duplicateRootKeys.length !== 0)
-        {
-          throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
-        }
-        rootKeys.forEach((rootKey) =>
-        {
-          doc['_source'][rootKey] = doc[rootKey];
-          delete doc[rootKey];
-        });
-      }
-    }
-    return doc;
   }
 
   // recursively attempts to parse strings to dates
