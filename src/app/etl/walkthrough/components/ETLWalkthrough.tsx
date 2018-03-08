@@ -61,8 +61,9 @@ import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 
+import PickAlgorithmStep from './PickAlgorithmStep';
 import PickDatabaseStep from './PickDatabaseStep';
-import ETLPickTemplateStep from './ETLPickTemplateStep';
+import PickTemplateStep from './PickTemplateStep';
 import ETLReviewStep from './ETLReviewStep';
 import ETLUploadStep from './ETLUploadStep';
 
@@ -174,7 +175,7 @@ export default Util.createContainer(
 export const walkthroughGraph: WalkthroughGraphType<ViewState> =
   {
     [ViewState.Begin]: {
-      prompt: '',
+      prompt: 'What Would You Like to Do?',
       options: [
         {
           link: ViewState.StartNew,
@@ -187,7 +188,7 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       ],
     },
     [ViewState.StartNew]: {
-      prompt: 'What Would You Like to Do?',
+      prompt: 'Are you Importing or Exporting?',
       options: [
         {
           link: ViewState.NewImport,
@@ -205,9 +206,9 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.Review,
-          component: ETLPickTemplateStep,
-          onRevert: ETLPickTemplateStep.onRevert,
-          onArrive: ETLPickTemplateStep.onArrive,
+          component: PickTemplateStep,
+          onRevert: PickTemplateStep.onRevert,
+          onArrive: PickTemplateStep.onArrive,
         },
       ],
     },
@@ -217,14 +218,15 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.ExportDestination,
-          component: null,
+          component: PickAlgorithmStep,
+          onRevert: PickAlgorithmStep.onRevert,
+          onArrive: PickAlgorithmStep.onArrive,
         },
       ],
     },
     [ViewState.ExportDestination]: {
       prompt: 'Where Would You Like the Results?',
       crumbText: 'Destination Type',
-      additionalText: 'You can always change this later',
       options: [
         {
           link: ViewState.Review,

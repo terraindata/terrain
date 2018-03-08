@@ -242,7 +242,7 @@ class TemplateEditor extends TerrainComponent<Props>
           onClose={this.closeTemplateUI}
           wide={true}
         >
-          <div className='template-list-wrapper' style={backgroundColor(Colors().bg2)}>
+          <div className='template-list-wrapper' style={backgroundColor(Colors().bg3)}>
             <TemplateList
               onClick={this.handleLoadTemplateItemClicked}
               getRowStyle={this.getTemplateItemStyle}

@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
-
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -63,12 +62,11 @@ import TemplateList from 'etl/templates/components/TemplateList';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { getFileType } from 'shared/etl/FileUtil';
-import { Sources } from 'shared/etl/types/EndpointTypes';
+
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
-class ETLPickTemplateStep extends ETLStepComponent
+class PickTemplateStep extends ETLStepComponent
 {
   public static onRevert(params: TransitionParams)
   {
@@ -118,14 +116,14 @@ const templateListItemStyle = [
   backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
 ];
 
-const templateListStyle = _.extend({}, 
+const templateListStyle = _.extend({},
   backgroundColor(Colors().bg3),
   getStyle('boxShadow', `2px 2px 3px ${Colors().boxShadow}`),
 );
 
 const transitionRowHeight = '28px';
 export default Util.createTypedContainer(
-  ETLPickTemplateStep,
+  PickTemplateStep,
   ['walkthrough'],
   { act: WalkthroughActions },
 );
