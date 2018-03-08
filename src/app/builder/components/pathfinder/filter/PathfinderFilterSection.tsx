@@ -68,6 +68,7 @@ import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderCon
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
+import FadeInOut from 'common/components/FadeInOut';
 
 export interface Props
 {
@@ -403,6 +404,12 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
   }
 
+  public toggleExpanded(expanded)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'collapsed'),
+      !expanded);
+  }
+
   public render()
   {
     const { filterGroup, pathfinderContext, isSoftFilter } = this.props;
@@ -412,90 +419,91 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const groupStyle = { opacity: dragging ? 0.7 : 1, zIndex: dragging ? 99 : 5 };
     const { canEdit } = this.props.pathfinderContext;
     let title = PathfinderText.hardFilterSectionTitle;
-    let subtitle = PathfinderText.hardFilterSectionSubtitle;
+    let tooltip = PathfinderText.hardFilterSectionSubtitle;
     if (isSoftFilter)
     {
       title = PathfinderText.softFilterSectionTitle;
-      subtitle = PathfinderText.softFilterSectionSubtitle;
+      tooltip = PathfinderText.softFilterSectionSubtitle;
     }
 
     return (
       <div
         className='pf-section pf-filter-section'
       >
-        <SingleRouteSelector
-          canEdit={false}
-          shortNameText={'Filter'}
-          semilarge={true}
-          value={title}
-          options={List([])}
-          onChange={(value) => { }}
-          headerText={'Filter'}
-          hideLine={true}
+        <PathfinderSectionTitle
+          title={title}
+          tooltipText={tooltip}
+          canExpand={true}
+          onExpand={this.toggleExpanded}
+          expanded={!filterGroup.collapsed}
         />
-
-        <CustomDragLayer />
-        <DropZone
-          keyPath={List([0])}
-          onDrop={this.handleDrop}
-          style={dropZoneStyle}
-        />
-        {
-          filterGroup.lines.map((line, i) =>
-            <div key={i}>
-              {
-                !this.isGroup(line) ?
-                  <DragDropItem
-                    children={this.renderFilterLine(line, List([i]))}
-                    keyPath={List([i])}
-                    onDrop={this.handleGroupDrop}
-                    canDrop={true}
-                    data={line}
-                    hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
-                    style={itemStyle}
-                    onDragStart={this._toggle('dragging')}
-                    onDragStop={this._toggle('dragging')}
-                    dropZoneStyle={dropZoneStyle}
-                    canDrag={canEdit}
-                  />
-                  :
-                  <DragDropGroup
-                    canDrag={canEdit}
-                    items={line.filterGroup.lines}
-                    data={line.filterGroup}
-                    onDrop={this.handleGroupDrop}
-                    keyPath={List([i])}
-                    onReorder={this.handleDrop}
-                    isGroup={this.isGroup}
-                    keyPathStarter={List(['filterGroup', 'lines'])}
-                    renderChildren={this.renderFilterLine}
-                    renderHeader={this.renderGroupHeader}
-                    setCollapsed={this.changeCollapsed}
-                    hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
-                    onDragStart={this._toggle('dragging')}
-                    onDragStop={this._toggle('dragging')}
-                    style={groupStyle}
-                    dropZoneStyle={dropZoneStyle}
-                    itemStyle={itemStyle}
-                  />
-              }
-              <DropZone
-                keyPath={List([i + 1])}
-                onDrop={this.handleDrop}
-                style={_.extend(
-                  {},
-                  dropZoneStyle,
-                  i === filterGroup.lines.size - 1 ? { top: 20 } : {}
+        <FadeInOut
+          open={!filterGroup.collapsed}
+          // POSSIBLY DONT UNMOUNT
+        >
+          <CustomDragLayer />
+          <DropZone
+            keyPath={List([0])}
+            onDrop={this.handleDrop}
+            style={dropZoneStyle}
+          />
+          {
+            filterGroup.lines.map((line, i) =>
+              <div key={i}>
+                {
+                  !this.isGroup(line) ?
+                    <DragDropItem
+                      children={this.renderFilterLine(line, List([i]))}
+                      keyPath={List([i])}
+                      onDrop={this.handleGroupDrop}
+                      canDrop={true}
+                      data={line}
+                      hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
+                      style={itemStyle}
+                      onDragStart={this._toggle('dragging')}
+                      onDragStop={this._toggle('dragging')}
+                      dropZoneStyle={dropZoneStyle}
+                      canDrag={canEdit}
+                    />
+                    :
+                    <DragDropGroup
+                      canDrag={canEdit}
+                      items={line.filterGroup.lines}
+                      data={line.filterGroup}
+                      onDrop={this.handleGroupDrop}
+                      keyPath={List([i])}
+                      onReorder={this.handleDrop}
+                      isGroup={this.isGroup}
+                      keyPathStarter={List(['filterGroup', 'lines'])}
+                      renderChildren={this.renderFilterLine}
+                      renderHeader={this.renderGroupHeader}
+                      setCollapsed={this.changeCollapsed}
+                      hoverHeader={this.renderGroupHeader(_FilterGroup(), List([]))}
+                      onDragStart={this._toggle('dragging')}
+                      onDragStop={this._toggle('dragging')}
+                      style={groupStyle}
+                      dropZoneStyle={dropZoneStyle}
+                      itemStyle={itemStyle}
+                    />
                 }
-              />
-            </div>,
-          )
-        }
-        <PathfinderCreateLine
-          canEdit={pathfinderContext.canEdit}
-          text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
-          onCreate={this.handleAddFilter}
-        />
+                <DropZone
+                  keyPath={List([i + 1])}
+                  onDrop={this.handleDrop}
+                  style={_.extend(
+                    {},
+                    dropZoneStyle,
+                    i === filterGroup.lines.size - 1 ? { top: 20 } : {})
+                  }
+                />
+              </div>,
+            )
+          }
+          <PathfinderCreateLine
+            canEdit={pathfinderContext.canEdit}
+            text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
+            onCreate={this.handleAddFilter}
+          />
+        </FadeInOut>
       </div>
     );
   }

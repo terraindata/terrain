@@ -403,7 +403,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                   {
                     tooltip(
                       <FloatingInput
-                        label={'Reference'}
+                        label={PathfinderText.referenceName}
                         isTextInput={true}
                         value={ref}
                         onChange={this._fn(this.handleReferenceChange, i)}
@@ -421,7 +421,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                     <FloatingInput
                       value={nested.get(i) !== undefined ? nested.get(i).name : undefined}
                       onChange={this._fn(this.handleAlgorithmNameChange, i)}
-                      label={'Algorithm Name'}
+                      label={PathfinderText.innerQueryName}
                       isTextInput={true}
                       canEdit={canEdit}
                       className='pf-more-nested-name-input'
@@ -450,6 +450,29 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     );
   }
 
+  public renderScripts(scripts)
+  {
+    return (
+      <div>
+        {
+          scripts.map((script) =>
+            <div>
+              <div>{script.name}</div>
+              <div>Params: </div>
+              <textarea>{script.script}</textarea>
+            </div>
+          )
+        }
+      </div>
+    );
+  }
+
+  public toggleExpanded(expanded)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'expanded'),
+      expanded);
+  }
+
   public render()
   {
     const { canEdit } = this.props.pathfinderContext;
@@ -460,7 +483,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         {!this.props.hideTitle &&
           <PathfinderSectionTitle
             title={PathfinderText.moreSectionTitle}
-            text={PathfinderText.moreSectionSubtitle}
+            tooltipText={PathfinderText.moreSectionSubtitle}
+            onExpand={this.toggleExpanded}
+            canExpand={true}
+            expanded={this.props.more.expanded}
           />
         }
         {
@@ -474,52 +500,59 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           //   autoFocus={true}
           // />
         }
-        <RouteSelector
-          optionSets={this.getCollapseOptionSets()}
-          values={List([this.props.more.collapse])}
-          onChange={this.handleCollapseChange}
-          canEdit={canEdit}
-          defaultOpen={false}
-          autoFocus={true}
-        />
-        {
-          this.props.keyPath.includes('nested') ?
-            <RouteSelector
-              optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
-              values={List([this.props.path.minMatches])}
-              onChange={this.handleMinMatchesChange}
-              canEdit={canEdit}
-              defaultOpen={false}
-              autoFocus={true}
-            /> : null
-        }
-        {
-          // <DragAndDrop
-          //   draggableItems={this.getAggregationLines()}
-          //   onDrop={this.handleLinesReorder}
-          //   className='more-aggregations-drag-drop'
-          // />
-          // <PathfinderCreateLine
-          //   canEdit={canEdit}
-          //   onCreate={this.handleAddLine}
-          //   text={PathfinderText.createAggregationLine}
-          // />
-        }
-        <div>
-          {this.renderNestedPaths()}
+        <FadeInOut
+          open={this.props.more.expanded}
+        >
+          <RouteSelector
+            optionSets={this.getCollapseOptionSets()}
+            values={List([this.props.more.collapse])}
+            onChange={this.handleCollapseChange}
+            canEdit={canEdit}
+            defaultOpen={false}
+            autoFocus={true}
+          />
           {
-            !this.props.keyPath.includes('nested') ?
-              tooltip(
-                <PathfinderCreateLine
-                  canEdit={canEdit}
-                  onCreate={this.handleAddNested}
-                  text={PathfinderText.createNestedLine}
-                  style={{ marginTop: 12 }}
-                />,
-                PathfinderText.nestedExplanation,
-              ) : null
+            this.props.keyPath.includes('nested') ?
+              <RouteSelector
+                optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
+                values={List([this.props.path.minMatches])}
+                onChange={this.handleMinMatchesChange}
+                canEdit={canEdit}
+                defaultOpen={false}
+                autoFocus={true}
+              /> : null
           }
-        </div>
+          {
+            // <DragAndDrop
+            //   draggableItems={this.getAggregationLines()}
+            //   onDrop={this.handleLinesReorder}
+            //   className='more-aggregations-drag-drop'
+            // />
+            // <PathfinderCreateLine
+            //   canEdit={canEdit}
+            //   onCreate={this.handleAddLine}
+            //   text={PathfinderText.createAggregationLine}
+            // />
+          }
+          {
+            this.renderScripts(this.props.more.scripts)
+          }
+          <div>
+            {this.renderNestedPaths()}
+            {
+              !this.props.keyPath.includes('nested') ?
+                tooltip(
+                  <PathfinderCreateLine
+                    canEdit={canEdit}
+                    onCreate={this.handleAddNested}
+                    text={PathfinderText.createNestedLine}
+                    style={{ marginTop: 12 }}
+                  />,
+                  PathfinderText.nestedExplanation,
+                ) : null
+            }
+          </div>
+        </FadeInOut>
       </div>
     );
   }

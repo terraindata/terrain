@@ -203,6 +203,7 @@ class ScoreC extends BaseClass
   public lines: List<ScoreLine> = List<ScoreLine>([]);
   public type: ScoreType = ScoreType.terrain;
   public seed: number = 10; // For random scoring
+  public expanded: boolean = true;
 }
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>
@@ -280,6 +281,8 @@ class MoreC extends BaseClass
   public aggregations: List<AggregationLine> = List([]);
   public references: List<string> = List([]); // What should this query be referred to in other queries (@parent in US query)
   public collapse: string = undefined;
+  public scripts: List<Script> = List();
+  public expanded: boolean = true;
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -288,6 +291,7 @@ export const _More = (config?: { [key: string]: any }) =>
   let more = New<More>(new MoreC(config || {}), config);
   more = more
     .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
+    .set('scripts', List(more['scripts'].map((agg) => _Script(agg))))
     .set('references', List(more['references']));
 
   return more;
@@ -352,12 +356,17 @@ export const _Sample = (config?: { [key: string]: any }) =>
 
 class ScriptC extends BaseClass
 {
-  public id: string = '';
+  public name: string = '';
+  public params: Immutable.Map<string, any> = Map<string, any>();
   public script: string = '';
 }
 export type Script = ScriptC & IRecord<ScriptC>;
 export const _Script = (config?: { [key: string]: any }) =>
-  New<Script>(new ScriptC(config), config);
+{
+  let script = New<Script>(new ScriptC(Util.asJS(config)), Util.asJS(config));
+  script = script.set('params', Map(script.params));
+  return script;
+}
 
 class FilterLineC extends LineC
 {

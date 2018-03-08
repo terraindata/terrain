@@ -442,7 +442,6 @@ class Builder extends TerrainComponent<Props>
       },
       {
         text: 'SAVE',
-        tooltip: 'Save',
         icon: null,
         onClick: this.onSave,
         enabled: this.shouldSave(builderState),

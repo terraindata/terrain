@@ -177,14 +177,15 @@ class PathfinderArea extends TerrainComponent<Props>
 
           <FadeInOut
             open={path.step >= PathfinderSteps.Filter}
-          >
-            <PathfinderScoreSection
-              pathfinderContext={pathfinderContext}
-              score={path.score}
-              keyPath={this._ikeyPath(keyPath, 'score')}
-              onStepChange={this.incrementStep}
-            />
 
+          >          
+            <PathfinderFilterSection
+              pathfinderContext={pathfinderContext}
+              filterGroup={path.filterGroup}
+              keyPath={this._ikeyPath(keyPath, 'filterGroup')}
+              onStepChange={this.incrementStep}
+              toSkip={toSkip}
+            />
             <PathfinderFilterSection
               isSoftFilter={true}
               pathfinderContext={pathfinderContext}
@@ -193,15 +194,12 @@ class PathfinderArea extends TerrainComponent<Props>
               onStepChange={this.incrementStep}
               toSkip={toSkip}
             />
-
-            <PathfinderFilterSection
+            <PathfinderScoreSection
               pathfinderContext={pathfinderContext}
-              filterGroup={path.filterGroup}
-              keyPath={this._ikeyPath(keyPath, 'filterGroup')}
+              score={path.score}
+              keyPath={this._ikeyPath(keyPath, 'score')}
               onStepChange={this.incrementStep}
-              toSkip={toSkip}
             />
-
             <PathfinderMoreSection
               pathfinderContext={pathfinderContext}
               more={path.more}

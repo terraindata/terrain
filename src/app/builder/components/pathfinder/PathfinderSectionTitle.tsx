@@ -51,11 +51,17 @@ import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { tooltip } from 'common/components/tooltip/Tooltips';
+import ExpandIcon from 'common/components/ExpandIcon';
 
 export interface Props
 {
   title: string;
-  text: string;
+  text?: string;
+  tooltipText?: string;
+  canExpand?: boolean;
+  onExpand?: (expanded: boolean) => void;
+  expanded?: boolean;
 }
 
 @Radium
@@ -63,19 +69,29 @@ class PathfinderSectionTitle extends TerrainComponent<Props>
 {
   public render()
   {
-    const { text, title } = this.props;
+    const { text, title, tooltipText, canExpand, onExpand, expanded } = this.props;
 
     return (
       <div
         className='pf-section-title'
         style={backgroundColor(Colors().bg)}
       >
+        {
+          canExpand &&
+          <ExpandIcon
+            onClick={this._fn(onExpand, !expanded)}
+            open={expanded}
+          />
+        }
         <div
           className='pf-section-title-title'
           style={fontColor(Colors().text3)}
         >
           {
-            title
+            tooltip(
+              title,
+              tooltipText
+            )
           }
         </div>
         <div

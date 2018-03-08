@@ -67,6 +67,7 @@ import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import FadeInOut from 'app/common/components/FadeInOut';
 import
 {
   _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
@@ -333,6 +334,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       Math.round(Math.random() * 100));
   }
 
+  public toggleExpanded(expanded)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'expanded'),
+     expanded);
+  }
+
   public render()
   {
     const { pathfinderContext, score } = this.props;
@@ -342,54 +349,66 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       <div
         className='pf-section pf-score-section'
       >
-        <SingleRouteSelector
-          options={ScoreTypesChoices}
-          value={score.type}
-          onChange={this.handleScoreTypeChange}
-          canEdit={canEdit}
-          shortNameText={PathfinderText.scoreTypeLabel}
-          headerText={PathfinderText.scoreTypeExplanation}
-          hasOther={false}
-          semilarge={true}
-          hideLine={true}
-          hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
+      {
+        // <SingleRouteSelector
+        //   options={ScoreTypesChoices}
+        //   value={score.type}
+        //   onChange={this.handleScoreTypeChange}
+        //   canEdit={canEdit}
+        //   shortNameText={PathfinderText.scoreTypeLabel}
+        //   headerText={PathfinderText.scoreTypeExplanation}
+        //   hasOther={false}
+        //   semilarge={true}
+        //   hideLine={true}
+        //   hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
+        // />
+      }
+        <PathfinderSectionTitle
+          title={PathfinderText.scoreSectionTitle}
+          tooltipText={PathfinderText.scoreSectionSubtitle}
+          canExpand={true}
+          onExpand={this.toggleExpanded}
+          expanded={score.expanded}
         />
-
-        {
-          score.type === 'terrain' || score.type === 'linear' ?
-            <DragAndDrop
-              draggableItems={score.type === 'terrain' ?
-                this.getScoreLines(score.lines) : this.getLinearScoreLines(score.lines)
-              }
-              onDrop={this.handleLinesReorder}
-              className='drag-drop-pf-score'
-            />
-            :
-            null
-        }
-        {
-          score.type === 'terrain' || score.type === 'linear' ?
-            <PathfinderCreateLine
-              canEdit={canEdit}
-              onCreate={this.handleAddScoreLine}
-              text={PathfinderText.createScoreLine}
-            />
-            :
-            null
-        }
-        {
-          score.type === 'random' &&
-          <div
-            className='pf-score-randomize-button'
-            onClick={this.randomizeScore}
-            style={[
-              fontColor(Colors().fontWhite),
-              backgroundColor(Colors().active),
-            ]}
-          >
-            Randomize
-          </div>
-        }
+        <FadeInOut
+          open={score.expanded}
+        >
+          {
+            score.type === 'terrain' || score.type === 'linear' ?
+              <DragAndDrop
+                draggableItems={score.type === 'terrain' ?
+                  this.getScoreLines(score.lines) : this.getLinearScoreLines(score.lines)
+                }
+                onDrop={this.handleLinesReorder}
+                className='drag-drop-pf-score'
+              />
+              :
+              null
+          }
+          {
+            score.type === 'terrain' || score.type === 'linear' ?
+              <PathfinderCreateLine
+                canEdit={canEdit}
+                onCreate={this.handleAddScoreLine}
+                text={PathfinderText.createScoreLine}
+              />
+              :
+              null
+          }
+          {
+            score.type === 'random' &&
+            <div
+              className='pf-score-randomize-button'
+              onClick={this.randomizeScore}
+              style={[
+                fontColor(Colors().fontWhite),
+                backgroundColor(Colors().active),
+              ]}
+            >
+              Randomize
+            </div>
+          }
+        </FadeInOut>
       </div>
     );
   }

@@ -56,27 +56,25 @@ export const PathfinderText = {
   // `Choose where your data are located and filter out everything that isn't a match.`,
 
   // Filter sections
-  hardFilterSectionTitle: 'Requirements',
-  hardFilterSectionSubtitle: '',
-  hardFilterAdd: 'Requirement',
-  softFilterAdd: 'Match Quality',
-  softFilterSectionTitle: 'Match Qualities',
-  softFilterSectionSubtitle: '',
+  hardFilterSectionTitle: 'Must Match',
+  hardFilterSectionSubtitle: 'When conditions are met, results are visible. When conditions are not met, results are hidden.',
+  hardFilterAdd: 'Factor',
+  softFilterAdd: 'Factor',
+  softFilterSectionTitle: 'Should Match',
+  softFilterSectionSubtitle: 'When conditions are met, results are rewarded. When conditions are not met, there is no impact.',
 
   nestedFilterIntro: '',
-  filterGroupPost: 'of the following:',
-  createFilterLine: 'criteria',
-  createFilterGroup: 'group of filter conditions',
+  // filterGroupPost: 'of the following:',
+  // createFilterLine: 'criteria',
+  // createFilterGroup: 'group of filter conditions',
 
-  softFilterLine: 'text match quality',
-
-  createScoreLine: 'score factor',
+  createScoreLine: 'field',
   createAggregationLine: 'metadata',
-  createNestedLine: 'nested algorithm',
+  createNestedLine: 'personalization algorithm',
 
   // Score section
-  scoreSectionTitle: 'Score',
-  scoreSectionSubtitle: '',
+  scoreSectionTitle: 'Rank',
+  scoreSectionSubtitle: 'Rank fields must be numbers and determine the order in which results are returned.',
   // `Score your results, so that the best picks show up in the top spots.`,
   scoreTypeLabel: 'Score',
   scoreTypeExplanation: 'Choose how to score your algorithm',
@@ -106,12 +104,15 @@ export const PathfinderText = {
 
   // More section
   moreSectionTitle: 'Advanced',
-  moreSectionSubtitle: '',
+  moreSectionSubtitle: 'Add advanced functionality to your algorithm, like grouping by a field, adding scripts, and adding personalization algorithms',
+  // Collapse
+  collapseTitle: 'Group by',
+  collapseTootlip: 'Force algorithm to only show the top result with matching values for this field',
   // `Add nested algorithms to create a set of results for each result of your parent algorithm.`,
-
+  referenceName: 'Alias',
   referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',
   nestedExplanation: 'Add another algorithm that uses the results of this one as input',
-
+  innerQueryName: 'Algorithm Name',
   aggregation:
     {
       missing: {
