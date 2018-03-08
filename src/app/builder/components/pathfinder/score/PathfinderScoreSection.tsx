@@ -68,6 +68,7 @@ import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import FadeInOut from 'app/common/components/FadeInOut';
+import CheckBox from 'app/common/components/CheckBox';
 import
 {
   _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
@@ -127,11 +128,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper .dropdown-option',
-      style: { background: Colors().blockBg },
-    });
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.pf-score-section .pf-create',
       style: { background: Colors().blockBg },
     });
   }
@@ -370,6 +366,14 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           onExpand={this.toggleExpanded}
           expanded={score.expanded}
         />
+        {
+          // <CheckBox
+          //   checked={score.type === 'random'}
+          //   onChange={this._fn(this.handleScoreTypeChange,
+          //     score.type === 'random' ? 'terrain' : 'random')}
+          //   label='Random'
+          // />
+        }
         <FadeInOut
           open={score.expanded}
         >

@@ -128,7 +128,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           onChange={this.handleSourcePathChange}
           canEdit={canEdit}
           shortNameText={'Find'}
-          headerText={'Choose which data to use in your algorithm'}
+         // headerText={'Choose which data to use in your algorithm'}
           forceOpen={pickerIsForcedOpen}
           noShadow={pickerIsForcedOpen}
           hasOther={false}

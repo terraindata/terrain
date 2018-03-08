@@ -262,7 +262,7 @@ function parseTerrainScore(score: Score)
       a: 0,
       b: 1,
       weight: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
-      numerators: [[line.field, 1]],
+      numerators: [[line.field === 'Match Quality' ? '_score' : line.field, 1]],
       denominators: [],
       ranges,
       outputs,

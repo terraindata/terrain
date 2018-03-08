@@ -282,7 +282,7 @@ class MoreC extends BaseClass
   public references: List<string> = List([]); // What should this query be referred to in other queries (@parent in US query)
   public collapse: string = undefined;
   public scripts: List<Script> = List();
-  public expanded: boolean = true;
+  public expanded: boolean = false;
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -632,7 +632,7 @@ class ElasticDataSourceC extends DataSource
           // TODO when reorganizing, move these to some better, constant space
           defaultOptions = List([
             _ChoiceOption({
-              displayName: '_score',
+              displayName: 'Match Quality',
               value: '_score',
               sampleData: List([]),
               meta: {

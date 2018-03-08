@@ -546,7 +546,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                     canEdit={canEdit}
                     onCreate={this.handleAddNested}
                     text={PathfinderText.createNestedLine}
-                    style={{ marginTop: 12 }}
+                    style={{ marginLeft: -110 }}
+                    showText={true}
                   />,
                   PathfinderText.nestedExplanation,
                 ) : null

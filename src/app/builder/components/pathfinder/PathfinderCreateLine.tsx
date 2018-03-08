@@ -59,6 +59,7 @@ export interface Props
   canEdit: boolean;
   onCreate: () => void;
   style?: any;
+  showText?: boolean;
 }
 
 @Radium
@@ -84,9 +85,10 @@ class PathfinderCreateLine extends TerrainComponent<Props>
         onClick={onCreate}
       >
         <AddIcon />
-        <span>
-          Add {text}
-        </span>
+        {
+          this.props.showText &&
+          text
+        }
       </div>
     );
   }
