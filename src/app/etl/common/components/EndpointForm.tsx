@@ -72,6 +72,7 @@ export interface Props
   isSource: boolean;
   endpoint: SourceConfig | SinkConfig;
   onChange: (newEndpoint: SourceConfig | SinkConfig) => void;
+  hideTypePicker?: boolean;
 }
 
 export default class EndpointForm extends TerrainComponent<Props>
@@ -102,21 +103,29 @@ export default class EndpointForm extends TerrainComponent<Props>
 
   public render()
   {
-    const { isSource, endpoint, onChange } = this.props;
+    const { isSource, endpoint, onChange, hideTypePicker } = this.props;
     const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
     const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
 
     return (
       <div className='endpoint-block'>
-        <DynamicForm
-          inputMap={mapToUse}
-          inputState={this.typeValueToState(endpoint)}
-          onStateChange={this.handleTypeChange}
-        />
-        <FormClass
-          endpoint={endpoint}
-          onChange={this.handleEndpointChange}
-        />
+        {
+          hideTypePicker === true ? null :
+          <DynamicForm
+            inputMap={mapToUse}
+            inputState={this.typeValueToState(endpoint)}
+            onStateChange={this.handleTypeChange}
+          />
+        }
+        {
+          FormClass != null ?
+          <FormClass
+            endpoint={endpoint}
+            onChange={this.handleEndpointChange}
+          />
+          : null
+        }
+
       </div>
     );
   }

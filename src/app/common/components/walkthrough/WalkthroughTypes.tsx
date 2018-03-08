@@ -76,8 +76,9 @@ export interface WalkthroughNodeOption<ViewEnum, Context>
   link: ViewEnum; // What ViewEnum to go to next
   buttonText?: string; // if it's a simple button, what does it say?
   component?: WalkthroughComponentClass<Context>; // if it's a custom ui interaction, what component to use
+  extraProps?: object;
   onRevert?: (params: object) => void; // called when the step gets reverted (if a user goes to a previous crumb and changes the path)
-  onArrive?: (params: object) => void; // called when we arrive at the step containing this option
+  onArrive?: (params: object) => void; // called when we arrive at the step containing this option (only when it is a new step, not a revisit)
   componentNeedsButton?: boolean;
   default?: boolean; // TODO
 }

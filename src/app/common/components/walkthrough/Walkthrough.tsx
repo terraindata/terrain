@@ -94,10 +94,12 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
       if (option.component != null)
       {
         const ComponentClass = option.component;
+        const extraProps = option.extraProps !== undefined ? option.extraProps : {};
         const customComponent = (
           <div>
             <ComponentClass
               key={index}
+              {...extraProps}
               context={this.props.context}
               onDone={this.handleMoveToNextFactory(option.link)}
             />

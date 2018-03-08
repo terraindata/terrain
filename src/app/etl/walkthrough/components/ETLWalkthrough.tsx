@@ -63,6 +63,7 @@ import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes
 
 import PickAlgorithmStep from './PickAlgorithmStep';
 import PickDatabaseStep from './PickDatabaseStep';
+import PickEndpointStep from './PickEndpointStep';
 import PickTemplateStep from './PickTemplateStep';
 import ETLReviewStep from './ETLReviewStep';
 import ETLUploadStep from './ETLUploadStep';
@@ -245,7 +246,10 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.Review,
-          component: null,
+          component: PickEndpointStep,
+          extraProps: { isSource: false },
+          onRevert: PickEndpointStep.onRevert.bind(undefined, false),
+          onArrive: PickEndpointStep.onArrive.bind(undefined, false),
         },
       ],
     },
@@ -282,7 +286,10 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.PickDatabase,
-          component: null,
+          component: PickEndpointStep,
+          extraProps: { isSource: true },
+          onRevert: PickEndpointStep.onRevert.bind(undefined, true),
+          onArrive: PickEndpointStep.onArrive.bind(undefined, true),
         },
       ],
     },

@@ -58,7 +58,7 @@ import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import EndpointForm from 'etl/common/components/EndpointForm';
+import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointOptions';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
@@ -98,10 +98,11 @@ class PickAlgorithmStep extends ETLStepComponent
     const source = walkthrough.source;
     const algorithmPicked = source.options['algorithmId'] !== -1;
 
+    const AlgorithmForm = SourceFormMap[Sources.Algorithm];
+
     return (
       <div className='etl-transition-column'>
-        <EndpointForm
-          isSource={true}
+        <AlgorithmForm
           endpoint={source}
           onChange={this.handleChange}
         />
