@@ -83,6 +83,8 @@ export interface Props
 }
 
 type EndpointsType = ETLTemplate['sources'] | ETLTemplate['sinks'];
+type LooseEndpointsType = Immutable.Map<string, SourceConfig | SinkConfig>;
+
 class EndpointSection extends TerrainComponent<Props>
 {
   public state: {
@@ -149,7 +151,6 @@ class EndpointSection extends TerrainComponent<Props>
   {
     const { isSource } = this.props;
     const { endpoints } = this.state;
-
     const buttonsDisabled = endpoints === (isSource ? this.props.sources : this.props.sinks);
 
     return (
@@ -188,7 +189,7 @@ class EndpointSection extends TerrainComponent<Props>
             </div>
           </div>
         </Quarantine>
-        {endpoints.map(this.renderEndpoint).toList()}
+        {(endpoints as LooseEndpointsType).map(this.renderEndpoint).toList()}
       </div>
     );
   }
@@ -214,7 +215,7 @@ class EndpointSection extends TerrainComponent<Props>
 
       act({
         actionType: 'setSources',
-        sources: endpoints,
+        sources: endpoints as ETLTemplate['sources'],
       });
       deletedKeys.forEach((key) =>
       {
@@ -225,18 +226,18 @@ class EndpointSection extends TerrainComponent<Props>
       });
       newKeys.forEach((key) =>
       {
-        DocumentsHelpers.fetchDocuments(endpoints.get(key), key);
+        DocumentsHelpers.fetchDocuments((endpoints as ETLTemplate['sources']).get(key), key);
       });
       differentKeys.forEach((key) =>
       {
-        DocumentsHelpers.fetchDocuments(endpoints.get(key), key);
+        DocumentsHelpers.fetchDocuments((endpoints as ETLTemplate['sources']).get(key), key);
       });
     }
     else
     {
       act({
         actionType: 'setSinks',
-        sinks: endpoints,
+        sinks: endpoints as ETLTemplate['sinks'],
       });
     }
   }
@@ -266,13 +267,13 @@ class EndpointSection extends TerrainComponent<Props>
     {
       const { endpoints } = this.state;
       this.setState({
-        endpoints: endpoints.set(key, endpoint),
+        endpoints: (endpoints as LooseEndpointsType).set(key, endpoint),
       });
     };
   }
 }
 
-function getChangedKeys(original: EndpointsType, next: EndpointsType)
+function getChangedKeys(original: LooseEndpointsType, next: LooseEndpointsType)
 {
   const differentKeys = [];
   const deletedKeys = [];
