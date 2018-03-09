@@ -167,8 +167,8 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _currentEngine(): TransformationEngine
   {
-    const key = this._uiState().get('currentView');
-    return this._template().getIn(['sources', key, 'transformations']);
+    const key = this._uiState().get('currentEdge');
+    return this._template().process.getTransformationEngine(key);
   }
 
   // for array types

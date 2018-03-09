@@ -66,8 +66,9 @@ export interface TemplateBase
   id?: number;
   archived: boolean;
   templateName: string;
-  sources: any; // difficult to type, but sources should always have a source under the key '_default'
-  sinks: any; // likewise with sinks
+  sources: any;
+  sinks: any;
+  process: any;
 }
 
 export type TemplateObject = {
@@ -75,3 +76,42 @@ export type TemplateObject = {
 };
 
 export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+
+export enum NodeTypes
+{
+  MergeJoin = 'MergeJoin',
+  Source = 'Source',
+  Sink = 'Sink',
+}
+
+export interface ETLProcess
+{
+  nodes: {
+    [id: number]: ETLNode;
+  };
+  edges: ETLEdge[];
+  uid: number;
+}
+
+export interface ETLEdge
+{
+  from: number;
+  to: number;
+  transformations: TransformationEngine;
+}
+
+export interface ETLNode
+{
+  type: NodeTypes;
+  options: MergeJoinOptions;
+  endpoint: string;
+}
+
+export interface MergeJoinOptions
+{
+  leftId: number;
+  rightId: number;
+  leftJoinKey: string;
+  rightJoinKey: string;
+  outputKey: string;
+}

@@ -72,6 +72,7 @@ export default class Templates
       [
         'archived',
         'templateName',
+        'process',
         'sources',
         'sinks',
       ],
@@ -138,6 +139,7 @@ export default class Templates
       const newTemplate: TemplateConfig = {
         archived: false,
         templateName: template.templateName,
+        process: template.process,
         sources: template.sources,
         sinks: template.sinks,
       };
@@ -158,6 +160,7 @@ export default class Templates
         archived: template.archived,
         id: template.id,
         templateName: template.templateName,
+        process: template.process,
         sources: template.sources,
         sinks: template.sinks,
       };

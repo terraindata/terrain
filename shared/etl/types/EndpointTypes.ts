@@ -76,7 +76,6 @@ export interface SourceConfig
   type: SourceTypes;
   fileConfig: FileConfig;
   options: SourceOptionsType<SourceTypes>;
-  transformations: TransformationEngine;
   // a union of all possible option types
 }
 

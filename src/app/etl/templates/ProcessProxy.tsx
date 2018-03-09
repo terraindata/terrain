@@ -43,76 +43,60 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file strict-boolean-expressions import-spacing
+// tslint:disable:max-classes-per-file
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
-import
-{
-  FileConfig as FileConfigI,
-  SinkConfig as SinkConfigI,
-  SinkOptionsDefaults, SinkOptionsType,
-  Sinks,
-  SourceConfig as SourceConfigI,
-  SourceOptionsDefaults, SourceOptionsType,
-  Sources,
-} from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { TemplateField } from 'etl/templates/FieldTypes';
+import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
+import { FieldMap } from 'etl/templates/TemplateTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-class FileConfigC implements FileConfigI
-{
-  public fileType: FileTypes = FileTypes.Json;
-  public hasCsvHeader = true;
-  public jsonNewlines = false;
-}
-export type FileConfig = WithIRecord<FileConfigC>;
-export const _FileConfig = makeConstructor(FileConfigC);
+import { _ETLNode, ETLNode, ETLEdge, _ETLEdge, ETLProcess, _ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
+import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
-class SourceConfigC implements SourceConfigI
+export type Mutator<T> = (newItem: T) => void;
+
+export class ProcessProxy
 {
-  public type = null;
-  public fileConfig = _FileConfig();
-  public options = {};
-  // public transformations = new TransformationEngine();
-}
-export type SourceConfig = WithIRecord<SourceConfigC>;
-export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
-  fileConfig: _FileConfig,
-},
-  (cfg?, deep?) =>
+  constructor(private process: ETLProcess, private mutate: Mutator<ETLProcess> = doNothing)
   {
-    const config = cfg || {};
-    const defaults: Partial<SourceConfig> = {};
-    if (config.type !== undefined)
-    {
-      defaults.options = SourceOptionsDefaults[config.type];
-    }
-    return _.extend(defaults, config);
-  },
-);
 
-class SinkConfigC implements SinkConfigI
-{
-  public type = null;
-  public fileConfig = _FileConfig();
-  public options = {};
-}
-export type SinkConfig = WithIRecord<SinkConfigC>;
-export const _SinkConfig = makeExtendedConstructor(SinkConfigC, true, {
-  fileConfig: _FileConfig,
-},
-  (cfg?, deep?) =>
+  }
+
+  public getProcess()
   {
-    const config = cfg || {};
-    const defaults: Partial<SourceConfig> = {};
-    if (config.type !== undefined)
-    {
-      defaults.options = SinkOptionsDefaults[config.type];
-    }
-    return _.extend(defaults, config);
-  },
-);
+    return this.process;
+  }
+
+  public addNode(node: ETLNode)
+  {
+    const id = this.process.uid;
+    this.process = this.process
+      .setIn(['nodes', id], node)
+      .set('uid', id + 1);
+    this.sync();
+    return id;
+  }
+
+  public addEdge(edge: ETLEdge)
+  {
+    this.process = this.process.update('edges', 
+      (edges) => edges.push(edge)
+    );
+    this.sync();
+    return this.process.edges.size - 1;
+  }
+
+  private sync()
+  {
+    this.mutate(this.process);
+  }
+}
+
+const doNothing = () => null;

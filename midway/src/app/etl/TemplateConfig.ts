@@ -47,7 +47,7 @@ import * as _ from 'lodash';
 import ConfigType from '../ConfigType';
 
 import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
-import { TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export class TemplateConfig extends ConfigType implements TemplateBase
@@ -55,6 +55,11 @@ export class TemplateConfig extends ConfigType implements TemplateBase
   public id?: number = undefined;
   public archived: boolean = false; // TODO, add ability to filter on this in routes
   public templateName: string = '';
+  public process: ETLProcess = { 
+    nodes: {},
+    edges: [],
+    uid: 0,
+  };
   public sources: {
     _default?: SourceConfig;
     [k: string]: SourceConfig;
@@ -86,6 +91,10 @@ export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfi
   {
     newObj.sinks = JSON.parse(newObj.sinks as string);
   }
+  if (newObj.process != null)
+  {
+    newObj.process = JSON.parse(newObj.process as string);
+  }
   return new TemplateConfig(newObj);
 }
 
@@ -94,5 +103,6 @@ export function templateForSave(template: TemplateObject): TemplateInDatabase
   const obj = _.extend({}, template);
   obj.sources = JSON.stringify(template.sources);
   obj.sinks = JSON.stringify(template.sinks);
+  obj.process = JSON.stringify(template.process);
   return obj;
 }

@@ -53,16 +53,25 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { ETLProcess, _ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
+interface ETLTemplateI extends TemplateBase
+{
+  sources: Immutable.Map<string, SourceConfig>;
+  sinks: Immutable.Map<string, SinkConfig>;
+  process: ETLProcess;
+}
 
 class ETLTemplateC implements ETLTemplateI
 {
   public id = -1;
   public archived = false;
   public templateName = '';
+  public process = _ETLProcess();
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
 }
@@ -81,9 +90,11 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
       .map((obj, key) => _SinkConfig(obj, true))
       .toMap();
   },
+  process: _ETLProcess,
 });
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
+
 class TemplateEditorStateC
 {
   public template: ETLTemplate = _ETLTemplate();
@@ -94,8 +105,8 @@ class TemplateEditorStateC
 
   public getCurrentEngine(): TransformationEngine
   {
-    const key = this.uiState.currentView;
-    return this.template.getIn(['sources', key, 'transformations']);
+    const key = this.uiState.currentEdge;
+    return this.template.process.getTransformationEngine(key);
   }
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
@@ -120,28 +131,26 @@ class EditorDisplayStateC
   public previewIndex: number = 0;
   public settingsFieldId: number = null;
   public settingsDisplayKeyPath: KeyPath = null;
-  public currentView: string = '_default';
+  public currentEdge: number = 0;
   public engineVersion: number = 0;
   public columnState: ColumnOptions = ColumnOptions.Preview;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
-interface ETLTemplateI extends TemplateBase
-{
-  sources: Immutable.Map<string, SourceConfig>;
-  sinks: Immutable.Map<string, SinkConfig>;
-}
-
 export function templateForBackend(template: ETLTemplate): TemplateBase
 {
   const obj: TemplateObject = (template as any).toObject(); // shallow js object
-  obj.sources = obj.sources.map((source, key) =>
-  {
-    return source.set('transformations', JSON.stringify(source.transformations.toJSON()));
-  }).toMap();
+
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
+  
+  obj.process = obj.process.update('edges', (edges) => edges.map((edge, key) => {
+    return edge.set('transformations', JSON.stringify(edge.transformations.toJSON()));
+  }));
+
+  obj.process = recordForSave(obj.process);
+
   _.forOwn(obj.sources, (source, key) =>
   {
     if (source.type === Sources.Upload)

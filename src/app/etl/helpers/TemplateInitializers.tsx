@@ -68,9 +68,10 @@ import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { FileTypes, NodeTypes, } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
+import { _ETLNode, ETLNode, ETLEdge, _ETLEdge, ETLProcess, _ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 
 import DocumentsHelpers from './DocumentsHelpers';
 
@@ -185,22 +186,33 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
   let template = _ETLTemplate({
     id: -1,
     templateName: name,
-    // transformationEngine: engine,
   });
-  let newSource = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
-  newSource = newSource.set('transformations', engine);
-
+  const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
+  // newSource = newSource.set('transformations', engine);
+  const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
   // default source and sink is upload and download
-  template = template.setIn(['sources', '_default'], newSource);
 
-  template = template.setIn(['sinks', '_default'],
-    sink !== undefined ?
-      sink
-      :
-      _SinkConfig({
-        type: Sinks.Download,
-      }),
-  );
+  const proxy = template.process.proxy();
+  const defaultSink = _ETLNode({
+    type: NodeTypes.Sink,
+    endpoint: '_default',
+  });
+  const defaultSource = _ETLNode({
+    type: NodeTypes.Source,
+    endpoint: '_default',
+  });
+  const sinkId = proxy.addNode(defaultSink);
+  const sourceId = proxy.addNode(defaultSource);
+  const defaultEdge = _ETLEdge({
+    from: sourceId,
+    to: sinkId,
+    transformations: engine,
+  });
+  proxy.addEdge(defaultEdge);
+  template = template.set('process', proxy.getProcess());
+
+  template = template.setIn(['sources', '_default'], sourceToAdd);
+  template = template.setIn(['sinks', '_default'], sinkToAdd);
 
   return {
     template,
