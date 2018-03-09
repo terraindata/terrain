@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import * as winston from 'winston';
+import {KeyPath} from '../util/KeyPath';
+import * as yadeep from '../util/yadeep';
 import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
@@ -194,15 +196,25 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     console.log('here!');
-    console.log(node.fieldIDs.toJS());
-    for (const fieldID of node.fieldIDs.toJS())
+    console.log(node.fields);
+    node.fields.forEach((field) =>
     {
+        console.log('AAAAA ' + field);
+        console.log(yadeep.get(doc, field));
       if (true)//doc[fieldID].constructor === Array)
       {
-        for (let i: number = 0; i < Object.keys(doc[fieldID]).length; i++)
+        for (let i: number = 0; i < Object.keys(yadeep.get(doc, field)).length; i++)
         {
-          console.log(doc[fieldID][i]);
-          doc[fieldID][i] = doc[fieldID][i].toUpperCase();
+            console.log('FLLLLL ' + i);
+            let kpi: KeyPath = field;
+            if (kpi.last() === '*')
+            {
+                kpi = kpi.pop();
+            }
+            kpi = kpi.push(i.toString());
+          // console.log(doc[fieldID][i]);
+            yadeep.set(doc, kpi, yadeep.get(doc, kpi).toUpperCase());
+          //doc[fieldID][i] = doc[fieldID][i].toUpperCase();
         }
       }
       else if (typeof doc[fieldID] !== 'string')
@@ -219,7 +231,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       {
         doc[fieldID] = doc[fieldID].toUpperCase();
       }
-    }
+    });
 
     return {
       document: doc,

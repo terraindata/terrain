@@ -105,7 +105,10 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
           results[j] = found;
           return next(found);
         }, options);
-      } // else push undefined?
+      } else {
+          // else push undefined?
+          results[j] = obj[keys[j]];
+      }
     }
     obj = next(results);
     return;
@@ -151,6 +154,7 @@ export function get(obj: object, path: KeyPath): any
   let result: any;
   find(obj, path, (found) =>
   {
+      console.log('found: '+found);
     result = found;
     return found;
   });

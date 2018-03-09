@@ -276,6 +276,17 @@ test('rename a field (deeply nested property in array)', () =>
   expect(e.transform(doc3)['arr'][1][1]['cool']).toBe('fren');
 });
 
+test('proper wildcard behavior in rename stage', () =>
+{
+    const e: TransformationEngine = new TransformationEngine(doc4);
+    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+    expect(e.transform(doc5)).toEqual(
+        {
+            car: ['a', 'b', 'c', 'd'],
+        },
+    );
+});
+
 /*test('transform of deeply nested value', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
