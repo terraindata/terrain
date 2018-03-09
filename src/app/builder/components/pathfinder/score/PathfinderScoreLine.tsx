@@ -103,7 +103,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   } = {
       weight: this.props.line.weight,
       expanded: this.props.line.expanded,
-      fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
+      fieldIndex: this.props.dropdownOptions.map((v) => v.value).toList().indexOf(this.props.line.field),
       editingField: false,
     };
 
@@ -113,7 +113,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     {
       const weight = nextProps.line.weight;
       this.setState({
-        fieldIndex: nextProps.dropdownOptions.map((v) => v.displayName).toList().indexOf(nextProps.line.field),
+        fieldIndex: nextProps.dropdownOptions.map((v) => v.value).toList().indexOf(nextProps.line.field),
         weight: weight !== '' ? parseInt(weight, 10) : 0,
         expanded: nextProps.line.expanded,
       });
@@ -137,7 +137,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public handleFieldChange(index)
   {
-    const value = this.props.dropdownOptions.map((v) => v.displayName).toList().get(index);
+    const value = this.props.dropdownOptions.map((v) => v.value).toList().get(index);
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'field'), value, false, true);
     this.setState((state) => ({ editingField: false }));
   }

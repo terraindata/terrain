@@ -340,7 +340,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   {
     const { pathfinderContext, score } = this.props;
     const { source, step, canEdit } = this.props.pathfinderContext;
-
     return (
       <div
         className='pf-section pf-score-section'

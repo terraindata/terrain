@@ -267,8 +267,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     const fieldSet = {
       key: 'field',
       options: fieldOptions,
-      shortNameText: 'Collapse',
-      headerText: 'Collapse results with the same', // 'Choose on which field to impose a condition',
+      shortNameText: PathfinderText.collapseTitle,
+      headerText: PathfinderText.collapseTootlip, // 'Choose on which field to impose a condition',
       column: true,
       hideSampleData: true,
       hasSearch: true,

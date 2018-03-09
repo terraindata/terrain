@@ -165,7 +165,6 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       min,
       max,
       height,
-      value,
       background,
       noLeftLine,
       step,
@@ -174,7 +173,15 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
     const handleStyle = this.getHandleStyle();
     const trackStyle = this.getTrackStyle();
     const customRailStyle = this.getCustomRailStyle();
-
+    let { value } = this.props;
+    if (typeof value === 'string')
+    {
+      value = parseFloat(value);
+      if (isNaN(value))
+      {
+        value = 0;
+      }
+    }
     return (
       <div
         style={styles.wrapper(height, background)}

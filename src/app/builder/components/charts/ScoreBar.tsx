@@ -205,9 +205,9 @@ class ScoreBar extends TerrainComponent<Props>
 
   private handleWeightTextChange(e)
   {
-    if (this.props.canEdit && this.props.onChange)
+    if (this.props.canEdit && this.props.onAfterChange)
     {
-      this.props.onChange(e.target.value);
+      this.props.onAfterChange(e.target.value);
     }
   }
 
