@@ -131,7 +131,7 @@ class PickDatabaseStep extends ETLStepComponent
     );
   }
 
-  public handleDbPickerChange(serverId: ID, database: string, table: string)
+  public handleDbPickerChange(serverId: ID, database: string, table: string, language: Languages)
   {
     const changedOptions: Partial<DbOptions> = {
       serverId,

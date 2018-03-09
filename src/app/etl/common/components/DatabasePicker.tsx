@@ -68,6 +68,7 @@ interface FormState
   serverIndex: number;
   database: string;
   table: string;
+  language: Languages;
 }
 
 interface Props
@@ -76,7 +77,7 @@ interface Props
   serverId: ID;
   database: string;
   table: string;
-  onChange: (server: ID, database: string, table: string) => void;
+  onChange: (server: ID, database: string, table: string, language: Languages) => void;
   constantHeight?: boolean; // if true, applies a pre-calculated minHeight
   // injected props
   servers?: ServerMap;
@@ -212,6 +213,7 @@ class DatabasePicker extends TerrainComponent<Props>
       serverIndex: this._getServerIndex(this.props.servers, this.props.serverId),
       database: this.props.database,
       table: this.props.table,
+      language: this.props.language,
     };
   }
 
@@ -231,7 +233,7 @@ class DatabasePicker extends TerrainComponent<Props>
   {
     const serverId = state.serverIndex !== -1 ?
       this._getServerIds(this.props.servers).get(state.serverIndex) : -1;
-    this.props.onChange(serverId, state.database, state.table);
+    this.props.onChange(serverId, state.database, state.table, state.language);
   }
 }
 

@@ -207,7 +207,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     });
     if (params.algorithmId !== undefined)
     {
-      Initializers.initNewFromAlgorithm(params.algorithmId);
+      Initializers.initNewFromAlgorithm(getAlgorithmId(params));
     }
     else if (params.templateId !== undefined)
     {

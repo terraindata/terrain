@@ -57,6 +57,9 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'src/app/Classes';
 
+import { LibraryState } from 'library/LibraryTypes';
+import AlgorithmSelector from 'library/components/AlgorithmSelector';
+import DatabasePicker from 'etl/common/components/DatabasePicker';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -67,7 +70,7 @@ import
   SftpOptions, SinkOptionsType, Sinks,
   SourceOptionsType, Sources,
 } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
 import './EndpointOptions.less';
 
@@ -211,17 +214,99 @@ class UploadEndpoint extends EndpointForm<UploadState>
 }
 
 type AlgorithmState = SourceOptionsType<Sources.Algorithm>;
-
-class AlgorithmEndpoint extends EndpointForm<AlgorithmState>
+//AlgorithmSelector
+class AlgorithmEndpointC extends EndpointForm<AlgorithmState>
 {
   public showFileConfig = false;
+
+  public state: {
+    ids: List<number>
+  };
+
+  public defaultIds = List([-1, -1, -1]);
+
+  constructor(props)
+  {
+    super(props);
+    const { algorithmId } = props.endpoint.options;
+    this.state = {
+      ids: this.computeIds(algorithmId)
+    }
+  }
+
+  public computeIds(algorithmId)
+  {
+    if (algorithmId === -1 || algorithmId == null)
+    {
+      return this.defaultIds;
+    }
+
+    const { library } = this.props as any;
+    const algorithm = (library as LibraryState).algorithms.get(algorithmId);
+
+    if (algorithm == null)
+    {
+      return this.defaultIds;
+    }
+
+    return List([algorithm.categoryId, algorithm.groupId, algorithmId]);
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    const { algorithmId } = nextProps.endpoint.options;
+    const ids = this.computeIds(algorithmId);
+    if (!ids.equals(this.defaultIds))
+    {
+      this.setState({
+        ids,
+      });
+    }
+  }
+
   public inputMap: InputDeclarationMap<AlgorithmState> = {
     algorithmId: {
-      type: DisplayType.NumberBox,
-      displayName: 'Algorithm Id',
-    },
-  };
+      type: DisplayType.Custom,
+      options: {
+        render: this.renderAlgorithmSelector
+      }
+    }
+  }
+
+  public renderAlgorithmSelector(state: AlgorithmState, disabled: boolean)
+  {
+    const { library } = this.props as any;
+    const { algorithmId } = state;
+    const algorithm = (library as LibraryState).algorithms.get(algorithmId);
+    let ids = this.state.ids;
+    if (algorithm != null)
+    {
+      ids = List([algorithm.categoryId, algorithm.groupId, algorithmId]) as List<number>;
+    }
+
+    return (
+      <AlgorithmSelector
+        ids={ids}
+        onChangeSelection={this.handleSelectionChange}
+      />
+    );
+  }
+
+  public handleSelectionChange(ids: List<number>)
+  {
+    const { onChange, endpoint } = this.props;
+    const newOptions = { algorithmId: ids.get(2) };
+    this.setState({
+      ids,
+    });
+    onChange(endpoint.set('options', newOptions));
+  }
 }
+const AlgorithmEndpoint = Util.createContainer(
+  AlgorithmEndpointC,
+  ['library'],
+  {},
+);
 
 type SftpState = SftpOptions;
 
@@ -324,8 +409,35 @@ class DatabaseEndpoint extends EndpointForm<DatabaseState>
 {
   public showFileConfig = false;
   public inputMap: InputDeclarationMap<DatabaseState> = {
-    // todo
+    serverId: {
+      type: DisplayType.Custom,
+      options: {
+        render: this.renderDatabasePicker
+      }
+    }
   };
+
+  public renderDatabasePicker(state: DatabaseState, disabled: boolean)
+  {
+    const { language, serverId, database, table } = state;
+    return (
+      <DatabasePicker
+        language={state.language}
+        serverId={serverId != null ? serverId : -1}
+        database={database != null ? database : ''}
+        table={table != null ? table : ''}
+        onChange={this.handleDbPickerChange}
+        constantHeight={true}
+      />
+    );
+  }
+
+  public handleDbPickerChange(serverId: ID, database: string, table: string, language: Languages)
+  {
+    const { onChange, endpoint } = this.props;
+    const newOptions = { serverId, database, table, language};
+    onChange(endpoint.set('options', newOptions));
+  }
 }
 
 // exports

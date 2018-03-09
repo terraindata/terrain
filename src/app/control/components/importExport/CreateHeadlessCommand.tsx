@@ -273,7 +273,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     return (
       <div>
         <AlgorithmSelector
-          libraryState={this.props.library}
           onChangeSelection={this._setStateWrapper('selectedIds')}
           ids={this.state.selectedIds}
           dropdownWidth={inputElementWidth}
