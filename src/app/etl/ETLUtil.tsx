@@ -61,7 +61,7 @@ import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } 
 export class UpdateChecker
 {
   private checkFns: {
-    [k: string]: (props, nextProps, state?, nextState?) => boolean,
+    [k: string]: (props, state?) => boolean,
   };
   private isRunning: boolean = false;
 
@@ -70,8 +70,7 @@ export class UpdateChecker
     this.checkFns = {};
   }
 
-  // checker function takes in props and states and returns false if the given props and state indicate a changed value
-  public addChecker(fn: (props, nextProps, state?, nextState?) => boolean, key: string)
+  public setChecker(key: string, fn: (props, state?) => any)
   {
     if (!this.isRunning)
     {
@@ -98,7 +97,7 @@ export class UpdateChecker
     for (const k of Object.keys(this.checkFns))
     {
       const fn = this.checkFns[k];
-      if (!fn(props, nextProps, state, nextState))
+      if (fn(props, state) !== fn(nextProps, nextState))
       {
         return false;
       }
@@ -164,6 +163,7 @@ export function isVisiblyEqual<T>(a: T, b: T, seen: Array<string | number>)
   return true;
 }
 
+// returns true if the two objects are shallowly the same, using a custom comparator map
 export function compareObjects(a: object, b: object, custom: { [k: string]: (aValue, bValue) => boolean } = {})
 {
   const aKeys = Object.keys(a);
