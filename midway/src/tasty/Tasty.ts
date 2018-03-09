@@ -152,8 +152,7 @@ export class Tasty
       query.filter(node);
     }
 
-    const generatedQuery: string[] = this.db.generate(query);
-    return this.db.execute(generatedQuery);
+    return this.execute(query);
   }
 
   /**
@@ -229,9 +228,8 @@ export class Tasty
       }
       query.delete();
     }
-    const queryString = this.db.generate(query);
 
-    return this.db.execute(queryString);
+    return this.execute(query);
   }
 
   public async schema(): Promise<TastySchema>

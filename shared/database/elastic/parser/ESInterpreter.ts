@@ -113,14 +113,14 @@ export default class ESInterpreter
         root.clause = this.config.getClause('body');
       }
 
-      let alias = 'parent';
+      let alias: string | null = null;
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
           if (info.parameter !== undefined)
           {
             const ps = info.parameter.split('.');
-            if (ps[0] === alias)
+            if (alias !== null && ps[0] === alias)
             {
               // give a special value to parameterValue
               info.parameterValue = new ESJSONParser(info.value);
@@ -156,7 +156,11 @@ export default class ESInterpreter
         },
         (info: ESValueInfo): boolean =>
         {
-          if (info.clause !== undefined && info.clause.type === 'parentAlias')
+          if (info.clause !== undefined && info.clause.type === 'groupjoin_name' && alias === null)
+          {
+            alias = 'parent';
+          }
+          else if (info.clause !== undefined && info.clause.type === 'parentAlias' && alias !== null)
           {
             alias = info.value;
           }
