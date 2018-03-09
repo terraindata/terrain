@@ -493,10 +493,10 @@ export class RouteSelector extends TerrainComponent<Props>
               <div key='3' className='routeselector-option-wrapper' />,
             ]
           }
-         {
-          <div
-           className='routeselector-options-gradient'
-          />
+          {
+            <div
+              className='routeselector-options-gradient'
+            />
           }
         </div>
       </div>
@@ -999,7 +999,7 @@ export class RouteSelector extends TerrainComponent<Props>
           height: column.offsetHeight,
           width: column.offsetWidth,
           top: column.offsetTop,
-          left: column.offsetLeft
+          left: column.offsetLeft,
         } : {}}
       />
     );

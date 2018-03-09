@@ -178,7 +178,7 @@ class PathfinderArea extends TerrainComponent<Props>
           <FadeInOut
             open={path.step >= PathfinderSteps.Filter}
 
-          >          
+          >
             <PathfinderFilterSection
               pathfinderContext={pathfinderContext}
               filterGroup={path.filterGroup}

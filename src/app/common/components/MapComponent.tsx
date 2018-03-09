@@ -146,7 +146,7 @@ export const units =
 
 class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
-  private debouncedExecuteChange;
+  public debouncedExecuteChange;
 
   public state: {
     mapExpanded: boolean,
@@ -177,7 +177,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
   {
     this.setState({
       inputValue,
-      });
+    });
     if (this.props.onChange !== undefined)
     {
       this.debouncedExecuteChange(coordinates, inputValue);
@@ -245,8 +245,8 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     if (nextProps.inputValue !== this.props.inputValue)
     {
       this.setState({
-        inputValue: nextProps.inputValue
-      })
+        inputValue: nextProps.inputValue,
+      });
     }
   }
 

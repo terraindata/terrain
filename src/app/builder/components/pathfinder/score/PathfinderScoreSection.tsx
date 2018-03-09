@@ -57,9 +57,11 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
+import CheckBox from 'app/common/components/CheckBox';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
 import Dropdown from 'app/common/components/Dropdown';
+import FadeInOut from 'app/common/components/FadeInOut';
 import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import SingleRouteSelector from 'app/common/components/SingleRouteSelector';
 import Util from '../../../../util/Util';
@@ -67,8 +69,6 @@ import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import FadeInOut from 'app/common/components/FadeInOut';
-import CheckBox from 'app/common/components/CheckBox';
 import
 {
   _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, ScoreType,
@@ -333,7 +333,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   public toggleExpanded(expanded)
   {
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'expanded'),
-     expanded);
+      expanded);
   }
 
   public render()
@@ -344,20 +344,20 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       <div
         className='pf-section pf-score-section'
       >
-      {
-        // <SingleRouteSelector
-        //   options={ScoreTypesChoices}
-        //   value={score.type}
-        //   onChange={this.handleScoreTypeChange}
-        //   canEdit={canEdit}
-        //   shortNameText={PathfinderText.scoreTypeLabel}
-        //   headerText={PathfinderText.scoreTypeExplanation}
-        //   hasOther={false}
-        //   semilarge={true}
-        //   hideLine={true}
-        //   hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
-        // />
-      }
+        {
+          // <SingleRouteSelector
+          //   options={ScoreTypesChoices}
+          //   value={score.type}
+          //   onChange={this.handleScoreTypeChange}
+          //   canEdit={canEdit}
+          //   shortNameText={PathfinderText.scoreTypeLabel}
+          //   headerText={PathfinderText.scoreTypeExplanation}
+          //   hasOther={false}
+          //   semilarge={true}
+          //   hideLine={true}
+          //   hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
+          // />
+        }
         <PathfinderSectionTitle
           title={PathfinderText.scoreSectionTitle}
           tooltipText={PathfinderText.scoreSectionSubtitle}

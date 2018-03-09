@@ -366,7 +366,7 @@ export const _Script = (config?: { [key: string]: any }) =>
   let script = New<Script>(new ScriptC(Util.asJS(config)), Util.asJS(config));
   script = script.set('params', Map(script.params));
   return script;
-}
+};
 
 class FilterLineC extends LineC
 {

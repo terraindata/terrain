@@ -61,6 +61,7 @@ import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
 import { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
+import FadeInOut from 'common/components/FadeInOut';
 import SingleRouteSelector from 'common/components/SingleRouteSelector';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
@@ -68,7 +69,6 @@ import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, PathfinderCon
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import './PathfinderFilterStyle.less';
-import FadeInOut from 'common/components/FadeInOut';
 
 export interface Props
 {
@@ -439,7 +439,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         />
         <FadeInOut
           open={!filterGroup.collapsed}
-          // POSSIBLY DONT UNMOUNT
+        // POSSIBLY DONT UNMOUNT
         >
           <CustomDragLayer />
           <DropZone

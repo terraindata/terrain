@@ -446,7 +446,7 @@ class HitComponent extends TerrainComponent<Props> {
           })}
         >
           {
-              value
+            value
           }
         </div>
       </div>

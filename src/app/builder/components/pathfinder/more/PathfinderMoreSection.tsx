@@ -460,7 +460,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               <div>{script.name}</div>
               <div>Params: </div>
               <textarea>{script.script}</textarea>
-            </div>
+            </div>,
           )
         }
       </div>
