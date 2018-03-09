@@ -76,21 +76,49 @@ export class ProcessProxy
 
   public addNode(node: ETLNode)
   {
-    const id = this.process.uid;
+    const id = this.process.uidNode;
     this.process = this.process
       .setIn(['nodes', id], node)
-      .set('uid', id + 1);
+      .set('uidNode', id + 1);
     this.sync();
     return id;
   }
 
+  // adds an edge to the process. returns -1 if the edge is invalid
   public addEdge(edge: ETLEdge)
   {
-    this.process = this.process.update('edges',
-      (edges) => edges.push(edge),
-    );
+    if (!this.verifyEdge(edge))
+    {
+      return -1;
+    }
+    const id = this.process.uidEdge;
+    this.process = this.process
+      .setIn(['edges', id], edge)
+      .set('uidEdge', id + 1);
     this.sync();
-    return this.process.edges.size - 1;
+    return id;
+  }
+
+  public verifyEdge(edge: ETLEdge): boolean
+  {
+    const { from, to } = edge;
+    if (!this.process.nodes.hasIn([from]) || !this.process.nodes.hasIn([to]))
+    {
+      return false;
+    }
+    if (from === to)
+    {
+      return false;
+    }
+    if (this.process.nodes.get(from).type === NodeTypes.Sink)
+    {
+      return false;
+    }
+    if (this.process.nodes.get(to).type === NodeTypes.Source)
+    {
+      return false;
+    }
+    return true;
   }
 
   private sync()

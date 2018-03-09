@@ -53,7 +53,7 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { _ETLProcess, ETLProcess } from 'etl/templates/ETLProcess';
+import { _ETLProcess, ETLProcess, ETLEdge } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
@@ -108,6 +108,12 @@ class TemplateEditorStateC
     const key = this.uiState.currentEdge;
     return this.template.process.getTransformationEngine(key);
   }
+
+  public getCurrentEdge(): ETLEdge
+  {
+    const key = this.uiState.currentEdge;
+    return this.template.process.getEdge(key);
+  }
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeExtendedConstructor(TemplateEditorStateC, true);
@@ -148,7 +154,7 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
   obj.process = obj.process.update('edges', (edges) => edges.map((edge, key) =>
   {
     return edge.set('transformations', JSON.stringify(edge.transformations.toJSON()));
-  }));
+  }).toMap());
 
   obj.process = recordForSave(obj.process);
 

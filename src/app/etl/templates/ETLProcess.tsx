@@ -72,8 +72,9 @@ import { ProcessProxy } from './ProcessProxy';
 class ETLProcessC
 {
   public readonly nodes: Immutable.Map<number, ETLNode> = Map();
-  public readonly edges: Immutable.List<ETLEdge> = List();
-  public readonly uid: number = 0;
+  public readonly edges: Immutable.Map<number, ETLEdge> = Map();
+  public readonly uidNode: number = 0;
+  public readonly uidEdge: number = 0;
 
   public proxy()
   {
@@ -84,20 +85,25 @@ class ETLProcessC
   {
     return this.edges.getIn([edge, 'transformations']);
   }
+
+  public getEdge(edge: number): ETLEdge
+  {
+    return this.edges.get(edge);
+  }
 }
 export type ETLProcess = WithIRecord<ETLProcessC>;
 export const _ETLProcess = makeExtendedConstructor(ETLProcessC, true, {
   nodes: (nodes) =>
   {
-    return Map<number, ETLNode>(nodes).map(
-      (obj, key) => _ETLNode(obj, true),
+    return Map(nodes).mapEntries<number, ETLNode>(
+      ([key, obj]) => [Number(key), _ETLNode(obj, true)],
     ).toMap();
   },
   edges: (edges) =>
   {
-    return List(edges).map(
-      (obj, i) => _ETLEdge(obj, true),
-    ).toList();
+    return Map(edges).mapEntries<number, ETLEdge>(
+      ([key, obj]) => [Number(key), _ETLEdge(obj, true)],
+    ).toMap();
   },
 });
 

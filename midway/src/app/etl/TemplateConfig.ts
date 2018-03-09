@@ -58,7 +58,8 @@ export class TemplateConfig extends ConfigType implements TemplateBase
   public process: ETLProcess = {
     nodes: {},
     edges: [],
-    uid: 0,
+    uidNode: 0,
+    uidEdge: 0,
   };
   public sources: {
     _default?: SourceConfig;

@@ -89,8 +89,11 @@ export interface ETLProcess
   nodes: {
     [id: number]: ETLNode;
   };
-  edges: ETLEdge[];
-  uid: number;
+  edges: {
+    [id: number]: ETLEdge;
+  }
+  uidNode: number;
+  uidEdge: number;
 }
 
 export interface ETLEdge
