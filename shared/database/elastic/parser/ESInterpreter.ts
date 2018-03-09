@@ -183,7 +183,7 @@ export default class ESInterpreter
     const e = new ESParserError(token, info, message, isWarning);
     this.errors.push(e);
     if (this.parser !== null)
-  {
+    {
       this.parser.accumulateError(e);
     }
   }
