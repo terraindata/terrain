@@ -55,7 +55,7 @@ import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONPa
 import { isInput } from '../../../../blocks/types/Input';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import { Query } from '../../../../items/types/Query';
-import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
+import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 const MAX_COUNT = 101;
 
@@ -137,6 +137,11 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   {
     baseQuery = baseQuery.set('collapse', { field: collapse });
   }
+  // Scripts
+  const scripts = parseScripts(path.more.scripts);
+  baseQuery = baseQuery.set('script_fields', scripts);
+
+  // Nested algorithms (groupjoins)
   const groupJoin = parseNested(path.more, path.nested, inputs);
   if (groupJoin)
   {
@@ -688,4 +693,26 @@ function parseNested(more: More, nested: List<Path>, inputs)
     }
   });
   return groupJoins;
+}
+
+
+function parseScripts(scripts: List<Script>)
+{
+  let scriptObj = Map({});
+  scripts.forEach((script: Script) => {
+    let params = Map({});
+    script.params.forEach((param) => {
+      params = params.set(param.name, param.value);
+    });
+    console.log(params);
+    const s = Map({
+      script: {
+        params: params.toJS(),
+        inline: script.script
+      }
+    });
+    scriptObj = scriptObj.set(script.name, s);
+  });
+  console.log(scriptObj);
+  return scriptObj;
 }

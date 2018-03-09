@@ -65,11 +65,14 @@ import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
-import { _AggregationLine, _ChoiceOption, _Path, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import { _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
+  More, Path, PathfinderContext, Script, Source } from '../PathfinderTypes';
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
 import './PathfinderMoreStyle.less';
+import TQLEditor from 'app/tql/components/TQLEditor';
+
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -119,6 +122,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       const nestedKeyPath = this._ikeyPath(keyPath.butLast().toList(), 'nested', i);
       this.props.builderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
     }
+  }
+
+  public handleAddScript()
+  {
+    const newScript = _Script();
+    const keyPath = this._ikeyPath(this.props.keyPath, 'scripts');
+    this.props.builderActions.changePath(keyPath, this.props.more.scripts.push(newScript));
   }
 
   public handleAddNested()
@@ -456,16 +466,116 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     );
   }
 
+  public handleScriptValueChange(keys, value)
+  {
+    console.log('change expanded', keys, value);
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, ['scripts'].concat(keys)),
+      value
+    );
+  }
+
+  public handleAddScriptParameter(i)
+  {
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'scripts', i, 'params'),
+      this.props.more.scripts.get(i).params.push(_Param({name: '', value: ''}))
+    );
+  }
+
+  public deleteScript(i)
+  {
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'scripts'),
+      this.props.more.scripts.splice(i, 1)
+    );
+  }
+
+  public deleteParam(i, j)
+  {
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'scripts', i, 'params'),
+      this.props.more.scripts.get(i).params.splice(j, 1)
+    );
+  }
+
+
   public renderScripts(scripts)
   {
+    const { canEdit } = this.props.pathfinderContext;
     return (
-      <div>
+      <div className='pf-more-scripts-wrapper'>
         {
-          scripts.map((script) =>
-            <div>
-              <div>{script.name}</div>
-              <div>Params: </div>
-              <textarea>{script.script}</textarea>
+          scripts.map((script: Script, i) =>
+            <div
+              className='pf-more-script'
+              key={i}
+            >
+              <div className='pf-more-script-name-wrapper'>
+                <ExpandIcon
+                  open={script.expanded}
+                  onClick={this._fn(this.handleScriptValueChange, [i, 'expanded'], !script.expanded)}
+                />
+                <FloatingInput
+                  label='Script Name'
+                  value={script.name}
+                  onChange={this._fn(this.handleScriptValueChange, [i, 'name'])}
+                  isTextInput={true}
+                />
+                <RemoveIcon
+                  onClick={this._fn(this.deleteScript, i)}
+                  className='close pf-more-delete-script'
+                />
+              </div>
+              <FadeInOut
+                open={script.expanded}
+              >
+                <div className='pf-more-paramater-label'>
+                  Parameters
+                </div>
+                {
+                  script.params.map((param, j) => 
+                    <div
+                      className='pf-more-script-param-wrapper'
+                      key={j}
+                    >
+                      <FloatingInput
+                        label='Paramater Name'
+                        value={script.params.get(j).name}
+                        onChange={this._fn(this.handleScriptValueChange, [i, 'params', j, 'name'])}
+                        isTextInput={true}
+                        canEdit={canEdit}
+                        debounce={true}
+                      />
+                      <FloatingInput
+                        label='Paramater Value'
+                        value={script.params.get(j).value}
+                        onChange={this._fn(this.handleScriptValueChange, [i, 'params', j, 'value'])}
+                        isTextInput={true}
+                        canEdit={canEdit}
+                        debounce={true}
+                      />
+                      <RemoveIcon
+                        onClick={this._fn(this.deleteParam, i, j)}
+                        className='close pf-more-delete-param'
+                      />
+                  </div>
+                  )
+                }
+                <PathfinderCreateLine
+                  canEdit={canEdit}
+                  onCreate={this._fn(this.handleAddScriptParameter, i)}
+                  text={'Parameter'}
+                  style={{ marginBottom: 0 }}
+                />
+                <TQLEditor
+                  tql={script.script}
+                  canEdit={canEdit}
+                  onChange={this._fn(this.handleScriptValueChange, [i, 'script'])}
+                  placeholder={'Enter a script here'}
+                  className='pf-more-script-script'
+                />
+              </FadeInOut>
             </div>,
           )
         }
@@ -543,23 +653,44 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           {
             this.renderScripts(this.props.more.scripts)
           }
-          <div>
-            {this.renderNestedPaths()}
-            {
-              !this.props.keyPath.includes('nested') ?
+            <div>
+              {
                 tooltip(
                   <PathfinderCreateLine
                     canEdit={canEdit}
-                    onCreate={this.handleAddNested}
-                    text={PathfinderText.createNestedLine}
-                    style={{ marginLeft: -110 }}
+                    onCreate={this.handleAddScript}
+                    text={PathfinderText.addScript}
+                    style={{ marginLeft: -110, marginBottom: 0 }}
                     showText={true}
                   />,
-                  PathfinderText.nestedExplanation,
-                ) : null
-            }
-          </div>
+                  {
+                    title: PathfinderText.scriptExplanation,
+                    arrow: false,
+                  }
+                )
+              }
+            </div>
+          
         </FadeInOut>
+        <div>
+          {this.renderNestedPaths()}
+          {
+            !this.props.keyPath.includes('nested') ?
+              tooltip(
+                <PathfinderCreateLine
+                  canEdit={canEdit}
+                  onCreate={this.handleAddNested}
+                  text={PathfinderText.createNestedLine}
+                  style={{ marginLeft: -110 }}
+                  showText={true}
+                />,
+                {
+                  title: PathfinderText.nestedExplanation,
+                  arrow: false 
+                }
+              ) : null
+          }
+          </div>
       </div>
     );
   }

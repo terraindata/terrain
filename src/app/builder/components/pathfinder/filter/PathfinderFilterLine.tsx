@@ -491,7 +491,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   distance={props.value && props.value.distance || 0}
                   distanceUnit={props.value && props.value.units || 'miles'}
                   wrapperClassName={'pf-filter-map-component-wrapper'}
-                  fadeInOut={true}
+                  // fadeInOut={true}
                   onChange={this.handleMapChange}
                   debounce={true}
                   canEdit={pathfinderContext.canEdit}
