@@ -1623,125 +1623,125 @@ describe('Credentials tests', () =>
   });
 });
 
-// describe('Scheduler tests', () =>
-// {
-//   test('POST /midway/v1/scheduler/create scheduled export', async () =>
-//   {
-//     await request(server)
-//       .post('/midway/v1/scheduler/create')
-//       .send({
-//         id: 1,
-//         accessToken: 'ImAnAdmin',
-//         body: {
-//           jobType: 'export',
-//           schedule: '* * * * *', // next run on some leap year date
-//           sort: 'asc',
-//           transport:
-//             {
-//               type: 'local',
-//               filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
-//             },
-//           name: 'Test Local Export',
-//           paramsJob:
-//             {
-//               dbid: 1,
-//               dbname: 'movies',
-//               templateId: exportTemplateID,
-//               filetype: 'csv',
-//               query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
-//                 + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
-//             },
-//           filetype: 'json',
-//         },
-//       })
-//       .expect(200)
-//       .then(async (response) =>
-//       {
-//         expect(response.text).not.toBe('');
-//         if (response.text === '')
-//         {
-//           fail('POST /scheduler/create request returned empty response body');
-//         }
-//         const result = JSON.parse(response.text);
-//         expect(Object.keys(result).lastIndexOf('errors')).toEqual(-1);
-//         schedulerExportId = result['id'];
-//         expect(await new Promise<boolean>(async (resolve, reject) =>
-//         {
-//           function verifyFileWritten()
-//           {
-//             resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
-//           }
-//           setTimeout(verifyFileWritten, (60 - (Math.floor(Date.now() / 1000) % 60) + 3) * 1000);
-//         })).toBe(true);
-//       });
-//   }, 70000);
+describe('Scheduler tests', () =>
+{
+  test('POST /midway/v1/scheduler/create scheduled export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/create')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          jobType: 'export',
+          schedule: '* * * * *', // next run on some leap year date
+          sort: 'asc',
+          transport:
+            {
+              type: 'local',
+              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
+            },
+          name: 'Test Local Export',
+          paramsJob:
+            {
+              dbid: 1,
+              dbname: 'movies',
+              templateId: exportTemplateID,
+              filetype: 'csv',
+              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
+            },
+          filetype: 'json',
+        },
+      })
+      .expect(200)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/create request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Object.keys(result).lastIndexOf('errors')).toEqual(-1);
+        schedulerExportId = result['id'];
+        expect(await new Promise<boolean>(async (resolve, reject) =>
+        {
+          function verifyFileWritten()
+          {
+            resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
+          }
+          setTimeout(verifyFileWritten, (60 - (Math.floor(Date.now() / 1000) % 60) + 3) * 1000);
+        })).toBe(true);
+      });
+  }, 70000);
 
-//   test('POST /midway/v1/scheduler/run/<scheduled export ID> run now', async () =>
-//   {
-//     await request(server)
-//       .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
-//       .send({
-//         id: 1,
-//         accessToken: 'ImAnAdmin',
-//         body: {
-//         },
-//       })
-//       .expect(200)
-//       .then(async (responseRun) =>
-//       {
-//         expect(await new Promise<boolean>(async (resolve, reject) =>
-//         {
-//           function verifyFileWritten()
-//           {
-//             resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
-//           }
-//           setTimeout(verifyFileWritten, 3000);
-//         })).toBe(true);
-//       });
-//   });
+  test('POST /midway/v1/scheduler/run/<scheduled export ID> run now', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+        },
+      })
+      .expect(200)
+      .then(async (responseRun) =>
+      {
+        expect(await new Promise<boolean>(async (resolve, reject) =>
+        {
+          function verifyFileWritten()
+          {
+            resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
+          }
+          setTimeout(verifyFileWritten, 3000);
+        })).toBe(true);
+      });
+  });
 
-//   test('POST /midway/v1/scheduler/create INVALID scheduled export', async () =>
-//   {
-//     await request(server)
-//       .post('/midway/v1/scheduler/create')
-//       .send({
-//         id: 1,
-//         accessToken: 'ImAnAdmin',
-//         body: {
-//           jobTypeInvalidParam: 'export',
-//           schedule: '* * * * *', // next run on some leap year date
-//           sort: 'asc',
-//           transport:
-//             {
-//               type: 'local',
-//               filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
-//             },
-//           name: 'Test Local Export',
-//           paramsJob:
-//             {
-//               dbid: 1,
-//               dbname: 'movies',
-//               templateId: exportTemplateID,
-//               filetype: 'csv',
-//               query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
-//                 + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
-//             },
-//           filetype: 'json',
-//         },
-//       })
-//       .expect(400)
-//       .then(async (response) =>
-//       {
-//         expect(response.text).not.toBe('');
-//         if (response.text === '')
-//         {
-//           fail('POST /scheduler/create request returned empty response body');
-//         }
-//         const result = JSON.parse(response.text);
-//         expect(Object.keys(result).lastIndexOf('errors')).not.toEqual(-1);
-//       });
-//   });
-// });
+  test('POST /midway/v1/scheduler/create INVALID scheduled export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/create')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          jobTypeInvalidParam: 'export',
+          schedule: '* * * * *', // next run on some leap year date
+          sort: 'asc',
+          transport:
+            {
+              type: 'local',
+              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
+            },
+          name: 'Test Local Export',
+          paramsJob:
+            {
+              dbid: 1,
+              dbname: 'movies',
+              templateId: exportTemplateID,
+              filetype: 'csv',
+              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
+            },
+          filetype: 'json',
+        },
+      })
+      .expect(400)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/create request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Object.keys(result).lastIndexOf('errors')).not.toEqual(-1);
+      });
+  });
+});
 
 describe('Analytics events route tests', () =>
 {
