@@ -85,8 +85,8 @@ const Container = ContainerC`
   `)}
 
   ${(props) => props['noBg'] && (`
-    border: none !important;
     background: transparent;
+    border: none !important;
   `)}
 `;
 
@@ -147,9 +147,13 @@ const Input = InputC`
   padding-right: ${RIGHT};
   font-size: ${fontSizeFn};
   ${(props) => props['noBg'] && (`
-    border: none !important;
     background-color: transparent;
   `)}
+  &:focus {
+    ${(props) => props['noBg'] && (`
+      background-color: transparent;
+    `)}
+  }
 `;
 
 const InputDivC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;

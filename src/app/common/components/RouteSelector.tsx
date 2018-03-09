@@ -277,7 +277,7 @@ export class RouteSelector extends TerrainComponent<Props>
           className='routeselector-close'
           onClick={this.toggle}
         >
-          Close
+          Done
         </div>
         {
           (this.props.canDelete && this.props.canEdit && !this.state.open) &&

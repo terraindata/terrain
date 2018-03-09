@@ -400,6 +400,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       !expanded)}
                     open={expanded}
                   />
+                  <span className='nested-reference-header'>@</span>
                   {
                     tooltip(
                       <FloatingInput
@@ -410,7 +411,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         canEdit={canEdit}
                         className='pf-more-nested-reference-input'
                         noBg={true}
+                        autoFocus={true}
                         debounce={true}
+                        forceFloat={true}
+                        noBorder={false}
                       />,
                       PathfinderText.referenceExplanation,
                     )
@@ -426,6 +430,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       canEdit={canEdit}
                       className='pf-more-nested-name-input'
                       noBg={true}
+                      forceFloat={true}
+                      noBorder={false}
                       debounce={true}
                     />
                   </FadeInOut>

@@ -789,7 +789,7 @@ const TransformChart = {
       .attr('class', (d) => 'spotlight-tooltip spotlight-tooltip-' + d['id'])
       .attr('y', (d) => idToY[d['id']] + 5)
       .attr('x', (d) => getFinalX(d) + SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING + 3)
-      .attr('fill', (d) => d['color'])
+      .attr('fill', (d) => Colors().fontColor2)
       .attr('style', 'font-size: 12px')
       ;
 

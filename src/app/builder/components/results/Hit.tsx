@@ -463,7 +463,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     const spotlightData = this.props.hit.toJS();
     spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig,
-      this.props.expanded, this.props.schema, this.props.builder, this.props.locations, spotlightColor);
+      this.props.expanded, this.props.schema, this.props.builder, this.props.locations, spotlightColor, true);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = this.props.index;
@@ -492,7 +492,7 @@ class HitComponent extends TerrainComponent<Props> {
   {
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
-    return (
+    return tooltip(
       <div
         onClick={spotlight !== undefined ? this.unspotlight : this.spotlight}
         className={classNames({
@@ -513,7 +513,8 @@ class HitComponent extends TerrainComponent<Props> {
         >
           {_.padStart((this.props.index + 1).toString(), 2, '0')}
         </div>
-      </div>
+      </div>,
+      spotlight !== undefined ? 'Unspotlight' : 'Spotlight',
     );
   }
 
@@ -834,7 +835,7 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
 }
 
 export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
-  locations?: { [field: string]: any }, color?: string)
+  locations?: { [field: string]: any }, color?: string, valueOnly=false)
 {
   let nameField: string;
 
@@ -847,7 +848,7 @@ export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean
     nameField = _.first(getResultFields(hit, config, [], schema, builder));
   }
 
-  return getResultValue(hit, nameField, config, true, expanded, null, locations, color);
+  return getResultValue(hit, nameField, config, true, expanded, null, locations, color, valueOnly);
 }
 
 export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean, expanded: boolean,
@@ -1005,6 +1006,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       </div>,
       interactive: true,
       position: 'left-start',
+      arrow: false,
     });
   }
 
