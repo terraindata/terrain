@@ -151,7 +151,7 @@ export class ExportTypes
     {
       for (let doc of docs)
       {
-        doc = Export.mergeGroupJoin(doc);
+        doc = Export.mergeDocument(doc);
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {

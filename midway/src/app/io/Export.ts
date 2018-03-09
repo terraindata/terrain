@@ -78,13 +78,13 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 
 export class Export
 {
-  public static mergeGroupJoin(doc: object): object
+  public static mergeDocument(doc: object): object
   {
     if (doc['_source'] !== undefined)
     {
       const sourceKeys = Object.keys(doc['_source']);
       const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
-      if (rootKeys.length > 0) // there were group join objects
+      if (rootKeys.length > 0) // there were other top-level objects in the document
       {
         const duplicateRootKeys: string[] = [];
         rootKeys.forEach((rootKey) =>
@@ -255,8 +255,8 @@ export class Export
 
   public _postProcessDoc(doc: object, cfg: any): object
   {
-    // merge groupJoins with _source if necessary
-    doc = Export.mergeGroupJoin(doc);
+    // merge top-level fields with _source if necessary
+    doc = Export.mergeDocument(doc);
 
     // extract field after doing all merge joins
     cfg.extractTransformations.forEach((transform) =>
@@ -335,6 +335,8 @@ export class Export
 
   private _applyTransforms(obj: object, transforms: object[]): object
   {
+    console.log(obj);
+    console.log(transforms);
     let colName: string | undefined;
     for (const transform of transforms)
     {
