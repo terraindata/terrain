@@ -82,7 +82,7 @@ export interface Props
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
 
-abstract class EndpointForm<State> extends TerrainComponent<Props>
+abstract class EndpointForm<State, P extends Props = Props> extends TerrainComponent<P>
 {
   public abstract inputMap: InputDeclarationMap<State>;
 

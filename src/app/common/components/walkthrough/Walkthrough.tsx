@@ -75,14 +75,7 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
       const buttonText = option.buttonText != null ?
         option.buttonText :
         'Next';
-      // add the text 'or' in between buttons or elements
-      const orText = index % 2 === 0 ? null :
-        <div
-          key={`or ${index}`}
-          className='walkthrough-or-element'
-        >
-          Or
-        </div>;
+
       const buttonComponent = (
         <Quarantine>
           <div
@@ -101,10 +94,12 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
       if (option.component != null)
       {
         const ComponentClass = option.component;
+        const extraProps = option.extraProps !== undefined ? option.extraProps : {};
         const customComponent = (
           <div>
             <ComponentClass
               key={index}
+              {...extraProps}
               context={this.props.context}
               onDone={this.handleMoveToNextFactory(option.link)}
             />
@@ -113,12 +108,12 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
         );
         // TODO style the container
         return (
-          [orText, customComponent]
+          [customComponent]
         );
       }
       else
       {
-        return ([orText, buttonComponent]);
+        return ([buttonComponent]);
       }
     }
 

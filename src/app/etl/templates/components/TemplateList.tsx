@@ -50,6 +50,7 @@ import * as classNames from 'classnames';
 import cronstrue from 'cronstrue';
 import { List } from 'immutable';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 import Util from 'util/Util';
 
@@ -60,16 +61,18 @@ import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { MidwayError } from 'shared/error/MidwayError';
+import { instanceFnDecorator } from 'src/app/Classes';
 
 import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 
 export interface Props
 {
   onClick?: (template: ETLTemplate) => void;
   getRowStyle?: (template: ETLTemplate) => object | object[];
+  filter?: (template: ETLTemplate) => boolean;
   // injected props
   templates: List<ETLTemplate>;
 }
@@ -94,6 +97,25 @@ class TemplateList extends TerrainComponent<Props>
       render: (template, index) => template.getIn(['sinks', '_default', 'type'], 'N/A'),
     },
   ];
+
+  @instanceFnDecorator(memoizeOne)
+  public _getTemplates(templates, filter)
+  {
+    if (typeof filter === 'function')
+    {
+      return templates.filter(filter);
+    }
+    else
+    {
+      return templates;
+    }
+  }
+
+  public getTemplates()
+  {
+    const { templates, filter } = this.props;
+    return this._getTemplates(templates, filter);
+  }
 
   public getRowStyle(index)
   {

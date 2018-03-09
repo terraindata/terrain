@@ -45,109 +45,132 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
 import FadeInOut from 'common/components/FadeInOut';
-import { ComponentProps } from 'common/components/walkthrough/WalkthroughTypes';
 
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Quarantine from 'util/RadiumQuarantine';
+import Util from 'util/Util';
 
+import EndpointForm from 'etl/common/components/EndpointForm';
+import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointOptions';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { getFileType } from 'shared/etl/FileUtil';
+import { Sources } from 'shared/etl/types/EndpointTypes';
+import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
-export interface StepProps
+interface Props extends StepProps
 {
-  onDone: () => void;
-  walkthrough?: WalkthroughState;
-  act?: typeof WalkthroughActions;
+  isSource: boolean;
 }
 
-export interface TransitionParams
+class PickEndpointStep extends ETLStepComponent<Props>
 {
-  act: typeof WalkthroughActions;
-  walkthrough: WalkthroughState;
-}
-
-export abstract class ETLStepComponent<Props extends StepProps = StepProps> extends TerrainComponent<Props>
-{
-  // called when a user arrives at this step, but later
-  // chooses a different path
-  public static onRevert(...args: any[])
+  public static onRevert(isSource: boolean, params: TransitionParams)
   {
-    // do nothing by default
+    if (isSource)
+    {
+      params.act({
+        actionType: 'setState',
+        state: {
+          source: _SourceConfig(),
+        },
+      });
+    }
+    else
+    {
+      params.act({
+        actionType: 'setState',
+        state: {
+          sink: _SinkConfig(),
+        },
+      });
+    }
   }
 
-  // called when a user arrives at this step
-  public static onArrive(...args: any[])
+  public static onArrive(isSource: boolean, params: TransitionParams)
   {
-    // do nothing by default
+    if (isSource)
+    {
+      params.act({
+        actionType: 'setState',
+        state: {
+          source: _SourceConfig(),
+        },
+      });
+    }
+    else
+    {
+      params.act({
+        actionType: 'setState',
+        state: {
+          sink: _SinkConfig(),
+        },
+      });
+    }
   }
 
-  public _getButtonStyle(enabled)
+  public render()
   {
-    return enabled ? activeStyle : disabledStyle;
-  }
+    const { walkthrough, isSource } = this.props;
+    const endpoint = isSource ? walkthrough.source : walkthrough.sink;
+    const endpointChosen = endpoint.type !== null;
 
-  public _getButtonClass(enabled)
-  {
-    return classNames({
-      'etl-step-big-button': true,
-      'button-disabled': !enabled,
-    });
-  }
-
-  public _altButtonStyle()
-  {
-    return altButtonStyle;
-  }
-
-  public _altButtonClass()
-  {
-    return 'etl-alt-button';
-  }
-
-  public _renderNextButton(shown = true, enabled = true, text = 'Next')
-  {
     return (
-      <span
-        className='transition'
-        style={{
-          visibility: shown ? 'visible' : 'hidden',
-          opacity: shown ? 1 : 0,
-        }}
-      >
-        <Quarantine>
-          <div
-            className={this._getButtonClass(enabled)}
-            onClick={enabled ? this.props.onDone : () => null}
-            style={this._getButtonStyle(enabled)}
-          >
-            {text}
-          </div>
-        </Quarantine>
-      </span>
+      <div className='etl-transition-column'>
+        <EndpointForm
+          isSource={isSource}
+          endpoint={endpoint}
+          onChange={this.handleChange}
+        />
+        <div className='etl-step-next-button-spacer'>
+          {this._renderNextButton(endpointChosen)}
+        </div>
+      </div>
     );
   }
+
+  public handleChange(endpoint: SourceConfig | SinkConfig)
+  {
+    const { walkthrough, act, isSource } = this.props;
+    const key = isSource ? 'source' : 'sink';
+
+    if (isSource)
+    {
+      act({
+        actionType: 'setState',
+        state: {
+          source: endpoint as SourceConfig,
+        },
+      });
+    }
+    else
+    {
+      act({
+        actionType: 'setState',
+        state: {
+          sink: endpoint as SinkConfig,
+        },
+      });
+    }
+
+  }
+
 }
 
-const altButtonStyle = [
-  backgroundColor(Colors().bg3),
-  fontColor(Colors().text2, Colors().text2),
-  borderColor(Colors().darkerHighlight, Colors().active),
-  getStyle('boxShadow', `2px 1px 3px ${Colors().boxShadow}`),
-];
-
-const activeStyle = [
-  backgroundColor(Colors().active, Colors().activeHover),
-  fontColor(Colors().activeText),
-];
-const disabledStyle = [
-  backgroundColor(Colors().activeHover, Colors().activeHover),
-  fontColor(Colors().activeText),
-];
+const transitionRowHeight = '28px';
+export default Util.createTypedContainer(
+  PickEndpointStep,
+  ['walkthrough'],
+  { act: WalkthroughActions },
+);

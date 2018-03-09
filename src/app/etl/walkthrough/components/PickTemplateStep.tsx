@@ -44,110 +44,86 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
-
-import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
 import FadeInOut from 'common/components/FadeInOut';
-import { ComponentProps } from 'common/components/walkthrough/WalkthroughTypes';
 
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Quarantine from 'util/RadiumQuarantine';
+import Util from 'util/Util';
 
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import TemplateList from 'etl/templates/components/TemplateList';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+
+import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
-export interface StepProps
+class PickTemplateStep extends ETLStepComponent
 {
-  onDone: () => void;
-  walkthrough?: WalkthroughState;
-  act?: typeof WalkthroughActions;
-}
-
-export interface TransitionParams
-{
-  act: typeof WalkthroughActions;
-  walkthrough: WalkthroughState;
-}
-
-export abstract class ETLStepComponent<Props extends StepProps = StepProps> extends TerrainComponent<Props>
-{
-  // called when a user arrives at this step, but later
-  // chooses a different path
-  public static onRevert(...args: any[])
+  public static onRevert(params: TransitionParams)
   {
-    // do nothing by default
-  }
-
-  // called when a user arrives at this step
-  public static onArrive(...args: any[])
-  {
-    // do nothing by default
-  }
-
-  public _getButtonStyle(enabled)
-  {
-    return enabled ? activeStyle : disabledStyle;
-  }
-
-  public _getButtonClass(enabled)
-  {
-    return classNames({
-      'etl-step-big-button': true,
-      'button-disabled': !enabled,
+    params.act({
+      actionType: 'setState',
+      state: {
+        chosenTemplateId: -1,
+      },
     });
   }
 
-  public _altButtonStyle()
+  public getTemplateItemStyle(template)
   {
-    return altButtonStyle;
+    return templateListItemStyle;
   }
 
-  public _altButtonClass()
-  {
-    return 'etl-alt-button';
-  }
-
-  public _renderNextButton(shown = true, enabled = true, text = 'Next')
+  public render()
   {
     return (
-      <span
-        className='transition'
-        style={{
-          visibility: shown ? 'visible' : 'hidden',
-          opacity: shown ? 1 : 0,
-        }}
+      <div
+        className='etl-transition-column etl-pick-template'
+        style={templateListStyle}
       >
-        <Quarantine>
-          <div
-            className={this._getButtonClass(enabled)}
-            onClick={enabled ? this.props.onDone : () => null}
-            style={this._getButtonStyle(enabled)}
-          >
-            {text}
-          </div>
-        </Quarantine>
-      </span>
+        <TemplateList
+          onClick={this.handleLoadTemplateItemClicked}
+          getRowStyle={this.getTemplateItemStyle}
+        />
+      </div>
     );
+  }
+
+  public handleLoadTemplateItemClicked(template: ETLTemplate)
+  {
+    const { onDone, act } = this.props;
+    act({
+      actionType: 'setState',
+      state: {
+        chosenTemplateId: template.id,
+      },
+    });
+    onDone();
   }
 }
 
-const altButtonStyle = [
-  backgroundColor(Colors().bg3),
-  fontColor(Colors().text2, Colors().text2),
-  borderColor(Colors().darkerHighlight, Colors().active),
-  getStyle('boxShadow', `2px 1px 3px ${Colors().boxShadow}`),
+const templateListItemStyle = [
+  { cursor: 'pointer' },
+  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
 ];
 
-const activeStyle = [
-  backgroundColor(Colors().active, Colors().activeHover),
-  fontColor(Colors().activeText),
-];
-const disabledStyle = [
-  backgroundColor(Colors().activeHover, Colors().activeHover),
-  fontColor(Colors().activeText),
-];
+const templateListStyle = _.extend({},
+  backgroundColor(Colors().bg3),
+  getStyle('boxShadow', `2px 2px 3px ${Colors().boxShadow}`),
+);
+
+const transitionRowHeight = '28px';
+export default Util.createTypedContainer(
+  PickTemplateStep,
+  ['walkthrough'],
+  { act: WalkthroughActions },
+);

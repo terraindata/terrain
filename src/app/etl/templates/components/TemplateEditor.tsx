@@ -242,7 +242,7 @@ class TemplateEditor extends TerrainComponent<Props>
           onClose={this.closeTemplateUI}
           wide={true}
         >
-          <div className='template-list-wrapper' style={backgroundColor(Colors().bg2)}>
+          <div className='template-list-wrapper' style={backgroundColor(Colors().bg3)}>
             <TemplateList
               onClick={this.handleLoadTemplateItemClicked}
               getRowStyle={this.getTemplateItemStyle}
@@ -258,10 +258,10 @@ class TemplateEditor extends TerrainComponent<Props>
     );
   }
 
-  public getTemplateItemStyle(clickedTemplate: ETLTemplate)
+  public getTemplateItemStyle(templateInList: ETLTemplate)
   {
     const { template } = this.props.templateEditor;
-    return template.id !== clickedTemplate.id ? templateListItemStyle : templateListItemCurrentStyle;
+    return template.id !== templateInList.id ? templateListItemStyle : templateListItemCurrentStyle;
   }
 
   public handleLoadTemplateItemClicked(template: ETLTemplate)

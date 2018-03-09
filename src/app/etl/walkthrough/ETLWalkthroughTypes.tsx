@@ -57,15 +57,13 @@ import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
 export enum ViewState
 {
-  Start = 'Start',
-  Import = 'Import',
-  Export = 'Export',
-  PickExportTemplate = 'PickExportTemplate',
+  Begin = 'Begin',
+  StartNew = 'StartNew',
+  PickTemplate = 'PickTemplate',
   PickExportAlgorithm = 'PickExportAlgorithm',
   PickExportDestination = 'PickExportDestination',
   ExportDestination = 'ExportDestination',
   NewImport = 'NewImport',
-  PickImportTemplate = 'PickImportTemplate',
   PickLocalFile = 'PickLocalFile',
   PickImportSource = 'PickImportSource',
   ImportDestination = 'ImportDestination',
@@ -76,7 +74,7 @@ export enum ViewState
 
 class WalkthroughStateC
 {
-  public stepHistory: List<ViewState> = List([ViewState.NewImport]);
+  public stepHistory: List<ViewState> = List([ViewState.Begin]);
   public source: SourceConfig = _SourceConfig();
   public sink: SinkConfig = _SinkConfig();
   public chosenTemplateId: ID = -1;

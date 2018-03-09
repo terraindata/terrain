@@ -55,16 +55,24 @@ import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughT
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+
+import { TransitionParams } from './ETLStepComponent';
 
 import ETLReviewStep from './ETLReviewStep';
 import ETLUploadStep from './ETLUploadStep';
-import './ETLWalkthrough.less';
+import PickAlgorithmStep from './PickAlgorithmStep';
 import PickDatabaseStep from './PickDatabaseStep';
+import PickEndpointStep from './PickEndpointStep';
+import PickTemplateStep from './PickTemplateStep';
+
+import './ETLWalkthrough.less';
 
 const { List } = Immutable;
 
@@ -171,41 +179,41 @@ export default Util.createContainer(
 
 export const walkthroughGraph: WalkthroughGraphType<ViewState> =
   {
-    [ViewState.Start]: {
+    [ViewState.Begin]: {
       prompt: 'What Would You Like to Do?',
       options: [
         {
-          link: ViewState.Export,
-          buttonText: 'Export a File',
+          link: ViewState.StartNew,
+          buttonText: 'Start a New Import or Export',
         },
         {
-          link: ViewState.Import,
-          buttonText: 'Import a File',
+          link: ViewState.PickTemplate,
+          buttonText: 'Edit an Existing Process',
         },
       ],
     },
-    // Export
-    [ViewState.Export]: {
-      prompt: 'Export a File',
-      crumbText: 'Export',
+    [ViewState.StartNew]: {
+      prompt: 'Are you Importing or Exporting?',
       options: [
+        {
+          link: ViewState.NewImport,
+          buttonText: 'Start a New Import',
+        },
         {
           link: ViewState.PickExportAlgorithm,
           buttonText: 'Start a New Export',
         },
-        {
-          link: ViewState.PickExportTemplate,
-          buttonText: 'Use an Existing Export',
-        },
       ],
     },
-    [ViewState.PickExportTemplate]: {
-      prompt: 'Select a Saved Export Template',
+    [ViewState.PickTemplate]: {
+      prompt: 'Select a Saved Template',
       crumbText: 'Select Template',
       options: [
         {
           link: ViewState.Review,
-          component: null,
+          component: PickTemplateStep,
+          onRevert: PickTemplateStep.onRevert,
+          onArrive: PickTemplateStep.onArrive,
         },
       ],
     },
@@ -215,17 +223,24 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.ExportDestination,
-          component: null,
+          component: PickAlgorithmStep,
+          onRevert: PickAlgorithmStep.onRevert,
+          onArrive: PickAlgorithmStep.onArrive,
         },
       ],
     },
     [ViewState.ExportDestination]: {
       prompt: 'Where Would You Like the Results?',
       crumbText: 'Destination Type',
-      additionalText: 'You can always change this later',
       options: [
         {
           link: ViewState.Review,
+          onArrive: (params: TransitionParams) => params.act({
+            actionType: 'setState',
+            state: {
+              sink: _SinkConfig({ type: Sinks.Download }),
+            },
+          }),
           buttonText: 'Download The Results',
           default: true,
         },
@@ -241,32 +256,10 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.Review,
-          component: null,
-        },
-      ],
-    },
-    // Import
-    [ViewState.Import]: {
-      prompt: 'Import a File',
-      crumbText: 'Import',
-      options: [
-        {
-          link: ViewState.NewImport,
-          buttonText: 'Start a New Import',
-        },
-        {
-          link: ViewState.PickImportTemplate,
-          buttonText: 'Use an Existing Import',
-        },
-      ],
-    },
-    [ViewState.PickImportTemplate]: {
-      prompt: 'Select a Saved Import Template',
-      crumbText: 'Select Template',
-      options: [
-        {
-          link: ViewState.Review,
-          component: null,
+          component: PickEndpointStep,
+          extraProps: { isSource: false },
+          onRevert: PickEndpointStep.onRevert.bind(undefined, false),
+          onArrive: PickEndpointStep.onArrive.bind(undefined, false),
         },
       ],
     },
@@ -303,7 +296,10 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.PickDatabase,
-          component: null,
+          component: PickEndpointStep,
+          extraProps: { isSource: true },
+          onRevert: PickEndpointStep.onRevert.bind(undefined, true),
+          onArrive: PickEndpointStep.onArrive.bind(undefined, true),
         },
       ],
     },

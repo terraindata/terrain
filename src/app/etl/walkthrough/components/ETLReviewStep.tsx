@@ -55,6 +55,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';
@@ -63,7 +64,14 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
 
-class ETLReviewStep extends ETLStepComponent
+const { List, Map } = Immutable;
+
+interface Props extends StepProps
+{
+  templates: List<ETLTemplate>;
+}
+
+class ETLReviewStep extends ETLStepComponent<Props>
 {
   public isImport()
   {
@@ -85,44 +93,72 @@ class ETLReviewStep extends ETLStepComponent
     );
   }
 
-  public renderSourceInfo() // TODO should info for other sources
+  public renderSourceInfo(source: SourceConfig) // TODO should info for other sources
   {
-    const { walkthrough } = this.props;
-    const { source } = walkthrough;
+    // const { walkthrough } = this.props;
+    // const { source } = walkthrough;
     const file = source.getIn(['options', 'file'], {});
+
+    let sourceInfo = [];
+    if (source.type === Sources.Upload)
+    {
+      sourceInfo = [
+        this.renderRow('File Name', file.name),
+      ];
+    }
+
     return [
       this.renderRow('Source Type', source.type),
-      source.type === Sources.Upload ? this.renderRow('File Name', file.name) : null,
+      ...sourceInfo,
     ];
   }
 
-  public renderSinkInfo() // TODO show info for other sinks
+  public renderSinkInfo(sink: SinkConfig) // TODO show info for other sinks
   {
-    const { walkthrough } = this.props;
-    const { sink } = walkthrough;
+    // const { walkthrough } = this.props;
+    // const { sink } = walkthrough;
     const options = sink.options as SinkOptionsType<Sinks.Database>;
+    let sinkInfo = [];
+    if (sink.type === Sinks.Database)
+    {
+      sinkInfo = [
+        this.renderRow('Server', options.serverId), // TODO show the server name
+        this.renderRow('Database', options.database),
+        this.renderRow('Table', options.table),
+      ];
+    }
+
     return [
       this.renderRow('Sink Type', sink.type),
-      ...sink.type !== Sinks.Database ? [] :
-        [
-          this.renderRow('Server', options.serverId), // TODO show the server name
-          this.renderRow('Database', options.database),
-          this.renderRow('Table', options.table),
-        ],
+      ...sinkInfo,
     ];
   }
 
   public renderSummary()
   {
-    const { walkthrough } = this.props;
+    const { walkthrough, templates } = this.props;
     const { chosenTemplateId } = walkthrough;
+
+    let source = walkthrough.source;
+    let sink = walkthrough.sink;
+
+    if (chosenTemplateId !== -1)
+    {
+      const chosenTemplate = templates.find((template, i) => template.id === chosenTemplateId);
+      if (chosenTemplate !== undefined)
+      {
+        source = chosenTemplate.getIn(['sources', '_default']);
+        sink = chosenTemplate.getIn(['sinks', '_default']);
+      }
+    }
+
     return (
       <div className='etl-review-column'>
         {this.renderRow('Type', this.isImport() ? 'Import' : 'Export')}
         <div className='etl-review-gap' style={gapStyle} />
-        {... this.renderSourceInfo()}
+        {... this.renderSourceInfo(source)}
         <div className='etl-review-gap' style={gapStyle} />
-        {... this.renderSinkInfo()}
+        {... this.renderSinkInfo(sink)}
       </div>
     );
   }
@@ -157,6 +193,9 @@ const gapStyle = { borderBottom: `1px solid ${Colors().border1}` };
 
 export default Util.createTypedContainer(
   ETLReviewStep,
-  ['walkthrough'],
+  [
+    ['walkthrough'],
+    ['etl', 'templates'],
+  ],
   { act: WalkthroughActions },
 );
