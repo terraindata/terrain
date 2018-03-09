@@ -835,7 +835,7 @@ export function getResultThumbnail(hit: Hit, config: ResultsConfig, expanded: bo
 }
 
 export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, schema?: SchemaState, builder?: BuilderState,
-  locations?: { [field: string]: any }, color?: string, valueOnly=false)
+  locations?: { [field: string]: any }, color?: string, valueOnly = false)
 {
   let nameField: string;
 
