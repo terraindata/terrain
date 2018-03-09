@@ -623,7 +623,18 @@ export class FilterUtils
     const matchValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
     if (matchValue.clause.type === 'match_settings')
     {
-      return false;
+      if (matchValue.childrenSize() === 0)
+      {
+        return false;
+      }
+
+      for (const k of Object.keys(matchValue.childrenSize()))
+      {
+        if (k !== 'query' && k !== 'boost')
+        {
+          return false;
+        }
+      }
     }
     return true;
   }
@@ -641,6 +652,7 @@ export class FilterUtils
     const blocks = [];
     const termQuery = rangeClause.propertyValue;
     const field = this.GetFilterClauseField(termQuery);
+    let boost = '';
     if (field === null)
     {
       return blocks;
@@ -649,6 +661,16 @@ export class FilterUtils
     let blockValue;
     switch (termValue.clause.type)
     {
+      case 'match_settings':
+        if (termValue.objectChildren['query'] !== undefined)
+        {
+          blockValue = String(termValue.value['query']);
+          if (termValue.objectChildren['boost'] !== undefined)
+          {
+            boost = String(termValue.value['boost']);
+          }
+        }
+        break;
       case 'null':
         blockValue = String(termValue.value);
         break;
@@ -673,6 +695,7 @@ export class FilterUtils
           value: blockValue,
           boolQuery: boolTypeName,
           filterOp: '≈',
+          boost,
         }, true),
       );
     }
@@ -682,19 +705,38 @@ export class FilterUtils
   private static MatchClauseBlockToCard(block: Block): Block
   {
     let queryCard;
+    const boost = block['boost'];
     const valueString = String(block['value']);
     const valueType = this.GetTemplateTypeOfValueString(valueString, ':string');
     const templateField = String(block['field']) + valueType;
 
-    queryCard = BlockUtils.make(ElasticBlocks,
-      'eqlquery',
-      {
-        template: {
-          'match:match': {
-            [templateField]: valueString,
+    if (boost !== '')
+    {
+      const matchSettingField = String(block['field']) + ':match_settings';
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'match:match': {
+              [matchSettingField]: {
+                'query:string': valueString,
+                'boost:boost': boost,
+              },
+            },
           },
-        },
-      });
+        });
+    } else
+    {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'match:match': {
+              [templateField]: valueString,
+            },
+          },
+        });
+    }
     return queryCard;
   }
 
