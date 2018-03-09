@@ -135,8 +135,8 @@ export interface TemplateEditorActionTypes
   resetState: { // resets the display state
     actionType: 'resetState';
   };
-  switchEdge: {
-    actionType: 'switchEdge';
+  setCurrentEdge: {
+    actionType: 'setCurrentEdge';
     edge: number;
   };
 }
@@ -227,7 +227,7 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       {
         return _TemplateEditorState();
       },
-      switchEdge: (state, action) =>
+      setCurrentEdge: (state, action) =>
       {
         return state.setIn(['uiState', 'currentEdge'], action.payload.edge);
       },

@@ -137,7 +137,7 @@ class EditorDisplayStateC
   public previewIndex: number = 0;
   public settingsFieldId: number = null;
   public settingsDisplayKeyPath: KeyPath = null;
-  public currentEdge: number = 0;
+  public currentEdge: number = -1;
   public engineVersion: number = 0;
   public columnState: ColumnOptions = ColumnOptions.Preview;
 }

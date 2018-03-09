@@ -89,6 +89,10 @@ class Initializers extends ETLHelpers
         template,
       });
       this.editorAct({
+        actionType: 'setCurrentEdge',
+        edge: 0,
+      });
+      this.editorAct({
         actionType: 'rebuildFieldMap',
       });
       this.editorAct({
@@ -141,7 +145,18 @@ class Initializers extends ETLHelpers
   {
     return (hits) =>
     {
-      const { template, fieldMap } = createInitialTemplate(hits, source, sink);
+      const { template, fieldMap, initialEdge } = createInitialTemplate(hits, source, sink);
+      if (initialEdge !== -1)
+      {
+        this.editorAct({
+          actionType: 'setCurrentEdge',
+          edge: initialEdge,
+        });
+      }
+      else
+      {
+        // TODO error
+      }
       this.editorAct({
         actionType: 'setTemplate',
         template,
@@ -159,6 +174,7 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
   {
     template: ETLTemplate,
     fieldMap: FieldMap,
+    initialEdge: number,
     warnings: string[],
     softWarnings: string[],
   }
@@ -170,6 +186,7 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
       fieldMap: Map(),
       warnings: ['No documents provided for initial Template construction'],
       softWarnings: [],
+      initialEdge: 0,
     };
   }
   const { engine, warnings, softWarnings } = createMergedEngine(documents);
@@ -200,9 +217,9 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     to: sinkId,
     transformations: engine,
   });
-  proxy.addEdge(defaultEdge);
-  template = template.set('process', proxy.getProcess());
+  const initialEdge = proxy.addEdge(defaultEdge);
 
+  template = template.set('process', proxy.getProcess());
   template = template.setIn(['sources', '_default'], sourceToAdd);
   template = template.setIn(['sinks', '_default'], sinkToAdd);
 
@@ -211,5 +228,6 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     fieldMap,
     warnings,
     softWarnings,
+    initialEdge,
   };
 }
