@@ -61,17 +61,17 @@ import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, Source
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
+import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, NodeTypes, } from 'shared/etl/types/ETLTypes';
+import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
-import { _ETLNode, ETLNode, ETLEdge, _ETLEdge, ETLProcess, _ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 
 import DocumentsHelpers from './DocumentsHelpers';
 
@@ -130,16 +130,8 @@ class Initializers extends ETLHelpers
     const source = walkthrough.source;
     const sink = walkthrough.sink;
     const onLoad = this.createInitialTemplateFn(source, sink);
-
-    if (source.type === Sources.Upload)
-    {
-      const file = walkthrough.getFile();
-      DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
-    }
-    else
-    {
-      // TODO other types
-    }
+    const file = walkthrough.getFile();
+    DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
   }
 
   private createInitialTemplateFn(

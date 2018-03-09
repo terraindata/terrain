@@ -55,15 +55,16 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import {
-  ETLProcess as ETLProcessI,
+import
+{
   ETLEdge as ETLEdgeI,
   ETLNode as ETLNodeI,
+  ETLProcess as ETLProcessI,
+  Languages,
   MergeJoinOptions as MergeJoinOptionsI,
   NodeTypes,
-  Languages,
   TemplateBase,
-  TemplateObject
+  TemplateObject,
 } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { ProcessProxy } from './ProcessProxy';
@@ -86,16 +87,18 @@ class ETLProcessC
 }
 export type ETLProcess = WithIRecord<ETLProcessC>;
 export const _ETLProcess = makeExtendedConstructor(ETLProcessC, true, {
-  nodes: (nodes) => {
+  nodes: (nodes) =>
+  {
     return Map<number, ETLNode>(nodes).map(
-      (obj, key) => _ETLNode(obj, true)
+      (obj, key) => _ETLNode(obj, true),
     ).toMap();
   },
-  edges: (edges) => {
+  edges: (edges) =>
+  {
     return List(edges).map(
-      (obj, i) => _ETLEdge(obj, true)
+      (obj, i) => _ETLEdge(obj, true),
     ).toList();
-  }
+  },
 });
 
 class ETLEdgeC implements ETLEdgeI
@@ -106,16 +109,16 @@ class ETLEdgeC implements ETLEdgeI
 }
 export type ETLEdge = WithIRecord<ETLEdgeC>;
 export const _ETLEdge = makeExtendedConstructor(ETLEdgeC, true, {
-  transformations: TransformationEngine.load
+  transformations: TransformationEngine.load,
 });
 
 class MergeJoinOptionsC implements MergeJoinOptionsI
 {
-  leftId: number = -1;
-  rightId: number = -1;
-  leftJoinKey: string = '';
-  rightJoinKey: string = '';
-  outputKey: string = '';
+  public leftId: number = -1;
+  public rightId: number = -1;
+  public leftJoinKey: string = '';
+  public rightJoinKey: string = '';
+  public outputKey: string = '';
 }
 export type MergeJoinOptions = WithIRecord<MergeJoinOptionsC>;
 export const _MergeJoinOptions = makeExtendedConstructor(MergeJoinOptionsC);

@@ -57,7 +57,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-import { _ETLNode, ETLNode, ETLEdge, _ETLEdge, ETLProcess, _ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
+import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
 export type Mutator<T> = (newItem: T) => void;
@@ -86,8 +86,8 @@ export class ProcessProxy
 
   public addEdge(edge: ETLEdge)
   {
-    this.process = this.process.update('edges', 
-      (edges) => edges.push(edge)
+    this.process = this.process.update('edges',
+      (edges) => edges.push(edge),
     );
     this.sync();
     return this.process.edges.size - 1;

@@ -56,12 +56,12 @@ import FadeInOut from 'common/components/FadeInOut';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { guessFileOptions } from 'shared/etl/FileUtil';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
-import { _SinkConfig, _SourceConfig, _FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _FileConfig, _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';
+import { guessFileOptions } from 'shared/etl/FileUtil';
 import { Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
@@ -131,11 +131,14 @@ class ETLUploadStep extends ETLStepComponent
       sourceOptions: (options) => _.extend({}, options, { file }),
     });
 
-    guessFileOptions(file).then((config) => {
+    guessFileOptions(file).then((config) =>
+    {
       act({
         actionType: 'setFileConfig',
         sourceConfig: _FileConfig(config),
       });
+    }).catch((err) => {
+      // TODO
     });
   }
 }

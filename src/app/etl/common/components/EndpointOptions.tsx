@@ -57,13 +57,13 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'src/app/Classes';
 
-import { LibraryState } from 'library/LibraryTypes';
-import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import AlgorithmSelector from 'library/components/AlgorithmSelector';
+import { LibraryState } from 'library/LibraryTypes';
 import
 {
   FileConfig as FileConfigI, HttpOptions,
@@ -158,11 +158,11 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
         />
         {
           this.showFileConfig ?
-          <DynamicForm
-            inputMap={this.fileConfigInputMap}
-            inputState={this.fileConfigToFormState(fileConfig)}
-            onStateChange={this.handleFileConfigChange}
-          /> : null
+            <DynamicForm
+              inputMap={this.fileConfigInputMap}
+              inputState={this.fileConfigToFormState(fileConfig)}
+              onStateChange={this.handleFileConfigChange}
+            /> : null
         }
       </div>
     );
@@ -214,24 +214,30 @@ class UploadEndpoint extends EndpointForm<UploadState>
 }
 
 type AlgorithmState = SourceOptionsType<Sources.Algorithm>;
-//AlgorithmSelector
 class AlgorithmEndpointC extends EndpointForm<AlgorithmState>
 {
   public showFileConfig = false;
-
   public state: {
-    ids: List<number>
+    ids: List<number>,
   };
-
   public defaultIds = List([-1, -1, -1]);
+
+  public inputMap: InputDeclarationMap<AlgorithmState> = {
+    algorithmId: {
+      type: DisplayType.Custom,
+      options: {
+        render: this.renderAlgorithmSelector,
+      },
+    },
+  };
 
   constructor(props)
   {
     super(props);
     const { algorithmId } = props.endpoint.options;
     this.state = {
-      ids: this.computeIds(algorithmId)
-    }
+      ids: this.computeIds(algorithmId),
+    };
   }
 
   public computeIds(algorithmId)
@@ -261,15 +267,6 @@ class AlgorithmEndpointC extends EndpointForm<AlgorithmState>
       this.setState({
         ids,
       });
-    }
-  }
-
-  public inputMap: InputDeclarationMap<AlgorithmState> = {
-    algorithmId: {
-      type: DisplayType.Custom,
-      options: {
-        render: this.renderAlgorithmSelector
-      }
     }
   }
 
@@ -412,9 +409,9 @@ class DatabaseEndpoint extends EndpointForm<DatabaseState>
     serverId: {
       type: DisplayType.Custom,
       options: {
-        render: this.renderDatabasePicker
-      }
-    }
+        render: this.renderDatabasePicker,
+      },
+    },
   };
 
   public renderDatabasePicker(state: DatabaseState, disabled: boolean)
@@ -435,7 +432,7 @@ class DatabaseEndpoint extends EndpointForm<DatabaseState>
   public handleDbPickerChange(serverId: ID, database: string, table: string, language: Languages)
   {
     const { onChange, endpoint } = this.props;
-    const newOptions = { serverId, database, table, language};
+    const newOptions = { serverId, database, table, language };
     onChange(endpoint.set('options', newOptions));
   }
 }

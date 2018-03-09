@@ -53,7 +53,7 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { ETLProcess, _ETLProcess } from 'etl/templates/ETLProcess';
+import { _ETLProcess, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
@@ -144,8 +144,9 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
 
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
-  
-  obj.process = obj.process.update('edges', (edges) => edges.map((edge, key) => {
+
+  obj.process = obj.process.update('edges', (edges) => edges.map((edge, key) =>
+  {
     return edge.set('transformations', JSON.stringify(edge.transformations.toJSON()));
   }));
 

@@ -50,8 +50,8 @@ import * as _ from 'lodash';
 import * as Papa from 'papaparse';
 import { FileTypes } from './types/ETLTypes';
 
-import { parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from 'shared/Util';
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
+import { parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from 'shared/Util';
 
 export function getFileType(file: File): FileTypes
 {
@@ -159,9 +159,10 @@ export function guessFileOptions(file: File): Promise<FileConfig>
     };
     guessJsonFileOptions(
       file,
-      (result) => {
+      (result) =>
+      {
         resolve(_.extend(cfg, result));
-      }
+      },
     );
   });
 }
