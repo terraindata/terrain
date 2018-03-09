@@ -213,11 +213,11 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       setSinks: (state, action) =>
       {
-        return state.setIn(['template', 'sinks'], action.payload.sinks);
+        return state.setIn(['template', 'sinks'], action.payload.sinks).set('isDirty', true);
       },
       setSources: (state, action) =>
       {
-        return state.setIn(['template', 'sources'], action.payload.sources);
+        return state.setIn(['template', 'sources'], action.payload.sources).set('isDirty', true);
       },
       resetState: (state, action) =>
       {

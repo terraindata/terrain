@@ -163,21 +163,13 @@ class ETLReviewStep extends ETLStepComponent<Props>
     );
   }
 
-  public renderSummaryChosenTemplate()
-  {
-    return null; // TODO
-  }
-
   public render()
   {
     const { walkthrough } = this.props;
     return (
       <div className='etl-transition-column etl-review-step'>
         {
-          walkthrough.chosenTemplateId !== -1 ?
-            this.renderSummaryChosenTemplate()
-            :
-            this.renderSummary()
+          this.renderSummary()
         }
         <div className='etl-step-next-button-spacer'>
           {this._renderNextButton()}

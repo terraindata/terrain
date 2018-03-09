@@ -54,7 +54,7 @@ import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 's
 import { Ajax } from 'util/Ajax';
 import { _WalkthroughState, ViewState, WalkthroughState } from './ETLWalkthroughTypes';
 
-import { getFileType, getSampleRows, guessJsonFileOptions } from 'shared/etl/FileUtil';
+import { guessJsonFileOptions } from 'shared/etl/FileUtil';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 type CfgOrHandler = ((cfg: FileConfig) => FileConfig) | FileConfig;
@@ -82,10 +82,6 @@ export interface WalkthroughActionTypes
     actionType: 'setEndpointOptions';
     sourceOptions?: OptionsOrHandler;
     sinkOptions?: OptionsOrHandler;
-  };
-  autodetectJsonOptions: {
-    actionType: 'autodetectJsonOptions';
-    file: File;
   };
 }
 
@@ -163,33 +159,7 @@ class WalkthroughRedux extends TerrainRedux<WalkthroughActionTypes, WalkthroughS
         }
         return newState;
       },
-      autodetectJsonOptions: (state, action) => state, // overriden
     };
-
-  public autodetectJsonOptions(action: WalkthroughActionType<'autodetectJsonOptions'>, dispatch)
-  {
-    const directDispatch = this._dispatchReducerFactory(dispatch);
-    const setOptions = (options) =>
-    {
-      directDispatch({
-        actionType: 'setFileConfig',
-        sourceConfig: (cfg) =>
-          cfg.set('jsonNewlines', options.jsonNewlines),
-      });
-    };
-    guessJsonFileOptions(action.file, setOptions);
-  }
-
-  public overrideAct(action: Unroll<WalkthroughActionTypes>)
-  {
-    switch (action.actionType)
-    {
-      case 'autodetectJsonOptions':
-        return this.autodetectJsonOptions.bind(this, action);
-      default:
-        return undefined;
-    }
-  }
 }
 
 const ReduxInstance = new WalkthroughRedux();

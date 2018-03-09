@@ -51,6 +51,7 @@ import * as Papa from 'papaparse';
 import { FileTypes } from './types/ETLTypes';
 
 import { parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from 'shared/Util';
+import { FileConfig } from 'shared/etl/types/EndpointTypes';
 
 export function getFileType(file: File): FileTypes
 {
@@ -145,6 +146,25 @@ export function getSampleRows(
   }
 }
 // TODO for json, use a streaming implementation
+
+export function guessFileOptions(file: File): Promise<FileConfig>
+{
+  return new Promise<FileConfig>((resolve, reject) =>
+  {
+    const fileType = getFileType(file);
+    const cfg: FileConfig = {
+      fileType,
+      hasCsvHeader: true,
+      jsonNewlines: false,
+    };
+    guessJsonFileOptions(
+      file,
+      (result) => {
+        resolve(_.extend(cfg, result));
+      }
+    );
+  });
+}
 
 export function guessJsonFileOptions(
   file: File,

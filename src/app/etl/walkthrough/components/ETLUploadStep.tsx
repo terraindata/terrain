@@ -56,8 +56,9 @@ import FadeInOut from 'common/components/FadeInOut';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { guessFileOptions } from 'shared/etl/FileUtil';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _SinkConfig, _SourceConfig, _FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';
@@ -130,13 +131,12 @@ class ETLUploadStep extends ETLStepComponent
       sourceOptions: (options) => _.extend({}, options, { file }),
     });
 
-    if (getFileType(file) === FileTypes.Json)
-    {
-      this.props.act({
-        actionType: 'autodetectJsonOptions',
-        file,
+    guessFileOptions(file).then((config) => {
+      act({
+        actionType: 'setFileConfig',
+        sourceConfig: _FileConfig(config),
       });
-    }
+    });
   }
 }
 

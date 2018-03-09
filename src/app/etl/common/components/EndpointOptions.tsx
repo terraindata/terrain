@@ -85,6 +85,7 @@ const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
 abstract class EndpointForm<State, P extends Props = Props> extends TerrainComponent<P>
 {
   public abstract inputMap: InputDeclarationMap<State>;
+  public showFileConfig = true; // override this to hide
 
   public fileConfigInputMap: InputDeclarationMap<FileConfigI> =
     {
@@ -152,11 +153,14 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
           inputState={inputState}
           onStateChange={this.handleOptionsFormChange}
         />
-        <DynamicForm
-          inputMap={this.fileConfigInputMap}
-          inputState={this.fileConfigToFormState(fileConfig)}
-          onStateChange={this.handleFileConfigChange}
-        />
+        {
+          this.showFileConfig ?
+          <DynamicForm
+            inputMap={this.fileConfigInputMap}
+            inputState={this.fileConfigToFormState(fileConfig)}
+            onStateChange={this.handleFileConfigChange}
+          /> : null
+        }
       </div>
     );
   }
@@ -210,6 +214,7 @@ type AlgorithmState = SourceOptionsType<Sources.Algorithm>;
 
 class AlgorithmEndpoint extends EndpointForm<AlgorithmState>
 {
+  public showFileConfig = false;
   public inputMap: InputDeclarationMap<AlgorithmState> = {
     algorithmId: {
       type: DisplayType.NumberBox,
@@ -317,6 +322,7 @@ type DatabaseState = SinkOptionsType<Sinks.Database>;
 
 class DatabaseEndpoint extends EndpointForm<DatabaseState>
 {
+  public showFileConfig = false;
   public inputMap: InputDeclarationMap<DatabaseState> = {
     // todo
   };
