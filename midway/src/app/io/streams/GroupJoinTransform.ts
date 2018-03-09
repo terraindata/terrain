@@ -172,76 +172,100 @@ export default class GroupJoinTransform extends Readable
           const header = {};
           body.push(header);
 
-          const queryStr = ESParameterFiller.generate(
-            vi,
-            {
-              [this.parentAlias]: inputs[i]['_source'],
-            });
-          body.push(queryStr);
+          try
+          {
+            const queryStr = ESParameterFiller.generate(
+              vi,
+              {
+                [this.parentAlias]: inputs[i]['_source'],
+              });
+            body.push(queryStr);
+          }
+          catch (e)
+          {
+            this.emit('error', e);
+            return;
+          }
         }
       }
 
-      this.client.msearch(
-        {
-          body,
-        },
-        (error: Error | null, resp: any) =>
-        {
-          if (error !== null && error !== undefined)
-          {
-            throw error;
-          }
+      if (body.length === 0)
+      {
+        ticket.count--;
+        continue;
+      }
 
-          if (resp.error !== undefined)
+      try
+      {
+        this.client.msearch(
           {
-            throw resp.error;
-          }
-
-          for (let j = 0; j < numInputs; ++j)
+            body,
+          },
+          (error: Error | null, resp: any) =>
           {
-            if (resp.responses[j] !== undefined && resp.responses[j].hits !== undefined)
+            if (error !== null && error !== undefined)
             {
-              ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
+              this.emit('error', error);
+              return;
             }
-            else
+
+            if (resp.error !== undefined)
             {
-              ticket.response['hits'].hits[j][subQuery] = [];
+              this.emit('error', resp.error);
+              return;
             }
-          }
 
-          ticket.count--;
-
-          // check if we have anything to push to the output stream
-          let done = false;
-          while (!done && this.bufferedOutputs.length > 0)
-          {
-            const front = this.bufferedOutputs.peekFront();
-            if (front !== undefined && front.count === 0)
+            for (let j = 0; j < numInputs; ++j)
             {
-              front.response['hits'].hits = front.response['hits'].hits.filter(
-                (obj) =>
-                {
-                  return Object.keys(query).reduce((acc, q) =>
+              if (resp.responses[j] !== undefined && resp.responses[j].hits !== undefined)
+              {
+                ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
+              }
+              else
+              {
+                ticket.response['hits'].hits[j][subQuery] = [];
+              }
+            }
+
+            ticket.count--;
+
+            // check if we have anything to push to the output stream
+            let done = false;
+            while (!done && this.bufferedOutputs.length > 0)
+            {
+              const front = this.bufferedOutputs.peekFront();
+              if (front !== undefined && front.count === 0)
+              {
+                front.response['hits'].hits = front.response['hits'].hits.filter(
+                  (obj) =>
                   {
-                    return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
-                  }, true);
-                },
-              );
-              this.push(front.response);
-              this.bufferedOutputs.shift();
+                    return Object.keys(query).reduce((acc, q) =>
+                    {
+                      return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
+                    }, true);
+                  },
+                );
+                this.push(front.response);
+                this.bufferedOutputs.shift();
+              }
+              else
+              {
+                done = true;
+              }
             }
-            else
-            {
-              done = true;
-            }
-          }
 
-          if (this.source.isEmpty()
-            && this.bufferedOutputs.length === 0)
-          {
-            this.push(null);
-          }
-        });
+            if (this.source.isEmpty()
+              && this.bufferedOutputs.length === 0)
+            {
+              this.push(null);
+            }
+          });
+      }
+      catch (e)
+      {
+        this.emit('error', e);
+        return;
+      }
     }
   }
 }

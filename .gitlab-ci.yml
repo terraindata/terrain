@@ -95,6 +95,9 @@ fullstack:
     paths:
     - rr/test/builder/__image_snapshots__/__diff_output__
     - rr/test/login/__image_snapshots__/__diff_output__
+  after_script:
+    - killall node || true;
+    - ./midway/test/scripts/copy_screenshot.sh || true;
 
 deploy:
   script:
@@ -113,6 +116,3 @@ deploy:
     name: production
     url: http://pa-terraformer01.terrain.int:3000
 
-after_script:
-  - killall node || true;
-  - ./midway/test/scripts/copy_screenshot.sh || true;
