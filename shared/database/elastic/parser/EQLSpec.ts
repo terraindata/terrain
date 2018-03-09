@@ -1922,7 +1922,7 @@ const EQLSpec: ESClause[] =
     new ESStructureClause('exists_query',
       {
         field: 'field',
-        null_value: 'base',
+        boost: 'boost',
       },
       {
         path: ['filter'],
@@ -2114,6 +2114,7 @@ const EQLSpec: ESClause[] =
         max_expansions: 'fuzzy_max_expansions',
         slop: 'slop',
         lenient: 'boolean',
+        boost: 'boost',
       },
       {
         path: ['match'],
