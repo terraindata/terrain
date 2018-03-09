@@ -2114,6 +2114,7 @@ const EQLSpec: ESClause[] =
         max_expansions: 'fuzzy_max_expansions',
         slop: 'slop',
         lenient: 'boolean',
+        boost: 'boost',
       },
       {
         path: ['match'],
