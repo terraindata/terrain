@@ -64,7 +64,7 @@ export interface Props
   canEdit?: boolean;
 
   shortNameText: string;
-  headerText: string;
+  headerText?: string;
 
   forceOpen?: boolean;
   defaultOpen?: boolean;
