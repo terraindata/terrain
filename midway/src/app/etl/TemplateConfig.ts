@@ -55,7 +55,6 @@ export class TemplateConfig extends ConfigType implements TemplateBase
   public id?: number = undefined;
   public archived: boolean = false; // TODO, add ability to filter on this in routes
   public templateName: string = '';
-  public transformationConfig: any = undefined;
   public sources: {
     _default?: SourceConfig;
     [k: string]: SourceConfig;
@@ -93,9 +92,6 @@ export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfi
 export function templateForSave(template: TemplateObject): TemplateInDatabase
 {
   const obj = _.extend({}, template);
-  // obj.sources = _.forOwn(obj.sources, (source, key) => {
-  //   obj.sources.transformations = JSON.stringify(obj.sources.transformations);
-  // });
   obj.sources = JSON.stringify(template.sources);
   obj.sinks = JSON.stringify(template.sinks);
   return obj;

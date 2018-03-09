@@ -138,7 +138,6 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
     (id ` + primaryKeyType + ` PRIMARY KEY,
      archived bool NOT NULL,
      templateName text NOT NULL,
-     transformationConfig text NOT NULL,
      sources text NOT NULL,
      sinks text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS schedulerLogs

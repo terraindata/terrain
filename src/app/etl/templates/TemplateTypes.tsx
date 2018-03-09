@@ -63,7 +63,6 @@ class ETLTemplateC implements ETLTemplateI
   public id = -1;
   public archived = false;
   public templateName = '';
-  public transformationConfig = '';
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
 }
