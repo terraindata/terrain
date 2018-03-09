@@ -62,6 +62,11 @@ export class Job
     this.taskTree = new TaskTree();
   }
 
+  public cancel(): void
+  {
+    this.taskTree.cancel();
+  }
+
   public create(args: TaskConfig[]): boolean | string
   {
     if (args === undefined || (Array.isArray(args) && args.length === 0))

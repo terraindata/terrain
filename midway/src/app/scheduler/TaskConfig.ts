@@ -48,6 +48,7 @@ import * as stream from 'stream';
 
 export interface TaskConfig
 {
+  cancel: boolean; // whether the tree of tasks should be cancelled
   id: number; // unique id that identifies this task to other tasks in the input array of TaskConfigs
   name: string; // name of the task i.e. 'import'
   onFailure?: number; // id of task to execute on failure

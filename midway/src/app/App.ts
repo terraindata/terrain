@@ -235,8 +235,8 @@ export class App
     winston.debug('Finished connecting to configured databases...');
 
     // setup stored users
-    await scheduler.initializeJobs();
-    await scheduler.initializeSchedules();
+    // await scheduler.initializeJobs();
+    // await scheduler.initializeSchedules();
     winston.debug('Finished initializing scheduler jobs and schedules...');
 
     const heapStats: object = v8.getHeapStatistics();

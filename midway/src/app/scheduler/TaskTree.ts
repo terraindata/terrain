@@ -61,6 +61,14 @@ export class TaskTree
     this.tasks = [];
   }
 
+  public cancel(): void
+  {
+    this.tasks.forEach((task) =>
+    {
+      task.cancel = true;
+    });
+  }
+
   public create(taskConfigs: TaskConfig[]): boolean | string
   {
     // verify that each task has a unique id
@@ -129,6 +137,7 @@ export class TaskTree
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
+      let cancelled: boolean = false;
       let ind: number = 0;
       let result: TaskOutputConfig = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
       while (result.exit !== true)
@@ -136,16 +145,27 @@ export class TaskTree
         if (result.status === true)
         {
           ind = this.tasks[ind].onSuccess;
+          if (this.tasks[ind].cancel === true)
+          {
+            cancelled = true;
+            break;
+          }
           this._setInputConfigFromOutputConfig(this.tasks[ind], result);
           result = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
         }
         else if (result.status === false)
         {
           ind = this.tasks[ind].onFailure;
+          if (this.tasks[ind].cancel === true)
+          {
+            cancelled = true;
+            break;
+          }
           this._setInputConfigFromOutputConfig(this.tasks[ind], result);
           result = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
         }
       }
+      result.cancelled = cancelled;
       return resolve(result);
     });
   }
