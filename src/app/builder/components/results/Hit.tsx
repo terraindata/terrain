@@ -446,7 +446,7 @@ class HitComponent extends TerrainComponent<Props> {
           })}
         >
           {
-            value
+              value
           }
         </div>
       </div>
@@ -673,7 +673,9 @@ class HitComponent extends TerrainComponent<Props> {
                 <div className='result-pin-icon'>
                   <PinIcon />
                 </div>
-                <span className='result-name-label'>{name}</span>
+                <span className='result-name-label'>
+                  {name}
+                </span>
                 {
                   this.props.expanded &&
                   <div
@@ -803,16 +805,14 @@ export function getResultNestedFields(hit: Hit, config: ResultsConfig): string[]
     ).toArray();
     const unconfigNested = config.fields.filter((field) =>
     {
-      return (typeof hit.fields.get(field) === 'object' ||
-        List.isList(hit.fields.get(field))) &&
+      return (List.isList(hit.fields.get(field))) &&
         configuredNested.indexOf(field) === -1;
     }).toArray();
     return unconfigNested.concat(configuredNested);
   }
   return _.keys(hit.fields.toJS()).filter((field) =>
   {
-    return typeof hit.fields.get(field) === 'object' ||
-      List.isList(hit.fields.get(field));
+    return List.isList(hit.fields.get(field));
   });
 }
 
@@ -975,25 +975,36 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     value = Math.floor((value as number) * 10000) / 10000;
     value = value.toLocaleString();
   }
-  // Add in tooltip stuff here
 
-  if (tooltipText && !expanded)
+  // check if its a date and format it nicely if so
+  if (typeof value === 'string')
+  {
+    const dateValue = Util.formatDate(value, true); // If it's not a valid date, nothing will change in value
+    if (dateValue !== value)
+    {
+      tooltipText = value;
+      value = dateValue;
+    }
+  }
+  if (!tooltipText)
+  {
+    tooltipText = value;
+  }
+
+  if (tooltipText && !expanded && !bgUrlOnly)
   {
     return tooltip(<div>{value}</div>, {
       html: <div style={{
-        width: 140,
-        height: 200,
         overflowY: 'auto',
-        fontSize: '12px',
+        maxHeight: '200px',
         display: 'inline-block',
         textAlign: 'left',
-
       }}
       >
         {tooltipText}
       </div>,
       interactive: true,
-      position: 'right',
+      position: 'left-start',
     });
   }
 

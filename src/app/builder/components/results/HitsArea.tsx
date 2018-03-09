@@ -58,6 +58,8 @@ import { BuilderState } from 'app/builder/data/BuilderState';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import Ajax from 'app/util/Ajax';
 import Util from 'app/util/Util';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import { ESParseTreeToCode } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Radium = require('radium');
 import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -122,7 +124,7 @@ interface State
 }
 
 const MAP_MAX_HEIGHT = 300;
-const MAP_MIN_HEIGHT = 25; // height of top bar on map
+const MAP_MIN_HEIGHT = 30; // height of top bar on map
 
 @Radium
 class HitsArea extends TerrainComponent<Props>
@@ -392,6 +394,7 @@ class HitsArea extends TerrainComponent<Props>
     const allMapsData = [];
     _.keys(locations).forEach((field) =>
     {
+      let canAdd = true;
       let multiLocations = [];
       const target = locations[field];
       hits.forEach((hit, i) =>
@@ -401,6 +404,10 @@ class HitsArea extends TerrainComponent<Props>
           hit.fields.get(resultsConfig.name) : hit.fields.get('_id');
         const spotlight = this.state.spotlightHits.get(hit.primaryKey);
         const color = spotlight !== undefined && spotlight.color !== undefined ? spotlight.color : 'black';
+        if (!hit.fields.get(field))
+        {
+          canAdd = false;
+        }
         multiLocations.push({
           coordinates: hit.fields.get(field),
           name,
@@ -408,7 +415,10 @@ class HitsArea extends TerrainComponent<Props>
           color,
         });
       });
-      allMapsData.push({ target, multiLocations: List(multiLocations) });
+      if (canAdd)
+      {
+        allMapsData.push({ target, multiLocations: List(multiLocations) });
+      }
     });
     return allMapsData;
   }
@@ -468,7 +478,7 @@ class HitsArea extends TerrainComponent<Props>
   {
     const el = this.refs['map'];
     const cr = el['getBoundingClientRect']();
-    if (cr.height <= MAP_MIN_HEIGHT)
+    if (cr.height <= MAP_MIN_HEIGHT + 5)
     {
       this.setState({
         mapHeight: MAP_MAX_HEIGHT,
@@ -499,13 +509,14 @@ class HitsArea extends TerrainComponent<Props>
           style={{
             height: this.state.mapHeight,
             maxHeight,
+            borderColor: Colors().blockOutline,
           }}
           ref='map'
         >
           <div
             className='results-area-map-topbar'
             onMouseUp={this.toggleMapOpen}
-            style={backgroundColor(localStorage.getItem('theme') === 'DARK' ? Colors().bg3 : Colors().bg2)}
+            style={backgroundColor(Colors().blockBg)}
           >
             <div
               onMouseDown={this.handleMapMouseDown}
@@ -619,12 +630,15 @@ class HitsArea extends TerrainComponent<Props>
       // Extract the geo_distance fields and values from the query
       try
       {
-        const tqlString = AllBackendsMap[this.props.query.language].parseTreeToQueryString(
-          this.props.query,
-          {
-            replaceInputs: true,
-          },
-        );
+        // const tqlString = AllBackendsMap[this.props.query.language].parseTreeToQueryString(
+        //   this.props.query,
+        //   {
+        //     replaceInputs: true,
+        //   },
+        // );
+        const { query } = this.props;
+        const parser = new ESJSONParser(query.tql, true);
+        const tqlString = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
         const geoDistances = tqlString.match(/"geo_distance": \{[^\}]*\}/g);
         this.locations = {};
         if (geoDistances !== undefined && geoDistances !== null)
