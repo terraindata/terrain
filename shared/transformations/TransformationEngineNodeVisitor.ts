@@ -152,9 +152,10 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   public visitSubstringNode(node: SubstringTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
-    for (const fieldID of node.fieldIDs.toJS())
+    node.fields.forEach((field) =>
     {
-      if (typeof doc[fieldID] !== 'string')
+        const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
       {
         return {
           errors: [
@@ -185,8 +186,8 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         } as TransformationVisitResult;
       }
       // Currently assumes a single from and length for all fieldIDs
-      doc[fieldID] = doc[fieldID].substr(opts['from'], opts['length']);
-    }
+      yadeep.set(doc, field, el.substr(opts['from'], opts['length']), { create: true });
+    });
 
     return {
       document: doc,
@@ -199,25 +200,29 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     console.log(node.fields);
     node.fields.forEach((field) =>
     {
+        const el: any = yadeep.get(doc, field);
         console.log('AAAAA ' + field);
-        console.log(yadeep.get(doc, field));
-      if (true)//doc[fieldID].constructor === Array)
+        console.log(el);
+      if (el.constructor === Array)
       {
-        for (let i: number = 0; i < Object.keys(yadeep.get(doc, field)).length; i++)
+        for (let i: number = 0; i < Object.keys(el).length; i++)
         {
             console.log('FLLLLL ' + i);
             let kpi: KeyPath = field;
-            if (kpi.last() === '*')
+            if (kpi.contains('*'))
             {
-                kpi = kpi.pop();
+                kpi = kpi.set(kpi.indexOf('*'), i.toString());
             }
-            kpi = kpi.push(i.toString());
+            else
+            {
+                kpi = kpi.push(i.toString());
+            }
           // console.log(doc[fieldID][i]);
             yadeep.set(doc, kpi, yadeep.get(doc, kpi).toUpperCase());
           //doc[fieldID][i] = doc[fieldID][i].toUpperCase();
         }
       }
-      else if (typeof doc[fieldID] !== 'string')
+      else if (typeof el !== 'string')
       {
         return {
           errors: [
@@ -229,7 +234,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        doc[fieldID] = doc[fieldID].toUpperCase();
+          yadeep.set(doc, field, el.toUpperCase());
       }
     });
 

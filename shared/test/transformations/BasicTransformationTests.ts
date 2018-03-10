@@ -71,11 +71,11 @@ const doc2 = {
 };
 
 const doc3 = {
-  // name: 'Bob',
+  name: 'Bob',
   arr: ['sled', [{ a: 'dog' }, { a: 'fren', b: 'doggo' }]],
   // arr2: [{foo: {bar: {cat: 'a'}}}],
   // arr2: [[{foo: 'a', bar: 'b'}], [{foo: 'c'}]],
-  // hardarr: [['a'], ['b', ['c']]],
+  hardarr: [['a'], ['b', ['c']]],
 };
 
 const doc4 = {
@@ -86,7 +86,7 @@ const doc5 = {
   arr: ['a', 'b', 'c', 'd'],
 };
 
-/*test('add fields manually', () =>
+test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   e.addField(KeyPath(['meta', 'school']), 'string');
@@ -121,12 +121,12 @@ test('serialize to JSON', () =>
         {
           v: '0',
           value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
-            (0, List<number>([0]), {}, TransformationNodeType.UppercaseNode),
+            (0, List<KeyPath>([KeyPath(['name'])]), {}, TransformationNodeType.UppercaseNode),
         },
         {
           v: '1',
           value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
-            (1, List<number>([3]), {}, TransformationNodeType.UppercaseNode),
+            (1, List<KeyPath>([KeyPath(['meta', 'school'])]), {}, TransformationNodeType.UppercaseNode),
         },
       ],
       edges: [],
@@ -216,7 +216,7 @@ test('get transformations for a field', () =>
   e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['name'])]), { from: 0, length: 2 });
   e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['meta', 'school'])]));
   expect(e.getTransformations(id1)).toEqual(List<number>([0, 1]));
-});*/
+});
 
 test('rename a field (no structural changes)', () =>
 {
@@ -287,7 +287,7 @@ test('proper wildcard behavior in rename stage', () =>
     );
 });
 
-/*test('transform of deeply nested value', () =>
+test('transform of deeply nested value', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
   e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['hardarr', '1', '1', '0'])]));
@@ -319,12 +319,14 @@ test('proper wildcard behavior in rename stage', () =>
       ],
     },
   );
-});*/
+});
 
-/*test('nested transform with wildcard', () =>
+test('nested transform with wildcard', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
   e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]));
+  //const x = ;
+  // console.log(JSON.stringify(x));
   expect(e.transform(doc3)).toEqual(
     {
       name: 'Bob',
@@ -340,28 +342,29 @@ test('proper wildcard behavior in rename stage', () =>
           },
         ],
       ],
-      // hardarr: [
-      //   [
-      //     'a',
-      //   ],
-      //   [
-      //     'b',
-      //     [
-      //       'c',
-      //     ],
-      //   ],
-      // ],
+      hardarr: [
+        [
+          'a',
+        ],
+        [
+          'b',
+          [
+            'c',
+          ],
+        ],
+      ],
     },
   );
-});*/
+});
 
-/*test('proper wildcard behavior across multiple docs', () =>
+test('proper wildcard behavior across multiple docs', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc4);
-  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
+    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+    e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
   expect(e.transform(doc5)).toEqual(
     {
-      arr: ['A', 'B', 'C', 'D'],
+      car: ['A', 'B', 'C', 'D'],
     },
   );
-});*/
+});

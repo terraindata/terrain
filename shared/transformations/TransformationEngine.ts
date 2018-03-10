@@ -121,13 +121,15 @@ export class TransformationEngine
     for (let i: number = 0; i < parsed['dag']['nodes'].length; i++)
     {
       const raw: object = parsed['dag']['nodes'][i]['value'];
+      console.log(raw['fields']);
       parsed['dag']['nodes'][i]['value'] =
         new (TransformationInfo.getType(raw['typeCode']))(
           raw['id'],
-          List<number>(raw['fieldIDs']),
+          List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
           raw['options'],
           raw['typeCode'],
         ) as TransformationNode;
+      console.log(parsed['dag']['nodes'][i]['value']);
     }
     return parsed;
   }
@@ -305,7 +307,8 @@ export class TransformationEngine
     let output: object = this.rename(doc);
     console.log('RENAME DONE');
     console.log(JSON.stringify(output));
-    return output;
+    output = objectify(output);
+    //return output;
 
       for (const nodeKey of this.dag.sources())
       {
@@ -332,6 +335,21 @@ export class TransformationEngine
           output = transformationResult.document;
         }
       }
+
+      // If a field is supposed to be an array but is an object in its flattened
+      // representation, convert it back to an array
+      this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
+      {
+          if (yadeep.get(output, value) !== undefined && this.fieldEnabled.get(key) === true)
+          {
+              if (this.fieldTypes.get(key) === 'array')
+              {
+                  const x = yadeep.get(output, value);
+                  x['length'] = Object.keys(x).length;
+                  yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
+              }
+          }
+      });
 
       return output;
 
@@ -426,11 +444,11 @@ export class TransformationEngine
     // could be adding a map e.g. (field ID => List<transformation ID>)
     // to make this function O(1), if it's ever a performance issue.
 
-    const target: number = typeof field === 'number' ? field : this.fieldNameToIDMap.get(field);
+    const target: KeyPath = typeof field === 'number' ? this.fieldNameToIDMap.keyOf(field) : field;
     const nodes: TransformationNode[] = [];
     _.each(this.dag.nodes(), (node) =>
     {
-      if ((this.dag.node(node) as TransformationNode).fieldIDs.includes(target))
+      if ((this.dag.node(node) as TransformationNode).fields.includes(target))
       {
         nodes.push(this.dag.node(node) as TransformationNode);
       }
