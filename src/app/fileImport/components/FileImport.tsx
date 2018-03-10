@@ -351,7 +351,17 @@ class FileImport extends TerrainComponent<any>
           break;
         case 'json':
           previewColumns = columnNamesToMap.map((name) =>
-            List(items.map((item) => JSON.stringify(item[name]))));
+            List(items.map((item) =>
+            {
+              if (typeof item[name] === 'string')
+              {
+                return item[name];
+              }
+              else
+              {
+                return JSON.stringify(item[name]);
+              }
+            })));
           break;
         default:
       }
