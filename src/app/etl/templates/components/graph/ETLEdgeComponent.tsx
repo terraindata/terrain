@@ -43,7 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing max-classes-per-file
+// tslint:disable:no-var-requires import-spacing
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -53,61 +54,110 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+const Color = require('color');
+import Dropdown from 'common/components/Dropdown';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import ExpandableView from 'common/components/ExpandableView';
+import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
+import Quarantine from 'util/RadiumQuarantine';
 
+import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 
-import EndpointSection from 'etl/templates/components/endpoints/EndpointSection';
-import EdgeSection from 'etl/templates/components/graph/EdgeSection';
+import './EdgeSection.less';
 
-import './OptionsColumn.less';
 const { List, Map } = Immutable;
 
-type Props = {};
-
-export class EndpointsColumn extends TerrainComponent<Props>
+export interface Props
 {
-  public render()
+  edgeId: number;
+  edge: ETLEdge;
+  // below from container
+  templateEditor: TemplateEditorState;
+  act?: typeof TemplateEditorActions;
+}
+
+@Radium
+class ETLEdgeComponent extends TerrainComponent<Props>
+{
+
+  public renderNode(node: ETLNode, id: number)
+  {
+    const { template } = this.props.templateEditor;
+    let name = '';
+    if (node.type === NodeTypes.Source)
+    {
+      name = template.getSourceName(node.endpoint);
+    }
+    else if (node.type === NodeTypes.Sink)
+    {
+      name = template.getSinkName(node.endpoint);
+    }
+    else
+    {
+      name = template.process.getNodeName(id);
+    }
+
+    return (
+      <div className='edge-component-spacing'>
+        { name }
+      </div>
+    );
+  }
+
+  public renderBetween()
   {
     return (
+      <div className='edge-component-spacing'>
+        to
+      </div>
+    );
+  }
+
+  public render()
+  {
+    const { edgeId, edge, templateEditor } = this.props;
+    const { process } = templateEditor.template;
+    const { from, to } = edge;
+    const fromNode = process.getNode(from);
+    const toNode = process.getNode(to);
+
+    const isActive = templateEditor.getCurrentEdgeId() === edgeId;
+    const style = isActive ? edgeComponentStyleActive : edgeComponentStyle;
+    return (
       <div
-        className='template-editor-options-column'
-        style={columnStyle}
+        className='edge-component-item'
+        style={style}
       >
-        <div className='options-column-content'>
-          <EndpointSection isSource={true} />
-          <EndpointSection isSource={false} />
-        </div>
+        {this.renderNode(fromNode, from)}
+        {this.renderBetween()}
+        {this.renderNode(toNode, to)}
       </div>
     );
   }
 }
 
-// todo
-export class MergesColumn extends TerrainComponent<Props>
-{
-  public render()
-  {
-    return (
-      <div
-        className='template-editor-options-column'
-        style={columnStyle}
-      >
-        <div className='options-column-content'>
-          <EdgeSection />
-        </div>
-      </div>
-    );
-  }
-}
-
-const columnStyle = _.extend({},
+const edgeComponentStyle = [
   backgroundColor(Colors().bg3),
-  getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
+  borderColor(Colors().border2, Colors().active),
+];
+
+const edgeComponentStyleActive = [
+  backgroundColor(Colors().bg3),
+  borderColor(Colors().active, Colors().active),
+]
+
+export default Util.createContainer(
+  ETLEdgeComponent,
+  [
+    ['templateEditor'],
+  ],
+  { act: TemplateEditorActions },
 );

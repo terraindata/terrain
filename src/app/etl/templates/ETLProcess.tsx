@@ -86,9 +86,19 @@ class ETLProcessC
     return this.edges.getIn([edge, 'transformations']);
   }
 
-  public getEdge(edge: number): ETLEdge
+  public getNode(id: number)
   {
-    return this.edges.get(edge);
+    return this.nodes.get(id);
+  }
+
+  public getEdges(): Immutable.Map<number, ETLEdge>
+  {
+    return this.edges;
+  }
+
+  public getNodeName(id: number)
+  {
+    return `Merge Node ${id}`;
   }
 }
 export type ETLProcess = WithIRecord<ETLProcessC>;

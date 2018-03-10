@@ -119,14 +119,13 @@ class TemplateEditorStateC
 
   public getCurrentEngine(): TransformationEngine
   {
-    const key = this.uiState.currentEdge;
+    const key = this.getCurrentEdgeId();
     return this.template.process.getTransformationEngine(key);
   }
 
-  public getCurrentEdge(): ETLEdge
+  public getCurrentEdgeId()
   {
-    const key = this.uiState.currentEdge;
-    return this.template.process.getEdge(key);
+    return this.uiState.currentEdge;
   }
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
