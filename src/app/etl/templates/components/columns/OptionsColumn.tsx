@@ -88,7 +88,7 @@ export class EndpointsColumn extends TerrainComponent<{}>
 }
 
 // todo
-export class StepsColumn extends TerrainComponent<{}}>
+export class StepsColumn extends TerrainComponent<{}>
 {
   public render()
   {

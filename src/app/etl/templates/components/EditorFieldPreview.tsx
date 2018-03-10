@@ -57,6 +57,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
 
@@ -74,6 +75,25 @@ export interface Props extends TemplateEditorFieldProps
 @Radium
 class EditorFieldPreview extends TemplateEditorField<Props>
 {
+  public state: {
+    hovered: boolean;
+    menuOpen: boolean;
+  } = {
+    hovered: false,
+    menuOpen: false,
+  };
+
+  public menuOptions = List([
+    {
+      text: 'Edit this Field',
+      onClick: () => null,
+    },
+    {
+      text: 'Move this Field',
+      onClick: () => null,
+    },
+  ]);
+
   public render()
   {
     const { canEdit, preview, hidePreviewValue, displayValueOverride, labelOverride } = this.props;
@@ -88,16 +108,36 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
       previewText : displayValueOverride;
 
+    const showMenu = this.state.hovered || this.state.menuOpen;
+
     return (
       <div className='template-editor-field-block'>
         <div className='field-preview-row'>
-          <div className='field-preview-label-group' style={labelStyle}>
+          <div
+            className='field-preview-label-group'
+            onMouseEnter={this.handleMouseEnter}
+            onMouseLeave={this.handleMouseLeave}
+            style={labelStyle}
+          >
             <div className={classNames({
               'field-preview-label': true,
             })}
               onClick={this.handleLabelClicked}
             >
               {labelOverride != null ? labelOverride : field.name}
+            </div>
+            <div
+              className={classNames({
+                'field-preview-menu': true,
+                'field-preview-menu-hidden': !showMenu,
+              })}
+            >
+              <Menu
+                options={this.menuOptions}
+                small={true}
+                openRight={true}
+                onChangeState={this._setStateWrapper('menuOpen')}
+              />
             </div>
           </div>
           {
@@ -114,6 +154,20 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         </div>
       </div>
     );
+  }
+
+  public handleMouseEnter()
+  {
+    this.setState({
+      hovered: true,
+    });
+  }
+
+  public handleMouseLeave()
+  {
+    this.setState({
+      hovered: false,
+    });
   }
 
   public handleLabelClicked()
