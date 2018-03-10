@@ -87,17 +87,17 @@ export class Export
     const database: DatabaseController | undefined = DatabaseRegistry.get(exportConfig.dbid);
     if (database === undefined)
     {
-      throw Error('Database "' + exportConfig.dbid.toString() + '" not found.');
+      throw new Error('Database "' + exportConfig.dbid.toString() + '" not found.');
     }
 
     if (database.getType() !== 'ElasticController')
     {
-      throw Error('File export currently is only supported for Elastic databases.');
+      throw new Error('File export currently is only supported for Elastic databases.');
     }
 
     if (exportConfig.filetype !== 'csv' && exportConfig.filetype !== 'json' && exportConfig.filetype !== 'json [type object]')
     {
-      throw Error('Filetype must be either CSV or JSON.');
+      throw new Error('Filetype must be either CSV or JSON.');
     }
 
     if (headless)
@@ -106,12 +106,12 @@ export class Export
       const templates: ExportTemplateConfig[] = await exportTemplates.get(exportConfig.templateId);
       if (templates.length === 0)
       {
-        throw Error('Template not found. Did you supply an export template ID?');
+        throw new Error('Template not found. Did you supply an export template ID?');
       }
       const template = templates[0] as object;
       if (exportConfig.dbid !== template['dbid'])
       {
-        throw Error('Template database ID does not match supplied database ID.');
+        throw new Error('Template database ID does not match supplied database ID.');
       }
       for (const templateKey of Object.keys(template))
       {
@@ -122,7 +122,7 @@ export class Export
     const mapping: object = exportConfig.columnTypes;
     if (mapping === undefined)
     {
-      throw Error('Must provide export template column types.');
+      throw new Error('Must provide export template column types.');
     }
 
     return new Promise<stream.Readable>(async (resolve, reject) =>
@@ -143,12 +143,12 @@ export class Export
       }
       else
       {
-        throw Error('Must provide either algorithm ID or query, not both or neither.');
+        throw new Error('Must provide either algorithm ID or query, not both or neither.');
       }
 
       if (query === '')
       {
-        throw Error('Empty query provided.');
+        throw new Error('Empty query provided.');
       }
 
       // get list of export column names
@@ -185,7 +185,7 @@ export class Export
       const respStream: stream.Readable = await qh.handleQuery(payload) as stream.Readable;
       if (respStream === undefined)
       {
-        throw Error('Nothing to export.');
+        throw new Error('Nothing to export.');
       }
 
       try
@@ -213,7 +213,7 @@ export class Export
             exportTransform = new CSVExportTransform(columnNames);
             break;
           default:
-            throw Error('File type must be either CSV or JSON.');
+            throw new Error('File type must be either CSV or JSON.');
         }
 
         resolve(respStream.pipe(documentTransform).pipe(exportTransform));
