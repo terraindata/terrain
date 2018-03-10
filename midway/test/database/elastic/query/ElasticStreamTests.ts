@@ -70,7 +70,7 @@ beforeAll(() =>
 const query = {
   size: 3,
   _source: ['movieid', 'title'],
-  sort: { movieid : 'asc' },
+  sort: { movieid: 'asc' },
   query: {
     bool: {
       filter: [
