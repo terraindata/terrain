@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import * as winston from 'winston';
-import {KeyPath} from '../util/KeyPath';
+import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
@@ -154,7 +154,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
     node.fields.forEach((field) =>
     {
-        const el: any = yadeep.get(doc, field);
+      const el: any = yadeep.get(doc, field);
       if (typeof el !== 'string')
       {
         return {
@@ -196,30 +196,23 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    console.log('here!');
-    console.log(node.fields);
     node.fields.forEach((field) =>
     {
-        const el: any = yadeep.get(doc, field);
-        console.log('AAAAA ' + field);
-        console.log(el);
+      const el: any = yadeep.get(doc, field);
       if (el.constructor === Array)
       {
         for (let i: number = 0; i < Object.keys(el).length; i++)
         {
-            console.log('FLLLLL ' + i);
-            let kpi: KeyPath = field;
-            if (kpi.contains('*'))
-            {
-                kpi = kpi.set(kpi.indexOf('*'), i.toString());
-            }
-            else
-            {
-                kpi = kpi.push(i.toString());
-            }
-          // console.log(doc[fieldID][i]);
-            yadeep.set(doc, kpi, yadeep.get(doc, kpi).toUpperCase());
-          //doc[fieldID][i] = doc[fieldID][i].toUpperCase();
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, yadeep.get(doc, kpi).toUpperCase());
         }
       }
       else if (typeof el !== 'string')
@@ -234,7 +227,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-          yadeep.set(doc, field, el.toUpperCase());
+        yadeep.set(doc, field, el.toUpperCase());
       }
     });
 

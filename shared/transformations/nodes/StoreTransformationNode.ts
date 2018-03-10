@@ -44,17 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import {KeyPath} from '../../util/KeyPath';
+import { KeyPath } from '../../util/KeyPath';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNode from './TransformationNode';
 
 export default class StoreTransformationNode extends TransformationNode
 {
-    public constructor(id: number,
-                       fields: List<KeyPath>,
-                       options: object = {},
-                       typeCode: TransformationNodeType = TransformationNodeType.StoreNode)
-    {
-        super(id, fields, options, typeCode);
-    }
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.StoreNode)
+  {
+    super(id, fields, options, typeCode);
+  }
 }

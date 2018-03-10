@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { TransformationInfo } from 'shared/transformations/TransformationInfo';
-import {KeyPath} from '../../util/KeyPath';
+import { KeyPath } from '../../util/KeyPath';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNodeVisitor from '../TransformationNodeVisitor';
 import TransformationVisitError from '../TransformationVisitError';

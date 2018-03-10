@@ -100,14 +100,17 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
     const results: any[] = [];
     for (let j: number = 0; j < keys.length; j++)
     {
-      if (!isPrimitive(obj[keys[j]])) {
-        find(obj[keys[j]], path.shift(), (found) => {
+      if (!isPrimitive(obj[keys[j]]))
+      {
+        find(obj[keys[j]], path.shift(), (found) =>
+        {
           results[j] = found;
           return next(found);
         }, options);
-      } else {
-          // else push undefined?
-          results[j] = obj[keys[j]];
+      } else
+      {
+        // else push undefined?
+        results[j] = obj[keys[j]];
       }
     }
     obj = next(results);
@@ -154,7 +157,6 @@ export function get(obj: object, path: KeyPath): any
   let result: any;
   find(obj, path, (found) =>
   {
-      console.log('found: '+found);
     result = found;
     return found;
   });

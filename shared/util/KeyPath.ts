@@ -95,7 +95,6 @@ export function keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean
  */
 export function updateKeyPath(toUpdate: KeyPath, toReplace: KeyPath, replaceWith: KeyPath): KeyPath
 {
-  // console.log(toUpdate + ' ' + toReplace + ' ' + replaceWith);
   let updated: KeyPath = replaceWith;
   for (let i: number = 0; i < updated.size; i++)
   {

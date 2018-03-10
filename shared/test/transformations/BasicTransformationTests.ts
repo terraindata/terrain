@@ -269,7 +269,6 @@ test('rename a field (deeply nested property in array)', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
   e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr', '1', '*', 'a'])), KeyPath(['arr', '1', '*', 'cool']));
-  //console.log(JSON.stringify(e.transform(doc3)));
   expect(e.transform(doc3)['arr'][1][0]['a']).toBe(undefined);
   expect(e.transform(doc3)['arr'][1][0]['cool']).toBe('dog');
   expect(e.transform(doc3)['arr'][1][1]['a']).toBe(undefined);
@@ -278,13 +277,13 @@ test('rename a field (deeply nested property in array)', () =>
 
 test('proper wildcard behavior in rename stage', () =>
 {
-    const e: TransformationEngine = new TransformationEngine(doc4);
-    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
-    expect(e.transform(doc5)).toEqual(
-        {
-            car: ['a', 'b', 'c', 'd'],
-        },
-    );
+  const e: TransformationEngine = new TransformationEngine(doc4);
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  expect(e.transform(doc5)).toEqual(
+    {
+      car: ['a', 'b', 'c', 'd'],
+    },
+  );
 });
 
 test('transform of deeply nested value', () =>
@@ -325,8 +324,6 @@ test('nested transform with wildcard', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
   e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '1', '*', 'a'])]));
-  //const x = ;
-  // console.log(JSON.stringify(x));
   expect(e.transform(doc3)).toEqual(
     {
       name: 'Bob',
@@ -360,8 +357,8 @@ test('nested transform with wildcard', () =>
 test('proper wildcard behavior across multiple docs', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc4);
-    e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
-    e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
   expect(e.transform(doc5)).toEqual(
     {
       car: ['A', 'B', 'C', 'D'],
