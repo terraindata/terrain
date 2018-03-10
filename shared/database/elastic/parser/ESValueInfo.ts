@@ -167,12 +167,12 @@ export default class ESValueInfo
     this._errors.push(error);
   }
 
-  public forEachProperty(func: (property: ESPropertyInfo) => void): void
+  public forEachProperty(func: (property: ESPropertyInfo, name?: string) => void): void
   {
     Object.keys(this.objectChildren).forEach(
       (name: string): void =>
       {
-        func(this.objectChildren[name]);
+        func(this.objectChildren[name], name);
       });
   }
 

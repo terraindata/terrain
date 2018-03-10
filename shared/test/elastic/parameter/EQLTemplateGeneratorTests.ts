@@ -70,8 +70,6 @@ function testGeneration(testString: string, expectedValue: string)
   expect(errors.length).toEqual(0);
 
   const result = EQLTemplateGenerator.generate(valueInfo);
-
-  winston.info(result);
   expect(result).toEqual(expectedValue);
 }
 
