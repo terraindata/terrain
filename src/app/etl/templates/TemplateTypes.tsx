@@ -135,13 +135,13 @@ export enum ColumnOptions
 {
   Preview = 'Preview',
   Endpoints = 'Endpoints',
-  Merges = 'Merges',
+  Steps = 'Steps',
 }
 
 export const columnOptions = List([
   ColumnOptions.Preview,
   ColumnOptions.Endpoints,
-  ColumnOptions.Merges,
+  ColumnOptions.Steps,
 ]);
 
 class EditorDisplayStateC

@@ -62,7 +62,7 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
-import { EndpointsColumn, MergesColumn } from 'etl/templates/components/columns/OptionsColumn';
+import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import TemplateList from 'etl/templates/components/TemplateList';
@@ -178,7 +178,7 @@ class TemplateEditor extends TerrainComponent<Props>
         </div>
         {columnState === ColumnOptions.Preview ? <DocumentsPreviewColumn /> : null}
         {columnState === ColumnOptions.Endpoints ? <EndpointsColumn /> : null}
-        {columnState === ColumnOptions.Merges ? <MergesColumn /> : null}
+        {columnState === ColumnOptions.Steps ? <StepsColumn /> : null}
       </div>
     );
   }

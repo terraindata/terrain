@@ -90,7 +90,7 @@ export class EndpointsColumn extends TerrainComponent<Props>
 }
 
 // todo
-export class MergesColumn extends TerrainComponent<Props>
+export class StepsColumn extends TerrainComponent<Props>
 {
   public render()
   {

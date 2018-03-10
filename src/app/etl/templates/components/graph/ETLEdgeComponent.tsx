@@ -59,6 +59,7 @@ import Dropdown from 'common/components/Dropdown';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ExpandableView from 'common/components/ExpandableView';
+import Menu from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
@@ -87,6 +88,16 @@ export interface Props
 @Radium
 class ETLEdgeComponent extends TerrainComponent<Props>
 {
+  public menuOptions = List([
+    {
+      text: 'Edit Transformations',
+      onClick: this.makeThisActive,
+    },
+    {
+      text: 'Merge Into This Step',
+      onClick: this.openMergeUI,
+    }
+  ]);
 
   public renderNode(node: ETLNode, id: number)
   {
@@ -135,12 +146,30 @@ class ETLEdgeComponent extends TerrainComponent<Props>
       <div
         className='edge-component-item'
         style={style}
+        key={`${isActive}`}
       >
         {this.renderNode(fromNode, from)}
         {this.renderBetween()}
         {this.renderNode(toNode, to)}
+        <div className='edge-item-menu-wrapper'>
+          <Menu options={this.menuOptions}/>
+        </div>
       </div>
     );
+  }
+
+  public makeThisActive()
+  {
+    const { act, edgeId } = this.props;
+    act({
+      actionType: 'setCurrentEdge',
+      edge: edgeId,
+    });
+  }
+
+  public openMergeUI()
+  {
+    // TODO
   }
 }
 
