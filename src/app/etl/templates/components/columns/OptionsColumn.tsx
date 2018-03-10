@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
+// tslint:disable:no-var-requires import-spacing max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -71,21 +71,16 @@ const { List, Map } = Immutable;
 export interface Props
 {
   // below from container
-  template?: ETLTemplate;
-  act?: typeof TemplateEditorActions;
 }
 
-class OptionsColumn extends TerrainComponent<Props>
+export class EndpointsColumn extends TerrainComponent<Props>
 {
   public render()
   {
     return (
       <div
         className='template-editor-options-column'
-        style={_.extend({},
-          backgroundColor(Colors().bg3),
-          getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
-        )}
+        style={columnStyle}
       >
         <div className='options-column-content'>
           <EndpointSection isSource={true} />
@@ -94,11 +89,27 @@ class OptionsColumn extends TerrainComponent<Props>
       </div>
     );
   }
-
 }
 
-export default Util.createContainer(
-  OptionsColumn,
-  [['templateEditor', 'template']],
-  { act: TemplateEditorActions },
+// todo
+export class MergesColumn extends TerrainComponent<Props>
+{
+  public render()
+  {
+    return (
+      <div
+        className='template-editor-options-column'
+        style={columnStyle}
+      >
+        <div className='options-column-content'>
+
+        </div>
+      </div>
+    );
+  }
+}
+
+const columnStyle = _.extend({},
+  backgroundColor(Colors().bg3),
+  getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
 );

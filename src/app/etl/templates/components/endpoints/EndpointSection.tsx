@@ -59,6 +59,7 @@ import Dropdown from 'common/components/Dropdown';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ExpandableView from 'common/components/ExpandableView';
+import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
@@ -71,14 +72,15 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import EndpointForm from 'etl/common/components/EndpointForm';
 
+import './EndpointSection.less';
+
 const { List, Map } = Immutable;
 
 export interface Props
 {
   isSource?: boolean;
   // below from container
-  sources: ETLTemplate['sources'];
-  sinks: ETLTemplate['sinks'];
+  template: ETLTemplate;
   act?: typeof TemplateEditorActions;
 }
 
@@ -90,22 +92,28 @@ class EndpointSection extends TerrainComponent<Props>
   public state: {
     expandableState: Immutable.Map<string, boolean>;
     endpoints: EndpointsType;
+    newSourceModalOpen: boolean;
+    newSourceModalName: string;
+    newSource: SourceConfig;
   };
 
-  constructor(props)
+  constructor(props: Props)
   {
     super(props);
     this.state = {
       expandableState: Map(),
-      endpoints: props.isSource ? props.sources : props.sinks,
+      endpoints: props.isSource ? props.template.sources : props.template.sinks,
+      newSourceModalOpen: false,
+      newSourceModalName: '',
+      newSource: _SourceConfig(),
     };
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps: Props)
   {
-    const { isSource } = this.props;
-    const newEndpoints = isSource ? nextProps.sources : nextProps.sinks;
-    const oldEndpoints = isSource ? this.props.sources : this.props.sinks;
+    const { isSource, template } = this.props;
+    const newEndpoints = isSource ? nextProps.template.sources : nextProps.template.sinks;
+    const oldEndpoints = isSource ? template.sources : template.sinks;
 
     if (newEndpoints !== oldEndpoints || isSource !== nextProps.isSource)
     {
@@ -117,15 +125,15 @@ class EndpointSection extends TerrainComponent<Props>
 
   public renderEndpoint(endpoint: SourceConfig | SinkConfig, key)
   {
-    const { isSource } = this.props;
-
+    const { isSource, template } = this.props;
+    const name = isSource ? template.getSourceName(key) : template.getSinkName(key);
     const content = (
       <div
         className='endpoint-name-section'
         style={fontColor(Colors().text2)}
         onClick={this.expandableToggleFactory(key)}
       >
-        {key}
+        {name}
       </div>
     );
     const childContent = (
@@ -147,11 +155,79 @@ class EndpointSection extends TerrainComponent<Props>
     );
   }
 
+  public renderNewSourceButton()
+  {
+    if (!this.props.isSource)
+    {
+      return null; // Currently no need for dests
+    }
+    return (
+      <Quarantine>
+        <div
+          className='add-additional-endpoint'
+          style={addEndpointStyle}
+          onClick={this.openNewSourceModal}
+        >
+          Add Another Source
+        </div>
+      </Quarantine>
+    );
+  }
+
+  public closeNewSourceModal()
+  {
+    this.setState({
+      newSourceModalOpen: false,
+    });
+  }
+
+  public openNewSourceModal()
+  {
+    this.setState({
+      newSourceModalOpen: true,
+    });
+  }
+
+  public renderNewSourceModal()
+  {
+    const { template } = this.props;
+    const editForm = (
+      <div style={{padding: '6px'}}>
+        <EndpointForm
+          isSource={true}
+          endpoint={this.state.newSource}
+          onChange={this._setStateWrapper('newSource')}
+        />
+      </div>
+    );
+    const confirmDisabled =
+      this.state.newSourceModalName === '' ||
+      this.state.newSource.type == null ||
+      template.sources.hasIn([this.state.newSourceModalName]);
+
+    return (
+      <Modal
+        open={this.state.newSourceModalOpen}
+        onConfirm={this.handleAddNewSource}
+        onClose={this.closeNewSourceModal}
+        confirmDisabled={confirmDisabled}
+        title='Add New Source'
+        showTextbox={true}
+        confirm={true}
+        onTextboxValueChange={this._setStateWrapper('newSourceModalName')}
+        textboxPlaceholderValue='Source Name'
+        closeOnConfirm={true}
+      >
+        {editForm}
+      </Modal>
+    );
+  }
+
   public render()
   {
-    const { isSource } = this.props;
+    const { isSource, template } = this.props;
     const { endpoints } = this.state;
-    const buttonsDisabled = endpoints === (isSource ? this.props.sources : this.props.sinks);
+    const buttonsDisabled = endpoints === (isSource ? template.sources : template.sinks);
 
     return (
       <div className='endpoint-section'>
@@ -161,7 +237,7 @@ class EndpointSection extends TerrainComponent<Props>
             style={getStyle('borderBottom', `1px solid ${Colors().border1}`)}
           >
             <div className='endpoint-type-title-text'>
-              {isSource ? 'Sources' : 'Sinks'}
+              {isSource ? 'Sources' : 'Destination'}
             </div>
             <div className='endpoint-apply-section'>
               <div
@@ -190,14 +266,16 @@ class EndpointSection extends TerrainComponent<Props>
           </div>
         </Quarantine>
         {(endpoints as LooseEndpointsType).map(this.renderEndpoint).toList()}
+        {isSource && this.renderNewSourceButton()}
+        {isSource && this.renderNewSourceModal()}
       </div>
     );
   }
 
   public handleCancelChanges()
   {
-    const { sources, sinks, isSource } = this.props;
-    const newEndpoints = isSource ? sources : sinks;
+    const { template, isSource } = this.props;
+    const newEndpoints = isSource ? template.sources : template.sinks;
     this.setState({
       endpoints: newEndpoints,
     });
@@ -205,13 +283,13 @@ class EndpointSection extends TerrainComponent<Props>
 
   public handleApplyChanges()
   {
-    const { sources, sinks, isSource, act } = this.props;
+    const { template, isSource, act } = this.props;
     const { endpoints } = this.state;
 
     if (isSource)
     {
       const { newKeys, deletedKeys, differentKeys } =
-        getChangedKeys(isSource ? sources : sinks, endpoints);
+        getChangedKeys(isSource ? template.sources : template.sinks, endpoints);
 
       act({
         actionType: 'setSources',
@@ -240,6 +318,14 @@ class EndpointSection extends TerrainComponent<Props>
         sinks: endpoints as ETLTemplate['sinks'],
       });
     }
+  }
+
+  public handleAddNewSource()
+  {
+    const { endpoints, newSourceModalName, newSource } = this.state;
+    this.setState({
+      endpoints: (endpoints as LooseEndpointsType).set(newSourceModalName, newSource),
+    }, () => this.handleApplyChanges());
   }
 
   // closed by default, since expandableState is empty
@@ -306,6 +392,9 @@ function getChangedKeys(original: LooseEndpointsType, next: LooseEndpointsType)
   };
 }
 
+const addEndpointStyle = _.extend({},
+  backgroundColor('rgba(0,0,0,0)', Colors().highlight),
+);
 // memoized
 let getButtonStyle = (active: boolean, disabled: boolean)
 {
@@ -343,8 +432,7 @@ getButtonStyle = _.memoize(getButtonStyle, resolveBooleans);
 export default Util.createContainer(
   EndpointSection,
   [
-    ['templateEditor', 'template', 'sources'],
-    ['templateEditor', 'template', 'sinks'],
+    ['templateEditor', 'template'],
   ],
   { act: TemplateEditorActions },
 );

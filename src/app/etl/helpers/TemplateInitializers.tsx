@@ -197,7 +197,6 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     templateName: name,
   });
   const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
-  // newSource = newSource.set('transformations', engine);
   const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
   // default source and sink is upload and download
 

@@ -92,7 +92,7 @@ export const mapStateKeys = [
 
 interface Injected
 {
-  templateEditor: TemplateEditorState
+  templateEditor: TemplateEditorState;
 }
 
 export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
@@ -138,9 +138,9 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
           {
             return isVisiblyEqual(value, nextValue, uiStateKeysSeen);
           },
-        }
+        };
         return compareObjects(current.toObject(), next.toObject(), subComparatorMap);
-      }
+      },
     };
     return !compareObjects(this.props, nextProps, customComparatorMap);
   }
