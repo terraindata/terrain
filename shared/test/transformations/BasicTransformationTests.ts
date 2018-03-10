@@ -45,8 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
-import UppercaseTransformationNode from 'shared/transformations/nodes/UppercaseTransformationNode';
-import TransformationNode from '../../transformations/nodes/TransformationNode';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationInfo } from '../../transformations/TransformationInfo';
 import TransformationNodeType from '../../transformations/TransformationNodeType';

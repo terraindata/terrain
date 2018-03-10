@@ -397,10 +397,10 @@ export class TransformationEngine
    * This method allows editing of any/all transformation node properties.
    *
    * @param {number} transformationID Which transformation to update
-   * @param {Immutable.List<KeyPath> | Immutable.List<number>} fieldNamesOrIDs New field names/IDs
+   * @param {Immutable.List<KeyPath>} fieldNames New field names
    * @param {object} options New options
    */
-  public editTransformation(transformationID: number, fieldNamesOrIDs?: List<KeyPath> | List<number>,
+  public editTransformation(transformationID: number, fieldNames?: List<KeyPath>,
     options?: object): void
   {
     if (!this.dag.nodes().includes(transformationID.toString()))
@@ -408,9 +408,9 @@ export class TransformationEngine
       return;
     }
 
-    if (fieldNamesOrIDs !== undefined)
+    if (fieldNames !== undefined)
     {
-      (this.dag.node(transformationID) as TransformationNode).fieldIDs = this.parseFieldIDs(fieldNamesOrIDs);
+      (this.dag.node(transformationID) as TransformationNode).fields = fieldNames;
     }
 
     if (options !== undefined)
