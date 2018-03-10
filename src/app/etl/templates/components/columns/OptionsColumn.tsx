@@ -68,10 +68,7 @@ import EndpointSection from 'etl/templates/components/endpoints/EndpointSection'
 import './OptionsColumn.less';
 const { List, Map } = Immutable;
 
-export interface Props
-{
-  // below from container
-}
+type Props = {};
 
 export class EndpointsColumn extends TerrainComponent<Props>
 {

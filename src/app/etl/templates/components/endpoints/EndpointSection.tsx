@@ -192,7 +192,7 @@ class EndpointSection extends TerrainComponent<Props>
   {
     const { template } = this.props;
     const editForm = (
-      <div style={{padding: '6px'}}>
+      <div style={{ padding: '6px' }}>
         <EndpointForm
           isSource={true}
           endpoint={this.state.newSource}
@@ -217,6 +217,7 @@ class EndpointSection extends TerrainComponent<Props>
         onTextboxValueChange={this._setStateWrapper('newSourceModalName')}
         textboxPlaceholderValue='Source Name'
         closeOnConfirm={true}
+        allowOverflow={true}
       >
         {editForm}
       </Modal>
@@ -266,8 +267,8 @@ class EndpointSection extends TerrainComponent<Props>
           </div>
         </Quarantine>
         {(endpoints as LooseEndpointsType).map(this.renderEndpoint).toList()}
-        {isSource && this.renderNewSourceButton()}
-        {isSource && this.renderNewSourceModal()}
+        {isSource ? this.renderNewSourceButton() : null}
+        {isSource ? this.renderNewSourceModal() : null}
       </div>
     );
   }

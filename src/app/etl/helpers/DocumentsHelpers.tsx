@@ -124,10 +124,7 @@ class DocumentsHelpers extends ETLHelpers
     };
     try
     {
-      this.editorAct({
-        actionType: 'changeLoadingDocuments',
-        increment: true,
-      });
+      this.updateStateBeforeFetch();
       switch (source.type)
       {
         case Sources.Algorithm: {
@@ -181,11 +178,7 @@ class DocumentsHelpers extends ETLHelpers
       key,
       documents,
     });
-    this.computeMergedDocuments();
-    this.editorAct({
-      actionType: 'changeLoadingDocuments',
-      increment: false,
-    });
+    this.updateStateAfterFetch();
   }
 
   protected onDocumentsError(ev: string | MidwayError)
@@ -193,9 +186,26 @@ class DocumentsHelpers extends ETLHelpers
     // tslint:disable-next-line
     console.error(ev);
     // TODO add a modal message?
+    this.updateStateAfterFetch();
+  }
+
+  private updateStateAfterFetch()
+  {
     this.editorAct({
       actionType: 'changeLoadingDocuments',
       increment: false,
+    });
+    if (this.templateEditor.loadingDocuments <= 0)
+    {
+      this.computeMergedDocuments();
+    }
+  }
+
+  private updateStateBeforeFetch()
+  {
+    this.editorAct({
+      actionType: 'changeLoadingDocuments',
+      increment: true,
     });
   }
 }
