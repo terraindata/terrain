@@ -124,7 +124,8 @@ export default class CSVExportTransform extends AExportTransform
         if (value === null)
         {
           return this.nullValue;
-        } else
+        }
+        else
         {
           return this.escapeString(JSON.stringify(value));
         }
