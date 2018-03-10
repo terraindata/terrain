@@ -63,16 +63,16 @@ import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
+import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 
-import ETLEdgeComponent from './ETLEdgeComponent';
 import './EdgeSection.less';
+import ETLEdgeComponent from './ETLEdgeComponent';
 
 const { List, Map } = Immutable;
 
@@ -91,7 +91,7 @@ class EdgeSection extends TerrainComponent<Props>
       <div
         key={edgeId}
       >
-        <ETLEdgeComponent 
+        <ETLEdgeComponent
           edge={edge}
           edgeId={edgeId}
         />

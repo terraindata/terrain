@@ -64,9 +64,9 @@ import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
+import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
@@ -96,7 +96,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
     {
       text: 'Merge Into This Step',
       onClick: this.openMergeUI,
-    }
+    },
   ]);
 
   public renderNode(node: ETLNode, id: number)
@@ -118,7 +118,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
 
     return (
       <div className='edge-component-spacing'>
-        { name }
+        {name}
       </div>
     );
   }
@@ -152,7 +152,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
         {this.renderBetween()}
         {this.renderNode(toNode, to)}
         <div className='edge-item-menu-wrapper'>
-          <Menu options={this.menuOptions}/>
+          <Menu options={this.menuOptions} />
         </div>
       </div>
     );
@@ -181,7 +181,7 @@ const edgeComponentStyle = [
 const edgeComponentStyleActive = [
   backgroundColor(Colors().bg3),
   borderColor(Colors().active, Colors().active),
-]
+];
 
 export default Util.createContainer(
   ETLEdgeComponent,

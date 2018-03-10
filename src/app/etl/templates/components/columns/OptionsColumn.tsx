@@ -69,9 +69,7 @@ import EdgeSection from 'etl/templates/components/graph/EdgeSection';
 import './OptionsColumn.less';
 const { List, Map } = Immutable;
 
-type Props = {};
-
-export class EndpointsColumn extends TerrainComponent<Props>
+export class EndpointsColumn extends TerrainComponent<{}>
 {
   public render()
   {
@@ -90,7 +88,7 @@ export class EndpointsColumn extends TerrainComponent<Props>
 }
 
 // todo
-export class StepsColumn extends TerrainComponent<Props>
+export class StepsColumn extends TerrainComponent<{}}>
 {
   public render()
   {
