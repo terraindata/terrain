@@ -107,7 +107,8 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
           results[j] = found;
           return next(found);
         }, options);
-      } else
+      }
+      else if (path.size === 1)
       {
         // else push undefined?
         results[j] = obj[keys[j]];
