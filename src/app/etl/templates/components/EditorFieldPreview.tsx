@@ -79,14 +79,14 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     hovered: boolean;
     menuOpen: boolean;
   } = {
-    hovered: false,
-    menuOpen: false,
-  };
+      hovered: false,
+      menuOpen: false,
+    };
 
   public menuOptions = List([
     {
       text: 'Edit this Field',
-      onClick: () => null,
+      onClick: this.openSettings,
     },
     {
       text: 'Move this Field',
@@ -122,7 +122,6 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             <div className={classNames({
               'field-preview-label': true,
             })}
-              onClick={this.handleLabelClicked}
             >
               {labelOverride != null ? labelOverride : field.name}
             </div>
@@ -136,7 +135,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 options={this.menuOptions}
                 small={true}
                 openRight={true}
-                onChangeState={this._setStateWrapper('menuOpen')}
+                onChangeState={this.handleMenuStateChange}
               />
             </div>
           </div>
@@ -170,6 +169,25 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     });
   }
 
+  public handleMenuStateChange(menuOpen)
+  {
+    this.setState({
+      menuOpen,
+      hovered: menuOpen ? this.state.hovered : false,
+    });
+  }
+
+  public openSettings()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        settingsFieldId: this.props.fieldId,
+        settingsDisplayKeyPath: this.props.displayKeyPath,
+      },
+    });
+  }
+
   public handleLabelClicked()
   {
     if (this._settingsAreOpen())
@@ -180,13 +198,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     }
     else
     {
-      this.props.act({
-        actionType: 'setDisplayState',
-        state: {
-          settingsFieldId: this.props.fieldId,
-          settingsDisplayKeyPath: this.props.displayKeyPath,
-        },
-      });
+      this.openSettings();
     }
   }
 }

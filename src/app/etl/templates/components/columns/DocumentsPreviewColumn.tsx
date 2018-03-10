@@ -81,8 +81,14 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
   public renderNoDocuments()
   {
     return (
-      <div className='template-editor-no-documents'>
-        <div className='no-documents-section'>
+      <div
+        className='template-editor-no-documents'
+        style={noDocumentsStyle}
+      >
+        <div
+          className='no-documents-section'
+          style={noDocumentsTextStyle}
+        >
           Unable to Load Documents
         </div>
       </div>
@@ -108,6 +114,12 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
     }
   }
 }
+
+const noDocumentsStyle = _.extend({},
+  backgroundColor(Colors().fadedOutBg),
+  borderColor(Colors().border1),
+);
+const noDocumentsTextStyle = fontColor(Colors().error);
 
 export default Util.createContainer(
   DocumentsPreviewColumn,
