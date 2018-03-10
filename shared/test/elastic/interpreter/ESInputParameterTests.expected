@@ -5,18 +5,33 @@
     "parameter": "{}"
   },
   "number input" : {
-      "query": "{\"from\": @number}",
-      "expect": {
-            "from" : "@number"
-      },
-      "parameter": {"number":0}
+    "query": "{\"from\": @number}",
+    "expect": {
+      "from" : "@number"
     },
-    "runtime input" : {
-          "query": "{\"from\": @parent}",
-          "expect": {
-                "from" : "@parent"
-          },
-          "parameter": {}
+    "parameter": {"number": 0}
+  },
+  "runtime input" : {
+    "query": "{\"groupJoin\": {\"test\": {\"from\": @parent}}}",
+    "expect": {
+      "groupJoin": {
+        "test": {
+          "from" : "@parent"
         }
-
+      }
+    },
+    "parameter": {}
+  },
+  "runtime input with parent alias" : {
+    "query": "{\"groupJoin\": {\"parentAlias\": \"user\", \"test\": {\"from\": @user}}}",
+    "expect": {
+      "groupJoin": {
+        "parentAlias": "user",
+        "test": {
+          "from" : "@user"
+        }
+      }
+    },
+    "parameter": {}
+  }
 }
