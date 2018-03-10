@@ -128,25 +128,25 @@ export class Export
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
       // get query data from algorithmId or query (or variant Id if necessary)
-      let qry: string = '';
+      let query: string = '';
       if (exportConfig['variantId'] !== undefined && exportConfig.algorithmId === undefined)
       {
         exportConfig.algorithmId = exportConfig['variantId'];
       }
       if (exportConfig.algorithmId !== undefined && exportConfig.query === undefined)
       {
-        qry = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
+        query = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
       }
       else if (exportConfig.algorithmId === undefined && exportConfig.query !== undefined)
       {
-        qry = exportConfig.query;
+        query = exportConfig.query;
       }
       else
       {
         throw Error('Must provide either algorithm ID or query, not both or neither.');
       }
 
-      if (qry === '')
+      if (query === '')
       {
         throw Error('Empty query provided.');
       }
@@ -179,7 +179,7 @@ export class Export
         type: 'search',
         streaming: true,
         databasetype: 'elastic',
-        body: qry,
+        body: query,
       };
 
       const respStream: stream.Readable = await qh.handleQuery(payload) as stream.Readable;
