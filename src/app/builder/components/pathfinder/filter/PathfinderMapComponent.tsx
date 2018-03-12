@@ -132,7 +132,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
     {
       const spotlight = spotlights[key];
       return {
-        coordinates: spotlight.fields[this.props.data.field],
+        coordinates: spotlight.fields[this.props.filterLine.field],
         name: spotlight.name,
         index: spotlight.rank + 1,
         color: spotlight.color,
@@ -160,6 +160,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
         markers={this.spotlightsToMarkers()}
         onZoomChange={this.handleZoomChange}
         zoom={(data && data.zoom !== undefined) ? data.zoom : 15}
+        hideZoomControl={true}
       />
     );
   }

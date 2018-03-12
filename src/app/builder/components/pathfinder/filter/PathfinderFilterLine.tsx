@@ -87,8 +87,9 @@ export interface Props
   comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
   isSoftFilter?: boolean; // does this section apply to soft filters?
   fieldOptionSet: RouteSelectorOptionSet;
-  onAddScript?: (script: Script) => void;
-
+  onAddScript?: (fieldName: string, lat: any, lon: any, name: string) => string;
+  onDeleteScript?: (scriptName: string) => void;
+  onUpdateScript?: (fieldName: string, name: string, lat?: any, lon?: any) => void;
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
 }
@@ -198,7 +199,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         canEdit={props.canEdit}
         defaultOpen={fieldValue === null}
         canDelete={true}
-        onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
+        onDelete={this._fn(this.props.onDelete, this.props.keyPath, this.props.filterLine)}
         hideLine={true}
         footer={this.renderFooter()}
       />
@@ -360,7 +361,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           builderState: props.pathfinderContext.builderState,
         });
         const fieldChoice = fieldOptions.find((option) => option.value === value);
-        this.handleChange('field', value, fieldChoice.meta !== undefined ? fieldChoice.meta.fieldType : FieldType.Any, true);
+        this.handleChange(
+          'field',
+          value,
+          fieldChoice.meta !== undefined ? fieldChoice.meta.fieldType : FieldType.Any,
+          true
+        );
         return;
 
       case 1:
@@ -500,7 +506,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 <PathfinderMapComponent
                   data={value}
                   filterLine={this.props.filterLine}
-                  onChange={this.props.onChange}
+                  onChange={this.handleMapChange}
                   keyPath={this.props.keyPath}
                   canEdit={pathfinderContext.canEdit}
                 />
@@ -518,6 +524,35 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       default:
         return (() => <div></div>); // Nested, can only handle exists, so there is no value
     }
+  }
+
+  private getScriptParams(value)
+  {
+    let lat;
+    let lon;
+    if ((value as any).location)
+    {
+      const point = MapUtil.getCoordinatesFromGeopoint((value as any).location);
+      lat = point[0];
+      lon = point[1];
+    }
+    else if ((value as any).address)
+    {
+      lat = (value as any).address + '.lat';
+      lon = (value as any).address + '.lon';
+    }
+    return {lat, lon}
+  }
+
+  private handleMapChange(keyPath: KeyPath, filterLine: FilterLine)
+  {
+    // If this distance card is involved in a distance script, need to update that script
+    if (filterLine.addScript && this.props.onUpdateScript)
+    {
+      const {lat, lon} = this.getScriptParams(filterLine.value);
+      this.props.onUpdateScript(filterLine.field, filterLine.scriptName, lat, lon);
+    }
+    this.props.onChange(keyPath, filterLine);
   }
 
   private handleMapValueChange(key, value)
@@ -548,40 +583,26 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     if (!filterLine.addScript)
     {
       // Pull out the parameters
-      let lat;
-      let lon;
-      if ((filterLine.value as any).location)
-      {
-        const point = MapUtil.getCoordinatesFromGeopoint((filterLine.value as any).location);
-        lat = point[0];
-        lon = point[1];
-      }
-      else if ((filterLine.value as any).address)
-      {
-        lat = (filterLine.value as any).address + '.lat';
-        lon = (filterLine.value as any).address + '.lon';
-      }
-      const newScript = _Script({
-        name: 'distance',
-        params: [
-          {
-            name: 'lat',
-            value: lat,
-          },
-          {
-            name: 'lon',
-            value: lon,
-          },
-        ],
-        script: `Math.round(100 * doc['${this.props.filterLine.field}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
-        userAdded: true,
-      });
+      const {lat, lon} = this.getScriptParams(filterLine.value);
       if (this.props.onAddScript)
       {
-        this.props.onAddScript(newScript);
+        const scriptName = this.props.onAddScript(filterLine.field, lat, lon, 'distance');
+        this.props.onChange(
+          this.props.keyPath,
+          filterLine
+            .set('scriptName', scriptName)
+            .set('addScript', true));
       }
     }
-    this.props.onChange(this.props.keyPath, filterLine.set('addScript', !filterLine.addScript));
+    else
+    {
+      if (this.props.onDeleteScript)
+      {
+        this.props.onDeleteScript(filterLine.scriptName);
+      }
+      this.props.onChange(this.props.keyPath, filterLine.set('addScript', false));
+
+    }
   }
 
   private renderFooter()
@@ -629,6 +650,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       {
         filterLine = filterLine.set('comparison', null); // comparisonOptions.get(0).value);
       }
+      // If the field changed, the comparison was 'located', and the addScript is true, need to update script
+      if (filterLine.comparison === 'located' && filterLine.addScript && this.props.onUpdateScript)
+      {
+        this.props.onUpdateScript(filterLine.field, filterLine.scriptName);
+      }
+      
     }
     this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }

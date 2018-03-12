@@ -66,7 +66,7 @@ import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
-import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
+import { _PathfinderContext, Path, PathfinderSteps, _Script } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 
@@ -155,11 +155,91 @@ class PathfinderArea extends TerrainComponent<Props>
     return linearVerticalStrength(box, point);
   }
 
-  public handleAddScript(script)
+  public handleAddScript(fieldName, lat, lon, name): string
   {
+    // Get the name for the script, based on the other script names
+    let scriptName = '';
+    const scriptNames = this.props.path.more.scripts.map((script) => script.name).toList();
+    if (scriptNames.indexOf(name) === -1)
+    {
+      scriptName = name;
+    }
+    // If the name is taken, append a number to it (1, 2, 3...) based on the other script names
+    else
+    {
+      let i = 1;
+      while (scriptNames.indexOf(name + '_' + String(i)) !== -1)
+      {
+        i++;
+      }
+      scriptName = name + '_' + String(i);
+    }
+    // Create a new script and add it to scripts
+    const newScript = _Script({
+      name: scriptName,
+      params: [
+          {
+            name: 'lat',
+            value: lat,
+          },
+          {
+            name: 'lon',
+            value: lon,
+          },
+        ],
+      script: `Math.round(100 * doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
+      userAdded: false
+    });
+    // Return the name of the script to the filter line that created it
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
-      this.props.path.more.scripts.push(script),
+      this.props.path.more.scripts.push(newScript),
+      true
+    );
+    return scriptName;
+  }
+
+  public handleUpdateScript(fieldName, scriptName, lat?, lon?)
+  {
+    const { scripts } = this.props.path.more;
+    const oldScript = scripts.filter((script) => script.name === scriptName).toList().get(0);
+    let params: any = oldScript.params;
+    if (lat !== undefined && lon !== undefined)
+    {
+      params = [
+        {
+          name: 'lat',
+          value: lat,
+        },
+        {
+          name: 'lon',
+          value: lon
+        }
+      ];
+    }
+    const newScript = _Script({
+      name: scriptName,
+      params: Util.asJS(params),
+      script: `Math.round(100 * doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
+      userAdded: false
+    });
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
+      scripts.push(newScript),
+      true
+    );
+  }
+
+  public handleDeleteScript(scriptName: string)
+  {
+    console.log('Deleting ', scriptName);
+    const { scripts } = this.props.path.more;
+    const scriptNames = scripts.map((script) => script.name).toList();
+    const scriptIndex = scriptNames.indexOf(scriptName);
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'more', 'scripts'), 
+      scripts.splice(scriptIndex, 1),
+      true
     );
   }
 
@@ -194,6 +274,8 @@ class PathfinderArea extends TerrainComponent<Props>
               onStepChange={this.incrementStep}
               toSkip={toSkip}
               onAddScript={this.handleAddScript}
+              onDeleteScript={this.handleDeleteScript}
+              onUpdateScript={this.handleUpdateScript}
             />
             <PathfinderFilterSection
               isSoftFilter={true}

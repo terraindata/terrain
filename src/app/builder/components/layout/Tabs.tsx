@@ -203,7 +203,7 @@ class Tabs extends TerrainComponent<TabsProps> {
 
   public setSelectedPosition()
   {
-    if (this.state.tabs === null || this.state.tabs.length === 0)
+    if (this.state.tabs === null || this.state.tabs.length === 0 || !this)
     {
       return;
     }

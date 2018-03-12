@@ -542,7 +542,8 @@ class HitsArea extends TerrainComponent<Props>
                 geocoder='photon'
                 canEdit={false}
               />,
-            )}
+            )
+          }
         </div>
       );
     }

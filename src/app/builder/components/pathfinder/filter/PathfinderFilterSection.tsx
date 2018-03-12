@@ -78,7 +78,9 @@ export interface Props
   onStepChange?: (oldStep: PathfinderSteps) => void;
   toSkip?: number;
   isSoftFilter?: boolean; // does this section apply to soft filters?
-  onAddScript?: (script) => void;
+  onAddScript?: (fieldName: string, lat: any, lon: any, name: string) => string;
+  onDeleteScript?: (scriptName: string) => void;
+  onUpdateScript?: (fieldName: string, name: string, lat?: any, lon?: any) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
 }
@@ -207,14 +209,17 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     this.props.builderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
 
-  public handleFilterDelete(keyPath: KeyPath)
+  public handleFilterDelete(keyPath: KeyPath, filter?: FilterLine | FilterGroup)
   {
+    if (filter && (filter as FilterLine).addScript)
+    {
+      this.props.onDeleteScript((filter as FilterLine).scriptName);
+    }
     const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(skip).toList());
     const index = keyPath.last();
     this.props.builderActions.changePath(parentKeyPath, parent.splice(index, 1));
-    // TODO consider 'removeIn' instead
   }
 
   public renderFilterLine(filterLine, keyPath: List<string | number>)
@@ -239,6 +244,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         isSoftFilter={isSoftFilter}
         fieldOptionSet={this.state.fieldOptionSet}
         onAddScript={this.props.onAddScript}
+        onDeleteScript={this.props.onDeleteScript}
+        onUpdateScript={this.props.onUpdateScript}
       />
     );
   }

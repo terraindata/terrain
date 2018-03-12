@@ -389,7 +389,9 @@ class FilterLineC extends LineC
   public value: string | number | DistanceValue = null;
   public valueType: ValueType = null;
   public boost: number = 1;
+  // Some filter lines ( like geo_distance ones ) have the ability to generate scripts
   public addScript: boolean = false;
+  public scriptName: string = '';
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
 }
