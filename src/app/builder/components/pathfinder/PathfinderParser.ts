@@ -566,7 +566,10 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       try
       {
         return Map({
-          terms: { [line.field]: JSON.parse(String(value).toLowerCase()) },
+          terms: {
+            [line.field]: JSON.parse(String(value).toLowerCase()),
+            boost,
+          },
         });
       }
       catch {
@@ -577,11 +580,17 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
           let pieces = value.split(',');
           pieces = pieces.map((piece) => piece.toLowerCase().trim());
           return Map({
-            terms: { [line.field]: pieces },
+            terms: {
+              [line.field]: pieces,
+              boost,
+            },
           });
         }
         return Map({
-          terms: { [line.field]: value },
+          terms: {
+            [line.field]: value,
+            boost,
+          },
         });
       }
 
