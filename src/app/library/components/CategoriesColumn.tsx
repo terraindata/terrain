@@ -197,7 +197,9 @@ class CategoriesColumn extends TerrainComponent<Props>
       {
         if (id === v.categoryId)
         {
-          return !(v.status === ItemStatus.Live || v.status === ItemStatus.Default);
+          return !(v.status === ItemStatus.Default ||
+            v.status === ItemStatus.Lock
+          );
         }
         return true;
       },

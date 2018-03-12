@@ -544,6 +544,9 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     //     role = 'Builder';
     //   }
     // }
+
+    const canRename = algorithm.status !== ItemStatus.Default &&
+      algorithm.status !== ItemStatus.Lock;
     return (
       <LibraryItem
         index={index}
@@ -558,7 +561,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
         canArchive={canDrag && algorithm.status !== ItemStatus.Archive}
         canDuplicate={canEdit}
         canUnarchive={algorithm.status === ItemStatus.Archive}
-        canRename={algorithm.status !== ItemStatus.Live && algorithm.status !== ItemStatus.Default}
+        canRename={canRename}
         canPin={canPinItems}
         isPinned={isPinned}
         onPin={this.handlePinAlgorithm}
@@ -626,7 +629,11 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
       this.props.algorithmActions.change(v.set('status', ItemStatus.Archive) as Algorithm);
       return;
     }
-    else if (toStatus === ItemStatus.Archive && (v.status === ItemStatus.Live || v.status === ItemStatus.Default))
+    else if (toStatus === ItemStatus.Archive && (
+      v.status === ItemStatus.Default ||
+      v.status === ItemStatus.Lock
+    )
+    )
     {
       this.props.algorithmActions.status(v, ItemStatus.Archive, false);
       return;
@@ -643,8 +650,8 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     const { users } = this.props;
     const { roles } = this.state;
     const { currentUser: me } = users;
-    const canMakeLive = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
-    const canCreate = true; // canMakeLive;
+    const canMakeLock = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
+    const canCreate = true; // canMakeLock;
     // TODO maybe on the new middle tier, builders can create algorithms
     //  || (
     //   me && roles && roles.getIn([this.props.categoryId, me.id, 'builder'])

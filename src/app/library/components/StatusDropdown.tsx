@@ -88,7 +88,10 @@ class StatusDropdown extends TerrainComponent<Props>
     const { algorithm, users } = this.props;
     const { currentUser } = users;
     return (currentUser !== undefined && currentUser.isSuperUser) ||
-      (this.state.isBuilder && algorithm.status !== Status.Live && algorithm.status !== Status.Default);
+      (this.state.isBuilder &&
+        algorithm.status !== Status.Lock &&
+        algorithm.status !== Status.Default
+      );
   }
 
   public getOptions(): List<string> // List<El>
@@ -157,12 +160,12 @@ class StatusDropdown extends TerrainComponent<Props>
       }
       else if (!currentUser.isSuperUser)
       {
-        tooltipText = "This Algorithm is Live and you aren't<br />an Admin in this Category, so you<br />can't edit its status.";
+        tooltipText = "This Algorithm is Lock and you aren't<br />an Admin in this Category, so you<br />can't edit its status.";
       }
     }
     else
     {
-      tooltipText = 'Click to change the Algorithm\'s status, e.g. to Deploy or Archive';
+      tooltipText = 'Click to change the Algorithm\'s status, e.g. to Lock or Archive';
     }
 
     return (
@@ -228,6 +231,7 @@ const AdminOptionsOrder =
   [
     Status.Default,
     Status.Live,
+    Status.Lock,
     Status.Approve,
     Status.Build,
     Status.Archive,

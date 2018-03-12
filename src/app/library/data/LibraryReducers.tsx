@@ -170,8 +170,8 @@ LibraryReducers[ActionTypes.algorithms.status] =
 
     if (
       !confirmed &&
-      (status === ItemStatus.Live || algorithm.status === ItemStatus.Live
-        || status === ItemStatus.Default || algorithm.status === ItemStatus.Default)
+      (status === ItemStatus.Default || algorithm.status === ItemStatus.Default
+        || status === ItemStatus.Lock || algorithm.status === ItemStatus.Lock)
     )
     {
       return state
@@ -192,7 +192,7 @@ LibraryReducers[ActionTypes.algorithms.status] =
             {
               if (v.groupId === algorithm.groupId && v.status === 'DEFAULT')
               {
-                return v.set('status', 'LIVE');
+                return v.set('status', 'LOCK');
               }
               return v;
             },

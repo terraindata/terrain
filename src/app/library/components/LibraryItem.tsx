@@ -153,7 +153,7 @@ class LibraryItem extends TerrainComponent<Props>
           {
             text: 'Rename',
             disabled: true,
-            tooltip: "Can't rename Live or Default Algorithms",
+            tooltip: "Can't rename Lock or Default Algorithms",
           },
         ]),
       duplicateRename:
@@ -176,7 +176,7 @@ class LibraryItem extends TerrainComponent<Props>
           {
             text: 'Rename',
             disabled: true,
-            tooltip: "Can't rename Live or Default Algorithms",
+            tooltip: "Can't rename Lock or Default Algorithms",
           },
         ]),
       archiveRename:
@@ -199,7 +199,7 @@ class LibraryItem extends TerrainComponent<Props>
           {
             text: 'Rename',
             disabled: true,
-            tooltip: "Can't rename Live or Default Algorithms",
+            tooltip: "Can't rename Lock or Default Algorithms",
           },
         ]),
       unarchiveRename:
@@ -226,7 +226,7 @@ class LibraryItem extends TerrainComponent<Props>
           {
             text: 'Rename',
             disabled: true,
-            tooltip: "Can't rename Live or Default Algorithms",
+            tooltip: "Can't rename Lock or Default Algorithms",
           },
         ]),
       duplicateRenameArchive:

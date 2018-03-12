@@ -464,6 +464,12 @@ class GroupsColumn extends TerrainComponent<Props>
           color: LibraryTypes.colorForStatus(ItemStatus.Live),
           name: 'Algorithms in Live Status',
         },
+      [ItemStatus.Lock]:
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Lock),
+          name: 'Algorithms in Lock Status',
+        },
       [ItemStatus.Default]:
         {
           score: 0,
@@ -492,7 +498,8 @@ class GroupsColumn extends TerrainComponent<Props>
     const { roles } = this.state;
     const canArchive = (group.status !== ItemStatus.Archive); // me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
     const canDuplicate = true;
-    const canRename = (scores[ItemStatus.Live].score === 0 && scores[ItemStatus.Default].score === 0);
+    const canRename = scores[ItemStatus.Default].score === 0 &&
+      scores[ItemStatus.Lock].score === 0;
     const canDrag = true; // me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
     const canEdit = canDrag; // ||me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
     // (me && roles && roles.getIn([group.categoryId, me.id, 'builder']));

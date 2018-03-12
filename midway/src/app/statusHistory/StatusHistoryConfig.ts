@@ -44,69 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-access no-reference
+import ConfigType from '../ConfigType';
 
-/// TODO: remove when the "src" dependency is eliminated
-/// <reference path="../../typings/tsd.d.ts" />
-
-import { BaseClass } from '../../app/Classes';
-import BackendInstance from '../../database/types/BackendInstance';
-
-export type ItemType = 'QUERY' | 'ALGORITHM' | 'GROUP' | 'CATEGORY';
-export const ItemType: {
-  Query: ItemType;
-  Algorithm: ItemType;
-  Group: ItemType;
-  Category: ItemType;
-} = {
-    Query: 'QUERY',
-    Algorithm: 'ALGORITHM',
-    Group: 'GROUP',
-    Category: 'CATEGORY',
-  };
-
-export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT' | 'LOCK';
-export const ItemStatus: {
-  Archive: ItemStatus;
-  Build: ItemStatus;
-  Approve: ItemStatus;
-  Live: ItemStatus;
-  Default: ItemStatus;
-  Lock: ItemStatus;
-} =
-  {
-    Archive: 'ARCHIVE',
-    Build: 'BUILD',
-    Approve: 'APPROVE',
-    Live: 'LIVE',
-    Default: 'DEFAULT',
-    Lock: 'LOCK',
-  };
-
-export class ItemC extends BaseClass
+export class StatusHistoryConfig extends ConfigType
 {
-  // TODO potentially consolidate with midway
-  id: ID = -1;
-  parent: number = 0;
+  public createdAt?: string = undefined;
+  public userId: number = -1;
+  public id?: number = undefined;
+  public algorithmId: number = -1;
+  public fromStatus: string = '';
+  public toStatus: string = '';
 
-  name: string = '';
-  status: ItemStatus = 'BUILD';
-  type: ItemType;
-
-  db: BackendInstance = {} as any;
-
-  dbFields = ['id', 'parent', 'name', 'status', 'type'];
-  excludeFields = ['dbFields', 'excludeFields'];
-
-  modelVersion = 2; // 2 is for the first version of Node midway
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
 }
-export type Item = ItemC & IRecord<ItemC>;
-// remove?
-// export const _Item = (config?: {[key:string]: any}) =>
-// {
-//   if(config && typeToConstructor[config.type])
-//   {
-//     return typeToConstructor[config.type](config);
-//   }
-//   throw new Error('Unrecognized item type: ' + (config && config.type));
-// }
+
+export default StatusHistoryConfig;
