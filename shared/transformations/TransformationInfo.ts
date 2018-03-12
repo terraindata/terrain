@@ -47,14 +47,10 @@ THE SOFTWARE.
 import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
-import GetTransformationNode from './nodes/GetTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
-import LoadTransformationNode from './nodes/LoadTransformationNode';
 import PlusTransformationNode from './nodes/PlusTransformationNode';
 import PrependTransformationNode from './nodes/PrependTransformationNode';
-import PutTransformationNode from './nodes/PutTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
-import StoreTransformationNode from './nodes/StoreTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
@@ -84,46 +80,6 @@ export interface InfoType
 
 const TransformationNodeInfo: AllNodeInfoType =
   {
-    [TransformationNodeType.LoadNode]:
-      {
-        humanName: 'Load',
-        type: LoadTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitLoadNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.StoreNode]:
-      {
-        humanName: 'Store',
-        type: StoreTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitStoreNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.PutNode]:
-      {
-        humanName: 'Put',
-        type: PutTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitPutNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.GetNode]:
-      {
-        humanName: 'Get',
-        type: GetTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitGetNode(transformationNode, docCopy, options),
-      },
     [TransformationNodeType.SplitNode]:
       {
         humanName: 'Split Field',

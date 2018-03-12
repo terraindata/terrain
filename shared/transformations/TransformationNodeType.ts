@@ -46,10 +46,6 @@ THE SOFTWARE.
 // tslint:disable no-unused-expression
 enum TransformationNodeType
 {
-  LoadNode = 'LoadNode',
-  StoreNode = 'StoreNode',
-  PutNode = 'PutNode',
-  GetNode = 'GetNode',
   SplitNode = 'SplitNode',
   JoinNode = 'JoinNode',
   FilterNode = 'FilterNode',
@@ -74,10 +70,6 @@ type AssertOptionTypesExhaustive = {
 
 interface TransformationOptionTypes
 {
-  LoadNode: any;
-  StoreNode: any;
-  PutNode: any;
-  GetNode: any;
   SplitNode: any;
   JoinNode: any;
   FilterNode: any;

@@ -50,14 +50,10 @@ import * as yadeep from '../util/yadeep';
 import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
-import GetTransformationNode from './nodes/GetTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
-import LoadTransformationNode from './nodes/LoadTransformationNode';
 import PlusTransformationNode from './nodes/PlusTransformationNode';
 import PrependTransformationNode from './nodes/PrependTransformationNode';
-import PutTransformationNode from './nodes/PutTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
-import StoreTransformationNode from './nodes/StoreTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
@@ -101,19 +97,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return this.visitDefault(node, doc, options);
   }
 
-  public visitGetNode(node: GetTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitJoinNode(node: JoinTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitLoadNode(node: LoadTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
     return this.visitDefault(node, doc, options);
@@ -131,19 +115,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return this.visitDefault(node, doc, options);
   }
 
-  public visitPutNode(node: PutTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitSplitNode(node: SplitTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitStoreNode(node: StoreTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
     return this.visitDefault(node, doc, options);
