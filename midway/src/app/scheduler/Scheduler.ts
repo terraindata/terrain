@@ -767,7 +767,7 @@ export class Scheduler
             if (typeof imprtSourceConfig === 'string')
             {
               errMsg = 'Schedule ' + scheduleID.toString() +
-                ': Failed to complete scheduled import from Google spreadsheets. Error: ' + (readStream as string);
+                ': Failed to complete scheduled import from Google spreadsheets. Error: ' + (imprtSourceConfig as string);
               winston.info(errMsg);
               await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
               return rejectJob(errMsg);
