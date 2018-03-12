@@ -69,7 +69,7 @@ import PathfinderText from '../PathfinderText';
 import
 {
   _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
-  More, Path, PathfinderContext, Script, Source
+  More, Path, PathfinderContext, Script, Source,
 } from '../PathfinderTypes';
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';

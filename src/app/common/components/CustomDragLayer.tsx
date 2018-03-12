@@ -109,7 +109,7 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
           style={valueStyle}
         >
           {
-           // TODO MAKE THIS USE FILTER LINES DISPLAY FUNCTION SOMEHOW
+            // TODO MAKE THIS USE FILTER LINES DISPLAY FUNCTION SOMEHOW
             key === 'comparison' ?
               comparisons.get(data['comparison']) :
               JSON.stringify(data[key])

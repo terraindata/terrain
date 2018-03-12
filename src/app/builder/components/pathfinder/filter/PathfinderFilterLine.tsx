@@ -365,7 +365,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           'field',
           value,
           fieldChoice.meta !== undefined ? fieldChoice.meta.fieldType : FieldType.Any,
-          true
+          true,
         );
         return;
 
@@ -541,7 +541,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       lat = (value as any).address + '.lat';
       lon = (value as any).address + '.lon';
     }
-    return {lat, lon}
+    return { lat, lon };
   }
 
   private handleMapChange(keyPath: KeyPath, filterLine: FilterLine)
@@ -549,7 +549,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     // If this distance card is involved in a distance script, need to update that script
     if (filterLine.addScript && this.props.onUpdateScript)
     {
-      const {lat, lon} = this.getScriptParams(filterLine.value);
+      const { lat, lon } = this.getScriptParams(filterLine.value);
       this.props.onUpdateScript(filterLine.field, filterLine.scriptName, lat, lon);
     }
     this.props.onChange(keyPath, filterLine);
@@ -583,7 +583,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     if (!filterLine.addScript)
     {
       // Pull out the parameters
-      const {lat, lon} = this.getScriptParams(filterLine.value);
+      const { lat, lon } = this.getScriptParams(filterLine.value);
       if (this.props.onAddScript)
       {
         const scriptName = this.props.onAddScript(filterLine.field, lat, lon, 'distance');
@@ -655,7 +655,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       {
         this.props.onUpdateScript(filterLine.field, filterLine.scriptName);
       }
-      
+
     }
     this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }

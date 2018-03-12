@@ -350,7 +350,7 @@ const MapUtil = {
     {
       lat = geopoint.lat;
       lon = geopoint.lon;
-  
+
     }
     // array type for geopoint
     else if (geopoint[0] !== undefined && geopoint[1] !== undefined)

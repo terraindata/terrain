@@ -66,7 +66,7 @@ import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
-import { _PathfinderContext, Path, PathfinderSteps, _Script } from './PathfinderTypes';
+import { _PathfinderContext, _Script, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 
@@ -178,23 +178,23 @@ class PathfinderArea extends TerrainComponent<Props>
     const newScript = _Script({
       name: scriptName,
       params: [
-          {
-            name: 'lat',
-            value: lat,
-          },
-          {
-            name: 'lon',
-            value: lon,
-          },
-        ],
+        {
+          name: 'lat',
+          value: lat,
+        },
+        {
+          name: 'lon',
+          value: lon,
+        },
+      ],
       script: `Math.round(100 * doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
-      userAdded: false
+      userAdded: false,
     });
     // Return the name of the script to the filter line that created it
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
       this.props.path.more.scripts.push(newScript),
-      true
+      true,
     );
     return scriptName;
   }
@@ -213,33 +213,32 @@ class PathfinderArea extends TerrainComponent<Props>
         },
         {
           name: 'lon',
-          value: lon
-        }
+          value: lon,
+        },
       ];
     }
     const newScript = _Script({
       name: scriptName,
       params: Util.asJS(params),
       script: `Math.round(100 * doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
-      userAdded: false
+      userAdded: false,
     });
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
       scripts.push(newScript),
-      true
+      true,
     );
   }
 
   public handleDeleteScript(scriptName: string)
   {
-    console.log('Deleting ', scriptName);
     const { scripts } = this.props.path.more;
     const scriptNames = scripts.map((script) => script.name).toList();
     const scriptIndex = scriptNames.indexOf(scriptName);
     this.props.builderActions.changePath(
-      this._ikeyPath(this.props.keyPath, 'more', 'scripts'), 
+      this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
       scripts.splice(scriptIndex, 1),
-      true
+      true,
     );
   }
 
