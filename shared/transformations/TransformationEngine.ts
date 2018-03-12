@@ -320,14 +320,15 @@ export class TransformationEngine
 
   /**
    * Register a field with the current engine.  This enables adding
-   * transformations to the field.
+   * transformations to the field. If the field already exists, returns
+   * the associated id.
    *
    * @param {KeyPath} fullKeyPath The path of the field to add
    * @param {string} typeName     The JS type of the field
    * @param {object} options      Any field options (e.g., Elastic analyzers)
    * @returns {number}            The ID of the newly-added field
    */
-  public addField(fullKeyPath: KeyPath, typeName: string, options: object = {}): number
+  public addField(fullKeyPath: KeyPath, typeName: string = null, options: object = {}): number
   {
     if (this.fieldNameToIDMap.has(fullKeyPath))
     {
@@ -336,6 +337,10 @@ export class TransformationEngine
 
     this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
     this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
+    if (typeName === null)
+    {
+      typeName = 'object';
+    }
     this.fieldTypes = this.fieldTypes.set(this.uidField, typeName);
     this.fieldEnabled = this.fieldEnabled.set(this.uidField, true);
     this.fieldProps = this.fieldProps.set(this.uidField, options);
