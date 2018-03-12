@@ -680,7 +680,7 @@ export class ResultsManager extends TerrainComponent<Props>
         });
       }
       const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
-      const fields = hitTemp.fields !== undefined ? {fields: hitTemp.fields} : {};
+      const fields = hitTemp.fields !== undefined ? { fields: hitTemp.fields } : {};
       return _.extend({}, hitTemp._source, sort, fields, {
         _index: hitTemp._index,
         _type: hitTemp._type,

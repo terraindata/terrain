@@ -441,6 +441,7 @@ class DistanceValueC extends BaseClass
   public address: string = '';
   public distance?: number = 10;
   public units?: string = 'mi';
+  public zoom: number = 15;
 }
 
 export type DistanceValue = DistanceValueC & IRecord<DistanceValueC>;

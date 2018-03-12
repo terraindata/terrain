@@ -56,19 +56,20 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } f
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import ScoreBar from 'app/builder/components/charts/ScoreBar';
+import PathfinderMapComponent from 'app/builder/components/pathfinder/filter/PathfinderMapComponent';
+import PahfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
+import CheckBox from 'app/common/components/CheckBox';
 import DatePicker from 'app/common/components/DatePicker';
 import Dropdown from 'app/common/components/Dropdown';
-import MapComponent, { units } from 'app/common/components/MapComponent';
+import { units } from 'app/common/components/MapComponent';
 import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
+import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
-import PahfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import CheckBox from 'app/common/components/CheckBox';
-import MapUtil from 'app/util/MapUtil';
 import
 {
   _DistanceValue, _Param, _Script, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
@@ -496,16 +497,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                     openDown={true}
                   />
                 </div>
-                <MapComponent
-                  geocoder='google'
-                  inputValue={props.value && props.value.address || ''}
-                  coordinates={props.value && props.value.location !== undefined ? props.value.location : undefined}
-                  distance={props.value && props.value.distance || 0}
-                  distanceUnit={props.value && props.value.units || 'miles'}
-                  wrapperClassName={'pf-filter-map-component-wrapper'}
-                  // fadeInOut={true}
-                  onChange={this.handleMapChange}
-                  debounce={true}
+                <PathfinderMapComponent
+                  data={value}
+                  filterLine={this.props.filterLine}
+                  onChange={this.props.onChange}
+                  keyPath={this.props.keyPath}
                   canEdit={pathfinderContext.canEdit}
                 />
               </div>
@@ -524,6 +520,27 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     }
   }
 
+  private handleMapValueChange(key, value)
+  {
+    if (key === 'units')
+    {
+      value = _.keys(units)[value];
+    }
+    let filterLine;
+    if (this.props.filterLine.value !== undefined &&
+      this.props.filterLine.value[key] !== undefined)
+    {
+      filterLine = this.props.filterLine
+        .setIn(['value', key], value);
+    }
+    else
+    {
+      filterLine = this.props.filterLine
+        .set('value', _DistanceValue({ [key]: value }));
+    }
+    this.props.onChange(this.props.keyPath, filterLine, false, false);
+  }
+
   private handleAddScriptChange()
   {
     const { filterLine } = this.props;
@@ -535,11 +552,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       let lon;
       if ((filterLine.value as any).location)
       {
-        const point = MapUtil.getCoordinatesFromGeopoint((filterLine.value as any).location)
+        const point = MapUtil.getCoordinatesFromGeopoint((filterLine.value as any).location);
         lat = point[0];
         lon = point[1];
       }
-      else if((filterLine.value as any).address)
+      else if ((filterLine.value as any).address)
       {
         lat = (filterLine.value as any).address + '.lat';
         lon = (filterLine.value as any).address + '.lon';
@@ -553,8 +570,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           },
           {
             name: 'lon',
-            value: lon
-          }
+            value: lon,
+          },
         ],
         script: `Math.round(100 * doc['${this.props.filterLine.field}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
         userAdded: true,
@@ -587,44 +604,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       }
     }
     return null;
-  }
-
-  private handleMapValueChange(key, value)
-  {
-    if (key === 'units')
-    {
-      value = _.keys(units)[value];
-    }
-    let filterLine;
-    if (this.props.filterLine.value !== undefined &&
-      this.props.filterLine.value[key] !== undefined)
-    {
-      filterLine = this.props.filterLine
-        .setIn(['value', key], value);
-    }
-    else
-    {
-      filterLine = this.props.filterLine
-        .set('value', _DistanceValue({ [key]: value }));
-    }
-    this.props.onChange(this.props.keyPath, filterLine, false, false);
-  }
-
-  private handleMapChange(coordinates, inputValue)
-  {
-    let filterLine;
-    if (this.props.filterLine.value && this.props.filterLine.value['location'] !== undefined)
-    {
-      filterLine = this.props.filterLine
-        .setIn(List(['value', 'location']), coordinates)
-        .setIn(List(['value', 'address']), inputValue);
-    }
-    else
-    {
-      filterLine = this.props.filterLine
-        .set('value', _DistanceValue({ location: coordinates, address: inputValue }));
-    }
-    this.props.onChange(this.props.keyPath, filterLine, false, false);
   }
 
   private handleChange(key, value, fieldType?, fieldChange?)

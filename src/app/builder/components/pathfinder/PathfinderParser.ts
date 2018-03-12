@@ -700,9 +700,11 @@ function parseNested(more: More, nested: List<Path>, inputs)
 function parseScripts(scripts: List<Script>)
 {
   let scriptObj = Map({});
-  scripts.forEach((script: Script) => {
+  scripts.forEach((script: Script) =>
+  {
     let params = Map({});
-    script.params.forEach((param) => {
+    script.params.forEach((param) =>
+    {
       params = params.set(param.name, param.value);
     });
     const s = Map({

@@ -169,7 +169,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       background,
       noLeftLine,
       step,
-      lengthOffset
+      lengthOffset,
     } = this.props;
 
     const handleStyle = this.getHandleStyle();

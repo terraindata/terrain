@@ -420,9 +420,9 @@ class HitComponent extends TerrainComponent<Props> {
               'result-field-name': true,
               'result-field-name-header': hideFieldNames && index === 0,
             })}
-            style={hideFieldNames && index !== 0 ? 
-              { opacity: 0, color: Colors().fontColorLightest } : 
-              {color: Colors().fontColorLightest}
+            style={hideFieldNames && index !== 0 ?
+              { opacity: 0, color: Colors().fontColorLightest } :
+              { color: Colors().fontColorLightest }
             } // Keep them there to make sizing work
           >
             {

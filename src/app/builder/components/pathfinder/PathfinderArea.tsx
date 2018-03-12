@@ -159,7 +159,7 @@ class PathfinderArea extends TerrainComponent<Props>
   {
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
-      this.props.path.more.scripts.push(script)
+      this.props.path.more.scripts.push(script),
     );
   }
 

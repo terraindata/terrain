@@ -86,7 +86,7 @@ class PathfinderCreateLine extends TerrainComponent<Props>
       >
         <AddIcon />
         {
-        this.props.showText &&
+          this.props.showText &&
           text
         }
       </div>

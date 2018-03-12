@@ -66,8 +66,11 @@ import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
-import { _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
-  More, Path, PathfinderContext, Script, Source } from '../PathfinderTypes';
+import
+{
+  _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
+  More, Path, PathfinderContext, Script, Source
+} from '../PathfinderTypes';
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
@@ -469,7 +472,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleScriptValueChange(keys, value)
   {
-    console.log('change expanded', keys, value);
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, ['scripts'].concat(keys)),
       value,
@@ -480,7 +482,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, 'scripts', i, 'params'),
-      this.props.more.scripts.get(i).params.push(_Param({name: '', value: ''})),
+      this.props.more.scripts.get(i).params.push(_Param({ name: '', value: '' })),
     );
   }
 
@@ -561,7 +563,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         onClick={this._fn(this.deleteParam, i, j)}
                         className='close pf-more-delete-param'
                       />
-                  </div>,
+                    </div>,
                   )
                 }
                 <PathfinderCreateLine
@@ -656,23 +658,23 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           {
             this.renderScripts(this.props.more.scripts.filter((script) => script.userAdded))
           }
-            <div>
-              {
-                tooltip(
-                  <PathfinderCreateLine
-                    canEdit={canEdit}
-                    onCreate={this.handleAddScript}
-                    text={PathfinderText.addScript}
-                    style={{ marginLeft: -110, marginBottom: 0 }}
-                    showText={true}
-                  />,
-                  {
-                    title: PathfinderText.scriptExplanation,
-                    arrow: false,
-                  },
-                )
-              }
-            </div>
+          <div>
+            {
+              tooltip(
+                <PathfinderCreateLine
+                  canEdit={canEdit}
+                  onCreate={this.handleAddScript}
+                  text={PathfinderText.addScript}
+                  style={{ marginLeft: -110, marginBottom: 0 }}
+                  showText={true}
+                />,
+                {
+                  title: PathfinderText.scriptExplanation,
+                  arrow: false,
+                },
+              )
+            }
+          </div>
 
         </FadeInOut>
         <div>
@@ -693,7 +695,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 },
               ) : null
           }
-          </div>
+        </div>
       </div>
     );
   }

@@ -474,23 +474,23 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     if (coordinates !== undefined)
     {
       location = MapUtil.getCoordinatesFromGeopoint(coordinates);
-      if (!this.isValidCoordinate(location))
+    }
+    if (!this.isValidCoordinate(location) || coordinates === undefined)
+    {
+      // Try to see if it inputValue is an input, in that case get the coordinates from there
+      const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
+      if (inputs[inputValue] !== undefined)
       {
-        // Try to see if it inputValue is an input, in that case get the coordinates from there
-        const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
-        if (inputs[inputValue] !== undefined)
-        {
-          location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
-        }
-        // Double check, because input coordinates could also be invalid
-        if (location[0] === undefined || String(location[0]) === '')
-        {
-          location[0] = 0;
-        }
-        if (location[1] === undefined || String(location[1]) === '')
-        {
-          location[1] = 0;
-        }
+        location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
+      }
+      // Double check, because input coordinates could also be invalid
+      if (location[0] === undefined || String(location[0]) === '')
+      {
+        location[0] = 0;
+      }
+      if (location[1] === undefined || String(location[1]) === '')
+      {
+        location[1] = 0;
       }
     }
     return location;
@@ -522,7 +522,6 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
           onMouseDown={this.handleOnMapClick}
         >
           {
-            this.props.coordinates !== undefined &&
             this.renderMarker(inputValue, location, 'black')
           }
           {
