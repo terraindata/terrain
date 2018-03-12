@@ -76,7 +76,7 @@ export interface ImportSourceConfig
 export class Sources
 {
 
-  public async handleTemplateSourceExport(body: object, readStream: stream.Readable): Promise<string>
+  public async handleTemplateExportSource(body: object, readStream: stream.Readable): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
