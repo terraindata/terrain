@@ -127,15 +127,14 @@ class TransformCard extends TerrainComponent<Props>
     };
   }
 
-public componentDidMount()
+  public componentDidMount()
   {
-     // Only want to calculate this the first time that we open the chart 
+    // Only want to calculate this the first time that we open the chart
     if (this.state.bars.size === 0)
     {
       this.computeBars(this.props.data.input, this.state.maxDomain, !this.props.data.hasCustomDomain);
     }
   }
-
 
   public componentWillReceiveProps(nextProps: Props)
   {

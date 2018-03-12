@@ -65,11 +65,11 @@ class FadeInOut extends TerrainComponent<Props>
     {
       return (
         <div
-          style={!this.props.open ? {opacity: 0, zIndex: -10, height: 0}: {}}
+          style={!this.props.open ? { opacity: 0, zIndex: -10, height: 0 } : {}}
         >
           {this.props.children}
         </div>;
-      )  
+      )
     }
     if (this.props.open)
     {
