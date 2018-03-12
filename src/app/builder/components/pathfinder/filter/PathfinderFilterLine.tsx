@@ -562,7 +562,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       value = _.keys(units)[value];
     }
     let filterLine;
-    if (this.props.filterLine.value !== undefined &&
+    if (this.props.filterLine.value &&
       this.props.filterLine.value[key] !== undefined)
     {
       filterLine = this.props.filterLine

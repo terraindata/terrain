@@ -75,6 +75,7 @@ const TextIcon = require('./../../../../images/icon_text_12x18.svg?name=TextIcon
 const ImageIcon = require('./../../../../images/icon_profile_16x16.svg?name=ImageIcon');
 const HandleIcon = require('./../../../../images/icon_handle.svg?name=HandleIcon');
 const MarkerIcon = require('./../../../../images/icon_marker.svg?name=MarkerIcon');
+const DateIcon = require('images/icon_dateDropdown.svg?name=DateIcon');
 
 export interface Props
 {
@@ -415,8 +416,13 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
   public getAvailableFields(fields, term)
   {
     return fields.filter((field) =>
-      field.toLowerCase().indexOf(term.toLowerCase()) !== -1,
-    );
+    {
+      if (field === '_score')
+      {
+        return 'Match Quality'.toLowerCase().indexOf(term.toLowerCase()) !== -1        
+      }
+      return field.toLowerCase().indexOf(term.toLowerCase()) !== -1;
+    });
   }
 
   public render()
@@ -690,19 +696,9 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     });
   }
 
-  public changeToText()
+  public changeFormatType(type: string)
   {
-    this.changeFormat('type', 'text');
-  }
-
-  public changeToImage()
-  {
-    this.changeFormat('type', 'image');
-  }
-
-  public changeToMap()
-  {
-    this.changeFormat('type', 'map');
+    this.changeFormat('type', type);
   }
 
   public toggleRaw(event)
@@ -753,6 +749,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const { format, field } = this.props;
     const image = format && format.type === 'image';
     const map = format && format.type === 'map';
+    const date = format && format.type === 'date';
     // Check using the schema if it can be nested
     const selected: boolean = this.props.is !== null && this.props.isAvailableField;
     const mainStyle = [
@@ -767,7 +764,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 
     const activeBtnStyle = [
       backgroundColor(Colors().active),
-      fontColor(Colors().text1),
+      fontColor(Colors().fontWhite),
       borderColor(Colors().border2),
     ];
 
@@ -819,9 +816,10 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         <div className={classNames({
           'results-config-field-format': true,
           'results-config-field-format-showing': this.state.showFormat,
-          'results-config-field-format-text': !(image || map),
+          'results-config-field-format-text': !(image || map || date),
           'results-config-field-format-image': image,
           'results-config-field-format-map': map,
+          'results-config-field-format-date': date,
         })}>
           <div className='results-config-format-header'>
             <input
@@ -847,18 +845,34 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 
               <div className='results-config-text-btn'
                 key={'text-btn-' + field}
-                onClick={this.changeToText}
-                style={(image || map) ? inactiveBtnStyle : activeBtnStyle}
+                onClick={this._fn(this.changeFormatType, 'text')}
+                style={(image || date) ? inactiveBtnStyle : activeBtnStyle}
               >
-                <TextIcon /> Text
+                <TextIcon
+                  style={(image || date) ? {fill: Colors().iconColor} : {fill: Colors().fontWhite}}
+                />
+                Text
               </div>
               <div className='results-config-image-btn'
                 key={'image-btn-' + field}
-                onClick={this.changeToImage}
+                onClick={this._fn(this.changeFormatType, 'image')}
                 style={image ? activeBtnStyle : inactiveBtnStyle}
               >
-                <ImageIcon /> Image
+                <ImageIcon
+                  style={!image ? {fill: Colors().iconColor} : {fill: Colors().fontWhite}}
+                />
+                Image
                 </div>
+              <div className='results-config-date-btn'
+                key={'date-btn-' + field}
+                onClick={this._fn(this.changeFormatType, 'date')}
+                style={date ? activeBtnStyle : inactiveBtnStyle}
+              >
+                <DateIcon
+                  style={!date ? {fill: Colors().iconColor} : {fill: Colors().fontWhite}}
+                />
+                Date
+              </div>
             </div>
           }
           {

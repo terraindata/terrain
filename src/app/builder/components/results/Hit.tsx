@@ -209,8 +209,9 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
-  public renderNestedFieldHeader(field, depth, size, expandState: NestedState)
+  public renderNestedFieldHeader(field, depth, size, expandState: NestedState, maxFields: number)
   {
+    const scrollState = this.state.scrollState.get(field) || 0;
     return (
       <div>
         <div
@@ -252,7 +253,7 @@ class HitComponent extends TerrainComponent<Props> {
           expandState !== NestedState.Collapsed &&
           <div>
             {
-              this.state.scrollState.get(field) ?
+              scrollState ?
                 <div
                   onClick={this._fn(this.handleScroll, field, -1)}
                   className='hit-content-scroll-back'
@@ -264,14 +265,17 @@ class HitComponent extends TerrainComponent<Props> {
                 :
                 null
             }
-            <div
-              onClick={this._fn(this.handleScroll, field, 1)}
-              className='hit-content-scroll-forward'
-              style={getStyle('fill', Colors().iconColor)}
-              key='back-icon'
-            >
-              <CarrotIcon />
-            </div>
+            {
+              (scrollState < maxFields - 2) &&
+              <div
+                onClick={this._fn(this.handleScroll, field, 1)}
+                className='hit-content-scroll-forward'
+                style={getStyle('fill', Colors().iconColor)}
+                key='back-icon'
+              >
+                <CarrotIcon />
+              </div>
+            }
           </div>
         }
       </div>
@@ -331,6 +335,28 @@ class HitComponent extends TerrainComponent<Props> {
     );
   }
 
+  public getNumberOfFields(fields, format)
+  {
+    if (typeof fields !== 'object')
+    {
+      return 0;
+    }
+    if (fields['_source'])
+    {
+      fields = _.extend({}, fields, fields['_source']);
+    }
+    const nestedFields = getResultNestedFields(_Hit({fields: Map(fields)}), format && format.config);
+    // Get sample set of result fields to set max length
+    const allFields = getResultFields(
+      _Hit({fields: Map(fields)}),
+      format && format.config,
+      nestedFields,
+      this.props.schema,
+      this.props.builder
+    );
+    return allFields.length;
+  }
+
   public renderNestedField(field)
   {
     const config = this.props.resultsConfig;
@@ -348,6 +374,7 @@ class HitComponent extends TerrainComponent<Props> {
       allValues = allValues.slice(0, 1);
     }
     const depth = this.props.depth ? this.props.depth : 0;
+    const maxFields = this.getNumberOfFields(allValues[0], format);
     return (
       <div
         className='hit-nested-content'
@@ -360,7 +387,7 @@ class HitComponent extends TerrainComponent<Props> {
         ]}
       >
         {
-          this.renderNestedFieldHeader(field, depth, size, expandState)
+          this.renderNestedFieldHeader(field, depth, size, expandState, maxFields)
         }
         <div
           className='hit-nested-content-values'
@@ -520,7 +547,7 @@ class HitComponent extends TerrainComponent<Props> {
           {_.padStart((this.props.index + 1).toString(), 2, '0')}
         </div>
       </div>,
-      spotlight !== undefined ? 'Unspotlight' : 'Spotlight',
+      this.props.allowSpotlights ? spotlight !== undefined ? 'Unspotlight' : 'Spotlight' : '',
     );
   }
 
@@ -570,6 +597,7 @@ class HitComponent extends TerrainComponent<Props> {
       const start = this.props.firstVisibleField || 0;
       fields = fields.slice(start, start + 2);
     }
+
     const configHasFields = resultsConfigHasFields(resultsConfig);
     let bottomContent: any;
     if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
@@ -603,6 +631,7 @@ class HitComponent extends TerrainComponent<Props> {
     {
       resultsConfig = _ResultsConfig();
     }
+    
     const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
       resultsConfig.thumbnailWidth;
     const depth = this.props.depth !== undefined ? this.props.depth : 0;
@@ -766,7 +795,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
 {
   let fields: string[];
 
-  if (resultsConfigHasFields(config))
+  if (config && config.fields)
   {
     fields = config.fields.filter((field) =>
       nested.indexOf(field) === -1,
@@ -943,6 +972,18 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
             </div>
           </div>
         );
+      case 'date':
+        value = Util.formatDate(value, true);
+        if (!expanded && !bgUrlOnly)
+        {
+          return tooltip(
+            value,
+            {
+              title: value,
+              position: 'left-start',
+              arrow: false
+            });
+        }
 
       // case 'map':
       //   const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
@@ -983,16 +1024,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     value = value.toLocaleString();
   }
 
-  // check if its a date and format it nicely if so
-  if (typeof value === 'string')
-  {
-    const dateValue = Util.formatDate(value, true); // If it's not a valid date, nothing will change in value
-    if (dateValue !== value)
-    {
-      tooltipText = value;
-      value = dateValue;
-    }
-  }
   if (!tooltipText)
   {
     tooltipText = value;

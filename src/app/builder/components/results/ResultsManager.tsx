@@ -680,7 +680,14 @@ export class ResultsManager extends TerrainComponent<Props>
         });
       }
       const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
-      const fields = hitTemp.fields !== undefined ? { fields: hitTemp.fields } : {};
+      let fields = {};
+      if (hitTemp.fields !== undefined)
+      {
+        _.keys(hitTemp.fields).forEach((field) =>
+        {
+          fields[field] = hitTemp.fields[field][0];
+        });
+      }
       return _.extend({}, hitTemp._source, sort, fields, {
         _index: hitTemp._index,
         _type: hitTemp._type,
@@ -790,7 +797,6 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private handleM2QueryError(response: MidwayQueryResponse, isAllFields?: boolean)
   {
-    console.log(response);
     this.updateM2ErrorState(response.errors, isAllFields);
   }
 
