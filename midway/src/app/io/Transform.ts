@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
+import { KeyPath } from '../../../../shared/util/KeyPath';
 
 export function mergeDocument(doc: object): object
 {
@@ -92,11 +93,7 @@ export function applyTransforms(obj: object, transforms: object[]): object
         {
           throw new Error('Rename transformation must supply colName and newName arguments.');
         }
-        if (oldName !== newName)
-        {
-          obj[newName] = obj[oldName];
-          delete obj[oldName];
-        }
+        e.setOutputKeyPath(e.addField(KeyPath([oldName])), KeyPath([newName]));
         break;
       case 'extract':
         const oldColName: string | undefined = transform['colName'];
