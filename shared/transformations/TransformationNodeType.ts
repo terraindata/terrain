@@ -51,8 +51,6 @@ enum TransformationNodeType
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
   PlusNode = 'PlusNode',
-  PrependNode = 'PrependNode',
-  AppendNode = 'AppendNode',
   UppercaseNode = 'UppercaseNode',
   SubstringNode = 'SubstringNode',
 }
@@ -75,8 +73,6 @@ interface TransformationOptionTypes
   FilterNode: any;
   DuplicateNode: any;
   PlusNode: any;
-  PrependNode: any;
-  AppendNode: any;
   UppercaseNode: {
   };
   SubstringNode: {

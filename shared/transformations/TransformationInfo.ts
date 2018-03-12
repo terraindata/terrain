@@ -44,12 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
 import PlusTransformationNode from './nodes/PlusTransformationNode';
-import PrependTransformationNode from './nodes/PrependTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
@@ -145,32 +143,6 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitPlusNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.PrependNode]:
-      {
-        humanName: 'Prepend',
-        editable: true,
-        creatable: true,
-        description: `Add text before this field's value`,
-        type: PrependTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitPrependNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.AppendNode]:
-      {
-        humanName: 'Append',
-        editable: true,
-        creatable: true,
-        description: `Add text after this field's value`,
-        type: AppendTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitAppendNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.UppercaseNode]:
       {

@@ -45,12 +45,10 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import * as winston from 'winston';
-import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
 import PlusTransformationNode from './nodes/PlusTransformationNode';
-import PrependTransformationNode from './nodes/PrependTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
@@ -62,11 +60,6 @@ import TransformationVisitResult from './TransformationVisitResult';
 export default abstract class TransformationNodeVisitor
 {
   public abstract visitDefault(node: TransformationNode, doc: object, options: object): TransformationVisitResult;
-
-  public visitAppendNode(node: AppendTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
 
   public visitDuplicateNode(node: DuplicateTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
@@ -84,11 +77,6 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitPlusNode(node: PlusTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitPrependNode(node: PrependTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
