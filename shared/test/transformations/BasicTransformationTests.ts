@@ -45,8 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { List } from 'immutable';
-import UppercaseTransformationNode from 'shared/transformations/nodes/UppercaseTransformationNode';
-import TransformationNode from '../../transformations/nodes/TransformationNode';
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationInfo } from '../../transformations/TransformationInfo';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
@@ -73,7 +71,17 @@ const doc2 = {
 const doc3 = {
   name: 'Bob',
   arr: ['sled', [{ a: 'dog' }, { a: 'fren', b: 'doggo' }]],
+  // arr2: [{foo: {bar: {cat: 'a'}}}],
+  // arr2: [[{foo: 'a', bar: 'b'}], [{foo: 'c'}]],
   hardarr: [['a'], ['b', ['c']]],
+};
+
+const doc4 = {
+  arr: ['a', 'b'],
+};
+
+const doc5 = {
+  arr: ['a', 'b', 'c', 'd'],
 };
 
 test('add fields manually', () =>
@@ -111,12 +119,12 @@ test('serialize to JSON', () =>
         {
           v: '0',
           value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
-            (0, List<number>([0]), {}, TransformationNodeType.UppercaseNode),
+            (0, List<KeyPath>([KeyPath(['name'])]), {}, TransformationNodeType.UppercaseNode),
         },
         {
           v: '1',
           value: new (TransformationInfo.getType(TransformationNodeType.UppercaseNode))
-            (1, List<number>([3]), {}, TransformationNodeType.UppercaseNode),
+            (1, List<KeyPath>([KeyPath(['meta', 'school'])]), {}, TransformationNodeType.UppercaseNode),
         },
       ],
       edges: [],
@@ -255,6 +263,27 @@ test('rename a field (an object with subkeys)', () =>
   expect(e.transform(doc2)['sport']).toBe('bobsled');
 });
 
+test('rename a field (deeply nested property in array)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc3);
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr', '1', '*', 'a'])), KeyPath(['arr', '1', '*', 'cool']));
+  expect(e.transform(doc3)['arr'][1][0]['a']).toBe(undefined);
+  expect(e.transform(doc3)['arr'][1][0]['cool']).toBe('dog');
+  expect(e.transform(doc3)['arr'][1][1]['a']).toBe(undefined);
+  expect(e.transform(doc3)['arr'][1][1]['cool']).toBe('fren');
+});
+
+test('proper wildcard behavior in rename stage', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc4);
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  expect(e.transform(doc5)).toEqual(
+    {
+      car: ['a', 'b', 'c', 'd'],
+    },
+  );
+});
+
 test('transform of deeply nested value', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc3);
@@ -319,6 +348,18 @@ test('nested transform with wildcard', () =>
           ],
         ],
       ],
+    },
+  );
+});
+
+test('proper wildcard behavior across multiple docs', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc4);
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
+  expect(e.transform(doc5)).toEqual(
+    {
+      car: ['A', 'B', 'C', 'D'],
     },
   );
 });

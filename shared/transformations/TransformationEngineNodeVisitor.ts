@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import * as winston from 'winston';
+import { KeyPath } from '../util/KeyPath';
+import * as yadeep from '../util/yadeep';
 import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
@@ -150,9 +152,10 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   public visitSubstringNode(node: SubstringTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
-    for (const fieldID of node.fieldIDs.toJS())
+    node.fields.forEach((field) =>
     {
-      if (typeof doc[fieldID] !== 'string')
+      const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
       {
         return {
           errors: [
@@ -183,8 +186,8 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         } as TransformationVisitResult;
       }
       // Currently assumes a single from and length for all fieldIDs
-      doc[fieldID] = doc[fieldID].substr(opts['from'], opts['length']);
-    }
+      yadeep.set(doc, field, el.substr(opts['from'], opts['length']), { create: true });
+    });
 
     return {
       document: doc,
@@ -193,9 +196,26 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    for (const fieldID of node.fieldIDs.toJS())
+    node.fields.forEach((field) =>
     {
-      if (typeof doc[fieldID] !== 'string')
+      const el: any = yadeep.get(doc, field);
+      if (el.constructor === Array)
+      {
+        for (let i: number = 0; i < Object.keys(el).length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, yadeep.get(doc, kpi).toUpperCase());
+        }
+      }
+      else if (typeof el !== 'string')
       {
         return {
           errors: [
@@ -205,8 +225,11 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           ],
         } as TransformationVisitResult;
       }
-      doc[fieldID] = doc[fieldID].toUpperCase();
-    }
+      else
+      {
+        yadeep.set(doc, field, el.toUpperCase());
+      }
+    });
 
     return {
       document: doc,
