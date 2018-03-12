@@ -229,7 +229,6 @@
         text-overflow: ellipsis;
         text-transform: uppercase;
         padding: 4px 0;
-        color: @light-black;
         &.result-field-name-header {
           position: absolute;
           top: 19px;
@@ -474,6 +473,12 @@
         width: 0px;  /* remove scrollbar space */
         background: transparent;  /* optional: just make scrollbar invisible */
     }
+  .result .result-name .result-name-inner .result-name-label {
+    max-width: 167;
+    font-size: 12px;
+  }
+  
+
   .hit-content-scroll-forward, .hit-content-scroll-back {
     position: absolute;
     top: 22px;
@@ -514,7 +519,6 @@
     .hit-nested-column-names {
       height: 27px;
       font-size: 10px;
-      color: @light-black;
       span {
         top: 20px;
         position: absolute;

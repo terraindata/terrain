@@ -405,7 +405,7 @@ class Tabs extends TerrainComponent<TabsProps> {
     const tabsLayout =
       {
         compact: true,
-        columns: tabs ? tabs.map((tab, index) => (
+        columns: tabs ? tabs.slice(-4).map((tab, index) => (
           {
             key: tab.id,
             content:

@@ -239,7 +239,10 @@ class HitComponent extends TerrainComponent<Props> {
           >
             {field} ({size})
           </div>
-          <div className='hit-nested-column-names'>
+          <div
+            className='hit-nested-column-names'
+            style={fontColor(Colors().fontColorLightest)}
+          >
             <span className='column-name-image'>Image</span>
             <span className='column-name-number'>No.</span>
             <span className='column-name-name'>Name</span>
@@ -417,10 +420,13 @@ class HitComponent extends TerrainComponent<Props> {
               'result-field-name': true,
               'result-field-name-header': hideFieldNames && index === 0,
             })}
-            style={hideFieldNames && index !== 0 ? { opacity: 0 } : {}} // Keep them there to make sizing work
+            style={hideFieldNames && index !== 0 ? 
+              { opacity: 0, color: Colors().fontColorLightest } : 
+              {color: Colors().fontColorLightest}
+            } // Keep them there to make sizing work
           >
             {
-              field
+              field === '_score' ? 'Match quality' : field
             }
           </div>
         }

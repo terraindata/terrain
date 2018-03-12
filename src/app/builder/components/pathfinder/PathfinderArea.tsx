@@ -155,6 +155,14 @@ class PathfinderArea extends TerrainComponent<Props>
     return linearVerticalStrength(box, point);
   }
 
+  public handleAddScript(script)
+  {
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
+      this.props.path.more.scripts.push(script)
+    );
+  }
+
   public render()
   {
     const { path, toSkip } = this.props;
@@ -185,6 +193,7 @@ class PathfinderArea extends TerrainComponent<Props>
               keyPath={this._ikeyPath(keyPath, 'filterGroup')}
               onStepChange={this.incrementStep}
               toSkip={toSkip}
+              onAddScript={this.handleAddScript}
             />
             <PathfinderFilterSection
               isSoftFilter={true}

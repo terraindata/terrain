@@ -113,6 +113,7 @@ class ScoreBar extends TerrainComponent<Props>
           max={max || 100}
           color={color}
           height={height || (altStyle && 22) || 34}
+          lengthOffset={altStyle ? 12 : 34}
           noLeftLine={altStyle}
           rounded={altStyle}
           noPadding={altStyle}

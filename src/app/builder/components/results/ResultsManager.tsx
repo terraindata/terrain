@@ -658,7 +658,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       let hitTemp = _.cloneDeep(hit);
       let rootKeys: string[] = [];
-      rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '');
+      rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
       if (rootKeys.length > 0) // there were group join objects
       {
         const duplicateRootKeys: string[] = [];
@@ -680,7 +680,8 @@ export class ResultsManager extends TerrainComponent<Props>
         });
       }
       const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
-      return _.extend({}, hitTemp._source, sort, {
+      const fields = hitTemp.fields !== undefined ? {fields: hitTemp.fields} : {};
+      return _.extend({}, hitTemp._source, sort, fields, {
         _index: hitTemp._index,
         _type: hitTemp._type,
         _score: hitTemp._score,

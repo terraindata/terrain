@@ -50,13 +50,14 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Colors, getStyle } from '../../../../colors/Colors';
+import { backgroundColor, borderColor, Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
+import TQLEditor from 'app/tql/components/TQLEditor';
 import Util from 'app/util/Util';
 import ExpandIcon from 'common/components/ExpandIcon';
 import RouteSelector from 'common/components/RouteSelector';
@@ -71,7 +72,6 @@ import DragAndDrop, { DraggableItem } from './../../../../common/components/Drag
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
 import './PathfinderMoreStyle.less';
-import TQLEditor from 'app/tql/components/TQLEditor';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
@@ -401,6 +401,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               <div
                 className='pf-more-nested'
                 key={i}
+                style={_.extend({}, backgroundColor(Colors().blockBg, Colors().blockOutline))}
               >
                 <div className='pf-more-nested-reference'>
                   <ExpandIcon
@@ -471,7 +472,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     console.log('change expanded', keys, value);
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, ['scripts'].concat(keys)),
-      value
+      value,
     );
   }
 
@@ -479,7 +480,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, 'scripts', i, 'params'),
-      this.props.more.scripts.get(i).params.push(_Param({name: '', value: ''}))
+      this.props.more.scripts.get(i).params.push(_Param({name: '', value: ''})),
     );
   }
 
@@ -487,7 +488,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, 'scripts'),
-      this.props.more.scripts.splice(i, 1)
+      this.props.more.scripts.splice(i, 1),
     );
   }
 
@@ -495,14 +496,14 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     this.props.builderActions.changePath(
       this._ikeyPath(this.props.keyPath, 'scripts', i, 'params'),
-      this.props.more.scripts.get(i).params.splice(j, 1)
+      this.props.more.scripts.get(i).params.splice(j, 1),
     );
   }
-
 
   public renderScripts(scripts)
   {
     const { canEdit } = this.props.pathfinderContext;
+    const style = _.extend({}, backgroundColor(Colors().blockBg, Colors().blockOutline));
     return (
       <div className='pf-more-scripts-wrapper'>
         {
@@ -510,6 +511,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             <div
               className='pf-more-script'
               key={i}
+              style={style}
             >
               <div className='pf-more-script-name-wrapper'>
                 <ExpandIcon
@@ -534,7 +536,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                   Parameters
                 </div>
                 {
-                  script.params.map((param, j) => 
+                  script.params.map((param, j) =>
                     <div
                       className='pf-more-script-param-wrapper'
                       key={j}
@@ -559,7 +561,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         onClick={this._fn(this.deleteParam, i, j)}
                         className='close pf-more-delete-param'
                       />
-                  </div>
+                  </div>,
                   )
                 }
                 <PathfinderCreateLine
@@ -574,6 +576,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                   onChange={this._fn(this.handleScriptValueChange, [i, 'script'])}
                   placeholder={'Enter a script here'}
                   className='pf-more-script-script'
+                  style={style}
                 />
               </FadeInOut>
             </div>,
@@ -651,7 +654,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             // />
           }
           {
-            this.renderScripts(this.props.more.scripts)
+            this.renderScripts(this.props.more.scripts.filter((script) => script.userAdded))
           }
             <div>
               {
@@ -666,11 +669,11 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                   {
                     title: PathfinderText.scriptExplanation,
                     arrow: false,
-                  }
+                  },
                 )
               }
             </div>
-          
+
         </FadeInOut>
         <div>
           {this.renderNestedPaths()}
@@ -686,8 +689,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 />,
                 {
                   title: PathfinderText.nestedExplanation,
-                  arrow: false 
-                }
+                  arrow: false,
+                },
               ) : null
           }
           </div>

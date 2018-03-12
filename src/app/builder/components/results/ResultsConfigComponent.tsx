@@ -799,7 +799,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
           </span>
           <span className='results-config-text flex-grow'>
             {
-              field
+              field === '_score' ? 'Match Quality' : field
             }
           </span>
           {

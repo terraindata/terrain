@@ -106,7 +106,7 @@ export interface Props
   relevantData?: any; // If this data changes, have to recalculate option sets
   onChange: (key: number, value: any) => void;
   canEdit: boolean;
-
+  footer?: El;
   forceOpen?: boolean; // force it to be open no matter whwat
   defaultOpen?: boolean; // default to open when the component mounts (but don't force open)
   large?: boolean;
@@ -368,6 +368,15 @@ export class RouteSelector extends TerrainComponent<Props>
               state.optionSets.map(this.renderOptionSet)
             }
           </div>
+          {
+            props.footer &&
+            <div
+              className='routeselector-picker-footer'
+              style={borderColor(Colors().blockOutline)}
+            >
+              {props.footer}
+            </div>
+          }
         </div>
       </DrawerAnimation>
     );

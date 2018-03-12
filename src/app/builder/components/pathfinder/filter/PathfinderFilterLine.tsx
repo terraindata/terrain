@@ -66,10 +66,13 @@ import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
+import PahfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import CheckBox from 'app/common/components/CheckBox';
+import MapUtil from 'app/util/MapUtil';
 import
 {
-  _DistanceValue, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
-  Source,
+  _DistanceValue, _Param, _Script, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
+  Script, Source,
 } from '../PathfinderTypes';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
@@ -83,9 +86,10 @@ export interface Props
   comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
   isSoftFilter?: boolean; // does this section apply to soft filters?
   fieldOptionSet: RouteSelectorOptionSet;
+  onAddScript?: (script: Script) => void;
+
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
-  // so that we can make the according UI adjustments
 }
 
 const pieceStyle = {
@@ -112,6 +116,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     this.setState({
       boost: nextProps.filterLine && nextProps.filterLine.boost,
     });
+    if (nextProps.filterLine &&
+      nextProps.filterLine.fieldType === FieldType.Geopoint &&
+      nextProps.filterLine.comparison === 'located' &&
+      nextProps.filterLine.value !== this.props.filterLine.value
+    )
+    {
+      // UPDATE SCRIPT
+    }
   }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
@@ -187,6 +199,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         canDelete={true}
         onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
         hideLine={true}
+        footer={this.renderFooter()}
       />
     );
   }
@@ -483,7 +496,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                     openDown={true}
                   />
                 </div>
-
                 <MapComponent
                   geocoder='google'
                   inputValue={props.value && props.value.address || ''}
@@ -510,6 +522,71 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       default:
         return (() => <div></div>); // Nested, can only handle exists, so there is no value
     }
+  }
+
+  private handleAddScriptChange()
+  {
+    const { filterLine } = this.props;
+    // Add or remove the script
+    if (!filterLine.addScript)
+    {
+      // Pull out the parameters
+      let lat;
+      let lon;
+      if ((filterLine.value as any).location)
+      {
+        const point = MapUtil.getCoordinatesFromGeopoint((filterLine.value as any).location)
+        lat = point[0];
+        lon = point[1];
+      }
+      else if((filterLine.value as any).address)
+      {
+        lat = (filterLine.value as any).address + '.lat';
+        lon = (filterLine.value as any).address + '.lon';
+      }
+      const newScript = _Script({
+        name: 'distance',
+        params: [
+          {
+            name: 'lat',
+            value: lat,
+          },
+          {
+            name: 'lon',
+            value: lon
+          }
+        ],
+        script: `Math.round(100 * doc['${this.props.filterLine.field}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
+        userAdded: true,
+      });
+      if (this.props.onAddScript)
+      {
+        this.props.onAddScript(newScript);
+      }
+    }
+    this.props.onChange(this.props.keyPath, filterLine.set('addScript', !filterLine.addScript));
+  }
+
+  private renderFooter()
+  {
+    const { filterLine } = this.props;
+    if (filterLine && filterLine.field && filterLine.comparison && filterLine.fieldType)
+    {
+      if (filterLine.fieldType === FieldType.Geopoint && filterLine.comparison === 'located')
+      {
+        return (
+          <div className='pf-filter-line-distance-footer'>
+            <CheckBox
+              checked={filterLine.addScript}
+              onChange={this.handleAddScriptChange}
+              disabled={!this.props.pathfinderContext.canEdit}
+              label={PahfinderText.includeDistanceExplanation}
+            />
+          </div>
+        );
+      }
+    }
+    return null;
   }
 
   private handleMapValueChange(key, value)

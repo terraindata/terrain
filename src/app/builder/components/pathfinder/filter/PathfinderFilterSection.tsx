@@ -78,7 +78,7 @@ export interface Props
   onStepChange?: (oldStep: PathfinderSteps) => void;
   toSkip?: number;
   isSoftFilter?: boolean; // does this section apply to soft filters?
-
+  onAddScript?: (script) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
 }
@@ -238,6 +238,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         comesBeforeAGroup={successor && this.isGroup(successor)}
         isSoftFilter={isSoftFilter}
         fieldOptionSet={this.state.fieldOptionSet}
+        onAddScript={this.props.onAddScript}
       />
     );
   }

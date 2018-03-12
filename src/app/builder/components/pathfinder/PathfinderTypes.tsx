@@ -359,7 +359,9 @@ class ScriptC extends BaseClass
   public name: string = '';
   public params: List<Param> = List();
   public script: string = '';
-  public expanded: boolean. = true;
+  public expanded: boolean = true;
+  // some scripts will be automatically generated and shouldnt should up in score section
+  public userAdded: boolean = true;
 }
 export type Script = ScriptC & IRecord<ScriptC>;
 export const _Script = (config?: { [key: string]: any }) =>
@@ -372,7 +374,7 @@ export const _Script = (config?: { [key: string]: any }) =>
 class ParamC extends BaseClass
 {
   public name: string = '';
-  public value: string = '';
+  public value: string | number = '';
 }
 export type Param = ParamC & IRecord<ParamC>;
 export const _Param = (config?: { [key: string]: any }) =>
@@ -387,7 +389,7 @@ class FilterLineC extends LineC
   public value: string | number | DistanceValue = null;
   public valueType: ValueType = null;
   public boost: number = 1;
-
+  public addScript: boolean = false;
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
 }
@@ -714,7 +716,7 @@ class ElasticDataSourceC extends DataSource
       const defaultOptions = List(metaFields.map((option) =>
       {
         return _ChoiceOption({
-          displayName: option,
+          displayName: option === '_score' ? 'Match Quality' : option,
           value: option,
           meta: {
             fieldType: ['_score', '_size'].indexOf(option) !== -1 ? FieldType.Numerical : FieldType.Text,

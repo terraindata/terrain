@@ -75,6 +75,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     aggs: Map({}),
     from: 0,
     size: MAX_COUNT,
+    _source: true,
     track_scores: true,
   });
 
@@ -396,6 +397,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       nested: {
         path,
         score_mode: 'avg',
+        ignore_unmapped: true,
         query: {
           bool: {
             [boolQueryType]: innerLine,
@@ -695,7 +697,6 @@ function parseNested(more: More, nested: List<Path>, inputs)
   return groupJoins;
 }
 
-
 function parseScripts(scripts: List<Script>)
 {
   let scriptObj = Map({});
@@ -704,15 +705,13 @@ function parseScripts(scripts: List<Script>)
     script.params.forEach((param) => {
       params = params.set(param.name, param.value);
     });
-    console.log(params);
     const s = Map({
       script: {
         params: params.toJS(),
-        inline: script.script
-      }
+        inline: script.script,
+      },
     });
     scriptObj = scriptObj.set(script.name, s);
   });
-  console.log(scriptObj);
   return scriptObj;
 }

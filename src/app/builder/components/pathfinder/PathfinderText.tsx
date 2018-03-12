@@ -62,7 +62,7 @@ export const PathfinderText = {
   softFilterAdd: 'Factor',
   softFilterSectionTitle: 'Should Match',
   softFilterSectionSubtitle: 'When conditions are met, results are rewarded. When conditions are not met, there is no impact.',
-
+  includeDistanceExplanation: 'Include distance from each result to this location as a field',
   nestedFilterIntro: '',
   // filterGroupPost: 'of the following:',
   // createFilterLine: 'criteria',
