@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
-import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
+import ESInterpreter, { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
 import ESParser from '../../../../shared/database/elastic/parser/ESParser';
@@ -307,7 +307,7 @@ export default class ESCardParser extends ESParser
       case ESClauseType.ESIndexClause:
         return this.parseCardValue(block, blockPath);
       case ESClauseType.ESMapClause:
-        return this.parseESStructureClause(block, blockPath);
+        return this.parseESMapClause(block, blockPath);
       case ESClauseType.ESNullClause:
         return this.parseCardValue(block, blockPath);
       case ESClauseType.ESNumberClause:
@@ -320,8 +320,6 @@ export default class ESCardParser extends ESParser
         return this.parseESReferenceClause(block, blockPath);
       case ESClauseType.ESStringClause:
         return this.parseCardValue(block, blockPath);
-      case ESClauseType.ESScriptClause:
-        return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESStructureClause:
         return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESTypeClause:
@@ -329,7 +327,7 @@ export default class ESCardParser extends ESParser
       case ESClauseType.ESScriptClause:
         return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESWildcardStructureClause:
-        return this.parseESStructureClause(block, blockPath);
+        return this.parseESWildcardClause(block, blockPath);
       default:
         return this.parseESClause(block, blockPath);
     }
@@ -386,6 +384,79 @@ export default class ESCardParser extends ESParser
     return valueInfo;
   }
 
+  private parseESWildcardClause(block, blockPath)
+  {
+    const valueInfo = new ESValueInfo();
+    valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
+    valueInfo.cardPath = blockPath;
+    const theValue = {};
+    valueInfo.jsonType = ESJSONType.object;
+    valueInfo.value = theValue;
+    const childrenCard = blockPath.push('cards');
+    block['cards'].map(
+      (card, key) =>
+      {
+        const keyName = card['key'];
+        const childName = new ESJSONParser(JSON.stringify(keyName)).getValueInfo();
+        childName.card = card;
+        childName.cardPath = childrenCard.push(key);
+
+        if (block.static.clause.structure.hasOwnProperty(childName))
+        {
+          childName.clause = ESInterpreterDefaultConfig.getClause('string');
+        } else
+        {
+          childName.clause = ESInterpreterDefaultConfig.getClause(block.static.clause.nameType);
+        }
+        const childValue = this.parseCard(card, childrenCard.push(key));
+        if (childValue !== null)
+        {
+          const propertyInfo = new ESPropertyInfo(childName, childValue);
+          valueInfo.addObjectChild(keyName, propertyInfo);
+          theValue[keyName] = childValue.value;
+        } else
+        {
+          // console.log('card ' + keyName + ' has value null');
+        }
+      },
+    );
+    return valueInfo;
+  }
+
+  private parseESMapClause(block, blockPath)
+  {
+    const valueInfo = new ESValueInfo();
+    valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
+    valueInfo.cardPath = blockPath;
+    const theValue = {};
+    valueInfo.jsonType = ESJSONType.object;
+    valueInfo.value = theValue;
+    const childrenCard = blockPath.push('cards');
+    block['cards'].map(
+      (card, key) =>
+      {
+        const keyName = card['key'];
+        const childName = new ESJSONParser(JSON.stringify(keyName)).getValueInfo();
+        childName.card = card;
+        childName.cardPath = childrenCard.push(key);
+        childName.clause = ESInterpreterDefaultConfig.getClause(block.static.clause.nameType);
+        const childValue = this.parseCard(card, childrenCard.push(key));
+        if (childValue !== null)
+        {
+          const propertyInfo = new ESPropertyInfo(childName, childValue);
+          valueInfo.addObjectChild(keyName, propertyInfo);
+          theValue[keyName] = childValue.value;
+        } else
+        {
+          // console.log('card ' + keyName + ' has value null');
+        }
+      },
+    );
+    return valueInfo;
+  }
+
   private parseESStructureClause(block, blockPath)
   {
     const valueInfo = new ESValueInfo();
@@ -403,6 +474,7 @@ export default class ESCardParser extends ESParser
         const childName = new ESJSONParser(JSON.stringify(keyName)).getValueInfo();
         childName.card = card;
         childName.cardPath = childrenCard.push(key);
+        childName.clause = ESInterpreterDefaultConfig.getClause('string');
         const childValue = this.parseCard(card, childrenCard.push(key));
         if (childValue !== null)
         {

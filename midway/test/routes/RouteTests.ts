@@ -1780,10 +1780,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2018, 1, 16, 7, 24, 4),
-        end: new Date(2018, 1, 16, 7, 36, 4),
+        start: new Date(2018, 2, 16, 7, 24, 4),
+        end: new Date(2018, 2, 16, 7, 36, 4),
         eventname: 'impression',
-        algorithmid: 'terrain_5',
+        algorithmid: 'bestMovies3',
         agg: 'select',
       })
       .expect(200)
@@ -1795,7 +1795,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(3);
+        expect(respData['bestMovies3'].length).toEqual(4);
       });
   });
 
@@ -1807,10 +1807,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2018, 1, 16, 7, 24, 4),
-        end: new Date(2018, 1, 16, 7, 36, 4),
+        start: new Date(2018, 2, 16, 7, 24, 4),
+        end: new Date(2018, 2, 16, 7, 36, 4),
         eventname: 'impression',
-        algorithmid: 'terrain_5',
+        algorithmid: 'bestMovies3',
         agg: 'histogram',
         interval: 'minute',
       })
@@ -1823,7 +1823,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(5);
+        expect(respData['bestMovies3'].length).toEqual(8);
       });
   });
 
@@ -1835,10 +1835,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2018, 1, 31, 7, 24, 4),
-        end: new Date(2018, 1, 31, 10, 24, 4),
+        start: new Date(2018, 3, 3, 7, 24, 4),
+        end: new Date(2018, 3, 3, 10, 24, 4),
         eventname: 'click,impression',
-        algorithmid: 'terrain_5',
+        algorithmid: 'bestMovies3',
         agg: 'rate',
         interval: 'hour',
       })
@@ -1851,7 +1851,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(4);
+        expect(respData['bestMovies3'].length).toEqual(4);
       });
   });
 
