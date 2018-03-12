@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as _ from 'lodash';
+import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
 
 export function mergeDocument(doc: object): object
 {
@@ -78,6 +79,7 @@ export function mergeDocument(doc: object): object
 
 export function applyTransforms(obj: object, transforms: object[]): object
 {
+  const e: TransformationEngine = new TransformationEngine();
   let colName: string | undefined;
   for (const transform of transforms)
   {

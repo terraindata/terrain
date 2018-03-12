@@ -86,7 +86,6 @@ interface TransformationOptionTypes
   PrependNode: any;
   AppendNode: any;
   UppercaseNode: {
-
   };
   SubstringNode: {
     from: number;

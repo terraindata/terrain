@@ -119,8 +119,7 @@ export class Export
       }
     }
 
-    const mapping: object = exportConfig.columnTypes;
-    if (mapping === undefined)
+    if (exportConfig.columnTypes === undefined)
     {
       throw new Error('Must provide export template column types.');
     }
@@ -151,27 +150,6 @@ export class Export
         throw new Error('Empty query provided.');
       }
 
-      // get list of export column names
-      const columnNames: string[] = Object.keys(mapping);
-      if (exportConfig.rank === true && columnNames.indexOf('TERRAINRANK') === -1)
-      {
-        columnNames.push('TERRAINRANK');
-      }
-
-      const originalMapping: object = {};
-      // generate original mapping if there were any renames
-      const allNames = Object.keys(mapping);
-      allNames.forEach((value, i) =>
-      {
-        originalMapping[value] = value;
-      });
-
-      const renameTransformations: object[] = exportConfig.transformations.filter((transformation) => transformation['name'] === 'rename');
-      renameTransformations.forEach((transformation) =>
-      {
-        originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
-      });
-
       // TODO add transformation check for addcolumn and update mapping accordingly
       const qh: QueryHandler = database.getQueryHandler();
       const payload = {
@@ -190,19 +168,8 @@ export class Export
 
       try
       {
-        const extractTransformations = exportConfig.transformations.filter((transformation) => transformation['name'] === 'extract');
-        exportConfig.transformations = exportConfig.transformations.filter((transformation) => transformation['name'] !== 'extract');
-
         winston.info('Beginning export transformations.');
-        const exportTransformConfig = {
-          extractTransformations,
-          exportConfig,
-          fieldArrayDepths: {},
-          id: 1,
-          mapping: originalMapping,
-        };
-
-        const documentTransform: ExportTransform = new ExportTransform(this, exportTransformConfig);
+        const documentTransform: ExportTransform = new ExportTransform(this, exportConfig);
         let exportTransform: AExportTransform;
         switch (exportConfig.filetype)
         {
@@ -210,7 +177,7 @@ export class Export
             exportTransform = new JSONExportTransform();
             break;
           case 'csv':
-            exportTransform = new CSVExportTransform(columnNames);
+            exportTransform = new CSVExportTransform(Object.keys(exportConfig.columnTypes));
             break;
           default:
             throw new Error('File type must be either CSV or JSON.');
@@ -225,48 +192,13 @@ export class Export
     });
   }
 
-  public _postProcessDoc(doc: object, cfg: any): object
+  public _postProcessDoc(doc: object, exportConfig: ExportConfig): object
   {
     // merge top-level fields with _source if necessary
     doc = Transform.mergeDocument(doc);
 
     // verify schema mapping with documents and fix documents accordingly
-    doc = this._checkDocumentAgainstMapping(doc['_source'], cfg.mapping);
-    for (const field of Object.keys(doc))
-    {
-      if (doc[field] !== null && doc[field] !== undefined)
-      {
-        if (cfg.fieldArrayDepths[field] !== undefined)
-        {
-          cfg.fieldArrayDepths[field] = Number(cfg.fieldArrayDepths[field]) + this._getArrayDepth(doc[field]);
-          if (cfg.fieldArrayDepths[field] > 1)
-          {
-            throw new Error('Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.');
-          }
-        }
-        else
-        {
-          cfg.fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
-        }
-
-        if (Array.isArray(doc[field]) && cfg.exportConfig.filetype === 'csv')
-        {
-          doc[field] = this._convertArrayToCSVArray(doc[field]);
-        }
-      }
-    }
-
-    doc = this._transformAndCheck(doc, cfg.exportConfig, false);
-    if (cfg.exportConfig.rank === true)
-    {
-      if (doc['TERRAINRANK'] !== undefined)
-      {
-        throw new Error('Conflicting field: TERRAINRANK.');
-      }
-      doc['TERRAINRANK'] = cfg.id;
-      cfg.id++;
-    }
-    return doc;
+    return this._transformAndCheck(doc, exportConfig, false);
   }
 
   private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
@@ -318,27 +250,6 @@ export class Export
       return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
     }
     return typeObj['type'];
-  }
-
-  private _checkDocumentAgainstMapping(document: object, mapping: object): object
-  {
-    const newDocument: object = document;
-    const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
-    for (const field of fieldsInMappingNotInDocument)
-    {
-      newDocument[field] = null;
-      // TODO: Case 740
-      // if (fields[field]['type'] === 'text')
-      // {
-      //   newDocument[field] = '';
-      // }
-    }
-    const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
-    for (const field of fieldsInDocumentNotMapping)
-    {
-      delete newDocument[field];
-    }
-    return newDocument;
   }
 
   /* checks whether obj has the fields and types specified by nameToType
@@ -396,11 +307,6 @@ export class Export
         }
       }
     }
-  }
-
-  private _convertArrayToCSVArray(arr: any[]): string
-  {
-    return JSON.stringify(arr);
   }
 
   /* assumes arrays are of uniform depth */
@@ -532,6 +438,7 @@ export class Export
     {
       throw new Error('Failed to apply transforms: ' + String(e));
     }
+
     // only include the specified columns
     // NOTE: unclear if faster to copy everything over or delete the unused ones
     const trimmedDoc: object = {};

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import Export from '../Export';
+import { Export, ExportConfig } from '../Export';
 import ADocumentTransform from './ADocumentTransform';
 
 /**
@@ -53,12 +53,29 @@ import ADocumentTransform from './ADocumentTransform';
 export default class ExportTransform extends ADocumentTransform
 {
   private exportt: Export;
-  private configuration: object;
+  private configuration: ExportConfig;
+  private rank: number;
+  private mapping: object;
 
-  constructor(exportt: Export, configuration: object)
+  constructor(exportt: Export, configuration: ExportConfig)
   {
     super();
+    this.rank = 1;
     this.exportt = exportt;
+
+    if (configuration.rank === true)
+    {
+      configuration.columnTypes['TERRAINRANK'] = null;
+    }
+
+    configuration.transformations.forEach((transformation) =>
+    {
+      if (transformation['name'] === 'rename')
+      {
+        configuration.columnTypes[transformation['colName']] = configuration.columnTypes[transformation['args']['newName']];
+      }
+    });
+
     this.configuration = configuration;
   }
 
@@ -69,7 +86,34 @@ export default class ExportTransform extends ADocumentTransform
       return input;
     }
 
-    const hits = input['hits'].hits;
-    return hits.map((hit) => this.exportt._postProcessDoc(hit, this.configuration));
+    return input['hits'].hits.map((hit) => this.process(hit['_source']));
+  }
+
+  private process(doc: object): object
+  {
+    if (this.configuration.rank && doc['TERRAINRANK'] !== undefined)
+    {
+      doc['TERRAINRANK'] = this.rank++;
+    }
+
+    // fields in document not in mapping
+    for (const field of Object.keys(doc))
+    {
+      if (this.configuration.columnTypes[field] === undefined)
+      {
+        delete doc[field];
+      }
+    }
+
+    // fields in mapping not in document
+    for (const field of Object.keys(this.configuration.columnTypes))
+    {
+      if (doc[field] === undefined)
+      {
+        doc[field] = null;
+      }
+    }
+
+    return this.exportt._postProcessDoc(doc, this.configuration);
   }
 }
