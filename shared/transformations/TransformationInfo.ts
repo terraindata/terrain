@@ -43,25 +43,25 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
-import AppendTransformationNode from 'shared/transformations/nodes/AppendTransformationNode';
-import DuplicateTransformationNode from 'shared/transformations/nodes/DuplicateTransformationNode';
-import FilterTransformationNode from 'shared/transformations/nodes/FilterTransformationNode';
-import GetTransformationNode from 'shared/transformations/nodes/GetTransformationNode';
-import JoinTransformationNode from 'shared/transformations/nodes/JoinTransformationNode';
-import LoadTransformationNode from 'shared/transformations/nodes/LoadTransformationNode';
-import PlusTransformationNode from 'shared/transformations/nodes/PlusTransformationNode';
-import PrependTransformationNode from 'shared/transformations/nodes/PrependTransformationNode';
-import PutTransformationNode from 'shared/transformations/nodes/PutTransformationNode';
-import SplitTransformationNode from 'shared/transformations/nodes/SplitTransformationNode';
-import StoreTransformationNode from 'shared/transformations/nodes/StoreTransformationNode';
-import SubstringTransformationNode from 'shared/transformations/nodes/SubstringTransformationNode';
-import TransformationNode from 'shared/transformations/nodes/TransformationNode';
-import UppercaseTransformationNode from 'shared/transformations/nodes/UppercaseTransformationNode';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor from 'shared/transformations/TransformationNodeVisitor';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+
+import AppendTransformationNode from './nodes/AppendTransformationNode';
+import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
+import FilterTransformationNode from './nodes/FilterTransformationNode';
+import GetTransformationNode from './nodes/GetTransformationNode';
+import JoinTransformationNode from './nodes/JoinTransformationNode';
+import LoadTransformationNode from './nodes/LoadTransformationNode';
+import PlusTransformationNode from './nodes/PlusTransformationNode';
+import PrependTransformationNode from './nodes/PrependTransformationNode';
+import PutTransformationNode from './nodes/PutTransformationNode';
+import SplitTransformationNode from './nodes/SplitTransformationNode';
+import StoreTransformationNode from './nodes/StoreTransformationNode';
+import SubstringTransformationNode from './nodes/SubstringTransformationNode';
+import TransformationNode from './nodes/TransformationNode';
+import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import { TransformationEngine } from './TransformationEngine';
+import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeVisitor from './TransformationNodeVisitor';
+import TransformationVisitResult from './TransformationVisitResult';
 
 type AllNodeInfoType =
   {
