@@ -345,14 +345,14 @@ class HitComponent extends TerrainComponent<Props> {
     {
       fields = _.extend({}, fields, fields['_source']);
     }
-    const nestedFields = getResultNestedFields(_Hit({fields: Map(fields)}), format && format.config);
+    const nestedFields = getResultNestedFields(_Hit({ fields: Map(fields) }), format && format.config);
     // Get sample set of result fields to set max length
     const allFields = getResultFields(
-      _Hit({fields: Map(fields)}),
+      _Hit({ fields: Map(fields) }),
       format && format.config,
       nestedFields,
       this.props.schema,
-      this.props.builder
+      this.props.builder,
     );
     return allFields.length;
   }
@@ -631,7 +631,7 @@ class HitComponent extends TerrainComponent<Props> {
     {
       resultsConfig = _ResultsConfig();
     }
-    
+
     const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
       resultsConfig.thumbnailWidth;
     const depth = this.props.depth !== undefined ? this.props.depth : 0;
@@ -920,7 +920,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     {
       tooltipText = JSON.stringify(value, null, 2);
       tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
-      let valueString = '';
+      const valueString = '';
 
       return (
         <div>
@@ -932,22 +932,22 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
                 val = Util.asJS(val);
                 return (
                   <div key={i}>
-                  {
-                     _.keys(val).map((key, j) =>
-                       <div key={j}>
-                        <span
-                          style={{marginRight: 6, opacity: 0.35}}
-                        >
-                        <b>{key}: </b>
-                        </span>
-                        <span>
-                          {JSON.stringify(val[key])}
-                        </span>
-                        <br/>
-                       </div>
-                    )
-                  }
-                  <br/>
+                    {
+                      _.keys(val).map((key, j) =>
+                        <div key={j}>
+                          <span
+                            style={{ marginRight: 6, opacity: 0.35 }}
+                          >
+                            <b>{key}: </b>
+                          </span>
+                          <span>
+                            {JSON.stringify(val[key])}
+                          </span>
+                          <br />
+                        </div>,
+                      )
+                    }
+                    <br />
                   </div>
                 );
               }
@@ -1015,10 +1015,10 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
             {
               title: value,
               position: 'left-start',
-              arrow: false
+              arrow: false,
             });
         }
-
+        break;
       // case 'map':
       //   const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
       //   let targetLocation: [number, number];
@@ -1047,7 +1047,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       //   );
 
       case 'text':
-
         break;
     }
   }

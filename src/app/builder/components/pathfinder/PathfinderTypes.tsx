@@ -804,12 +804,12 @@ class ElasticDataSourceC extends DataSource
             builderState: context.builderState,
             schemaState: context.schemaState,
             source: context.source,
-        });
+          });
         parentFields = parentFields.map((field) =>
           _ChoiceOption({
-            displayName: '@' + context.parentName + '.' + field.displayName,
-            value: '@' + context.parentName + '.' + field.value,
-        })).toList();
+            displayName: `@${context.parentName}.${field.displayName}`,
+            value: `@${context.parentName}.${field.value}`,
+          })).toList();
       }
       return inputs.concat(parentFields).toList();
     }

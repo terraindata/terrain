@@ -67,12 +67,12 @@ interface ScoreWeightSliderProps
   onChange: (value: number) => void;
   onAfterChange: (value: number) => void;
   height: number;
+  lengthOffset: number;
   noLeftLine?: boolean;
   rounded?: boolean;
   noPadding?: boolean;
   background?: string;
   growOnHover?: boolean;
-  lengthOffset?: number;
 }
 
 const styles = {

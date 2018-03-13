@@ -268,9 +268,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     };
 
     const shouldShowValue = this.shouldShowValue();
-    let valueOptions = shouldShowValue ? this.props.valueOptions : List<RouteSelectorOption>();
+    const valueOptions = shouldShowValue ? this.props.valueOptions : List<RouteSelectorOption>();
     let valueHeader = '';
-    
+
     if (filterLine.field && !filterLine.comparison)
     {
       valueHeader = 'Choose a method next';
