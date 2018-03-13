@@ -59,7 +59,7 @@ import CustomDragLayer from 'app/common/components/CustomDragLayer';
 import DragDropGroup from 'app/common/components/DragDropGroup';
 import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
-import { RouteSelectorOptionSet, RouteSelectorOption } from 'app/common/components/RouteSelector';
+import { RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
 import FadeInOut from 'common/components/FadeInOut';
 import SingleRouteSelector from 'common/components/SingleRouteSelector';
@@ -92,7 +92,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       dragging: boolean,
       canDrag: boolean,
       fieldOptionSet: RouteSelectorOptionSet,
-      valueOptions:  List<RouteSelectorOption>,
+      valueOptions: List<RouteSelectorOption>,
     } = {
       dragging: false,
       canDrag: true,
@@ -134,15 +134,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
     // If inputs changes, or parent query data source changes, update value possibilities
     if (nextProps.pathfinderContext.builderState.query.inputs !==
-       this.props.pathfinderContext.builderState.query.inputs ||
-       !_.isEqual(nextProps.pathfinderContext.parentSource,
-       this.props.pathfinderContext.parentSource) ||
-       nextProps.pathfinderContext.parentName !==
-       this.props.pathfinderContext.parentName
-      )
+      this.props.pathfinderContext.builderState.query.inputs ||
+      !_.isEqual(nextProps.pathfinderContext.parentSource,
+        this.props.pathfinderContext.parentSource) ||
+      nextProps.pathfinderContext.parentName !==
+      this.props.pathfinderContext.parentName
+    )
     {
       this.setState({
-        valueOptions: this.getValueOptions(nextProps)
+        valueOptions: this.getValueOptions(nextProps),
       });
     }
   }
@@ -185,7 +185,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       isNested: keyPath.includes('nested'),
       parentName: pathfinderContext.parentName,
     });
-    console.log('value options ', valueOptions);
     return valueOptions;
   }
 

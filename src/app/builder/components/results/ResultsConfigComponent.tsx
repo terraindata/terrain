@@ -419,7 +419,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     {
       if (field === '_score')
       {
-        return 'Match Quality'.toLowerCase().indexOf(term.toLowerCase()) !== -1        
+        return 'Match Quality'.toLowerCase().indexOf(term.toLowerCase()) !== -1;
       }
       return field.toLowerCase().indexOf(term.toLowerCase()) !== -1;
     });
@@ -849,7 +849,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
                 style={(image || date) ? inactiveBtnStyle : activeBtnStyle}
               >
                 <TextIcon
-                  style={(image || date) ? {fill: Colors().iconColor} : {fill: Colors().fontWhite}}
+                  style={(image || date) ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
                 />
                 Text
               </div>
@@ -859,7 +859,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
                 style={image ? activeBtnStyle : inactiveBtnStyle}
               >
                 <ImageIcon
-                  style={!image ? {fill: Colors().iconColor} : {fill: Colors().fontWhite}}
+                  style={!image ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
                 />
                 Image
                 </div>
@@ -869,7 +869,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
                 style={date ? activeBtnStyle : inactiveBtnStyle}
               >
                 <DateIcon
-                  style={!date ? {fill: Colors().iconColor} : {fill: Colors().fontWhite}}
+                  style={!date ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
                 />
                 Date
               </div>

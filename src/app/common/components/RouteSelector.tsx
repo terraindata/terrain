@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access no-console no-var-requires
+// tslint:disable:strict-boolean-expressions member-access no-var-requires no-console
 
 import Ajax from 'app/util/Ajax';
 import Hit from 'builder/components/results/Hit.tsx';
@@ -194,7 +194,6 @@ export class RouteSelector extends TerrainComponent<Props>
   public render()
   {
     const { props, state } = this;
-    console.log(this.state.optionSets);
     return (
       <div
         className='routeselector-wrapper'

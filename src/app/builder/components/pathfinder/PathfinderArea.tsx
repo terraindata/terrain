@@ -128,7 +128,7 @@ class PathfinderArea extends TerrainComponent<Props>
       schemaState: props.schema,
       builderState: props.builder,
       parentSource: props.parentSource,
-      parentName: props.parentName
+      parentName: props.parentName,
     };
   }
 

@@ -156,8 +156,17 @@ class HitsArea extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.setIndexAndResultsConfig(this.props);
+    this.setIndexAndResultsConfig(this.props, true);
     this.getNestedFields(this.props);
+  }
+
+  public shouldComponentUpdate(nextProps: Props, nextState: State)
+  {
+    if (this.state.resultsConfig !== nextState.resultsConfig)
+    {
+      this.getNestedFields(nextProps, nextState.resultsConfig);
+    }
+    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -166,10 +175,11 @@ class HitsArea extends TerrainComponent<Props>
       this.props.query.path.source !== nextProps.query.path.source ||
       this.props.query.resultsConfig !== nextProps.query.resultsConfig)
     {
-      this.setIndexAndResultsConfig(nextProps);
+      const indexChange = (this.props.query.path.source.dataSource as any).index !==
+        (nextProps.query.path.source.dataSource as any).index;
+      this.setIndexAndResultsConfig(nextProps, indexChange);
     }
-    if (this.props.query.resultsConfig !== nextProps.query.resultsConfig ||
-      this.props.resultsState.fields !== nextProps.resultsState.fields)
+    if (!_.isEqual(this.props.resultsState.fields, nextProps.resultsState.fields))
     {
       this.getNestedFields(nextProps);
     }
@@ -202,7 +212,7 @@ class HitsArea extends TerrainComponent<Props>
     }
   }
 
-  public getNestedFields(props: Props)
+  public getNestedFields(props: Props, overrideConfig?)
   {
     // Get the fields that are nested
     const { builder, schema, resultsState } = props;
@@ -226,10 +236,11 @@ class HitsArea extends TerrainComponent<Props>
       ).toList();
     }
     // If there is a results config in use, only use nested fields in that config
-    if (props.query.resultsConfig && props.query.resultsConfig.enabled)
+    const resultsConfig = overrideConfig || this.state.resultsConfig;
+    if (resultsConfig && resultsConfig.enabled)
     {
       nestedFields = nestedFields.filter((field) =>
-        props.query.resultsConfig.fields.indexOf(field) !== -1,
+        resultsConfig.fields.indexOf(field) !== -1,
       ).toList();
     }
     this.setState({
@@ -237,7 +248,7 @@ class HitsArea extends TerrainComponent<Props>
     });
   }
 
-  public setIndexAndResultsConfig(props: Props)
+  public setIndexAndResultsConfig(props: Props, indexChange = false)
   {
     let indexName = props.db.name + '/' + getIndex('', this.props.builder);
     if (props.query.path &&
@@ -250,7 +261,9 @@ class HitsArea extends TerrainComponent<Props>
       indexName,
     });
     if (props.query.resultsConfig !== undefined &&
-      props.query.resultsConfig.enabled)
+      props.query.resultsConfig.enabled &&
+      !indexChange
+    )
     {
       this.setState({
         resultsConfig: props.query.resultsConfig,
