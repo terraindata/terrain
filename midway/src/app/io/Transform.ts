@@ -176,7 +176,7 @@ export function applyTransforms(obj: object, transforms: object[]): object
         //   {
         //     name: copyName,
         //   });
-        // break;
+        break;
       case 'prepend':
         colName = transform['colName'];
         const prependText: string | undefined = transform['args']['text'];
@@ -184,7 +184,7 @@ export function applyTransforms(obj: object, transforms: object[]): object
         {
           throw new Error('Prepend transformation must supply colName and text arguments.');
         }
-        e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath([colName])]), { at: 0, value: prependText});
+        e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath([colName])]), { at: 0, value: prependText });
         break;
       case 'append':
         colName = transform['colName'];
@@ -193,11 +193,11 @@ export function applyTransforms(obj: object, transforms: object[]): object
         {
           throw new Error('Append transformation must supply colName and text arguments.');
         }
-        e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath([colName])]), { value: appendText});
+        e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath([colName])]), { value: appendText });
         break;
       default:
         throw new Error('Invalid transform name encountered: ' + String(transform['name']));
     }
   }
-  return obj;
+  return e.transform(obj);
 }

@@ -226,7 +226,6 @@ export class TransformationEngine
   public transform(doc: object): object
   {
     let output: object = this.rename(doc);
-
     for (const nodeKey of this.dag.sources())
     {
       const toTraverse: string[] = GraphLib.alg.preorder(this.dag, nodeKey);

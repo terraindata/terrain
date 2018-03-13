@@ -103,6 +103,33 @@ test('make a field uppercase', () =>
   expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
 });
 
+test('prepend string to a field', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]), { at: 0, value: 'Sponge ' });
+  const r = e.transform(doc1);
+  expect(r['name']).toBe('Sponge Bob');
+});
+
+test('append string to a field', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]), { value: 's Burgers' });
+  const r = e.transform(doc1);
+  expect(r['name']).toBe('Bobs Burgers');
+});
+
+test('insert field value in a field', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]),
+    { at: 0, value: ' ' });
+  e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath(['name'])]),
+    { at: 0, value: KeyPath(['meta', 'school']) });
+  const r = e.transform(doc1);
+  expect(r['name']).toBe('Stanford Bob');
+});
+
 test('serialize to JSON', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);

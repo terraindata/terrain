@@ -74,7 +74,7 @@ interface TransformationOptionTypes
   DuplicateNode: any;
   InsertNode: {
     at?: number;
-    value: string | List<string>;
+    value: string | KeyPath;
   };
   UppercaseNode: {
   };

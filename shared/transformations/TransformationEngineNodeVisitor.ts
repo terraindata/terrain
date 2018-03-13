@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import * as winston from 'winston';
+import * as Immutable from 'immutable';
+
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
@@ -121,7 +123,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           at += el.length + 1;
         }
       }
-      else if (typeof opts['at'] === undefined)
+      else if (opts['at'] === undefined)
       {
         at = el.length;
       }
@@ -137,9 +139,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
 
       let value;
-      if (Immutable.Iterable.isIterable(opts['value']))
+      if (Immutable.Iterable.isIterable(opts['value']) || opts['value'] instanceof KeyPath)
       {
-        value = yadeep.get(doc, opts['value'] as List<string>);
+        value = yadeep.get(doc, opts['value'] as KeyPath);
         if (typeof value !== 'string')
         {
           return {
@@ -167,7 +169,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
 
       // Currently assumes a single from and length for all fieldIDs
-      yadeep.set(doc, field, el.slice(0, at) + value + el.slice(at), { create: true });
+      yadeep.set(doc, field, el.slice(0, at) + String(value) + el.slice(at), { create: true });
     });
 
     return {

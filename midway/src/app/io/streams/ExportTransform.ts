@@ -91,7 +91,7 @@ export default class ExportTransform extends ADocumentTransform
 
   private process(doc: object): object
   {
-    if (this.configuration.rank && doc['TERRAINRANK'] !== undefined)
+    if (this.configuration.rank !== undefined && this.configuration.rank === true && doc['TERRAINRANK'] !== undefined)
     {
       doc['TERRAINRANK'] = this.rank++;
     }
