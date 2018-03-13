@@ -266,7 +266,7 @@ export class Items
         }
         if (resp['_id'] === deployedName && resp['found'] === true && (items[0].status === 'LIVE' || items[0].status === 'LOCK'))
         {
-          return resolve('Algorithm is ' + items[0].status + ' ' + (deployedName as string));
+          return resolve(`Algorithm is ${items[0].status} ${deployedName}`);
         }
         else if (resp['_id'] === deployedName && resp['found'] === true && items[0].status !== 'LIVE' && items[0].status !== 'LOCK')
         {
@@ -274,7 +274,7 @@ export class Items
         }
         else if (resp['_id'] === deployedName && resp['found'] === false && (items[0].status === 'LIVE' || items[0].status === 'LOCK'))
         {
-          return resolve('Error: ' + items[0].status + ' Algorithm not found in ES instance');
+          return resolve(`Error: ${items[0].status} Algorithm not found in ES instance`);
         }
         else
         {
