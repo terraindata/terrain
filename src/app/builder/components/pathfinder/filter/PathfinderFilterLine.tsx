@@ -88,6 +88,7 @@ export interface Props
   isSoftFilter?: boolean; // does this section apply to soft filters?
   fieldOptionSet: RouteSelectorOptionSet;
   valueOptions: List<RouteSelectorOption>;
+  onToggleOpen?: (open: boolean) => void;
   onAddScript?: (fieldName: string, lat: any, lon: any, name: string) => string;
   onDeleteScript?: (scriptName: string) => void;
   onUpdateScript?: (fieldName: string, name: string, lat?: any, lon?: any) => void;
@@ -201,7 +202,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         canDelete={true}
         onDelete={this._fn(this.props.onDelete, this.props.keyPath, this.props.filterLine)}
         hideLine={true}
+        autoFocus={true}
         footer={this.renderFooter()}
+        onToggleOpen={this.props.onToggleOpen}
       />
     );
   }
@@ -287,7 +290,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       hasOther: shouldShowValue && canShowValueInput ? true : false, // for now, hide other manually
       focusOtherByDefault: true,
       getValueComponent: this.renderValueComponent(),
-      getCustomDisplayName: this.getCustomValueDisplayName,
+      getCustomDisplayName: this._fn(getCustomValueDisplayName, this.props.filterLine),
       forceFloat: true,
     };
 
@@ -312,28 +315,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     // }
 
     return List(sets);
-  }
-
-  private getCustomValueDisplayName(value, setIndex: number)
-  {
-    if (COMPARISONS_WITHOUT_VALUES.indexOf(this.props.filterLine.comparison) !== -1)
-    {
-      return 'N/A';
-    }
-    switch (this.props.filterLine.fieldType)
-    {
-      case FieldType.Date:
-        if (!value)
-        {
-          return '';
-        }
-        return Util.formatDate(value, true);
-      case FieldType.Geopoint:
-        value = _DistanceValue(Util.asJS(value));
-        return value.distance + ' ' + units[value.units] + ' of ' + value.address;
-      default:
-        return undefined;
-    }
   }
 
   private handleFilterPickerChange(optionSetIndex: number, value: any)
@@ -652,8 +633,30 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   }
 }
 
-const COMPARISONS_WITHOUT_VALUES = [
+export const COMPARISONS_WITHOUT_VALUES = [
   'exists',
 ];
+
+export function getCustomValueDisplayName(filterLine: FilterLine, value, setIndex: number)
+{
+  if (COMPARISONS_WITHOUT_VALUES.indexOf(filterLine.comparison) !== -1)
+  {
+    return 'N/A';
+  }
+  switch (filterLine.fieldType)
+  {
+    case FieldType.Date:
+      if (!value)
+      {
+        return '';
+      }
+      return Util.formatDate(value, true);
+    case FieldType.Geopoint:
+      value = _DistanceValue(Util.asJS(value));
+      return value.distance + ' ' + units[value.units] + ' of ' + value.address;
+    default:
+      return value;
+  }
+}
 
 export default PathfinderFilterLine;

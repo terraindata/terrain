@@ -50,6 +50,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { DragLayer } from 'react-dnd';
 import PerformantDragLayer from './DragLayer.js';
+import { getCustomValueDisplayName } from 'app/builder/components/pathfinder/filter/PathfinderFilterLine';
 
 interface Props
 {
@@ -92,6 +93,12 @@ const comparisons: Map<string, string> = Map({
 */
 class CustomDragLayerRaw extends TerrainComponent<Props> {
 
+  public formatItemValue(data)
+  {
+    return getCustomValueDisplayName(data, data.value, 0);
+  }
+
+
   public renderItemBlock(key: string, header: string, data: any)
   {
     const headerStyle = fontColor(Colors().text3);
@@ -109,10 +116,11 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
           style={valueStyle}
         >
           {
-            // TODO MAKE THIS USE FILTER LINES DISPLAY FUNCTION SOMEHOW
             key === 'comparison' ?
-              comparisons.get(data['comparison']) :
-              JSON.stringify(data[key])
+              comparisons.get(data[key]) :
+            key === 'value' ?
+              this.formatItemValue(data) :
+            data[key]
           }
         </div>
       </div>

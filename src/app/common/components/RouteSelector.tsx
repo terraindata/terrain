@@ -116,6 +116,7 @@ export interface Props
   hideLine?: boolean;
   canDelete?: boolean;
   onDelete?: () => void;
+  onToggleOpen?: (open: boolean) => void;
 }
 
 export class RouteSelector extends TerrainComponent<Props>
@@ -1041,6 +1042,10 @@ export class RouteSelector extends TerrainComponent<Props>
     this.setState({
       open,
     });
+    if (this.props.onToggleOpen)
+    {
+      this.props.onToggleOpen(true);
+    }
   }
 
   private close()
@@ -1053,6 +1058,10 @@ export class RouteSelector extends TerrainComponent<Props>
       focusedSetIndex: -1,
       focusedOptionIndex: -1,
     });
+    if (this.props.onToggleOpen)
+    {
+      this.props.onToggleOpen(false);
+    }
   }
 
   private toggle()

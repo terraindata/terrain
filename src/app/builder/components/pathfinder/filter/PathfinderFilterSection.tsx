@@ -90,10 +90,12 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public state:
     {
       dragging: boolean,
+      canDrag: boolean,
       fieldOptionSet: RouteSelectorOptionSet,
       valueOptions:  List<RouteSelectorOption>,
     } = {
       dragging: false,
+      canDrag: true,
       fieldOptionSet: undefined,
       valueOptions: undefined,
     };
@@ -196,6 +198,10 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   {
     const newLines = this.props.filterGroup.lines.push(_FilterLine());
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
+    // When a line is created, it is automatically open so we should disable dradgging
+    this.setState({
+      canDrag: false,
+    });
   }
 
   public insertIn(items, keyPath, item): List<any>
@@ -276,11 +282,19 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         isSoftFilter={isSoftFilter}
         fieldOptionSet={this.state.fieldOptionSet}
         valueOptions={this.state.valueOptions}
+        onToggleOpen={this.handleFilterOpen}
         onAddScript={this.props.onAddScript}
         onDeleteScript={this.props.onDeleteScript}
         onUpdateScript={this.props.onUpdateScript}
       />
     );
+  }
+
+  public handleFilterOpen(open: boolean)
+  {
+    this.setState({
+      canDrag: !open,
+    });
   }
 
   public renderGroupHeader(group, keyPath)
@@ -503,11 +517,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                       onDragStart={this._toggle('dragging')}
                       onDragStop={this._toggle('dragging')}
                       dropZoneStyle={dropZoneStyle}
-                      canDrag={canEdit}
+                      canDrag={canEdit && this.state.canDrag}
                     />
                     :
                     <DragDropGroup
-                      canDrag={canEdit}
+                      canDrag={canEdit && this.state.canDrag}
                       items={line.filterGroup.lines}
                       data={line.filterGroup}
                       onDrop={this.handleGroupDrop}
