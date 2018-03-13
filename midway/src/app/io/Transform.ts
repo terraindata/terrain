@@ -83,7 +83,7 @@ export function mergeDocument(doc: object): object
 
 export function applyTransforms(obj: object, transforms: object[]): object
 {
-  const e: TransformationEngine = new TransformationEngine();
+  const e: TransformationEngine = new TransformationEngine(obj);
   for (const transform of transforms)
   {
     let colName: string | undefined;

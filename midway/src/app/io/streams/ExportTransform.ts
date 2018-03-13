@@ -65,7 +65,12 @@ export default class ExportTransform extends ADocumentTransform
 
     if (configuration.rank === true)
     {
-      configuration.columnTypes['TERRAINRANK'] = null;
+      configuration.columnTypes['TERRAINRANK'] = {
+        type: 'long',
+        index: 'not_analyzed',
+        analyzer: null,
+        innerType: null,
+      };
     }
 
     configuration.transformations.forEach((transformation) =>
@@ -91,7 +96,7 @@ export default class ExportTransform extends ADocumentTransform
 
   private process(doc: object): object
   {
-    if (this.configuration.rank !== undefined && this.configuration.rank === true && doc['TERRAINRANK'] !== undefined)
+    if (this.configuration.rank === true && doc['TERRAINRANK'] === undefined)
     {
       doc['TERRAINRANK'] = this.rank++;
     }
