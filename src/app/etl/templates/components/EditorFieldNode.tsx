@@ -194,6 +194,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     {
       const content = (
         <EditorFieldPreview
+          toggleOpen={this.handleToggleOpen}
           hidePreviewValue={true}
           labelOverride={previewLabel}
           {...this._passProps()}
@@ -213,7 +214,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         <ExpandableView
           content={content}
           open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
+          onToggle={this.handleToggleOpen}
           children={childrenComponent}
           injectedContent={injectedContent}
           style={style}
@@ -241,7 +242,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }
   }
 
-  public handleExpandArrowClicked()
+  public handleToggleOpen()
   {
     this.setState({
       expandableViewOpen: !this.state.expandableViewOpen,

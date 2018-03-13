@@ -67,6 +67,7 @@ import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
 {
+  toggleOpen?: () => void;
   hidePreviewValue?: boolean;
   displayValueOverride?: any;
   labelOverride?: string;
@@ -119,9 +120,12 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             onMouseLeave={this.handleMouseLeave}
             style={labelStyle}
           >
-            <div className={classNames({
-              'field-preview-label': true,
-            })}
+            <div
+              className={classNames({
+                'field-preview-label': true,
+                'field-preview-can-toggle': this.props.toggleOpen !== undefined,
+              })}
+              onClick={this.props.toggleOpen}
             >
               {labelOverride != null ? labelOverride : field.name}
             </div>
