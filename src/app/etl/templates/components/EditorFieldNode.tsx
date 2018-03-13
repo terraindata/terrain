@@ -146,7 +146,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
   public renderArrayChildren()
   {
     const { preview } = this.props;
-    if (preview == null || !Array.isArray(preview))
+    if (preview == null /*|| !Array.isArray(preview) todo*/)
     {
       return this.renderArrayChild(null, -1, false);
     }
@@ -154,7 +154,11 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     {
       return this.renderArrayChild(null, -1, true);
     }
-    return List(preview.map((value, index) =>
+    // return List(preview.map((value, index) =>
+    // {
+    //   return this.renderArrayChild(value, index);
+    // })); TODO go back to this when array fixed
+    return List(_.map(preview, (value, index) =>
     {
       return this.renderArrayChild(value, index);
     }));
@@ -190,11 +194,13 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     {
       const content = (
         <EditorFieldPreview
+          toggleOpen={this.handleToggleOpen}
           hidePreviewValue={true}
           labelOverride={previewLabel}
           {...this._passProps()}
         />
       );
+
       const childrenComponent = (
         <div className='template-editor-children-container'>
           {
@@ -208,7 +214,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         <ExpandableView
           content={content}
           open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
+          onToggle={this.handleToggleOpen}
           children={childrenComponent}
           injectedContent={injectedContent}
           style={style}
@@ -236,7 +242,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }
   }
 
-  public handleExpandArrowClicked()
+  public handleToggleOpen()
   {
     this.setState({
       expandableViewOpen: !this.state.expandableViewOpen,

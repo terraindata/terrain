@@ -106,6 +106,44 @@ class DocumentsHelpers extends ETLHelpers
     onError?: (ev: string | MidwayError) => void,
   )
   {
+    // // TODO DELET THIS TESTING
+    // try {
+    //   const documents = List([
+    //     {
+    //       "named field": 'foon',
+    //       "deepArray":
+    //       [
+    //         [
+    //           5
+    //         ]
+    //       ],
+    //       'nested array': [
+    //         {
+    //           'name': 'blah',
+    //           'other name': 'blooh',
+    //         },
+    //         {
+    //           'name': 'xD',
+    //           'other name': 'hmm',
+    //         }
+    //       ]
+    //     }
+    //   ]);
+
+    //   onLoad(documents);
+    //   this.onLoadDocuments(documents, key);
+    //   if (1 === 1)
+    //   {
+    //     return;
+    //   }
+    // }
+    // catch(e)
+    // {
+    //   console.error(e);
+    //   return;
+    // }
+    // // delet this
+
     const onFetchLoad = (documents: List<object>) =>
     {
       this.onLoadDocuments(documents, key);
@@ -124,10 +162,7 @@ class DocumentsHelpers extends ETLHelpers
     };
     try
     {
-      this.editorAct({
-        actionType: 'changeLoadingDocuments',
-        increment: true,
-      });
+      this.updateStateBeforeFetch();
       switch (source.type)
       {
         case Sources.Algorithm: {
@@ -181,11 +216,7 @@ class DocumentsHelpers extends ETLHelpers
       key,
       documents,
     });
-    this.computeMergedDocuments();
-    this.editorAct({
-      actionType: 'changeLoadingDocuments',
-      increment: false,
-    });
+    this.updateStateAfterFetch();
   }
 
   protected onDocumentsError(ev: string | MidwayError)
@@ -193,9 +224,26 @@ class DocumentsHelpers extends ETLHelpers
     // tslint:disable-next-line
     console.error(ev);
     // TODO add a modal message?
+    this.updateStateAfterFetch();
+  }
+
+  private updateStateAfterFetch()
+  {
     this.editorAct({
       actionType: 'changeLoadingDocuments',
       increment: false,
+    });
+    if (this.templateEditor.loadingDocuments <= 0)
+    {
+      this.computeMergedDocuments();
+    }
+  }
+
+  private updateStateBeforeFetch()
+  {
+    this.editorAct({
+      actionType: 'changeLoadingDocuments',
+      increment: true,
     });
   }
 }

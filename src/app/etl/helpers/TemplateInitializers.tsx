@@ -190,6 +190,7 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     };
   }
   const { engine, warnings, softWarnings } = createMergedEngine(documents);
+
   const fieldMap = createTreeFromEngine(engine);
 
   let template = _ETLTemplate({
@@ -197,7 +198,6 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     templateName: name,
   });
   const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
-  // newSource = newSource.set('transformations', engine);
   const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
   // default source and sink is upload and download
 
@@ -210,8 +210,8 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     type: NodeTypes.Source,
     endpoint: '_default',
   });
-  const sinkId = proxy.addNode(defaultSink);
   const sourceId = proxy.addNode(defaultSource);
+  const sinkId = proxy.addNode(defaultSink);
   const defaultEdge = _ETLEdge({
     from: sourceId,
     to: sinkId,

@@ -49,6 +49,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import TransformationNodeBase from 'shared/transformations/nodes/TransformationNode';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
@@ -66,12 +67,24 @@ class TemplateFieldC
 
   public isArray(): boolean
   {
-    return this.type === 'array';
+    return this.representedType() === 'array';
+  }
+
+  public representedType(): FieldTypes
+  {
+    if (this.name === '*')
+    {
+      return this.fieldProps['valueType'];
+    }
+    else
+    {
+      return this.type;
+    }
   }
 
   public isNested(): boolean
   {
-    return this.type === 'object';
+    return this.representedType() === 'object';
   }
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
@@ -83,7 +96,7 @@ class TransformationNodeC
 {
   public id: number = 0;
   public typeCode: TransformationNodeType = TransformationNodeType.LoadNode;
-  public fieldIDs: List<number> = List([]);
+  public fields: List<List<string>> = List([]);
   public meta: object = {};
 }
 export type TransformationNode = WithIRecord<TransformationNodeC>;

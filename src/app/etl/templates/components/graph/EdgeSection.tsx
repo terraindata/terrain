@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires import-spacing
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -53,76 +54,100 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+const Color = require('color');
+import Dropdown from 'common/components/Dropdown';
+import { DynamicForm } from 'common/components/DynamicForm';
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import ExpandableView from 'common/components/ExpandableView';
+import Modal from 'common/components/Modal';
+import { instanceFnDecorator } from 'src/app/Classes';
+import Quarantine from 'util/RadiumQuarantine';
 
-import DocumentPreview from './DocumentPreview';
-import './DocumentsPreviewColumn.less';
-const { List } = Immutable;
+import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
+import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
+
+import './EdgeSection.less';
+import ETLEdgeComponent from './ETLEdgeComponent';
+
+const { List, Map } = Immutable;
 
 export interface Props
 {
   // below from container
-  templateEditor?: TemplateEditorState;
+  templateEditor: TemplateEditorState;
   act?: typeof TemplateEditorActions;
 }
 
-class DocumentsPreviewColumn extends TerrainComponent<Props>
+class EdgeSection extends TerrainComponent<Props>
 {
-  public renderDocument(document, index)
-  {
-    return (
-      <DocumentPreview index={index} key={index} />
-    );
-  }
-
-  public renderNoDocuments()
+  public renderEdge(edge, edgeId)
   {
     return (
       <div
-        className='template-editor-no-documents'
-        style={noDocumentsStyle}
+        key={edgeId}
       >
-        <div
-          className='no-documents-section'
-          style={noDocumentsTextStyle}
-        >
-          Unable to Load Documents
-        </div>
+        <ETLEdgeComponent
+          edge={edge}
+          edgeId={edgeId}
+        />
       </div>
     );
   }
 
   public render()
   {
-    const { documents } = this.props.templateEditor.uiState;
-    if (documents.size === 0)
-    {
-      return this.renderNoDocuments();
-    }
-    else
-    {
-      return (
-        <div className='template-editor-documents-container'>
-          <div className='documents-area' tabIndex={-1}>
-            {documents.map(this.renderDocument)}
-          </div>
-        </div>
-      );
-    }
+    const { templateEditor } = this.props;
+    return (
+      <div className='edge-section'>
+        {templateEditor.template.process.getEdges().map(this.renderEdge).toList()}
+      </div>
+    );
   }
 }
 
-const noDocumentsStyle = _.extend({},
-  backgroundColor(Colors().fadedOutBg),
-  borderColor(Colors().border1),
-);
-const noDocumentsTextStyle = fontColor(Colors().error);
+// memoized
+let getButtonStyle = (active: boolean, disabled: boolean) =>
+{
+  if (active)
+  {
+    return disabled ? [
+      fontColor(Colors().activeText),
+      backgroundColor(Colors().activeHover, Colors().activeHover),
+      borderColor(Colors().altBg2),
+    ] : [
+        backgroundColor(Colors().active, Colors().activeHover),
+        borderColor(Colors().active, Colors().activeHover),
+        fontColor(Colors().activeText),
+      ];
+  }
+  else
+  {
+    return disabled ? [
+      fontColor(Colors().text3, Colors().text3),
+      backgroundColor(Color(Colors().bg2).alpha(0.5).toString(), Color(Colors().bg2).alpha(0.5).toString()),
+      borderColor(Colors().bg2),
+    ] : [
+        fontColor(Colors().text2, Colors().text3),
+        backgroundColor(Colors().bg2, Color(Colors().bg2).alpha(0.5).toString()),
+        borderColor(Colors().bg1),
+      ];
+  }
+};
+function resolveBooleans(a, b)
+{
+  return a ? (b ? 'tt' : 'tf') : (b ? 'ft' : 'ff');
+}
+getButtonStyle = _.memoize(getButtonStyle, resolveBooleans);
 
 export default Util.createContainer(
-  DocumentsPreviewColumn,
-  ['templateEditor'],
+  EdgeSection,
+  [
+    ['templateEditor'],
+  ],
   { act: TemplateEditorActions },
 );

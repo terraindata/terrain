@@ -137,7 +137,8 @@ class ETLUploadStep extends ETLStepComponent
         actionType: 'setFileConfig',
         sourceConfig: _FileConfig(config),
       });
-    }).catch((err) => {
+    }).catch((err) =>
+    {
       // TODO
     });
   }

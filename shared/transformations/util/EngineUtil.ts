@@ -68,6 +68,27 @@ export function unhashPath(keypath: PathHash): KeyPath
   return KeyPath(JSON.parse(keypath));
 }
 
+const valueTypeKeyPath = List(['valueType']);
+
+// root is considered to be a named field
+export function isNamedField(
+  keypath: KeyPath,
+): boolean
+{
+  const last = keypath.last();
+  return last !== '*' && Number.isNaN(Number(last));
+}
+
+export function isArrayField(
+  keypath: KeyPath,
+  engine: TransformationEngine,
+  pathToIdMap: PathHashMap<number>,
+): boolean
+{
+  const hashedPath = hashPath(keypath);
+  return engine.getFieldType(pathToIdMap[hashedPath]) === 'array';
+}
+
 // turn all indices into a particular value, based on
 // an existing engine that has fields with indices in them
 export function turnIndicesIntoValue(
@@ -84,18 +105,18 @@ export function turnIndicesIntoValue(
   const arrayIndices = {};
   for (const i of _.range(1, keypath.size))
   {
-    const parentPath = keypath.slice(0, i).toList();
-    const parentId = pathToIdMap[hashPath(parentPath)];
-
-    if (parentId !== undefined && engine.getFieldType(parentId) === 'array')
+    const path = keypath.slice(0, i + 1).toList();
+    if (!isNamedField(path))
     {
       arrayIndices[i] = true;
     }
   }
-  return keypath.map((key, i) =>
+
+  const scrubbed = keypath.map((key, i) =>
   {
     return arrayIndices[i] === true ? value : key;
   }).toList();
+  return scrubbed;
 }
 
 // creates a mapping from hashed keypath to fieldId
@@ -111,7 +132,7 @@ export function createPathToIdMap(engine: TransformationEngine): PathHashMap<num
 }
 
 // takes an engine path and the path type mapping and returns true if
-// all of the path's parent paths represent array or object types and if it doesnt exist already
+// all of the path's parent paths represent array
 export function isAValidField(keypath: KeyPath, pathTypes: PathHashMap<FieldTypes>): boolean
 {
   if (keypath.size === 0)
@@ -132,6 +153,7 @@ export function isAValidField(keypath: KeyPath, pathTypes: PathHashMap<FieldType
 
 export function addFieldsToEngine(
   pathTypes: PathHashMap<FieldTypes>,
+  pathValueTypes: PathHashMap<FieldTypes>,
   engine: TransformationEngine,
 )
 {
@@ -141,9 +163,27 @@ export function addFieldsToEngine(
     if (isAValidField(unhashPath(hashedPath), pathTypes))
     {
       const fieldType = pathTypes[hashedPath];
-      engine.addField(unhashPath(hashedPath), fieldType);
+      const id = engine.addField(unhashPath(hashedPath), fieldType);
+
+      const valueType = pathValueTypes[hashedPath];
+      if (valueType !== undefined)
+      {
+        engine.setFieldProp(id, valueTypeKeyPath, valueType);
+      }
     }
   });
+}
+
+export function getConsistentType(id: number, engine: TransformationEngine): FieldTypes
+{
+  if (engine.getInputKeyPath(id).last() === '*')
+  {
+    return engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
+  }
+  else
+  {
+    return engine.getFieldType(id) as FieldTypes;
+  }
 }
 
 export function createMergedEngine(documents: List<object>):
@@ -156,6 +196,7 @@ export function createMergedEngine(documents: List<object>):
   const warnings: string[] = [];
   const softWarnings: string[] = [];
   const pathTypes: PathHashMap<FieldTypes> = {};
+  const pathValueTypes: PathHashMap<FieldTypes> = {};
   documents.forEach((doc, i) =>
   {
     const e: TransformationEngine = new TransformationEngine(doc);
@@ -164,9 +205,10 @@ export function createMergedEngine(documents: List<object>):
 
     fieldIds.forEach((id, j) =>
     {
-      const currentType: FieldTypes = e.getFieldType(id) as FieldTypes;
-      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), e, pathToIdMap, '0');
+      const currentType: FieldTypes = getConsistentType(id, e);
+      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), e, pathToIdMap, '*');
       const path = hashPath(deIndexedPath);
+
       if (pathTypes[path] !== undefined)
       {
         const existingType = pathTypes[path];
@@ -176,33 +218,35 @@ export function createMergedEngine(documents: List<object>):
           if (newType === 'warning')
           {
             warnings.push(
-              `path: ${path} has incompatible types. \
-              Interpreted types ${currentType} and ${existingType} are incompatible. \
-              The resultant type will be coerced to a string. \
-              Details: document ${i}`,
+              `path: ${path} has incompatible types.` +
+              ` Interpreted types ${currentType} and ${existingType} are incompatible.` +
+              ` The resultant type will be coerced to a string.` +
+              ` Details: document ${i}`,
             );
           }
           else
           {
             softWarnings.push(
-              `path: ${path} has different types, but can be resolved. \
-              Interpreted types ${currentType} and ${existingType} are different. \
-              The resultant type will be coerced to a string. \
-              Details: document ${i}`,
+              `path: ${path} has different types, but can be resolved.` +
+              ` Interpreted types ${currentType} and ${existingType} are different.` +
+              ` The resultant type will be coerced to a string.` +
+              ` Details: document ${i}`,
             );
           }
           pathTypes[path] = 'string';
+          pathValueTypes[path] = undefined;
         }
       }
       else
       {
         pathTypes[path] = currentType;
+        pathValueTypes[path] = e.getFieldProp(id, valueTypeKeyPath);
       }
     });
   });
-
   const engine = new TransformationEngine();
-  addFieldsToEngine(pathTypes, engine);
+  addFieldsToEngine(pathTypes, pathValueTypes, engine);
+
   return {
     engine,
     warnings,

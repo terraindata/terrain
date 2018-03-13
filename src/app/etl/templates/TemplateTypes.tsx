@@ -53,7 +53,7 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { _ETLProcess, ETLProcess, ETLEdge } from 'etl/templates/ETLProcess';
+import { _ETLProcess, ETLEdge, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
@@ -74,10 +74,24 @@ class ETLTemplateC implements ETLTemplateI
   public process = _ETLProcess();
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
+
+  public getSourceName(key)
+  {
+    const source = this.sources.get(key);
+    const type = (source != null && source.type != null) ? source.type : '';
+    return `${key} (${type})`;
+  }
+
+  public getSinkName(key)
+  {
+    const sink = this.sinks.get(key);
+    const type = (sink != null && sink.type != null) ? sink.type : '';
+    return `${key} (${type})`;
+  }
 }
 
 export type ETLTemplate = WithIRecord<ETLTemplateC>;
-export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, false, {
+export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
   sources: (sources) =>
   {
     return Map<string, SourceConfig>(sources)
@@ -105,14 +119,13 @@ class TemplateEditorStateC
 
   public getCurrentEngine(): TransformationEngine
   {
-    const key = this.uiState.currentEdge;
+    const key = this.getCurrentEdgeId();
     return this.template.process.getTransformationEngine(key);
   }
 
-  public getCurrentEdge(): ETLEdge
+  public getCurrentEdgeId()
   {
-    const key = this.uiState.currentEdge;
-    return this.template.process.getEdge(key);
+    return this.uiState.currentEdge;
   }
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
@@ -121,12 +134,14 @@ export const _TemplateEditorState = makeExtendedConstructor(TemplateEditorStateC
 export enum ColumnOptions
 {
   Preview = 'Preview',
-  Options = 'Options',
+  Endpoints = 'Endpoints',
+  Steps = 'Steps',
 }
 
 export const columnOptions = List([
   ColumnOptions.Preview,
-  ColumnOptions.Options,
+  ColumnOptions.Endpoints,
+  ColumnOptions.Steps,
 ]);
 
 class EditorDisplayStateC

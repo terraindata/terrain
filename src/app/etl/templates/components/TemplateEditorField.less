@@ -22,11 +22,26 @@
 
   .field-preview-label {
     padding: @half-spacing;
-    cursor: pointer;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    
     .tef-big-text;
+    &.field-preview-can-toggle {
+      cursor: pointer;
+    }
+  }
+
+  .field-preview-menu {
+    position: relative;
+    .transition;
+    opacity: 1;
+    padding-left: @spacing;
+    left: 14px;
+    top: 6px;
+    &.field-preview-menu-hidden {
+      opacity: 0;
+    }
   }
 
   .field-preview-value {

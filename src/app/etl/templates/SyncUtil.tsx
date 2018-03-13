@@ -100,7 +100,7 @@ export function createFieldFromEngine(
   id: number,
 ): TemplateField
 {
-  const enginePath = engine.getOutputKeyPath(id).toJS();
+  const enginePath = engine.getOutputKeyPath(id);
   const transformationIds = engine.getTransformations(id);
 
   const transformations: List<TransformationNode> = transformationIds.map((transformationId, index) =>
@@ -109,7 +109,7 @@ export function createFieldFromEngine(
     return _TransformationNode({
       id: transformNode.id,
       typeCode: transformNode.typeCode,
-      fieldIDs: transformNode.fieldIDs,
+      fields: transformNode.fields,
       meta: transformNode.meta,
     });
   }).toList();
@@ -120,7 +120,7 @@ export function createFieldFromEngine(
     fieldProps: engine.getFieldProps(id),
     type: engine.getFieldType(id) as FieldTypes,
     transformations,
-    name: enginePath[enginePath.length - 1],
+    name: enginePath.last(),
   });
 }
 

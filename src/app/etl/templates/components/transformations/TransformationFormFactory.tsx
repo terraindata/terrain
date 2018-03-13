@@ -83,7 +83,7 @@ export interface TransformationFormProps
 interface ArgsPayload<Type extends TransformationNodeType>
 {
   options: NodeOptionsType<Type>;
-  fieldNamesOrIDs: List<number>;
+  fields: List<EnginePath>;
 }
 
 export interface FactoryArgs<State extends object, Type extends TransformationNodeType>
@@ -180,13 +180,13 @@ export function transformationFormFactory<State extends object, Type extends Tra
     public defaultComputeParams(state: State, engine: TransformationEngine, fieldID: number, transformID?): ArgsPayload<Type>
     {
       const { transformation } = this.props;
-      const fieldIDs = (transformation === undefined || transformation.fieldIDs === undefined) ?
-        List([this.props.fieldID]) :
-        transformation.fieldIDs;
+      const fields = (transformation === undefined || transformation.fields === undefined) ?
+        List([engine.getInputKeyPath(this.props.fieldID)]) :
+        transformation.fields;
 
       return {
         options: state,
-        fieldNamesOrIDs: fieldIDs,
+        fields,
       };
     }
 
@@ -216,13 +216,13 @@ export function transformationFormFactory<State extends object, Type extends Tra
       if (this.props.isCreate)
       {
         const { engine } = this.props;
-        this.props.engine.appendTransformation(args.type, payload.fieldNamesOrIDs, payload.options);
+        this.props.engine.appendTransformation(args.type, payload.fields, payload.options);
         this.props.onEditOrCreate(false); // TODO figure out if structural changes happen
         this.props.onClose();
       }
       else
       {
-        this.props.engine.editTransformation(transformID, payload.fieldNamesOrIDs, payload.options);
+        this.props.engine.editTransformation(transformID, payload.fields, payload.options);
         this.props.onEditOrCreate(false); // TODO figure out if structural changes happen
       }
     }
