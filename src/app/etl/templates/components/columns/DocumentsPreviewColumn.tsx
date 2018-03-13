@@ -89,7 +89,7 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
           className='no-documents-section'
           style={noDocumentsTextStyle}
         >
-          Unable to Load Documents. <br/> If You Are Using an Uploaded File, Retry in the Endpoints Section.
+          Unable to Load Documents. <br /> If You Are Using an Uploaded File, Retry in the Endpoints Section.
         </div>
       </div>
     );

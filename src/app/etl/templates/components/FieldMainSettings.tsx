@@ -177,10 +177,6 @@ const settingsInputMap: InputDeclarationMap<SettingsState> = {
     type: DisplayType.TextBox,
     displayName: 'Name',
   },
-  isIncluded: {
-    type: DisplayType.CheckBox,
-    displayName: 'Include this field',
-  },
   type: {
     type: DisplayType.Pick,
     displayName: 'Field Type',
@@ -188,6 +184,10 @@ const settingsInputMap: InputDeclarationMap<SettingsState> = {
       pickOptions: (s: SettingsState) => typeOptions,
       indexResolver: (value) => typeOptions.indexOf(value),
     },
+  },
+  isIncluded: {
+    type: DisplayType.CheckBox,
+    displayName: 'Include this field',
   },
 };
 

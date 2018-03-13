@@ -95,6 +95,8 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
       fileType: {
         type: DisplayType.Pick,
         displayName: 'File Type',
+        widthFactor: 2,
+        group: 'file type',
         options: {
           pickOptions: (s: FileConfigI) => fileTypeList,
           indexResolver: (value) => fileTypeList.indexOf(value),
@@ -103,15 +105,15 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
       hasCsvHeader: {
         type: DisplayType.CheckBox,
         displayName: 'File Has CSV Header',
-        group: 'options',
-        widthFactor: 5,
+        group: 'file type',
+        widthFactor: 4,
         getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
       },
       jsonNewlines: {
         type: DisplayType.CheckBox,
         displayName: 'Objects separated by newlines',
-        group: 'options',
-        widthFactor: 5,
+        group: 'file type',
+        widthFactor: 4,
         getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
       },
     };
@@ -315,7 +317,7 @@ class SftpEndpoint extends EndpointForm<SftpState>
       type: DisplayType.TextBox,
       displayName: 'IP Address',
       group: 'addr row',
-      widthFactor: 3
+      widthFactor: 3,
     },
     port: {
       type: DisplayType.NumberBox,
@@ -409,6 +411,7 @@ class DatabaseEndpoint extends EndpointForm<DatabaseState>
   public inputMap: InputDeclarationMap<DatabaseState> = {
     serverId: {
       type: DisplayType.Custom,
+      widthFactor: 5,
       options: {
         render: this.renderDatabasePicker,
       },

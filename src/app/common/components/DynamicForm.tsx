@@ -102,6 +102,15 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       [DisplayType.Custom]: this.renderCustom,
     };
 
+  public yOffsetLookup:
+    {[K in DisplayType]: number} =
+    {
+      [DisplayType.CheckBox]: -6,
+      [DisplayType.NumberBox]: 0,
+      [DisplayType.TextBox]: 0,
+      [DisplayType.Pick]: 0,
+      [DisplayType.Custom]: 0,
+    };
   constructor(props)
   {
     super(props);
@@ -211,46 +220,98 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     );
   }
 
-  public getCellStyle(inputInfo: InputDeclarationType<S>, displayState: DisplayState): object
+  public getCellStyle(
+    inputInfo: InputDeclarationType<S>,
+    preRender: PreRenderInfo
+  ): object
   {
+    const { displayState, yCenterOffset } = preRender;
     const widthFactor = inputInfo.widthFactor ? inputInfo.widthFactor : 4;
     const widthBase = 56; // subject to change
+
     return {
       width: `${widthFactor * widthBase}px`,
       display: displayState === DisplayState.Hidden ? 'none' : undefined,
+      position: 'relative',
+      top: `${-1*yCenterOffset}px`,
+    };
+  }
+
+  public getRowStyle(preRenders: List<PreRenderInfo>): object
+  {
+    const visible = preRenders.findIndex((value) => value.displayState !== DisplayState.Hidden);
+    return {
+      display: visible === -1 ? 'none' : undefined,
     }
   }
 
-  public renderInputElement(inputInfo: InputDeclarationType<S>, stateName, state: S, index): any
+  public renderInputElement(
+    inputInfo: InputDeclarationType<S>,
+    stateName,
+    preRenders: List<PreRenderInfo>,
+    state: S,
+    index
+  ): any
   {
-    const displayState = inputInfo.getDisplayState(state);
     const renderFn: renderSignature<S> = this.renderFnLookup[inputInfo.type];
-    return (
-        <div
-          key={index}
-          style={this.getCellStyle(inputInfo, displayState)}
-          className='dynamic-form-cell'
-        >
-          {renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive)}
-        </div>
+    const renderInfo = preRenders.get(index);
 
+    return (
+      <div
+        key={index}
+        style={this.getCellStyle(inputInfo, renderInfo)}
+        className='dynamic-form-cell'
+      >
+        {renderFn(inputInfo, stateName, state, index, renderInfo.displayState === DisplayState.Inactive)}
+      </div>
     );
   }
 
-  public renderMatrixCell(cellFn: MatrixCellFn<S>, index)
+  public computePreRenderInfo(inputInfo: InputDeclarationType<S>, stateName, state: S, index): PreRenderInfo
   {
-    return cellFn(this.props.inputState, index); // is essentially renderinputElement(...)
+    const displayState = inputInfo.getDisplayState(state);
+    const yCenterOffset = this.yOffsetLookup[inputInfo.type];
+
+    return {
+      displayState,
+      yCenterOffset,
+    };
+  }
+
+  public renderInputElementFactory(inputInfo, stateName)
+  {
+    return {
+      render: ((state, index, preRender) => this.renderInputElement(inputInfo, stateName, preRender, state, index)),
+      preRender: ((state, index) => this.computePreRenderInfo(inputInfo, stateName, state, index)),
+    };
+  }
+
+  // public renderMatrixCell(cellFn: MatrixCellFn<S>, index, preRender: List<PreRenderInfo>)
+  // {
+  //   return cellFn.render(this.props.inputState, index); // is essentially renderinputElement(...)
+  // }
+
+  public computeCellInfo(cellFn: MatrixCellFn<S>, index)
+  {
+    return cellFn.preRender(this.props.inputState, index);
   }
 
   public renderMatrixRow(row: MatrixRowType<S>, index)
   {
+    const preRenderInfo = row.map(this.computeCellInfo).toList();
+    const renderFn = (cell: MatrixCellFn<S>, i) => {
+      return cell.render(this.props.inputState, i, preRenderInfo);
+    };
+    const rowStyle = this.getRowStyle(preRenderInfo);
+
     return (
       <div
         key={index}
         className='dynamic-form-matrix-row'
+        style={rowStyle}
       >
         {
-          row.map(this.renderMatrixCell)
+          row.map(renderFn)
         }
       </div>
     );
@@ -331,7 +392,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         useIndex = groupToIndex[group];
       }
       renderMatrix = renderMatrix.updateIn([useIndex], List([]), (value) => value.push(
-        (state, index) => this.renderInputElement(inputInfo, stateName, state, index),
+        this.renderInputElementFactory(inputInfo, stateName),
+        // (state, index) => this.renderInputElement(inputInfo, stateName, state, index),
       ));
     }
     return renderMatrix;
@@ -361,10 +423,26 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   }
 }
 
+interface PreRenderInfo
+{
+  yCenterOffset: number;
+  displayState: DisplayState;
+}
+
 type MatrixType<S> = List<MatrixRowType<S>>; // list of list of functions
 type MatrixRowType<S> = List<MatrixCellFn<S>>;
-type MatrixCellFn<S> = (state: S, key) => any;
-type renderSignature<S> = (inputInfo: InputDeclarationType<S>, stateName: string, state: S, index: number, disabled: boolean) => any;
+interface MatrixCellFn<S> {
+  render: (state: S, key, preRender: List<PreRenderInfo>) => any;
+  preRender: (state: S, key) => PreRenderInfo;
+}
+type renderSignature<S> =
+  (
+    inputInfo: InputDeclarationType<S>,
+    stateName: string,
+    state: S,
+    index: number,
+    disabled: boolean,
+  ) => any;
 
 function noop(disabled: boolean, fn)
 {

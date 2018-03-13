@@ -193,7 +193,7 @@ class EndpointSection extends TerrainComponent<Props>
   {
     const { template } = this.props;
     const editForm = (
-      <div style={{ padding: '6px' }}>
+      <div className='new-source-modal'>
         <EndpointForm
           isSource={true}
           endpoint={this.state.newSource}
