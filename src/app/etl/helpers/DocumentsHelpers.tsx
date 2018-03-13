@@ -106,6 +106,44 @@ class DocumentsHelpers extends ETLHelpers
     onError?: (ev: string | MidwayError) => void,
   )
   {
+    // // TODO DELET THIS TESTING
+    // try {
+    //   const documents = List([
+    //     {
+    //       "named field": 'foon',
+    //       "deepArray":
+    //       [
+    //         [
+    //           5
+    //         ]
+    //       ],
+    //       'nested array': [
+    //         {
+    //           'name': 'blah',
+    //           'other name': 'blooh',
+    //         },
+    //         {
+    //           'name': 'xD',
+    //           'other name': 'hmm',
+    //         }
+    //       ]
+    //     }
+    //   ]);
+
+    //   onLoad(documents);
+    //   this.onLoadDocuments(documents, key);
+    //   if (1 === 1)
+    //   {
+    //     return;
+    //   }
+    // }
+    // catch(e)
+    // {
+    //   console.error(e);
+    //   return;
+    // }
+    // // delet this
+
     const onFetchLoad = (documents: List<object>) =>
     {
       this.onLoadDocuments(documents, key);

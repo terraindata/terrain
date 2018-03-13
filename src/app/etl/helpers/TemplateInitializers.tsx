@@ -190,6 +190,7 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     };
   }
   const { engine, warnings, softWarnings } = createMergedEngine(documents);
+
   const fieldMap = createTreeFromEngine(engine);
 
   let template = _ETLTemplate({
@@ -209,8 +210,8 @@ function createInitialTemplate(documents: List<object>, source?: SourceConfig, s
     type: NodeTypes.Source,
     endpoint: '_default',
   });
-  const sinkId = proxy.addNode(defaultSink);
   const sourceId = proxy.addNode(defaultSource);
+  const sinkId = proxy.addNode(defaultSink);
   const defaultEdge = _ETLEdge({
     from: sourceId,
     to: sinkId,
