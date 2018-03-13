@@ -90,6 +90,7 @@ export interface InputDeclarationType<S>
   group?: string; // inputs with the same group value will show in a row
   getDisplayState?: (state: S) => DisplayState;
   widthFactor?: number; // defaults to 4
+  style?: object; // extend the cell style
 }
 
 export type OptionType<K extends keyof InputDeclarationOptionTypes, S = any> = InputDeclarationOptionTypes<S>[K];

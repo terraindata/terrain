@@ -79,31 +79,35 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   public state: ElasticFieldProps;
 
   private inputMap: InputDeclarationMap<ElasticFieldProps> = {
+    isPrimaryKey: {
+      type: DisplayType.CheckBox,
+      displayName: 'Primary Key',
+      group: 'first row',
+      widthFactor: 3,
+      getDisplayState: this.showPrimaryKey,
+    },
     elasticType: {
       type: DisplayType.Pick,
       displayName: 'Elastic Type',
       group: 'first row',
+      widthFactor: 3,
       options: {
         pickOptions: this.getTypeOptions,
         indexResolver: this.resolveTypeIndex,
       },
     },
-    isPrimaryKey: {
-      type: DisplayType.CheckBox,
-      displayName: 'Primary Key',
-      group: 'first row',
-      getDisplayState: this.showPrimaryKey,
-    },
     isAnalyzed: {
       type: DisplayType.CheckBox,
       displayName: 'Analyze This Field',
       group: 'analyzer row',
+      widthFactor: 3,
       getDisplayState: this.showIsAnalyzed,
     },
     analyzer: {
       type: DisplayType.Pick,
       displayName: 'Analyzer',
       group: 'analyzer row',
+      widthFactor: 3,
       options: {
         pickOptions: this.getAnalyzerOptions,
         indexResolver: this.resolveAnalyzerIndex,

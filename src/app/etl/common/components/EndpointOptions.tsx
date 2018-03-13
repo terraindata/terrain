@@ -192,6 +192,7 @@ class UploadEndpoint extends EndpointForm<UploadState>
   public inputMap: InputDeclarationMap<UploadState> = {
     file: {
       type: DisplayType.Custom,
+      style: { padding: '0px' },
       options: {
         render: this.renderFilePicker,
       },
@@ -412,6 +413,7 @@ class DatabaseEndpoint extends EndpointForm<DatabaseState>
     serverId: {
       type: DisplayType.Custom,
       widthFactor: 5,
+      style: { padding: '0px' },
       options: {
         render: this.renderDatabasePicker,
       },

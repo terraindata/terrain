@@ -229,12 +229,20 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     const widthFactor = inputInfo.widthFactor ? inputInfo.widthFactor : 4;
     const widthBase = 56; // subject to change
 
-    return {
+    const style = {
       width: `${widthFactor * widthBase}px`,
       display: displayState === DisplayState.Hidden ? 'none' : undefined,
       position: 'relative',
       top: `${-1*yCenterOffset}px`,
     };
+    if (inputInfo.style !== undefined)
+    {
+      return _.extend(style, inputInfo.style);
+    }
+    else
+    {
+      return style;
+    }
   }
 
   public getRowStyle(preRenders: List<PreRenderInfo>): object
@@ -255,7 +263,6 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const renderFn: renderSignature<S> = this.renderFnLookup[inputInfo.type];
     const renderInfo = preRenders.get(index);
-
     return (
       <div
         key={index}
@@ -285,11 +292,6 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       preRender: ((state, index) => this.computePreRenderInfo(inputInfo, stateName, state, index)),
     };
   }
-
-  // public renderMatrixCell(cellFn: MatrixCellFn<S>, index, preRender: List<PreRenderInfo>)
-  // {
-  //   return cellFn.render(this.props.inputState, index); // is essentially renderinputElement(...)
-  // }
 
   public computeCellInfo(cellFn: MatrixCellFn<S>, index)
   {
