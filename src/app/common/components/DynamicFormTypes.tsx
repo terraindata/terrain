@@ -84,11 +84,12 @@ export interface InputDeclarationOptionTypes<S = any>
 
 export interface InputDeclarationType<S>
 {
-  type: string;
+  type: string; // TextBox, NumberBox etc
   options?: any; // one of InputDeclarationOptionTypes
   displayName?: string; // defaults to the state name
   group?: string; // inputs with the same group value will show in a row
-  shouldShow?: (state: S) => DisplayState;
+  getDisplayState?: (state: S) => DisplayState;
+  widthFactor?: number; // defaults to 4
 }
 
 export type OptionType<K extends keyof InputDeclarationOptionTypes, S = any> = InputDeclarationOptionTypes<S>[K];

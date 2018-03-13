@@ -119,7 +119,10 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const options: OptionType<DisplayType.TextBox> = inputInfo.options || {};
     return (
-      <div className='dynamic-form-autocomplete-block' key={index}>
+      <div
+        className='dynamic-form-default-block'
+        key={index}
+      >
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
         <Autocomplete
           className='dynamic-form-autocomplete'
@@ -137,7 +140,10 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const options: OptionType<DisplayType.NumberBox> = inputInfo.options || {};
     return (
-      <div className='dynamic-form-autocomplete-block' key={index}>
+      <div
+        className='dynamic-form-default-block'
+        key={index}
+      >
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
         <Autocomplete
           className='dynamic-form-autocomplete'
@@ -190,7 +196,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       onChange = this.setStateHOC(stateName);
     }
     return (
-      <div className='dynamic-form-pick-block' key={index}>
+      <div className='dynamic-form-default-block' key={index}>
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
         <span style={{ marginLeft: '0px' }}>
           <Dropdown
@@ -205,21 +211,24 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     );
   }
 
-  public getStyle(inputInfo: InputDeclarationType<S>)
+  public getCellStyle(inputInfo: InputDeclarationType<S>, displayState: DisplayState): object
   {
+    const widthFactor = inputInfo.widthFactor ? inputInfo.widthFactor : 4;
+    const widthBase = 56; // subject to change
     return {
-      width: '200px'
-    };
+      width: `${widthFactor * widthBase}px`,
+      display: displayState === DisplayState.Hidden ? 'none' : undefined,
+    }
   }
 
   public renderInputElement(inputInfo: InputDeclarationType<S>, stateName, state: S, index): any
   {
-    const displayState = inputInfo.shouldShow(state);
+    const displayState = inputInfo.getDisplayState(state);
     const renderFn: renderSignature<S> = this.renderFnLookup[inputInfo.type];
     return (
         <div
           key={index}
-          style={this.getStyle(inputInfo)}
+          style={this.getCellStyle(inputInfo, displayState)}
           className='dynamic-form-cell'
         >
           {renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive)}
@@ -313,7 +322,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const { group } = inputMap[stateName];
       const inputInfo: InputDeclarationType<S> = _.defaults({}, inputMap[stateName],
-        { displayName: stateName, shouldShow: () => true },
+        { displayName: stateName, getDisplayState: () => DisplayState.Active },
       );
       let useIndex = renderMatrix.size;
       if (group !== undefined)

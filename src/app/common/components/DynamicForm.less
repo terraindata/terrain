@@ -8,10 +8,14 @@
     display: flex;
     align-items: center;
     padding: @quarter-spacing;
+    box-sizing: border-box;
   }
 
   .dynamic-form-cell {
     box-sizing: border-box;
+    padding: @quarter-spacing;
+    box-sizing: border-box;
+    .transition;
   }
 
   .dynamic-form-checkbox-row {
@@ -27,7 +31,7 @@
     }
   }
 
-  .dynamic-form-autocomplete-block {
+  .dynamic-form-default-block {
     display: flex;
     flex-direction: column;
 
@@ -36,13 +40,6 @@
     }
   }
 
-  .dynamic-form-pick-block {
-    .dynamic-form-autocomplete-block;
-
-    .dynamic-form-label {
-      .normal-text;
-    }
-  }
   .dynamic-form-confirm-bar {
     display: flex;
     flex: 1 0 32px;
@@ -50,11 +47,13 @@
     padding: @half-spacing @quarter-spacing;
     justify-content: flex-end;
     align-items: flex-end;
+    box-sizing: border-box;
 
     .dynamic-form-button {
       .transition;
       cursor: pointer;
       padding: @half-spacing @spacing;
+      box-sizing: border-box;
       border-radius: 3px;
       &:not(:first-child) {
         margin-left: @spacing;

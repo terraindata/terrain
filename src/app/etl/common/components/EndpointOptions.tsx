@@ -103,12 +103,16 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
       hasCsvHeader: {
         type: DisplayType.CheckBox,
         displayName: 'File Has CSV Header',
-        shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
+        group: 'options',
+        widthFactor: 5,
+        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
       },
       jsonNewlines: {
         type: DisplayType.CheckBox,
         displayName: 'Objects separated by newlines',
-        shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
+        group: 'options',
+        widthFactor: 5,
+        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
       },
     };
 
@@ -311,11 +315,13 @@ class SftpEndpoint extends EndpointForm<SftpState>
       type: DisplayType.TextBox,
       displayName: 'IP Address',
       group: 'addr row',
+      widthFactor: 3
     },
     port: {
       type: DisplayType.NumberBox,
       displayName: 'Port',
       group: 'addr row',
+      widthFactor: 1,
     },
     filepath: {
       type: DisplayType.TextBox,
@@ -354,12 +360,10 @@ class HttpEndpoint extends EndpointForm<HttpState>
     accept: {
       type: DisplayType.TextBox,
       displayName: 'Accept',
-      group: 'headers',
     },
     contentType: {
       type: DisplayType.TextBox,
       displayName: 'Content Type',
-      group: 'headers',
     },
   };
 

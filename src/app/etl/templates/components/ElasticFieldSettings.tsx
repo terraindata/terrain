@@ -92,13 +92,13 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
       type: DisplayType.CheckBox,
       displayName: 'Primary Key',
       group: 'first row',
-      shouldShow: this.showPrimaryKey,
+      getDisplayState: this.showPrimaryKey,
     },
     isAnalyzed: {
       type: DisplayType.CheckBox,
       displayName: 'Analyze This Field',
       group: 'analyzer row',
-      shouldShow: this.showIsAnalyzed,
+      getDisplayState: this.showIsAnalyzed,
     },
     analyzer: {
       type: DisplayType.Pick,
@@ -108,7 +108,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
         pickOptions: this.getAnalyzerOptions,
         indexResolver: this.resolveAnalyzerIndex,
       },
-      shouldShow: this.showAnalyzer,
+      getDisplayState: this.showAnalyzer,
     },
   };
 

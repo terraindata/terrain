@@ -103,7 +103,7 @@ class DatabasePicker extends TerrainComponent<Props>
       database: {
         type: DisplayType.TextBox,
         displayName: 'Database',
-        shouldShow: this.shouldShowBoxes,
+        getDisplayState: this.getDisplayStateBoxes,
         options: {
           acOptions: this.getDatabaseOptions,
         },
@@ -111,7 +111,7 @@ class DatabasePicker extends TerrainComponent<Props>
       table: {
         type: DisplayType.TextBox,
         displayName: 'Table',
-        shouldShow: this.shouldShowBoxes,
+        getDisplayState: this.getDisplayStateBoxes,
         options: {
           acOptions: this.getTableOptions,
         },
@@ -119,7 +119,7 @@ class DatabasePicker extends TerrainComponent<Props>
     };
   }
 
-  public shouldShowBoxes(state: FormState)
+  public getDisplayStateBoxes(state: FormState)
   {
     return state.serverIndex === -1 ? DisplayState.Hidden : DisplayState.Active;
   }
