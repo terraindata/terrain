@@ -193,6 +193,7 @@ export class RouteSelector extends TerrainComponent<Props>
   public render()
   {
     const { props, state } = this;
+    console.log(this.state.optionSets);
     return (
       <div
         className='routeselector-wrapper'

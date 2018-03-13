@@ -87,6 +87,7 @@ export interface Props
   comesBeforeAGroup: boolean; // whether this immediately proceeds a filter group
   isSoftFilter?: boolean; // does this section apply to soft filters?
   fieldOptionSet: RouteSelectorOptionSet;
+  valueOptions: List<RouteSelectorOption>;
   onAddScript?: (fieldName: string, lat: any, lon: any, name: string) => string;
   onDeleteScript?: (scriptName: string) => void;
   onUpdateScript?: (fieldName: string, name: string, lat?: any, lon?: any) => void;
@@ -153,7 +154,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-
     return (
       <div
         className={classNames({
@@ -267,20 +267,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       // hasOther: false,
     };
 
-    let valueOptions = List<RouteSelectorOption>();
-    let valueHeader = '';
     const shouldShowValue = this.shouldShowValue();
-
-    if (shouldShowValue)
-    {
-      // TODO add more value options
-      // TODO add value component selector for Other
-      valueOptions = pathfinderContext.source.dataSource.getChoiceOptions({
-        type: 'input',
-        builderState: pathfinderContext.builderState,
-      });
-    }
-    else if (filterLine.field && !filterLine.comparison)
+    let valueOptions = shouldShowValue ? this.props.valueOptions : List<RouteSelectorOption>();
+    let valueHeader = '';
+    
+    if (filterLine.field && !filterLine.comparison)
     {
       valueHeader = 'Choose a method next';
     }

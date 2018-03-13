@@ -918,10 +918,44 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   {
     if (List.isList(value))
     {
-      value = JSON.stringify(value);
-      value = value.replace(/\"/g, '').replace(/,/g, ', ').replace(/\[/g, '').replace(/\]/g, '');
       tooltipText = JSON.stringify(value, null, 2);
       tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
+      let valueString = '';
+
+      return (
+        <div>
+          {
+            value.map((val, i) =>
+            {
+              if (typeof val === 'object')
+              {
+                val = Util.asJS(val);
+                return (
+                  <div key={i}>
+                  {
+                     _.keys(val).map((key, j) =>
+                       <div key={j}>
+                        <span
+                          style={{marginRight: 6, opacity: 0.35}}
+                        >
+                        <b>{key}: </b>
+                        </span>
+                        <span>
+                          {JSON.stringify(val[key])}
+                        </span>
+                        <br/>
+                       </div>
+                    )
+                  }
+                  <br/>
+                  </div>
+                );
+              }
+              return null;
+            })
+          }
+        </div>
+      );
     }
   }
   if (typeof value === 'object')

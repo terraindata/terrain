@@ -536,6 +536,8 @@ class PathfinderContextC extends BaseClass
   public canEdit: boolean = null;
   public schemaState: SchemaState = null;
   public builderState: BuilderState = null;
+  public parentSource?: Source = null;
+  public parentName?: string = null;
 }
 export type PathfinderContext = PathfinderContextC & IRecord<PathfinderContextC>;
 export const _PathfinderContext = (config?: { [key: string]: any }) =>
@@ -563,16 +565,12 @@ type ChoiceContext = {
     field: string,
     fieldType?: FieldType,
   } | {
-    type: 'valueType',
+    type: 'input',
     source: Source,
     schemaState: SchemaState,
     builderState: BuilderState,
-    field: string,
-    comparison: string,
-  } | {
-    type: 'input',
-    builderState: BuilderState,
-    // TODO builder state
+    isNested: boolean,
+    parentName: string,
   };
 
 class ElasticDataSourceC extends DataSource
@@ -788,14 +786,32 @@ class ElasticDataSourceC extends DataSource
     }
     if (context.type === 'input')
     {
-      // TODO use current builder state
-      const inputs = context.builderState.query.inputs;
-      return inputs.map((input) =>
+      // Get all of the inputs
+      let inputs = context.builderState.query.inputs;
+      inputs = inputs.map((input) =>
         _ChoiceOption({
           displayName: '@' + String(input.key),
           value: '@' + String(input.key),
         }),
       ).toList();
+      // If this is a nested query, also get all of the parents fields (@{parentName}.{parentField})
+      let parentFields = List([]);
+      if (context.isNested)
+      {
+        parentFields = context.source.dataSource
+          .getChoiceOptions({
+            type: 'fields',
+            builderState: context.builderState,
+            schemaState: context.schemaState,
+            source: context.source,
+        });
+        parentFields = parentFields.map((field) =>
+          _ChoiceOption({
+            displayName: '@' + context.parentName + '.' + field.displayName,
+            value: '@' + context.parentName + '.' + field.value,
+        })).toList();
+      }
+      return inputs.concat(parentFields).toList();
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));

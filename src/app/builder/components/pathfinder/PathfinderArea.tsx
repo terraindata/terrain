@@ -66,7 +66,7 @@ import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
-import { _PathfinderContext, _Script, Path, PathfinderSteps } from './PathfinderTypes';
+import { _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 
@@ -78,6 +78,8 @@ export interface Props
   canEdit: boolean;
   schema: SchemaState;
   keyPath?: KeyPath;
+  parentSource?: Source;
+  parentName?: string;
   colorsActions: typeof ColorsActions;
   colors: ColorsState;
   toSkip?: number;
@@ -105,7 +107,9 @@ class PathfinderArea extends TerrainComponent<Props>
       pathfinderContext.source !== nextProps.path.source ||
       pathfinderContext.step !== nextProps.path.step ||
       pathfinderContext.schemaState !== nextProps.schema ||
-      pathfinderContext.builderState.db !== nextProps.builder.db
+      pathfinderContext.builderState.db !== nextProps.builder.db ||
+      pathfinderContext.parentSource !== nextProps.parentSource ||
+      pathfinderContext.parentName !== nextProps.parentName
     )
     {
       this.setState({
@@ -123,6 +127,8 @@ class PathfinderArea extends TerrainComponent<Props>
       step: props.path.step,
       schemaState: props.schema,
       builderState: props.builder,
+      parentSource: props.parentSource,
+      parentName: props.parentName
     };
   }
 

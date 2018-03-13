@@ -210,6 +210,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         schema={this.props.pathfinderContext.schemaState}
         keyPath={this.props.keyPath.butLast().toList().push('nested').push(i)}
         toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
+        parentSource={this.props.pathfinderContext.source}
+        parentName={this.props.more.references.get(i)}
       />
     );
   }

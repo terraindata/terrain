@@ -59,7 +59,7 @@ import CustomDragLayer from 'app/common/components/CustomDragLayer';
 import DragDropGroup from 'app/common/components/DragDropGroup';
 import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
-import { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
+import { RouteSelectorOptionSet, RouteSelectorOption } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
 import FadeInOut from 'common/components/FadeInOut';
 import SingleRouteSelector from 'common/components/SingleRouteSelector';
@@ -91,9 +91,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     {
       dragging: boolean,
       fieldOptionSet: RouteSelectorOptionSet,
+      valueOptions:  List<RouteSelectorOption>,
     } = {
       dragging: false,
       fieldOptionSet: undefined,
+      valueOptions: undefined,
     };
 
   public componentWillMount()
@@ -115,6 +117,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     });
     this.setState({
       fieldOptionSet: this.getFieldOptionSet(this.props),
+      valueOptions: this.getValueOptions(this.props),
     });
   }
 
@@ -125,6 +128,19 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     {
       this.setState({
         fieldOptionSet: this.getFieldOptionSet(nextProps),
+      });
+    }
+    // If inputs changes, or parent query data source changes, update value possibilities
+    if (nextProps.pathfinderContext.builderState.query.inputs !==
+       this.props.pathfinderContext.builderState.query.inputs ||
+       !_.isEqual(nextProps.pathfinderContext.parentSource,
+       this.props.pathfinderContext.parentSource) ||
+       nextProps.pathfinderContext.parentName !==
+       this.props.pathfinderContext.parentName
+      )
+    {
+      this.setState({
+        valueOptions: this.getValueOptions(nextProps)
       });
     }
   }
@@ -153,6 +169,22 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       // hasOther: false,
     };
     return fieldSet;
+  }
+
+  public getValueOptions(props: Props)
+  {
+    const { pathfinderContext, keyPath } = props;
+    const { source } = pathfinderContext;
+    const valueOptions = source.dataSource.getChoiceOptions({
+      type: 'input',
+      source: pathfinderContext.parentSource,
+      builderState: pathfinderContext.builderState,
+      schemaState: pathfinderContext.schemaState,
+      isNested: keyPath.includes('nested'),
+      parentName: pathfinderContext.parentName,
+    });
+    console.log('value options ', valueOptions);
+    return valueOptions;
   }
 
   public shouldComponentUpdate(nextProps, nextState)
@@ -243,6 +275,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         comesBeforeAGroup={successor && this.isGroup(successor)}
         isSoftFilter={isSoftFilter}
         fieldOptionSet={this.state.fieldOptionSet}
+        valueOptions={this.state.valueOptions}
         onAddScript={this.props.onAddScript}
         onDeleteScript={this.props.onDeleteScript}
         onUpdateScript={this.props.onUpdateScript}
@@ -447,7 +480,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         />
         <FadeInOut
           open={!filterGroup.collapsed}
-        // POSSIBLY DONT UNMOUNT
         >
           <CustomDragLayer />
           <DropZone
