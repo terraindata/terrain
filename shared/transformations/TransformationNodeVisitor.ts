@@ -44,11 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// import * as winston from 'winston';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
+import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
-import PlusTransformationNode from './nodes/PlusTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
@@ -76,7 +75,7 @@ export default abstract class TransformationNodeVisitor
     return this.visitDefault(node, doc, options);
   }
 
-  public visitPlusNode(node: PlusTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visitInsertNode(node: InsertTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

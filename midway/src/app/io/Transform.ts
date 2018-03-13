@@ -109,67 +109,74 @@ export function applyTransforms(obj: object, transforms: object[]): object
         e.setOutputKeyPath(e.addField(KeyPath(path.split('.'))), KeyPath([newName]));
         break;
       case 'split':
-        colName = transform['colName'];
-        newName = transform['args']['newName'];
-        const splitText: string | undefined = transform['args']['text'];
-        if (colName === undefined || newName === undefined || splitText === undefined)
-        {
-          throw new Error('Split transformation must supply colName, newName, and text arguments.');
-        }
-        if (newName.length !== 2)
-        {
-          throw new Error('Split transformation currently only supports splitting into two columns.');
-        }
-        if (typeof obj[colName] !== 'string')
-        {
-          throw new Error('Can only split columns containing text.');
-        }
-        const oldText: string = obj[colName];
-        delete obj[colName];
-        const ind: number = oldText.indexOf(splitText);
-        if (ind === -1)
-        {
-          obj[newName[0]] = oldText;
-          obj[newName[1]] = '';
-        }
-        else
-        {
-          obj[newName[0]] = oldText.substring(0, ind);
-          obj[newName[1]] = oldText.substring(ind + splitText.length);
-        }
+        // TODO:
+        //
+        // colName = transform['colName'];
+        // newName = transform['args']['newName'];
+        // const splitText: string | undefined = transform['args']['text'];
+        // if (colName === undefined || newName === undefined || splitText === undefined)
+        // {
+        //   throw new Error('Split transformation must supply colName, newName, and text arguments.');
+        // }
+        // if (newName.length !== 2)
+        // {
+        //   throw new Error('Split transformation currently only supports splitting into two columns.');
+        // }
+        // if (typeof obj[colName] !== 'string')
+        // {
+        //   throw new Error('Can only split columns containing text.');
+        // }
+        // const oldText: string = obj[colName];
+        // delete obj[colName];
+        // const ind: number = oldText.indexOf(splitText);
+        // if (ind === -1)
+        // {
+        //   obj[newName[0]] = oldText;
+        //   obj[newName[1]] = '';
+        // }
+        // else
+        // {
+        //   obj[newName[0]] = oldText.substring(0, ind);
+        //   obj[newName[1]] = oldText.substring(ind + splitText.length);
+        // }
         break;
       case 'merge':
-        colName = transform['colName'];
-        newName = transform['args']['newName'];
-        const mergeCol: string | undefined = transform['args']['mergeName'];
-        const mergeText: string | undefined = transform['args']['text'];
-        if (colName === undefined || mergeCol === undefined || newName === undefined || mergeText === undefined)
-        {
-          throw new Error('Merge transformation must supply colName, mergeName, newName, and text arguments.');
-        }
-        if (typeof obj[colName] !== 'string' || typeof obj[mergeCol] !== 'string')
-        {
-          throw new Error('Can only merge columns containing text.');
-        }
-        obj[newName] = String(obj[colName]) + mergeText + String(obj[mergeCol]);
-        if (colName !== newName)
-        {
-          delete obj[colName];
-        }
-        if (mergeCol !== newName)
-        {
-          delete obj[mergeCol];
-        }
+        // TODO:
+        //
+        // colName = transform['colName'];
+        // newName = transform['args']['newName'];
+        // const mergeCol: string | undefined = transform['args']['mergeName'];
+        // const mergeText: string | undefined = transform['args']['text'];
+        // if (colName === undefined || mergeCol === undefined || newName === undefined || mergeText === undefined)
+        // {
+        //   throw new Error('Merge transformation must supply colName, mergeName, newName, and text arguments.');
+        // }
+        // if (typeof obj[colName] !== 'string' || typeof obj[mergeCol] !== 'string')
+        // {
+        //   throw new Error('Can only merge columns containing text.');
+        // }
+        // obj[newName] = String(obj[colName]) + mergeText + String(obj[mergeCol]);
+        // if (colName !== newName)
+        // {
+        //   delete obj[colName];
+        // }
+        // if (mergeCol !== newName)
+        // {
+        //   delete obj[mergeCol];
+        // }
         break;
       case 'duplicate':
-        colName = transform['colName'];
-        const copyName: string | undefined = transform['args']['newName'];
-        if (colName === undefined || copyName === undefined)
-        {
-          throw new Error('Duplicate transformation must supply colName and newName arguments.');
-        }
-        obj[copyName] = obj[colName];
-        break;
+        // colName = transform['colName'];
+        // const copyName: string | undefined = transform['args']['newName'];
+        // if (colName === undefined || copyName === undefined)
+        // {
+        //   throw new Error('Duplicate transformation must supply colName and newName arguments.');
+        // }
+        // e.appendTransformation(TransformationNodeType.DuplicateNode, List<KeyPath>([KeyPath([colName])]),
+        //   {
+        //     name: copyName,
+        //   });
+        // break;
       case 'prepend':
         colName = transform['colName'];
         const prependText: string | undefined = transform['args']['text'];
@@ -177,12 +184,7 @@ export function applyTransforms(obj: object, transforms: object[]): object
         {
           throw new Error('Prepend transformation must supply colName and text arguments.');
         }
-        if (typeof obj[colName] !== 'string')
-        {
-          throw new Error('Can only prepend to columns of type string.');
-        }
-        e.appendTransformation(TransformationNodeType.PlusNode, List<KeyPath>([KeyPath([colName])]));
-        obj[colName] = prependText + String(obj[colName]);
+        e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath([colName])]), { at: 0, value: prependText});
         break;
       case 'append':
         colName = transform['colName'];
@@ -191,11 +193,7 @@ export function applyTransforms(obj: object, transforms: object[]): object
         {
           throw new Error('Append transformation must supply colName and text arguments.');
         }
-        if (typeof obj[colName] !== 'string')
-        {
-          throw new Error('Can only append to columns of type string.');
-        }
-        obj[colName] = String(obj[colName]) + appendText;
+        e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath([colName])]), { at: 0, value: appendText});
         break;
       default:
         throw new Error('Invalid transform name encountered: ' + String(transform['name']));

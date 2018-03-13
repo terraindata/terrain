@@ -50,7 +50,7 @@ enum TransformationNodeType
   JoinNode = 'JoinNode',
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
-  PlusNode = 'PlusNode',
+  InsertNode = 'InsertNode',
   UppercaseNode = 'UppercaseNode',
   SubstringNode = 'SubstringNode',
 }
@@ -72,7 +72,10 @@ interface TransformationOptionTypes
   JoinNode: any;
   FilterNode: any;
   DuplicateNode: any;
-  PlusNode: any;
+  InsertNode: {
+    at?: number;
+    value: string | List<string>;
+  };
   UppercaseNode: {
   };
   SubstringNode: {

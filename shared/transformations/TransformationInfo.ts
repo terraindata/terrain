@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
+import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
-import PlusTransformationNode from './nodes/PlusTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
@@ -131,18 +131,18 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitDuplicateNode(transformationNode, docCopy, options),
       },
-    [TransformationNodeType.PlusNode]:
+    [TransformationNodeType.InsertNode]:
       {
-        humanName: 'Add',
+        humanName: 'Insert String',
         editable: true,
         creatable: true,
-        description: `Add a value to this field's value`,
-        type: PlusTransformationNode,
+        description: `Insert a string at a given position in this field's value`,
+        type: InsertTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
-          visitor.visitPlusNode(transformationNode, docCopy, options),
+          visitor.visitInsertNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.UppercaseNode]:
       {

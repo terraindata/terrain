@@ -48,7 +48,7 @@ import { KeyPath } from '../../util/KeyPath';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNode from './TransformationNode';
 
-export default class PlusTransformationNode extends TransformationNode
+export default class InsertTransformationNode extends TransformationNode
 {
   public constructor(id: number,
     fields: List<KeyPath>,
