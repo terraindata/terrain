@@ -119,12 +119,10 @@ const substringInputMap: InputDeclarationMap<SubstringState> = {
   from: {
     type: DisplayType.NumberBox,
     displayName: 'From Position',
-    group: 'main',
   },
   length: {
     type: DisplayType.NumberBox,
     displayName: 'Substring Length',
-    group: 'main',
   },
 };
 

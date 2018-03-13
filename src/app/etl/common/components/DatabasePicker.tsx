@@ -99,7 +99,6 @@ class DatabasePicker extends TerrainComponent<Props>
         options: {
           pickOptions: this.getServerOptions,
         },
-        fillSpace: true,
       },
       database: {
         type: DisplayType.TextBox,
@@ -108,7 +107,6 @@ class DatabasePicker extends TerrainComponent<Props>
         options: {
           acOptions: this.getDatabaseOptions,
         },
-        fillSpace: true,
       },
       table: {
         type: DisplayType.TextBox,
@@ -117,7 +115,6 @@ class DatabasePicker extends TerrainComponent<Props>
         options: {
           acOptions: this.getTableOptions,
         },
-        fillSpace: true,
       },
     };
   }

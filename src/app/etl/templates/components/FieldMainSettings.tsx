@@ -176,12 +176,10 @@ const settingsInputMap: InputDeclarationMap<SettingsState> = {
   fieldName: {
     type: DisplayType.TextBox,
     displayName: 'Name',
-    group: 'row',
   },
   isIncluded: {
     type: DisplayType.CheckBox,
     displayName: 'Include this field',
-    group: 'row',
   },
   type: {
     type: DisplayType.Pick,

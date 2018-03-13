@@ -95,7 +95,6 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
       fileType: {
         type: DisplayType.Pick,
         displayName: 'File Type',
-        group: 'row1',
         options: {
           pickOptions: (s: FileConfigI) => fileTypeList,
           indexResolver: (value) => fileTypeList.indexOf(value),
@@ -104,13 +103,11 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
       hasCsvHeader: {
         type: DisplayType.CheckBox,
         displayName: 'File Has CSV Header',
-        group: 'row1',
         shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
       },
       jsonNewlines: {
         type: DisplayType.CheckBox,
         displayName: 'Objects separated by newlines',
-        group: 'row1',
         shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
       },
     };

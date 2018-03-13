@@ -205,20 +205,26 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     );
   }
 
+  public getStyle(inputInfo: InputDeclarationType<S>)
+  {
+    return {
+      width: '200px'
+    };
+  }
+
   public renderInputElement(inputInfo: InputDeclarationType<S>, stateName, state: S, index): any
   {
     const displayState = inputInfo.shouldShow(state);
     const renderFn: renderSignature<S> = this.renderFnLookup[inputInfo.type];
     return (
-      <FadeInOut
-        key={index}
-        open={displayState !== DisplayState.Hidden}
-        style={{ flexGrow: inputInfo.fillSpace === true ? '1' : '0' }}
-      >
-        <div className={inputInfo.className} style={inputInfo.style}>
+        <div
+          key={index}
+          style={this.getStyle(inputInfo)}
+          className='dynamic-form-cell'
+        >
           {renderFn(inputInfo, stateName, state, index, displayState === DisplayState.Inactive)}
         </div>
-      </FadeInOut>
+
     );
   }
 
@@ -230,7 +236,10 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   public renderMatrixRow(row: MatrixRowType<S>, index)
   {
     return (
-      <div key={index} className='dynamic-form-matrix-row'>
+      <div
+        key={index}
+        className='dynamic-form-matrix-row'
+      >
         {
           row.map(this.renderMatrixCell)
         }
