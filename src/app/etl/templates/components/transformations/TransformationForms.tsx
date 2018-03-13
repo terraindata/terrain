@@ -103,6 +103,7 @@ const uppercaseArgs: FactoryArgs<UppercaseState, TransformationNodeType.Uppercas
   inputMap: uppercaseInputMap,
   type: TransformationNodeType.UppercaseNode,
   initialState: {},
+  noEditOptions: true,
 };
 
 const UppercaseClass =
