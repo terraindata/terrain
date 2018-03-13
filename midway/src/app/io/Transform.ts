@@ -193,7 +193,7 @@ export function applyTransforms(obj: object, transforms: object[]): object
         {
           throw new Error('Append transformation must supply colName and text arguments.');
         }
-        e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath([colName])]), { at: 0, value: appendText});
+        e.appendTransformation(TransformationNodeType.InsertNode, List<KeyPath>([KeyPath([colName])]), { value: appendText});
         break;
       default:
         throw new Error('Invalid transform name encountered: ' + String(transform['name']));
