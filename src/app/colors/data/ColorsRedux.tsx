@@ -44,10 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
-
-// Copyright 2017 Terrain Data, Inc.
-
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 import * as Immutable from 'immutable';
 import { Map } from 'immutable';

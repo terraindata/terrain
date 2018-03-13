@@ -81,6 +81,7 @@ export interface Props
   id?: ID;
   vertical?: boolean;
   openRight?: boolean; // menu will open to the right
+  onChangeState?: (open: boolean) => void;
 }
 
 @Radium
@@ -148,6 +149,10 @@ class Menu extends TerrainComponent<Props>
     this.setState({
       open: false,
     });
+    if (this.props.onChangeState)
+    {
+      this.props.onChangeState(false);
+    }
     $(document).off('click', this.close);
   }
 
@@ -169,6 +174,11 @@ class Menu extends TerrainComponent<Props>
   {
     e.preventDefault();
     e.stopPropagation();
+
+    if (this.props.onChangeState)
+    {
+      this.props.onChangeState(!this.state.open);
+    }
     this.setState({
       open: !this.state.open,
     });

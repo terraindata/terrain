@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
+
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';
@@ -53,6 +54,9 @@ import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
 import ControlPage from './control/components/ControlPage';
+import ETLEditorPage from './etl/components/ETLEditorPage';
+import ETLPage from './etl/components/ETLPage';
+import ETLWalkthrough from './etl/walkthrough/components/ETLWalkthrough';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
 import ManualWrapper from './manual/components/ManualWrapper';
@@ -130,7 +134,14 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/control' component={ControlPage} />
 
-          <Route path='/import' component={FileImport} />
+          <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
+          <Route path='/etl' component={ETLPage}>
+            <IndexRoute component={ETLWalkthrough} />
+            <Route path='new/:step' component={ETLWalkthrough} />
+            <Route path='edit/new' component={ETLEditorPage} />
+            <Route path='edit/algorithmId=:algorithmId' component={ETLEditorPage} />
+            <Route path='edit/templateId=:templateId' component={ETLEditorPage} />
+          </Route>
           <Route path='/analytics'>
             <IndexRoute component={analyticsLibrary} />
             <Route path=':categoryId' component={analyticsLibrary}>

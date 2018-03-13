@@ -1,0 +1,109 @@
+/*
+University of Illinois/NCSA Open Source License 
+
+Copyright (c) 2018 Terrain Data, Inc. and the authors. All rights reserved.
+
+Developed by: Terrain Data, Inc. and
+              the individuals who committed the code in this file.
+              https://github.com/terraindata/terrain
+                  
+Permission is hereby granted, free of charge, to any person 
+obtaining a copy of this software and associated documentation files 
+(the "Software"), to deal with the Software without restriction, 
+including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, 
+and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:
+
+* Redistributions of source code must retain the above copyright notice, 
+  this list of conditions and the following disclaimers.
+
+* Redistributions in binary form must reproduce the above copyright 
+  notice, this list of conditions and the following disclaimers in the 
+  documentation and/or other materials provided with the distribution.
+
+* Neither the names of Terrain Data, Inc., Terrain, nor the names of its 
+  contributors may be used to endorse or promote products derived from
+  this Software without specific prior written permission.
+
+This license supersedes any copyright notice, license, or related statement
+following this comment block.  All files in this repository are provided
+under the same license, regardless of whether a corresponding comment block
+appears in them.  This license also applies retroactively to any previous
+state of the repository, including different branches and commits, which
+were made public on or after December 8th, 2018.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
+THE SOFTWARE.
+*/
+
+// Copyright 2018 Terrain Data, Inc.
+import * as _ from 'lodash';
+import ConfigType from '../ConfigType';
+
+import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
+import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+
+export class TemplateConfig extends ConfigType implements TemplateBase
+{
+  public id?: number = undefined;
+  public archived: boolean = false; // TODO, add ability to filter on this in routes
+  public templateName: string = '';
+  public process: ETLProcess = {
+    nodes: {},
+    edges: [],
+    uidNode: 0,
+    uidEdge: 0,
+  };
+  public sources: {
+    _default?: SourceConfig;
+    [k: string]: SourceConfig;
+  } = {};
+  public sinks: {
+    _default?: SinkConfig;
+    [k: string]: SinkConfig;
+  } = {};
+
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
+
+export type TemplateInDatabase = {
+  [k in keyof TemplateBase]: string | number | boolean;
+};
+
+export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfig
+{
+  const newObj: TemplateObject = _.extend({}, obj);
+  if (newObj.sources != null)
+  {
+    newObj.sources = JSON.parse(newObj.sources as string);
+  }
+  if (newObj.sinks != null)
+  {
+    newObj.sinks = JSON.parse(newObj.sinks as string);
+  }
+  if (newObj.process != null)
+  {
+    newObj.process = JSON.parse(newObj.process as string);
+  }
+  return new TemplateConfig(newObj);
+}
+
+export function templateForSave(template: TemplateObject): TemplateInDatabase
+{
+  const obj = _.extend({}, template);
+  obj.sources = JSON.stringify(template.sources);
+  obj.sinks = JSON.stringify(template.sinks);
+  obj.process = JSON.stringify(template.process);
+  return obj;
+}

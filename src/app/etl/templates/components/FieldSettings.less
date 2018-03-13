@@ -1,0 +1,101 @@
+@import "../../../common/Common.less";
+
+@title-bar-height: 40px;
+// EditorFieldSettings
+.template-editor-field-settings {
+  padding: 0px;
+  flex: 1;
+
+  .field-settings-title-bar {
+    height: @title-bar-height;
+    display: flex;
+    position: relative;
+    border-bottom: 1px solid;
+    box-sizing: border-box;
+
+    .field-settings-category {
+      .transition;
+      display: flex;
+      margin: 0px @half-spacing;
+      padding: @quarter-spacing 0px;
+      width: 128px;
+      font-size: 18px;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .field-settings-title-filler {
+      width: 1px;
+      flex: 1 0 1px;
+    }
+
+    .field-settings-close-button {
+      .transition;
+      display: flex;
+      margin: 0px @half-spacing;
+      padding: @quarter-spacing 0px;
+      width: 32px;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      svg {
+        fill: currentColor;
+      }
+    }
+  }
+
+  .field-settings-section {
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+    justify-content: center;
+    height: ~"calc(100% - @{title-bar-height})";
+  }
+
+  .field-settings-row {
+    display: flex;
+    padding: @half-spacing;
+    align-items: center;
+  }
+
+  .field-settings-label {
+    padding-right: @spacing;
+    padding-left: @half-spacing;
+  }
+}
+
+.field-main-settings {
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.field-advanced-settings {
+  min-width: 200px;
+  display: flex;
+}
+
+// shared
+.tef-checkbox-section {
+  padding-left: @half-spacing;
+  display: flex;
+  cursor: pointer;
+  .transition;
+}
+
+.tef-checkbox-label {
+  padding: @quarter-spacing + @half-spacing @half-spacing;
+  padding-left: 0px;
+}
+
+.tef-checkbox-spacer {
+  margin-top: 2px;
+  padding: @half-spacing;
+  padding-right: 0px;
+  margin-right: -3px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  bottom: 1px;
+}

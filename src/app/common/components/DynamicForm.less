@@ -1,0 +1,75 @@
+@import "../Common.less";
+
+.dynamic-form {
+  display: flex;
+  flex-direction: column;
+
+  .dynamic-form-matrix-row {
+    display: flex;
+    align-items: center;
+    padding: @quarter-spacing;
+  }
+
+  .dynamic-form-input-element {
+    flex: 1;
+  }
+
+  .dynamic-form-checkbox-row {
+    margin-right: @spacing;
+    padding-top: @quarter-spacing;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    .dynamic-form-checkbox {
+      margin-bottom: 1px;
+    }
+
+    .dynamic-form-label {
+
+    }
+  }
+
+  .dynamic-form-autocomplete-block {
+    margin-right: @half-spacing;
+    margin-left: @half-spacing;
+    display: flex;
+    flex-direction: column;
+
+    .dynamic-form-label {
+      .normal-text;
+    }
+  }
+
+  .dynamic-form-pick-block {
+    .dynamic-form-autocomplete-block;
+
+    .dynamic-form-label {
+      .normal-text;
+    }
+  }
+  .dynamic-form-confirm-bar {
+    display: flex;
+    flex: 1 0 32px;
+    margin-top: @half-spacing;
+    padding: @half-spacing @quarter-spacing;
+    justify-content: flex-end;
+    align-items: flex-end;
+
+    .dynamic-form-button {
+      .transition;
+      cursor: pointer;
+      padding: @half-spacing @spacing;
+      border-radius: 3px;
+      &:not(:first-child) {
+        margin-left: @spacing;
+      }
+      &.dynamic-form-button-active {
+
+      }
+      &.dynamic-form-button-disabled {
+        cursor: default;
+      }
+    }
+  }
+
+}

@@ -156,7 +156,6 @@ class Builder extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
     this._subscribe(FileImportStore, {
       stateKey: 'exportState',
     });

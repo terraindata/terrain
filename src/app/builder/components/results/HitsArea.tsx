@@ -61,6 +61,7 @@ import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
+
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
@@ -76,6 +77,9 @@ import MapComponent from '../../../common/components/MapComponent';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
+
+import ETLRouteUtil from 'etl/ETLRouteUtil';
+
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
 const HITS_PAGE_SIZE = 20;
@@ -83,11 +87,10 @@ const HITS_PAGE_SIZE = 20;
 export interface Props
 {
   resultsState: ResultsState;
-  exportState?: FileImportState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
-  algorithmName: string;
+  algorithmId: ID;
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
@@ -106,7 +109,6 @@ interface State
   hitsPages: number;
   onHitsLoaded?: (unchanged?: boolean) => void;
 
-  showingExport?: boolean;
   mapHeight?: number;
   mouseStartY?: number;
   mapMaxHeight?: number;
@@ -128,7 +130,6 @@ class HitsArea extends TerrainComponent<Props>
     expanded: false,
     expandedHitIndex: null,
     showingConfig: false,
-    showingExport: false,
     hitsPages: 1,
     hitFormat: 'icon',
     mapHeight: MAP_MIN_HEIGHT,
@@ -606,65 +607,6 @@ class HitsArea extends TerrainComponent<Props>
     );
   }
 
-  /* public handleESresultExport()
-  {
-    this.props.onNavigationException();
-
-    const { xhr, queryId } = Ajax.query(
-      this.props.query.tql,
-      this.props.db,
-      _.noop,
-      _.noop,
-      false,
-      {
-        streaming: true,
-        streamingTo: this.props.algorithmName + ' on ' + moment().format('MM/DD/YY') + '.json',
-      },
-    );
-
-    // TODO kill this on unmount
-    this.setState({
-      csvXhr: xhr,
-      csvQueryId: queryId,
-    });
-
-    alert('Your data is being prepared for export, and will be automatically downloaded when ready.\n\
-Note: this exports the results of your query, which may be different from the results in the Results \
-column if you have customized the results view.');
-  }*/
-
-  /*  handleExport()
-    {
-      this.props.onNavigationException();
-
-      const {xhr, queryId} = Ajax.query(
-        .toTQL(
-          this.props.query,
-          {
-            replaceInputs: true,
-          },
-        ),
-        this.props.db,
-        _.noop,
-        _.noop,
-        false,
-        {
-          csv: true,
-          csvName: this.props.algorithmName + ' on ' + moment().format('MM/DD/YY') + '.csv',
-        },
-      );
-
-      // TODO kill this on unmount
-      this.setState({
-        csvXhr: xhr,
-        csvQueryId: queryId,
-      });
-
-      alert('Your data are being prepared for export, and will automatically download when ready.\n\
-  Note: this exports the results of your query, which may be different from the results in the Results \
-  column if you have set a custom results view.');
-    }*/
-
   public toggleView()
   {
     this.setState({
@@ -749,16 +691,7 @@ column if you have customized the results view.');
 
   public showExport()
   {
-    this.setState({
-      showingExport: true,
-    });
-  }
-
-  public hideExport()
-  {
-    this.setState({
-      showingExport: false,
-    });
+    ETLRouteUtil.gotoEditAlgorithm(this.props.algorithmId);
   }
 
   public showConfig()
@@ -773,51 +706,6 @@ column if you have customized the results view.');
     this.setState({
       showingConfig: false,
     });
-  }
-
-  public renderExport()
-  {
-    const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
-      filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
-    // const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-    //   filetype, requireJSONHaveAllFields, exportRank, objectKey, elasticUpdate } = this.props.exportState;
-
-    const content =
-      <div
-        style={backgroundColor(Colors().bg1)}
-      >
-        <FileImportPreview
-          exporting={true}
-          filetype={filetype}
-          previewColumns={previewColumns}
-          columnNames={columnNames}
-          columnsToInclude={columnsToInclude}
-          columnTypes={columnTypes}
-          templates={templates}
-          transforms={transforms}
-          columnOptions={List()}
-          uploadInProgress={false}
-          requireJSONHaveAllFields={requireJSONHaveAllFields}
-          objectKey={objectKey}
-          exportRank={exportRank}
-          elasticUpdate={elasticUpdate}
-          query={this.props.query}
-          inputs={this.props.query.inputs}
-          serverId={Number(this.props.db.id)}
-          algorithmName={this.props.algorithmName}
-        />
-      </div>;
-
-    return (
-      <Modal
-        open={this.state.showingExport}
-        onClose={this.hideExport}
-        title={'Export'}
-        children={content}
-        fill={true}
-        noFooterPadding={true}
-      />
-    );
   }
 
   public renderConfig()
@@ -849,7 +737,6 @@ column if you have customized the results view.');
         {this.renderHitsMap()}
         {this.renderExpandedHit()}
         {this.props.showCustomizeView && this.renderConfig()}
-        {this.props.showExport && this.renderExport()}
       </div>
     );
   }

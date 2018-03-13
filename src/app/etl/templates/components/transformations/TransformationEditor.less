@@ -1,0 +1,137 @@
+@import "~common/Common.less";
+
+// TemplateEditorFieldTransformations
+.template-editor-field-transformations {
+  padding: @half-spacing;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+
+  .transformations-list-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 0 1 100%;
+    overflow-x: hidden;
+    .transition;
+  }
+
+  .transformations-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .transformation-row {
+      align-items: stretch;
+      display: flex;
+      width: 220px;
+      justify-content: space-between;
+    }
+
+    .transformation-row-text {
+      .transition;
+      padding: @quarter-spacing;
+      display: flex;
+      align-items: center;
+    }
+
+    .edit-transformation-spacer {
+      display: flex;
+      align-items: center;
+    }
+
+    .edit-transformation-button {
+      .transition;
+      padding: @half-spacing;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-radius: 3px;
+      svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+      }
+    }
+
+    .add-transformation-row {
+      cursor: pointer;
+      display: flex;
+      border-radius: 3px;
+      padding: @half-spacing;
+      justify-content: center;
+    }
+
+    .add-transformation-button {
+      display: flex;
+      align-items: center;
+      padding: @half-spacing;
+      padding-bottom: @half-spacing + 1px;
+      .transition;
+      svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+      } 
+    }
+  }
+
+  .transformation-fade-container {
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+
+    .transformation-inner-container {
+      display: block;
+    }
+  }
+}
+
+// transformation creator and transformation editor
+.transformation-editor {
+  padding: @half-spacing;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .transformation-editor-title {
+    padding: @half-spacing;
+  }
+
+  .available-transformations-list {
+    display: flex;
+    flex-direction: column;
+
+    .transformation-option {
+      padding: @half-spacing;
+      border: 1px solid;
+      margin: @quarter-spacing;
+      border-radius: 3px;
+    }
+  }
+
+  .create-transformation-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 100px;
+
+    .create-transformation-title {
+      display: flex;
+      padding: @half-spacing;
+      border-bottom: 1px solid;
+      justify-content: center;
+    }
+
+    .create-transformation-component {
+      display: flex;
+      padding: @half-spacing;
+      flex: 1 0 100px;
+    }
+  }
+
+  .edit-transformation-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 100px;
+  }
+}

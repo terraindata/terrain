@@ -420,6 +420,10 @@
   version "8.9.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.9.4.tgz#dfd327582a06c114eb6e0441fa3d6fab35edad48"
 
+"@types/papaparse@^4.1.33":
+  version "4.1.33"
+  resolved "https://registry.yarnpkg.com/@types/papaparse/-/papaparse-4.1.33.tgz#142ed7d6626648fced8ec85d4b8829c12eb2874b"
+
 "@types/passport-local@^1.0.30":
   version "1.0.32"
   resolved "https://registry.yarnpkg.com/@types/passport-local/-/passport-local-1.0.32.tgz#0856e3772c46ab8ac89aacf5535fa001a2ce5a13"
@@ -6669,6 +6673,10 @@ packet-reader@0.3.1:
 pako@^1.0.3, pako@~1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
+
+papaparse@^4.3.7:
+  version "4.3.7"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-4.3.7.tgz#ed1e7183320d1e0839dfe9f7186185cfc5097b8d"
 
 parse-asn1@^5.0.0:
   version "5.1.0"

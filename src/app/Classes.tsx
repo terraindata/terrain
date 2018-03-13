@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name strict-boolean-expressions no-console
+// tslint:disable:variable-name strict-boolean-expressions no-console no-invalid-this
 
 /**
  * This file provides utility functions for implementing classes
@@ -249,6 +249,19 @@ export function responseToRecordConfig(response: object): object
   return response;
 }
 
+export function instanceFnDecorator(fnToApply)
+{
+  return function decoratorFn(target: any, key: string | symbol, descriptor: TypedPropertyDescriptor<any>)
+  {
+    const existingFn = target[key];
+    descriptor.value = function(...args)
+    {
+      this[key] = fnToApply(existingFn);
+      return this[key](...args);
+    };
+  };
+}
+
 // boilerplate generator
 export type WithIRecord<T> = T & IRecord<T>;
 export function makeConstructor<T>(Type: { new(): T; }): (config?: ConfigType<T>) => WithIRecord<T>
@@ -279,43 +292,59 @@ function injectInstanceMethods(constructor, instance)
 type ConfigType<T> = {
   [k in keyof T]?: T[k];
 };
+type ConfigTransformer<T> = (config?: ConfigType<T>, deep?: boolean) => ConfigType<T>;
 /**
  * If injectMethods is true, then the resultant object creator will add the Type's instance methods to the object's prototype.
- * You should use configOverride if the immutable record can be rebuilt from a pure js object (e.g. an object returned by recordForSave)
+ * You should use deepConfigOverride if the immutable record can be rebuilt from a pure js object (e.g. an object returned by recordForSave)
  * the overrider is called if the resultant constructor is called with deep = true
+ * A config transformer can also be passed, which is a function that transforms a config into a config of the same type.
  */
 export function makeExtendedConstructor<T>(
   Type: { new(): T; },
   injectMethods: boolean = false,
-  configOverride?: overrideMap<T>,
+  deepConfigOverride?: overrideMap<T>,
+  transformConfig?: ConfigTransformer<T>,
 ): (config?: ConfigType<T>, deep?: boolean) => WithIRecord<T>
 {
-  if (injectMethods)
+  let constructorFn = null;
+  if (deepConfigOverride || transformConfig)
   {
-    const instance = new Type();
-    injectInstanceMethods(Constructor(instance), instance);
-  }
-  if (configOverride)
-  {
-    return (config?: { [key: string]: any }, deep?: boolean) =>
+    constructorFn = (config?: ConfigType<T>, deep?: boolean) =>
     {
-      const overrideKeys = Object.keys(configOverride);
-      if (deep)
+      const overrideKeys = Object.keys(deepConfigOverride);
+      let newConfig = config;
+      if (deep && deepConfigOverride)
       {
         const overridenConfig = {};
         for (const key of overrideKeys)
         {
-          overridenConfig[key] = configOverride[key](config[key], true);
+          overridenConfig[key] = deepConfigOverride[key](newConfig[key], true);
         }
-        config = _.defaults(overridenConfig, config);
+        newConfig = _.defaults(overridenConfig, newConfig);
       }
-      return New<WithIRecord<T>>(new Type(), config);
+      newConfig = transformConfig !== undefined ? transformConfig(newConfig, deep) : newConfig;
+      return New<WithIRecord<T>>(new Type(), newConfig);
     };
   }
   else
   {
-    return (config?: { [key: string]: any }) => New<WithIRecord<T>>(new Type(), config);
+    constructorFn = (config?: ConfigType<T>) => New<WithIRecord<T>>(new Type(), config);
   }
+
+  const runOnce = _.once(() =>
+  {
+    if (injectMethods)
+    {
+      const instance = new Type();
+      injectInstanceMethods(Constructor(instance), instance);
+    }
+    return constructorFn;
+  });
+
+  return (config?: ConfigType<T>, deep?: boolean) =>
+  {
+    return runOnce()(config, deep);
+  };
 }
 
 /*** Example Usage ***/

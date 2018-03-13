@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// this file has been obsoleted by ItemList and should be cleaned up along with the rest of control
 import * as classNames from 'classnames';
 import { List } from 'immutable';
 import * as _ from 'lodash';

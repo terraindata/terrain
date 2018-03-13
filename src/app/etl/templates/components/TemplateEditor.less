@@ -1,0 +1,127 @@
+@import "~common/Common.less";
+
+@main-column-basis: 900px;
+@preview-column-basis: 480px;
+@total-column-basis: @main-column-basis + @preview-column-basis + 64px;
+.template-editor-root-container {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+  justify-content: center;
+  
+  .template-editor-width-spacer {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 @total-column-basis;
+    overflow-x: hidden;
+  }
+
+  .template-editor-columns-area {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    .template-editor-column {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      margin: @spacing;
+      align-items: stretch;
+      .transition;
+
+      &.main-document-column {
+        flex: 0 1 @main-column-basis;
+        overflow-x: hidden;
+      }
+
+      &.main-document-column-hidden {
+        flex: 0 1 0px;
+      }
+
+      &.preview-documents-column {
+        flex: 0 1 @preview-column-basis;
+        overflow-x: hidden;
+      }
+    }
+  }
+
+  .template-editor-top-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 0 0 32px;
+
+    .editor-top-bar-item {
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      border-radius: @spacing;
+      height: @double-spacing;
+      padding: 0px @spacing + @half-spacing;
+      margin-left: @spacing;
+      cursor: pointer;
+    }
+
+    .editor-top-bar-name {
+      margin-right: @spacing;
+      .normal-text;
+    }
+  }
+
+  .template-editor-preview-control-spacer {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1 1 0;
+  }
+
+  .template-editor-title-bar {
+    flex: 0 0 43px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .template-editor-title-bar-spacer {
+      align-self: flex-start;
+      flex: 1 1 0;
+      width: 1px;
+    }
+
+    .template-editor-title {
+      text-align: center;
+      .title-text;
+    }
+  }
+
+  .template-editor {
+    height: 100%;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-y: overlay; // webkit only
+    .big-text;
+    &:focus {
+      outline: none;
+    }
+    border-radius: 3px;
+
+    .template-editor-full-area {
+      padding: @spacing;
+      padding-right: @double-spacing;
+    }
+  }
+}
+
+.template-list-wrapper {
+  padding: @double-spacing;
+  min-height: 30%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.tef-big-text {
+  font-size: 18px;
+}
