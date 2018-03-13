@@ -2,23 +2,23 @@
 .periscope {
   @active: #fc5218;
   overflow: visible;
-  
+
   .tick line {
     stroke-width: 1px;
   }
-  
+
   .domain {
     fill: none;
     stroke-width: 1px;
   }
-  
+
   .handle {
     cursor: pointer;
     transition: stroke-width 0.15s, stroke 0.15s;
     stroke-width: 2px;
-    
+
     .transition(~"opacity 0.15s, stroke-width 0.15s, stroke 0.15s");
-    
+
     &:hover,
     &.handle-active {
       stroke-width: 3px;
@@ -39,4 +39,17 @@
   &:hover, &:focus {
     background: none;
   }
+}
+
+.readonly-domain-input {
+  position: absolute;
+  top: 313px;
+  left: 19px;
+  font-size: 14px;
+  width: 38px;
+  text-align: center;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
 }
