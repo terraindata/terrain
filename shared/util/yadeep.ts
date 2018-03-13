@@ -52,6 +52,7 @@ THE SOFTWARE.
  * on all children.
  */
 
+import isPrimitive = require('is-primitive');
 import { KeyPath, WayPoint } from './KeyPath';
 
 /**
@@ -99,11 +100,19 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
     const results: any[] = [];
     for (let j: number = 0; j < keys.length; j++)
     {
-      find(obj[keys[j]], path.shift(), (found) =>
+      if (!isPrimitive(obj[keys[j]]))
       {
-        results[j] = found;
-        return next(found);
-      }, options);
+        find(obj[keys[j]], path.shift(), (found) =>
+        {
+          results[j] = found;
+          return next(found);
+        }, options);
+      }
+      else if (path.size === 1)
+      {
+        // else push undefined?
+        results[j] = obj[keys[j]];
+      }
     }
     obj = next(results);
     return;
