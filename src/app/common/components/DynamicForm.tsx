@@ -175,6 +175,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         onClick={noop(disabled,
           this.setStateWithTransformHOC(stateName, (value, inputState) => !inputState[stateName]),
         )}
+        style={{ opacity: disabled ? 0.7 : 1 }}
       >
         <CheckBox
           className='dynamic-form-checkbox'
@@ -222,7 +223,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
 
   public getCellStyle(
     inputInfo: InputDeclarationType<S>,
-    preRender: PreRenderInfo
+    preRender: PreRenderInfo,
   ): object
   {
     const { displayState, yCenterOffset } = preRender;
@@ -233,7 +234,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       width: `${widthFactor * widthBase}px`,
       display: displayState === DisplayState.Hidden ? 'none' : undefined,
       position: 'relative',
-      top: `${-1*yCenterOffset}px`,
+      top: `${-1 * yCenterOffset}px`,
     };
     if (inputInfo.style !== undefined)
     {
@@ -250,7 +251,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     const visible = preRenders.findIndex((value) => value.displayState !== DisplayState.Hidden);
     return {
       display: visible === -1 ? 'none' : undefined,
-    }
+    };
   }
 
   public renderInputElement(
@@ -258,7 +259,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     stateName,
     preRenders: List<PreRenderInfo>,
     state: S,
-    index
+    index,
   ): any
   {
     const renderFn: renderSignature<S> = this.renderFnLookup[inputInfo.type];
@@ -301,7 +302,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   public renderMatrixRow(row: MatrixRowType<S>, index)
   {
     const preRenderInfo = row.map(this.computeCellInfo).toList();
-    const renderFn = (cell: MatrixCellFn<S>, i) => {
+    const renderFn = (cell: MatrixCellFn<S>, i) =>
+    {
       return cell.render(this.props.inputState, i, preRenderInfo);
     };
     const rowStyle = this.getRowStyle(preRenderInfo);
@@ -433,7 +435,8 @@ interface PreRenderInfo
 
 type MatrixType<S> = List<MatrixRowType<S>>; // list of list of functions
 type MatrixRowType<S> = List<MatrixCellFn<S>>;
-interface MatrixCellFn<S> {
+interface MatrixCellFn<S>
+{
   render: (state: S, key, preRender: List<PreRenderInfo>) => any;
   preRender: (state: S, key) => PreRenderInfo;
 }

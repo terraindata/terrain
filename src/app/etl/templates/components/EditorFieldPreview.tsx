@@ -68,8 +68,6 @@ import './TemplateEditorField.less';
 export interface Props extends TemplateEditorFieldProps
 {
   toggleOpen?: () => void;
-  hidePreviewValue?: boolean;
-  displayValueOverride?: any;
   labelOverride?: string;
 }
 
@@ -97,19 +95,30 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
   public render()
   {
-    const { canEdit, preview, hidePreviewValue, displayValueOverride, labelOverride } = this.props;
+    const { canEdit, preview, labelOverride } = this.props;
     const field = this._field();
     const settingsOpen = this._settingsAreOpen();
-    const labelStyle = settingsOpen ?
-      fontColor(Colors().active, Colors().active)
-      :
-      fontColor(Colors().text2, Colors().text1);
 
-    const previewText = preview === undefined || preview === null ? 'N/A' : preview.toString();
-    const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
-      previewText : displayValueOverride;
+    let labelStyle;
+    if (field.isWildcardElement())
+    {
+      labelStyle = settingsOpen ?
+        fontColor(Colors().active, Colors().active)
+        :
+        fontColor(Colors().text3, Colors().text3);
+    }
+    else
+    {
+      labelStyle = settingsOpen ?
+        fontColor(Colors().active, Colors().active)
+        :
+        fontColor(Colors().text2, Colors().text1);
+    }
 
-    const showMenu = this.state.hovered || this.state.menuOpen;
+    const previewText = preview == null ? 'N/A' : preview.toString();
+
+    const showMenu = this._canEditField() && (this.state.hovered || this.state.menuOpen);
+    const hidePreviewValue = field.isArray() || field.isNested();
 
     return (
       <div className='template-editor-field-block'>
@@ -123,6 +132,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             <div
               className={classNames({
                 'field-preview-label': true,
+                'field-preview-array-label': field.isWildcardElement(),
                 'field-preview-can-toggle': this.props.toggleOpen !== undefined,
               })}
               onClick={this.props.toggleOpen}
@@ -151,7 +161,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
               })}
               style={fontColor(Colors().text2)}
             >
-              {previewContent}
+              {previewText}
             </div>
           }
         </div>

@@ -103,7 +103,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
     return {
       fieldName: field.name,
       isIncluded: field.isIncluded,
-      type: field.type,
+      type: field.representedType(),
     };
   }
 
@@ -150,7 +150,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
       {
         proxy.changeName(formState.fieldName);
       }
-      if (field.type !== formState.type)
+      if (field.representedType() !== formState.type)
       {
         proxy.changeType(formState.type);
       }

@@ -162,10 +162,13 @@ export function addFieldsToEngine(
   {
     if (isAValidField(unhashPath(hashedPath), pathTypes))
     {
-      const fieldType = pathTypes[hashedPath];
-      const id = engine.addField(unhashPath(hashedPath), fieldType);
-
+      let fieldType = pathTypes[hashedPath];
       const valueType = pathValueTypes[hashedPath];
+      if (valueType !== undefined)
+      {
+        fieldType = 'array';
+      }
+      const id = engine.addField(unhashPath(hashedPath), fieldType);
       if (valueType !== undefined)
       {
         engine.setFieldProp(id, valueTypeKeyPath, valueType);

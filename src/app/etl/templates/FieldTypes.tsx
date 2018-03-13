@@ -70,6 +70,17 @@ class TemplateFieldC
     return this.representedType() === 'array';
   }
 
+  public isWildcardElement(): boolean
+  {
+    return this.name === '*';
+  }
+
+  public isPrimitive(): boolean
+  {
+    const repType = this.representedType();
+    return repType !== 'array' && repType !== 'object';
+  }
+
   public representedType(): FieldTypes
   {
     if (this.name === '*')
@@ -80,6 +91,11 @@ class TemplateFieldC
     {
       return this.type;
     }
+  }
+
+  public isNamedField()
+  {
+    return this.name !== '*' && Number.isNaN(Number(this.name));
   }
 
   public isNested(): boolean
