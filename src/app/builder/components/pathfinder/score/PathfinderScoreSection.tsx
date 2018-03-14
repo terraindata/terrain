@@ -340,6 +340,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   {
     const { pathfinderContext, score } = this.props;
     const { source, step, canEdit } = this.props.pathfinderContext;
+
     return (
       <div
         className='pf-section pf-score-section'
@@ -364,6 +365,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           canExpand={true}
           onExpand={this.toggleExpanded}
           expanded={score.expanded}
+          contentCount={score.lines.count()}
         />
         {
           // <CheckBox

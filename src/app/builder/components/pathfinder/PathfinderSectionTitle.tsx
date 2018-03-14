@@ -62,6 +62,7 @@ export interface Props
   canExpand?: boolean;
   onExpand?: (expanded: boolean) => void;
   expanded?: boolean;
+  contentCount?: number; // number of items under this expandable title
 }
 
 @Radium
@@ -69,7 +70,15 @@ class PathfinderSectionTitle extends TerrainComponent<Props>
 {
   public render()
   {
-    const { text, title, tooltipText, canExpand, onExpand, expanded } = this.props;
+    const {
+      text,
+      title,
+      tooltipText,
+      canExpand,
+      onExpand,
+      expanded,
+      contentCount,
+    } = this.props;
 
     return (
       <div
@@ -101,6 +110,12 @@ class PathfinderSectionTitle extends TerrainComponent<Props>
             text
           }
         </div>
+        {
+          contentCount !== undefined && !expanded ?
+            <div className='pf-section-title-count'>
+              {contentCount}
+            </div> : null
+        }
       </div>
     );
   }

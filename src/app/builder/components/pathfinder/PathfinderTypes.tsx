@@ -807,8 +807,8 @@ class ElasticDataSourceC extends DataSource
           });
         parentFields = parentFields.map((field) =>
           _ChoiceOption({
-            displayName: '@' + context.parentName + '.' + String(field.displayName),
-            value: '@' + context.parentName + '.' + String(field.value),
+            displayName: `@${context.parentName}.${field.displayName}`,
+            value: `@${context.parentName}.${field.value}`,
           })).toList();
       }
       return inputs.concat(parentFields).toList();

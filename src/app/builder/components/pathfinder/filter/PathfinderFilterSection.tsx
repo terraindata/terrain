@@ -490,6 +490,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           canExpand={true}
           onExpand={this.toggleExpanded}
           expanded={!filterGroup.collapsed}
+          contentCount={filterGroup.lines.count()}
         />
         <FadeInOut
           open={!filterGroup.collapsed}

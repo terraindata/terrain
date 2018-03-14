@@ -1019,7 +1019,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
             });
         }
         break;
-
       // case 'map':
       //   const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
       //   let targetLocation: [number, number];
@@ -1048,7 +1047,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       //   );
 
       case 'text':
-
         break;
     }
   }
