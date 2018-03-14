@@ -231,9 +231,9 @@ class ETLEditorPage extends TerrainComponent<Props>
     this.props.editorAct({
       actionType: 'resetState',
     });
-    // Initializers.initFromDebug();
-    // return;
-    this.initFromRoute();
+    Initializers.initFromDebug();
+    return;
+    // this.initFromRoute();
   }
 
   public render()

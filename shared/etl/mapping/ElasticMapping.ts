@@ -52,39 +52,51 @@ import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 
 // import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { ElasticTypes, ElasticFieldProps, defaultProps, JsAutoMap } from 'shared/etl/types/ETLElasticTypes';
+import { defaultProps, ElasticFieldProps, ElasticTypes, JsAutoMap } from 'shared/etl/types/ETLElasticTypes';
+import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { Languages, FieldTypes } from 'shared/etl/types/ETLTypes';
+import { hashPath, isNamedField, isWildcardField, PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
-import { isNamedField, isWildcardField } from 'shared/transformations/util/EngineUtil';
 
-class ElasticMapping
+interface TypeConfig
 {
-  private errors: string[];
+  type: string;
+  index?: boolean;
+  fields?: {
+    keyword: {
+      type: 'keyword';
+      index: boolean;
+      ignore_above?: number;
+    },
+  };
+  analyzer?: string;
+}
+
+interface MappingType {
+  properties?: {
+    [k: string]: {
+      properties?: MappingType['properties'],
+    } & TypeConfig,
+  };
+}
+
+export class ElasticMapping
+{
+  private errors: string[] = [];
+  private pathSchema: PathHashMap<{
+    type: ElasticTypes,
+    analyzer: string,
+  }> = {};
   private engine: TransformationEngine;
+  private mapping: MappingType = {};
 
   constructor(engine: TransformationEngine)
   {
-    this.errors = [];
     this.engine = engine;
+    this.createElasticMapping();
   }
 
-  public getArrayConfig(elasticProps: ElasticFieldProps, valueType?: FieldTypes)
-  {
-    const elasticType = JsAutoMap[valueType];
-    if (elasticType === ElasticTypes.Text)
-    {
-      return this.getTextConfig(elasticProps);
-    }
-    else
-    {
-      return {
-        type: elasticType
-      }
-    }
-  }
-
-  public getTextConfig(elasticProps: ElasticFieldProps)
+  public getTextConfig(elasticProps: ElasticFieldProps): TypeConfig
   {
     return {
       type: elasticProps.isAnalyzed ? 'text' : 'keyword',
@@ -94,25 +106,25 @@ class ElasticMapping
           keyword: elasticProps.isAnalyzed ?
             {
               type: 'keyword',
-              index: elasticProps.isAnalyzed
+              index: elasticProps.isAnalyzed,
             }
             :
             {
               type: 'keyword',
               index: true,
-              ignore_above: 256
+              ignore_above: 256,
             },
         },
       analyzer: elasticProps.analyzer,
     };
   }
 
-  public getTypeConfig(fieldID: number): object | null
+  public getTypeConfig(fieldID: number): TypeConfig | null
   {
     const elasticProps = this.getElasticProps(fieldID);
     const valueType = this.getValueType(fieldID);
 
-    const jsType = this.engine.getFieldType(fieldID);
+    const jsType = this.getRepresentedType(fieldID);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
       JsAutoMap[jsType]
       :
@@ -121,17 +133,30 @@ class ElasticMapping
     switch (elasticType)
     {
       case ElasticTypes.Text:
-        return this.getTextConfig(elasticProps)
+        return this.getTextConfig(elasticProps);
       case ElasticTypes.Array:
-        return this.getArrayConfig(elasticProps, valueType);
+        return null;
       case ElasticTypes.Nested:
         return {
           type: ElasticTypes.Nested,
-        }
+        };
       default:
         return {
-          type: elasticType
-        }
+          type: elasticType,
+        };
+    }
+  }
+
+  public getRepresentedType(fieldID: number): FieldTypes
+  {
+    const kp = this.engine.getOutputKeyPath(fieldID);
+    if (isWildcardField(kp))
+    {
+      return this.getValueType(fieldID);
+    }
+    else
+    {
+      return this.engine.getFieldType(fieldID) as FieldTypes;
     }
   }
 
@@ -142,7 +167,7 @@ class ElasticMapping
   public enginePathToMappingPath(path: EnginePath): EnginePath
   {
     return path.flatMap(
-      (value, i) => isNamedField(path, i) ? ['properties', value] : []
+      (value, i) => isNamedField(path, i) ? ['properties', value] : [],
     ).toList() as EnginePath;
   }
 
@@ -157,18 +182,71 @@ class ElasticMapping
     return defaultProps(props);
   }
 
+  public addFieldToMapping(id: number)
+  {
+    const config = this.getTypeConfig(id);
+    const enginePath = this.engine.getOutputKeyPath(id);
+    const cleanedPath = this.enginePathToMappingPath(enginePath);
+    const hashed = hashPath(cleanedPath);
+
+    if (config !== null)
+    {
+      if (this.pathSchema[hashed] === undefined)
+      {
+        const mappingPath = cleanedPath.toJS();
+        const toExtend = _.get(this.mapping, mappingPath, {});
+        const newObject = _.extend({}, toExtend, config);
+        _.set(this.mapping, cleanedPath.toJS(), newObject);
+        this.pathSchema[hashed] = {
+          type: config.type as ElasticTypes,
+          analyzer: config.analyzer,
+        };
+      }
+      else if (config.type !== this.pathSchema[hashed].type)
+      {
+        this.errors.push(
+          `Type Mismatch: ${enginePath.toJS()} has a type of '${config.type}' but ` +
+          `the type is already defined to be '${this.pathSchema[hashed].type}'`,
+        );
+      }
+      else if (config.analyzer !== this.pathSchema[hashed].analyzer)
+      {
+        this.errors.push(
+          `Type Mismatch: ${enginePath.toJS()} has an analyzer of '${config.analyzer}' but ` +
+          `the analyzer is already defined to be '${this.pathSchema[hashed].analyzer}'`,
+        );
+      }
+    }
+  }
+
   public createElasticMapping()
   {
-    const mapping = {};
-    const ids = this.engine.getAllFieldIDs;
+    const ids = this.engine.getAllFieldIDs();
+    ids.forEach((id, i) =>
+    {
+      try
+      {
+        this.addFieldToMapping(id);
+      }
+      catch (e)
+      {
+        this.errors.push(
+          `Error encountered while adding field ${id} to mapping. Details: ${String(e)}`,
+        );
+      }
+    });
+  }
 
+  public getMapping(): MappingType
+  {
+    return this.mapping;
+  }
+
+  public getErrors(): string[]
+  {
+    return this.errors;
   }
 }
 
 const elasticPropPath = EnginePath([Languages.Elastic]);
 const valueTypePath = EnginePath(['valueType']);
-
-export function createElasticMapping(engine: TransformationEngine)
-{
-
-}

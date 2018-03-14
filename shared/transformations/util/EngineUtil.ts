@@ -93,8 +93,6 @@ const valueTypeKeyPath = List(['valueType']);
 // an existing engine that has fields with indices in them
 export function turnIndicesIntoValue(
   keypath: KeyPath,
-  engine: TransformationEngine,
-  pathToIdMap: PathHashMap<number>,
   value = '*',
 ): KeyPath
 {
@@ -117,18 +115,6 @@ export function turnIndicesIntoValue(
     return arrayIndices[i] === true ? value : key;
   }).toList();
   return scrubbed;
-}
-
-// creates a mapping from hashed keypath to fieldId
-export function createPathToIdMap(engine: TransformationEngine): PathHashMap<number>
-{
-  const fieldIds = engine.getAllFieldIDs();
-  const mapping = {};
-  fieldIds.forEach((id, i) =>
-  {
-    mapping[hashPath(engine.getOutputKeyPath(id))] = id;
-  });
-  return mapping;
 }
 
 // takes an engine path and the path type mapping and returns true if
@@ -204,12 +190,11 @@ export function createMergedEngine(documents: List<object>):
   {
     const e: TransformationEngine = new TransformationEngine(doc);
     const fieldIds = e.getAllFieldIDs();
-    const pathToIdMap = createPathToIdMap(e);
 
     fieldIds.forEach((id, j) =>
     {
       const currentType: FieldTypes = getConsistentType(id, e);
-      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), e, pathToIdMap, '*');
+      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), '*');
       const path = hashPath(deIndexedPath);
 
       if (pathTypes[path] !== undefined)

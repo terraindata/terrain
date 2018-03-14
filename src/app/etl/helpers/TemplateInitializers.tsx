@@ -68,7 +68,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { createElasticMapping } from 'shared/etl/mapping/ElasticMapping';
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -92,14 +92,16 @@ class Initializers extends ETLHelpers
           nested2: true,
         },
         arrObj: [
-          { foo: 'hi'},
-          { foo: 'yo'},
-        ]
-      }
+          { foo: 'hi' },
+          { foo: 'yo' },
+        ],
+      },
     ]);
     const FT = new FieldTypes();
-    FT.getFullTypeFromDocument(documents.get(0)).then((value) => {
-      FT.getESMappingFromDocument(value).then((mapping) => {
+    FT.getFullTypeFromDocument(documents.get(0)).then((value) =>
+    {
+      FT.getESMappingFromDocument(value).then((mapping) =>
+      {
         console.log(mapping);
       });
     });
@@ -107,7 +109,7 @@ class Initializers extends ETLHelpers
     onLoad(documents);
 
     const e = this.templateEditor.getCurrentEngine();
-    createElasticMapping(e);
+    const mapping = new ElasticMapping(e);
   }
 
   public loadExistingTemplate(templateId: number)

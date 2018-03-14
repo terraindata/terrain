@@ -52,8 +52,8 @@ import TransformationNodeBase from 'shared/transformations/nodes/TransformationN
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 import { isWildcardField } from 'shared/transformations/util/EngineUtil';
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC

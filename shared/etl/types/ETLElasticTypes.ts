@@ -105,12 +105,12 @@ export const JsToElasticOptions: {
 export const JsAutoMap: {
   [k in FieldTypes]: ElasticTypes
 } = {
-  array: ElasticTypes.Array,
-  object: ElasticTypes.Nested,
-  string: ElasticTypes.Text,
-  number: ElasticTypes.Double,
-  boolean: ElasticTypes.Boolean,
-}
+    array: ElasticTypes.Array,
+    object: ElasticTypes.Nested,
+    string: ElasticTypes.Text,
+    number: ElasticTypes.Double,
+    boolean: ElasticTypes.Boolean,
+  };
 
 export function jsToElastic(type): ElasticTypes
 {

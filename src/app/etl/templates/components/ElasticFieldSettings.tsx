@@ -124,14 +124,14 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public showPrimaryKey(s: ElasticFieldProps)
   {
-    const jsType = this._field().type;
+    const jsType = this._field().representedType();
     return (jsType !== 'array' && jsType !== 'object' && jsType !== 'boolean') ?
       DisplayState.Active : DisplayState.Inactive;
   }
 
   public showIsAnalyzed(s: ElasticFieldProps)
   {
-    const jsType = this._field().type;
+    const jsType = this._field().representedType();
     return (jsType === 'string' && !s.isPrimaryKey) ?
       DisplayState.Active : DisplayState.Inactive;
   }
@@ -150,12 +150,12 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public getTypeOptions()
   {
-    return this._getTypeOptions(this._field().type);
+    return this._getTypeOptions(this._field().representedType());
   }
 
   public resolveTypeIndex(option)
   {
-    return JsToElasticOptions[this._field().type].indexOf(option);
+    return JsToElasticOptions[this._field().representedType()].indexOf(option);
   }
 
   @instanceFnDecorator(memoizeOne)
