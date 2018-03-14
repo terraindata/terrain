@@ -1019,9 +1019,9 @@ export class RouteSelector extends TerrainComponent<Props>
         onClick={this.handleVeilClick}
         style={column ? {
           height: column.offsetHeight,
-          width: column.offsetWidth,
+          width: column.offsetWidth + 25,
           top: column.offsetTop,
-          left: column.offsetLeft,
+          left: column.offsetLeft - 25,
         } : {}}
       />
     );

@@ -7,6 +7,8 @@
 
 .pf-filter-line {
 	border-bottom: 1px solid #eee;
+	border-radius: 4px;
+    margin-bottom: 1px;
 
 	.close {
 		margin-top: 8px;
@@ -41,6 +43,14 @@
 			margin-left: 0px;
 		}
 	}
+	.routeselector-wrapper {
+		margin-bottom: 1px;
+		.routeselector {
+			.routeselector-box-values {
+				border-radius: 4px;
+			}
+		}
+	}
 }
 
 .drag-drop-group {
@@ -59,21 +69,30 @@
 	padding-top: 6px;
 	font-size: 12px;
 	text-transform: uppercase;
+    width: calc(~"100% + 10px");
+    margin: -5px;
+    /* padding-right: 10px; */
+    padding-bottom: 4px;
+    border-bottom: 1px solid;
+    margin-bottom: 5px;
 	.builder-tb {
 		max-width: 200px;
 		display: inline-flex;
-		top: -9px;
+		top: -6px;
 		left: 7px;
 		height: 26px;
 	}
 	.pf-filter-group-name-wrapper {
 		display: inline-flex;
-		margin-left: 4px;
+		margin-left: 26px;
 		.pf-filter-group-name {
 			cursor: text;
 			position: relative;
+			margin-left: 10px;
+		}
+		.expand-icon {
 			top: -2px;
-			margin-left: 6px;
+			position: relative;
 		}
 	}
 	.linear-selector-wrapper {
@@ -90,6 +109,7 @@
 	.close {
 		float: right;
 		opacity: 0;
+		margin-right: 2px;
 		.transition;
 	}
 	&:hover {

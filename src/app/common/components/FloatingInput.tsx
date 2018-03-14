@@ -59,6 +59,8 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 export let LARGE_FONT_SIZE = '52px';
 export let SEMI_LARGE_FONT_SIZE = '38px';
 export let FONT_SIZE = '18px';
+export let SMALL_FONT_SIZE = '16px';
+export let SMALL_LABEL_FLOATING_FONT_SIZE = '10px';
 export let LARGE_LABEL_FLOATING_FONT_SIZE = '16px';
 export let LABEL_FLOATING_FONT_SIZE = '12px';
 
@@ -108,10 +110,13 @@ const Label = LabelC`
   {
     if (props.isFloating)
     {
-      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
+      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE 
+      : props.small ? SMALL_LABEL_FLOATING_FONT_SIZE :
+      LABEL_FLOATING_FONT_SIZE;
     }
 
-    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE : FONT_SIZE;
+    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE : 
+      props.small ? SMALL_FONT_SIZE : FONT_SIZE;
   }};
 `;
 
@@ -136,7 +141,8 @@ const inputStyle = `
   }
 `;
 
-const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE : FONT_SIZE;
+const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
+    props.small ? SMALL_FONT_SIZE : FONT_SIZE;
 
 // duplication of code because the functions don't work if you put them
 //  in inputStyle
@@ -178,6 +184,7 @@ interface InputProps
   onBlur?: () => void;
   value?: any;
   large?: boolean;
+  small?: boolean;
   semilarge?: boolean;
   isFloating?: boolean;
   extendRight?: boolean;
@@ -190,6 +197,7 @@ interface InputDivProps
   onClick?: () => void;
   large?: boolean;
   semilarge?: boolean;
+  small?: boolean;
   isFloating?: boolean;
   extendRight?: boolean;
 }
@@ -216,6 +224,7 @@ export interface Props
   className?: string;
   debounce?: boolean;
   extendRight?: boolean;
+  small?: boolean;
 }
 
 export class FloatingInput extends TerrainComponent<Props>
@@ -293,6 +302,7 @@ export class FloatingInput extends TerrainComponent<Props>
         <Label
           large={props.large}
           semilarge={props.semilarge}
+          small={props.small}
           noBorder={props.noBorder}
           noBg={props.noBg}
           isFloating={isFloating}
@@ -353,6 +363,7 @@ export class FloatingInput extends TerrainComponent<Props>
           ref={this.getValueRef}
           onKeyDown={this.handleKeyDown}
           extendRight={props.extendRight}
+          small={props.small}
         />
       );
     }

@@ -406,7 +406,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               <div
                 className='pf-more-nested'
                 key={i}
-                style={_.extend({}, backgroundColor(Colors().blockBg, Colors().blockOutline))}
+                style={
+                  _.extend({},
+                    backgroundColor(Colors().blockBg),
+                    borderColor(Colors().blockOutline),
+                    {paddingBottom: expanded ? 6 : 0 }
+                )}
               >
                 <div className='pf-more-nested-reference'>
                   <ExpandIcon
@@ -507,7 +512,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public renderScripts(scripts)
   {
     const { canEdit } = this.props.pathfinderContext;
-    const style = _.extend({}, backgroundColor(Colors().blockBg, Colors().blockOutline));
+    const style = _.extend({}, backgroundColor(Colors().blockBg), borderColor(Colors().blockOutline));
     return (
       <div className='pf-more-scripts-wrapper'>
         {
@@ -572,7 +577,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                   canEdit={canEdit}
                   onCreate={this._fn(this.handleAddScriptParameter, i)}
                   text={'Parameter'}
-                  style={{ marginBottom: 0 }}
+                  style={{ marginBottom: 2 }}
+                  showText={true}
                 />
                 <TQLEditor
                   tql={script.script}
@@ -600,86 +606,88 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const { canEdit } = this.props.pathfinderContext;
     return (
-      <div
-        className='pf-section pf-more-section'
-      >
-        {!this.props.hideTitle &&
-          <PathfinderSectionTitle
-            title={PathfinderText.moreSectionTitle}
-            tooltipText={PathfinderText.moreSectionSubtitle}
-            onExpand={this.toggleExpanded}
-            canExpand={true}
-            expanded={this.props.more.expanded}
-          />
-        }
-        {
-          // <RouteSelector
-          //   optionSets={this.getSizeOptionSets() /* TODO store in state? */}
-          //   values={List([this.props.path.source.count])}
-          //   onChange={this.handleSizePickerChange}
-          //   canEdit={canEdit}
-          //   defaultOpen={false}
-          //   hideLine={true}
-          //   autoFocus={true}
-          // />
-        }
-        <FadeInOut
-          open={this.props.more.expanded}
+      <div>
+        <div
+          className='pf-section pf-more-section'
         >
-          <RouteSelector
-            optionSets={this.getCollapseOptionSets()}
-            values={List([this.props.more.collapse])}
-            onChange={this.handleCollapseChange}
-            canEdit={canEdit}
-            defaultOpen={false}
-            autoFocus={true}
-          />
-          {
-            this.props.keyPath.includes('nested') ?
+          {!this.props.hideTitle &&
+            <PathfinderSectionTitle
+              title={PathfinderText.moreSectionTitle}
+              tooltipText={PathfinderText.moreSectionSubtitle}
+              onExpand={this.toggleExpanded}
+              canExpand={true}
+              expanded={this.props.more.expanded}
+            />
+          }
+          <FadeInOut
+            open={this.props.more.expanded}
+          >
+            {
               <RouteSelector
-                optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
-                values={List([this.props.path.minMatches])}
-                onChange={this.handleMinMatchesChange}
+                optionSets={this.getSizeOptionSets() /* TODO store in state? */}
+                values={List([this.props.path.source.count])}
+                onChange={this.handleSizePickerChange}
                 canEdit={canEdit}
                 defaultOpen={false}
+                hideLine={true}
                 autoFocus={true}
-              /> : null
-          }
-          {
-            // <DragAndDrop
-            //   draggableItems={this.getAggregationLines()}
-            //   onDrop={this.handleLinesReorder}
-            //   className='more-aggregations-drag-drop'
-            // />
-            // <PathfinderCreateLine
-            //   canEdit={canEdit}
-            //   onCreate={this.handleAddLine}
-            //   text={PathfinderText.createAggregationLine}
-            // />
-          }
-          {
-            this.renderScripts(this.props.more.scripts.filter((script) => script.userAdded))
-          }
-          <div>
-            {
-              tooltip(
-                <PathfinderCreateLine
-                  canEdit={canEdit}
-                  onCreate={this.handleAddScript}
-                  text={PathfinderText.addScript}
-                  style={{ marginLeft: -110, marginBottom: 0 }}
-                  showText={true}
-                />,
-                {
-                  title: PathfinderText.scriptExplanation,
-                  arrow: false,
-                },
-              )
+              />
             }
-          </div>
+            <RouteSelector
+              optionSets={this.getCollapseOptionSets()}
+              values={List([this.props.more.collapse])}
+              onChange={this.handleCollapseChange}
+              canEdit={canEdit}
+              defaultOpen={false}
+              autoFocus={true}
+            />
+            {
+              this.props.keyPath.includes('nested') ?
+                <RouteSelector
+                  optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
+                  values={List([this.props.path.minMatches])}
+                  onChange={this.handleMinMatchesChange}
+                  canEdit={canEdit}
+                  defaultOpen={false}
+                  autoFocus={true}
+                /> : null
+            }
+            {
+              // <DragAndDrop
+              //   draggableItems={this.getAggregationLines()}
+              //   onDrop={this.handleLinesReorder}
+              //   className='more-aggregations-drag-drop'
+              // />
+              // <PathfinderCreateLine
+              //   canEdit={canEdit}
+              //   onCreate={this.handleAddLine}
+              //   text={PathfinderText.createAggregationLine}
+              // />
+            }
+            {
+              this.renderScripts(this.props.more.scripts.filter((script) => script.userAdded))
+            }
+            <div>
+              {
+                tooltip(
+                  <PathfinderCreateLine
+                    canEdit={canEdit}
+                    onCreate={this.handleAddScript}
+                    text={PathfinderText.addScript}
+                    style={{ marginTop: -1, marginBottom: 2 }}
+                    showText={true}
+                  />,
+                  {
+                    title: PathfinderText.scriptExplanation,
+                    arrow: false,
+                  },
+                )
+              }
+            </div>
 
-        </FadeInOut>
-        <div>
+          </FadeInOut>
+        </div>
+        <div className='pf-nested-section'>
           {this.renderNestedPaths()}
           {
             !this.props.keyPath.includes('nested') ?
@@ -688,7 +696,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                   canEdit={canEdit}
                   onCreate={this.handleAddNested}
                   text={PathfinderText.createNestedLine}
-                  style={{ marginLeft: -110 }}
+                  // style={{ marginLeft: -110 }}
                   showText={true}
                 />,
                 {
@@ -698,7 +706,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               ) : null
           }
         </div>
-      </div>
+    </div>
     );
   }
 }

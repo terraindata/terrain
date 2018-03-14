@@ -136,15 +136,15 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           forceFloat={true}
         />
         {
-        //           <LinearSelector
-        //   options={List(['all', '1', '5', '10', '100'])}
-        //   selected={source.count}
-        //   keyPath={this._ikeyPath(this.props.keyPath.push('count'))}
-        //   action={this.props.builderActions.changePath}
-        //   canEdit={canEdit}
-        //   allowCustomInput={true}
-        //   hideOptions={true}
-        // />
+          // <LinearSelector
+          //   options={List(['all', '1', '5', '10', '100'])}
+          //   selected={source.count}
+          //   keyPath={this._ikeyPath(this.props.keyPath.push('count'))}
+          //   action={this.props.builderActions.changePath}
+          //   canEdit={canEdit}
+          //   allowCustomInput={true}
+          //   hideOptions={true}
+          // />
         }
 
       </div>

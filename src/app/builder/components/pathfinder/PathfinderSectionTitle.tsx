@@ -74,7 +74,6 @@ class PathfinderSectionTitle extends TerrainComponent<Props>
     return (
       <div
         className='pf-section-title'
-        style={backgroundColor(Colors().blockBg)}
       >
         {
           canExpand &&

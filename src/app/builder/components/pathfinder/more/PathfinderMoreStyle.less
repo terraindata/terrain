@@ -1,19 +1,22 @@
 @import "../../../../common/Common.less";
 
  .pf-more-section {
- 	.routeselector
+ 	.routeselector-wrapper
  	{
- 		.routeselector-picker {
- 			.routeselector-search {
-		 		padding: 6px 12px;
-		 	}
- 		}
+ 		margin-bottom: 2px;
+ 		.routeselector
+	 	{
+	 		.routeselector-picker {
+	 			.routeselector-search {
+			 		padding: 6px 12px;
+			 	}
+	 		}
+	 		.routeselector-box-values {
+	 			border-radius: 4px;
+	 		}
+	 	}
  	}
 
-	.pathfinder-column-content {
-		margin-left: 24px;
-		margin-top: 62px;
-	}
 	.pf-line {
 		padding: 6px;
 		span {
@@ -52,10 +55,10 @@
 		    .transition;
 		}
 		.pf-more-script {
-			margin: 0px 12px;
 		    padding: 6px;
 		    border: 1px solid;
 		    border-radius: 4px;
+		    margin-bottom: 4px;
 		}
 		.pf-more-script-param-wrapper {
 			display: flex !important;
@@ -87,85 +90,6 @@
 		    .CodeMirror-vscrollbar {
 		    	display: none;
 		    }
-		}
-	}
-
-	.pf-more-nested {
-		position: relative;
-		border-radius: 4px 0 0 4px;
-		width: ~"calc(100% - 12px)";
-		overflow: hidden;
-		margin: 12px 0 0 12px;
-	    padding-bottom: 6px;
-
-		.pf-more-nested-remove {
-		    height: 12px;
-		    width: 12px;
-		    position: absolute;
-		    top: 26px;
-		    right: 16px;
-		}
-		.nested-reference-header {
-			position: relative;
-			top: 24px;
-			left: 8px;
-		}
-		.pf-more-nested-reference {
-			display: inline-flex;
-			margin-left: 8px;
-			width: 100%;
-			position: relative;
-			.expand-icon {
-				position: relative;
-			    top: 26px;
-			    margin-right: 6px;
-			    &.expand-icon-open {
-			    	top: 19px;
-			    }
-			}
-			.pf-more-nested-reference-input {
-				margin: 6px 0;
-				max-width: 180px;
-			}
-			.pf-more-nested-name-input {
-				margin: 6px 0;
-				max-width: 180px;
-			}
-		}
-		.pf-nested-line {
-			border-top: 2px solid #47a7ff;
-	    border-left: 2px solid #47a7ff;
-	    border-bottom: 2px solid #47a7ff;
-	    position: absolute;
-	    z-index: 9;
-	    -webkit-transition: all 0.15s;
-	    transition: all 0.15s;
-	    height: 55px;
-	    width: 10;
-	    top: 25px;
-	    left: -12px;
-
-			.pf-nested-line-inner {
-	    	.transition;
-	    		@t: 6px;
-			    position: absolute;
-				left: 5px;
-				bottom: -7px;
-			    width: 0px;
-			    height: 0px;
-		      	border-top: @t solid transparent; // change this one to the card color
-		      	border-bottom: @t solid transparent;
-		      	border-right: @t solid transparent;
-		      	border-left: @t solid transparent;
-			    border-left-color: #46a7ff;
-			}
-		}
-		.pf-area {
-			margin-left: 8px;
-			width: ~"calc(100% - 8px)";
-			background-color: white;
-			height: auto;
-			overflow: hidden;
 		}
 	}
 	.pf-aggregation-advanced-name-line {
@@ -366,3 +290,84 @@
 		}
 	}
  }
+
+.pf-more-nested {
+	position: relative;
+	border-radius: 4px;
+	overflow: hidden;
+    margin-top: 12px;
+	.pathfinder-column-content {
+		margin-left: 24px;
+	}
+	.pf-more-nested-remove {
+	    height: 12px;
+	    width: 12px;
+	    position: absolute;
+	    top: 26px;
+	    right: 16px;
+	}
+	.nested-reference-header {
+		position: relative;
+		top: 21px;
+		left: 8px;
+		font-size: 16px;
+	}
+	.pf-more-nested-reference {
+		display: inline-flex;
+		margin-left: 8px;
+		width: 100%;
+		position: relative;
+		height: 47px;
+		.expand-icon {
+			position: relative;
+		    top: 21px;
+		    margin-right: 6px;
+		    margin-left: 26px;
+
+		    &.expand-icon-open {
+		    	top: 19px;
+		    }
+		}
+		.pf-more-nested-reference-input {
+			max-width: 180px;
+		}
+		.pf-more-nested-name-input {
+			max-width: 180px;
+		}
+	}
+	.pf-nested-line {
+		border-top: 2px solid #47a7ff;
+	    border-left: 2px solid #47a7ff;
+	    border-bottom: 2px solid #47a7ff;
+	    position: absolute;
+	    z-index: 9;
+	    -webkit-transition: all 0.15s;
+	    transition: all 0.15s;
+	    height: 55px;
+	    width: 10;
+	    top: 25px;
+	    left: -12px;
+
+		.pf-nested-line-inner {
+    	.transition;
+    		@t: 6px;
+		    position: absolute;
+			left: 5px;
+			bottom: -7px;
+		    width: 0px;
+		    height: 0px;
+	      	border-top: @t solid transparent; // change this one to the card color
+	      	border-bottom: @t solid transparent;
+	      	border-right: @t solid transparent;
+	      	border-left: @t solid transparent;
+		    border-left-color: #46a7ff;
+		}
+	}
+	.pf-area {
+		margin-left: 2px;
+		width: ~"calc(100% - 4px)";
+		background-color: white;
+		height: auto;
+		overflow: hidden;
+	}
+}

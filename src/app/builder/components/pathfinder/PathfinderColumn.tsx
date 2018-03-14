@@ -94,6 +94,11 @@ class PathfinderColumn extends TerrainComponent<Props>
       selector: '.pf-score-line-transform .linear-selector-option',
       style: { color: Colors().fontColorLightest },
     });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-section',
+      style: { 'background-color': Colors().blockBg },
+    });
   }
 
   public render()

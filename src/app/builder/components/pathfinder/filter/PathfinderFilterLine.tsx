@@ -161,7 +161,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           'pf-filter-line': true,
           // 'pf-filter-line-pre-group': this.props.comesBeforeAGroup,
         })}
-        style={getStyle('alignItems', 'flex-start')}
+        style={_.extend({}, 
+          getStyle('alignItems', 'flex-start'),
+          backgroundColor(Colors().fontWhite)
+        )}
       >
         {
           this.renderPicker()

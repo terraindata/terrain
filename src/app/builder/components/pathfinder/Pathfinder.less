@@ -38,10 +38,17 @@
 		
 		.pathfinder-column-content {
 			padding-bottom: 60px;
-			.pf-section {
+			.pf-section, .pf-nested-section {
 				border-bottom: 1px solid rgba(204,204,204,0.2);
+				display: block;
+			    margin-left: 3px;
+			    margin-right: 6px;
+			    border-radius: 4px;
+			    padding: 0px 2px;
+			    padding-bottom: 2px;
 				&.pf-source-section {
 					position: relative;
+					padding: 0px;
 					.linear-selector-wrapper {
 						position: absolute;
 					    top: 16px;
@@ -93,23 +100,30 @@
 					text-transform: uppercase;
 					font-size: @small-font-size;
 					position: relative;
-					fill: currentColor;
-					padding: 18px;
-
-					
+					width: 100%;
+					height: 60px;
+					border-radius: 4px;
+					margin-top: 1px;
+					display: flex;
+				    flex-direction: row;
+				    flex-wrap: wrap;
+				    justify-content: center;
+				    align-items: center;
+					.pf-create-content {
+						position: absolute;
+					//    display: inline-block;
+						top: calc(~"50% - @{svg-width} / 2");
+					  //  margin-left: auto;
+					}
+					span {
+						margin-left: 6px;
+						top: -1px;
+						position: relative;
+					}
 					@svg-width: 14px;
-					@svg-left: 0px;
-					
-					padding-left: @svg-width + @svg-left + 12px;
-					margin: auto;
-				    left: 50%;
-				    margin-bottom: 25px;
-					
+					@svg-big: 18px;
 					svg {
 						width: @svg-width;
-						position: absolute;
-						top: calc(~"50% - @{svg-width} / 2");
-						left: @svg-left;
 						.transition;
 					}
 					
@@ -117,8 +131,6 @@
 						svg {
 							@svg-big: 18px;
 							width: @svg-big;
-							left: @svg-left - (@svg-big - @svg-width) / 2;
-							top: calc(~"50% - @{svg-big} / 2");
 						}
 					}
 				}
