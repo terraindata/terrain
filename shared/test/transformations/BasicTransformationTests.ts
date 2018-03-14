@@ -84,6 +84,10 @@ const doc5 = {
   arr: ['a', 'b', 'c', 'd'],
 };
 
+const doc6 = {
+  value: null,
+};
+
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
@@ -128,6 +132,13 @@ test('insert field value in a field', () =>
     { at: 0, value: KeyPath(['meta', 'school']) });
   const r = e.transform(doc1);
   expect(r['name']).toBe('Stanford Bob');
+});
+
+test('transform doc with null value(s)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc6);
+  const r = e.transform(doc6);
+  expect(r['value']).toBe(null);
 });
 
 test('serialize to JSON', () =>
