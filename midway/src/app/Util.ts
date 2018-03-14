@@ -44,12 +44,50 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as request from 'request';
 import * as rimraf from 'rimraf';
 
 import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../shared/database/elastic/parser/ESParser';
 import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
+
+export function getEmptyObject(payload: object): object
+{
+  let emptyObj: any = {};
+  if (Array.isArray(payload))
+  {
+    emptyObj = [];
+  }
+  return Object.keys(payload).reduce((res, item) =>
+  {
+    switch (typeof (payload[item]))
+    {
+      case 'boolean':
+        res[item] = false;
+        break;
+
+      case 'number':
+        res[item] = 0;
+        break;
+      case 'object':
+        if (payload[item] === null)
+        {
+          res[item] = null;
+        }
+        else
+        {
+          res[item] = getEmptyObject(payload[item]);
+        }
+        break;
+
+      default:
+        res[item] = '';
+    }
+    return res;
+  },
+    emptyObj);
+}
 
 export function doRequest(url)
 {
@@ -99,6 +137,31 @@ export function makePromiseCallbackVoid(resolve: () => void, reject: (Error) => 
   };
 }
 
+export async function mkdir(dirName: string)
+{
+  return new Promise((resolve, reject) =>
+  {
+    fs.mkdir(dirName, makePromiseCallbackVoid(resolve, reject));
+  });
+}
+
+export async function readFile(fileName: string, options: object)
+{
+  return new Promise((resolve, reject) =>
+  {
+    fs.readFile(fileName, options, makePromiseCallback(resolve, reject));
+  });
+}
+
+/* differs from File System's rmdir in that no error is thrown if the directory does not exist */
+export async function rmdir(dirName: string)
+{
+  return new Promise((resolve, reject) =>
+  {
+    rimraf(dirName, makePromiseCallbackVoid(resolve, reject));
+  });
+}
+
 export function updateObject<T>(obj: T, newObj: T): T
 {
   for (const key in newObj)
@@ -125,6 +188,14 @@ export function verifyParameters(parameters: any, required: string[]): void
       throw new Error('Parameter "' + key + '" not found in request object.');
     }
   }
+}
+
+export async function writeFile(fileName: string, data: string, options: object)
+{
+  return new Promise((resolve, reject) =>
+  {
+    fs.writeFile(fileName, data, options, makePromiseCallbackVoid(resolve, reject));
+  });
 }
 
 export function getParsedQuery(body: string): ESParser

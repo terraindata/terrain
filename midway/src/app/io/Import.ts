@@ -47,11 +47,9 @@ THE SOFTWARE.
 import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
-import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
-import { promisify } from 'util';
 import * as winston from 'winston';
 
 import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
@@ -260,7 +258,7 @@ export class Import
       );
 
       await this._deleteStreamingTempFolder();
-      await promisify(fs.mkdir)(this.STREAMING_TEMP_FOLDER);
+      await Util.mkdir(this.STREAMING_TEMP_FOLDER);
 
       this.chunkQueue = [];
       this.nextChunk = '';
@@ -638,7 +636,7 @@ export class Import
   {
     try
     {
-      await promisify(fs.rmdir)(this.STREAMING_TEMP_FOLDER);
+      await Util.rmdir(this.STREAMING_TEMP_FOLDER);
     }
     catch (e)
     {
@@ -969,7 +967,7 @@ export class Import
       let items: object[];
       try
       {
-        const data: string = await promisify(fs.readFile)(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
+        const data: string = await Util.readFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
           { encoding: 'utf8' }) as string;
 
         const time = Date.now();
@@ -1341,7 +1339,7 @@ export class Import
       try
       {
         winston.info('File Import: opening temp file for writing.');
-        await promisify(fs.writeFile)(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
+        await Util.writeFile(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
           JSON.stringify(items), { flag: 'wx' });
         winston.info('File Import: finished writing items to temp file.');
       }
