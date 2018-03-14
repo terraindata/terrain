@@ -100,7 +100,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     const settingsOpen = this._settingsAreOpen();
 
     let labelStyle;
-    if (field.isWildcardElement())
+    if (field.isWildcardField())
     {
       labelStyle = settingsOpen ?
         fontColor(Colors().active, Colors().active)
@@ -132,7 +132,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             <div
               className={classNames({
                 'field-preview-label': true,
-                'field-preview-array-label': field.isWildcardElement(),
+                'field-preview-array-label': field.isWildcardField(),
                 'field-preview-can-toggle': this.props.toggleOpen !== undefined,
               })}
               onClick={this.props.toggleOpen}

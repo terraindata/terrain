@@ -205,6 +205,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     editorAct({
       actionType: 'resetState',
     });
+
     if (params.algorithmId !== undefined)
     {
       Initializers.initNewFromAlgorithm(getAlgorithmId(params));
@@ -230,6 +231,8 @@ class ETLEditorPage extends TerrainComponent<Props>
     this.props.editorAct({
       actionType: 'resetState',
     });
+    // Initializers.initFromDebug();
+    // return;
     this.initFromRoute();
   }
 

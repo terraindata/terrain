@@ -222,7 +222,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _canEditName(): boolean
   {
-    return !this._field().isWildcardElement();
+    return !this._field().isWildcardField();
   }
 
   protected _willFieldChange(nextProps)

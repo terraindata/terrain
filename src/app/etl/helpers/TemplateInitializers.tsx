@@ -68,6 +68,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { createElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -75,8 +76,40 @@ import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
 
 import DocumentsHelpers from './DocumentsHelpers';
 
+import { FieldTypes } from 'shared/etl/FieldTypes';
+
 class Initializers extends ETLHelpers
 {
+  public initFromDebug()
+  {
+    const documents = List([
+      {
+        rf1: 'hi',
+        rf2: 'yo',
+        arr: [1, 2, 3],
+        nestedField: {
+          nested1: 1,
+          nested2: true,
+        },
+        arrObj: [
+          { foo: 'hi'},
+          { foo: 'yo'},
+        ]
+      }
+    ]);
+    const FT = new FieldTypes();
+    FT.getFullTypeFromDocument(documents.get(0)).then((value) => {
+      FT.getESMappingFromDocument(value).then((mapping) => {
+        console.log(mapping);
+      });
+    });
+    const onLoad = this.createInitialTemplateFn();
+    onLoad(documents);
+
+    const e = this.templateEditor.getCurrentEngine();
+    createElasticMapping(e);
+  }
+
   public loadExistingTemplate(templateId: number)
   {
     const onLoad = (template: ETLTemplate) =>
@@ -88,7 +121,7 @@ class Initializers extends ETLHelpers
         actionType: 'setTemplate',
         template,
       });
-      this.editorAct({
+      this.editorAct({ // todo find the last edge
         actionType: 'setCurrentEdge',
         edge: 0,
       });

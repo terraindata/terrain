@@ -57,6 +57,25 @@ export interface PathHashMap<T>
   [k: string]: T;
 }
 
+// root is considered to be a named field
+export function isNamedField(
+  keypath: KeyPath,
+  index?: number,
+): boolean
+{
+  const last = index === undefined ? keypath.last() : keypath.get(index);
+  return last !== '*' && Number.isNaN(Number(last));
+}
+
+export function isWildcardField(
+  keypath: KeyPath,
+  index?: number,
+): boolean
+{
+  const last = index === undefined ? keypath.last() : keypath.get(index);
+  return last === '*';
+}
+
 // document merge logic
 export function hashPath(keypath: KeyPath): PathHash
 {
@@ -69,25 +88,6 @@ export function unhashPath(keypath: PathHash): KeyPath
 }
 
 const valueTypeKeyPath = List(['valueType']);
-
-// root is considered to be a named field
-export function isNamedField(
-  keypath: KeyPath,
-): boolean
-{
-  const last = keypath.last();
-  return last !== '*' && Number.isNaN(Number(last));
-}
-
-export function isArrayField(
-  keypath: KeyPath,
-  engine: TransformationEngine,
-  pathToIdMap: PathHashMap<number>,
-): boolean
-{
-  const hashedPath = hashPath(keypath);
-  return engine.getFieldType(pathToIdMap[hashedPath]) === 'array';
-}
 
 // turn all indices into a particular value, based on
 // an existing engine that has fields with indices in them

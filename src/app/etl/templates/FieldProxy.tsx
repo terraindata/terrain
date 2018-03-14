@@ -202,7 +202,7 @@ export class FieldNodeProxy
   {
     const field = this.field();
     const engine = this.tree.getEngine();
-    if (field.isWildcardElement())
+    if (field.isWildcardField())
     {
       engine.setFieldProp(field.fieldId, List(['valueType']), newType);
     }

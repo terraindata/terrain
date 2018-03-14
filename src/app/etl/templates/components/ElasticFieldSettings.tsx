@@ -182,9 +182,9 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   public getFormState(props): ElasticFieldProps
   {
     const field = this._fieldMap(props).get(props.fieldId);
-    const { type, fieldProps } = field;
-    const elasticFieldProps = fieldProps['elastic'];
-    return defaultProps(type, elasticFieldProps);
+    const { fieldProps } = field;
+    const elasticFieldProps = fieldProps[Languages.Elastic] as Partial<ElasticFieldProps>;
+    return defaultProps(elasticFieldProps);
   }
 
   public render()

@@ -53,6 +53,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { isWildcardField } from 'shared/transformations/util/EngineUtil';
 
 // only put fields in here that are needed to track display-sensitive state
 class TemplateFieldC
@@ -62,6 +63,7 @@ class TemplateFieldC
   public readonly type: FieldTypes = 'object';
   public readonly fieldId: number = -1;
   public readonly name: string = '';
+  public readonly inputKeyPath: List<string> = List([]);
   public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
 
@@ -70,9 +72,9 @@ class TemplateFieldC
     return this.representedType() === 'array';
   }
 
-  public isWildcardElement(): boolean
+  public isWildcardField(): boolean
   {
-    return this.name === '*';
+    return isWildcardField(this.inputKeyPath);
   }
 
   public isPrimitive(): boolean
@@ -83,7 +85,7 @@ class TemplateFieldC
 
   public representedType(): FieldTypes
   {
-    if (this.name === '*')
+    if (this.isWildcardField())
     {
       return this.fieldProps['valueType'];
     }
