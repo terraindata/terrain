@@ -66,7 +66,6 @@ const scaleMin = (scale) => scale.range()[0];
 const scaleMax = (scale) => scale.range()[scale.range().length - 1];
 
 const Periscope = {
-
   create(el, state)
   {
     d3.select(el).attr('class', 'periscope-wrapper');
@@ -237,6 +236,15 @@ const Periscope = {
     bd.on('mouseleave', offFn);
   },
 
+  _doubleClickFactory: (el, onMove, scale, domain, onMoveStart) => function(event)
+  {
+    const handle = d3.select(this)[0][0];
+    d3.select('#input-' + handle['id'])
+      .style('display', 'block');
+    d3.select('#readonly-' + handle['id'])
+      .style('display', 'none');
+  },
+
   _drawHandles(el, scales, domain, onDomainChange, onMoveStart)
   {
     const g = d3.select(el).selectAll('.handles');
@@ -257,11 +265,16 @@ const Periscope = {
       .attr('r', 20);
 
     handle
-      .attr('_id', (d, i) => i);
+      .attr('_id', (d, i) => i)
+      .attr('id', (d, i) => i);
 
     handle.on('mousedown', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
     handle.on('touchstart', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
-
+    handle.on('dblclick', this._doubleClickFactory(el));
+    // handle.on('dblclick', function() {
+    //   const handle = d3.select(this);
+    //   console.log(handle);
+    // }.bind(this));
     handle.exit().remove();
   },
 
@@ -280,18 +293,15 @@ const Periscope = {
 
       const readonlyInput = div.append('span')
         .attr('class', 'readonly-domain-input')
+        .attr('id', 'readonly-0')
         .style('left', left + 'px')
-        .text(Util.formatNumber(domain.x[0]).replace(/\s/g, ''))
-        .on('dblclick', (e) =>
-        {
-          readonlyInput.style('display', 'none');
-          input.style('display', 'block');
-        });
+        .text(Util.formatNumber(domain.x[0]).replace(/\s/g, ''));
 
       const input = div.append('input')
         .attr('class', 'domain-input')
         .attr('id', 'input-0')
         .attr('value', Util.formatNumber(domain.x[0]).replace(/\s/g, ''))
+        .attr('autofocus', true)
         .style('left', left + 'px')
         .style('color', Colors().active)
         .style('display', 'none')
@@ -316,13 +326,9 @@ const Periscope = {
 
       const readonlyInput = div.append('span')
         .attr('class', 'readonly-domain-input')
+        .attr('id', 'readonly-1')
         .style('left', left2 + 'px')
-        .text(Util.formatNumber(domain.x[1]).replace(/\s/g, ''))
-        .on('dblclick', (e) =>
-        {
-          readonlyInput.style('display', 'none');
-          input.style('display', 'block');
-        });
+        .text(Util.formatNumber(domain.x[1]).replace(/\s/g, ''));
 
       const input = div.append('input')
         .attr('class', 'domain-input')
