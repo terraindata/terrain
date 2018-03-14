@@ -125,7 +125,7 @@ export class TransformationEngine
         new (TransformationInfo.getType(raw['typeCode']))(
           raw['id'],
           List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
-          raw['options'],
+          raw['meta'],
           raw['typeCode'],
         ) as TransformationNode;
     }
@@ -816,14 +816,13 @@ export class TransformationEngine
         {
           if (key.contains('*'))
           {
+            const newKey: KeyPath = this.IDToFieldNameMap.get(value);
             const upto: KeyPath = key.slice(0, key.indexOf('*')).toList();
-            let newUpto: KeyPath = this.IDToFieldNameMap.get(this.fieldNameToIDMap.get(upto));
-            newUpto = updateKeyPath(key, upto, newUpto);
             for (let j: number = 0; j < Object.keys(yadeep.get(o, upto)).length; j++)
             {
-              const oldSubkey: KeyPath = key.set(key.indexOf('*'), j.toString());
-              const subkey: KeyPath = newUpto.set(newUpto.indexOf('*'), j.toString());
-              this.renameHelper(r, o, subkey, this.fieldNameToIDMap.get(subkey), oldSubkey);
+              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf('*'), j.toString());
+              const oldKeyReplaced: KeyPath = key.set(key.indexOf('*'), j.toString());
+              this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
             }
           } else
           {
