@@ -216,14 +216,12 @@ class HitsArea extends TerrainComponent<Props>
   {
     // Get the fields that are nested
     const { builder, schema, resultsState } = props;
-    const dataSource = props.query.path.source.dataSource;
     let nestedFields = resultsState.fields.filter((field) =>
     {
       const type = ElasticBlockHelpers.getTypeOfField(
         schema,
         builder,
         field,
-        dataSource,
         true,
       );
       return type === 'nested' || type === '';

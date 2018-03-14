@@ -158,7 +158,10 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       closed: !line.expanded,
     };
     return (
-      <div className='pf-score-line-transform'>
+      <div
+        className='pf-score-line-transform'
+        style={backgroundColor(Colors().blockBg)}
+      >
         <LinearSelector
           options={List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'])}
           selected={line.transformData.mode}
@@ -251,7 +254,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     return (
       <div
         className='pf-line pf-score-line-inner'
-        style={backgroundColor(Colors().blockBg)}
       >
         {this.renderExpandIcon()}
         <EditableField
@@ -290,6 +292,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         }
 
         {
+          this.props.line.field &&
           this.renderTransformChartPreview()
         }
       </div>
@@ -309,6 +312,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         onDelete={this.props.onDelete}
         index={this.props.index}
         expanded={this.props.line.expanded}
+        style={_.extend({}, borderColor(Colors().blockBg), backgroundColor(Colors().fontWhite))}
         expandableContent={expandableContent}
       />
     );

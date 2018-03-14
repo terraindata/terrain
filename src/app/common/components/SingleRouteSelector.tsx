@@ -62,7 +62,7 @@ export interface Props
   value: any;
   onChange: (value: any) => void;
   canEdit?: boolean;
-
+  forceFloat?: boolean;
   shortNameText: string;
   headerText?: string;
 
@@ -128,6 +128,7 @@ export class SingleRouteSelector extends TerrainComponent<Props>
       hasSearch: props.hasSearch,
       column: props.column,
       hideSampleData: props.hideSampleData,
+      forceFloat: props.forceFloat,
     }]);
   }
 

@@ -171,7 +171,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
           schema,
           builder,
           field,
-          dataSource,
           true,
         );
         return type === 'nested' || type === '';

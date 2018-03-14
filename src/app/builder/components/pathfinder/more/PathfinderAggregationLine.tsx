@@ -136,7 +136,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       this.props.pathfinderContext.schemaState,
       this.props.pathfinderContext.builderState,
       newField,
-      this.props.pathfinderContext.source.dataSource,
     );
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'fieldType'), fieldType);
     this.updateAggregation(this.props.aggregation.type, newField);

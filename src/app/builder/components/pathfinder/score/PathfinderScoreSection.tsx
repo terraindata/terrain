@@ -107,7 +107,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       actionType: 'setStyle',
       selector: `.pf-section .pf-score-line-transform
       .linear-selector-wrapper .linear-selector-options .linear-selector-option`,
-      style: fontColor(Colors().fontColorLightest + ' !important'),
+      style: fontColor(Colors().active + ' !important'),
     });
     this.props.colorsActions({
       actionType: 'setStyle',
@@ -118,17 +118,17 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-wrapper',
-      style: { background: Colors().blockBg },
+      style: { background: Colors().fontWhite },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper',
-      style: { background: Colors().blockBg },
+      style: { background: Colors().fontWhite },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper .dropdown-option',
-      style: { background: Colors().blockBg },
+      style: { background: Colors().fontWhite },
     });
   }
 
@@ -384,6 +384,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
                 }
                 onDrop={this.handleLinesReorder}
                 className='drag-drop-pf-score'
+                style={backgroundColor(Colors().blockBg)}
               />
               :
               null

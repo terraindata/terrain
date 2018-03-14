@@ -49,9 +49,9 @@ THE SOFTWARE.
 export const PathfinderText = {
 
   // Source section
-  firstWord: 'Find',
+  firstWord: 'Data Source',
   chooseDataSourceDropdownPrompt: 'Choose a data source',
-  findSectionTitle: 'Find',
+  findSectionTitle: 'Data Source',
   findSectionSubtitle: '',
   // `Choose where your data are located and filter out everything that isn't a match.`,
 

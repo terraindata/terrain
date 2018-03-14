@@ -600,10 +600,11 @@ const TransformChart = {
 
     const spotlight = g.selectAll('.spotlight')
       .data(
-        spotlights.filter((d) => d['fields'][inputKey] !== undefined),
+        spotlights
+          .filter((d) => d['fields'][inputKey] !== undefined)
+          .sort((d, b) => d['rank'] - b['rank']),
         (d) => d['fields']['_id'],
     );
-
     const spotlightEnter = spotlight.enter()
       .append('g')
       .attr('class', 'spotlight')
@@ -1785,7 +1786,7 @@ const TransformChart = {
 
     this._drawBg(el, scales);
 
-    const isDate = ElasticBlockHelpers.getColumnType(schema, builder, inputKey) === 'date';
+    const isDate = ElasticBlockHelpers.getTypeOfField(schema, builder, inputKey, true) === 'date';
     this._drawAxes(el, scales, width, height, inputKey, isDate);
 
     if (inputKey === '' || inputKey === undefined)

@@ -87,7 +87,7 @@ const NewTheme =
     active: NTColors.mainBlue,
 
     bg: NTColors.light1,
-    blockBg: NTColors.light2, // e.g., in Pathfinder, behind block elements
+    blockBg: NTColors.light3, // e.g., in Pathfinder, behind block elements
     blockOutline: NTColors.grey1,
 
     sidebarBg: NTColors.light1,

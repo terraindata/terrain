@@ -68,6 +68,7 @@ export interface Props
   onDelete?: (index: number) => void;
   depth?: number;
   pieces?: List<PathfinderPiece>;
+  style?: any;
   // For expandable section, like transform chart
   expanded?: boolean;
   expandableContent?: any;
@@ -87,7 +88,10 @@ export class PathfinderLine extends TerrainComponent<Props>
   {
     const { canDrag, canDelete, canEdit, children, pieces } = this.props;
     return this.addIndentation(
-      <div className='pf-line-wrapper'>
+      <div
+        className='pf-line-wrapper'
+        style={this.props.style}
+      >
         <div
           className={classNames({
             'pf-line': true,

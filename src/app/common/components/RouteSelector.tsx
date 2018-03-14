@@ -354,7 +354,7 @@ export class RouteSelector extends TerrainComponent<Props>
     return (
       <DrawerAnimation
         open={this.isOpen()}
-        maxHeight={350 /* coordinate this with LESS */}
+        maxHeight={props.large ? 300 : 350 /* coordinate this with LESS */}
       >
         <div
           className={classNames({
@@ -445,13 +445,17 @@ export class RouteSelector extends TerrainComponent<Props>
         key={optionSet.key}
         style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
       >
-        <div
-          className='routeselector-header'
-        >
-          {
-            optionSet.headerText
-          }
-        </div>
+        {
+          optionSet.headerText &&
+          <div
+            className='routeselector-header'
+          >
+            {
+              optionSet.headerText
+            }
+          </div>
+        }
+
 
         {
           showTextbox ?
@@ -758,34 +762,42 @@ export class RouteSelector extends TerrainComponent<Props>
               })}
               onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
             >
-              <div
-                className='routeselector-option-name'
-                style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
-                key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
-              >
-                {
-                  option.icon !== undefined &&
-                  <div className='routeselector-option-icon'>
-                    {
-                      option.icon
-                    }
-                  </div>
-                }
+              {
+                (option.sampleData === undefined || optionSet.hideSampleData) &&
                 <div
-                  className='routeselector-option-name-inner'
-                  style={fontColor(Colors().fontColor2)}
+                  className='routeselector-option-name'
+                  style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
+                  key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
                 >
                   {
-                    option.displayName
+                    option.icon !== undefined &&
+                    <div className='routeselector-option-icon'>
+                      {
+                        option.icon
+                      }
+                    </div>
                   }
+                      <div
+                        className='routeselector-option-name-inner'
+                        style={fontColor(Colors().fontColor2)}
+                      >
+                        {
+                          option.displayName
+                        }
+                      </div>
                 </div>
-              </div>
-
+              }
               {
                 option.sampleData && !optionSet.hideSampleData &&
-                <div className='routeselector-data'>
-                  <div className='routeselector-data-header'>
-                    Sample Data
+                <div
+                  className='routeselector-data'
+                  style={isSelected ? backgroundColor(Colors().active) : {}}
+                >
+                  <div
+                    className='routeselector-data-header'
+                    style={isSelected ? fontColor(Colors().fontWhite) : {}}
+                  >
+                    {option.displayName}
                     </div>
                   {
                     option.sampleData.slice(0, 1).map((data, i) =>
