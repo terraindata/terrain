@@ -805,17 +805,14 @@ export class TransformationEngine
     }
     else if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
     {
-      let el: any = yadeep.get(o, key);
+      const el: any = yadeep.get(o, key);
       if (el !== undefined)
       {
         if (isPrimitive(el))
         {
-          if (typeof el === 'object')
-          {
-            el = Object.assign({}, el);
-          }
           yadeep.set(r, this.IDToFieldNameMap.get(value), el, { create: true });
-        } else if (el.constructor === Array)
+        }
+        else if (el.constructor === Array)
         {
           if (key.contains('*'))
           {
