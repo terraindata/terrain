@@ -88,6 +88,18 @@ const doc6 = {
   value: null,
 };
 
+const doc7 = {
+    'deepArray':
+    [
+        [
+            5
+        ],
+        [
+            6
+        ]
+    ]
+};
+
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
@@ -319,6 +331,12 @@ test('rename a field (deeply nested property in array)', () =>
   expect(e.transform(doc3)['arr'][1][0]['cool']).toBe('dog');
   expect(e.transform(doc3)['arr'][1][1]['a']).toBe(undefined);
   expect(e.transform(doc3)['arr'][1][1]['cool']).toBe('fren');
+});
+
+test('array in array in object: identity transformation', () =>
+{
+    const e: TransformationEngine = new TransformationEngine(doc7);
+    expect(e.transform(doc7)).toEqual(doc7);
 });
 
 test('proper wildcard behavior in rename stage', () =>
