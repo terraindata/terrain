@@ -80,36 +80,46 @@ import { FieldTypes } from 'shared/etl/FieldTypes';
 
 class Initializers extends ETLHelpers
 {
+  // TODO for easy testing. get rid of this before release
   public initFromDebug()
   {
-    const documents = List([
-      {
-        rf1: 'hi',
-        rf2: 'yo',
-        arr: [1, 2, 3],
-        nestedField: {
-          nested1: 1,
-          nested2: true,
-        },
-        arrObj: [
-          { foo: 'hi' },
-          { foo: 'yo' },
-        ],
-      },
-    ]);
-    const FT = new FieldTypes();
-    FT.getFullTypeFromDocument(documents.get(0)).then((value) =>
-    {
-      FT.getESMappingFromDocument(value).then((mapping) =>
-      {
-        console.log(mapping);
-      });
-    });
-    const onLoad = this.createInitialTemplateFn();
-    onLoad(documents);
+    // const documents = List([
+    //   {
+    //     rf1: 'hi',
+    //     rf2: 'yo',
+    //     arr: [1, 2, 3],
+    //     nestedField: {
+    //       nested1: 1,
+    //       nested2: true,
+    //     },
+    //     arrObj: [
+    //       { foo: 'hi' },
+    //       { foo: 5 },
+    //     ],
+    //   },
+    // ]);
 
-    const e = this.templateEditor.getCurrentEngine();
-    const mapping = new ElasticMapping(e);
+    // const document2 = {
+    //   rf1: 'hi',
+    //   rf2: 'yo',
+    // }
+
+    // const debug = (oldMapping) => {
+    //   const e = this.templateEditor.getCurrentEngine();
+    //   const mapping = new ElasticMapping(e);
+    //   console.log(ElasticMapping.compareMapping(mapping.getMapping(), oldMapping));
+    // };
+
+    // const FT = new FieldTypes();
+    // FT.getFullTypeFromDocument(document2).then((value) =>
+    // {
+    //   FT.getESMappingFromDocument(value).then((mapping) =>
+    //   {
+    //     debug(mapping);
+    //   });
+    // });
+    // const onLoad = this.createInitialTemplateFn();
+    // onLoad(documents);
   }
 
   public loadExistingTemplate(templateId: number)

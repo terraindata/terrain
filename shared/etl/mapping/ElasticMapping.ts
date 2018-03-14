@@ -58,7 +58,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import { hashPath, isNamedField, isWildcardField, PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
-interface TypeConfig
+export interface TypeConfig
 {
   type: string;
   index?: boolean;
@@ -72,7 +72,8 @@ interface TypeConfig
   analyzer?: string;
 }
 
-interface MappingType {
+export interface MappingType
+{
   properties?: {
     [k: string]: {
       properties?: MappingType['properties'],
@@ -80,8 +81,88 @@ interface MappingType {
   };
 }
 
+// generator that iterates over each field in mapping
+// e.g. ['properties', 'foo'], ['properties', 'foo', 'properties', 'bar'], ...
+function* getKeyPathsForComparison(mapping: MappingType): IterableIterator<List<string>>
+{
+  if (_.has(mapping, 'properties'))
+  {
+    const basePath = List(['properties']);
+    for (const key of Object.keys(mapping['properties']))
+    {
+      yield basePath.push(key);
+      for (const kp of getKeyPathsForComparison(mapping['properties'][key]))
+      {
+        yield basePath.push(key).concat(kp).toList();
+      }
+    }
+  }
+}
+
+function humanReadablePathName(keypath: EnginePath)
+{
+  return keypath.filter((val, index) => index % 2 === 1)
+    .reduce((accum, val) =>
+    {
+      if (accum === '')
+      {
+        return `[${val}`;
+      }
+      else
+      {
+        return `${accum}, ${val}`;
+      }
+    }, '') as string + ']';
+}
+
+export interface MappingComparison
+{
+  isSubset: boolean; // if true, then newMapping represents a subset of existingMapping (less than or equal)
+  hasConflicts: boolean; // if true, the two mappings are not compatible
+  conflicts: string[]; // an array of human readable conflict descriptions
+}
+
 export class ElasticMapping
 {
+  public static compareMapping(toCompare: MappingType, existingMapping: MappingType): MappingComparison
+  {
+    const result: MappingComparison = {
+      isSubset: true,
+      hasConflicts: false,
+      conflicts: [],
+    };
+
+    for (const kp of getKeyPathsForComparison(toCompare))
+    {
+      const kpArray = kp.toArray();
+      const toCompareConfig: TypeConfig = _.get(toCompare, kpArray);
+      const existingConfig: TypeConfig = _.get(existingMapping, kpArray);
+
+      if (existingConfig === undefined)
+      {
+        result.isSubset = false;
+      }
+      else
+      {
+        if (toCompareConfig['type'] !== existingConfig['type'])
+        {
+          result.hasConflicts = true;
+          const message = `Type conflict for field ${humanReadablePathName(kp)}. ` +
+            `Type '${toCompareConfig['type']}'' does not match type '${existingConfig['type']}'.`;
+          result.conflicts.push(message);
+        }
+        else if (toCompareConfig['analyzer'] !== toCompareConfig['analyzer'])
+        {
+          result.hasConflicts = true;
+          const message = `Type conflict for field ${humanReadablePathName(kp)}. ` +
+            `Analyzer '${toCompareConfig['analyzer']}' does not match Analyzer '${existingConfig['analyzer']}'.`;
+          result.conflicts.push(message);
+        }
+      }
+    }
+    return result;
+  }
+
   private errors: string[] = [];
   private pathSchema: PathHashMap<{
     type: ElasticTypes,
@@ -96,7 +177,17 @@ export class ElasticMapping
     this.createElasticMapping();
   }
 
-  public getTextConfig(elasticProps: ElasticFieldProps): TypeConfig
+  public getMapping(): MappingType
+  {
+    return this.mapping;
+  }
+
+  public getErrors(): string[]
+  {
+    return this.errors;
+  }
+
+  protected getTextConfig(elasticProps: ElasticFieldProps): TypeConfig
   {
     return {
       type: elasticProps.isAnalyzed ? 'text' : 'keyword',
@@ -119,7 +210,7 @@ export class ElasticMapping
     };
   }
 
-  public getTypeConfig(fieldID: number): TypeConfig | null
+  protected getTypeConfig(fieldID: number): TypeConfig | null
   {
     const elasticProps = this.getElasticProps(fieldID);
     const valueType = this.getValueType(fieldID);
@@ -147,7 +238,7 @@ export class ElasticMapping
     }
   }
 
-  public getRepresentedType(fieldID: number): FieldTypes
+  protected getRepresentedType(fieldID: number): FieldTypes
   {
     const kp = this.engine.getOutputKeyPath(fieldID);
     if (isWildcardField(kp))
@@ -164,25 +255,25 @@ export class ElasticMapping
   // e.g. ['foo', 'bar'] to ['properties', 'foo', 'properties', 'bar']
   // e.g. ['foo', '0', 'bar'] to ['properties', 'foo', 'properties', 'bar']
   // e.g. ['foo', '*'] to ['properties', 'foo']
-  public enginePathToMappingPath(path: EnginePath): EnginePath
+  protected enginePathToMappingPath(path: EnginePath): EnginePath
   {
     return path.flatMap(
       (value, i) => isNamedField(path, i) ? ['properties', value] : [],
     ).toList() as EnginePath;
   }
 
-  public getValueType(fieldID: number): FieldTypes
+  protected getValueType(fieldID: number): FieldTypes
   {
     return this.engine.getFieldProp(fieldID, valueTypePath) as FieldTypes;
   }
 
-  public getElasticProps(fieldID: number): ElasticFieldProps
+  protected getElasticProps(fieldID: number): ElasticFieldProps
   {
     const props: Partial<ElasticFieldProps> = this.engine.getFieldProp(fieldID, elasticPropPath);
     return defaultProps(props);
   }
 
-  public addFieldToMapping(id: number)
+  protected addFieldToMapping(id: number)
   {
     const config = this.getTypeConfig(id);
     const enginePath = this.engine.getOutputKeyPath(id);
@@ -219,14 +310,17 @@ export class ElasticMapping
     }
   }
 
-  public createElasticMapping()
+  protected createElasticMapping()
   {
     const ids = this.engine.getAllFieldIDs();
     ids.forEach((id, i) =>
     {
       try
       {
-        this.addFieldToMapping(id);
+        if (this.engine.getFieldEnabled(id))
+        {
+          this.addFieldToMapping(id);
+        }
       }
       catch (e)
       {
@@ -235,16 +329,6 @@ export class ElasticMapping
         );
       }
     });
-  }
-
-  public getMapping(): MappingType
-  {
-    return this.mapping;
-  }
-
-  public getErrors(): string[]
-  {
-    return this.errors;
   }
 }
 
