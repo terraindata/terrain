@@ -88,6 +88,18 @@ const doc6 = {
   value: null,
 };
 
+const doc7 = {
+  deepArray:
+    [
+      [
+        5,
+      ],
+      [
+        6,
+      ],
+    ],
+};
+
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
@@ -234,6 +246,16 @@ test('String serialize/deserialize round trip', () =>
   expect(e.equals(e2)).toBe(false);
 });
 
+test('String serialize/deserialize round trip - substring', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformationNodeType.SubstringNode, List<KeyPath>([KeyPath(['meta', 'school'])]), { from: 1, length: 3 });
+  const j: string = JSON.stringify(e.toJSON());
+  const e2 = TransformationEngine.load(j);
+  expect(e.equals(e2)).toBe(true);
+  expect(e2.transform(doc1)['meta']['school']).toBe('tan');
+});
+
 test('linear chain of transformations', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
@@ -309,6 +331,12 @@ test('rename a field (deeply nested property in array)', () =>
   expect(e.transform(doc3)['arr'][1][0]['cool']).toBe('dog');
   expect(e.transform(doc3)['arr'][1][1]['a']).toBe(undefined);
   expect(e.transform(doc3)['arr'][1][1]['cool']).toBe('fren');
+});
+
+test('array in array in object: identity transformation', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc7);
+  expect(e.transform(doc7)).toEqual(doc7);
 });
 
 test('proper wildcard behavior in rename stage', () =>
@@ -400,4 +428,27 @@ test('proper wildcard behavior across multiple docs', () =>
       car: ['A', 'B', 'C', 'D'],
     },
   );
+});
+
+test('wildcard rename with manual field adding', () =>
+{
+  // manually creating an engine that matches doc, but only using wildcards
+  const e: TransformationEngine = new TransformationEngine();
+  const foo = e.addField(List(['foo']), 'array');
+  e.setFieldProp(foo, List(['valueType']), 'object');
+  const wildcard = e.addField(List(['foo', '*']), 'array');
+  e.setFieldProp(wildcard, List(['valueType']), 'object');
+  const bar = e.addField(List(['foo', '*', 'bar']), 'string');
+
+  const doc = {
+    foo: [
+      { bar: 'hi' },
+      { bar: 'yo' },
+    ],
+  };
+  expect(e.transform(doc)).toEqual(doc);
+
+  e.setOutputKeyPath(bar, List(['foo', '*', 'baz']));
+
+  expect(e.transform(doc)['foo'][0]['baz']).toBe('hi');
 });

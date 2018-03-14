@@ -125,7 +125,7 @@ export class TransformationEngine
         new (TransformationInfo.getType(raw['typeCode']))(
           raw['id'],
           List<KeyPath>(raw['fields'].map((item) => KeyPath(item))),
-          raw['options'],
+          raw['meta'],
           raw['typeCode'],
         ) as TransformationNode;
     }
@@ -226,6 +226,7 @@ export class TransformationEngine
   public transform(doc: object): object
   {
     let output: object = this.rename(doc);
+
     for (const nodeKey of this.dag.sources())
     {
       const toTraverse: string[] = GraphLib.alg.preorder(this.dag, nodeKey);
@@ -265,34 +266,6 @@ export class TransformationEngine
     });
 
     return output;
-
-    // console.dir(this.fieldNameToIDMap);
-    // let output: object = this.flatten(doc);
-    // console.dir(output);
-    // for (const nodeKey of this.dag.sources())
-    // {
-    //   const toTraverse: string[] = GraphLib.alg.preorder(this.dag, nodeKey);
-    //   for (let i = 0; i < toTraverse.length; i++)
-    //   {
-    //     const preprocessedNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
-    //     const visitor: TransformationEngineNodeVisitor = new TransformationEngineNodeVisitor();
-    //     const transformationResult: TransformationVisitResult =
-    //       visitor.applyTransformationNode(preprocessedNode, output);
-    //     if (transformationResult.errors !== undefined)
-    //     {
-    //       // winston.error('Transformation encountered errors!:');
-    //       transformationResult.errors.forEach((error: TransformationVisitError) =>
-    //       {
-    //         console.log('fail! ' + error.message);
-    //         // winston.error(`\t -${error.message}`);
-    //       });
-    //       // TODO abort transforming if errors occur?
-    //     }
-    //     output = transformationResult.document;
-    //   }
-    // }
-    // console.dir(output);
-    // return this.unflatten(output);
   }
 
   /**
@@ -705,74 +678,6 @@ export class TransformationEngine
     return ids;
   }
 
-  /**
-   * Takes a deeply nested object and flattens it into a map of
-   * field names/IDs to values.  This makes it convenient for
-   * the engine to perform transformations without worrying about
-   * nesting etc. -- nesting and complicated hierarchical document
-   * structures only exist at the fringes of the `TransformationEngine`.
-   * Within the engine documents enjoy serene flatness.
-   *
-   * @param {object} obj The document to flatten
-   * @returns {object} The flattened document
-   */
-  private flatten(obj: object): object
-  {
-    const objectified: object = objectify(obj);
-    const output: object = {};
-    this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
-    {
-      const ref: any = yadeep.get(objectified, keyPath);
-      if (ref !== undefined)
-      {
-        if (isPrimitive(ref))
-        {
-          output[value] = ref;
-        }
-        else
-        {
-          output[value] = Object.assign({}, ref);
-        }
-      }
-    });
-    return output;
-  }
-
-  /**
-   * The inverse of `flatten` (above).  Using engine knowledge, take
-   * a flattened document and restore it to the correct deeply nested
-   * structure that the document should have.
-   *
-   * @param {object} obj A flattened document
-   * @returns {object}   The unflattened, maybe deeply nested, result
-   */
-  private unflatten(obj: object): object
-  {
-    const output: object = {};
-    this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
-    {
-      if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
-      {
-        yadeep.set(output, value, obj[key], { create: true });
-      }
-    });
-    // If a field is supposed to be an array but is an object in its flattened
-    // representation, convert it back to an array
-    this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
-    {
-      if (obj !== undefined && obj.hasOwnProperty(key) && this.fieldEnabled.get(key) === true)
-      {
-        if (this.fieldTypes.get(key) === 'array')
-        {
-          const x = yadeep.get(output, value);
-          x['length'] = Object.keys(x).length;
-          yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
-        }
-      }
-    });
-    return output;
-  }
-
   private preprocessNode(rawNode: TransformationNode, ftDoc: object): TransformationNode
   {
     const node: TransformationNode = _.cloneDeep(rawNode);
@@ -816,14 +721,13 @@ export class TransformationEngine
         {
           if (key.contains('*'))
           {
+            const newKey: KeyPath = this.IDToFieldNameMap.get(value);
             const upto: KeyPath = key.slice(0, key.indexOf('*')).toList();
-            let newUpto: KeyPath = this.IDToFieldNameMap.get(this.fieldNameToIDMap.get(upto));
-            newUpto = updateKeyPath(key, upto, newUpto);
             for (let j: number = 0; j < Object.keys(yadeep.get(o, upto)).length; j++)
             {
-              const oldSubkey: KeyPath = key.set(key.indexOf('*'), j.toString());
-              const subkey: KeyPath = newUpto.set(newUpto.indexOf('*'), j.toString());
-              this.renameHelper(r, o, subkey, this.fieldNameToIDMap.get(subkey), oldSubkey);
+              const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf('*'), j.toString());
+              const oldKeyReplaced: KeyPath = key.set(key.indexOf('*'), j.toString());
+              this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
             }
           } else
           {
