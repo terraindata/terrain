@@ -181,7 +181,7 @@ export class Items
       // check privileges if setting to live/lock/default
       if (!user.isSuperUser && (item.status === 'LIVE' || item.status === 'DEPLOYED' || item.status === 'DEFAULT'))
       {
-        return reject('Cannot set item status as LIVE, LOCK or DEFAULT as non-superuser');
+        return reject('Cannot set item status as LIVE, DEPLOYED or DEFAULT as non-superuser');
       }
 
       // if modifying existing item, check for existence and check privileges
@@ -198,7 +198,7 @@ export class Items
         if (!user.isSuperUser && (status === 'LIVE' || status === 'DEPLOYED' || status === 'DEFAULT'))
         {
           // only superusers can update live / default items
-          return reject('Cannot update LIVE, LOCK or DEFAULT item as non-superuser');
+          return reject('Cannot update LIVE, DEPLOYED or DEFAULT item as non-superuser');
         }
 
         const id = items[0].id;
@@ -270,7 +270,7 @@ export class Items
         }
         else if (resp['_id'] === deployedName && resp['found'] === true && items[0].status !== 'LIVE' && items[0].status !== 'DEPLOYED')
         {
-          return resolve('Error: Algorithm found in ES instance but not LIVE or LOCK');
+          return resolve('Error: Algorithm found in ES instance but not LIVE or DEPLOYED');
         }
         else if (resp['_id'] === deployedName && resp['found'] === false && (items[0].status === 'LIVE' || items[0].status === 'DEPLOYED'))
         {
