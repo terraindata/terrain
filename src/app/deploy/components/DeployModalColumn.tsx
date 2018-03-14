@@ -63,7 +63,7 @@ const AlgorithmIcon = require('./../../../images/icon_badgeVariant.svg');
 
 const TEXT =
   {
-    lock:
+    deployed:
       {
         main: 'You are deploying and locking the following algorithm. The algorithm query will be pushed to the database servers.',
         confirm: 'I approve of deploying and locking this query for this algorithm.',
@@ -188,7 +188,7 @@ class DeployModalColumn extends TerrainComponent<Props>
     //   title = 'Remove "' + name + '" from Live';
     // }
 
-    let text = status === ItemStatus.Deployed ? TEXT.lock : TEXT.notLive;
+    let text = status === ItemStatus.Deployed ? TEXT.deployed : TEXT.notLive;
     if (this.props.defaultChecked)
     {
       text = TEXT.default;
