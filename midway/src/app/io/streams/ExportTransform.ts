@@ -65,12 +65,7 @@ export default class ExportTransform extends ADocumentTransform
 
     if (configuration.rank === true)
     {
-      configuration.columnTypes['TERRAINRANK'] = {
-        type: 'long',
-        index: 'not_analyzed',
-        analyzer: null,
-        innerType: null,
-      };
+      configuration.columnTypes['TERRAINRANK'] = { type: 'long' };
     }
 
     configuration.transformations.forEach((transformation) =>
