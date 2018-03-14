@@ -230,8 +230,8 @@ export const ElasticBlockHelpers = {
       return FieldType.Text;
     }
     const { source } = builderState.query.path;
-    const index = source && source.dataSource && source.dataSource.index ? 
-      source.dataSource.index.split('/')[1] : getIndex('', builderState)
+    const index = source && source.dataSource && source.dataSource.index ?
+      source.dataSource.index.split('/')[1] : getIndex('', builderState);
     const server = builderState.db.name;
 
     if (index !== null)

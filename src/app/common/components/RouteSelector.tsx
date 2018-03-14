@@ -456,7 +456,6 @@ export class RouteSelector extends TerrainComponent<Props>
           </div>
         }
 
-
         {
           showTextbox ?
             <div
@@ -777,14 +776,14 @@ export class RouteSelector extends TerrainComponent<Props>
                       }
                     </div>
                   }
-                      <div
-                        className='routeselector-option-name-inner'
-                        style={fontColor(Colors().fontColor2)}
-                      >
-                        {
-                          option.displayName
-                        }
-                      </div>
+                  <div
+                    className='routeselector-option-name-inner'
+                    style={fontColor(Colors().fontColor2)}
+                  >
+                    {
+                      option.displayName
+                    }
+                  </div>
                 </div>
               }
               {
@@ -798,7 +797,7 @@ export class RouteSelector extends TerrainComponent<Props>
                     style={isSelected ? fontColor(Colors().fontWhite) : {}}
                   >
                     {option.displayName}
-                    </div>
+                  </div>
                   {
                     option.sampleData.slice(0, 1).map((data, i) =>
                       this.renderSampleDatum(data, i, String(option.value)),
@@ -1019,9 +1018,9 @@ export class RouteSelector extends TerrainComponent<Props>
         onClick={this.handleVeilClick}
         style={column ? {
           height: column.offsetHeight,
-          width: column.offsetWidth + 25,
+          width: Number(column.offsetWidth) + 25,
           top: column.offsetTop,
-          left: column.offsetLeft - 25,
+          left: Number(column.offsetLeft) - 25,
         } : {}}
       />
     );

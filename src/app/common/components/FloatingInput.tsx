@@ -110,12 +110,12 @@ const Label = LabelC`
   {
     if (props.isFloating)
     {
-      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE 
-      : props.small ? SMALL_LABEL_FLOATING_FONT_SIZE :
-      LABEL_FLOATING_FONT_SIZE;
+      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE
+        : props.small ? SMALL_LABEL_FLOATING_FONT_SIZE :
+          LABEL_FLOATING_FONT_SIZE;
     }
 
-    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE : 
+    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
       props.small ? SMALL_FONT_SIZE : FONT_SIZE;
   }};
 `;
@@ -142,7 +142,7 @@ const inputStyle = `
 `;
 
 const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
-    props.small ? SMALL_FONT_SIZE : FONT_SIZE;
+  props.small ? SMALL_FONT_SIZE : FONT_SIZE;
 
 // duplication of code because the functions don't work if you put them
 //  in inputStyle

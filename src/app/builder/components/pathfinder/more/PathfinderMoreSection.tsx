@@ -410,8 +410,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                   _.extend({},
                     backgroundColor(Colors().blockBg),
                     borderColor(Colors().blockOutline),
-                    {paddingBottom: expanded ? 6 : 0 }
-                )}
+                    { paddingBottom: expanded ? 6 : 0 },
+                  )}
               >
                 <div className='pf-more-nested-reference'>
                   <ExpandIcon
@@ -706,7 +706,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               ) : null
           }
         </div>
-    </div>
+      </div>
     );
   }
 }
