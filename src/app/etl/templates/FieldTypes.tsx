@@ -95,7 +95,7 @@ export const _TemplateField = makeExtendedConstructor(TemplateFieldC, true);
 class TransformationNodeC
 {
   public id: number = 0;
-  public typeCode: TransformationNodeType = TransformationNodeType.LoadNode;
+  public typeCode: TransformationNodeType = TransformationNodeType.SplitNode;
   public fields: List<List<string>> = List([]);
   public meta: object = {};
 }
