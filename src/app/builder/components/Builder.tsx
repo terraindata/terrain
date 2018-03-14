@@ -528,7 +528,7 @@ class Builder extends TerrainComponent<Props>
     const algorithm = this.getAlgorithm();
     if (algorithm)
     {
-      if (algorithm.status === ItemStatus.Lock || algorithm.status === ItemStatus.Approve)
+      if (algorithm.status === ItemStatus.Deployed || algorithm.status === ItemStatus.Approve)
       {
         return false;
       }

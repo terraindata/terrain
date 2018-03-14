@@ -129,7 +129,7 @@ class DeployModal extends TerrainComponent<Props>
 
     const { changingStatusTo } = this.state;
 
-    if ((changingStatusTo === ItemStatus.Lock && algorithm.status !== 'LOCK')
+    if ((changingStatusTo === ItemStatus.Deployed && algorithm.status !== 'DEPLOYED')
       || (changingStatusTo === ItemStatus.Default && algorithm.status !== 'DEFAULT')
     )
     {
@@ -151,7 +151,7 @@ class DeployModal extends TerrainComponent<Props>
       };
       this.props.algorithmActions.deploy(algorithm, 'putTemplate', body, changingStatusTo, this.state.deployedName);
     }
-    else if ((changingStatusTo !== ItemStatus.Lock && algorithm.status === 'LOCK')
+    else if ((changingStatusTo !== ItemStatus.Deployed && algorithm.status === 'DEPLOYED')
       || (changingStatusTo !== ItemStatus.Default && algorithm.status === 'DEFAULT'))
     {
       // undeploy this algorithm
@@ -215,14 +215,14 @@ class DeployModal extends TerrainComponent<Props>
     const { changingStatus, changingStatusOf, changingStatusTo } = this.state;
     const name = (changingStatusOf && changingStatusOf.name);
 
-    let title = 'Deploy "' + name + '" to Lock';
+    let title = `Lock and Deploy "${name}"`;
     if (changingStatusTo === ItemStatus.Default)
     {
-      title = 'Make "' + name + '" Default';
+      title = `Make "${name}" Default`;
     }
-    else if (changingStatusTo !== ItemStatus.Lock)
+    else if (changingStatusTo !== ItemStatus.Deployed)
     {
-      title = 'Remove "' + name + '" from Lock';
+      title = `Remove "${name}" from Deployed and Unlock`;
     }
 
     let defaultAlgorithm: LibraryTypes.Algorithm;

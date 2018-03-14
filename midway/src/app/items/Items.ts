@@ -179,7 +179,7 @@ export class Items
     return new Promise<ItemConfig>(async (resolve, reject) =>
     {
       // check privileges if setting to live/lock/default
-      if (!user.isSuperUser && (item.status === 'LIVE' || item.status === 'LOCK' || item.status === 'DEFAULT'))
+      if (!user.isSuperUser && (item.status === 'LIVE' || item.status === 'DEPLOYED' || item.status === 'DEFAULT'))
       {
         return reject('Cannot set item status as LIVE, LOCK or DEFAULT as non-superuser');
       }
@@ -195,7 +195,7 @@ export class Items
         }
 
         const status = items[0].status;
-        if (!user.isSuperUser && (status === 'LIVE' || status === 'LOCK' || status === 'DEFAULT'))
+        if (!user.isSuperUser && (status === 'LIVE' || status === 'DEPLOYED' || status === 'DEFAULT'))
         {
           // only superusers can update live / default items
           return reject('Cannot update LIVE, LOCK or DEFAULT item as non-superuser');
@@ -264,15 +264,15 @@ export class Items
         {
           return resolve('Item is not an Algorithm');
         }
-        if (resp['_id'] === deployedName && resp['found'] === true && (items[0].status === 'LIVE' || items[0].status === 'LOCK'))
+        if (resp['_id'] === deployedName && resp['found'] === true && (items[0].status === 'LIVE' || items[0].status === 'DEPLOYED'))
         {
           return resolve(`Algorithm is ${items[0].status} ${deployedName}`);
         }
-        else if (resp['_id'] === deployedName && resp['found'] === true && items[0].status !== 'LIVE' && items[0].status !== 'LOCK')
+        else if (resp['_id'] === deployedName && resp['found'] === true && items[0].status !== 'LIVE' && items[0].status !== 'DEPLOYED')
         {
           return resolve('Error: Algorithm found in ES instance but not LIVE or LOCK');
         }
-        else if (resp['_id'] === deployedName && resp['found'] === false && (items[0].status === 'LIVE' || items[0].status === 'LOCK'))
+        else if (resp['_id'] === deployedName && resp['found'] === false && (items[0].status === 'LIVE' || items[0].status === 'DEPLOYED'))
         {
           return resolve(`Error: ${items[0].status} Algorithm not found in ES instance`);
         }

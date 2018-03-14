@@ -546,7 +546,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     // }
 
     const canRename = algorithm.status !== ItemStatus.Default &&
-      algorithm.status !== ItemStatus.Lock;
+      algorithm.status !== ItemStatus.Deployed;
     return (
       <LibraryItem
         index={index}
@@ -631,7 +631,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     }
     else if (toStatus === ItemStatus.Archive && (
       v.status === ItemStatus.Default ||
-      v.status === ItemStatus.Lock
+      v.status === ItemStatus.Deployed
     )
     )
     {
@@ -650,8 +650,8 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     const { users } = this.props;
     const { roles } = this.state;
     const { currentUser: me } = users;
-    const canMakeLock = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
-    const canCreate = true; // canMakeLock;
+    const canMakeDeployed = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
+    const canCreate = true; // canMakedDeployed;
     // TODO maybe on the new middle tier, builders can create algorithms
     //  || (
     //   me && roles && roles.getIn([this.props.categoryId, me.id, 'builder'])
