@@ -268,6 +268,7 @@ const Periscope = {
   _drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange)
   {
     d3.select(el).selectAll('.domain-input').remove();
+    d3.select(el).selectAll('.readonly-domain-input').remove();
     const div = d3.select(el).selectAll('.inputs');
     const handles = d3.select(el).selectAll('.handle');
     const cCr = d3.select(el)[0][0]['getBoundingClientRect']();
@@ -276,17 +277,34 @@ const Periscope = {
     {
       const cr = handles[0][0]['getBoundingClientRect']();
       const left = (cr.left - cCr.left) - 16;
-      div.append('input')
+
+      const readonlyInput = div.append('span')
+        .attr('class', 'readonly-domain-input')
+        .style('left', left + 'px')
+        .text(Util.formatNumber(domain.x[0]).replace(/\s/g, ''))
+        .on('dblclick', (e) =>
+        {
+          readonlyInput.style('display', 'none');
+          input.style('display', 'block');
+        });
+
+      const input = div.append('input')
         .attr('class', 'domain-input')
         .attr('id', 'input-0')
         .attr('value', Util.formatNumber(domain.x[0]).replace(/\s/g, ''))
         .style('left', left + 'px')
         .style('color', Colors().active)
+        .style('display', 'none')
         .on('change', function()
         {
           let value = d3.select(el).select('#input-0').node().value;
           value = Util.formattedToNumber(value);
           onDomainLowChange(value);
+        }.bind(this))
+        .on('blur', function()
+        {
+          input.style('display', 'none');
+          readonlyInput.style('display', 'block');
         }.bind(this))
         ;
     }
@@ -295,17 +313,34 @@ const Periscope = {
     {
       const cr2 = handles[0][1]['getBoundingClientRect']();
       const left2 = (cr2.left - cCr.left) - 16;
-      div.append('input')
+
+      const readonlyInput = div.append('span')
+        .attr('class', 'readonly-domain-input')
+        .style('left', left2 + 'px')
+        .text(Util.formatNumber(domain.x[1]).replace(/\s/g, ''))
+        .on('dblclick', (e) =>
+        {
+          readonlyInput.style('display', 'none');
+          input.style('display', 'block');
+        });
+
+      const input = div.append('input')
         .attr('class', 'domain-input')
         .attr('id', 'input-1')
         .attr('value', Util.formatNumber(domain.x[1]).replace(/\s/g, ''))
         .style('left', left2 + 'px')
         .style('color', Colors().active)
+        .style('display', 'none')
         .on('change', function()
         {
           let value = d3.select(el).select('#input-1').node().value;
           value = Util.formattedToNumber(value);
           onDomainHighChange(value);
+        }.bind(this))
+        .on('blur', function()
+        {
+          input.style('display', 'none');
+          readonlyInput.style('display', 'block');
         }.bind(this))
         ;
     }
