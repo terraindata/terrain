@@ -44,10 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { Task } from './Task';
+import { TaskConfig, TaskOutputConfig } from './TaskConfig';
+
+import { TaskDefaultExit } from './tasks/TaskDefaultExit';
+import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
+import { TaskExport } from './tasks/TaskExport';
+import { TaskImport } from './tasks/TaskImport';
+
 export abstract class TreeVisitor
 {
-  constructor()
+  public constructor()
   {
     // do nothing
   }
+  public abstract async visitNode(node: Task): Promise<TaskOutputConfig>;
+
+  public abstract async visitDefaultExitNode(node: TaskDefaultExit): Promise<TaskOutputConfig>;
+
+  public abstract async visitDefaultFailureNode(node: TaskDefaultFailure): Promise<TaskOutputConfig>;
+
+  public abstract async visitExportNode(node: TaskExport): Promise<TaskOutputConfig>;
+
+  public abstract async visitImportNode(node: TaskImport): Promise<TaskOutputConfig>;
 }

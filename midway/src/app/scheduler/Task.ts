@@ -44,13 +44,85 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { TaskConfig, TaskInputConfig, TaskOutputConfig } from './TaskConfig';
+import { TaskConfig, TaskEnum, TaskInputConfig, TaskOutputConfig } from './TaskConfig';
 
 export abstract class Task
 {
-  public static async abstract printNode(task: TaskConfig): Promise<TaskOutputConfig>;
+  protected taskConfig: TaskConfig;
+  constructor(taskConfig: TaskConfig)
+  {
+    this.taskConfig = taskConfig;
+  }
 
-  public static async abstract run(task: TaskConfig): Promise<TaskOutputConfig>;
+  public cancel(): void
+  {
+    this.taskConfig.cancel = true;
+  }
+
+  public getCancelStatus(): boolean
+  {
+    if (this.taskConfig.cancel === true)
+    {
+      return true;
+    }
+    return false;
+  }
+
+  public getOnFailure(): number
+  {
+    return this.taskConfig.onFailure;
+  }
+
+  public getOnSuccess(): number
+  {
+    return this.taskConfig.onSuccess;
+  }
+
+  public getTaskId(): number
+  {
+    return this.taskConfig.taskId;
+  }
+
+  public setInputConfig(taskOutputConfig: TaskOutputConfig): void
+  {
+    this.taskConfig.params['options'] = taskOutputConfig['options'];
+  }
+
+  public abstract async printNode(): Promise<TaskOutputConfig>;
+  // {
+  //   return Promise.resolve({
+  //     status: true,
+  //     exit: true,
+  //   } as TaskOutputConfig);
+  // }
+
+  public recurse(tasks: Task[], traversedNodes: number[]): boolean
+  {
+    if (this.taskConfig.taskId === TaskEnum.taskDefaultExit || this.taskConfig.taskId === TaskEnum.taskDefaultFailure)
+    {
+      return true;
+    }
+    if (traversedNodes.includes(this.taskConfig.id)
+      || this.taskConfig.onSuccess === undefined || this.taskConfig.onFailure === undefined
+      || tasks[this.taskConfig.onSuccess] === undefined || tasks[this.taskConfig.onFailure] === undefined)
+    {
+      return false;
+    }
+    return tasks[this.taskConfig.onSuccess].recurse(tasks, traversedNodes.concat(this.taskConfig.id))
+      && tasks[this.taskConfig.onFailure].recurse(tasks, traversedNodes.concat(this.taskConfig.id));
+  }
+
+  public abstract async run(): Promise<TaskOutputConfig>;
+  // {
+  //   return new Promise<TaskOutputConfig>(async (resolve, reject) =>
+  //   {
+  //     // TODO: call other functions (needs to wrap in Promise for later)
+  //     resolve({
+  //       status: true,
+  //       exit: true,
+  //     } as TaskOutputConfig);
+  //   });
+  // }
 }
 
 export default Task;

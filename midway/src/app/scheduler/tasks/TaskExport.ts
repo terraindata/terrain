@@ -52,7 +52,12 @@ import { TaskConfig, TaskOutputConfig } from '../TaskConfig';
 
 export class TaskExport extends Task
 {
-  public static async run(taskConfig: TaskConfig): Promise<TaskOutputConfig>
+  constructor(taskConfig: TaskConfig)
+  {
+    super(taskConfig);
+  }
+
+  public async run(): Promise<TaskOutputConfig>
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
@@ -75,9 +80,9 @@ export class TaskExport extends Task
     });
   }
 
-  public static async printNode(taskConfig: TaskConfig): Promise<TaskOutputConfig>
+  public async printNode(): Promise<TaskOutputConfig>
   {
-    winston.info('Printing Export, params: ' + JSON.stringify(taskConfig.params as object));
+    winston.info('Printing Export, params: ' + JSON.stringify(this.taskConfig.params as object));
     return Promise.resolve(
       {
         status: true,

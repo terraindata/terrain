@@ -51,10 +51,20 @@ import { Task } from './Task';
 import { TaskConfig, TaskEnum, TaskOutputConfig } from './TaskConfig';
 import { TaskTreeNode } from './TaskTreeNode';
 import { TaskTreePrinter } from './TaskTreePrinter';
+import { TaskTreeVisitor } from './TaskTreeVisitor';
+
+import { TaskDefaultExit } from './tasks/TaskDefaultExit';
+import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
+import { TaskExport } from './tasks/TaskExport';
+import { TaskImport } from './tasks/TaskImport';
+
+const taskTreeNode = new TaskTreeNode();
+const taskTreePrinter = new TaskTreePrinter();
+const taskTreeVisitor = new TaskTreeVisitor();
 
 export class TaskTree
 {
-  private tasks: TaskConfig[];
+  private tasks: Task[];
 
   constructor()
   {
@@ -65,7 +75,7 @@ export class TaskTree
   {
     this.tasks.forEach((task) =>
     {
-      task.cancel = true;
+      task.cancel();
     });
   }
 
@@ -106,7 +116,24 @@ export class TaskTree
     }
     taskConfigs.forEach((taskConfig) =>
     {
-      this.tasks.push(taskConfig);
+      switch (taskConfig.taskId)
+      {
+        case TaskEnum.taskDefaultExit:
+          this.tasks.push(new TaskDefaultExit(taskConfig));
+          break;
+        case TaskEnum.taskDefaultFailure:
+          this.tasks.push(new TaskDefaultFailure(taskConfig));
+          break;
+        case TaskEnum.taskExport:
+          this.tasks.push(new TaskExport(taskConfig));
+          break;
+        case TaskEnum.taskImport:
+          this.tasks.push(new TaskImport(taskConfig));
+          break;
+        default:
+          this.tasks.push(new TaskDefaultExit(taskConfig));
+          break;
+      }
     });
 
     return this.isValid() as boolean;
@@ -114,22 +141,22 @@ export class TaskTree
 
   public isValid(): boolean // checks if tree is a valid DAG
   {
-    return this._isValidHelper(this.tasks[0], this.tasks, []);
+    return this.tasks[0].recurse(this.tasks, []);
   }
 
-  public async printTree(): void // iterate through tree and print tasks
+  public async printTree(): Promise<void> // iterate through tree and print tasks
   {
     if (this.tasks.length === 0)
     {
       return;
     }
     let ind: number = 0;
-    let result: TaskOutputConfig = await TaskTreeNode.accept(TaskTreePrinter, this.tasks[ind]);
+    let result: TaskOutputConfig = await taskTreeNode.accept(taskTreePrinter, this.tasks[ind]);
     while (result.exit !== true)
     {
       winston.info('-->');
-      ind = this.tasks[ind].onSuccess;
-      result = await TaskTreeNode.accept(TaskTreePrinter, this.tasks[ind]);
+      ind = this.tasks[ind].getOnSuccess();
+      result = await taskTreeNode.accept(taskTreePrinter, this.tasks[ind]);
     }
   }
 
@@ -139,30 +166,30 @@ export class TaskTree
     {
       let cancelled: boolean = false;
       let ind: number = 0;
-      let result: TaskOutputConfig = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
+      let result: TaskOutputConfig = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
       while (result.exit !== true)
       {
         if (result.status === true)
         {
-          ind = this.tasks[ind].onSuccess;
-          if (this.tasks[ind].cancel === true)
+          ind = this.tasks[ind].getOnSuccess();
+          if (this.tasks[ind].getCancelStatus() === true)
           {
             cancelled = true;
             break;
           }
-          this._setInputConfigFromOutputConfig(this.tasks[ind], result);
-          result = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
+          this.tasks[ind].setInputConfig(result);
+          result = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
         }
         else if (result.status === false)
         {
-          ind = this.tasks[ind].onFailure;
-          if (this.tasks[ind].cancel === true)
+          ind = this.tasks[ind].getOnFailure();
+          if (this.tasks[ind].getCancelStatus() === true)
           {
             cancelled = true;
             break;
           }
-          this._setInputConfigFromOutputConfig(this.tasks[ind], result);
-          result = await TaskTreeNode.accept(TaskTreeVisitor, this.tasks[ind]);
+          this.tasks[ind].setInputConfig(result);
+          result = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
         }
       }
       result.cancelled = cancelled;
@@ -180,6 +207,7 @@ export class TaskTree
     const defaults: TaskConfig[] =
       [
         {
+          cancel: false,
           id: maxId + 1,
           name: 'Default Exit',
           params:
@@ -190,9 +218,9 @@ export class TaskTree
                 },
             },
           taskId: TaskEnum.taskDefaultExit,
-          type: 'default',
         },
         {
+          cancel: false,
           id: maxId + 2,
           name: 'Default Failure',
           params:
@@ -203,31 +231,9 @@ export class TaskTree
                 },
             },
           taskId: TaskEnum.taskDefaultFailure,
-          type: 'default',
         },
       ];
     tasks = tasks.concat(defaults);
     return tasks;
-  }
-
-  private _isValidHelper(currTask: TaskConfig, tasks: TaskConfig[], traversedTasks: number[]): boolean
-  {
-    if (currTask.type === 'default')
-    {
-      return true;
-    }
-    if (traversedTasks.includes(currTask.id)
-      || currTask.onSuccess === undefined || currTask.onFailure === undefined
-      || tasks[currTask.onSuccess] === undefined || tasks[currTask.onFailure] === undefined)
-    {
-      return false;
-    }
-    return this._isValidHelper(tasks[currTask.onSuccess], tasks, traversedTasks.concat(currTask.id))
-      && this._isValidHelper(tasks[currTask.onFailure], tasks, traversedTasks.concat(currTask.id));
-  }
-
-  private _setInputConfigFromOutputConfig(taskConfig: TaskTreeNode, taskOutputConfig: TaskOutputConfig): void
-  {
-    taskConfig.setValueOptions(taskOutputConfig);
   }
 }

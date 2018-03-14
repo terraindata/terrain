@@ -79,6 +79,7 @@ export class Scheduler
         'shouldRunNext',
         'tasks',
         'templateId',
+        'workerId',
       ],
     );
   }

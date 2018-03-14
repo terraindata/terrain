@@ -44,14 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { Task } from './Task';
 import { TaskConfig, TaskEnum, TaskOutputConfig } from './TaskConfig';
 import { TreeVisitor } from './TreeVisitor';
 
-export abstract class TaskTreeNode
+export class TaskTreeNode
 {
-  public static async accept(v: TreeVisitor, node: TaskConfig): Promise<TaskOutputConfig>
+  public async accept(v: TreeVisitor, node: Task): Promise<TaskOutputConfig>
   {
-    switch (node.taskId)
+    switch (node.getTaskId())
     {
       case TaskEnum.taskDefaultExit:
         return v.visitDefaultExitNode(node);
@@ -62,7 +63,7 @@ export abstract class TaskTreeNode
       case TaskEnum.taskImport:
         return v.visitImportNode(node);
       default:
-        return v.visitDefaultExitNode(n);
+        return v.visitDefaultExitNode(node);
     }
   }
 }

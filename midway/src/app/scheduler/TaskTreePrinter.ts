@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { TaskOutputConfig, TaskTypes } from './TaskConfig';
+import { Task } from './Task';
+import { TaskConfig, TaskOutputConfig } from './TaskConfig';
 import { TreeVisitor } from './TreeVisitor';
 
 import { TaskDefaultExit } from './tasks/TaskDefaultExit';
@@ -54,24 +55,28 @@ import { TaskImport } from './tasks/TaskImport';
 
 export class TaskTreePrinter extends TreeVisitor
 {
-
-  public static async visitDefaultExitNode(node: TaskConfig): Promise<TaskOutputConfig>
+  public async visitNode(node: Task): Promise<TaskOutputConfig>
   {
-    return TaskDefaultExit.printNode(node);
+    return node.printNode();
   }
 
-  public static async visitDefaultFailureNode(node: TaskConfig): Promise<TaskOutputConfig>
+  public async visitDefaultExitNode(node: TaskDefaultExit): Promise<TaskOutputConfig>
   {
-    return TaskDefaultFailure.printNode(node);
+    return node.printNode();
   }
 
-  public static async visitExportNode(node: TaskConfig): Promise<TaskOutputConfig>
+  public async visitDefaultFailureNode(node: TaskDefaultFailure): Promise<TaskOutputConfig>
   {
-    return TaskExport.printNode(node);
+    return node.printNode();
   }
 
-  public static async visitImportNode(node: TaskConfig): Promise<TaskOutputConfig>
+  public async visitExportNode(node: TaskExport): Promise<TaskOutputConfig>
   {
-    return TaskImport.printNode(node);
+    return node.printNode();
+  }
+
+  public async visitImportNode(node: TaskImport): Promise<TaskOutputConfig>
+  {
+    return node.printNode();
   }
 }

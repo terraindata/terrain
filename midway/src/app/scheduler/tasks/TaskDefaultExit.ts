@@ -58,7 +58,12 @@ const taskOutputConfig: TaskOutputConfig =
 
 export class TaskDefaultExit extends Task
 {
-  public static async run(taskConfig: TaskConfig): Promise<TaskOutputConfig>
+  constructor(taskConfig: TaskConfig)
+  {
+    super(taskConfig);
+  }
+
+  public async run(): Promise<TaskOutputConfig>
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
@@ -67,7 +72,7 @@ export class TaskDefaultExit extends Task
     });
   }
 
-  public static async printNode(taskConfig: TaskConfig): Promise<TaskOutputConfig>
+  public async printNode(): Promise<TaskOutputConfig>
   {
     winston.info('Printing Default Exit, params: ' + JSON.stringify(taskOutputConfig as object));
     return Promise.resolve(taskOutputConfig);

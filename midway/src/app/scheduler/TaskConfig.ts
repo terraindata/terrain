@@ -55,7 +55,6 @@ export interface TaskConfig
   onSuccess?: number; // id of next task to execute (default should be next in array)
   params: TaskInputConfig; // input parameters for the task
   taskId: number; // maps to a statically declared task
-  type: number; // enum TaskTypes
 }
 
 export enum TaskEnum
@@ -73,6 +72,7 @@ export interface TaskInputConfig
 
 export interface TaskOutputConfig extends TaskInputConfig
 {
+  cancelled?: boolean;
   exit: boolean;
   status: boolean;
 }
