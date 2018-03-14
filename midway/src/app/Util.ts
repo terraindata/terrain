@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'request';
-import * as rimraf from 'rimraf';
 
 import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../shared/database/elastic/parser/ESParser';

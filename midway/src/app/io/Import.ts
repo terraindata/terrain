@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as rimraf from 'rimraf';
 import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
@@ -638,7 +639,7 @@ export class Import
   {
     try
     {
-      await promisify(fs.rmdir)(this.STREAMING_TEMP_FOLDER);
+      await promisify(rimraf)(this.STREAMING_TEMP_FOLDER);
     }
     catch (e)
     {
