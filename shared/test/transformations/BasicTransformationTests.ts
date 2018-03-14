@@ -89,15 +89,15 @@ const doc6 = {
 };
 
 const doc7 = {
-    'deepArray':
+  deepArray:
     [
-        [
-            5
-        ],
-        [
-            6
-        ]
-    ]
+      [
+        5,
+      ],
+      [
+        6,
+      ],
+    ],
 };
 
 test('add fields manually', () =>
@@ -335,8 +335,8 @@ test('rename a field (deeply nested property in array)', () =>
 
 test('array in array in object: identity transformation', () =>
 {
-    const e: TransformationEngine = new TransformationEngine(doc7);
-    expect(e.transform(doc7)).toEqual(doc7);
+  const e: TransformationEngine = new TransformationEngine(doc7);
+  expect(e.transform(doc7)).toEqual(doc7);
 });
 
 test('proper wildcard behavior in rename stage', () =>
