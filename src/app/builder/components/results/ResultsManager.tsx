@@ -233,7 +233,8 @@ export class ResultsManager extends TerrainComponent<Props>
         (spotlight, id) =>
         {
           const nestedFields = this.getNestedFields(nextProps).toJS();
-
+          let nestedIndex = -1;
+          let fields: any = undefined;
           let hitIndex = nextState.hits && nextState.hits.findIndex(
             (hit) =>
             {
@@ -243,11 +244,17 @@ export class ResultsManager extends TerrainComponent<Props>
                 const hitStillInNestedResults = nestedFields.map(
                   (nestedField) =>
                   {
-                    const nestedHits = hit.fields.get(nestedField);
+                    const nestedHits: any = hit.fields.get(nestedField);
                     const hitStillInNestedResult = nestedHits.map(
                       (nestedHit) => getPrimaryKeyFor({ fields: nestedHit } as Hit, resultsConfig) === id,
                     );
-
+                    nestedIndex = hitStillInNestedResult.indexOf(true);
+                    if (nestedIndex !== -1)
+                    {
+                      const nestedHit = Util.asJS(nestedHits.get(nestedIndex));
+                      fields = _.extend({}, nestedHit, nestedHit['_source']);
+                      fields = {fields, primaryKey: ''} as Hit;
+                    }
                     return hitStillInNestedResult.reduce((result, r) => result || r);
                   },
                 );
@@ -268,9 +275,9 @@ export class ResultsManager extends TerrainComponent<Props>
               hit: _.extend({
                 color: spotlight.color,
                 name: spotlight.name,
-                rank: hitIndex,
+                rank: nestedIndex !== -1 ? nestedIndex : hitIndex,
               },
-                nextState.hits.get(hitIndex).toJS(),
+                fields || nextState.hits.get(hitIndex).toJS(),
               ),
             });
             // TODO something more like this
