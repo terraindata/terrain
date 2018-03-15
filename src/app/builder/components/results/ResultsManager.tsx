@@ -52,6 +52,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import { BuilderState } from 'builder/data/BuilderState';
+import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
+import { SchemaState } from 'schema/SchemaTypes';
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import MidwayError from '../../../../../shared/error/MidwayError';
@@ -84,6 +87,8 @@ export interface Props
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
   spotlightActions?: typeof SpotlightActions;
+  builder?: BuilderState;
+  schema?: SchemaState;
 }
 
 interface ResultsQuery
@@ -227,9 +232,34 @@ export class ResultsManager extends TerrainComponent<Props>
       this.props.spotlights.spotlights.map(
         (spotlight, id) =>
         {
+          const nestedFields = this.getNestedFields(nextProps).toJS();
+
           let hitIndex = nextState.hits && nextState.hits.findIndex(
-            (h) => getPrimaryKeyFor(h, resultsConfig) === id,
+            (hit) =>
+            {
+              let hitStillInResults = getPrimaryKeyFor(hit, resultsConfig) === id;
+              if (!hitStillInResults)
+              {
+                const hitStillInNestedResults = nestedFields.map(
+                  (nestedField) =>
+                  {
+                    const nestedHits = hit.fields.get(nestedField);
+                    const hitStillInNestedResult = nestedHits.map(
+                      (nestedHit) => getPrimaryKeyFor({ fields: nestedHit } as Hit, resultsConfig) === id,
+                    );
+
+                    return hitStillInNestedResult.reduce((result, r) => result || r);
+                  },
+                );
+
+                hitStillInResults = hitStillInResults ||
+                  hitStillInNestedResults.reduce((result, r) => result || r);
+              }
+
+              return hitStillInResults;
+            },
           );
+
           if (hitIndex !== -1)
           {
             this.props.spotlightActions({
@@ -262,6 +292,33 @@ export class ResultsManager extends TerrainComponent<Props>
         },
       );
     }
+  }
+
+  public getNestedFields(props: Props, overrideConfig?)
+  {
+    // Get the fields that are nested
+    const { builder, schema, resultsState } = props;
+    const dataSource = props.query.path.source.dataSource;
+    let nestedFields = resultsState.fields.filter((field) =>
+    {
+      const type = ElasticBlockHelpers.getTypeOfField(
+        schema,
+        builder,
+        field,
+        dataSource,
+        true,
+      );
+      return type === 'nested' || type === '';
+    }).toList();
+    // Filter out anything that it is a single object, not a list of objects
+    if (resultsState.hits && resultsState.hits.size)
+    {
+      nestedFields = nestedFields.filter((field) =>
+        List.isList(resultsState.hits.get(0).fields.get(field)),
+      ).toList();
+    }
+
+    return nestedFields;
   }
 
   public handleCountResponse(response: M1QueryResponse)
@@ -837,6 +894,6 @@ function getPrimaryKeyFor(hit: Hit, config: ResultsConfig, index?: number): stri
 
 export default Util.createTypedContainer(
   ResultsManager,
-  ['spotlights'],
+  ['spotlights', 'builder', 'schema'],
   { spotlightActions: SpotlightActions },
 );
