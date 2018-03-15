@@ -310,9 +310,9 @@ class HitComponent extends TerrainComponent<Props> {
             if (fields['fields'] !== undefined)
             {
               const scriptFields = {};
-              _.keys(fields['fields']).forEach((field) =>
+              _.keys(fields['fields']).forEach((f) =>
               {
-                scriptFields[field] = fields['fields'][field][0];
+                scriptFields[f] = fields['fields'][f][0];
               });
               fields = _.extend({}, fields, scriptFields);
             }

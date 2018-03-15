@@ -47,9 +47,9 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
 
 import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
-import * as _ from 'lodash';
 
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';

@@ -234,7 +234,7 @@ export class ResultsManager extends TerrainComponent<Props>
         {
           const nestedFields = this.getNestedFields(nextProps).toJS();
           let nestedIndex = -1;
-          let fields: any = undefined;
+          let fields: any;
           let hitIndex = nextState.hits && nextState.hits.findIndex(
             (hit) =>
             {

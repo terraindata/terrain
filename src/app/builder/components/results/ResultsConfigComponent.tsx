@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
+import {Hit} from 'app/builder/components/results/ResultTypes';
 import { BuilderState } from 'app/builder/data/BuilderState';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { SchemaState } from 'app/schema/SchemaTypes';
@@ -66,7 +67,6 @@ import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import {Hit} from 'app/builder/components/results/ResultTypes'
 
 const Color = require('color');
 

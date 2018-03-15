@@ -227,7 +227,7 @@ class HitsArea extends TerrainComponent<Props>
       ).toList();
     }
     // If there is a results config in use, only use nested fields in that config
-    const resultsConfig = overrideConfig || this.state.resultsConfig;
+    const resultsConfig = overrideConfig || this.state.resultsConfig || props.query.resultsConfig;
     if (resultsConfig && resultsConfig.enabled)
     {
       nestedFields = nestedFields.filter((field) =>
