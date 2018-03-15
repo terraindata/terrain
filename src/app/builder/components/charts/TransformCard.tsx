@@ -297,6 +297,7 @@ class TransformCard extends TerrainComponent<Props>
           colors={this.props.data.static.colors}
           mode={this.props.data.mode}
           builder={this.props.builder}
+          index={this.props.index || getIndex('', this.props.builder)}
         />
         <TransformCardPeriscope
           onChange={this.props.onChange}

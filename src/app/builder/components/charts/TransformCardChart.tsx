@@ -89,6 +89,7 @@ export interface Props
   colors: [string, string];
   spotlights: any; // TODO spawtlights
   mode: string;
+  index?: string;
   schema?: SchemaState;
   builder?: BuilderState;
 }
@@ -596,6 +597,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       colors: this.props.colors,
       contextOptions: this.getContextOptions(),
       mode,
+      index: this.props.index,
       schema: this.props.schema,
       builder: this.props.builder,
     };

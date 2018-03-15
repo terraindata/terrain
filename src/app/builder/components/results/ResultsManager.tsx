@@ -889,14 +889,14 @@ export class ResultsManager extends TerrainComponent<Props>
 
 function getPrimaryKeyFor(hit: Hit, config: ResultsConfig, index?: number): string
 {
-  if (config && config.primaryKeys.size)
+  if (config && config.primaryKeys.size && hit && hit.fields && hit.fields.get)
   {
     return config.primaryKeys.map(
       (field) => hit.fields.get(field),
     ).join('-and-');
   }
 
-  return index + ': ' + JSON.stringify(hit.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
+  return index + ': ' + JSON.stringify(Util.asJS(hit.fields)); // 'result-' + Math.floor(Math.random() * 100000000);
 }
 
 export default Util.createTypedContainer(
