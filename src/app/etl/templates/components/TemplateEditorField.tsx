@@ -215,6 +215,16 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return settingsAreOpen(this.props);
   }
 
+  protected _canEditField(): boolean
+  {
+    return this._field().isNamedField() || this._field().isPrimitive();
+  }
+
+  protected _canEditName(): boolean
+  {
+    return !this._field().isWildcardField();
+  }
+
   protected _willFieldChange(nextProps)
   {
     return this._field(this.props.fieldId, this.props)

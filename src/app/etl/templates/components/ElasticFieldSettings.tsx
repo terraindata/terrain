@@ -79,36 +79,40 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   public state: ElasticFieldProps;
 
   private inputMap: InputDeclarationMap<ElasticFieldProps> = {
+    isPrimaryKey: {
+      type: DisplayType.CheckBox,
+      displayName: 'Primary Key',
+      group: 'first row',
+      widthFactor: 3,
+      getDisplayState: this.showPrimaryKey,
+    },
     elasticType: {
       type: DisplayType.Pick,
       displayName: 'Elastic Type',
       group: 'first row',
+      widthFactor: 3,
       options: {
         pickOptions: this.getTypeOptions,
         indexResolver: this.resolveTypeIndex,
       },
     },
-    isPrimaryKey: {
-      type: DisplayType.CheckBox,
-      displayName: 'Primary Key',
-      group: 'first row',
-      shouldShow: this.showPrimaryKey,
-    },
     isAnalyzed: {
       type: DisplayType.CheckBox,
       displayName: 'Analyze This Field',
       group: 'analyzer row',
-      shouldShow: this.showIsAnalyzed,
+      widthFactor: 3,
+      getDisplayState: this.showIsAnalyzed,
     },
     analyzer: {
       type: DisplayType.Pick,
       displayName: 'Analyzer',
       group: 'analyzer row',
+      widthFactor: 3,
       options: {
         pickOptions: this.getAnalyzerOptions,
         indexResolver: this.resolveAnalyzerIndex,
       },
-      shouldShow: this.showAnalyzer,
+      getDisplayState: this.showAnalyzer,
     },
   };
 
@@ -120,14 +124,14 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public showPrimaryKey(s: ElasticFieldProps)
   {
-    const jsType = this._field().type;
+    const jsType = this._field().representedType();
     return (jsType !== 'array' && jsType !== 'object' && jsType !== 'boolean') ?
       DisplayState.Active : DisplayState.Inactive;
   }
 
   public showIsAnalyzed(s: ElasticFieldProps)
   {
-    const jsType = this._field().type;
+    const jsType = this._field().representedType();
     return (jsType === 'string' && !s.isPrimaryKey) ?
       DisplayState.Active : DisplayState.Inactive;
   }
@@ -146,12 +150,12 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public getTypeOptions()
   {
-    return this._getTypeOptions(this._field().type);
+    return this._getTypeOptions(this._field().representedType());
   }
 
   public resolveTypeIndex(option)
   {
-    return JsToElasticOptions[this._field().type].indexOf(option);
+    return JsToElasticOptions[this._field().representedType()].indexOf(option);
   }
 
   @instanceFnDecorator(memoizeOne)
@@ -178,9 +182,9 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   public getFormState(props): ElasticFieldProps
   {
     const field = this._fieldMap(props).get(props.fieldId);
-    const { type, fieldProps } = field;
-    const elasticFieldProps = fieldProps['elastic'];
-    return defaultProps(type, elasticFieldProps);
+    const { fieldProps } = field;
+    const elasticFieldProps = fieldProps[Languages.Elastic] as Partial<ElasticFieldProps>;
+    return defaultProps(elasticFieldProps);
   }
 
   public render()

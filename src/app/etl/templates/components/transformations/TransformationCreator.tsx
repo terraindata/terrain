@@ -71,7 +71,6 @@ import './TransformationEditor.less';
 interface FormState
 {
   transformationIndex: number;
-  applyToAll: boolean;
 }
 
 export interface Props
@@ -87,7 +86,6 @@ export class TransformationCreator extends TerrainComponent<Props>
 {
   public state: FormState = {
     transformationIndex: -1,
-    applyToAll: true,
   };
 
   private inputMap: InputDeclarationMap<FormState> =
@@ -100,18 +98,7 @@ export class TransformationCreator extends TerrainComponent<Props>
           pickOptions: this.getOptionNames,
         },
       },
-      applyToAll: {
-        type: DisplayType.CheckBox,
-        displayName: 'Apply to All',
-        shouldShow: this.shouldApplyAllShow,
-      },
     };
-
-  public shouldApplyAllShow(s: FormState)
-  {
-    // todo Figure out if this is a child inside an array
-    return DisplayState.Hidden;
-  }
 
   public getValidOptions(): List<TransformationNodeType>
   {

@@ -178,6 +178,7 @@ class EndpointSection extends TerrainComponent<Props>
   {
     this.setState({
       newSourceModalOpen: false,
+      newSourceModalName: '',
     });
   }
 
@@ -192,7 +193,7 @@ class EndpointSection extends TerrainComponent<Props>
   {
     const { template } = this.props;
     const editForm = (
-      <div style={{ padding: '6px' }}>
+      <div className='new-source-modal'>
         <EndpointForm
           isSource={true}
           endpoint={this.state.newSource}
@@ -214,6 +215,7 @@ class EndpointSection extends TerrainComponent<Props>
         title='Add New Source'
         showTextbox={true}
         confirm={true}
+        textboxValue={this.state.newSourceModalName}
         onTextboxValueChange={this._setStateWrapper('newSourceModalName')}
         textboxPlaceholderValue='Source Name'
         closeOnConfirm={true}

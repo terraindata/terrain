@@ -57,6 +57,25 @@ export interface PathHashMap<T>
   [k: string]: T;
 }
 
+// root is considered to be a named field
+export function isNamedField(
+  keypath: KeyPath,
+  index?: number,
+): boolean
+{
+  const last = index === undefined ? keypath.last() : keypath.get(index);
+  return last !== '*' && Number.isNaN(Number(last));
+}
+
+export function isWildcardField(
+  keypath: KeyPath,
+  index?: number,
+): boolean
+{
+  const last = index === undefined ? keypath.last() : keypath.get(index);
+  return last === '*';
+}
+
 // document merge logic
 export function hashPath(keypath: KeyPath): PathHash
 {
@@ -70,31 +89,10 @@ export function unhashPath(keypath: PathHash): KeyPath
 
 const valueTypeKeyPath = List(['valueType']);
 
-// root is considered to be a named field
-export function isNamedField(
-  keypath: KeyPath,
-): boolean
-{
-  const last = keypath.last();
-  return last !== '*' && Number.isNaN(Number(last));
-}
-
-export function isArrayField(
-  keypath: KeyPath,
-  engine: TransformationEngine,
-  pathToIdMap: PathHashMap<number>,
-): boolean
-{
-  const hashedPath = hashPath(keypath);
-  return engine.getFieldType(pathToIdMap[hashedPath]) === 'array';
-}
-
 // turn all indices into a particular value, based on
 // an existing engine that has fields with indices in them
 export function turnIndicesIntoValue(
   keypath: KeyPath,
-  engine: TransformationEngine,
-  pathToIdMap: PathHashMap<number>,
   value = '*',
 ): KeyPath
 {
@@ -117,18 +115,6 @@ export function turnIndicesIntoValue(
     return arrayIndices[i] === true ? value : key;
   }).toList();
   return scrubbed;
-}
-
-// creates a mapping from hashed keypath to fieldId
-export function createPathToIdMap(engine: TransformationEngine): PathHashMap<number>
-{
-  const fieldIds = engine.getAllFieldIDs();
-  const mapping = {};
-  fieldIds.forEach((id, i) =>
-  {
-    mapping[hashPath(engine.getOutputKeyPath(id))] = id;
-  });
-  return mapping;
 }
 
 // takes an engine path and the path type mapping and returns true if
@@ -162,10 +148,13 @@ export function addFieldsToEngine(
   {
     if (isAValidField(unhashPath(hashedPath), pathTypes))
     {
-      const fieldType = pathTypes[hashedPath];
-      const id = engine.addField(unhashPath(hashedPath), fieldType);
-
+      let fieldType = pathTypes[hashedPath];
       const valueType = pathValueTypes[hashedPath];
+      if (valueType !== undefined)
+      {
+        fieldType = 'array';
+      }
+      const id = engine.addField(unhashPath(hashedPath), fieldType);
       if (valueType !== undefined)
       {
         engine.setFieldProp(id, valueTypeKeyPath, valueType);
@@ -201,12 +190,11 @@ export function createMergedEngine(documents: List<object>):
   {
     const e: TransformationEngine = new TransformationEngine(doc);
     const fieldIds = e.getAllFieldIDs();
-    const pathToIdMap = createPathToIdMap(e);
 
     fieldIds.forEach((id, j) =>
     {
       const currentType: FieldTypes = getConsistentType(id, e);
-      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), e, pathToIdMap, '*');
+      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), '*');
       const path = hashPath(deIndexedPath);
 
       if (pathTypes[path] !== undefined)
