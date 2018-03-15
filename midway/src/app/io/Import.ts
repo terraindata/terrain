@@ -155,8 +155,6 @@ export class Import
       {
         return reject(hasCsvHeader);
       }
-      let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
-      let jsonBracketRemoved: boolean = !(fields['filetype'] === 'json' && !isNewlineSeparatedJSON);
 
       const requireJSONHaveAllFieldsDefault: boolean | string = this._parseBooleanField(fields, 'requireJSONHaveAllFields', true);
 
@@ -260,92 +258,15 @@ export class Import
         imprtConf.primaryKeyDelimiter,
       );
 
-      await this._deleteStreamingTempFolder();
-      await promisify(fs.mkdir)(this.STREAMING_TEMP_FOLDER);
-
-      this.chunkQueue = [];
-      this.nextChunk = '';
-      this.chunkCount = 0;
-      let contents: string = '';
-      file.on('data', async (chunk) =>
+      try
       {
-        contents += chunk.toString();
-        if (contents.length > this.CHUNK_SIZE)
-        {
-          const chunkError: string = this._enqueueChunk(imprtConf, contents, false, csvHeaderRemoved, jsonBracketRemoved);
-          if (chunkError !== '')
-          {
-            return reject(chunkError);
-          }
-          csvHeaderRemoved = true;
-          jsonBracketRemoved = true;
-          contents = '';
-          if (this.chunkQueue.length >= this.MAX_ALLOWED_QUEUE_SIZE)
-          {
-            (file as stream.Readable).pause();     // hack around silly lint error
-            try
-            {
-              // do not read the last one in case "isLast" still needs to be set through the "end" event below
-              await this._writeFromChunkQueue(imprtConf, 1);
-            }
-            catch (e)
-            {
-              await this._deleteStreamingTempFolder();
-              return reject(e);
-            }
-            (file as stream.Readable).resume();     // hack around silly lint error
-          }
-        }
-      });
-      file.on('error', async (e) =>
-      {
-        await this._deleteStreamingTempFolder();
-        return reject(e);
-      });
-      file.on('end', async () =>
-      {
-        if (contents !== '')
-        {
-          const chunkError: string = this._enqueueChunk(imprtConf, contents, true, csvHeaderRemoved, jsonBracketRemoved);
-          if (chunkError !== '')
-          {
-            await this._deleteStreamingTempFolder();
-            return reject(chunkError);
-          }
-          csvHeaderRemoved = true;
-          jsonBracketRemoved = true;
-        }
-        else
-        {
-          if (this.chunkQueue.length === 0)
-          {
-            await this._deleteStreamingTempFolder();
-            return reject('Logic issue with streaming queue.');    // shouldn't happen
-          }
-          this.chunkQueue[this.chunkQueue.length - 1]['isLast'] = true;
-        }
-        try
-        {
-          await this._writeFromChunkQueue(imprtConf, 0);
-        }
-        catch (e)
-        {
-          await this._deleteStreamingTempFolder();
-          return reject(e);
-        }
-
-        try
-        {
-          await this._streamingUpsert(imprtConf, database, insertTable);
-        }
-        catch (e)
-        {
-          await this._deleteStreamingTempFolder();
-          return reject(e);
-        }
-
+        await this._streamingUpsert(imprtConf, database, insertTable);
         resolve(imprtConf);
-      });
+      }
+      catch (e)
+      {
+        return reject(e);
+      }
     });
   }
 
@@ -646,30 +567,6 @@ export class Import
       // can't catch this error more gracefully, or else would end up in an infinite cycle
       throw new Error('Failed to clean streaming temp folder: ' + String(e));
     }
-  }
-
-  /* streaming helper function ; enqueue the next chunk of data for processing
-   * returns an error message if there was one, else empty string */
-  private _enqueueChunk(imprt: ImportConfig, contents: string, isLast: boolean,
-    csvHeaderRemoved: boolean, jsonBracketRemoved: boolean): string
-  {
-    if (!csvHeaderRemoved)
-    {
-      const ind: number = contents.indexOf('\n');
-      const headers: string[] = contents.substring(0, ind).split(',');
-      if (headers.length !== imprt.originalNames.length)
-      {
-        return 'CSV header does not contain the expected number of columns (' +
-          String(imprt.originalNames.length) + '): ' + JSON.stringify(headers);
-      }
-      contents = contents.substring(ind + 1, contents.length);
-    }
-    else if (!jsonBracketRemoved)
-    {
-      contents = contents.substring(contents.indexOf('[') + 1, contents.length);
-    }
-    this.chunkQueue.push({ chunk: contents, isLast });
-    return '';
   }
 
   /* return ES type from type specification format of ImportConfig
@@ -1235,123 +1132,6 @@ export class Import
       return 'Invalid data type encountered.';
     }
     return '';
-  }
-
-  /* streaming helper function ; dequeue the next chunk of data, process it, and write the results to a temp file */
-  private async _writeFromChunkQueue(imprt: ImportConfig, targetQueueSize: number): Promise<void[]>
-  {
-    const promises: Array<Promise<void>> = [];
-    while (this.chunkQueue.length > targetQueueSize)
-    {
-      const chunkObj: object = this.chunkQueue.shift() as object;
-      promises.push(this._writeItemsFromChunkToFile(imprt, chunkObj['chunk'], chunkObj['isLast'], this.chunkCount));
-      this.chunkCount++;
-    }
-    return Promise.all(promises);
-  }
-
-  /* streaming helper function ; slice "chunk" into a coherent piece of data, process it, and write the results to a temp file */
-  private async _writeItemsFromChunkToFile(imprt: ImportConfig, chunk: string, isLast: boolean, num: number): Promise<void>
-  {
-    return new Promise<void>(async (resolve, reject) =>
-    {
-      // get valid piece of data
-      let thisChunk: string = '';
-      if (imprt.filetype === 'csv' || (imprt.filetype === 'json' && imprt.isNewlineSeparatedJSON === true))
-      {
-        const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
-        thisChunk = this.nextChunk + String(chunk.substring(0, end));
-        this.nextChunk = chunk.substring(end + 1, chunk.length);
-      }
-      else
-      {
-        // open square-bracket has already been removed by frontend/headless preprocessing
-        if (isLast)
-        {
-          thisChunk = '[' + this.nextChunk + chunk;
-          this.nextChunk = '';
-        }
-        else
-        {
-          thisChunk = this.nextChunk + chunk;
-          let openBraces: number = 0;
-          let openBrackets: number = 0;
-          let match: number = 0;
-          let previousMatch: boolean = true;
-          let quotemarkCounter: number = 0;
-          for (let i = 0; i < thisChunk.length; i++)
-          {
-            if (openBraces === 0 && openBrackets === 0 && quotemarkCounter % 2 === 0)
-            {
-              if (!previousMatch)
-              {
-                match = i;
-              }
-              previousMatch = true;
-            }
-            else
-            {
-              previousMatch = false;
-            }
-            if (quotemarkCounter % 2 === 0 && thisChunk.charAt(i) === '"' && i > 0 && thisChunk.charAt(i - 1) !== '\\') // entering str
-            {
-              quotemarkCounter++;
-            }
-            else if (quotemarkCounter % 2 !== 0 && thisChunk.charAt(i) === '"' && i > 0 && thisChunk.charAt(i - 1) !== '\\') // leaving str
-            {
-              quotemarkCounter--;
-            }
-            else if (thisChunk.charAt(i) === '{' && quotemarkCounter % 2 === 0)
-            {
-              openBraces++;
-            }
-            else if (thisChunk.charAt(i) === '}' && quotemarkCounter % 2 === 0)
-            {
-              openBraces--;
-            }
-            else if (thisChunk.charAt(i) === '[' && quotemarkCounter % 2 === 0)
-            {
-              openBrackets++;
-            }
-            else if (thisChunk.charAt(i) === ']' && quotemarkCounter % 2 === 0)
-            {
-              openBrackets--;
-            }
-          }
-          this.nextChunk = thisChunk.substring(match, thisChunk.length);
-          const trimmedNextChunk: string = this.nextChunk.trim();
-          if (trimmedNextChunk.length > 0 && trimmedNextChunk.charAt(0) !== ',')
-          {
-            return reject('JSON format incorrect.');
-          }
-          this.nextChunk = this.nextChunk.substring(this.nextChunk.indexOf(',') + 1, this.nextChunk.length);
-          thisChunk = '[' + thisChunk.substring(0, match) + ']';
-        }
-      }
-
-      let items: object[];
-      try
-      {
-        items = await this._getItems(imprt, thisChunk);
-      }
-      catch (e)
-      {
-        return reject('Failed to get items: ' + String(e));
-      }
-
-      try
-      {
-        winston.info('File Import: opening temp file for writing.');
-        await promisify(fs.writeFile)(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
-          JSON.stringify(items), { flag: 'wx' });
-        winston.info('File Import: finished writing items to temp file.');
-      }
-      catch (err)
-      {
-        return reject('Failed to dump to temp file: ' + String(err));
-      }
-      resolve();
-    });
   }
 }
 
