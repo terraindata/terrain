@@ -89,7 +89,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     },
     {
       text: 'Move this Field',
-      onClick: () => null,
+      onClick: this.moveField,
     },
   ]);
 
