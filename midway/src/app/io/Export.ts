@@ -67,6 +67,8 @@ import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
 
+import * as Transform from './Transform';
+
 const exportTemplates = new ExportTemplates();
 const TastyItems: Items = new Items();
 
@@ -78,36 +80,6 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 
 export class Export
 {
-  public static mergeGroupJoin(doc: object): object
-  {
-    if (doc['_source'] !== undefined)
-    {
-      const sourceKeys = Object.keys(doc['_source']);
-      const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
-      if (rootKeys.length > 0) // there were group join objects
-      {
-        const duplicateRootKeys: string[] = [];
-        rootKeys.forEach((rootKey) =>
-        {
-          if (sourceKeys.indexOf(rootKey) > -1)
-          {
-            duplicateRootKeys.push(rootKey);
-          }
-        });
-        if (duplicateRootKeys.length !== 0)
-        {
-          throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
-        }
-        rootKeys.forEach((rootKey) =>
-        {
-          doc['_source'][rootKey] = doc[rootKey];
-          delete doc[rootKey];
-        });
-      }
-    }
-    return doc;
-  }
-
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
 
   public async export(exportConfig: ExportConfig, headless: boolean): Promise<stream.Readable>
@@ -115,17 +87,17 @@ export class Export
     const database: DatabaseController | undefined = DatabaseRegistry.get(exportConfig.dbid);
     if (database === undefined)
     {
-      throw Error('Database "' + exportConfig.dbid.toString() + '" not found.');
+      throw new Error('Database "' + exportConfig.dbid.toString() + '" not found.');
     }
 
     if (database.getType() !== 'ElasticController')
     {
-      throw Error('File export currently is only supported for Elastic databases.');
+      throw new Error('File export currently is only supported for Elastic databases.');
     }
 
     if (exportConfig.filetype !== 'csv' && exportConfig.filetype !== 'json' && exportConfig.filetype !== 'json [type object]')
     {
-      throw Error('Filetype must be either CSV or JSON.');
+      throw new Error('Filetype must be either CSV or JSON.');
     }
 
     if (headless)
@@ -134,12 +106,12 @@ export class Export
       const templates: ExportTemplateConfig[] = await exportTemplates.get(exportConfig.templateId);
       if (templates.length === 0)
       {
-        throw Error('Template not found. Did you supply an export template ID?');
+        throw new Error('Template not found. Did you supply an export template ID?');
       }
       const template = templates[0] as object;
       if (exportConfig.dbid !== template['dbid'])
       {
-        throw Error('Template database ID does not match supplied database ID.');
+        throw new Error('Template database ID does not match supplied database ID.');
       }
       for (const templateKey of Object.keys(template))
       {
@@ -147,58 +119,36 @@ export class Export
       }
     }
 
-    const mapping: object = exportConfig.columnTypes;
-    if (mapping === undefined)
+    if (exportConfig.columnTypes === undefined)
     {
-      throw Error('Must provide export template column types.');
+      throw new Error('Must provide export template column types.');
     }
 
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
       // get query data from algorithmId or query (or variant Id if necessary)
-      let qry: string = '';
+      let query: string = '';
       if (exportConfig['variantId'] !== undefined && exportConfig.algorithmId === undefined)
       {
         exportConfig.algorithmId = exportConfig['variantId'];
       }
       if (exportConfig.algorithmId !== undefined && exportConfig.query === undefined)
       {
-        qry = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
+        query = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
       }
       else if (exportConfig.algorithmId === undefined && exportConfig.query !== undefined)
       {
-        qry = exportConfig.query;
+        query = exportConfig.query;
       }
       else
       {
-        throw Error('Must provide either algorithm ID or query, not both or neither.');
+        throw new Error('Must provide either algorithm ID or query, not both or neither.');
       }
 
-      if (qry === '')
+      if (query === '')
       {
-        throw Error('Empty query provided.');
+        throw new Error('Empty query provided.');
       }
-
-      // get list of export column names
-      const columnNames: string[] = Object.keys(mapping);
-      if (exportConfig.rank === true && columnNames.indexOf('TERRAINRANK') === -1)
-      {
-        columnNames.push('TERRAINRANK');
-      }
-
-      const originalMapping: object = {};
-      // generate original mapping if there were any renames
-      const allNames = Object.keys(mapping);
-      allNames.forEach((value, i) =>
-      {
-        originalMapping[value] = value;
-      });
-
-      const renameTransformations: object[] = exportConfig.transformations.filter((transformation) => transformation['name'] === 'rename');
-      renameTransformations.forEach((transformation) =>
-      {
-        originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
-      });
 
       // TODO add transformation check for addcolumn and update mapping accordingly
       const qh: QueryHandler = database.getQueryHandler();
@@ -207,30 +157,19 @@ export class Export
         type: 'search',
         streaming: true,
         databasetype: 'elastic',
-        body: qry,
+        body: query,
       };
 
       const respStream: stream.Readable = await qh.handleQuery(payload) as stream.Readable;
       if (respStream === undefined)
       {
-        throw Error('Nothing to export.');
+        throw new Error('Nothing to export.');
       }
 
       try
       {
-        const extractTransformations = exportConfig.transformations.filter((transformation) => transformation['name'] === 'extract');
-        exportConfig.transformations = exportConfig.transformations.filter((transformation) => transformation['name'] !== 'extract');
-
         winston.info('Beginning export transformations.');
-        const exportTransformConfig = {
-          extractTransformations,
-          exportConfig,
-          fieldArrayDepths: {},
-          id: 1,
-          mapping: originalMapping,
-        };
-
-        const documentTransform: ExportTransform = new ExportTransform(this, exportTransformConfig);
+        const documentTransform: ExportTransform = new ExportTransform(this, exportConfig);
         let exportTransform: AExportTransform;
         switch (exportConfig.filetype)
         {
@@ -238,10 +177,10 @@ export class Export
             exportTransform = new JSONExportTransform();
             break;
           case 'csv':
-            exportTransform = new CSVExportTransform(columnNames);
+            exportTransform = new CSVExportTransform(Object.keys(exportConfig.columnTypes));
             break;
           default:
-            throw Error('File type must be either CSV or JSON.');
+            throw new Error('File type must be either CSV or JSON.');
         }
 
         resolve(respStream.pipe(documentTransform).pipe(exportTransform));
@@ -253,60 +192,13 @@ export class Export
     });
   }
 
-  public _postProcessDoc(doc: object, cfg: any): object
+  public _postProcessDoc(doc: object, exportConfig: ExportConfig): object
   {
-    // merge groupJoins with _source if necessary
-    doc = Export.mergeGroupJoin(doc);
-
-    // extract field after doing all merge joins
-    cfg.extractTransformations.forEach((transform) =>
-    {
-      const oldColName: string | undefined = transform['colName'];
-      const newColName: string | undefined = transform['args']['newName'];
-      const path: string | undefined = transform['args']['path'];
-      if (oldColName !== undefined && newColName !== undefined && path !== undefined)
-      {
-        doc['_source'][newColName] = _.get(doc['_source'], path);
-      }
-    });
+    // merge top-level fields with _source if necessary
+    doc = Transform.mergeDocument(doc);
 
     // verify schema mapping with documents and fix documents accordingly
-    doc = this._checkDocumentAgainstMapping(doc['_source'], cfg.mapping);
-    for (const field of Object.keys(doc))
-    {
-      if (doc[field] !== null && doc[field] !== undefined)
-      {
-        if (cfg.fieldArrayDepths[field] !== undefined)
-        {
-          cfg.fieldArrayDepths[field] = Number(cfg.fieldArrayDepths[field]) + this._getArrayDepth(doc[field]);
-          if (cfg.fieldArrayDepths[field] > 1)
-          {
-            throw new Error('Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.');
-          }
-        }
-        else
-        {
-          cfg.fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
-        }
-
-        if (Array.isArray(doc[field]) && cfg.exportConfig.filetype === 'csv')
-        {
-          doc[field] = this._convertArrayToCSVArray(doc[field]);
-        }
-      }
-    }
-
-    doc = this._transformAndCheck(doc, cfg.exportConfig, false);
-    if (cfg.exportConfig.rank === true)
-    {
-      if (doc['TERRAINRANK'] !== undefined)
-      {
-        throw new Error('Conflicting field: TERRAINRANK.');
-      }
-      doc['TERRAINRANK'] = cfg.id;
-      cfg.id++;
-    }
-    return doc;
+    return this._transformAndCheck(doc, exportConfig, false);
   }
 
   private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
@@ -331,116 +223,6 @@ export class Export
         return reject('Malformed algorithm');
       }
     });
-  }
-
-  private _applyTransforms(obj: object, transforms: object[]): object
-  {
-    let colName: string | undefined;
-    for (const transform of transforms)
-    {
-      switch (transform['name'])
-      {
-        case 'rename':
-          const oldName: string | undefined = transform['colName'];
-          const newName: string | undefined = transform['args']['newName'];
-          if (oldName === undefined || newName === undefined)
-          {
-            throw new Error('Rename transformation must supply colName and newName arguments.');
-          }
-          if (oldName !== newName)
-          {
-            obj[newName] = obj[oldName];
-            delete obj[oldName];
-          }
-          break;
-        case 'split':
-          const oldCol: string | undefined = transform['colName'];
-          const newCols: string[] | undefined = transform['args']['newName'];
-          const splitText: string | undefined = transform['args']['text'];
-          if (oldCol === undefined || newCols === undefined || splitText === undefined)
-          {
-            throw new Error('Split transformation must supply colName, newName, and text arguments.');
-          }
-          if (newCols.length !== 2)
-          {
-            throw new Error('Split transformation currently only supports splitting into two columns.');
-          }
-          if (typeof obj[oldCol] !== 'string')
-          {
-            throw new Error('Can only split columns containing text.');
-          }
-          const oldText: string = obj[oldCol];
-          delete obj[oldCol];
-          const ind: number = oldText.indexOf(splitText);
-          if (ind === -1)
-          {
-            obj[newCols[0]] = oldText;
-            obj[newCols[1]] = '';
-          }
-          else
-          {
-            obj[newCols[0]] = oldText.substring(0, ind);
-            obj[newCols[1]] = oldText.substring(ind + splitText.length);
-          }
-          break;
-        case 'merge':
-          const startCol: string | undefined = transform['colName'];
-          const mergeCol: string | undefined = transform['args']['mergeName'];
-          const newCol: string | undefined = transform['args']['newName'];
-          const mergeText: string | undefined = transform['args']['text'];
-          if (startCol === undefined || mergeCol === undefined || newCol === undefined || mergeText === undefined)
-          {
-            throw new Error('Merge transformation must supply colName, mergeName, newName, and text arguments.');
-          }
-          if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
-          {
-            throw new Error('Can only merge columns containing text.');
-          }
-          obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
-          if (startCol !== newCol)
-          {
-            delete obj[startCol];
-          }
-          if (mergeCol !== newCol)
-          {
-            delete obj[mergeCol];
-          }
-          break;
-        case 'duplicate':
-          colName = transform['colName'];
-          const copyName: string | undefined = transform['args']['newName'];
-          if (colName === undefined || copyName === undefined)
-          {
-            throw new Error('Duplicate transformation must supply colName and newName arguments.');
-          }
-          obj[copyName] = obj[colName];
-          break;
-        default:
-          if (transform['name'] !== 'prepend' && transform['name'] !== 'append')
-          {
-            throw new Error('Invalid transform name encountered: ' + String(transform['name']));
-          }
-          colName = transform['colName'];
-          const text: string | undefined = transform['args']['text'];
-          if (colName === undefined || text === undefined)
-          {
-            throw new Error('Prepend/append transformation must supply colName and text arguments.');
-          }
-          if (typeof obj[colName] !== 'string')
-          {
-            throw new Error('Can only prepend/append to columns containing text.');
-          }
-          if (transform['name'] === 'prepend')
-          {
-            obj[colName] = text + String(obj[colName]);
-          }
-          else
-          {
-            obj[colName] = String(obj[colName]) + text;
-          }
-      }
-    }
-    return obj;
   }
 
   /* return the target hash an object with the specified field names and types should have
@@ -468,27 +250,6 @@ export class Export
       return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
     }
     return typeObj['type'];
-  }
-
-  private _checkDocumentAgainstMapping(document: object, mapping: object): object
-  {
-    const newDocument: object = document;
-    const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
-    for (const field of fieldsInMappingNotInDocument)
-    {
-      newDocument[field] = null;
-      // TODO: Case 740
-      // if (fields[field]['type'] === 'text')
-      // {
-      //   newDocument[field] = '';
-      // }
-    }
-    const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
-    for (const field of fieldsInDocumentNotMapping)
-    {
-      delete newDocument[field];
-    }
-    return newDocument;
   }
 
   /* checks whether obj has the fields and types specified by nameToType
@@ -546,11 +307,6 @@ export class Export
         }
       }
     }
-  }
-
-  private _convertArrayToCSVArray(arr: any[]): string
-  {
-    return JSON.stringify(arr);
   }
 
   /* assumes arrays are of uniform depth */
@@ -676,12 +432,13 @@ export class Export
   {
     try
     {
-      doc = this._applyTransforms(doc, exportConfig.transformations);
+      doc = Transform.applyTransforms(doc, exportConfig.transformations);
     }
     catch (e)
     {
       throw new Error('Failed to apply transforms: ' + String(e));
     }
+
     // only include the specified columns
     // NOTE: unclear if faster to copy everything over or delete the unused ones
     const trimmedDoc: object = {};
