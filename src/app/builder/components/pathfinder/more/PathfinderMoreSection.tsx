@@ -131,8 +131,9 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleAddNested()
   {
+    const currIndex = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references'),
-      this.props.more.references.push(undefined));
+      this.props.more.references.push(currIndex));
     const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
     this.props.builderActions.changePath(nestedKeyPath,
       this.props.path.nested.push(_Path({ name: undefined, step: 0 })), true);
@@ -151,6 +152,17 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       this.props.builderActions.changePath(
         nestedKeyPath,
         this.props.path.nested.splice(i, 1));
+    }
+  }
+
+  public handleSourceChange(i, value)
+  {
+   if (this.props.pathfinderContext.canEdit)
+    {
+      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i, 'name');
+      this.props.builderActions.changePath(
+        nestedKeyPath,
+        value);
     }
   }
 
@@ -208,6 +220,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
         parentSource={this.props.pathfinderContext.source}
         parentName={this.props.more.references.get(i)}
+        onSourceChange={this._fn(this.handleSourceChange, i)}
       />
     );
   }
@@ -398,12 +411,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           references.map((ref, i) =>
           {
             const expanded = nested.get(i) !== undefined ? nested.get(i).expanded : false;
-            ref = ref !== undefined ? ref : (source.dataSource as any).index.split('/')[1];
             const nestedPath = nested.get(i);
-            const childIndex = (nestedPath.source.dataSource as any).index ?
-              (nestedPath.source.dataSource as any).index.split('/')[1] : '';
-            const name = nestedPath === undefined ? '' : nestedPath.name === undefined ?
-              childIndex : nestedPath.name;
             return (
               <div
                 className='pf-more-nested'
@@ -445,7 +453,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                     open={nested.get(i) !== undefined}
                   >
                     <FloatingInput
-                      value={name}
+                      value={nestedPath.name}
                       onChange={this._fn(this.handleAlgorithmNameChange, i)}
                       label={PathfinderText.innerQueryName}
                       isTextInput={true}

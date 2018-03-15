@@ -84,6 +84,7 @@ export interface Props
   colors: ColorsState;
   toSkip?: number;
   builder: BuilderState;
+  onSourceChange?: (source: string) => void;
   builderActions?: typeof BuilderActions;
 }
 const linearHorizontalStrength = createHorizontalStrength(0);
@@ -266,6 +267,7 @@ class PathfinderArea extends TerrainComponent<Props>
             keyPath={this._ikeyPath(keyPath, 'source')}
             onStepChange={this.incrementStep}
             source={path.source}
+            onSourceChange={this.props.onSourceChange}
           />
 
           <FadeInOut

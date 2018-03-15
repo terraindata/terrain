@@ -792,14 +792,14 @@ class ElasticDataSourceC extends DataSource
               column.name === field,
           ).toList().get(0);
           // If it is analyzed, remove 'equal' / 'notequal' (term)
-          if (col.analyzed)
+          if (col && col.analyzed)
           {
             options = options.filter((opt) => opt.value !== 'equal' && opt.value !== 'notequal');
           }
           // If it is not-analyzed, remove 'contain' / 'notcontain' (match)
           else
           {
-            options = options.filter((opt) => opt.value !== 'contain' && opt.value !== 'notcontain');
+            options = options.filter((opt) => opt.value !== 'contains' && opt.value !== 'notcontain');
           }
         }
       }

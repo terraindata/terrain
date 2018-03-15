@@ -76,7 +76,7 @@ export interface Props
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
   source: Source;
-
+  onSourceChange: (source: string) => void;
   builderActions?: typeof BuilderActions;
 }
 
@@ -161,6 +161,10 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     if (props.pathfinderContext.step === PathfinderSteps.Source)
     {
       props.onStepChange(props.pathfinderContext.step);
+    }
+    if (this.props.onSourceChange)
+    {
+      this.props.onSourceChange(value.split('/')[1]);
     }
   }
 
