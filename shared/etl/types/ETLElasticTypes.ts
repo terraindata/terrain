@@ -55,7 +55,7 @@ export enum ElasticTypes
   Long = 'long',
   Boolean = 'boolean',
   Date = 'date',
-  Array = 'array',
+  Array = 'array', // also not actually an elastic type
   Nested = 'nested',
   Double = 'double',
   Short = 'short',
@@ -76,13 +76,13 @@ export interface ElasticFieldProps
 }
 
 // compute smart defaults for a given props object and js field type. Could be undefined or empty
-export function defaultProps(type: FieldTypes, obj: any = {}): ElasticFieldProps
+export function defaultProps(obj: Partial<ElasticFieldProps> = {}): ElasticFieldProps
 {
   // in case the passed object is undefined or not an object
   const config = (obj == null || typeof obj !== 'object') ? {} : obj;
   return _.extend(
     {
-      isAnalyzed: type === 'string',
+      isAnalyzed: true,
       isPrimaryKey: false,
       analyzer: 'standard',
       elasticType: ElasticTypes.Auto,
@@ -100,6 +100,16 @@ export const JsToElasticOptions: {
     number: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Long, ElasticTypes.Short, ElasticTypes.Byte,
     ElasticTypes.Integer, ElasticTypes.HalfFloat, ElasticTypes.Float],
     boolean: [ElasticTypes.Auto, ElasticTypes.Boolean],
+  };
+
+export const JsAutoMap: {
+  [k in FieldTypes]: ElasticTypes
+} = {
+    array: ElasticTypes.Array,
+    object: ElasticTypes.Nested,
+    string: ElasticTypes.Text,
+    number: ElasticTypes.Double,
+    boolean: ElasticTypes.Boolean,
   };
 
 export function jsToElastic(type): ElasticTypes

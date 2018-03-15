@@ -110,8 +110,8 @@ Router.post('/mysqlheadless', async (ctx, next) =>
     return;
   }
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
-  ctx.body = await imprt.upsert(
-    await fieldTypes.getJSONFromMySQLFormatStream(authStream['files'], authStream['fields']), authStream['fields'], true);
+  // ctx.body = await imprt.upsert(
+  //   await fieldTypes.getJSONFromMySQLFormatStream(authStream['files'], authStream['fields']), authStream['fields'], true);
 });
 
 Router.post('/headless', async (ctx, next) =>

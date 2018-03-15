@@ -154,7 +154,6 @@ class AlgorithmSelector extends TerrainComponent<Props>
       this.getAvailableGroups(this.props.library, this.props.ids.get(0), this.props.ids.get(1));
     const [algorithms, algorithmNames, algorithmIndex] =
       this.getAvailableAlgorithms(this.props.library, this.props.ids.get(1), this.props.ids.get(2));
-    const width = this.props.dropdownWidth !== undefined ? this.props.dropdownWidth : '220px';
     return (
       <div className='algorithm-selector-wrapper'>
         <div className='algorithm-selector-column'>
@@ -168,7 +167,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleCategoryChange}
               openDown={true}
-              width={width}
+              className='alg-selector-grow-to-fit'
             />
           </div>
         </div>
@@ -183,7 +182,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleGroupChange}
               openDown={true}
-              width={width}
+              className='alg-selector-grow-to-fit'
             />
           </div>
         </div>
@@ -198,7 +197,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleAlgorithmChange}
               openDown={true}
-              width={width}
+              className='alg-selector-grow-to-fit'
             />
           </div>
         </div>

@@ -90,7 +90,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
 {
   public menuOptions = List([
     {
-      text: 'Edit Transformations',
+      text: 'Edit This Step',
       onClick: this.makeThisActive,
     },
     {
