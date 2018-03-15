@@ -52,6 +52,7 @@ export enum ElasticTypes
 {
   Auto = 'auto', // this is not actually an elastic type
   Text = 'text',
+  Keyword = 'keyword',
   Long = 'long',
   Boolean = 'boolean',
   Date = 'date',

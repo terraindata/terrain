@@ -74,6 +74,8 @@ import './TemplateEditor.less';
 
 import Quarantine from 'util/RadiumQuarantine';
 
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping'; // temp
+
 const { List } = Immutable;
 
 export interface Props
