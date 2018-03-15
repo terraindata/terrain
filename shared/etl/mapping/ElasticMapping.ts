@@ -359,14 +359,14 @@ export class ElasticMapping
     {
       this.errors.push(
         `'${humanReadablePathName(enginePath)}' is not a valid primary key. ` +
-        `Primary keys should be a root level field`
+        `Primary keys should be a root level field`,
       );
       this.primaryKeyAttempts.push(humanReadablePathName(enginePath));
     }
     else if (enginePath.size === 0)
     {
       this.errors.push(
-        `'${humanReadablePathName(enginePath)}' is not a valid primary key. `
+        `'${humanReadablePathName(enginePath)}' is not a valid primary key. `,
       );
       this.primaryKeyAttempts.push(humanReadablePathName(enginePath));
     }
@@ -377,19 +377,19 @@ export class ElasticMapping
       if (typeof primaryKey !== 'string')
       {
         this.errors.push(
-          `Unexpected primary key name. Field name '${String(primaryKey)}' is not a string`
+          `Unexpected primary key name. Field name '${String(primaryKey)}' is not a string`,
         );
       }
       else if (this.primaryKey !== null && this.primaryKey !== primaryKey)
       {
         this.errors.push(
-          `Cannot set new primary key to '${primaryKey}'. There is already a primary key '${this.primaryKey}'`
+          `Cannot set new primary key to '${primaryKey}'. There is already a primary key '${this.primaryKey}'`,
         );
       }
       else if (elasticType !== ElasticTypes.Text && elasticType !== ElasticTypes.Keyword)
       {
         this.errors.push(
-          `Field '${primaryKey}' of type '${elasticType}' cannot be a primary key. Primary keys must be text or keyword`
+          `Field '${primaryKey}' of type '${elasticType}' cannot be a primary key. Primary keys must be text or keyword`,
         );
       }
       else
@@ -403,7 +403,8 @@ export class ElasticMapping
   {
     const ids = this.engine.getAllFieldIDs();
 
-    ids.forEach((id, i) => {
+    ids.forEach((id, i) =>
+    {
       try
       {
         if (this.engine.getFieldEnabled(id))
@@ -430,7 +431,7 @@ export class ElasticMapping
         :
         `No primary key specified`;
       this.errors.push(
-        msg
+        msg,
       );
     }
   }
