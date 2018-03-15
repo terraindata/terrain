@@ -519,6 +519,9 @@ export class RouteSelector extends TerrainComponent<Props>
   private handleOtherChange(optionSetIndex: number, searchValue: string)
   {
     this.handleValueChange(optionSetIndex, searchValue);
+    this.setState({
+      searches: this.state.searches.set(optionSetIndex, searchValue),
+    })
   }
 
   private handleOptionSearch(optionSetIndex: number, searchValue: string)
