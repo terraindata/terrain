@@ -44,56 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import AExportTransform from './AExportTransform';
+import * as _ from 'lodash';
+
+import { Import, ImportConfig } from '../Import';
+import ADocumentTransform from './ADocumentTransform';
 
 /**
- * Export to CSV format.
- *
- * Additional configuration options are possible.
+ * Applies import transformations to a result stream
  */
-export default class CSVExportTransform extends AExportTransform
+export default class ImportTransform extends ADocumentTransform
 {
+  private importt: Import;
+  private config: ImportConfig;
+  private mapping: object;
 
-  private columnNames: string[];
-  private separator: string = ',';
-  private nullValue: string = 'null';
-
-  constructor(columnNames: string[],
-    separator: string = ',',
-    nullValue: string = 'null')
+  constructor(importt: Import, config: ImportConfig)
   {
     super();
-    this.columnNames = columnNames;
-    this.separator = separator;
-    this.nullValue = nullValue;
+    this.importt = importt;
+    this.config = config;
   }
 
-  protected preamble(): string
+  protected transform(input: object, chunkNumber: number): object | object[]
   {
-    const headerObject: object = {};
-    for (let i: number = 0; i < this.columnNames.length; ++i)
+    if (this.config.requireJSONHaveAllFields)
     {
-      const name: string = this.columnNames[i];
-      headerObject[name] = name;
+      const expectedCols = JSON.stringify(this.config.originalNames.sort());
+      const inputCols = JSON.stringify(Object.keys(input).sort());
+      if (inputCols !== expectedCols)
+      {
+        this.emit('error', new Error('Stream contains an object that does not contain the expected fields. Got fields: ' +
+          inputCols + '\nExpected: ' + expectedCols));
+      }
     }
-
-    return this.transform(headerObject, 0) + this.delimiter();
-  }
-
-  protected transform(input: object, chunkNumber: number): string
-  {
-    let result: string = '';
-    return result;
-  }
-
-  protected delimiter(): string
-  {
-    return '\r\n';
-  }
-
-  protected conclusion(chunkNumber: number): string
-  {
-    return this.delimiter();
+    else
+    {
+      const fieldsInDocumentNotExpected = _.difference(Object.keys(input), this.config.originalNames);
+      for (const field of fieldsInDocumentNotExpected)
+      {
+        if (input.hasOwnProperty(field))
+        {
+          this.emit('error', new Error('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
+            JSON.stringify(input)));
+        }
+        delete input[field];
+      }
+      const expectedFieldsNotInDocument = _.difference(this.config.originalNames, Object.keys(input));
+      for (const field of expectedFieldsNotInDocument)
+      {
+        input[field] = null;
+      }
+    }
+    return input;
   }
 }

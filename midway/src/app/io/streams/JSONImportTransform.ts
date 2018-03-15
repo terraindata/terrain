@@ -53,13 +53,25 @@ import AImportTransform from './AImportTransform';
  */
 export default class JSONImportTransform extends AImportTransform
 {
-  constructor()
+  private isNewlineSeparated: boolean = true;
+
+  constructor(isNewlineSeparated: boolean = true)
   {
     super();
+
+    this.isNewlineSeparated = isNewlineSeparated;
   }
 
-  protected transform(input: string, chunkNumber: number): object
+  protected transform(input: string, chunkNumber: number): object | object[]
   {
-    return JSON.parse(input);
+    if (this.isNewlineSeparated)
+    {
+      const strings = input.split(/\r|\n/).filter((s) => s.length);
+      return strings.map((str) => JSON.parse(str));
+    }
+    else
+    {
+      return JSON.parse(input);
+    }
   }
 }

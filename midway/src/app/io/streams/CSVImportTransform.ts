@@ -74,7 +74,7 @@ export default class CSVImportTransform extends AImportTransform
   {
     if (this.hasHeader && chunkNumber === 0)
     {
-
+      
     }
 
     let result: string = '';

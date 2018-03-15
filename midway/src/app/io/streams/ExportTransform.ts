@@ -53,30 +53,30 @@ import ADocumentTransform from './ADocumentTransform';
 export default class ExportTransform extends ADocumentTransform
 {
   private exportt: Export;
-  private configuration: ExportConfig;
+  private config: ExportConfig;
   private rank: number;
   private mapping: object;
 
-  constructor(exportt: Export, configuration: ExportConfig)
+  constructor(exportt: Export, config: ExportConfig)
   {
     super();
     this.rank = 1;
     this.exportt = exportt;
 
-    if (configuration.rank === true)
+    if (config.rank === true)
     {
-      configuration.columnTypes['TERRAINRANK'] = { type: 'long' };
+      config.columnTypes['TERRAINRANK'] = { type: 'long' };
     }
 
-    configuration.transformations.forEach((transformation) =>
+    config.transformations.forEach((transformation) =>
     {
       if (transformation['name'] === 'rename')
       {
-        configuration.columnTypes[transformation['colName']] = configuration.columnTypes[transformation['args']['newName']];
+        config.columnTypes[transformation['colName']] = config.columnTypes[transformation['args']['newName']];
       }
     });
 
-    this.configuration = configuration;
+    this.config = config;
   }
 
   protected transform(input: object, chunkNumber: number): object | object[]
@@ -91,7 +91,7 @@ export default class ExportTransform extends ADocumentTransform
 
   private process(doc: object): object
   {
-    if (this.configuration.rank === true && doc['TERRAINRANK'] === undefined)
+    if (this.config.rank === true && doc['TERRAINRANK'] === undefined)
     {
       doc['TERRAINRANK'] = this.rank++;
     }
@@ -99,14 +99,14 @@ export default class ExportTransform extends ADocumentTransform
     // fields in document not in mapping
     for (const field of Object.keys(doc))
     {
-      if (this.configuration.columnTypes[field] === undefined)
+      if (this.config.columnTypes[field] === undefined)
       {
         delete doc[field];
       }
     }
 
     // fields in mapping not in document
-    for (const field of Object.keys(this.configuration.columnTypes))
+    for (const field of Object.keys(this.config.columnTypes))
     {
       if (doc[field] === undefined)
       {
@@ -114,6 +114,6 @@ export default class ExportTransform extends ADocumentTransform
       }
     }
 
-    return this.exportt._postProcessDoc(doc, this.configuration);
+    return this.exportt._postProcessDoc(doc, this.config);
   }
 }

@@ -66,7 +66,7 @@ export default abstract class ADocumentTransform extends Transform
     const out = this.transform(chunk, this.chunkNumber++);
     if (Array.isArray(out))
     {
-      out.forEach((e) => this.push(e));
+      out.forEach((o) => this.push(o));
       callback();
     }
     else

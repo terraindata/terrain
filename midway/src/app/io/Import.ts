@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as rimraf from 'rimraf';
 import sha1 = require('sha1');
 
 import * as csv from 'fast-csv';
@@ -232,7 +231,7 @@ export class Import
         return reject('File import currently is only supported for Elastic databases.');
       }
 
-      const time: number = Date.now();
+      let time: number = Date.now();
       winston.info('File Import: beginning config/schema check.');
       const configError: string = this._verifyConfig(imprtConf);
       if (configError !== '')
@@ -260,7 +259,19 @@ export class Import
 
       try
       {
-        await this._streamingUpsert(imprtConf, database, insertTable);
+        time = Date.now();
+        winston.info('File Import: beginning to insert ES mapping.');
+        await database.getTasty().getDB().putMapping(insertTable);
+        winston.info('File Import: finished inserted ES mapping. Time (s): ' + String((Date.now() - time) / 1000));
+        const items = [];
+        if (imprtConf.update)
+        {
+          await database.getTasty().update(insertTable, items);
+        }
+        else
+        {
+          await database.getTasty().upsert(insertTable, items);
+        }
         resolve(imprtConf);
       }
       catch (e)
@@ -556,19 +567,6 @@ export class Import
     return true;
   }
 
-  private async _deleteStreamingTempFolder()
-  {
-    try
-    {
-      await promisify(rimraf)(this.STREAMING_TEMP_FOLDER);
-    }
-    catch (e)
-    {
-      // can't catch this error more gracefully, or else would end up in an infinite cycle
-      throw new Error('Failed to clean streaming temp folder: ' + String(e));
-    }
-  }
-
   /* return ES type from type specification format of ImportConfig
    * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
   private _getESType(typeObject: object, withinArray: boolean = false, isIndexAnalyzed?: string, typeAnalyzer?: string): object
@@ -737,79 +735,7 @@ export class Import
   {
     return new Promise<object[]>(async (resolve, reject) =>
     {
-      if (imprt.filetype === 'json')
-      {
-        let items: object[];
-        if (imprt.isNewlineSeparatedJSON === true)
-        {
-          const stringItems: string[] = contents.split(/\r|\n/);
-          items = [];
-          for (const str of stringItems)
-          {
-            try
-            {
-              if (str !== '')
-              {
-                items.push(JSON.parse(str));
-              }
-            }
-            catch (e)
-            {
-              return reject('JSON format incorrect: Could not parse object: ' + str);
-            }
-          }
-        }
-        else
-        {
-          try
-          {
-            items = JSON.parse(contents);
-            if (!Array.isArray(items))
-            {
-              return reject('Input JSON file must parse to an array of objects.');
-            }
-          }
-          catch (e)
-          {
-            return reject('JSON format incorrect: ' + String(e));
-          }
-        }
-
-        if (imprt['requireJSONHaveAllFields'] !== false)
-        {
-          const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
-          for (const obj of items)
-          {
-            if (JSON.stringify(Object.keys(obj).sort()) !== expectedCols)
-            {
-              return reject('JSON file contains an object that does not contain the expected fields. Got fields: ' +
-                JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
-            }
-          }
-        }
-        else
-        {
-          for (const obj of items)
-          {
-            const fieldsInDocumentNotExpected = _.difference(Object.keys(obj), imprt.originalNames);
-            for (const field of fieldsInDocumentNotExpected)
-            {
-              if (obj.hasOwnProperty(field))
-              {
-                return reject('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
-                  JSON.stringify(obj));
-              }
-              delete obj[field];
-            }
-            const expectedFieldsNotInDocument = _.difference(imprt.originalNames, Object.keys(obj));
-            for (const field of expectedFieldsNotInDocument)
-            {
-              obj[field] = null;
-            }
-          }
-        }
-        resolve(items);
-      } else if (imprt.filetype === 'csv')
+      if (imprt.filetype === 'csv')
       {
         const items: object[] = [];
         csv.fromString(contents, { ignoreEmpty: true }).on('data', (data) =>
@@ -856,82 +782,6 @@ export class Import
         item[field] = new Date(date);
       }
     }
-  }
-
-  /* streaming helper function ; read from temp file number "num" to upsert to tasty */
-  private async _readFileAndUpsert(imprt: ImportConfig, database: DatabaseController, insertTable: Tasty.Table, num: number)
-  {
-    return new Promise<void>(async (resolve, reject) =>
-    {
-      winston.info('File Import: beginning read/upload file number ' + String(num) + '.');
-      let items: object[];
-      try
-      {
-        const data: string = await promisify(fs.readFile)(this.STREAMING_TEMP_FOLDER + '/' + this.STREAMING_TEMP_FILE_PREFIX + String(num),
-          { encoding: 'utf8' }) as string;
-
-        const time = Date.now();
-        winston.info('File Import: about to update/upsert to ES.');
-        items = JSON.parse(data);
-        if (items.length === 0)
-        {
-          return resolve();
-        }
-        if (imprt.update)
-        {
-          await database.getTasty().update(insertTable, items);
-        }
-        else
-        {
-          await database.getTasty().upsert(insertTable, items);
-        }
-        winston.info('File Import: finished update/upsert to ES. Time (s): ' + String((Date.now() - time) / 1000));
-        winston.info('File Import: finished read/upload file number ' + String(num) + '.');
-        resolve();
-      }
-      catch (err)
-      {
-        return reject(err);
-      }
-    });
-  }
-
-  /* after type-checking has completed, read from temp files to upsert via Tasty, and delete the temp files */
-  private async _streamingUpsert(imprt: ImportConfig, database: DatabaseController, insertTable: Tasty.Table): Promise<void>
-  {
-    return new Promise<void>(async (resolve, reject) =>
-    {
-      const time: number = Date.now();
-      winston.info('File Import: beginning to insert ES mapping.');
-      await database.getTasty().getDB().putMapping(insertTable);
-      winston.info('File Import: finished inserted ES mapping. Time (s): ' + String((Date.now() - time) / 1000));
-
-      const queue = new promiseQueue(this.MAX_ACTIVE_READS, this.chunkCount);
-      let counter: number = 0;
-      for (let num = 0; num < this.chunkCount; num++)
-      {
-        queue.add(() =>
-          new Promise<void>(async (thisResolve, thisReject) =>
-          {
-            await this._readFileAndUpsert(imprt, database, insertTable, num);
-            counter++;
-            if (counter === this.chunkCount)
-            {
-              try
-              {
-                await this._deleteStreamingTempFolder();
-                winston.info('File Import: deleted streaming temp folder.');
-                resolve();
-              }
-              catch (e)
-              {
-                reject(e);
-              }
-            }
-            thisResolve();
-          }));
-      }
-    });
   }
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */

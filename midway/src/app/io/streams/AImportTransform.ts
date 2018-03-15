@@ -73,8 +73,16 @@ export default abstract class AImportTransform extends Transform
       }
     }
 
-    this.push(this.transform(chunk as string, chunkNumber));
-    callback();
+    const out = this.transform(chunk as string, chunkNumber);
+    if (Array.isArray(out))
+    {
+      out.forEach((o) => this.push(o));
+      callback();
+    }
+    else
+    {
+      callback(null, out);
+    }
   }
 
   public _flush(callback)
@@ -102,7 +110,7 @@ export default abstract class AImportTransform extends Transform
     return null;
   }
 
-  protected abstract transform(input: string, chunkNumber: number): object;
+  protected abstract transform(input: string, chunkNumber: number): object | object[];
 
   protected conclusion(chunkNumber: number): object
   {
