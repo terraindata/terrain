@@ -390,7 +390,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const { references } = this.props.more;
     const { nested } = this.props.path;
-    const { canEdit, source} = this.props.pathfinderContext;
+    const { canEdit, source } = this.props.pathfinderContext;
     const { keyPath } = this.props;
     return (
       <div>
@@ -496,17 +496,29 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public deleteScript(i)
   {
+    const {pathfinderContext, keyPath, more} = this.props;
+    const canEdit = pathfinderContext.canEdit && more.scripts.get(i).userAdded
+    if (!canEdit)
+    {
+      return;
+    }
     this.props.builderActions.changePath(
-      this._ikeyPath(this.props.keyPath, 'scripts'),
-      this.props.more.scripts.splice(i, 1),
+      this._ikeyPath(keyPath, 'scripts'),
+      more.scripts.splice(i, 1),
     );
   }
 
   public deleteParam(i, j)
   {
+    const {pathfinderContext, keyPath, more} = this.props;
+    const canEdit = pathfinderContext.canEdit && more.scripts.get(i).userAdded
+    if (!canEdit)
+    {
+      return;
+    }
     this.props.builderActions.changePath(
-      this._ikeyPath(this.props.keyPath, 'scripts', i, 'params'),
-      this.props.more.scripts.get(i).params.splice(j, 1),
+      this._ikeyPath(keyPath, 'scripts', i, 'params'),
+      more.scripts.get(i).params.splice(j, 1),
     );
   }
 
@@ -518,81 +530,92 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       <div className='pf-more-scripts-wrapper'>
         {
           scripts.map((script: Script, i) =>
-            <div
-              className='pf-more-script'
-              key={i}
-              style={style}
-            >
-              <div className='pf-more-script-name-wrapper'>
-                <ExpandIcon
-                  open={script.expanded}
-                  onClick={this._fn(this.handleScriptValueChange, [i, 'expanded'], !script.expanded)}
-                />
-                <FloatingInput
-                  label='Script Name'
-                  value={script.name}
-                  onChange={this._fn(this.handleScriptValueChange, [i, 'name'])}
-                  isTextInput={true}
-                />
-                <RemoveIcon
-                  onClick={this._fn(this.deleteScript, i)}
-                  className='close pf-more-delete-script'
-                />
-              </div>
-              <FadeInOut
-                open={script.expanded}
+          {
+            const canEditScript = canEdit && script.userAdded;
+            return (
+              <div
+                className='pf-more-script'
+                key={i}
+                style={style}
               >
-                <div className='pf-more-paramater-label'>
-                  Parameters
+                <div className='pf-more-script-name-wrapper'>
+                  <ExpandIcon
+                    open={script.expanded}
+                    onClick={this._fn(this.handleScriptValueChange, [i, 'expanded'], !script.expanded)}
+                  />
+                  <FloatingInput
+                    label='Script Name'
+                    value={script.name}
+                    onChange={this._fn(this.handleScriptValueChange, [i, 'name'])}
+                    isTextInput={true}
+                    debounce={true}
+                    canEdit={canEditScript}
+                  />
+                  {
+                    canEditScript &&
+                    <RemoveIcon
+                      onClick={this._fn(this.deleteScript, i)}
+                      className='close pf-more-delete-script'
+                    />
+                  }
                 </div>
-                {
-                  script.params.map((param, j) =>
-                    <div
-                      className='pf-more-script-param-wrapper'
-                      key={j}
-                    >
-                      <FloatingInput
-                        label='Paramater Name'
-                        value={script.params.get(j).name}
-                        onChange={this._fn(this.handleScriptValueChange, [i, 'params', j, 'name'])}
-                        isTextInput={true}
-                        canEdit={canEdit}
-                        debounce={true}
-                      />
-                      <FloatingInput
-                        label='Paramater Value'
-                        value={script.params.get(j).value}
-                        onChange={this._fn(this.handleScriptValueChange, [i, 'params', j, 'value'])}
-                        isTextInput={true}
-                        canEdit={canEdit}
-                        debounce={true}
-                      />
-                      <RemoveIcon
-                        onClick={this._fn(this.deleteParam, i, j)}
-                        className='close pf-more-delete-param'
-                      />
-                    </div>,
-                  )
-                }
-                <PathfinderCreateLine
-                  canEdit={canEdit}
-                  onCreate={this._fn(this.handleAddScriptParameter, i)}
-                  text={'Parameter'}
-                  style={{ marginBottom: 2 }}
-                  showText={true}
-                />
-                <TQLEditor
-                  tql={script.script}
-                  canEdit={canEdit}
-                  onChange={this._fn(this.handleScriptValueChange, [i, 'script'])}
-                  placeholder={'Enter a script here'}
-                  className='pf-more-script-script'
-                  style={style}
-                />
-              </FadeInOut>
-            </div>,
-          )
-        }
+                <FadeInOut
+                  open={script.expanded}
+                >
+                  <div className='pf-more-paramater-label'>
+                    Parameters
+                  </div>
+                  {
+                    script.params.map((param, j) =>
+                      <div
+                        className='pf-more-script-param-wrapper'
+                        key={j}
+                      >
+                        <FloatingInput
+                          label='Paramater Name'
+                          value={script.params.get(j).name}
+                          onChange={this._fn(this.handleScriptValueChange, [i, 'params', j, 'name'])}
+                          isTextInput={true}
+                          canEdit={canEditScript}
+                          debounce={true}
+                        />
+                        <FloatingInput
+                          label='Paramater Value'
+                          value={script.params.get(j).value}
+                          onChange={this._fn(this.handleScriptValueChange, [i, 'params', j, 'value'])}
+                          isTextInput={true}
+                          canEdit={canEditScript}
+                          debounce={true}
+                        />
+                        {
+                          canEditScript &&
+                          <RemoveIcon
+                            onClick={this._fn(this.deleteParam, i, j)}
+                            className='close pf-more-delete-param'
+                          />
+                      }
+                      </div>,
+                    )
+                  }
+                  <PathfinderCreateLine
+                    canEdit={canEditScript}
+                    onCreate={this._fn(this.handleAddScriptParameter, i)}
+                    text={'Parameter'}
+                    style={{ marginBottom: 2 }}
+                    showText={true}
+                  />
+                  <TQLEditor
+                    tql={script.script}
+                    canEdit={canEditScript}
+                    onChange={this._fn(this.handleScriptValueChange, [i, 'script'])}
+                    placeholder={'Enter a script here'}
+                    className='pf-more-script-script'
+                    style={style}
+                  />
+                </FadeInOut>
+              </div>
+            )
+          })}
       </div>
     );
   }
@@ -666,7 +689,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               // />
             }
             {
-              this.renderScripts(this.props.more.scripts.filter((script) => script.userAdded))
+              this.renderScripts(this.props.more.scripts)
             }
             <div>
               {

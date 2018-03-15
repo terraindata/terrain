@@ -136,9 +136,9 @@ const inputStyle = `
   transition: all 0.15s;
   color: ${Colors().active};
 
-  &:hover {
-    background-color: transparent;
-  }
+  // &:hover {
+  //   background-color: transparent;
+  // }
 `;
 
 const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
@@ -364,6 +364,7 @@ export class FloatingInput extends TerrainComponent<Props>
           onKeyDown={this.handleKeyDown}
           extendRight={props.extendRight}
           small={props.small}
+          disabled={!props.canEdit}
         />
       );
     }

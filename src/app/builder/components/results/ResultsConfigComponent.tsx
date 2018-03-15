@@ -233,7 +233,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         if (!config.formats.get(field))
         {
           config = config.set('formats',
-            config.formats.set(field, _Format({type: 'image', template: '[value]'})));
+            config.formats.set(field, _Format({ type: 'image', template: '[value]' })));
         }
       }
     }

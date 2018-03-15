@@ -786,10 +786,10 @@ class ElasticDataSourceC extends DataSource
           const { dataSource } = context.source;
           const { index } = dataSource as any;
           const col = schemaState.columns.filter(
-          (column) =>
-            column.serverId === String(server) &&
-            column.databaseId === String(index) &&
-            column.name === field
+            (column) =>
+              column.serverId === String(server) &&
+              column.databaseId === String(index) &&
+              column.name === field,
           ).toList().get(0);
           // If it is analyzed, remove 'equal' / 'notequal' (term)
           if (col.analyzed)
@@ -869,37 +869,37 @@ const ElasticComparisons = [
     value: 'equal',
     displayName: 'equals', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
     fieldTypes: List([FieldType.Numerical, FieldType.Text]),
-    placeholder: 'e.g. 100 or apple'
+    placeholder: 'e.g. 100 or apple',
   },
   {
     value: 'contains',
     displayName: 'equals',
     fieldTypes: List([FieldType.Text]),
-    placeholder: 'e.g. apple'
+    placeholder: 'e.g. apple',
   },
   {
     value: 'notequal',
     displayName: 'does not equal', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
     fieldTypes: List([FieldType.Text, FieldType.Numerical]),
-    placeholder: 'e.g. 100 or apple'
+    placeholder: 'e.g. 100 or apple',
   },
   {
     value: 'isin',
     displayName: 'is in',
     fieldTypes: List([FieldType.Text]),
-    placeholder: 'e.g. apple, banana, kiwi'
+    placeholder: 'e.g. apple, banana, kiwi',
   },
   {
     value: 'isnotin',
     displayName: 'is not in',
     fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
-    placeholder: 'e.g. apple, banana, kiwi'
+    placeholder: 'e.g. apple, banana, kiwi',
   },
   {
     value: 'notcontain',
     displayName: 'does not equal',
     fieldTypes: List([FieldType.Text]),
-    placeholder: 'e.g. apple'
+    placeholder: 'e.g. apple',
   },
   {
     value: 'greater',
