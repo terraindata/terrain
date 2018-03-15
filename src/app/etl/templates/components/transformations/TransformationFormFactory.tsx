@@ -91,6 +91,7 @@ export interface FactoryArgs<State extends object, Type extends TransformationNo
   inputMap: InputDeclarationMap<State>;
   type: Type;
   initialState: State;
+  noEditOptions?: boolean; // if true, then this transformation has no editable properties
 
   getStateFromNode?: (node: TransformationNode, engine: TransformationEngine, fieldID: number)
     => State;
@@ -141,6 +142,22 @@ export function transformationFormFactory<State extends object, Type extends Tra
     public render()
     {
       const { isCreate } = this.props;
+
+      if (!isCreate && args.noEditOptions)
+      {
+        return (
+          <div
+            style={{
+              display: 'flex',
+              padding: '12px',
+              justifyContent: 'center',
+            }}
+          >
+            This Transformation Is Not Editable
+          </div>
+        );
+      }
+
       return (
         <DynamicForm
           inputMap={args.inputMap}

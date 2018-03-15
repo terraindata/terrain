@@ -72,11 +72,38 @@ import './FieldSettings.less';
 
 export type Props = TemplateEditorFieldProps;
 
+interface SettingsState
+{
+  fieldName: string;
+  isIncluded: boolean;
+  type: FieldTypes;
+}
+
 @Radium
 class FieldMainSettings extends TemplateEditorField<Props>
 {
   public state: {
     formState: SettingsState,
+  };
+
+  public settingsInputMap: InputDeclarationMap<SettingsState> = {
+    fieldName: {
+      type: DisplayType.TextBox,
+      displayName: 'Name',
+      getDisplayState: this.getFieldNameDisplayState,
+    },
+    type: {
+      type: DisplayType.Pick,
+      displayName: 'Field Type',
+      options: {
+        pickOptions: (s: SettingsState) => typeOptions,
+        indexResolver: (value) => typeOptions.indexOf(value),
+      },
+    },
+    isIncluded: {
+      type: DisplayType.CheckBox,
+      displayName: 'Include this field',
+    },
   };
 
   constructor(props)
@@ -97,13 +124,18 @@ class FieldMainSettings extends TemplateEditorField<Props>
     }
   }
 
+  public getFieldNameDisplayState(s: SettingsState)
+  {
+    return this._canEditName() ? DisplayState.Active : DisplayState.Hidden;
+  }
+
   public getFormStateFromField(props)
   {
     const field = this._fieldMap(props).get(props.fieldId);
     return {
       fieldName: field.name,
       isIncluded: field.isIncluded,
-      type: field.type,
+      type: field.representedType(),
     };
   }
 
@@ -112,7 +144,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
     return (
       <div className='field-main-settings'>
         <DynamicForm
-          inputMap={settingsInputMap}
+          inputMap={this.settingsInputMap}
           inputState={this.state.formState}
           onStateChange={this._setStateWrapper('formState')}
           centerForm={true}
@@ -150,7 +182,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
       {
         proxy.changeName(formState.fieldName);
       }
-      if (field.type !== formState.type)
+      if (field.representedType() !== formState.type)
       {
         proxy.changeType(formState.type);
       }
@@ -164,34 +196,6 @@ class FieldMainSettings extends TemplateEditorField<Props>
     });
   }
 }
-
-interface SettingsState
-{
-  fieldName: string;
-  isIncluded: boolean;
-  type: FieldTypes;
-}
-
-const settingsInputMap: InputDeclarationMap<SettingsState> = {
-  fieldName: {
-    type: DisplayType.TextBox,
-    displayName: 'Name',
-    group: 'row',
-  },
-  isIncluded: {
-    type: DisplayType.CheckBox,
-    displayName: 'Include this field',
-    group: 'row',
-  },
-  type: {
-    type: DisplayType.Pick,
-    displayName: 'Field Type',
-    options: {
-      pickOptions: (s: SettingsState) => typeOptions,
-      indexResolver: (value) => typeOptions.indexOf(value),
-    },
-  },
-};
 
 const typeOptions = List(['array', 'object', 'string', 'number', 'boolean']);
 

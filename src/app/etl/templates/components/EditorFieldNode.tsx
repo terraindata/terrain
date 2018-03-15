@@ -124,10 +124,10 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const field = this._field();
     const displayKeyPath = this._getPreviewChildPath(index);
     const childField = this._field(this.getAppropriateChild(index));
-    let previewLabel = `${index}`;
+    let previewLabel = `[${index}]`;
     if (index === -1)
     {
-      previewLabel = previewExists ? '(List Empty)' : '(0 of 0)';
+      previewLabel = previewExists ? '[List Empty]' : '[N/A]';
     }
     return (
       <EditorFieldNode
@@ -195,7 +195,6 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
       const content = (
         <EditorFieldPreview
           toggleOpen={this.handleToggleOpen}
-          hidePreviewValue={true}
           labelOverride={previewLabel}
           {...this._passProps()}
         />

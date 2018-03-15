@@ -45,19 +45,15 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import * as winston from 'winston';
+import * as Immutable from 'immutable';
+
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
-import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
-import GetTransformationNode from './nodes/GetTransformationNode';
+import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
-import LoadTransformationNode from './nodes/LoadTransformationNode';
-import PlusTransformationNode from './nodes/PlusTransformationNode';
-import PrependTransformationNode from './nodes/PrependTransformationNode';
-import PutTransformationNode from './nodes/PutTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
-import StoreTransformationNode from './nodes/StoreTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
@@ -83,12 +79,6 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return {} as TransformationVisitResult;
   }
 
-  public visitAppendNode(node: AppendTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitDuplicateNode(node: DuplicateTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
@@ -101,49 +91,93 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return this.visitDefault(node, doc, options);
   }
 
-  public visitGetNode(node: GetTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitJoinNode(node: JoinTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
     return this.visitDefault(node, doc, options);
   }
 
-  public visitLoadNode(node: LoadTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visitInsertNode(node: InsertTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.InsertNode>;
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to insert in a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
 
-  public visitPlusNode(node: PlusTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
+      let at: number = 0;
+      if (typeof opts['at'] === 'number')
+      {
+        at = opts['at'];
+        if (opts['at'] < 0)
+        {
+          at += el.length + 1;
+        }
+      }
+      else if (opts['at'] === undefined)
+      {
+        at = el.length;
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Insert node: "at" property is invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
 
-  public visitPrependNode(node: PrependTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
+      let value;
+      if (Immutable.Iterable.isIterable(opts['value']) || opts['value'] instanceof KeyPath)
+      {
+        value = yadeep.get(doc, opts['value'] as KeyPath);
+        if (typeof value !== 'string')
+        {
+          return {
+            errors: [
+              {
+                message: 'Insert: field denoted by "value" keypath is not a string',
+              } as TransformationVisitError,
+            ],
+          } as TransformationVisitResult;
+        }
+      }
+      else if (typeof opts['value'] === 'string')
+      {
+        value = opts['value'];
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Insert: "value" property is missing or invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
 
-  public visitPutNode(node: PutTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
+      // Currently assumes a single from and length for all fieldIDs
+      yadeep.set(doc, field, el.slice(0, at) + String(value) + el.slice(at), { create: true });
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
   public visitSplitNode(node: SplitTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitStoreNode(node: StoreTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     // TODO
     return this.visitDefault(node, doc, options);

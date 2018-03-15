@@ -46,17 +46,11 @@ THE SOFTWARE.
 // tslint:disable no-unused-expression
 enum TransformationNodeType
 {
-  LoadNode = 'LoadNode',
-  StoreNode = 'StoreNode',
-  PutNode = 'PutNode',
-  GetNode = 'GetNode',
   SplitNode = 'SplitNode',
   JoinNode = 'JoinNode',
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
-  PlusNode = 'PlusNode',
-  PrependNode = 'PrependNode',
-  AppendNode = 'AppendNode',
+  InsertNode = 'InsertNode',
   UppercaseNode = 'UppercaseNode',
   SubstringNode = 'SubstringNode',
 }
@@ -74,19 +68,15 @@ type AssertOptionTypesExhaustive = {
 
 interface TransformationOptionTypes
 {
-  LoadNode: any;
-  StoreNode: any;
-  PutNode: any;
-  GetNode: any;
   SplitNode: any;
   JoinNode: any;
   FilterNode: any;
   DuplicateNode: any;
-  PlusNode: any;
-  PrependNode: any;
-  AppendNode: any;
+  InsertNode: {
+    at?: number;
+    value: string | KeyPath;
+  };
   UppercaseNode: {
-
   };
   SubstringNode: {
     from: number;

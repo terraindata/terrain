@@ -103,6 +103,7 @@ const uppercaseArgs: FactoryArgs<UppercaseState, TransformationNodeType.Uppercas
   inputMap: uppercaseInputMap,
   type: TransformationNodeType.UppercaseNode,
   initialState: {},
+  noEditOptions: true,
 };
 
 const UppercaseClass =
@@ -119,12 +120,10 @@ const substringInputMap: InputDeclarationMap<SubstringState> = {
   from: {
     type: DisplayType.NumberBox,
     displayName: 'From Position',
-    group: 'main',
   },
   length: {
     type: DisplayType.NumberBox,
     displayName: 'Substring Length',
-    group: 'main',
   },
 };
 

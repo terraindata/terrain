@@ -54,6 +54,7 @@ import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { QueryHandler } from '../query/QueryHandler';
 import { Export } from './Export';
+import * as Transform from './Transform';
 
 export class ExportTypes
 {
@@ -151,7 +152,7 @@ export class ExportTypes
     {
       for (let doc of docs)
       {
-        doc = Export.mergeGroupJoin(doc);
+        doc = Transform.mergeDocument(doc);
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {

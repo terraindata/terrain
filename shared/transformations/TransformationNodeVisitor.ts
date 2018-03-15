@@ -44,18 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-// import * as winston from 'winston';
-import AppendTransformationNode from './nodes/AppendTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
-import GetTransformationNode from './nodes/GetTransformationNode';
+import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
-import LoadTransformationNode from './nodes/LoadTransformationNode';
-import PlusTransformationNode from './nodes/PlusTransformationNode';
-import PrependTransformationNode from './nodes/PrependTransformationNode';
-import PutTransformationNode from './nodes/PutTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
-import StoreTransformationNode from './nodes/StoreTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
@@ -67,11 +60,6 @@ export default abstract class TransformationNodeVisitor
 {
   public abstract visitDefault(node: TransformationNode, doc: object, options: object): TransformationVisitResult;
 
-  public visitAppendNode(node: AppendTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitDuplicateNode(node: DuplicateTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
@@ -82,42 +70,17 @@ export default abstract class TransformationNodeVisitor
     return this.visitDefault(node, doc, options);
   }
 
-  public visitGetNode(node: GetTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitJoinNode(node: JoinTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
 
-  public visitLoadNode(node: LoadTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitPlusNode(node: PlusTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitPrependNode(node: PrependTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitPutNode(node: PutTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visitInsertNode(node: InsertTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
 
   public visitSplitNode(node: SplitTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    return this.visitDefault(node, doc, options);
-  }
-
-  public visitStoreNode(node: StoreTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

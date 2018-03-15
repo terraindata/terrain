@@ -44,16 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { List } from 'immutable';
+
 import { KeyPath } from '../../util/KeyPath';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNode from './TransformationNode';
 
-export default class StoreTransformationNode extends TransformationNode
+export default class InsertTransformationNode extends TransformationNode
 {
   public constructor(id: number,
     fields: List<KeyPath>,
     options: object = {},
-    typeCode: TransformationNodeType = TransformationNodeType.StoreNode)
+    typeCode: TransformationNodeType = TransformationNodeType.InsertNode)
   {
     super(id, fields, options, typeCode);
   }
