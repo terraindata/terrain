@@ -222,7 +222,7 @@ class DeployModal extends TerrainComponent<Props>
     }
     else if (changingStatusTo !== ItemStatus.Deployed)
     {
-      title = `Remove "${name}" from Deployed and Unlock`;
+      title = `Unlock and withdraw "${name}" from Deployed status`;
     }
 
     let defaultAlgorithm: LibraryTypes.Algorithm;
