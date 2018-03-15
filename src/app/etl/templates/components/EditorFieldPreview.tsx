@@ -193,7 +193,12 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
   public moveField()
   {
-    
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        moveFieldId: this.props.fieldId,
+      }
+    });
   }
 
   public openSettings()

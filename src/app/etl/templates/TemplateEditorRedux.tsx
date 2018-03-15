@@ -138,6 +138,7 @@ export interface TemplateEditorActionTypes
   setCurrentEdge: {
     actionType: 'setCurrentEdge';
     edge: number;
+    rebuild?: boolean;
   };
 }
 
@@ -232,6 +233,32 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         return state.setIn(['uiState', 'currentEdge'], action.payload.edge);
       },
     };
+
+  public setCurrentEdge(action: TemplateEditorActionType<'setCurrentEdge'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'setCurrentEdge',
+      edge: action.edge,
+    });
+    if (action.rebuild === true)
+    {
+      directDispatch({
+        actionType: 'rebuildFieldMap'
+      });
+    }
+  }
+
+  public overrideAct(action: Unroll<TemplateEditorActionTypes>)
+  {
+    switch (action.actionType)
+    {
+      case 'setCurrentEdge':
+        return this.setCurrentEdge.bind(this, action);
+      default:
+        return undefined;
+    }
+  }
 }
 
 const ReduxInstance = new TemplateEditorRedux();

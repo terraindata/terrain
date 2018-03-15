@@ -69,6 +69,7 @@ import TemplateList from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import MoveFieldModal from 'etl/templates/components/MoveFieldModal';
 
 import './TemplateEditor.less';
 
@@ -272,14 +273,9 @@ class TemplateEditor extends TerrainComponent<Props>
     return modals;
   }
 
-  public renderFieldModals(): any[]
-  {
-    return [];
-  }
-
   public render()
   {
-    const { previewIndex, documents, modalRequests } = this.props.templateEditor.uiState;
+    const { previewIndex, documents, modalRequests, moveFieldId } = this.props.templateEditor.uiState;
     const showEditor = previewIndex >= 0;
     return (
       <div className='template-editor-root-container'>
@@ -291,7 +287,13 @@ class TemplateEditor extends TerrainComponent<Props>
           </div>
         </div>
         {... this.renderRootLevelModals()}
-        {... this.renderFieldModals()}
+        <MoveFieldModal
+          fieldId={moveFieldId}
+          canEdit={true}
+          noInteract={false}
+          preview={null}
+          displayKeyPath={emptyList}
+        />
         <MultiModal
           requests={modalRequests}
           setRequests={this.setModalRequests}
