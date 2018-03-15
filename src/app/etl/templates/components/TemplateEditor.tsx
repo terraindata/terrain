@@ -91,9 +91,11 @@ class TemplateEditor extends TerrainComponent<Props>
 {
   public state: {
     newTemplateName: string,
+    saveNewTemplateOpen: boolean,
     loadTemplateOpen: boolean,
   } = {
       newTemplateName: 'New Template',
+      saveNewTemplateOpen: false,
       loadTemplateOpen: false,
     };
 
@@ -226,6 +228,55 @@ class TemplateEditor extends TerrainComponent<Props>
     );
   }
 
+  public renderRootLevelModals(): any[]
+  {
+    const modals = [];
+    if (this.state.loadTemplateOpen)
+    {
+      modals.push(
+        <Modal
+          key='loadTemplate'
+          title={'Load a Template'}
+          open={this.state.loadTemplateOpen}
+          onClose={this.closeTemplateUI}
+          wide={true}
+        >
+          <div className='template-list-wrapper' style={backgroundColor(Colors().bg3)}>
+            <TemplateList
+              onClick={this.handleLoadTemplateItemClicked}
+              getRowStyle={this.getTemplateItemStyle}
+            />
+          </div>
+        </Modal>
+      );
+    }
+    else if (this.state.saveNewTemplateOpen)
+    {
+      modals.push(
+        <Modal
+          key='saveNew'
+          title='Save New Template'
+          open={this.state.saveNewTemplateOpen}
+          showTextbox={true}
+          onConfirm={this.handleSave}
+          onClose={this.handleCloseSave}
+          confirmDisabled={this.state.newTemplateName === ''}
+          textboxValue={this.state.newTemplateName}
+          onTextboxValueChange={this.handleNewTemplateNameChange}
+          textboxPlaceholderValue='Template Name'
+          closeOnConfirm={true}
+          confirm={true}
+        />
+      );
+    }
+    return modals;
+  }
+
+  public renderFieldModals(): any[]
+  {
+    return [];
+  }
+
   public render()
   {
     const { previewIndex, documents, modalRequests } = this.props.templateEditor.uiState;
@@ -239,22 +290,10 @@ class TemplateEditor extends TerrainComponent<Props>
             {this.renderDocumentsSection()}
           </div>
         </div>
-        <Modal
-          title={'Load a Template'}
-          open={this.state.loadTemplateOpen}
-          onClose={this.closeTemplateUI}
-          wide={true}
-        >
-          <div className='template-list-wrapper' style={backgroundColor(Colors().bg3)}>
-            <TemplateList
-              onClick={this.handleLoadTemplateItemClicked}
-              getRowStyle={this.getTemplateItemStyle}
-            />
-          </div>
-        </Modal>
+        {... this.renderRootLevelModals()}
+        {... this.renderFieldModals()}
         <MultiModal
           requests={modalRequests}
-          state={this.state}
           setRequests={this.setModalRequests}
         />
       </div>
@@ -301,22 +340,7 @@ class TemplateEditor extends TerrainComponent<Props>
   {
     this.setState({
       newTemplateName: 'New Template',
-    });
-  }
-
-  public computeSaveModalProps()
-  {
-    return ({
-      onConfirm: this.handleSave,
-      onClose: this.handleCloseSave,
-      confirmDisabled: this.state.newTemplateName === '',
-      title: 'Save New Template',
-      showTextbox: true,
-      confirm: true,
-      textboxValue: this.state.newTemplateName,
-      onTextboxValueChange: this.handleNewTemplateNameChange,
-      textboxPlaceholderValue: 'Template Name',
-      closeOnConfirm: true,
+      saveNewTemplateOpen: false,
     });
   }
 
@@ -333,11 +357,8 @@ class TemplateEditor extends TerrainComponent<Props>
     const { editorAct } = this.props;
     if (template.id === -1)
     {
-      editorAct({
-        actionType: 'addModal',
-        props: {
-          computeProps: this.computeSaveModalProps,
-        },
+      this.setState({
+        saveNewTemplateOpen: true,
       });
     }
     else

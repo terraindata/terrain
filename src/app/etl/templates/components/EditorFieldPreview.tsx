@@ -191,6 +191,11 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     });
   }
 
+  public moveField()
+  {
+    
+  }
+
   public openSettings()
   {
     this.props.act({

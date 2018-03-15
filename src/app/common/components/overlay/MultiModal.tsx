@@ -59,7 +59,7 @@ export type ModalPropsObject = {
   [key in keyof _ModalProps]?: _ModalProps[key];
 };
 export type ModalProps = ModalPropsObject & {
-  computeProps?: () => ModalPropsObject;
+  computeProps?: () => ModalPropsObject; // if props should be computed at the moment that the modal gets shown
 };
 // ModalProps is the same as the Props type from Modal.tsx, however all the props are optional.
 // This is important because MultiModal overrides the open prop.
@@ -68,8 +68,6 @@ export type ModalProps = ModalPropsObject & {
 export interface Props
 {
   requests: List<ModalProps>;
-  // MultiModal doesn't care about state, but change this if elements that use computeProps need to be rerendered
-  state?: any;
   setRequests: (newRequests: List<ModalProps>) => void;
   // a function that allows MultiModal to change requests - it's like onChange for a textbox
 }
