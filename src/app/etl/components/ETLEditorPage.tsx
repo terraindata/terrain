@@ -227,9 +227,6 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.editorAct({
-      actionType: 'resetState',
-    });
     this.initFromRoute();
   }
 
