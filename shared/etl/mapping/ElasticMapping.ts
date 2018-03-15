@@ -99,9 +99,16 @@ function* getKeyPathsForComparison(mapping: MappingType): IterableIterator<List<
   }
 }
 
-function humanReadablePathName(keypath: EnginePath)
+// turn a keypath into a readable string.
+// isMappingPath specifies if its a regular keypath, or one that comes from a MappingType
+function humanReadablePathName(keypath: EnginePath, isMappingPath = false)
 {
-  return keypath.filter((val, index) => index % 2 === 1)
+  const filterFn = isMappingPath ?
+    (val, index) => index % 2 === 1
+    :
+    (val, index) => true;
+
+  return keypath.filter(filterFn)
     .reduce((accum, val) =>
     {
       if (accum === '')
@@ -124,6 +131,7 @@ export interface MappingComparison
 
 export class ElasticMapping
 {
+  // compare two elastic mapping to determine if they are compatible
   public static compareMapping(toCompare: MappingType, existingMapping: MappingType): MappingComparison
   {
     const result: MappingComparison = {
@@ -147,14 +155,14 @@ export class ElasticMapping
         if (toCompareConfig['type'] !== existingConfig['type'])
         {
           result.hasConflicts = true;
-          const message = `Type conflict for field ${humanReadablePathName(kp)}. ` +
+          const message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
             `Type '${toCompareConfig['type']}'' does not match type '${existingConfig['type']}'.`;
           result.conflicts.push(message);
         }
         else if (toCompareConfig['analyzer'] !== toCompareConfig['analyzer'])
         {
           result.hasConflicts = true;
-          const message = `Type conflict for field ${humanReadablePathName(kp)}. ` +
+          const message = `Type conflict for field ${humanReadablePathName(kp, true)}. ` +
             `Analyzer '${toCompareConfig['analyzer']}' does not match Analyzer '${existingConfig['analyzer']}'.`;
           result.conflicts.push(message);
         }
@@ -170,11 +178,14 @@ export class ElasticMapping
   }> = {};
   private engine: TransformationEngine;
   private mapping: MappingType = {};
+  private primaryKey: string = null;
+  private primaryKeyAttempts: string[] = [];
 
   constructor(engine: TransformationEngine)
   {
     this.engine = engine;
     this.createElasticMapping();
+    this.findPrimaryKeys();
   }
 
   public getMapping(): MappingType
@@ -185,6 +196,11 @@ export class ElasticMapping
   public getErrors(): string[]
   {
     return this.errors;
+  }
+
+  public getPrimaryKey(): string | null
+  {
+    return this.primaryKey;
   }
 
   protected getTextConfig(elasticProps: ElasticFieldProps): TypeConfig
@@ -213,7 +229,6 @@ export class ElasticMapping
   protected getTypeConfig(fieldID: number): TypeConfig | null
   {
     const elasticProps = this.getElasticProps(fieldID);
-    const valueType = this.getValueType(fieldID);
 
     const jsType = this.getRepresentedType(fieldID);
     const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
@@ -325,10 +340,100 @@ export class ElasticMapping
       catch (e)
       {
         this.errors.push(
-          `Error encountered while adding field ${id} to mapping. Details: ${String(e)}`,
+          `Error encountered while adding field '${id}' to mapping. Details: ${String(e)}`,
         );
       }
     });
+  }
+
+  protected verifyAndSetPrimaryKey(id: number)
+  {
+    const elasticProps = this.getElasticProps(id);
+    const jsType = this.getRepresentedType(id);
+    const elasticType = elasticProps.elasticType === ElasticTypes.Auto ?
+      JsAutoMap[jsType]
+      :
+      elasticProps.elasticType;
+    const enginePath = this.engine.getOutputKeyPath(id);
+    if (enginePath.size > 1)
+    {
+      this.errors.push(
+        `'${humanReadablePathName(enginePath)}' is not a valid primary key. ` +
+        `Primary keys should be a root level field`,
+      );
+      this.primaryKeyAttempts.push(humanReadablePathName(enginePath));
+    }
+    else if (enginePath.size === 0)
+    {
+      this.errors.push(
+        `'${humanReadablePathName(enginePath)}' is not a valid primary key. `,
+      );
+      this.primaryKeyAttempts.push(humanReadablePathName(enginePath));
+    }
+    else
+    {
+      const primaryKey = enginePath.get(0);
+      this.primaryKeyAttempts.push(primaryKey);
+      if (typeof primaryKey !== 'string')
+      {
+        this.errors.push(
+          `Unexpected primary key name. Field name '${String(primaryKey)}' is not a string`,
+        );
+      }
+      else if (this.primaryKey !== null && this.primaryKey !== primaryKey)
+      {
+        this.errors.push(
+          `Cannot set new primary key to '${primaryKey}'. There is already a primary key '${this.primaryKey}'`,
+        );
+      }
+      else if (elasticType !== ElasticTypes.Text && elasticType !== ElasticTypes.Keyword)
+      {
+        this.errors.push(
+          `Field '${primaryKey}' of type '${elasticType}' cannot be a primary key. Primary keys must be text or keyword`,
+        );
+      }
+      else
+      {
+        this.primaryKey = primaryKey;
+      }
+    }
+  }
+
+  protected findPrimaryKeys()
+  {
+    const ids = this.engine.getAllFieldIDs();
+
+    ids.forEach((id, i) =>
+    {
+      try
+      {
+        if (this.engine.getFieldEnabled(id))
+        {
+          const elasticProps = this.getElasticProps(id);
+          if (elasticProps.isPrimaryKey)
+          {
+            this.verifyAndSetPrimaryKey(id);
+          }
+        }
+      }
+      catch (e)
+      {
+        this.errors.push(
+          `Error encountered while searching for primary key. Details: ${String(e)}`,
+        );
+      }
+    });
+
+    if (this.primaryKey === null)
+    {
+      const msg = this.primaryKeyAttempts.length > 0 ?
+        `Primary keys are specified but none are valid`
+        :
+        `No primary key specified`;
+      this.errors.push(
+        msg,
+      );
+    }
   }
 }
 
