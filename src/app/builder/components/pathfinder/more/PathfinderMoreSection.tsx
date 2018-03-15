@@ -496,8 +496,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public deleteScript(i)
   {
-    const {pathfinderContext, keyPath, more} = this.props;
-    const canEdit = pathfinderContext.canEdit && more.scripts.get(i).userAdded
+    const { pathfinderContext, keyPath, more } = this.props;
+    const canEdit = pathfinderContext.canEdit && more.scripts.get(i).userAdded;
     if (!canEdit)
     {
       return;
@@ -510,8 +510,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public deleteParam(i, j)
   {
-    const {pathfinderContext, keyPath, more} = this.props;
-    const canEdit = pathfinderContext.canEdit && more.scripts.get(i).userAdded
+    const { pathfinderContext, keyPath, more } = this.props;
+    const canEdit = pathfinderContext.canEdit && more.scripts.get(i).userAdded;
     if (!canEdit)
     {
       return;
@@ -531,6 +531,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         {
           scripts.map((script: Script, i) =>
           {
+            if (!script.userAdded)
+            {
+              return null;
+            }
             const canEditScript = canEdit && script.userAdded;
             return (
               <div
@@ -593,7 +597,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                             onClick={this._fn(this.deleteParam, i, j)}
                             className='close pf-more-delete-param'
                           />
-                      }
+                        }
                       </div>,
                     )
                   }
@@ -614,7 +618,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                   />
                 </FadeInOut>
               </div>
-            )
+            );
           })}
       </div>
     );

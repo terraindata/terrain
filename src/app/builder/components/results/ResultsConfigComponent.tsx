@@ -82,6 +82,7 @@ export interface Props
   fields: List<string>;
   config: ResultsConfig;
   onConfigChange: (config: ResultsConfig, builderActions: typeof BuilderActions) => void;
+  onSaveAsDefault: (config: ResultsConfig) => void;
   onClose: (config: ResultsConfig) => void;
   colorsActions: typeof ColorsActions;
   builderActions?: typeof BuilderActions;
@@ -89,6 +90,7 @@ export interface Props
   schema?: SchemaState;
   builder?: BuilderState;
   columns?: any;
+  nested?: boolean;
 }
 
 @Radium
@@ -327,6 +329,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         onClose={this._fn(this.handleNestedConfigClose, field)}
         columns={columns}
         dataSource={{ index }}
+        nested={true}
       />
     );
   }
@@ -400,6 +403,11 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     );
   }
 
+  public handleSaveAsDefault()
+  {
+    this.props.onSaveAsDefault(this.state.config);
+  }
+
   public handleClose()
   {
     this.props.onConfigChange(this.state.config, this.props.builderActions);
@@ -467,8 +475,23 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 second='Disabled'
                 onChange={this.handleEnabledToggle}
                 selected={enabled ? 1 : 2}
+                medium={true}
               />
             </div>
+            {
+              !this.props.nested &&
+              <div key={'results-config-default-button'}
+                className='results-config-default-button'
+                style={[
+                  fontColor(Colors().text1),
+                  borderColor(Colors().border1, Colors().border3),
+                  backgroundColor(Colors().bg3),
+                ]}
+                onClick={this.handleSaveAsDefault}
+              >
+                Save as Default
+              </div>
+            }
             <div key={'results-config-button'}
               className='results-config-button'
               style={[
@@ -616,6 +639,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 onChange={this.handleSearchTermChange}
                 label={'Search'}
                 isTextInput={true}
+                canEdit={true}
               />
             </div>
             <CRTarget

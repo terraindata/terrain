@@ -55,6 +55,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { BuilderState } from 'app/builder/data/BuilderState';
+import { notificationManager } from 'app/common/components/InAppNotification';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import Ajax from 'app/util/Ajax';
 import Util from 'app/util/Util';
@@ -912,13 +913,25 @@ column if you have customized the results view.');
     });
   }
 
+  public saveConfigAsDefault(config: ResultsConfig)
+  {
+    if (config.enabled)
+    {
+      Ajax.updateResultsConfig(this.state.indexName, config, (resp) =>
+      {
+        notificationManager.addNotification(
+          'Saved',
+          'Saved as default config for ' + this.state.indexName,
+          'info',
+          3,
+        );
+      });
+    }
+  }
+
   public hideConfig(config: ResultsConfig)
   {
     // Update the default config for this index
-    if (config.enabled)
-    {
-      Ajax.updateResultsConfig(this.state.indexName, config);
-    }
     this.setState({
       showingConfig: false,
     });
@@ -981,6 +994,7 @@ column if you have customized the results view.');
         config={resultsConfig !== undefined ? resultsConfig : this.props.query.resultsConfig}
         fields={fields}
         onClose={this.hideConfig}
+        onSaveAsDefault={this.saveConfigAsDefault}
         onConfigChange={HitsArea.handleConfigChange}
         builder={this.props.builder}
         schema={this.props.schema}
