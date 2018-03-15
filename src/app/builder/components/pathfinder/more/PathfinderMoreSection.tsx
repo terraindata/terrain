@@ -120,11 +120,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const { keyPath } = this.props;
     this.props.builderActions.changePath(this._ikeyPath(keyPath, 'references', i), value);
-    if (this.props.path.nested.get(i) === undefined)
-    {
-      const nestedKeyPath = this._ikeyPath(keyPath.butLast().toList(), 'nested', i);
-      this.props.builderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
-    }
   }
 
   public handleAddScript()
@@ -137,9 +132,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleAddNested()
   {
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references'),
-      this.props.more.references.push(''));
+      this.props.more.references.push(undefined));
     const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
-    this.props.builderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
+    this.props.builderActions.changePath(nestedKeyPath,
+      this.props.path.nested.push(_Path({ name: undefined, step: 0 })), true);
   }
 
   public handleDeleteNested(i)
@@ -394,7 +390,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const { references } = this.props.more;
     const { nested } = this.props.path;
-    const { canEdit } = this.props.pathfinderContext;
+    const { canEdit, source} = this.props.pathfinderContext;
     const { keyPath } = this.props;
     return (
       <div>
@@ -402,6 +398,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           references.map((ref, i) =>
           {
             const expanded = nested.get(i) !== undefined ? nested.get(i).expanded : false;
+            ref = ref !== undefined ? ref : (source.dataSource as any).index.split('/')[1];
+            const nestedPath = nested.get(i);
+            const childIndex = (nestedPath.source.dataSource as any).index ?
+              (nestedPath.source.dataSource as any).index.split('/')[1] : '';
+            const name = nestedPath === undefined ? '' : nestedPath.name === undefined ?
+              childIndex : nestedPath.name;
             return (
               <div
                 className='pf-more-nested'
@@ -432,7 +434,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         canEdit={canEdit}
                         className='pf-more-nested-reference-input'
                         noBg={true}
-                        autoFocus={true}
                         debounce={true}
                         forceFloat={true}
                         noBorder={false}
@@ -441,10 +442,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                     )
                   }
                   <FadeInOut
-                    open={nested.get(i) !== undefined && nested.get(i).name !== undefined}
+                    open={nested.get(i) !== undefined}
                   >
                     <FloatingInput
-                      value={nested.get(i) !== undefined ? nested.get(i).name : undefined}
+                      value={name}
                       onChange={this._fn(this.handleAlgorithmNameChange, i)}
                       label={PathfinderText.innerQueryName}
                       isTextInput={true}

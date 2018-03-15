@@ -110,12 +110,12 @@ export const PathfinderText = {
   collapseTitle: 'Group by',
   collapseTootlip: 'Force algorithm to only show the top result with matching values for this field',
   // `Add nested algorithms to create a set of results for each result of your parent algorithm.`,
-  referenceName: 'Alias',
+  referenceName: 'Parent Alias',
   referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',
   nestedExplanation: 'Add another algorithm that uses the results of this one as input',
   scriptExplanation: 'Scripts can be used to create custom values to return with each result',
   addScript: 'Script',
-  innerQueryName: 'Algorithm Name',
+  innerQueryName: 'Child Alias',
   aggregation:
     {
       missing: {

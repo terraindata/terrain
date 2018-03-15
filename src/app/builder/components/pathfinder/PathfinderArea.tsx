@@ -193,7 +193,7 @@ class PathfinderArea extends TerrainComponent<Props>
           value: lon,
         },
       ],
-      script: `Math.round(100 * doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
+      script: `0.01 * Math.round(doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.0621371)`,
       userAdded: false,
     });
     // Return the name of the script to the filter line that created it
@@ -226,7 +226,7 @@ class PathfinderArea extends TerrainComponent<Props>
     const newScript = _Script({
       name: scriptName,
       params: Util.asJS(params),
-      script: `Math.round(100 * doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.000621371) / 100`,
+      script: `0.01 * Math.round(doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.0621371)`,
       userAdded: false,
     });
     this.props.builderActions.changePath(

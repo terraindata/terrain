@@ -776,10 +776,32 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'comparison')
     {
       const { field, fieldType, schemaState, source } = context;
+      const server = context.builderState.db.name;
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)
       {
         options = options.filter((opt) => opt.fieldTypes.indexOf(fieldType) !== -1);
+        if (fieldType === FieldType.Text)
+        {
+          const { dataSource } = context.source;
+          const { index } = dataSource as any;
+          const col = schemaState.columns.filter(
+          (column) =>
+            column.serverId === String(server) &&
+            column.databaseId === String(index) &&
+            column.name === field
+          ).toList().get(0);
+          // If it is analyzed, remove 'equal' / 'notequal' (term)
+          if (col.analyzed)
+          {
+            options = options.filter((opt) => opt.value !== 'equal' && opt.value !== 'notequal');
+          }
+          // If it is not-analyzed, remove 'contain' / 'notcontain' (match)
+          else
+          {
+            options = options.filter((opt) => opt.value !== 'contain' && opt.value !== 'notcontain');
+          }
+        }
       }
 
       return List(options.map((c) => _ChoiceOption(c)));
@@ -845,73 +867,87 @@ const ElasticComparisons = [
   },
   {
     value: 'equal',
-    displayName: '=', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
+    displayName: 'equals', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
     fieldTypes: List([FieldType.Numerical, FieldType.Text]),
+    placeholder: 'e.g. 100 or apple'
   },
   {
     value: 'contains',
-    displayName: 'contains',
+    displayName: 'equals',
     fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple'
   },
   {
     value: 'notequal',
-    displayName: '≠', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
+    displayName: 'does not equal', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
     fieldTypes: List([FieldType.Text, FieldType.Numerical]),
+    placeholder: 'e.g. 100 or apple'
   },
   {
     value: 'isin',
     displayName: 'is in',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
+    fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple, banana, kiwi'
   },
   {
     value: 'isnotin',
     displayName: 'is not in',
     fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
+    placeholder: 'e.g. apple, banana, kiwi'
   },
   {
     value: 'notcontain',
-    displayName: 'does not contain',
+    displayName: 'does not equal',
     fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple'
   },
   {
     value: 'greater',
-    displayName: '>', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than' : '>',
+    displayName: 'is greater than', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than' : '>',
     fieldTypes: List([FieldType.Numerical]),
+    placeholder: 'e.g. 100',
   },
   {
     value: 'less',
-    displayName: '<', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than' : '<',
+    displayName: 'is less than', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than' : '<',
     fieldTypes: List([FieldType.Numerical]),
+    placeholder: 'e.g. 100',
   },
   {
     value: 'greaterequal',
-    displayName: '≥', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than or equal to' : '≥',
+    displayName: 'is greater or equal to', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than or equal to' : '≥',
     fieldTypes: List([FieldType.Numerical]),
+    placeholder: 'e.g. 100',
   },
   {
     value: 'lessequal',
-    displayName: '≤', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than or equal to' : '≤',
+    displayName: 'is less or equal to', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than or equal to' : '≤',
     fieldTypes: List([FieldType.Numerical]),
+    placeholder: 'e.g. 100',
   },
   {
     value: 'alphabefore',
     displayName: 'comes before',
     fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple',
   },
   {
     value: 'alphaafter',
     displayName: 'comes after',
     fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple',
   },
   {
     value: 'datebefore',
     displayName: 'starts before',
     fieldTypes: List([FieldType.Date]),
+    placeholder: 'e.g. 3/15/1995',
   },
   {
     value: 'dateafter',
     displayName: 'starts after',
     fieldTypes: List([FieldType.Date]),
+    placeholder: 'e.g. 3/15/1995',
   },
   {
     value: 'located',

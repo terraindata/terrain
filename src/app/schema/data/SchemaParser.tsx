@@ -247,6 +247,7 @@ export function parseElasticDb(elasticServer: object,
                 tableId,
                 datatype: fieldProperties['type'],
                 properties: fieldProperties['properties'],
+                analyzed: fieldProperties['analyzer'] !== undefined ? true : false,
               });
 
               column = column.set(

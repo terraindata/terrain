@@ -575,7 +575,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       {
         this.props.onDeleteScript(filterLine.scriptName);
       }
-      this.props.onChange(this.props.keyPath, filterLine.set('addScript', false));
+      this.props.onChange(this.props.keyPath,
+        filterLine
+          .set('addScript', false)
+          .set('scriptName', ''));
 
     }
   }
@@ -595,6 +598,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               disabled={!this.props.pathfinderContext.canEdit}
               label={PahfinderText.includeDistanceExplanation}
             />
+            {
+              filterLine.scriptName &&
+              <span>
+                (Returned as {filterLine.scriptName})
+              </span>
+            }
           </div>
         );
       }

@@ -228,6 +228,14 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     else if (type != null)
     {
       config = config.set(type, field);
+      if (type === 'thumbnail')
+      {
+        if (!config.formats.get(field))
+        {
+          config = config.set('formats',
+            config.formats.set(field, _Format({type: 'image', template: '[value]'})));
+        }
+      }
     }
 
     this.changeConfig(config);

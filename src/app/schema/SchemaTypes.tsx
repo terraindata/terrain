@@ -222,6 +222,7 @@ class ColumnC extends SchemaBaseClass
 
   public sampleData: List<any> = List();
   public properties?: List<any> = List();
+  public analyzed?: boolean = false;
 }
 export type Column = ColumnC & IRecord<ColumnC>;
 export const _Column = (config: {
@@ -235,6 +236,7 @@ export const _Column = (config: {
   isNullable?: boolean,
   isPrimaryKey?: boolean,
   properties?: any,
+  analyzed?: boolean;
   // fieldProperties?: any,
 
   id?: string,
