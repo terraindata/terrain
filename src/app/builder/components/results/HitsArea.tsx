@@ -991,6 +991,7 @@ column if you have customized the results view.');
         builder={this.props.builder}
         schema={this.props.schema}
         dataSource={this.props.query.path.source.dataSource}
+        sampleHit={props.resultsState.hits && props.resultsState.hits.get(0)}
       />;
     }
   }

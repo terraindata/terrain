@@ -49,6 +49,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
+import * as _ from 'lodash';
 
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
@@ -133,6 +134,25 @@ class TransformCard extends TerrainComponent<Props>
   public componentDidMount()
   {
     this.computeBars(this.props.data.input, this.state.maxDomain, !this.props.data.hasCustomDomain);
+  }
+
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
+    for (const key in nextProps)
+    {
+      if (!_.isEqual(nextProps[key], this.props[key]))
+      {
+        return true;
+      }
+    }
+    for (const key in nextState)
+    {
+      if (!_.isEqual(nextState[key], this.state[key]))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   public componentWillReceiveProps(nextProps: Props)

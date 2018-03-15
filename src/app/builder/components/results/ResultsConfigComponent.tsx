@@ -66,6 +66,7 @@ import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+import {Hit} from 'app/builder/components/results/ResultTypes'
 
 const Color = require('color');
 
@@ -91,6 +92,7 @@ export interface Props
   builder?: BuilderState;
   columns?: any;
   nested?: boolean;
+  sampleHit?: Hit;
 }
 
 @Radium
@@ -316,9 +318,16 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         col.serverId === String(server) &&
         col.databaseId === String(indexId),
       ).toList();
-
-      // it was actually a group join, need to extract data differently.
       fields = columns.map((col) => col.name).toList();
+      // Use the sample hit to get any script fields included in the groupJoin
+      if (this.props.sampleHit)
+      {
+        const allFields: any = this.props.sampleHit.fields.get(field);
+        if (allFields && allFields.size && allFields.get(0).get('fields'))
+        {
+          fields = fields.concat(_.keys(allFields.get(0).get('fields').toJS())).toList();
+        }
+      }
     }
     return (
       <ResultsConfigComponent

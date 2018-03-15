@@ -307,6 +307,15 @@ class HitComponent extends TerrainComponent<Props> {
               fields = _.extend({}, fields, fields['_source']);
               canSpotlight = true;
             }
+            if (fields['fields'] !== undefined)
+            {
+              const scriptFields = {};
+              _.keys(fields['fields']).forEach((field) =>
+              {
+                scriptFields[field] = fields['fields'][field][0];
+              });
+              fields = _.extend({}, fields, scriptFields);
+            }
             // This happens when the source isn't properly set, such as in the Schema Browser
             if (typeof fields !== 'object')
             {

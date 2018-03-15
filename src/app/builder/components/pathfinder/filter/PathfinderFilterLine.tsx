@@ -653,7 +653,7 @@ export function getCustomValueDisplayName(filterLine: FilterLine, value, setInde
 {
   if (COMPARISONS_WITHOUT_VALUES.indexOf(filterLine.comparison) !== -1)
   {
-    return 'N/A';
+    return '--';
   }
   switch (filterLine.fieldType)
   {

@@ -1011,17 +1011,17 @@ export class RouteSelector extends TerrainComponent<Props>
     }
 
     const isOpen = this.isOpen();
-    const column: any = $('#pf-column')[0];
+    // const column: any = $('#pf-column')[0];
     return (
       <div
         className={'routeselector-veil' + (isOpen ? '-open' : '')}
         onClick={this.handleVeilClick}
-        style={column ? {
-          height: column.offsetHeight,
-          width: Number(column.offsetWidth) + 25,
-          top: column.offsetTop,
-          left: Number(column.offsetLeft) - 25,
-        } : {}}
+        // style={column ? {
+        //   height: column.offsetHeight,
+        //   width: Number(column.offsetWidth) + 25,
+        //   top: column.offsetTop,
+        //   left: Number(column.offsetLeft) - 25,
+        // } : {}}
       />
     );
   }

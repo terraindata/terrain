@@ -611,6 +611,35 @@ export class TransformCardChart extends TerrainComponent<Props>
     TransformChart.destroy(el);
   }
 
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
+    for (const key in nextProps)
+    {
+      if (!_.isEqual(nextProps[key], this.props[key]))
+      {
+        if (key === 'builder')
+        {
+          // only matters if the db name or source has changed
+          if (this.props[key].db.name !== nextProps[key].db.name)
+          {
+            return true;
+          }
+          const oldSource = this.props[key].query.path.source.dataSource;
+          const newSource = nextProps[key].query.path.source.dataSource;
+          if (!_.isEqual(newSource, oldSource))
+          {
+            return true;
+          }
+        }
+        else
+        {
+          return true;
+      }
+      }
+    }
+    return !_.isEqual(nextState, this.state);
+  }
+
   // happens on undos/redos
   public componentWillReceiveProps(nextProps)
   {
