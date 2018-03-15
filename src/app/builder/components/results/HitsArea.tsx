@@ -130,11 +130,6 @@ const MAP_MIN_HEIGHT = 30; // height of top bar on map
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
-  public static handleConfigChange(config: ResultsConfig, builderActions)
-  {
-    builderActions.changeResultsConfig(config);
-  }
-
   public state: State = {
     expanded: false,
     expandedHitIndex: null,
@@ -157,17 +152,14 @@ class HitsArea extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.setIndexAndResultsConfig(this.props, true);
+    this.setIndexAndResultsConfig(this.props);
     this.getNestedFields(this.props);
   }
 
-  public shouldComponentUpdate(nextProps: Props, nextState: State)
+  public handleConfigChange(config: ResultsConfig, builderActions)
   {
-    if (this.state.resultsConfig !== nextState.resultsConfig)
-    {
-      this.getNestedFields(nextProps, nextState.resultsConfig);
-    }
-    return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
+    builderActions.changeResultsConfig(config);
+    this.getNestedFields(this.props, config);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -995,7 +987,7 @@ column if you have customized the results view.');
         fields={fields}
         onClose={this.hideConfig}
         onSaveAsDefault={this.saveConfigAsDefault}
-        onConfigChange={HitsArea.handleConfigChange}
+        onConfigChange={this.handleConfigChange}
         builder={this.props.builder}
         schema={this.props.schema}
         dataSource={this.props.query.path.source.dataSource}
