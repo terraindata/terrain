@@ -68,15 +68,12 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { FieldMap } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
 
 import DocumentsHelpers from './DocumentsHelpers';
-
-import { FieldTypes } from 'shared/etl/FieldTypes';
 
 class Initializers extends ETLHelpers
 {
