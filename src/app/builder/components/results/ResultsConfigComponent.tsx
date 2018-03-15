@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
-import {Hit} from 'app/builder/components/results/ResultTypes';
+import { Hit } from 'app/builder/components/results/ResultTypes';
 import { BuilderState } from 'app/builder/data/BuilderState';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { SchemaState } from 'app/schema/SchemaTypes';

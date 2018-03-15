@@ -157,7 +157,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleSourceChange(i, value)
   {
-   if (this.props.pathfinderContext.canEdit)
+    if (this.props.pathfinderContext.canEdit)
     {
       const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i, 'name');
       this.props.builderActions.changePath(

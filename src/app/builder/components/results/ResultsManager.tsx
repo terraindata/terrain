@@ -253,7 +253,7 @@ export class ResultsManager extends TerrainComponent<Props>
                     {
                       const nestedHit = Util.asJS(nestedHits.get(nestedIndex));
                       fields = _.extend({}, nestedHit, nestedHit['_source']);
-                      fields = {fields, primaryKey: ''} as Hit;
+                      fields = { fields, primaryKey: '' } as Hit;
                     }
                     return hitStillInNestedResult.reduce((result, r) => result || r);
                   },

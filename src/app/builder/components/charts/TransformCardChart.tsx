@@ -636,7 +636,7 @@ export class TransformCardChart extends TerrainComponent<Props>
         else
         {
           return true;
-      }
+        }
       }
     }
     return !_.isEqual(nextState, this.state);

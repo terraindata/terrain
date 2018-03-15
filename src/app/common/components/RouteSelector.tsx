@@ -521,7 +521,7 @@ export class RouteSelector extends TerrainComponent<Props>
     this.handleValueChange(optionSetIndex, searchValue);
     this.setState({
       searches: this.state.searches.set(optionSetIndex, searchValue),
-    })
+    });
   }
 
   private handleOptionSearch(optionSetIndex: number, searchValue: string)
@@ -1019,12 +1019,12 @@ export class RouteSelector extends TerrainComponent<Props>
       <div
         className={'routeselector-veil' + (isOpen ? '-open' : '')}
         onClick={this.handleVeilClick}
-        // style={column ? {
-        //   height: column.offsetHeight,
-        //   width: Number(column.offsetWidth) + 25,
-        //   top: column.offsetTop,
-        //   left: Number(column.offsetLeft) - 25,
-        // } : {}}
+      // style={column ? {
+      //   height: column.offsetHeight,
+      //   width: Number(column.offsetWidth) + 25,
+      //   top: column.offsetTop,
+      //   left: Number(column.offsetLeft) - 25,
+      // } : {}}
       />
     );
   }
