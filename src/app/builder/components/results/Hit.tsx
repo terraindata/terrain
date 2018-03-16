@@ -95,9 +95,10 @@ export interface Props
   allowSpotlights: boolean;
   onSpotlightAdded: (id, spotlightData) => void;
   onSpotlightRemoved: (id) => void;
-  hitSize?: 'large' | 'small';
+  hitSize?: 'large' | 'small' | 'smaller';
   style?: any;
   depth?: any;
+  isNestedHit?: boolean;
   nestedFields?: List<string>;
   hideNested?: boolean;
   hideFieldNames?: boolean;
@@ -330,7 +331,7 @@ class HitComponent extends TerrainComponent<Props> {
                 allowSpotlights={canSpotlight}
                 key={fields['_id'] !== undefined ? fields['_id'] : i}
                 style={borderColor(Colors().blockOutline)}
-                hitSize='small'
+                hitSize={this.props.hitSize === 'small' ? 'smaller' : 'small'}
                 hit={_Hit({
                   fields: Map(fields),
                 })}
@@ -340,6 +341,7 @@ class HitComponent extends TerrainComponent<Props> {
                 firstVisibleField={this.state.scrollState.get(field)}
                 primaryKey={fields['_id']}
                 onExpand={undefined}
+                isNestedHit={true}
               />);
           },
           )
@@ -425,11 +427,16 @@ class HitComponent extends TerrainComponent<Props> {
 
   public renderField(field, i?, fields?, overrideFormat?)
   {
-    if (!resultsConfigHasFields(this.props.resultsConfig) && i >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
+    if (
+      !resultsConfigHasFields(this.props.resultsConfig) &&
+      i >= MAX_DEFAULT_FIELDS &&
+      this.props.hitSize !== 'small' &&
+      this.props.hitSize !== 'smaller'
+    )
     {
       return null;
     }
-    const { hideFieldNames, index } = this.props;
+    const { hideFieldNames, index, isNestedHit } = this.props;
     const spotlights = this.props.spotlights.spotlights;
     const isSpotlit = spotlights.get(this.props.primaryKey);
     const color = isSpotlit ? spotlights.get(this.props.primaryKey).color : 'black';
@@ -446,7 +453,7 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className={classNames({
           'result-field': true,
-          'results-are-small': this.props.hitSize === 'small',
+          'results-are-small': this.props.hitSize === 'small' || this.props.hitSize === 'smaller',
           'result-field-hide-field': this.props.hideFieldNames,
         })}
         style={style}
@@ -489,6 +496,7 @@ class HitComponent extends TerrainComponent<Props> {
             'result-field-value-number': typeof value === 'number',
             'result-field-value-show-overflow': format && format.type === 'map',
             'result-field-value-header': hideFieldNames && index === 0,
+            'nested-results-are-small': this.props.hitSize === 'smaller' && isNestedHit,
           })}
         >
           {
@@ -574,7 +582,16 @@ class HitComponent extends TerrainComponent<Props> {
 
   public render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, hit, hitSize, expanded } = this.props;
+    const {
+      isDragging,
+      connectDragSource,
+      isOver,
+      connectDropTarget,
+      hit,
+      hitSize,
+      expanded,
+      isNestedHit,
+    } = this.props;
     let { resultsConfig } = this.props;
     const classes = classNames({
       'result': true,
@@ -613,7 +630,7 @@ class HitComponent extends TerrainComponent<Props> {
 
     const configHasFields = resultsConfigHasFields(resultsConfig);
     let bottomContent: any;
-    if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
+    if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small' && this.props.hitSize !== 'smaller')
     {
       bottomContent = (
         <div className='result-bottom' onClick={this.expand}>
@@ -645,7 +662,7 @@ class HitComponent extends TerrainComponent<Props> {
       resultsConfig = _ResultsConfig();
     }
 
-    const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
+    const thumbnailWidth = hitSize === 'small' || hitSize === 'smaller' ? resultsConfig.smallThumbnailWidth :
       resultsConfig.thumbnailWidth;
     const depth = this.props.depth !== undefined ? this.props.depth : 0;
     return ((
@@ -658,7 +675,8 @@ class HitComponent extends TerrainComponent<Props> {
         <div
           className={classNames({
             'result-inner': true,
-            'results-are-small': hitSize === 'small',
+            'results-are-small': hitSize === 'small' || hitSize === 'smaller',
+            'nested-results-are-small': hitSize === 'smaller' && isNestedHit,
           })}
           style={[
             borderColor(Colors().resultLine),
@@ -672,7 +690,7 @@ class HitComponent extends TerrainComponent<Props> {
               <div
                 className={classNames({
                   'result-thumbnail-wrapper': true,
-                  'results-are-small': hitSize === 'small',
+                  'results-are-small': hitSize === 'small' || hitSize === 'smaller',
                 })}
                 style={{
                   backgroundImage: `url(${thumbnail})`,
@@ -703,13 +721,13 @@ class HitComponent extends TerrainComponent<Props> {
           <div
             className={classNames({
               'result-details-wrapper': true,
-              'results-are-small': hitSize === 'small',
+              'results-are-small': hitSize === 'small' || hitSize === 'smaller',
             })}
           >
             <div
               className={classNames({
                 'result-name': true,
-                'results-are-small': hitSize === 'small',
+                'results-are-small': hitSize === 'small' || hitSize === 'smaller',
               })}
             >
               <div
@@ -739,7 +757,8 @@ class HitComponent extends TerrainComponent<Props> {
             <div
               className={classNames({
                 'result-fields-wrapper': true,
-                'results-are-small': hitSize === 'small',
+                'results-are-small': hitSize === 'small' || hitSize === 'smaller',
+                'nested-results-are-small': this.props.hitSize === 'smaller' && isNestedHit,
               })}
             >
               {score}
@@ -780,7 +799,7 @@ class HitComponent extends TerrainComponent<Props> {
     const { x, y } = data;
 
     let config = this.props.resultsConfig;
-    const key = this.props.hitSize === 'small' ? 'smallThumbnailWidth' : 'thumbnailWidth';
+    const key = this.props.hitSize === 'small' || this.props.hitSize === 'smaller' ? 'smallThumbnailWidth' : 'thumbnailWidth';
     config = config.set(key, Math.max(config[key] + data.deltaX, 15));
 
     Actions.changeResultsConfig(config);
