@@ -89,25 +89,25 @@ const TuningIcon = require('./../../../images/icon_tuning.svg');
 
 enum COLUMNS
 {
+  Pathfinder,
   Cards,
   Results,
   Editor,
   Inputs,
   Schema,
   Tuning,
-  Pathfinder,
 }
 // Manual,
 const NUM_COLUMNS = 7;
 
 const menuIcons = [
   { icon: <BuilderIcon />, color: '#76a2c1' },
+  { icon: <BuilderIcon />, color: '#76a2c1' },
   { icon: <ResultsIcon />, color: '#71bca2' },
   { icon: <TQLIcon />, color: '#d47884' },
   { icon: <InputsIcon />, color: '#c2b694' },
   { icon: <ManualIcon />, color: '#a98abf' },
   { icon: <TuningIcon />, color: 'black' },
-  { icon: <BuilderIcon />, color: '#76a2c1' },
 ]; // TODO add schema icon above
 
 // interface Props
