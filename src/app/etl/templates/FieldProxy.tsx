@@ -55,8 +55,8 @@ import { FieldMap } from 'etl/templates/TemplateTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 import { validateRename } from 'shared/transformations/util/EngineUtil';
+import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 /*
  *  The FieldProxy structures act as the binding between the TemplateEditorField
  *  tree structure and the flattened structure of the transformation engine
@@ -211,6 +211,16 @@ export class FieldNodeProxy
     if (validateRename(engine, this.fieldId, newPath).isValid)
     {
       engine.setOutputKeyPath(this.fieldId, newPath);
+
+      for (let i = 1; i < newPath.size; i++)
+      {
+        const ancestorPath = newPath.slice(0, i).toList();
+        const parentId = engine.getOutputFieldID(ancestorPath);
+        if (parentId === undefined)
+        {
+          engine.addField(ancestorPath, 'object');
+        }
+      }
       this.syncWithEngine(true);
     }
   }
@@ -244,15 +254,15 @@ export class FieldNodeProxy
     {
       if (structuralChanges)
       {
-        this.tree.rebuildAll(); 
+        this.tree.rebuildAll();
       }
       else
       {
         const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.fieldId, this.field());
         this.tree.setField(this.fieldId, updatedField);
-        this.tree.updateEngineVersion();
-        this.shouldSync = false;
       }
+      this.tree.updateEngineVersion();
+      this.shouldSync = false;
     }
     else
     {

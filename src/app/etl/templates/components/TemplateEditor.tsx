@@ -63,13 +63,13 @@ import { ETLState } from 'etl/ETLTypes';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
+import MoveFieldModal from 'etl/templates/components/MoveFieldModal';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import TemplateList from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import MoveFieldModal from 'etl/templates/components/MoveFieldModal';
 
 import './TemplateEditor.less';
 
@@ -248,7 +248,7 @@ class TemplateEditor extends TerrainComponent<Props>
               getRowStyle={this.getTemplateItemStyle}
             />
           </div>
-        </Modal>
+        </Modal>,
       );
     }
     else if (this.state.saveNewTemplateOpen)
@@ -267,7 +267,7 @@ class TemplateEditor extends TerrainComponent<Props>
           textboxPlaceholderValue='Template Name'
           closeOnConfirm={true}
           confirm={true}
-        />
+        />,
       );
     }
     return modals;

@@ -164,7 +164,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
     act({
       actionType: 'setCurrentEdge',
       edge: edgeId,
-      rebuild: edgeId === templateEditor.getCurrentEdgeId()
+      rebuild: edgeId === templateEditor.getCurrentEdgeId(),
     });
   }
 

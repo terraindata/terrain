@@ -108,12 +108,18 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
-  // placeholder logic. just gets the first child
+  // TODO, if there are special index children that match get those
   public getAppropriateChild(arrayIndex): number
   {
     const field = this._field();
-    const placeholderId = field.childrenIds.get(0);
-    return placeholderId;
+    if (field.childrenIds.size > 0)
+    {
+      return field.childrenIds.get(0);
+    }
+    else
+    {
+      return -1;
+    }
   }
 
   // -1 if there is no available preview
@@ -123,7 +129,14 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const { canEdit } = this.props;
     const field = this._field();
     const displayKeyPath = this._getPreviewChildPath(index);
-    const childField = this._field(this.getAppropriateChild(index));
+    const childId = this.getAppropriateChild(index);
+
+    if (childId === -1)
+    {
+      return null;
+    }
+
+    const childField = this._field(childId);
     let previewLabel = `[${index}]`;
     if (index === -1)
     {

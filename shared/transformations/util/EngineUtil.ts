@@ -62,33 +62,35 @@ export interface PathHashMap<T>
 export function stringToKP(kp: string): KeyPath
 {
   const split = kp.split(',');
-  const fuseList = split.map((val, i) => {
+  const fuseList = split.map((val, i) =>
+  {
     const replaced = val.replace(/\\\\/g, '');
-    if (replaced.length > 0 && replaced.charAt(replaced.length-1) === '\\')
+    if (replaced.length > 0 && replaced.charAt(replaced.length - 1) === '\\')
     {
       return {
         fuseNext: true,
         value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, '').slice(0, -1),
-      }
+      };
     }
     else
     {
       return {
         fuseNext: false,
         value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, ''),
-      }
+      };
     }
   });
-  const reduced = fuseList.reduce((accum, val) => {
+  const reduced = fuseList.reduce((accum, val) =>
+  {
     if (accum.length > 0)
     {
-      const last = accum[accum.length -1];
+      const last = accum[accum.length - 1];
       if (last.fuseNext)
       {
-        accum[accum.length -1] = {
+        accum[accum.length - 1] = {
           fuseNext: val.fuseNext,
-          value: last.value + ',' + val.value
-        }
+          value: `${last.value},${val.value}`,
+        };
         return accum;
       }
       else
@@ -110,7 +112,7 @@ export function stringToKP(kp: string): KeyPath
 export function kpToString(kp: KeyPath): string
 {
   return kp.map((val) => val.replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
-    .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null)
+    .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null);
 }
 
 // TODO make these into real tests?
@@ -134,11 +136,12 @@ export function kpToString(kp: KeyPath): string
 export function validateRename(
   engine: TransformationEngine,
   fieldId: number,
-  newKeyPath: KeyPath
-): {
-  isValid: boolean,
-  message: string,
-}
+  newKeyPath: KeyPath,
+):
+    {
+      isValid: boolean,
+      message: string,
+    }
 {
   const existingKp = engine.getOutputKeyPath(fieldId);
   const failIndex = newKeyPath.findIndex((value) => value === '');
@@ -169,7 +172,7 @@ export function validateRename(
     return {
       isValid: false,
       message: 'Invalid Rename. Cannot rename a dynamic field',
-    }
+    };
   }
 
   const oldLastNamedIndex = existingKp.findLastIndex((value, index) => !isNamedField(existingKp, index));
@@ -182,13 +185,30 @@ export function validateRename(
     return {
       isValid: false,
       message: 'Invalid Rename. Cannot move field between array levels',
+    };
+  }
+
+  for (let i = 1; i < newKeyPath.size - 1; i++)
+  {
+    const kpToTest = newKeyPath.slice(0, i).toList();
+    const parentId = engine.getOutputFieldID(kpToTest);
+    if (parentId !== undefined)
+    {
+      const parentType = engine.getFieldType(parentId);
+      if (parentType !== 'object' && parentType !== 'array')
+      {
+        return {
+          isValid: false,
+          message: 'Invalid Rename. One of the ancestor fields is not a nested object',
+        }
+      }
     }
   }
 
   return {
     isValid: true,
     message: '',
-  }
+  };
 }
 
 // root is considered to be a named field

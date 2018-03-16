@@ -47,22 +47,22 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-import { instanceFnDecorator } from 'src/app/Classes';
-import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { kpToString, stringToKP, validateRename } from 'shared/transformations/util/EngineUtil';
 import Autocomplete from 'common/components/Autocomplete';
+import Modal from 'common/components/Modal';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { kpToString, stringToKP, validateRename } from 'shared/transformations/util/EngineUtil';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import Modal from 'common/components/Modal';
 
 import './MoveFieldModal.less';
 
@@ -96,10 +96,10 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
     pathKP: List<string>;
     uneditableDepth: number;
   } = {
-    pathValue: '',
-    pathKP: List([]),
-    uneditableDepth: 0,
-  };
+      pathValue: '',
+      pathKP: List([]),
+      uneditableDepth: 0,
+    };
 
   constructor(props)
   {
@@ -125,7 +125,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
       pathValue: kpToString(kp),
       pathKP: kp,
       uneditableDepth: lastNamed,
-    }
+    };
   }
 
   // TODO replace this with an svg
@@ -133,8 +133,8 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   {
     return {
       position: 'absolute',
-      left: `${indentSize * depth - indentSize / 2 - 4 }px`,
-      width: `${indentSize/2}px`,
+      left: `${indentSize * depth - indentSize / 2 - 4}px`,
+      width: `${indentSize / 2}px`,
       height: `0.75em`,
       top: `2px`,
       borderLeft: `1px solid ${Colors().text3}`,
@@ -160,9 +160,9 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   {
     const style = _.extend(
       {
-        paddingLeft: `${depth * indentSize}px`
+        paddingLeft: `${depth * indentSize}px`,
       },
-      fontColor(isEditable ? Colors().text2 : Colors().text3)
+      fontColor(isEditable ? Colors().text2 : Colors().text3),
     );
 
     return (
@@ -171,8 +171,8 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
         className='field-location-key'
         style={style}
       >
-        { depth > 0 ? <div style={this.depthBoxStyle(depth)}/> : null}
-        { key }
+        {depth > 0 ? <div style={this.depthBoxStyle(depth)} /> : null}
+        {key}
       </div>
     );
   }
@@ -184,7 +184,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
       <div className='field-location-visual'>
         {
           pathKP.map((key, index) =>
-            this.renderLocationKey(key, index > uneditableDepth, index)
+            this.renderLocationKey(key, index > uneditableDepth, index),
           )
         }
       </div>
@@ -205,7 +205,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
             helpIsError={!isValid}
           />
         </div>
-        { this.renderLocation() }
+        {this.renderLocation()}
       </div>
     );
   }
@@ -237,8 +237,8 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   {
     this.setState({
       pathValue: val,
-      pathKP: stringToKP(val)
-    })
+      pathKP: stringToKP(val),
+    });
   }
 
   public closeModal()
@@ -247,7 +247,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
       actionType: 'setDisplayState',
       state: {
         moveFieldId: null,
-      }
+      },
     });
   }
 

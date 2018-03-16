@@ -197,7 +197,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       actionType: 'setDisplayState',
       state: {
         moveFieldId: this.props.fieldId,
-      }
+      },
     });
   }
 

@@ -244,7 +244,7 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
     if (action.rebuild === true)
     {
       directDispatch({
-        actionType: 'rebuildFieldMap'
+        actionType: 'rebuildFieldMap',
       });
     }
   }
