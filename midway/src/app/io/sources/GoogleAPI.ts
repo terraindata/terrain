@@ -93,8 +93,7 @@ export class GoogleAPI
           }
           catch (e)
           {
-            winston.info(e.toString());
-            winston.info('Potentially incorrect credentials.');
+            winston.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
             reject('Potentially incorrect Google API credentials.');
           }
         });
