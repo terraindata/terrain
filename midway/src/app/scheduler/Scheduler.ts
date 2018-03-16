@@ -62,11 +62,12 @@ const sources = new Sources();
 
 export class Scheduler
 {
+  private runningSchedules: Map<number, Job>;
   private schedulerTable: Tasty.Table;
 
   constructor()
   {
-    this.runningSchedules = {};
+    this.runningSchedules = new Map<number, Job>();
     this.schedulerTable = new Tasty.Table(
       'schedules',
       ['id'],
@@ -185,12 +186,12 @@ export class Scheduler
   {
     return new Promise<TaskOutputConfig | string>(async (resolve, reject) =>
     {
-      if (this.runningSchedules[id] !== undefined)
+      if (this.runningSchedules.get(id) !== undefined)
       {
         return resolve('Schedule is already running.');
       }
       // TODO: lock row
-      this.runningSchedules[id] = new Job();
+      this.runningSchedules.set(id, new Job());
       const schedules: SchedulerConfig[] = this.get(id);
       if (schedules.length === 0)
       {
@@ -205,13 +206,13 @@ export class Scheduler
       {
         return reject(e);
       }
-      const jobCreateStatus: boolean | string = await this.runningSchedules[id].create(taskConfig);
+      const jobCreateStatus: boolean | string = await this.runningSchedules.get(id).create(taskConfig);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);
       }
-      const result: TaskOutputConfig = await this.runningSchedules[id].run();
-      delete this.runningSchedules[id];
+      const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
+      this.runningSchedules.delete(id);
       // TODO: unlock row
       return resolve(result);
     });
