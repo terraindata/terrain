@@ -298,6 +298,10 @@ export class FilterUtils
     const filterRowMap = { filter: [], must: [], should: [], must_not: [] };
     filterRows.map((row: Block) =>
     {
+      if (filterRowMap[row.boolQuery] == undefined)
+      {
+        console.log('row is ' + row.boolQuery, row);
+      }
       filterRowMap[row.boolQuery].push(row);
     });
     for (const boolOp of ['filter', 'must', 'should', 'must_not'])
@@ -1101,14 +1105,16 @@ export const elasticFilter = _card({
   currentIndex: '',
   // caching the type
   currentType: '',
-  indexFilters: List(),
-  typeFilters: List(),
-  otherFilters: List(),
+  indexFilters: List([]),
+  typeFilters: List([]),
+  otherFilters: List([]),
   cards: Immutable.List([]),
   getChildOptions: FilterUtils.BoolQueryCard.getChildOptions,
   childOptionClickHandler: FilterUtils.BoolQueryCard.childOptionClickHandler,
   childrenHaveKeys: true,
   key: 'bool',
+  dataSource: '',
+
 
   static: {
     // this makes the shape of elasticFilterBlock similar with the bool_query clause card.
@@ -1140,16 +1146,26 @@ export const elasticFilter = _card({
     updateCards: (rootBlock: Block, block: Block, blockPath: KeyPath) =>
     {
       block = FilterUtils.reGroupFilterRows(block);
+
       // updating cached index and type
+      // keep only one filter and one type
       if (block['indexFilters'].size > 0)
       {
         const indexField = block['indexFilters'].get(0).value;
         block = block.set('currentIndex', indexField);
+        if (block['indexFilters'].size > 1)
+        {
+          block = block.set('indexFilters', List([block['indexFilters'].get(0)]));
+        }
       }
       if (block['typeFilters'].size > 0)
       {
         const typeField = block['typeFilters'].get(0).value;
         block = block.set('currentType', typeField);
+        if (block['typeFilters'].size > 1)
+        {
+          block = block.set('typeFilters', List([block['typeFilters'].get(0)]));
+        }
       }
       return block;
     },

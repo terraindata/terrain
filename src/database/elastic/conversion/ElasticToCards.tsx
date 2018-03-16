@@ -331,7 +331,7 @@ function isScoreCard(valueInfo: ESValueInfo): boolean
   }
 }
 
-function parseElasticWeightBlock(obj: object): Block
+export function parseElasticWeightBlock(obj: object): Block
 {
   if (obj['weight'] === 0)
   {

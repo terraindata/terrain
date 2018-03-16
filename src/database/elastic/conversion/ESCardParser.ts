@@ -68,6 +68,7 @@ import { Card } from '../../../blocks/types/Card';
 
 import * as _ from 'lodash';
 import Util from 'util/Util';
+import {List} from 'immutable';
 
 export default class ESCardParser extends ESParser
 {
@@ -265,21 +266,122 @@ export default class ESCardParser extends ESParser
     this.errors.push(error);
   }
 
-  private accumulateErrorOnValueInfo(valueInfo: ESValueInfo, message: string, isWarning: boolean = false): void
+  public linkCard(cardValueInfo: ESValueInfo)
   {
-    this.errors.push(new ESParserError(
-      null, valueInfo, message, isWarning),
-    );
-  }
-
-  private accumulateErrorsOnParser(errors: ESParserError[]): void
-  {
-    for (const e of errors)
+    let cards;
+    let newValue;
+    switch (cardValueInfo.jsonType)
     {
-      this.errors.push(e);
+      case ESJSONType.array:
+        cards = [];
+        newValue = [];
+        cardValueInfo.forEachElement((element: ESValueInfo) =>
+        {
+          cards.push(element.card);
+          newValue.push(element.value);
+        });
+        cardValueInfo.card = cardValueInfo.card.set('cards', List(cards));
+        cardValueInfo.value = newValue;
+        return;
+      case ESJSONType.object:
+        cards = [];
+        newValue = {};
+        cardValueInfo.forEachProperty((element: ESPropertyInfo) =>
+        {
+          cards.push(element.propertyValue.card);
+          newValue[element.propertyName.value] = element.propertyValue.value;
+        });
+        cardValueInfo.card = cardValueInfo.card.set('cards', List(cards));
+        cardValueInfo.value = newValue;
+        break;
+      default:
+        return;
     }
   }
-  private parseCard(block: Block, blockPath: KeyPath): ESValueInfo
+
+  // generate a new root card from the valueInfo
+  public updateCard(): Card
+  {
+    this.valueInfo.recursivelyVisit((element) => true, this.linkCard);
+    return this.valueInfo.card;
+  }
+
+  public searchCard(pattern, valueInfo = this.getValueInfo())
+  {
+    console.log('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));
+    switch (valueInfo.jsonType)
+    {
+      case ESJSONType.object:
+        if (typeof pattern !== 'object')
+        {
+          return null;
+        }
+        if (Object.keys(pattern).length !== 1)
+        {
+          return null;
+        }
+        const k = Object.keys(pattern)[0];
+        let q = k.split(':');
+        if (q.length !== 2)
+        {
+          return null;
+        }
+        // now try to search { "index:cardType": {}}
+        const newVal = valueInfo.objectChildren[q[0]]
+        if (newVal)
+        {
+          if (newVal.propertyValue.card.type === q[1])
+          {
+            if (pattern[k] === true)
+            {
+              return newVal.propertyValue;
+            }
+            // keep searching
+            return this.searchCard(pattern[k], newVal.propertyValue);
+          } else
+          {
+            return null;
+          }
+        } else
+        {
+          return null;
+        }
+      case ESJSONType.array:
+        for (const element of valueInfo.arrayChildren)
+        {
+          const v = this.searchCard(pattern[0], element);
+          if (v != null)
+          {
+            return v;
+          }
+        }
+        return null;
+      default:
+        if (typeof pattern !== 'string')
+        {
+          return null;
+        }
+        q = pattern.split(':');
+        if (valueInfo.card.type === q[1])
+        {
+          if (q[0] === 'any')
+          {
+            return valueInfo;
+          } else if (q[0] === valueInfo.card.key)
+          {
+            return valueInfo;
+          } else
+          {
+            return null;
+          }
+        } else
+        {
+          return null;
+        }
+    }
+  }
+
+  public parseCard(block: Block, blockPath: KeyPath): ESValueInfo
   {
     if (block.static.toValueInfo !== undefined)
     {
@@ -330,6 +432,21 @@ export default class ESCardParser extends ESParser
         return this.parseESWildcardClause(block, blockPath);
       default:
         return this.parseESClause(block, blockPath);
+    }
+  }
+
+  private accumulateErrorOnValueInfo(valueInfo: ESValueInfo, message: string, isWarning: boolean = false): void
+  {
+    this.errors.push(new ESParserError(
+      null, valueInfo, message, isWarning),
+    );
+  }
+
+  private accumulateErrorsOnParser(errors: ESParserError[]): void
+  {
+    for (const e of errors)
+    {
+      this.errors.push(e);
     }
   }
 

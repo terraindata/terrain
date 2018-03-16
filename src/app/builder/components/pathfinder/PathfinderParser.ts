@@ -55,9 +55,489 @@ import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONPa
 import { isInput } from '../../../../blocks/types/Input';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import { Query } from '../../../../items/types/Query';
-import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
+import {DistanceValue, ElasticDataSource, FilterGroup, FilterLine, More, Path, Score, Source, sourceCountOptions} from './PathfinderTypes';
+import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
+import {RecordsSerializer} from '../../../Classes';
+import * as TerrainLog from 'loglevel';
+import Card from '../../../../blocks/types/Card';
+import {ElasticBackend} from '../../../../database/elastic/ElasticBackend';
+import {ElasticBlocks} from '../../../../database/elastic/blocks/ElasticBlocks';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
+import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
+import Blocks from '../../../../database/elastic/blocks/ElasticBlocks';
+import {make} from '../../../../blocks/BlockUtils';
+import {parseElasticWeightBlock} from '../../../../database/elastic/conversion/ElasticToCards';
+import {_FilterGroup, _FilterLine, _ScoreLine, ScoreLine} from 'builder/components/pathfinder/PathfinderTypes';
+import Block from '../../../../blocks/types/Block';
+import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
 
 const MAX_COUNT = 101;
+
+export class PathToCards
+{
+  public static updateCards(query: Query): List<Card>
+  {
+    let rootCard = query.cards.get(0);
+    const path = query.path;
+    if (rootCard === undefined)
+    {
+      // the card is empty
+      console.log('There is no card at all, please create a set of cards');
+      console.log('Set index to ' + (path.source.dataSource as ElasticDataSource).index);
+      const template = {
+      'query:query': {
+        'bool:elasticFilter': {
+          'filter:query[]': [{'term:term_query': {'_index:string': (path.source.dataSource as ElasticDataSource).index}}],
+        },
+      },
+      'from:from': 0,
+      'size:size': MAX_COUNT,
+      'track_scores:track_scores': true,
+      };
+      rootCard = BlockUtils.make(ElasticBlocks, 'eqlbody', { key: 'body', template});
+    }
+    // parse the card
+    const parsedCard = new ESCardParser(rootCard);
+    this.fromSourceSection(path, parsedCard);
+    this.fromScore(path, parsedCard);
+    rootCard = parsedCard.getValueInfo().card;
+    console.log('Path -> Cards: ' + parsedCard.getValueInfo().value);
+    return List([rootCard]);
+  }
+
+  private static updateSize(path: Path, parser: ESCardParser)
+  {
+    const rootValueInfo = parser.getValueInfo();
+    let updateSize = false;
+    let sourceSize;
+    if (path.source.count === 'all')
+    {
+      sourceSize = MAX_COUNT;
+    } else
+    {
+      sourceSize = Number(path.source.count);
+    }
+
+    if (rootValueInfo.objectChildren.hasOwnProperty('size'))
+    {
+      if (rootValueInfo.objectChildren['size'].propertyValue.value !== sourceSize)
+      {
+        updateSize = true;
+      }
+    } else
+    {
+      updateSize = true;
+    }
+
+    if (updateSize)
+    {
+      const sizeCard = BlockUtils.make(ElasticBlocks, 'eqlsize', {key: 'size', template: sourceSize});
+      const parsedCard = new ESCardParser(sizeCard);
+      rootValueInfo.objectChildren['size'].propertyValue = parsedCard.getValueInfo();
+      parser.updateCard();
+    }
+  }
+
+  private static updateSourceBool(path: Path, parser: ESCardParser)
+  {
+    // get the source bool card
+    const rootValueInfo = parser.getValueInfo();
+    const indexValue = (path.source.dataSource as ElasticDataSource).index;
+    if (rootValueInfo.objectChildren['query'])
+    {
+      const queryInfo = rootValueInfo.objectChildren['query'].propertyValue;
+      if (queryInfo.objectChildren['bool'])
+      {
+        // do we have a _index filter card
+        const boolValueInfo = queryInfo.objectChildren['bool'].propertyValue;
+        const boolCard = boolValueInfo.card;
+        console.log('bool index: ' + boolCard.currentIndex + ' source index ' + indexValue);
+        if (boolCard.currentIndex === indexValue)
+        {
+          console.log('Builder index is as same as pathfinder.');
+          return;
+        }
+        console.assert(boolCard.type === 'elasticFilter');
+        // make a elasticFilterBlock
+        const indexBlock = BlockUtils.make(ElasticBlocks, 'elasticFilterBlock',
+          {
+            field: '_index',
+            value: indexValue,
+            boolQuery: 'filter',
+            filterOp: '=',
+          }, true);
+        boolValueInfo.card = boolCard.set('indexFilters', List([indexBlock])).set('currentIndex', indexValue);
+      } else
+      {
+        // no bool at all
+        console.log('Create a bool');
+        const boolTemplate =
+          {
+            'filter:query[]': [{'term:term_query': {'_index:string': indexValue}}],
+          };
+        const boolBlock = BlockUtils.make(ElasticBlocks, 'elasticFilter', { key: 'bool', template: boolTemplate});
+        const boolValueInfo = new ESCardParser(boolBlock).getValueInfo();
+        const childName = new ESJSONParser(JSON.stringify('bool')).getValueInfo();
+        childName.card = boolBlock;
+        const propertyInfo = new ESPropertyInfo(childName, boolValueInfo);
+        queryInfo.addObjectChild('bool', propertyInfo);
+      }
+    } else
+    {
+      // no query at all
+      console.log('Create a query');
+      const queryTemplate = {
+        'bool:elasticFilter': {
+          'filter:query[]': [{'term:term_query': {'_index:string': indexValue}}],
+        }};
+      const queryBlock = BlockUtils.make(ElasticBlocks, 'eqlquery', { key: 'query', template: queryTemplate});
+      const queryValueInfo = new ESCardParser(queryBlock).getValueInfo();
+      const childName = new ESJSONParser(JSON.stringify('query')).getValueInfo();
+      childName.card = queryBlock;
+      const propertyInfo = new ESPropertyInfo(childName, queryValueInfo);
+      rootValueInfo.addObjectChild('bool', propertyInfo);
+    }
+    parser.updateCard();
+  }
+
+  private static fromSourceSection(path: Path, parser: ESCardParser)
+  {
+    this.updateSize(path, parser);
+    this.updateSourceBool(path, parser);
+  }
+
+  private static fromScore(path: Path, parser: ESCardParser)
+  {
+    const rootValueInfo = parser.getValueInfo();
+
+    if (path.score.lines.size === 0)
+    {
+      // we have to delete the sort card
+      if (rootValueInfo.objectChildren.sort)
+      {
+        delete rootValueInfo.objectChildren.sort;
+        parser.updateCard();
+        return;
+      }
+      return;
+    }
+    const scoreObj = parseScore(path.score)._script;
+    console.log('scoreObj ' + JSON.stringify(scoreObj));
+    const weights = [];
+    console.assert(scoreObj.script);
+    for (const factor of scoreObj.script.params.factors)
+    {
+      const weight = parseElasticWeightBlock(factor);
+      if (weight)
+      {
+        weights.push(weight);
+      }
+    }
+
+    const sortOrder = scoreObj.order || 'desc';
+    const sortMode = scoreObj.mode || 'auto';
+    let sortType = scoreObj.type || 'number';
+
+    const scoreCard = make(
+      Blocks, 'elasticScore',
+      {
+        weights: List(weights),
+        sortOrder,
+        sortMode,
+        sortType,
+      }, true);
+    const scoreCardValueInfo = new ESCardParser(scoreCard).getValueInfo();
+    console.log('scoreCardValueInfo ' + scoreCardValueInfo.value);
+
+    // de we have sort card
+    if (rootValueInfo.objectChildren.sort)
+    {
+      rootValueInfo.objectChildren.sort.propertyValue = scoreCardValueInfo;
+    } else
+    {
+      const childName = new ESJSONParser(JSON.stringify('sort')).getValueInfo();
+      childName.card = scoreCard;
+      const propertyInfo = new ESPropertyInfo(childName, scoreCardValueInfo);
+      rootValueInfo.addObjectChild('sort', propertyInfo);
+    }
+    parser.updateCard();
+  }
+}
+
+export class CardsToPath
+{
+  public static updatePath(query: Query): Path
+  {
+    const rootCard = query.cards.get(0);
+    if (rootCard === undefined)
+    {
+      // the card is empty
+      console.log('There is no card at all.')
+      return query.path;
+    }
+
+    // let's parse the card
+    const parsedCard = new ESCardParser(rootCard);
+    if (parsedCard.hasError())
+    {
+      TerrainLog.debug('Avoid updating path since card side has errors: ', parsedCard.getErrors());
+      return query.path
+    }
+    //
+    console.log('The parsed card is ' + JSON.stringify(parsedCard.getValueInfo().value));
+
+    // update source first
+    const newSource = this.updateSource(query.path.source, parsedCard);
+    const newScore = this.updateScore(query.path.score, parsedCard);
+    const filterGroup = this.updateHardFilterGroup(query.path.filterGroup, parsedCard);
+    const softFilterGroup = this.updateSoftFilterGroup(query.path.softFilterGroup, parsedCard);
+
+    const newPath = query.path
+      .set('source', newSource)
+      .set('score', newScore)
+      .set('filterGroup', filterGroup)
+      .set('softFilterGroup', softFilterGroup);
+
+      return newPath;
+  }
+
+  private static filterOpComparisonsMap = {
+      '>': 'greater',
+      '≥': 'greaterequal',
+      '<': 'less',
+      '≤': 'lessequal',
+      '=': 'equal',
+      'in': 'isin',
+      'exists': 'exists',
+  }
+
+  private static staticFilterRowToFilterLine(row: Block): FilterLine
+  {
+    const template = {
+      field: row.field,
+      value: row.value,
+      comparison: this.filterOpComparisonsMap[row.filterOp],
+      boost: row.boost === '' ? 1 : Number(row.boost),
+    }
+    return _FilterLine(template);
+  }
+
+  private static BoolToFilterGroup(boolValueInfo: ESValueInfo, filterGroup: FilterGroup, boolType: "hard"|"soft", isInnerGroup: boolean = false): FilterGroup
+  {
+    const boolCard = boolValueInfo.card;
+    const filterRowList = {indexFilters: [], typeFilters: [], otherFilters: []};
+    const filterRows = boolCard['otherFilters'];
+    const filterRowMap = {filter: [], must: [], should: [], must_not: []};
+
+    // regroup the filters
+    filterRows.map((row: Block) =>
+    {
+      if (filterRowMap[row.boolQuery] === undefined)
+      {
+        console.log('row is ' + row.boolQuery, row);
+      }
+      filterRowMap[row.boolQuery].push(row);
+    });
+
+    if (boolType === 'hard')
+    {
+      // check whether this is a `all` group first
+      if (filterRowMap.filter.length > 0)
+      {
+        // set the filtergroup to
+        filterGroup = filterGroup.set('minMatches', 'all');
+        const newLines = List(filterRowMap.filter.map((row) => this.staticFilterRowToFilterLine(row)));
+        filterGroup = filterGroup.set('lines', newLines);
+        return filterGroup;
+      }
+      if (isInnerGroup === true)
+      {
+        if (filterRowMap.should.length > 0)
+        {
+          // set the filtergroup to
+          filterGroup = filterGroup.set('minMatches', 'any');
+          const newLines = List(filterRowMap.should.map((row) => this.staticFilterRowToFilterLine(row)));
+          filterGroup = filterGroup.set('lines', newLines);
+          return filterGroup;
+        }
+      }
+    } else
+    {
+      // soft
+      // only check should
+      if (filterRowMap.should.length > 0)
+      {
+        // set the filtergroup to
+        filterGroup = filterGroup.set('minMatches', 'any');
+        const newLines = List(filterRowMap.should.map((row) => this.staticFilterRowToFilterLine(row)));
+        filterGroup = filterGroup.set('lines', newLines);
+        return filterGroup;
+      }
+    }
+
+    // empty bool
+    if (filterGroup.lines.size > 0)
+    {
+      filterGroup = filterGroup.set('lines', List([])).set('groupCount', 1);
+    }
+
+    return filterGroup;
+  }
+
+  private static updateInnerFilterGroup(parentFilterGroup: FilterGroup, parentBool: ESValueInfo, boolType: "hard"|"soft"): FilterGroup
+  {
+    // let search whether we have an inner bool or not
+    let from;
+    if (parentFilterGroup.minMatches === 'all')
+    {
+      // let's search childBool from parentBool: { filter : [Bool, Bool, Bool]
+      from = parentBool.objectChildren.filter;
+    } else if (parentFilterGroup.minMatches === 'any')
+    {
+      from = parentBool.objectChildren.should;
+    }
+
+    console.log('updateInner', from, parentFilterGroup);
+
+    if (from)
+    {
+      const queries = from.propertyValue;
+      if (queries.jsonType === ESJSONType.array)
+      {
+        queries.forEachElement((query: ESValueInfo) =>
+        {
+          console.log('Handle Query ' + query.value);
+          if (query.objectChildren.bool)
+          {
+            // create filter group
+            let newFilterGroup = _FilterGroup();
+            const boolValueInfo = query.objectChildren.bool.propertyValue;
+            newFilterGroup = this.BoolToFilterGroup(boolValueInfo, newFilterGroup, boolType, true);
+            // keep searching this group
+            newFilterGroup = this.updateInnerFilterGroup(newFilterGroup, boolValueInfo, boolType);
+            const newFilterLine = _FilterLine().set('filterGroup', newFilterGroup);
+            // add this line to the parentFilterGroup
+            parentFilterGroup = parentFilterGroup.set('lines', parentFilterGroup.lines.push(newFilterLine))
+              .set('groupCount', parentFilterGroup.groupCount + 1);
+          }
+        });
+      }
+    }
+    return parentFilterGroup;
+  }
+
+  private static updateHardFilterGroup(filterGroup: FilterGroup, parsedCard: ESCardParser): FilterGroup
+  {
+    const hardBool = parsedCard.searchCard({
+      'query:eqlquery': {
+        'bool:elasticFilter': {
+          "filter:eqlquery[]": [{"bool:elasticFilter": true}]
+        }
+      }
+    });
+    if (hardBool)
+    {
+      console.log('Got Hard Bool ', hardBool);
+      filterGroup  = this.BoolToFilterGroup(hardBool, filterGroup, 'hard');
+      filterGroup = this.updateInnerFilterGroup(filterGroup, hardBool, 'hard');
+      // nest bool
+    }
+    return filterGroup;
+  }
+
+  private static updateSoftFilterGroup(filterGroup: FilterGroup, parsedCard: ESCardParser): FilterGroup
+  {
+    const softBool = parsedCard.searchCard(
+      {'query:eqlquery': {'bool:elasticFilter': {"should:eqlquery[]": [{"bool:elasticFilter": true}]}}});
+    if (softBool)
+    {
+      console.log('Got soft Bool ', softBool);
+      filterGroup = this.BoolToFilterGroup(softBool, filterGroup, 'soft');
+      filterGroup = this.updateInnerFilterGroup(filterGroup, softBool, 'soft');
+    }
+    return filterGroup;
+  }
+
+
+  private static updateSource(source: Source , parsedCard: ESCardParser): Source
+  {
+    const rootVal = parsedCard.getValueInfo().value;
+    if (rootVal.hasOwnProperty('from'))
+    {
+      source = source.set('start', rootVal.from);
+    } else
+    {
+      source = source.set('start', 0);
+    }
+    if (rootVal.hasOwnProperty('size'))
+    {
+      source = source.set('count', rootVal.size);
+    } else
+    {
+      //default count
+      source = source.set('count', sourceCountOptions.get(0));
+    }
+
+    if (rootVal.query && rootVal.query.bool)
+    {
+      const rootValueInfo = parsedCard.getValueInfo();
+      const sourceCard = rootValueInfo.objectChildren['query'].propertyValue.objectChildren['bool'].propertyValue.card;
+      console.assert(sourceCard !== undefined && sourceCard.type === 'elasticFilter');
+      source = source.setIn(['dataSource', 'index'], sourceCard.currentIndex);
+    } else
+    {
+      // default index
+      source = source.setIn(['dataSource', 'index'], '');
+    }
+    return source;
+  }
+
+  private static elasticTransformToScoreLine(transCard, weight): ScoreLine
+  {
+    const transformData = {
+      weight,
+      scorePoints: transCard.scorePoints.toJS(),
+      domain: transCard.domain.toJS(),
+      dataDomain: transCard.dataDomain.toJS(),
+      hasCustomDomain: transCard.hasCustomDomain,
+      mode: transCard.mode,
+    };
+    return _ScoreLine({field: transCard.input, transformData});
+  }
+
+  private static elasticScoreToLines(scoreCard)
+  {
+    return scoreCard['weights'].map((weightBlock) =>
+      this.elasticTransformToScoreLine(weightBlock['key'], weightBlock.weight)
+    );
+  }
+
+  private static updateScore(score: Score, parsedCard: ESCardParser): Score
+  {
+    const rootValueInfo = parsedCard.getValueInfo();
+    let hasScoreCard = false;
+    if (rootValueInfo.objectChildren.sort)
+    {
+      const sortCard = rootValueInfo.objectChildren.sort.propertyValue.card;
+      if (sortCard.type === 'elasticScore')
+      {
+        hasScoreCard = true;
+        score = score.set('lines', this.elasticScoreToLines(sortCard));
+      }
+    }
+
+    if (hasScoreCard === false)
+    {
+      if (score.lines.size > 0)
+      {
+        score = score.set('lines', List([]));
+      }
+    }
+    return score;
+  }
+
+}
 
 export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
@@ -264,6 +744,7 @@ function parseTerrainScore(score: Score)
       weight: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
       numerators: [[line.field, 1]],
       denominators: [],
+      mode: line.transformData['mode'],
       ranges,
       outputs,
     };

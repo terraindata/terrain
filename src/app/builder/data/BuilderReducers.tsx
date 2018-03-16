@@ -67,6 +67,8 @@ import
 } from './BuilderActionTypes';
 import ActionTypes from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
+import {CardsToPath, PathToCards} from 'builder/components/pathfinder/PathfinderParser';
+import {ElasticDataSource} from 'builder/components/pathfinder/PathfinderTypes';
 const { List, Map } = Immutable;
 
 const BuilderReducers =
@@ -562,27 +564,40 @@ const BuilderReducersWrapper = (
     state = (BuilderReducers[action.type] as any)(state, action);
   }
 
-  if (BuilderPathActionTypes[action.type])
-  {
-    if (!action.payload.notDirty)
-    {
-      const path = state.query.path;
-      state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
-    }
-  }
 
-  if (BuilderCardActionTypes[action.type])
+  if (BuilderCardActionTypes[action.type] || BuilderPathActionTypes[action.type])
   {
+    // path -> card
+    if (BuilderPathActionTypes[action.type])
+    {
+      if (!action.payload.notDirty)
+      {
+        const path = state.query.path;
+        state = state.setIn(['query', 'cards'], PathToCards.updateCards(state.query));
+        console.log('Path would generates TQL: ' + AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
+      }
+    }
+
+    // path/card -> tql
     // a card changed and we need to re-translate the tql
     //  needs to be after the card change has affected the state
     const newCards = ESCardParser.parseAndUpdateCards(state.query.cards, state.query);
     state = state.setIn(['query', 'cards'], newCards);
+    // update query
     state = state
       .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
     state = state
       .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
       .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
       .setIn(['query', 'cardsAndCodeInSync'], true);
+
+    // card -> path
+    if (BuilderCardActionTypes[action.type])
+    {
+      // update path
+      console.log('New index is ' + (state.query.path.source.dataSource as ElasticDataSource).index);
+      state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query));
+    }
   }
 
   if (!state.modelVersion || state.modelVersion < 3)

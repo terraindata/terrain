@@ -151,8 +151,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const { props } = this;
     const keyPath = this._ikeyPath(props.keyPath, 'dataSource');
+    const t = value.split('/');
+    console.assert(t.length === 2); // 'serverID/index'
 
-    props.builderActions.changePath(this._ikeyPath(keyPath, 'index'), value);
+    props.builderActions.changePath(this._ikeyPath(keyPath, 'index'), t[1]);
+    props.builderActions.changePath(this._ikeyPath(keyPath, 'server'), t[0]);
 
     if (props.pathfinderContext.step === PathfinderSteps.Source)
     {

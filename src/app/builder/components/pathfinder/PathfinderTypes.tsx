@@ -124,14 +124,14 @@ class PathC extends BaseClass
 {
   public source: Source = _Source();
   public filterGroup: FilterGroup = _FilterGroup();
-  public softFilterGroup: FilterGroup = _FilterGroup();
+  public softFilterGroup: FilterGroup = _FilterGroup({minMatches: 'any'});
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
   public nested: List<Path> = List([]);
   public expanded?: boolean = true;
   public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
-  public minMatches?: number = 0; // also helpful for inner-queries of groupjoins
+  public minMatches?: string = 'any'; // also helpful for inner-queries of groupjoins
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
@@ -235,6 +235,11 @@ export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
 export const _ScoreLine = (config?: { [key: string]: any }) =>
 {
   let scoreLine = New<ScoreLine>(new ScoreLineC(config), config);
+  if (config.weight !== undefined)
+  {
+    console.log('weight: ' + config.weight + ',' + scoreLine.weight);
+    scoreLine.set('weight', config.weight);
+  }
   scoreLine = scoreLine
     .set('transformData', _TransformData(scoreLine['transformData']));
   return scoreLine;
@@ -563,6 +568,7 @@ type ChoiceContext = {
 class ElasticDataSourceC extends DataSource
 {
   public index: string = '';
+  public server: string = '';
 
   // TODO remove
   public types: List<string> = List([]);
@@ -667,16 +673,17 @@ class ElasticDataSourceC extends DataSource
         }
 
         const { dataSource } = context.source;
-        const { index, types } = dataSource as any;
+        const { server, index, types } = dataSource as ElasticDataSource;
 
         if (!index)
         {
           return defaultOptions;
         }
 
+        const theDatabaseId = `${server}/${index}`;
         const acceptableCols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
-            column.databaseId === String(index) &&
+            column.databaseId === theDatabaseId &&
             acceptableFieldTypes.indexOf(column.datatype) !== -1,
         );
 
@@ -688,7 +695,7 @@ class ElasticDataSourceC extends DataSource
           });
         }).toSet().toList();
         let fieldNames = acceptableOptions.map((f) => f.value).toList();
-        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, theDatabaseId);
         acceptableOptions = acceptableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
 
         return acceptableOptions.concat(defaultOptions).toList();
@@ -713,12 +720,13 @@ class ElasticDataSourceC extends DataSource
         });
       }));
       const { dataSource } = context.source;
-      const { index } = dataSource as any;
+      const { server, index } = dataSource as any;
       if (index)
       {
+        const theDatabaseId = `${server}/${index}`;
         const cols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
-            column.databaseId === String(index));
+            column.databaseId === theDatabaseId);
         let fields = List([]);
         cols.forEach((col) =>
         {
@@ -798,7 +806,7 @@ export const _ElasticDataSource = (config?: { [key: string]: any }) =>
   elasticSource = elasticSource.set('types', List(elasticSource['types']));
   return elasticSource;
 };
-≈
+
 const ElasticComparisons = [
   {
     value: 'exists',
