@@ -154,7 +154,7 @@ class EditorDisplayStateC
   public settingsDisplayKeyPath: KeyPath = null;
   public currentEdge: number = -1;
   public engineVersion: number = 0;
-  public columnState: ColumnOptions = ColumnOptions.Preview;
+  public columnState: ColumnOptions = ColumnOptions.Endpoints;
   public moveFieldId: number = null;
   public addFieldId: number = null;
 }

@@ -102,111 +102,65 @@ class DocumentsHelpers extends ETLHelpers
   public fetchDocuments(
     source: SourceConfig,
     key: string,
-    onLoad?: (docs: List<object>) => void,
-    onError?: (ev: string | MidwayError) => void,
-  )
+  ): Promise<List<object>>
   {
-    // // TODO DELET THIS TESTING
-    // try {
-    //   const documents = List([
-    //     {
-    //       "named field": 'foon',
-    //       "deepArray":
-    //       [
-    //         [
-    //           5
-    //         ]
-    //       ],
-    //       'nested array': [
-    //         {
-    //           'name': 'blah',
-    //           'other name': 'blooh',
-    //         },
-    //         {
-    //           'name': 'xD',
-    //           'other name': 'hmm',
-    //         }
-    //       ]
-    //     }
-    //   ]);
+    return new Promise<List<object>>((resolve, reject) => {
 
-    //   onLoad(documents);
-    //   this.onLoadDocuments(documents, key);
-    //   if (1 === 1)
-    //   {
-    //     return;
-    //   }
-    // }
-    // catch(e)
-    // {
-    //   console.error(e);
-    //   return;
-    // }
-    // // delet this
-
-    const onFetchLoad = (documents: List<object>) =>
-    {
-      this.onLoadDocuments(documents, key);
-      if (onLoad != null)
+      const onFetchLoad = (documents: List<object>) =>
       {
-        onLoad(documents);
-      }
-    };
-    const defaultError = (ev) =>
-    {
-      this.onDocumentsError(ev);
-      if (onError != null)
+        this.onLoadDocuments(documents, key);
+        resolve(documents);
+      };
+      const defaultError = (ev) =>
       {
-        onError(ev);
-      }
-    };
-    try
-    {
-      this.updateStateBeforeFetch();
-      switch (source.type)
+        this.onDocumentsError(ev, key);
+        reject(ev);
+      };
+      try
       {
-        case Sources.Algorithm: {
-          const options: SourceOptionsType<Sources.Algorithm> = source.options as any;
-          const algorithmId = options.algorithmId;
-          const onLoadAlgorithm = (algorithm: Algorithm) =>
-          {
-            if (algorithm == null)
+        this.updateStateBeforeFetch();
+        switch (source.type)
+        {
+          case Sources.Algorithm: {
+            const options: SourceOptionsType<Sources.Algorithm> = source.options as any;
+            const algorithmId = options.algorithmId;
+            const onLoadAlgorithm = (algorithm: Algorithm) =>
             {
-              defaultError('Could not find algorithm');
+              if (algorithm == null)
+              {
+                defaultError('Could not find algorithm');
+                return;
+              }
+              fetchDocumentsFromAlgorithm(algorithm, DefaultDocumentLimit)
+                .then(onFetchLoad)
+                .catch(defaultError);
+            };
+            Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
+            break;
+          }
+          case Sources.Upload: {
+            const file = source.options['file'];
+            if (file == null)
+            {
+              defaultError('File not provided');
               return;
             }
-            fetchDocumentsFromAlgorithm(algorithm, DefaultDocumentLimit)
-              .then(onFetchLoad).catch(defaultError);
-          };
-          Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
-          break;
-        }
-        case Sources.Upload: {
-          const file = source.options['file'];
-          if (file == null)
-          {
-            defaultError('File not provided');
-            return;
+            const config = source.fileConfig;
+            fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
+              .then(onFetchLoad)
+              .catch(defaultError);
+            break;
           }
-          const config = source.fileConfig;
-          fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
-            .then(onFetchLoad).catch(defaultError);
-          break;
-        }
-        default: {
-          if (onError != null)
-          {
+          default: {
             defaultError('Failed to retrieve documents. Unknown source type');
           }
         }
       }
-    }
-    catch (e)
-    {
-      // tslint:disable-next-line
-      console.error(`An unexpected Error Occurred: ${String(e)}`);
-      defaultError(e);
-    }
+      catch (e)
+      {
+        defaultError(e);
+      }
+    });
   }
 
   protected onLoadDocuments(documents: List<object>, key: string)
@@ -219,7 +173,7 @@ class DocumentsHelpers extends ETLHelpers
     this.updateStateAfterFetch();
   }
 
-  protected onDocumentsError(ev: string | MidwayError)
+  protected onDocumentsError(ev: string | MidwayError, key: string)
   {
     // tslint:disable-next-line
     console.error(ev);

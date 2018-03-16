@@ -121,37 +121,36 @@ class Initializers extends ETLHelpers
 
   public loadExistingTemplate(templateId: number)
   {
-    const onLoad = (template: ETLTemplate) =>
-    {
-      this.editorAct({
-        actionType: 'resetState',
-      });
-      this.editorAct({
-        actionType: 'setTemplate',
-        template,
-      });
-      this.editorAct({ // todo find the last edge
-        actionType: 'setCurrentEdge',
-        edge: 0,
-        rebuild: true,
-      });
-      this.editorAct({
-        actionType: 'setIsDirty',
-        isDirty: false,
-      });
-
-      template.sources.map((source, key) =>
+    this.getTemplate(templateId)
+      .then((template: ETLTemplate) =>
       {
-        DocumentsHelpers.fetchDocuments(source, key);
-      });
-      ETLRouteUtil.gotoEditTemplate(template.id);
-    };
-    const onError = (response) =>
-    {
-      // TODO
-    };
+        this.editorAct({
+          actionType: 'resetState',
+        });
+        this.editorAct({
+          actionType: 'setTemplate',
+          template,
+        });
+        this.editorAct({ // todo find the last edge
+          actionType: 'setCurrentEdge',
+          edge: 0,
+          rebuild: true,
+        });
+        this.editorAct({
+          actionType: 'setIsDirty',
+          isDirty: false,
+        });
 
-    this.getTemplate(templateId).then(onLoad).catch(onError);
+        template.sources.map((source, key) =>
+        {
+          DocumentsHelpers.fetchDocuments(source, key);
+        });
+        ETLRouteUtil.gotoEditTemplate(template.id);
+      })
+      .catch((response) =>
+      {
+        // TODO
+      });
   }
 
   public initNewFromAlgorithm(algorithmId: number)
@@ -165,17 +164,17 @@ class Initializers extends ETLHelpers
         algorithmId,
       },
     });
-    const onLoad = this.createInitialTemplateFn(source);
-    DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
+    DocumentsHelpers.fetchDocuments(source, '_default')
+      .then(this.createInitialTemplateFn(source));
   }
 
   public initNewFromWalkthrough(walkthrough: WalkthroughState = this.walkthrough)
   {
     const source = walkthrough.source;
     const sink = walkthrough.sink;
-    const onLoad = this.createInitialTemplateFn(source, sink);
     const file = walkthrough.getFile();
-    DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
+    DocumentsHelpers.fetchDocuments(source, '_default')
+      .then(this.createInitialTemplateFn(source, sink));
   }
 
   private createInitialTemplateFn(

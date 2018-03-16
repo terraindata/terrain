@@ -331,10 +331,9 @@ class EndpointSection extends TerrainComponent<Props>
     }, () => this.handleApplyChanges());
   }
 
-  // closed by default, since expandableState is empty
   public isEndpointOpen(key: string)
   {
-    return Boolean(this.state.expandableState.get(key));
+    return this.state.expandableState.get(key) !== false;
   }
 
   @instanceFnDecorator(_.memoize)
