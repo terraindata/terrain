@@ -192,15 +192,16 @@ export class Scheduler
       }
       // TODO: lock row
       this.runningSchedules.set(id, new Job());
-      const schedules: SchedulerConfig[] = this.get(id);
+      const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length === 0)
       {
         return reject('Schedule not found.');
       }
       const schedule: SchedulerConfig = schedules[0];
+      let taskConfig: TaskConfig[] = [];
       try
       {
-        const taskConfig: TaskConfig[] = JSON.parse(schedule.tasks);
+        taskConfig = JSON.parse(schedule.tasks);
       }
       catch (e)
       {
@@ -214,28 +215,31 @@ export class Scheduler
       const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
       this.runningSchedules.delete(id);
       // TODO: unlock row
-      return resolve(result);
+      return resolve(result as TaskOutputConfig);
     });
   }
 
   private async _select(columns: string[], filter: object, locked?: boolean): Promise<SchedulerConfig[]>
   {
-    let rawResults: object[] = [];
-    if (locked === undefined) // all
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      rawResults = await App.DB.select(this.schedulerTable, columns, filter);
-    }
-    else if (locked === true) // currently running
-    {
-      // TODO
-    }
-    else // currently not running
-    {
-      // TODO
-    }
+      let rawResults: object[] = [];
+      if (locked === undefined) // all
+      {
+        rawResults = await App.DB.select(this.schedulerTable, columns, filter);
+      }
+      else if (locked === true) // currently running
+      {
+        // TODO
+      }
+      else // currently not running
+      {
+        // TODO
+      }
 
-    const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
-    resolve(results);
+      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
+      resolve(results);
+    });
   }
 }
 

@@ -78,6 +78,7 @@ Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, nex
   ctx.body = await scheduler.get(ctx.params.id, getArchived);
 });
 
+/*
 // update scheduled job's status: set active to 1
 Router.post('/active/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -109,6 +110,7 @@ Router.post('/inactive/:id', passport.authenticate('access-token-local'), async 
 {
   ctx.body = await scheduler.changeActiveStatus(ctx.state.user, ctx.params.id, 0);
 });
+*/
 
 // Update job
 Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
