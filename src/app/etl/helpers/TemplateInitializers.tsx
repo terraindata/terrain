@@ -133,9 +133,7 @@ class Initializers extends ETLHelpers
       this.editorAct({ // todo find the last edge
         actionType: 'setCurrentEdge',
         edge: 0,
-      });
-      this.editorAct({
-        actionType: 'rebuildFieldMap',
+        rebuild: true,
       });
       this.editorAct({
         actionType: 'setIsDirty',
