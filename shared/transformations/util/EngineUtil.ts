@@ -131,39 +131,63 @@ export function kpToString(kp: KeyPath): string
 //   }
 // });
 
-export function isValidRename(
+export function validateRename(
   engine: TransformationEngine,
   fieldId: number,
   newKeyPath: KeyPath
 ): {
   isValid: boolean,
-  message?: string,
+  message: string,
 }
 {
-  const failIndex = newKeyPath.findIndex((value) => {
-    return value === '' || value === '*'
-  });
+  const existingKp = engine.getOutputKeyPath(fieldId);
+  const failIndex = newKeyPath.findIndex((value) => value === '');
   if (failIndex !== -1)
   {
     return {
       isValid: false,
-      message: 'Invalid Rename. Names cannot be empty or \'*',
+      message: 'Invalid Rename. Names cannot be empty',
+    };
+  }
+  if (newKeyPath.last() === '*')
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Name cannot end with \'*\'',
     };
   }
   const otherId = engine.getOutputFieldID(newKeyPath);
-  if (otherId !== undefined)
+  if (otherId !== undefined && otherId !== fieldId)
   {
     return {
       isValid: false,
       message: 'Invalid Rename. This field already exists',
     };
   }
-  else if (isNamedField(engine.getOutputKeyPath(fieldId)))
+  else if (!isNamedField(existingKp))
   {
     return {
       isValid: false,
-      message: 'Invalid Rename. This field is not a named field',
+      message: 'Invalid Rename. Cannot rename a dynamic field',
     }
+  }
+
+  const oldLastNamedIndex = existingKp.findLastIndex((value, index) => !isNamedField(existingKp, index));
+  const oldPathConcrete = existingKp.slice(0, oldLastNamedIndex + 1);
+  const newLastNamedIndex = newKeyPath.findLastIndex((value, index) => !isNamedField(newKeyPath, index));
+  const newPathConcrete = newKeyPath.slice(0, newLastNamedIndex + 1);
+
+  if (newLastNamedIndex !== oldLastNamedIndex || !oldPathConcrete.equals(newPathConcrete))
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Cannot move field between array levels',
+    }
+  }
+
+  return {
+    isValid: true,
+    message: '',
   }
 }
 

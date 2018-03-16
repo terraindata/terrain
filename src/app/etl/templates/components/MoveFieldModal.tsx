@@ -53,11 +53,11 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-
+import { instanceFnDecorator } from 'src/app/Classes';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { kpToString, stringToKP, isValidRename } from 'shared/transformations/util/EngineUtil';
+import { kpToString, stringToKP, validateRename } from 'shared/transformations/util/EngineUtil';
 import Autocomplete from 'common/components/Autocomplete';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -142,20 +142,18 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
     } as any;
   }
 
-  public validateKeyPath(pathKP: List<string>)
+  @instanceFnDecorator(memoizeOne)
+  public _validateKeyPath(engine, engineVersion, field, pathKP: List<string>)
   {
+    return validateRename(engine, field.fieldId, pathKP);
+  }
+
+  public validateKeyPath(): { isValid: boolean, message: string }
+  {
+    const engineVersion = this._uiState().get('engineVersion');
     const engine = this._currentEngine();
     const field = this._field();
-    const kp = engine.getOutputKeyPath(field.fieldId);
-
-    const oldPathConcrete = kp.slice(0, this.state.uneditableDepth + 1);
-    const thisConcrete = pathKP.slice(0, this.state.uneditableDepth + 1);
-    if (!oldPathConcrete.equals(thisConcrete))
-    {
-      return false;
-    }
-
-    return isValidRename(engine, field.fieldId, pathKP);
+    return this._validateKeyPath(engine, engineVersion, field, this.state.pathKP);
   }
 
   public renderLocationKey(key: string, isEditable: boolean, depth)
@@ -191,12 +189,11 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
         }
       </div>
     );
-
   }
 
   public renderMoveUI()
   {
-
+    const { isValid, message } = this.validateKeyPath();
     return (
       <div className='move-field-modal'>
         <div className='move-field-edit-section'>
@@ -204,6 +201,8 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
             value={this.state.pathValue}
             options={emptyList}
             onChange={this.handleChangePathValue}
+            help={message}
+            helpIsError={!isValid}
           />
         </div>
         { this.renderLocation() }
@@ -213,12 +212,16 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public render()
   {
+    const { isValid, message } = this.validateKeyPath();
     return (
       <Modal
         open={this.props.fieldId !== null}
         title='Move Field'
         onClose={this.closeModal}
         onConfirm={this.onConfirm}
+        confirm={true}
+        closeOnConfirm={true}
+        confirmDisabled={!isValid}
       >
         {
           this.props.fieldId !== null ?
@@ -250,7 +253,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public onConfirm()
   {
-
+    this._proxy().structuralChangeName(this.state.pathKP);
   }
 }
 
