@@ -66,6 +66,7 @@ class TemplateFieldC
   public readonly inputKeyPath: List<string> = List([]);
   public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
+  public readonly outputKeyPath: List<string> = List([]);
 
   public isArray(): boolean
   {
@@ -75,6 +76,19 @@ class TemplateFieldC
   public isWildcardField(): boolean
   {
     return isWildcardField(this.inputKeyPath);
+  }
+
+  public isAncestorNamedField(index: number)
+  {
+    const value = this.outputKeyPath.get(index);
+    if (index != null)
+    {
+      return value !== '*' && Number.isNaN(Number(value));
+    }
+    else
+    {
+      return false;
+    }
   }
 
   public isPrimitive(): boolean

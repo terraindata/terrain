@@ -125,7 +125,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
   public showPrimaryKey(s: ElasticFieldProps)
   {
     const jsType = this._field().representedType();
-    return (jsType !== 'array' && jsType !== 'object' && jsType !== 'boolean') ?
+    return (jsType === 'string' && this._isRootField()) ?
       DisplayState.Active : DisplayState.Inactive;
   }
 
