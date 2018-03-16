@@ -155,6 +155,8 @@ class EditorDisplayStateC
   public currentEdge: number = -1;
   public engineVersion: number = 0;
   public columnState: ColumnOptions = ColumnOptions.Preview;
+  public moveFieldId: number = null;
+  public addFieldId: number = null;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);

@@ -190,6 +190,13 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return _.extend(_.pick(this.props, ['fieldId', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);
   }
 
+  protected _isRootField()
+  {
+    const { fieldId } = this.props;
+    const kp = this._currentEngine().getOutputKeyPath(fieldId);
+    return kp.size === 1;
+  }
+
   protected _getSinkLanguage(): Languages
   {
     const { sinks } = this._template();
@@ -213,6 +220,21 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     this.updateChecker.setChecker('settingsOpen', settingsAreOpen);
     return settingsAreOpen(this.props);
+  }
+
+  protected _canMoveField(): boolean
+  {
+    return this._field().isNamedField();
+  }
+
+  protected _canEditField(): boolean
+  {
+    return this._field().isNamedField() || this._field().isPrimitive();
+  }
+
+  protected _canEditName(): boolean
+  {
+    return !this._field().isWildcardField();
   }
 
   protected _willFieldChange(nextProps)

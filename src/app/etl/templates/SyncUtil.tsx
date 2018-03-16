@@ -118,6 +118,8 @@ export function createFieldFromEngine(
     isIncluded: engine.getFieldEnabled(id),
     fieldId: id,
     fieldProps: engine.getFieldProps(id),
+    inputKeyPath: engine.getInputKeyPath(id),
+    outputKeyPath: engine.getOutputKeyPath(id),
     type: engine.getFieldType(id) as FieldTypes,
     transformations,
     name: enginePath.last(),

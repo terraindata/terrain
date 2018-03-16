@@ -60,7 +60,7 @@ const { List, Map } = Immutable;
 import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
-
+import { instanceFnDecorator } from 'src/app/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './TemplateEditorField.less';
@@ -68,8 +68,6 @@ import './TemplateEditorField.less';
 export interface Props extends TemplateEditorFieldProps
 {
   toggleOpen?: () => void;
-  hidePreviewValue?: boolean;
-  displayValueOverride?: any;
   labelOverride?: string;
 }
 
@@ -84,32 +82,67 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       menuOpen: false,
     };
 
-  public menuOptions = List([
+  @instanceFnDecorator(memoizeOne)
+  public _getMenuOptions(canEdit, canMove, isNested)
+  {
+    const options = [];
+    if (canEdit)
     {
-      text: 'Edit this Field',
-      onClick: this.openSettings,
-    },
+      options.push({
+        text: 'Edit this Field',
+        onClick: this.openSettings,
+      });
+    }
+    if (canMove)
     {
-      text: 'Move this Field',
-      onClick: () => null,
-    },
-  ]);
+      options.push({
+        text: 'Move this Field',
+        onClick: this.moveField,
+      });
+    }
+    if (isNested)
+    {
+      options.push({
+        text: 'Add a subfield',
+        onClick: this.addField,
+      });
+    }
+    return List(options);
+  }
+
+  public getMenuOptions()
+  {
+    const field = this._field();
+    return this._getMenuOptions(this._canEditField(), this._canMoveField(), field.isNested());
+  }
 
   public render()
   {
-    const { canEdit, preview, hidePreviewValue, displayValueOverride, labelOverride } = this.props;
+    const { canEdit, preview, labelOverride } = this.props;
     const field = this._field();
     const settingsOpen = this._settingsAreOpen();
-    const labelStyle = settingsOpen ?
-      fontColor(Colors().active, Colors().active)
-      :
-      fontColor(Colors().text2, Colors().text1);
 
-    const previewText = preview === undefined || preview === null ? 'N/A' : preview.toString();
-    const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
-      previewText : displayValueOverride;
+    let labelStyle;
+    if (field.isWildcardField())
+    {
+      labelStyle = settingsOpen ?
+        fontColor(Colors().active, Colors().active)
+        :
+        fontColor(Colors().text3, Colors().text3);
+    }
+    else
+    {
+      labelStyle = settingsOpen ?
+        fontColor(Colors().active, Colors().active)
+        :
+        fontColor(Colors().text2, Colors().text1);
+    }
 
-    const showMenu = this.state.hovered || this.state.menuOpen;
+    const previewText = preview == null ? 'N/A' : preview.toString();
+
+    const menuOptions = this.getMenuOptions();
+    const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
+    const hidePreviewValue = field.isArray() || field.isNested();
 
     return (
       <div className='template-editor-field-block'>
@@ -123,6 +156,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             <div
               className={classNames({
                 'field-preview-label': true,
+                'field-preview-array-label': field.isWildcardField(),
                 'field-preview-can-toggle': this.props.toggleOpen !== undefined,
               })}
               onClick={this.props.toggleOpen}
@@ -136,7 +170,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
               })}
             >
               <Menu
-                options={this.menuOptions}
+                options={menuOptions}
                 small={true}
                 openRight={true}
                 onChangeState={this.handleMenuStateChange}
@@ -151,7 +185,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
               })}
               style={fontColor(Colors().text2)}
             >
-              {previewContent}
+              {previewText}
             </div>
           }
         </div>
@@ -178,6 +212,26 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     this.setState({
       menuOpen,
       hovered: menuOpen ? this.state.hovered : false,
+    });
+  }
+
+  public moveField()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        moveFieldId: this.props.fieldId,
+      },
+    });
+  }
+
+  public addField()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        addFieldId: this.props.fieldId,
+      },
     });
   }
 

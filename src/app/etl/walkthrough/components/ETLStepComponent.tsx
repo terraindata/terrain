@@ -102,16 +102,6 @@ export abstract class ETLStepComponent<Props extends StepProps = StepProps> exte
     });
   }
 
-  public _altButtonStyle()
-  {
-    return altButtonStyle;
-  }
-
-  public _altButtonClass()
-  {
-    return 'etl-alt-button';
-  }
-
   public _renderNextButton(shown = true, enabled = true, text = 'Next')
   {
     return (

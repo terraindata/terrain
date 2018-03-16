@@ -97,7 +97,6 @@ function getTemplateId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-// Some of this logic could be put in redux using some neat features of Thunk (particularly getState)
 @Radium
 class ETLEditorPage extends TerrainComponent<Props>
 {
@@ -205,6 +204,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     editorAct({
       actionType: 'resetState',
     });
+
     if (params.algorithmId !== undefined)
     {
       Initializers.initNewFromAlgorithm(getAlgorithmId(params));
@@ -227,9 +227,6 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.editorAct({
-      actionType: 'resetState',
-    });
     this.initFromRoute();
   }
 

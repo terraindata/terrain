@@ -60,14 +60,17 @@ import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
+import AddFieldModal from 'etl/templates/components/AddFieldModal';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
+import MoveFieldModal from 'etl/templates/components/MoveFieldModal';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import TemplateList from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import './TemplateEditor.less';
 
@@ -90,9 +93,11 @@ class TemplateEditor extends TerrainComponent<Props>
 {
   public state: {
     newTemplateName: string,
+    saveNewTemplateOpen: boolean,
     loadTemplateOpen: boolean,
   } = {
       newTemplateName: 'New Template',
+      saveNewTemplateOpen: false,
       loadTemplateOpen: false,
     };
 
@@ -117,6 +122,7 @@ class TemplateEditor extends TerrainComponent<Props>
     {
       return {};
     }
+
     return engine.transform(previewDocument);
   }
 
@@ -224,20 +230,14 @@ class TemplateEditor extends TerrainComponent<Props>
     );
   }
 
-  public render()
+  public renderRootLevelModals(): any[]
   {
-    const { previewIndex, documents, modalRequests } = this.props.templateEditor.uiState;
-    const showEditor = previewIndex >= 0;
-    return (
-      <div className='template-editor-root-container'>
-        <div className='template-editor-width-spacer'>
-          {this.renderTopBar()}
-          <div className='template-editor-columns-area'>
-            {this.renderEditorSection(showEditor)}
-            {this.renderDocumentsSection()}
-          </div>
-        </div>
+    const modals = [];
+    if (this.state.loadTemplateOpen)
+    {
+      modals.push(
         <Modal
+          key='loadTemplate'
           title={'Load a Template'}
           open={this.state.loadTemplateOpen}
           onClose={this.closeTemplateUI}
@@ -249,10 +249,69 @@ class TemplateEditor extends TerrainComponent<Props>
               getRowStyle={this.getTemplateItemStyle}
             />
           </div>
-        </Modal>
+        </Modal>,
+      );
+    }
+    else if (this.state.saveNewTemplateOpen)
+    {
+      modals.push(
+        <Modal
+          key='saveNew'
+          title='Save New Template'
+          open={this.state.saveNewTemplateOpen}
+          showTextbox={true}
+          onConfirm={this.handleSave}
+          onClose={this.handleCloseSave}
+          confirmDisabled={this.state.newTemplateName === ''}
+          textboxValue={this.state.newTemplateName}
+          onTextboxValueChange={this.handleNewTemplateNameChange}
+          textboxPlaceholderValue='Template Name'
+          closeOnConfirm={true}
+          confirm={true}
+        />,
+      );
+    }
+    return modals;
+  }
+
+  public render()
+  {
+    const {
+      previewIndex,
+      documents,
+      modalRequests,
+      moveFieldId,
+      addFieldId,
+    } = this.props.templateEditor.uiState;
+
+    const showEditor = previewIndex >= 0;
+    const fieldModalProps = {
+      canEdit: true,
+      noInteract: false,
+      preview: null,
+      displayKeyPath: emptyList,
+    };
+
+    return (
+      <div className='template-editor-root-container'>
+        <div className='template-editor-width-spacer'>
+          {this.renderTopBar()}
+          <div className='template-editor-columns-area'>
+            {this.renderEditorSection(showEditor)}
+            {this.renderDocumentsSection()}
+          </div>
+        </div>
+        {... this.renderRootLevelModals()}
+        <MoveFieldModal
+          fieldId={moveFieldId}
+          {...fieldModalProps}
+        />
+        <AddFieldModal
+          fieldId={addFieldId}
+          {...fieldModalProps}
+        />
         <MultiModal
           requests={modalRequests}
-          state={this.state}
           setRequests={this.setModalRequests}
         />
       </div>
@@ -299,22 +358,7 @@ class TemplateEditor extends TerrainComponent<Props>
   {
     this.setState({
       newTemplateName: 'New Template',
-    });
-  }
-
-  public computeSaveModalProps()
-  {
-    return ({
-      onConfirm: this.handleSave,
-      onClose: this.handleCloseSave,
-      confirmDisabled: this.state.newTemplateName === '',
-      title: 'Save New Template',
-      showTextbox: true,
-      confirm: true,
-      textboxValue: this.state.newTemplateName,
-      onTextboxValueChange: this.handleNewTemplateNameChange,
-      textboxPlaceholderValue: 'Template Name',
-      closeOnConfirm: true,
+      saveNewTemplateOpen: false,
     });
   }
 
@@ -331,11 +375,8 @@ class TemplateEditor extends TerrainComponent<Props>
     const { editorAct } = this.props;
     if (template.id === -1)
     {
-      editorAct({
-        actionType: 'addModal',
-        props: {
-          computeProps: this.computeSaveModalProps,
-        },
+      this.setState({
+        saveNewTemplateOpen: true,
       });
     }
     else

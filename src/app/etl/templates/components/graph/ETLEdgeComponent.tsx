@@ -90,7 +90,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
 {
   public menuOptions = List([
     {
-      text: 'Edit Transformations',
+      text: 'Edit This Step',
       onClick: this.makeThisActive,
     },
     {
@@ -160,10 +160,11 @@ class ETLEdgeComponent extends TerrainComponent<Props>
 
   public makeThisActive()
   {
-    const { act, edgeId } = this.props;
+    const { act, edgeId, templateEditor } = this.props;
     act({
       actionType: 'setCurrentEdge',
       edge: edgeId,
+      rebuild: edgeId === templateEditor.getCurrentEdgeId(),
     });
   }
 

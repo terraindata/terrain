@@ -57,6 +57,227 @@ export interface PathHashMap<T>
   [k: string]: T;
 }
 
+// turns 'foo, bar, baz' into ['foo', 'bar', 'baz']
+// commas should be escaped by \ e.g. 'foo\, bar' is ['foo,', 'bar']
+export function stringToKP(kp: string): KeyPath
+{
+  const split = kp.split(',');
+  const fuseList = split.map((val, i) =>
+  {
+    const replaced = val.replace(/\\\\/g, '');
+    if (replaced.length > 0 && replaced.charAt(replaced.length - 1) === '\\')
+    {
+      return {
+        fuseNext: true,
+        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, '').slice(0, -1),
+      };
+    }
+    else
+    {
+      return {
+        fuseNext: false,
+        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, ''),
+      };
+    }
+  });
+  const reduced = fuseList.reduce((accum, val) =>
+  {
+    if (accum.length > 0)
+    {
+      const last = accum[accum.length - 1];
+      if (last.fuseNext)
+      {
+        accum[accum.length - 1] = {
+          fuseNext: val.fuseNext,
+          value: `${last.value},${val.value}`,
+        };
+        return accum;
+      }
+      else
+      {
+        accum.push(val);
+        return accum;
+      }
+    }
+    return [val];
+  }, []);
+  if (reduced.length > 0 && reduced[reduced.length - 1].fuseNext)
+  {
+    reduced[reduced.length - 1].value += ',';
+  }
+  return List(reduced.map((val, i) => val.value));
+}
+
+// turns ['foo', 'bar', 'baz'] into 'foo, bar, baz'
+export function kpToString(kp: KeyPath): string
+{
+  return kp.map((val) => val.replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
+    .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null);
+}
+
+// TODO make these into real tests?
+// const tests = [
+//   List(['hi,', 'bye']),
+//   List(['hi', 'bye', 'why,']),
+//   List(['hi', 'bye\\', 'why']),
+//   List(['hi', 'bye\\\\', 'why']),
+//   List(['h\i', 'b\\,\\y\e\\', 'w\\h\\\y']),
+//   List([',h\\\,i', 'by,e', 'wh,\,,y,']),
+// ];
+// tests.forEach((val, i) =>
+// {
+//   const str: string = kpToString(val);
+//   if (kpToString(stringToKP(str)) !== str)
+//   {
+//     console.log(String(val), ':', str, ':', String(stringToKP(str)), ':', kpToString(stringToKP(str)));
+//   }
+// });
+
+export function validateNewFieldName(
+  engine: TransformationEngine,
+  fieldId: number,
+  newKeyPath: KeyPath,
+):
+  {
+    isValid: boolean,
+    message: string,
+  }
+{
+  if (newKeyPath.last() === '')
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Name. Names cannot be empty',
+    };
+  }
+  if (newKeyPath.last() === '*')
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Name. Name cannot be \'*\'',
+    };
+  }
+  const otherId = engine.getOutputFieldID(newKeyPath);
+  if (otherId !== undefined && otherId !== fieldId)
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Name. This field already exists',
+    };
+  }
+
+  const parentType = engine.getFieldType(fieldId);
+  if (parentType !== 'object' && parentType !== 'array')
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Parent fields is not a nested object',
+    };
+  }
+
+  return {
+    isValid: true,
+    message: '',
+  };
+}
+
+export function validateRename(
+  engine: TransformationEngine,
+  fieldId: number,
+  newKeyPath: KeyPath,
+):
+  {
+    isValid: boolean,
+    message: string,
+  }
+{
+  const existingKp = engine.getOutputKeyPath(fieldId);
+  const failIndex = newKeyPath.findIndex((value) => value === '');
+  if (failIndex !== -1)
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Names cannot be empty',
+    };
+  }
+  if (newKeyPath.last() === '*')
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Name cannot end with \'*\'',
+    };
+  }
+  const otherId = engine.getOutputFieldID(newKeyPath);
+  if (otherId !== undefined && otherId !== fieldId)
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. This field already exists',
+    };
+  }
+  else if (!isNamedField(existingKp))
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Cannot rename a dynamic field',
+    };
+  }
+
+  const oldLastNamedIndex = existingKp.findLastIndex((value, index) => !isNamedField(existingKp, index));
+  const oldPathConcrete = existingKp.slice(0, oldLastNamedIndex + 1);
+  const newLastNamedIndex = newKeyPath.findLastIndex((value, index) => !isNamedField(newKeyPath, index));
+  const newPathConcrete = newKeyPath.slice(0, newLastNamedIndex + 1);
+
+  if (newLastNamedIndex !== oldLastNamedIndex || !oldPathConcrete.equals(newPathConcrete))
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Cannot move field between array levels',
+    };
+  }
+
+  for (let i = 1; i < newKeyPath.size; i++)
+  {
+    const kpToTest = newKeyPath.slice(0, i).toList();
+    const parentId = engine.getOutputFieldID(kpToTest);
+    if (parentId !== undefined)
+    {
+      const parentType = engine.getFieldType(parentId);
+      if (parentType !== 'object' && parentType !== 'array')
+      {
+        return {
+          isValid: false,
+          message: 'Invalid Rename. One of the ancestor fields is not a nested object',
+        };
+      }
+    }
+  }
+
+  return {
+    isValid: true,
+    message: '',
+  };
+}
+
+// root is considered to be a named field
+export function isNamedField(
+  keypath: KeyPath,
+  index?: number,
+): boolean
+{
+  const last = index === undefined ? keypath.last() : keypath.get(index);
+  return last !== '*' && Number.isNaN(Number(last));
+}
+
+export function isWildcardField(
+  keypath: KeyPath,
+  index?: number,
+): boolean
+{
+  const last = index === undefined ? keypath.last() : keypath.get(index);
+  return last === '*';
+}
+
 // document merge logic
 export function hashPath(keypath: KeyPath): PathHash
 {
@@ -70,31 +291,10 @@ export function unhashPath(keypath: PathHash): KeyPath
 
 const valueTypeKeyPath = List(['valueType']);
 
-// root is considered to be a named field
-export function isNamedField(
-  keypath: KeyPath,
-): boolean
-{
-  const last = keypath.last();
-  return last !== '*' && Number.isNaN(Number(last));
-}
-
-export function isArrayField(
-  keypath: KeyPath,
-  engine: TransformationEngine,
-  pathToIdMap: PathHashMap<number>,
-): boolean
-{
-  const hashedPath = hashPath(keypath);
-  return engine.getFieldType(pathToIdMap[hashedPath]) === 'array';
-}
-
 // turn all indices into a particular value, based on
 // an existing engine that has fields with indices in them
 export function turnIndicesIntoValue(
   keypath: KeyPath,
-  engine: TransformationEngine,
-  pathToIdMap: PathHashMap<number>,
   value = '*',
 ): KeyPath
 {
@@ -117,18 +317,6 @@ export function turnIndicesIntoValue(
     return arrayIndices[i] === true ? value : key;
   }).toList();
   return scrubbed;
-}
-
-// creates a mapping from hashed keypath to fieldId
-export function createPathToIdMap(engine: TransformationEngine): PathHashMap<number>
-{
-  const fieldIds = engine.getAllFieldIDs();
-  const mapping = {};
-  fieldIds.forEach((id, i) =>
-  {
-    mapping[hashPath(engine.getOutputKeyPath(id))] = id;
-  });
-  return mapping;
 }
 
 // takes an engine path and the path type mapping and returns true if
@@ -162,10 +350,13 @@ export function addFieldsToEngine(
   {
     if (isAValidField(unhashPath(hashedPath), pathTypes))
     {
-      const fieldType = pathTypes[hashedPath];
-      const id = engine.addField(unhashPath(hashedPath), fieldType);
-
+      let fieldType = pathTypes[hashedPath];
       const valueType = pathValueTypes[hashedPath];
+      if (valueType !== undefined)
+      {
+        fieldType = 'array';
+      }
+      const id = engine.addField(unhashPath(hashedPath), fieldType);
       if (valueType !== undefined)
       {
         engine.setFieldProp(id, valueTypeKeyPath, valueType);
@@ -201,12 +392,11 @@ export function createMergedEngine(documents: List<object>):
   {
     const e: TransformationEngine = new TransformationEngine(doc);
     const fieldIds = e.getAllFieldIDs();
-    const pathToIdMap = createPathToIdMap(e);
 
     fieldIds.forEach((id, j) =>
     {
       const currentType: FieldTypes = getConsistentType(id, e);
-      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), e, pathToIdMap, '*');
+      const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), '*');
       const path = hashPath(deIndexedPath);
 
       if (pathTypes[path] !== undefined)

@@ -95,7 +95,8 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
       fileType: {
         type: DisplayType.Pick,
         displayName: 'File Type',
-        group: 'row1',
+        widthFactor: 2,
+        group: 'file type',
         options: {
           pickOptions: (s: FileConfigI) => fileTypeList,
           indexResolver: (value) => fileTypeList.indexOf(value),
@@ -104,14 +105,16 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
       hasCsvHeader: {
         type: DisplayType.CheckBox,
         displayName: 'File Has CSV Header',
-        group: 'row1',
-        shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
+        group: 'file type',
+        widthFactor: 4,
+        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
       },
       jsonNewlines: {
         type: DisplayType.CheckBox,
         displayName: 'Objects separated by newlines',
-        group: 'row1',
-        shouldShow: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
+        group: 'file type',
+        widthFactor: 4,
+        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
       },
     };
 
@@ -189,6 +192,7 @@ class UploadEndpoint extends EndpointForm<UploadState>
   public inputMap: InputDeclarationMap<UploadState> = {
     file: {
       type: DisplayType.Custom,
+      style: { padding: '0px' },
       options: {
         render: this.renderFilePicker,
       },
@@ -314,11 +318,13 @@ class SftpEndpoint extends EndpointForm<SftpState>
       type: DisplayType.TextBox,
       displayName: 'IP Address',
       group: 'addr row',
+      widthFactor: 3,
     },
     port: {
       type: DisplayType.NumberBox,
       displayName: 'Port',
       group: 'addr row',
+      widthFactor: 1,
     },
     filepath: {
       type: DisplayType.TextBox,
@@ -357,12 +363,10 @@ class HttpEndpoint extends EndpointForm<HttpState>
     accept: {
       type: DisplayType.TextBox,
       displayName: 'Accept',
-      group: 'headers',
     },
     contentType: {
       type: DisplayType.TextBox,
       displayName: 'Content Type',
-      group: 'headers',
     },
   };
 
@@ -408,6 +412,8 @@ class DatabaseEndpoint extends EndpointForm<DatabaseState>
   public inputMap: InputDeclarationMap<DatabaseState> = {
     serverId: {
       type: DisplayType.Custom,
+      widthFactor: 5,
+      style: { padding: '0px' },
       options: {
         render: this.renderDatabasePicker,
       },

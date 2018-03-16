@@ -52,6 +52,7 @@ import TransformationNodeBase from 'shared/transformations/nodes/TransformationN
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType, NodeTypes } from 'shared/transformations/TransformationNodeType';
+import { isWildcardField } from 'shared/transformations/util/EngineUtil';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 // only put fields in here that are needed to track display-sensitive state
@@ -62,17 +63,43 @@ class TemplateFieldC
   public readonly type: FieldTypes = 'object';
   public readonly fieldId: number = -1;
   public readonly name: string = '';
+  public readonly inputKeyPath: List<string> = List([]);
   public readonly childrenIds: List<number> = List([]);
   public readonly transformations: List<TransformationNode> = List([]);
+  public readonly outputKeyPath: List<string> = List([]);
 
   public isArray(): boolean
   {
     return this.representedType() === 'array';
   }
 
+  public isWildcardField(): boolean
+  {
+    return isWildcardField(this.inputKeyPath);
+  }
+
+  public isAncestorNamedField(index: number)
+  {
+    const value = this.outputKeyPath.get(index);
+    if (index != null)
+    {
+      return value !== '*' && Number.isNaN(Number(value));
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  public isPrimitive(): boolean
+  {
+    const repType = this.representedType();
+    return repType !== 'array' && repType !== 'object';
+  }
+
   public representedType(): FieldTypes
   {
-    if (this.name === '*')
+    if (this.isWildcardField())
     {
       return this.fieldProps['valueType'];
     }
@@ -80,6 +107,11 @@ class TemplateFieldC
     {
       return this.type;
     }
+  }
+
+  public isNamedField()
+  {
+    return this.name !== '*' && Number.isNaN(Number(this.name));
   }
 
   public isNested(): boolean
