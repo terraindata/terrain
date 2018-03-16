@@ -74,8 +74,15 @@ export default abstract class AExportTransform extends Transform
       result = this.delimiter();
     }
 
-    result += this.transform(chunk as object, chunkNumber);
-    callback(null, result);
+    const transformed = this.transform(chunk as object, chunkNumber);
+    if (transformed instanceof Promise)
+    {
+      transformed.then((str) => callback(null, result + str)).catch((e) => this.emit('error', e));
+    }
+    else
+    {
+      callback(null, result + transformed);
+    }
   }
 
   public _flush(callback)
@@ -95,7 +102,7 @@ export default abstract class AExportTransform extends Transform
 
   protected abstract preamble(): string;
 
-  protected abstract transform(input: object, chunkNumber: number): string;
+  protected abstract transform(input: object, chunkNumber: number): string | Promise<string>;
 
   protected abstract delimiter(): string;
 

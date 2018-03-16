@@ -54,7 +54,6 @@ import AExportTransform from './AExportTransform';
  */
 export default class CSVExportTransform extends AExportTransform
 {
-
   private columnNames: string[];
   private separator: string = ',';
   private nullValue: string = 'null';
@@ -81,10 +80,22 @@ export default class CSVExportTransform extends AExportTransform
     return this.transform(headerObject, 0) + this.delimiter();
   }
 
-  protected transform(input: object, chunkNumber: number): string
+  protected transform(input: object, chunkNumber: number): Promise<string>
   {
-    let result: string = '';
-    return result;
+    return new Promise<string>((resolve, reject) =>
+    {
+      csv.writeToString([input], { headers: false }, (err, result) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          reject(err);
+        }
+        else
+        {
+          resolve(result);
+        }
+      });
+    });
   }
 
   protected delimiter(): string
