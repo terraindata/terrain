@@ -452,3 +452,30 @@ test('wildcard rename with manual field adding', () =>
 
   expect(e.transform(doc)['foo'][0]['baz']).toBe('hi');
 });
+
+test('gracefully handle invalid rename (TE remains in some working/recoverable state)', () =>
+{
+  const e = new TransformationEngine();
+  const fooId = e.addField(List(['foo']), 'number');
+  e.addField(List(['bar']), 'number');
+
+  e.setOutputKeyPath(fooId, List(['bar'])); // oops, invalid
+  e.setOutputKeyPath(fooId, List(['foo'])); // change it back to foo
+
+  const doc = {
+    foo: 5,
+    bar: 7,
+  };
+  expect(e.transform(doc)).toEqual(doc);
+});
+
+test('(deep) clone a TransformationEngine', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc4);
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
+  const clone: TransformationEngine = e.clone();
+  expect(clone.equals(e)).toBe(true);
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['dog']));
+  expect(clone.equals(e)).toBe(false);
+});
