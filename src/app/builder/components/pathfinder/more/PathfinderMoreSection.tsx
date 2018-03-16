@@ -272,6 +272,47 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     ]);
   }
 
+  public getScoreTypeOptionSets()
+  {
+    const options = List([
+      {
+        value: 'terrain',
+        displayName: PathfinderText.terrainTypeName,
+        hasOther: false,
+        extraContent: PathfinderText.terrainTypeExplanation,
+      },
+      {
+        value: 'linear',
+        displayName: PathfinderText.fieldTypeName,
+        hasOther: false,
+        extraContent: PathfinderText.fieldTypeExplanation,
+      },
+      {
+        value: 'random',
+        displayName: PathfinderText.randomTypeName,
+        hasOther: false,
+        extraContent: PathfinderText.randomTypeExplanation,
+      },
+      {
+        value: 'elastic',
+        displayName: PathfinderText.elasticTypeName,
+        hasOther: false,
+        extraContent: PathfinderText.elasticTypeExplanation,
+      },
+    ]);
+    const optionSet = {
+      key: 'type',
+      options,
+      shortNameText: PathfinderText.scoreTypeLabel,
+      headerText: PathfinderText.scoreTypeExplanation,
+      column: true,
+      hideSampleData: true,
+      hasSearch: false,
+      forceFloat: true,
+    };
+    return List([optionSet]);
+  }
+
   public getCollapseOptionSets()
   {
     const { pathfinderContext } = this.props;
@@ -392,6 +433,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleCollapseChange(optionSetIndex: number, value)
   {
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath.push('collapse')), value);
+  }
+
+  public handleScoreTypeChange(optionSetIndex: number, value)
+  {
+    const keyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'score', 'type');
+    this.props.builderActions.changePath(keyPath, value);
   }
 
   public handleExpandNested(keyPath, expanded)
@@ -677,6 +724,15 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               defaultOpen={false}
               autoFocus={true}
             />
+            {
+              <RouteSelector
+                optionSets={this.getScoreTypeOptionSets()}
+                values={List([this.props.path.score.type])}
+                onChange={this.handleScoreTypeChange}
+                canEdit={canEdit}
+                defaultOpen={false}
+              />
+            }
             {
               this.props.keyPath.includes('nested') ?
                 <RouteSelector

@@ -257,6 +257,8 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             canEdit={canEdit}
             canDelete={canEdit}
             onDelete={this.handleDeleteLine}
+            className='pf-linear-score-line-wrapper'
+            style={index === 0 ? { marginTop: -4 } : {}}
           />,
           key: String(index),
           draggable: true,

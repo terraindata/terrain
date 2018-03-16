@@ -76,8 +76,16 @@ export const PathfinderText = {
   scoreSectionTitle: 'Rank',
   scoreSectionSubtitle: 'Rank fields must be numbers and determine the order in which results are returned.',
   // `Score your results, so that the best picks show up in the top spots.`,
-  scoreTypeLabel: 'Score',
-  scoreTypeExplanation: 'Choose how to score your algorithm',
+  scoreTypeLabel: 'Ranking Method',
+  scoreTypeExplanation: 'Select how you would like to rank results. Terrain Ranking is recommended',
+  terrainTypeExplanation: 'Use custom charts and weightings to create a custom ranking algorithm for results',
+  terrainTypeName: 'Terrain Rank',
+  fieldTypeExplanation: 'Rank items linearly given a list of fields. The result can be ordered ascending or descending by field',
+  fieldTypeName: 'Linear',
+  randomTypeExplanation: 'Randomly rank items',
+  randomTypeName: 'Random',
+  elasticTypeExplanation: 'Use only the text match quality to determine the ranking',
+  elasticTypeName: 'Match Quality',
 
   scoreSectionTypes: {
     terrain: {

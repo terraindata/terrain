@@ -75,7 +75,7 @@ export interface RouteSelectorOption
   displayName?: string | number | El;
   color?: string;
   sampleData?: List<any>;
-  extraContent?: string | El;
+  extraContent?: string;
   icon?: any;
   closeOnPick?: boolean; // close the picker when this option is picked
 }
@@ -779,14 +779,18 @@ export class RouteSelector extends TerrainComponent<Props>
                       }
                     </div>
                   }
-                  <div
-                    className='routeselector-option-name-inner'
-                    style={fontColor(Colors().fontColor2)}
-                  >
-                    {
-                      option.displayName
-                    }
-                  </div>
+                  {
+                    tooltip(
+                      <div
+                        className='routeselector-option-name-inner'
+                        style={fontColor(Colors().fontColor2)}
+                      >
+                        {
+                          option.displayName
+                        }
+                      </div>,
+                      option.extraContent,
+                    )}
                 </div>
               }
               {
