@@ -87,7 +87,7 @@ class DocumentsHelpers extends ETLHelpers
 
   public computeMergedDocuments()
   {
-    const mergeDocuments = this.templateEditor.uiState.mergeDocuments;
+    const mergeDocuments = this._templateEditor.uiState.mergeDocuments;
     // placeholder TODO
     const merged = mergeDocuments.get('_default', List([]));
 
@@ -99,23 +99,35 @@ class DocumentsHelpers extends ETLHelpers
     });
   }
 
+  // fetches documents for provided source keys
+  public fetchSources(keys: List<string>)
+  {
+    const sources = this._templateEditor.template.sources;
+    keys.forEach((key) =>
+    {
+      const source = sources.get(key);
+      this.fetchDocuments(source, key).catch(this._logRejection);
+    });
+  }
+
   public fetchDocuments(
     source: SourceConfig,
     key: string,
   ): Promise<List<object>>
   {
-    return new Promise<List<object>>((resolve, reject) => {
+    return new Promise<List<object>>((resolve, reject) =>
+    {
 
       const onFetchLoad = (documents: List<object>) =>
       {
         this.onLoadDocuments(documents, key);
         resolve(documents);
       };
-      const defaultError = (ev) =>
+      const catchError = (ev) =>
       {
-        this.onDocumentsError(ev, key);
-        reject(ev);
+        this.onFetchDocumentsError(ev, key);
       };
+
       try
       {
         this.updateStateBeforeFetch();
@@ -128,12 +140,11 @@ class DocumentsHelpers extends ETLHelpers
             {
               if (algorithm == null)
               {
-                defaultError('Could not find algorithm');
-                return;
+                return catchError('Could not find algorithm');
               }
               fetchDocumentsFromAlgorithm(algorithm, DefaultDocumentLimit)
                 .then(onFetchLoad)
-                .catch(defaultError);
+                .catch(catchError);
             };
             Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
             break;
@@ -142,23 +153,22 @@ class DocumentsHelpers extends ETLHelpers
             const file = source.options['file'];
             if (file == null)
             {
-              defaultError('File not provided');
-              return;
+              return catchError('File not provided');
             }
             const config = source.fileConfig;
             fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
               .then(onFetchLoad)
-              .catch(defaultError);
+              .catch(catchError);
             break;
           }
           default: {
-            defaultError('Failed to retrieve documents. Unknown source type');
+            return catchError('Failed to retrieve documents. Unknown source type');
           }
         }
       }
       catch (e)
       {
-        defaultError(e);
+        return catchError(e);
       }
     });
   }
@@ -173,11 +183,8 @@ class DocumentsHelpers extends ETLHelpers
     this.updateStateAfterFetch();
   }
 
-  protected onDocumentsError(ev: string | MidwayError, key: string)
+  protected onFetchDocumentsError(ev: string | MidwayError, key: string)
   {
-    // tslint:disable-next-line
-    console.error(ev);
-    // TODO add a modal message?
     this.updateStateAfterFetch();
   }
 
@@ -187,7 +194,7 @@ class DocumentsHelpers extends ETLHelpers
       actionType: 'changeLoadingDocuments',
       increment: false,
     });
-    if (this.templateEditor.loadingDocuments <= 0)
+    if (this._templateEditor.loadingDocuments <= 0)
     {
       this.computeMergedDocuments();
     }

@@ -121,7 +121,7 @@ class Initializers extends ETLHelpers
 
   public loadExistingTemplate(templateId: number)
   {
-    this.getTemplate(templateId)
+    this._getTemplate(templateId)
       .then((template: ETLTemplate) =>
       {
         this.editorAct({
@@ -140,11 +140,7 @@ class Initializers extends ETLHelpers
           actionType: 'setIsDirty',
           isDirty: false,
         });
-
-        template.sources.map((source, key) =>
-        {
-          DocumentsHelpers.fetchDocuments(source, key);
-        });
+        DocumentsHelpers.fetchSources(template.sources.keySeq());
         ETLRouteUtil.gotoEditTemplate(template.id);
       })
       .catch((response) =>
@@ -165,16 +161,18 @@ class Initializers extends ETLHelpers
       },
     });
     DocumentsHelpers.fetchDocuments(source, '_default')
-      .then(this.createInitialTemplateFn(source));
+      .then(this.createInitialTemplateFn(source))
+      .catch(this._logRejection);
   }
 
-  public initNewFromWalkthrough(walkthrough: WalkthroughState = this.walkthrough)
+  public initNewFromWalkthrough(walkthrough: WalkthroughState = this._walkthrough)
   {
     const source = walkthrough.source;
     const sink = walkthrough.sink;
     const file = walkthrough.getFile();
     DocumentsHelpers.fetchDocuments(source, '_default')
-      .then(this.createInitialTemplateFn(source, sink));
+      .then(this.createInitialTemplateFn(source, sink))
+      .catch(this._logRejection);
   }
 
   private createInitialTemplateFn(

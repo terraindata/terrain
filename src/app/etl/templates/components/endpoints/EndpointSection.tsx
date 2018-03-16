@@ -305,14 +305,8 @@ class EndpointSection extends TerrainComponent<Props>
           key,
         });
       });
-      newKeys.forEach((key) =>
-      {
-        DocumentsHelpers.fetchDocuments((endpoints as ETLTemplate['sources']).get(key), key);
-      });
-      differentKeys.forEach((key) =>
-      {
-        DocumentsHelpers.fetchDocuments((endpoints as ETLTemplate['sources']).get(key), key);
-      });
+      DocumentsHelpers.fetchSources(newKeys);
+      DocumentsHelpers.fetchSources(differentKeys);
     }
     else
     {
@@ -361,7 +355,12 @@ class EndpointSection extends TerrainComponent<Props>
   }
 }
 
-function getChangedKeys(original: LooseEndpointsType, next: LooseEndpointsType)
+function getChangedKeys(original: LooseEndpointsType, next: LooseEndpointsType):
+  {
+    differentKeys: List<string>;
+    deletedKeys: List<string>;
+    newKeys: List<string>;
+  }
 {
   const differentKeys = [];
   const deletedKeys = [];

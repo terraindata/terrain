@@ -76,24 +76,24 @@ export default abstract class ETLHelpers
   protected editorAct: typeof TemplateEditorActions;
   protected etlAct: typeof ETLActions;
 
-  get state(): Immutable.Map<string, any>
+  protected get _state(): Immutable.Map<string, any>
   {
     return TerrainStore.getState() as any;
   }
 
-  get templateEditor(): TemplateEditorState
+  protected get _templateEditor(): TemplateEditorState
   {
-    return this.state.get('templateEditor');
+    return this._state.get('templateEditor');
   }
 
-  get etl(): ETLState
+  protected get _etl(): ETLState
   {
-    return this.state.get('etl');
+    return this._state.get('etl');
   }
 
-  get walkthrough(): WalkthroughState
+  protected get _walkthrough(): WalkthroughState
   {
-    return this.state.get('walkthrough');
+    return this._state.get('walkthrough');
   }
 
   constructor(protected store)
@@ -108,7 +108,7 @@ export default abstract class ETLHelpers
     };
   }
 
-  protected grabOne<T>(resolve, reject)
+  protected _grabOne<T>(resolve, reject)
   {
     return (response: List<T>) =>
     {
@@ -123,16 +123,22 @@ export default abstract class ETLHelpers
     };
   }
 
-  protected getTemplate(templateId: number): Promise<ETLTemplate>
+  protected _getTemplate(templateId: number): Promise<ETLTemplate>
   {
     return new Promise<ETLTemplate>((resolve, reject) =>
     {
       this.etlAct({
         actionType: 'getTemplate',
         id: templateId,
-        onLoad: this.grabOne(resolve, reject),
+        onLoad: this._grabOne(resolve, reject),
         onError: reject,
       });
     });
+  }
+
+  protected _logRejection(ev)
+  {
+    // tslint:disable-next-line
+    console.error(String(ev));
   }
 }
