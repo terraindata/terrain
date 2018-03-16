@@ -44,37 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import AExportTransform from './AExportTransform';
+import * as JSONStream from 'JSONStream';
+import WrapperTransform from './WrapperTransform';
 
 /**
  * Converts result stream to JSON text stream
  *
  * Could add additional config options.
  */
-export default class JSONExportTransform extends AExportTransform
+export default class JSONExportTransform extends WrapperTransform
 {
   constructor()
   {
-    super();
-  }
-
-  protected preamble(): string
-  {
-    return '[\n';
-  }
-
-  protected transform(input: object, chunkNumber: number): string
-  {
-    return JSON.stringify(input);
-  }
-
-  protected delimiter(): string
-  {
-    return ',\n';
-  }
-
-  protected conclusion(chunkNumber: number): string
-  {
-    return '\n]\n';
+    super(JSONStream.stringify());
   }
 }

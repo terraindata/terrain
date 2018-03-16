@@ -44,57 +44,55 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'lodash';
-
-import { Import, ImportConfig } from '../Import';
-import ADocumentTransform from './ADocumentTransform';
+import { Transform } from 'stream';
 
 /**
- * Applies import transformations to a result stream
+ * Export to CSV format.
+ *
+ * Additional configuration options are possible.
  */
-export default class ImportTransform extends ADocumentTransform
+export default class WrapperTransform extends Transform
 {
-  private importt: Import;
-  private config: ImportConfig;
-  private mapping: object;
+  private stream: any;
 
-  constructor(importt: Import, config: ImportConfig)
+  constructor(stream: Transform)
   {
     super();
-    this.importt = importt;
-    this.config = config;
+    this.stream = stream;
   }
 
-  protected transform(input: object, chunkNumber: number): object | object[]
+  public _read(size)
   {
-    if (this.config.requireJSONHaveAllFields === true)
-    {
-      const expectedCols = JSON.stringify(this.config.originalNames.sort());
-      const inputCols = JSON.stringify(Object.keys(input).sort());
-      if (inputCols !== expectedCols)
-      {
-        this.emit('error', new Error('Stream contains an object that does not contain the expected fields. Got fields: ' +
-          inputCols + '\nExpected: ' + expectedCols));
-      }
-    }
-    else
-    {
-      const fieldsInDocumentNotExpected = _.difference(Object.keys(input), this.config.originalNames);
-      for (const field of fieldsInDocumentNotExpected)
-      {
-        if (input.hasOwnProperty(field))
-        {
-          this.emit('error', new Error('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
-            JSON.stringify(input)));
-        }
-        delete input[field];
-      }
-      const expectedFieldsNotInDocument = _.difference(this.config.originalNames, Object.keys(input));
-      for (const field of expectedFieldsNotInDocument)
-      {
-        input[field] = null;
-      }
-    }
-    return input;
+    return this.stream._read(size);
+  }
+
+  public _write(chunk, encoding, callback)
+  {
+    return this.stream._write(chunk, encoding, callback);
+  }
+
+  public _writev(chunks, callback)
+  {
+    return this.stream._writev(chunks, callback);
+  }
+
+  public _transform(chunk, encoding, callback)
+  {
+    return this.stream._transform(chunk, encoding, callback);
+  }
+
+  public _destroy(err, callback)
+  {
+    return this.stream._destroy(err, callback);
+  }
+
+  public _flush(callback)
+  {
+    return this.stream._flush();
+  }
+
+  public _final(callback)
+  {
+    return this.stream._final(callback);
   }
 }

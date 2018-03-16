@@ -62,10 +62,12 @@ import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../Util';
+
+import CSVImportTransform from './streams/CSVImportTransform';
+import JSONImportTransform from './streams/JSONImportTransform';
 import ImportTemplateConfig from './templates/ImportTemplateConfig';
 import { ImportTemplates } from './templates/ImportTemplates';
 import { TemplateBase } from './templates/TemplateBase';
-
 import * as Transform from './Transform';
 
 const importTemplates = new ImportTemplates();
@@ -263,15 +265,31 @@ export class Import
         winston.info('File Import: beginning to insert ES mapping.');
         await database.getTasty().getDB().putMapping(insertTable);
         winston.info('File Import: finished inserted ES mapping. Time (s): ' + String((Date.now() - time) / 1000));
-        const items = [];
-        if (imprtConf.update)
+
+        let importTransform: stream.Transform;
+        switch (imprtConf.filetype)
         {
-          await database.getTasty().update(insertTable, items);
+          case 'json':
+            importTransform = new JSONImportTransform();
+            break;
+          case 'csv':
+            importTransform = new CSVImportTransform(hasCsvHeader);
+            break;
+          default:
+            throw new Error('File type must be either CSV or JSON.');
         }
-        else
-        {
-          await database.getTasty().upsert(insertTable, items);
-        }
+
+        // TODO: push to elasticsearch update stream
+        // file.pipe(importTransform).pipe(documentTransform).pipe(elasticStream);
+
+        // if (imprtConf.update)
+        // {
+        //   await database.getTasty().update(insertTable, items);
+        // }
+        // else
+        // {
+        //   await database.getTasty().upsert(insertTable, items);
+        // }
         resolve(imprtConf);
       }
       catch (e)
@@ -589,39 +607,6 @@ export class Import
     }
   }
 
-  private async _getItems(imprt: ImportConfig, contents: string): Promise<object[]>
-  {
-    return new Promise<object[]>(async (resolve, reject) =>
-    {
-      let time: number = Date.now();
-      winston.info('File Import: beginning data parsing.');
-      let items: object[];
-      try
-      {
-        items = await this._parseData(imprt, contents);
-      } catch (e)
-      {
-        return reject('Error parsing data: ' + String(e));
-      }
-      winston.info('File Import: finished parsing data. Time (s): ' + String((Date.now() - time) / 1000));
-      time = Date.now();
-      winston.info('File Import: beginning transform/type-checking of data.');
-      if (items.length === 0)
-      {
-        return resolve(items);
-      }
-      try
-      {
-        items = [].concat.apply([], await this._transformAndCheck(items, imprt));
-      } catch (e)
-      {
-        return reject(e);
-      }
-      winston.info('File Import: finished transforming/type-checking data. Time (s): ' + String((Date.now() - time) / 1000));
-      resolve(items);
-    });
-  }
-
   /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
   private async _getMappingForSchema(imprt: ImportConfig): Promise<object>
   {
@@ -729,37 +714,6 @@ export class Import
       return 'Invalid value for parameter "' + field + '": ' + String(obj[field]);
     }
     return parsed;
-  }
-
-  private async _parseData(imprt: ImportConfig, contents: string): Promise<object[]>
-  {
-    return new Promise<object[]>(async (resolve, reject) =>
-    {
-      if (imprt.filetype === 'csv')
-      {
-        const items: object[] = [];
-        csv.fromString(contents, { ignoreEmpty: true }).on('data', (data) =>
-        {
-          if (data.length !== imprt.originalNames.length)
-          {
-            return reject('CSV row does not contain the expected number of entries (' +
-              String(imprt.originalNames.length) + '): ' + JSON.stringify(data));
-          }
-          const obj: object = {};
-          imprt.originalNames.forEach((val, ind) =>
-          {
-            obj[val] = data[ind];
-          });
-          items.push(obj);
-        }).on('error', (e) =>
-        {
-          return reject('CSV format incorrect: ' + String(e));
-        }).on('end', () =>
-        {
-          resolve(items);
-        });
-      }
-    });
   }
 
   /* recursively attempts to parse strings to dates */

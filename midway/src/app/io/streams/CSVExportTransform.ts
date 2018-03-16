@@ -45,66 +45,26 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as csv from 'fast-csv';
-import AExportTransform from './AExportTransform';
+import WrapperTransform from './WrapperTransform';
 
 /**
  * Export to CSV format.
  *
  * Additional configuration options are possible.
  */
-export default class CSVExportTransform extends AExportTransform
+export default class CSVExportTransform extends WrapperTransform
 {
   private columnNames: string[];
-  private separator: string = ',';
-  private nullValue: string = 'null';
 
-  constructor(columnNames: string[],
-    separator: string = ',',
-    nullValue: string = 'null')
+  constructor(columnNames: string[] = [],
+    separator: string = ',')
   {
-    super();
+    super(
+      csv.createWriteStream({
+        headers: true,
+        rowDelimiter: separator,
+      }),
+    );
     this.columnNames = columnNames;
-    this.separator = separator;
-    this.nullValue = nullValue;
-  }
-
-  protected preamble(): string
-  {
-    const headerObject: object = {};
-    for (let i: number = 0; i < this.columnNames.length; ++i)
-    {
-      const name: string = this.columnNames[i];
-      headerObject[name] = name;
-    }
-
-    return this.transform(headerObject, 0) + this.delimiter();
-  }
-
-  protected transform(input: object, chunkNumber: number): Promise<string>
-  {
-    return new Promise<string>((resolve, reject) =>
-    {
-      csv.writeToString([input], { headers: false }, (err, result) =>
-      {
-        if (err !== null && err !== undefined)
-        {
-          reject(err);
-        }
-        else
-        {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  protected delimiter(): string
-  {
-    return '\r\n';
-  }
-
-  protected conclusion(chunkNumber: number): string
-  {
-    return this.delimiter();
   }
 }

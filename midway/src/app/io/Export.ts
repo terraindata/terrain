@@ -170,7 +170,7 @@ export class Export
       {
         winston.info('Beginning export transformations.');
         const documentTransform: ExportTransform = new ExportTransform(this, exportConfig);
-        let exportTransform: AExportTransform;
+        let exportTransform: stream.Transform;
         switch (exportConfig.filetype)
         {
           case 'json':

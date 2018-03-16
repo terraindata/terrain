@@ -44,34 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import AImportTransform from './AImportTransform';
+import * as JSONStream from 'JSONStream';
+import WrapperTransform from './WrapperTransform';
 
 /**
  * Converts a JSON text stream to an object stream
  *
  * Could add additional config options.
  */
-export default class JSONImportTransform extends AImportTransform
+export default class JSONImportTransform extends WrapperTransform
 {
-  private isNewlineSeparated: boolean = true;
-
-  constructor(isNewlineSeparated: boolean = true)
+  constructor()
   {
-    super();
-
-    this.isNewlineSeparated = isNewlineSeparated;
-  }
-
-  protected transform(input: string, chunkNumber: number): object | object[]
-  {
-    if (this.isNewlineSeparated)
-    {
-      const strings = input.split(/\r|\n/).filter((s) => s.length);
-      return strings.map((str) => JSON.parse(str));
-    }
-    else
-    {
-      return JSON.parse(input);
-    }
+    super(JSONStream.parse());
   }
 }

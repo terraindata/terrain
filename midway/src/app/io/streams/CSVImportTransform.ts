@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import AImportTransform from './AImportTransform';
+import * as csv from 'fast-csv';
+import WrapperTransform from './WrapperTransform';
 
 /**
  * Import from a CSV format.
@@ -52,83 +53,16 @@ import AImportTransform from './AImportTransform';
  *
  * Additional configuration options are possible.
  */
-export default class CSVImportTransform extends AImportTransform
+export default class CSVImportTransform extends WrapperTransform
 {
-
-  private columnNames: string[] = [];
-  private separator: string = ',';
-  private nullValue: string = 'null';
-  private hasHeader: boolean = true;
-
-  constructor(separator: string = ',',
-    nullValue: string = 'null',
-    hasHeader: boolean = true)
+  constructor(
+    hasHeader: boolean = true,
+    separator: string = ',',
+  )
   {
-    super();
-    this.separator = separator;
-    this.nullValue = nullValue;
-    this.hasHeader = hasHeader;
-  }
-
-  protected transform(input: string, chunkNumber: number): object
-  {
-    if (this.hasHeader && chunkNumber === 0)
-    {
-      
-    }
-
-    let result: string = '';
-
-    for (let i: number = 0; i < this.columnNames.length; ++i)
-    {
-      const name: string = this.columnNames[i];
-      const value: any = input[name];
-
-      if (i > 0)
-      {
-        result += this.separator;
-      }
-
-      result += this.translation(value);
-    }
-    return result;
-  }
-
-  private translation(value: any): string
-  {
-    switch (typeof value)
-    {
-      case 'boolean':
-        return (value === true) ? 'true' : 'false';
-      case 'number':
-        return value.toString();
-      case 'string':
-        return this.escapeString(value as string);
-      case 'object':
-        if (value === null)
-        {
-          return this.nullValue;
-        }
-        else
-        {
-          return this.escapeString(JSON.stringify(value));
-        }
-      case 'undefined':
-        return this.nullValue;
-      default:
-        throw Error('Unable to convert value to valid CSV: ' + JSON.stringify(value));
-    }
-  }
-
-  private escapeString(input: string): string
-  {
-    if (!(/[,\n\r"]/.test(input)))
-    {
-      return input; // no need to escape
-    }
-
-    // CSV escapes quotes by doubling them
-    input = input.replace(/"/g, '""');
-    return '"' + input + '"';
+    super(csv({
+      headers: hasHeader,
+      delimiter: separator,
+    }));
   }
 }
