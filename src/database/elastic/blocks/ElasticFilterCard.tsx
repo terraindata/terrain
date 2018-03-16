@@ -175,20 +175,17 @@ export class FilterUtils
     return block;
   }
 
-  // Shuffle filter cards to indexFilters, typeFilters, and otherFilters
+  // Shuffle filter cards to indexFilters, otherFilters
   public static reGroupFilterRows(block: Block): Block
   {
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
-    const filterRows = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
-    const filterRowList = { indexFilters: [], typeFilters: [], otherFilters: [] };
+    const filterRows = block['indexFilters'].concat(block['otherFilters']);
+    const filterRowList = { indexFilters: [], otherFilters: [] };
     filterRows.map((row: Block) =>
     {
       if (row.boolQuery === 'filter' && row.filterOp === '=' && row.field === '_index')
       {
         filterRowList.indexFilters.push(row);
-      } else if (row.boolQuery === 'filter' && row.filterOp === '=' && row.field === '_type')
-      {
-        filterRowList.typeFilters.push(row);
       } else
       {
         filterRowList.otherFilters.push(row);
@@ -217,7 +214,6 @@ export class FilterUtils
     const boolValueInfo = cardTree.getValueInfo();
     const filterBlocks = FilterUtils.extractFilterBlocks(boolValueInfo);
     const indexFilters = [];
-    const typeFilters = [];
     const otherFilters = [];
     filterBlocks.map((filterBlock) =>
     {
@@ -227,14 +223,12 @@ export class FilterUtils
           indexFilters.push(filterBlock);
           break;
         case '_type':
-          typeFilters.push(filterBlock);
           break;
         default:
           otherFilters.push(filterBlock);
       }
     });
     block = block.set('indexFilters', List(indexFilters));
-    block = block.set('typeFilters', List(typeFilters));
     block = block.set('otherFilters', List(otherFilters));
     return block;
   }
@@ -294,7 +288,7 @@ export class FilterUtils
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
     const cardTree = new ESCardParser(block);
     const boolValueInfo = cardTree.getValueInfo();
-    const filterRows = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
+    const filterRows = block['indexFilters'].concat(block['otherFilters']);
     const filterRowMap = { filter: [], must: [], should: [], must_not: [] };
     filterRows.map((row: Block) =>
     {
@@ -1106,7 +1100,6 @@ export const elasticFilter = _card({
   // caching the type
   currentType: '',
   indexFilters: List([]),
-  typeFilters: List([]),
   otherFilters: List([]),
   cards: Immutable.List([]),
   getChildOptions: FilterUtils.BoolQueryCard.getChildOptions,
@@ -1125,7 +1118,7 @@ export const elasticFilter = _card({
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: (c: Card) =>
     {
-      return String(c['indexFilters'].size + c['typeFilters'].size + c['otherFilters'].size + c['cards'].size) + ' Filters';
+      return String(c['indexFilters'].size + c['otherFilters'].size + c['cards'].size) + ' Filters';
     },
     // this tql is same as tql of other clause cards.
     tql: (block, tqlTranslationFn, tqlConfig) =>
@@ -1158,15 +1151,6 @@ export const elasticFilter = _card({
           block = block.set('indexFilters', List([block['indexFilters'].get(0)]));
         }
       }
-      if (block['typeFilters'].size > 0)
-      {
-        const typeField = block['typeFilters'].get(0).value;
-        block = block.set('currentType', typeField);
-        if (block['typeFilters'].size > 1)
-        {
-          block = block.set('typeFilters', List([block['typeFilters'].get(0)]));
-        }
-      }
       return block;
     },
 
@@ -1197,33 +1181,6 @@ export const elasticFilter = _card({
                     getAutoTerms: (schemaState, builderState) =>
                     {
                       return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Index);
-                    },
-                  },
-                ],
-            },
-        },
-        // display _type filters second, so that 1) type filters are always following the index filters.
-        // 2) we can auto-complete the value with type schema options.
-        {
-          displayType: DisplayType.ROWS,
-          key: 'typeFilters',
-          english: 'Filter',
-          factoryType: 'elasticFilterBlock',
-          row:
-            {
-              inner:
-                [
-                  {
-                    displayType: DisplayType.LABEL,
-                    label: 'Type:',
-                    key: null,
-                  },
-                  {
-                    displayType: DisplayType.TEXT,
-                    key: 'value',
-                    getAutoTerms: (schemaState, builderState) =>
-                    {
-                      return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Type);
                     },
                   },
                 ],

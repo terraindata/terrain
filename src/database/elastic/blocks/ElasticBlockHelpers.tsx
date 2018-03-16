@@ -89,9 +89,8 @@ export const ElasticBlockHelpers = {
     }
     const serverName = builderState.db.name;
     const index = getIndex('', builderState);
-    const type = getType('', builderState);
 
-    const key = serverName + '/' + String(index) + '.' + String(type) + '.c.' + column;
+    const key = serverName + '/' + String(index) + '.' + "data" + '.c.' + column;
 
     if (schemaState.columns instanceof Map)
     {
@@ -138,7 +137,7 @@ export const ElasticBlockHelpers = {
       // else we are in the Field or Transform case...
 
       // 2. Need to get current type
-      const type = getType('', builderState);
+      const type = "data";
 
       // 3. If Transform, return columns matching server/index/type that can be transformed
       if (matchType === AutocompleteMatchType.Transform)
@@ -319,31 +318,7 @@ export function getIndex(notSetIndex: string = null, builderState: BuilderState)
 
 export function getType(notSetType: string = null, builderState: BuilderState): string | List<string> | null
 {
-  const cards = findCardType('elasticFilter', builderState);
-  if (cards.size === 0)
-  {
-    return notSetType;
-  }
-  else if (cards.size === 1)
-  {
-    const c = cards.get(0);
-    if (c['currentType'] === '')
-    {
-      return notSetType;
-    }
-    return c['currentType'];
-  }
-  // multiple filter cards, return all possible indexes
-  let types = List([]);
-  cards.forEach((c) =>
-  {
-    if (c['currentType'] !== '')
-    {
-      types = types.push(c['currentType']);
-    }
-  });
-  // If no types, return not set. If one, return as string. Otherwise return list
-  return (types.size === 0) ? notSetType : (types.size === 1) ? types.get(0) : types;
+  return "data";
 }
 
 export default ElasticBlockHelpers;
