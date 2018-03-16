@@ -692,7 +692,8 @@ export class Import
           {
             try
             {
-              item = Common.applyTransforms(item, imprt.transformations);
+              item = item;
+              // item = Common.applyTransforms(item, imprt.transformations);
             } catch (e)
             {
               return thisReject('Failed to apply transforms: ' + String(e));

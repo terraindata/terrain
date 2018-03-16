@@ -62,6 +62,7 @@ import AExportTransform from './streams/AExportTransform';
 import CSVExportTransform from './streams/CSVExportTransform';
 import ExportTransform from './streams/ExportTransform';
 import JSONExportTransform from './streams/JSONExportTransform';
+import TransformationEngineTransform from './streams/TransformationEngineTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
@@ -169,6 +170,7 @@ export class Export
       {
         winston.info('Beginning export transformations.');
         const documentTransform: ExportTransform = new ExportTransform(this, exportConfig);
+        const transformationEngineTransform = new TransformationEngineTransform(exportConfig.transformations);
         let exportTransform: stream.Transform;
         switch (exportConfig.filetype)
         {
@@ -182,7 +184,9 @@ export class Export
             throw new Error('File type must be either CSV or JSON.');
         }
 
-        resolve(respStream.pipe(documentTransform).pipe(exportTransform));
+        resolve(respStream.pipe(documentTransform)
+          .pipe(transformationEngineTransform)
+          .pipe(exportTransform));
       }
       catch (e)
       {
@@ -369,15 +373,6 @@ export class Export
   // asynchronously perform transformations on each item to upsert, and check against expected resultant types
   private _transformAndCheck(doc: object, exportConfig: ExportConfig, dontCheck?: boolean): object
   {
-    try
-    {
-      doc = Common.applyTransforms(doc, exportConfig.transformations);
-    }
-    catch (e)
-    {
-      throw new Error('Failed to apply transforms: ' + String(e));
-    }
-
     // only include the specified columns
     // NOTE: unclear if faster to copy everything over or delete the unused ones
     const trimmedDoc: object = {};
