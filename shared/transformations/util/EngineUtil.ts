@@ -133,15 +133,63 @@ export function kpToString(kp: KeyPath): string
 //   }
 // });
 
+export function validateNewFieldName(
+  engine: TransformationEngine,
+  fieldId: number,
+  newKeyPath: KeyPath,
+):
+  {
+    isValid: boolean,
+    message: string,
+  }
+{
+  if (newKeyPath.last() === '')
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Name. Names cannot be empty',
+    };
+  }
+  if (newKeyPath.last() === '*')
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Name. Name cannot be \'*\'',
+    };
+  }
+  const otherId = engine.getOutputFieldID(newKeyPath);
+  if (otherId !== undefined && otherId !== fieldId)
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Name. This field already exists',
+    };
+  }
+
+  const parentType = engine.getFieldType(fieldId);
+  if (parentType !== 'object' && parentType !== 'array')
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Parent fields is not a nested object',
+    };
+  }
+
+  return {
+    isValid: true,
+    message: '',
+  };
+}
+
 export function validateRename(
   engine: TransformationEngine,
   fieldId: number,
   newKeyPath: KeyPath,
 ):
-    {
-      isValid: boolean,
-      message: string,
-    }
+  {
+    isValid: boolean,
+    message: string,
+  }
 {
   const existingKp = engine.getOutputKeyPath(fieldId);
   const failIndex = newKeyPath.findIndex((value) => value === '');
@@ -188,7 +236,7 @@ export function validateRename(
     };
   }
 
-  for (let i = 1; i < newKeyPath.size - 1; i++)
+  for (let i = 1; i < newKeyPath.size; i++)
   {
     const kpToTest = newKeyPath.slice(0, i).toList();
     const parentId = engine.getOutputFieldID(kpToTest);
@@ -200,7 +248,7 @@ export function validateRename(
         return {
           isValid: false,
           message: 'Invalid Rename. One of the ancestor fields is not a nested object',
-        }
+        };
       }
     }
   }

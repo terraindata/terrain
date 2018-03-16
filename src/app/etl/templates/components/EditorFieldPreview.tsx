@@ -60,7 +60,7 @@ const { List, Map } = Immutable;
 import Menu from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateField } from 'etl/templates/FieldTypes';
-
+import { instanceFnDecorator } from 'src/app/Classes';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './TemplateEditorField.less';
@@ -82,16 +82,39 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       menuOpen: false,
     };
 
-  public menuOptions = List([
+  @instanceFnDecorator(memoizeOne)
+  public _getMenuOptions(canEdit, canMove, isNested)
+  {
+    const options = [];
+    if (canEdit)
     {
-      text: 'Edit this Field',
-      onClick: this.openSettings,
-    },
+      options.push({
+        text: 'Edit this Field',
+        onClick: this.openSettings,
+      });
+    }
+    if (canMove)
     {
-      text: 'Move this Field',
-      onClick: this.moveField,
-    },
-  ]);
+      options.push({
+        text: 'Move this Field',
+        onClick: this.moveField,
+      });
+    }
+    if (isNested)
+    {
+      options.push({
+        text: 'Add a subfield',
+        onClick: this.addField,
+      });
+    }
+    return List(options);
+  }
+
+  public getMenuOptions()
+  {
+    const field = this._field();
+    return this._getMenuOptions(this._canEditField(), this._canMoveField(), field.isNested());
+  }
 
   public render()
   {
@@ -117,7 +140,8 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
     const previewText = preview == null ? 'N/A' : preview.toString();
 
-    const showMenu = this._canEditField() && (this.state.hovered || this.state.menuOpen);
+    const menuOptions = this.getMenuOptions();
+    const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
     const hidePreviewValue = field.isArray() || field.isNested();
 
     return (
@@ -146,7 +170,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
               })}
             >
               <Menu
-                options={this.menuOptions}
+                options={menuOptions}
                 small={true}
                 openRight={true}
                 onChangeState={this.handleMenuStateChange}
@@ -197,6 +221,16 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       actionType: 'setDisplayState',
       state: {
         moveFieldId: this.props.fieldId,
+      },
+    });
+  }
+
+  public addField()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        addFieldId: this.props.fieldId,
       },
     });
   }

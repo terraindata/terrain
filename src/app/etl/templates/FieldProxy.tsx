@@ -55,7 +55,7 @@ import { FieldMap } from 'etl/templates/TemplateTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { validateRename } from 'shared/transformations/util/EngineUtil';
+import { validateNewFieldName, validateRename } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 /*
  *  The FieldProxy structures act as the binding between the TemplateEditorField
@@ -221,6 +221,16 @@ export class FieldNodeProxy
           engine.addField(ancestorPath, 'object');
         }
       }
+      this.syncWithEngine(true);
+    }
+  }
+
+  public addNewField(newPath: EnginePath)
+  {
+    const engine = this.tree.getEngine();
+    if (validateNewFieldName(engine, this.fieldId, newPath).isValid)
+    {
+      engine.addField(newPath, 'string');
       this.syncWithEngine(true);
     }
   }

@@ -222,6 +222,11 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return settingsAreOpen(this.props);
   }
 
+  protected _canMoveField(): boolean
+  {
+    return this._field().isNamedField();
+  }
+
   protected _canEditField(): boolean
   {
     return this._field().isNamedField() || this._field().isPrimitive();

@@ -60,6 +60,7 @@ import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
+import AddFieldModal from 'etl/templates/components/AddFieldModal';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
@@ -275,8 +276,22 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public render()
   {
-    const { previewIndex, documents, modalRequests, moveFieldId } = this.props.templateEditor.uiState;
+    const {
+      previewIndex,
+      documents,
+      modalRequests,
+      moveFieldId,
+      addFieldId,
+    } = this.props.templateEditor.uiState;
+
     const showEditor = previewIndex >= 0;
+    const fieldModalProps = {
+      canEdit: true,
+      noInteract: false,
+      preview: null,
+      displayKeyPath: emptyList,
+    };
+
     return (
       <div className='template-editor-root-container'>
         <div className='template-editor-width-spacer'>
@@ -289,10 +304,11 @@ class TemplateEditor extends TerrainComponent<Props>
         {... this.renderRootLevelModals()}
         <MoveFieldModal
           fieldId={moveFieldId}
-          canEdit={true}
-          noInteract={false}
-          preview={null}
-          displayKeyPath={emptyList}
+          {...fieldModalProps}
+        />
+        <AddFieldModal
+          fieldId={addFieldId}
+          {...fieldModalProps}
         />
         <MultiModal
           requests={modalRequests}
