@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as _ from 'lodash';
-import sha1 = require('sha1');
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -67,7 +66,7 @@ import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
 
-import * as Transform from './Transform';
+import * as Common from './Common';
 
 const exportTemplates = new ExportTemplates();
 const TastyItems: Items = new Items();
@@ -195,7 +194,7 @@ export class Export
   public _postProcessDoc(doc: object, exportConfig: ExportConfig): object
   {
     // merge top-level fields with _source if necessary
-    doc = Transform.mergeDocument(doc);
+    doc = Common.mergeDocument(doc);
 
     // verify schema mapping with documents and fix documents accordingly
     return this._transformAndCheck(doc, exportConfig, false);
@@ -225,39 +224,12 @@ export class Export
     });
   }
 
-  /* return the target hash an object with the specified field names and types should have
-     * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _buildDesiredHash(nameToType: object): string
-  {
-    let strToHash: string = 'object';
-    const nameToTypeArr: string[] = Object.keys(nameToType).sort();
-    nameToTypeArr.forEach((name) =>
-    {
-      strToHash += '|' + name + ':' + this._buildDesiredHashHelper(nameToType[name]) + '|';
-    });
-    return sha1(strToHash);
-  }
-  /* recursive helper to handle arrays */
-
-  private _buildDesiredHashHelper(typeObj: object): string
-  {
-    if (this.NUMERIC_TYPES.has(typeObj['type']))
-    {
-      return 'number';
-    }
-    if (typeObj['type'] === 'array')
-    {
-      return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
-    }
-    return typeObj['type'];
-  }
-
   /* checks whether obj has the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _checkTypes(obj: object, exportConfig: ExportConfig): void
   {
-    const targetHash: string = this._buildDesiredHash(exportConfig.columnTypes);
+    const targetHash: string = SharedUtil.buildDesiredHash(exportConfig.columnTypes);
     const targetKeys: string = JSON.stringify(Object.keys(exportConfig.columnTypes).sort());
 
     // parse dates
@@ -277,7 +249,7 @@ export class Export
       });
     }
 
-    if (this._hashObjectStructure(obj) !== targetHash)
+    if (SharedUtil.hashObjectStructure(obj) !== targetHash)
     {
       if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
       {
@@ -332,39 +304,6 @@ export class Export
       default:
         return typeObject['type'];
     }
-  }
-
-  private _getObjectStructureStr(payload: object): string
-  {
-    let structStr: string = SharedUtil.getType(payload);
-    if (structStr === 'object')
-    {
-      structStr = Object.keys(payload).sort().reduce((res, item) =>
-      {
-        res += '|' + item + ':' + this._getObjectStructureStr(payload[item]) + '|';
-        return res;
-      },
-        structStr);
-    }
-    else if (structStr === 'array')
-    {
-      if (Object.keys(structStr).length > 0)
-      {
-        structStr += '-' + this._getObjectStructureStr(payload[0]);
-      }
-      else
-      {
-        structStr += '-empty';
-      }
-    }
-    return structStr;
-  }
-
-  /* returns a hash based on the object's field names and data types
-   * handles object fields recursively ; only checks the type of the first element of arrays */
-  private _hashObjectStructure(payload: object): string
-  {
-    return sha1(this._getObjectStructureStr(payload));
   }
 
   // manually checks types (rather than checking hashes) ; handles arrays recursively
@@ -432,7 +371,7 @@ export class Export
   {
     try
     {
-      doc = Transform.applyTransforms(doc, exportConfig.transformations);
+      doc = Common.applyTransforms(doc, exportConfig.transformations);
     }
     catch (e)
     {

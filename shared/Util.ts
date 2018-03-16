@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
 import * as _ from 'lodash';
+import sha1 = require('sha1');
 
 const BAD_DELIMITERS =
   [
@@ -627,6 +628,21 @@ function _isTypeConsistentHelper(arr: object[]): string
   return type;
 }
 
+export function getRootFieldFromDocPath(path: string): string | undefined
+{
+  try
+  {
+    let pathAsArr: string[] = [];
+    path.split(/(\.)/g).forEach((elem) => pathAsArr = pathAsArr.concat(elem.split(/(\[\d+\])/g)));
+    pathAsArr = pathAsArr.filter((elem) => elem.length !== 0);
+    return pathAsArr[0];
+  }
+  catch (e)
+  {
+    return undefined;
+  }
+}
+
 export function getType(obj: object): string
 {
   if (typeof obj === 'object')
@@ -656,17 +672,64 @@ export function getType(obj: object): string
   return typeof obj;
 }
 
-export function getRootFieldFromDocPath(path: string): string | undefined
+function _getObjectStructureStr(payload: object): string
 {
-  try
+  let structStr: string = getType(payload);
+  if (structStr === 'object')
   {
-    let pathAsArr: string[] = [];
-    path.split(/(\.)/g).forEach((elem) => pathAsArr = pathAsArr.concat(elem.split(/(\[\d+\])/g)));
-    pathAsArr = pathAsArr.filter((elem) => elem.length !== 0);
-    return pathAsArr[0];
+    structStr = Object.keys(payload).sort().reduce((res, item) =>
+    {
+      res += '|' + item + ':' + _getObjectStructureStr(payload[item]) + '|';
+      return res;
+    },
+      structStr);
   }
-  catch (e)
+  else if (structStr === 'array')
   {
-    return undefined;
+    if (Object.keys(structStr).length > 0)
+    {
+      structStr += '-' + _getObjectStructureStr(payload[0]);
+    }
+    else
+    {
+      structStr += '-empty';
+    }
   }
+  return structStr;
+}
+
+/* returns a hash based on the object's field names and data types
+  * handles object fields recursively ; only checks the type of
+  * the first element of arrays */
+ export function hashObjectStructure(payload: object): string
+ {
+   return sha1(_getObjectStructureStr(payload));
+ }
+
+ /* recursive helper to handle arrays */
+function _buildDesiredHashHelper(typeObj: object): string
+{
+  const NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
+  if (NUMERIC_TYPES.has(typeObj['type']))
+  {
+    return 'number';
+  }
+  if (typeObj['type'] === 'array')
+  {
+    return 'array-' + _buildDesiredHashHelper(typeObj['innerType']);
+  }
+  return typeObj['type'];
+}
+
+/* return the target hash an object with the specified field names and types should have
+ * nameToType: maps field name (string) to object (contains "type" field (string)) */
+export function buildDesiredHash(nameToType: object): string
+{
+  let strToHash: string = 'object';
+  const nameToTypeArr: string[] = Object.keys(nameToType).sort();
+  nameToTypeArr.forEach((name) =>
+  {
+    strToHash += '|' + name + ':' + _buildDesiredHashHelper(nameToType[name]) + '|';
+  });
+  return sha1(strToHash);
 }

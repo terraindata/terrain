@@ -44,12 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import sha1 = require('sha1');
-
 import * as csv from 'fast-csv';
 import * as fs from 'fs';
 import * as _ from 'lodash';
-import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import * as winston from 'winston';
@@ -63,12 +60,12 @@ import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../Util';
 
+import * as Common from './Common';
 import CSVImportTransform from './streams/CSVImportTransform';
 import JSONImportTransform from './streams/JSONImportTransform';
 import ImportTemplateConfig from './templates/ImportTemplateConfig';
 import { ImportTemplates } from './templates/ImportTemplates';
 import { TemplateBase } from './templates/TemplateBase';
-import * as Transform from './Transform';
 
 const importTemplates = new ImportTemplates();
 
@@ -299,33 +296,6 @@ export class Import
     });
   }
 
-  /* return the target hash an object with the specified field names and types should have
-   * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _buildDesiredHash(nameToType: object): string
-  {
-    let strToHash: string = 'object';
-    const nameToTypeArr: string[] = Object.keys(nameToType).sort();
-    nameToTypeArr.forEach((name) =>
-    {
-      strToHash += '|' + name + ':' + this._buildDesiredHashHelper(nameToType[name]) + '|';
-    });
-    return sha1(strToHash);
-  }
-  /* recursive helper to handle arrays */
-
-  private _buildDesiredHashHelper(typeObj: object): string
-  {
-    if (this.NUMERIC_TYPES.has(typeObj['type']))
-    {
-      return 'number';
-    }
-    if (typeObj['type'] === 'array')
-    {
-      return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
-    }
-    return typeObj['type'];
-  }
-
   /* check for conflicts with existing schema, return error (string) if there is one
    * filters out fields already present in the existing mapping (since they don't need to be inserted)
    * mapping: ES mapping
@@ -367,7 +337,7 @@ export class Import
   {
     if (imprt.filetype === 'json')
     {
-      const targetHash: string = this._buildDesiredHash(imprt.columnTypes);
+      const targetHash: string = SharedUtil.buildDesiredHash(imprt.columnTypes);
       const targetKeys: string = JSON.stringify(Object.keys(imprt.columnTypes).sort());
 
       // parse dates
@@ -387,7 +357,7 @@ export class Import
         });
       }
 
-      if (this._hashObjectStructure(obj) !== targetHash)
+      if (SharedUtil.hashObjectStructure(obj) !== targetHash)
       {
         if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
         {
@@ -613,39 +583,6 @@ export class Import
     return fieldTypes.getESMappingFromDocument(imprt.columnTypes);
   }
 
-  private _getObjectStructureStr(payload: object): string
-  {
-    let structStr: string = SharedUtil.getType(payload);
-    if (structStr === 'object')
-    {
-      structStr = Object.keys(payload).sort().reduce((res, item) =>
-      {
-        res += '|' + item + ':' + this._getObjectStructureStr(payload[item]) + '|';
-        return res;
-      },
-        structStr);
-    }
-    else if (structStr === 'array')
-    {
-      if (Object.keys(structStr).length > 0)
-      {
-        structStr += '-' + this._getObjectStructureStr(payload[0]);
-      }
-      else
-      {
-        structStr += '-empty';
-      }
-    }
-    return structStr;
-  }
-
-  /* returns a hash based on the object's field names and data types
-   * handles object fields recursively ; only checks the type of the first element of arrays */
-  private _hashObjectStructure(payload: object): string
-  {
-    return sha1(this._getObjectStructureStr(payload));
-  }
-
   /* proposed: ES mapping
    * existing: ES mapping */
   private _isCompatibleType(proposed: object, existing: object): boolean
@@ -755,7 +692,7 @@ export class Import
           {
             try
             {
-              item = Transform.applyTransforms(item, imprt.transformations);
+              item = Common.applyTransforms(item, imprt.transformations);
             } catch (e)
             {
               return thisReject('Failed to apply transforms: ' + String(e));
