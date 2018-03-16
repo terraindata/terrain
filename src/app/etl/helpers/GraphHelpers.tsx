@@ -43,93 +43,68 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
+// tslint:disable:max-classes-per-file import-spacing
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import * as Radium from 'radium';
+import * as React from 'react';
+import { withRouter } from 'react-router';
 
-import { TemplateField } from 'etl/templates/FieldTypes';
-import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
+import { Algorithm, LibraryState } from 'library/LibraryTypes';
+import TerrainStore from 'src/app/store/TerrainStore';
+import Util from 'util/Util';
+
+import ETLHelpers from './ETLHelpers';
+
+import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { ETLActions } from 'etl/ETLRedux';
+import ETLRouteUtil from 'etl/ETLRouteUtil';
+import TemplateEditor from 'etl/templates/components/TemplateEditor';
+import { _ETLEdge, _ETLNode, _ETLProcess,
+  _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
+import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { createTreeFromEngine } from 'etl/templates/SyncUtil';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { FieldMap } from 'etl/templates/TemplateTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
+import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
 
-import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
-import { NodeTypes } from 'shared/etl/types/ETLTypes';
+import DocumentsHelpers from './DocumentsHelpers';
 
-export type Mutator<T> = (newItem: T) => void;
-
-export class ProcessProxy
+class GraphHelpers extends ETLHelpers
 {
-  constructor(private process: ETLProcess, private mutate: Mutator<ETLProcess> = doNothing)
+  public createMergeJoin(
+    leftId: number,
+    rightId: number,
+    leftJoinKey: string,
+    rightJoinKey: string,
+    outputKey: string,
+  )
   {
+    const proxy = this._template.process.proxy();
 
-  }
+    const mergeNode = _ETLNode({
+      type: NodeTypes.MergeJoin,
+      options: _MergeJoinOptions({
+        leftId,
+        rightId,
+        leftJoinKey,
+        rightJoinKey,
+        outputKey,
+      }),
+    });
+    const mergeNodeId = proxy.addNode(mergeNode);
 
-  public getProcess()
-  {
-    return this.process;
-  }
-
-  public addNode(node: ETLNode): number
-  {
-    const id = this.process.uidNode;
-    this.process = this.process
-      .setIn(['nodes', id], node)
-      .set('uidNode', id + 1);
-    this.sync();
-    return id;
-  }
-
-  // adds an edge to the process. returns -1 if the edge is invalid
-  public addEdge(edge: ETLEdge): number
-  {
-    if (!this.verifyEdge(edge))
-    {
-      return -1;
-    }
-    const id = this.process.uidEdge;
-    this.process = this.process
-      .setIn(['edges', id], edge)
-      .set('uidEdge', id + 1);
-    this.sync();
-    return id;
-  }
-
-  public splitEdge(edgeId: number)
-  {
-    // TODO
-  }
-
-  public verifyEdge(edge: ETLEdge): boolean
-  {
-    const { from, to } = edge;
-    if (!this.process.nodes.hasIn([from]) || !this.process.nodes.hasIn([to]))
-    {
-      return false;
-    }
-    if (from === to)
-    {
-      return false;
-    }
-    if (this.process.nodes.get(from).type === NodeTypes.Sink)
-    {
-      return false;
-    }
-    if (this.process.nodes.get(to).type === NodeTypes.Source)
-    {
-      return false;
-    }
-    return true;
-  }
-
-  private sync()
-  {
-    this.mutate(this.process);
+    proxy.addEdge(_ETLEdge({
+      from: leftId,
+      to: rightId,
+      transformations: new TransformationEngine(),
+    }));
   }
 }
-
-const doNothing = () => null;
+export default new GraphHelpers(TerrainStore);

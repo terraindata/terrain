@@ -110,23 +110,22 @@ class ETLProcessC
   public getDefaultSink(): number
   {
     return this.nodes.findKey(
-      (node) => node.type === NodeTypes.Sink && node.endpoint === '_default'
+      (node) => node.type === NodeTypes.Sink && node.endpoint === '_default',
     );
   }
 
   public getEdgesToNode(node: number): List<number>
   {
     return this.edges.filter(
-      (edge, key) => edge.to === node
+      (edge, key) => edge.to === node,
     ).keySeq().toList();
   }
 
-  // return all nodes that don't have connected outbound edges
-  public getMergeableNodes(): List<ETLNode>
+  public getMergeableNodes(): List<number>
   {
     // get all edges that are connected to both a source and a sink
     const nodes = this.nodes.filter((node) => node.type !== NodeTypes.Sink);
-    return nodes.toList();
+    return nodes.keySeq().toList();
   }
 }
 export type ETLProcess = WithIRecord<ETLProcessC>;

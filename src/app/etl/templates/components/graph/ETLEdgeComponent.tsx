@@ -175,7 +175,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
       actionType: 'setDisplayState',
       state: {
         mergeIntoEdgeId: edgeId,
-      }
+      },
     });
   }
 }

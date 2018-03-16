@@ -81,6 +81,11 @@ export default abstract class ETLHelpers
     return TerrainStore.getState() as any;
   }
 
+  protected get _template(): ETLTemplate
+  {
+    return this._templateEditor.get('template');
+  }
+
   protected get _templateEditor(): TemplateEditorState
   {
     return this._state.get('templateEditor');

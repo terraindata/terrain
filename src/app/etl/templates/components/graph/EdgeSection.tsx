@@ -63,7 +63,8 @@ import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
-import {
+import
+{
   _FileConfig,
   _SourceConfig,
   FileConfig,
@@ -71,11 +72,12 @@ import {
   SourceConfig,
 } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions, _MergeJoinOptions } from 'etl/templates/ETLProcess';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
+import { _ETLProcess, _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, NodeTypes, MergeJoinOptions as MergeJoinOptionsI } from 'shared/etl/types/ETLTypes';
+import { FileTypes, MergeJoinOptions as MergeJoinOptionsI, NodeTypes } from 'shared/etl/types/ETLTypes';
 
 import './EdgeSection.less';
 import ETLEdgeComponent from './ETLEdgeComponent';
@@ -99,16 +101,16 @@ interface MergeFormState
 
 class EdgeSection extends TerrainComponent<Props>
 {
-  public state: { 
-    formState: MergeFormState
+  public state: {
+    formState: MergeFormState,
   } = {
-    formState: {
-      rightIdIndex: -1,
-      leftJoinKey: '',
-      rightJoinKey: '',
-      outputKey: '',
-    }
-  };
+      formState: {
+        rightIdIndex: -1,
+        leftJoinKey: '',
+        rightJoinKey: '',
+        outputKey: '',
+      },
+    };
 
   public inputMap: InputDeclarationMap<MergeFormState> = {
     rightIdIndex: {
@@ -116,7 +118,7 @@ class EdgeSection extends TerrainComponent<Props>
       displayName: 'Source to Merge (Right)',
       options: {
         pickOptions: (s) => this.calculateRightJoinOptions(),
-      }
+      },
     },
     leftJoinKey: {
       type: DisplayType.TextBox,
@@ -124,7 +126,7 @@ class EdgeSection extends TerrainComponent<Props>
     },
     rightJoinKey: {
       type: DisplayType.TextBox,
-      displayName: 'Right Join Field'
+      displayName: 'Right Join Field',
     },
     outputKey: {
       type: DisplayType.TextBox,
@@ -133,7 +135,7 @@ class EdgeSection extends TerrainComponent<Props>
   };
 
   @instanceFnDecorator(memoizeOne)
-  public _calculateRightJoinNodes(template: ETLTemplate): List<ETLNode>
+  public _calculateRightJoinNodes(template: ETLTemplate): List<number>
   {
     return template.process.getMergeableNodes();
   }
@@ -141,7 +143,10 @@ class EdgeSection extends TerrainComponent<Props>
   @instanceFnDecorator(memoizeOne)
   public _calculateRightJoinOptions(template: ETLTemplate): List<string>
   {
-    return this._calculateRightJoinNodes(template).map((node, id) => {
+    const { process } = this.props.templateEditor.template;
+    return this._calculateRightJoinNodes(template).map((id) =>
+    {
+      const node = process.getNode(id);
       switch (node.type)
       {
         case NodeTypes.Source:
@@ -213,7 +218,16 @@ class EdgeSection extends TerrainComponent<Props>
 
   public confirmMerge()
   {
+    const { rightIdIndex, leftJoinKey, rightJoinKey, outputKey } = this.state.formState;
+    const { templateEditor } = this.props;
+    const { mergeIntoEdgeId } = templateEditor.uiState;
 
+    const leftId = templateEditor.uiState.mergeIntoEdgeId;
+    const rightId = rightIdIndex !== -1 ?
+      this._calculateRightJoinNodes(templateEditor.template).get(rightIdIndex)
+      :
+      -1;
+    GraphHelpers.createMergeJoin(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
   }
 
   public closeMergeModal()
@@ -222,7 +236,7 @@ class EdgeSection extends TerrainComponent<Props>
       actionType: 'setDisplayState',
       state: {
         mergeIntoEdgeId: null,
-      }
+      },
     });
   }
 }
