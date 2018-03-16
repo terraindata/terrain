@@ -152,6 +152,7 @@ const Input = InputC`
   padding-left: ${LEFT};
   padding-right: ${RIGHT};
   font-size: ${fontSizeFn};
+  ${(props) => props['showEllipsis'] ? `text-overflow: ellipsis;` : ''}
   ${(props) => props['noBg'] && (`
     background-color: transparent;
   `)}
@@ -188,6 +189,7 @@ interface InputProps
   semilarge?: boolean;
   isFloating?: boolean;
   extendRight?: boolean;
+  showEllipsis?: boolean;
 }
 
 interface InputDivProps
@@ -225,12 +227,14 @@ export interface Props
   debounce?: boolean;
   extendRight?: boolean;
   small?: boolean;
+  showEllipsis?: boolean;
 }
 
 export class FloatingInput extends TerrainComponent<Props>
 {
   static defaultProps = {
     semilarge: false,
+    showEllipsis: false,
   };
 
   state = {
@@ -353,6 +357,7 @@ export class FloatingInput extends TerrainComponent<Props>
           large={props.large}
           semilarge={props.semilarge}
           value={value === null || value === undefined ? '' : value}
+          title={value === null || value === undefined ? '' : value}
           onChange={this.handleChange}
           autoFocus={props.autoFocus}
           noBorder={props.noBorder}
@@ -365,6 +370,7 @@ export class FloatingInput extends TerrainComponent<Props>
           extendRight={props.extendRight}
           small={props.small}
           disabled={!props.canEdit}
+          showEllipsis={props.showEllipsis}
         />
       );
     }

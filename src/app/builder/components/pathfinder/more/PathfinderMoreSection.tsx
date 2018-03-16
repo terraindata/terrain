@@ -492,6 +492,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         debounce={true}
                         forceFloat={true}
                         noBorder={false}
+                        showEllipsis={true}
                       />,
                       PathfinderText.referenceExplanation,
                     )
@@ -510,6 +511,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       forceFloat={true}
                       noBorder={false}
                       debounce={true}
+                      showEllipsis={true}
                     />
                   </FadeInOut>
                   {
