@@ -57,6 +57,116 @@ export interface PathHashMap<T>
   [k: string]: T;
 }
 
+// turns 'foo, bar, baz' into ['foo', 'bar', 'baz']
+// commas should be escaped by \ e.g. 'foo\, bar' is ['foo,', 'bar']
+export function stringToKP(kp: string): KeyPath
+{
+  const split = kp.split(',');
+  const fuseList = split.map((val, i) => {
+    const replaced = val.replace(/\\\\/g, '');
+    if (replaced.length > 0 && replaced.charAt(replaced.length-1) === '\\')
+    {
+      return {
+        fuseNext: true,
+        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, '').slice(0, -1),
+      }
+    }
+    else
+    {
+      return {
+        fuseNext: false,
+        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, ''),
+      }
+    }
+  });
+  const reduced = fuseList.reduce((accum, val) => {
+    if (accum.length > 0)
+    {
+      const last = accum[accum.length -1];
+      if (last.fuseNext)
+      {
+        accum[accum.length -1] = {
+          fuseNext: val.fuseNext,
+          value: last.value + ',' + val.value
+        }
+        return accum;
+      }
+      else
+      {
+        accum.push(val);
+        return accum;
+      }
+    }
+    return [val];
+  }, []);
+  if (reduced.length > 0 && reduced[reduced.length - 1].fuseNext)
+  {
+    reduced[reduced.length - 1].value += ',';
+  }
+  return List(reduced.map((val, i) => val.value));
+}
+
+// turns ['foo', 'bar', 'baz'] into 'foo, bar, baz'
+export function kpToString(kp: KeyPath): string
+{
+  return kp.map((val) => val.replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
+    .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null)
+}
+
+// TODO make these into real tests?
+// const tests = [
+//   List(['hi,', 'bye']),
+//   List(['hi', 'bye', 'why,']),
+//   List(['hi', 'bye\\', 'why']),
+//   List(['hi', 'bye\\\\', 'why']),
+//   List(['h\i', 'b\\,\\y\e\\', 'w\\h\\\y']),
+//   List([',h\\\,i', 'by,e', 'wh,\,,y,']),
+// ];
+// tests.forEach((val, i) =>
+// {
+//   const str: string = kpToString(val);
+//   if (kpToString(stringToKP(str)) !== str)
+//   {
+//     console.log(String(val), ':', str, ':', String(stringToKP(str)), ':', kpToString(stringToKP(str)));
+//   }
+// });
+
+export function isValidRename(
+  engine: TransformationEngine,
+  fieldId: number,
+  newKeyPath: KeyPath
+): {
+  isValid: boolean,
+  message?: string,
+}
+{
+  const failIndex = newKeyPath.findIndex((value) => {
+    return value === '' || value === '*'
+  });
+  if (failIndex !== -1)
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. Names cannot be empty or \'*',
+    };
+  }
+  const otherId = engine.getOutputFieldID(newKeyPath);
+  if (otherId !== undefined)
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. This field already exists',
+    };
+  }
+  else if (isNamedField(engine.getOutputKeyPath(fieldId)))
+  {
+    return {
+      isValid: false,
+      message: 'Invalid Rename. This field is not a named field',
+    }
+  }
+}
+
 // root is considered to be a named field
 export function isNamedField(
   keypath: KeyPath,

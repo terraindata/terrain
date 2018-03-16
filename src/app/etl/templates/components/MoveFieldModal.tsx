@@ -57,6 +57,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { kpToString, stringToKP, isValidRename } from 'shared/transformations/util/EngineUtil';
 import Autocomplete from 'common/components/Autocomplete';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -88,86 +89,16 @@ export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 const indentSize = 24;
 const emptyList = List([]);
 
-function stringToKP(kp: string): List<string>
-{
-  const split = kp.split(',');
-  const fuseList = split.map((val, i) => {
-    const replaced = val.replace(/\\\\/g, '');
-    if (replaced.length > 0 && replaced.charAt(replaced.length-1) === '\\')
-    {
-      return {
-        fuseNext: true,
-        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, '').slice(0, -1),
-      }
-    }
-    else
-    {
-      return {
-        fuseNext: false,
-        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, ''),
-      }
-    }
-  });
-  const reduced = fuseList.reduce((accum, val) => {
-    if (accum.length > 0)
-    {
-      const last = accum[accum.length -1];
-      if (last.fuseNext)
-      {
-        accum[accum.length -1] = {
-          fuseNext: val.fuseNext,
-          value: last.value + ',' + val.value
-        }
-        return accum;
-      }
-      else
-      {
-        accum.push(val);
-        return accum;
-      }
-    }
-    return [val];
-  }, []);
-  if (reduced.length > 0 && reduced[reduced.length - 1].fuseNext)
-  {
-    reduced[reduced.length - 1].value += ',';
-  }
-  return List(reduced.map((val, i) => val.value));
-}
-
-function kpToString(kp: List<string>): string
-{
-  return kp.map((val) => val.replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
-    .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null)
-}
-
-// const tests = [
-//   List(['hi,', 'bye']),
-//   List(['hi', 'bye', 'why,']),
-//   List(['hi', 'bye\\', 'why']),
-//   List(['hi', 'bye\\\\', 'why']),
-//   List(['h\i', 'b\\,\\y\e\\', 'w\\h\\\y']),
-//   List([',h,i', 'by,e', 'wh,,,y,']),
-// ];
-// tests.forEach((val, i) =>
-// {
-//   const str: string = kpToString(val);
-//   if (kpToString(stringToKP(str)) !== str)
-//   {
-//     console.log(String(val), ':', str, ':', String(stringToKP(str)), ':', kpToString(stringToKP(str)));
-//   }
-// });
-
 class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
   public state: {
     pathValue: string;
     pathKP: List<string>;
-    editableDepth: number;
+    uneditableDepth: number;
   } = {
     pathValue: '',
     pathKP: List([]),
-    editableDepth: 0,
+    uneditableDepth: 0,
   };
 
   constructor(props)
@@ -193,7 +124,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
     return {
       pathValue: kpToString(kp),
       pathKP: kp,
-      editableDepth: lastNamed,
+      uneditableDepth: lastNamed,
     }
   }
 
@@ -213,7 +144,18 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public validateKeyPath(pathKP: List<string>)
   {
-    
+    const engine = this._currentEngine();
+    const field = this._field();
+    const kp = engine.getOutputKeyPath(field.fieldId);
+
+    const oldPathConcrete = kp.slice(0, this.state.uneditableDepth + 1);
+    const thisConcrete = pathKP.slice(0, this.state.uneditableDepth + 1);
+    if (!oldPathConcrete.equals(thisConcrete))
+    {
+      return false;
+    }
+
+    return isValidRename(engine, field.fieldId, pathKP);
   }
 
   public renderLocationKey(key: string, isEditable: boolean, depth)
@@ -239,12 +181,12 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public renderLocation()
   {
-    const { pathKP, editableDepth } = this.state;
+    const { pathKP, uneditableDepth } = this.state;
     return (
       <div className='field-location-visual'>
         {
           pathKP.map((key, index) =>
-            this.renderLocationKey(key, index > editableDepth, index)
+            this.renderLocationKey(key, index > uneditableDepth, index)
           )
         }
       </div>
