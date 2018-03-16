@@ -241,6 +241,8 @@ export default class ESCardParser extends ESParser
     return rootCard;
   }
 
+  public isMutated: boolean;
+
   public constructor(rootCard: Block, cardPath: KeyPath = Immutable.List([]))
   {
     super();
@@ -259,6 +261,8 @@ export default class ESCardParser extends ESParser
     {
       this.accumulateErrorOnValueInfo(null, 'Failed to parse cards, message: ' + String(e.message));
     }
+
+    this.isMutated = false;
   }
 
   public accumulateError(error: ESParserError): void
@@ -304,6 +308,27 @@ export default class ESCardParser extends ESParser
   {
     this.valueInfo.recursivelyVisit((element) => true, this.linkCard);
     return this.valueInfo.card;
+  }
+
+  public deleteChild(valueInfo: ESValueInfo, index: string | number)
+  {
+    if (typeof index === 'string')
+    {
+      if (valueInfo.objectChildren[index] !== undefined)
+      {
+        console.log('delete ' + index);
+        delete valueInfo.objectChildren[index];
+        this.isMutated = true;
+      }
+    } else
+    {
+      if (valueInfo.arrayChildren[index] !== undefined)
+      {
+        console.log('delete ' + index);
+        delete valueInfo.arrayChildren[index];
+        this.isMutated = true;
+      }
+    }
   }
 
   public searchCard(pattern, valueInfo = this.getValueInfo())

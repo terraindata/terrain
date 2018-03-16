@@ -128,6 +128,7 @@ export default class ESValueInfo
     return Object.keys(this.objectChildren).length;
   }
 
+
   public addObjectChild(name: string, info: ESPropertyInfo): void
   {
     this._objectChildren = this.objectChildren;
@@ -141,6 +142,12 @@ export default class ESValueInfo
   {
     return (this._arrayChildren === undefined) ? [] : this._arrayChildren;
   }
+
+  public set arrayChildren(children: ESValueInfo[])
+  {
+    this._arrayChildren = children;
+  }
+
 
   public addArrayChild(info: ESValueInfo): void
   {
@@ -176,7 +183,7 @@ export default class ESValueInfo
       });
   }
 
-  public forEachElement(func: (element: ESValueInfo) => void): void
+  public forEachElement(func: (element: ESValueInfo, index?: number, array?: ESValueInfo[]) => void): void
   {
     this.arrayChildren.forEach(func);
   }

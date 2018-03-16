@@ -86,11 +86,24 @@ export class PathToCards
       console.log('There is no card at all, please create a set of cards');
       console.log('Set index to ' + (path.source.dataSource as ElasticDataSource).index);
       const template = {
-      'query:query': {
-        'bool:elasticFilter': {
-          'filter:query[]': [{'term:term_query': {'_index:string': (path.source.dataSource as ElasticDataSource).index}}],
+        'query:query': {
+          'bool:elasticFilter': {
+            'filter:query[]': [
+              { 'term:term_query': { '_index:string': (path.source.dataSource as ElasticDataSource).index } },
+              {
+                'bool:elasticFilter': {
+                  'filter:query[]': [{'term:term_query': {' :string': ''}}]
+                }
+              }
+            ],
+            'should:query[]': [
+              {
+                'bool:elasticFilter': {
+                  'should:query[]': [{'term:term_query': {' :string': ''}}]
+                }
+              }]
+          }
         },
-      },
       'from:from': 0,
       'size:size': MAX_COUNT,
       'track_scores:track_scores': true,
@@ -100,6 +113,8 @@ export class PathToCards
     // parse the card
     const parsedCard = new ESCardParser(rootCard);
     this.fromSourceSection(path, parsedCard);
+    this.updateHardBool(path.filterGroup, parsedCard);
+    this.updateSoftBool(path.softFilterGroup,parsedCard);
     this.fromScore(path, parsedCard);
     rootCard = parsedCard.getValueInfo().card;
     console.log('Path -> Cards: ' + parsedCard.getValueInfo().value);
@@ -136,6 +151,115 @@ export class PathToCards
       const parsedCard = new ESCardParser(sizeCard);
       rootValueInfo.objectChildren['size'].propertyValue = parsedCard.getValueInfo();
       parser.updateCard();
+    }
+  }
+
+  private static ComparisonsToFilterOpMap = {
+    'greater' : '>',
+    'greaterequal': '≥',
+    'less' : '<',
+    'lessequal': '≤',
+    'equal': '=',
+    'notequal': '=',
+    'isin': 'in',
+    'isnotin': 'in',
+    'exists': 'exists',
+    'contains': '≈',
+    'notcontain': '≈',
+  };
+
+  private static ComparisonsToBoolType = {
+    'greater' : {'filter':'filter', 'should':'should'},
+    'greaterequal': {'filter':'filter', 'should':'should'},
+    'less' : {'filter':'filter', 'should':'should'},
+    'lessequal': {'filter':'filter', 'should':'should'},
+    'equal': {'filter':'filter', 'should':'should'},
+    'isin': {'filter':'filter', 'should':'should'},
+    'exists': {'filter':'filter', 'should':'should'},
+    'contains': {'filter':'filter', 'should':'should'},
+    'notequal': {'filter':'filter_not', 'should':'should_not'},
+    'isnotin': {'filter':'filter_not', 'should':'should_not'},
+    'notcontain': {'filter':'filter_not', 'should':'should_not'}
+  };
+
+  private static filterLineToFilterBlock(boolType: 'filter'|'should', line: FilterLine): Block[]
+  {
+    if (line.filterGroup)
+    {
+      return [];
+    }
+    if (this.ComparisonsToFilterOpMap[line.comparison] === undefined)
+    {
+      return [];
+    }
+    const filterOp = this.ComparisonsToFilterOpMap[line.comparison];
+    const boolQuery = this.ComparisonsToBoolType[line.comparison][boolType];
+    const block = BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+      field: line.field,
+      value: line.value,
+      boolQuery,
+      filterOp,
+      boost: line.boost,
+    }, true);
+    return [block];
+  }
+
+  private static updateHardBool(filterGroup: FilterGroup, parsedCard: ESCardParser)
+  {
+    const hardBool = parsedCard.searchCard({
+      'query:eqlquery': {
+        'bool:elasticFilter': {
+          "filter:eqlquery[]": [{"bool:elasticFilter": true}]
+        }
+      }
+    });
+    if (hardBool)
+    {
+      console.log('Got Hard Bool ', hardBool);
+      let blocks = [];
+      filterGroup.lines.map((line: FilterLine) => {
+        blocks = blocks.concat(this.filterLineToFilterBlock('filter', line));
+      });
+      const boolCard = hardBool.card;
+      const keepFilters = [];
+      boolCard.otherFilters.map((filterBlock: Block) => {
+        if (filterBlock.boolQuery != 'filter' && filterBlock.boolQuery != 'filter_not')
+        {
+          keepFilters.push(filterBlock);
+        }
+      }
+      hardBool.card = boolCard.set('otherFilters', List(keepFilters.concat(blocks)));
+      parsedCard.updateCard();
+    }
+  }
+
+
+  private static updateSoftBool(filterGroup: FilterGroup, parsedCard: ESCardParser)
+  {
+    const softBool = parsedCard.searchCard({
+      'query:eqlquery': {
+        'bool:elasticFilter': {
+          "should:eqlquery[]": [{"bool:elasticFilter": true}]
+        }
+      }
+    });
+    if (softBool)
+    {
+      console.log('Got soft bool');
+      let blocks = [];
+      filterGroup.lines.map((line: FilterLine) => {
+        blocks = blocks.concat(this.filterLineToFilterBlock('should', line));
+      });
+      const boolCard = softBool.card;
+      const keepFilters = [];
+      boolCard.otherFilters.map((filterBlock: Block) => {
+        if (filterBlock.boolQuery != 'should' && filterBlock.boolQuery != 'should_not')
+        {
+          keepFilters.push(filterBlock);
+        }
+      }
+      softBool.card = boolCard.set('otherFilters', List(keepFilters.concat(blocks)));
+      parsedCard.updateCard();
     }
   }
 
@@ -206,6 +330,7 @@ export class PathToCards
     this.updateSize(path, parser);
     this.updateSourceBool(path, parser);
   }
+
 
   private static fromScore(path: Path, parser: ESCardParser)
   {
@@ -302,22 +427,47 @@ export class CardsToPath
       return newPath;
   }
 
-  private static filterOpComparisonsMap = {
+  private static filterOpToComparisonsMap = {
       '>': 'greater',
       '≥': 'greaterequal',
       '<': 'less',
       '≤': 'lessequal',
       '=': 'equal',
+      '≈': 'contains',
       'in': 'isin',
       'exists': 'exists',
   }
 
+  private static filterNotOpToComparisonsMap = {
+    '>': 'lessequal',
+    '≥': 'less',
+    '<': 'greaterequal',
+    '≤': 'greater',
+    '=': 'notequal',
+    '≈': 'notcontain',
+    'in': 'isnotin',
+  }
+
   private static staticFilterRowToFilterLine(row: Block): FilterLine
   {
+    let comparison;
+    if (row.boolQuery === 'should_not' || row.boolQuery === 'filter_not')
+    {
+      comparison = this.filterNotOpToComparisonsMap[row.filterOp];
+      if (comparison === undefined)
+      {
+        // we can't express this comparison in the pathfinder
+        return null;
+      }
+    } else
+    {
+      comparison = this.filterOpToComparisonsMap[row.filterOp];
+    }
+
     const template = {
       field: row.field,
       value: row.value,
-      comparison: this.filterOpComparisonsMap[row.filterOp],
+      comparison,
       boost: row.boost === '' ? 1 : Number(row.boost),
     }
     return _FilterLine(template);
@@ -328,7 +478,7 @@ export class CardsToPath
     const boolCard = boolValueInfo.card;
     const filterRowList = {indexFilters: [], typeFilters: [], otherFilters: []};
     const filterRows = boolCard['otherFilters'];
-    const filterRowMap = {filter: [], must: [], should: [], must_not: []};
+    const filterRowMap = {filter: [], filter_not: [], must: [], must_not: [], should: [], should_not:[]};
 
     // regroup the filters
     filterRows.map((row: Block) =>
@@ -340,6 +490,9 @@ export class CardsToPath
       filterRowMap[row.boolQuery].push(row);
     });
 
+    filterRowMap.filter = filterRowMap.filter.concat(filterRowMap.filter_not);
+    filterRowMap.should = filterRowMap.should.concat(filterRowMap.should_not);
+
     if (boolType === 'hard')
     {
       // check whether this is a `all` group first
@@ -347,7 +500,7 @@ export class CardsToPath
       {
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'all');
-        const newLines = List(filterRowMap.filter.map((row) => this.staticFilterRowToFilterLine(row)));
+        const newLines = List(filterRowMap.filter.map((row) => this.staticFilterRowToFilterLine(row)).filter((filter) => filter !== null));
         filterGroup = filterGroup.set('lines', newLines);
         return filterGroup;
       }
@@ -357,7 +510,7 @@ export class CardsToPath
         {
           // set the filtergroup to
           filterGroup = filterGroup.set('minMatches', 'any');
-          const newLines = List(filterRowMap.should.map((row) => this.staticFilterRowToFilterLine(row)));
+          const newLines = List(filterRowMap.should.map((row) => this.staticFilterRowToFilterLine(row)).filter((filter) => filter !== null));
           filterGroup = filterGroup.set('lines', newLines);
           return filterGroup;
         }
@@ -370,7 +523,7 @@ export class CardsToPath
       {
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'any');
-        const newLines = List(filterRowMap.should.map((row) => this.staticFilterRowToFilterLine(row)));
+        const newLines = List(filterRowMap.should.map((row) => this.staticFilterRowToFilterLine(row)).filter((filter) => filter !== null));
         filterGroup = filterGroup.set('lines', newLines);
         return filterGroup;
       }
@@ -495,15 +648,18 @@ export class CardsToPath
 
   private static elasticTransformToScoreLine(transCard, weight): ScoreLine
   {
+    if (Number(weight) > 100)
+    {
+      weight = 100;
+    }
     const transformData = {
-      weight,
       scorePoints: transCard.scorePoints.toJS(),
       domain: transCard.domain.toJS(),
       dataDomain: transCard.dataDomain.toJS(),
       hasCustomDomain: transCard.hasCustomDomain,
       mode: transCard.mode,
     };
-    return _ScoreLine({field: transCard.input, transformData});
+    return _ScoreLine({field: transCard.input, transformData, weight});
   }
 
   private static elasticScoreToLines(scoreCard)

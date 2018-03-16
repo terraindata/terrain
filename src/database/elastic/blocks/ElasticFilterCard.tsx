@@ -68,6 +68,8 @@ import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo'
 import ESCardParser from '../conversion/ESCardParser';
 import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
+import ESParserError from '../../../../shared/database/elastic/parser/ESParserError';
+import ESBoolCardParser from '../conversion/ESBoolCardParser';
 
 const esFilterOperatorsMap = {
   '>': 'gt',
@@ -91,6 +93,8 @@ const esRangeOperatorMap = {
   exists: 'exists',
 };
 
+const terrainFilterClauses = ['filter', 'filter_not', 'must', 'must_not', 'should', 'should_not'];
+
 const esFilterOperatorsTooltips = {
   '>': "The data's field must be greater than your specified valued.",
   '≥': "The data's field must be greater than or equal to your specified valued.",
@@ -112,7 +116,12 @@ export class FilterUtils
     blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean)
   {
     console.assert(blockType === 'eqlbool_query', 'Unrecognized block type ' + blockType);
+    if (extraConfig && extraConfig.doNotCustom === true)
+    {
+      return BlockUtils.make(blocksConfig, blockType, extraConfig, skipTemplate);
+    }
     let filterCard = BlockUtils.make(blocksConfig, 'elasticFilter', extraConfig, skipTemplate);
+    // epilogueInit is this.customFilterBlock
     filterCard = filterCard.static.epilogueInit(filterCard);
     // delete any filter blocks since they are in filter rows now
     return filterCard;
@@ -122,151 +131,53 @@ export class FilterUtils
   public static customFilterBlock(block: Block)
   {
     // update filter rows if there is any
-    block = FilterUtils.generateFilterRowsFromBlocks(block);
-    block = FilterUtils.removeFilterBlocks(block);
-    return block;
-  }
-
-  // Remove the filter blocks which can be presented as filter rows from a Filter card.
-  public static removeFilterBlocks(block: Block): Block
-  {
-    const cardTree = new ESCardParser(block);
-    if (cardTree.hasError())
-    {
-      return block;
-    }
-    const boolValueInfo = cardTree.getValueInfo();
-    for (const boolOp of ['filter', 'must', 'should', 'must_not'])
-    {
-      if (boolValueInfo.objectChildren[boolOp])
-      {
-        const opValueInfo = boolValueInfo.objectChildren[boolOp].propertyValue;
-        let nonFilterCards;
-        if (opValueInfo.card.type === 'eqlquery')
-        {
-          const currentQueryCard = opValueInfo.card;
-          const allCards = Immutable.List([currentQueryCard]);
-          nonFilterCards = allCards.filter((queryBlock) => FilterUtils.isNotFilterBlock(queryBlock));
-        } else
-        {
-          console.assert(opValueInfo.card.type === 'eqlquery[]');
-          const allCards = opValueInfo.card.cards;
-          nonFilterCards = allCards.filter((queryBlock) => FilterUtils.isNotFilterBlock(queryBlock));
-        }
-
-        if (nonFilterCards.size === 0)
-        {
-          // there is no non-filter cards in this query
-          block = block.setIn(opValueInfo.cardPath, null);
-        } else
-        {
-          const opCard = BlockUtils.make(ElasticBlocks, 'eqlquery[]',
-            {
-              key: boolOp,
-              cards: nonFilterCards,
-            },
-            true);
-          block = block.setIn(opValueInfo.cardPath, opCard);
-        }
-      }
-    }
-    const newCards = block.cards.filter((card) => card !== null);
-    block = block.set('cards', newCards);
-    return block;
+    // this block should be a bool block
+    const boolParser = new ESBoolCardParser(block);
+    return boolParser.queryToFilter();
   }
 
   // Shuffle filter cards to indexFilters, otherFilters
-  public static reGroupFilterRows(block: Block): Block
+  public static reGroupFilterRows(block: Block, allBlocks?: Block[]): Block
   {
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
-    const filterRows = block['indexFilters'].concat(block['otherFilters']);
-    const filterRowList = { indexFilters: [], otherFilters: [] };
+    let filterRows;
+
+    if (allBlocks)
+    {
+      filterRows = allBlocks;
+    } else
+    {
+      filterRows = block['indexFilters'].concat(block['otherFilters']);
+    }
+
+    const indexFilters: Block[] = [];
+    const otherFilters: Block[] = [];
     filterRows.map((row: Block) =>
     {
       if (row.boolQuery === 'filter' && row.filterOp === '=' && row.field === '_index')
       {
-        filterRowList.indexFilters.push(row);
+        indexFilters.push(row);
       } else
       {
-        filterRowList.otherFilters.push(row);
+        otherFilters.push(row);
       }
     });
     // regroup the filter rows first because a new other-filter row added into
     // the index filter list or the type filter list
-    for (const index in filterRowList)
-    {
-      if (filterRowList.hasOwnProperty(index))
-      {
-        block = block.set(index, Immutable.List(filterRowList[index]));
-      }
-    }
-    return block;
-  }
+    block = block.set('indexFilters', Immutable.List(indexFilters));
+    block = block.set('otherFilters', Immutable.List(otherFilters));
 
-  public static generateFilterRowsFromBlocks(block: Block): Block
-  {
-    console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
-    const cardTree = new ESCardParser(block);
-    if (cardTree.hasError())
+    // update the cached currentIndex;
+    let indexField = '';
+    if (block['indexFilters'].size > 0)
     {
-      return block;
+      indexField = block['indexFilters'].get(0).value;
     }
-    const boolValueInfo = cardTree.getValueInfo();
-    const filterBlocks = FilterUtils.extractFilterBlocks(boolValueInfo);
-    const indexFilters = [];
-    const otherFilters = [];
-    filterBlocks.map((filterBlock) =>
-    {
-      switch (filterBlock.field)
-      {
-        case '_index':
-          indexFilters.push(filterBlock);
-          break;
-        case '_type':
-          break;
-        default:
-          otherFilters.push(filterBlock);
-      }
-    });
-    block = block.set('indexFilters', List(indexFilters));
-    block = block.set('otherFilters', List(otherFilters));
-    return block;
-  }
+    block = block.set('currentIndex', indexField);
 
-  public static isNotFilterBlock(queryBlock: Block)
-  {
-    if (queryBlock.type !== 'eqlquery')
-    {
-      return true;
-    }
-    if (queryBlock.cards.find((termBlock) =>
-    {
-      if (termBlock.key === 'term' && termBlock.type === 'eqlterm_query')
-      {
-        return this.IsTermClauseFilter(termBlock);
-      }
-      if (termBlock.key === 'terms' && termBlock.type === 'eqlterms_query')
-      {
-        return this.IsTermsClauseFilter(termBlock);
-      }
-      if (termBlock.key === 'range' && termBlock.type === 'eqlrange_query')
-      {
-        return this.IsRangeClauseFilter(termBlock);
-      }
-      if (termBlock.key === 'match' && termBlock.type === 'eqlmatch')
-      {
-        return this.IsMatchClauseFilter(termBlock);
-      }
-      if (termBlock.key === 'exists' && termBlock.type === 'eqlexists_query')
-      {
-        return this.IsExistsClauseFilter(termBlock);
-      }
-      return false;
-    }) === undefined)
-    {
-      return true;
-    }
-    return false;
+    console.log('after regroup filters ',allBlocks,' to ', block);
+
+    return block;
   }
 
   // Insert query blocks generated from the filter rows to a card
@@ -289,7 +200,7 @@ export class FilterUtils
     const cardTree = new ESCardParser(block);
     const boolValueInfo = cardTree.getValueInfo();
     const filterRows = block['indexFilters'].concat(block['otherFilters']);
-    const filterRowMap = { filter: [], must: [], should: [], must_not: [] };
+    const filterRowMap = { filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: [] };
     filterRows.map((row: Block) =>
     {
       if (filterRowMap[row.boolQuery] == undefined)
@@ -298,6 +209,8 @@ export class FilterUtils
       }
       filterRowMap[row.boolQuery].push(row);
     });
+    filterRowMap.filter = filterRowMap.filter.concat(filterRowMap.filter_not);
+    filterRowMap.should = filterRowMap.should.concat(filterRowMap.should_not);
     for (const boolOp of ['filter', 'must', 'should', 'must_not'])
     {
       if (filterRowMap[boolOp].length > 0)
@@ -338,25 +251,6 @@ export class FilterUtils
       }
     }
     return block;
-  }
-
-  public static extractFilterBlocks(boolValueInfo: ESValueInfo): Block[]
-  {
-    console.assert(boolValueInfo.clause.type === 'bool_query');
-    const clauseChildren = boolValueInfo.objectChildren;
-    let filters = [];
-    for (const key of ['filter', 'must', 'should', 'must_not'])
-    {
-      if (clauseChildren[key] !== undefined)
-      {
-        const fs = this.ParseFilterBlockFromValueInfo(clauseChildren[key]);
-        if (fs)
-        {
-          filters = filters.concat(fs);
-        }
-      }
-    }
-    return filters;
   }
 
   /**
@@ -414,29 +308,17 @@ export class FilterUtils
     return defaultType;
   }
 
-  private static IsExistsClauseFilter(rangeCard: Block)
-  {
-    const blockValue = new ESCardParser(rangeCard);
-    const field = this.GetFilterClauseField(blockValue.getValueInfo());
-    if (field === null)
-    {
-      return false;
-    }
-    const existsValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
-    console.assert(existsValue.clause.type === 'field');
-    return true;
-  }
-
   /**
    *
    * @param {ESPropertyInfo} termClause "term":term_query
    * @return elasticFilterBlocks generated from the filter clause
    */
-  private static ExistsClauseToBlocks(boolTypeName, existsClause: ESPropertyInfo): Block[]
+  public static ExistsClauseToBlocks(boolTypeName, existsClause: ESPropertyInfo): Block[]
   {
     // term : {field : term_value}
     // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
     // term_settings: { value: 'base', boost: 'boost' }
+    console.log('Exists Clause to blocks');
     const blocks = [];
     const existsQuery = existsClause.propertyValue;
     const field = this.GetFilterClauseField(existsQuery);
@@ -510,23 +392,39 @@ export class FilterUtils
     return queryCard;
   }
 
-  private static IsRangeClauseFilter(rangeCard: Block)
+  public static BoolClauseToBlocks(boolTypeName, boolClause: ESPropertyInfo): Block[]
   {
-    const blockValue = new ESCardParser(rangeCard);
-    const field = this.GetFilterClauseField(blockValue.getValueInfo());
-    if (field === null)
+    const boolCard = boolClause.propertyValue.card;
+    const boolValueInfo = boolClause.propertyValue;
+    console.log('boolClauseToBlocks, val ' + JSON.stringify(boolValueInfo.value) + ' cardtype: ' + boolCard.type);
+    if (boolTypeName !== 'should' && boolTypeName !== 'filter')
     {
-      return false;
+      return []
     }
-    const rangeValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
-    for (const k of Object.keys(rangeValue.objectChildren))
+
+    if (boolValueInfo.childrenSize() > 0)
     {
-      if (esRangeOperatorMap[k] !== undefined)
-      {
-        return true;
-      }
+      return [];
     }
-    return false;
+    if (boolCard.otherFilters.size !== 1)
+    {
+      return [];
+    }
+
+    let innerBlock = boolCard.otherFilters.get(0);
+    if (innerBlock.boolQuery !== 'must_not')
+    {
+      return [];
+    }
+    if (boolTypeName === 'should')
+    {
+      innerBlock = innerBlock.set('boolQuery', 'should_not');
+      return innerBlock;
+    } else
+    {
+      innerBlock = innerBlock.set('boolQuery', 'filter_not');
+      return innerBlock;
+    }
   }
 
   /**
@@ -534,8 +432,9 @@ export class FilterUtils
    * @param {ESPropertyInfo} valueInfo: term or range
    * @return elasticFilterBlocks generated from the filter clause
    */
-  private static RangeClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
+  public static RangeClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
   {
+    console.log('Range Clause to blocks');
     const blocks = [];
     const rangeQuery = rangeClause.propertyValue;
     const field = this.GetFilterClauseField(rangeQuery);
@@ -610,39 +509,13 @@ export class FilterUtils
     return queryCard;
   }
 
-  private static IsMatchClauseFilter(matchCard: Block): boolean
-  {
-    const blockValue = new ESCardParser(matchCard);
-    const field = this.GetFilterClauseField(blockValue.getValueInfo());
-    if (field === null)
-    {
-      return false;
-    }
-    const matchValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
-    if (matchValue.clause.type === 'match_settings')
-    {
-      if (matchValue.childrenSize() === 0)
-      {
-        return false;
-      }
-
-      for (const k of Object.keys(matchValue.childrenSize()))
-      {
-        if (k !== 'query' && k !== 'boost')
-        {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
 
   /**
    *
    * @param {ESPropertyInfo} valueInfo: term or range
    * @return elasticFilterBlocks generated from the filter clause
    */
-  private static MatchClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
+  public static MatchClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
   {
     // term : {field : term_value}
     // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
@@ -738,48 +611,17 @@ export class FilterUtils
     return queryCard;
   }
 
-  private static IsTermClauseFilter(termCard: Block): boolean
-  {
-    const blockValue = new ESCardParser(termCard);
-    const field = this.GetFilterClauseField(blockValue.getValueInfo());
-    if (field === null)
-    {
-      return false;
-    }
-    const termValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
-    switch (termValue.clause.type)
-    {
-      case 'term_settings':
-        if (termValue.objectChildren['value'] !== undefined)
-        {
-          return true;
-        } else
-        {
-          return false;
-        }
-      case 'null':
-        return true;
-      case 'boolean':
-        return true;
-      case 'number':
-        return true;
-      case 'string':
-        return true;
-      default:
-        TerrainLog.error('The type of ', termValue, ' is unknown');
-    }
-  }
-
   /**
    *
    * @param {ESPropertyInfo} termClause "term":term_query
    * @return elasticFilterBlocks generated from the filter clause
    */
-  private static TermClauseToBlocks(boolTypeName, termClause: ESPropertyInfo): Block[]
+  public static TermClauseToBlocks(boolTypeName, termClause: ESPropertyInfo): Block[]
   {
     // term : {field : term_value}
     // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
     // term_settings: { value: 'base', boost: 'boost' }
+    console.log('Term Clause to blocks');
     const blocks = [];
     const termQuery = termClause.propertyValue;
     const field = this.GetFilterClauseField(termQuery);
@@ -855,6 +697,7 @@ export class FilterUtils
               },
             },
           },
+          key: 'term',
         });
     } else
     {
@@ -871,28 +714,6 @@ export class FilterUtils
     return queryCard;
   }
 
-  private static IsTermsClauseFilter(termsCard: Block): boolean
-  {
-    const cardParser = new ESCardParser(termsCard);
-    const termsValueInfo = cardParser.getValueInfo();
-    const nrFields = termsValueInfo.childrenSize();
-    if (nrFields === 0 || nrFields > 2)
-    {
-      return false;
-    }
-
-    let ret = true;
-
-    termsValueInfo.forEachProperty((kv: ESPropertyInfo) =>
-    {
-      if (kv.propertyValue.clause.type === 'terms_settings')
-      {
-        ret = false;
-      }
-    });
-    return ret;
-  }
-
   /**
    *
    * @param boolTypeName: [must, must_not, should, filter]
@@ -900,9 +721,10 @@ export class FilterUtils
    * @returns {Block[]}: a list of elasticFilterBlock
    * @constructor
    */
-  private static TermsClauseToBlocks(boolTypeName, termsClause: ESPropertyInfo): Block[]
+  public  static TermsClauseToBlocks(boolTypeName, termsClause: ESPropertyInfo): Block[]
   {
     // terms: {field : terms_value, boost : boost, _name : string}
+    console.log('Terms Clause to blocks');
     const blocks = [];
     const termsQuery = termsClause.propertyValue;
     const termsQueryKVs = termsQuery.objectChildren;
@@ -979,56 +801,7 @@ export class FilterUtils
     }
     return queryCard;
   }
-  /**
-   *
-   * @param {string} queryName : must, must_not, filter, should
-   * @param {ESValueInfo} valueInfo
-   * @returns {Block[]}
-   * @constructor
-   */
-  private static ParseFilterBlockFromValueInfo(boolTypeClause: ESPropertyInfo): Block[]
-  {
-    const boolTypeName = boolTypeClause.propertyName.value;
-    // 'query[]' or 'query'
-    const filters = boolTypeClause.propertyValue;
-    let queries: ESValueInfo[];
-    let blocks = [];
-    if (filters.clause.type === 'query[]')
-    {
-      queries = filters.arrayChildren;
-    } else
-    {
-      console.assert(filters.clause.type === 'query');
-      queries = [filters];
-    }
-    for (const query of queries)
-    {
-      let newBlocks = [];
-      if (query.objectChildren['term'])
-      {
-        newBlocks = this.TermClauseToBlocks(boolTypeName, query.objectChildren['term']);
-      } else if (query.objectChildren['terms'])
-      {
-        newBlocks = this.TermsClauseToBlocks(boolTypeName, query.objectChildren['terms']);
-      }
-      else if (query.objectChildren['range'])
-      {
-        newBlocks = this.RangeClauseToBlocks(boolTypeName, query.objectChildren['range']);
-      } else if (query.objectChildren['match'])
-      {
-        newBlocks = this.MatchClauseToBlocks(boolTypeName, query.objectChildren['match']);
-      } else if (query.objectChildren['exists'])
-      {
-        newBlocks = this.ExistsClauseToBlocks(boolTypeName, query.objectChildren['exists']);
-      }
-      if (newBlocks.length > 0)
-      {
-        TerrainLog.debug(boolTypeClause, 'generates blocks ', newBlocks);
-        blocks = blocks.concat(newBlocks);
-      }
-    }
-    return blocks;
-  }
+
   // generate matched query cards from filter rows
   private static filterRowToQueryCard(block: Block): Block
   {
@@ -1057,6 +830,25 @@ export class FilterUtils
         break;
       default:
         TerrainLog.error('Unknown filterOp ' + block['filterOp']);
+    }
+
+    // we have to put the queryCard in a bool query  bool : { must_not : queryCard}
+    if (block.boolQuery === 'filter_not' || block.boolQuery === 'should_not')
+    {
+      let boolCard = BlockUtils.make(ElasticBlocks, 'eqlquery',
+        {
+          template: {
+            'bool:bool_query': {
+            }
+          },
+          key: 'bool',
+          doNotCustom: true
+        });
+      queryCard = queryCard.set('key', 'must_not');
+      const mustNotCard = boolCard.cards.get(0);
+      console.log('must not card is ' + mustNotCard.type);
+      boolCard = boolCard.setIn(['cards', 0, 'cards'], List([queryCard]));
+      return boolCard;
     }
     return queryCard;
   }
@@ -1099,6 +891,7 @@ export const elasticFilter = _card({
   currentIndex: '',
   // caching the type
   currentType: '',
+  // filters divided as index/other filters
   indexFilters: List([]),
   otherFilters: List([]),
   cards: Immutable.List([]),
@@ -1140,17 +933,6 @@ export const elasticFilter = _card({
     {
       block = FilterUtils.reGroupFilterRows(block);
 
-      // updating cached index and type
-      // keep only one filter and one type
-      if (block['indexFilters'].size > 0)
-      {
-        const indexField = block['indexFilters'].get(0).value;
-        block = block.set('currentIndex', indexField);
-        if (block['indexFilters'].size > 1)
-        {
-          block = block.set('indexFilters', List([block['indexFilters'].get(0)]));
-        }
-      }
       return block;
     },
 
@@ -1208,12 +990,7 @@ export const elasticFilter = _card({
                     displayType: DisplayType.DROPDOWN,
                     key: 'boolQuery',
                     options: List(
-                      [
-                        'must',
-                        'must_not',
-                        'should',
-                        'filter',
-                      ],
+                      terrainFilterClauses,
                       // Can consider using this, but it includes "minmum_should_match," which
                       //  doesn't make sense in this context
                       // Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])
@@ -1223,21 +1000,26 @@ export const elasticFilter = _card({
                         must: 'Must',
                         must_not: 'Must Not',
                         should: 'Should',
+                        should_not: 'Snot',
                         filter: 'Filter',
+                        filter_not: 'Fnot',
                       } as any,
                     ),
                     dropdownTooltips: List([
                       'A result must pass the equation you specify to be included in the final results.',
                       'A result must not pass the equation you specify to be included in the final results.',
                       'A result must pass at least one of the "should" equations you specify to be included in the final results.',
+                      'A result must not pass at least one of the "should" equations you specify to be included in the final results.',
                       'A result must pass the equation you specify to be included in the final results, ' +
+                      "but this equation won't be included in calculating the Elastic _score.",
+                      'A result must not pass the equation you specify to be included in the final results, ' +
                       "but this equation won't be included in calculating the Elastic _score.",
                     ]),
                     dropdownUsesRawValues: true,
                     autoDisabled: true,
                     centerDropdown: true,
                     style: {
-                      maxWidth: 125,
+                      maxWidth: 150,
                       minWidth: 105,
                       marginRight: 3,
                     },
