@@ -194,4 +194,24 @@ export default class Templates
       }
     });
   }
+
+  public async execute(id: number): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      const ts: TemplateConfig[] = await this.get(id);
+      if (ts.length < 1)
+      {
+        return reject(`Template ID ${String(id)} not found.`);
+      }
+      const template = ts[0];
+      winston.info('Executing template ', template.templateName);
+
+      // detect if it's an import
+
+      // detect if it's an export
+
+      resolve('success');
+    });
+  }
 }
