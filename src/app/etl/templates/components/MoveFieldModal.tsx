@@ -57,13 +57,13 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import Autocomplete from 'common/components/Autocomplete';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import Modal from 'common/components/Modal';
 
-import './TemplateEditorField.less';
-
+import './MoveFieldModal.less';
 
 export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 {
@@ -85,11 +85,163 @@ export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
   }
 }
 
+const indentSize = 24;
+const emptyList = List([]);
+
+function stringToKP(kp: string): List<string>
+{
+  const split = kp.split(',');
+  const fuseList = split.map((val, i) => {
+    const replaced = val.replace(/\\\\/g, '');
+    if (replaced.length > 0 && replaced.charAt(replaced.length-1) === '\\')
+    {
+      return {
+        fuseNext: true,
+        value: val.replace(/\\\\/g, '\\').trim(),
+      }
+    }
+    else
+    {
+      return {
+        fuseNext: false,
+        value: val.replace(/\\\\/g, '\\').trim(),
+      }
+    }
+  });
+  const reduced = fuseList.reduce((accum, val) => {
+    if (accum.length > 0)
+    {
+      const last = accum[accum.length -1];
+      if (last.fuseNext)
+      {
+        accum[accum.length -1] = {
+          fuseNext: val.fuseNext,
+          value: last.value + val.value
+        }
+        return accum;
+      }
+      else
+      {
+        accum.push(val);
+        return accum;
+      }
+    }
+    return [val];
+  }, []);
+  return List(reduced.map((val, i) => val.value));
+}
+
+function kpToString(kp: List<string>): string
+{
+  return kp.map((val) => val.replace(/\\/g, '\\\\').replace(',', '\,'))
+    .reduce((accum, val) => accum === null ? val : `${accum},${val}`, null)
+}
+
+// const tests = [
+//   List(['hi', 'bye']),
+//   List(['hi', 'bye', 'why']),
+//   List(['hi', 'bye\\', 'why']),
+//   List(['hi', 'bye\\\\', 'why']),
+//   List(['h\i', 'b\\,\\y\e\\', 'w\\h\\\y']),
+//   List([',h,i', 'by,e', 'wh,,,y,']),
+// ];
+// tests.forEach((val, i) =>
+// {
+//   const str: string = kpToString(val);
+//   if (kpToString(stringToKP(str)) !== str)
+//   {
+//     console.log(String(val), ':', str, ':', String(stringToKP(str)), ':', kpToString(stringToKP(str)));
+//   }
+// });
+
+
 class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
+  public state: {
+    pathValue: string;
+    pathKP: List<string>;
+    editableDepth: number;
+  } = {
+    pathValue: '',
+    pathKP: List([]),
+    editableDepth: 0,
+  };
+
+  public computeStateFromProps(props)
+  {
+    const engine = this._currentEngine();
+    const field = this._field();
+    const kp = engine.getOutputKeyPath(field.fieldId);
+  }
+
+  // TODO replace this with an svg
+  public depthBoxStyle(depth)
+  {
+    return {
+      position: 'absolute',
+      left: `${indentSize * depth - indentSize / 2 - 4 }px`,
+      width: `${indentSize/2}px`,
+      height: `0.75em`,
+      top: `2px`,
+      borderLeft: `1px solid ${Colors().text3}`,
+      borderBottom: `1px solid ${Colors().text3}`,
+    } as any;
+  }
+
+  public renderLocationKey(key: string, isEditable: boolean, depth)
+  {
+    const style = _.extend(
+      {
+        paddingLeft: `${depth * indentSize}px`
+      },
+      fontColor(isEditable ? Colors().text2 : Colors().text3)
+    );
+
+    return (
+      <div
+        key={depth}
+        className='field-location-key'
+        style={style}
+      >
+        { depth > 0 ? <div style={this.depthBoxStyle(depth)}/> : null}
+        {isEditable ? key : `[${key}]`}
+      </div>
+    );
+  }
+
+  public renderLocation()
+  {
+    // const engine = this._currentEngine();
+    // const field = this._field();
+    // const kp = engine.getOutputKeyPath(field.fieldId);
+    const { pathKP, editableDepth } = this.state;
+    return (
+      <div className='field-location-visual'>
+        {
+          pathKP.map((key, index) =>
+            this.renderLocationKey(key, index > editableDepth, index)
+          )
+        }
+      </div>
+    );
+
+  }
+
   public renderMoveUI()
   {
-    
+
+    return (
+      <div className='move-field-modal'>
+        <div className='move-field-edit-section'>
+          <Autocomplete
+            value={this.state.pathValue}
+            options={emptyList}
+            onChange={this.handleChangePathValue}
+          />
+        </div>
+        { this.renderLocation() }
+      </div>
+    );
   }
 
   public render()
@@ -111,6 +263,11 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
     );
   }
 
+  public handleChangePathValue(val: string)
+  {
+
+  }
+
   public closeModal()
   {
     this.props.act({
@@ -123,7 +280,7 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public onConfirm()
   {
-    
+
   }
 }
 
