@@ -117,7 +117,6 @@ class DocumentsHelpers extends ETLHelpers
   {
     return new Promise<List<object>>((resolve, reject) =>
     {
-
       const onFetchLoad = (documents: List<object>) =>
       {
         this.onLoadDocuments(documents, key);

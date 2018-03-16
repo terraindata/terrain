@@ -170,7 +170,13 @@ class ETLEdgeComponent extends TerrainComponent<Props>
 
   public openMergeUI()
   {
-    // TODO
+    const { act, edgeId } = this.props;
+    act({
+      actionType: 'setDisplayState',
+      state: {
+        mergeIntoEdgeId: edgeId,
+      }
+    });
   }
 }
 

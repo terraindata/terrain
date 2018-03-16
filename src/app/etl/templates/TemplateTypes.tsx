@@ -157,6 +157,7 @@ class EditorDisplayStateC
   public columnState: ColumnOptions = ColumnOptions.Endpoints;
   public moveFieldId: number = null;
   public addFieldId: number = null;
+  public mergeIntoEdgeId: number = null;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);

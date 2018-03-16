@@ -100,6 +100,34 @@ class ETLProcessC
   {
     return `Merge Node ${id}`;
   }
+
+  public getLastEdgeId(): number
+  {
+    const edges = this.getEdgesToNode(this.getDefaultSink());
+    return edges.size > 0 ? edges.first() : -1;
+  }
+
+  public getDefaultSink(): number
+  {
+    return this.nodes.findKey(
+      (node) => node.type === NodeTypes.Sink && node.endpoint === '_default'
+    );
+  }
+
+  public getEdgesToNode(node: number): List<number>
+  {
+    return this.edges.filter(
+      (edge, key) => edge.to === node
+    ).keySeq().toList();
+  }
+
+  // return all nodes that don't have connected outbound edges
+  public getMergeableNodes(): List<ETLNode>
+  {
+    // get all edges that are connected to both a source and a sink
+    const nodes = this.nodes.filter((node) => node.type !== NodeTypes.Sink);
+    return nodes.toList();
+  }
 }
 export type ETLProcess = WithIRecord<ETLProcessC>;
 export const _ETLProcess = makeExtendedConstructor(ETLProcessC, true, {
