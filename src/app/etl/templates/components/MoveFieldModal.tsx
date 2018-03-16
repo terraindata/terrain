@@ -97,14 +97,14 @@ function stringToKP(kp: string): List<string>
     {
       return {
         fuseNext: true,
-        value: val.replace(/\\\\/g, '\\').trim(),
+        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, '').slice(0, -1),
       }
     }
     else
     {
       return {
         fuseNext: false,
-        value: val.replace(/\\\\/g, '\\').trim(),
+        value: val.replace(/\\\\/g, '\\').replace(/^ +/, '').replace(/ +$/, ''),
       }
     }
   });
@@ -116,7 +116,7 @@ function stringToKP(kp: string): List<string>
       {
         accum[accum.length -1] = {
           fuseNext: val.fuseNext,
-          value: last.value + val.value
+          value: last.value + ',' + val.value
         }
         return accum;
       }
@@ -128,18 +128,22 @@ function stringToKP(kp: string): List<string>
     }
     return [val];
   }, []);
+  if (reduced.length > 0 && reduced[reduced.length - 1].fuseNext)
+  {
+    reduced[reduced.length - 1].value += ',';
+  }
   return List(reduced.map((val, i) => val.value));
 }
 
 function kpToString(kp: List<string>): string
 {
-  return kp.map((val) => val.replace(/\\/g, '\\\\').replace(',', '\,'))
-    .reduce((accum, val) => accum === null ? val : `${accum},${val}`, null)
+  return kp.map((val) => val.replace(/\\/g, '\\\\').replace(/,/g, '\\,'))
+    .reduce((accum, val) => accum === null ? val : `${accum}, ${val}`, null)
 }
 
 // const tests = [
-//   List(['hi', 'bye']),
-//   List(['hi', 'bye', 'why']),
+//   List(['hi,', 'bye']),
+//   List(['hi', 'bye', 'why,']),
 //   List(['hi', 'bye\\', 'why']),
 //   List(['hi', 'bye\\\\', 'why']),
 //   List(['h\i', 'b\\,\\y\e\\', 'w\\h\\\y']),
@@ -154,7 +158,6 @@ function kpToString(kp: List<string>): string
 //   }
 // });
 
-
 class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
   public state: {
@@ -167,11 +170,31 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
     editableDepth: 0,
   };
 
+  constructor(props)
+  {
+    super(props);
+    this.state = _.extend({}, this.state, this.computeStateFromProps(props));
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this._willFieldChange(nextProps))
+    {
+      this.setState(this.computeStateFromProps(nextProps));
+    }
+  }
+
   public computeStateFromProps(props)
   {
     const engine = this._currentEngine();
     const field = this._field();
     const kp = engine.getOutputKeyPath(field.fieldId);
+    const lastNamed = kp.findLastIndex((value, index) => !field.isAncestorNamedField(index));
+    return {
+      pathValue: kpToString(kp),
+      pathKP: kp,
+      editableDepth: lastNamed,
+    }
   }
 
   // TODO replace this with an svg
@@ -186,6 +209,11 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
       borderLeft: `1px solid ${Colors().text3}`,
       borderBottom: `1px solid ${Colors().text3}`,
     } as any;
+  }
+
+  public validateKeyPath(pathKP: List<string>)
+  {
+    
   }
 
   public renderLocationKey(key: string, isEditable: boolean, depth)
@@ -204,16 +232,13 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
         style={style}
       >
         { depth > 0 ? <div style={this.depthBoxStyle(depth)}/> : null}
-        {isEditable ? key : `[${key}]`}
+        { key }
       </div>
     );
   }
 
   public renderLocation()
   {
-    // const engine = this._currentEngine();
-    // const field = this._field();
-    // const kp = engine.getOutputKeyPath(field.fieldId);
     const { pathKP, editableDepth } = this.state;
     return (
       <div className='field-location-visual'>
@@ -265,7 +290,10 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public handleChangePathValue(val: string)
   {
-
+    this.setState({
+      pathValue: val,
+      pathKP: stringToKP(val)
+    })
   }
 
   public closeModal()
