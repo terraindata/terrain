@@ -160,6 +160,11 @@ export class TransformationEngine
     // allow construction without example doc (manually add fields)
   }
 
+  public clone(): TransformationEngine
+  {
+    return TransformationEngine.load(this.toJSON());
+  }
+
   /**
    * Checks whether a provides `TransformationEngine` is equal to the current `TransformationEngine` (`this`).
    * Performs a "deep equals" due to the complex nature of this type.
@@ -437,13 +442,20 @@ export class TransformationEngine
    */
   public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any): void
   {
-    const oldName: KeyPath = this.IDToFieldNameMap.get(fieldID);
+    const oldKeyPath: KeyPath = this.IDToFieldNameMap.get(fieldID);
+
+    // Short-circuit: do nothing if this isn't really a change, and also return immediately
+    // if this is an invalid rename (because there's already a field named `newKeyPath`)
+    if (oldKeyPath === newKeyPath || this.IDToFieldNameMap.valueSeq().contains(newKeyPath))
+    {
+      return;
+    }
 
     this.IDToFieldNameMap.forEach((field: KeyPath, id: number) =>
     {
-      if (keyPathPrefixMatch(field, oldName))
+      if (keyPathPrefixMatch(field, oldKeyPath))
       {
-        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldName, newKeyPath));
+        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldKeyPath, newKeyPath));
       }
     });
   }
