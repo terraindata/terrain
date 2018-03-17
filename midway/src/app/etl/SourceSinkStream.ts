@@ -79,7 +79,7 @@ export async function getSourceStream(sources: DefaultSourceConfig): Promise<str
     switch (src.type)
     {
       case 'Algorithm':
-        const algorithmId = src.options.algorithmId;
+        const algorithmId = src.options['algorithmId'];
         const dbId = 1;
 
         const database: DatabaseController | undefined = DatabaseRegistry.get(dbId);
