@@ -60,8 +60,8 @@ Router.use('/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods(
 
 Router.post('/execute', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const requestObj: object = JSON.parse(ctx.request.body.data).body;
-  Util.verifyParameters(requestObj, ['templateID']);
+  const req: object = ctx.request.body.body;
+  Util.verifyParameters(req, ['templateID']);
 
   const templateID = ctx.params.templateID;
   ctx.body = await templates.execute(templateID);

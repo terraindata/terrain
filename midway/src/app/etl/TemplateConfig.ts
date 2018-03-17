@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import ConfigType from '../ConfigType';
 
-import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
+import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/EndpointTypes';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
@@ -61,14 +61,8 @@ export class TemplateConfig extends ConfigType implements TemplateBase
     uidNode: 0,
     uidEdge: 0,
   };
-  public sources: {
-    _default?: SourceConfig;
-    [k: string]: SourceConfig;
-  } = {};
-  public sinks: {
-    _default?: SinkConfig;
-    [k: string]: SinkConfig;
-  } = {};
+  public sources: DefaultSourceConfig = {};
+  public sinks: DefaultSinkConfig = {};
 
   constructor(props: object)
   {

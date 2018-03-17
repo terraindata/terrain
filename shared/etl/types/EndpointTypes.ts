@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file no-unused-expression
 
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { FileTypes, Languages } from './ETLTypes';
 
 export enum Sources
@@ -79,12 +78,24 @@ export interface SourceConfig
   // a union of all possible option types
 }
 
+export interface DefaultSourceConfig
+{
+  _default?: SourceConfig;
+  [k: string]: SourceConfig;
+}
+
 export interface SinkConfig
 {
   type: SinkTypes;
   fileConfig: FileConfig;
   options: SinkOptionsType<SinkTypes>;
   // a union of all possible option types
+}
+
+export interface DefaultSinkConfig
+{
+  _default?: SinkConfig;
+  [k: string]: SinkConfig;
 }
 
 // so far sources and options are different

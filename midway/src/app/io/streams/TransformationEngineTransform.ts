@@ -59,7 +59,7 @@ export default class TransformationEngineTransform extends ADocumentTransform
   private engine: TransformationEngine | undefined;
   private transforms: object[];
 
-  constructor(transforms: object[], engine?: TransformationEngine)
+  constructor(transforms: object[] = [], engine?: TransformationEngine)
   {
     super();
     this.transforms = transforms;

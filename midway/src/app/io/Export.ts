@@ -51,7 +51,7 @@ import * as winston from 'winston';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
 import * as SharedUtil from '../../../../shared/Util';
-import { getParsedQuery } from '../../app/Util';
+import { getParsedQuery, getQueryFromAlgorithm } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import ItemConfig from '../items/ItemConfig';
@@ -59,9 +59,9 @@ import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
 import AExportTransform from './streams/AExportTransform';
-import CSVExportTransform from './streams/CSVExportTransform';
+import CSVTransform from './streams/CSVTransform';
 import ExportTransform from './streams/ExportTransform';
-import JSONExportTransform from './streams/JSONExportTransform';
+import JSONTransform from './streams/JSONTransform';
 import TransformationEngineTransform from './streams/TransformationEngineTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
@@ -134,7 +134,7 @@ export class Export
       }
       if (exportConfig.algorithmId !== undefined && exportConfig.query === undefined)
       {
-        query = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
+        query = await getQueryFromAlgorithm(exportConfig.algorithmId);
       }
       else if (exportConfig.algorithmId === undefined && exportConfig.query !== undefined)
       {
@@ -175,10 +175,10 @@ export class Export
         switch (exportConfig.filetype)
         {
           case 'json':
-            exportTransform = new JSONExportTransform();
+            exportTransform = JSONTransform.createExportStream();
             break;
           case 'csv':
-            exportTransform = new CSVExportTransform(Object.keys(exportConfig.columnTypes));
+            exportTransform = CSVTransform.createExportStream();
             break;
           default:
             throw new Error('File type must be either CSV or JSON.');
@@ -202,30 +202,6 @@ export class Export
 
     // verify schema mapping with documents and fix documents accordingly
     return this._transformAndCheck(doc, exportConfig, false);
-  }
-
-  private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
-      if (algorithms.length === 0)
-      {
-        return reject('Algorithm not found.');
-      }
-
-      try
-      {
-        if (algorithms[0].meta !== undefined)
-        {
-          return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
-        }
-      }
-      catch (e)
-      {
-        return reject('Malformed algorithm');
-      }
-    });
   }
 
   /* checks whether obj has the fields and types specified by nameToType

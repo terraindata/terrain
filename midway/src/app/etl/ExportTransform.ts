@@ -44,27 +44,37 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import WrapperTransform from './WrapperTransform';
+import ADocumentTransform from '../io/streams/ADocumentTransform';
 
 /**
- * Export to CSV format.
- *
- * Additional configuration options are possible.
+ * Applies export transformations to a result stream
  */
-export default class CSVExportTransform extends WrapperTransform
+export default class ExportTransform extends ADocumentTransform
 {
-  private columnNames: string[];
+  private rank: number = 0;
 
-  constructor(columnNames: string[] = [],
-    separator: string = ',')
+  constructor(includeRank: boolean = true)
   {
-    super(
-      csv.createWriteStream({
-        headers: true,
-        rowDelimiter: separator,
-      }),
-    );
-    this.columnNames = columnNames;
+    super();
+    this.rank = 1;
+  }
+
+  protected transform(input: object, chunkNumber: number): object | object[]
+  {
+    if (input['hits'] === undefined)
+    {
+      return input;
+    }
+
+    return input['hits'].hits.map((hit) => this.process(hit['_source']));
+  }
+
+  private process(doc: object): object
+  {
+    if (this.rank > 0 && doc['TERRAINRANK'] === undefined)
+    {
+      doc['TERRAINRANK'] = this.rank++;
+    }
+    return doc;
   }
 }

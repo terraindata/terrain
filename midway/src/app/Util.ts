@@ -46,6 +46,9 @@ THE SOFTWARE.
 
 import * as request from 'request';
 
+import { ItemConfig } from '../app/items/ItemConfig';
+import { items } from '../app/items/ItemRouter';
+
 import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../shared/database/elastic/parser/ESParser';
 import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
@@ -152,4 +155,28 @@ export function getParsedQuery(body: string): ESParser
   }
 
   return parser;
+}
+
+export async function getQueryFromAlgorithm(algorithmId: number): Promise<string>
+{
+  return new Promise<string>(async (resolve, reject) =>
+  {
+    const algorithms: ItemConfig[] = await items.get(algorithmId);
+    if (algorithms.length === 0)
+    {
+      return reject('Algorithm not found.');
+    }
+
+    try
+    {
+      if (algorithms[0].meta !== undefined)
+      {
+        return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
+      }
+    }
+    catch (e)
+    {
+      return reject('Malformed algorithm');
+    }
+  });
 }

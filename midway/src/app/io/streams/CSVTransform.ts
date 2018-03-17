@@ -44,18 +44,34 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as JSONStream from 'JSONStream';
-import WrapperTransform from './WrapperTransform';
+import * as csv from 'fast-csv';
+import { Transform } from 'stream';
 
 /**
- * Converts a JSON text stream to an object stream
- *
- * Could add additional config options.
+ * Import/Export from a CSV format. *
+ * Additional configuration options are possible.
  */
-export default class JSONImportTransform extends WrapperTransform
+export default class CSVTransform
 {
-  constructor()
+  public static createImportStream(
+    headers: boolean = true,
+    delimiter: string = ',',
+  ): Transform
   {
-    super(JSONStream.parse());
+    return csv({
+      headers,
+      delimiter,
+    });
+  }
+
+  public static createExportStream(
+    headers: boolean = true,
+    rowDelimiter: string = ',',
+  ): Transform
+  {
+    return csv.createWriteStream({
+      headers,
+      rowDelimiter,
+    });
   }
 }

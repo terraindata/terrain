@@ -61,8 +61,8 @@ import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../Util';
 
 import * as Common from './Common';
-import CSVImportTransform from './streams/CSVImportTransform';
-import JSONImportTransform from './streams/JSONImportTransform';
+import CSVTransform from './streams/CSVTransform';
+import JSONTransform from './streams/JSONTransform';
 import ImportTemplateConfig from './templates/ImportTemplateConfig';
 import { ImportTemplates } from './templates/ImportTemplates';
 import { TemplateBase } from './templates/TemplateBase';
@@ -267,10 +267,10 @@ export class Import
         switch (imprtConf.filetype)
         {
           case 'json':
-            importTransform = new JSONImportTransform();
+            importTransform = JSONTransform.createImportStream();
             break;
           case 'csv':
-            importTransform = new CSVImportTransform(hasCsvHeader);
+            importTransform = CSVTransform.createImportStream(hasCsvHeader);
             break;
           default:
             throw new Error('File type must be either CSV or JSON.');

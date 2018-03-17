@@ -701,12 +701,12 @@ function _getObjectStructureStr(payload: object): string
 /* returns a hash based on the object's field names and data types
   * handles object fields recursively ; only checks the type of
   * the first element of arrays */
- export function hashObjectStructure(payload: object): string
- {
-   return sha1(_getObjectStructureStr(payload));
- }
+export function hashObjectStructure(payload: object): string
+{
+  return sha1(_getObjectStructureStr(payload));
+}
 
- /* recursive helper to handle arrays */
+/* recursive helper to handle arrays */
 function _buildDesiredHashHelper(typeObj: object): string
 {
   const NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);

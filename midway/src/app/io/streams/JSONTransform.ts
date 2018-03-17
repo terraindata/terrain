@@ -45,17 +45,21 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as JSONStream from 'JSONStream';
-import WrapperTransform from './WrapperTransform';
+import { Transform } from 'stream';
 
 /**
- * Converts result stream to JSON text stream
- *
- * Could add additional config options.
+ * Import/Export from a JSON format. *
+ * Additional configuration options are possible.
  */
-export default class JSONExportTransform extends WrapperTransform
+export default class JSONTransform
 {
-  constructor()
+  public static createImportStream(): Transform
   {
-    super(JSONStream.stringify());
+    return JSONStream.parse();
+  }
+
+  public static createExportStream(): Transform
+  {
+    return JSONStream.stringify();
   }
 }
