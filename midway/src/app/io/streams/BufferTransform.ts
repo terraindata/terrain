@@ -77,7 +77,7 @@ export default class BufferTransform
   private _onData: (doc) => void;
   private _onEvent: (err) => void;
 
-  constructor(stream: Readable, callback: (err, arr) => void)
+  constructor(stream: Readable, callback: (err: Error, arr: any[]) => void)
   {
     this.arr = [];
     this.stream = stream;

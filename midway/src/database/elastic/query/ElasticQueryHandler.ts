@@ -62,8 +62,8 @@ import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 
+import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
 import ElasticStream from './ElasticStream';
-import { handleMergeJoin } from './MergeJoin';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -148,53 +148,36 @@ export class ElasticQueryHandler extends QueryHandler
           throw new Error('Specifying multiple join types is not supported at the moment.');
         }
 
+        let stream: Readable;
         if (query['groupJoin'] !== undefined)
         {
-          const groupJoinQuery = query['groupJoin'];
-          query['groupJoin'] = undefined;
-
-          const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
-          const childQueryStr = ESConverter.formatValueInfo(valueInfo);
-          const elasticStream = new ElasticStream(client, query);
-          const groupJoinStream = new GroupJoinTransform(client, elasticStream, childQueryStr);
-          if (request.streaming === true)
-          {
-            return groupJoinStream;
-          }
-          else
-          {
-            return new Promise<QueryResponse>((resolve, reject) =>
-            {
-              const bufferTransform = new BufferTransform(groupJoinStream,
-                (err, res) =>
-                {
-                  ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, {
-                    hits: {
-                      hits: res,
-                    },
-                  });
-                });
-            });
-          }
+          stream = new GroupJoinTransform(client, request.body);
         }
         else if (query['mergeJoin'] !== undefined)
         {
-          return handleMergeJoin(client, request, parser, query);
+          stream = new MergeJoinTransform(client, request.body);
         }
         else
         {
-          if (request.streaming === true)
-          {
-            return new ElasticStream(client, query);
-          }
-          else
-          {
-            return new Promise<QueryResponse>((resolve, reject) =>
-            {
-              client.search({ body: query } as Elastic.SearchParams, ElasticQueryHandler.makeQueryCallback(resolve, reject));
-            });
-          }
+          stream = new ElasticStream(client, query);
         }
+
+        if (request.streaming === true)
+        {
+          return stream;
+        }
+        else
+        {
+          return new Promise<QueryResponse>((resolve, reject) =>
+          {
+            const bufferTransform = new BufferTransform(stream,
+              (err, res) =>
+              {
+                ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, res[0]);
+              });
+          });
+        }
+
       case 'deleteTemplate':
       case 'getTemplate':
       case 'putTemplate':
