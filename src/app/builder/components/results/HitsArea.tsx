@@ -82,7 +82,7 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const HITS_PAGE_SIZE = 20;
+const HITS_PAGE_SIZE = 100;
 
 export interface Props
 {
@@ -680,10 +680,10 @@ class HitsArea extends TerrainComponent<Props>
           {
             hits.map((hit, index) =>
             {
-              if (index > this.state.hitsPages * HITS_PAGE_SIZE)
-              {
-                return null;
-              }
+              // if (index > this.state.hitsPages * HITS_PAGE_SIZE)
+              // {
+              //   return null;
+              // }
 
               return (
                 <Hit
