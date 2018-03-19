@@ -84,6 +84,16 @@ class ETLTemplateC implements ETLTemplateI
     return new TemplateProxy(this as any, mutator);
   }
 
+  public getSources()
+  {
+    return this.sources;
+  }
+
+  public getSinks()
+  {
+    return this.sinks;
+  }
+
   public getSourceName(key)
   {
     const source = this.sources.get(key);

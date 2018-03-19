@@ -68,7 +68,7 @@ import
 } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-class ETLProcessC
+class ETLProcessC implements ETLProcessI
 {
   public readonly nodes: Immutable.Map<number, ETLNode> = Map();
   public readonly edges: Immutable.Map<number, ETLEdge> = Map();

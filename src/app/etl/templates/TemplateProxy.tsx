@@ -196,12 +196,12 @@ export class TemplateProxy
 
   private get sinks()
   {
-    return this.template.sinks;
+    return this.template.getSinks();
   }
 
   private get sources()
   {
-    return this.template.sources;
+    return this.template.getSources();
   }
 
   private set template(val: ETLTemplate)

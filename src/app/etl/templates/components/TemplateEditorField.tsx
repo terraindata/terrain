@@ -199,7 +199,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _getSinkLanguage(): Languages
   {
-    const { sinks } = this._template();
+    const sinks = this._template().getSinks();
     if (sinks.has('_default'))
     {
       const sink: SinkConfig = sinks.get('_default');

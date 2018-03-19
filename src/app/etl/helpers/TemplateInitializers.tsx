@@ -99,7 +99,7 @@ class Initializers extends ETLHelpers
           actionType: 'setIsDirty',
           isDirty: false,
         });
-        DocumentsHelpers.fetchSources(template.sources.keySeq().toList());
+        DocumentsHelpers.fetchSources(template.getSources().keySeq().toList());
         ETLRouteUtil.gotoEditTemplate(template.id);
       })
       .catch(this._logRejection);

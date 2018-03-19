@@ -66,7 +66,7 @@ import Quarantine from 'util/RadiumQuarantine';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ETLTemplate, SinksMap, SourcesMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
@@ -102,7 +102,7 @@ class EndpointSection extends TerrainComponent<Props>
     super(props);
     this.state = {
       expandableState: Map(),
-      endpoints: props.isSource ? props.template.sources : props.template.sinks,
+      endpoints: props.isSource ? props.template.getSources() : props.template.getSinks(),
       newSourceModalOpen: false,
       newSourceModalName: '',
       newSource: _SourceConfig(),
@@ -112,8 +112,8 @@ class EndpointSection extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     const { isSource, template } = this.props;
-    const newEndpoints = isSource ? nextProps.template.sources : nextProps.template.sinks;
-    const oldEndpoints = isSource ? template.sources : template.sinks;
+    const newEndpoints = isSource ? nextProps.template.getSources() : nextProps.template.getSinks();
+    const oldEndpoints = isSource ? template.getSources() : template.getSinks();
 
     if (newEndpoints !== oldEndpoints || isSource !== nextProps.isSource)
     {
@@ -204,7 +204,7 @@ class EndpointSection extends TerrainComponent<Props>
     const confirmDisabled =
       this.state.newSourceModalName === '' ||
       this.state.newSource.type == null ||
-      template.sources.hasIn([this.state.newSourceModalName]);
+      template.getSources().hasIn([this.state.newSourceModalName]);
 
     return (
       <Modal
@@ -230,7 +230,7 @@ class EndpointSection extends TerrainComponent<Props>
   {
     const { isSource, template } = this.props;
     const { endpoints } = this.state;
-    const buttonsDisabled = endpoints === (isSource ? template.sources : template.sinks);
+    const buttonsDisabled = endpoints === (isSource ? template.getSources() : template.getSinks());
 
     return (
       <div className='endpoint-section'>
@@ -278,7 +278,7 @@ class EndpointSection extends TerrainComponent<Props>
   public handleCancelChanges()
   {
     const { template, isSource } = this.props;
-    const newEndpoints = isSource ? template.sources : template.sinks;
+    const newEndpoints = isSource ? template.getSources() : template.getSinks();
     this.setState({
       endpoints: newEndpoints,
     });
@@ -289,7 +289,7 @@ class EndpointSection extends TerrainComponent<Props>
     const { template, isSource, act } = this.props;
     const { endpoints } = this.state;
     const { newKeys, deletedKeys, differentKeys } =
-      getChangedKeys(isSource ? template.sources : template.sinks, endpoints);
+      getChangedKeys(isSource ? template.getSources() : template.getSinks(), endpoints);
 
     const proxy = template.proxy();
     if (isSource)
@@ -324,6 +324,11 @@ class EndpointSection extends TerrainComponent<Props>
         proxy.deleteSink(key);
       });
     }
+
+    act({
+      actionType: 'setTemplate',
+      template: proxy.getTemplate(),
+    });
   }
 
   public handleAddNewSource()

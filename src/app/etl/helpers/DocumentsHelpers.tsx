@@ -102,7 +102,7 @@ class DocumentsHelpers extends ETLHelpers
   // fetches documents for provided source keys
   public fetchSources(keys: List<string>)
   {
-    const sources = this._templateEditor.template.sources;
+    const sources = this._templateEditor.template.getSources();
     keys.forEach((key) =>
     {
       const source = sources.get(key);
