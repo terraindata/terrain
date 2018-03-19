@@ -221,19 +221,21 @@ export class TransformationEngine
     // Process fields created/disabled by this transformation
     if (options !== undefined)
     {
-        if (options['newFieldKeyPaths'] !== undefined)
+      if (options['newFieldKeyPaths'] !== undefined)
+      {
+        for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
         {
-            for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++) {
-                // TODO infer types of new fields
-                this.addField(options['newFieldKeyPaths'].get(i), 'string');
-            }
+          // TODO infer types of new fields
+          this.addField(options['newFieldKeyPaths'].get(i), 'string');
         }
-        if (options['preserveOldFields'] === false)
+      }
+      if (options['preserveOldFields'] === false)
+      {
+        for (let i: number = 0; i < fieldNames.size; i++)
         {
-            for (let i: number = 0; i < fieldNames.size; i++) {
-              this.disableField(this.getInputFieldID(fieldNames.get(i)));
-            }
+          this.disableField(this.getInputFieldID(fieldNames.get(i)));
         }
+      }
     }
 
     this.dag.setNode(this.uidNode.toString(), node);
@@ -286,6 +288,15 @@ export class TransformationEngine
           x['length'] = Object.keys(x).length;
           yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
         }
+      }
+    });
+
+    // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
+    this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
+    {
+      if (!enabled)
+      {
+        yadeep.remove(output, this.getOutputKeyPath(fieldID));
       }
     });
 
@@ -739,7 +750,7 @@ export class TransformationEngine
       // setting new array element
       yadeep.set(r, key, yadeep.get(o, oldKey), { create: true });
     }
-    else if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
+    else// if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
     {
       const el: any = yadeep.get(o, key);
       if (el !== undefined)

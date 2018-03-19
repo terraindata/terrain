@@ -93,24 +93,25 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitJoinNode(node: JoinTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-      const opts = node.meta as NodeOptionsType<TransformationNodeType.JoinNode>;
-      let joined: any;
-      node.fields.forEach((field) => {
-          const el: any = yadeep.get(doc, field);
-          if (joined === undefined)
-          {
-              joined = el;
-          }
-          else
-          {
-              joined = joined + opts.delimiter + el;
-          }
-      });
-      yadeep.set(doc, opts.newFieldKeyPaths.get(0), joined, { create: true });
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.JoinNode>;
+    let joined: any;
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      if (joined === undefined)
+      {
+        joined = el;
+      }
+      else
+      {
+        joined = (joined as string) + (opts.delimiter as string) + (el as string);
+      }
+    });
+    yadeep.set(doc, opts.newFieldKeyPaths.get(0), joined, { create: true });
 
-      return {
-          document: doc,
-      } as TransformationVisitResult;
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
   public visitInsertNode(node: InsertTransformationNode, doc: object, options: object = {}): TransformationVisitResult

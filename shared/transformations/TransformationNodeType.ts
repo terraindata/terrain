@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable no-unused-expression
-import {KeyPath} from "sharedutil/KeyPath";
-import {List} from "immutable";
+import { List } from 'immutable';
+import { KeyPath } from 'sharedutil/KeyPath';
 
 enum TransformationNodeType
 {
@@ -73,9 +73,9 @@ interface TransformationOptionTypes
 {
   SplitNode: any;
   JoinNode: {
-      newFieldKeyPaths: List<KeyPath>;
-      preserveOldFields: boolean;
-      delimiter: any;
+    newFieldKeyPaths: List<KeyPath>;
+    preserveOldFields: boolean;
+    delimiter: any;
   };
   FilterNode: any;
   DuplicateNode: any;

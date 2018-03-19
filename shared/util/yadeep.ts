@@ -132,7 +132,14 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
       // Don't be fooled, this is the real base case...
       if (path.size === 1)
       {
-        obj[keys[i]] = next(obj[keys[i]]);
+        if (options['delete'] === true)
+        {
+          delete obj[keys[i]];
+        }
+        else
+        {
+          obj[keys[i]] = next(obj[keys[i]]);
+        }
         return;
       } else
       {
@@ -182,4 +189,18 @@ export function set(obj: object, path: KeyPath, value: any, options: object = {}
   {
     return value;
   }, options);
+}
+
+/**
+ * Deletes the value(s) specified by the provided
+ * `KeyPath` from the document `obj`.
+ *
+ * NOTE: this modifies `obj`.
+ *
+ * @param obj  The object to modify.
+ * @param path The path of the value(s) to delete.
+ */
+export function remove(obj: object, path: KeyPath): void
+{
+  set(obj, path, undefined, { delete: true });
 }
