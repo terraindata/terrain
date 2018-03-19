@@ -288,18 +288,21 @@ class EndpointSection extends TerrainComponent<Props>
   {
     const { template, isSource, act } = this.props;
     const { endpoints } = this.state;
+    const { newKeys, deletedKeys, differentKeys } =
+      getChangedKeys(isSource ? template.sources : template.sinks, endpoints);
 
+    const proxy = template.proxy();
     if (isSource)
     {
-      const { newKeys, deletedKeys, differentKeys } =
-        getChangedKeys(isSource ? template.sources : template.sinks, endpoints);
-
-      act({
-        actionType: 'setSources',
-        sources: endpoints as ETLTemplate['sources'],
+      newKeys.forEach((key) => {
+        proxy.addSource(endpoints.get(key), key);
+      });
+      differentKeys.forEach((key) => {
+        proxy.setSource(key, endpoints.get(key));
       });
       deletedKeys.forEach((key) =>
       {
+        proxy.deleteSource(key);
         act({
           actionType: 'deleteInMergeDocuments',
           key,
@@ -310,9 +313,15 @@ class EndpointSection extends TerrainComponent<Props>
     }
     else
     {
-      act({
-        actionType: 'setSinks',
-        sinks: endpoints as ETLTemplate['sinks'],
+      newKeys.forEach((key) => {
+        proxy.addSink(endpoints.get(key), key);
+      });
+      differentKeys.forEach((key) => {
+        proxy.setSink(key, endpoints.get(key));
+      });
+      deletedKeys.forEach((key) =>
+      {
+        proxy.deleteSink(key);
       });
     }
   }
@@ -355,7 +364,7 @@ class EndpointSection extends TerrainComponent<Props>
   }
 }
 
-function getChangedKeys(original: LooseEndpointsType, next: LooseEndpointsType):
+function getChangedKeys(original: Immutable.Map<string, any>, next: Immutable.Map<string, any>):
   {
     differentKeys: List<string>;
     deletedKeys: List<string>;

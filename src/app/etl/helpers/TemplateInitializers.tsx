@@ -192,27 +192,12 @@ class Initializers extends ETLHelpers
     const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
     // default source and sink is upload and download
 
-    const proxy = template.process.proxy();
-    const defaultSink = _ETLNode({
-      type: NodeTypes.Sink,
-      endpoint: '_default',
-    });
-    const defaultSource = _ETLNode({
-      type: NodeTypes.Source,
-      endpoint: '_default',
-    });
-    const sourceId = proxy.addNode(defaultSource);
-    const sinkId = proxy.addNode(defaultSink);
-    const defaultEdge = _ETLEdge({
-      from: sourceId,
-      to: sinkId,
-      transformations: engine,
-    });
-    const initialEdge = proxy.addEdge(defaultEdge);
+    const proxy = template.proxy();
+    const sourceId = proxy.addSource(sourceToAdd);
+    const sinkId = proxy.addSink(sinkToAdd);
+    const initialEdge = proxy.addEdge(sourceId, sinkId, engine);
 
-    template = template.set('process', proxy.getProcess());
-    template = template.setIn(['sources', '_default'], sourceToAdd);
-    template = template.setIn(['sinks', '_default'], sinkToAdd);
+    template = proxy.getTemplate();
 
     return {
       template,

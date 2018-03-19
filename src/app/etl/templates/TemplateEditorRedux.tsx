@@ -80,14 +80,14 @@ export interface TemplateEditorActionTypes
     actionType: 'setIsDirty';
     isDirty: boolean;
   };
-  setTemplate: {
+  setTemplate: { // this should be the only way to mutate the template graph
     actionType: 'setTemplate';
     template: ETLTemplate;
   };
   rebuildFieldMap: {
     actionType: 'rebuildFieldMap';
   };
-  setFieldMap: { // this should be the only way to edit the template tree
+  setFieldMap: { // this should be the only way to mutate the template tree
     actionType: 'setFieldMap';
     fieldMap: FieldMap;
   };
@@ -123,14 +123,6 @@ export interface TemplateEditorActionTypes
   };
   updateEngineVersion: {
     actionType: 'updateEngineVersion';
-  };
-  setSinks: {
-    actionType: 'setSinks';
-    sinks: ETLTemplate['sinks'];
-  };
-  setSources: {
-    actionType: 'setSources';
-    sources: ETLTemplate['sources'];
   };
   resetState: { // resets the display state
     actionType: 'resetState';
@@ -215,14 +207,6 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         const oldVersion = state.uiState.engineVersion;
         return state.setIn(['uiState', 'engineVersion'], oldVersion + 1)
           .set('isDirty', true);
-      },
-      setSinks: (state, action) =>
-      {
-        return state.setIn(['template', 'sinks'], action.payload.sinks).set('isDirty', true);
-      },
-      setSources: (state, action) =>
-      {
-        return state.setIn(['template', 'sources'], action.payload.sources).set('isDirty', true);
       },
       resetState: (state, action) =>
       {

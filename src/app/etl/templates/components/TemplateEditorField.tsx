@@ -193,7 +193,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _isRootField()
   {
     const { fieldId } = this.props;
-    const kp = this._currentEngine().getOutputKeyPath(fieldId);
+    const kp = this._field().outputKeyPath;
     return kp.size === 1;
   }
 

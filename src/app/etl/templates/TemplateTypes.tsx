@@ -58,11 +58,15 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+ import { TemplateProxy } from './TemplateProxy';
+
+export type SourcesMap = Immutable.Map<string, SourceConfig>;
+export type SinksMap = Immutable.Map<string, SinkConfig>;
 
 interface ETLTemplateI extends TemplateBase
 {
-  sources: Immutable.Map<string, SourceConfig>;
-  sinks: Immutable.Map<string, SinkConfig>;
+  sources: SourcesMap;
+  sinks: SinksMap;
   process: ETLProcess;
 }
 
@@ -74,6 +78,11 @@ class ETLTemplateC implements ETLTemplateI
   public process = _ETLProcess();
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
+
+  public proxy(mutator?: (template: ETLTemplate) => void)
+  {
+    return new TemplateProxy(this as any, mutator);
+  }
 
   public getSourceName(key)
   {

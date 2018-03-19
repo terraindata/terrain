@@ -144,6 +144,6 @@ export default abstract class ETLHelpers
   protected _logRejection(ev)
   {
     // tslint:disable-next-line
-    console.error(String(ev));
+    console.error(ev);
   }
 }

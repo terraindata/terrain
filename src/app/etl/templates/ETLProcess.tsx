@@ -67,7 +67,6 @@ import
   TemplateObject,
 } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { ProcessProxy } from './ProcessProxy';
 
 class ETLProcessC
 {
@@ -75,11 +74,6 @@ class ETLProcessC
   public readonly edges: Immutable.Map<number, ETLEdge> = Map();
   public readonly uidNode: number = 0;
   public readonly uidEdge: number = 0;
-
-  public proxy()
-  {
-    return new ProcessProxy(this as any);
-  }
 
   public getTransformationEngine(edge: number)
   {

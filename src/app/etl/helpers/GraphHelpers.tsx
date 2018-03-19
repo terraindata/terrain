@@ -86,25 +86,25 @@ class GraphHelpers extends ETLHelpers
     outputKey: string,
   )
   {
-    const proxy = this._template.process.proxy();
+    // const proxy = this._template.process.proxy();
 
-    const mergeNode = _ETLNode({
-      type: NodeTypes.MergeJoin,
-      options: _MergeJoinOptions({
-        leftId,
-        rightId,
-        leftJoinKey,
-        rightJoinKey,
-        outputKey,
-      }),
-    });
-    const mergeNodeId = proxy.addNode(mergeNode);
+    // const mergeNode = _ETLNode({
+    //   type: NodeTypes.MergeJoin,
+    //   options: _MergeJoinOptions({
+    //     leftId,
+    //     rightId,
+    //     leftJoinKey,
+    //     rightJoinKey,
+    //     outputKey,
+    //   }),
+    // });
+    // const mergeNodeId = proxy.addNode(mergeNode);
 
-    proxy.addEdge(_ETLEdge({
-      from: leftId,
-      to: rightId,
-      transformations: new TransformationEngine(),
-    }));
+    // proxy.addEdge(_ETLEdge({
+    //   from: leftId,
+    //   to: rightId,
+    //   transformations: new TransformationEngine(),
+    // }));
   }
 }
 export default new GraphHelpers(TerrainStore);

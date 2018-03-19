@@ -51,41 +51,100 @@ const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
-import { FieldMap } from 'etl/templates/TemplateTypes';
+import { ETLTemplate, FieldMap, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 
 import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
 export type Mutator<T> = (newItem: T) => void;
 
-export class ProcessProxy
+export class TemplateProxy
 {
-  constructor(private process: ETLProcess, private mutate: Mutator<ETLProcess> = doNothing)
+  constructor(
+    private _template: ETLTemplate,
+    private onMutate: Mutator<ETLTemplate> = doNothing,
+  )
   {
 
   }
 
-  public getProcess()
+  public getTemplate()
   {
-    return this.process;
+    return this.template;
   }
 
-  public addNode(node: ETLNode): number
+  public setSource(key: string, source: SourceConfig)
+  {
+    this.sources = this.sources.set(key, source);
+  }
+
+  public setSink(key: string, sink: SinkConfig)
+  {
+    this.sinks = this.sinks.set(key, sink);
+  }
+
+  public addSource(source: SourceConfig, key: string = '_default'): number
+  {
+    this.sources = this.sources.set(key, source);
+    const sourceNode = _ETLNode({
+      endpoint: key,
+      type: NodeTypes.Source
+    });
+    return this.createNode(sourceNode);
+  }
+
+  public addSink(sink: SinkConfig, key: string = '_default'): number
+  {
+    this.sinks = this.sinks.set(key, sink);
+    const sinkNode = _ETLNode({
+      endpoint: key,
+      type: NodeTypes.Sink
+    });
+    return this.createNode(sinkNode);
+  }
+
+  public deleteSource(key: string)
+  {
+    this.sources = this.sources.delete(key);
+  }
+
+  public deleteSink(key: string)
+  {
+    this.sinks = this.sinks.delete(key);
+  }
+
+  public addEdge(from: number, to: number, engine: TransformationEngine = new TransformationEngine())
+  {
+    const edge = _ETLEdge({
+      from,
+      to,
+      transformations: engine,
+    });
+    return this.createEdge(edge);
+  }
+
+  public splitEdge(edgeId: number)
+  {
+    // TODO
+  }
+
+  private createNode(node: ETLNode): number
   {
     const id = this.process.uidNode;
     this.process = this.process
       .setIn(['nodes', id], node)
       .set('uidNode', id + 1);
-    this.sync();
     return id;
   }
 
   // adds an edge to the process. returns -1 if the edge is invalid
-  public addEdge(edge: ETLEdge): number
+  private createEdge(edge: ETLEdge): number
   {
     if (!this.verifyEdge(edge))
     {
@@ -95,16 +154,10 @@ export class ProcessProxy
     this.process = this.process
       .setIn(['edges', id], edge)
       .set('uidEdge', id + 1);
-    this.sync();
     return id;
   }
 
-  public splitEdge(edgeId: number)
-  {
-    // TODO
-  }
-
-  public verifyEdge(edge: ETLEdge): boolean
+  private verifyEdge(edge: ETLEdge): boolean
   {
     const { from, to } = edge;
     if (!this.process.nodes.hasIn([from]) || !this.process.nodes.hasIn([to]))
@@ -128,7 +181,51 @@ export class ProcessProxy
 
   private sync()
   {
-    this.mutate(this.process);
+    this.onMutate(this.template);
+  }
+
+  private get template()
+  {
+    return this._template;
+  }
+
+  private get process()
+  {
+    return this.template.process;
+  }
+
+  private get sinks()
+  {
+    return this.template.sinks;
+  }
+
+  private get sources()
+  {
+    return this.template.sources;
+  }
+
+  private set template(val: ETLTemplate)
+  {
+    this._template = val;
+    this.sync();
+  }
+
+  private set process(val: ETLProcess)
+  {
+    this.template = this.template.set('process', val);
+    this.sync();
+  }
+
+  private set sinks(val: SinksMap)
+  {
+    this.template = this.template.set('sinks', val);
+    this.sync();
+  }
+
+  private set sources(val: SourcesMap)
+  {
+    this.template = this.template.set('sources', val);
+    this.sync();
   }
 }
 
