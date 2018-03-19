@@ -66,7 +66,7 @@ import Quarantine from 'util/RadiumQuarantine';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
+import { ETLEdge, ETLNode } from 'etl/templates/ETLProcess';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
@@ -113,7 +113,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
     }
     else
     {
-      name = template.process.getNodeName(id);
+      name = template.getNodeName(id);
     }
 
     return (
@@ -135,10 +135,9 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   public render()
   {
     const { edgeId, edge, templateEditor } = this.props;
-    const { process } = templateEditor.template;
     const { from, to } = edge;
-    const fromNode = process.getNode(from);
-    const toNode = process.getNode(to);
+    const fromNode = templateEditor.template.getNode(from);
+    const toNode = templateEditor.template.getNode(to);
 
     const isActive = templateEditor.getCurrentEdgeId() === edgeId;
     const style = isActive ? edgeComponentStyleActive : edgeComponentStyle;

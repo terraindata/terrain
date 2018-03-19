@@ -53,7 +53,6 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { _ETLProcess, ETLEdge, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
@@ -72,8 +71,8 @@ class TemplateEditorStateC
 
   public getCurrentEngine(): TransformationEngine
   {
-    const key = this.getCurrentEdgeId();
-    return this.template.process.getTransformationEngine(key);
+    const currentEdge = this.getCurrentEdgeId();
+    return this.template.getTransformationEngine(currentEdge);
   }
 
   public getCurrentEdgeId()

@@ -55,7 +55,7 @@ import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/Endpoi
 import { _ETLProcess, ETLEdge, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { TemplateProxy } from './TemplateProxy';
 
@@ -105,6 +105,53 @@ class ETLTemplateC implements ETLTemplateI
     const sink = this.sinks.get(key);
     const type = (sink != null && sink.type != null) ? sink.type : '';
     return `${key} (${type})`;
+  }
+
+  public getTransformationEngine(edge: number)
+  {
+    return this.process.edges.getIn([edge, 'transformations']);
+  }
+
+  public getNode(id: number)
+  {
+    return this.process.nodes.get(id);
+  }
+
+  public getEdges(): Immutable.Map<number, ETLEdge>
+  {
+    return this.process.edges;
+  }
+
+  public getNodeName(id: number)
+  {
+    return `Merge Node ${id}`;
+  }
+
+  public getLastEdgeId(): number
+  {
+    const edges = this.getEdgesToNode(this.getDefaultSink());
+    return edges.size > 0 ? edges.first() : -1;
+  }
+
+  public getDefaultSink(): number
+  {
+    return this.process.nodes.findKey(
+      (node) => node.type === NodeTypes.Sink && node.endpoint === '_default',
+    );
+  }
+
+  public getEdgesToNode(node: number): List<number>
+  {
+    return this.process.edges.filter(
+      (edge, key) => edge.to === node,
+    ).keySeq().toList();
+  }
+
+  public getMergeableNodes(): List<number>
+  {
+    // get all edges that are connected to both a source and a sink
+    const nodes = this.process.nodes.filter((node) => node.type !== NodeTypes.Sink);
+    return nodes.keySeq().toList();
   }
 }
 

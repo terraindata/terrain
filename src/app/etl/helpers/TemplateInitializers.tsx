@@ -89,7 +89,7 @@ class Initializers extends ETLHelpers
           actionType: 'setTemplate',
           template,
         });
-        const edge = template.process.getLastEdgeId();
+        const edge = template.getLastEdgeId();
         this.editorAct({ // todo find the last edge
           actionType: 'setCurrentEdge',
           edge,

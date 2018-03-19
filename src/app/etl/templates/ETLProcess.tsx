@@ -74,53 +74,6 @@ class ETLProcessC implements ETLProcessI
   public readonly edges: Immutable.Map<number, ETLEdge> = Map();
   public readonly uidNode: number = 0;
   public readonly uidEdge: number = 0;
-
-  public getTransformationEngine(edge: number)
-  {
-    return this.edges.getIn([edge, 'transformations']);
-  }
-
-  public getNode(id: number)
-  {
-    return this.nodes.get(id);
-  }
-
-  public getEdges(): Immutable.Map<number, ETLEdge>
-  {
-    return this.edges;
-  }
-
-  public getNodeName(id: number)
-  {
-    return `Merge Node ${id}`;
-  }
-
-  public getLastEdgeId(): number
-  {
-    const edges = this.getEdgesToNode(this.getDefaultSink());
-    return edges.size > 0 ? edges.first() : -1;
-  }
-
-  public getDefaultSink(): number
-  {
-    return this.nodes.findKey(
-      (node) => node.type === NodeTypes.Sink && node.endpoint === '_default',
-    );
-  }
-
-  public getEdgesToNode(node: number): List<number>
-  {
-    return this.edges.filter(
-      (edge, key) => edge.to === node,
-    ).keySeq().toList();
-  }
-
-  public getMergeableNodes(): List<number>
-  {
-    // get all edges that are connected to both a source and a sink
-    const nodes = this.nodes.filter((node) => node.type !== NodeTypes.Sink);
-    return nodes.keySeq().toList();
-  }
 }
 export type ETLProcess = WithIRecord<ETLProcessC>;
 export const _ETLProcess = makeExtendedConstructor(ETLProcessC, true, {

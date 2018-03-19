@@ -73,12 +73,11 @@ import
 } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
-import { _ETLProcess, _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, MergeJoinOptions as MergeJoinOptionsI, NodeTypes } from 'shared/etl/types/ETLTypes';
+import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
 import './EdgeSection.less';
 import ETLEdgeComponent from './ETLEdgeComponent';
@@ -138,16 +137,15 @@ class EdgeSection extends TerrainComponent<Props>
   @instanceFnDecorator(memoizeOne)
   public _calculateRightJoinNodes(template: ETLTemplate): List<number>
   {
-    return template.process.getMergeableNodes();
+    return template.getMergeableNodes();
   }
 
   @instanceFnDecorator(memoizeOne)
   public _calculateRightJoinOptions(template: ETLTemplate): List<string>
   {
-    const { process } = this.props.templateEditor.template;
     return this._calculateRightJoinNodes(template).map((id) =>
     {
-      const node = process.getNode(id);
+      const node = template.getNode(id);
       switch (node.type)
       {
         case NodeTypes.Source:
@@ -155,7 +153,7 @@ class EdgeSection extends TerrainComponent<Props>
         case NodeTypes.Sink:
           return template.getSinkName(node.endpoint);
         default:
-          return template.process.getNodeName(id);
+          return template.getNodeName(id);
       }
     }).toList();
   }
@@ -203,7 +201,7 @@ class EdgeSection extends TerrainComponent<Props>
     const { mergeIntoEdgeId } = templateEditor.uiState;
     return (
       <div className='edge-section'>
-        {templateEditor.template.process.getEdges().map(this.renderEdge).toList()}
+        {templateEditor.template.getEdges().map(this.renderEdge).toList()}
         <Modal
           open={mergeIntoEdgeId !== null}
           title='Merge Documents'
