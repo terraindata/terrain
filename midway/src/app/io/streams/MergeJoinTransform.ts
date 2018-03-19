@@ -49,7 +49,7 @@ import { Readable } from 'stream';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import BufferedElasticStream from './BufferedElasticStream';
+import BufferedElasticReader from '../../../database/elastic/streams/BufferedElasticReader';
 
 /**
  * Types of merge joins
@@ -74,10 +74,10 @@ export default class MergeJoinTransform extends Readable
   private client: ElasticClient;
   private type: MergeJoinType;
 
-  private leftSource: BufferedElasticStream;
+  private leftSource: BufferedElasticReader;
   private leftBuffer: object | null;
   private leftPosition: number;
-  private rightSource: BufferedElasticStream;
+  private rightSource: BufferedElasticReader;
   private rightBuffer: object | null;
   private rightPosition: number;
 
@@ -120,7 +120,7 @@ export default class MergeJoinTransform extends Readable
     // set up the left source
     const leftQuery = this.setSortClause(query);
     this.leftBuffer = null;
-    this.leftSource = new BufferedElasticStream(client, leftQuery,
+    this.leftSource = new BufferedElasticReader(client, leftQuery,
       ((buffer: object[]) => this.accumulateBuffer(buffer, StreamType.Left)).bind(this));
     this.leftPosition = 0;
 
@@ -128,7 +128,7 @@ export default class MergeJoinTransform extends Readable
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
     this.rightBuffer = null;
-    this.rightSource = new BufferedElasticStream(client, rightQuery,
+    this.rightSource = new BufferedElasticReader(client, rightQuery,
       ((buffer: object[]) => this.accumulateBuffer(buffer, StreamType.Right)).bind(this));
     this.rightPosition = 0;
   }

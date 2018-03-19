@@ -52,7 +52,7 @@ import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQL
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import BufferedElasticStream from './BufferedElasticStream';
+import BufferedElasticReader from '../../../database/elastic/streams/BufferedElasticReader';
 
 interface Ticket
 {
@@ -66,7 +66,7 @@ interface Ticket
 export default class GroupJoinTransform extends Readable
 {
   private client: ElasticClient;
-  private source: BufferedElasticStream;
+  private source: BufferedElasticReader;
   private query: object;
 
   private maxPendingQueries: number = 4;
@@ -122,7 +122,7 @@ export default class GroupJoinTransform extends Readable
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
-    this.source = new BufferedElasticStream(client, query, ((responses) =>
+    this.source = new BufferedElasticReader(client, query, ((responses) =>
     {
       for (const r of responses)
       {

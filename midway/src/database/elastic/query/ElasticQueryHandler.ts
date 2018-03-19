@@ -56,14 +56,13 @@ import QueryRequest from '../../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../../shared/database/types/QueryResponse';
 import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
+import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
-
-import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
-import ElasticStream from './ElasticStream';
+import ElasticReader from '../streams/ElasticReader';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -159,7 +158,7 @@ export class ElasticQueryHandler extends QueryHandler
         }
         else
         {
-          stream = new ElasticStream(client, query);
+          stream = new ElasticReader(client, query);
         }
 
         if (request.streaming === true)

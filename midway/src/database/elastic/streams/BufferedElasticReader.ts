@@ -46,13 +46,13 @@ THE SOFTWARE.
 
 import { Readable } from 'stream';
 
-import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
+import ElasticClient from '../client/ElasticClient';
+import { ElasticReader } from './ElasticReader';
 
 /**
- * A buffered ElasticStream source
+ * A buffered ElasticReader source
  */
-export default class BufferedElasticStream extends Readable
+export default class BufferedElasticReader extends Readable
 {
   public maxBufferSize: number = 8;
   public buffer: object[] = [];
@@ -75,7 +75,7 @@ export default class BufferedElasticStream extends Readable
     });
 
     this.query = query;
-    this.stream = new ElasticStream(client, query);
+    this.stream = new ElasticReader(client, query);
     this.maxBufferSize = size;
 
     this._onBufferFull = onBufferFull;

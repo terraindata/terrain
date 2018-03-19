@@ -51,7 +51,7 @@ import * as winston from 'winston';
 import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import ElasticClient from '../client/ElasticClient';
 
-export class ElasticStream extends Stream.Readable
+export class ElasticReader extends Stream.Readable
 {
   private client: ElasticClient;
   private query: any;
@@ -197,4 +197,4 @@ export class ElasticStream extends Stream.Readable
   }
 }
 
-export default ElasticStream;
+export default ElasticReader;
