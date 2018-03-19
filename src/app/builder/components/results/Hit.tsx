@@ -983,7 +983,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
                   </div>
                 );
               }
-              return null;
+              return <span key={i}>{i !== 0 ? ', ' + val : val} </span>;
             })
           }
         </div>
