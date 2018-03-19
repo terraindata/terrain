@@ -333,6 +333,22 @@ test('rename a field (deeply nested property in array)', () =>
   expect(e.transform(doc3)['arr'][1][1]['cool']).toBe('fren');
 });
 
+test('structural rename with array', () =>
+{
+  const e = new TransformationEngine();
+  const arrId = e.addField(List(['foo']), 'array');
+  e.addField(List(['foo', '*']), 'array');
+
+  e.setOutputKeyPath(arrId, List(['bar', 'baz']));
+
+  const doc = {
+    foo: [1, 2, 3],
+  };
+
+  expect(e.transform(doc)['foo']).toBe(undefined);
+  expect(e.transform(doc)['bar']['baz'][1]).toBe(2);
+});
+
 test('array in array in object: identity transformation', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc7);
