@@ -495,3 +495,20 @@ test('(deep) clone a TransformationEngine', () =>
   e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['dog']));
   expect(clone.equals(e)).toBe(false);
 });
+
+test('join two fields', () =>
+{
+    const e: TransformationEngine = new TransformationEngine(doc2);
+    e.appendTransformation(
+        TransformationNodeType.JoinNode,
+        List<KeyPath>([KeyPath(['meta', 'school']), KeyPath(['meta', 'sport'])]),
+        {
+            newFieldKeyPaths: List<KeyPath>([KeyPath(['meta', 'fullTeam'])]),
+            preserveOldFields: false,
+            delimiter: ' ',
+        });
+    const r = e.transform(doc1);
+    console.log(JSON.stringify(r));
+    //expect(r['name']).toBe('BOB');
+    //expect(yadeep.get(r, KeyPath(['meta', 'school']))).toBe('STANFORD');
+});

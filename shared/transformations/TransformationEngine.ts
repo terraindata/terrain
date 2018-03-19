@@ -217,6 +217,25 @@ export class TransformationEngine
     // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node: TransformationNode =
       new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options, nodeType);
+
+    // Process fields created/disabled by this transformation
+    if (options !== undefined)
+    {
+        if (options['newFieldKeyPaths'] !== undefined)
+        {
+            for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++) {
+                // TODO infer types of new fields
+                this.addField(options['newFieldKeyPaths'].get(i), 'string');
+            }
+        }
+        if (options['preserveOldFields'] === false)
+        {
+            for (let i: number = 0; i < fieldNames.size; i++) {
+              this.disableField(this.getInputFieldID(fieldNames.get(i)));
+            }
+        }
+    }
+
     this.dag.setNode(this.uidNode.toString(), node);
     this.uidNode++;
     return this.uidNode - 1;
