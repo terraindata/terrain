@@ -261,16 +261,6 @@ export class Export
     }
   }
 
-  /* assumes arrays are of uniform depth */
-  private _getArrayDepth(obj: any): number
-  {
-    if (Array.isArray(obj))
-    {
-      return this._getArrayDepth(obj[0]) + 1;
-    }
-    return 0;
-  }
-
   /* return ES type from type specification format of ImportConfig
    * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
   private _getESType(typeObject: object, withinArray: boolean = false): string
