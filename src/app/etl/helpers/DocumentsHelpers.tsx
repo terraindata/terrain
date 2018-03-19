@@ -71,10 +71,10 @@ import
   _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
-  ETLTemplate,
   FieldMap,
   TemplateEditorState,
-} from 'etl/templates/TemplateTypes';
+} from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';

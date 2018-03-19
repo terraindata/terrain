@@ -55,7 +55,7 @@ import Util from 'util/Util';
 
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
 import './DocumentsPreviewColumn.less';
 const { List } = Immutable;

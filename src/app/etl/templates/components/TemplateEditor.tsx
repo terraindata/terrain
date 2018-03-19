@@ -69,7 +69,8 @@ import EditorPreviewControl from 'etl/templates/components/preview/EditorPreview
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import TemplateList from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ColumnOptions, columnOptions, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import './TemplateEditor.less';

@@ -55,7 +55,7 @@ import
   _TemplateField, _TransformationNode,
   TemplateField, TransformationNode,
 } from 'etl/templates/FieldTypes';
-import { FieldMap } from 'etl/templates/TemplateTypes';
+import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';

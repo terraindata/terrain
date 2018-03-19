@@ -75,7 +75,8 @@ import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { _ETLProcess, _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, MergeJoinOptions as MergeJoinOptionsI, NodeTypes } from 'shared/etl/types/ETLTypes';
 

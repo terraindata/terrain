@@ -58,10 +58,11 @@ import
   _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
-  ETLTemplate,
   FieldMap,
   TemplateEditorState,
-} from 'etl/templates/TemplateTypes';
+} from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
+
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';

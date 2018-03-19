@@ -66,7 +66,7 @@ import Quarantine from 'util/RadiumQuarantine';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, SinksMap, SourcesMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ETLTemplate, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
@@ -84,7 +84,7 @@ export interface Props
   act?: typeof TemplateEditorActions;
 }
 
-type EndpointsType = ETLTemplate['sources'] | ETLTemplate['sinks'];
+type EndpointsType = SourcesMap | SinksMap;
 type LooseEndpointsType = Immutable.Map<string, SourceConfig | SinkConfig>;
 
 class EndpointSection extends TerrainComponent<Props>
@@ -294,10 +294,12 @@ class EndpointSection extends TerrainComponent<Props>
     const proxy = template.proxy();
     if (isSource)
     {
-      newKeys.forEach((key) => {
+      newKeys.forEach((key) =>
+      {
         proxy.addSource(endpoints.get(key), key);
       });
-      differentKeys.forEach((key) => {
+      differentKeys.forEach((key) =>
+      {
         proxy.setSource(key, endpoints.get(key));
       });
       deletedKeys.forEach((key) =>
@@ -313,10 +315,12 @@ class EndpointSection extends TerrainComponent<Props>
     }
     else
     {
-      newKeys.forEach((key) => {
+      newKeys.forEach((key) =>
+      {
         proxy.addSink(endpoints.get(key), key);
       });
-      differentKeys.forEach((key) => {
+      differentKeys.forEach((key) =>
+      {
         proxy.setSink(key, endpoints.get(key));
       });
       deletedKeys.forEach((key) =>

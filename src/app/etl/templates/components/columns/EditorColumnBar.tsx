@@ -56,7 +56,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { instanceFnDecorator } from 'src/app/Classes';
 
 const { List } = Immutable;

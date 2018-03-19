@@ -49,15 +49,15 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
+import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
-import { ETLTemplate, FieldMap, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
+import { ETLTemplate, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 
 import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
 import { NodeTypes } from 'shared/etl/types/ETLTypes';
@@ -94,7 +94,7 @@ export class TemplateProxy
     this.sources = this.sources.set(key, source);
     const sourceNode = _ETLNode({
       endpoint: key,
-      type: NodeTypes.Source
+      type: NodeTypes.Source,
     });
     return this.createNode(sourceNode);
   }
@@ -104,7 +104,7 @@ export class TemplateProxy
     this.sinks = this.sinks.set(key, sink);
     const sinkNode = _ETLNode({
       endpoint: key,
-      type: NodeTypes.Sink
+      type: NodeTypes.Sink,
     });
     return this.createNode(sinkNode);
   }
@@ -184,30 +184,10 @@ export class TemplateProxy
     this.onMutate(this.template);
   }
 
-  private get template()
-  {
-    return this._template;
-  }
 
   private get process()
   {
     return this.template.process;
-  }
-
-  private get sinks()
-  {
-    return this.template.getSinks();
-  }
-
-  private get sources()
-  {
-    return this.template.getSources();
-  }
-
-  private set template(val: ETLTemplate)
-  {
-    this._template = val;
-    this.sync();
   }
 
   private set process(val: ETLProcess)
@@ -216,10 +196,20 @@ export class TemplateProxy
     this.sync();
   }
 
+  private get sinks()
+  {
+    return this.template.getSinks();
+  }
+
   private set sinks(val: SinksMap)
   {
     this.template = this.template.set('sinks', val);
     this.sync();
+  }
+
+  private get sources()
+  {
+    return this.template.getSources();
   }
 
   private set sources(val: SourcesMap)
@@ -227,6 +217,18 @@ export class TemplateProxy
     this.template = this.template.set('sources', val);
     this.sync();
   }
+
+  private get template()
+  {
+    return this._template;
+  }
+
+  private set template(val: ETLTemplate)
+  {
+    this._template = val;
+    this.sync();
+  }
+
 }
 
 const doNothing = () => null;
