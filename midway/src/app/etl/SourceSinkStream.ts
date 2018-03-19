@@ -80,7 +80,8 @@ export async function getSourceStream(sources: DefaultSourceConfig): Promise<str
     {
       case 'Algorithm':
         const algorithmId = src.options['algorithmId'];
-        const dbId = 1;
+        const query: string = await Util.getQueryFromAlgorithm(algorithmId);
+        const dbId: number = await Util.getDBFromAlgorithm(algorithmId);
 
         const database: DatabaseController | undefined = DatabaseRegistry.get(dbId);
         if (database === undefined)
@@ -93,7 +94,6 @@ export async function getSourceStream(sources: DefaultSourceConfig): Promise<str
           throw new Error('Algorithm source only supports Elastic databases.');
         }
 
-        const query: string = await Util.getQueryFromAlgorithm(algorithmId);
         const qh: QueryHandler = database.getQueryHandler();
         const payload = {
           database: dbId,

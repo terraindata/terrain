@@ -180,3 +180,27 @@ export async function getQueryFromAlgorithm(algorithmId: number): Promise<string
     }
   });
 }
+
+export async function getDBFromAlgorithm(algorithmId: number): Promise<number>
+{
+  return new Promise<number>(async (resolve, reject) =>
+  {
+    const algorithms: ItemConfig[] = await items.get(algorithmId);
+    if (algorithms.length === 0)
+    {
+      return reject('Algorithm not found.');
+    }
+
+    try
+    {
+      if (algorithms[0].meta !== undefined)
+      {
+        return resolve(JSON.parse(algorithms[0].meta as string)['db']['id']);
+      }
+    }
+    catch (e)
+    {
+      return reject('Malformed algorithm');
+    }
+  });
+}
