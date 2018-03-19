@@ -81,8 +81,16 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitDuplicateNode(node: DuplicateTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    // TODO
-    return this.visitDefault(node, doc, options);
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.DuplicateNode>;
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      yadeep.set(doc, opts.newFieldKeyPaths.get(0), el, { create: true });
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
   public visitFilterNode(node: FilterTransformationNode, doc: object, options: object = {}): TransformationVisitResult
@@ -94,17 +102,28 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   public visitJoinNode(node: JoinTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.JoinNode>;
-    let joined: any;
+    let joined: string;
     node.fields.forEach((field) =>
     {
       const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to join using a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
       if (joined === undefined)
       {
-        joined = el;
+        joined = el as string;
       }
       else
       {
-        joined = (joined as string) + (opts.delimiter as string) + (el as string);
+        joined = joined + opts.stringDelimiter + (el as string);
       }
     });
     yadeep.set(doc, opts.newFieldKeyPaths.get(0), joined, { create: true });

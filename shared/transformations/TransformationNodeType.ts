@@ -75,10 +75,12 @@ interface TransformationOptionTypes
   JoinNode: {
     newFieldKeyPaths: List<KeyPath>;
     preserveOldFields: boolean;
-    delimiter: any;
+    stringDelimiter: string;
   };
   FilterNode: any;
-  DuplicateNode: any;
+  DuplicateNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
   InsertNode: {
     at?: number;
     value: string | KeyPath;

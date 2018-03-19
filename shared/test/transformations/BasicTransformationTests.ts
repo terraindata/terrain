@@ -505,10 +505,24 @@ test('join two fields', () =>
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['meta', 'fullTeam'])]),
       preserveOldFields: false,
-      delimiter: ' ',
+      stringDelimiter: ' ',
     });
   const r = e.transform(doc2);
   expect(r['meta']['fullTeam']).toBe('Stanford bobsled');
   expect(r['meta']['sport']).toBe(undefined);
   expect(r['meta']['school']).toBe(undefined);
+});
+
+test('duplicate a field', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc2);
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    List<KeyPath>([KeyPath(['meta', 'school'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['meta', 'schoolCopy'])]),
+    });
+  const r = e.transform(doc2);
+  expect(r['meta']['school']).toBe('Stanford');
+  expect(r['meta']['schoolCopy']).toBe('Stanford');
 });
