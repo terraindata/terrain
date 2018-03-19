@@ -104,7 +104,7 @@ export class GoogleAPI
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const writer = new CSVExportTransform(Object.keys(values[0]));
+      const writer = new CSVExportTransform(values[0]);
       if (values.length > 0)
       {
         for (let i = 1; i < values.length; ++i)
