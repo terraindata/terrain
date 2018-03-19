@@ -129,8 +129,9 @@ class DeployModal extends TerrainComponent<Props>
 
     const { changingStatusTo } = this.state;
 
-    if ((changingStatusTo === ItemStatus.Live && algorithm.status !== 'LIVE')
-      || (changingStatusTo === ItemStatus.Default && algorithm.status !== 'DEFAULT'))
+    if ((changingStatusTo === ItemStatus.Deployed && algorithm.status !== 'DEPLOYED')
+      || (changingStatusTo === ItemStatus.Default && algorithm.status !== 'DEFAULT')
+    )
     {
       const tql = algorithm ? algorithm.query.tql : '';
       const parser: ESJSONParser = new ESJSONParser(tql);
@@ -150,7 +151,7 @@ class DeployModal extends TerrainComponent<Props>
       };
       this.props.algorithmActions.deploy(algorithm, 'putTemplate', body, changingStatusTo, this.state.deployedName);
     }
-    else if ((changingStatusTo !== ItemStatus.Live && algorithm.status === 'LIVE')
+    else if ((changingStatusTo !== ItemStatus.Deployed && algorithm.status === 'DEPLOYED')
       || (changingStatusTo !== ItemStatus.Default && algorithm.status === 'DEFAULT'))
     {
       // undeploy this algorithm
@@ -214,14 +215,14 @@ class DeployModal extends TerrainComponent<Props>
     const { changingStatus, changingStatusOf, changingStatusTo } = this.state;
     const name = (changingStatusOf && changingStatusOf.name);
 
-    let title = 'Deploy "' + name + '" to Live';
+    let title = `Lock and Deploy "${name}"`;
     if (changingStatusTo === ItemStatus.Default)
     {
-      title = 'Make "' + name + '" Default';
+      title = `Make "${name}" Default`;
     }
-    else if (changingStatusTo !== ItemStatus.Live)
+    else if (changingStatusTo !== ItemStatus.Deployed)
     {
-      title = 'Remove "' + name + '" from Live';
+      title = `Unlock and withdraw "${name}" from Deployed status`;
     }
 
     let defaultAlgorithm: LibraryTypes.Algorithm;

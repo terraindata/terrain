@@ -328,7 +328,7 @@ class HitsArea extends TerrainComponent<Props>
           onExpand={this.handleCollapse}
           expanded={true}
           allowSpotlights={this.props.allowSpotlights}
-          index={-1}
+          index={this.state.expandedHitIndex}
           primaryKey={hit.primaryKey}
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}

@@ -227,6 +227,11 @@ const BuilderColumn = createReactClass<any, any>(
       };
     },
 
+    shouldShowExport()
+    {
+      return ['DEPLOYED', 'LIVE', 'DEFAULT'].indexOf(this.props.algorithm.status) > -1;
+    }
+
     renderContent()
     {
       if (!this.props.query)
@@ -273,7 +278,7 @@ const BuilderColumn = createReactClass<any, any>(
             algorithmName={this.props.algorithm.name}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
-            showExport={true}
+            showExport={this.shouldShowExport()}
             showCustomizeView={true}
             allowSpotlights={true}
             exportState={this.props.exportState}

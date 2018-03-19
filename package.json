@@ -11,7 +11,7 @@
     "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback --compress --progress --info",
     "stop-postgres": "docker-compose -f midway-postgres-docker.yml down",
     "test": "yarn test-back && yarn test-front",
-    "test-front": "jest src",
+    "test-front": "jest src --forceExit",
     "test-back-setup": "./midway/test/scripts/setup_env.sh",
     "test-sigint-setup": "./midway/test/scripts/setup_env.sh --use-mysql=0 --use-sqlite=0",
     "test-back": "jest midway shared --forceExit --coverage",
