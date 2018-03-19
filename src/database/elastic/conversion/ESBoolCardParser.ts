@@ -54,17 +54,41 @@ import * as TerrainLog from 'loglevel';
 import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
 import {List} from 'immutable';
+import {ElasticBlocks} from '../blocks/ElasticBlocks';
 
+// Translate an Elastic bool card to the format of terrain filter card.
 export default class ESBoolCardParser
 {
+  /**
+   * Return the field name of the first field key.
+   */
+  private static GetFilterClauseField(filterValueInfo: ESValueInfo): string
+  {
+    for (const name of Object.keys(filterValueInfo.objectChildren))
+    {
+      const kv = filterValueInfo.objectChildren[name];
+      if (kv.propertyName.clause.type === 'field')
+      {
+        return String(kv.propertyName.value);
+      }
+      if (name === 'field' && kv.propertyValue.clause.type === 'field')
+      {
+        return 'field';
+      }
+    }
+    return null;
+  }
+
+
+
   private filterQueryOp =
     {
-      term: { clauseToBlocks : (boolTypeName, clause) => FilterUtils.TermClauseToBlocks(boolTypeName, clause)},
-      terms: { clauseToBlocks: (boolTypeName, clause) => FilterUtils.TermsClauseToBlocks(boolTypeName, clause)},
-      range: { clauseToBlocks: (boolTypeName, clause) => FilterUtils.RangeClauseToBlocks(boolTypeName, clause)},
-      match: { clauseToBlocks: (boolTypeName, clause) => FilterUtils.MatchClauseToBlocks(boolTypeName, clause)},
-      exists: {clauseToBlocks: (boolTypeName, clause) => FilterUtils.ExistsClauseToBlocks(boolTypeName, clause)},
-      bool: {clauseToBlocks: (boolTypeName, clause) => FilterUtils.BoolClauseToBlocks(boolTypeName, clause)},
+      term: { clauseToBlocks : (boolTypeName, clause) => ESBoolCardParser.TermClauseToBlocks(boolTypeName, clause)},
+      terms: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.TermsClauseToBlocks(boolTypeName, clause)},
+      range: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.RangeClauseToBlocks(boolTypeName, clause)},
+      match: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.MatchClauseToBlocks(boolTypeName, clause)},
+      exists: {clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.ExistsClauseToBlocks(boolTypeName, clause)},
+      bool: {clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.BoolClauseToBlocks(boolTypeName, clause)},
     };
   private ElasticFilterClauseOp =
     {
@@ -167,4 +191,323 @@ export default class ESBoolCardParser
     return blocks;
   }
 
+
+
+
+  /**
+   * Return the field name of the first field key.
+   */
+  private static GetBoostValue(filterValueInfo: ESValueInfo): ESValueInfo
+  {
+    if (filterValueInfo.objectChildren.hasOwnProperty('boost'))
+    {
+      if (filterValueInfo.objectChildren['boost'].propertyValue.clause.type === 'boost')
+      {
+        return filterValueInfo.objectChildren['boost'].propertyValue;
+      }
+    }
+    return null;
+  }
+
+  /**
+   *
+   * @param boolTypeName: [must, must_not, should, filter]
+   * @param {ESPropertyInfo}: termClause : {terms: TERMS_QUERY}
+   * @returns {Block[]}: a list of elasticFilterBlock
+   * @constructor
+   */
+  public  static TermsClauseToBlocks(boolTypeName, termsClause: ESPropertyInfo): Block[]
+  {
+    // terms: {field : terms_value, boost : boost, _name : string}
+    console.log('Terms Clause to blocks');
+    const blocks = [];
+    const termsQuery = termsClause.propertyValue;
+    const termsQueryKVs = termsQuery.objectChildren;
+    let boost = '';
+    let field;
+    let blockValue;
+    for (const k of Object.keys(termsQueryKVs))
+    {
+      if (k === 'boost')
+      {
+        boost = String(termsQueryKVs[k].propertyValue.value);
+      } else
+      {
+        console.assert(termsQueryKVs[k].propertyValue.clause.type === 'base[]');
+        field = k;
+        blockValue = JSON.stringify(termsQueryKVs[k].propertyValue.value);
+      }
+    }
+    if (blockValue !== undefined)
+    {
+      blocks.push(
+        BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+          field,
+          value: blockValue,
+          boolQuery: boolTypeName,
+          filterOp: 'in',
+          boost,
+        }, true),
+      );
+    }
+
+    return blocks;
+  }
+
+  /**
+   *
+   * @param {ESPropertyInfo} valueInfo: term or range
+   * @return elasticFilterBlocks generated from the filter clause
+   */
+  public static RangeClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
+  {
+    console.log('Range Clause to blocks');
+    const blocks = [];
+    const rangeQuery = rangeClause.propertyValue;
+    const field = this.GetFilterClauseField(rangeQuery);
+    if (field === null)
+    {
+      return blocks;
+    }
+    const rangeValue = rangeQuery.objectChildren[field].propertyValue;
+    let boost = '';
+    if (rangeValue.objectChildren['boost'])
+    {
+      boost = String(rangeValue.objectChildren['boost'].propertyValue.value);
+    }
+    for (const k of Object.keys(rangeValue.objectChildren))
+    {
+      if (FilterUtils.esRangeOperatorMap[k] !== undefined)
+      {
+        // generating a new block from this range filter
+        const value = String(rangeValue.objectChildren[k].propertyValue.value);
+        blocks.push(
+          BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+            field,
+            value,
+            boost,
+            boolQuery: boolTypeName,
+            filterOp: FilterUtils.esRangeOperatorMap[k],
+          }, true),
+        );
+      }
+    }
+    return blocks;
+  }
+
+
+  /**
+   *
+   * @param {ESPropertyInfo} valueInfo: term or range
+   * @return elasticFilterBlocks generated from the filter clause
+   */
+  public static MatchClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
+  {
+    // term : {field : term_value}
+    // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
+    // term_settings: { value: 'base', boost: 'boost' }
+    const blocks = [];
+    const termQuery = rangeClause.propertyValue;
+    const field = this.GetFilterClauseField(termQuery);
+    let boost = '';
+    if (field === null)
+    {
+      return blocks;
+    }
+    const termValue = termQuery.objectChildren[field].propertyValue;
+    let blockValue;
+    switch (termValue.clause.type)
+    {
+      case 'match_settings':
+        if (termValue.objectChildren['query'] !== undefined)
+        {
+          blockValue = String(termValue.value['query']);
+          if (termValue.objectChildren['boost'] !== undefined)
+          {
+            boost = String(termValue.value['boost']);
+          }
+        }
+        break;
+      case 'null':
+        blockValue = String(termValue.value);
+        break;
+      case 'boolean':
+        blockValue = String(termValue.value);
+        break;
+      case 'number':
+        blockValue = String(termValue.value);
+        break;
+      case 'string':
+        blockValue = String(termValue.value);
+        break;
+      default:
+        break;
+    }
+
+    if (blockValue !== undefined)
+    {
+      blocks.push(
+        BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+          field,
+          value: blockValue,
+          boolQuery: boolTypeName,
+          filterOp: '≈',
+          boost,
+        }, true),
+      );
+    }
+    return blocks;
+  }
+
+
+  /**
+   *
+   * @param {ESPropertyInfo} termClause "term":term_query
+   * @return elasticFilterBlocks generated from the filter clause
+   */
+  public static ExistsClauseToBlocks(boolTypeName, existsClause: ESPropertyInfo): Block[]
+  {
+    // term : {field : term_value}
+    // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
+    // term_settings: { value: 'base', boost: 'boost' }
+    console.log('Exists Clause to blocks');
+    const blocks = [];
+    const existsQuery = existsClause.propertyValue;
+    const field = this.GetFilterClauseField(existsQuery);
+    const boostValueInfo = this.GetBoostValue(existsQuery);
+    if (field === null)
+    {
+      return blocks;
+    }
+    const existsValue = existsQuery.objectChildren[field].propertyValue;
+    let blockValue;
+    console.assert(existsValue.clause.type === 'field');
+    blockValue = String(existsValue.value);
+
+    if (blockValue !== undefined)
+    {
+      if (boostValueInfo === null)
+      {
+        blocks.push(
+          BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+            field: blockValue,
+            value: blockValue,
+            boolQuery: boolTypeName,
+            filterOp: 'exists',
+          }, true),
+        );
+      } else
+      {
+        blocks.push(
+          BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+            field: blockValue,
+            value: blockValue,
+            boolQuery: boolTypeName,
+            filterOp: 'exists',
+            boost: String(boostValueInfo.value),
+          }, true),
+        );
+      }
+    }
+    return blocks;
+  }
+
+  public static BoolClauseToBlocks(boolTypeName, boolClause: ESPropertyInfo): Block[]
+  {
+    const boolCard = boolClause.propertyValue.card;
+    const boolValueInfo = boolClause.propertyValue;
+    console.log('boolClauseToBlocks, val ' + JSON.stringify(boolValueInfo.value) + ' cardtype: ' + boolCard.type);
+    if (boolTypeName !== 'should' && boolTypeName !== 'filter')
+    {
+      return []
+    }
+
+    if (boolValueInfo.childrenSize() > 0)
+    {
+      return [];
+    }
+    if (boolCard.otherFilters.size !== 1)
+    {
+      return [];
+    }
+
+    let innerBlock = boolCard.otherFilters.get(0);
+    if (innerBlock.boolQuery !== 'must_not')
+    {
+      return [];
+    }
+    if (boolTypeName === 'should')
+    {
+      innerBlock = innerBlock.set('boolQuery', 'should_not');
+      return innerBlock;
+    } else
+    {
+      innerBlock = innerBlock.set('boolQuery', 'filter_not');
+      return innerBlock;
+    }
+  }
+
+  /**
+   *
+   * @param {ESPropertyInfo} termClause "term":term_query
+   * @return elasticFilterBlocks generated from the filter clause
+   */
+  public static TermClauseToBlocks(boolTypeName, termClause: ESPropertyInfo): Block[]
+  {
+    // term : {field : term_value}
+    // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
+    // term_settings: { value: 'base', boost: 'boost' }
+    console.log('Term Clause to blocks');
+    const blocks = [];
+    const termQuery = termClause.propertyValue;
+    const field = this.GetFilterClauseField(termQuery);
+    if (field === null)
+    {
+      return blocks;
+    }
+    const termValue = termQuery.objectChildren[field].propertyValue;
+    let blockValue;
+    let boost = '';
+    switch (termValue.clause.type)
+    {
+      case 'term_settings':
+        if (termValue.objectChildren['value'] !== undefined)
+        {
+          blockValue = String(termValue.value['value']);
+          if (termValue.objectChildren['boost'] !== undefined)
+          {
+            boost = String(termValue.value['boost']);
+          }
+        }
+        break;
+      case 'null':
+        blockValue = String(termValue.value);
+        break;
+      case 'boolean':
+        blockValue = String(termValue.value);
+        break;
+      case 'number':
+        blockValue = String(termValue.value);
+        break;
+      case 'string':
+        blockValue = String(termValue.value);
+        break;
+      default:
+        break;
+    }
+
+    if (blockValue !== undefined)
+    {
+      blocks.push(
+        BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+          field,
+          value: blockValue,
+          boolQuery: boolTypeName,
+          filterOp: '=',
+          boost,
+        }, true),
+      );
+    }
+    return blocks;
+  }
 }

@@ -149,10 +149,16 @@ export default class ESValueInfo
   }
 
 
-  public addArrayChild(info: ESValueInfo): void
+  public addArrayChild(info: ESValueInfo, index?: number): void
   {
     this._arrayChildren = this.arrayChildren;
-    this._arrayChildren.push(info);
+    if (index === undefined)
+    {
+      this._arrayChildren.push(info);
+    } else
+    {
+      this._arrayChildren[index] = info;
+    }
   }
 
   /**

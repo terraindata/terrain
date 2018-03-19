@@ -310,22 +310,54 @@ export default class ESCardParser extends ESParser
     return this.valueInfo.card;
   }
 
-  public deleteChild(valueInfo: ESValueInfo, index: string | number)
+  public deleteChild(parent: ESValueInfo, index: string | number)
   {
     if (typeof index === 'string')
     {
-      if (valueInfo.objectChildren[index] !== undefined)
+      if (parent.objectChildren[index] !== undefined)
       {
         console.log('delete ' + index);
-        delete valueInfo.objectChildren[index];
+        delete parent.objectChildren[index];
         this.isMutated = true;
       }
     } else
     {
-      if (valueInfo.arrayChildren[index] !== undefined)
+      if (parent.arrayChildren[index] !== undefined)
       {
         console.log('delete ' + index);
-        delete valueInfo.arrayChildren[index];
+        delete parent.arrayChildren[index];
+        this.isMutated = true;
+      }
+    }
+  }
+
+  public updateChild(parent: ESValueInfo, index: string | number, newChild: ESValueInfo | ESPropertyInfo)
+  {
+    this.deleteChild(parent, index);
+    this.addChild(parent, index, newChild);
+  }
+
+  public addChild(parent: ESValueInfo, index: string | number, newChild: ESValueInfo | ESPropertyInfo)
+  {
+    if (typeof index === 'string')
+    {
+      if (parent.objectChildren[index] === undefined)
+      {
+        console.log('Add child ' + index);
+        console.assert(typeof index === 'string');
+        if (newChild instanceof ESPropertyInfo)
+        {
+          parent.addObjectChild(index, newChild);
+        }
+        this.isMutated = true;
+      }
+    } else
+    {
+      if (parent.arrayChildren[index] === undefined)
+      {
+        console.log('add ' + index);
+        console.assert(typeof index === 'number');
+        parent.addArrayChild(newChild as ESValueInfo, index);
         this.isMutated = true;
       }
     }

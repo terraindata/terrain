@@ -83,8 +83,6 @@ export class PathToCards
     if (rootCard === undefined)
     {
       // the card is empty
-      console.log('There is no card at all, please create a set of cards');
-      console.log('Set index to ' + (path.source.dataSource as ElasticDataSource).index);
       const template = {
         'query:query': {
           'bool:elasticFilter': {
@@ -111,13 +109,19 @@ export class PathToCards
       rootCard = BlockUtils.make(ElasticBlocks, 'eqlbody', { key: 'body', template});
     }
     // parse the card
-    const parsedCard = new ESCardParser(rootCard);
-    this.fromSourceSection(path, parsedCard);
-    this.updateHardBool(path.filterGroup, parsedCard);
-    this.updateSoftBool(path.softFilterGroup,parsedCard);
-    this.fromScore(path, parsedCard);
-    rootCard = parsedCard.getValueInfo().card;
-    console.log('Path -> Cards: ' + parsedCard.getValueInfo().value);
+    const parser = new ESCardParser(rootCard);
+    this.updateSize(path, parser);
+    this.updateSourceBool(path, parser);
+    this.updateHardBool(path.filterGroup, parser);
+    this.updateSoftBool(path.softFilterGroup, parser);
+    this.fromScore(path, parser);
+
+    if (parser.isMutated === true)
+    {
+      parser.updateCard();
+    }
+    rootCard = parser.getValueInfo().card;
+    console.log('Path -> Cards: ' + parser.getValueInfo().value);
     return List([rootCard]);
   }
 
@@ -223,7 +227,7 @@ export class PathToCards
       const boolCard = hardBool.card;
       const keepFilters = [];
       boolCard.otherFilters.map((filterBlock: Block) => {
-        if (filterBlock.boolQuery != 'filter' && filterBlock.boolQuery != 'filter_not')
+        if (filterBlock.boolQuery !== 'filter' && filterBlock.boolQuery !== 'filter_not')
         {
           keepFilters.push(filterBlock);
         }
@@ -305,7 +309,7 @@ export class PathToCards
         const childName = new ESJSONParser(JSON.stringify('bool')).getValueInfo();
         childName.card = boolBlock;
         const propertyInfo = new ESPropertyInfo(childName, boolValueInfo);
-        queryInfo.addObjectChild('bool', propertyInfo);
+        parser.addChild(rootValueInfo, 'bool', propertyInfo);
       }
     } else
     {
@@ -320,17 +324,9 @@ export class PathToCards
       const childName = new ESJSONParser(JSON.stringify('query')).getValueInfo();
       childName.card = queryBlock;
       const propertyInfo = new ESPropertyInfo(childName, queryValueInfo);
-      rootValueInfo.addObjectChild('bool', propertyInfo);
+      parser.addChild(rootValueInfo, 'bool', propertyInfo);
     }
-    parser.updateCard();
   }
-
-  private static fromSourceSection(path: Path, parser: ESCardParser)
-  {
-    this.updateSize(path, parser);
-    this.updateSourceBool(path, parser);
-  }
-
 
   private static fromScore(path: Path, parser: ESCardParser)
   {
