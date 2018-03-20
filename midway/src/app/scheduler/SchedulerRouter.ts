@@ -70,50 +70,35 @@ Router.get('/connections', passport.authenticate('access-token-local'), async (c
 // Get job by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  let getArchived: boolean = false;
-  if (ctx.query['archived'] !== undefined && (ctx.query.archived === 'true' || ctx.query.archived === true))
-  {
-    getArchived = true;
-  }
-  ctx.body = await scheduler.get(ctx.params.id, getArchived);
+  ctx.body = await scheduler.get(ctx.params.id);
 });
 
-/*
-// update scheduled job's status: set active to 1
-Router.post('/active/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.changeActiveStatus(ctx.state.user, ctx.params.id, 1);
+  ctx.body = await scheduler.cancel(ctx.params.id);
 });
 
-// Post new scheduled job
-Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const schedule: SchedulerConfig = ctx.request.body.body;
-  Util.verifyParameters(schedule, ['jobType', 'name', 'paramsJob', 'schedule', 'sort', 'transport']);
-  ctx.body = await scheduler.createCustomSchedule(ctx.state.user, schedule);
+  ctx.body = await scheduler.runSchedule(ctx.params.id);
 });
 
-// run a job on demand
-Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  ctx.body = await scheduler.runOnDemand(ctx.state.user, ctx.params.id);
-});
-
-// Delete scheduled jobs by parameter
+// Delete schedules by parameter
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.archive(ctx.state.user, ctx.params.id);
+  ctx.body = await scheduler.delete(ctx.state.user, ctx.params.id);
 });
 
-// update scheduled job's status: set active to 0
-Router.post('/inactive/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.changeActiveStatus(ctx.state.user, ctx.params.id, 0);
+  const schedule: SchedulerConfig = ctx.request.body.body;
+  schedule.id = ctx.params.id;
+  Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
+  ctx.body = await scheduler.upsert(ctx.state.user, schedule);
 });
-*/
 
 // Update job
-Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
   schedule.id = ctx.params.id;

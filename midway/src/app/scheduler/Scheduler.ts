@@ -103,65 +103,21 @@ export class Scheduler
     return false;
   }
 
+  public async delete(user: UserConfig, scheduleId: number): Promise<SchedulerConfig[] | string>
+  {
+    if (user.isSuperUser === false)
+    {
+      return Promise.resolve('User must be superuser.');
+    }
+    return App.DB.delete(this.schedulerTable, [scheduleId]) as Promise<SchedulerConfig[]>;
+  }
+
   public async get(id?: number, running?: boolean): Promise<SchedulerConfig[]>
   {
     return this._select([], { id, running });
   }
 
-  public async getAvailableSchedules(): Promise<number[]>
-  {
-    return new Promise<number[]>(async (resolve, reject) =>
-    {
-      const scheduleIds: number[] = [];
-      const schedules: SchedulerConfig[] = await this._select([], { running: true }) as SchedulerConfig[];
-      schedules.forEach((schedule) =>
-      {
-        scheduleIds.push(schedule.id);
-      });
-      resolve(scheduleIds);
-    });
-  }
-
-  public async upsert(user: UserConfig, schedule: SchedulerConfig): Promise<SchedulerConfig[]>
-  {
-    return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
-  }
-
-  public async setRunning(id: number, running: boolean): Promise<void>
-  {
-    const schedules: SchedulerConfig[] = await this.get(id);
-    if (schedules.length !== 0)
-    {
-      schedules[0].running = running;
-      await App.DB.upsert(this.schedulerTable, schedules[0]);
-    }
-  }
-
-  private async _checkSchedulerTable(): Promise<void>
-  {
-    // TODO check the scheduler for unlocked rows and detect which schedules should run next
-    const availableSchedules: number[] = await this.getAvailableSchedules();
-    availableSchedules.forEach((scheduleId) =>
-    {
-      this._checkSchedulerTableHelper(scheduleId);
-    });
-    setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
-  }
-
-  private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
-  {
-    const result: TaskOutputConfig | string = await this._runSchedule(scheduleId);
-    if (typeof result === 'string')
-    {
-      winston.warn(result as string);
-    }
-    else if ((result as TaskOutputConfig).exit === true)
-    {
-      winston.info('Schedule ' + scheduleId.toString() as string + ' successfully completed');
-    }
-  }
-
-  private async _runSchedule(id: number): Promise<TaskOutputConfig | string>
+  public async runSchedule(id: number): Promise<TaskOutputConfig | string>
   {
     return new Promise<TaskOutputConfig | string>(async (resolve, reject) =>
     {
@@ -169,13 +125,13 @@ export class Scheduler
       {
         return resolve('Schedule is already running.');
       }
-      await this.setRunning(id, true);
-      this.runningSchedules.set(id, new Job());
       const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length === 0)
       {
         return reject('Schedule not found.');
       }
+      await this._setRunning(id, true);
+      this.runningSchedules.set(id, new Job());
       const schedule: SchedulerConfig = schedules[0];
       let taskConfig: TaskConfig[] = [];
       try
@@ -197,10 +153,57 @@ export class Scheduler
         return reject(jobCreateStatus as string);
       }
       const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
-      await this.setRunning(id, false);
+      await this._setRunning(id, false);
       this.runningSchedules.delete(id);
       // TODO: unlock row
       return resolve(result as TaskOutputConfig);
+    });
+  }
+
+  public async upsert(user: UserConfig, schedule: SchedulerConfig): Promise<SchedulerConfig[]>
+  {
+    // TODO: sanitize inputs
+    return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
+  }
+
+  private async _checkSchedulerTable(): Promise<void>
+  {
+    // TODO check the scheduler for unlocked rows and detect which schedules should run next
+    const availableSchedules: number[] = await this._getAvailableSchedules();
+    availableSchedules.forEach((scheduleId) =>
+    {
+      this._checkSchedulerTableHelper(scheduleId).catch((err) =>
+      {
+        winston.warn(err.toString() as string);
+      });
+    });
+    setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
+  }
+
+  private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
+  {
+    const result: TaskOutputConfig | string = await this.runSchedule(scheduleId);
+    if (typeof result === 'string')
+    {
+      winston.warn(result as string);
+    }
+    else if ((result as TaskOutputConfig).exit === true)
+    {
+      winston.info('Schedule ' + scheduleId.toString() as string + ' successfully completed');
+    }
+  }
+
+  private async _getAvailableSchedules(): Promise<number[]>
+  {
+    return new Promise<number[]>(async (resolve, reject) =>
+    {
+      const scheduleIds: number[] = [];
+      const schedules: SchedulerConfig[] = await this._select([], { running: true }) as SchedulerConfig[];
+      schedules.forEach((schedule) =>
+      {
+        scheduleIds.push(schedule.id);
+      });
+      resolve(scheduleIds);
     });
   }
 
@@ -225,6 +228,16 @@ export class Scheduler
       const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
       resolve(results);
     });
+  }
+
+  private async _setRunning(id: number, running: boolean): Promise<void>
+  {
+    const schedules: SchedulerConfig[] = await this.get(id);
+    if (schedules.length !== 0)
+    {
+      schedules[0].running = running;
+      await App.DB.upsert(this.schedulerTable, schedules[0]);
+    }
   }
 }
 
