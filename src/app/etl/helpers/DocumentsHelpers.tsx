@@ -63,6 +63,11 @@ import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
+import
+{
+  _ETLEdge, _ETLNode, _ETLProcess,
+  _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
+} from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -74,11 +79,6 @@ import
   FieldMap,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
-import
-{
-  _ETLEdge, _ETLNode, _ETLProcess,
-  _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
-} from 'etl/templates/ETLProcess';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
@@ -88,64 +88,65 @@ import Ajax from 'util/Ajax';
 
 class DocumentsHelpers extends ETLHelpers
 {
-  // public mergeDocuments(nodeId: number, joinOptions: MergeJoinOptions): List<object>
-  // {
-  //   const template = this._template;
-  //   const { leftId, rightId, leftJoinKey, rightJoinKey, outputKey } = joinOptions;
+  public mergeDocuments(nodeId: number, joinOptions: MergeJoinOptions): List<object>
+  {
+    const template = this._template;
+    const { leftId, rightId, leftJoinKey, rightJoinKey, outputKey } = joinOptions;
 
-  //   const inboundEdges = template.findEdges((edge) => edge.to === nodeId);
-  //   const leftEdge = inboundEdges.find((id) => template.getEdge(id).from === leftId);
-  //   const rightEdge = inboundEdges.find((id) => template.getEdge(id).from === rightId);
+    const inboundEdges = template.findEdges((edge) => edge.to === nodeId);
+    const leftEdge = inboundEdges.find((id) => template.getEdge(id).from === leftId);
+    const rightEdge = inboundEdges.find((id) => template.getEdge(id).from === rightId);
 
-  //   const leftDocuments = this.getDocumentsForNode(leftId);
-  //   const rightDocuments = this.getDocumentsForNode(rightId);
+    const leftDocuments = this.getDocumentsForNode(leftId);
+    const rightDocuments = this.getDocumentsForNode(rightId);
 
-  //   const leftTE = template.getTransformationEngine(leftEdge);
-  //   const rightTE = template.getTransformationEngine(rightEdge);
-  //   return List([]);
-  // }
+    const leftTE = template.getTransformationEngine(leftEdge);
+    const rightTE = template.getTransformationEngine(rightEdge);
+    return List([]);
+  }
 
-  // public getDocumentsForNode(nodeId: number)
-  // {
-  //   const template = this._template;
-  //   const node = template.getNode(nodeId);
-  //   switch (node.type)
-  //   {
-  //     case NodeTypes.Source: {
-  //       return this._templateEditor.getSourceDocuments(node.endpoint);
-  //     }
-  //     case NodeTypes.Sink: {
-  //       throw new Error(`Cannot Get Documents For a Sink`);
-  //     }
-  //     case NodeTypes.MergeJoin: {
-  //       return this.mergeDocuments(nodeId, node.options as MergeJoinOptions);
-  //     }
-  //     default: {
-  //       this._logError(`Unrecognized or unsupported node type: ${node.type}`);
-  //     }
-  //   }
-  // }
+  public getDocumentsForNode(nodeId: number)
+  {
+    const template = this._template;
+    const node = template.getNode(nodeId);
+    switch (node.type)
+    {
+      case NodeTypes.Source: {
+        return this._templateEditor.getSourceDocuments(node.endpoint);
+      }
+      case NodeTypes.Sink: {
+        throw new Error(`Cannot Get Documents For a Sink`);
+      }
+      case NodeTypes.MergeJoin: {
+        return this.mergeDocuments(nodeId, node.options as MergeJoinOptions);
+      }
+      default: {
+        this._logError(`Unrecognized or unsupported node type: ${node.type}`);
+      }
+    }
+  }
 
-  // public computeMergedDocuments()
-  // {
-  //   try {
-  //     const template = this._template;
-  //     const currentEdge = this._templateEditor.getCurrentEdgeId();
-  //     const edge = template.getEdge(currentEdge);
-  //     const documents = this.getDocumentsForNode(edge.from);
+  public computeDocuments()
+  {
+    try
+    {
+      const template = this._template;
+      const currentEdge = this._templateEditor.getCurrentEdgeId();
+      const edge = template.getEdge(currentEdge);
+      const documents = this.getDocumentsForNode(edge.from);
 
-  //     this.editorAct({
-  //       actionType: 'setDisplayState',
-  //       state: {
-  //         documents,
-  //       }
-  //     });
-  //   }
-  //   catch (e)
-  //   {
-  //     this._logError(e);
-  //   }
-  // }
+      this.editorAct({
+        actionType: 'setDisplayState',
+        state: {
+          documents,
+        },
+      });
+    }
+    catch (e)
+    {
+      this._logError(e);
+    }
+  }
 
   // fetches documents for provided source keys
   public fetchSources(keys: List<string>)
@@ -245,7 +246,7 @@ class DocumentsHelpers extends ETLHelpers
     });
     if (this._templateEditor.loadingDocuments <= 0)
     {
-      // this.computeMergedDocuments();
+      this.computeDocuments();
     }
   }
 

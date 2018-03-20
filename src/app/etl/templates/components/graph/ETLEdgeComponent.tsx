@@ -65,7 +65,7 @@ import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { ETLEdge, ETLNode } from 'etl/templates/ETLProcess';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
@@ -165,11 +165,12 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   public makeThisActive()
   {
     const { act, edgeId, templateEditor } = this.props;
-    act({
-      actionType: 'setCurrentEdge',
-      edge: edgeId,
-      rebuild: edgeId !== templateEditor.getCurrentEdgeId(),
-    });
+    GraphHelpers.switchEdge(edgeId);
+    // act({
+    //   actionType: 'setCurrentEdge',
+    //   edge: edgeId,
+    //   rebuild: edgeId !== templateEditor.getCurrentEdgeId(),
+    // });
   }
 
   public openMergeUI()

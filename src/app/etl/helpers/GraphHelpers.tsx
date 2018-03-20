@@ -178,6 +178,16 @@ class GraphHelpers extends ETLHelpers
       template: proxy.getTemplate(),
     });
   }
+
+  public switchEdge(edgeId: number)
+  {
+    this.editorAct({
+      actionType: 'setCurrentEdge',
+      edge: edgeId,
+      rebuild: edgeId !== this._templateEditor.getCurrentEdgeId(),
+    });
+    DocumentsHelpers.computeDocuments();
+  }
 }
 
 function getChangedKeys(original: Immutable.Map<string, any>, next: Immutable.Map<string, any>):

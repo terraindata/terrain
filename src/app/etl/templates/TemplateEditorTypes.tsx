@@ -71,7 +71,7 @@ class TemplateEditorStateC
 
   public getPreviewDocuments()
   {
-    return List([]);
+    return this.uiState.documents;
   }
 
   public getCurrentEngine(): TransformationEngine
@@ -108,7 +108,7 @@ export const columnOptions = List([
 
 class EditorDisplayStateC
 {
-  // public documents: List<object> = List([]);
+  public documents: List<object> = List([]);
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = 0;
