@@ -102,7 +102,7 @@ class Initializers extends ETLHelpers
         DocumentsHelpers.fetchSources(template.getSources().keySeq().toList());
         ETLRouteUtil.gotoEditTemplate(template.id);
       })
-      .catch(this._logRejection);
+      .catch(this._logError);
   }
 
   public initNewFromAlgorithm(algorithmId: number)
@@ -118,7 +118,7 @@ class Initializers extends ETLHelpers
     });
     DocumentsHelpers.fetchDocuments(source, '_default')
       .then(this.createInitialTemplateFn(source))
-      .catch(this._logRejection);
+      .catch(this._logError);
   }
 
   public initNewFromWalkthrough(walkthrough: WalkthroughState = this._walkthrough)
@@ -128,7 +128,7 @@ class Initializers extends ETLHelpers
     const file = walkthrough.getFile();
     DocumentsHelpers.fetchDocuments(source, '_default')
       .then(this.createInitialTemplateFn(source, sink))
-      .catch(this._logRejection);
+      .catch(this._logError);
   }
 
   private createInitialTemplateFn(

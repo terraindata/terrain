@@ -69,6 +69,11 @@ class TemplateEditorStateC
   public loadingDocuments: number = 0;
   public uiState: EditorDisplayState = _EditorDisplayState();
 
+  public getPreviewDocuments()
+  {
+    return List([]);
+  }
+
   public getCurrentEngine(): TransformationEngine
   {
     const currentEdge = this.getCurrentEdgeId();
@@ -78,6 +83,11 @@ class TemplateEditorStateC
   public getCurrentEdgeId()
   {
     return this.uiState.currentEdge;
+  }
+
+  public getSourceDocuments(id: string): List<object>
+  {
+    return this.uiState.mergeDocuments.get(id, List([]));
   }
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
@@ -98,7 +108,7 @@ export const columnOptions = List([
 
 class EditorDisplayStateC
 {
-  public documents: List<object> = List([]);
+  // public documents: List<object> = List([]);
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = 0;

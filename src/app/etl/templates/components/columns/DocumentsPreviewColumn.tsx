@@ -97,7 +97,7 @@ class DocumentsPreviewColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const { documents } = this.props.templateEditor.uiState;
+    const documents = this.props.templateEditor.getPreviewDocuments();
     if (documents.size === 0)
     {
       return this.renderNoDocuments();

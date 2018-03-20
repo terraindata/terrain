@@ -129,7 +129,8 @@ class TemplateEditor extends TerrainComponent<Props>
   public getDocument()
   {
     const { templateEditor } = this.props;
-    const { documents, previewIndex, engineVersion } = templateEditor.uiState;
+    const { previewIndex, engineVersion } = templateEditor.uiState;
+    const documents = templateEditor.getPreviewDocuments();
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
     return this.transformDocument(previewDocument, templateEditor.getCurrentEngine(), engineVersion);
   }
@@ -278,7 +279,6 @@ class TemplateEditor extends TerrainComponent<Props>
   {
     const {
       previewIndex,
-      documents,
       modalRequests,
       moveFieldId,
       addFieldId,

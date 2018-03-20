@@ -125,7 +125,7 @@ export interface TemplateEditorActionTypes
   updateEngineVersion: {
     actionType: 'updateEngineVersion';
   };
-  resetState: { // resets the display state
+  resetState: { // resets the display state. is this prone to race conditions?
     actionType: 'resetState';
   };
   setCurrentEdge: {

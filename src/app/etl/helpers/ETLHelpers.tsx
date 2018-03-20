@@ -65,7 +65,6 @@ import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import
 {
-  _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
   FieldMap,
@@ -163,7 +162,7 @@ export default abstract class ETLHelpers
     });
   }
 
-  protected _logRejection(ev)
+  protected _logError(ev)
   {
     // tslint:disable-next-line
     console.error(ev);

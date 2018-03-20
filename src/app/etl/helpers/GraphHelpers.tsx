@@ -70,7 +70,6 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
-import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -122,7 +121,7 @@ class GraphHelpers extends ETLHelpers
       {
         const { engine, warnings, softWarnings } = createMergedEngine(documents);
         proxy.setEdgeTransformations(edgeId, engine);
-      }).catch(this._logRejection);
+      }).catch(this._logError);
     }
   }
 

@@ -150,9 +150,9 @@ class ETLTemplateC implements ETLTemplateI
     return this.findNodes((node) => node.type !== NodeTypes.Sink);
   }
 
-  public findEdges(matcher: (e: ETLEdge) => boolean): List<number>
+  public findEdges(matcher: (e: ETLEdge) => boolean, edges = this.process.edges): List<number>
   {
-    return this.process.edges.filter(matcher).keySeq().toList();
+    return edges.filter(matcher).keySeq().toList();
   }
 
   public findNodes(matcher: (n: ETLNode) => boolean): List<number>
