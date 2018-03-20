@@ -52,7 +52,7 @@ const { List, Map } = Immutable;
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { _ETLProcess, ETLEdge, ETLProcess } from 'etl/templates/ETLProcess';
+import { _ETLProcess, ETLEdge, ETLProcess, ETLNode } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
@@ -107,6 +107,11 @@ class ETLTemplateC implements ETLTemplateI
     return `${key} (${type})`;
   }
 
+  public getNodeName(id: number)
+  {
+    return `Merge Node ${id}`;
+  }
+
   public getTransformationEngine(edge: number)
   {
     return this.process.edges.getIn([edge, 'transformations']);
@@ -122,14 +127,9 @@ class ETLTemplateC implements ETLTemplateI
     return this.process.edges;
   }
 
-  public getNodeName(id: number)
-  {
-    return `Merge Node ${id}`;
-  }
-
   public getLastEdgeId(): number
   {
-    const edges = this.getEdgesToNode(this.getDefaultSink());
+    const edges = this.findEdges((edge) => edge.to === this.getDefaultSink());
     return edges.size > 0 ? edges.first() : -1;
   }
 
@@ -140,18 +140,19 @@ class ETLTemplateC implements ETLTemplateI
     );
   }
 
-  public getEdgesToNode(node: number): List<number>
-  {
-    return this.process.edges.filter(
-      (edge, key) => edge.to === node,
-    ).keySeq().toList();
-  }
-
   public getMergeableNodes(): List<number>
   {
-    // get all edges that are connected to both a source and a sink
-    const nodes = this.process.nodes.filter((node) => node.type !== NodeTypes.Sink);
-    return nodes.keySeq().toList();
+    return this.findNodes((node) => node.type !== NodeTypes.Sink);
+  }
+
+  public findEdges(matcher: (e: ETLEdge) => boolean): List<number>
+  {
+    return this.process.edges.filter(matcher).keySeq().toList();
+  }
+
+  public findNodes(matcher: (n: ETLNode) => boolean): List<number>
+  {
+    return this.process.nodes.filter(matcher).keySeq().toList();
   }
 }
 

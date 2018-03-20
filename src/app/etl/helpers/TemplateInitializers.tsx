@@ -193,8 +193,8 @@ class Initializers extends ETLHelpers
     // default source and sink is upload and download
 
     const proxy = template.proxy();
-    const sourceId = proxy.addSource(sourceToAdd);
-    const sinkId = proxy.addSink(sinkToAdd);
+    const sourceId = proxy.addSource('_default', sourceToAdd);
+    const sinkId = proxy.addSink('_default', sinkToAdd);
     const initialEdge = proxy.addEdge(sourceId, sinkId, engine);
 
     template = proxy.getTemplate();

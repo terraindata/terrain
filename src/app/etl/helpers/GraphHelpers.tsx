@@ -66,6 +66,7 @@ import
   _ETLEdge, _ETLNode, _ETLProcess,
   _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
 } from 'etl/templates/ETLProcess';
+import { SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -107,5 +108,102 @@ class GraphHelpers extends ETLHelpers
     //   transformations: new TransformationEngine(),
     // }));
   }
+
+  public updateSources(newSources: SourcesMap)
+  {
+    const { newKeys, deletedKeys, differentKeys } =
+      getChangedKeys(this._template.getSources(), newSources);
+
+    const proxy = this._template.proxy();
+
+    newKeys.forEach((key) =>
+    {
+      proxy.addSource(key, newSources.get(key));
+    });
+    differentKeys.forEach((key) =>
+    {
+      proxy.setSource(key, newSources.get(key));
+    });
+    deletedKeys.forEach((key) =>
+    {
+      proxy.deleteSource(key);
+      this.editorAct({
+        actionType: 'deleteInMergeDocuments',
+        key,
+      });
+    });
+    DocumentsHelpers.fetchSources(newKeys);
+    DocumentsHelpers.fetchSources(differentKeys);
+
+    this.editorAct({
+      actionType: 'setTemplate',
+      template: proxy.getTemplate(),
+    });
+  }
+
+  public updateSinks(newSinks: SinksMap)
+  {
+    const { newKeys, deletedKeys, differentKeys } =
+      getChangedKeys(this._template.getSinks(), newSinks);
+
+    const proxy = this._template.proxy();
+
+    newKeys.forEach((key) =>
+    {
+      proxy.addSink(key, newSinks.get(key));
+    });
+    differentKeys.forEach((key) =>
+    {
+      proxy.setSink(key, newSinks.get(key));
+    });
+    deletedKeys.forEach((key) =>
+    {
+      proxy.deleteSink(key);
+    });
+
+    this.editorAct({
+      actionType: 'setTemplate',
+      template: proxy.getTemplate(),
+    });
+  }
 }
+
+function getChangedKeys(original: Immutable.Map<string, any>, next: Immutable.Map<string, any>):
+  {
+    differentKeys: List<string>;
+    deletedKeys: List<string>;
+    newKeys: List<string>;
+  }
+{
+  const differentKeys = [];
+  const deletedKeys = [];
+  const newKeys = [];
+  original.forEach((value, key) =>
+  {
+    if (next.has(key))
+    {
+      if (original.get(key) !== next.get(key))
+      {
+        differentKeys.push(key);
+      }
+    }
+    else
+    {
+      deletedKeys.push(key);
+    }
+  });
+  next.forEach((value, key) =>
+  {
+    if (!original.has(key))
+    {
+      newKeys.push(key);
+    }
+  });
+  return {
+    differentKeys: List(differentKeys),
+    deletedKeys: List(deletedKeys),
+    newKeys: List(newKeys),
+  };
+}
+
 export default new GraphHelpers(TerrainStore);

@@ -89,7 +89,7 @@ export class TemplateProxy
     this.sinks = this.sinks.set(key, sink);
   }
 
-  public addSource(source: SourceConfig, key: string = '_default'): number
+  public addSource(key: string, source: SourceConfig): number
   {
     this.sources = this.sources.set(key, source);
     const sourceNode = _ETLNode({
@@ -99,7 +99,7 @@ export class TemplateProxy
     return this.createNode(sourceNode);
   }
 
-  public addSink(sink: SinkConfig, key: string = '_default'): number
+  public addSink(key: string, sink: SinkConfig): number
   {
     this.sinks = this.sinks.set(key, sink);
     const sinkNode = _ETLNode({
@@ -112,11 +112,19 @@ export class TemplateProxy
   public deleteSource(key: string)
   {
     this.sources = this.sources.delete(key);
+    const nodeToDelete: number = this.template.findNodes(
+      (node) => node.type === NodeTypes.Source && node.endpoint === key
+    ).first();
+    this.nodes = this.nodes.delete(nodeToDelete);
   }
 
   public deleteSink(key: string)
   {
     this.sinks = this.sinks.delete(key);
+    const nodeToDelete: number = this.template.findNodes(
+      (node) => node.type === NodeTypes.Sink && node.endpoint === key
+    ).first();
+    this.nodes = this.nodes.delete(nodeToDelete);
   }
 
   public addEdge(from: number, to: number, engine: TransformationEngine = new TransformationEngine())
@@ -137,9 +145,8 @@ export class TemplateProxy
   private createNode(node: ETLNode): number
   {
     const id = this.process.uidNode;
-    this.process = this.process
-      .setIn(['nodes', id], node)
-      .set('uidNode', id + 1);
+    this.nodes = this.nodes.set(id, node);
+    this.process = this.process.set('uidNode', id + 1);
     return id;
   }
 
@@ -151,16 +158,15 @@ export class TemplateProxy
       return -1;
     }
     const id = this.process.uidEdge;
-    this.process = this.process
-      .setIn(['edges', id], edge)
-      .set('uidEdge', id + 1);
+    this.edges = this.edges.set(id, edge);
+    this.process = this.process.set('uidEdge', id + 1);
     return id;
   }
 
   private verifyEdge(edge: ETLEdge): boolean
   {
     const { from, to } = edge;
-    if (!this.process.nodes.hasIn([from]) || !this.process.nodes.hasIn([to]))
+    if (!this.nodes.hasIn([from]) || !this.process.nodes.hasIn([to]))
     {
       return false;
     }
@@ -168,11 +174,11 @@ export class TemplateProxy
     {
       return false;
     }
-    if (this.process.nodes.get(from).type === NodeTypes.Sink)
+    if (this.nodes.get(from).type === NodeTypes.Sink)
     {
       return false;
     }
-    if (this.process.nodes.get(to).type === NodeTypes.Source)
+    if (this.nodes.get(to).type === NodeTypes.Source)
     {
       return false;
     }
@@ -184,7 +190,6 @@ export class TemplateProxy
     this.onMutate(this.template);
   }
 
-
   private get process()
   {
     return this.template.process;
@@ -193,6 +198,28 @@ export class TemplateProxy
   private set process(val: ETLProcess)
   {
     this.template = this.template.set('process', val);
+    this.sync();
+  }
+
+  private get nodes(): Immutable.Map<number, ETLNode>
+  {
+    return this.process.nodes;
+  }
+
+  private set nodes(val: Immutable.Map<number, ETLNode>)
+  {
+    this.process = this.process.set('nodes', val);
+    this.sync();
+  }
+
+  private get edges(): Immutable.Map<number, ETLEdge>
+  {
+    return this.process.edges;
+  }
+
+  private set edges(val: Immutable.Map<number, ETLEdge>)
+  {
+    this.process = this.process.set('edges', val);
     this.sync();
   }
 

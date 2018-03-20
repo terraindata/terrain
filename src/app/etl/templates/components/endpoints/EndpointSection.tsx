@@ -69,7 +69,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
-
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import EndpointForm from 'etl/common/components/EndpointForm';
 
 import './EndpointSection.less';
@@ -287,52 +287,14 @@ class EndpointSection extends TerrainComponent<Props>
   public handleApplyChanges()
   {
     const { template, isSource, act } = this.props;
-    const { endpoints } = this.state;
-    const { newKeys, deletedKeys, differentKeys } =
-      getChangedKeys(isSource ? template.getSources() : template.getSinks(), endpoints);
-
-    const proxy = template.proxy();
     if (isSource)
     {
-      newKeys.forEach((key) =>
-      {
-        proxy.addSource(endpoints.get(key), key);
-      });
-      differentKeys.forEach((key) =>
-      {
-        proxy.setSource(key, endpoints.get(key));
-      });
-      deletedKeys.forEach((key) =>
-      {
-        proxy.deleteSource(key);
-        act({
-          actionType: 'deleteInMergeDocuments',
-          key,
-        });
-      });
-      DocumentsHelpers.fetchSources(newKeys);
-      DocumentsHelpers.fetchSources(differentKeys);
+      GraphHelpers.updateSources(this.state.endpoints);
     }
     else
     {
-      newKeys.forEach((key) =>
-      {
-        proxy.addSink(endpoints.get(key), key);
-      });
-      differentKeys.forEach((key) =>
-      {
-        proxy.setSink(key, endpoints.get(key));
-      });
-      deletedKeys.forEach((key) =>
-      {
-        proxy.deleteSink(key);
-      });
+      GraphHelpers.updateSinks(this.state.endpoints);
     }
-
-    act({
-      actionType: 'setTemplate',
-      template: proxy.getTemplate(),
-    });
   }
 
   public handleAddNewSource()
@@ -371,44 +333,6 @@ class EndpointSection extends TerrainComponent<Props>
       });
     };
   }
-}
-
-function getChangedKeys(original: Immutable.Map<string, any>, next: Immutable.Map<string, any>):
-  {
-    differentKeys: List<string>;
-    deletedKeys: List<string>;
-    newKeys: List<string>;
-  }
-{
-  const differentKeys = [];
-  const deletedKeys = [];
-  const newKeys = [];
-  original.forEach((value, key) =>
-  {
-    if (next.has(key))
-    {
-      if (original.get(key) !== next.get(key))
-      {
-        differentKeys.push(key);
-      }
-    }
-    else
-    {
-      deletedKeys.push(key);
-    }
-  });
-  next.forEach((value, key) =>
-  {
-    if (!original.has(key))
-    {
-      newKeys.push(key);
-    }
-  });
-  return {
-    differentKeys: List(differentKeys),
-    deletedKeys: List(deletedKeys),
-    newKeys: List(newKeys),
-  };
 }
 
 const addEndpointStyle = _.extend({},
