@@ -78,7 +78,6 @@ import FileImportPreviewColumn from './FileImportPreviewColumn';
 import TransformModal from './TransformModal';
 
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
-import { getRootFieldFromDocPath } from '../../../../shared/Util';
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
@@ -439,6 +438,21 @@ class FileImportPreview extends TerrainComponent<Props>
     return Number(template.substring(0, template.indexOf(':')));
   }
 
+  public getRootFieldFromDocPath(path: string): string | undefined
+  {
+    try
+    {
+      let pathAsArr: string[] = [];
+      path.split(/(\.)/g).forEach((elem) => pathAsArr = pathAsArr.concat(elem.split(/(\[\d+\])/g)));
+      pathAsArr = pathAsArr.filter((elem) => elem.length !== 0);
+      return pathAsArr[0];
+    }
+    catch (e)
+    {
+      return undefined;
+    }
+  }
+
   public onSaveTemplateNameChange(saveTemplateName: string)
   {
     this.setState({
@@ -771,7 +785,7 @@ class FileImportPreview extends TerrainComponent<Props>
     const transform: Transform = FileImportTypes._Transform(
       {
         name: 'extract',
-        colName: getRootFieldFromDocPath(this.state.addExportColumnPath),
+        colName: this.getRootFieldFromDocPath(this.state.addExportColumnPath),
         args: FileImportTypes._TransformArgs({
           newName: this.state.addExportColumnName,
           path: this.state.addExportColumnPath,
@@ -840,7 +854,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderUpdateTemplate()
   {
-    const overwriteName: string = this.state.templateOptions.find((option) => getTemplateName(option) === this.state.saveTemplateName);
+    const overwriteName: string = this.state.templateOptions.find((option) => this.getTemplateName(option) === this.state.saveTemplateName);
     return (
       <Modal
         open={this.state.showingUpdateTemplate}

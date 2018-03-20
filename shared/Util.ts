@@ -44,21 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions max-line-length
+import * as csv from './util/CSV';
+import * as elastic from './util/Elastic';
+import * as json from './util/JSON';
+import * as promise from './util/Promise';
+import * as tests from './util/Tests';
 
-import * as _ from 'lodash';
+const Util =
+  {
+    csv,
+    elastic,
+    json,
+    promise,
+    tests,
+  };
 
-export function getRootFieldFromDocPath(path: string): string | undefined
-{
-  try
-  {
-    let pathAsArr: string[] = [];
-    path.split(/(\.)/g).forEach((elem) => pathAsArr = pathAsArr.concat(elem.split(/(\[\d+\])/g)));
-    pathAsArr = pathAsArr.filter((elem) => elem.length !== 0);
-    return pathAsArr[0];
-  }
-  catch (e)
-  {
-    return undefined;
-  }
-}
+export default Util;
