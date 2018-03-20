@@ -56,6 +56,7 @@ export class ElasticReader extends Stream.Readable
   private client: ElasticClient;
   private query: any;
 
+  private _isEmpty: boolean = false;
   private querying: boolean = false;
   private doneReading: boolean = false;
   private rowsProcessed: number = 0;
@@ -120,6 +121,11 @@ export class ElasticReader extends Stream.Readable
     }
   }
 
+  public isEmpty(): boolean
+  {
+    return this._isEmpty;
+  }
+
   private scrollCallback(error, response): void
   {
     if (typeof response._scroll_id === 'string')
@@ -177,6 +183,7 @@ export class ElasticReader extends Stream.Readable
         }, (_err, _resp) =>
           {
             this.push(null);
+            this._isEmpty = true;
           });
 
         this.scrollID = undefined;

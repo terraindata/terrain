@@ -50,7 +50,7 @@ import * as winston from 'winston';
 import srs = require('secure-random-string');
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import * as Util from '../Util';
+import * as Util from '../AppUtil';
 import UserConfig from './UserConfig';
 
 export class Users

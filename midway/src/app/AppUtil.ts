@@ -44,67 +44,101 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
+import * as request from 'request';
 
-/**
- * An client which acts as a selective isomorphic wrapper around
- * midway databases
- */
-abstract class ADatabaseController
+import { ItemConfig } from '../app/items/ItemConfig';
+import { items } from '../app/items/ItemRouter';
+
+export function doRequest(url)
 {
-  private id: number; // unique id
-  private lsn: number; // log sequence number
-  private type: string; // connection type
-  private name: string; // connection name
-  private header: string; // log entry header
-
-  constructor(type: string, id: number, name: string)
+  return new Promise((resolve, reject) =>
   {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-  }
-
-  public log(methodName: string, info?: any, moreInfo?: any)
-  {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.info(header);
-    if (info !== undefined)
+    request(url, (error, res, body) =>
     {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
-    }
-    if (moreInfo !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
-    }
-  }
-
-  public getID(): number
-  {
-    return this.id;
-  }
-
-  public getType(): string
-  {
-    return this.type;
-  }
-
-  public getName(): string
-  {
-    return this.name;
-  }
-
-  public abstract getClient(): object;
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB(): object;
+      if ((error === null || error === undefined) && res.statusCode === 200)
+      {
+        resolve(body);
+      }
+      else
+      {
+        reject(error);
+      }
+    });
+  });
 }
 
-export default ADatabaseController;
+export function updateObject<T>(obj: T, newObj: T): T
+{
+  for (const key in newObj)
+  {
+    if (newObj.hasOwnProperty(key))
+    {
+      obj[key] = newObj[key];
+    }
+  }
+  return obj;
+}
+
+export function verifyParameters(parameters: any, required: string[]): void
+{
+  if (parameters === undefined)
+  {
+    throw new Error('No parameters found.');
+  }
+
+  for (const key of required)
+  {
+    if (parameters.hasOwnProperty(key) === false)
+    {
+      throw new Error('Parameter "' + key + '" not found in request object.');
+    }
+  }
+}
+
+export async function getQueryFromAlgorithm(algorithmId: number): Promise<string>
+{
+  return new Promise<string>(async (resolve, reject) =>
+  {
+    const algorithms: ItemConfig[] = await items.get(algorithmId);
+    if (algorithms.length === 0)
+    {
+      return reject('Algorithm not found.');
+    }
+
+    try
+    {
+      if (algorithms[0].meta !== undefined)
+      {
+        return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
+      }
+    }
+    catch (e)
+    {
+      return reject('Malformed algorithm');
+    }
+  });
+}
+
+export async function getDBFromAlgorithm(algorithmId: number): Promise<number>
+{
+  return new Promise<number>(async (resolve, reject) =>
+  {
+    const algorithms: ItemConfig[] = await items.get(algorithmId);
+    if (algorithms.length === 0)
+    {
+      return reject('Algorithm not found.');
+    }
+
+    try
+    {
+      if (algorithms[0].meta !== undefined)
+      {
+        return resolve(JSON.parse(algorithms[0].meta as string)['db']['id']);
+      }
+    }
+    catch (e)
+    {
+      return reject('Malformed algorithm');
+    }
+  });
+}

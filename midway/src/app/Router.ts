@@ -48,6 +48,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
 
+import * as Util from './AppUtil';
 import AuthRouter from './auth/AuthRouter';
 import CredentialRouter from './credentials/CredentialRouter';
 import DatabaseRouter from './database/DatabaseRouter';
@@ -61,7 +62,6 @@ import SchedulerRouter from './scheduler/SchedulerRouter';
 import SchemaRouter from './schema/SchemaRouter';
 import StatusRouter from './status/StatusRouter';
 import UserRouter from './users/UserRouter';
-import * as Util from './Util';
 import VersionRouter from './versions/VersionRouter';
 
 const AppRouter = new KoaRouter();

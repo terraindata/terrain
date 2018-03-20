@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Tasty from '../../tasty/Tasty';
 
 import QueryHandler from '../../app/query/QueryHandler';
-import ADatabaseController from '../ADatabaseController';
+import DatabaseController from '../DatabaseController';
 import MySQLClient from './client/MySQLClient';
 import MySQLConfig from './MySQLConfig';
 import MySQLDB from './tasty/MySQLDB';
@@ -55,7 +55,7 @@ import MySQLDB from './tasty/MySQLDB';
 /**
  * The central controller for communicating with MySQL.
  */
-class MySQLController extends ADatabaseController
+class MySQLController extends DatabaseController
 {
   private client: MySQLClient;
   private tasty: Tasty.Tasty;

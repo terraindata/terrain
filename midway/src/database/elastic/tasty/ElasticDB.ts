@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 import * as Elastic from 'elasticsearch';
 
+import util from '../../../../../shared/Util';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
-import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
 import ElasticGenerator from './ElasticGenerator';
 import ElasticQuery from './ElasticQuery';
@@ -80,7 +80,7 @@ export class ElasticDB implements TastyDB
     {
       this.client.indices.getMapping(
         {},
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
 
     return TastySchema.fromElasticTree(result);
@@ -102,7 +102,7 @@ export class ElasticDB implements TastyDB
       {
         this.client.search(
           queries[i],
-          makePromiseCallback(resolve, reject));
+          util.promise.makeCallback(resolve, reject));
       });
 
       if (i === queries.length - 1)
@@ -151,7 +151,7 @@ export class ElasticDB implements TastyDB
       {
         this.client.putScript(
           procedure,
-          makePromiseCallback(resolve, reject));
+          util.promise.makeCallback(resolve, reject));
       });
   }
 
@@ -216,7 +216,7 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.create(
         params,
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -233,7 +233,7 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.delete(
         params,
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -254,7 +254,7 @@ export class ElasticDB implements TastyDB
           type: table.getTableName(),
           body: payload,
         },
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -278,7 +278,7 @@ export class ElasticDB implements TastyDB
 
           this.client.delete(
             params,
-            makePromiseCallback(resolve, reject));
+            util.promise.makeCallback(resolve, reject));
         }));
     }
     return Promise.all(promises);
@@ -297,7 +297,7 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.refresh(
         params,
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -329,7 +329,7 @@ export class ElasticDB implements TastyDB
 
           this.client.index(
             query as any,
-            makePromiseCallback(resolve, reject));
+            util.promise.makeCallback(resolve, reject));
         }),
       );
     }
@@ -367,7 +367,7 @@ export class ElasticDB implements TastyDB
 
           this.client.update(
             query as any,
-            makePromiseCallback(resolve, reject));
+            util.promise.makeCallback(resolve, reject));
         }),
       );
     }
@@ -403,7 +403,7 @@ export class ElasticDB implements TastyDB
         {
           body,
         },
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -439,7 +439,7 @@ export class ElasticDB implements TastyDB
         {
           body,
         },
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 

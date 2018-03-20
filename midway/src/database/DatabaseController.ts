@@ -44,104 +44,67 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ADatabaseController from './ADatabaseController';
+import * as winston from 'winston';
+import QueryHandler from '../app/query/QueryHandler';
+import * as Tasty from '../tasty/Tasty';
 
-import ElasticConfig from './elastic/ElasticConfig';
-import ElasticController from './elastic/ElasticController';
-
-import MySQLConfig from './mysql/MySQLConfig';
-import MySQLController from './mysql/MySQLController';
-
-import PostgreSQLConfig from './pg/PostgreSQLConfig';
-import PostgreSQLController from './pg/PostgreSQLController';
-
-import SQLiteConfig from './sqlite/SQLiteConfig';
-import SQLiteController from './sqlite/SQLiteController';
-
-export type DatabaseConfig = SQLiteConfig | MySQLConfig | ElasticConfig | PostgreSQLConfig;
-
-export function DSNToConfig(type: string, dsnString: string): DatabaseConfig | undefined
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * midway databases
+ */
+abstract class DatabaseController
 {
-  if (type === 'sqlite')
-  {
-    return {
-      filename: dsnString,
-    } as SQLiteConfig;
-  }
-  else if (type === 'mysql' || type === 'postgres')
-  {
-    const idx0 = dsnString.lastIndexOf('@');
-    const idx1 = dsnString.lastIndexOf('/');
-    const end = idx1 > 0 ? idx1 : dsnString.length;
-    const h0 = dsnString.substr(0, idx0);
-    const h1 = dsnString.substr(idx0 + 1, end);
-    const h2 = (idx1 > 0) ? dsnString.substr(idx1 + 1, dsnString.length - idx1) : undefined;
-    const q1 = h0.split(':');
-    const q2 = h1.split(':');
+  private id: number; // unique id
+  private lsn: number; // log sequence number
+  private type: string; // connection type
+  private name: string; // connection name
+  private header: string; // log entry header
 
-    if (q1.length !== 2 || q2.length !== 2)
+  constructor(type: string, id: number, name: string)
+  {
+    this.id = id;
+    this.lsn = -1;
+    this.type = type;
+    this.name = name;
+    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
+  }
+
+  public log(methodName: string, info?: any, moreInfo?: any)
+  {
+    const header = this.header + (++this.lsn).toString() + ':' + methodName;
+    winston.info(header);
+    if (info !== undefined)
     {
-      throw new Error('Error interpreting DSN parameter for MySQL.');
+      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
     }
+    if (moreInfo !== undefined)
+    {
+      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
+    }
+  }
 
-    const user: string = q1[0];
-    const password: string = q1[1];
-    const host: string = q2[0];
-    const port: number = parseInt(q2[1], 10);
-    const database: string = (h2 !== undefined && h2 !== '') ? h2 : 'midway';
+  public getID(): number
+  {
+    return this.id;
+  }
 
-    return {
-      user,
-      password,
-      host,
-      port,
-      database,
-    };
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
+  public getType(): string
   {
-    return {
-      hosts: [dsnString],
-      keepAlive: false,
-      requestTimeout: 180000,
-    } as ElasticConfig;
+    return this.type;
   }
-  else
+
+  public getName(): string
   {
-    throw new Error('Error parsing database connection parameters.');
+    return this.name;
   }
+
+  public abstract getClient(): object;
+
+  public abstract getTasty(): Tasty.Tasty;
+
+  public abstract getQueryHandler(): QueryHandler;
+
+  public abstract getAnalyticsDB(): object;
 }
 
-export function makeDatabaseController(
-  type: string,
-  id: number,
-  dsnString: string,
-  analyticsIndex?: string,
-  analyticsType?: string): ADatabaseController
-{
-  type = type.toLowerCase();
-  if (type === 'sqlite')
-  {
-    const config = DSNToConfig(type, dsnString) as SQLiteConfig;
-    return new SQLiteController(config, id, 'SQLite');
-  }
-  else if (type === 'mysql')
-  {
-    const config = DSNToConfig(type, dsnString) as MySQLConfig;
-    return new MySQLController(config, id, 'MySQL');
-  }
-  else if (type === 'postgres')
-  {
-    const config = DSNToConfig(type, dsnString) as PostgreSQLConfig;
-    return new PostgreSQLController(config, id, 'PostgreSQL');
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, id, 'Elastic', analyticsIndex, analyticsType);
-  }
-  else
-  {
-    throw new Error('Error making new database controller: undefined database type "' + type + '".');
-  }
-}
+export default DatabaseController;

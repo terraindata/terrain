@@ -47,9 +47,9 @@ THE SOFTWARE.
 import * as equal from 'deep-equal';
 import * as _ from 'lodash';
 
+import { getParsedQuery } from '../../../../shared/database/elastic/ElasticUtil';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
-import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { QueryHandler } from '../query/QueryHandler';

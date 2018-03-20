@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Tasty from '../../tasty/Tasty';
 
 import QueryHandler from '../../app/query/QueryHandler';
-import ADatabaseController from '../ADatabaseController';
+import DatabaseController from '../DatabaseController';
 import PostgreSQLClient from './client/PostgreSQLClient';
 import PostgreSQLConfig from './PostgreSQLConfig';
 import PostgreSQLDB from './tasty/PostgreSQLDB';
@@ -55,7 +55,7 @@ import PostgreSQLDB from './tasty/PostgreSQLDB';
 /**
  * The central controller for communicating with PostgreSQL.
  */
-class PostgreSQLController extends ADatabaseController
+class PostgreSQLController extends DatabaseController
 {
   private client: PostgreSQLClient;
   private tasty: Tasty.Tasty;

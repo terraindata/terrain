@@ -48,15 +48,13 @@ import * as csv from './util/CSV';
 import * as elastic from './util/Elastic';
 import * as json from './util/JSON';
 import * as promise from './util/Promise';
-import * as tests from './util/Tests';
 
-const Util =
+export const Util =
   {
     csv,
     elastic,
     json,
     promise,
-    tests,
   };
 
 export default Util;

@@ -46,13 +46,13 @@ THE SOFTWARE.
 
 import * as mysql from 'mysql';
 
+import util from '../../../../../shared/Util';
 import SQLGenerator from '../../../tasty/MySQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
-import { makePromiseCallback } from '../../../tasty/Utils';
 import MySQLClient from '../client/MySQLClient';
 
 export class MySQLDB implements TastyDB
@@ -114,7 +114,7 @@ export class MySQLDB implements TastyDB
     {
       const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.query(statement, [], makePromiseCallback(resolve, reject));
+        this.client.query(statement, [], util.promise.makeCallback(resolve, reject));
       });
 
       results = results.concat(result);
@@ -135,7 +135,7 @@ export class MySQLDB implements TastyDB
       const value = values[i];
       const result = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.query(statement, value, makePromiseCallback(resolve, reject));
+        this.client.query(statement, value, util.promise.makeCallback(resolve, reject));
       });
 
       upserted = upserted.concat(result);
@@ -159,7 +159,7 @@ export class MySQLDB implements TastyDB
   {
     return new Promise<void>((resolve, reject) =>
     {
-      this.client.end(makePromiseCallback(resolve, reject));
+      this.client.end(util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -178,7 +178,7 @@ export class MySQLDB implements TastyDB
   {
     return new Promise<mysql.Connection>((resolve, reject) =>
     {
-      this.client.getConnection(makePromiseCallback(resolve, reject));
+      this.client.getConnection(util.promise.makeCallback(resolve, reject));
     });
   }
 }

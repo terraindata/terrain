@@ -48,6 +48,7 @@ import * as Elastic from 'elasticsearch';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
+import { getParsedQuery } from '../../../../../shared/database/elastic/ElasticUtil';
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
@@ -58,7 +59,6 @@ import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
 import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
 import QueryHandler from '../../../app/query/QueryHandler';
-import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';

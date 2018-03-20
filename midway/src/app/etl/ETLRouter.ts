@@ -49,8 +49,8 @@ import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
 import * as stream from 'stream';
 
+import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
-import * as Util from '../Util';
 import TemplateRouter, { templates } from './TemplateRouter';
 
 const Router = new KoaRouter();

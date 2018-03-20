@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import sha1 = require('sha1');
 
 export function getType(obj: object): string
@@ -150,12 +151,12 @@ function _getObjectStructureStr(obj: object): string
 /* returns a hash based on the object's field names and data types
   * handles object fields recursively ; only checks the type of
   * the first element of arrays */
- export function hashObjectStructure(obj: object): string
- {
-   return sha1(_getObjectStructureStr(obj));
- }
+export function hashObjectStructure(obj: object): string
+{
+  return sha1(_getObjectStructureStr(obj));
+}
 
- /* recursive helper to handle arrays */
+/* recursive helper to handle arrays */
 function _buildDesiredHashHelper(typeObj: object): string
 {
   const NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);

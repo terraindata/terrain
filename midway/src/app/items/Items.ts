@@ -49,8 +49,8 @@ import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import * as Util from '../AppUtil';
 import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
 import ItemConfig from './ItemConfig';
 

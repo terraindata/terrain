@@ -56,10 +56,10 @@ import
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import * as Util from '../AppUtil';
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
 import { QueryHandler } from '../query/QueryHandler';
-import * as Util from '../Util';
 
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';

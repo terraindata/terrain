@@ -49,7 +49,7 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as Util from '../Util';
+import * as Util from '../AppUtil';
 import CredentialConfig from './CredentialConfig';
 import Credentials from './Credentials';
 

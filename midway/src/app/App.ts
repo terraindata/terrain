@@ -57,7 +57,7 @@ import v8 = require('v8');
 import './auth/Passport';
 import './Logging';
 
-import { makeDatabaseController } from '../database/DatabaseController';
+import DatabaseControllerConfig from '../database/DatabaseControllerConfig';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
 import appStats from './AppStats';
@@ -85,7 +85,7 @@ export class App
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = makeDatabaseController(type, 0, dsn);
+    const controller = DatabaseControllerConfig.makeDatabaseController(type, 0, dsn);
     return controller.getTasty();
   }
 

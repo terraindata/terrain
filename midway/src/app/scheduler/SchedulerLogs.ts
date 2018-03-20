@@ -49,14 +49,13 @@ THE SOFTWARE.
 // via /credentials to localhost for testing purposes
 
 import aesjs = require('aes-js');
-import sha1 = require('sha1');
-
 import * as _ from 'lodash';
+import sha1 = require('sha1');
 import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import * as Util from '../Util';
+import * as Util from '../AppUtil';
 import SchedulerLogConfig from './SchedulerLogConfig';
 
 export class SchedulerLogs

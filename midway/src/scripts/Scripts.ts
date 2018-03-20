@@ -49,9 +49,9 @@ import * as path from 'path';
 import * as util from 'util';
 import * as winston from 'winston';
 
+import sharedUtil from '../../../shared/Util';
 import DatabaseController from '../database/DatabaseController';
 import ElasticClient from '../database/elastic/client/ElasticClient';
-import { makePromiseCallback } from '../tasty/Utils';
 
 export interface ScriptConfig
 {
@@ -118,7 +118,7 @@ export async function provisionScripts(controller: DatabaseController)
                 lang: script.lang,
                 body: script.body,
               },
-              makePromiseCallback(resolve, reject));
+              sharedUtil.promise.makeCallback(resolve, reject));
           });
 
         winston.info('Provisioned script ' + script.id + ' to database ' + controller.getName());

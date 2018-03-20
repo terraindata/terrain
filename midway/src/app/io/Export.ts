@@ -50,8 +50,8 @@ import * as winston from 'winston';
 
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
-import * as SharedUtil from '../../../../shared/Util';
-import { getParsedQuery, getQueryFromAlgorithm } from '../../app/Util';
+import SharedUtil from '../../../../shared/Util';
+import { getQueryFromAlgorithm } from '../../app/AppUtil';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import ItemConfig from '../items/ItemConfig';
@@ -209,7 +209,7 @@ export class Export
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _checkTypes(obj: object, exportConfig: ExportConfig): void
   {
-    const targetHash: string = SharedUtil.buildDesiredHash(exportConfig.columnTypes);
+    const targetHash: string = SharedUtil.elastic.buildDesiredHash(exportConfig.columnTypes);
     const targetKeys: string = JSON.stringify(Object.keys(exportConfig.columnTypes).sort());
 
     // parse dates
@@ -229,7 +229,7 @@ export class Export
       });
     }
 
-    if (SharedUtil.hashObjectStructure(obj) !== targetHash)
+    if (SharedUtil.elastic.hashObjectStructure(obj) !== targetHash)
     {
       if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
       {
@@ -253,7 +253,7 @@ export class Export
     {
       if (exportConfig.columnTypes[field]['type'] === 'array')
       {
-        if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
+        if (obj[field] !== null && !SharedUtil.elastic.isTypeConsistent(obj[field]))
         {
           throw new Error('Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj));
         }
@@ -279,7 +279,7 @@ export class Export
   // manually checks types (rather than checking hashes) ; handles arrays recursively
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
-    const type: string = SharedUtil.getType(item);
+    const type: string = SharedUtil.elastic.getType(item);
     if (type === 'null')
     {
       return true;

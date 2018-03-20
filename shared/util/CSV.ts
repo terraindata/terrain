@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 export interface ParseCSVConfig
 {
   /* The delimiting character. Must be string of length 1. */
@@ -76,19 +78,19 @@ export interface ParseCSVConfig
 export function parseCSV(file, config: ParseCSVConfig)
 {
   const BAD_DELIMITERS =
-  [
-    '\r',
-    '\n',
-    '\r\n',
-    '"',
-  ];
+    [
+      '\r',
+      '\n',
+      '\r\n',
+      '"',
+    ];
 
   const NEWLINE_DELIMITERS =
-  [
-    '\r\n',
-    '\r',
-    '\n',
-  ];
+    [
+      '\r\n',
+      '\r',
+      '\n',
+    ];
 
   const delim = config.delimiter || ',';
   const quoteChar = config.quoteChar || '\"';

@@ -52,13 +52,13 @@ import { promisify } from 'util';
 import * as winston from 'winston';
 
 import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
-import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
+import CSVTypeParser from '../../../../shared/etl/CSVTypeParser';
 import { FieldTypes } from '../../../../shared/etl/FieldTypes';
-import * as SharedUtil from '../../../../shared/Util';
+import SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import * as Util from '../Util';
+import * as AppUtil from '../AppUtil';
 
 import * as Common from './Common';
 import CSVTransform from './streams/CSVTransform';
@@ -337,7 +337,7 @@ export class Import
   {
     if (imprt.filetype === 'json')
     {
-      const targetHash: string = SharedUtil.buildDesiredHash(imprt.columnTypes);
+      const targetHash: string = SharedUtil.elastic.buildDesiredHash(imprt.columnTypes);
       const targetKeys: string = JSON.stringify(Object.keys(imprt.columnTypes).sort());
 
       // parse dates
@@ -357,7 +357,7 @@ export class Import
         });
       }
 
-      if (SharedUtil.hashObjectStructure(obj) !== targetHash)
+      if (SharedUtil.elastic.hashObjectStructure(obj) !== targetHash)
       {
         if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
         {
@@ -396,7 +396,7 @@ export class Import
     {
       if (imprt.columnTypes[field]['type'] === 'array')
       {
-        if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
+        if (obj[field] !== null && !SharedUtil.elastic.isTypeConsistent(obj[field]))
         {
           return 'Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj);
         }
@@ -594,7 +594,7 @@ export class Import
   /* manually checks types (rather than checking hashes) ; handles arrays recursively */
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
-    const thisType: string = SharedUtil.getType(item);
+    const thisType: string = SharedUtil.elastic.getType(item);
     if (thisType === 'null')
     {
       return true;
