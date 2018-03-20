@@ -333,6 +333,22 @@ test('rename a field (deeply nested property in array)', () =>
   expect(e.transform(doc3)['arr'][1][1]['cool']).toBe('fren');
 });
 
+test('structural rename with array', () =>
+{
+  const e = new TransformationEngine();
+  const arrId = e.addField(List(['foo']), 'array');
+  e.addField(List(['foo', '*']), 'array');
+
+  e.setOutputKeyPath(arrId, List(['bar', 'baz']));
+
+  const doc = {
+    foo: [1, 2, 3],
+  };
+
+  expect(e.transform(doc)['foo']).toBe(undefined);
+  expect(e.transform(doc)['bar']['baz'][1]).toBe(2);
+});
+
 test('array in array in object: identity transformation', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc7);
@@ -451,4 +467,116 @@ test('wildcard rename with manual field adding', () =>
   e.setOutputKeyPath(bar, List(['foo', '*', 'baz']));
 
   expect(e.transform(doc)['foo'][0]['baz']).toBe('hi');
+});
+
+test('gracefully handle invalid rename (TE remains in some working/recoverable state)', () =>
+{
+  const e = new TransformationEngine();
+  const fooId = e.addField(List(['foo']), 'number');
+  e.addField(List(['bar']), 'number');
+
+  e.setOutputKeyPath(fooId, List(['bar'])); // oops, invalid
+  e.setOutputKeyPath(fooId, List(['foo'])); // change it back to foo
+
+  const doc = {
+    foo: 5,
+    bar: 7,
+  };
+  expect(e.transform(doc)).toEqual(doc);
+});
+
+test('(deep) clone a TransformationEngine', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc4);
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['car']));
+  e.appendTransformation(TransformationNodeType.UppercaseNode, List<KeyPath>([KeyPath(['arr', '*'])]));
+  const clone: TransformationEngine = e.clone();
+  expect(clone.equals(e)).toBe(true);
+  e.setOutputKeyPath(e.getInputFieldID(KeyPath(['arr'])), KeyPath(['dog']));
+  expect(clone.equals(e)).toBe(false);
+});
+
+test('join two fields', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc2);
+  e.appendTransformation(
+    TransformationNodeType.JoinNode,
+    List<KeyPath>([KeyPath(['meta', 'school']), KeyPath(['meta', 'sport'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['meta', 'fullTeam'])]),
+      preserveOldFields: false,
+      delimiter: ' ',
+    });
+  const r = e.transform(doc2);
+  expect(r['meta']['fullTeam']).toBe('Stanford bobsled');
+  expect(r['meta']['sport']).toBe(undefined);
+  expect(r['meta']['school']).toBe(undefined);
+});
+
+test('duplicate a field', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc2);
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    List<KeyPath>([KeyPath(['meta', 'school'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['meta', 'schoolCopy'])]),
+    });
+  const r = e.transform(doc2);
+  expect(r['meta']['school']).toBe('Stanford');
+  expect(r['meta']['schoolCopy']).toBe('Stanford');
+});
+
+test('split a field (string delimiter)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc2);
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List<KeyPath>([KeyPath(['meta', 'sport'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
+      preserveOldFields: false,
+      delimiter: 'b',
+    });
+  const r = e.transform(doc2);
+  expect(r['s1']).toBe('');
+  expect(r['s2']).toBe('o');
+  expect(r['s3']).toBe('sled');
+});
+
+test('split a field (numeric index)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc2);
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List<KeyPath>([KeyPath(['meta', 'sport'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2'])]),
+      preserveOldFields: false,
+      delimiter: 3,
+    });
+  const r = e.transform(doc2);
+  expect(r['s1']).toBe('bob');
+  expect(r['s2']).toBe('sled');
+});
+
+test('split a field (regex delimiter)', () =>
+{
+  const doc = {
+    foo: 'la dee da',
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List<KeyPath>([KeyPath(['foo'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
+      preserveOldFields: false,
+      delimiter: RegExp('[\\s,]+'),
+    });
+  const r = e.transform(doc);
+  expect(r['s1']).toBe('la');
+  expect(r['s2']).toBe('dee');
+  expect(r['s3']).toBe('da');
 });

@@ -160,6 +160,11 @@ export class TransformationEngine
     // allow construction without example doc (manually add fields)
   }
 
+  public clone(): TransformationEngine
+  {
+    return TransformationEngine.load(this.toJSON());
+  }
+
   /**
    * Checks whether a provides `TransformationEngine` is equal to the current `TransformationEngine` (`this`).
    * Performs a "deep equals" due to the complex nature of this type.
@@ -212,6 +217,27 @@ export class TransformationEngine
     // const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node: TransformationNode =
       new (TransformationInfo.getType(nodeType))(this.uidNode, fieldNames, options, nodeType);
+
+    // Process fields created/disabled by this transformation
+    if (options !== undefined)
+    {
+      if (options['newFieldKeyPaths'] !== undefined)
+      {
+        for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
+        {
+          // TODO infer types of new fields
+          this.addField(options['newFieldKeyPaths'].get(i), 'string');
+        }
+      }
+      if (options['preserveOldFields'] === false)
+      {
+        for (let i: number = 0; i < fieldNames.size; i++)
+        {
+          this.disableField(this.getInputFieldID(fieldNames.get(i)));
+        }
+      }
+    }
+
     this.dag.setNode(this.uidNode.toString(), node);
     this.uidNode++;
     return this.uidNode - 1;
@@ -262,6 +288,15 @@ export class TransformationEngine
           x['length'] = Object.keys(x).length;
           yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
         }
+      }
+    });
+
+    // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
+    this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
+    {
+      if (!enabled)
+      {
+        yadeep.remove(output, this.getOutputKeyPath(fieldID));
       }
     });
 
@@ -437,13 +472,20 @@ export class TransformationEngine
    */
   public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any): void
   {
-    const oldName: KeyPath = this.IDToFieldNameMap.get(fieldID);
+    const oldKeyPath: KeyPath = this.IDToFieldNameMap.get(fieldID);
+
+    // Short-circuit: do nothing if this isn't really a change, and also return immediately
+    // if this is an invalid rename (because there's already a field named `newKeyPath`)
+    if (oldKeyPath === newKeyPath || this.IDToFieldNameMap.valueSeq().contains(newKeyPath))
+    {
+      return;
+    }
 
     this.IDToFieldNameMap.forEach((field: KeyPath, id: number) =>
     {
-      if (keyPathPrefixMatch(field, oldName))
+      if (keyPathPrefixMatch(field, oldKeyPath))
       {
-        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldName, newKeyPath));
+        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldKeyPath, newKeyPath));
       }
     });
   }
@@ -708,7 +750,7 @@ export class TransformationEngine
       // setting new array element
       yadeep.set(r, key, yadeep.get(o, oldKey), { create: true });
     }
-    else if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
+    else// if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
     {
       const el: any = yadeep.get(o, key);
       if (el !== undefined)
