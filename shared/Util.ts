@@ -48,8 +48,6 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 
-
-
 export function getRootFieldFromDocPath(path: string): string | undefined
 {
   try
@@ -64,4 +62,3 @@ export function getRootFieldFromDocPath(path: string): string | undefined
     return undefined;
   }
 }
-
