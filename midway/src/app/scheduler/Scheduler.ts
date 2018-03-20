@@ -78,6 +78,7 @@ export class Scheduler
         'name',
         'pausedFilename',
         'priority',
+        'running',
         'shouldRunNext',
         'tasks',
         'templateId',
@@ -102,97 +103,62 @@ export class Scheduler
     return false;
   }
 
-  public async get(id?: number, locked?: boolean): Promise<SchedulerConfig[]>
+  public async get(id?: number, running?: boolean): Promise<SchedulerConfig[]>
   {
-    if (id !== undefined)
+    return this._select([], { id, running });
+  }
+
+  public async getAvailableSchedules(): Promise<number[]>
+  {
+    return new Promise<number[]>(async (resolve, reject) =>
     {
-      return this._select([], { id }, locked);
-    }
-    return this._select([], {}, locked);
+      const scheduleIds: number[] = [];
+      const schedules: SchedulerConfig[] = await this._select([], { running: true }) as SchedulerConfig[];
+      schedules.forEach((schedule) =>
+      {
+        scheduleIds.push(schedule.id);
+      });
+      resolve(scheduleIds);
+    });
   }
 
   public async upsert(user: UserConfig, schedule: SchedulerConfig): Promise<SchedulerConfig[]>
   {
-    // TODO: cancel job if it's currently running
-    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
-    {
-      /*
-      schedule.paramsScheduleStr = Array.isArray(schedule.paramsScheduleArr) ?
-        JSON.stringify(schedule.paramsScheduleArr) : schedule.paramsScheduleStr;
-      if (schedule.transportStr === undefined)
-      {
-        try
-        {
-          if (schedule.transport !== undefined)
-          {
-            schedule.transportStr = JSON.stringify(schedule.transport as object);
-          }
-          else
-          {
-            return reject('Transport is not defined.');
-          }
-        }
-        catch (e)
-        {
-          return reject('Transport is not a valid object.');
-        }
-      }
+    return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
+  }
 
-      if (schedule.jobId === undefined)
-      {
-        return reject('Cannot upsert without a JobID.');
-      }
-      schedule.jobType = schedule.jobType === undefined ? '' : schedule.jobType;
-      schedule.name = schedule.name === undefined ? '' : schedule.name;
-      schedule.sort = schedule.sort === undefined ? '' : schedule.sort;
-      if (schedule.schedule === undefined)
-      {
-        return reject('Must provide a schedule in cronjob format.');
-      }
-      if (schedule.id !== undefined) // update existing schedule
-      {
-        const schedules: SchedulerConfig[] = await this.get(schedule.id) as SchedulerConfig[];
-        if (schedules.length !== 0)
-        {
-          for (const scheduleObj of schedules)
-          {
-            if (scheduleObj.archived === true)
-            {
-              return reject('Cannot upsert on an archived schedule.');
-            }
-            this.scheduleMap[(scheduleObj['id'] as number)].cancel();
-            if (scheduleObj.active === true)
-            {
-              const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
-              const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
-              const job: any = nodeScheduler.scheduleJob(schedule.schedule,
-                function callJob(unwrappedParams)
-                {
-                  this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
-                }.bind(this, appendedParamsArr));
-              this.scheduleMap[resultJobId] = job;
-            }
-          }
-          // insert a version to save the past state of this schedule
-          await versions.create(user, 'schedules', schedules[0].id as number, schedules[0]);
-        }
-      }
-      else
-      {
-        schedule.active = schedule.active !== undefined ? schedule.active : false;
-        schedule.archived = false;
-        schedule.currentlyRunning = false;
-      }
-      */
-      return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
-    });
+  public async setRunning(id: number, running: boolean): Promise<void>
+  {
+    const schedules: SchedulerConfig[] = await this.get(id);
+    if (schedules.length !== 0)
+    {
+      schedules[0].running = running;
+      await App.DB.upsert(this.schedulerTable, schedules[0]);
+    }
   }
 
   private async _checkSchedulerTable(): Promise<void>
   {
-    console.log(new Date());
     // TODO check the scheduler for unlocked rows and detect which schedules should run next
+    const availableSchedules: number[] = await this.getAvailableSchedules();
+    availableSchedules.forEach((scheduleId) =>
+    {
+      this.checkSchedulerTableHelper(scheduleId);
+    });
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
+  }
+
+  private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
+  {
+    const result: taskOutputConfig | string = await _runSchedule(scheduleId);
+    if (typeof result === 'string')
+    {
+      winston.warn(result as string);
+    }
+    else if ((result as TaskOutputConfig).exit === true)
+    {
+      winston.info('Schedule ' + scheduleId.toString() as string + ' successfully completed');
+    }
   }
 
   private async _runSchedule(id: number): Promise<TaskOutputConfig | string>
@@ -203,7 +169,7 @@ export class Scheduler
       {
         return resolve('Schedule is already running.');
       }
-      // TODO: lock row
+      await this.setRunning(id, true);
       this.runningSchedules.set(id, new Job());
       const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length === 0)
@@ -220,6 +186,10 @@ export class Scheduler
       {
         return reject(e);
       }
+      if (Array.isArray(taskConfig) === false)
+      {
+        return reject('Tasks are in an incorrect format');
+      }
       const filename: string = 'Task_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
       const jobCreateStatus: boolean | string = await this.runningSchedules.get(id).create(taskConfig, filename);
       if (typeof jobCreateStatus === 'string')
@@ -227,6 +197,7 @@ export class Scheduler
         return reject(jobCreateStatus as string);
       }
       const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
+      await this.setRunning(id, false);
       this.runningSchedules.delete(id);
       // TODO: unlock row
       return resolve(result as TaskOutputConfig);

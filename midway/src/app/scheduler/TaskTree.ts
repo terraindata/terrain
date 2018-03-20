@@ -284,7 +284,7 @@ export class TaskTree
         {
           fs.unlink(filename, (err) =>
           {
-            if (err)
+            if (err !== undefined)
             {
               throw err;
             }
@@ -307,7 +307,7 @@ export class TaskTree
       {
         fs.stat(filename, (err, stats) =>
         {
-          if (err)
+          if (err !== undefined)
           {
             throw err;
           }
