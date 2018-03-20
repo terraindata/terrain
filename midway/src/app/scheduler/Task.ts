@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as stream from 'stream';
+
 import { TaskConfig, TaskEnum, TaskInputConfig, TaskOutputConfig } from './TaskConfig';
 
 export abstract class Task
@@ -52,11 +54,6 @@ export abstract class Task
   constructor(taskConfig: TaskConfig)
   {
     this.taskConfig = taskConfig;
-  }
-
-  public cancel(): void
-  {
-    this.taskConfig.cancel = true;
   }
 
   public getCancelStatus(): boolean
@@ -86,6 +83,11 @@ export abstract class Task
   public setInputConfig(taskOutputConfig: TaskOutputConfig): void
   {
     this.taskConfig.params['options'] = taskOutputConfig['options'];
+  }
+
+  public setInputConfigStream(lastStream: stream.Readable): void
+  {
+    this.taskConfig.params['options']['stream'] = lastStream;
   }
 
   public abstract async printNode(): Promise<TaskOutputConfig>;

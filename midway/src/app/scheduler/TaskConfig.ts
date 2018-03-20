@@ -48,12 +48,14 @@ import * as stream from 'stream';
 
 export interface TaskConfig
 {
-  cancel: boolean; // whether the tree of tasks should be cancelled
+  cancel?: boolean; // whether the tree of tasks should be cancelled
   id: number; // unique id that identifies this task to other tasks in the input array of TaskConfigs
+  jobStatus?: number; // 0: not running, 1: running, 2: paused
   name: string; // name of the task i.e. 'import'
   onFailure?: number; // id of task to execute on failure
   onSuccess?: number; // id of next task to execute (default should be next in array)
   params: TaskInputConfig; // input parameters for the task
+  paused?: number; // where in the tree of tasks the tasks are paused
   taskId: number; // maps to a statically declared task
 }
 
@@ -72,9 +74,16 @@ export interface TaskInputConfig
 
 export interface TaskOutputConfig extends TaskInputConfig
 {
-  cancelled?: boolean;
   exit: boolean;
   status: boolean;
+}
+
+export interface TaskTreeConfig
+{
+  cancel: boolean;
+  filename: string;
+  jobStatus: number;
+  paused: number;
 }
 
 interface TaskInputConfigTypes

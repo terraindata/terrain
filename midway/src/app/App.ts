@@ -221,6 +221,9 @@ export class App
     await credentials.initializeLocalFilesystemCredential();
     winston.debug('Finished adding local filesystem credentials...');
 
+    // initialize scheduler
+    await scheduler.initializeScheduler();
+
     // connect to configured databases
     const dbs = await databases.select(['id'], {});
     for (const db of dbs)

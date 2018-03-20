@@ -44,11 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { Task } from './Task';
-import { TaskConfig, TaskEnum, TaskOutputConfig } from './TaskConfig';
+import { TaskConfig, TaskEnum, TaskOutputConfig, TaskTreeConfig } from './TaskConfig';
 import { TaskTreeNode } from './TaskTreeNode';
 import { TaskTreePrinter } from './TaskTreePrinter';
 import { TaskTreeVisitor } from './TaskTreeVisitor';
@@ -65,21 +66,26 @@ const taskTreeVisitor = new TaskTreeVisitor();
 export class TaskTree
 {
   private tasks: Task[];
+  private taskTreeConfig: TaskTreeConfig;
 
   constructor()
   {
     this.tasks = [];
+    this.taskTreeConfig =
+      {
+        cancel: false,
+        filename: '',
+        jobStatus: 0,
+        paused: -1,
+      };
   }
 
   public cancel(): void
   {
-    this.tasks.forEach((task) =>
-    {
-      task.cancel();
-    });
+    this.taskTreeConfig.cancel = true;
   }
 
-  public create(taskConfigs: TaskConfig[]): boolean | string
+  public create(taskConfigs: TaskConfig[], taskTreeConfig: TaskTreeConfig): boolean | string
   {
     // verify that each task has a unique id
     const idSet: Set<number> = new Set<number>();
@@ -91,6 +97,8 @@ export class TaskTree
     {
       return 'All tasks must have unique IDs';
     }
+
+    this.taskTreeConfig = taskTreeConfig;
 
     taskConfigs = this._appendDefaults(taskConfigs);
     for (let i = 0; i < taskConfigs.length - 2; ++i)
@@ -139,6 +147,11 @@ export class TaskTree
     return this.isValid() as boolean;
   }
 
+  public isCancelled(): boolean
+  {
+    return this.taskTreeConfig.cancel;
+  }
+
   public isValid(): boolean // checks if tree is a valid DAG
   {
     return this.tasks[0].recurse(this.tasks, []);
@@ -160,39 +173,60 @@ export class TaskTree
     }
   }
 
+  public pause(): void
+  {
+    if (this.taskTreeConfig.cancel === false)
+    {
+      this.taskTreeConfig.jobStatus = 2;
+    }
+  }
+
   public async visit(): Promise<TaskOutputConfig> // iterate through tree and execute tasks
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
-      let cancelled: boolean = false;
       let ind: number = 0;
+      if (this.taskTreeConfig.jobStatus === 2)
+      {
+        ind = this.taskTreeConfig.paused;
+        const lastStream: stream.Readable | string = await this._readFromFile(this.taskTreeConfig.filename);
+        if (typeof lastStream === 'string')
+        {
+          winston.warn(lastStream as string);
+        }
+        this.tasks[ind].setInputConfigStream(lastStream as stream.Readable);
+      }
+      this.taskTreeConfig.jobStatus = 1;
       let result: TaskOutputConfig = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
       while (result.exit !== true)
       {
-        if (result.status === true)
+        switch (result.status)
         {
-          ind = this.tasks[ind].getOnSuccess();
-          if (this.tasks[ind].getCancelStatus() === true)
-          {
-            cancelled = true;
+          case true:
+            ind = this.tasks[ind].getOnSuccess();
             break;
-          }
-          this.tasks[ind].setInputConfig(result);
-          result = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
+          default:
+            ind = this.tasks[ind].getOnFailure();
         }
-        else if (result.status === false)
+        if (this.taskTreeConfig.cancel === true)
         {
-          ind = this.tasks[ind].getOnFailure();
-          if (this.tasks[ind].getCancelStatus() === true)
-          {
-            cancelled = true;
-            break;
-          }
-          this.tasks[ind].setInputConfig(result);
-          result = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
+          break;
         }
+        this.tasks[ind].setInputConfig(result);
+        if (this.taskTreeConfig.jobStatus === 2) // was paused
+        {
+          const saveResults: boolean | string = await this._saveToFile(result['options']['stream'], this.taskTreeConfig.filename);
+          if (typeof saveResults === 'boolean')
+          {
+            winston.info('Saved as ' + this.taskTreeConfig.filename);
+          }
+          else
+          {
+            winston.warn('Error while saving file ' + this.taskTreeConfig.filename + ': ' + saveResults as string);
+          }
+        }
+        result = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
       }
-      result.cancelled = cancelled;
       return resolve(result);
     });
   }
@@ -207,8 +241,8 @@ export class TaskTree
     const defaults: TaskConfig[] =
       [
         {
-          cancel: false,
           id: maxId + 1,
+          jobStatus: 0,
           name: 'Default Exit',
           params:
             {
@@ -220,8 +254,8 @@ export class TaskTree
           taskId: TaskEnum.taskDefaultExit,
         },
         {
-          cancel: false,
           id: maxId + 2,
+          jobStatus: 0,
           name: 'Default Failure',
           params:
             {
@@ -235,5 +269,65 @@ export class TaskTree
       ];
     tasks = tasks.concat(defaults);
     return tasks;
+  }
+
+  private async _readFromFile(filename: string): Promise<stream.Readable | string>
+  {
+    return new Promise<stream.Readable | string>(async (resolve, reject) =>
+    {
+      // read a stream from the file and delete the file when finished reading
+      // have to write the file contents to a readable stream
+      try
+      {
+        const reader: stream.Readable = fs.createReadStream(filename);
+        reader.on('end', () =>
+        {
+          fs.unlink(filename, (err) =>
+          {
+            if (err)
+            {
+              throw err;
+            }
+          });
+        });
+        return resolve(reader);
+      }
+      catch (e)
+      {
+        return resolve(e.toString() as string);
+      }
+    });
+  }
+
+  private async _saveToFile(saveStream: stream.Readable, filename: string): Promise<boolean | string>
+  {
+    return new Promise<boolean | string>(async (resolve, reject) =>
+    {
+      try
+      {
+        fs.stat(filename, (err, stats) =>
+        {
+          if (err)
+          {
+            throw err;
+          }
+          const writer = fs.createWriteStream(filename, 'w');
+          saveStream.on('data', (chunk) =>
+          {
+            writer.write(chunk);
+          });
+
+          saveStream.on('end', () =>
+          {
+            writer.end();
+            resolve(true); // wait until the stream is finished writing to resolve
+          });
+        });
+      }
+      catch (e)
+      {
+        return resolve(false);
+      }
+    });
   }
 }

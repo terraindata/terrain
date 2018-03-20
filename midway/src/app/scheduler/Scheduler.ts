@@ -76,6 +76,7 @@ export class Scheduler
         'lastRun',
         'meta',
         'name',
+        'pausedFilename',
         'priority',
         'shouldRunNext',
         'tasks',
@@ -83,6 +84,11 @@ export class Scheduler
         'workerId',
       ],
     );
+  }
+
+  public async initializeScheduler(): Promise<void>
+  {
+    setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
   public cancel(id: number): boolean
@@ -182,6 +188,13 @@ export class Scheduler
     });
   }
 
+  private async _checkSchedulerTable(): Promise<void>
+  {
+    console.log(new Date());
+    // TODO check the scheduler for unlocked rows and detect which schedules should run next
+    setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
+  }
+
   private async _runSchedule(id: number): Promise<TaskOutputConfig | string>
   {
     return new Promise<TaskOutputConfig | string>(async (resolve, reject) =>
@@ -207,7 +220,8 @@ export class Scheduler
       {
         return reject(e);
       }
-      const jobCreateStatus: boolean | string = await this.runningSchedules.get(id).create(taskConfig);
+      const filename: string = 'Task_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
+      const jobCreateStatus: boolean | string = await this.runningSchedules.get(id).create(taskConfig, filename);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);

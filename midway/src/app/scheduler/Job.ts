@@ -48,7 +48,7 @@ import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import { Task } from './Task';
-import { TaskConfig, TaskOutputConfig } from './TaskConfig';
+import { TaskConfig, TaskOutputConfig, TaskTreeConfig } from './TaskConfig';
 import { TaskTree } from './TaskTree';
 
 export class Job
@@ -67,14 +67,29 @@ export class Job
     this.taskTree.cancel();
   }
 
-  public create(args: TaskConfig[]): boolean | string
+  public create(args: TaskConfig[], filename: string): boolean | string
   {
     if (args === undefined || (Array.isArray(args) && args.length === 0))
     {
       return false;
     }
     this.tasks = args;
-    return this.taskTree.create(args);
+    const taskTreeConfig: TaskTreeConfig =
+      {
+        cancel: false,
+        filename,
+        jobStatus: 0,
+        paused: -1,
+      };
+    return this.taskTree.create(args, taskTreeConfig);
+  }
+
+  public pause(): void
+  {
+    if (this.taskTree.isCancelled() === false)
+    {
+      this.taskTree.pause();
+    }
   }
 
   public async printTree(): Promise<void>
