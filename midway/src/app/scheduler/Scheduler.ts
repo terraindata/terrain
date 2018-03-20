@@ -143,14 +143,14 @@ export class Scheduler
     const availableSchedules: number[] = await this.getAvailableSchedules();
     availableSchedules.forEach((scheduleId) =>
     {
-      this.checkSchedulerTableHelper(scheduleId);
+      this._checkSchedulerTableHelper(scheduleId);
     });
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
   private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
   {
-    const result: taskOutputConfig | string = await _runSchedule(scheduleId);
+    const result: TaskOutputConfig | string = await this._runSchedule(scheduleId);
     if (typeof result === 'string')
     {
       winston.warn(result as string);
