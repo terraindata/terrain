@@ -951,10 +951,16 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     if (List.isList(value))
     {
       tooltipText = JSON.stringify(value, null, 2);
-      tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
+      tooltipText = tooltipText
+        .replace(/\"/g, '')
+        .replace(/\\/g, '')
+        .replace(/:/g, ': ')
+        .replace(/,/g, ', ')
+        .replace(/\[/g, '')
+        .replace(/\]/g, '');
       const valueString = '';
 
-      return (
+      const content = (
         <div>
           {
             value.map((val, i) =>
@@ -988,6 +994,11 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
           }
         </div>
       );
+      if (value.size && typeof value.get(0) !== 'object')
+      {
+        return tooltip(content, {title: tooltipText, arrow: false});
+      }
+      return content;
     }
   }
   if (typeof value === 'object')

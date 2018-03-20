@@ -89,10 +89,13 @@
     margin-bottom: 6px;
 
     &.results-are-small {
-      width: 200px;
-      min-width: 200px;
       height: auto;
       margin-bottom: 0px;
+      .result-name-inner {
+        max-width: 160px;
+        min-width: 160px;
+        overflow: hidden;
+      }
     }
 
     .transition;
