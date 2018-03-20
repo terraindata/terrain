@@ -58,8 +58,9 @@ export class ElasticStream extends Stream.Readable
 
   private querying: boolean = false;
   private doneReading: boolean = false;
+  private streaming: boolean = false;
   private rowsProcessed: number = 0;
-  private scroll: string;
+  private scroll: string | undefined;
   private size: number;
 
   private scrollID: string | undefined = undefined;
@@ -70,15 +71,23 @@ export class ElasticStream extends Stream.Readable
 
   private numRequested: number = 0;
 
-  constructor(client: ElasticClient, query: any)
+  constructor(client: ElasticClient, query: any, streaming: boolean = false)
   {
     super({ objectMode: true, highWaterMark: 1024 * 128 });
 
     this.client = client;
     this.query = query;
+    this.streaming = streaming;
 
     this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
-    this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
+    if (this.streaming || query['scroll'] !== undefined)
+    {
+      this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
+    }
+    else
+    {
+      this.scroll = undefined;
+    }
 
     try
     {

@@ -159,7 +159,7 @@ export class ElasticQueryHandler extends QueryHandler
         }
         else
         {
-          stream = new ElasticStream(client, query);
+          stream = new ElasticStream(client, query, request.streaming);
         }
 
         if (request.streaming === true)
