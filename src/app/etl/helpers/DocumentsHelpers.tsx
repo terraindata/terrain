@@ -161,7 +161,7 @@ class DocumentsHelpers extends ETLHelpers
             break;
           }
           default: {
-            return catchError('Failed to retrieve documents. Unknown source type');
+            return catchError(`Failed to retrieve documents. Unsupported source type: ${source.type}`);
           }
         }
       }
@@ -184,6 +184,8 @@ class DocumentsHelpers extends ETLHelpers
 
   protected onFetchDocumentsError(ev: string | MidwayError, key: string)
   {
+    // tslint:disable-next-line
+    console.error(`error fetchhing ${key}: ${ev}`)
     this.updateStateAfterFetch();
   }
 

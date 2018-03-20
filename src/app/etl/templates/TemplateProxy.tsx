@@ -66,12 +66,14 @@ export type Mutator<T> = (newItem: T) => void;
 
 export class TemplateProxy
 {
+  private cacheTemplate: boolean;
+
   constructor(
-    private _template: ETLTemplate,
+    private _template: (() => ETLTemplate) | ETLTemplate,
     private onMutate: Mutator<ETLTemplate> = doNothing,
   )
   {
-
+    this.cacheTemplate = typeof _template !== 'function';
   }
 
   public getTemplate()
@@ -113,7 +115,7 @@ export class TemplateProxy
   {
     this.sources = this.sources.delete(key);
     const nodeToDelete: number = this.template.findNodes(
-      (node) => node.type === NodeTypes.Source && node.endpoint === key
+      (node) => node.type === NodeTypes.Source && node.endpoint === key,
     ).first();
     this.nodes = this.nodes.delete(nodeToDelete);
   }
@@ -122,7 +124,7 @@ export class TemplateProxy
   {
     this.sinks = this.sinks.delete(key);
     const nodeToDelete: number = this.template.findNodes(
-      (node) => node.type === NodeTypes.Sink && node.endpoint === key
+      (node) => node.type === NodeTypes.Sink && node.endpoint === key,
     ).first();
     this.nodes = this.nodes.delete(nodeToDelete);
   }
@@ -135,6 +137,11 @@ export class TemplateProxy
       transformations: engine,
     });
     return this.createEdge(edge);
+  }
+
+  public setEdgeTransformations(edgeId: number, transformations: TransformationEngine)
+  {
+    this.edges = this.edges.update(edgeId, (edge) => edge.set('transformations', transformations));
   }
 
   public splitEdge(edgeId: number)
@@ -166,28 +173,19 @@ export class TemplateProxy
   private verifyEdge(edge: ETLEdge): boolean
   {
     const { from, to } = edge;
-    if (!this.nodes.hasIn([from]) || !this.process.nodes.hasIn([to]))
-    {
-      return false;
-    }
     if (from === to)
     {
       return false;
     }
-    if (this.nodes.get(from).type === NodeTypes.Sink)
+    if (this.nodes.hasIn([from]) && this.nodes.get(from).type === NodeTypes.Sink)
     {
       return false;
     }
-    if (this.nodes.get(to).type === NodeTypes.Source)
+    if (this.process.nodes.hasIn([to]) && this.nodes.get(to).type === NodeTypes.Source)
     {
       return false;
     }
     return true;
-  }
-
-  private sync()
-  {
-    this.onMutate(this.template);
   }
 
   private get process()
@@ -198,7 +196,6 @@ export class TemplateProxy
   private set process(val: ETLProcess)
   {
     this.template = this.template.set('process', val);
-    this.sync();
   }
 
   private get nodes(): Immutable.Map<number, ETLNode>
@@ -209,7 +206,6 @@ export class TemplateProxy
   private set nodes(val: Immutable.Map<number, ETLNode>)
   {
     this.process = this.process.set('nodes', val);
-    this.sync();
   }
 
   private get edges(): Immutable.Map<number, ETLEdge>
@@ -220,7 +216,6 @@ export class TemplateProxy
   private set edges(val: Immutable.Map<number, ETLEdge>)
   {
     this.process = this.process.set('edges', val);
-    this.sync();
   }
 
   private get sinks()
@@ -231,7 +226,6 @@ export class TemplateProxy
   private set sinks(val: SinksMap)
   {
     this.template = this.template.set('sinks', val);
-    this.sync();
   }
 
   private get sources()
@@ -242,20 +236,31 @@ export class TemplateProxy
   private set sources(val: SourcesMap)
   {
     this.template = this.template.set('sources', val);
-    this.sync();
   }
 
   private get template()
   {
-    return this._template;
+    if (this.cacheTemplate)
+    {
+      return this._template as ETLTemplate;
+    }
+    else
+    {
+      return (this._template as () => ETLTemplate)();
+    }
   }
 
   private set template(val: ETLTemplate)
   {
-    this._template = val;
-    this.sync();
+    if (this.cacheTemplate)
+    {
+      this._template = val;
+    }
+    else
+    {
+      this.onMutate(val);
+    }
   }
-
 }
 
 const doNothing = () => null;

@@ -71,6 +71,7 @@ import
   FieldMap,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
+import { TemplateProxy } from 'etl/templates/TemplateProxy';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
@@ -118,6 +119,20 @@ export default abstract class ETLHelpers
     {
       this.store.dispatch(ETLActions(action));
     };
+    this.templateGetter = this.templateGetter.bind(this);
+    this.templateSetter = this.templateSetter.bind(this);
+  }
+
+  protected _templateProxy(cache = false)
+  {
+    if (cache)
+    {
+      return this._template.proxy();
+    }
+    else
+    {
+      return new TemplateProxy(this.templateGetter, this.templateSetter);
+    }
   }
 
   protected _grabOne<T>(resolve, reject)
@@ -152,5 +167,18 @@ export default abstract class ETLHelpers
   {
     // tslint:disable-next-line
     console.error(ev);
+  }
+
+  private templateSetter(template: ETLTemplate)
+  {
+    this.editorAct({
+      actionType: 'setTemplate',
+      template,
+    });
+  }
+
+  private templateGetter()
+  {
+    return this._template;
   }
 }

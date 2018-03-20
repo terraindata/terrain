@@ -101,6 +101,11 @@ class ETLEdgeComponent extends TerrainComponent<Props>
 
   public renderNode(node: ETLNode, id: number)
   {
+    if (node == null)
+    {
+      return null;
+    }
+
     const { template } = this.props.templateEditor;
     let name = '';
     if (node.type === NodeTypes.Source)
@@ -163,7 +168,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
     act({
       actionType: 'setCurrentEdge',
       edge: edgeId,
-      rebuild: edgeId === templateEditor.getCurrentEdgeId(),
+      rebuild: edgeId !== templateEditor.getCurrentEdgeId(),
     });
   }
 

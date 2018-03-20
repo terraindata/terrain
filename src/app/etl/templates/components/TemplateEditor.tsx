@@ -123,7 +123,6 @@ class TemplateEditor extends TerrainComponent<Props>
     {
       return {};
     }
-
     return engine.transform(previewDocument);
   }
 

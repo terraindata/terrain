@@ -63,14 +63,14 @@ import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
+import EndpointForm from 'etl/common/components/EndpointForm';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
-import GraphHelpers from 'etl/helpers/GraphHelpers';
-import EndpointForm from 'etl/common/components/EndpointForm';
 
 import './EndpointSection.less';
 

@@ -66,10 +66,10 @@ import
   _ETLEdge, _ETLNode, _ETLProcess,
   _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
 } from 'etl/templates/ETLProcess';
-import { SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
@@ -109,16 +109,34 @@ class GraphHelpers extends ETLHelpers
     // }));
   }
 
+  public createEngineForEdge(edgeId: number)
+  {
+    const template = this._template;
+    const edge = template.getEdge(edgeId);
+    const fromNode = template.getNode(edge.from);
+    const proxy = this._templateProxy();
+    if (fromNode.type === NodeTypes.Source)
+    {
+      const source = template.getSources().get(fromNode.endpoint);
+      DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
+      {
+        const { engine, warnings, softWarnings } = createMergedEngine(documents);
+        proxy.setEdgeTransformations(edgeId, engine);
+      }).catch(this._logRejection);
+    }
+  }
+
   public updateSources(newSources: SourcesMap)
   {
     const { newKeys, deletedKeys, differentKeys } =
       getChangedKeys(this._template.getSources(), newSources);
-
-    const proxy = this._template.proxy();
+    const proxy = this._templateProxy();
 
     newKeys.forEach((key) =>
     {
-      proxy.addSource(key, newSources.get(key));
+      const sourceId = proxy.addSource(key, newSources.get(key));
+      const edgeId = proxy.addEdge(sourceId, -1);
+      this.createEngineForEdge(edgeId);
     });
     differentKeys.forEach((key) =>
     {
@@ -132,13 +150,8 @@ class GraphHelpers extends ETLHelpers
         key,
       });
     });
-    DocumentsHelpers.fetchSources(newKeys);
+    // DocumentsHelpers.fetchSources(newKeys);
     DocumentsHelpers.fetchSources(differentKeys);
-
-    this.editorAct({
-      actionType: 'setTemplate',
-      template: proxy.getTemplate(),
-    });
   }
 
   public updateSinks(newSinks: SinksMap)

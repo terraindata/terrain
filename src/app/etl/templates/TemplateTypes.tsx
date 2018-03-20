@@ -52,7 +52,7 @@ const { List, Map } = Immutable;
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { _ETLProcess, ETLEdge, ETLProcess, ETLNode } from 'etl/templates/ETLProcess';
+import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
@@ -78,9 +78,9 @@ class ETLTemplateC implements ETLTemplateI
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
 
-  public proxy(mutator?: (template: ETLTemplate) => void)
+  public proxy()
   {
-    return new TemplateProxy(this as any, mutator);
+    return new TemplateProxy(this as any);
   }
 
   public getSources()
@@ -120,6 +120,11 @@ class ETLTemplateC implements ETLTemplateI
   public getNode(id: number)
   {
     return this.process.nodes.get(id);
+  }
+
+  public getEdge(id: number)
+  {
+    return this.process.edges.get(id);
   }
 
   public getEdges(): Immutable.Map<number, ETLEdge>
