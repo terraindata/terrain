@@ -49,7 +49,7 @@ import { Readable } from 'stream';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import BufferedElasticReader from '../../../database/elastic/streams/BufferedElasticReader';
+import ElasticReader from '../../../database/elastic/streams/ElasticReader';
 
 /**
  * Types of merge joins
@@ -74,10 +74,10 @@ export default class MergeJoinTransform extends Readable
   private client: ElasticClient;
   private type: MergeJoinType;
 
-  private leftSource: BufferedElasticReader;
+  private leftSource: ElasticReader;
   private leftBuffer: object | null;
   private leftPosition: number;
-  private rightSource: BufferedElasticReader;
+  private rightSource: ElasticReader;
   private rightBuffer: object | null;
   private rightPosition: number;
 
@@ -120,16 +120,26 @@ export default class MergeJoinTransform extends Readable
     // set up the left source
     const leftQuery = this.setSortClause(query);
     this.leftBuffer = null;
-    this.leftSource = new BufferedElasticReader(client, leftQuery,
-      ((buffer: object[]) => this.accumulateBuffer(buffer, StreamType.Left)).bind(this));
+    this.leftSource = new ElasticReader(client, leftQuery);
+    this.leftSource.on('readable', (() =>
+    {
+      const buffer = this.leftSource.read();
+      this.accumulateBuffer(buffer, StreamType.Left);
+    }).bind(this));
+
     this.leftPosition = 0;
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
     this.rightBuffer = null;
-    this.rightSource = new BufferedElasticReader(client, rightQuery,
-      ((buffer: object[]) => this.accumulateBuffer(buffer, StreamType.Right)).bind(this));
+    this.rightSource = new ElasticReader(client, rightQuery);
+    this.rightSource.on('readable', (() =>
+    {
+      const buffer = this.rightSource.read();
+      this.accumulateBuffer(buffer, StreamType.Right);
+    }).bind(this));
+
     this.rightPosition = 0;
   }
 

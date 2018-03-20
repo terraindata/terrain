@@ -44,57 +44,36 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
+import * as Elastic from 'elasticsearch';
+import * as Stream from 'stream';
+import * as winston from 'winston';
 
 import ElasticClient from '../client/ElasticClient';
-import { ElasticReader } from './ElasticReader';
 
-/**
- * A buffered ElasticReader source
- */
-export default class BufferedElasticReader extends Readable
+export class ElasticWriter extends Stream.Writable
 {
-  public maxBufferSize: number = 8;
-  public buffer: object[] = [];
+  private client: ElasticClient;
+  private objects: any;
 
-  private query: any;
-  private stream: Readable;
+  private querying: boolean = false;
+  private doneReading: boolean = false;
+  private rowsProcessed: number = 0;
 
-  private _shouldContinue: boolean = true;
-  private _isSourceEmpty: boolean = false;
+  private MAX_BUFFER_SIZE: number = 10 * 1000;
 
-  private _onBufferFull: (buffer: object[]) => void;
-  private _onRead: () => void;
-  private _onError: () => void;
-  private _onEnd: () => void;
+  private numRequested: number = 0;
 
-  constructor(client: ElasticClient, query: any, onBufferFull: (buffer: object[]) => void, size: number = 8)
+  constructor(client: ElasticClient)
   {
-    super({
-      objectMode: true,
-    });
+    super({ objectMode: true, highWaterMark: 1024 * 128 });
 
-    this.query = query;
-    this.stream = new ElasticReader(client, query);
-    this.maxBufferSize = size;
-
-    this._onBufferFull = onBufferFull;
-    this._onRead = this.readStream.bind(this);
-    this._onError = ((e) => this.emit('error', e)).bind(this);
-    this._onEnd = this._final.bind(this);
-
-    this.stream.on('readable', this._onRead);
-    this.stream.on('error', this._onError);
-    this.stream.on('end', this._onEnd);
+    this.client = client;
   }
 
-  public _read(): void
+  public _write(chunk, encoding, callback)
   {
-    if (!this._isSourceEmpty
-      && this.buffer.length < this.maxBufferSize)
-    {
-      this._shouldContinue = true;
-    }
+    this.numRequested = size;
+    this.continueScrolling();
   }
 
   public _destroy(error, callback)
@@ -104,58 +83,89 @@ export default class BufferedElasticReader extends Readable
 
   public _final(callback)
   {
-    this.stream.removeListener('readable', this._onRead);
-    this.stream.removeListener('error', this._onError);
-    this.stream.removeListener('end', this._onEnd);
-
-    this._shouldContinue = false;
-    this._isSourceEmpty = true;
-
+    this.doneReading = true;
+    this.continueScrolling();
     if (callback !== undefined)
     {
       callback();
     }
   }
 
-  public resetBuffer(): any[]
+  private scrollCallback(error, response): void
   {
-    const buffer = this.buffer;
-    this.buffer = [];
-    this._shouldContinue = true;
-    return buffer;
+    if (typeof response._scroll_id === 'string')
+    {
+      this.scrollID = response._scroll_id;
+    }
+
+    if (error !== null && error !== undefined)
+    {
+      this.emit('error', error);
+      return;
+    }
+
+    const hits: ElasticQueryHit[] = response.hits.hits;
+    let length: number = hits.length;
+
+    // trim off excess results
+    if (this.rowsProcessed + length > this.size)
+    {
+      length = this.size - this.rowsProcessed;
+      response.hits.hits = hits.slice(0, length);
+    }
+
+    this.rowsProcessed += length;
+    this.numRequested = Math.max(0, this.numRequested - length);
+
+    this.push(response);
+
+    this.querying = false;
+    this.doneReading = this.doneReading
+      || length <= 0
+      || this.rowsProcessed >= this.size;
+
+    this.continueScrolling();
   }
 
-  public isEmpty(): boolean
+  private continueScrolling()
   {
-    return this._isSourceEmpty && (this.buffer.length === 0);
-  }
-
-  private readStream(): void
-  {
-    // should we keep reading from the source streams?
-    if (!this._shouldContinue)
+    if (this.querying)
     {
       return;
     }
 
-    // if yes, keep buffering inputs from the source stream
-    const obj = this.stream.read();
-    if (obj === null)
+    if (this.doneReading)
     {
-      this._isSourceEmpty = true;
-    }
-    else
-    {
-      this.buffer.push(obj);
+      // stop scrolling
+      if (this.scrollID !== undefined)
+      {
+        this.client.clearScroll({
+          scrollId: this.scrollID,
+        }, (_err, _resp) =>
+          {
+            this.push(null);
+          });
+
+        this.scrollID = undefined;
+      }
+
+      return;
     }
 
-    // if we have data buffered up to maxBufferSize, swap the buffer list out
-    // and dispatch the onBufferFull callback
-    if (this.buffer.length >= this.maxBufferSize ||
-      this._isSourceEmpty && this.buffer.length > 0)
+    if (this.numRequested > 0)
     {
-      const buffer = this.resetBuffer();
-      this._onBufferFull(buffer);
+      // continue scrolling
+      this.querying = true;
+      this.client.scroll({
+        scrollId: this.scrollID,
+        scroll: this.scroll,
+      } as Elastic.ScrollParams,
+        (error, response) =>
+        {
+          this.scrollCallback(error, response);
+        });
     }
   }
 }
+
+export default ElasticWriter;

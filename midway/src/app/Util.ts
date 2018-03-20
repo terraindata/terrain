@@ -71,36 +71,6 @@ export function doRequest(url)
   });
 }
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
-
-export function makePromiseCallbackVoid(resolve: () => void, reject: (Error) => void)
-{
-  return (error: Error) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve();
-    }
-  };
-}
-
 export function updateObject<T>(obj: T, newObj: T): T
 {
   for (const key in newObj)

@@ -146,7 +146,11 @@ export class ElasticReader extends Stream.Readable
     this.rowsProcessed += length;
     this.numRequested = Math.max(0, this.numRequested - length);
 
-    this.push(response);
+    const shouldContinue = this.push(response);
+    if (!shouldContinue)
+    {
+      this.numRequested = 0;
+    }
 
     this.querying = false;
     this.doneReading = this.doneReading
