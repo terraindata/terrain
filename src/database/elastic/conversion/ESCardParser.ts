@@ -56,11 +56,12 @@ import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropert
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
 import { forAllCards } from '../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
 import { toInputMap } from '../../../blocks/types/Input';
 
-import { KEY_DISPLAY, STATIC_KEY_DISPLAY } from 'builder/getCard/GetCardVisitor';
+import {default as GetCardVisitor, KEY_DISPLAY, STATIC_KEY_DISPLAY} from 'builder/getCard/GetCardVisitor';
 import * as Immutable from 'immutable';
 import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
 import { DisplayType } from '../../../blocks/displays/Display';
@@ -69,6 +70,8 @@ import { Card } from '../../../blocks/types/Card';
 import * as _ from 'lodash';
 import Util from 'util/Util';
 import {List} from 'immutable';
+import ElasticBlocks from '../blocks/ElasticBlocks';
+import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
 
 export default class ESCardParser extends ESParser
 {
@@ -343,27 +346,134 @@ export default class ESCardParser extends ESParser
     {
       if (parent.objectChildren[index] === undefined)
       {
-        console.log('Add child ' + index);
-        console.assert(typeof index === 'string');
+        console.log('add ' + index, newChild);
         if (newChild instanceof ESPropertyInfo)
         {
           parent.addObjectChild(index, newChild);
+          this.isMutated = true;
+        } else if (newChild instanceof ESValueInfo)
+        {
+          // we have to create a ESPropertyInfo
+          const childName = new ESJSONParser(JSON.stringify(index)).getValueInfo();
+          childName.card = newChild.card;
+          childName.clause = ESInterpreterDefaultConfig.getClause('string');
+          const propertyInfo = new ESPropertyInfo(childName, newChild);
+          parent.addObjectChild(index, propertyInfo);
+          this.isMutated = true;
         }
-        this.isMutated = true;
       }
     } else
     {
       if (parent.arrayChildren[index] === undefined)
       {
         console.log('add ' + index);
-        console.assert(typeof index === 'number');
         parent.addArrayChild(newChild as ESValueInfo, index);
         this.isMutated = true;
       }
     }
   }
 
-  public searchCard(pattern, valueInfo = this.getValueInfo())
+  /**
+   *
+   * @param template: the template of creating a card
+   * @param {ESValueInfo} valueInfo: where we start to search/create the card
+   */
+  public createCardIfNotExist(template, valueInfo = this.getValueInfo())
+  {
+    console.log('search/create ' + JSON.stringify(template) + ' from ' + JSON.stringify(valueInfo.value));
+    switch (valueInfo.jsonType)
+    {
+      case ESJSONType.object:
+        if (typeof template !== 'object')
+        {
+          return null;
+        }
+        for (const k of Object.keys(template))
+        {
+          const q = k.split(':');
+          if (q.length !== 2)
+          {
+            return null;
+          }
+          const cardKey = q[0]
+          const cardType = GetCardVisitor.getCardType(q[1]);
+          // now try to search { "index:cardType": {}}
+          const newVal = valueInfo.objectChildren[cardKey]
+          if (newVal)
+          {
+            // if both the key and
+            if (newVal.propertyValue.card.type === cardType)
+            {
+              // keep searching
+              const nextLevel = this.createCardIfNotExist(template[k], newVal.propertyValue);
+            }
+          } else
+          {
+            // create the card
+            const cardTemplate = {[k]: template[k]};
+            console.log('Crate Child Card with template ' + JSON.stringify(cardTemplate));
+            const newCard = BlockUtils.make(ElasticBlocks, cardType, {key: cardKey, template: template[k]});
+            const newCardParser = new ESCardParser(newCard);
+            if (newCardParser.hasError())
+            {
+              return null;
+            }
+            this.addChild(valueInfo, cardKey, newCardParser.getValueInfo());
+            // install the new card to the valueInfo
+          }
+        }
+        return;
+      case ESJSONType.array:
+        console.assert(Array.isArray(template));
+        for (const t of template)
+        {
+          let searchingTemplate;
+          let searchKey;
+          if (typeof t === 'string')
+          {
+            searchingTemplate = t;
+          } else
+          {
+            console.assert(typeof t === 'object');
+            if (Object.keys(t).length === 0)
+            {
+              continue;
+            }
+            searchKey = Object.keys(t)[0];
+            searchingTemplate = {[searchKey]: true};
+          }
+          const hitChild = this.searchCard([searchingTemplate], valueInfo);
+          if (hitChild === null)
+          {
+            // create the card
+            const cardTemplate = t;
+            console.log('Crate Array Card with template ' + JSON.stringify(cardTemplate));
+            const cardType = GetCardVisitor.getCardType((valueInfo.clause as ESArrayClause).elementID);
+            const newCard = BlockUtils.make(ElasticBlocks, cardType, {key: valueInfo.arrayChildren.length, template: cardTemplate});
+            const newCardParser = new ESCardParser(newCard);
+            if (newCardParser.hasError())
+            {
+              return null;
+            }
+            console.log('Add card ' + JSON.stringify(newCardParser.value));
+            this.addChild(valueInfo, valueInfo.arrayChildren.length, newCardParser.getValueInfo());
+          } else
+          {
+            // keep searching
+            if (typeof  t === 'object' )
+            {
+              this.createCardIfNotExist(t[searchKey], hitChild);
+            }
+          }
+        }
+        return;
+
+      default:
+        return;
+    }
+  }
+
+  public searchCard(pattern, valueInfo = this.getValueInfo(), returnLastMatched: boolean = false)
   {
     console.log('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));
     switch (valueInfo.jsonType)
@@ -384,23 +494,34 @@ export default class ESCardParser extends ESParser
           return null;
         }
         // now try to search { "index:cardType": {}}
-        const newVal = valueInfo.objectChildren[q[0]]
+        const cardKey = q[0];
+        const cardTypeName = GetCardVisitor.getCardType(q[1]);
+        console.log('Searching Object ' + cardKey + ":" + cardTypeName);
+        const newVal = valueInfo.objectChildren[cardKey]
         if (newVal)
         {
-          if (newVal.propertyValue.card.type === q[1])
+          if (newVal.propertyValue.card.type === cardTypeName)
           {
             if (pattern[k] === true)
             {
+              console.log('Got Card ' + newVal.propertyValue.card.type);
               return newVal.propertyValue;
             }
             // keep searching
-            return this.searchCard(pattern[k], newVal.propertyValue);
+            const nextLevel = this.searchCard(pattern[k], newVal.propertyValue);
+            if (nextLevel === null && returnLastMatched === true)
+            {
+              return newVal.propertyValue;
+            }
+            return nextLevel;
           } else
           {
+            console.log('Card type is not matched' + newVal.propertyValue.card.type);
             return null;
           }
         } else
         {
+          console.log('Card is not existed ' + cardKey);
           return null;
         }
       case ESJSONType.array:
@@ -414,27 +535,15 @@ export default class ESCardParser extends ESParser
         }
         return null;
       default:
-        if (typeof pattern !== 'string')
+        if (typeof pattern === 'object' || Array.isArray(pattern))
         {
           return null;
         }
-        q = pattern.split(':');
-        if (valueInfo.card.type === q[1])
+        if (valueInfo.card.value === pattern)
         {
-          if (q[0] === 'any')
-          {
-            return valueInfo;
-          } else if (q[0] === valueInfo.card.key)
-          {
-            return valueInfo;
-          } else
-          {
-            return null;
-          }
-        } else
-        {
-          return null;
+          return valueInfo;
         }
+        return null;
     }
   }
 
