@@ -59,7 +59,6 @@ import Util from 'util/Util';
 
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
-import { getTemplateId, getTemplateName } from './../../../../shared/Util';
 import { ESParseTreeToCode } from './../../../database/elastic/conversion/ParseElasticQuery';
 import Query from './../../../items/types/Query';
 import Autocomplete from './../../common/components/Autocomplete';
@@ -429,6 +428,17 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  // full template name is of the form - 'id: name'
+  public getTemplateName(template: string): string
+  {
+    return template.substring(template.indexOf(':') + 2);
+  }
+
+  public getTemplateId(template: string): number
+  {
+    return Number(template.substring(0, template.indexOf(':')));
+  }
+
   public onSaveTemplateNameChange(saveTemplateName: string)
   {
     this.setState({
@@ -449,7 +459,7 @@ class FileImportPreview extends TerrainComponent<Props>
       this.setPreviewErrorMsg('Please enter a template name');
       return;
     }
-    if (this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName))
+    if (this.state.templateOptions.find((option) => this.getTemplateName(option) === saveTemplateName))
     {
       this.showUpdateTemplate();
       return;
@@ -533,7 +543,7 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleUpdateTemplate()
   {
     const { saveTemplateName } = this.state;
-    const id = getTemplateId(this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName));
+    const id = this.getTemplateId(this.state.templateOptions.find((option) => this.getTemplateName(option) === saveTemplateName));
     Actions.updateTemplate(id, this.props.exporting, this.handleUpdateTemplateSuccess, this.handleUpdateTemplateError, saveTemplateName);
     this.setState({
       showingSaveTemplate: false,
@@ -560,7 +570,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const templateName = this.state.templateOptions.get(itemIndex);
     Actions.deleteTemplate(
-      getTemplateId(templateName),
+      this.getTemplateId(templateName),
       this.props.exporting,
       this.handleDeleteTemplateSuccess,
       this.handleDeleteTemplateError,
@@ -601,11 +611,11 @@ class FileImportPreview extends TerrainComponent<Props>
       return;
     }
 
-    Actions.applyTemplate(getTemplateId(templateName), List(Array.from(unmatchedTemplateCols)));
+    Actions.applyTemplate(this.getTemplateId(templateName), List(Array.from(unmatchedTemplateCols)));
     this.setState({
       showingApplyTemplate: false,
-      appliedTemplateName: getTemplateName(templateName),
-      saveTemplateName: getTemplateName(templateName),
+      appliedTemplateName: this.getTemplateName(templateName),
+      saveTemplateName: this.getTemplateName(templateName),
     });
   }
 

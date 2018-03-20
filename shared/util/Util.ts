@@ -44,34 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
+import * as koaBodyParser from 'koa-bodyparser';
+import * as koaFavicon from 'koa-favicon';
+import * as koaLogger from 'koa-logger-winston';
+import * as koaPassport from 'koa-passport';
+import koaResponseTime = require('koa-response-time');
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
+const Middleware =
   {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
+    bodyParser: koaBodyParser,
+    favicon: koaFavicon,
+    logger: koaLogger,
+    passport: koaPassport,
+    responseTime: koaResponseTime,
   };
-}
 
-export async function readFile(fileName: string)
-{
-  return new Promise((resolve, reject) =>
-  {
-    fs.readFile(fileName, makePromiseCallback(resolve, reject));
-  });
-}
-
-export async function checkResults(fileName: string, testName: string, results: any)
-{
-  const contents: any = await readFile(fileName);
-  const expected = JSON.parse(contents);
-  expect(results).toMatchObject(expected[testName]);
-}
+export default Middleware;

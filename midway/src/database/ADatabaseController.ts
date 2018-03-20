@@ -44,21 +44,67 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import { makePromiseCallback } from '../tasty/Utils';
+import * as winston from 'winston';
+import QueryHandler from '../app/query/QueryHandler';
+import * as Tasty from '../tasty/Tasty';
 
-export async function readDirAsync(path: string)
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * midway databases
+ */
+abstract class ADatabaseController
 {
-  return new Promise<string[]>(async (resolve, reject) =>
+  private id: number; // unique id
+  private lsn: number; // log sequence number
+  private type: string; // connection type
+  private name: string; // connection name
+  private header: string; // log entry header
+
+  constructor(type: string, id: number, name: string)
   {
-    fs.readdir(path, makePromiseCallback(resolve, reject));
-  });
+    this.id = id;
+    this.lsn = -1;
+    this.type = type;
+    this.name = name;
+    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
+  }
+
+  public log(methodName: string, info?: any, moreInfo?: any)
+  {
+    const header = this.header + (++this.lsn).toString() + ':' + methodName;
+    winston.info(header);
+    if (info !== undefined)
+    {
+      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
+    }
+    if (moreInfo !== undefined)
+    {
+      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
+    }
+  }
+
+  public getID(): number
+  {
+    return this.id;
+  }
+
+  public getType(): string
+  {
+    return this.type;
+  }
+
+  public getName(): string
+  {
+    return this.name;
+  }
+
+  public abstract getClient(): object;
+
+  public abstract getTasty(): Tasty.Tasty;
+
+  public abstract getQueryHandler(): QueryHandler;
+
+  public abstract getAnalyticsDB(): object;
 }
 
-export async function readFileAsync(file: string, encoding: string)
-{
-  return new Promise<string>(async (resolve, reject) =>
-  {
-    fs.readFile(file, encoding, makePromiseCallback(resolve, reject));
-  });
-}
+export default ADatabaseController;

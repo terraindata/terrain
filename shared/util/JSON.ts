@@ -44,32 +44,78 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+export function parseObjectListJSON(file: string, numLines: number): object[]
 {
-  return (error: Error, response: T) =>
+  let lineCount = 0;
+  let openBracketCount = 0;
+  let closeBracketCount = 0;
+  let c = 0;
+
+  while (lineCount < numLines)
   {
-    if (error !== null && error !== undefined)
+    const curChar = file[c];
+    if (c >= file.length - 1)
     {
-      reject(error);
+      if (curChar === '\n')
+      {
+        c--;
+      }
+      break;
     }
-    else
+
+    if (curChar === '{')
     {
-      resolve(response);
+      openBracketCount++;
     }
-  };
+    else if (curChar === '}')
+    {
+      closeBracketCount++;
+    }
+    c++;
+
+    if (openBracketCount === closeBracketCount && openBracketCount !== 0)
+    {
+      lineCount++;
+      openBracketCount = 0;
+      closeBracketCount = 0;
+    }
+  }
+  return JSON.parse(file.substring(0, c) + ']');
 }
 
-export function makePromiseCallback0(resolve: () => void, reject: (Error) => void)
+export function parseNewlineJSON(file: string, numLines: number): object[] | string
 {
-  return (error: Error) =>
+  const items: object[] = [];
+  let ind: number = 0;
+  while (ind < file.length)
   {
-    if (error !== null && error !== undefined)
+    let rInd: number = file.indexOf('\r', ind);
+    rInd = rInd === -1 ? file.length : rInd;
+    let nInd: number = file.indexOf('\n', ind);
+    nInd = nInd === -1 ? file.length : nInd;
+    const end: number = Math.min(rInd, nInd);
+
+    const line: string = file.substring(ind, end);
+    if (line !== '')
     {
-      reject(error);
+      try
+      {
+        items.push(JSON.parse(file.substring(ind, end)));
+        if (items.length === numLines)
+        {
+          return items;
+        }
+      }
+      catch (e)
+      {
+        return 'JSON format incorrect. Could not parse object: ' + line;
+      }
+      ind = end;
     }
     else
     {
-      resolve();
+      ind++;
     }
-  };
+  }
+  return items;
 }

@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as Tasty from '../../tasty/Tasty';
 
-import DatabaseController from '../DatabaseController';
+import ADatabaseController from '../ADatabaseController';
 import ElasticClient from './client/ElasticClient';
 import ElasticConfig from './ElasticConfig';
 import ElasticQueryHandler from './query/ElasticQueryHandler';
@@ -55,7 +55,7 @@ import ElasticDB from './tasty/ElasticDB';
 /**
  * The central controller for communicating with ElasticSearch.
  */
-class ElasticController extends DatabaseController
+class ElasticController extends ADatabaseController
 {
   private client: ElasticClient;
   private tasty: Tasty.Tasty;

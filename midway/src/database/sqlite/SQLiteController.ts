@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Tasty from '../../tasty/Tasty';
 
 import QueryHandler from '../../app/query/QueryHandler';
-import DatabaseController from '../DatabaseController';
+import ADatabaseController from '../ADatabaseController';
 import SQLiteClient from './client/SQLiteClient';
 import SQLiteConfig from './SQLiteConfig';
 import SQLiteDB from './tasty/SQLiteDB';
@@ -55,7 +55,7 @@ import SQLiteDB from './tasty/SQLiteDB';
 /**
  * The central controller for communicating with SQLite.
  */
-class SQLiteController extends DatabaseController
+class SQLiteController extends ADatabaseController
 {
   private client: SQLiteClient;
   private tasty: Tasty.Tasty;

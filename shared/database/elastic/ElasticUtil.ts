@@ -65,6 +65,7 @@ export function isValidIndexName(name: string): string
   }
   return '';
 }
+
 /* returns an error message if there are any; else returns empty string */
 export function isValidTypeName(name: string): string
 {
@@ -78,6 +79,7 @@ export function isValidTypeName(name: string): string
   }
   return '';
 }
+
 /* returns an error message if there are any; else returns empty string */
 export function isValidFieldName(name: string): string
 {

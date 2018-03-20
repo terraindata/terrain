@@ -54,17 +54,18 @@ import serve = require('koa-static-server');
 import srs = require('secure-random-string');
 import v8 = require('v8');
 
-import * as DBUtil from '../database/Util';
+import './auth/Passport';
+import './Logging';
+
+import { makeDatabaseController } from '../database/DatabaseController';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
 import appStats from './AppStats';
-import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import { credentials } from './credentials/CredentialRouter';
 import { databases } from './database/DatabaseRouter';
 import { events } from './events/EventRouter';
-import './Logging';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
@@ -84,7 +85,7 @@ export class App
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DBUtil.makeDatabaseController(type, 0, dsn);
+    const controller = makeDatabaseController(type, 0, dsn);
     return controller.getTasty();
   }
 
