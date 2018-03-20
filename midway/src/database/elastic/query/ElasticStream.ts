@@ -60,7 +60,7 @@ export class ElasticStream extends Stream.Readable
   private doneReading: boolean = false;
   private streaming: boolean = false;
   private rowsProcessed: number = 0;
-  private scroll: string | undefined;
+  private scroll: string | undefined = undefined;
   private size: number;
 
   private scrollID: string | undefined = undefined;
@@ -83,10 +83,6 @@ export class ElasticStream extends Stream.Readable
     if (this.streaming || query['scroll'] !== undefined)
     {
       this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
-    }
-    else
-    {
-      this.scroll = undefined;
     }
 
     try
