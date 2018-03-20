@@ -59,7 +59,17 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
-import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
+import
+{
+  _ETLEdge,
+  _ETLNode,
+  _ETLProcess,
+  _MergeJoinOptions,
+  ETLEdge,
+  ETLNode,
+  ETLProcess,
+  MergeJoinOptions,
+} from 'etl/templates/ETLProcess';
 import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
 export type Mutator<T> = (newItem: T) => void;
@@ -111,6 +121,21 @@ export class TemplateProxy
     return this.createNode(sinkNode);
   }
 
+  public addMerge(leftId: number, rightId: number, leftJoinKey: string, rightJoinKey: string, outputKey: string): number
+  {
+    const mergeNode = _ETLNode({
+      type: NodeTypes.MergeJoin,
+      options: _MergeJoinOptions({
+        leftId,
+        rightId,
+        leftJoinKey,
+        rightJoinKey,
+        outputKey,
+      }),
+    });
+    return this.createNode(mergeNode);
+  }
+
   public deleteSource(key: string)
   {
     this.sources = this.sources.delete(key);
@@ -142,6 +167,11 @@ export class TemplateProxy
   public setEdgeTransformations(edgeId: number, transformations: TransformationEngine)
   {
     this.edges = this.edges.update(edgeId, (edge) => edge.set('transformations', transformations));
+  }
+
+  public setEdgeTo(edgeId: number, toNode: number)
+  {
+    this.edges = this.edges.update(edgeId, (edge) => edge.set('to', toNode));
   }
 
   public splitEdge(edgeId: number)

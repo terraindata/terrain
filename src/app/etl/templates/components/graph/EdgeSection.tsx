@@ -207,6 +207,7 @@ class EdgeSection extends TerrainComponent<Props>
           title='Merge Documents'
           onClose={this.closeMergeModal}
           onConfirm={this.confirmMerge}
+          confirm={true}
           closeOnConfirm={this.validateMergeFormState()}
         >
           {this.renderMergeForm()}

@@ -71,7 +71,7 @@ import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthro
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
+import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
 
 import DocumentsHelpers from './DocumentsHelpers';
 
@@ -180,7 +180,7 @@ class Initializers extends ETLHelpers
         initialEdge: 0,
       };
     }
-    const { engine, warnings, softWarnings } = createMergedEngine(documents);
+    const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
 
     const fieldMap = createTreeFromEngine(engine);
 

@@ -102,7 +102,16 @@ class DocumentsHelpers extends ETLHelpers
 
     const leftTE = template.getTransformationEngine(leftEdge);
     const rightTE = template.getTransformationEngine(rightEdge);
-    return List([]);
+
+    const mergeDocuments: List<object> = leftDocuments.map((document: object) =>
+    {
+      const leftDocument = leftTE.transform(document);
+      const innerDocs = rightDocuments.slice(3).map(rightTE.transform).toArray();
+      leftDocument[outputKey] = innerDocs;
+      return leftDocument;
+    }).toList();
+
+    return mergeDocuments;
   }
 
   public getDocumentsForNode(nodeId: number)

@@ -377,7 +377,16 @@ export function getConsistentType(id: number, engine: TransformationEngine): Fie
   }
 }
 
-export function createMergedEngine(documents: List<object>):
+export function mergeJoinEngines(
+  leftEngine: TransformationEngine,
+  rightEngine: TransformationEngine,
+  outputKey: string,
+): TransformationEngine
+{
+  return leftEngine;
+}
+
+export function createEngineFromDocuments(documents: List<object>):
   {
     engine: TransformationEngine,
     warnings: string[],

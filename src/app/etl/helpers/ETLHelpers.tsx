@@ -76,7 +76,7 @@ import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthro
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
+import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
 
 export default abstract class ETLHelpers
 {
