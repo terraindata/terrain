@@ -228,7 +228,6 @@ export const elasticFilter = _card({
   childOptionClickHandler: FilterUtils.BoolQueryCard.childOptionClickHandler,
   childrenHaveKeys: true,
   key: 'bool',
-  dataSource: '',
 
   static: {
     // this makes the shape of elasticFilterBlock similar with the bool_query clause card.

@@ -473,7 +473,7 @@ export default class ESCardParser extends ESParser
     }
   }
 
-  public searchCard(pattern, valueInfo = this.getValueInfo(), returnLastMatched: boolean = false)
+  public searchCard(pattern, valueInfo = this.getValueInfo(), returnLastMatched: boolean = false, returnAll: boolean = false)
   {
     console.log('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));
     switch (valueInfo.jsonType)
@@ -505,14 +505,28 @@ export default class ESCardParser extends ESParser
             if (pattern[k] === true)
             {
               console.log('Got Card ' + newVal.propertyValue.card.type);
-              return newVal.propertyValue;
+              if (returnAll === false)
+              {
+                return newVal.propertyValue;
+              } else
+              {
+                console.log('Return the card as array.');
+                return [newVal.propertyValue];
+              }
             }
             // keep searching
-            const nextLevel = this.searchCard(pattern[k], newVal.propertyValue);
+            const nextLevel = this.searchCard(pattern[k], newVal.propertyValue, returnLastMatched, returnAll);
             if (nextLevel === null && returnLastMatched === true)
             {
-              return newVal.propertyValue;
+              if (returnAll === false)
+              {
+                return newVal.propertyValue;
+              } else
+              {
+                return [newVal.propertyValue];
+              }
             }
+            console.log('pass ', nextLevel);
             return nextLevel;
           } else
           {
@@ -525,13 +539,25 @@ export default class ESCardParser extends ESParser
           return null;
         }
       case ESJSONType.array:
+        let hits = [];
         for (const element of valueInfo.arrayChildren)
         {
-          const v = this.searchCard(pattern[0], element);
+          const v = this.searchCard(pattern[0], element, returnLastMatched, returnAll);
           if (v != null)
           {
-            return v;
+            if (returnAll === false)
+            {
+              return v;
+            } else
+            {
+              hits = hits.concat(v);
+            }
           }
+        }
+        console.log('collect hits ', hits);
+        if (hits.length > 0)
+        {
+          return hits;
         }
         return null;
       default:
@@ -541,7 +567,13 @@ export default class ESCardParser extends ESParser
         }
         if (valueInfo.card.value === pattern)
         {
-          return valueInfo;
+          if (returnAll === false)
+          {
+            return valueInfo;
+          } else
+          {
+            return [valueInfo];
+          }
         }
         return null;
     }

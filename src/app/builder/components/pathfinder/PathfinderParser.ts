@@ -112,8 +112,14 @@ export class PathToCards
     const parser = new ESCardParser(rootCard);
     this.updateSize(path, parser);
     this.updateSourceBool(path, parser);
-    this.updateHardBool(path.filterGroup, parser);
-    this.updateSoftBool(path.softFilterGroup, parser);
+
+    // hard bool
+    this.updateBodyBool(path.filterGroup, parser, parser.getValueInfo(), 'hard');
+    // soft bool
+    this.updateBodyBool(path.softFilterGroup, parser, parser.getValueInfo(), 'soft');
+    // groupJoin
+    //this.updateGroupJoin(path.nested, parser);
+    // score card
     this.fromScore(path, parser);
 
     if (parser.isMutated === true)
@@ -121,7 +127,7 @@ export class PathToCards
       parser.updateCard();
     }
     rootCard = parser.getValueInfo().card;
-    console.log('Path -> Cards: ' + parser.getValueInfo().value);
+    console.log('Path -> Cards: ' + JSON.stringify(parser.getValueInfo().value));
     return List([rootCard]);
   }
 
@@ -215,81 +221,127 @@ export class PathToCards
     return [block];
   }
 
-  private static updateHardBool(filterGroup: FilterGroup, parsedCard: ESCardParser)
+
+  private static MergeFilterGroupWithBool(filterGroup: FilterGroup, parser: ESCardParser, boolValueInfo: ESValueInfo, filterSection: 'hard'|'soft' = 'hard')
   {
-    parsedCard.createCardIfNotExist({
-      'query:query': {
-        'bool:elasticFilter': {
-          "filter:query[]": [{"bool:elasticFilter": {}}]
-        }
-      }
-    });
-    const hardBool = parsedCard.searchCard({
-      'query:query': {
-        'bool:elasticFilter': {
-          "filter:query[]": [{"bool:elasticFilter": true}]
-        }
-      }
-    });
-    console.assert(hardBool !== null);
-    if (hardBool)
+    console.log('MergeFilterGroupWithBool ', filterGroup, boolValueInfo);
+    // collect all potential
+    let blocks = [];
+    let boolType: 'filter'|'should' = 'filter';
+    // collect all `bool.filter` query
+    if (filterSection === 'soft')
     {
-      console.log('Got Hard Bool ', hardBool);
-      let blocks = [];
-      filterGroup.lines.map((line: FilterLine) => {
-        blocks = blocks.concat(this.filterLineToFilterBlock('filter', line));
-      });
-
-      // if this line is a nested query, update the nested query.
-
-      const boolCard = hardBool.card;
-      const keepFilters = [];
-      boolCard.otherFilters.map((filterBlock: Block) => {
-        if (filterBlock.boolQuery !== 'filter' && filterBlock.boolQuery !== 'filter_not')
-        {
-          keepFilters.push(filterBlock);
-        }
-      }
-      hardBool.card = boolCard.set('otherFilters', List(keepFilters.concat(blocks)));
-      parsedCard.updateCard();
-    }
-  }
-
-
-  private static updateSoftBool(filterGroup: FilterGroup, parsedCard: ESCardParser)
-  {
-    parsedCard.createCardIfNotExist({
-      'query:query': {
-        'bool:elasticFilter': {
-          "should:query[]": [{"bool:elasticFilter": {}}]
-        }
-      }
-    });
-    const softBool = parsedCard.searchCard({
-      'query:query': {
-        'bool:elasticFilter': {
-          "should:query[]": [{"bool:elasticFilter": true}]
-        }
-      }
-    });
-    if (softBool)
+      boolType = 'should';
+    } else
     {
-      console.log('Got soft bool');
-      let blocks = [];
-      filterGroup.lines.map((line: FilterLine) => {
-        blocks = blocks.concat(this.filterLineToFilterBlock('should', line));
-      });
-      const boolCard = softBool.card;
-      const keepFilters = [];
-      boolCard.otherFilters.map((filterBlock: Block) => {
-        if (filterBlock.boolQuery !== 'should' && filterBlock.boolQuery !== 'should_not')
+      // hard section
+      if (filterGroup.minMatches !== 'all')
+      {
+        boolType = 'should';
+      }
+    }
+
+    let boolTypeFiltersType = boolType + ':query[]';
+    let filterCard;
+    let innerBools;
+
+    const filterLineMap = { filter: [], nested: [], group: []};
+    filterGroup.lines.map((line: FilterLine) => {
+      if (line.fieldType === FieldType.Nested)
+      {
+        filterLineMap.nested.push(line);
+      } else if (line.filterGroup)
+      {
+        filterLineMap.group.push(line);
+      } else
+      {
+        filterLineMap.filter.push(line);
+      }
+    }
+      console.log('Inner filter ' + filterLineMap.group.length);
+      innerBools = parser.searchCard({[boolTypeFiltersType]: [{'bool:elasticFilter': true}]}, boolValueInfo, false, true);
+      if (innerBools === null)
+      {
+        if (filterLineMap.group.length > 0)
         {
-          keepFilters.push(filterBlock);
+          parser.createCardIfNotExist({[boolTypeFiltersType]: true}, boolValueInfo);
+          console.log('innerBool after create', boolValueInfo.objectChildren);
+          filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
+          // create filterGroup.groupCount queries
+          innerBools = [];
+          for (let i = 0; i < filterLineMap.group.length; i = i + 1)
+          {
+            const template = {'bool:elasticFilter': true}
+            const queryCard = BlockUtils.make(ElasticBlocks, 'eqlquery', {
+              key: i,
+              template,
+            });
+            const parsedBoolCard = new ESCardParser(queryCard);
+            innerBools.push(parsedBoolCard.getValueInfo().objectChildren.bool.propertyValue);
+            parser.addChild(filterCard, filterCard.arrayChildren.length, parsedBoolCard.getValueInfo());
+          }
+        }
+      } else
+      {
+        console.log('Discovered innerBools ', innerBools);
+        filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
+        if (innerBools.length < filterLineMap.group.length)
+        {
+          for (let i = innerBools.length; i < filterLineMap.group.length; i = i + 1)
+          {
+            const template = {'bool:elasticFilter': true}
+            const boolQueryCard = BlockUtils.make(ElasticBlocks, 'eqlquery', {
+              key: i,
+              template,
+            });
+            const parsedBoolCard = new ESCardParser(boolQueryCard);
+            innerBools.push(parsedBoolCard.getValueInfo().objectChildren.bool.propertyValue);
+            parser.addChild(filterCard, filterCard.arrayChildren.length, parsedBoolCard.getValueInfo());
+          }
+        } else if (innerBools.length > filterLineMap.group.length)
+        {
+          // TODO: decide whether we want to remove these
+          if (filterLineMap.group.length > 0)
+          {
+            filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
+            for (let i = innerBools.length; i > filterLineMap.group.length; i = i - 1)
+            {
+              parser.deleteChild(filterCard, i - 1);
+            }
+          } else
+          {
+            // delete the filter card
+            parser.deleteChild(boolValueInfo, boolType);
+          }
         }
       }
-      softBool.card = boolCard.set('otherFilters', List(keepFilters.concat(blocks)));
-      parsedCard.updateCard();
-    }
+
+    let nrGroup = 0;
+    filterGroup.lines.map((line: FilterLine) => {
+      if (line.fieldType === FieldType.Nested)
+      {
+        // this is an nested query
+      } else if (line.filterGroup)
+      {
+        // this is an inner filter group
+        const innerBoolValueInfo = innerBools[nrGroup];
+        nrGroup += 1;
+        this.MergeFilterGroupWithBool(line.filterGroup, parser, innerBoolValueInfo, filterSection);
+      }
+      blocks = blocks.concat(this.filterLineToFilterBlock(boolType, line));
+    });
+    console.log('Gnerate ' + blocks.length + ' blocks from ' + filterGroup.lines.size + ' blocks');
+
+    const boolCard = boolValueInfo.card;
+    const keepFilters = [];
+    boolCard.otherFilters.map((filterBlock: Block) => {
+      if (filterBlock.boolQuery.startsWith('filter') === false &&
+        filterBlock.boolQuery.startsWith('should') === false)
+      {
+        keepFilters.push(filterBlock);
+      }
+    });
+    boolValueInfo.card = boolCard.set('otherFilters', List(keepFilters.concat(blocks)));
   }
 
   private static updateSourceBool(path: Path, parser: ESCardParser)
@@ -327,6 +379,56 @@ export class PathToCards
       sourceBool.card = sourceBool.card.set('indexFilters', List([indexBlock])).set('currentIndex', indexValue);
     }
   }
+
+  private static updateBodyBool(filterGroup: FilterGroup, parser: ESCardParser, bodyValueInfo: ESValueInfo, filterSection: 'soft'|'hard')
+  {
+    let boolType  = 'filter:query[]';
+    // collect all `bool.filter` query
+    if (filterSection === 'soft')
+    {
+      boolType = 'should:query[]';
+    } else
+    {
+      // hard section
+      if (filterGroup.minMatches !== 'all')
+      {
+        boolType = 'should:query[]';
+      }
+    }
+    let hardBool = parser.searchCard(
+      {
+        "query:query": {
+          'bool:elasticFilter': {
+            [boolType]:
+              [{"bool:elasticFilter": true}]
+          }
+        }
+      }, bodyValueInfo);
+    if (hardBool === null)
+    {
+      // slow path
+      parser.createCardIfNotExist(
+        {
+          "query:query": {
+            'bool:elasticFilter': {
+              [boolType]:
+                [{"bool:elasticFilter": {}}]
+            }
+          }
+        }, bodyValueInfo);
+      hardBool = parser.searchCard(
+        {
+          "query:query": {
+            'bool:elasticFilter': {
+              [boolType]:
+                [{"bool:elasticFilter": true}]
+            }
+          }
+        }, bodyValueInfo);
+    }
+    this.MergeFilterGroupWithBool(filterGroup, parser, hardBool, filterSection);
+  }
+
 
 
   private static fromScore(path: Path, parser: ESCardParser)
@@ -536,7 +638,7 @@ export class CardsToPath
     // empty bool
     if (filterGroup.lines.size > 0)
     {
-      filterGroup = filterGroup.set('lines', List([])).set('groupCount', 0);
+      filterGroup = filterGroup.set('lines', List([])).set('groupCount', 1);
     }
 
     return filterGroup;
