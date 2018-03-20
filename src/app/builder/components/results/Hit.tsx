@@ -996,7 +996,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       );
       if (value.size && typeof value.get(0) !== 'object')
       {
-        return tooltip(content, {title: tooltipText, arrow: false});
+        return tooltip(content, { title: tooltipText, arrow: false });
       }
       return content;
     }

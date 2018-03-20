@@ -557,6 +557,7 @@ type ChoiceContext = {
     schemaState: SchemaState,
     builderState: BuilderState,
     subtype?: 'transform' | 'match',
+    noNested: boolean,
   } | {
     type: 'comparison',
     source: Source,
@@ -737,7 +738,7 @@ class ElasticDataSourceC extends DataSource
         {
           const fieldType = ReverseFieldTypeMapping[col.datatype];
           // If a column is nested, pull out the properties of that column to be filtered on
-          if (fieldType === FieldType.Nested)
+          if (fieldType === FieldType.Nested && !context.noNested)
           {
             _.keys(col.properties).forEach((property) =>
             {
