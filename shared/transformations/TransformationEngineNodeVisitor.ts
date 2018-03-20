@@ -123,7 +123,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        joined = joined + opts.stringDelimiter + (el as string);
+        joined = joined + opts.delimiter + (el as string);
       }
     });
     yadeep.set(doc, opts.newFieldKeyPaths.get(0), joined, { create: true });
@@ -215,8 +215,66 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitSplitNode(node: SplitTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    // TODO
-    return this.visitDefault(node, doc, options);
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.SplitNode>;
+
+    if (node.fields.size > 1)
+    {
+      return {
+        errors: [
+          {
+            message: 'Attempted to split multiple fields at once (this is not supported)',
+          } as TransformationVisitError,
+        ],
+      } as TransformationVisitResult;
+    }
+
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to split a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      let split: string[];
+      if (typeof opts.delimiter === 'number')
+      {
+        split = [
+          (el as string).slice(0, opts.delimiter as number),
+          (el as string).slice(opts.delimiter as number),
+        ];
+      }
+      else
+      {
+        split = (el as string).split(opts.delimiter as string | RegExp);
+      }
+
+      if (split.length !== opts.newFieldKeyPaths.size)
+      {
+        return {
+          errors: [
+            {
+              message: 'Number of split field names does not match number of split elements',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      for (let i: number = 0; i < split.length; i++)
+      {
+        yadeep.set(doc, opts.newFieldKeyPaths.get(i), split[i], { create: true });
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
   public visitSubstringNode(node: SubstringTransformationNode, doc: object, options: object = {}): TransformationVisitResult

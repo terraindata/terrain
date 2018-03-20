@@ -71,11 +71,15 @@ type AssertOptionTypesExhaustive = {
 
 interface TransformationOptionTypes
 {
-  SplitNode: any;
+  SplitNode: {
+    newFieldKeyPaths: List<KeyPath>;
+    preserveOldFields: boolean;
+    delimiter: string | RegExp | number;
+  };
   JoinNode: {
     newFieldKeyPaths: List<KeyPath>;
     preserveOldFields: boolean;
-    stringDelimiter: string;
+    delimiter: string;
   };
   FilterNode: any;
   DuplicateNode: {
