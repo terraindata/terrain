@@ -138,7 +138,7 @@ class HitComponent extends TerrainComponent<Props> {
     {
       hovered: false,
       nestedStates: Map<string, NestedState>({}),
-      nestedFields: undefined,
+      nestedFields: [],
       scrollState: Map<string, number>({}),
     };
 
@@ -182,7 +182,7 @@ class HitComponent extends TerrainComponent<Props> {
           return true;
         }
         else if (key !== 'hit' && key !== 'builder'
-          && this.props[key] !== nextProps[key])
+          && !_.isEqual(this.props[key], nextProps[key]))
         {
           return true;
         }
@@ -191,12 +191,20 @@ class HitComponent extends TerrainComponent<Props> {
 
     for (const key in nextState)
     {
-      if (this.state[key] !== nextState[key])
+      if (!_.isEqual(this.state[key], nextState[key]))
       {
         return true;
       }
     }
-    return !_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS());
+    // If only the id has changed, we don't need to update the result
+    for (const key in nextProps.hit.toJS())
+    {
+      if (key !== 'id' && !_.isEqual(nextProps.hit.toJS()[key], this.props.hit.toJS()[key]))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   public renderExpandedField(value, field)
@@ -996,7 +1004,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       );
       if (value.size && typeof value.get(0) !== 'object')
       {
-        return tooltip(content, {title: tooltipText, arrow: false});
+        return tooltip(content, { title: tooltipText, arrow: false });
       }
       return content;
     }

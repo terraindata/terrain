@@ -74,7 +74,6 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     sort: Map({}),
     aggs: Map({}),
     from: 0,
-    size: MAX_COUNT,
     _source: true,
     track_scores: true,
   });
@@ -82,7 +81,10 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   // Sources
   const sourceInfo = parseSource(path.source);
   baseQuery = baseQuery.set('from', sourceInfo.from);
-  baseQuery = baseQuery.set('size', sourceInfo.size);
+  if (sourceInfo.size !== 'all')
+  {
+    baseQuery = baseQuery.set('size', sourceInfo.size);
+  }
   baseQuery = baseQuery.setIn(['query', 'bool', 'filter'], List([
     Map({
       term: Map({
@@ -166,7 +168,7 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : MAX_COUNT,
+    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : 'all',
     index: (source.dataSource as any).index,
   };
 }

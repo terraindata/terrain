@@ -329,6 +329,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         }
       }
     }
+    fields = fields.push('_score');
     return (
       <ResultsConfigComponent
         {...this.props}
@@ -573,33 +574,35 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                     </div>
                 }
               </CRTarget>
-              <CRTarget
-                className='results-config-score'
-                type='score'
-                onDrop={this.handleDrop}
-              >
-                <div className='results-config-area-title' style={mainFontColor}>
-                  Score
-                </div>
-                {
-                  config && config.score ?
-                    <ResultsConfigResult
-                      field={config.score}
-                      is='score'
-                      onRemove={this.handleRemove}
-                      format={formats.get(config.score)}
-                      onFormatChange={this.handleFormatChange}
-                      primaryKeys={config.primaryKeys}
-                      onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                      openConfig={this.handleOpenConfig}
-                      nested={this.state.nestedFields.indexOf(config.score) !== -1}
-                    />
-                    :
-                    <div className='results-config-placeholder' style={placeholderStyle}>
-                      Drag score field <em>(optional)</em>
-                    </div>
-                }
-              </CRTarget>
+              {
+                // <CRTarget
+                //   className='results-config-score'
+                //   type='score'
+                //   onDrop={this.handleDrop}
+                // >
+                //   <div className='results-config-area-title' style={mainFontColor}>
+                //     Score
+                //   </div>
+                //   {
+                //     config && config.score ?
+                //       <ResultsConfigResult
+                //         field={config.score}
+                //         is='score'
+                //         onRemove={this.handleRemove}
+                //         format={formats.get(config.score)}
+                //         onFormatChange={this.handleFormatChange}
+                //         primaryKeys={config.primaryKeys}
+                //         onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                //         openConfig={this.handleOpenConfig}
+                //         nested={this.state.nestedFields.indexOf(config.score) !== -1}
+                //       />
+                //       :
+                //       <div className='results-config-placeholder' style={placeholderStyle}>
+                //         Drag score field <em>(optional)</em>
+                //       </div>
+                //   }
+                // </CRTarget>
+              }
               <CRTarget
                 className='results-config-fields'
                 type='field'

@@ -82,7 +82,7 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const HITS_PAGE_SIZE = 100;
+const HITS_PAGE_SIZE = 20;
 
 export interface Props
 {
@@ -160,6 +160,37 @@ class HitsArea extends TerrainComponent<Props>
   {
     builderActions.changeResultsConfig(config);
     this.getNestedFields(this.props, config);
+  }
+
+  public shouldComponentUpdate(nextProps: Props, nextState: State)
+  {
+    for (const key in nextProps)
+    {
+      if (!_.isEqual(this.props[key], nextProps[key]))
+      {
+        if (key === 'builder' && !_.isEqual(
+          this.props.builder.query.path.source.dataSource,
+          nextProps.builder.query.path.source.dataSource) ||
+          this.props.builder.db.name !==
+          nextProps.builder.db.name)
+        {
+          return true;
+        }
+        else
+        {
+          return true;
+        }
+      }
+    }
+
+    for (const key in nextState)
+    {
+      if (!_.isEqual(this.state[key], nextState[key]))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -241,7 +272,7 @@ class HitsArea extends TerrainComponent<Props>
 
   public setIndexAndResultsConfig(props: Props, indexChange = false)
   {
-    let indexName = props.db.name + '/' + getIndex('', this.props.builder);
+    let indexName = '';
     if (props.query.path &&
       props.query.path.source &&
       props.query.path.source.dataSource)
@@ -340,7 +371,7 @@ class HitsArea extends TerrainComponent<Props>
     );
   }
 
-  public handleRequestMoreHits(onHitsLoaded: (unchanged?: boolean) => void)
+  public handleRequestMoreHits()
   {
     const { hitsPages } = this.state;
 
@@ -348,12 +379,7 @@ class HitsArea extends TerrainComponent<Props>
     {
       this.setState({
         hitsPages: hitsPages + 1,
-        onHitsLoaded,
       });
-    }
-    else
-    {
-      onHitsLoaded(true);
     }
   }
 
@@ -676,14 +702,16 @@ class HitsArea extends TerrainComponent<Props>
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
+          onScroll={this.checkIfBottom}
+          id='hits-area'
         >
           {
             hits.map((hit, index) =>
             {
-              // if (index > this.state.hitsPages * HITS_PAGE_SIZE)
-              // {
-              //   return null;
-              // }
+              if (index > this.state.hitsPages * HITS_PAGE_SIZE)
+              {
+                return null;
+              }
 
               return (
                 <Hit
@@ -726,6 +754,25 @@ class HitsArea extends TerrainComponent<Props>
           infoAreaContent
         }
       </div>
+    );
+  }
+
+  public checkIfBottom(e)
+  {
+    const elem = $(e.currentTarget);
+    if (elem[0].scrollHeight - elem.scrollTop() === elem.outerHeight())
+    {
+      this.handleRequestMoreHits();
+    }
+  }
+
+  public getDocHeight()
+  {
+    const D = document;
+    return Math.max(
+      D.body.scrollHeight, D.documentElement.scrollHeight,
+      D.body.offsetHeight, D.documentElement.offsetHeight,
+      D.body.clientHeight, D.documentElement.clientHeight,
     );
   }
 
