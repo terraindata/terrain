@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as stream from 'stream';
 
 import { GoogleAnalyticsConfig, GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
-import { Magento } from './Magento';
+import { Magento, MagentoSourceConfig } from './Magento';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
@@ -57,12 +57,12 @@ export const mySQL: MySQL = new MySQL();
 export interface SourceConfig
 {
   type: string;
-  params: object;
+  params: object | object[];
 }
 
 export interface ExportSourceConfig
 {
-  params: object;
+  params: object[];
   stream: stream.Readable;
 }
 
@@ -83,7 +83,7 @@ export class Sources
       let result = '';
       const exprtSourceConfig: ExportSourceConfig | string =
         {
-          params: {},
+          params: [],
           stream: readStream,
         };
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
@@ -116,11 +116,14 @@ export class Sources
         case 'analytics':
           imprtSourceConfig = await this._getStreamFromGoogleAnalytics(sourceConfig, body['body'], body['templateId']);
           break;
-        case 'spreadsheets':
-          imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
-          break;
         case 'mysql':
           imprtSourceConfig = await this._getStreamFromMySQL(sourceConfig, body['body'], body['templateId']);
+          break;
+        case 'magento':
+          result = await this._getStreamFromMagento(sourceConfig, body['body'], body['templateId']);
+          break;
+        case 'spreadsheets':
+          imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
           break;
         default:
           break;
@@ -177,6 +180,33 @@ export class Sources
           filetype: 'csv',
           params: body,
           stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
+    });
+  }
+
+  private async _getStreamFromMagento(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig | string>
+  {
+    return new Promise<ImportSourceConfig | string>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream: stream.Readable | string = await magento._getJSONFromCSV(
+        await magento.runQuery(source['params'] as MagentoSourceConfig[]));
+      if (typeof writeStream === 'string')
+      {
+        return resolve(writeStream);
+      }
+
+      delete body['source'];
+      body['filetype'] = 'json';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'json',
+          params: body,
+          stream: writeStream as stream.Readable,
         };
       return resolve(imprtSourceConfig);
     });

@@ -774,6 +774,7 @@ export class Scheduler
                 body:
                   JSON.parse(transport['filename']),
               };
+
             const result = await sources.handleTemplateExportSource(magentoArgs, jsonStream as stream.Readable);
             successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to magento. Response: ' + result;
             await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);

@@ -63,65 +63,160 @@ export interface MagentoJSONConfig
 export interface MagentoSourceConfig
 {
   credentialId: number;
+  customOperation?: string;
   data: object[];
-  mappedParams: object;
+  mappedParams: object | object[];
   options?: object;
-  updateParams: object;
-  url: string;
+  updateParams: object | object[];
+  url: object[];
 }
 
 export class Magento
 {
-
-  public async getJSONStreamAsMagentoSourceConfig(exportSourceConfig: ExportSourceConfig): Promise<MagentoSourceConfig>
+  public async getJSONStreamAsMagentoSourceConfig(exportSourceConfig: ExportSourceConfig): Promise<MagentoSourceConfig[]>
   {
-    return new Promise<MagentoSourceConfig>(async (resolve, reject) =>
+    return new Promise<MagentoSourceConfig[]>(async (resolve, reject) =>
     {
-      // TODO: parse JSON stream as JSON objects
+      // cannot stream unfortunately as we need the entire dataset to do certain operations
+      // such as getting all products and removing products that aren't in the exported dataset
+      const magentoSourceConfigs: MagentoSourceConfig[] = [];
       let results: object[] = [];
       const jsonParser = jsonStream.parse();
       exportSourceConfig.stream.pipe(jsonParser);
       jsonParser.on('data', (data) =>
       {
-        results = data;
-        const magentoSourceConfig: MagentoSourceConfig =
+        results = results.concat(data);
+      });
+      jsonParser.on('end', () =>
+      {
+        if (Array.isArray(exportSourceConfig.params))
+        {
+          exportSourceConfig.params.forEach((exportSourceConfigParam) =>
           {
+            magentoSourceConfigs.push({
+              credentialId: exportSourceConfigParam['credentialId'],
+              customOperation: exportSourceConfigParam['customOperation'],
+              data: results,
+              mappedParams: exportSourceConfigParam['mappedParams'],
+              options: exportSourceConfigParam['options'],
+              updateParams: exportSourceConfigParam['updateParams'],
+              url: exportSourceConfigParam['url'],
+            } as MagentoSourceConfig);
+          });
+        }
+        else
+        {
+          magentoSourceConfigs.push({
             credentialId: exportSourceConfig.params['credentialId'],
+            customOperation: exportSourceConfig.params['customOperation'],
             data: results,
             mappedParams: exportSourceConfig.params['mappedParams'],
             options: exportSourceConfig.params['options'],
             updateParams: exportSourceConfig.params['updateParams'],
             url: exportSourceConfig.params['url'],
-          };
-        resolve(magentoSourceConfig);
+          } as magentoSourceConfig);
+        }
+        return resolve(magentoSourceConfigs);
+      });
+      jsonParser.on('error', (err) =>
+      {
+        winston.error(err);
+        throw err;
       });
     });
   }
 
-  public async runQuery(magentoSourceConfig: MagentoSourceConfig): Promise<string>
+  public async runQuery(magentoSourceConfigs: MagentoSourceConfig[]): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      try
+      const resultStr: string = '';
+      magentoSourceConfigs.forEach(async (magentoSourceConfig) =>
       {
-        const soapCreds: object = {};
-        const creds: string[] = await credentials.getAsStrings(magentoSourceConfig.credentialId, 'magento');
-        if (creds.length === 0)
+        try
         {
-          winston.info('No credentials found for that credential ID.');
+          const soapCreds: object = {};
+          const creds: string[] = await credentials.getAsStrings(magentoSourceConfig.credentialId, 'magento');
+          if (creds.length === 0)
+          {
+            winston.info('No credentials found for that credential ID.');
+          }
+          else
+          {
+            const cred: object = JSON.parse(creds[0]);
+            soapCreds['username'] = cred['apiUser'];
+            soapCreds['apiKey'] = cred['apiKey'];
+            soapCreds['baseUrl'] = cred['baseUrl'];
+          }
+          const options = magentoSourceConfig.options !== undefined ? magentoSourceConfig.options : {};
+          _.extend(options, soapCreds);
+          delete options['baseUrl'];
+          if (Array.isArray(magentoSourceConfig.url))
+          {
+            let result: object[] = [];
+            // chain operations
+            const deepCopyMagentoSourceConfig = _.cloneDeep(magentoSourceConfig);
+            let i = 0;
+            while (i < magentoSourceConfig.url.length)
+            {
+              deepCopyMagentoSourceConfig['mappedParams'] = deepCopyMagentoSourceConfig['mappedParams'][i];
+              deepCopyMagentoSourceConfig['updateParams'] = deepCopyMagentoSourceConfig['updateParams'][i];
+              if (Array.isArray(magentoSourceConfig.url[i]['name'].match(new RegExp(/^<.*>$/g))))
+              {
+                const op: string = magentoSourceConfig.url[i]['name'].substring(1, magentoSourceConfig.url[i].length - 1);
+                switch (op)
+                {
+                  case 'trim':
+                    // magentoSourceConfig.data
+                    result = await this._runSoapOperation(deepCopyMagentoSourceConfig, soapCreds, options) as object[];
+                    const excludedProducts: object[] = result.filter((row) =>
+                      {
+                        return row;
+                      });
+                    i++;
+                    deepCopyMagentoSourceConfig.url = [magentoSourceConfig.url[i]];
+                    deepCopyMagentoSourceConfig.data = excludedProducts;
+                    result = await this._runSoapOperation(deepCopyMagentoSourceConfig, soapCreds, options) as object[];
+                    break;
+                  default:
+                    break;
+                }
+              }
+              else
+              {
+                deepCopyMagentoSourceConfig.url = [magentoSourceConfig.url[i]];
+                result = await this._runSoapOperation(deepCopyMagentoSourceConfig, soapCreds, options) as object[];
+                console.log('((((((((((((((((((((((((((((((((((((((((((');
+                // console.log(JSON.stringify(result, null, 2));
+                console.log(result[0]['status']['storeView']['item'].length);
+                console.log(JSON.stringify(result[0]['status']['storeView']['item'][0], null, 2));
+                console.log('))))))))))))))))))))))))))))))))))))))))))');
+              }
+              i++;
+            }
+            resultStr += JSON.stringify(result);
+          }
+          else
+          {
+            resultStr += await this._runSoapOperation(magentoSourceConfig, soapCreds, options, resultStr) as string;
+          }
         }
-        else
+        catch (e)
         {
-          const cred: object = JSON.parse(creds[0]);
-          soapCreds['username'] = cred['apiUser'];
-          soapCreds['apiKey'] = cred['apiKey'];
-          soapCreds['baseUrl'] = cred['baseUrl'];
+          return resolve(resultStr + ((e as any).toString()));
         }
-        const options = magentoSourceConfig.options !== undefined ? magentoSourceConfig.options : {};
-        _.extend(options, soapCreds);
-        delete options['baseUrl'];
-        const resultArr: Array<Promise<object>> = [];
-        soap.soap.createClient(soapCreds['baseUrl'], options, async (err, client) =>
+      });
+      return resolve(resultStr);
+    });
+  }
+
+  private async _runSoapOperation(magentoSourceConfig: MagentoSourceConfig, soapCreds: object,
+    options: object): Promise<string | object[]>
+  {
+    return new Promise<string | object[]>(async (resolve, reject) =>
+    {
+      const resultArr: Array<Promise<object>> = [];
+      soap.soap.createClient(soapCreds['baseUrl'], options, async (err, client) =>
         {
           if (err)
           {
@@ -129,6 +224,12 @@ export class Magento
           }
           let sessionId: string = '';
           winston.info('creating SOAP client.');
+          client.on('request', (body) =>
+          {
+            console.log('XML request:');
+            console.log(body);
+            console.log('end XML request');
+          });
           client['login']({ username: soapCreds['username'], apiKey: soapCreds['apiKey'] },
             async (errLogin, resultLogin, envLogin, soapHeaderLogin) =>
             {
@@ -136,67 +237,107 @@ export class Magento
               {
                 sessionId = resultLogin['loginReturn']['$value'];
                 let method: any = client;
-                const routeSplit: string[] = magentoSourceConfig.url.split('/');
+                const routeSplit: string[] = magentoSourceConfig.url[0]['name'].split('/');
                 routeSplit.forEach((routeIndiv) =>
                 {
                   method = method[routeIndiv];
                 });
-                magentoSourceConfig.data.forEach(async (row) =>
+                if (magentoSourceConfig.url[0]['get'] === true) // GET request
                 {
                   try
                   {
                     const requestArgs: object = {};
-                    Object.keys(magentoSourceConfig.updateParams).forEach((key) =>
-                    {
-                      requestArgs[key] = magentoSourceConfig.updateParams[key];
-                    });
-                    Object.keys(magentoSourceConfig.mappedParams).forEach((key) =>
-                    {
-                      requestArgs[key] = row[magentoSourceConfig.mappedParams[key]];
-                    });
                     const sanitizedRequestArgs = _.cloneDeep(requestArgs);
                     requestArgs['sessionId'] = sessionId;
-                    resultArr.push(new Promise<object>((thisResolve, thisReject) =>
-                    {
-                      method(requestArgs, (error, result, envelope, soapHeader) =>
+                    Object.keys(magentoSourceConfig.updateParams).forEach((key) =>
                       {
-                        if (error)
-                        {
-                          thisResolve({
-                            args: sanitizedRequestArgs, status: 'false',
-                            error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
-                          });
-                        }
-                        else
-                        {
-                          if (result && result['result'] !== undefined)
-                          {
-                            thisResolve({ args: sanitizedRequestArgs, status: result['result']['$value'] });
-                          }
-                          else
-                          {
-                            thisResolve({ args: sanitizedRequestArgs, status: 'true' });
-                          }
-                        }
+                        requestArgs[key] = magentoSourceConfig.updateParams[key];
                       });
-                    }));
+                    console.log(JSON.stringify(requestArgs));
+                    resultArr.push(new Promise<object>((thisResolve, thisReject) =>
+                      {
+                        method(requestArgs, (error, result, envelope, soapHeader) =>
+                          {
+                            if (error)
+                            {
+                              thisResolve({
+                                args: sanitizedRequestArgs, status: 'false',
+                                error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
+                              });
+                            }
+                            else
+                            {
+                              if (result && result['result'] !== undefined)
+                              {
+                                thisResolve({ args: sanitizedRequestArgs, status: result['result']['$value'] });
+                              }
+                              else
+                              {
+                                thisResolve({ args: sanitizedRequestArgs, status: result });
+                              }
+                            }
+                          });
+                      }));
                   }
                   catch (e)
                   {
-                    resolve((e as any).toString());
+                    return resolve(resultStr + ((e as any).toString()));
                   }
-                });
+                }
+                else
+                {
+                  magentoSourceConfig.data.forEach(async (row) =>
+                  {
+                    try
+                    {
+                      const requestArgs: object = {};
+                      Object.keys(magentoSourceConfig.updateParams).forEach((key) =>
+                      {
+                        requestArgs[key] = magentoSourceConfig.updateParams[key];
+                      });
+                      Object.keys(magentoSourceConfig.mappedParams).forEach((key) =>
+                      {
+                        requestArgs[key] = row[magentoSourceConfig.mappedParams[key]];
+                      });
+                      const sanitizedRequestArgs = _.cloneDeep(requestArgs);
+                      requestArgs['sessionId'] = sessionId;
+                      resultArr.push(new Promise<object>((thisResolve, thisReject) =>
+                      {
+                        method(requestArgs, (error, result, envelope, soapHeader) =>
+                        {
+                          if (error)
+                          {
+                            thisResolve({
+                              args: sanitizedRequestArgs, status: 'false',
+                              error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
+                            });
+                          }
+                          else
+                          {
+                            if (result && result['result'] !== undefined)
+                            {
+                              thisResolve({ args: sanitizedRequestArgs, status: result['result']['$value'] });
+                            }
+                            else
+                            {
+                              thisResolve({ args: sanitizedRequestArgs, status: 'true' });
+                            }
+                          }
+                        });
+                      }));
+                    }
+                    catch (e)
+                    {
+                      return resolve(resultStr + ((e as any).toString()));
+                    }
+                  });
+                }
               }
-              const resultAsString: string = JSON.stringify(await Promise.all(resultArr));
-              winston.info('Result of Magento request: ' + resultAsString);
-              resolve(resultAsString);
+              const resultObj: object[] = await Promise.all(resultArr);
+              // winston.info('Result of Magento request: ' + JSON.stringify(resultObj, null, 2));
+              return resolve(resultObj);
             });
         });
-      }
-      catch (e)
-      {
-        resolve((e as any).toString());
-      }
     });
   }
 }
