@@ -44,69 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-access no-reference
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import UserConfig from '../users/UserConfig';
+import StatusHistoryConfig from './StatusHistoryConfig';
 
-/// TODO: remove when the "src" dependency is eliminated
-/// <reference path="../../typings/tsd.d.ts" />
-
-import { BaseClass } from '../../app/Classes';
-import BackendInstance from '../../database/types/BackendInstance';
-
-export type ItemType = 'QUERY' | 'ALGORITHM' | 'GROUP' | 'CATEGORY';
-export const ItemType: {
-  Query: ItemType;
-  Algorithm: ItemType;
-  Group: ItemType;
-  Category: ItemType;
-} = {
-    Query: 'QUERY',
-    Algorithm: 'ALGORITHM',
-    Group: 'GROUP',
-    Category: 'CATEGORY',
-  };
-
-export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT' | 'DEPLOYED';
-export const ItemStatus: {
-  Archive: ItemStatus;
-  Build: ItemStatus;
-  Approve: ItemStatus;
-  Live: ItemStatus;
-  Default: ItemStatus;
-  Deployed: ItemStatus;
-} =
-  {
-    Archive: 'ARCHIVE',
-    Build: 'BUILD',
-    Approve: 'APPROVE',
-    Live: 'LIVE',
-    Default: 'DEFAULT',
-    Deployed: 'DEPLOYED',
-  };
-
-export class ItemC extends BaseClass
+export class StatusHistory
 {
-  // TODO potentially consolidate with midway
-  id: ID = -1;
-  parent: number = 0;
+  private statusHistoryTable: Tasty.Table;
 
-  name: string = '';
-  status: ItemStatus = 'BUILD';
-  type: ItemType;
+  constructor()
+  {
+    this.statusHistoryTable = new Tasty.Table(
+      'statusHistory',
+      ['id'],
+      [
+        'createdAt',
+        'userId',
+        'algorithmId',
+        'fromStatus',
+        'toStatus',
+      ],
+    );
+  }
 
-  db: BackendInstance = {} as any;
-
-  dbFields = ['id', 'parent', 'name', 'status', 'type'];
-  excludeFields = ['dbFields', 'excludeFields'];
-
-  modelVersion = 2; // 2 is for the first version of Node midway
+  public async create(user: UserConfig, id: number, obj: object, newStatus: string): Promise<StatusHistoryConfig>
+  {
+    if (user.id === undefined)
+    {
+      throw new Error('User ID unknown');
+    }
+    // can only insert
+    const newVersion: StatusHistoryConfig =
+      {
+        userId: user.id,
+        algorithmId: id,
+        fromStatus: obj['status'],
+        toStatus: newStatus,
+      };
+    return App.DB.upsert(this.statusHistoryTable, newVersion) as Promise<StatusHistoryConfig>;
+  }
 }
-export type Item = ItemC & IRecord<ItemC>;
-// remove?
-// export const _Item = (config?: {[key:string]: any}) =>
-// {
-//   if(config && typeToConstructor[config.type])
-//   {
-//     return typeToConstructor[config.type](config);
-//   }
-//   throw new Error('Unrecognized item type: ' + (config && config.type));
-// }
+
+export default StatusHistory;
