@@ -232,6 +232,16 @@ export class Scheduler
         jobId = 9;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
+      else if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'analytics')
+      {
+        jobId = 10;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'analytics')
+      {
+        jobId = 11;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
 
       req.active = true;
       req.archived = false;
@@ -310,6 +320,8 @@ export class Scheduler
     // 7: export via magento
     // 8: import via spreadsheets
     // 9: export via spreadsheets (not implemented yet)
+    // 10: import via analytics
+    // 11: export via analytics (not implemented yet)
     await this.createJob(async (scheduleID: number, fields: object, // 0
       transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
@@ -700,8 +712,41 @@ export class Scheduler
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
-        // TODO add this after adding Magento as an ETL source
-        resolveJob('');
+        let successMsg: string = '';
+        let errMsg: string = '';
+        try
+        {
+          await this.setJobStatus(scheduleID, 1);
+          const magentoArgs =
+            {
+              body:
+                JSON.parse(transport['filename']),
+            };
+          const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateImportSource(magentoArgs);
+          if (typeof imprtSourceConfig === 'string')
+          {
+            errMsg = 'Schedule ' + scheduleID.toString() +
+              ': Failed to complete scheduled import from Magento. Error: ' + (imprtSourceConfig as string);
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+            return rejectJob(errMsg);
+          }
+          winston.info('Schedule ' + scheduleID.toString() + ': Starting import from Magento');
+          await imprt.upsert(imprtSourceConfig.stream as stream.Readable, fields, true);
+          await this.setJobStatus(scheduleID, 0);
+          successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from Magento.';
+          winston.info(successMsg);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
+          return resolveJob('Successfully completed scheduled import from Magento.');
+        }
+        catch (e)
+        {
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string);
+          winston.info(errMsg);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob(e.toString());
+        }
       });
     });
 
@@ -806,6 +851,71 @@ export class Scheduler
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
         // TODO add this after adding Google spreadsheets as an ETL source
+        resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 10
+      sort: string, encoding?: string | null) => // import from analytics
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        let successMsg: string = '';
+        let errMsg: string = '';
+        try
+        {
+          try
+          {
+            await this.setJobStatus(scheduleID, 1);
+            const analyticsArgs =
+              {
+                body:
+                  JSON.parse(transport['filename']),
+              };
+            analyticsArgs['body']['source']['params']['credentialId'] = transport['id'];
+            const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateImportSource(analyticsArgs);
+            if (typeof imprtSourceConfig === 'string')
+            {
+              errMsg = 'Schedule ' + scheduleID.toString() +
+                ': Failed to complete scheduled import from Google analytics. Error: ' + (imprtSourceConfig as string);
+              winston.info(errMsg);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+              return rejectJob(errMsg);
+            }
+            winston.info('Schedule ' + scheduleID.toString() + ': Starting import with Google analytics');
+            await imprt.upsert(imprtSourceConfig.stream as stream.Readable, fields, true);
+            await this.setJobStatus(scheduleID, 0);
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from Google analytics.';
+            winston.info(successMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
+            return resolveJob('Successfully completed scheduled import from Google analytics.');
+          }
+          catch (e)
+          {
+            errMsg = 'Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string);
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          }
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob('Failed to import.');
+        }
+        catch (e)
+        {
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
+          await this.setJobStatus(scheduleID, 0);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          return rejectJob(errMsg);
+        }
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 11
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // export to analytics
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        // TODO add this after adding Google analytics as an ETL source
         resolveJob('');
       });
     });

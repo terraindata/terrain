@@ -56,6 +56,26 @@ import CSVExportTransform from '../streams/CSVExportTransform';
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();
 
+export interface GoogleAnalyticsConfig
+{
+  dateRanges: GoogleAnalyticsDateRangeConfig[];
+  metrics: GoogleAnalyticsMetricConfig[];
+  pageToken?: string;
+  pageSize?: number;
+  viewId: number;
+}
+
+export interface GoogleAnalyticsDateRangeConfig
+{
+  endDate: string;
+  startDate: string;
+}
+
+export interface GoogleAnalyticsMetricConfig
+{
+  alias: string;
+}
+
 export interface GoogleSpreadsheetConfig
 {
   credentialId: number;
@@ -68,6 +88,55 @@ export class GoogleAPI
 {
   private storedEmail: string;
   private storedKeyFilePath: string;
+
+  public async getAnalytics(analytics: GoogleAnalyticsConfig): Promise<any>
+  {
+    return new Promise<any>(async (resolve, reject) =>
+    {
+      if (this.storedEmail === undefined && this.storedKeyFilePath === undefined)
+      {
+        await this._getStoredGoogleAPICredentials(analytics.credentialId, 'spreadsheets');
+      }
+      delete analytics['credentialId'];
+      const analyticsBody =
+      {
+        reportRequests: [analytics],
+      };
+      console.log(this.storedEmail);
+      console.log(this.storedKeyFilePath);
+      console.log(JSON.stringify(analyticsBody, null, 2));
+
+      const analyticsBatchGet = function()
+      {
+        request({
+          method: 'POST',
+          url: 'https://analyticsreporting.googleapis.com/v4/reports:batchGet',
+          jwt: {
+            email: this.storedEmail,
+            key: this.storedKeyFilePath,
+            scopes: ['https://www.googleapis.com/auth/analytics.readonly'],
+          },
+          json: true,
+          body: analyticsBody,
+        }, (err, res, body) =>
+          {
+            try
+            {
+              // const bodyObj = JSON.parse(body);
+              console.log(JSON.stringify(body, null, 2));
+              resolve(body);
+              // resolve(body['values']);
+            }
+            catch (e)
+            {
+              winston.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
+              reject('Potentially incorrect Google API credentials.');
+            }
+          });
+      }.bind(this);
+      analyticsBatchGet();
+    });
+  }
 
   public async getSpreadsheets(spreadsheet: GoogleSpreadsheetConfig): Promise<any>
   {

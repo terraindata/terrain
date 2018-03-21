@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
-import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
+import { GoogleAnalyticsConfig, GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
 import { Magento } from './Magento';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
@@ -113,6 +113,9 @@ export class Sources
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
       switch (sourceConfig.type)
       {
+        case 'analytics':
+          imprtSourceConfig = await this._getStreamFromGoogleAnalytics(sourceConfig, body['body'], body['templateId']);
+          break;
         case 'spreadsheets':
           imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
           break;
@@ -130,6 +133,29 @@ export class Sources
       {
         return resolve(imprtSourceConfig);
       }
+    });
+  }
+
+  private async _getStreamFromGoogleAnalytics(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig>
+  {
+    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream = await googleAPI.getAnalyticsValuesAsCSVStream(
+        await googleAPI.getAnalytics(source['params'] as GoogleAnalyticsConfig)) as stream.Readable;
+
+      delete body['source'];
+      body['filetype'] = 'csv';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'csv',
+          params: body,
+          stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
     });
   }
 
