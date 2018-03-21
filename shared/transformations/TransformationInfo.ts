@@ -197,6 +197,16 @@ export abstract class TransformationInfo
     return TransformationNodeInfo[type];
   }
 
+  public static canCreate(type: TransformationNodeType): boolean
+  {
+    return TransformationNodeInfo[type].creatable;
+  }
+
+  public static canEdit(type: TransformationNodeType): boolean
+  {
+    return TransformationNodeInfo[type].editable;
+  }
+
   public static getType(type: TransformationNodeType): any
   {
     return TransformationNodeInfo[type].type;

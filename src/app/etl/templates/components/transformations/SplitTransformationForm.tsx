@@ -70,12 +70,15 @@ interface SplitOptions
   leftName: string;
   rightName: string;
   preserveOldFields: boolean;
-  delimiter: string;
+  delimiter: any;
 }
 
+// curent assumption is that you only split into 2 fields.
+// TODO extend class so it can take arbitrary # of splits
+// TODO extend class to allow regex splits too
 export class SplitTFF extends TransformationForm<SplitOptions, TransformationNodeType.SplitNode>
 {
-  protected inputMap: InputDeclarationMap<SplitOptions> = {
+  protected readonly inputMap: InputDeclarationMap<SplitOptions> = {
     leftName: {
       type: DisplayType.TextBox,
       displayName: 'New Field Name 1',
@@ -97,31 +100,50 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
       group: 'row2',
     },
   };
-  protected initialState = {
+  protected readonly initialState = {
     leftName: 'Split Field 1',
     rightName: 'Split Field 2',
     preserveOldFields: false,
     delimiter: '-',
   };
-  protected type = TransformationNodeType.SplitNode; // lack of type safety here
+  protected readonly type = TransformationNodeType.SplitNode; // lack of type safety here
 
   protected isStructuralChange()
   {
     return true;
   }
 
+  protected computeInitialState()
+  {
+    const { isCreate, transformation } = this.props;
+    if (isCreate)
+    {
+      return this.initialState;
+    }
+    else
+    {
+      const meta = transformation.meta as NodeOptionsType<TransformationNodeType.SplitNode>;
+      return {
+        leftName: meta.newFieldKeyPaths.size > 0 ? meta.newFieldKeyPaths.get(0).last() : '',
+        rightName: meta.newFieldKeyPaths.size > 1 ? meta.newFieldKeyPaths.get(1).last() : '',
+        delimiter: meta.delimiter,
+        preserveOldFields: meta.preserveOldFields,
+      };
+    }
+  }
+
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;
     const { leftName, rightName, delimiter, preserveOldFields } = this.state;
-    const args =  super.computeArgs();
+    const args = super.computeArgs();
 
     const currentKeyPath = engine.getOutputKeyPath(fieldId);
     const changeIndex = currentKeyPath.size - 1;
 
     const newFieldKeyPaths = List([
       currentKeyPath.set(changeIndex, leftName),
-      currentKeyPath.set(changeIndex, rightName)
+      currentKeyPath.set(changeIndex, rightName),
     ]);
 
     return {
@@ -131,6 +153,6 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
         preserveOldFields,
       },
       fields: args.fields,
-    }
+    };
   }
 }

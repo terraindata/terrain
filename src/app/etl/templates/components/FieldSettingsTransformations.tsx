@@ -160,21 +160,26 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
   public renderTransformationListItem(value: TransformationNode, index)
   {
     const style = this.transformationListItemStyle(index === this.state.currentIndex && this.state.viewState === ViewState.EDIT);
-
+    const canEdit = TransformationInfo.canEdit(value.typeCode);
     return (
       <div className='transformation-row' key={index}>
         <div className='transformation-row-text' style={style.textStyle}>
           {TransformationInfo.getReadableName(value.typeCode)}
         </div>
         <div className='edit-transformation-spacer'>
-          <div
-            className='edit-transformation-button'
-            key={`edit ${index}`}
-            style={style.buttonStyle}
-            onClick={this.handleEditTransformationFactory(index)}
-          >
-            <EditIcon />
-          </div>
+          {
+            canEdit ?
+              <div
+                className='edit-transformation-button'
+                key={`edit ${index}`}
+                style={style.buttonStyle}
+                onClick={this.handleEditTransformationFactory(index)}
+              >
+                <EditIcon />
+              </div>
+              :
+              null
+          }
         </div>
       </div>
     );

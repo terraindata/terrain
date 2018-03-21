@@ -48,6 +48,7 @@ THE SOFTWARE.
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { TransformationFormProps } from './TransformationFormBase';
 
@@ -80,7 +81,10 @@ function determineAvailableTransformations(): List<TransformationNodeType>
   let typeList = List([]);
   for (const type in TransformationNodeType)
   {
-    if (getTransformationForm(type as TransformationNodeType) !== null)
+    if (
+      getTransformationForm(type as TransformationNodeType) !== null
+      && TransformationInfo.canCreate(type as TransformationNodeType)
+    )
     {
       typeList = typeList.push(type);
     }

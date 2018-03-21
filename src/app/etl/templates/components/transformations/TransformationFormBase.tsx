@@ -88,7 +88,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   // override these to configure
   protected readonly abstract inputMap: InputDeclarationMap<State>;
   protected readonly abstract initialState: State;
-  protected readonly abstract type: TransformationNodeType;
+  protected readonly abstract type: Type;
   protected readonly noEditOptions = false;
 
   constructor(props)
