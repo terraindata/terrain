@@ -57,7 +57,7 @@ import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { TransformationFormProps, TransformationArgs, TransformationForm } from './TransformationFormBase';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
@@ -83,4 +83,12 @@ export class SubstringTFF extends TransformationForm<SubstringOptions, Transform
     length: 5,
   };
   protected type = TransformationNodeType.SubstringNode;
+}
+
+type UppercaseOptions = NodeOptionsType<TransformationNodeType.UppercaseNode>;
+export class UppercaseTFF extends TransformationForm<UppercaseOptions, TransformationNodeType.UppercaseNode>
+{
+  protected inputMap: InputDeclarationMap<UppercaseOptions> = {};
+  protected initialState = {};
+  protected type = TransformationNodeType.UppercaseNode;
 }

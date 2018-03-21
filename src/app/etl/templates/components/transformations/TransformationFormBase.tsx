@@ -100,7 +100,8 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
 
   public componentWillMount()
   {
-    try {
+    try
+    {
       this.setState(this.computeInitialState());
     }
     catch (e)
@@ -165,8 +166,8 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
 
     return {
       options: this.state,
-      fields
-    }
+      fields,
+    };
   }
 
   // override this to customize how initial state gets computed from existing args

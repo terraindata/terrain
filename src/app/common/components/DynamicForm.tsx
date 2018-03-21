@@ -51,9 +51,9 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
-import { instanceFnDecorator } from 'src/app/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap, InputDeclarationType, OptionType } from './DynamicFormTypes';
 
@@ -437,7 +437,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       {
         setState(asNum);
       }
-    }
+    };
   }
 }
 
