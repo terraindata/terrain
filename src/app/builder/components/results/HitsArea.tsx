@@ -148,7 +148,7 @@ class HitsArea extends TerrainComponent<Props>
     nestedFields: List([]),
     pageBreaks: List([0]),
   };
-
+  public scrollTop = 0;
   public hitsFodderRange = _.range(0, 25);
   public locations = {};
 
@@ -770,16 +770,15 @@ class HitsArea extends TerrainComponent<Props>
     return index >= firstPage * HITS_PAGE_SIZE &&
            index < lastPage * HITS_PAGE_SIZE + HITS_PAGE_SIZE;
   }
-  public scrollTop = 0;
   public checkScroll(e)
   {
     const elem = $(e.currentTarget);
+    const lastPage = this.state.hitsPages[this.state.hitsPages.length - 1];
     // scrolled to the bottom, increment visible pages and set the new "top"
     const scrollUp = this.scrollTop > elem.scrollTop();
     this.scrollTop = elem.scrollTop();
     if (elem[0].scrollHeight - elem.scrollTop() === elem.outerHeight())
     {
-      const lastPage = this.state.hitsPages[this.state.hitsPages.length - 1];
       if (lastPage * HITS_PAGE_SIZE < MAX_HITS)
       {
         this.setState({
@@ -790,8 +789,8 @@ class HitsArea extends TerrainComponent<Props>
     }
     // If it has scrolled up to "top", decrement visible pages
     else if (
-      scrollUp && 
-      this.state.pageBreaks.get(this.state.hitsPages[0]) <= elem.scrollTop() &&
+      scrollUp &&
+      this.state.pageBreaks.get(lastPage) >= elem.scrollTop() &&
       this.state.hitsPages.indexOf(0) === -1
     )
     {
@@ -1085,8 +1084,6 @@ column if you have customized the results view.');
 
   public render()
   {
-    console.log('VISIBLE PAGES ARE ', this.state.hitsPages);
-    console.log('PAGE BREAKS ARE ', this.state.pageBreaks.toJS());
     return (
       <div
         className={classNames({

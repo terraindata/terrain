@@ -172,7 +172,7 @@ class HitComponent extends TerrainComponent<Props> {
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
-    // Never update the component if it's not visible - this might cause issues 
+    // Never update the component if it's not visible - this might cause issues
     // with changing size
     if (!nextProps.isVisible && nextProps.hitSize === this.props.hitSize)
     {
