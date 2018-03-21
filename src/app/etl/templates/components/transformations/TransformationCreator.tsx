@@ -129,7 +129,7 @@ export class TransformationCreator extends TerrainComponent<Props>
         <CompClass
           isCreate={true}
           engine={this.props.engine}
-          fieldID={this.props.fieldID}
+          fieldId={this.props.fieldID}
           onEditOrCreate={this.props.onTransformationCreated}
           onClose={this.props.onClose}
         />

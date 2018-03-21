@@ -49,25 +49,22 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { FactoryArgs, transformationFormFactory, TransformationFormProps } from './TransformationFormFactory';
+// import { FactoryArgs, transformationFormFactory, TransformationFormProps } from './TransformationFormFactory';
+import { TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-/*
- *  How to add a transformations to the UI:
- *  1: See 'SUBSTRING' for an example of how to declare the transformation UI config.
- *  2: Add the transformation class to the getTransformationForm switch statement
- */
+import { SubstringTFF } from './SimpleTransformations';
 
 export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
 {
   switch (type)
   {
     case TransformationNodeType.UppercaseNode:
-      return UppercaseClass as any;
+      // return UppercaseClass as any;
     case TransformationNodeType.SubstringNode:
-      return SubstringClass;
+      return SubstringTFF;
     default:
       return null;
   }
@@ -89,52 +86,52 @@ function determineAvailableTransformations(): List<TransformationNodeType>
   return typeList;
 }
 
-// UPPERCASE
-interface UppercaseState
-{
+// // UPPERCASE
+// interface UppercaseState
+// {
 
-}
+// }
 
-const uppercaseInputMap = {
+// const uppercaseInputMap = {
 
-};
+// };
 
-const uppercaseArgs: FactoryArgs<UppercaseState, TransformationNodeType.UppercaseNode> = {
-  inputMap: uppercaseInputMap,
-  type: TransformationNodeType.UppercaseNode,
-  initialState: {},
-  noEditOptions: true,
-};
+// const uppercaseArgs: FactoryArgs<UppercaseState, TransformationNodeType.UppercaseNode> = {
+//   inputMap: uppercaseInputMap,
+//   type: TransformationNodeType.UppercaseNode,
+//   initialState: {},
+//   noEditOptions: true,
+// };
 
-const UppercaseClass =
-  transformationFormFactory<UppercaseState, TransformationNodeType.UppercaseNode>(uppercaseArgs);
+// const UppercaseClass =
+//   transformationFormFactory<UppercaseState, TransformationNodeType.UppercaseNode>(uppercaseArgs);
 
-// SUBSTRING
-interface SubstringState
-{
-  from: number;
-  length: number;
-}
+// // SUBSTRING
+// interface SubstringState
+// {
+//   from: number;
+//   length: number;
+// }
 
-const substringInputMap: InputDeclarationMap<SubstringState> = {
-  from: {
-    type: DisplayType.NumberBox,
-    displayName: 'From Position',
-  },
-  length: {
-    type: DisplayType.NumberBox,
-    displayName: 'Substring Length',
-  },
-};
+// const substringInputMap: InputDeclarationMap<SubstringState> = {
+//   from: {
+//     type: DisplayType.NumberBox,
+//     displayName: 'From Position',
+//   },
+//   length: {
+//     type: DisplayType.NumberBox,
+//     displayName: 'Substring Length',
+//   },
+// };
 
-const substringArgs: FactoryArgs<SubstringState, TransformationNodeType.SubstringNode> = {
-  inputMap: substringInputMap,
-  type: TransformationNodeType.SubstringNode,
-  initialState: {
-    from: 0,
-    length: 3,
-  },
-};
+// const substringArgs: FactoryArgs<SubstringState, TransformationNodeType.SubstringNode> = {
+//   inputMap: substringInputMap,
+//   type: TransformationNodeType.SubstringNode,
+//   initialState: {
+//     from: 0,
+//     length: 3,
+//   },
+// };
 
-const SubstringClass =
-  transformationFormFactory<SubstringState, TransformationNodeType.SubstringNode>(substringArgs);
+// const SubstringClass =
+//   transformationFormFactory<SubstringState, TransformationNodeType.SubstringNode>(substringArgs);

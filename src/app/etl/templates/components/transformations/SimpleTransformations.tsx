@@ -43,56 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
-
-import * as classNames from 'classnames';
+// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+
+import { instanceFnDecorator } from 'src/app/Classes';
+
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationFormProps, TransformationArgs, TransformationForm } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
-import { TransformationNode } from 'etl/templates/FieldTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-
-import './TransformationEditor.less';
-
-export interface Props
+type SubstringOptions = NodeOptionsType<TransformationNodeType.SubstringNode>;
+export class SubstringTFF extends TransformationForm<SubstringOptions, TransformationNodeType.SubstringNode>
 {
-  transformation?: TransformationNode;
-  onTransformationChange: (structuralChanges: boolean) => void;
-  onClose: () => void;
-  engine: TransformationEngine;
-  fieldID: number;
-}
-
-@Radium
-export class TransformationEditor extends TerrainComponent<Props>
-{
-  public render()
-  {
-    const CompClass = getTransformationForm(this.props.transformation.typeCode);
-    return (
-      <div className='transformation-editor'>
-        <div className='edit-transformation-container'>
-          <CompClass
-            isCreate={false}
-            engine={this.props.engine}
-            fieldId={this.props.fieldID}
-            onEditOrCreate={this.props.onTransformationChange}
-            onClose={this.props.onClose}
-            transformation={this.props.transformation}
-          />
-        </div>
-      </div>
-    );
-  }
+  protected inputMap: InputDeclarationMap<SubstringOptions> = {
+    from: {
+      type: DisplayType.NumberBox,
+      displayName: 'From Position',
+    },
+    length: {
+      type: DisplayType.NumberBox,
+      displayName: 'SubstringLength',
+    },
+  };
+  protected initialState = {
+    from: 0,
+    length: 5,
+  };
+  protected type = TransformationNodeType.SubstringNode;
 }
