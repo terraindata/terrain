@@ -347,9 +347,13 @@ const EQLSpec: ESClause[] =
         path: ['groupjoin'],
         desc: 'Whether groupJoin should ignore documents with less than a given number of results.',
       }),
-    new ESMapClause('groupjoin_clause',
+    new ESWildcardStructureClause('groupjoin_clause',
+      {
+        parentAlias: 'string',
+        dropIfLessThan: 'number',
+      },
       'groupjoin_name',
-      'groupjoin_body',
+      'body',
       {
         path: ['groupjoin'],
         name: 'groupJoin query',
