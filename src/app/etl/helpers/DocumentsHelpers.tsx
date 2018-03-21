@@ -106,7 +106,7 @@ class DocumentsHelpers extends ETLHelpers
     const mergeDocuments: List<object> = leftDocuments.map((document: object) =>
     {
       const leftDocument = leftTE.transform(document);
-      const innerDocs = rightDocuments.slice(3).map(rightTE.transform).toArray();
+      const innerDocs = rightDocuments.slice(0, 3).map((innerDoc) => rightTE.transform(innerDoc)).toArray();
       leftDocument[outputKey] = innerDocs;
       return leftDocument;
     }).toList();
@@ -243,7 +243,7 @@ class DocumentsHelpers extends ETLHelpers
   protected onFetchDocumentsError(ev: string | MidwayError, key: string)
   {
     // tslint:disable-next-line
-    console.error(`error fetchhing ${key}: ${ev}`)
+    console.error(`error fetching ${key}: ${ev}`)
     this.updateStateAfterFetch();
   }
 

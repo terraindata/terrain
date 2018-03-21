@@ -142,6 +142,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     {
       previewLabel = previewExists ? '[List Empty]' : '[N/A]';
     }
+
     return (
       <EditorFieldNode
         {...this._passProps({
@@ -159,7 +160,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
   public renderArrayChildren()
   {
     const { preview } = this.props;
-    if (preview == null /*|| !Array.isArray(preview) todo*/)
+    if (preview == null || !Array.isArray(preview))
     {
       return this.renderArrayChild(null, -1, false);
     }
@@ -167,11 +168,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     {
       return this.renderArrayChild(null, -1, true);
     }
-    // return List(preview.map((value, index) =>
-    // {
-    //   return this.renderArrayChild(value, index);
-    // })); TODO go back to this when array fixed
-    return List(_.map(preview, (value, index) =>
+    return List(preview.map((value, index) =>
     {
       return this.renderArrayChild(value, index);
     }));

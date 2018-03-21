@@ -73,7 +73,7 @@ import { SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
+import { createEngineFromDocuments, mergeJoinEngines } from 'shared/transformations/util/EngineUtil';
 
 import DocumentsHelpers from './DocumentsHelpers';
 
@@ -91,18 +91,22 @@ class GraphHelpers extends ETLHelpers
     // 2: split the left edge using the merge node
     // 3: connect the right edge to the merge node
     const proxy = this._templateProxy();
-    proxy.addMerge(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
     const leftEdgeId = this._template.findEdges((edge) => edge.from === leftId).first();
     const rightEdgeId = this._template.findEdges((edge) => edge.from === rightId).first();
+
     const destinationNodeId = this._template.getEdge(leftEdgeId).to;
 
-    // const leftNode = this._template.getNode(leftId);
-    // const rightNode = this._template.getNode(rightId);
     const mergeNodeId = proxy.addMerge(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
     proxy.setEdgeTo(leftEdgeId, mergeNodeId);
     proxy.setEdgeTo(rightEdgeId, mergeNodeId);
 
-    proxy.addEdge(mergeNodeId, destinationNodeId);
+    const newEdgeId = proxy.addEdge(mergeNodeId, destinationNodeId);
+    const newEngine = mergeJoinEngines(
+      this._template.getTransformationEngine(leftEdgeId),
+      this._template.getTransformationEngine(rightEdgeId),
+      outputKey,
+    );
+    proxy.setEdgeTransformations(newEdgeId, newEngine);
   }
 
   public createEngineForEdge(edgeId: number)
@@ -120,6 +124,7 @@ class GraphHelpers extends ETLHelpers
         proxy.setEdgeTransformations(edgeId, engine);
       }).catch(this._logError);
     }
+    // todo do it for other node types
   }
 
   public updateSources(newSources: SourcesMap)
