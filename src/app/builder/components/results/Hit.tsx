@@ -103,6 +103,7 @@ export interface Props
   hideNested?: boolean;
   hideFieldNames?: boolean;
   firstVisibleField?: number;
+  isVisible?: boolean;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -171,6 +172,12 @@ class HitComponent extends TerrainComponent<Props> {
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
+    // Never update the component if it's not visible - this might cause issues 
+    // with changing size
+    if (!nextProps.isVisible && nextProps.hitSize === this.props.hitSize)
+    {
+      return false;
+    }
     for (const key in nextProps)
     {
       if (nextProps.hasOwnProperty(key))

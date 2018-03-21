@@ -110,7 +110,8 @@ interface State
   expanded?: boolean;
   expandedHitIndex?: number;
 
-  hitsPages: number;
+  hitsPages: number[];
+  pageBreaks: List<number>;
   onHitsLoaded?: (unchanged?: boolean) => void;
 
   showingExport?: boolean;
@@ -135,7 +136,7 @@ class HitsArea extends TerrainComponent<Props>
     expandedHitIndex: null,
     showingConfig: false,
     showingExport: false,
-    hitsPages: 1,
+    hitsPages: [0],
     hitFormat: 'icon',
     mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
@@ -145,6 +146,7 @@ class HitsArea extends TerrainComponent<Props>
     indexName: '',
     resultsConfig: undefined,
     nestedFields: List([]),
+    pageBreaks: List([0]),
   };
 
   public hitsFodderRange = _.range(0, 25);
@@ -366,22 +368,23 @@ class HitsArea extends TerrainComponent<Props>
           hitSize={'large'}
           nestedFields={this.state.nestedFields}
           builder={this.props.builder}
+          isVisible={true}
         />
       </div>
     );
   }
 
-  public handleRequestMoreHits()
-  {
-    const { hitsPages } = this.state;
+  // public handleRequestMoreHits()
+  // {
+  //   const { hitsPages } = this.state;
 
-    if (hitsPages * HITS_PAGE_SIZE < MAX_HITS)
-    {
-      this.setState({
-        hitsPages: hitsPages + 1,
-      });
-    }
-  }
+  //   if (hitsPages * HITS_PAGE_SIZE < MAX_HITS)
+  //   {
+  //     this.setState({
+  //       hitsPages: hitsPages + 1,
+  //     });
+  //   }
+  // }
 
   public componentDidUpdate()
   {
@@ -696,19 +699,20 @@ class HitsArea extends TerrainComponent<Props>
       }
       catch (e)
       { }
+      const lastPage = this.state.hitsPages[this.state.hitsPages.length - 1];
       hitsContent = (
         <div
           className={classNames({
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
-          onScroll={this.checkIfBottom}
+          onScroll={this.checkScroll}
           id='hits-area'
         >
           {
             hits.map((hit, index) =>
             {
-              if (index > this.state.hitsPages * HITS_PAGE_SIZE)
+              if (!(index < lastPage * HITS_PAGE_SIZE + HITS_PAGE_SIZE))
               {
                 return null;
               }
@@ -728,6 +732,7 @@ class HitsArea extends TerrainComponent<Props>
                   hitSize={this.state.hitSize}
                   nestedFields={this.state.nestedFields}
                   builder={this.props.builder}
+                  isVisible={this.isVisible(index)}
                 />
               );
             })
@@ -757,12 +762,43 @@ class HitsArea extends TerrainComponent<Props>
     );
   }
 
-  public checkIfBottom(e)
+  public isVisible(index)
+  {
+    const { hitsPages } = this.state;
+    const firstPage = hitsPages[0];
+    const lastPage = hitsPages[hitsPages.length - 1];
+    return index >= firstPage * HITS_PAGE_SIZE &&
+           index < lastPage * HITS_PAGE_SIZE + HITS_PAGE_SIZE;
+  }
+  public scrollTop = 0;
+  public checkScroll(e)
   {
     const elem = $(e.currentTarget);
+    // scrolled to the bottom, increment visible pages and set the new "top"
+    const scrollUp = this.scrollTop > elem.scrollTop();
+    this.scrollTop = elem.scrollTop();
     if (elem[0].scrollHeight - elem.scrollTop() === elem.outerHeight())
     {
-      this.handleRequestMoreHits();
+      const lastPage = this.state.hitsPages[this.state.hitsPages.length - 1];
+      if (lastPage * HITS_PAGE_SIZE < MAX_HITS)
+      {
+        this.setState({
+          hitsPages: [lastPage, lastPage + 1],
+          pageBreaks: this.state.pageBreaks.set(lastPage + 1, elem.scrollTop()),
+        });
+      }
+    }
+    // If it has scrolled up to "top", decrement visible pages
+    else if (
+      scrollUp && 
+      this.state.pageBreaks.get(this.state.hitsPages[0]) <= elem.scrollTop() &&
+      this.state.hitsPages.indexOf(0) === -1
+    )
+    {
+      const firstPage = this.state.hitsPages[0];
+      this.setState({
+        hitsPages: [firstPage - 1, firstPage],
+      });
     }
   }
 
@@ -926,8 +962,12 @@ column if you have customized the results view.');
 
   public toggleHitSize()
   {
+    // Need to scroll this to the top to avoid weird bugs with infinite scroller
+    document.getElementById('hits-area').scrollTop = 0;
     this.setState({
       hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
+      hitsPages: [0],
+      pageBreaks: List([0]),
     });
   }
 
@@ -1045,6 +1085,8 @@ column if you have customized the results view.');
 
   public render()
   {
+    console.log('VISIBLE PAGES ARE ', this.state.hitsPages);
+    console.log('PAGE BREAKS ARE ', this.state.pageBreaks.toJS());
     return (
       <div
         className={classNames({
