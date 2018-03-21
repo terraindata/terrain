@@ -82,7 +82,7 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const HITS_PAGE_SIZE = 20;
+const HITS_PAGE_SIZE = 15;
 
 export interface Props
 {
@@ -768,7 +768,7 @@ class HitsArea extends TerrainComponent<Props>
     const firstPage = hitsPages[0];
     const lastPage = hitsPages[hitsPages.length - 1];
     return index >= firstPage * HITS_PAGE_SIZE &&
-           index < lastPage * HITS_PAGE_SIZE + HITS_PAGE_SIZE;
+      index < lastPage * HITS_PAGE_SIZE + HITS_PAGE_SIZE;
   }
   public checkScroll(e)
   {
