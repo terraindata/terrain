@@ -59,7 +59,7 @@ import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser } from './../../../../shared/etl/CSVTypeParser';
 import SharedUtil from './../../../../shared/Util';
-import { ParseCSVConfig } from './../../../../shared/Util/CSV';
+import { ParseCSVConfig } from './../../../../shared/util/CSV';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
