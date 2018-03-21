@@ -62,7 +62,7 @@ import Initializers from 'etl/helpers/TemplateInitializers';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _ETLTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';

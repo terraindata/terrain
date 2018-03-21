@@ -63,6 +63,11 @@ import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { fetchDocumentsFromAlgorithm, fetchDocumentsFromFile } from 'etl/templates/DocumentRetrievalUtil';
+import
+{
+  _ETLEdge, _ETLNode, _ETLProcess,
+  _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
+} from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -71,142 +76,161 @@ import
   _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
-  ETLTemplate,
   FieldMap,
   TemplateEditorState,
-} from 'etl/templates/TemplateTypes';
-import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+} from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import Ajax from 'util/Ajax';
 
 class DocumentsHelpers extends ETLHelpers
 {
-
-  public computeMergedDocuments()
+  public mergeDocuments(nodeId: number, joinOptions: MergeJoinOptions): List<object>
   {
-    const mergeDocuments = this.templateEditor.uiState.mergeDocuments;
-    // placeholder TODO
-    const merged = mergeDocuments.get('_default', List([]));
+    const template = this._template;
+    const { leftId, rightId, leftJoinKey, rightJoinKey, outputKey } = joinOptions;
 
-    this.editorAct({
-      actionType: 'setDisplayState',
-      state: {
-        documents: merged,
-      },
+    const inboundEdges = template.findEdges((edge) => edge.to === nodeId);
+    const leftEdge = inboundEdges.find((id) => template.getEdge(id).from === leftId);
+    const rightEdge = inboundEdges.find((id) => template.getEdge(id).from === rightId);
+
+    const leftDocuments = this.getDocumentsForNode(leftId);
+    const rightDocuments = this.getDocumentsForNode(rightId);
+
+    const leftTE = template.getTransformationEngine(leftEdge);
+    const rightTE = template.getTransformationEngine(rightEdge);
+
+    const mergeDocuments: List<object> = leftDocuments.map((document: object) =>
+    {
+      const leftDocument = leftTE.transform(document);
+      const innerDocs = rightDocuments.slice(0, 3).map((innerDoc) => rightTE.transform(innerDoc)).toArray();
+      leftDocument[outputKey] = innerDocs;
+      return leftDocument;
+    }).toList();
+
+    return mergeDocuments;
+  }
+
+  public getDocumentsForNode(nodeId: number)
+  {
+    const template = this._template;
+    const node = template.getNode(nodeId);
+    switch (node.type)
+    {
+      case NodeTypes.Source: {
+        return this._templateEditor.getSourceDocuments(node.endpoint);
+      }
+      case NodeTypes.Sink: {
+        throw new Error(`Cannot Get Documents For a Sink`);
+      }
+      case NodeTypes.MergeJoin: {
+        return this.mergeDocuments(nodeId, node.options as MergeJoinOptions);
+      }
+      default: {
+        this._logError(`Unrecognized or unsupported node type: ${node.type}`);
+      }
+    }
+  }
+
+  public computeDocuments()
+  {
+    try
+    {
+      const template = this._template;
+      const currentEdge = this._templateEditor.getCurrentEdgeId();
+      const edge = template.getEdge(currentEdge);
+
+      if (edge !== undefined)
+      {
+        const documents = this.getDocumentsForNode(edge.from);
+        this.editorAct({
+          actionType: 'setDisplayState',
+          state: {
+            documents,
+          },
+        });
+      }
+    }
+    catch (e)
+    {
+      this._logError(e);
+    }
+  }
+
+  // fetches documents for provided source keys
+  public fetchSources(keys: List<string>)
+  {
+    const sources = this._templateEditor.template.getSources();
+    keys.forEach((key) =>
+    {
+      const source = sources.get(key);
+      this.fetchDocuments(source, key).catch(this._logError);
     });
   }
 
   public fetchDocuments(
     source: SourceConfig,
     key: string,
-    onLoad?: (docs: List<object>) => void,
-    onError?: (ev: string | MidwayError) => void,
-  )
+  ): Promise<List<object>>
   {
-    // // TODO DELET THIS TESTING
-    // try {
-    //   const documents = List([
-    //     {
-    //       "named field": 'foon',
-    //       "deepArray":
-    //       [
-    //         [
-    //           5
-    //         ]
-    //       ],
-    //       'nested array': [
-    //         {
-    //           'name': 'blah',
-    //           'other name': 'blooh',
-    //         },
-    //         {
-    //           'name': 'xD',
-    //           'other name': 'hmm',
-    //         }
-    //       ]
-    //     }
-    //   ]);
+    return new Promise<List<object>>((resolve, reject) =>
+    {
+      const onFetchLoad = (documents: List<object>) =>
+      {
+        this.onLoadDocuments(documents, key);
+        resolve(documents);
+      };
+      const catchError = (ev) =>
+      {
+        this.onFetchDocumentsError(ev, key);
+      };
 
-    //   onLoad(documents);
-    //   this.onLoadDocuments(documents, key);
-    //   if (1 === 1)
-    //   {
-    //     return;
-    //   }
-    // }
-    // catch(e)
-    // {
-    //   console.error(e);
-    //   return;
-    // }
-    // // delet this
-
-    const onFetchLoad = (documents: List<object>) =>
-    {
-      this.onLoadDocuments(documents, key);
-      if (onLoad != null)
+      try
       {
-        onLoad(documents);
-      }
-    };
-    const defaultError = (ev) =>
-    {
-      this.onDocumentsError(ev);
-      if (onError != null)
-      {
-        onError(ev);
-      }
-    };
-    try
-    {
-      this.updateStateBeforeFetch();
-      switch (source.type)
-      {
-        case Sources.Algorithm: {
-          const options: SourceOptionsType<Sources.Algorithm> = source.options as any;
-          const algorithmId = options.algorithmId;
-          const onLoadAlgorithm = (algorithm: Algorithm) =>
-          {
-            if (algorithm == null)
+        this.updateStateBeforeFetch();
+        switch (source.type)
+        {
+          case Sources.Algorithm: {
+            const options: SourceOptionsType<Sources.Algorithm> = source.options as any;
+            const algorithmId = options.algorithmId;
+            const onLoadAlgorithm = (algorithm: Algorithm) =>
             {
-              defaultError('Could not find algorithm');
-              return;
-            }
-            fetchDocumentsFromAlgorithm(algorithm, DefaultDocumentLimit)
-              .then(onFetchLoad).catch(defaultError);
-          };
-          Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
-          break;
-        }
-        case Sources.Upload: {
-          const file = source.options['file'];
-          if (file == null)
-          {
-            defaultError('File not provided');
-            return;
+              if (algorithm == null)
+              {
+                return catchError('Could not find algorithm');
+              }
+              fetchDocumentsFromAlgorithm(algorithm, DefaultDocumentLimit)
+                .then(onFetchLoad)
+                .catch(catchError);
+            };
+            Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
+            break;
           }
-          const config = source.fileConfig;
-          fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
-            .then(onFetchLoad).catch(defaultError);
-          break;
-        }
-        default: {
-          if (onError != null)
-          {
-            defaultError('Failed to retrieve documents. Unknown source type');
+          case Sources.Upload: {
+            const file = source.options['file'];
+            if (file == null)
+            {
+              return catchError('File not provided');
+            }
+            const config = source.fileConfig;
+            fetchDocumentsFromFile(file, config, DefaultDocumentLimit)
+              .then(onFetchLoad)
+              .catch(catchError);
+            break;
+          }
+          default: {
+            return catchError(`Failed to retrieve documents. Unsupported source type: ${source.type}`);
           }
         }
       }
-    }
-    catch (e)
-    {
-      // tslint:disable-next-line
-      console.error(`An unexpected Error Occurred: ${String(e)}`);
-      defaultError(e);
-    }
+      catch (e)
+      {
+        return catchError(e);
+      }
+    });
   }
 
   protected onLoadDocuments(documents: List<object>, key: string)
@@ -219,11 +243,10 @@ class DocumentsHelpers extends ETLHelpers
     this.updateStateAfterFetch();
   }
 
-  protected onDocumentsError(ev: string | MidwayError)
+  protected onFetchDocumentsError(ev: string | MidwayError, key: string)
   {
     // tslint:disable-next-line
-    console.error(ev);
-    // TODO add a modal message?
+    console.error(`error fetching ${key}: ${ev}`)
     this.updateStateAfterFetch();
   }
 
@@ -233,9 +256,9 @@ class DocumentsHelpers extends ETLHelpers
       actionType: 'changeLoadingDocuments',
       increment: false,
     });
-    if (this.templateEditor.loadingDocuments <= 0)
+    if (this._templateEditor.loadingDocuments <= 0)
     {
-      this.computeMergedDocuments();
+      this.computeDocuments();
     }
   }
 

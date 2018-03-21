@@ -54,13 +54,6 @@ import
   TemplateField,
 } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import
-{
-  _TemplateEditorState,
-  EditorDisplayState,
-  ETLTemplate,
-  TemplateEditorState,
-} from 'etl/templates/TemplateTypes';
 import { Algorithm } from 'library/LibraryTypes';
 import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
 import { MidwayError } from 'shared/error/MidwayError';

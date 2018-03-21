@@ -42,89 +42,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
+// Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import UserConfig from '../users/UserConfig';
+import StatusHistoryConfig from './StatusHistoryConfig';
 
-import { TemplateField } from 'etl/templates/FieldTypes';
-import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
-import { FieldMap } from 'etl/templates/TemplateTypes';
-import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-
-import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions } from 'etl/templates/ETLProcess';
-import { NodeTypes } from 'shared/etl/types/ETLTypes';
-
-export type Mutator<T> = (newItem: T) => void;
-
-export class ProcessProxy
+export class StatusHistory
 {
-  constructor(private process: ETLProcess, private mutate: Mutator<ETLProcess> = doNothing)
-  {
+  private statusHistoryTable: Tasty.Table;
 
+  constructor()
+  {
+    this.statusHistoryTable = new Tasty.Table(
+      'statusHistory',
+      ['id'],
+      [
+        'createdAt',
+        'userId',
+        'algorithmId',
+        'fromStatus',
+        'toStatus',
+      ],
+    );
   }
 
-  public getProcess()
+  public async create(user: UserConfig, id: number, obj: object, newStatus: string): Promise<StatusHistoryConfig>
   {
-    return this.process;
-  }
-
-  public addNode(node: ETLNode)
-  {
-    const id = this.process.uidNode;
-    this.process = this.process
-      .setIn(['nodes', id], node)
-      .set('uidNode', id + 1);
-    this.sync();
-    return id;
-  }
-
-  // adds an edge to the process. returns -1 if the edge is invalid
-  public addEdge(edge: ETLEdge)
-  {
-    if (!this.verifyEdge(edge))
+    if (user.id === undefined)
     {
-      return -1;
+      throw new Error('User ID unknown');
     }
-    const id = this.process.uidEdge;
-    this.process = this.process
-      .setIn(['edges', id], edge)
-      .set('uidEdge', id + 1);
-    this.sync();
-    return id;
-  }
-
-  public verifyEdge(edge: ETLEdge): boolean
-  {
-    const { from, to } = edge;
-    if (!this.process.nodes.hasIn([from]) || !this.process.nodes.hasIn([to]))
-    {
-      return false;
-    }
-    if (from === to)
-    {
-      return false;
-    }
-    if (this.process.nodes.get(from).type === NodeTypes.Sink)
-    {
-      return false;
-    }
-    if (this.process.nodes.get(to).type === NodeTypes.Source)
-    {
-      return false;
-    }
-    return true;
-  }
-
-  private sync()
-  {
-    this.mutate(this.process);
+    // can only insert
+    const newVersion: StatusHistoryConfig =
+      {
+        userId: user.id,
+        algorithmId: id,
+        fromStatus: obj['status'],
+        toStatus: newStatus,
+      };
+    return App.DB.upsert(this.statusHistoryTable, newVersion) as Promise<StatusHistoryConfig>;
   }
 }
 
-const doNothing = () => null;
+export default StatusHistory;

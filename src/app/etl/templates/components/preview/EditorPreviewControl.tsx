@@ -54,7 +54,7 @@ import Util from 'util/Util';
 
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
 import './EditorPreviewControl.less';
 const { List } = Immutable;
@@ -72,7 +72,9 @@ class EditorPreviewControl extends TerrainComponent<Props>
 {
   public render()
   {
-    const { documents, previewIndex } = this.props.templateEditor.uiState;
+    const { templateEditor } = this.props;
+    const { previewIndex } = templateEditor.uiState;
+    const documents = templateEditor.getPreviewDocuments();
     const indexSelectorText = documents.size > 0 ?
       `${previewIndex + 1} of ${documents.size}` :
       'no preview available';
@@ -108,7 +110,10 @@ class EditorPreviewControl extends TerrainComponent<Props>
 
   public handleDecrementDocument()
   {
-    const { documents, previewIndex } = this.props.templateEditor.uiState;
+    const { templateEditor } = this.props;
+    const { previewIndex } = templateEditor.uiState;
+    const documents = templateEditor.getPreviewDocuments();
+
     if (previewIndex > 0)
     {
       this.props.act({
@@ -125,7 +130,10 @@ class EditorPreviewControl extends TerrainComponent<Props>
 
   public handleIncrementDocument()
   {
-    const { documents, previewIndex } = this.props.templateEditor.uiState;
+    const { templateEditor } = this.props;
+    const { previewIndex } = templateEditor.uiState;
+    const documents = templateEditor.getPreviewDocuments();
+
     if (previewIndex + 1 < documents.size)
     {
       this.props.act({

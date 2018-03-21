@@ -43,67 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing max-classes-per-file
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
-import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { instanceFnDecorator } from 'src/app/Classes';
+import ConfigType from '../ConfigType';
 
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
-
-import EndpointSection from 'etl/templates/components/endpoints/EndpointSection';
-import EdgeSection from 'etl/templates/components/graph/EdgeSection';
-
-import './OptionsColumn.less';
-const { List, Map } = Immutable;
-
-export class EndpointsColumn extends TerrainComponent<{}>
+export class StatusHistoryConfig extends ConfigType
 {
-  public render()
+  public createdAt?: string = undefined;
+  public userId: number = -1;
+  public id?: number = undefined;
+  public algorithmId: number = -1;
+  public fromStatus: string = '';
+  public toStatus: string = '';
+
+  constructor(props: object)
   {
-    return (
-      <div
-        className='template-editor-options-column'
-        style={columnStyle}
-      >
-        <div className='options-column-content'>
-          <EndpointSection isSource={true} />
-          <EndpointSection isSource={false} />
-        </div>
-      </div>
-    );
+    super();
+    ConfigType.initialize(this, props);
   }
 }
 
-export class StepsColumn extends TerrainComponent<{}>
-{
-  public render()
-  {
-    return (
-      <div
-        className='template-editor-options-column'
-        style={columnStyle}
-      >
-        <div className='options-column-content'>
-          <EdgeSection />
-        </div>
-      </div>
-    );
-  }
-}
-
-const columnStyle = _.extend({},
-  backgroundColor(Colors().bg3),
-  getStyle('boxShadow', `1px 1px 5px ${Colors().boxShadow}`),
-);
+export default StatusHistoryConfig;

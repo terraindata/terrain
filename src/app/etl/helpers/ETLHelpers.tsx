@@ -63,37 +63,49 @@ import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { FieldMap } from 'etl/templates/TemplateTypes';
-import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import
+{
+  DefaultDocumentLimit,
+  EditorDisplayState,
+  FieldMap,
+  TemplateEditorState,
+} from 'etl/templates/TemplateEditorTypes';
+import { TemplateProxy } from 'etl/templates/TemplateProxy';
+import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
+import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
 
 export default abstract class ETLHelpers
 {
   protected editorAct: typeof TemplateEditorActions;
   protected etlAct: typeof ETLActions;
 
-  get state(): Immutable.Map<string, any>
+  protected get _state(): Immutable.Map<string, any>
   {
     return TerrainStore.getState() as any;
   }
 
-  get templateEditor(): TemplateEditorState
+  protected get _template(): ETLTemplate
   {
-    return this.state.get('templateEditor');
+    return this._templateEditor.get('template');
   }
 
-  get etl(): ETLState
+  protected get _templateEditor(): TemplateEditorState
   {
-    return this.state.get('etl');
+    return this._state.get('templateEditor');
   }
 
-  get walkthrough(): WalkthroughState
+  protected get _etl(): ETLState
   {
-    return this.state.get('walkthrough');
+    return this._state.get('etl');
+  }
+
+  protected get _walkthrough(): WalkthroughState
+  {
+    return this._state.get('walkthrough');
   }
 
   constructor(protected store)
@@ -106,9 +118,23 @@ export default abstract class ETLHelpers
     {
       this.store.dispatch(ETLActions(action));
     };
+    this.templateGetter = this.templateGetter.bind(this);
+    this.templateSetter = this.templateSetter.bind(this);
   }
 
-  protected grabOne<T>(resolve, reject)
+  protected _templateProxy(cache = false)
+  {
+    if (cache)
+    {
+      return this._template.proxy();
+    }
+    else
+    {
+      return new TemplateProxy(this.templateGetter, this.templateSetter);
+    }
+  }
+
+  protected _grabOne<T>(resolve, reject)
   {
     return (response: List<T>) =>
     {
@@ -123,16 +149,42 @@ export default abstract class ETLHelpers
     };
   }
 
-  protected getTemplate(templateId: number): Promise<ETLTemplate>
+  protected _getTemplate(templateId: number): Promise<ETLTemplate>
   {
     return new Promise<ETLTemplate>((resolve, reject) =>
     {
       this.etlAct({
         actionType: 'getTemplate',
         id: templateId,
-        onLoad: this.grabOne(resolve, reject),
+        onLoad: this._grabOne(resolve, reject),
         onError: reject,
       });
     });
+  }
+
+  protected _logError(ev)
+  {
+    // tslint:disable-next-line
+    console.error(ev);
+  }
+
+  private templateSetter(template: ETLTemplate)
+  {
+    this.editorAct({
+      actionType: 'setTemplate',
+      template,
+    });
+    if (!this._templateEditor.isDirty)
+    {
+      this.editorAct({
+        actionType: 'setIsDirty',
+        isDirty: true,
+      });
+    }
+  }
+
+  private templateGetter()
+  {
+    return this._template;
   }
 }

@@ -62,7 +62,7 @@ import FadeInOut from 'common/components/FadeInOut';
 import ExpandableView from 'common/components/ExpandableView';
 import EditorFieldNode from 'etl/templates/components/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import EditorFieldPreview from './EditorFieldPreview';
@@ -118,7 +118,7 @@ class RootFieldNode extends TerrainComponent<Props>
           canEdit={true}
           preview={childPreview}
           displayKeyPath={emptyList}
-          key={childField.fieldId}
+          key={`${templateEditor.getCurrentEdgeId()}-${childField.fieldId}`}
         />
       );
     }).toList();

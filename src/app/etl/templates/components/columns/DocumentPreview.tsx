@@ -55,7 +55,7 @@ import Util from 'util/Util';
 
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
 import './DocumentsPreviewColumn.less';
 const { List } = Immutable;
@@ -94,7 +94,9 @@ class DocumentPreview extends TerrainComponent<Props>
   public getDocument()
   {
     const { index, templateEditor } = this.props;
-    const { previewIndex, documents, engineVersion } = templateEditor.uiState;
+    const { previewIndex, engineVersion } = templateEditor.uiState;
+    const documents = templateEditor.getPreviewDocuments();
+
     const previewDocument = index < documents.size && documents.size > 0 ? documents.get(index) : null;
     return this.transformDocument(previewDocument, templateEditor.getCurrentEngine(), engineVersion);
   }

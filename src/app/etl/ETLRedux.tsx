@@ -54,7 +54,7 @@ import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 's
 import ETLAjax from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
 
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _ETLState, ETLState } from './ETLTypes';
 
 import { FileTypes } from 'shared/etl/types/ETLTypes';

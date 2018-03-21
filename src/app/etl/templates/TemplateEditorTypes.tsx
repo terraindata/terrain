@@ -54,72 +54,74 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import
-{
-  ETLEdge as ETLEdgeI,
-  ETLNode as ETLNodeI,
-  ETLProcess as ETLProcessI,
-  Languages,
-  MergeJoinOptions as MergeJoinOptionsI,
-  NodeTypes,
-  TemplateBase,
-  TemplateObject,
-} from 'shared/etl/types/ETLTypes';
+import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-class ETLProcessC implements ETLProcessI
+export type FieldMap = Immutable.Map<number, TemplateField>;
+
+class TemplateEditorStateC
 {
-  public readonly nodes: Immutable.Map<number, ETLNode> = Map();
-  public readonly edges: Immutable.Map<number, ETLEdge> = Map();
-  public readonly uidNode: number = 0;
-  public readonly uidEdge: number = 0;
-}
-export type ETLProcess = WithIRecord<ETLProcessC>;
-export const _ETLProcess = makeExtendedConstructor(ETLProcessC, true, {
-  nodes: (nodes) =>
+  public template: ETLTemplate = _ETLTemplate();
+  public fieldMap: FieldMap = Map();
+  public isDirty: boolean = true;
+  public loadingDocuments: number = 0;
+  public uiState: EditorDisplayState = _EditorDisplayState();
+
+  public getPreviewDocuments()
   {
-    return Map(nodes).mapEntries<number, ETLNode>(
-      ([key, obj]) => [Number(key), _ETLNode(obj, true)],
-    ).toMap();
-  },
-  edges: (edges) =>
+    return this.uiState.documents;
+  }
+
+  public getCurrentEngine(): TransformationEngine
   {
-    return Map(edges).mapEntries<number, ETLEdge>(
-      ([key, obj]) => [Number(key), _ETLEdge(obj, true)],
-    ).toMap();
-  },
-});
+    const currentEdge = this.getCurrentEdgeId();
+    return this.template.getTransformationEngine(currentEdge);
+  }
 
-class ETLEdgeC implements ETLEdgeI
-{
-  public from: number = -1;
-  public to: number = -1;
-  public transformations: TransformationEngine = new TransformationEngine();
-}
-export type ETLEdge = WithIRecord<ETLEdgeC>;
-export const _ETLEdge = makeExtendedConstructor(ETLEdgeC, true, {
-  transformations: TransformationEngine.load,
-});
+  public getCurrentEdgeId()
+  {
+    return this.uiState.currentEdge;
+  }
 
-class MergeJoinOptionsC implements MergeJoinOptionsI
-{
-  public leftId: number = -1;
-  public rightId: number = -1;
-  public leftJoinKey: string = '';
-  public rightJoinKey: string = '';
-  public outputKey: string = '';
+  public getSourceDocuments(id: string): List<object>
+  {
+    return this.uiState.mergeDocuments.get(id, List([]));
+  }
 }
-export type MergeJoinOptions = WithIRecord<MergeJoinOptionsC>;
-export const _MergeJoinOptions = makeExtendedConstructor(MergeJoinOptionsC);
+export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
+export const _TemplateEditorState = makeExtendedConstructor(TemplateEditorStateC, true);
 
-class ETLNodeC implements ETLNodeI
+export enum ColumnOptions
 {
-  public type: NodeTypes = NodeTypes.MergeJoin;
-  public options: MergeJoinOptions = _MergeJoinOptions();
-  public endpoint: string = '_default'; // if source or sink, which one is it?
+  Preview = 'Preview',
+  Endpoints = 'Endpoints',
+  Steps = 'Steps',
 }
-export type ETLNode = WithIRecord<ETLNodeC>;
-export const _ETLNode = makeExtendedConstructor(ETLNodeC, true, {
-  options: _MergeJoinOptions,
-});
+
+export const columnOptions = List([
+  ColumnOptions.Preview,
+  ColumnOptions.Endpoints,
+  ColumnOptions.Steps,
+]);
+
+class EditorDisplayStateC
+{
+  public documents: List<object> = List([]);
+  public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
+  public modalRequests: List<ModalProps> = List([]);
+  public previewIndex: number = 0;
+  public settingsFieldId: number = null;
+  public settingsDisplayKeyPath: KeyPath = null;
+  public currentEdge: number = -1;
+  public engineVersion: number = 0;
+  public columnState: ColumnOptions = ColumnOptions.Endpoints;
+  public moveFieldId: number = null;
+  public addFieldId: number = null;
+  public mergeIntoEdgeId: number = null;
+}
+export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
+export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
+
+export const DefaultDocumentLimit = 10;

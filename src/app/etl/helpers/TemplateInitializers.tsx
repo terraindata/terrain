@@ -56,6 +56,7 @@ import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
 
 import ETLHelpers from './ETLHelpers';
+import GraphHelpers from './GraphHelpers';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
@@ -65,93 +66,43 @@ import { _ETLEdge, _ETLNode, _ETLProcess, ETLEdge, ETLNode, ETLProcess, MergeJoi
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _ETLTemplate, _TemplateEditorState, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import { FieldMap } from 'etl/templates/TemplateTypes';
+import { FieldMap } from 'etl/templates/TemplateEditorTypes';
+import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createMergedEngine } from 'shared/transformations/util/EngineUtil';
+import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
 
 import DocumentsHelpers from './DocumentsHelpers';
 
 class Initializers extends ETLHelpers
 {
-  // TODO for easy testing. get rid of this before release
-  public initFromDebug()
-  {
-    // const documents = List([
-    //   {
-    //     rf1: 'hi',
-    //     rf2: 'yo',
-    //     arr: [1, 2, 3],
-    //     nestedField: {
-    //       nested1: 1,
-    //       nested2: true,
-    //     },
-    //     arrObj: [
-    //       { foo: 'hi' },
-    //       { foo: 5 },
-    //     ],
-    //   },
-    // ]);
-
-    // const document2 = {
-    //   rf1: 'hi',
-    //   rf2: 'yo',
-    // }
-
-    // const debug = (oldMapping) => {
-    //   const e = this.templateEditor.getCurrentEngine();
-    //   const mapping = new ElasticMapping(e);
-    //   console.log(ElasticMapping.compareMapping(mapping.getMapping(), oldMapping));
-    // };
-
-    // const FT = new FieldTypes();
-    // FT.getFullTypeFromDocument(document2).then((value) =>
-    // {
-    //   FT.getESMappingFromDocument(value).then((mapping) =>
-    //   {
-    //     debug(mapping);
-    //   });
-    // });
-    // const onLoad = this.createInitialTemplateFn();
-    // onLoad(documents);
-  }
-
   public loadExistingTemplate(templateId: number)
   {
-    const onLoad = (template: ETLTemplate) =>
-    {
-      this.editorAct({
-        actionType: 'resetState',
-      });
-      this.editorAct({
-        actionType: 'setTemplate',
-        template,
-      });
-      this.editorAct({ // todo find the last edge
-        actionType: 'setCurrentEdge',
-        edge: 0,
-        rebuild: true,
-      });
-      this.editorAct({
-        actionType: 'setIsDirty',
-        isDirty: false,
-      });
-
-      template.sources.map((source, key) =>
+    this._getTemplate(templateId)
+      .then((template: ETLTemplate) =>
       {
-        DocumentsHelpers.fetchDocuments(source, key);
-      });
-      ETLRouteUtil.gotoEditTemplate(template.id);
-    };
-    const onError = (response) =>
-    {
-      // TODO
-    };
-
-    this.getTemplate(templateId).then(onLoad).catch(onError);
+        this.editorAct({
+          actionType: 'resetState',
+        });
+        this.editorAct({
+          actionType: 'setTemplate',
+          template,
+        });
+        const edge = template.getLastEdgeId();
+        this.editorAct({ // todo find the last edge
+          actionType: 'setCurrentEdge',
+          edge,
+        });
+        this.editorAct({
+          actionType: 'setIsDirty',
+          isDirty: false,
+        });
+        DocumentsHelpers.fetchSources(template.getSources().keySeq().toList());
+        ETLRouteUtil.gotoEditTemplate(template.id);
+      })
+      .catch(this._logError);
   }
 
   public initNewFromAlgorithm(algorithmId: number)
@@ -165,17 +116,19 @@ class Initializers extends ETLHelpers
         algorithmId,
       },
     });
-    const onLoad = this.createInitialTemplateFn(source);
-    DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
+    DocumentsHelpers.fetchDocuments(source, '_default')
+      .then(this.createInitialTemplateFn(source))
+      .catch(this._logError);
   }
 
-  public initNewFromWalkthrough(walkthrough: WalkthroughState = this.walkthrough)
+  public initNewFromWalkthrough(walkthrough: WalkthroughState = this._walkthrough)
   {
     const source = walkthrough.source;
     const sink = walkthrough.sink;
-    const onLoad = this.createInitialTemplateFn(source, sink);
     const file = walkthrough.getFile();
-    DocumentsHelpers.fetchDocuments(source, '_default', onLoad);
+    DocumentsHelpers.fetchDocuments(source, '_default')
+      .then(this.createInitialTemplateFn(source, sink))
+      .catch(this._logError);
   }
 
   private createInitialTemplateFn(
@@ -185,17 +138,10 @@ class Initializers extends ETLHelpers
   {
     return (hits) =>
     {
-      const { template, fieldMap, initialEdge } = createInitialTemplate(hits, source, sink);
-      if (initialEdge !== -1)
+      const { template, fieldMap, initialEdge } = this.createInitialTemplate(hits, source, sink);
+      if (initialEdge === -1)
       {
-        this.editorAct({
-          actionType: 'setCurrentEdge',
-          edge: initialEdge,
-        });
-      }
-      else
-      {
-        // TODO error
+        throw new Error('Failed to create initial edge');
       }
       this.editorAct({
         actionType: 'setTemplate',
@@ -205,69 +151,55 @@ class Initializers extends ETLHelpers
         actionType: 'setFieldMap',
         fieldMap,
       });
+      GraphHelpers.switchEdge(initialEdge);
+    };
+  }
+
+  private createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
+    {
+      template: ETLTemplate,
+      fieldMap: FieldMap,
+      initialEdge: number,
+      warnings: string[],
+      softWarnings: string[],
+    }
+  {
+    if (documents == null || documents.size === 0)
+    {
+      return {
+        template: _ETLTemplate(),
+        fieldMap: Map(),
+        warnings: ['No documents provided for initial Template construction'],
+        softWarnings: [],
+        initialEdge: 0,
+      };
+    }
+    const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
+
+    const fieldMap = createTreeFromEngine(engine);
+
+    let template = _ETLTemplate({
+      id: -1,
+      templateName: name,
+    });
+    const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
+    const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
+    // default source and sink is upload and download
+
+    const proxy = template.proxy();
+    const sourceId = proxy.addSource('_default', sourceToAdd);
+    const sinkId = proxy.addSink('_default', sinkToAdd);
+    const initialEdge = proxy.addEdge(sourceId, sinkId, engine);
+
+    template = proxy.getTemplate();
+
+    return {
+      template,
+      fieldMap,
+      warnings,
+      softWarnings,
+      initialEdge,
     };
   }
 }
 export default new Initializers(TerrainStore);
-
-function createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
-  {
-    template: ETLTemplate,
-    fieldMap: FieldMap,
-    initialEdge: number,
-    warnings: string[],
-    softWarnings: string[],
-  }
-{
-  if (documents == null || documents.size === 0)
-  {
-    return {
-      template: _ETLTemplate(),
-      fieldMap: Map(),
-      warnings: ['No documents provided for initial Template construction'],
-      softWarnings: [],
-      initialEdge: 0,
-    };
-  }
-  const { engine, warnings, softWarnings } = createMergedEngine(documents);
-
-  const fieldMap = createTreeFromEngine(engine);
-
-  let template = _ETLTemplate({
-    id: -1,
-    templateName: name,
-  });
-  const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
-  const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
-  // default source and sink is upload and download
-
-  const proxy = template.process.proxy();
-  const defaultSink = _ETLNode({
-    type: NodeTypes.Sink,
-    endpoint: '_default',
-  });
-  const defaultSource = _ETLNode({
-    type: NodeTypes.Source,
-    endpoint: '_default',
-  });
-  const sourceId = proxy.addNode(defaultSource);
-  const sinkId = proxy.addNode(defaultSink);
-  const defaultEdge = _ETLEdge({
-    from: sourceId,
-    to: sinkId,
-    transformations: engine,
-  });
-  const initialEdge = proxy.addEdge(defaultEdge);
-
-  template = template.set('process', proxy.getProcess());
-  template = template.setIn(['sources', '_default'], sourceToAdd);
-  template = template.setIn(['sinks', '_default'], sinkToAdd);
-
-  return {
-    template,
-    fieldMap,
-    warnings,
-    softWarnings,
-    initialEdge,
-  };
-}
