@@ -142,14 +142,17 @@ class DocumentsHelpers extends ETLHelpers
       const template = this._template;
       const currentEdge = this._templateEditor.getCurrentEdgeId();
       const edge = template.getEdge(currentEdge);
-      const documents = this.getDocumentsForNode(edge.from);
 
-      this.editorAct({
-        actionType: 'setDisplayState',
-        state: {
-          documents,
-        },
-      });
+      if (edge !== undefined)
+      {
+        const documents = this.getDocumentsForNode(edge.from);
+        this.editorAct({
+          actionType: 'setDisplayState',
+          state: {
+            documents,
+          },
+        });
+      }
     }
     catch (e)
     {

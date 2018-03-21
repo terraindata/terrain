@@ -185,7 +185,6 @@ class GraphHelpers extends ETLHelpers
     this.editorAct({
       actionType: 'setCurrentEdge',
       edge: edgeId,
-      rebuild: edgeId !== this._templateEditor.getCurrentEdgeId(),
     });
     DocumentsHelpers.computeDocuments();
   }

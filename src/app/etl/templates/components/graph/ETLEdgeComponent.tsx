@@ -166,11 +166,6 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   {
     const { act, edgeId, templateEditor } = this.props;
     GraphHelpers.switchEdge(edgeId);
-    // act({
-    //   actionType: 'setCurrentEdge',
-    //   edge: edgeId,
-    //   rebuild: edgeId !== templateEditor.getCurrentEdgeId(),
-    // });
   }
 
   public openMergeUI()

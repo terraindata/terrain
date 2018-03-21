@@ -118,7 +118,7 @@ class RootFieldNode extends TerrainComponent<Props>
           canEdit={true}
           preview={childPreview}
           displayKeyPath={emptyList}
-          key={childField.fieldId}
+          key={`${templateEditor.getCurrentEdgeId()}-${childField.fieldId}`}
         />
       );
     }).toList();

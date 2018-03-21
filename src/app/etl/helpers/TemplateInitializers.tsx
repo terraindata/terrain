@@ -56,6 +56,7 @@ import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
 
 import ETLHelpers from './ETLHelpers';
+import GraphHelpers from './GraphHelpers';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
@@ -93,7 +94,6 @@ class Initializers extends ETLHelpers
         this.editorAct({ // todo find the last edge
           actionType: 'setCurrentEdge',
           edge,
-          rebuild: true,
         });
         this.editorAct({
           actionType: 'setIsDirty',
@@ -139,14 +139,7 @@ class Initializers extends ETLHelpers
     return (hits) =>
     {
       const { template, fieldMap, initialEdge } = this.createInitialTemplate(hits, source, sink);
-      if (initialEdge !== -1)
-      {
-        this.editorAct({
-          actionType: 'setCurrentEdge',
-          edge: initialEdge,
-        });
-      }
-      else
+      if (initialEdge === -1)
       {
         throw new Error('Failed to create initial edge');
       }
@@ -158,6 +151,7 @@ class Initializers extends ETLHelpers
         actionType: 'setFieldMap',
         fieldMap,
       });
+      GraphHelpers.switchEdge(initialEdge);
     };
   }
 

@@ -174,6 +174,13 @@ export default abstract class ETLHelpers
       actionType: 'setTemplate',
       template,
     });
+    if (!this._templateEditor.isDirty)
+    {
+      this.editorAct({
+        actionType: 'setIsDirty',
+        isDirty: true,
+      });
+    }
   }
 
   private templateGetter()

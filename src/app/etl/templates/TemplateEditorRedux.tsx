@@ -131,7 +131,6 @@ export interface TemplateEditorActionTypes
   setCurrentEdge: {
     actionType: 'setCurrentEdge';
     edge: number;
-    rebuild?: boolean;
   };
 }
 
@@ -226,12 +225,9 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       actionType: 'setCurrentEdge',
       edge: action.edge,
     });
-    if (action.rebuild === true)
-    {
-      directDispatch({
-        actionType: 'rebuildFieldMap',
-      });
-    }
+    directDispatch({
+      actionType: 'rebuildFieldMap',
+    });
   }
 
   public overrideAct(action: Unroll<TemplateEditorActionTypes>)
