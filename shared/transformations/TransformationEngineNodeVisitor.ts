@@ -385,9 +385,8 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           }
           break;
         }
-        // TODO int vs. float?
         case 'number': {
-          yadeep.set(doc, field, Number.parseInt(el, 10));
+          yadeep.set(doc, field, Number(el));
           break;
         }
         case 'object': {
