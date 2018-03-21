@@ -147,17 +147,21 @@ export const units =
 class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
   public debouncedExecuteChange;
+  public map;
+  public circle;
 
   public state: {
     mapExpanded: boolean,
     zoom: number;
     coordinateSearch: boolean;
     inputValue: string;
+    circleSet: boolean;
   } = {
       mapExpanded: false,
       zoom: 15,
       coordinateSearch: false,
       inputValue: this.props.inputValue,
+      circleSet: false,
     };
   public geoCache = {};
   public reverseGeoCache = {};
@@ -232,6 +236,23 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
       className: 'map-marker-container',
     });
     return styledIcon;
+  }
+
+  public componentDidUpdate(prevProps, prevState)
+  {
+    // initial update
+    if (!this.state.circleSet && this.circle && this.props.distance && this.map)
+    {
+      this.map.leafletElement.fitBounds(this.circle.leafletElement.getBounds());
+      this.setState({
+        circleSet: true,
+      });
+    }
+    else if (this.state.circleSet && this.circle && this.map &&
+      (this.props.distance !== prevProps.distance || this.props.distanceUnit !== prevProps.distanceUnit))
+    {
+      this.map.leafletElement.fitBounds(this.circle.leafletElement.getBounds());
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props & InjectedOnClickOutProps)
@@ -520,6 +541,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
           zoomControl={!this.props.hideZoomControl}
           onClick={this.handleOnMapClick}
           onMouseDown={this.handleOnMapClick}
+          ref={(map) => { this.map = map; }}
         >
           {
             this.renderMarker(inputValue, location, 'black')
@@ -534,6 +556,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
               width={7}
               fillColor={Colors().builder.cards.categories.filter}
               fillOpacity={0.2}
+              ref={(circle) => { this.circle = circle; }}
             />}
           {
             // Render addition locations (spotlights, aggregation map, etc.)
