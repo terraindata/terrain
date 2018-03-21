@@ -557,7 +557,7 @@ type ChoiceContext = {
     schemaState: SchemaState,
     builderState: BuilderState,
     subtype?: 'transform' | 'match',
-    noNested: boolean,
+    noNested?: boolean,
   } | {
     type: 'comparison',
     source: Source,
