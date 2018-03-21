@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';

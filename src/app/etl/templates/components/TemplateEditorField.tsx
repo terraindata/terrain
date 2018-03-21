@@ -62,7 +62,8 @@ import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from '
 import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { EditorDisplayState, ETLTemplate, FieldMap, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { EditorDisplayState, FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { SinkConfig, SinkOptionsType, Sinks, SourceConfig, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -193,13 +194,13 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   protected _isRootField()
   {
     const { fieldId } = this.props;
-    const kp = this._currentEngine().getOutputKeyPath(fieldId);
+    const kp = this._field().outputKeyPath;
     return kp.size === 1;
   }
 
   protected _getSinkLanguage(): Languages
   {
-    const { sinks } = this._template();
+    const sinks = this._template().getSinks();
     if (sinks.has('_default'))
     {
       const sink: SinkConfig = sinks.get('_default');

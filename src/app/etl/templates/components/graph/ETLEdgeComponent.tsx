@@ -65,10 +65,10 @@ import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
+import { ETLEdge, ETLNode } from 'etl/templates/ETLProcess';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 
@@ -101,6 +101,11 @@ class ETLEdgeComponent extends TerrainComponent<Props>
 
   public renderNode(node: ETLNode, id: number)
   {
+    if (node == null)
+    {
+      return null;
+    }
+
     const { template } = this.props.templateEditor;
     let name = '';
     if (node.type === NodeTypes.Source)
@@ -113,7 +118,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
     }
     else
     {
-      name = template.process.getNodeName(id);
+      name = template.getNodeName(id);
     }
 
     return (
@@ -135,10 +140,9 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   public render()
   {
     const { edgeId, edge, templateEditor } = this.props;
-    const { process } = templateEditor.template;
     const { from, to } = edge;
-    const fromNode = process.getNode(from);
-    const toNode = process.getNode(to);
+    const fromNode = templateEditor.template.getNode(from);
+    const toNode = templateEditor.template.getNode(to);
 
     const isActive = templateEditor.getCurrentEdgeId() === edgeId;
     const style = isActive ? edgeComponentStyleActive : edgeComponentStyle;
@@ -161,16 +165,18 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   public makeThisActive()
   {
     const { act, edgeId, templateEditor } = this.props;
-    act({
-      actionType: 'setCurrentEdge',
-      edge: edgeId,
-      rebuild: edgeId === templateEditor.getCurrentEdgeId(),
-    });
+    GraphHelpers.switchEdge(edgeId);
   }
 
   public openMergeUI()
   {
-    // TODO
+    const { act, edgeId } = this.props;
+    act({
+      actionType: 'setDisplayState',
+      state: {
+        mergeIntoEdgeId: edgeId,
+      },
+    });
   }
 }
 

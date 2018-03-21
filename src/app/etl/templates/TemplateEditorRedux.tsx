@@ -58,10 +58,11 @@ import
   _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
-  ETLTemplate,
   FieldMap,
   TemplateEditorState,
-} from 'etl/templates/TemplateTypes';
+} from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
+
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
@@ -80,14 +81,14 @@ export interface TemplateEditorActionTypes
     actionType: 'setIsDirty';
     isDirty: boolean;
   };
-  setTemplate: {
+  setTemplate: { // this should be the only way to mutate the template graph
     actionType: 'setTemplate';
     template: ETLTemplate;
   };
   rebuildFieldMap: {
     actionType: 'rebuildFieldMap';
   };
-  setFieldMap: { // this should be the only way to edit the template tree
+  setFieldMap: { // this should be the only way to mutate the template tree
     actionType: 'setFieldMap';
     fieldMap: FieldMap;
   };
@@ -124,21 +125,12 @@ export interface TemplateEditorActionTypes
   updateEngineVersion: {
     actionType: 'updateEngineVersion';
   };
-  setSinks: {
-    actionType: 'setSinks';
-    sinks: ETLTemplate['sinks'];
-  };
-  setSources: {
-    actionType: 'setSources';
-    sources: ETLTemplate['sources'];
-  };
-  resetState: { // resets the display state
+  resetState: { // resets the display state. is this prone to race conditions?
     actionType: 'resetState';
   };
   setCurrentEdge: {
     actionType: 'setCurrentEdge';
     edge: number;
-    rebuild?: boolean;
   };
 }
 
@@ -216,14 +208,6 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         return state.setIn(['uiState', 'engineVersion'], oldVersion + 1)
           .set('isDirty', true);
       },
-      setSinks: (state, action) =>
-      {
-        return state.setIn(['template', 'sinks'], action.payload.sinks).set('isDirty', true);
-      },
-      setSources: (state, action) =>
-      {
-        return state.setIn(['template', 'sources'], action.payload.sources).set('isDirty', true);
-      },
       resetState: (state, action) =>
       {
         return _TemplateEditorState();
@@ -241,12 +225,9 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       actionType: 'setCurrentEdge',
       edge: action.edge,
     });
-    if (action.rebuild === true)
-    {
-      directDispatch({
-        actionType: 'rebuildFieldMap',
-      });
-    }
+    directDispatch({
+      actionType: 'rebuildFieldMap',
+    });
   }
 
   public overrideAct(action: Unroll<TemplateEditorActionTypes>)

@@ -49,20 +49,23 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
-import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { _ETLProcess, ETLEdge, ETLProcess } from 'etl/templates/ETLProcess';
+import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { Languages, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { TemplateProxy } from './TemplateProxy';
+
+export type SourcesMap = Immutable.Map<string, SourceConfig>;
+export type SinksMap = Immutable.Map<string, SinkConfig>;
 
 interface ETLTemplateI extends TemplateBase
 {
-  sources: Immutable.Map<string, SourceConfig>;
-  sinks: Immutable.Map<string, SinkConfig>;
+  sources: SourcesMap;
+  sinks: SinksMap;
   process: ETLProcess;
 }
 
@@ -74,6 +77,21 @@ class ETLTemplateC implements ETLTemplateI
   public process = _ETLProcess();
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
+
+  public proxy()
+  {
+    return new TemplateProxy(this as any);
+  }
+
+  public getSources()
+  {
+    return this.sources;
+  }
+
+  public getSinks()
+  {
+    return this.sinks;
+  }
 
   public getSourceName(key)
   {
@@ -87,6 +105,59 @@ class ETLTemplateC implements ETLTemplateI
     const sink = this.sinks.get(key);
     const type = (sink != null && sink.type != null) ? sink.type : '';
     return `${key} (${type})`;
+  }
+
+  public getNodeName(id: number)
+  {
+    return `Merge Node ${id}`;
+  }
+
+  public getTransformationEngine(edge: number)
+  {
+    return this.process.edges.getIn([edge, 'transformations']);
+  }
+
+  public getNode(id: number)
+  {
+    return this.process.nodes.get(id);
+  }
+
+  public getEdge(id: number)
+  {
+    return this.process.edges.get(id);
+  }
+
+  public getEdges(): Immutable.Map<number, ETLEdge>
+  {
+    return this.process.edges;
+  }
+
+  public getLastEdgeId(): number
+  {
+    const edges = this.findEdges((edge) => edge.to === this.getDefaultSink());
+    return edges.size > 0 ? edges.first() : -1;
+  }
+
+  public getDefaultSink(): number
+  {
+    return this.process.nodes.findKey(
+      (node) => node.type === NodeTypes.Sink && node.endpoint === '_default',
+    );
+  }
+
+  public getMergeableNodes(): List<number>
+  {
+    return this.findNodes((node) => node.type !== NodeTypes.Sink);
+  }
+
+  public findEdges(matcher: (e: ETLEdge) => boolean, edges = this.process.edges): List<number>
+  {
+    return edges.filter(matcher).keySeq().toList();
+  }
+
+  public findNodes(matcher: (n: ETLNode) => boolean): List<number>
+  {
+    return this.process.nodes.filter(matcher).keySeq().toList();
   }
 }
 
@@ -106,60 +177,6 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
   },
   process: _ETLProcess,
 });
-
-export type FieldMap = Immutable.Map<number, TemplateField>;
-
-class TemplateEditorStateC
-{
-  public template: ETLTemplate = _ETLTemplate();
-  public fieldMap: FieldMap = Map();
-  public isDirty: boolean = true;
-  public loadingDocuments: number = 0;
-  public uiState: EditorDisplayState = _EditorDisplayState();
-
-  public getCurrentEngine(): TransformationEngine
-  {
-    const key = this.getCurrentEdgeId();
-    return this.template.process.getTransformationEngine(key);
-  }
-
-  public getCurrentEdgeId()
-  {
-    return this.uiState.currentEdge;
-  }
-}
-export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
-export const _TemplateEditorState = makeExtendedConstructor(TemplateEditorStateC, true);
-
-export enum ColumnOptions
-{
-  Preview = 'Preview',
-  Endpoints = 'Endpoints',
-  Steps = 'Steps',
-}
-
-export const columnOptions = List([
-  ColumnOptions.Preview,
-  ColumnOptions.Endpoints,
-  ColumnOptions.Steps,
-]);
-
-class EditorDisplayStateC
-{
-  public documents: List<object> = List([]);
-  public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
-  public modalRequests: List<ModalProps> = List([]);
-  public previewIndex: number = 0;
-  public settingsFieldId: number = null;
-  public settingsDisplayKeyPath: KeyPath = null;
-  public currentEdge: number = -1;
-  public engineVersion: number = 0;
-  public columnState: ColumnOptions = ColumnOptions.Preview;
-  public moveFieldId: number = null;
-  public addFieldId: number = null;
-}
-export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
-export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
 
 export function templateForBackend(template: ETLTemplate): TemplateBase
 {
@@ -184,5 +201,3 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
   });
   return obj;
 }
-
-export const DefaultDocumentLimit = 10;

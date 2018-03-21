@@ -59,7 +59,6 @@ import { instanceFnDecorator } from 'src/app/Classes';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
@@ -87,7 +86,6 @@ export class EndpointsColumn extends TerrainComponent<{}>
   }
 }
 
-// todo
 export class StepsColumn extends TerrainComponent<{}>
 {
   public render()

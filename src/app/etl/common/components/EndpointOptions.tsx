@@ -60,8 +60,6 @@ import { instanceFnDecorator } from 'src/app/Classes';
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
 import

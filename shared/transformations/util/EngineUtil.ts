@@ -377,7 +377,51 @@ export function getConsistentType(id: number, engine: TransformationEngine): Fie
   }
 }
 
-export function createMergedEngine(documents: List<object>):
+// copy a field from e1 to e2 with specified keypath
+// does not transfer transformations
+function transferField(id1: number, keypath: KeyPath, e1: TransformationEngine, e2: TransformationEngine)
+{
+  const id2 = e2.addField(keypath, e1.getFieldType(id1));
+  e2.setFieldProps(id2, e1.getFieldProps(id1));
+  if (e1.getFieldEnabled(id1))
+  {
+    e2.enableField(id2);
+  }
+  else
+  {
+    e2.disableField(id2);
+  }
+  return id2;
+}
+
+export function mergeJoinEngines(
+  leftEngine: TransformationEngine,
+  rightEngine: TransformationEngine,
+  outputKey: string,
+): TransformationEngine
+{
+  // const newEngine = leftEngine.clone();
+  const newEngine = new TransformationEngine();
+  leftEngine.getAllFieldIDs().forEach((id) =>
+  {
+    const keypath = leftEngine.getOutputKeyPath(id);
+    const newId = transferField(id, keypath, leftEngine, newEngine);
+  });
+  const outputKeyPathBase = List([outputKey, '*']);
+  const valueTypePath = List(['valueType']);
+  const outputFieldId = newEngine.addField(List([outputKey]), 'array');
+  const outputFieldWildcardId = newEngine.addField(outputKeyPathBase, 'array');
+  newEngine.setFieldProp(outputFieldId, valueTypePath, 'object');
+  newEngine.setFieldProp(outputFieldWildcardId, valueTypePath, 'object');
+  rightEngine.getAllFieldIDs().forEach((id) =>
+  {
+    const newKeyPath = outputKeyPathBase.concat(rightEngine.getOutputKeyPath(id)).toList();
+    const newId = transferField(id, newKeyPath, rightEngine, newEngine);
+  });
+  return newEngine;
+}
+
+export function createEngineFromDocuments(documents: List<object>):
   {
     engine: TransformationEngine,
     warnings: string[],

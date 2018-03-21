@@ -63,13 +63,21 @@ import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import
+{
+  _FileConfig,
+  _SourceConfig,
+  FileConfig,
+  SinkConfig,
+  SourceConfig,
+} from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
+import { NodeTypes } from 'shared/etl/types/ETLTypes';
 
 import './EdgeSection.less';
 import ETLEdgeComponent from './ETLEdgeComponent';
@@ -83,8 +91,90 @@ export interface Props
   act?: typeof TemplateEditorActions;
 }
 
+interface MergeFormState
+{
+  rightIdIndex: number;
+  leftJoinKey: string;
+  rightJoinKey: string;
+  outputKey: string;
+}
+
 class EdgeSection extends TerrainComponent<Props>
 {
+  public state: {
+    formState: MergeFormState,
+  } = {
+      formState: {
+        rightIdIndex: -1,
+        leftJoinKey: '',
+        rightJoinKey: '',
+        outputKey: '',
+      },
+    };
+
+  public inputMap: InputDeclarationMap<MergeFormState> = {
+    rightIdIndex: {
+      type: DisplayType.Pick,
+      displayName: 'Source to Merge (Right)',
+      options: {
+        pickOptions: (s) => this.calculateRightJoinOptions(),
+      },
+    },
+    leftJoinKey: {
+      type: DisplayType.TextBox,
+      displayName: 'Left Join Field',
+    },
+    rightJoinKey: {
+      type: DisplayType.TextBox,
+      displayName: 'Right Join Field',
+    },
+    outputKey: {
+      type: DisplayType.TextBox,
+      displayName: 'Output Field Name',
+    },
+  };
+
+  @instanceFnDecorator(memoizeOne)
+  public _calculateRightJoinNodes(template: ETLTemplate): List<number>
+  {
+    return template.getMergeableNodes();
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public _calculateRightJoinOptions(template: ETLTemplate): List<string>
+  {
+    return this._calculateRightJoinNodes(template).map((id) =>
+    {
+      const node = template.getNode(id);
+      switch (node.type)
+      {
+        case NodeTypes.Source:
+          return template.getSourceName(node.endpoint);
+        case NodeTypes.Sink:
+          return template.getSinkName(node.endpoint);
+        default:
+          return template.getNodeName(id);
+      }
+    }).toList();
+  }
+
+  public calculateRightJoinOptions(): List<string>
+  {
+    const { template } = this.props.templateEditor;
+    return this._calculateRightJoinOptions(template);
+  }
+
+  public renderMergeForm()
+  {
+    return (
+      <DynamicForm
+        inputMap={this.inputMap}
+        inputState={this.state.formState}
+        onStateChange={this._setStateWrapper('formState')}
+      />
+    );
+  }
+
   public renderEdge(edge, edgeId)
   {
     return (
@@ -99,14 +189,55 @@ class EdgeSection extends TerrainComponent<Props>
     );
   }
 
+  public validateMergeFormState()
+  {
+    const { rightIdIndex, leftJoinKey, rightJoinKey, outputKey } = this.state.formState;
+    return rightIdIndex !== -1 && leftJoinKey !== '' && rightJoinKey !== '' && outputKey !== '';
+  }
+
   public render()
   {
     const { templateEditor } = this.props;
+    const { mergeIntoEdgeId } = templateEditor.uiState;
     return (
       <div className='edge-section'>
-        {templateEditor.template.process.getEdges().map(this.renderEdge).toList()}
+        {templateEditor.template.getEdges().map(this.renderEdge).toList()}
+        <Modal
+          open={mergeIntoEdgeId !== null}
+          title='Merge Documents'
+          onClose={this.closeMergeModal}
+          onConfirm={this.confirmMerge}
+          confirm={true}
+          closeOnConfirm={this.validateMergeFormState()}
+        >
+          {this.renderMergeForm()}
+        </Modal>
       </div>
     );
+  }
+
+  public confirmMerge()
+  {
+    const { rightIdIndex, leftJoinKey, rightJoinKey, outputKey } = this.state.formState;
+    const { templateEditor } = this.props;
+    const { mergeIntoEdgeId } = templateEditor.uiState;
+
+    const leftId = templateEditor.uiState.mergeIntoEdgeId;
+    const rightId = rightIdIndex !== -1 ?
+      this._calculateRightJoinNodes(templateEditor.template).get(rightIdIndex)
+      :
+      -1;
+    GraphHelpers.createMergeJoin(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
+  }
+
+  public closeMergeModal()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        mergeIntoEdgeId: null,
+      },
+    });
   }
 }
 

@@ -51,7 +51,7 @@ const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine, updateFieldFromEngine } from 'etl/templates/SyncUtil';
-import { FieldMap } from 'etl/templates/TemplateTypes';
+import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';

@@ -63,14 +63,14 @@ import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
+import EndpointForm from 'etl/common/components/EndpointForm';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ETLTemplate, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
-
-import EndpointForm from 'etl/common/components/EndpointForm';
 
 import './EndpointSection.less';
 
@@ -84,7 +84,7 @@ export interface Props
   act?: typeof TemplateEditorActions;
 }
 
-type EndpointsType = ETLTemplate['sources'] | ETLTemplate['sinks'];
+type EndpointsType = SourcesMap | SinksMap;
 type LooseEndpointsType = Immutable.Map<string, SourceConfig | SinkConfig>;
 
 class EndpointSection extends TerrainComponent<Props>
@@ -102,7 +102,7 @@ class EndpointSection extends TerrainComponent<Props>
     super(props);
     this.state = {
       expandableState: Map(),
-      endpoints: props.isSource ? props.template.sources : props.template.sinks,
+      endpoints: props.isSource ? props.template.getSources() : props.template.getSinks(),
       newSourceModalOpen: false,
       newSourceModalName: '',
       newSource: _SourceConfig(),
@@ -112,8 +112,8 @@ class EndpointSection extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     const { isSource, template } = this.props;
-    const newEndpoints = isSource ? nextProps.template.sources : nextProps.template.sinks;
-    const oldEndpoints = isSource ? template.sources : template.sinks;
+    const newEndpoints = isSource ? nextProps.template.getSources() : nextProps.template.getSinks();
+    const oldEndpoints = isSource ? template.getSources() : template.getSinks();
 
     if (newEndpoints !== oldEndpoints || isSource !== nextProps.isSource)
     {
@@ -204,7 +204,7 @@ class EndpointSection extends TerrainComponent<Props>
     const confirmDisabled =
       this.state.newSourceModalName === '' ||
       this.state.newSource.type == null ||
-      template.sources.hasIn([this.state.newSourceModalName]);
+      template.getSources().hasIn([this.state.newSourceModalName]);
 
     return (
       <Modal
@@ -230,7 +230,7 @@ class EndpointSection extends TerrainComponent<Props>
   {
     const { isSource, template } = this.props;
     const { endpoints } = this.state;
-    const buttonsDisabled = endpoints === (isSource ? template.sources : template.sinks);
+    const buttonsDisabled = endpoints === (isSource ? template.getSources() : template.getSinks());
 
     return (
       <div className='endpoint-section'>
@@ -278,7 +278,7 @@ class EndpointSection extends TerrainComponent<Props>
   public handleCancelChanges()
   {
     const { template, isSource } = this.props;
-    const newEndpoints = isSource ? template.sources : template.sinks;
+    const newEndpoints = isSource ? template.getSources() : template.getSinks();
     this.setState({
       endpoints: newEndpoints,
     });
@@ -287,39 +287,13 @@ class EndpointSection extends TerrainComponent<Props>
   public handleApplyChanges()
   {
     const { template, isSource, act } = this.props;
-    const { endpoints } = this.state;
-
     if (isSource)
     {
-      const { newKeys, deletedKeys, differentKeys } =
-        getChangedKeys(isSource ? template.sources : template.sinks, endpoints);
-
-      act({
-        actionType: 'setSources',
-        sources: endpoints as ETLTemplate['sources'],
-      });
-      deletedKeys.forEach((key) =>
-      {
-        act({
-          actionType: 'deleteInMergeDocuments',
-          key,
-        });
-      });
-      newKeys.forEach((key) =>
-      {
-        DocumentsHelpers.fetchDocuments((endpoints as ETLTemplate['sources']).get(key), key);
-      });
-      differentKeys.forEach((key) =>
-      {
-        DocumentsHelpers.fetchDocuments((endpoints as ETLTemplate['sources']).get(key), key);
-      });
+      GraphHelpers.updateSources(this.state.endpoints);
     }
     else
     {
-      act({
-        actionType: 'setSinks',
-        sinks: endpoints as ETLTemplate['sinks'],
-      });
+      GraphHelpers.updateSinks(this.state.endpoints);
     }
   }
 
@@ -331,10 +305,9 @@ class EndpointSection extends TerrainComponent<Props>
     }, () => this.handleApplyChanges());
   }
 
-  // closed by default, since expandableState is empty
   public isEndpointOpen(key: string)
   {
-    return Boolean(this.state.expandableState.get(key));
+    return this.state.expandableState.get(key) !== false;
   }
 
   @instanceFnDecorator(_.memoize)
@@ -360,39 +333,6 @@ class EndpointSection extends TerrainComponent<Props>
       });
     };
   }
-}
-
-function getChangedKeys(original: LooseEndpointsType, next: LooseEndpointsType)
-{
-  const differentKeys = [];
-  const deletedKeys = [];
-  const newKeys = [];
-  original.forEach((value, key) =>
-  {
-    if (next.has(key))
-    {
-      if (original.get(key) !== next.get(key))
-      {
-        differentKeys.push(key);
-      }
-    }
-    else
-    {
-      deletedKeys.push(key);
-    }
-  });
-  next.forEach((value, key) =>
-  {
-    if (!original.has(key))
-    {
-      newKeys.push(key);
-    }
-  });
-  return {
-    differentKeys: List(differentKeys),
-    deletedKeys: List(deletedKeys),
-    newKeys: List(newKeys),
-  };
 }
 
 const addEndpointStyle = _.extend({},
