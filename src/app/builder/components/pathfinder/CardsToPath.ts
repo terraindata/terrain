@@ -103,13 +103,17 @@ export class CardsToPath
     const newScore = this.updateScore(path.score, parser, bodyValueInfo);
     const filterGroup = this.BodyToFilterSection(path.filterGroup, parser, bodyValueInfo, 'hard');
     const softFilterGroup = this.BodyToFilterSection(path.softFilterGroup, parser, bodyValueInfo, 'soft');
+    const parentAlias = this.getParentAlias(parser, bodyValueInfo);
+    const groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
+    const more = path.more.set('references', List([parentAlias]));
 
     const newPath = path
       .set('source', newSource)
       .set('score', newScore)
       .set('filterGroup', filterGroup)
-      .set('softFilterGroup', softFilterGroup);
-
+      .set('softFilterGroup', softFilterGroup)
+      .set('more', more)
+      .set('nested', List(groupJoinPaths));
     return newPath;
   }
 
@@ -334,6 +338,65 @@ export class CardsToPath
     {
       return this.BoolToFilterGroup(filterGroup, parser, theBool, filterSection);
     }
+  }
+
+  private static getParentAlias(parser: ESCardParser, bodyValueInfo: ESValueInfo)
+  {
+    const parentAliasValueInfo = parser.searchCard({'groupJoin:groupjoin_clause': {'parentAlias:string': true}}, bodyValueInfo);
+    if (parentAliasValueInfo === null)
+    {
+      TerrainLog.debug('(B->P) no parentAlias card, set the parentaAlias to parent.');
+      return 'parent';
+    } else
+    {
+      TerrainLog.debug('(B->P) current parent alias is ' + parentAliasValueInfo.value());
+      return parentAliasValueInfo.value();
+    }
+  }
+
+  private static getGroupJoinPaths(paths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string)
+  {
+    const joinBodyMap = {};
+    const pathMap = {};
+    if (body.objectChildren.groupJoin)
+    {
+      const parentJoinValueInfo = body.objectChildren.groupJoin.propertyValue;
+      if (parentJoinValueInfo)
+      {
+        parentJoinValueInfo.forEachProperty((joinBody, name) =>
+        {
+          if (joinBody.propertyValue.clause.type === 'body')
+          {
+            joinBodyMap[name] = joinBody.propertyValue;
+          }
+        });
+      }
+    }
+
+    paths.map((path: Path) => {
+      console.log(path);
+      if (path && path.name)
+      {
+        pathMap[path.name] = path;
+      }
+    });
+
+    const newPaths = [];
+    for (const key of Object.keys(joinBodyMap))
+    {
+      let oldPath;
+      if (pathMap[key] !== undefined)
+      {
+        oldPath = pathMap[key];
+      } else
+      {
+        oldPath = _Path();
+      }
+      const p = this.BodyCardToPath(oldPath, parser, joinBodyMap[key]).set('name', key);
+      TerrainLog.debug('(B->P) Turn groupJoin body ', joinBodyMap[key], ' to path', p);
+      newPaths.push(p)
+    }
+    return newPaths;
   }
 
   private static updateSource(source: Source, parser: ESCardParser, body: ESValueInfo): Source

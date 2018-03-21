@@ -96,17 +96,8 @@ export class PathToCards
     }
     // parse the card
     const parser = new ESCardParser(rootCard);
-    this.updateSize(path, parser);
-    this.updateSourceBool(path, parser);
 
-    // hard bool
-    this.FilterSectionToBodyBool(path.filterGroup, parser, parser.getValueInfo(), 'hard');
-    // soft bool
-    this.FilterSectionToBodyBool(path.softFilterGroup, parser, parser.getValueInfo(), 'soft');
-    // groupJoin
-    //this.updateGroupJoin(path.nested, parser);
-    // score card
-    this.fromScore(path, parser);
+    this.PathToBody(path, parser, parser.getValueInfo());
 
     if (parser.isMutated === true)
     {
@@ -118,9 +109,27 @@ export class PathToCards
     return List([rootCard]);
   }
 
-  private static updateSize(path: Path, parser: ESCardParser)
+  private static PathToBody(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
-    const rootValueInfo = parser.getValueInfo();
+    this.updateSize(path, parser, body);
+    this.updateSourceBool(path, parser, body);
+    // hard bool
+    this.FilterSectionToBodyBool(path.filterGroup, parser, body, 'hard');
+    // soft bool
+    this.FilterSectionToBodyBool(path.softFilterGroup, parser, body, 'soft');
+    // groupJoin
+    let parentAliasName = 'parent';
+    if (path.more.references.size > 0)
+    {
+      parentAliasName = path.more.references.get(0);
+    }
+    this.updateGroupJoin(path.nested, parser, body, parentAliasName);
+    // score card
+    this.fromScore(path, parser, body);
+  }
+  private static updateSize(path: Path, parser: ESCardParser, body: ESValueInfo)
+  {
+    const rootValueInfo = body;
     let updateSize = false;
     let sourceSize;
     if (path.source.count === 'all')
@@ -456,7 +465,111 @@ export class PathToCards
     // handle nested query filter group
   }
 
-  private static updateSourceBool(path: Path, parser: ESCardParser)
+  private static updateGroupJoin(sourcePaths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string)
+  {
+    const paths = [];
+    sourcePaths.map((path: Path) =>
+    {
+      if (path && path.name)
+      {
+        paths.push(path);
+      }
+    });
+
+    TerrainLog.debug('(P->B): from paths ', paths, ' to body', body);
+    if (paths.length === 0)
+    {
+      TerrainLog.debug('(P->B): No groupJoin path, delete the groupJoin card if existed.');
+      if (body.objectChildren.groupJoin)
+      {
+        parser.deleteChild(body, 'groupJoin');
+      }
+      return;
+    }
+
+    if (body.objectChildren.groupJoin === undefined)
+    {
+      parser.createCardIfNotExist({'groupJoin:groupjoin_clause': {'parentAlias:string': parentAlias}}, body);
+    } else
+    {
+      const parentAliasValueInfo = parser.searchCard({'groupJoin:groupjoin_clause': {'parentAlias:string': true}}, body);
+      if (parentAliasValueInfo === null)
+      {
+        parser.createCardIfNotExist({'groupJoin:groupjoin_clause': {'parentAlias:string': parentAlias}}, body);
+      } else
+      {
+        if (parentAliasValueInfo.value !== parentAlias)
+        {
+          parentAliasValueInfo.card = parentAliasValueInfo.card.set('value', parentAlias);
+          parser.isMutated = true;
+        }
+      }
+    }
+
+    const groupJoinV = body.objectChildren.groupJoin.propertyValue;
+
+    const pathMap = {};
+    paths.map((path: Path) => {pathMap[path.name] = path; });
+
+    const joinBodyMap = {};
+    groupJoinV.forEachProperty((joinBody, name) =>
+    {
+      if (joinBody.propertyValue.clause.type === 'body')
+      {
+        joinBodyMap[name] = joinBody.propertyValue;
+      }
+    });
+
+    TerrainLog.debug('(P->B): pathMap ', pathMap,' to body map', joinBodyMap);
+
+    for (const bodyKey of Object.keys(joinBodyMap))
+    {
+      if (pathMap[bodyKey] === undefined)
+      {
+        parser.deleteChild(groupJoinV, bodyKey);
+      }
+    }
+
+    for (const pathKey of Object.keys(pathMap))
+    {
+      if (joinBodyMap[pathKey])
+      {
+        this.PathToBody(pathMap[pathKey], parser, joinBodyMap[pathKey]);
+      } else
+      {
+        const bodyNameType = pathKey + ':body';
+        const pathBodyTemplate =
+        parser.createCardIfNotExist({[bodyNameType]: {      // the card is empty
+              'query:query': {
+                'bool:elasticFilter': {
+                  'filter:query[]': [
+                    {'term:term_query': {'_index:string': ''}},
+                    {
+                      'bool:elasticFilter': {
+                        'filter:query[]': [{'term:term_query': {' :string': ''}}]
+                      }
+                    }
+                  ],
+                  'should:query[]': [
+                    {
+                      'bool:elasticFilter': {
+                        'should:query[]': [{'term:term_query': {' :string': ''}}]
+                      }
+                    }]
+                }
+              },
+              'from:from': 0,
+              'size:size': PathFinderDefaultSize,
+              'track_scores:track_scores': true,
+            }}, groupJoinV);
+        const b = groupJoinV.objectChildren[pathKey].propertyValue;
+        this.PathToBody(pathMap[pathKey], parser, b);
+      }
+    }
+  }
+
+
+  private static updateSourceBool(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
     const indexValue = (path.source.dataSource as ElasticDataSource).index;
     // get the source bool card
@@ -464,7 +577,7 @@ export class PathToCards
       'query:query': {
         'bool:elasticFilter': true
       }
-    });
+    }, body);
 
     if (sourceBool == null)
     {
@@ -475,7 +588,7 @@ export class PathToCards
           }
         };
       TerrainLog.debug('(P->B) Source card is missing, create a new one with index ' + indexValue);
-      parser.createCardIfNotExist(sourceBoolTemplate);
+      parser.createCardIfNotExist(sourceBoolTemplate, body);
       return;
     }
 
@@ -540,9 +653,9 @@ export class PathToCards
   }
 
 
-  private static fromScore(path: Path, parser: ESCardParser)
+  private static fromScore(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
-    const rootValueInfo = parser.getValueInfo();
+    const rootValueInfo = body;
 
     if (path.score.lines.size === 0)
     {
