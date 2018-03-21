@@ -580,3 +580,21 @@ test('split a field (regex delimiter)', () =>
   expect(r['s2']).toBe('dee');
   expect(r['s3']).toBe('da');
 });
+
+test('super deep transformation preserves arrays', () =>
+{
+  const doc = {
+    foo: [
+      {
+        bar: [1, 2, 3],
+      },
+      {
+        bar: [3, 2, 1],
+      },
+    ],
+  };
+
+  const e = new TransformationEngine(doc);
+
+  expect(e.transform(doc)).toEqual(doc);
+});
