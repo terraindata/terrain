@@ -61,6 +61,7 @@ import TQLEditor from 'app/tql/components/TQLEditor';
 import Util from 'app/util/Util';
 import ExpandIcon from 'common/components/ExpandIcon';
 import RouteSelector from 'common/components/RouteSelector';
+import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
@@ -109,6 +110,36 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       selector: '.pf-aggregation-arrow-advanced',
       style: getStyle('fill', Colors().iconColor),
     });
+    const { pathfinderContext } = this.props;
+    const { source } = pathfinderContext;
+    this.setState({
+      fieldOptions: source.dataSource.getChoiceOptions({
+        type: 'fields',
+        source,
+        schemaState: pathfinderContext.schemaState,
+        builderState: pathfinderContext.builderState,
+        noNested: true,
+      }),
+    });
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.pathfinderContext.source.dataSource
+      !== nextProps.pathfinderContext.source.dataSource)
+    {
+      const { pathfinderContext } = nextProps;
+      const { source } = pathfinderContext;
+      this.setState({
+        fieldOptions: source.dataSource.getChoiceOptions({
+          type: 'fields',
+          source,
+          schemaState: pathfinderContext.schemaState,
+          builderState: pathfinderContext.builderState,
+          noNested: true,
+        }),
+      });
+    }
   }
 
   public shouldComponentUpdate(nextProps, nextState)
@@ -317,18 +348,11 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-    let fieldOptions = source.dataSource.getChoiceOptions({
-      type: 'fields',
-      source,
-      schemaState: pathfinderContext.schemaState,
-      builderState: pathfinderContext.builderState,
-      // subtype: isSoftFilter ? 'match' : undefined,
-    });
     const noneOption = _ChoiceOption({
       value: undefined,
       displayName: 'None',
     });
-    fieldOptions = List([noneOption]).concat(fieldOptions).toList();
+    const fieldOptions = List([noneOption]).concat(this.state.fieldOptions).toList();
     const fieldSet = {
       key: 'field',
       options: fieldOptions,
@@ -432,6 +456,14 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleCollapseChange(optionSetIndex: number, value)
   {
+    // if it is a text field, need to append .keyword
+    const option = this.state.fieldOptions && this.state.fieldOptions.filter((opt) =>
+      opt.value === value,
+    ).toList().get(0);
+    if (option && option.meta && option.meta.fieldType === FieldType.Text)
+    {
+      value += '.keyword';
+    }
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath.push('collapse')), value);
   }
 
@@ -690,6 +722,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public render()
   {
     const { canEdit } = this.props.pathfinderContext;
+    const collapseValue = this.props.more.collapse ?
+      this.props.more.collapse.replace('.keyword', '') : undefined;
     return (
       <div>
         <div
@@ -720,7 +754,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             }
             <RouteSelector
               optionSets={this.getCollapseOptionSets()}
-              values={List([this.props.more.collapse])}
+              values={List([collapseValue])}
               onChange={this.handleCollapseChange}
               canEdit={canEdit}
               defaultOpen={false}

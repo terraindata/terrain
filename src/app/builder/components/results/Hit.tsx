@@ -172,8 +172,7 @@ class HitComponent extends TerrainComponent<Props> {
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
-    // Never update the component if it's not visible - this might cause issues
-    // with changing size
+    // Never update the component if it's not visible (unless it's a size change)
     if (!nextProps.isVisible && nextProps.hitSize === this.props.hitSize)
     {
       return false;
@@ -1011,7 +1010,22 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       );
       if (value.size && typeof value.get(0) !== 'object')
       {
-        return tooltip(content, { title: tooltipText, arrow: false });
+        return tooltip(content, {
+          html: <div style={{
+            overflowY: 'auto',
+            maxHeight: '200px',
+            maxWidth: '300px',
+            display: 'inline-block',
+            textAlign: 'left',
+            zIndex: 9999,
+            background: 'white',
+            borderRadius: 0,
+          }}
+          >
+            {tooltipText}
+          </div>,
+          arrow: false
+        });
       }
       return content;
     }
@@ -1126,8 +1140,12 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       html: <div style={{
         overflowY: 'auto',
         maxHeight: '200px',
+        maxWidth: '300px',
         display: 'inline-block',
         textAlign: 'left',
+        zIndex: 9999,
+        background: 'white',
+        borderRadius: 0,
       }}
       >
         {tooltipText}
