@@ -44,53 +44,110 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
 
+import { instanceFnDecorator } from 'src/app/Classes';
+
+import Dropdown from 'common/components/Dropdown';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { TransformationFormProps } from './TransformationFormBase';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { JoinTFF } from './JoinTransformationForm';
-import { SubstringTFF, UppercaseTFF } from './SimpleTransformations';
-import { SplitTFF } from './SplitTransformationForm';
-
-export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
+interface Props
 {
-  switch (type)
-  {
-    case TransformationNodeType.UppercaseNode:
-      return UppercaseTFF;
-    case TransformationNodeType.SubstringNode:
-      return SubstringTFF;
-    case TransformationNodeType.SplitNode:
-      return SplitTFF;
-    case TransformationNodeType.JoinNode:
-      return JoinTFF;
-    default:
-      return null;
-  }
+  selectedIds: List<number>;
+  onChange: (ids: List<number>) => void;
+  engine: TransformationEngine;
+  availableFields?: List<number>;
 }
 
-export const availableTransformations: List<TransformationNodeType> = determineAvailableTransformations();
-// all transformation types for which getTransformationForm does not return null
-
-function determineAvailableTransformations(): List<TransformationNodeType>
+export class FieldPicker extends TerrainComponent<Props>
 {
-  let typeList = List([]);
-  for (const type in TransformationNodeType)
+  public stringifyKeyPath(kp: EnginePath)
   {
-    if (
-      getTransformationForm(type as TransformationNodeType) !== null
-      && TransformationInfo.canCreate(type as TransformationNodeType)
-    )
-    {
-      typeList = typeList.push(type);
-    }
+    return kp.reduce((reduction, value) => {
+      return reduction === undefined ? `${value}` : `${reduction}, ${value}`;
+    }, undefined);
   }
-  return typeList;
+
+  @instanceFnDecorator(memoizeOne)
+  public translateFieldsToStrings(availableFields: List<number>, engine: TransformationEngine)
+  {
+    return availableFields.map((id, i) =>
+      this.stringifyKeyPath(engine.getOutputKeyPath(id))
+    ).toList();
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public findIdIndexFactory(avail: List<number>): (id: number) => number
+  {
+    const fn = _.memoize((id: number) => {
+      return avail.indexOf(id);
+    });
+    return fn;
+  }
+
+  public renderSelectedField(id, i)
+  {
+    const { engine, onChange, availableFields } = this.props;
+    const avail = availableFields !== undefined ? availableFields : List([]);
+    const options = this.translateFieldsToStrings(avail, engine);
+    const idIndex = this.findIdIndexFactory(avail)(id);
+    return (
+      <div
+        key={i}
+      >
+        <Dropdown
+          selectedIndex={idIndex}
+          options={options}
+          onChange={this.handleChangeFactory(id)}
+        />
+      </div>
+    );
+  }
+
+  public renderNewFieldButton()
+  {
+    return (
+      <div onClick={this.handleAddNewField}>
+        Add Another
+      </div>
+    );
+  }
+
+  public render()
+  {
+    const { selectedIds } = this.props;
+    return (
+      <div>
+        {selectedIds.map(this.renderSelectedField)}
+        {this.renderNewFieldButton()}
+      </div>
+    );
+  }
+
+  @instanceFnDecorator(_.memoize)
+  public handleChangeFactory(id: number)
+  {
+    return (value) => {
+      
+    };
+  }
+
+  public handleAddNewField()
+  {
+
+  }
 }

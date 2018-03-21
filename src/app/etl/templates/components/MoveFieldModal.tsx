@@ -61,7 +61,7 @@ import Autocomplete from 'common/components/Autocomplete';
 import Modal from 'common/components/Modal';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { kpToString, stringToKP, validateRename } from 'shared/transformations/util/EngineUtil';
+import { kpToString, stringToKP, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './MoveFieldModal.less';
