@@ -123,6 +123,11 @@ export default class ESValueInfo
     return (this._objectChildren === undefined) ? {} : this._objectChildren;
   }
 
+  public childrenSize(): number
+  {
+    return Object.keys(this.objectChildren).length;
+  }
+
   public addObjectChild(name: string, info: ESPropertyInfo): void
   {
     this._objectChildren = this.objectChildren;
@@ -162,12 +167,12 @@ export default class ESValueInfo
     this._errors.push(error);
   }
 
-  public forEachProperty(func: (property: ESPropertyInfo) => void): void
+  public forEachProperty(func: (property: ESPropertyInfo, name?: string) => void): void
   {
     Object.keys(this.objectChildren).forEach(
       (name: string): void =>
       {
-        func(this.objectChildren[name]);
+        func(this.objectChildren[name], name);
       });
   }
 

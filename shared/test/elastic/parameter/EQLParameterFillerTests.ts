@@ -72,8 +72,6 @@ function testGeneration(testString: string,
   expect(errors.length).toEqual(0);
 
   const result = ESParameterFiller.generate(valueInfo, params);
-
-  winston.info(result);
   expect(JSON.parse(result)).toEqual(expectedValue);
 }
 

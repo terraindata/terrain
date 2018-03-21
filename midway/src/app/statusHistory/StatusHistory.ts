@@ -44,46 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Transform } from 'stream';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import UserConfig from '../users/UserConfig';
+import StatusHistoryConfig from './StatusHistoryConfig';
 
-/**
- * Abstract class for transforming a result stream
- */
-export default abstract class ADocumentTransform extends Transform
+export class StatusHistory
 {
-  private chunkNumber: number = 0;
+  private statusHistoryTable: Tasty.Table;
 
   constructor()
   {
-    super({
-      writableObjectMode: true,
-      readableObjectMode: true,
-    });
+    this.statusHistoryTable = new Tasty.Table(
+      'statusHistory',
+      ['id'],
+      [
+        'createdAt',
+        'userId',
+        'algorithmId',
+        'fromStatus',
+        'toStatus',
+      ],
+    );
   }
 
-  public _transform(chunk: object, encoding, callback)
+  public async create(user: UserConfig, id: number, obj: object, newStatus: string): Promise<StatusHistoryConfig>
   {
-    const out = this.transform(chunk, this.chunkNumber++);
-    if (Array.isArray(out))
+    if (user.id === undefined)
     {
-      out.forEach((e) => this.push(e));
-      callback();
+      throw new Error('User ID unknown');
     }
-    else
-    {
-      callback(null, out);
-    }
-  }
-
-  public _flush(callback)
-  {
-    this.conclusion(this.chunkNumber);
-    callback();
-  }
-
-  protected abstract transform(input: object, chunkNumber: number): object | object[];
-
-  protected conclusion(chunkNumber: number): void
-  {
+    // can only insert
+    const newVersion: StatusHistoryConfig =
+      {
+        userId: user.id,
+        algorithmId: id,
+        fromStatus: obj['status'],
+        toStatus: newStatus,
+      };
+    return App.DB.upsert(this.statusHistoryTable, newVersion) as Promise<StatusHistoryConfig>;
   }
 }
+
+export default StatusHistory;

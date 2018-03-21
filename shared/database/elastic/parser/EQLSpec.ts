@@ -1853,7 +1853,12 @@ const EQLSpec: ESClause[] =
         path: ['filter'],
         required: ['value'],
       }),
-    new ESMapClause('terms_query',
+    // TermsQueryBuilder.java
+    new ESWildcardStructureClause('terms_query',
+      {
+        boost: 'boost',
+        _name: 'string',
+      },
       'field',
       'terms_value',
       {
@@ -1865,7 +1870,6 @@ const EQLSpec: ESClause[] =
       {
         object: 'terms_lookup',
         array: 'base[]',
-        number: 'boost',
       },
       {
         path: ['filter'],
@@ -1918,7 +1922,7 @@ const EQLSpec: ESClause[] =
     new ESStructureClause('exists_query',
       {
         field: 'field',
-        null_value: 'base',
+        boost: 'boost',
       },
       {
         path: ['filter'],
@@ -2110,6 +2114,7 @@ const EQLSpec: ESClause[] =
         max_expansions: 'fuzzy_max_expansions',
         slop: 'slop',
         lenient: 'boolean',
+        boost: 'boost',
       },
       {
         path: ['match'],

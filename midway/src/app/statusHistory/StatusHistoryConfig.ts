@@ -44,46 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Transform } from 'stream';
+import ConfigType from '../ConfigType';
 
-/**
- * Abstract class for transforming a result stream
- */
-export default abstract class ADocumentTransform extends Transform
+export class StatusHistoryConfig extends ConfigType
 {
-  private chunkNumber: number = 0;
+  public createdAt?: string = undefined;
+  public userId: number = -1;
+  public id?: number = undefined;
+  public algorithmId: number = -1;
+  public fromStatus: string = '';
+  public toStatus: string = '';
 
-  constructor()
+  constructor(props: object)
   {
-    super({
-      writableObjectMode: true,
-      readableObjectMode: true,
-    });
-  }
-
-  public _transform(chunk: object, encoding, callback)
-  {
-    const out = this.transform(chunk, this.chunkNumber++);
-    if (Array.isArray(out))
-    {
-      out.forEach((e) => this.push(e));
-      callback();
-    }
-    else
-    {
-      callback(null, out);
-    }
-  }
-
-  public _flush(callback)
-  {
-    this.conclusion(this.chunkNumber);
-    callback();
-  }
-
-  protected abstract transform(input: object, chunkNumber: number): object | object[];
-
-  protected conclusion(chunkNumber: number): void
-  {
+    super();
+    ConfigType.initialize(this, props);
   }
 }
+
+export default StatusHistoryConfig;
