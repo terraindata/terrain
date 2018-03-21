@@ -996,7 +996,22 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       );
       if (value.size && typeof value.get(0) !== 'object')
       {
-        return tooltip(content, { title: tooltipText, arrow: false });
+        return tooltip(content, {
+          html: <div style={{
+            overflowY: 'auto',
+            maxHeight: '200px',
+            maxWidth: '300px',
+            display: 'inline-block',
+            textAlign: 'left',
+            zIndex: 9999,
+            background: 'white',
+            borderRadius: 0,
+          }}
+          >
+            {tooltipText}
+          </div>,
+          arrow: false
+        });
       }
       return content;
     }
@@ -1111,8 +1126,12 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       html: <div style={{
         overflowY: 'auto',
         maxHeight: '200px',
+        maxWidth: '300px',
         display: 'inline-block',
         textAlign: 'left',
+        zIndex: 9999,
+        background: 'white',
+        borderRadius: 0,
       }}
       >
         {tooltipText}

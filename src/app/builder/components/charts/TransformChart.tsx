@@ -494,7 +494,7 @@ const TransformChart = {
       .attr('text-anchor', 'middle')
       .attr('transform', 'translate(' + width / 2 + ',80)')
       .style('fill', Colors().fontColorLightest)
-      .text(inputKey);
+      .text(inputKey === '_score' ? 'Match Quality' : inputKey);
 
     d3.select(el).select('.yLeftAxis')
       .append('text')
