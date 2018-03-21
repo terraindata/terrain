@@ -44,60 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as Immutable from 'immutable';
+import * as Stream from 'stream';
 import * as winston from 'winston';
 
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import ESParserError from 'shared/database/elastic/parser/ESParserError';
-import SharedUtil from '../../../../shared/Util';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
+import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
+import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
+import ElasticController from '../../../../src/database/elastic/ElasticController';
+import ElasticReader from '../../../../src/database/elastic/streams/ElasticReader';
+import ElasticWriter from '../../../../src/database/elastic/streams/ElasticWriter';
 
-function getExpectedFile(): string
+let elasticController: ElasticController;
+let elasticClient: ElasticClient;
+
+beforeAll(() =>
 {
-  return __filename.split('.')[0] + '.expected';
-}
-
-let expected;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
+  const config: ElasticConfig = {
+    hosts: ['http://localhost:9200'],
+  };
 
-  const contents: any = await new Promise((resolve, reject) =>
-  {
-    fs.readFile(getExpectedFile(), SharedUtil.promise.makeCallback(resolve, reject));
-  });
-  expected = JSON.parse(contents);
-  done();
+  elasticController = new ElasticController(config, 0, 'ElasticWriterTests');
+  elasticClient = elasticController.getClient();
 });
 
-function testCardParseWithInputParameter(testName: string,
-  testString: string,
-  expectedValue: any,
-  inputParameter: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing "' + testName + '": "' + testString + '"' + '": "' + JSON.stringify(inputParameter) + '"');
-  const emptyCards = Immutable.List([]);
-  const parameters = { number: 10 };
-  const interpreter: ESInterpreter = new ESInterpreter(testString, parameters);
-  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
-  const rootValueInfo = parser.getValueInfo();
-  expect(rootValueInfo.value).toEqual(expectedValue);
-  expect(interpreter.errors).toEqual(expectedErrors);
-}
+const movies = [
+  {
+    movieid: 12121212,
+    title: 'Toy Story (1995)',
+  },
+  {
+    movieid: 13131313,
+    title: 'Jumanji (1995)',
+  },
+  {
+    movieid: 14141414,
+    title: 'Grumpier Old Men (1995)',
+  },
+];
 
-test('parse card', () =>
+test('simple elastic writer', (done) =>
 {
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
+  try
+  {
+    const readable = new Stream.Readable({ objectMode: true });
+    const writer = new ElasticWriter(elasticClient, 'movies', 'data', 'movieid');
+    readable.pipe(writer);
+    writer.on('finish', done);
+    writer.on('error', (err: Error) =>
     {
-      const testValue: any = expected[testName];
-      const testString = testValue['query'];
-      const inputParameter = testValue['parameter'];
-      const expectedValue = testValue['expect'];
-      testCardParseWithInputParameter('test', testString, expectedValue, inputParameter);
+      winston.error(String(err));
+      fail(err);
     });
+
+    movies.forEach((movie) => readable.push(movie));
+    readable.push(null);
+  }
+  catch (e)
+  {
+    fail(e);
+  }
 });

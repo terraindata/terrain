@@ -312,10 +312,10 @@ export class ElasticDB implements TastyDB
           }
 
           const query = {
-              body,
-              index: table.getDatabaseName(),
-              type: table.getTableName(),
-            };
+            body,
+            index: table.getDatabaseName(),
+            type: table.getTableName(),
+          };
 
           const compositePrimaryKey = this.makeID(table, element);
           if (compositePrimaryKey !== '')
@@ -358,7 +358,7 @@ export class ElasticDB implements TastyDB
       const compositePrimaryKey = this.makeID(table, element);
       if (compositePrimaryKey !== '')
       {
-        command.update['_id'] = compositePrimaryKey;
+        command[cmd]['_id'] = compositePrimaryKey;
       }
 
       let obj = {};

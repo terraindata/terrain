@@ -45,35 +45,67 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
+import { EventEmitter } from 'events';
 import * as Stream from 'stream';
 import * as winston from 'winston';
 
+import { ElasticMapping } from '../../../../../shared/etl/mapping/ElasticMapping';
 import ElasticClient from '../client/ElasticClient';
 
 export class ElasticWriter extends Stream.Writable
 {
   private client: ElasticClient;
-  private objects: any;
+  private primaryKey: string | undefined;
+  private index: string;
+  private type: string;
 
-  private querying: boolean = false;
-  private doneReading: boolean = false;
-  private rowsProcessed: number = 0;
+  private BULK_THRESHOLD: number = 10;
 
-  private MAX_BUFFER_SIZE: number = 10 * 1000;
-
-  private numRequested: number = 0;
-
-  constructor(client: ElasticClient)
+  constructor(client: ElasticClient, index: string, type: string, primaryKey?: string)
   {
     super({ objectMode: true, highWaterMark: 1024 * 128 });
 
     this.client = client;
+    this.index = index;
+    this.type = type;
+    this.primaryKey = primaryKey;
   }
 
-  public _write(chunk, encoding, callback)
+  public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    this.numRequested = size;
-    this.continueScrolling();
+    if (typeof chunk !== 'object')
+    {
+      this.emit('error', 'expecting chunk to be an object');
+      return;
+    }
+
+    this.upsert(chunk, callback);
+  }
+
+  public _writev?(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  {
+    //   console.log(chunks);
+    const numChunks = chunks.length;
+    if (numChunks < this.BULK_THRESHOLD)
+    {
+      let numPending = numChunks;
+      const done = new EventEmitter();
+      done.on('done', (err?) => callback(err));
+      for (const chunk of chunks)
+      {
+        this._write(chunk.chunk, chunk.encoding, (err?) =>
+        {
+          if (--numPending === 0)
+          {
+            done.emit('done', err);
+          }
+        });
+      }
+    }
+    else
+    {
+      this.bulkUpsert(chunks, callback);
+    }
   }
 
   public _destroy(error, callback)
@@ -83,88 +115,51 @@ export class ElasticWriter extends Stream.Writable
 
   public _final(callback)
   {
-    this.doneReading = true;
-    this.continueScrolling();
     if (callback !== undefined)
     {
       callback();
     }
   }
 
-  private scrollCallback(error, response): void
+  private upsert(body: object, callback: (err?: Error) => void): void
   {
-    if (typeof response._scroll_id === 'string')
+    const query: Elastic.IndexDocumentParams<object> = {
+      index: this.index,
+      type: this.type,
+      body,
+    };
+
+    if (this.primaryKey !== undefined && body[this.primaryKey] !== undefined)
     {
-      this.scrollID = response._scroll_id;
+      query['id'] = body[this.primaryKey];
     }
 
-    if (error !== null && error !== undefined)
-    {
-      this.emit('error', error);
-      return;
-    }
-
-    const hits: ElasticQueryHit[] = response.hits.hits;
-    let length: number = hits.length;
-
-    // trim off excess results
-    if (this.rowsProcessed + length > this.size)
-    {
-      length = this.size - this.rowsProcessed;
-      response.hits.hits = hits.slice(0, length);
-    }
-
-    this.rowsProcessed += length;
-    this.numRequested = Math.max(0, this.numRequested - length);
-
-    this.push(response);
-
-    this.querying = false;
-    this.doneReading = this.doneReading
-      || length <= 0
-      || this.rowsProcessed >= this.size;
-
-    this.continueScrolling();
+    this.client.index(query, callback);
   }
 
-  private continueScrolling()
+  private bulkUpsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
   {
-    if (this.querying)
+    const body: any[] = [];
+    for (const chunk of chunks)
     {
-      return;
-    }
+      const command =
+        {
+          index: {
+            _index: this.index,
+            _type: this.type,
+          },
+        };
 
-    if (this.doneReading)
-    {
-      // stop scrolling
-      if (this.scrollID !== undefined)
+      if (this.primaryKey !== undefined && chunk[this.primaryKey] !== undefined)
       {
-        this.client.clearScroll({
-          scrollId: this.scrollID,
-        }, (_err, _resp) =>
-          {
-            this.push(null);
-          });
-
-        this.scrollID = undefined;
+        command.index['_id'] = chunk[this.primaryKey];
       }
 
-      return;
+      body.push(command);
+      body.push(chunk.chunk);
     }
 
-    if (this.numRequested > 0)
-    {
-      // continue scrolling
-      this.querying = true;
-      this.client.scroll({
-        scrollId: this.scrollID,
-        scroll: this.scroll,
-      } as Elastic.ScrollParams,
-        (error, response) =>
-        {
-          this.scrollCallback(error, response);
-        });
-    }
+    this.client.bulk({ body }, callback);
   }
 }
 
