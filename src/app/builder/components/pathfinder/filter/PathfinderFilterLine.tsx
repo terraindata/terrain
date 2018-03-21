@@ -195,7 +195,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine } = this.props;
 
-    if (!filterLine.field || !filterLine.comparison)
+    if ((filterLine.field === undefined) || (filterLine.comparison === undefined))
     {
       return false;
     }
@@ -217,7 +217,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const fieldSet = this.props.fieldOptionSet;
     let comparisonOptions = List<RouteSelectorOption>();
     let comparisonHeader = 'Choose a data field first';
-    if (filterLine.field)
+    if (filterLine.field !== undefined)
     {
       comparisonHeader = '';
 
@@ -265,7 +265,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         builderState: pathfinderContext.builderState,
       });
     }
-    else if (filterLine.field && !filterLine.comparison)
+    else if (filterLine.field !== undefined && !filterLine.comparison)
     {
       valueHeader = 'Choose a method next';
     }

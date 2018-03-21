@@ -575,7 +575,7 @@ const BuilderReducersWrapper = (
       {
         const path = state.query.path;
         state = state.setIn(['query', 'cards'], PathToCards.updateRootCard(state.query));
-        console.log('Path would generates TQL: ' + AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
+        // console.log('Path would generates TQL: ' + AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
       }
     }
 

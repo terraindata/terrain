@@ -73,6 +73,8 @@ import {List} from 'immutable';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
 
+import * as TerrainLog from 'loglevel';
+
 export default class ESCardParser extends ESParser
 {
   public static parseAndUpdateCards(cards: List<Card>, query): List<Card>
@@ -475,7 +477,7 @@ export default class ESCardParser extends ESParser
 
   public searchCard(pattern, valueInfo = this.getValueInfo(), returnLastMatched: boolean = false, returnAll: boolean = false)
   {
-    console.log('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));
+    TerrainLog.debug('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));
     switch (valueInfo.jsonType)
     {
       case ESJSONType.object:
@@ -496,7 +498,6 @@ export default class ESCardParser extends ESParser
         // now try to search { "index:cardType": {}}
         const cardKey = q[0];
         const cardTypeName = GetCardVisitor.getCardType(q[1]);
-        console.log('Searching Object ' + cardKey + ":" + cardTypeName);
         const newVal = valueInfo.objectChildren[cardKey]
         if (newVal)
         {
@@ -504,13 +505,11 @@ export default class ESCardParser extends ESParser
           {
             if (pattern[k] === true)
             {
-              console.log('Got Card ' + newVal.propertyValue.card.type);
               if (returnAll === false)
               {
                 return newVal.propertyValue;
               } else
               {
-                console.log('Return the card as array.');
                 return [newVal.propertyValue];
               }
             }
@@ -526,16 +525,14 @@ export default class ESCardParser extends ESParser
                 return [newVal.propertyValue];
               }
             }
-            console.log('pass ', nextLevel);
             return nextLevel;
           } else
           {
-            console.log('Card type is not matched' + newVal.propertyValue.card.type);
+            TerrainLog.debug('SearchCard: cardkey ' + cardKey + ' is found, but type is ' +newVal.propertyValue.card.type);
             return null;
           }
         } else
         {
-          console.log('Card is not existed ' + cardKey);
           return null;
         }
       case ESJSONType.array:
@@ -554,7 +551,6 @@ export default class ESCardParser extends ESParser
             }
           }
         }
-        console.log('collect hits ', hits);
         if (hits.length > 0)
         {
           return hits;
