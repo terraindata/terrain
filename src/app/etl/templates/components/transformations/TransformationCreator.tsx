@@ -106,7 +106,7 @@ export class TransformationCreator extends TerrainComponent<Props>
       (type, index) =>
       {
         const info = TransformationInfo.getInfo(type);
-        return info.isAvailable(this.props.engine, this.props.fieldID);
+        return info.isAvailable !== undefined ? info.isAvailable(this.props.engine, this.props.fieldID) : true;
       },
     ).toList();
   }

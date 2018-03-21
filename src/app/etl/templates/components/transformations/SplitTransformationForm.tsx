@@ -44,46 +44,93 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
+
+import { instanceFnDecorator } from 'src/app/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { TransformationFormProps } from './TransformationFormBase';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { SubstringTFF, UppercaseTFF } from './SimpleTransformations';
-import { SplitTFF } from './SplitTransformationForm';
-
-export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
+interface SplitOptions
 {
-  switch (type)
-  {
-    case TransformationNodeType.UppercaseNode:
-      return UppercaseTFF;
-    case TransformationNodeType.SubstringNode:
-      return SubstringTFF;
-    case TransformationNodeType.SplitNode:
-      return SplitTFF;
-    default:
-      return null;
-  }
+  leftName: string;
+  rightName: string;
+  preserveOldFields: boolean;
+  delimiter: string;
 }
 
-export const availableTransformations: List<TransformationNodeType> = determineAvailableTransformations();
-// all transformation types for which getTransformationForm does not return null
-
-function determineAvailableTransformations(): List<TransformationNodeType>
+export class SplitTFF extends TransformationForm<SplitOptions, TransformationNodeType.SplitNode>
 {
-  let typeList = List([]);
-  for (const type in TransformationNodeType)
+  protected inputMap: InputDeclarationMap<SplitOptions> = {
+    leftName: {
+      type: DisplayType.TextBox,
+      displayName: 'New Field Name 1',
+      group: 'new name',
+    },
+    rightName: {
+      type: DisplayType.TextBox,
+      displayName: 'New Field Name 2',
+      group: 'new name',
+    },
+    delimiter: {
+      type: DisplayType.TextBox,
+      displayName: 'Delimiter',
+      group: 'row2',
+    },
+    preserveOldFields: {
+      type: DisplayType.CheckBox,
+      displayName: 'Keep Original Field',
+      group: 'row2',
+    },
+  };
+  protected initialState = {
+    leftName: 'Split Field 1',
+    rightName: 'Split Field 2',
+    preserveOldFields: false,
+    delimiter: '-',
+  };
+  protected type = TransformationNodeType.SplitNode; // lack of type safety here
+
+  protected isStructuralChange()
   {
-    if (getTransformationForm(type as TransformationNodeType) !== null)
-    {
-      typeList = typeList.push(type);
+    return true;
+  }
+
+  protected computeArgs()
+  {
+    const { engine, fieldId } = this.props;
+    const { leftName, rightName, delimiter, preserveOldFields } = this.state;
+    const args =  super.computeArgs();
+
+    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const changeIndex = currentKeyPath.size - 1;
+
+    const newFieldKeyPaths = List([
+      currentKeyPath.set(changeIndex, leftName),
+      currentKeyPath.set(changeIndex, rightName)
+    ]);
+
+    return {
+      options: {
+        newFieldKeyPaths,
+        delimiter,
+        preserveOldFields,
+      },
+      fields: args.fields,
     }
   }
-  return typeList;
 }

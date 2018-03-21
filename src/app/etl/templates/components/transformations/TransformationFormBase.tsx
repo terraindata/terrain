@@ -157,6 +157,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     return false;
   }
 
+  // override this to specify transformation args if they need to be computed from state
   protected computeArgs(): TransformationArgs<Type>
   {
     const { transformation, isCreate, engine, fieldId } = this.props;
