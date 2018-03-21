@@ -580,3 +580,39 @@ test('split a field (regex delimiter)', () =>
   expect(r['s2']).toBe('dee');
   expect(r['s3']).toBe('da');
 });
+
+test('cast node tests', () =>
+{
+  // const doc2 = {
+  //     name: 'Bob',
+  //     age: 17,
+  //     meta: {
+  //         school: 'Stanford',
+  //         sport: 'bobsled',
+  //     },
+  // };
+
+  const e: TransformationEngine = new TransformationEngine(doc2);
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['age'])]),
+    {
+      toTypename: 'string',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['meta', 'school'])]),
+    {
+      toTypename: 'object',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['meta', 'sport'])]),
+    {
+      toTypename: 'array',
+    });
+  const r = e.transform(doc2);
+  expect(r['age']).toBe('17');
+  expect(r['meta']['school']).toEqual({});
+  expect(r['meta']['sport']).toEqual([]);
+});
