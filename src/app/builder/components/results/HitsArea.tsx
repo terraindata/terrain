@@ -374,18 +374,6 @@ class HitsArea extends TerrainComponent<Props>
     );
   }
 
-  // public handleRequestMoreHits()
-  // {
-  //   const { hitsPages } = this.state;
-
-  //   if (hitsPages * HITS_PAGE_SIZE < MAX_HITS)
-  //   {
-  //     this.setState({
-  //       hitsPages: hitsPages + 1,
-  //     });
-  //   }
-  // }
-
   public componentDidUpdate()
   {
     if (this.state.onHitsLoaded)
@@ -799,16 +787,6 @@ class HitsArea extends TerrainComponent<Props>
         hitsPages: [firstPage - 1, firstPage],
       });
     }
-  }
-
-  public getDocHeight()
-  {
-    const D = document;
-    return Math.max(
-      D.body.scrollHeight, D.documentElement.scrollHeight,
-      D.body.offsetHeight, D.documentElement.offsetHeight,
-      D.body.clientHeight, D.documentElement.clientHeight,
-    );
   }
 
   /* public handleESresultExport()
