@@ -44,11 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as stream from 'stream';
-import { promisify } from 'util';
 import * as winston from 'winston';
 
 import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
@@ -56,16 +53,21 @@ import CSVTypeParser from '../../../../shared/etl/CSVTypeParser';
 import { FieldTypes } from '../../../../shared/etl/FieldTypes';
 import SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
+import ElasticWriter from '../../database/elastic/streams/ElasticWriter';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as AppUtil from '../AppUtil';
 
 import * as Common from './Common';
 import CSVTransform from './streams/CSVTransform';
+import ImportTransform from './streams/ImportTransform';
 import JSONTransform from './streams/JSONTransform';
+import TransformationEngineTransform from './streams/TransformationEngineTransform';
 import ImportTemplateConfig from './templates/ImportTemplateConfig';
 import { ImportTemplates } from './templates/ImportTemplates';
 import { TemplateBase } from './templates/TemplateBase';
+import ADocumentTransform from './streams/ADocumentTransform';
 
 const importTemplates = new ImportTemplates();
 
@@ -84,7 +86,6 @@ export interface ImportConfig extends TemplateBase
 export class Import
 {
   private BATCH_SIZE: number = 5000;
-  private CHUNK_SIZE: number = 10000000;
   private COMPATIBLE_TYPES: object =
     {
       text: new Set(['text']),
@@ -101,16 +102,8 @@ export class Import
       nested: new Set(['nested']),
       geo_point: new Set(['array', 'geo_point']),
     };
-  private MAX_ACTIVE_READS: number = 3;
-  private MAX_ALLOWED_QUEUE_SIZE: number = 3;
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
-  private STREAMING_TEMP_FILE_PREFIX: string = 'chunk';
-  private STREAMING_TEMP_FOLDER: string = 'import_streaming_tmp';
   private SUPPORTED_COLUMN_TYPES: Set<string> = new Set(Object.keys(this.COMPATIBLE_TYPES).concat(['array']));
-
-  private chunkCount: number;
-  private chunkQueue: object[];
-  private nextChunk: string;
 
   public async upsert(files: stream.Readable[] | stream.Readable, fields: object, headless: boolean): Promise<ImportConfig>
   {
@@ -238,12 +231,10 @@ export class Import
         return reject(configError);
       }
       const expectedMapping: object = await this._getMappingForSchema(imprtConf);
-      const mappingForSchema: object | string =
-        this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprtConf.dbname);
-      if (typeof mappingForSchema === 'string')
-      {
-        return reject(mappingForSchema);
-      }
+      const schema = await database.getTasty().schema();
+      const mappingForSchema: object =
+        this._checkMappingAgainstSchema(expectedMapping, schema, imprtConf.dbname);
+
       winston.info('File Import: finished config/schema check. Time (s): ' + String((Date.now() - time) / 1000));
 
       const columns: string[] = Object.keys(imprtConf.columnTypes);
@@ -276,18 +267,27 @@ export class Import
             throw new Error('File type must be either CSV or JSON.');
         }
 
-        // TODO: push to elasticsearch update stream
-        // file.pipe(importTransform).pipe(documentTransform).pipe(elasticStream);
+        const documentTransform: ADocumentTransform = new ImportTransform(this, imprtConf);
+        const transformationEngineTransform = new TransformationEngineTransform(imprtConf.transformations);
+        const client: ElasticClient = database.getClient() as ElasticClient;
+        let primaryKey;
+        if (imprtConf.primaryKeys.length > 1)
+        {
+          const delimiter = imprtConf.primaryKeyDelimiter !== undefined ? imprtConf.primaryKeyDelimiter : '-';
+          primaryKey = imprtConf.primaryKeys.join(delimiter);
+        }
+        else
+        {
+          primaryKey = imprtConf.primaryKeys[0];
+        }
 
-        // if (imprtConf.update)
-        // {
-        //   await database.getTasty().update(insertTable, items);
-        // }
-        // else
-        // {
-        //   await database.getTasty().upsert(insertTable, items);
-        // }
-        resolve(imprtConf);
+        const elasticWriter = new ElasticWriter(client, imprtConf.dbname, imprtConf.tablename, primaryKey);
+        file.pipe(importTransform)
+          .pipe(documentTransform)
+          .pipe(transformationEngineTransform)
+          .pipe(elasticWriter);
+        elasticWriter.on('error', (e) => reject(e));
+        elasticWriter.on('finish', () => resolve(imprtConf));
       }
       catch (e)
       {
@@ -296,16 +296,37 @@ export class Import
     });
   }
 
+  /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
+  public _transformAndCheck(obj: object, imprt: ImportConfig, dontCheck?: boolean): object
+  {
+    const specifiedColumnItem: object = {};
+    Object.keys(imprt.columnTypes).forEach((name) =>
+    {
+      specifiedColumnItem[name] = obj[name];
+    });
+
+    if (dontCheck !== true)
+    {
+      const typeError: string = this._checkTypes(specifiedColumnItem, imprt);
+      if (typeError !== '')
+      {
+        throw new Error(typeError);
+      }
+    }
+    return this._convertDateToESDateAndTrim(specifiedColumnItem, imprt.columnTypes);
+  }
+
   /* check for conflicts with existing schema, return error (string) if there is one
    * filters out fields already present in the existing mapping (since they don't need to be inserted)
    * mapping: ES mapping
    * returns: filtered mapping (object) or error message (string) */
-  private _checkMappingAgainstSchema(mapping: object, schema: Tasty.Schema, database: string): object | string
+  private _checkMappingAgainstSchema(mapping: object, schema: Tasty.Schema, database: string): object
   {
     if (schema.databaseNames().indexOf(database) === -1)
     {
       return mapping;
     }
+
     const fieldsToCheck: Set<string> = new Set(Object.keys(mapping['properties']));
     for (const table of schema.tableNames(database))
     {
@@ -317,12 +338,11 @@ export class Import
           if (this._isCompatibleType(mapping['properties'][field], fields[field]))
           {
             fieldsToCheck.delete(field);
-            delete mapping['properties'][field];
           }
           else
           {
-            return 'Type mismatch for field ' + field + '. Cannot cast "' +
-              String(mapping['properties'][field]['type']) + '" to "' + String(fields[field]['type']) + '".';
+            throw new Error('Type mismatch for field ' + field + '. Cannot cast "' +
+              String(mapping['properties'][field]['type']) + '" to "' + String(fields[field]['type']) + '".');
           }
         }
       }
@@ -369,7 +389,7 @@ export class Import
           {
             if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
             {
-              return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
+              return 'Encountered an object whose field "' + key + '" does not match the specified type (' +
                 JSON.stringify(imprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
             }
           }
@@ -673,53 +693,6 @@ export class Import
         item[field] = new Date(date);
       }
     }
-  }
-
-  /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(allItems: object[], imprt: ImportConfig,
-    dontCheck?: boolean): Promise<object[][]>
-  {
-    const promises: Array<Promise<object[]>> = [];
-    let items: object[];
-    while (allItems.length > 0)
-    {
-      items = allItems.splice(0, this.BATCH_SIZE);
-      promises.push(
-        new Promise<object[]>(async (thisResolve, thisReject) =>
-        {
-          const transformedItems: object[] = [];
-          for (let item of items)
-          {
-            try
-            {
-              item = item;
-              // item = Common.applyTransforms(item, imprt.transformations);
-            } catch (e)
-            {
-              return thisReject('Failed to apply transforms: ' + String(e));
-            }
-            // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
-            const specifiedColumnItem: object = {};
-            Object.keys(imprt.columnTypes).forEach((name) =>
-            {
-              specifiedColumnItem[name] = item[name];
-            });
-
-            if (dontCheck !== true)
-            {
-              const typeError: string = this._checkTypes(specifiedColumnItem, imprt);
-              if (typeError !== '')
-              {
-                return thisReject(typeError);
-              }
-            }
-            const trimmedItem: object = this._convertDateToESDateAndTrim(specifiedColumnItem, imprt.columnTypes);
-            transformedItems.push(trimmedItem);
-          }
-          thisResolve(transformedItems);
-        }));
-    }
-    return Promise.all(promises);
   }
 
   private _convertDateToESDateAndTrim(fieldObj: object, fieldTypesObj: object): object

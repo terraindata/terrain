@@ -65,7 +65,16 @@ export default class ImportTransform extends ADocumentTransform
     this.config = config;
   }
 
-  protected transform(input: object, chunkNumber: number): object | object[]
+  protected transform(input: object | object[], chunkNumber: number): object | object[]
+  {
+    if (Array.isArray(input))
+    {
+      return input.map((i) => this._apply(i, chunkNumber));
+    }
+    return this._apply(input, chunkNumber);
+  }
+
+  private _apply(input: object, chunkNumber: number): object
   {
     if (this.config.requireJSONHaveAllFields === true)
     {
@@ -95,6 +104,8 @@ export default class ImportTransform extends ADocumentTransform
         input[field] = null;
       }
     }
-    return input;
+
+    console.log(input);
+    return this.importt._transformAndCheck(input, this.config);
   }
 }

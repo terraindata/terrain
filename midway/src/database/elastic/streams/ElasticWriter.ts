@@ -73,6 +73,14 @@ export class ElasticWriter extends Stream.Writable
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
+    if (Array.isArray(chunk))
+    {
+      const chunks = chunk.map((c) => {
+        return { chunk: c, encoding };
+      });
+      return this._writev(chunks, callback);
+    }
+
     if (typeof chunk !== 'object')
     {
       this.emit('error', 'expecting chunk to be an object');
@@ -82,9 +90,8 @@ export class ElasticWriter extends Stream.Writable
     this.upsert(chunk, callback);
   }
 
-  public _writev?(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
   {
-    //   console.log(chunks);
     const numChunks = chunks.length;
     if (numChunks < this.BULK_THRESHOLD)
     {

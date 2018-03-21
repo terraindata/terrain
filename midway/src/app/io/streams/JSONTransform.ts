@@ -53,13 +53,13 @@ import { Transform } from 'stream';
  */
 export default class JSONTransform
 {
-  public static createImportStream(): Transform
+  public static createImportStream(pattern?: any, map?: any): Transform
   {
-    return JSONStream.parse();
+    return JSONStream.parse(pattern, map);
   }
 
-  public static createExportStream(): Transform
+  public static createExportStream(open?: any, sep?: any, close?: any): Transform
   {
-    return JSONStream.stringify();
+    return JSONStream.stringify(open, sep, close);
   }
 }
