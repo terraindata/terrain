@@ -583,14 +583,6 @@ test('split a field (regex delimiter)', () =>
 
 test('cast node tests', () =>
 {
-  // const doc2 = {
-  //     name: 'Bob',
-  //     age: 17,
-  //     meta: {
-  //         school: 'Stanford',
-  //         sport: 'bobsled',
-  //     },
-  // };
 
   const e: TransformationEngine = new TransformationEngine(doc2);
   e.appendTransformation(
@@ -615,4 +607,22 @@ test('cast node tests', () =>
   expect(r['age']).toBe('17');
   expect(r['meta']['school']).toEqual({});
   expect(r['meta']['sport']).toEqual([]);
+});
+
+test('super deep transformation preserves arrays', () =>
+{
+  const doc = {
+    foo: [
+      {
+        bar: [1, 2, 3],
+      },
+      {
+        bar: [3, 2, 1],
+      },
+    ],
+  };
+
+  const e = new TransformationEngine(doc);
+
+  expect(e.transform(doc)).toEqual(doc);
 });
