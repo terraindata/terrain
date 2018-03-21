@@ -110,8 +110,6 @@ interface State
   expanded?: boolean;
   expandedHitIndex?: number;
 
-  hitsPages: number[];
-  pageBreaks: List<number>;
   onHitsLoaded?: (unchanged?: boolean) => void;
 
   showingExport?: boolean;
@@ -136,7 +134,6 @@ class HitsArea extends TerrainComponent<Props>
     expandedHitIndex: null,
     showingConfig: false,
     showingExport: false,
-    hitsPages: [0],
     hitFormat: 'icon',
     mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
@@ -146,9 +143,7 @@ class HitsArea extends TerrainComponent<Props>
     indexName: '',
     resultsConfig: undefined,
     nestedFields: List([]),
-    pageBreaks: List([0]),
   };
-  public scrollTop = 0;
   public hitsFodderRange = _.range(0, 25);
   public locations = {};
 
@@ -687,46 +682,19 @@ class HitsArea extends TerrainComponent<Props>
       }
       catch (e)
       { }
-      const lastPage = this.state.hitsPages[this.state.hitsPages.length - 1];
       hitsContent = (
-        <div
+        <InfiniteScroll
           className={classNames({
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
-          onScroll={this.checkScroll}
+          // onScroll={this.checkScroll}
           id='hits-area'
-        >
-          {
-            hits.map((hit, index) =>
-            {
-              if (!(index < lastPage * HITS_PAGE_SIZE + HITS_PAGE_SIZE))
-              {
-                return null;
-              }
-
-              return (
-                <Hit
-                  hit={hit}
-                  resultsConfig={resultsConfig}
-                  onExpand={this.handleExpand}
-                  index={index}
-                  key={hit.primaryKey}
-                  primaryKey={hit.primaryKey}
-                  allowSpotlights={this.props.allowSpotlights}
-                  locations={this.locations}
-                  onSpotlightAdded={this.handleSpotlightAdded}
-                  onSpotlightRemoved={this.handleSpotlightRemoved}
-                  hitSize={this.state.hitSize}
-                  nestedFields={this.state.nestedFields}
-                  builder={this.props.builder}
-                  isVisible={this.isVisible(index)}
-                />
-              );
-            })
-          }
-
-        </div>
+          pageSize={HITS_PAGE_SIZE}
+          totalSize={MAX_HITS}
+          renderChild={this.renderHit}
+          childData={hits}
+        />
       );
     }
 
@@ -750,43 +718,26 @@ class HitsArea extends TerrainComponent<Props>
     );
   }
 
-  public isVisible(index)
+  public renderHit(hit, index, isVisible)
   {
-    const { hitsPages } = this.state;
-    const firstPage = hitsPages[0];
-    const lastPage = hitsPages[hitsPages.length - 1];
-    return index >= firstPage * HITS_PAGE_SIZE &&
-      index < lastPage * HITS_PAGE_SIZE + HITS_PAGE_SIZE;
-  }
-  public checkScroll(e)
-  {
-    const elem = $(e.currentTarget);
-    const lastPage = this.state.hitsPages[this.state.hitsPages.length - 1];
-    // scrolled to the bottom, increment visible pages and set the new "top"
-    const scrollUp = this.scrollTop > elem.scrollTop();
-    this.scrollTop = elem.scrollTop();
-    if (elem[0].scrollHeight - elem.scrollTop() === elem.outerHeight())
-    {
-      if (lastPage * HITS_PAGE_SIZE < MAX_HITS)
-      {
-        this.setState({
-          hitsPages: [lastPage, lastPage + 1],
-          pageBreaks: this.state.pageBreaks.set(lastPage + 1, elem.scrollTop()),
-        });
-      }
-    }
-    // If it has scrolled up to "top", decrement visible pages
-    else if (
-      scrollUp &&
-      this.state.pageBreaks.get(lastPage) >= elem.scrollTop() &&
-      this.state.hitsPages.indexOf(0) === -1
-    )
-    {
-      const firstPage = this.state.hitsPages[0];
-      this.setState({
-        hitsPages: [firstPage - 1, firstPage],
-      });
-    }
+    return (
+      <Hit
+        hit={hit}
+        resultsConfig={this.state.resultsConfig}
+        onExpand={this.handleExpand}
+        index={index}
+        key={hit.primaryKey}
+        primaryKey={hit.primaryKey}
+        allowSpotlights={this.props.allowSpotlights}
+        locations={this.locations}
+        onSpotlightAdded={this.handleSpotlightAdded}
+        onSpotlightRemoved={this.handleSpotlightRemoved}
+        hitSize={this.state.hitSize}
+        nestedFields={this.state.nestedFields}
+        builder={this.props.builder}
+        isVisible={isVisible}
+      />
+    );
   }
 
   /* public handleESresultExport()
@@ -943,8 +894,6 @@ column if you have customized the results view.');
     document.getElementById('hits-area').scrollTop = 0;
     this.setState({
       hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
-      hitsPages: [0],
-      pageBreaks: List([0]),
     });
   }
 
