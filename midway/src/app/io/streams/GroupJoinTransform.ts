@@ -125,10 +125,11 @@ export default class GroupJoinTransform extends Readable
     this.source = new ElasticReader(client, query);
     this.source.on('readable', (() =>
     {
-      const responses = this.source.read();
-      for (const r of responses)
+      let response = this.source.read();
+      while (response !== null)
       {
-        this.dispatchSubqueryBlock(r);
+        this.dispatchSubqueryBlock(response);
+        response = this.source.read();
       }
     }).bind(this));
   }
