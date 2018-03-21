@@ -527,7 +527,7 @@ class Builder extends TerrainComponent<Props>
     const algorithm = this.getAlgorithm();
     if (algorithm)
     {
-      if (algorithm.status === ItemStatus.Live || algorithm.status === ItemStatus.Approve)
+      if (algorithm.status === ItemStatus.Deployed || algorithm.status === ItemStatus.Approve)
       {
         return false;
       }
@@ -609,7 +609,9 @@ class Builder extends TerrainComponent<Props>
   {
     const { users } = this.props;
     const algorithm = this.getAlgorithm();
-    return algorithm && (algorithm.status === ItemStatus.Build
+    return algorithm && (
+      (algorithm.status === ItemStatus.Build ||
+        algorithm.status === ItemStatus.Live)
       && Util.canEdit(algorithm, users, RolesStore));
   }
 
@@ -620,9 +622,9 @@ class Builder extends TerrainComponent<Props>
     {
       return '';
     }
-    if (algorithm.status !== ItemStatus.Build)
+    if (algorithm.status !== ItemStatus.Build || algorithm.status !== ItemStatus.Live)
     {
-      return 'This Algorithm is not in Build status';
+      return 'This Algorithm is not in Build or Live status';
     }
     return 'You are not authorized to edit this Algorithm';
   }
