@@ -211,14 +211,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
   }
 
-  public handleLineEditorToggle(open)
-  {
-    if (!open)
-    {
-      this.setState({ addingFilterLine: false });
-    }
-  }
-
   public insertIn(items, keyPath, item): List<any>
   {
     // If key path is just a single value, do a normal insert
