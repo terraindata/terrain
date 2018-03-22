@@ -79,19 +79,25 @@ export class ElasticStream extends Stream.Readable
     this.query = query;
     this.streaming = streaming;
 
-    this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
     if (this.streaming || query['scroll'] !== undefined)
     {
+      this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
       this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
     }
 
     try
     {
+      let size;
+      if (this.size !== undefined)
+      {
+        size = Math.min(this.size, this.MAX_SEARCH_SIZE);
+      }
+
       this.querying = true;
       this.client.search({
         body: this.query,
         scroll: this.scroll,
-        size: Math.min(this.size, this.MAX_SEARCH_SIZE),
+        size,
       },
         (error, response): void =>
         {
