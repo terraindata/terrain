@@ -126,7 +126,7 @@ export default abstract class ETLHelpers
   {
     if (cache)
     {
-      return this._template.proxy();
+      return new TemplateProxy(this._template);
     }
     else
     {

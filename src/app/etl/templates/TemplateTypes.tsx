@@ -57,7 +57,6 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TemplateProxy } from './TemplateProxy';
 
 export type SourcesMap = Immutable.Map<string, SourceConfig>;
 export type SinksMap = Immutable.Map<string, SinkConfig>;
@@ -77,11 +76,6 @@ class ETLTemplateC implements ETLTemplateI
   public process = _ETLProcess();
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
-
-  public proxy()
-  {
-    return new TemplateProxy(this as any);
-  }
 
   public getSources()
   {
@@ -134,7 +128,8 @@ class ETLTemplateC implements ETLTemplateI
 
   public getLastEdgeId(): number
   {
-    const edges = this.findEdges((edge) => edge.to === this.getDefaultSink());
+    const defaultSink = this.getDefaultSink();
+    const edges = this.findEdges((edge) => edge.to === defaultSink);
     return edges.size > 0 ? edges.first() : -1;
   }
 

@@ -93,7 +93,6 @@ class GraphHelpers extends ETLHelpers
     const proxy = this._templateProxy();
     const leftEdgeId = this._template.findEdges((edge) => edge.from === leftId).first();
     const rightEdgeId = this._template.findEdges((edge) => edge.from === rightId).first();
-
     const destinationNodeId = this._template.getEdge(leftEdgeId).to;
 
     const mergeNodeId = proxy.addMerge(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
@@ -159,7 +158,7 @@ class GraphHelpers extends ETLHelpers
     const { newKeys, deletedKeys, differentKeys } =
       getChangedKeys(this._template.getSinks(), newSinks);
 
-    const proxy = this._template.proxy();
+    const proxy = this._templateProxy(true);
 
     newKeys.forEach((key) =>
     {

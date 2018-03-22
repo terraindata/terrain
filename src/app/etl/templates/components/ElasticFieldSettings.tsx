@@ -218,7 +218,6 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 
   public handleSettingsApplied()
   {
-    const field = this._field();
     this._proxy().setFieldProps(this.state, Languages.Elastic);
   }
 

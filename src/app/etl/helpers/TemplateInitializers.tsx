@@ -73,8 +73,10 @@ import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
+import { TemplateProxy } from 'etl/templates/TemplateProxy';
 
 import DocumentsHelpers from './DocumentsHelpers';
+
 
 class Initializers extends ETLHelpers
 {
@@ -185,8 +187,7 @@ class Initializers extends ETLHelpers
     const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
     const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
     // default source and sink is upload and download
-
-    const proxy = template.proxy();
+    const proxy = new TemplateProxy(template);
     const sourceId = proxy.addSource('_default', sourceToAdd);
     const sinkId = proxy.addSink('_default', sinkToAdd);
     const initialEdge = proxy.addEdge(sourceId, sinkId, engine);
