@@ -228,7 +228,7 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
-  public renderNestedFieldHeader(field, depth, size, expandState: NestedState, maxFields: number)
+  public renderNestedFieldHeader(field, depth, size, expandState: NestedState, maxFields: number, thumbnail: boolean)
   {
     const scrollState = this.state.scrollState.get(field) || 0;
     return (
@@ -263,9 +263,26 @@ class HitComponent extends TerrainComponent<Props> {
             className='hit-nested-column-names'
             style={fontColor(Colors().fontColorLightest)}
           >
-            <span className='column-name-image'>Image</span>
-            <span className='column-name-number'>No.</span>
-            <span className='column-name-name'>Name</span>
+            {
+              thumbnail &&
+              <span className='column-name-image'>Image</span>
+            }
+            <span
+              className={classNames({
+                'column-name-number': true,
+                'column-name-number-no-thumbnail': !thumbnail,
+              })}
+            >
+              No.
+            </span>
+            <span
+              className={classNames({
+                'column-name-name': true,
+                'column-name-name-no-thumbnail': !thumbnail,
+              })}
+            >
+              Name
+              </span>
           </div>
         </div>
         {
@@ -416,7 +433,13 @@ class HitComponent extends TerrainComponent<Props> {
         ]}
       >
         {
-          this.renderNestedFieldHeader(field, depth, size, expandState, maxFields)
+          this.renderNestedFieldHeader(
+            field,
+            depth,
+            size,
+            expandState,
+            maxFields,
+            format && format.config && format.config.thumbnail)
         }
         <div
           className='hit-nested-content-values'

@@ -54,10 +54,9 @@ export interface Props
 {
   pageSize: number;
   totalSize: number;
-  renderChild: (data: any, index: number, isVisible: boolean) => El;
-  childData: List<any>;
   className: string;
   id?: string;
+  children: any;
 }
 
 class InfiniteScroll extends TerrainComponent<Props>
@@ -124,6 +123,17 @@ class InfiniteScroll extends TerrainComponent<Props>
   {
     const { pageSize } = this.props;
     const lastPage = this.state.pages[this.state.pages.length - 1];
+    const { children } = this.props;
+    // inject isVisible prop into all of the children, if they are too far down on the page
+    // replace them with null
+    const childrenWithProps = React.Children.map(children, (child: any, index) =>
+    {
+      if (!(index < lastPage * pageSize + pageSize))
+      {
+        return null;
+      }
+      return React.cloneElement(child, { isVisible: this.isVisible(index) });
+    });
     return (
       <div
         className={this.props.className}
@@ -131,18 +141,7 @@ class InfiniteScroll extends TerrainComponent<Props>
         id={this.props.id}
       >
         {
-          this.props.childData.map((child, index) =>
-          {
-            if (!(index < lastPage * pageSize + pageSize))
-            {
-              return null;
-            }
-            else
-            {
-              return this.props.renderChild(child, index, this.isVisible(index));
-            }
-          })
-
+          childrenWithProps
         }
       </div>
     );

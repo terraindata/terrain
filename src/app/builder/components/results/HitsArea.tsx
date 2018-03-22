@@ -161,6 +161,7 @@ class HitsArea extends TerrainComponent<Props>
 
   public shouldComponentUpdate(nextProps: Props, nextState: State)
   {
+
     for (const key in nextProps)
     {
       if (!_.isEqual(this.props[key], nextProps[key]))
@@ -203,15 +204,6 @@ class HitsArea extends TerrainComponent<Props>
     if (!_.isEqual(this.props.resultsState.fields, nextProps.resultsState.fields))
     {
       this.getNestedFields(nextProps);
-    }
-    if (nextProps.query.cards !== this.props.query.cards
-      || nextProps.query.inputs !== this.props.query.inputs)
-    {
-      if (this.state.onHitsLoaded)
-      {
-        // reset infinite scroll
-        this.state.onHitsLoaded(false);
-      }
     }
     if (this.props.resultsState.hits !== nextProps.resultsState.hits)
     {
@@ -692,9 +684,27 @@ class HitsArea extends TerrainComponent<Props>
           id='hits-area'
           pageSize={HITS_PAGE_SIZE}
           totalSize={MAX_HITS}
-          renderChild={this.renderHit}
-          childData={hits}
-        />
+        >
+          {
+            hits.map((hit, index) =>
+              <Hit
+                hit={hit}
+                resultsConfig={resultsConfig}
+                onExpand={this.handleExpand}
+                index={index}
+                key={hit.primaryKey}
+                primaryKey={hit.primaryKey}
+                allowSpotlights={this.props.allowSpotlights}
+                locations={this.locations}
+                onSpotlightAdded={this.handleSpotlightAdded}
+                onSpotlightRemoved={this.handleSpotlightRemoved}
+                hitSize={this.state.hitSize}
+                nestedFields={this.state.nestedFields}
+                builder={this.props.builder}
+              />,
+            )
+          }
+        </InfiniteScroll>
       );
     }
 
@@ -715,28 +725,6 @@ class HitsArea extends TerrainComponent<Props>
           infoAreaContent
         }
       </div>
-    );
-  }
-
-  public renderHit(hit, index, isVisible)
-  {
-    return (
-      <Hit
-        hit={hit}
-        resultsConfig={this.state.resultsConfig}
-        onExpand={this.handleExpand}
-        index={index}
-        key={hit.primaryKey}
-        primaryKey={hit.primaryKey}
-        allowSpotlights={this.props.allowSpotlights}
-        locations={this.locations}
-        onSpotlightAdded={this.handleSpotlightAdded}
-        onSpotlightRemoved={this.handleSpotlightRemoved}
-        hitSize={this.state.hitSize}
-        nestedFields={this.state.nestedFields}
-        builder={this.props.builder}
-        isVisible={isVisible}
-      />
     );
   }
 
