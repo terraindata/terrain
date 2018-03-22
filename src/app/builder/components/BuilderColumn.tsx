@@ -90,8 +90,8 @@ const TuningIcon = require('./../../../images/icon_tuning.svg');
 enum COLUMNS
 {
   Pathfinder,
-  Cards,
   Results,
+  Cards,
   Editor,
   Inputs,
   Schema,
@@ -102,8 +102,8 @@ const NUM_COLUMNS = 7;
 
 const menuIcons = [
   { icon: <BuilderIcon />, color: '#76a2c1' },
-  { icon: <BuilderIcon />, color: '#76a2c1' },
   { icon: <ResultsIcon />, color: '#71bca2' },
+  { icon: <BuilderIcon />, color: '#76a2c1' },
   { icon: <TQLIcon />, color: '#d47884' },
   { icon: <InputsIcon />, color: '#c2b694' },
   { icon: <ManualIcon />, color: '#a98abf' },
