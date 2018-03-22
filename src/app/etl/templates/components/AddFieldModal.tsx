@@ -61,7 +61,7 @@ import Autocomplete from 'common/components/Autocomplete';
 import Modal from 'common/components/Modal';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformations/util/EngineUtil';
+import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -90,6 +90,7 @@ export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 const indentSize = 24;
 const emptyList = List([]);
 
+// UI to add a new field underneath this field
 class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 {
   public state: {

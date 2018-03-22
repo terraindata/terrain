@@ -43,124 +43,79 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
-
-import * as classNames from 'classnames';
+// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { borderColor, Colors, getStyle } from 'src/app/colors/Colors';
-import Util from 'util/Util';
+
+import { instanceFnDecorator } from 'src/app/Classes';
+
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { DynamicForm } from 'common/components/DynamicForm';
-import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-
-import { availableTransformations, getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
-import { TransformationNode } from 'etl/templates/FieldTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-
-import './TransformationEditor.less';
-
-interface FormState
+interface DuplicateOptions
 {
-  transformationIndex: number;
+  outputName: string;
 }
-
-export interface Props
+export class DuplicateTFF extends TransformationForm<DuplicateOptions, TransformationNodeType.DuplicateNode>
 {
-  onTransformationCreated: (structuralChanges: boolean) => void;
-  onClose: () => void;
-  engine: TransformationEngine;
-  fieldID: number;
-}
-
-@Radium
-export class TransformationCreator extends TerrainComponent<Props>
-{
-  public state: FormState = {
-    transformationIndex: -1,
+  protected readonly type = TransformationNodeType.DuplicateNode;
+  protected readonly inputMap: InputDeclarationMap<DuplicateOptions> = {
+    outputName: {
+      type: DisplayType.TextBox,
+      displayName: 'New Field Name',
+    },
+  };
+  protected readonly initialState = {
+    outputName: 'New Field',
   };
 
-  private inputMap: InputDeclarationMap<FormState> =
+  protected computeInitialState()
+  {
+    const { fieldId, isCreate, engine } = this.props;
+    if (isCreate)
     {
-      transformationIndex: {
-        type: DisplayType.Pick;
-        displayName: 'Transformation',
-        group: 'main',
-        options: {
-          pickOptions: this.getOptionNames,
-        },
-      },
-    };
-
-  public getValidOptions(): List<TransformationNodeType>
-  {
-    return availableTransformations.filter(
-      (type, index) =>
-      {
-        return TransformationInfo.isAvailable(type, this.props.engine, this.props.fieldID);
-      },
-    ).toList();
-  }
-
-  public getOptionNames(s: FormState)
-  {
-    const transformations = this.getValidOptions();
-    return transformations.map((type) => TransformationInfo.getReadableName(type)).toList();
-  }
-
-  public renderCreateTransformation()
-  {
-    const { transformationIndex } = this.state;
-    let compComponent = null;
-    if (transformationIndex !== -1)
-    {
-      const type = this.getValidOptions().get(transformationIndex);
-      const CompClass = getTransformationForm(type);
-      compComponent = (
-        <CompClass
-          isCreate={true}
-          engine={this.props.engine}
-          fieldId={this.props.fieldID}
-          onEditOrCreate={this.props.onTransformationCreated}
-          onClose={this.props.onClose}
-        />
-      );
+      const myKP = engine.getOutputKeyPath(fieldId);
+      return {
+        outputName: `Copy of ${myKP.last()}`,
+      };
     }
-
-    return (
-      <div className='create-transformation-container'>
-        <DynamicForm
-          inputMap={this.inputMap}
-          inputState={this.state}
-          onStateChange={this.handleStateChange}
-        />
-        <div className='create-transformation-component'>
-          {compComponent}
-        </div>
-      </div>
-    );
+    else
+    {
+      return super.computeInitialState();
+    }
   }
 
-  public render()
+  protected isStructuralChange()
   {
-    return (
-      <div className='transformation-editor'>
-        {this.renderCreateTransformation()}
-      </div>
-    );
+    return true;
   }
 
-  public handleStateChange(s: FormState)
+  protected computeArgs()
   {
-    this.setState(s);
-  }
+    const { engine, fieldId } = this.props;
+    const { outputName } = this.state;
+    const args = super.computeArgs();
 
+    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const newKeyPath = currentKeyPath.set(currentKeyPath.size - 1, outputName);
+    return {
+      options: {
+        newFieldKeyPaths: List([newKeyPath]),
+      },
+      fields: args.fields,
+    };
+  }
 }

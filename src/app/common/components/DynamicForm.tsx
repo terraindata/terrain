@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -114,7 +115,6 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   constructor(props)
   {
     super(props);
-    this.setStateHOC = _.memoize(this.setStateHOC);
     this.computeRenderMatrix = memoizeOne(this.computeRenderMatrix);
   }
 
@@ -157,7 +157,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         <Autocomplete
           className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
-          onChange={this.setStateHOC(stateName)}
+          onChange={this.setStateNumberBoxHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
         />
@@ -415,7 +415,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     };
   }
 
-  // This function is memoized
+  @instanceFnDecorator(_.memoize)
   public setStateHOC(stateName)
   {
     return (value) =>
@@ -423,6 +423,20 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
       this.props.onStateChange(shallowCopy);
+    };
+  }
+
+  @instanceFnDecorator(_.memoize)
+  public setStateNumberBoxHOC(stateName)
+  {
+    const setState = this.setStateHOC(stateName);
+    return (value) =>
+    {
+      const asNum = Number(value);
+      if (!Number.isNaN(asNum))
+      {
+        setState(asNum);
+      }
     };
   }
 }

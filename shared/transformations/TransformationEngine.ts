@@ -282,7 +282,7 @@ export class TransformationEngine
     {
       if (yadeep.get(output, value) !== undefined && this.fieldEnabled.get(key) === true)
       {
-        if (this.fieldTypes.get(key) === 'array')
+        if (this.fieldTypes.get(key) === 'array' && !value.includes('*'))
         {
           const x = yadeep.get(output, value);
           x['length'] = Object.keys(x).length;

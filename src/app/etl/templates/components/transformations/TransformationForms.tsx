@@ -48,26 +48,35 @@ THE SOFTWARE.
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { FactoryArgs, transformationFormFactory, TransformationFormProps } from './TransformationFormFactory';
+import { TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-/*
- *  How to add a transformations to the UI:
- *  1: See 'SUBSTRING' for an example of how to declare the transformation UI config.
- *  2: Add the transformation class to the getTransformationForm switch statement
- */
+import { CastTFF } from './CastTransformationForm';
+import { DuplicateTFF } from './DuplicateTransformationForm';
+import { JoinTFF } from './JoinTransformationForm';
+import { SubstringTFF, UppercaseTFF } from './SimpleTransformations';
+import { SplitTFF } from './SplitTransformationForm';
 
 export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
 {
   switch (type)
   {
     case TransformationNodeType.UppercaseNode:
-      return UppercaseClass as any;
+      return UppercaseTFF;
     case TransformationNodeType.SubstringNode:
-      return SubstringClass;
+      return SubstringTFF;
+    case TransformationNodeType.DuplicateNode:
+      return DuplicateTFF;
+    case TransformationNodeType.SplitNode:
+      return SplitTFF;
+    case TransformationNodeType.JoinNode:
+      return JoinTFF;
+    case TransformationNodeType.CastNode:
+      return CastTFF;
     default:
       return null;
   }
@@ -81,60 +90,13 @@ function determineAvailableTransformations(): List<TransformationNodeType>
   let typeList = List([]);
   for (const type in TransformationNodeType)
   {
-    if (getTransformationForm(type as TransformationNodeType) !== null)
+    if (
+      getTransformationForm(type as TransformationNodeType) !== null
+      && TransformationInfo.canCreate(type as TransformationNodeType)
+    )
     {
       typeList = typeList.push(type);
     }
   }
   return typeList;
 }
-
-// UPPERCASE
-interface UppercaseState
-{
-
-}
-
-const uppercaseInputMap = {
-
-};
-
-const uppercaseArgs: FactoryArgs<UppercaseState, TransformationNodeType.UppercaseNode> = {
-  inputMap: uppercaseInputMap,
-  type: TransformationNodeType.UppercaseNode,
-  initialState: {},
-  noEditOptions: true,
-};
-
-const UppercaseClass =
-  transformationFormFactory<UppercaseState, TransformationNodeType.UppercaseNode>(uppercaseArgs);
-
-// SUBSTRING
-interface SubstringState
-{
-  from: number;
-  length: number;
-}
-
-const substringInputMap: InputDeclarationMap<SubstringState> = {
-  from: {
-    type: DisplayType.NumberBox,
-    displayName: 'From Position',
-  },
-  length: {
-    type: DisplayType.NumberBox,
-    displayName: 'Substring Length',
-  },
-};
-
-const substringArgs: FactoryArgs<SubstringState, TransformationNodeType.SubstringNode> = {
-  inputMap: substringInputMap,
-  type: TransformationNodeType.SubstringNode,
-  initialState: {
-    from: 0,
-    length: 3,
-  },
-};
-
-const SubstringClass =
-  transformationFormFactory<SubstringState, TransformationNodeType.SubstringNode>(substringArgs);

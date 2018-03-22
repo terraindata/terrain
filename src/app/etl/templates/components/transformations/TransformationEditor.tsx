@@ -86,7 +86,7 @@ export class TransformationEditor extends TerrainComponent<Props>
           <CompClass
             isCreate={false}
             engine={this.props.engine}
-            fieldID={this.props.fieldID}
+            fieldId={this.props.fieldID}
             onEditOrCreate={this.props.onTransformationChange}
             onClose={this.props.onClose}
             transformation={this.props.transformation}

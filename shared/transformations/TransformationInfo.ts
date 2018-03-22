@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
@@ -85,6 +86,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Split this field into 2 or more fields',
         type: SplitTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return engine.getFieldType(fieldId) === 'string';
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
@@ -98,12 +103,15 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Join this field with another field',
         type: JoinTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return engine.getFieldType(fieldId) === 'string';
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
           visitor.visitJoinNode(transformationNode, docCopy, options),
-
       },
     [TransformationNodeType.FilterNode]: // what does this do?
       {
@@ -125,6 +133,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Duplicate this field',
         type: DuplicateTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return engine.getFieldType(fieldId) === 'string';
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
@@ -178,6 +190,19 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitSubstringNode(transformationNode, docCopy, options),
       },
+    [TransformationNodeType.CastNode]:
+      {
+        humanName: 'Cast',
+        editable: true,
+        creatable: true,
+        description: `Convert this field to a different type`,
+        type: CastTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitCastNode(transformationNode, docCopy, options),
+      },
   };
 
 export abstract class TransformationInfo
@@ -195,6 +220,29 @@ export abstract class TransformationInfo
   public static getInfo(type: TransformationNodeType): InfoType // get the whole info object
   {
     return TransformationNodeInfo[type];
+  }
+
+  public static isAvailable(type: TransformationNodeType, engine: TransformationEngine, field: number)
+  {
+    const info = TransformationNodeInfo[type];
+    if (info.isAvailable === undefined)
+    {
+      return true;
+    }
+    else
+    {
+      return info.isAvailable(engine, field);
+    }
+  }
+
+  public static canCreate(type: TransformationNodeType): boolean
+  {
+    return TransformationNodeInfo[type].creatable;
+  }
+
+  public static canEdit(type: TransformationNodeType): boolean
+  {
+    return TransformationNodeInfo[type].editable;
   }
 
   public static getType(type: TransformationNodeType): any

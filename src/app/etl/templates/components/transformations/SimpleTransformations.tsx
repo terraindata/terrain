@@ -43,65 +43,52 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable no-unused-expression
-import { List } from 'immutable';
-import { KeyPath } from 'shared/util/KeyPath';
+// tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
 
-enum TransformationNodeType
+import { instanceFnDecorator } from 'src/app/Classes';
+
+import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { TransformationNode } from 'etl/templates/FieldTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
+type SubstringOptions = NodeOptionsType<TransformationNodeType.SubstringNode>;
+export class SubstringTFF extends TransformationForm<SubstringOptions, TransformationNodeType.SubstringNode>
 {
-  SplitNode = 'SplitNode',
-  JoinNode = 'JoinNode',
-  FilterNode = 'FilterNode',
-  DuplicateNode = 'DuplicateNode',
-  InsertNode = 'InsertNode',
-  UppercaseNode = 'UppercaseNode',
-  SubstringNode = 'SubstringNode',
-  CastNode = 'CastNode',
-}
-
-// if this has errors, double check TransformationNodeType's keys are equal to its values
-type AssertEnumValuesEqualKeys = {
-  [K in keyof typeof TransformationNodeType]: K
-};
-TransformationNodeType as AssertEnumValuesEqualKeys;
-
-// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
-type AssertOptionTypesExhaustive = {
-  [K in TransformationNodeType]: TransformationOptionTypes[K]
-};
-
-interface TransformationOptionTypes
-{
-  SplitNode: {
-    newFieldKeyPaths: List<KeyPath>;
-    preserveOldFields: boolean;
-    delimiter: string | RegExp | number;
+  protected readonly type = TransformationNodeType.SubstringNode;
+  protected readonly inputMap: InputDeclarationMap<SubstringOptions> = {
+    from: {
+      type: DisplayType.NumberBox,
+      displayName: 'From Position',
+    },
+    length: {
+      type: DisplayType.NumberBox,
+      displayName: 'SubstringLength',
+    },
   };
-  JoinNode: {
-    newFieldKeyPaths: List<KeyPath>;
-    preserveOldFields: boolean;
-    delimiter: string;
-  };
-  FilterNode: any;
-  DuplicateNode: {
-    newFieldKeyPaths: List<KeyPath>;
-  };
-  InsertNode: {
-    at?: number;
-    value: string | KeyPath;
-  };
-  UppercaseNode: {
-  };
-  SubstringNode: {
-    from: number;
-    length: number;
-  };
-  CastNode: {
-    toTypename: string;
+  protected readonly initialState = {
+    from: 0,
+    length: 5,
   };
 }
 
-export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
-
-export default TransformationNodeType;
+type UppercaseOptions = NodeOptionsType<TransformationNodeType.UppercaseNode>;
+export class UppercaseTFF extends TransformationForm<UppercaseOptions, TransformationNodeType.UppercaseNode>
+{
+  protected readonly type = TransformationNodeType.UppercaseNode;
+  protected readonly inputMap: InputDeclarationMap<UppercaseOptions> = {};
+  protected readonly initialState = {};
+}

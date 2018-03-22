@@ -51,11 +51,10 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 
-// import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { defaultProps, ElasticFieldProps, ElasticTypes, JsAutoMap } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { hashPath, isNamedField, isWildcardField, PathHashMap } from 'shared/transformations/util/EngineUtil';
+import { getRepresentedType, hashPath, isNamedField, PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 export interface TypeConfig
@@ -255,15 +254,7 @@ export class ElasticMapping
 
   protected getRepresentedType(fieldID: number): FieldTypes
   {
-    const kp = this.engine.getOutputKeyPath(fieldID);
-    if (isWildcardField(kp))
-    {
-      return this.getValueType(fieldID);
-    }
-    else
-    {
-      return this.engine.getFieldType(fieldID) as FieldTypes;
-    }
+    return getRepresentedType(fieldID, this.engine);
   }
 
   // converts engine keypaths to keypaths in the elastic mapping

@@ -55,7 +55,7 @@ import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { validateNewFieldName, validateRename } from 'shared/transformations/util/EngineUtil';
+import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 /*
  *  The FieldProxy structures act as the binding between the TemplateEditorField
