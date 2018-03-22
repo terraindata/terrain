@@ -1010,7 +1010,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
           >
             {tooltipText}
           </div>,
-          arrow: false
+          arrow: false,
         });
       }
       return content;

@@ -44,10 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import aesjs = require('aes-js');
 import sha1 = require('sha1');
 
 import * as bcrypt from 'bcrypt';
 import * as csv from 'fast-csv';
+import * as keccak from 'keccak';
 import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
@@ -356,18 +358,46 @@ export class Import
         switch (transform['name'])
         {
           case 'encrypt':
-            const oldColName: string | undefined = transform['colName'];
-            const salt: string | undefined = transform['args']['salt'];
-            if (oldColName === undefined || salt === undefined)
+            const oldColEncryptName: string | undefined = transform['colName'];
+            const key: string | undefined = transform['args']['key'];
+            if (oldColEncryptName === undefined || key === undefined)
             {
-              throw new Error('Column name and salt must be provided.');
+              throw new Error('Column name and key must be provided.');
             }
-            if ((salt as string).length < 72)
+            if ((key as string).length !== 32)
             {
-              throw new Error('Salt is < 72 characters.');
+              throw new Error('Key must be exactly 32 characters.');
             }
+            const byteKey: any = aesjs.utils.utf8.toBytes(key as string);
+            const msgToEncrypt: string = typeof obj[oldColEncryptName as string] === 'string'
+              ? obj[oldColEncryptName as string] : JSON.stringify(obj[oldColEncryptName as string]);
+            const msgBytes: any = aesjs.utils.utf8.toBytes(msgToEncrypt);
+            const aesCtr = new aesjs.ModeOfOperation.ctr(byteKey, new aesjs.Counter(5));
+            obj[oldColEncryptName as string] = aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
+
+            /*
+            winston.info('Encrypted value: ' + JSON.stringify(obj[oldColEncryptName as string]));
+            const decryptedMsgBytes: any = aesjs.utils.hex.toBytes(obj[oldColEncryptName as string]);
+            const aesCtrDecrypt = new aesjs.ModeOfOperation.ctr(byteKey, new aesjs.Counter(5));
+            winston.info('Decrypted value: ' + aesjs.utils.utf8.fromBytes(aesCtrDecrypt.decrypt(decryptedMsgBytes)));
+            */
+            break;
+          case 'hash':
+            const oldColHashName: string | undefined = transform['colName'];
+            const bcryptSalt: string | undefined = transform['args']['bcryptSalt'];
+            const sha3Salt: string | undefined = transform['args']['sha3Salt'];
+            if (oldColHashName === undefined || bcryptSalt === undefined || sha3Salt === undefined)
+            {
+              throw new Error('Column name, bcrypt salt, and SHA3 salt must be provided.');
+            }
+            if ((bcryptSalt as string).length < 72)
+            {
+              throw new Error('bcrypt salt is < 72 characters.');
+            }
+            const sha3Hashed: string = keccak('sha3-256').update(
+              JSON.stringify(obj[oldColHashName as string]) + sha3Salt as string).digest('hex');
             // use BCRYPT_VERSION 2a, 10 rounds
-            obj[oldColName as string] = await bcrypt.hash(obj[oldColName as string], '$2a$10$' + (salt as string));
+            obj[oldColHashName as string] = await bcrypt.hash(sha3Hashed, '$2a$10$' + (bcryptSalt as string));
             break;
           case 'rename':
             const oldName: string | undefined = transform['colName'];
