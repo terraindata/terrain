@@ -629,8 +629,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
           terms: {
             [line.field]: parsed,
             boost,
-          }
-        })
+          },
+        });
       }
 
     default:
