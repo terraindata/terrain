@@ -145,7 +145,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   baseQuery = baseQuery.set('script_fields', scripts);
 
   // Nested algorithms (groupjoins)
-  const groupJoin = parseNested(path.more, path.nested, inputs);
+  const groupJoin = parseNested(path.reference, path.nested, inputs);
   if (groupJoin)
   {
     baseQuery = baseQuery.set('groupJoin', groupJoin);
@@ -712,7 +712,7 @@ function parseAggregations(more: More): {}
 }
 
 // Put a nested path inside of a groupJoin
-function parseNested(more: More, nested: List<Path>, inputs)
+function parseNested(reference: string, nested: List<Path>, inputs)
 {
   if (nested.size === 0)
   {
@@ -723,7 +723,7 @@ function parseNested(more: More, nested: List<Path>, inputs)
   {
     groupJoins = groupJoins.set('dropIfLessThan', parseFloat(String(nested.get(0).minMatches)));
   }
-  groupJoins = groupJoins.set('parentAlias', more.references.get(0));
+  groupJoins = groupJoins.set('parentAlias', reference);
   nested.forEach((n, i) =>
   {
     if (n)

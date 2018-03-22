@@ -82,7 +82,9 @@ const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 export interface Props
 {
   pathfinderContext: PathfinderContext;
-  path: Path;
+  count: number;
+  scoreType: string;
+  minMatches: number;
   more: More;
   keyPath: KeyPath;
   hideTitle?: boolean;
@@ -142,15 +144,9 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     }
   }
 
-  public shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps: Props, nextState)
   {
     return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
-  }
-
-  public handleReferenceChange(i, value)
-  {
-    const { keyPath } = this.props;
-    this.props.builderActions.changePath(this._ikeyPath(keyPath, 'references', i), value);
   }
 
   public handleAddScript()
@@ -158,43 +154,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     const newScript = _Script();
     const keyPath = this._ikeyPath(this.props.keyPath, 'scripts');
     this.props.builderActions.changePath(keyPath, this.props.more.scripts.push(newScript));
-  }
-
-  public handleAddNested()
-  {
-    const currIndex = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references'),
-      this.props.more.references.push(currIndex));
-    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
-    this.props.builderActions.changePath(nestedKeyPath,
-      this.props.path.nested.push(_Path({ name: undefined, step: 0 })), true);
-  }
-
-  public handleDeleteNested(i)
-  {
-    if (this.props.pathfinderContext.canEdit)
-    {
-      this.props.builderActions.changePath(
-        this._ikeyPath(this.props.keyPath, 'references'),
-        this.props.more.references.splice(i, 1),
-        true,
-      );
-      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
-      this.props.builderActions.changePath(
-        nestedKeyPath,
-        this.props.path.nested.splice(i, 1));
-    }
-  }
-
-  public handleSourceChange(i, value)
-  {
-    if (this.props.pathfinderContext.canEdit)
-    {
-      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i, 'name');
-      this.props.builderActions.changePath(
-        nestedKeyPath,
-        value);
-    }
   }
 
   public handleAddLine()
@@ -238,22 +197,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       };
     }).toList();
     return lines;
-  }
-
-  public renderPath(path: Path, i: number)
-  {
-    return (
-      <PathfinderArea
-        path={path}
-        canEdit={this.props.pathfinderContext.canEdit}
-        schema={this.props.pathfinderContext.schemaState}
-        keyPath={this.props.keyPath.butLast().toList().push('nested').push(i)}
-        toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
-        parentSource={this.props.pathfinderContext.source}
-        parentName={this.props.more.references.get(i)}
-        onSourceChange={this._fn(this.handleSourceChange, i)}
-      />
-    );
   }
 
   public getSizeOptionSets()
@@ -433,20 +376,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     }
   }
 
-  public handleNestedSizePickerChange(i: number, optionSetIndex: number, value: any)
-  {
-    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i);
-
-    this.props.builderActions.changePath
-      (nestedKeyPath.concat(List(['source', 'count'])).toList(), value);
-  }
-
-  public handleAlgorithmNameChange(i: number, value: any)
-  {
-    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i, 'name');
-    this.props.builderActions.changePath(nestedKeyPath, value);
-  }
-
   public handleMinMatchesChange(optionSetIndex: number, value: any)
   {
     const { keyPath } = this.props;
@@ -471,100 +400,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const keyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'score', 'type');
     this.props.builderActions.changePath(keyPath, value);
-  }
-
-  public handleExpandNested(keyPath, expanded)
-  {
-    this.props.builderActions.changePath(keyPath, expanded);
-  }
-
-  public renderNestedPaths()
-  {
-    const { references } = this.props.more;
-    const { nested } = this.props.path;
-    const { canEdit, source } = this.props.pathfinderContext;
-    const { keyPath } = this.props;
-    return (
-      <div>
-        {
-          references.map((ref, i) =>
-          {
-            const expanded = nested.get(i) !== undefined ? nested.get(i).expanded : false;
-            const nestedPath = nested.get(i);
-            return (
-              <div
-                className='pf-more-nested'
-                key={i}
-                style={
-                  _.extend({},
-                    backgroundColor(Colors().blockBg),
-                    borderColor(Colors().blockOutline),
-                    { paddingBottom: expanded ? 6 : 0 },
-                  )}
-              >
-                <div className='pf-more-nested-reference'>
-                  <ExpandIcon
-                    onClick={this._fn(
-                      this.handleExpandNested,
-                      this._ikeyPath(keyPath.butLast().toList(), 'nested', i, 'expanded'),
-                      !expanded)}
-                    open={expanded}
-                  />
-                  <span className='nested-reference-header'>@</span>
-                  {
-                    tooltip(
-                      <FloatingInput
-                        label={PathfinderText.referenceName}
-                        isTextInput={true}
-                        value={ref}
-                        onChange={this._fn(this.handleReferenceChange, i)}
-                        canEdit={canEdit}
-                        className='pf-more-nested-reference-input'
-                        noBg={true}
-                        debounce={true}
-                        forceFloat={true}
-                        noBorder={false}
-                        showEllipsis={true}
-                      />,
-                      PathfinderText.referenceExplanation,
-                    )
-                  }
-                  <FadeInOut
-                    open={nested.get(i) !== undefined}
-                  >
-                    <FloatingInput
-                      value={nestedPath.name}
-                      onChange={this._fn(this.handleAlgorithmNameChange, i)}
-                      label={PathfinderText.innerQueryName}
-                      isTextInput={true}
-                      canEdit={canEdit}
-                      className='pf-more-nested-name-input'
-                      noBg={true}
-                      forceFloat={true}
-                      noBorder={false}
-                      debounce={true}
-                      showEllipsis={true}
-                    />
-                  </FadeInOut>
-                  {
-                    canEdit &&
-                    <RemoveIcon
-                      onClick={this._fn(this.handleDeleteNested, i)}
-                      className='pf-more-nested-remove close'
-                    />
-                  }
-                </div>
-                <FadeInOut
-                  open={expanded}
-                >
-                  {this.renderPath(nested.get(i), i)}
-                </FadeInOut>
-              </div>
-            );
-          })
-        }
-      </div>
-    );
   }
 
   public handleScriptValueChange(keys, value)
@@ -744,7 +579,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             {
               <RouteSelector
                 optionSets={this.getSizeOptionSets() /* TODO store in state? */}
-                values={List([this.props.path.source.count])}
+                values={List([this.props.count])}
                 onChange={this.handleSizePickerChange}
                 canEdit={canEdit}
                 defaultOpen={false}
@@ -763,7 +598,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             {
               <RouteSelector
                 optionSets={this.getScoreTypeOptionSets()}
-                values={List([this.props.path.score.type])}
+                values={List([this.props.scoreType])}
                 onChange={this.handleScoreTypeChange}
                 canEdit={canEdit}
                 defaultOpen={false}
@@ -773,7 +608,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               this.props.keyPath.includes('nested') ?
                 <RouteSelector
                   optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
-                  values={List([this.props.path.minMatches])}
+                  values={List([this.props.minMatches])}
                   onChange={this.handleMinMatchesChange}
                   canEdit={canEdit}
                   defaultOpen={false}
@@ -814,25 +649,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             </div>
 
           </FadeInOut>
-        </div>
-        <div className='pf-nested-section'>
-          {this.renderNestedPaths()}
-          {
-            !this.props.keyPath.includes('nested') ?
-              tooltip(
-                <PathfinderCreateLine
-                  canEdit={canEdit}
-                  onCreate={this.handleAddNested}
-                  text={PathfinderText.createNestedLine}
-                  // style={{ marginLeft: -110 }}
-                  showText={true}
-                />,
-                {
-                  title: PathfinderText.nestedExplanation,
-                  arrow: false,
-                },
-              ) : null
-          }
         </div>
       </div>
     );

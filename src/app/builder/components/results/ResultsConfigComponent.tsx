@@ -310,7 +310,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       // Figure out the index of the inner query (NOTE ONLY WORKS W/ PATHFINDER FOR NOW)
       // Based on that, extract the columns of that index
       const { path } = this.props.builder.query;
-      const referenceIndex = path.more.references.indexOf(field);
+      const referenceIndex = path.nested.map((n) => n.name).toList().indexOf(field);
       index = (path.nested.get(referenceIndex).source.dataSource as any).index;
       index = index && index.split('/')[1];
       indexId = `${builder.db.name}/${String(index)}`;
