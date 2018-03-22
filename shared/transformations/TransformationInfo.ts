@@ -133,6 +133,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Duplicate this field',
         type: DuplicateTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return engine.getFieldType(fieldId) === 'string';
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,

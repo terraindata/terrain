@@ -68,6 +68,7 @@ const { List, Map } = Immutable;
 type SubstringOptions = NodeOptionsType<TransformationNodeType.SubstringNode>;
 export class SubstringTFF extends TransformationForm<SubstringOptions, TransformationNodeType.SubstringNode>
 {
+  protected readonly type = TransformationNodeType.SubstringNode;
   protected readonly inputMap: InputDeclarationMap<SubstringOptions> = {
     from: {
       type: DisplayType.NumberBox,
@@ -82,13 +83,12 @@ export class SubstringTFF extends TransformationForm<SubstringOptions, Transform
     from: 0,
     length: 5,
   };
-  protected readonly type = TransformationNodeType.SubstringNode;
 }
 
 type UppercaseOptions = NodeOptionsType<TransformationNodeType.UppercaseNode>;
 export class UppercaseTFF extends TransformationForm<UppercaseOptions, TransformationNodeType.UppercaseNode>
 {
+  protected readonly type = TransformationNodeType.UppercaseNode;
   protected readonly inputMap: InputDeclarationMap<UppercaseOptions> = {};
   protected readonly initialState = {};
-  protected readonly type = TransformationNodeType.UppercaseNode;
 }

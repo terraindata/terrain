@@ -44,59 +44,78 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
+
+import { instanceFnDecorator } from 'src/app/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { TransformationFormProps } from './TransformationFormBase';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { CastTFF } from './CastTransformationForm';
-import { DuplicateTFF } from './DuplicateTransformationForm';
-import { JoinTFF } from './JoinTransformationForm';
-import { SubstringTFF, UppercaseTFF } from './SimpleTransformations';
-import { SplitTFF } from './SplitTransformationForm';
-
-export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
+interface DuplicateOptions
 {
-  switch (type)
-  {
-    case TransformationNodeType.UppercaseNode:
-      return UppercaseTFF;
-    case TransformationNodeType.SubstringNode:
-      return SubstringTFF;
-    case TransformationNodeType.DuplicateNode:
-      return DuplicateTFF;
-    case TransformationNodeType.SplitNode:
-      return SplitTFF;
-    case TransformationNodeType.JoinNode:
-      return JoinTFF;
-    case TransformationNodeType.CastNode:
-      return CastTFF;
-    default:
-      return null;
-  }
+  outputName: string;
 }
-
-export const availableTransformations: List<TransformationNodeType> = determineAvailableTransformations();
-// all transformation types for which getTransformationForm does not return null
-
-function determineAvailableTransformations(): List<TransformationNodeType>
+export class DuplicateTFF extends TransformationForm<DuplicateOptions, TransformationNodeType.DuplicateNode>
 {
-  let typeList = List([]);
-  for (const type in TransformationNodeType)
+  protected readonly type = TransformationNodeType.DuplicateNode;
+  protected readonly inputMap: InputDeclarationMap<DuplicateOptions> = {
+    outputName: {
+      type: DisplayType.TextBox,
+      displayName: 'New Field Name',
+    }
+  };
+  protected readonly initialState = {
+    outputName: 'New Field',
+  };
+
+  protected computeInitialState()
   {
-    if (
-      getTransformationForm(type as TransformationNodeType) !== null
-      && TransformationInfo.canCreate(type as TransformationNodeType)
-    )
+    const { fieldId, isCreate, engine } = this.props;
+    if (isCreate)
     {
-      typeList = typeList.push(type);
+      const myKP = engine.getOutputKeyPath(fieldId);
+      return {
+        outputName: `Copy of ${myKP.last()}`
+      }
+    }
+    else
+    {
+      return super.computeInitialState();
     }
   }
-  return typeList;
+
+  protected isStructuralChange()
+  {
+    return true;
+  }
+
+  protected computeArgs()
+  {
+    const { engine, fieldId } = this.props;
+    const { outputName } = this.state;
+    const args = super.computeArgs();
+
+    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const newKeyPath = currentKeyPath.set(currentKeyPath.size - 1, outputName);
+    return {
+      options: {
+        newFieldKeyPaths: List([newKeyPath]),
+      },
+      fields: args.fields,
+    }
+  }
 }
