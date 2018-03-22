@@ -78,7 +78,7 @@ export default class GroupJoinTransform extends Readable
 
   private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
-  constructor(client: ElasticClient, queryStr: string)
+  constructor(client: ElasticClient, queryStr: string, streaming: boolean = false)
   {
     super({
       objectMode: true,
@@ -132,6 +132,7 @@ export default class GroupJoinTransform extends Readable
         response = this.source.read();
       }
     }).bind(this));
+    this.source.on('error', ((e) => this.emit('error', e)).bind(this));
   }
 
   public _read(size: number = 1024)

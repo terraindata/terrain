@@ -59,6 +59,7 @@ export class ElasticReader extends Stream.Readable
   private _isEmpty: boolean = false;
   private querying: boolean = false;
   private doneReading: boolean = false;
+  private streaming: boolean = false;
   private rowsProcessed: number = 0;
   private scroll: string;
   private size: number;
@@ -71,27 +72,36 @@ export class ElasticReader extends Stream.Readable
 
   private numRequested: number = 0;
 
-  constructor(client: ElasticClient, query: any)
+  constructor(client: ElasticClient, query: any, streaming: boolean = false)
   {
     super({ objectMode: true, highWaterMark: 1024 * 128 });
 
     this.client = client;
     this.query = query;
+    this.streaming = streaming;
 
     this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
+    this.numRequested = this.size;
 
     try
     {
-      this.querying = true;
-      this.client.search({
+      const body = {
         body: this.query,
-        scroll: this.scroll,
-        size: Math.min(this.size, this.MAX_SEARCH_SIZE),
-      },
+      };
+
+      if (this.streaming)
+      {
+        body['scroll'] = this.scroll,
+        body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
+      }
+
+      this.querying = true;
+      this.client.search(body,
         (error, response): void =>
         {
-          this.scrollCallback(error, response);
+          const scrollCallback = this.scrollCallback.bind(this);
+          scrollCallback(error, response);
         });
     }
     catch (e)
@@ -135,6 +145,7 @@ export class ElasticReader extends Stream.Readable
 
     if (error !== null && error !== undefined)
     {
+      winston.error(error);
       this.emit('error', error);
       return;
     }
@@ -188,6 +199,10 @@ export class ElasticReader extends Stream.Readable
 
         this.scrollID = undefined;
       }
+      else
+      {
+        this.push(null);
+      }
 
       return;
     }
@@ -196,14 +211,19 @@ export class ElasticReader extends Stream.Readable
     {
       // continue scrolling
       this.querying = true;
-      this.client.scroll({
-        scrollId: this.scrollID,
-        scroll: this.scroll,
-      } as Elastic.ScrollParams,
-        (error, response) =>
-        {
-          this.scrollCallback(error, response);
-        });
+
+      if (this.scrollID !== undefined)
+      {
+        this.client.scroll({
+          scrollId: this.scrollID,
+          scroll: this.scroll,
+        } as Elastic.ScrollParams,
+          (error, response) =>
+          {
+            const scrollCallback = this.scrollCallback.bind(this);
+            scrollCallback(error, response);
+          });
+      }
     }
   }
 }

@@ -150,7 +150,7 @@ export class ElasticQueryHandler extends QueryHandler
         let stream: Readable;
         if (query['groupJoin'] !== undefined)
         {
-          stream = new GroupJoinTransform(client, request.body);
+          stream = new GroupJoinTransform(client, request.body, request.streaming);
         }
         else if (query['mergeJoin'] !== undefined)
         {
@@ -158,7 +158,7 @@ export class ElasticQueryHandler extends QueryHandler
         }
         else
         {
-          stream = new ElasticReader(client, query);
+          stream = new ElasticReader(client, query, request.streaming);
         }
 
         if (request.streaming === true)
