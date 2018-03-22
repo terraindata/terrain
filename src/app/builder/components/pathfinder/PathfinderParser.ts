@@ -443,10 +443,10 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
               term: Map({
                 [line.field]: Map({
                   value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
-                  boost,
                 }),
               }),
             }),
+            boost,
           }),
         });
       }
@@ -468,9 +468,9 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
                 [line.field]: Map({
                   query: String(line.value || ''),
                 }),
-                boost,
               }),
             }),
+            boost,
           }),
         });
       }
@@ -562,7 +562,6 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         }),
       });
     case 'isin':
-    case 'isnotin':
       try
       {
         return Map({
@@ -592,6 +591,44 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
             boost,
           },
         });
+      }
+
+    case 'isnotin':
+      let parsed = value;
+      try
+      {
+        parsed = JSON.parse(String(value).toLowerCase());
+      }
+      catch {
+        // Try to split it along commas and create own value
+        if (typeof value === 'string' && value[0] !== '@')
+        {
+          value = value.replace(/\[/g, '').replace(/\]/g, '');
+          const pieces = value.split(',');
+          parsed = pieces.map((piece) => piece.toLowerCase().trim());
+        }
+      }
+      if (useShould)
+      {
+        return Map({
+          bool: {
+            must_not: {
+              terms: {
+                [line.field]: parsed,
+              },
+            },
+            boost,
+          },
+        });
+      }
+      else
+      {
+        return Map({
+          terms: {
+            [line.field]: parsed,
+            boost,
+          }
+        })
       }
 
     default:
