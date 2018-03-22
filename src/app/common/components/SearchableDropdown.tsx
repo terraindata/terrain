@@ -319,7 +319,7 @@ class SearchableDropdown extends TerrainComponent<Props & InjectedOnClickOutProp
       }
       else
       {
-        up = cr.bottom > windowBottom / 2 + (this.props.directionBias || 0);
+        up = cr.bottom > windowBottom / 2 + (this.props.directionBias as number || 0);
       }
       if (!value)
       {

@@ -56,11 +56,12 @@ export class ElasticStream extends Stream.Readable
   private client: ElasticClient;
   private query: any;
 
+  private _isEmpty: boolean = false;
   private querying: boolean = false;
   private doneReading: boolean = false;
   private streaming: boolean = false;
   private rowsProcessed: number = 0;
-  private scroll: string | undefined = undefined;
+  private scroll: string;
   private size: number;
 
   private scrollID: string | undefined = undefined;
@@ -79,29 +80,28 @@ export class ElasticStream extends Stream.Readable
     this.query = query;
     this.streaming = streaming;
 
-    if (this.streaming || query['scroll'] !== undefined)
-    {
-      this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
-      this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
-    }
+    this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
+    this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
+    this.numRequested = this.size;
 
     try
     {
-      let size;
-      if (this.size !== undefined)
+      const body = {
+        body: this.query,
+      };
+
+      if (this.streaming)
       {
-        size = Math.min(this.size, this.MAX_SEARCH_SIZE);
+        body['scroll'] = this.scroll,
+          body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
       }
 
       this.querying = true;
-      this.client.search({
-        body: this.query,
-        scroll: this.scroll,
-        size,
-      },
+      this.client.search(body,
         (error, response): void =>
         {
-          this.scrollCallback(error, response);
+          const scrollCallback = this.scrollCallback.bind(this);
+          scrollCallback(error, response);
         });
     }
     catch (e)
@@ -131,6 +131,11 @@ export class ElasticStream extends Stream.Readable
     }
   }
 
+  public isEmpty(): boolean
+  {
+    return this._isEmpty;
+  }
+
   private scrollCallback(error, response): void
   {
     if (typeof response._scroll_id === 'string')
@@ -140,6 +145,7 @@ export class ElasticStream extends Stream.Readable
 
     if (error !== null && error !== undefined)
     {
+      winston.error(error);
       this.emit('error', error);
       return;
     }
@@ -157,7 +163,11 @@ export class ElasticStream extends Stream.Readable
     this.rowsProcessed += length;
     this.numRequested = Math.max(0, this.numRequested - length);
 
-    this.push(response);
+    const shouldContinue = this.push(response);
+    if (!shouldContinue)
+    {
+      this.numRequested = 0;
+    }
 
     this.querying = false;
     this.doneReading = this.doneReading
@@ -176,6 +186,7 @@ export class ElasticStream extends Stream.Readable
 
     if (this.doneReading)
     {
+      this._isEmpty = true;
       // stop scrolling
       if (this.scrollID !== undefined)
       {
@@ -188,22 +199,31 @@ export class ElasticStream extends Stream.Readable
 
         this.scrollID = undefined;
       }
+      else
+      {
+        this.push(null);
+      }
 
       return;
     }
 
     if (this.numRequested > 0)
     {
-      // continue scrolling
       this.querying = true;
-      this.client.scroll({
-        scrollId: this.scrollID,
-        scroll: this.scroll,
-      } as Elastic.ScrollParams,
-        (error, response) =>
-        {
-          this.scrollCallback(error, response);
-        });
+
+      if (this.scrollID !== undefined)
+      {
+        // continue scrolling
+        this.client.scroll({
+          scrollId: this.scrollID,
+          scroll: this.scroll,
+        } as Elastic.ScrollParams,
+          (error, response) =>
+          {
+            const scrollCallback = this.scrollCallback.bind(this);
+            scrollCallback(error, response);
+          });
+      }
     }
   }
 }
