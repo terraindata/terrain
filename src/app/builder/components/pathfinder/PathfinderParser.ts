@@ -46,15 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import TransformUtil, {NUM_CURVE_POINTS} from 'app/util/TransformUtil';
+import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
-import {List, Map} from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
-import {FieldType} from '../../../../../shared/builder/FieldTypes';
+import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
-import {isInput} from '../../../../blocks/types/Input';
-import {ESParseTreeToCode, stringifyWithParameters} from '../../../../database/elastic/conversion/ParseElasticQuery';
-import {DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source} from './PathfinderTypes';
+import { isInput } from '../../../../blocks/types/Input';
+import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
+import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;
 

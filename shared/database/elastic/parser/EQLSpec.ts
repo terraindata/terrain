@@ -302,17 +302,17 @@ const EQLSpec: ESClause[] =
           'query:query': {
             'bool:elasticFilter': {
               'filter:query[]': [
-                  { 'term:term_query': { '_index:string': '' } },
-                  {
-                    'bool:elasticFilter': {
-                      'filter:query[]': [{'term:term_query': {' :string': ''}}]
-                    }
+                { 'term:term_query': { '_index:string': '' } },
+                {
+                  'bool:elasticFilter': {
+                    'filter:query[]': [{ 'term:term_query': { ' :string': '' } }]
                   }
-                ],
+                }
+              ],
               'should:query[]': [
                 {
                   'bool:elasticFilter': {
-                    'should:query[]': [{'term:term_query': {' :string': ''}}]
+                    'should:query[]': [{ 'term:term_query': { ' :string': '' } }]
                   }
                 }]
             }

@@ -58,7 +58,7 @@ import { _card } from '../../../blocks/types/Card';
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../app/util/TransformUtil';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
-import {_ScoreLine} from 'builder/components/pathfinder/PathfinderTypes';
+import { _ScoreLine } from 'builder/components/pathfinder/PathfinderTypes';
 
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');

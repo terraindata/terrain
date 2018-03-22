@@ -124,7 +124,7 @@ class PathC extends BaseClass
 {
   public source: Source = _Source();
   public filterGroup: FilterGroup = _FilterGroup();
-  public softFilterGroup: FilterGroup = _FilterGroup({minMatches: 'any'});
+  public softFilterGroup: FilterGroup = _FilterGroup({ minMatches: 'any' });
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();

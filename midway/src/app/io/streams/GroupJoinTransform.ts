@@ -161,8 +161,7 @@ export default class GroupJoinTransform extends Readable
     this.continueReading = false;
     this.sourceIsEmpty = true;
     if (callback !== undefined)
-
-    {
+{
       callback();
     }
   }

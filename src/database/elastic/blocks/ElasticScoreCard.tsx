@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:max-line-length
 
-import {List} from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';

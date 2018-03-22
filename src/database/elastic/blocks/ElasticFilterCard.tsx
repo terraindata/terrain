@@ -70,7 +70,7 @@ import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
 import ESParserError from '../../../../shared/database/elastic/parser/ESParserError';
 import ESBoolCardParser from '../conversion/ESBoolCardParser';
-import {TerrainFilterCardParser} from '../conversion/TerrainFilterCardParser';
+import { TerrainFilterCardParser } from '../conversion/TerrainFilterCardParser';
 
 export class FilterUtils
 {
@@ -115,7 +115,7 @@ export class FilterUtils
 
   // Make an elasticFilter card from a bool card
   public static makeCustomFilterCard(blocksConfig: { [type: string]: BlockConfig },
-                                     blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean)
+    blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean)
   {
     console.assert(blockType === 'eqlbool_query', 'Unrecognized block type ' + blockType);
     if (extraConfig && extraConfig.doNotCustom === true)

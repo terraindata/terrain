@@ -44,17 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import Block, {BlockConfig} from '../../../blocks/types/Block';
-import {ElasticElasticCards} from '../blocks/ElasticElasticCards';
+import Block, { BlockConfig } from '../../../blocks/types/Block';
+import { ElasticElasticCards } from '../blocks/ElasticElasticCards';
 import * as BlockUtils from '../../../blocks/BlockUtils';
-import {FilterUtils} from '../blocks/ElasticFilterCard';
+import { FilterUtils } from '../blocks/ElasticFilterCard';
 import ESCardParser from './ESCardParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import * as TerrainLog from 'loglevel';
 import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
-import {List} from 'immutable';
-import {ElasticBlocks} from '../blocks/ElasticBlocks';
+import { List } from 'immutable';
+import { ElasticBlocks } from '../blocks/ElasticBlocks';
 
 // Translate an Elastic bool card to the format of terrain filter card.
 export default class ESBoolCardParser
@@ -83,16 +83,16 @@ export default class ESBoolCardParser
 
   private filterQueryOp =
     {
-      term: { clauseToBlocks : (boolTypeName, clause) => ESBoolCardParser.TermClauseToBlocks(boolTypeName, clause)},
-      terms: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.TermsClauseToBlocks(boolTypeName, clause)},
-      range: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.RangeClauseToBlocks(boolTypeName, clause)},
-      match: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.MatchClauseToBlocks(boolTypeName, clause)},
-      exists: {clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.ExistsClauseToBlocks(boolTypeName, clause)},
-      bool: {clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.BoolClauseToBlocks(boolTypeName, clause)},
+      term: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.TermClauseToBlocks(boolTypeName, clause) },
+      terms: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.TermsClauseToBlocks(boolTypeName, clause) },
+      range: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.RangeClauseToBlocks(boolTypeName, clause) },
+      match: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.MatchClauseToBlocks(boolTypeName, clause) },
+      exists: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.ExistsClauseToBlocks(boolTypeName, clause) },
+      bool: { clauseToBlocks: (boolTypeName, clause) => ESBoolCardParser.BoolClauseToBlocks(boolTypeName, clause) },
     };
   private ElasticFilterClauseOp =
     {
-      filter: {filterListName: ''},
+      filter: { filterListName: '' },
       must: {},
       should: {},
       must_not: {},
@@ -216,7 +216,7 @@ export default class ESBoolCardParser
    * @returns {Block[]}: a list of elasticFilterBlock
    * @constructor
    */
-  public  static TermsClauseToBlocks(boolTypeName, termsClause: ESPropertyInfo): Block[]
+  public static TermsClauseToBlocks(boolTypeName, termsClause: ESPropertyInfo): Block[]
   {
     // terms: {field : terms_value, boost : boost, _name : string}
     console.log('Terms Clause to blocks');

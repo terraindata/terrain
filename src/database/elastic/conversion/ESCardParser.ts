@@ -61,7 +61,7 @@ import { Block } from '../../../blocks/types/Block';
 
 import { toInputMap } from '../../../blocks/types/Input';
 
-import {default as GetCardVisitor, KEY_DISPLAY, STATIC_KEY_DISPLAY} from 'builder/getCard/GetCardVisitor';
+import { default as GetCardVisitor, KEY_DISPLAY, STATIC_KEY_DISPLAY } from 'builder/getCard/GetCardVisitor';
 import * as Immutable from 'immutable';
 import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
 import { DisplayType } from '../../../blocks/displays/Display';
@@ -69,7 +69,7 @@ import { Card } from '../../../blocks/types/Card';
 
 import * as _ from 'lodash';
 import Util from 'util/Util';
-import {List} from 'immutable';
+import { List } from 'immutable';
 import ElasticBlocks from '../blocks/ElasticBlocks';
 import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
 
@@ -412,9 +412,9 @@ export default class ESCardParser extends ESParser
           } else
           {
             // create the card
-            const cardTemplate = {[k]: template[k]};
+            const cardTemplate = { [k]: template[k] };
             console.log('Crate Child Card with template ' + JSON.stringify(cardTemplate));
-            const newCard = BlockUtils.make(ElasticBlocks, cardType, {key: cardKey, template: template[k]});
+            const newCard = BlockUtils.make(ElasticBlocks, cardType, { key: cardKey, template: template[k] });
             const newCardParser = new ESCardParser(newCard);
             if (newCardParser.hasError())
             {
@@ -442,7 +442,7 @@ export default class ESCardParser extends ESParser
               continue;
             }
             searchKey = Object.keys(t)[0];
-            searchingTemplate = {[searchKey]: true};
+            searchingTemplate = { [searchKey]: true };
           }
           const hitChild = this.searchCard([searchingTemplate], valueInfo);
           if (hitChild === null)
@@ -451,7 +451,7 @@ export default class ESCardParser extends ESParser
             const cardTemplate = t;
             console.log('Crate Array Card with template ' + JSON.stringify(cardTemplate));
             const cardType = GetCardVisitor.getCardType((valueInfo.clause as ESArrayClause).elementID);
-            const newCard = BlockUtils.make(ElasticBlocks, cardType, {key: valueInfo.arrayChildren.length, template: cardTemplate});
+            const newCard = BlockUtils.make(ElasticBlocks, cardType, { key: valueInfo.arrayChildren.length, template: cardTemplate });
             const newCardParser = new ESCardParser(newCard);
             if (newCardParser.hasError())
             {
@@ -462,7 +462,7 @@ export default class ESCardParser extends ESParser
           } else
           {
             // keep searching
-            if (typeof  t === 'object' )
+            if (typeof t === 'object')
             {
               this.createCardIfNotExist(t[searchKey], hitChild);
             }
@@ -528,7 +528,7 @@ export default class ESCardParser extends ESParser
             return nextLevel;
           } else
           {
-            TerrainLog.debug('SearchCard: cardkey ' + cardKey + ' is found, but type is ' +newVal.propertyValue.card.type);
+            TerrainLog.debug('SearchCard: cardkey ' + cardKey + ' is found, but type is ' + newVal.propertyValue.card.type);
             return null;
           }
         } else

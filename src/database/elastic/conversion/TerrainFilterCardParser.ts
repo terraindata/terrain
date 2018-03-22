@@ -47,16 +47,16 @@ THE SOFTWARE.
 // Insert query blocks generated from the filter rows to a card
 // Please take care the order when pushing rows to cards
 // [Row1, Row2, ... block's child1, child2...]
-import {ElasticBlocks} from '../blocks/ElasticBlocks';
+import { ElasticBlocks } from '../blocks/ElasticBlocks';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import ESCardParser from './ESCardParser';
-import {Block} from '../../../blocks/types/Block';
-import {FilterUtils} from '../blocks/ElasticFilterCard';
+import { Block } from '../../../blocks/types/Block';
+import { FilterUtils } from '../blocks/ElasticFilterCard';
 import * as Immutable from "immutable";
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import * as TerrainLog from 'loglevel';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
-import {List} from 'immutable';
+import { List } from 'immutable';
 
 // utilities of translating a Terrain filter card to an Elastic bool card
 export class TerrainFilterCardParser
@@ -71,14 +71,14 @@ export class TerrainFilterCardParser
     return Immutable.List(filterCards).concat(block.cards);
   }
 
-// Generate a new card whose child cards are from combining filter rows and other cards.
+  // Generate a new card whose child cards are from combining filter rows and other cards.
   public static mergeFilterBlocksAndRows(block: Block): Block
   {
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
     const cardTree = new ESCardParser(block);
     const boolValueInfo = cardTree.getValueInfo();
     const filterRows = block['indexFilters'].concat(block['otherFilters']);
-    const filterRowMap = {filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: []};
+    const filterRowMap = { filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: [] };
     filterRows.map((row: Block) =>
     {
       if (filterRowMap[row.boolQuery] === undefined)

@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import Query from '../../../../items/types/Query';
-import {
+import
+{
   _FilterGroup,
   _FilterLine, _Path,
   _ScoreLine,
@@ -61,8 +62,8 @@ import * as TerrainLog from 'loglevel';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import Block from '../../../../blocks/types/Block';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
-import {List} from 'immutable';
-import {FieldType} from '../../../../../shared/builder/FieldTypes';
+import { List } from 'immutable';
+import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import PathfinderLine from 'builder/components/pathfinder/PathfinderLine';
 
 export class CardsToPath
@@ -170,7 +171,7 @@ export class CardsToPath
     const boolCard = boolValueInfo.card;
 
     const filterRows = boolCard['otherFilters'];
-    const filterRowMap = {filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: []};
+    const filterRowMap = { filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: [] };
 
     // regroup the filters
     filterRows.map((row: Block) =>
@@ -191,7 +192,7 @@ export class CardsToPath
       {
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'all');
-         newLines = newLines.concat(filterRowMap.filter.map(
+        newLines = newLines.concat(filterRowMap.filter.map(
           (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null)
         );
       } else if (isInnerGroup === true)
@@ -231,7 +232,7 @@ export class CardsToPath
     return filterGroup;
   }
 
-  private static processNestedQueryFilterGroup(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, sectionType: 'hard'|'soft')
+  private static processNestedQueryFilterGroup(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, sectionType: 'hard' | 'soft')
   {
     // let search whether we have an inner bool or not
     let from;
@@ -256,7 +257,7 @@ export class CardsToPath
           if (query.objectChildren.nested)
           {
             const nestedQuery = query.objectChildren.nested.propertyValue;
-            const boolQuery = parser.searchCard({'query:query':{'bool:elasticFilter': true}}, nestedQuery);
+            const boolQuery = parser.searchCard({ 'query:query': { 'bool:elasticFilter': true } }, nestedQuery);
             if (boolQuery !== null)
             {
               // create filter group
@@ -309,7 +310,7 @@ export class CardsToPath
   }
 
 
-  private static BodyToFilterSection(filterGroup: FilterGroup, parser: ESCardParser, body: ESValueInfo, filterSection: 'hard'|'soft')
+  private static BodyToFilterSection(filterGroup: FilterGroup, parser: ESCardParser, body: ESValueInfo, filterSection: 'hard' | 'soft')
   {
     let boolType;
     // collect all `bool.filter` query
@@ -325,7 +326,7 @@ export class CardsToPath
         "query:query": {
           'bool:elasticFilter': {
             [boolType]:
-              [{"bool:elasticFilter": true}]
+              [{ "bool:elasticFilter": true }]
           }
         }
       }, body);
@@ -343,7 +344,7 @@ export class CardsToPath
   private static getParentAlias(parser: ESCardParser, bodyValueInfo: ESValueInfo)
   {
     const parentAliasValueInfo = parser.searchCard(
-      {'groupJoin:groupjoin_clause': {'parentAlias:string': true}}, bodyValueInfo);
+      { 'groupJoin:groupjoin_clause': { 'parentAlias:string': true } }, bodyValueInfo);
     if (parentAliasValueInfo === null)
     {
       TerrainLog.debug('(B->P) no parentAlias card, set the parentaAlias to parent.');
@@ -374,7 +375,8 @@ export class CardsToPath
       }
     }
 
-    paths.map((path: Path) => {
+    paths.map((path: Path) =>
+    {
       console.log(path);
       if (path && path.name)
       {
@@ -425,7 +427,7 @@ export class CardsToPath
 
     // index from the sourceBool
     let cardIndex = '';
-    const sourceBool = parser.searchCard({'query:query': {'bool:elasticFilter': true}}, body);
+    const sourceBool = parser.searchCard({ 'query:query': { 'bool:elasticFilter': true } }, body);
     if (sourceBool)
     {
       cardIndex = sourceBool.card.currentIndex;
@@ -450,7 +452,7 @@ export class CardsToPath
       hasCustomDomain: transCard.hasCustomDomain,
       mode: transCard.mode,
     };
-    const l = _ScoreLine({field: transCard.input, transformData, weight});
+    const l = _ScoreLine({ field: transCard.input, transformData, weight });
     TerrainLog.debug('(C->P): transCard ', transCard, ' to scoreline ', l);
     return l;
   }

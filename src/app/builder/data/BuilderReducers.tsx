@@ -67,9 +67,9 @@ import
 } from './BuilderActionTypes';
 import ActionTypes from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
-import {CardsToPath} from 'builder/components/pathfinder/CardsToPath';
-import {ElasticDataSource} from 'builder/components/pathfinder/PathfinderTypes';
-import {PathToCards} from 'builder/components/pathfinder/PathToCards';
+import { CardsToPath } from 'builder/components/pathfinder/CardsToPath';
+import { ElasticDataSource } from 'builder/components/pathfinder/PathfinderTypes';
+import { PathToCards } from 'builder/components/pathfinder/PathToCards';
 const { List, Map } = Immutable;
 
 const BuilderReducers =
