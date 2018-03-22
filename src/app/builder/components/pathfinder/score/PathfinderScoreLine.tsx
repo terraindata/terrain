@@ -150,6 +150,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       domain: line.transformData.domain,
       hasCustomDomain: line.transformData.hasCustomDomain,
       scorePoints: line.transformData.scorePoints,
+      visiblePoints: line.transformData.visiblePoints,
       static: {
         colors: [Colors().builder.cards.categories.score, Colors().bg3],
       },

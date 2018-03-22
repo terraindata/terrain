@@ -497,7 +497,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     return points;
   }
 
-  public updatePointsSize(newSize: number, points, xDomain)
+  public updatePointsSize(newSize: number, points, scorePoints, xDomain)
   {
     const oldSize = points.size;
     if (oldSize < newSize)
@@ -522,11 +522,14 @@ export class TransformCardChart extends TerrainComponent<Props>
     }
     else if (oldSize > newSize)
     {
-      for (let i = oldSize - 1; i >= newSize; i--)
-      {
-        this.onDelete(points.get(i).id);
-      }
+      // This function can be very slow of new size is a lot smaller than old size
+      // for (let i = oldSize - 1; i >= newSize; i--)
+      // {
+      //   this.onDelete(points.get(i).id);
+      // }
+      scorePoints = scorePoints.splice(newSize);
       points = points.splice(newSize);
+      this.updatePoints(scorePoints, true);
     }
     return points;
   }
@@ -534,8 +537,8 @@ export class TransformCardChart extends TerrainComponent<Props>
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
-
-    let points = (overrideState.points || this.state.pointsCache).map((scorePoint) => ({
+    const scorePoints = (overrideState.points || this.state.pointsCache);
+    let points = scorePoints.map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
@@ -549,7 +552,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     if ((mode === 'logarithmic' && points.size !== NUM_CURVE_POINTS.logarithmic)
       || (mode === 'exponential' && points.size !== NUM_CURVE_POINTS.exponential))
     {
-      points = this.updatePointsSize(NUM_CURVE_POINTS.logarithmic, points, xDomain);
+      points = this.updatePointsSize(NUM_CURVE_POINTS.logarithmic, points, scorePoints, xDomain);
     }
     else if (mode === 'sigmoid' && points.size !== NUM_CURVE_POINTS.sigmoid)
     {

@@ -270,7 +270,11 @@ const Periscope = {
     d3.select(el).selectAll('.domain-input').remove();
     const div = d3.select(el).selectAll('.inputs');
     const handles = d3.select(el).selectAll('.handle');
-    const cCr = d3.select(el)[0][0]['getBoundingClientRect']();
+    const cCr = d3.select(el)[0][0] && d3.select(el)[0][0]['getBoundingClientRect']();
+    if (!cCr)
+    {
+      return;
+    }
     // Get the first handle to find the position where the input should go
     if (handles[0][0] !== undefined)
     {

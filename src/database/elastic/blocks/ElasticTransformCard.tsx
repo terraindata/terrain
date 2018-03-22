@@ -88,7 +88,10 @@ const numPoints = 31;
 export const elasticTransform = _card(
   {
     input: '',
+    // Score points are used by the script to calculate the score and may have to be interpolated from the 
+    // visible score points for parameterized curves
     scorePoints: List([]),
+    visiblePoints: List([]),
 
     // make this list<string> since the values passed from BuilderTextBox are string.
     domain: List(['0', '100']),
@@ -218,6 +221,10 @@ export const elasticTransform = _card(
           a: 0,
           b: 1,
           mode: block['mode'],
+          visiblePoints: {
+            ranges: block['visiblePoints'].map((scorePt) => scorePt.value).toArray(),
+            outputs: block['visiblePoints'].map((scorePt) => scorePt.value).toArray(),
+          },
           numerators: [[block['input'], 1]],
           denominators: [],
           ranges,

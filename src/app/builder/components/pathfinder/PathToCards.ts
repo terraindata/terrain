@@ -125,7 +125,7 @@ export class PathToCards
     }
     this.updateGroupJoin(path.nested, parser, body, parentAliasName);
     // score card
-    //this.fromScore(path, parser, body);
+    this.fromScore(path, parser, body);
 
     // finally, let's distribute filters from the sourcebool to the hard/soft bool.
     this.distributeSourceBoolFilters(path, parser, body);
@@ -858,21 +858,23 @@ export class PathToCards
       }
       return;
     }
-    const scoreObj = parseScore(path.score)._script;
+    //const scoreObj = parseScore(path.score)._script;
+    const factors = parseScore(path.score);
     const weights = [];
-    console.assert(scoreObj.script);
-    for (const factor of scoreObj.script.params.factors)
+    for (const factor of factors)
     {
-      const weight = parseElasticWeightBlock(factor);
+      const transform = make(ElasticBlocks, 'elasticTransform', factor);
+      const weight = make(ElasticBlocks, 'elasticWeight', {key: transform, weight: factor.weight});
+
       if (weight)
       {
         weights.push(weight);
       }
     }
+    const sortOrder = 'desc';
+    const sortMode = 'auto';
+    let sortType = 'number';
 
-    const sortOrder = scoreObj.order || 'desc';
-    const sortMode = scoreObj.mode || 'auto';
-    let sortType = scoreObj.type || 'number';
 
     const scoreCard = make(
       ElasticBlocks, 'elasticScore',

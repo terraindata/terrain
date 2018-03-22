@@ -444,12 +444,15 @@ export class CardsToPath
     }
     const transformData = {
       scorePoints: transCard.scorePoints.toJS(),
+      visiblePoints: transCard.visiblePoints.toJS(),
       domain: transCard.domain.toJS(),
       dataDomain: transCard.dataDomain.toJS(),
       hasCustomDomain: transCard.hasCustomDomain,
       mode: transCard.mode,
     };
-    return _ScoreLine({field: transCard.input, transformData, weight});
+    const l = _ScoreLine({field: transCard.input, transformData, weight});
+    TerrainLog.debug('(C->P): transCard ', transCard, ' to scoreline ', l);
+    return l;
   }
 
   private static elasticScoreToLines(scoreCard)

@@ -248,6 +248,7 @@ export const _ScoreLine = (config?: { [key: string]: any }) =>
 class TransformDataC extends BaseClass
 {
   public scorePoints: List<ScorePoint> = List([]);
+  public visiblePoints: List<ScorePoint> = List([]);
   public domain: List<number> = List([0, 10]);
   public dataDomain: List<number> = List([0, 10]);
   public hasCustomDomain: boolean = false;
@@ -260,6 +261,7 @@ export const _TransformData = (config?: { [key: string]: any }) =>
   let transform = New<TransformData>(new TransformDataC(config), config);
   transform = transform
     .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
+    .set('visiblePoints', List(transform['visiblePoints'].map((p) => _ScorePoint(p))))
     .set('domain', List(transform['domain']));
   return transform;
 };

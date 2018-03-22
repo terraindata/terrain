@@ -245,6 +245,7 @@ class TransformCard extends TerrainComponent<Props>
 
   public handleUpdatePoints(points, isConcrete?: boolean)
   {
+    this.props.onChange(this._ikeyPath(this.props.keyPath, 'visiblePoints'), points, true);
     this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
     // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to
     //  set an Undo checkpoint. Moving the same point in the same movement should not result
@@ -264,7 +265,7 @@ class TransformCard extends TerrainComponent<Props>
           onRequestDomainChange={this.handleRequestDomainChange}
           onRequestZoomToData={this.handleZoomToData}
           canEdit={this.props.canEdit}
-          points={data.scorePoints}
+          points={data.visiblePoints || data.scorePoints}
           bars={this.state.bars}
           domain={this.state.chartDomain}
           range={this.state.range}

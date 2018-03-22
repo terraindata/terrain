@@ -202,18 +202,6 @@ function parseLinearScore(score: Score)
 
 function parseTerrainScore(score: Score)
 {
-  const sortObj = {
-    _script: {
-      type: 'number',
-      order: 'desc',
-      script: {
-        stored: 'Terrain.Score.PWL',
-        params: {
-          factors: [],
-        },
-      },
-    },
-  };
   // This is a weird race condition where the path starts loading with the old path and then switches to new path...
   let dirty = false;
   const factors = score.lines.map((line) =>
@@ -258,22 +246,21 @@ function parseTerrainScore(score: Score)
       outputs = data.outputs;
     }
     return {
-      a: 0,
-      b: 1,
-      weight: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
-      numerators: [[line.field, 1]],
-      denominators: [],
-      mode: line.transformData['mode'],
-      ranges,
-      outputs,
+      dataDomain: List(line.transformData.dataDomain),
+      domain: List(line.transformData.domain),
+      mode: line.transformData.mode,
+      hasCustomDomain: line.transformData.hasCustomDomain,
+      input: line.field,
+      scorePoints: line.transformData.scorePoints,
+      visiblePoints: line.transformData.visiblePoints,
+      weight: line.weight,
     };
   }).toArray();
-  sortObj._script.script.params.factors = factors;
   if (dirty)
   {
-    return {};
+    return [];
   }
-  return sortObj;
+  return factors || [];
 }
 
 function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = false): any
