@@ -363,16 +363,28 @@ export const _Sample = (config?: { [key: string]: any }) =>
 class ScriptC extends BaseClass
 {
   public name: string = '';
-  public params: Immutable.Map<string, any> = Map<string, any>();
+  public params: List<Param> = List();
   public script: string = '';
+  public expanded: boolean = true;
+  // some scripts will be automatically generated and shouldnt should up in score section
+  public userAdded: boolean = true;
 }
 export type Script = ScriptC & IRecord<ScriptC>;
 export const _Script = (config?: { [key: string]: any }) =>
 {
   let script = New<Script>(new ScriptC(Util.asJS(config)), Util.asJS(config));
-  script = script.set('params', Map(script.params));
+  script = script.set('params', List(script.params.map((param) => _Param(param))));
   return script;
 };
+
+class ParamC extends BaseClass
+{
+  public name: string = '';
+  public value: string | number = '';
+}
+export type Param = ParamC & IRecord<ParamC>;
+export const _Param = (config?: { [key: string]: any }) =>
+  New<Param>(new ParamC(config), config);
 
 class FilterLineC extends LineC
 {

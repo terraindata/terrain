@@ -48,17 +48,23 @@ THE SOFTWARE.
 import
 {
   _FilterGroup,
-  _FilterLine, _Path,
+  _FilterLine,
+  _Param,
+  _Path,
+  _Script,
   _ScoreLine,
   FilterGroup,
   FilterLine,
   Path,
+  Param,
+  Script,
   Score,
   ScoreLine,
   Source,
   sourceCountOptions,
 } from 'builder/components/pathfinder/PathfinderTypes';
 import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
@@ -107,7 +113,10 @@ export class CardsToPath
     const softFilterGroup = this.BodyToFilterSection(path.softFilterGroup, parser, bodyValueInfo, 'soft');
     const parentAlias = this.getParentAlias(parser, bodyValueInfo);
     const groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
-    const more = path.more.set('references', List([parentAlias]));
+    const newScripts = this.getScripts(path.more.scripts, parser, bodyValueInfo);
+    const more = path.more
+      .set('references', List([parentAlias]))
+      .set('scripts', newScripts);
 
     const newPath = path
       .set('source', newSource)
@@ -399,6 +408,33 @@ export class CardsToPath
       newPaths.push(p);
     }
     return newPaths;
+  }
+
+  private static getScripts(scripts: List<Script>, parser: ESCardParser, body: ESValueInfo): List<Script>
+  {
+    const rootVal = body.value;
+    console.log(rootVal);
+    if (rootVal.hasOwnProperty('script_fields'))
+    {
+      return List(_.keys(rootVal.script_fields).map((key) =>
+        {
+          const script = rootVal.script_fields[key];
+          const oldScript = scripts.filter((script) => script.name === key).toList().get(0); // Look at old script 
+          return _Script({
+            name: key,
+            script: script.script.inline,
+            params: _.keys(script.script.params).map((paramKey) =>
+              _Param({
+                name: key,
+                value: script.script.params[paramKey],
+              })
+            ),
+            userAdded: oldScript !== undefined ? oldScript.userAdded : true,
+          });
+        }
+      ));
+    }
+    return List([]);
   }
 
   private static updateSource(source: Source, parser: ESCardParser, body: ESValueInfo): Source
