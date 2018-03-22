@@ -487,10 +487,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     return (
       <div>
         {
-          references.map((ref, i) =>
+          nested.map((nestedPath, i) =>
           {
+            const ref = references.get(0);
             const expanded = nested.get(i) !== undefined ? nested.get(i).expanded : false;
-            const nestedPath = nested.get(i);
             return (
               <div
                 className='pf-more-nested'
