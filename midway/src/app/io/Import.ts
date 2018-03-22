@@ -394,8 +394,9 @@ export class Import
             {
               throw new Error('bcrypt salt is < 72 characters.');
             }
-            const sha3Hashed: string = keccak('sha3-256').update(
-              JSON.stringify(obj[oldColHashName as string]) + sha3Salt as string).digest('hex');
+            const msgToHash: string = typeof obj[oldColHashName as string] === 'string'
+              ? obj[oldColHashName as string] : JSON.stringify(obj[oldColHashName as string]);
+            const sha3Hashed: string = keccak('sha3-256').update(msgToHash + sha3Salt as string).digest('hex');
             // use BCRYPT_VERSION 2a, 10 rounds
             obj[oldColHashName as string] = await bcrypt.hash(sha3Hashed, '$2a$10$' + (bcryptSalt as string));
             break;
