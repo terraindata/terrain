@@ -163,9 +163,10 @@ export function addFieldsToEngine(
   });
 }
 
-export function getConsistentType(id: number, engine: TransformationEngine): FieldTypes
+export function getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
 {
-  if (engine.getInputKeyPath(id).last() === '*')
+  const kp = engine.getOutputKeyPath(id);
+  if (isWildcardField(kp))
   {
     return engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
   }
@@ -237,7 +238,7 @@ export function createEngineFromDocuments(documents: List<object>):
 
     fieldIds.forEach((id, j) =>
     {
-      const currentType: FieldTypes = getConsistentType(id, e);
+      const currentType: FieldTypes = getRepresentedType(id, e);
       const deIndexedPath = turnIndicesIntoValue(e.getOutputKeyPath(id), '*');
       const path = hashPath(deIndexedPath);
 

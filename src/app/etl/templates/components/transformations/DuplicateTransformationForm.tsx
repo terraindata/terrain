@@ -76,7 +76,7 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
     outputName: {
       type: DisplayType.TextBox,
       displayName: 'New Field Name',
-    }
+    },
   };
   protected readonly initialState = {
     outputName: 'New Field',
@@ -89,8 +89,8 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
     {
       const myKP = engine.getOutputKeyPath(fieldId);
       return {
-        outputName: `Copy of ${myKP.last()}`
-      }
+        outputName: `Copy of ${myKP.last()}`,
+      };
     }
     else
     {
@@ -116,6 +116,6 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
         newFieldKeyPaths: List([newKeyPath]),
       },
       fields: args.fields,
-    }
+    };
   }
 }

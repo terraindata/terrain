@@ -76,8 +76,8 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
       options: {
         pickOptions: (s) => typeOptions,
         indexResolver: (value) => typeOptions.indexOf(value),
-      }
-    }
+      },
+    },
   };
   protected readonly initialState = {
     toTypename: 'string',
@@ -94,7 +94,7 @@ export class CastTFF extends TransformationForm<CastOptions, TransformationNodeT
     if (isCreate)
     {
       return {
-        toTypename: engine.getFieldType(fieldId)
+        toTypename: engine.getFieldType(fieldId),
       };
     }
     else
