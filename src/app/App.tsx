@@ -296,7 +296,7 @@ class App extends TerrainComponent<Props>
     });
     this.props.colorsActions({
       actionType: 'setStyle',
-      selector: 'input:hover',
+      selector: 'input:hover &:not(input:disabled)',
       style: { 'background': Colors().inputFocusBg, 'border-color': Colors().inactiveHover },
     });
     this.props.colorsActions({

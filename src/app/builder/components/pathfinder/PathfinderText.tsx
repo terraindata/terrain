@@ -49,9 +49,9 @@ THE SOFTWARE.
 export const PathfinderText = {
 
   // Source section
-  firstWord: 'Find',
+  firstWord: 'Data Source',
   chooseDataSourceDropdownPrompt: 'Choose a data source',
-  findSectionTitle: 'Find',
+  findSectionTitle: 'Data Source',
   findSectionSubtitle: '',
   // `Choose where your data are located and filter out everything that isn't a match.`,
 
@@ -62,7 +62,7 @@ export const PathfinderText = {
   softFilterAdd: 'Factor',
   softFilterSectionTitle: 'Should Match',
   softFilterSectionSubtitle: 'When conditions are met, results are rewarded. When conditions are not met, there is no impact.',
-
+  includeDistanceExplanation: 'Include distance from each result to this location as a field',
   nestedFilterIntro: '',
   // filterGroupPost: 'of the following:',
   // createFilterLine: 'criteria',
@@ -76,8 +76,16 @@ export const PathfinderText = {
   scoreSectionTitle: 'Rank',
   scoreSectionSubtitle: 'Rank fields must be numbers and determine the order in which results are returned.',
   // `Score your results, so that the best picks show up in the top spots.`,
-  scoreTypeLabel: 'Score',
-  scoreTypeExplanation: 'Choose how to score your algorithm',
+  scoreTypeLabel: 'Ranking Method',
+  scoreTypeExplanation: 'Select how you would like to rank results. Terrain Ranking is recommended',
+  terrainTypeExplanation: 'Use custom charts and weightings to create a custom ranking algorithm for results',
+  terrainTypeName: 'Terrain Rank',
+  fieldTypeExplanation: 'Rank items linearly given a list of fields. The result can be ordered ascending or descending by field',
+  fieldTypeName: 'Linear',
+  randomTypeExplanation: 'Randomly rank items',
+  randomTypeName: 'Random',
+  elasticTypeExplanation: 'Use only the text match quality to determine the ranking',
+  elasticTypeName: 'Match Quality',
 
   scoreSectionTypes: {
     terrain: {
@@ -110,10 +118,12 @@ export const PathfinderText = {
   collapseTitle: 'Group by',
   collapseTootlip: 'Force algorithm to only show the top result with matching values for this field',
   // `Add nested algorithms to create a set of results for each result of your parent algorithm.`,
-  referenceName: 'Alias',
+  referenceName: 'Parent Alias',
   referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',
   nestedExplanation: 'Add another algorithm that uses the results of this one as input',
-  innerQueryName: 'Algorithm Name',
+  scriptExplanation: 'Scripts can be used to create custom values to return with each result',
+  addScript: 'Script',
+  innerQueryName: 'Child Alias',
   aggregation:
     {
       missing: {

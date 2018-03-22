@@ -66,7 +66,7 @@ import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
-import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
+import { _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 
@@ -78,10 +78,13 @@ export interface Props
   canEdit: boolean;
   schema: SchemaState;
   keyPath?: KeyPath;
+  parentSource?: Source;
+  parentName?: string;
   colorsActions: typeof ColorsActions;
   colors: ColorsState;
   toSkip?: number;
   builder: BuilderState;
+  onSourceChange?: (source: string) => void;
   builderActions?: typeof BuilderActions;
 }
 const linearHorizontalStrength = createHorizontalStrength(0);
@@ -105,7 +108,9 @@ class PathfinderArea extends TerrainComponent<Props>
       pathfinderContext.source !== nextProps.path.source ||
       pathfinderContext.step !== nextProps.path.step ||
       pathfinderContext.schemaState !== nextProps.schema ||
-      pathfinderContext.builderState.db !== nextProps.builder.db
+      pathfinderContext.builderState.db !== nextProps.builder.db ||
+      pathfinderContext.parentSource !== nextProps.parentSource ||
+      pathfinderContext.parentName !== nextProps.parentName
     )
     {
       this.setState({
@@ -123,6 +128,8 @@ class PathfinderArea extends TerrainComponent<Props>
       step: props.path.step,
       schemaState: props.schema,
       builderState: props.builder,
+      parentSource: props.parentSource,
+      parentName: props.parentName,
     };
   }
 
@@ -155,6 +162,93 @@ class PathfinderArea extends TerrainComponent<Props>
     return linearVerticalStrength(box, point);
   }
 
+  public handleAddScript(fieldName, lat, lon, name): string
+  {
+    // Get the name for the script, based on the other script names
+    let scriptName = '';
+    const scriptNames = this.props.path.more.scripts.map((script) => script.name).toList();
+    if (scriptNames.indexOf(name) === -1)
+    {
+      scriptName = name;
+    }
+    // If the name is taken, append a number to it (1, 2, 3...) based on the other script names
+    else
+    {
+      let i = 1;
+      while (scriptNames.indexOf(name + '_' + String(i)) !== -1)
+      {
+        i++;
+      }
+      scriptName = name + '_' + String(i);
+    }
+    // Create a new script and add it to scripts
+    const newScript = _Script({
+      name: scriptName,
+      params: [
+        {
+          name: 'lat',
+          value: lat,
+        },
+        {
+          name: 'lon',
+          value: lon,
+        },
+      ],
+      script: `0.01 * Math.round(doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.0621371)`,
+      userAdded: false,
+    });
+    // Return the name of the script to the filter line that created it
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
+      this.props.path.more.scripts.push(newScript),
+      true,
+    );
+    return scriptName;
+  }
+
+  public handleUpdateScript(fieldName, scriptName, lat?, lon?)
+  {
+    const { scripts } = this.props.path.more;
+    const oldScript = scripts.filter((script) => script.name === scriptName).toList().get(0);
+    let params: any = oldScript.params;
+    if (lat !== undefined && lon !== undefined)
+    {
+      params = [
+        {
+          name: 'lat',
+          value: lat,
+        },
+        {
+          name: 'lon',
+          value: lon,
+        },
+      ];
+    }
+    const newScript = _Script({
+      name: scriptName,
+      params: Util.asJS(params),
+      script: `0.01 * Math.round(doc['${fieldName}'].arcDistance(params.lat, params.lon) * 0.0621371)`,
+      userAdded: false,
+    });
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
+      scripts.push(newScript),
+      true,
+    );
+  }
+
+  public handleDeleteScript(scriptName: string)
+  {
+    const { scripts } = this.props.path.more;
+    const scriptNames = scripts.map((script) => script.name).toList();
+    const scriptIndex = scriptNames.indexOf(scriptName);
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'more', 'scripts'),
+      scripts.splice(scriptIndex, 1),
+      true,
+    );
+  }
+
   public render()
   {
     const { path, toSkip } = this.props;
@@ -173,6 +267,7 @@ class PathfinderArea extends TerrainComponent<Props>
             keyPath={this._ikeyPath(keyPath, 'source')}
             onStepChange={this.incrementStep}
             source={path.source}
+            onSourceChange={this.props.onSourceChange}
           />
 
           <FadeInOut
@@ -185,6 +280,9 @@ class PathfinderArea extends TerrainComponent<Props>
               keyPath={this._ikeyPath(keyPath, 'filterGroup')}
               onStepChange={this.incrementStep}
               toSkip={toSkip}
+              onAddScript={this.handleAddScript}
+              onDeleteScript={this.handleDeleteScript}
+              onUpdateScript={this.handleUpdateScript}
             />
             <PathfinderFilterSection
               isSoftFilter={true}

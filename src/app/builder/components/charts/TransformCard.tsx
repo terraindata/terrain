@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
 
 import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 
@@ -133,6 +134,25 @@ class TransformCard extends TerrainComponent<Props>
   public componentDidMount()
   {
     this.computeBars(this.props.data.input, this.state.maxDomain, !this.props.data.hasCustomDomain);
+  }
+
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
+    for (const key in nextProps)
+    {
+      if (!_.isEqual(nextProps[key], this.props[key]))
+      {
+        return true;
+      }
+    }
+    for (const key in nextState)
+    {
+      if (!_.isEqual(nextState[key], this.state[key]))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -278,6 +298,7 @@ class TransformCard extends TerrainComponent<Props>
           colors={this.props.data.static.colors}
           mode={this.props.data.mode}
           builder={this.props.builder}
+          index={this.props.index || getIndex('', this.props.builder)}
         />
         <TransformCardPeriscope
           onChange={this.props.onChange}

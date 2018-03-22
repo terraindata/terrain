@@ -89,7 +89,6 @@ export const ElasticBlockHelpers = {
     }
     const serverName = builderState.db.name;
     const index = getIndex('', builderState);
-
     const key = serverName + '/' + String(index) + '.' + 'data' + '.c.' + column;
 
     if (schemaState.columns instanceof Map)
@@ -211,7 +210,7 @@ export const ElasticBlockHelpers = {
 
   // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
   // If the field is a metaField, return string / number accrodingly
-  getTypeOfField(schemaState, builderState, field, dataSource, returnDatatype?): FieldType | string
+  getTypeOfField(schemaState, builderState, field, returnDatatype?, overrideIndex?): FieldType | string
   {
     if (metaFields.indexOf(field) !== -1)
     {
@@ -229,9 +228,11 @@ export const ElasticBlockHelpers = {
       }
       return FieldType.Text;
     }
-    const index = dataSource && dataSource.index.split('/')[1] || getIndex('', builderState);
+    const { source } = builderState.query.path;
+    let index = source && source.dataSource && source.dataSource.index ?
+      source.dataSource.index.split('/')[1] : getIndex('', builderState);
+    index = overrideIndex || index;
     const server = builderState.db.name;
-
     if (index !== null)
     {
       const indexId = `${builderState.db.name}/${String(index)}`;

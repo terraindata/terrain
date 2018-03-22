@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
+import { Hit } from 'app/builder/components/results/ResultTypes';
 import { BuilderState } from 'app/builder/data/BuilderState';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { SchemaState } from 'app/schema/SchemaTypes';
@@ -75,12 +76,14 @@ const TextIcon = require('./../../../../images/icon_text_12x18.svg?name=TextIcon
 const ImageIcon = require('./../../../../images/icon_profile_16x16.svg?name=ImageIcon');
 const HandleIcon = require('./../../../../images/icon_handle.svg?name=HandleIcon');
 const MarkerIcon = require('./../../../../images/icon_marker.svg?name=MarkerIcon');
+const DateIcon = require('images/icon_dateDropdown.svg?name=DateIcon');
 
 export interface Props
 {
   fields: List<string>;
   config: ResultsConfig;
   onConfigChange: (config: ResultsConfig, builderActions: typeof BuilderActions) => void;
+  onSaveAsDefault: (config: ResultsConfig) => void;
   onClose: (config: ResultsConfig) => void;
   colorsActions: typeof ColorsActions;
   builderActions?: typeof BuilderActions;
@@ -88,6 +91,8 @@ export interface Props
   schema?: SchemaState;
   builder?: BuilderState;
   columns?: any;
+  nested?: boolean;
+  sampleHit?: Hit;
 }
 
 @Radium
@@ -170,7 +175,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
           schema,
           builder,
           field,
-          dataSource,
           true,
         );
         return type === 'nested' || type === '';
@@ -228,6 +232,14 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     else if (type != null)
     {
       config = config.set(type, field);
+      if (type === 'thumbnail')
+      {
+        if (!config.formats.get(field))
+        {
+          config = config.set('formats',
+            config.formats.set(field, _Format({ type: 'image', template: '[value]' })));
+        }
+      }
     }
 
     this.changeConfig(config);
@@ -306,10 +318,18 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         col.serverId === String(server) &&
         col.databaseId === String(indexId),
       ).toList();
-
-      // it was actually a group join, need to extract data differently.
       fields = columns.map((col) => col.name).toList();
+      // Use the sample hit to get any script fields included in the groupJoin
+      if (this.props.sampleHit)
+      {
+        const allFields: any = this.props.sampleHit.fields.get(field);
+        if (allFields && allFields.size && allFields.get(0).get('fields'))
+        {
+          fields = fields.concat(_.keys(allFields.get(0).get('fields').toJS())).toList();
+        }
+      }
     }
+    fields = fields.push('_score');
     return (
       <ResultsConfigComponent
         {...this.props}
@@ -319,6 +339,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
         onClose={this._fn(this.handleNestedConfigClose, field)}
         columns={columns}
         dataSource={{ index }}
+        nested={true}
       />
     );
   }
@@ -392,6 +413,11 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     );
   }
 
+  public handleSaveAsDefault()
+  {
+    this.props.onSaveAsDefault(this.state.config);
+  }
+
   public handleClose()
   {
     this.props.onConfigChange(this.state.config, this.props.builderActions);
@@ -415,8 +441,13 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
   public getAvailableFields(fields, term)
   {
     return fields.filter((field) =>
-      field.toLowerCase().indexOf(term.toLowerCase()) !== -1,
-    );
+    {
+      if (field === '_score')
+      {
+        return 'Match Quality'.toLowerCase().indexOf(term.toLowerCase()) !== -1;
+      }
+      return field.toLowerCase().indexOf(term.toLowerCase()) !== -1;
+    });
   }
 
   public render()
@@ -454,8 +485,23 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 second='Disabled'
                 onChange={this.handleEnabledToggle}
                 selected={enabled ? 1 : 2}
+                medium={true}
               />
             </div>
+            {
+              !this.props.nested &&
+              <div key={'results-config-default-button'}
+                className='results-config-default-button'
+                style={[
+                  fontColor(Colors().text1),
+                  borderColor(Colors().border1, Colors().border3),
+                  backgroundColor(Colors().bg3),
+                ]}
+                onClick={this.handleSaveAsDefault}
+              >
+                Save as Default
+              </div>
+            }
             <div key={'results-config-button'}
               className='results-config-button'
               style={[
@@ -528,33 +574,35 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                     </div>
                 }
               </CRTarget>
-              <CRTarget
-                className='results-config-score'
-                type='score'
-                onDrop={this.handleDrop}
-              >
-                <div className='results-config-area-title' style={mainFontColor}>
-                  Score
-                </div>
-                {
-                  config && config.score ?
-                    <ResultsConfigResult
-                      field={config.score}
-                      is='score'
-                      onRemove={this.handleRemove}
-                      format={formats.get(config.score)}
-                      onFormatChange={this.handleFormatChange}
-                      primaryKeys={config.primaryKeys}
-                      onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                      openConfig={this.handleOpenConfig}
-                      nested={this.state.nestedFields.indexOf(config.score) !== -1}
-                    />
-                    :
-                    <div className='results-config-placeholder' style={placeholderStyle}>
-                      Drag score field <em>(optional)</em>
-                    </div>
-                }
-              </CRTarget>
+              {
+                // <CRTarget
+                //   className='results-config-score'
+                //   type='score'
+                //   onDrop={this.handleDrop}
+                // >
+                //   <div className='results-config-area-title' style={mainFontColor}>
+                //     Score
+                //   </div>
+                //   {
+                //     config && config.score ?
+                //       <ResultsConfigResult
+                //         field={config.score}
+                //         is='score'
+                //         onRemove={this.handleRemove}
+                //         format={formats.get(config.score)}
+                //         onFormatChange={this.handleFormatChange}
+                //         primaryKeys={config.primaryKeys}
+                //         onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                //         openConfig={this.handleOpenConfig}
+                //         nested={this.state.nestedFields.indexOf(config.score) !== -1}
+                //       />
+                //       :
+                //       <div className='results-config-placeholder' style={placeholderStyle}>
+                //         Drag score field <em>(optional)</em>
+                //       </div>
+                //   }
+                // </CRTarget>
+              }
               <CRTarget
                 className='results-config-fields'
                 type='field'
@@ -603,6 +651,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                 onChange={this.handleSearchTermChange}
                 label={'Search'}
                 isTextInput={true}
+                canEdit={true}
               />
             </div>
             <CRTarget
@@ -690,19 +739,9 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     });
   }
 
-  public changeToText()
+  public changeFormatType(type: string)
   {
-    this.changeFormat('type', 'text');
-  }
-
-  public changeToImage()
-  {
-    this.changeFormat('type', 'image');
-  }
-
-  public changeToMap()
-  {
-    this.changeFormat('type', 'map');
+    this.changeFormat('type', type);
   }
 
   public toggleRaw(event)
@@ -753,6 +792,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const { format, field } = this.props;
     const image = format && format.type === 'image';
     const map = format && format.type === 'map';
+    const date = format && format.type === 'date';
     // Check using the schema if it can be nested
     const selected: boolean = this.props.is !== null && this.props.isAvailableField;
     const mainStyle = [
@@ -767,7 +807,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 
     const activeBtnStyle = [
       backgroundColor(Colors().active),
-      fontColor(Colors().text1),
+      fontColor(Colors().fontWhite),
       borderColor(Colors().border2),
     ];
 
@@ -799,7 +839,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
           </span>
           <span className='results-config-text flex-grow'>
             {
-              field
+              field === '_score' ? 'Match Quality' : field
             }
           </span>
           {
@@ -819,9 +859,10 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         <div className={classNames({
           'results-config-field-format': true,
           'results-config-field-format-showing': this.state.showFormat,
-          'results-config-field-format-text': !(image || map),
+          'results-config-field-format-text': !(image || map || date),
           'results-config-field-format-image': image,
           'results-config-field-format-map': map,
+          'results-config-field-format-date': date,
         })}>
           <div className='results-config-format-header'>
             <input
@@ -847,18 +888,34 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
 
               <div className='results-config-text-btn'
                 key={'text-btn-' + field}
-                onClick={this.changeToText}
-                style={(image || map) ? inactiveBtnStyle : activeBtnStyle}
+                onClick={this._fn(this.changeFormatType, 'text')}
+                style={(image || date) ? inactiveBtnStyle : activeBtnStyle}
               >
-                <TextIcon /> Text
+                <TextIcon
+                  style={(image || date) ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
+                />
+                Text
               </div>
               <div className='results-config-image-btn'
                 key={'image-btn-' + field}
-                onClick={this.changeToImage}
+                onClick={this._fn(this.changeFormatType, 'image')}
                 style={image ? activeBtnStyle : inactiveBtnStyle}
               >
-                <ImageIcon /> Image
+                <ImageIcon
+                  style={!image ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
+                />
+                Image
                 </div>
+              <div className='results-config-date-btn'
+                key={'date-btn-' + field}
+                onClick={this._fn(this.changeFormatType, 'date')}
+                style={date ? activeBtnStyle : inactiveBtnStyle}
+              >
+                <DateIcon
+                  style={!date ? { fill: Colors().iconColor } : { fill: Colors().fontWhite }}
+                />
+                Date
+              </div>
             </div>
           }
           {

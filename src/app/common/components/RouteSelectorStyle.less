@@ -5,6 +5,8 @@
 @option-max-width: calc(~"50% - 16px");
 @close-width: 35px;
 @picker-height: 350px;
+@large-option-max-height: 300px;
+@large-picker-height: 300px;
 
 .routeselector-wrapper {
 	width: 100%;
@@ -54,7 +56,7 @@
 		}
 		
 		&:hover:not(.routeselector-box-values-open) {
-			background: #f8f8f8;
+			// background: #f4f5f7;
 		}
 		
     &.routeselector-box-values-open:not(.routeselector-box-values-force-open) {
@@ -138,6 +140,16 @@
 
 	    ::-webkit-scrollbar-thumb {
 	    	background: rgba(180, 182, 186, 0.5);
+	    }
+	    .routeselector-picker-footer {
+	    	position: absolute;
+	    	z-index: 600;
+	    	border-top: 1px solid;
+	    	font-size: 14px;
+	    	padding: 3px 0px;
+	    	background: white;
+	    	bottom: 0;
+	    	width: 100%;
 	    }
 		.routeselector-picker-inner {
 			display: flex;
@@ -244,10 +256,10 @@
 			padding: 6px;
 			overflow-y: auto;
 			flex-shrink: 1; // allow this to shrink, with higher priority than the name
-			
+			border-radius: 4px;
 			.routeselector-data-header {
 				text-align: center;
-				font-size: 12px;
+				font-size: 16px;
 				// padding-top: 6px;
 			}
 			.result {
@@ -306,9 +318,6 @@
 			}
 		}
 	}
-	&.routeselector-semi-large {
-
-	}
 
 	&.routeselector-large {
 		.routeselector-box-values {
@@ -324,7 +333,21 @@
 		.routeselector-picker .routeselector-options .routeselector-option-wrapper {
 			min-width: 150px;
 		}
-		
+		.routeselector-picker {
+			max-height: @large-picker-height;
+			.routeselector-picker-inner {
+				min-height: @large-picker-height;
+		   		max-height: @large-picker-height;
+			}
+			.routeselector-option-set {
+		   		max-height: @large-picker-height;
+			}
+			.routeselector-options {
+				.routeselector-option {
+					max-height: @large-option-max-height;
+				}
+			}
+		}
 		.routeselector-option-name {
 			padding: 12px 18px;
 			font-size: 24px;

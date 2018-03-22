@@ -172,7 +172,7 @@ const TransformChart = {
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
-      state.canEdit, state.domain, state.mode, state.colors, state.schema, state.builder);
+      state.canEdit, state.domain, state.mode, state.colors, state.schema, state.builder, state.index);
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
@@ -494,7 +494,7 @@ const TransformChart = {
       .attr('text-anchor', 'middle')
       .attr('transform', 'translate(' + width / 2 + ',80)')
       .style('fill', Colors().fontColorLightest)
-      .text(inputKey);
+      .text(inputKey === '_score' ? 'Match Quality' : inputKey);
 
     d3.select(el).select('.yLeftAxis')
       .append('text')
@@ -600,10 +600,11 @@ const TransformChart = {
 
     const spotlight = g.selectAll('.spotlight')
       .data(
-        spotlights.filter((d) => d['fields'][inputKey] !== undefined),
+        spotlights
+          .filter((d) => d['fields'][inputKey] !== undefined)
+          .sort((d, b) => d['rank'] - b['rank']),
         (d) => d['fields']['_id'],
     );
-
     const spotlightEnter = spotlight.enter()
       .append('g')
       .attr('class', 'spotlight')
@@ -1777,15 +1778,17 @@ const TransformChart = {
     point.exit().remove();
   },
 
-  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, domain, mode, colors, schema, builder)
+  _draw(el, scales, barsData, pointsData, onMove,
+    onRelease, spotlights, inputKey, onLineClick,
+    onLineMove, onSelect, onCreate, onDelete, onPointMoveStart,
+    width, height, canEdit, domain, mode, colors, schema, builder, index)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-
-    const isDate = ElasticBlockHelpers.getColumnType(schema, builder, inputKey) === 'date';
+    const isDate = ElasticBlockHelpers.getTypeOfField(schema, builder, inputKey, true, index) === 'date';
     this._drawAxes(el, scales, width, height, inputKey, isDate);
 
     if (inputKey === '' || inputKey === undefined)

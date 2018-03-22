@@ -76,7 +76,7 @@ export interface Props
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
   source: Source;
-
+  onSourceChange: (source: string) => void;
   builderActions?: typeof BuilderActions;
 }
 
@@ -127,22 +127,26 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           value={(source.dataSource as any).index}
           onChange={this.handleSourcePathChange}
           canEdit={canEdit}
-          shortNameText={'Find'}
+          shortNameText={PathfinderText.findSectionTitle}
           forceOpen={pickerIsForcedOpen}
           noShadow={pickerIsForcedOpen}
           hasOther={false}
           large={true}
           hideLine={true}
+          forceFloat={true}
         />
-        <LinearSelector
-          options={List(['all', '1', '5', '10', '100'])}
-          selected={source.count}
-          keyPath={this._ikeyPath(this.props.keyPath.push('count'))}
-          action={this.props.builderActions.changePath}
-          canEdit={canEdit}
-          allowCustomInput={true}
-          hideOptions={true}
-        />
+        {
+          // <LinearSelector
+          //   options={List(['all', '1', '5', '10', '100'])}
+          //   selected={source.count}
+          //   keyPath={this._ikeyPath(this.props.keyPath.push('count'))}
+          //   action={this.props.builderActions.changePath}
+          //   canEdit={canEdit}
+          //   allowCustomInput={true}
+          //   hideOptions={true}
+          // />
+        }
+
       </div>
     );
   }
@@ -160,6 +164,10 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     if (props.pathfinderContext.step === PathfinderSteps.Source)
     {
       props.onStepChange(props.pathfinderContext.step);
+    }
+    if (this.props.onSourceChange)
+    {
+      this.props.onSourceChange(value.split('/')[1]);
     }
   }
 

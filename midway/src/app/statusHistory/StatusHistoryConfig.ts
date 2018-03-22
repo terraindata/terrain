@@ -44,70 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
+import ConfigType from '../ConfigType';
 
-/**
- * Consumes an input source stream and turns it into an array
- */
-export default class BufferTransform
+export class StatusHistoryConfig extends ConfigType
 {
-  public static toArray(stream: Readable): Promise<any[]>
+  public createdAt?: string = undefined;
+  public userId: number = -1;
+  public id?: number = undefined;
+  public algorithmId: number = -1;
+  public fromStatus: string = '';
+  public toStatus: string = '';
+
+  constructor(props: object)
   {
-    return new Promise<any[]>((resolve, reject) =>
-    {
-      const bufferTransform = new BufferTransform(stream,
-        (err, arr) =>
-        {
-          if (err !== null || err !== undefined)
-          {
-            reject(err);
-          }
-          else
-          {
-            resolve(arr);
-          }
-        });
-    });
-  }
-
-  private arr: any[];
-  private stream: Readable;
-  private callback: (err, arr) => void;
-
-  private _onData: (doc) => void;
-  private _onEvent: (err) => void;
-
-  constructor(stream: Readable, callback: (err: Error, arr: any[]) => void)
-  {
-    this.arr = [];
-    this.stream = stream;
-    this.callback = callback;
-
-    this._onData = this.onData.bind(this);
-    this._onEvent = this.onEvent.bind(this);
-
-    this.stream.on('data', this._onData);
-    this.stream.on('end', this._onEvent);
-    this.stream.on('error', this._onEvent);
-    this.stream.on('close', this._onEvent);
-  }
-
-  private onData(doc: any): void
-  {
-    this.arr.push(doc);
-  }
-
-  private onEvent(err: any): void
-  {
-    this._final();
-    this.callback(err, this.arr);
-  }
-
-  private _final(): void
-  {
-    this.stream.removeListener('data', this._onData);
-    this.stream.removeListener('end', this._onEvent);
-    this.stream.removeListener('error', this._onEvent);
-    this.stream.removeListener('close', this._onEvent);
+    super();
+    ConfigType.initialize(this, props);
   }
 }
+
+export default StatusHistoryConfig;

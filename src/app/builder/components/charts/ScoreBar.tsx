@@ -91,12 +91,7 @@ class ScoreBar extends TerrainComponent<Props>
   {
     const { weight, min, max, height, canEdit, altStyle, step, round } = this.props;
 
-    let color = Colors().active;
-    if (altStyle && weight === 1)
-    {
-      // untouched, alt style mode
-      color = Colors().blockOutline;
-    }
+    const color = Colors().active;
     return (
       <div
         className={classNames({
@@ -113,6 +108,7 @@ class ScoreBar extends TerrainComponent<Props>
           max={max || 100}
           color={color}
           height={height || (altStyle && 22) || 34}
+          lengthOffset={altStyle ? 12 : 34}
           noLeftLine={altStyle}
           rounded={altStyle}
           noPadding={altStyle}

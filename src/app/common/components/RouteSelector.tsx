@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access no-console no-var-requires
+// tslint:disable:strict-boolean-expressions member-access no-var-requires no-console
 
 import Ajax from 'app/util/Ajax';
 import Hit from 'builder/components/results/Hit.tsx';
@@ -75,7 +75,7 @@ export interface RouteSelectorOption
   displayName?: string | number | El;
   color?: string;
   sampleData?: List<any>;
-  extraContent?: string | El;
+  extraContent?: string;
   icon?: any;
   closeOnPick?: boolean; // close the picker when this option is picked
 }
@@ -106,7 +106,7 @@ export interface Props
   relevantData?: any; // If this data changes, have to recalculate option sets
   onChange: (key: number, value: any) => void;
   canEdit: boolean;
-
+  footer?: El;
   forceOpen?: boolean; // force it to be open no matter whwat
   defaultOpen?: boolean; // default to open when the component mounts (but don't force open)
   large?: boolean;
@@ -116,6 +116,7 @@ export interface Props
   hideLine?: boolean;
   canDelete?: boolean;
   onDelete?: () => void;
+  onToggleOpen?: (open: boolean) => void;
 }
 
 export class RouteSelector extends TerrainComponent<Props>
@@ -353,7 +354,7 @@ export class RouteSelector extends TerrainComponent<Props>
     return (
       <DrawerAnimation
         open={this.isOpen()}
-        maxHeight={350 /* coordinate this with LESS */}
+        maxHeight={props.large ? 300 : 350 /* coordinate this with LESS */}
       >
         <div
           className={classNames({
@@ -368,6 +369,15 @@ export class RouteSelector extends TerrainComponent<Props>
               state.optionSets.map(this.renderOptionSet)
             }
           </div>
+          {
+            props.footer &&
+            <div
+              className='routeselector-picker-footer'
+              style={borderColor(Colors().blockOutline)}
+            >
+              {props.footer}
+            </div>
+          }
         </div>
       </DrawerAnimation>
     );
@@ -435,13 +445,16 @@ export class RouteSelector extends TerrainComponent<Props>
         key={optionSet.key}
         style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
       >
-        <div
-          className='routeselector-header'
-        >
-          {
-            optionSet.headerText
-          }
-        </div>
+        {
+          optionSet.headerText &&
+          <div
+            className='routeselector-header'
+          >
+            {
+              optionSet.headerText
+            }
+          </div>
+        }
 
         {
           showTextbox ?
@@ -506,6 +519,9 @@ export class RouteSelector extends TerrainComponent<Props>
   private handleOtherChange(optionSetIndex: number, searchValue: string)
   {
     this.handleValueChange(optionSetIndex, searchValue);
+    this.setState({
+      searches: this.state.searches.set(optionSetIndex, searchValue),
+    });
   }
 
   private handleOptionSearch(optionSetIndex: number, searchValue: string)
@@ -748,35 +764,47 @@ export class RouteSelector extends TerrainComponent<Props>
               })}
               onClick={this._fn(this.handleOptionClick, optionSetIndex, option.value)}
             >
-              <div
-                className='routeselector-option-name'
-                style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
-                key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
-              >
-                {
-                  option.icon !== undefined &&
-                  <div className='routeselector-option-icon'>
-                    {
-                      option.icon
-                    }
-                  </div>
-                }
+              {
+                (option.sampleData === undefined || optionSet.hideSampleData) &&
                 <div
-                  className='routeselector-option-name-inner'
-                  style={fontColor(Colors().fontColor2)}
+                  className='routeselector-option-name'
+                  style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
+                  key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
                 >
                   {
-                    option.displayName
+                    option.icon !== undefined &&
+                    <div className='routeselector-option-icon'>
+                      {
+                        option.icon
+                      }
+                    </div>
                   }
+                  {
+                    tooltip(
+                      <div
+                        className='routeselector-option-name-inner'
+                        style={fontColor(Colors().fontColor2)}
+                      >
+                        {
+                          option.displayName
+                        }
+                      </div>,
+                      option.extraContent,
+                    )}
                 </div>
-              </div>
-
+              }
               {
                 option.sampleData && !optionSet.hideSampleData &&
-                <div className='routeselector-data'>
-                  <div className='routeselector-data-header'>
-                    Sample Data
-                    </div>
+                <div
+                  className='routeselector-data'
+                  style={isSelected ? backgroundColor(Colors().active) : {}}
+                >
+                  <div
+                    className='routeselector-data-header'
+                    style={isSelected ? fontColor(Colors().fontWhite) : {}}
+                  >
+                    {option.displayName}
+                  </div>
                   {
                     option.sampleData.slice(0, 1).map((data, i) =>
                       this.renderSampleDatum(data, i, String(option.value)),
@@ -990,17 +1018,17 @@ export class RouteSelector extends TerrainComponent<Props>
     }
 
     const isOpen = this.isOpen();
-    const column: any = $('#pf-column')[0];
+    // const column: any = $('#pf-column')[0];
     return (
       <div
         className={'routeselector-veil' + (isOpen ? '-open' : '')}
         onClick={this.handleVeilClick}
-        style={column ? {
-          height: column.offsetHeight,
-          width: column.offsetWidth,
-          top: column.offsetTop,
-          left: column.offsetLeft,
-        } : {}}
+      // style={column ? {
+      //   height: column.offsetHeight,
+      //   width: Number(column.offsetWidth) + 25,
+      //   top: column.offsetTop,
+      //   left: Number(column.offsetLeft) - 25,
+      // } : {}}
       />
     );
   }
@@ -1031,6 +1059,10 @@ export class RouteSelector extends TerrainComponent<Props>
     this.setState({
       open,
     });
+    if (this.props.onToggleOpen)
+    {
+      this.props.onToggleOpen(true);
+    }
   }
 
   private close()
@@ -1043,6 +1075,10 @@ export class RouteSelector extends TerrainComponent<Props>
       focusedSetIndex: -1,
       focusedOptionIndex: -1,
     });
+    if (this.props.onToggleOpen)
+    {
+      this.props.onToggleOpen(false);
+    }
   }
 
   private toggle()

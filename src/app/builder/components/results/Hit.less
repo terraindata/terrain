@@ -20,7 +20,7 @@
   .result-field-value-nested-image {
     display: inline-block;
     width: 100%;
-    height: 100%; 
+    height: 100%;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -87,12 +87,15 @@
    // position: relative;
     display: flex;
     margin-bottom: 6px;
-    
+
     &.results-are-small {
-      width: 200px;
-      min-width: 200px;
       height: auto;
       margin-bottom: 0px;
+      .result-name-inner {
+        max-width: 160px;
+        min-width: 160px;
+        overflow: hidden;
+      }
     }
 
     .transition;
@@ -127,13 +130,21 @@
     border-radius: 4px;
     display: flex;
     // overflow: hidden;
-    
+
     min-height: 200px;
     height: auto;
-    
+
     &.results-are-small {
       height: @small-result-height;
       min-height: @small-result-height;
+
+      &.nested-results-are-small {
+        height: 25px;
+        min-height: 25px;
+        .result-field-name {
+          height: 0px;
+        }
+      }
     }
 
     .transition;
@@ -146,7 +157,7 @@
       position: absolute;
       height: 100%;
     }
-      
+
     .result-thumbnail-wrapper {
       background-size: cover;
       background-position: center center;
@@ -154,11 +165,11 @@
       position: relative;
       border-radius: 4px 0px 0px 4px;
       // height: 100%;
-      
+
       // .result-thumbnail {
       //   // height: 100%;
       // }
-      
+
       &.results-are-small {
         width: @small-result-height;
         min-width: @small-result-height;
@@ -171,7 +182,7 @@
       padding: 10px;
       flex-grow: 1;
       overflow-x: auto;
-      
+
       &.results-are-small {
         padding: 3px 6px;
         flex-direction: row;
@@ -190,12 +201,17 @@
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: space-between;
-      
+
       &.results-are-small {
         flex-wrap: nowrap;
         height: 43px;
         padding-bottom: 6px;
         flex-basis: 100%;
+      }
+
+      &.nested-results-are-small {
+        height: 25px;
+        padding-bottom: 0px;
       }
     }
 
@@ -229,7 +245,6 @@
         text-overflow: ellipsis;
         text-transform: uppercase;
         padding: 4px 0;
-        color: @light-black;
         &.result-field-name-header {
           position: absolute;
           top: 19px;
@@ -243,6 +258,9 @@
         &.result-field-value-header {
           position: relative;
           top: 15px;
+          &.nested-results-are-small {
+            top: 2px;
+          }
         }
         &.result-field-value-short {
           float: right;
@@ -350,17 +368,17 @@
   display: inline-block;
   width: 100%;
   // height: 100%;
-  
+
   .result-field-value-image {
     display: inline-block;
     width: 100%;
-    
+
     // height: 100%;
     // min-height: 125px;
     // height: auto;
     // max-height: 25%;
     // overflow: hidden;
-    
+
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -474,6 +492,12 @@
         width: 0px;  /* remove scrollbar space */
         background: transparent;  /* optional: just make scrollbar invisible */
     }
+  .result .result-name .result-name-inner .result-name-label {
+    max-width: 167;
+    font-size: 12px;
+  }
+
+
   .hit-content-scroll-forward, .hit-content-scroll-back {
     position: absolute;
     top: 22px;
@@ -487,7 +511,7 @@
     }
   }
   .hit-content-scroll-back {
-    left: 246px;
+    left: 208px;
     .rotate180;
   }
   .hit-content-scroll-forward {
@@ -499,7 +523,7 @@
   }
   .hit-nested-content-values {
      overflow-y: scroll;
-  } 
+  }
   .hit-nested-content-header {
     display: flex;
     position: relative;
@@ -514,7 +538,6 @@
     .hit-nested-column-names {
       height: 27px;
       font-size: 10px;
-      color: @light-black;
       span {
         top: 20px;
         position: absolute;
@@ -528,17 +551,23 @@
       }
       .column-name-number {
         left: 60px;
+        &.column-name-number-no-thumbnail {
+          left: 6px;
+        }
       }
       .column-name-name {
         left: 90px;
+        &.column-name-name-no-thumbnail {
+          left: 34px;
+        }
       }
     }
     .hit-nested-content-title {
       margin-left: 8px;
       position: relative;
-      top: -3px;      
+      top: -3px;
     }
-    .result-fields-wrapper 
+    .result-fields-wrapper
       {
         &.results-are-small {
           overflow: hidden;

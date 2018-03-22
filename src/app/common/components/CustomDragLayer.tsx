@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { getCustomValueDisplayName } from 'app/builder/components/pathfinder/filter/PathfinderFilterLine';
 import Colors, { backgroundColor, borderColor, fontColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import { Map } from 'immutable';
@@ -92,6 +93,11 @@ const comparisons: Map<string, string> = Map({
 */
 class CustomDragLayerRaw extends TerrainComponent<Props> {
 
+  public formatItemValue(data)
+  {
+    return getCustomValueDisplayName(data, data.value, 0);
+  }
+
   public renderItemBlock(key: string, header: string, data: any)
   {
     const headerStyle = fontColor(Colors().text3);
@@ -110,8 +116,10 @@ class CustomDragLayerRaw extends TerrainComponent<Props> {
         >
           {
             key === 'comparison' ?
-              comparisons.get(data['comparison']) :
-              data[key]
+              comparisons.get(data[key]) :
+              key === 'value' ?
+                this.formatItemValue(data) :
+                data[key]
           }
         </div>
       </div>

@@ -52,6 +52,7 @@ describe('ScoreWeightSlider', () =>
 {
   let componentWrapper = null;
   const height = 33;
+  const lengthOffset = 40;
 
   beforeEach(() =>
   {
@@ -64,7 +65,8 @@ describe('ScoreWeightSlider', () =>
         onBeforeChange={(value: number) => 1}
         onChange={(value: number) => 1}
         onAfterChange={(value: number) => 1}
-        height={33}
+        height={height}
+        lengthOffset={lengthOffset}
       />,
     );
   });
@@ -93,7 +95,7 @@ describe('ScoreWeightSlider', () =>
 
         expect(divs.get(2).props.style)
           .toEqual({
-            width: `calc(100% - ${height}px)`,
+            width: `calc(100% - ${lengthOffset}px)`,
             position: 'relative',
             marginLeft: 0,
           });

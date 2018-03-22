@@ -54,7 +54,7 @@ import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import { isInput } from '../../../../blocks/types/Input';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
-import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
+import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;
 
@@ -74,13 +74,17 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     aggs: Map({}),
     from: 0,
     size: PathFinderDefaultSize,
+    _source: true,
     track_scores: true,
   });
 
   // Sources
   const sourceInfo = parseSource(path.source);
   baseQuery = baseQuery.set('from', sourceInfo.from);
-  baseQuery = baseQuery.set('size', sourceInfo.size);
+  if (sourceInfo.size !== 'all')
+  {
+    baseQuery = baseQuery.set('size', sourceInfo.size);
+  }
   baseQuery = baseQuery.setIn(['query', 'bool', 'filter'], List([
     Map({
       term: Map({
@@ -136,6 +140,11 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   {
     baseQuery = baseQuery.set('collapse', { field: collapse });
   }
+  // Scripts
+  const scripts = parseScripts(path.more.scripts);
+  baseQuery = baseQuery.set('script_fields', scripts);
+
+  // Nested algorithms (groupjoins)
   const groupJoin = parseNested(path.more, path.nested, inputs);
   if (groupJoin)
   {
@@ -160,6 +169,7 @@ function parseSource(source: Source): any
   return {
     from: source.start,
     size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : PathFinderDefaultSize,
+
     index: (source.dataSource as any).index,
   };
 }
@@ -378,6 +388,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       nested: {
         path,
         score_mode: 'avg',
+        ignore_unmapped: true,
         query: {
           bool: {
             [boolQueryType]: innerLine,
@@ -423,10 +434,10 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
               term: Map({
                 [line.field]: Map({
                   value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
-                  boost,
                 }),
               }),
             }),
+            boost,
           }),
         });
       }
@@ -448,9 +459,9 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
                 [line.field]: Map({
                   query: String(line.value || ''),
                 }),
-                boost,
               }),
             }),
+            boost,
           }),
         });
       }
@@ -542,11 +553,13 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         }),
       });
     case 'isin':
-    case 'isnotin':
       try
       {
         return Map({
-          terms: { [line.field]: JSON.parse(String(value).toLowerCase()) },
+          terms: {
+            [line.field]: JSON.parse(String(value).toLowerCase()),
+            boost,
+          },
         });
       }
       catch {
@@ -557,11 +570,55 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
           let pieces = value.split(',');
           pieces = pieces.map((piece) => piece.toLowerCase().trim());
           return Map({
-            terms: { [line.field]: pieces },
+            terms: {
+              [line.field]: pieces,
+              boost,
+            },
           });
         }
         return Map({
-          terms: { [line.field]: value },
+          terms: {
+            [line.field]: value,
+            boost,
+          },
+        });
+      }
+
+    case 'isnotin':
+      let parsed = value;
+      try
+      {
+        parsed = JSON.parse(String(value).toLowerCase());
+      }
+      catch {
+        // Try to split it along commas and create own value
+        if (typeof value === 'string' && value[0] !== '@')
+        {
+          value = value.replace(/\[/g, '').replace(/\]/g, '');
+          const pieces = value.split(',');
+          parsed = pieces.map((piece) => piece.toLowerCase().trim());
+        }
+      }
+      if (useShould)
+      {
+        return Map({
+          bool: {
+            must_not: {
+              terms: {
+                [line.field]: parsed,
+              },
+            },
+            boost,
+          },
+        });
+      }
+      else
+      {
+        return Map({
+          terms: {
+            [line.field]: parsed,
+            boost,
+          },
         });
       }
 
@@ -675,4 +732,25 @@ function parseNested(more: More, nested: List<Path>, inputs)
     }
   });
   return groupJoins;
+}
+
+function parseScripts(scripts: List<Script>)
+{
+  let scriptObj = Map({});
+  scripts.forEach((script: Script) =>
+  {
+    let params = Map({});
+    script.params.forEach((param) =>
+    {
+      params = params.set(param.name, param.value);
+    });
+    const s = Map({
+      script: {
+        params: params.toJS(),
+        inline: script.script,
+      },
+    });
+    scriptObj = scriptObj.set(script.name, s);
+  });
+  return scriptObj;
 }

@@ -89,6 +89,7 @@ export interface Props
   colors: [string, string];
   spotlights: any; // TODO spawtlights
   mode: string;
+  index?: string;
   schema?: SchemaState;
   builder?: BuilderState;
 }
@@ -599,6 +600,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       colors: this.props.colors,
       contextOptions: this.getContextOptions(),
       mode,
+      index: this.props.index,
       schema: this.props.schema,
       builder: this.props.builder,
     };
@@ -612,6 +614,35 @@ export class TransformCardChart extends TerrainComponent<Props>
     this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
+  }
+
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
+    for (const key in nextProps)
+    {
+      if (!_.isEqual(nextProps[key], this.props[key]))
+      {
+        if (key === 'builder')
+        {
+          // only matters if the db name or source has changed
+          if (this.props[key].db.name !== nextProps[key].db.name)
+          {
+            return true;
+          }
+          const oldSource = this.props[key].query.path.source.dataSource;
+          const newSource = nextProps[key].query.path.source.dataSource;
+          if (!_.isEqual(newSource, oldSource))
+          {
+            return true;
+          }
+        }
+        else
+        {
+          return true;
+        }
+      }
+    }
+    return !_.isEqual(nextState, this.state);
   }
 
   // happens on undos/redos

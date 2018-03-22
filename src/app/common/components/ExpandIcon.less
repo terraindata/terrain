@@ -4,15 +4,14 @@
     width: 14px;
     height: 1px;
     transition: margin .2s ease-in-out;
-    &:not(:first-child) {
+    &.expand-icon-line-middle {
       margin-top: 3px;
+      margin-bottom: 3px;
     }
   }
-  &.expand-icon-open {
-    .expand-icon-line {
-      &:not(:first-child) {
-        margin-top: 6px;
-      }
+  &.expand-icon-open {.expand-icon-line-middle {
+      margin-top: 6px;
+      margin-bottom: 6px;
     }
   }
 }

@@ -203,7 +203,7 @@ class Tabs extends TerrainComponent<TabsProps> {
 
   public setSelectedPosition()
   {
-    if (this.state.tabs === null || this.state.tabs.length === 0)
+    if (this.state.tabs === null || this.state.tabs.length === 0 || !this)
     {
       return;
     }
@@ -405,7 +405,7 @@ class Tabs extends TerrainComponent<TabsProps> {
     const tabsLayout =
       {
         compact: true,
-        columns: tabs ? tabs.map((tab, index) => (
+        columns: tabs ? tabs.slice(-4).map((tab, index) => (
           {
             key: tab.id,
             content:

@@ -50,26 +50,33 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Colors, getStyle } from '../../../../colors/Colors';
+import { backgroundColor, borderColor, Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
+import TQLEditor from 'app/tql/components/TQLEditor';
 import Util from 'app/util/Util';
 import ExpandIcon from 'common/components/ExpandIcon';
 import RouteSelector from 'common/components/RouteSelector';
+import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
-import { _AggregationLine, _ChoiceOption, _Path, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import
+{
+  _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
+  More, Path, PathfinderContext, Script, Source,
+} from '../PathfinderTypes';
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
 import './PathfinderMoreStyle.less';
+
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -103,6 +110,36 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       selector: '.pf-aggregation-arrow-advanced',
       style: getStyle('fill', Colors().iconColor),
     });
+    const { pathfinderContext } = this.props;
+    const { source } = pathfinderContext;
+    this.setState({
+      fieldOptions: source.dataSource.getChoiceOptions({
+        type: 'fields',
+        source,
+        schemaState: pathfinderContext.schemaState,
+        builderState: pathfinderContext.builderState,
+        noNested: true,
+      }),
+    });
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.pathfinderContext.source.dataSource
+      !== nextProps.pathfinderContext.source.dataSource)
+    {
+      const { pathfinderContext } = nextProps;
+      const { source } = pathfinderContext;
+      this.setState({
+        fieldOptions: source.dataSource.getChoiceOptions({
+          type: 'fields',
+          source,
+          schemaState: pathfinderContext.schemaState,
+          builderState: pathfinderContext.builderState,
+          noNested: true,
+        }),
+      });
+    }
   }
 
   public shouldComponentUpdate(nextProps, nextState)
@@ -114,19 +151,23 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const { keyPath } = this.props;
     this.props.builderActions.changePath(this._ikeyPath(keyPath, 'references', i), value);
-    if (this.props.path.nested.get(i) === undefined)
-    {
-      const nestedKeyPath = this._ikeyPath(keyPath.butLast().toList(), 'nested', i);
-      this.props.builderActions.changePath(nestedKeyPath, _Path({ name: '', step: 0 }), true);
-    }
+  }
+
+  public handleAddScript()
+  {
+    const newScript = _Script();
+    const keyPath = this._ikeyPath(this.props.keyPath, 'scripts');
+    this.props.builderActions.changePath(keyPath, this.props.more.scripts.push(newScript));
   }
 
   public handleAddNested()
   {
+    const currIndex = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references'),
-      this.props.more.references.push(''));
+      this.props.more.references.push(currIndex));
     const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
-    this.props.builderActions.changePath(nestedKeyPath, this.props.path.nested.push(undefined));
+    this.props.builderActions.changePath(nestedKeyPath,
+      this.props.path.nested.push(_Path({ name: undefined, step: 0 })), true);
   }
 
   public handleDeleteNested(i)
@@ -142,6 +183,17 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       this.props.builderActions.changePath(
         nestedKeyPath,
         this.props.path.nested.splice(i, 1));
+    }
+  }
+
+  public handleSourceChange(i, value)
+  {
+    if (this.props.pathfinderContext.canEdit)
+    {
+      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i, 'name');
+      this.props.builderActions.changePath(
+        nestedKeyPath,
+        value);
     }
   }
 
@@ -197,6 +249,9 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         schema={this.props.pathfinderContext.schemaState}
         keyPath={this.props.keyPath.butLast().toList().push('nested').push(i)}
         toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
+        parentSource={this.props.pathfinderContext.source}
+        parentName={this.props.more.references.get(i)}
+        onSourceChange={this._fn(this.handleSourceChange, i)}
       />
     );
   }
@@ -248,22 +303,56 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     ]);
   }
 
+  public getScoreTypeOptionSets()
+  {
+    const options = List([
+      {
+        value: 'terrain',
+        displayName: PathfinderText.terrainTypeName,
+        hasOther: false,
+        extraContent: PathfinderText.terrainTypeExplanation,
+      },
+      {
+        value: 'linear',
+        displayName: PathfinderText.fieldTypeName,
+        hasOther: false,
+        extraContent: PathfinderText.fieldTypeExplanation,
+      },
+      {
+        value: 'random',
+        displayName: PathfinderText.randomTypeName,
+        hasOther: false,
+        extraContent: PathfinderText.randomTypeExplanation,
+      },
+      {
+        value: 'elastic',
+        displayName: PathfinderText.elasticTypeName,
+        hasOther: false,
+        extraContent: PathfinderText.elasticTypeExplanation,
+      },
+    ]);
+    const optionSet = {
+      key: 'type',
+      options,
+      shortNameText: PathfinderText.scoreTypeLabel,
+      headerText: PathfinderText.scoreTypeExplanation,
+      column: true,
+      hideSampleData: true,
+      hasSearch: false,
+      forceFloat: true,
+    };
+    return List([optionSet]);
+  }
+
   public getCollapseOptionSets()
   {
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-    let fieldOptions = source.dataSource.getChoiceOptions({
-      type: 'fields',
-      source,
-      schemaState: pathfinderContext.schemaState,
-      builderState: pathfinderContext.builderState,
-      // subtype: isSoftFilter ? 'match' : undefined,
-    });
     const noneOption = _ChoiceOption({
       value: undefined,
       displayName: 'None',
     });
-    fieldOptions = List([noneOption]).concat(fieldOptions).toList();
+    const fieldOptions = List([noneOption]).concat(this.state.fieldOptions).toList();
     const fieldSet = {
       key: 'field',
       options: fieldOptions,
@@ -367,7 +456,21 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleCollapseChange(optionSetIndex: number, value)
   {
+    // if it is a text field, need to append .keyword
+    const option = this.state.fieldOptions && this.state.fieldOptions.filter((opt) =>
+      opt.value === value,
+    ).toList().get(0);
+    if (option && option.meta && option.meta.fieldType === FieldType.Text)
+    {
+      value += '.keyword';
+    }
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath.push('collapse')), value);
+  }
+
+  public handleScoreTypeChange(optionSetIndex: number, value)
+  {
+    const keyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'score', 'type');
+    this.props.builderActions.changePath(keyPath, value);
   }
 
   public handleExpandNested(keyPath, expanded)
@@ -379,7 +482,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   {
     const { references } = this.props.more;
     const { nested } = this.props.path;
-    const { canEdit } = this.props.pathfinderContext;
+    const { canEdit, source } = this.props.pathfinderContext;
     const { keyPath } = this.props;
     return (
       <div>
@@ -387,10 +490,17 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           references.map((ref, i) =>
           {
             const expanded = nested.get(i) !== undefined ? nested.get(i).expanded : false;
+            const nestedPath = nested.get(i);
             return (
               <div
                 className='pf-more-nested'
                 key={i}
+                style={
+                  _.extend({},
+                    backgroundColor(Colors().blockBg),
+                    borderColor(Colors().blockOutline),
+                    { paddingBottom: expanded ? 6 : 0 },
+                  )}
               >
                 <div className='pf-more-nested-reference'>
                   <ExpandIcon
@@ -411,19 +521,19 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                         canEdit={canEdit}
                         className='pf-more-nested-reference-input'
                         noBg={true}
-                        autoFocus={true}
                         debounce={true}
                         forceFloat={true}
                         noBorder={false}
+                        showEllipsis={true}
                       />,
                       PathfinderText.referenceExplanation,
                     )
                   }
                   <FadeInOut
-                    open={nested.get(i) !== undefined && nested.get(i).name !== undefined}
+                    open={nested.get(i) !== undefined}
                   >
                     <FloatingInput
-                      value={nested.get(i) !== undefined ? nested.get(i).name : undefined}
+                      value={nestedPath.name}
                       onChange={this._fn(this.handleAlgorithmNameChange, i)}
                       label={PathfinderText.innerQueryName}
                       isTextInput={true}
@@ -433,6 +543,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       forceFloat={true}
                       noBorder={false}
                       debounce={true}
+                      showEllipsis={true}
                     />
                   </FadeInOut>
                   {
@@ -456,19 +567,148 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     );
   }
 
+  public handleScriptValueChange(keys, value)
+  {
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, ['scripts'].concat(keys)),
+      value,
+    );
+  }
+
+  public handleAddScriptParameter(i)
+  {
+    this.props.builderActions.changePath(
+      this._ikeyPath(this.props.keyPath, 'scripts', i, 'params'),
+      this.props.more.scripts.get(i).params.push(_Param({ name: '', value: '' })),
+    );
+  }
+
+  public deleteScript(i)
+  {
+    const { pathfinderContext, keyPath, more } = this.props;
+    const canEdit = pathfinderContext.canEdit && more.scripts.get(i).userAdded;
+    if (!canEdit)
+    {
+      return;
+    }
+    this.props.builderActions.changePath(
+      this._ikeyPath(keyPath, 'scripts'),
+      more.scripts.splice(i, 1),
+    );
+  }
+
+  public deleteParam(i, j)
+  {
+    const { pathfinderContext, keyPath, more } = this.props;
+    const canEdit = pathfinderContext.canEdit && more.scripts.get(i).userAdded;
+    if (!canEdit)
+    {
+      return;
+    }
+    this.props.builderActions.changePath(
+      this._ikeyPath(keyPath, 'scripts', i, 'params'),
+      more.scripts.get(i).params.splice(j, 1),
+    );
+  }
+
   public renderScripts(scripts)
   {
+    const { canEdit } = this.props.pathfinderContext;
+    const style = _.extend({}, backgroundColor(Colors().blockBg), borderColor(Colors().blockOutline));
     return (
-      <div>
+      <div className='pf-more-scripts-wrapper'>
         {
-          scripts.map((script) =>
-            <div>
-              <div>{script.name}</div>
-              <div>Params: </div>
-              <textarea>{script.script}</textarea>
-            </div>,
-          )
-        }
+          scripts.map((script: Script, i) =>
+          {
+            if (!script.userAdded)
+            {
+              return null;
+            }
+            const canEditScript = canEdit && script.userAdded;
+            return (
+              <div
+                className='pf-more-script'
+                key={i}
+                style={style}
+              >
+                <div className='pf-more-script-name-wrapper'>
+                  <ExpandIcon
+                    open={script.expanded}
+                    onClick={this._fn(this.handleScriptValueChange, [i, 'expanded'], !script.expanded)}
+                  />
+                  <FloatingInput
+                    label='Script Name'
+                    value={script.name}
+                    onChange={this._fn(this.handleScriptValueChange, [i, 'name'])}
+                    isTextInput={true}
+                    debounce={true}
+                    canEdit={canEditScript}
+                  />
+                  {
+                    canEditScript &&
+                    <RemoveIcon
+                      onClick={this._fn(this.deleteScript, i)}
+                      className='close pf-more-delete-script'
+                    />
+                  }
+                </div>
+                <FadeInOut
+                  open={script.expanded}
+                >
+                  <div className='pf-more-paramater-label'>
+                    Parameters
+                  </div>
+                  {
+                    script.params.map((param, j) =>
+                      <div
+                        className='pf-more-script-param-wrapper'
+                        key={j}
+                      >
+                        <FloatingInput
+                          label='Paramater Name'
+                          value={script.params.get(j).name}
+                          onChange={this._fn(this.handleScriptValueChange, [i, 'params', j, 'name'])}
+                          isTextInput={true}
+                          canEdit={canEditScript}
+                          debounce={true}
+                        />
+                        <FloatingInput
+                          label='Paramater Value'
+                          value={script.params.get(j).value}
+                          onChange={this._fn(this.handleScriptValueChange, [i, 'params', j, 'value'])}
+                          isTextInput={true}
+                          canEdit={canEditScript}
+                          debounce={true}
+                        />
+                        {
+                          canEditScript &&
+                          <RemoveIcon
+                            onClick={this._fn(this.deleteParam, i, j)}
+                            className='close pf-more-delete-param'
+                          />
+                        }
+                      </div>,
+                    )
+                  }
+                  <PathfinderCreateLine
+                    canEdit={canEditScript}
+                    onCreate={this._fn(this.handleAddScriptParameter, i)}
+                    text={'Parameter'}
+                    style={{ marginBottom: 2 }}
+                    showText={true}
+                  />
+                  <TQLEditor
+                    tql={script.script}
+                    canEdit={canEditScript}
+                    onChange={this._fn(this.handleScriptValueChange, [i, 'script'])}
+                    placeholder={'Enter a script here'}
+                    className='pf-more-script-script'
+                    style={style}
+                  />
+                </FadeInOut>
+              </div>
+            );
+          })}
       </div>
     );
   }
@@ -482,84 +722,118 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public render()
   {
     const { canEdit } = this.props.pathfinderContext;
+    const collapseValue = this.props.more.collapse ?
+      this.props.more.collapse.replace('.keyword', '') : undefined;
     return (
-      <div
-        className='pf-section pf-more-section'
-      >
-        {!this.props.hideTitle &&
-          <PathfinderSectionTitle
-            title={PathfinderText.moreSectionTitle}
-            tooltipText={PathfinderText.moreSectionSubtitle}
-            onExpand={this.toggleExpanded}
-            canExpand={true}
-            expanded={this.props.more.expanded}
-          />
-        }
-        {
-          // <RouteSelector
-          //   optionSets={this.getSizeOptionSets() /* TODO store in state? */}
-          //   values={List([this.props.path.source.count])}
-          //   onChange={this.handleSizePickerChange}
-          //   canEdit={canEdit}
-          //   defaultOpen={false}
-          //   hideLine={true}
-          //   autoFocus={true}
-          // />
-        }
-        <FadeInOut
-          open={this.props.more.expanded}
+      <div>
+        <div
+          className='pf-section pf-more-section'
         >
-          <RouteSelector
-            optionSets={this.getCollapseOptionSets()}
-            values={List([this.props.more.collapse])}
-            onChange={this.handleCollapseChange}
-            canEdit={canEdit}
-            defaultOpen={false}
-            autoFocus={true}
-          />
-          {
-            this.props.keyPath.includes('nested') ?
+          {!this.props.hideTitle &&
+            <PathfinderSectionTitle
+              title={PathfinderText.moreSectionTitle}
+              tooltipText={PathfinderText.moreSectionSubtitle}
+              onExpand={this.toggleExpanded}
+              canExpand={true}
+              expanded={this.props.more.expanded}
+            />
+          }
+          <FadeInOut
+            open={this.props.more.expanded}
+          >
+            {
               <RouteSelector
-                optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
-                values={List([this.props.path.minMatches])}
-                onChange={this.handleMinMatchesChange}
+                optionSets={this.getSizeOptionSets() /* TODO store in state? */}
+                values={List([this.props.path.source.count])}
+                onChange={this.handleSizePickerChange}
                 canEdit={canEdit}
                 defaultOpen={false}
+                hideLine={true}
                 autoFocus={true}
-              /> : null
-          }
-          {
-            // <DragAndDrop
-            //   draggableItems={this.getAggregationLines()}
-            //   onDrop={this.handleLinesReorder}
-            //   className='more-aggregations-drag-drop'
-            // />
-            // <PathfinderCreateLine
-            //   canEdit={canEdit}
-            //   onCreate={this.handleAddLine}
-            //   text={PathfinderText.createAggregationLine}
-            // />
-          }
-          {
-            this.renderScripts(this.props.more.scripts)
-          }
-          <div>
-            {this.renderNestedPaths()}
+              />
+            }
+            <RouteSelector
+              optionSets={this.getCollapseOptionSets()}
+              values={List([collapseValue])}
+              onChange={this.handleCollapseChange}
+              canEdit={canEdit}
+              defaultOpen={false}
+              autoFocus={true}
+            />
             {
-              !this.props.keyPath.includes('nested') ?
+              <RouteSelector
+                optionSets={this.getScoreTypeOptionSets()}
+                values={List([this.props.path.score.type])}
+                onChange={this.handleScoreTypeChange}
+                canEdit={canEdit}
+                defaultOpen={false}
+              />
+            }
+            {
+              this.props.keyPath.includes('nested') ?
+                <RouteSelector
+                  optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
+                  values={List([this.props.path.minMatches])}
+                  onChange={this.handleMinMatchesChange}
+                  canEdit={canEdit}
+                  defaultOpen={false}
+                  autoFocus={true}
+                /> : null
+            }
+            {
+              // <DragAndDrop
+              //   draggableItems={this.getAggregationLines()}
+              //   onDrop={this.handleLinesReorder}
+              //   className='more-aggregations-drag-drop'
+              // />
+              // <PathfinderCreateLine
+              //   canEdit={canEdit}
+              //   onCreate={this.handleAddLine}
+              //   text={PathfinderText.createAggregationLine}
+              // />
+            }
+            {
+              this.renderScripts(this.props.more.scripts)
+            }
+            <div>
+              {
                 tooltip(
                   <PathfinderCreateLine
                     canEdit={canEdit}
-                    onCreate={this.handleAddNested}
-                    text={PathfinderText.createNestedLine}
-                    style={{ marginLeft: -110 }}
+                    onCreate={this.handleAddScript}
+                    text={PathfinderText.addScript}
+                    style={{ marginTop: -1, marginBottom: 2 }}
                     showText={true}
                   />,
-                  PathfinderText.nestedExplanation,
-                ) : null
-            }
-          </div>
-        </FadeInOut>
+                  {
+                    title: PathfinderText.scriptExplanation,
+                    arrow: false,
+                  },
+                )
+              }
+            </div>
+
+          </FadeInOut>
+        </div>
+        <div className='pf-nested-section'>
+          {this.renderNestedPaths()}
+          {
+            !this.props.keyPath.includes('nested') ?
+              tooltip(
+                <PathfinderCreateLine
+                  canEdit={canEdit}
+                  onCreate={this.handleAddNested}
+                  text={PathfinderText.createNestedLine}
+                  // style={{ marginLeft: -110 }}
+                  showText={true}
+                />,
+                {
+                  title: PathfinderText.nestedExplanation,
+                  arrow: false,
+                },
+              ) : null
+          }
+        </div>
       </div>
     );
   }

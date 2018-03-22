@@ -89,13 +89,13 @@ const TuningIcon = require('./../../../images/icon_tuning.svg');
 
 enum COLUMNS
 {
-  Cards,
+  Pathfinder,
   Results,
+  Cards,
   Editor,
   Inputs,
   Schema,
   Tuning,
-  Pathfinder,
 }
 // Manual,
 const NUM_COLUMNS = 7;
@@ -103,11 +103,11 @@ const NUM_COLUMNS = 7;
 const menuIcons = [
   { icon: <BuilderIcon />, color: '#76a2c1' },
   { icon: <ResultsIcon />, color: '#71bca2' },
+  { icon: <BuilderIcon />, color: '#76a2c1' },
   { icon: <TQLIcon />, color: '#d47884' },
   { icon: <InputsIcon />, color: '#c2b694' },
   { icon: <ManualIcon />, color: '#a98abf' },
   { icon: <TuningIcon />, color: 'black' },
-  { icon: <BuilderIcon />, color: '#76a2c1' },
 ]; // TODO add schema icon above
 
 // interface Props
@@ -227,6 +227,11 @@ const BuilderColumn = createReactClass<any, any>(
       };
     },
 
+    shouldShowExport()
+    {
+      return ['DEPLOYED', 'LIVE', 'DEFAULT'].indexOf(this.props.algorithm.status) > -1;
+    }
+
     renderContent()
     {
       if (!this.props.query)
@@ -273,7 +278,7 @@ const BuilderColumn = createReactClass<any, any>(
             algorithmName={this.props.algorithm.name}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
-            showExport={true}
+            showExport={this.shouldShowExport()}
             showCustomizeView={true}
             allowSpotlights={true}
             exportState={this.props.exportState}

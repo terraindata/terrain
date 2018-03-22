@@ -231,7 +231,10 @@ class Autocomplete extends TerrainComponent<Props>
       }
       return;
     }
-    const visibleOptions = this.props.options && this.props.options.filter((option) => this.showOption(option, 'any'));
+
+    const firstOptions = this.props.options && this.props.options.filter((o) => this.showOption(o, 'first'));
+    const secondOptions = this.props.options && this.props.options.filter((o) => this.showOption(o, 'second'));
+    const visibleOptions = firstOptions.concat(secondOptions).toSet().toList();
     switch (event.keyCode)
     {
       case 38:
@@ -379,8 +382,7 @@ class Autocomplete extends TerrainComponent<Props>
 
     const firstOptions = options.filter((o) => this.showOption(o, 'first'));
     const secondOptions = options.filter((o) => this.showOption(o, 'second'));
-    const otherOptions = options.filterNot((o) => this.showOption(o, 'any'));
-    return firstOptions.concat(secondOptions).concat(otherOptions).toSet().toList();
+    return firstOptions.concat(secondOptions).toSet().toList();
   }
 
   public render()

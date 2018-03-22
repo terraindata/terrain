@@ -73,7 +73,7 @@ class ExpandIcon extends TerrainComponent<Props>
           style={barStyle}
         />
         <div
-          className='expand-icon-line'
+          className='expand-icon-line expand-icon-line-middle'
           style={barStyle}
         />
         <div

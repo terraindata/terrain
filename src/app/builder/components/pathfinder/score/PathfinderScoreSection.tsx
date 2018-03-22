@@ -107,7 +107,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       actionType: 'setStyle',
       selector: `.pf-section .pf-score-line-transform
       .linear-selector-wrapper .linear-selector-options .linear-selector-option`,
-      style: fontColor(Colors().fontColorLightest + ' !important'),
+      style: fontColor(Colors().active + ' !important'),
     });
     this.props.colorsActions({
       actionType: 'setStyle',
@@ -118,17 +118,17 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-wrapper',
-      style: { background: Colors().blockBg },
+      style: { background: Colors().fontWhite },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper',
-      style: { background: Colors().blockBg },
+      style: { background: Colors().fontWhite },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.pf-section .pf-score-line-inner .dropdown-options-wrapper .dropdown-option',
-      style: { background: Colors().blockBg },
+      style: { background: Colors().fontWhite },
     });
   }
 
@@ -257,6 +257,8 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             canEdit={canEdit}
             canDelete={canEdit}
             onDelete={this.handleDeleteLine}
+            className='pf-linear-score-line-wrapper'
+            style={index === 0 ? { marginTop: -4 } : {}}
           />,
           key: String(index),
           draggable: true,
@@ -340,6 +342,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   {
     const { pathfinderContext, score } = this.props;
     const { source, step, canEdit } = this.props.pathfinderContext;
+
     return (
       <div
         className='pf-section pf-score-section'
@@ -364,6 +367,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           canExpand={true}
           onExpand={this.toggleExpanded}
           expanded={score.expanded}
+          contentCount={score.lines.count()}
         />
         {
           // <CheckBox
@@ -384,6 +388,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
                 }
                 onDrop={this.handleLinesReorder}
                 className='drag-drop-pf-score'
+                style={backgroundColor(Colors().blockBg)}
               />
               :
               null
