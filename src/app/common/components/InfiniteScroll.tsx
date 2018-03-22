@@ -46,105 +46,107 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands
 
+import { List, Map } from 'immutable';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
-const SCROLL_SENSITIVITY = 500;
-
 export interface Props
 {
-  onRequestMoreItems:
-  (
-    onItemsLoaded: (unchanged?: boolean) => void,
-    // parent calls this when items are loaded
-    //  if there is no change in the items, parent can pass 'true'
-    //  to prevent InfinteScroll from making infinite requests.
-    //  If the data later change, the parent can simply call the handler again
-    //  without 'true'
-  ) => void;
-
-  className?: string;
-  children?: any;
+  pageSize: number;
+  totalSize: number;
+  renderChild: (data: any, index: number, isVisible: boolean) => El;
+  childData: List<any>;
+  className: string;
+  id?: string;
 }
 
-class Library extends TerrainComponent<Props>
+class InfiniteScroll extends TerrainComponent<Props>
 {
+  public scrollTop;
+
   public state: {
-    unchanged: boolean;
+    pages: number[],
+    pageBreaks: List<number>,
   } = {
-      unchanged: false,
+      pages: [0],
+      pageBreaks: List([0]),
     };
 
-  public unmounted = false;
-
-  public componentDidMount()
+  public checkScroll(e)
   {
-    this.check();
-  }
-
-  public componentWillUnmount()
-  {
-    // I know this is an anti-pattern, but I can't figure out a way around it
-    //  HitsArea sometimes calls onItemsLoaded after this component has been unmounted
-    this.unmounted = true;
-  }
-
-  public handleScroll()
-  {
-    this.check();
-  }
-
-  public onItemsLoaded(unchanged?: boolean)
-  {
-    if (!this.unmounted)
+    const elem = $(e.currentTarget);
+    const lastPage = this.state.pages[this.state.pages.length - 1];
+    // scrolled to the bottom, increment visible pages and set the new "top"
+    const scrollUp = this.scrollTop > elem.scrollTop();
+    this.scrollTop = elem.scrollTop();
+    if (this.scrollTop === 0)
     {
+      // This could occur if the parent forcefully resets the scroll top, must properly set scroll pages
       this.setState({
-        unchanged,
+        pages: [0],
       });
-      this.check(unchanged);
+      return;
+    }
+    if (elem[0].scrollHeight - elem.scrollTop() === elem.outerHeight())
+    {
+      if (lastPage * this.props.pageSize < this.props.totalSize)
+      {
+        this.setState({
+          pages: [lastPage, lastPage + 1],
+          pageBreaks: this.state.pageBreaks.set(lastPage + 1, elem.scrollTop()),
+        });
+      }
+    }
+    // If it has scrolled up to "top", decrement visible pages
+    else if (
+      scrollUp &&
+      this.state.pageBreaks.get(lastPage) >= elem.scrollTop() &&
+      this.state.pages.indexOf(0) === -1
+    )
+    {
+      const firstPage = this.state.pages[0];
+      this.setState({
+        pages: [firstPage - 1, firstPage],
+      });
     }
   }
 
-  public check(unchanged?: boolean)
+  public isVisible(index)
   {
-    if (unchanged === undefined)
-    {
-      unchanged = this.state.unchanged;
-    }
-
-    if (unchanged)
-    {
-      // no change in item state, don't fire a request to parent
-      return;
-    }
-
-    const el: any = this.refs['is'];
-    if (!el)
-    {
-      return;
-    }
-
-    const { height } = el.getBoundingClientRect();
-    const { scrollHeight, scrollTop } = el;
-
-    if (height + scrollTop + SCROLL_SENSITIVITY > scrollHeight)
-    {
-      this.props.onRequestMoreItems(this.onItemsLoaded);
-    }
+    const { pages } = this.state;
+    const firstPage = pages[0];
+    const lastPage = pages[pages.length - 1];
+    return index >= firstPage * this.props.pageSize &&
+      index < lastPage * this.props.pageSize + this.props.pageSize;
   }
 
   public render()
   {
+    const { pageSize } = this.props;
+    const lastPage = this.state.pages[this.state.pages.length - 1];
     return (
       <div
         className={this.props.className}
-        onScroll={this.handleScroll}
-        ref='is'
+        onScroll={this.checkScroll}
+        id={this.props.id}
       >
-        {this.props.children}
+        {
+          this.props.childData.map((child, index) =>
+          {
+            if (!(index < lastPage * pageSize + pageSize))
+            {
+              return null;
+            }
+            else
+            {
+              return this.props.renderChild(child, index, this.isVisible(index));
+            }
+          })
+
+        }
       </div>
     );
   }
 }
 
-export default Library;
+export default InfiniteScroll;

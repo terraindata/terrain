@@ -76,7 +76,7 @@ export class ResultsConfig
 {
   thumbnail: string = '';
   name: string = '';
-  score: string = '_score';
+  score: string = '';
   fields: List<string> = List([]);
   enabled: boolean = false;
   formats: IMMap<string, Format> = Map<string, Format>();

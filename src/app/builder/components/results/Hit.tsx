@@ -103,6 +103,7 @@ export interface Props
   hideNested?: boolean;
   hideFieldNames?: boolean;
   firstVisibleField?: number;
+  isVisible?: boolean;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -138,7 +139,7 @@ class HitComponent extends TerrainComponent<Props> {
     {
       hovered: false,
       nestedStates: Map<string, NestedState>({}),
-      nestedFields: undefined,
+      nestedFields: [],
       scrollState: Map<string, number>({}),
     };
 
@@ -171,6 +172,11 @@ class HitComponent extends TerrainComponent<Props> {
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
+    // Never update the component if it's not visible (unless it's a size change)
+    if (!nextProps.isVisible && nextProps.hitSize === this.props.hitSize)
+    {
+      return false;
+    }
     for (const key in nextProps)
     {
       if (nextProps.hasOwnProperty(key))
@@ -182,7 +188,7 @@ class HitComponent extends TerrainComponent<Props> {
           return true;
         }
         else if (key !== 'hit' && key !== 'builder'
-          && this.props[key] !== nextProps[key])
+          && !_.isEqual(this.props[key], nextProps[key]))
         {
           return true;
         }
@@ -191,12 +197,20 @@ class HitComponent extends TerrainComponent<Props> {
 
     for (const key in nextState)
     {
-      if (this.state[key] !== nextState[key])
+      if (!_.isEqual(this.state[key], nextState[key]))
       {
         return true;
       }
     }
-    return !_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS());
+    // If only the id has changed, we don't need to update the result
+    for (const key in nextProps.hit.toJS())
+    {
+      if (key !== 'id' && !_.isEqual(nextProps.hit.toJS()[key], this.props.hit.toJS()[key]))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   public renderExpandedField(value, field)
@@ -1010,7 +1024,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
           >
             {tooltipText}
           </div>,
-          arrow: false
+          arrow: false,
         });
       }
       return content;

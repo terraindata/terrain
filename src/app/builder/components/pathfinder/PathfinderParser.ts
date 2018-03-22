@@ -74,7 +74,6 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     sort: Map({}),
     aggs: Map({}),
     from: 0,
-    size: MAX_COUNT,
     _source: true,
     track_scores: true,
   });
@@ -82,7 +81,10 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   // Sources
   const sourceInfo = parseSource(path.source);
   baseQuery = baseQuery.set('from', sourceInfo.from);
-  baseQuery = baseQuery.set('size', sourceInfo.size);
+  if (sourceInfo.size !== 'all')
+  {
+    baseQuery = baseQuery.set('size', sourceInfo.size);
+  }
   baseQuery = baseQuery.setIn(['query', 'bool', 'filter'], List([
     Map({
       term: Map({
@@ -166,7 +168,7 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : MAX_COUNT,
+    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : 'all',
     index: (source.dataSource as any).index,
   };
 }
@@ -443,10 +445,10 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
               term: Map({
                 [line.field]: Map({
                   value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
-                  boost,
                 }),
               }),
             }),
+            boost,
           }),
         });
       }
@@ -468,9 +470,9 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
                 [line.field]: Map({
                   query: String(line.value || ''),
                 }),
-                boost,
               }),
             }),
+            boost,
           }),
         });
       }
@@ -562,7 +564,6 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         }),
       });
     case 'isin':
-    case 'isnotin':
       try
       {
         return Map({
@@ -592,6 +593,44 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
             boost,
           },
         });
+      }
+
+    case 'isnotin':
+      let parsed = value;
+      try
+      {
+        parsed = JSON.parse(String(value).toLowerCase());
+      }
+      catch {
+        // Try to split it along commas and create own value
+        if (typeof value === 'string' && value[0] !== '@')
+        {
+          value = value.replace(/\[/g, '').replace(/\]/g, '');
+          const pieces = value.split(',');
+          parsed = pieces.map((piece) => piece.toLowerCase().trim());
+        }
+      }
+      if (useShould)
+      {
+        return Map({
+          bool: {
+            must_not: {
+              terms: {
+                [line.field]: parsed,
+              },
+            },
+            boost,
+          },
+        });
+      }
+      else
+      {
+        return Map({
+          terms: {
+            [line.field]: parsed,
+            boost,
+          }
+        })
       }
 
     default:
