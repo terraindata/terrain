@@ -1026,7 +1026,7 @@ describe('File import route tests', () =>
         },
         {
           name: 'rename',
-          colName: 'column3',
+          colName: 'sillyname',
           args: { newName: 'col3' },
         },
         {

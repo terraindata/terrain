@@ -69,43 +69,18 @@ export default class ImportTransform extends ADocumentTransform
   {
     if (Array.isArray(input))
     {
-      return input.map((i) => this._apply(i, chunkNumber));
-    }
-    return this._apply(input, chunkNumber);
-  }
-
-  private _apply(input: object, chunkNumber: number): object
-  {
-    if (this.config.requireJSONHaveAllFields === true)
-    {
-      const expectedCols = JSON.stringify(this.config.originalNames.sort());
-      const inputCols = JSON.stringify(Object.keys(input).sort());
-      if (inputCols !== expectedCols)
-      {
-        this.emit('error', new Error('Stream contains an object that does not contain the expected fields. Got fields: ' +
-          inputCols + '\nExpected: ' + expectedCols));
-      }
-    }
-    else
-    {
-      const fieldsInDocumentNotExpected = _.difference(Object.keys(input), this.config.originalNames);
-      for (const field of fieldsInDocumentNotExpected)
-      {
-        if (input.hasOwnProperty(field))
-        {
-          this.emit('error', new Error('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
-            JSON.stringify(input)));
-        }
-        delete input[field];
-      }
-      const expectedFieldsNotInDocument = _.difference(this.config.originalNames, Object.keys(input));
-      for (const field of expectedFieldsNotInDocument)
-      {
-        input[field] = null;
-      }
+      return input.map((i) => this.transform(i, chunkNumber++));
     }
 
-    console.log(input);
-    return this.importt._transformAndCheck(input, this.config);
+    let transformed;
+    try
+    {
+      transformed = this.importt._transformAndCheck(input, this.config);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+    return transformed;
   }
 }

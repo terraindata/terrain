@@ -68,6 +68,11 @@ export default class TransformationEngineTransform extends ADocumentTransform
 
   protected transform(input: object, chunkNumber: number): object | object[]
   {
+    if (Array.isArray(input))
+    {
+      return input.map((i) => this.transform(i, chunkNumber++));
+    }
+
     if (chunkNumber === 0 && this.engine === undefined)
     {
       this.engine = this.createTransformationEngine(input);

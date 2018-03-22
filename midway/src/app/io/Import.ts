@@ -60,6 +60,7 @@ import * as Tasty from '../../tasty/Tasty';
 import * as AppUtil from '../AppUtil';
 
 import * as Common from './Common';
+import ADocumentTransform from './streams/ADocumentTransform';
 import CSVTransform from './streams/CSVTransform';
 import ImportTransform from './streams/ImportTransform';
 import JSONTransform from './streams/JSONTransform';
@@ -67,7 +68,6 @@ import TransformationEngineTransform from './streams/TransformationEngineTransfo
 import ImportTemplateConfig from './templates/ImportTemplateConfig';
 import { ImportTemplates } from './templates/ImportTemplates';
 import { TemplateBase } from './templates/TemplateBase';
-import ADocumentTransform from './streams/ADocumentTransform';
 
 const importTemplates = new ImportTemplates();
 
@@ -283,11 +283,14 @@ export class Import
 
         const elasticWriter = new ElasticWriter(client, imprtConf.dbname, imprtConf.tablename, primaryKey);
         file.pipe(importTransform)
-          .pipe(documentTransform)
+          .on('error', reject)
           .pipe(transformationEngineTransform)
-          .pipe(elasticWriter);
-        elasticWriter.on('error', (e) => reject(e));
-        elasticWriter.on('finish', () => resolve(imprtConf));
+          .on('error', reject)
+          .pipe(documentTransform)
+          .on('error', reject)
+          .pipe(elasticWriter)
+          .on('error', reject)
+          .on('finish', () => resolve(imprtConf));
       }
       catch (e)
       {
@@ -404,7 +407,7 @@ export class Import
         {
           if (!this._csvCheckTypesHelper(obj, imprt.columnTypes[name], name))
           {
-            return 'Encountered an object whose field "' + name + '"does not match the specified type (' +
+            return 'Encountered an object whose field "' + name + '" does not match the specified type (' +
               JSON.stringify(imprt.columnTypes[name]) + '): ' + JSON.stringify(obj);
           }
         }
