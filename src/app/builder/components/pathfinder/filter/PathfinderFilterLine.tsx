@@ -274,7 +274,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     };
 
     const shouldShowValue = this.shouldShowValue();
-    const valueOptions = shouldShowValue ? this.props.valueOptions : List<RouteSelectorOption>();
+    let valueOptions = shouldShowValue ? this.props.valueOptions : List<RouteSelectorOption>();
     let valueHeader = '';
 
     if (shouldShowValue)

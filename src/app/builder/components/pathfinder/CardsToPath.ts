@@ -51,15 +51,15 @@ import
   _FilterLine,
   _Param,
   _Path,
-  _Script,
   _ScoreLine,
+  _Script,
   FilterGroup,
   FilterLine,
-  Path,
   Param,
-  Script,
+  Path,
   Score,
   ScoreLine,
+  Script,
   Source,
   sourceCountOptions,
 } from 'builder/components/pathfinder/PathfinderTypes';
@@ -115,8 +115,9 @@ export class CardsToPath
     const groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
     const newScripts = this.getScripts(path.more.scripts, parser, bodyValueInfo);
     const more = path.more
-      .set('references', List([parentAlias]))
+      .set('references', groupJoinPaths.length !== 0 ? List([parentAlias]) : List([]))
       .set('scripts', newScripts);
+    console.log(more);
 
     const newPath = path
       .set('source', newSource)
@@ -417,21 +418,24 @@ export class CardsToPath
     if (rootVal.hasOwnProperty('script_fields'))
     {
       return List(_.keys(rootVal.script_fields).map((key) =>
-        {
-          const script = rootVal.script_fields[key];
-          const oldScript = scripts.filter((script) => script.name === key).toList().get(0); // Look at old script 
-          return _Script({
-            name: key,
-            script: script.script.inline,
-            params: _.keys(script.script.params).map((paramKey) =>
-              _Param({
-                name: key,
+      {
+        const script = rootVal.script_fields[key];
+        const oldScript = scripts.filter((scr) => scr.name === key).toList().get(0); // Look at old script
+        return _Script({
+          name: key,
+          script: script.script && script.script.inline,
+          params: (script.script && script.script.params) ?
+            _.keys(script.script.params).map((paramKey) =>
+            {
+              return {
+                name: paramKey,
                 value: script.script.params[paramKey],
-              })
-            ),
-            userAdded: oldScript !== undefined ? oldScript.userAdded : true,
-          });
-        }
+              };
+            })
+            : [],
+          userAdded: oldScript !== undefined ? oldScript.userAdded : true,
+        });
+      },
       ));
     }
     return List([]);

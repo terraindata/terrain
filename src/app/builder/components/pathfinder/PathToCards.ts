@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 import { parseScore, PathFinderDefaultSize } from 'builder/components/pathfinder/PathfinderParser';
-import { ElasticDataSource, FilterGroup, FilterLine, Path } from 'builder/components/pathfinder/PathfinderTypes';
+import { ElasticDataSource, FilterGroup, FilterLine, Path, Script } from 'builder/components/pathfinder/PathfinderTypes';
 import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
@@ -127,6 +127,8 @@ export class PathToCards
     this.updateGroupJoin(path.nested, parser, body, parentAliasName);
     // score card
     this.fromScore(path, parser, body);
+
+    this.updateScripts(path.more.scripts, parser, body);
 
     // finally, let's distribute filters from the sourcebool to the hard/soft bool.
     this.distributeSourceBoolFilters(path, parser, body);
@@ -324,7 +326,7 @@ export class PathToCards
       {
         nestedQuery.objectChildren.path.propertyValue.card = nestedQuery.objectChildren.path.propertyValue.card.set('value', thePath);
       }
-    };
+    });
   }
 
   private static processInnerGroup(filterLines: FilterLine[], parser: ESCardParser, boolValueInfo: ESValueInfo, boolType, filterSection: 'soft' | 'hard')
@@ -396,7 +398,7 @@ export class PathToCards
       // this is an inner filter group
       const innerBoolValueInfo = innerBools[index];
       this.FilterGroupToBool(line.filterGroup, parser, innerBoolValueInfo, filterSection);
-    };
+    });
   }
 
   private static FilterGroupToBool(filterGroup: FilterGroup, parser: ESCardParser, boolValueInfo: ESValueInfo, filterSection: 'hard' | 'soft' = 'hard')
@@ -466,6 +468,66 @@ export class PathToCards
     this.processInnerGroup(filterLineMap.group, parser, boolValueInfo, boolType, filterSection);
     this.processNestedQueryFilterGroup(filterLineMap.nested, parser, boolValueInfo, boolType, filterSection);
     // handle nested query filter group
+  }
+
+  private static updateScripts(scripts: List<Script>, parser: ESCardParser, body: ESValueInfo)
+  {
+    if (scripts.size === 0)
+    {
+      TerrainLog.debug('(P->B): No scripts, delete the script_fields card if it exists');
+      if (body.objectChildren.script_fields)
+      {
+        parser.deleteChild(body, 'script_fields');
+      }
+      return;
+    }
+    if (body.objectChildren.script_fields === undefined)
+    {
+      TerrainLog.debug('(P->B): Creating a script_fields card because there is none');
+      parser.createCardIfNotExist({ 'script_fields:script_fields': {} }, body);
+    }
+    const pathScriptMap = {};
+    scripts.map((script: Script) => { pathScriptMap[script.name] = script; });
+    const cardScriptMap = {};
+    const scriptFieldValue = body.objectChildren.script_fields.propertyValue;
+    scriptFieldValue.forEachProperty((scriptBody, name) =>
+    {
+      cardScriptMap[name] = scriptBody.propertyValue;
+    });
+    // If there are any paths in cardScriptMap not in pathScriptMap, delete them
+    for (const scriptKey of Object.keys(cardScriptMap))
+    {
+      if (pathScriptMap[scriptKey] === undefined)
+      {
+        parser.deleteChild(scriptFieldValue, scriptKey);
+      }
+    }
+    for (const pathKey of Object.keys(pathScriptMap))
+    {
+      if (cardScriptMap[pathKey])
+      {
+        // Delete the old one
+        parser.deleteChild(scriptFieldValue, pathKey);
+      }
+      // create a new script card based on path script
+      const scriptTemplate = {
+        'script:script': {
+          'inline:string': pathScriptMap[pathKey].script,
+        },
+      };
+      if (pathScriptMap[pathKey].params && pathScriptMap[pathKey].params.size)
+      {
+        scriptTemplate['script:script']['params:script_params'] = {};
+        pathScriptMap[pathKey].params.forEach((param) =>
+        {
+          scriptTemplate['script:script']['params:script_params'][param.name + ':string'] = param.value;
+        });
+      }
+      parser.createCardIfNotExist({
+        [pathKey + ':script_field']: scriptTemplate,
+      }, scriptFieldValue);
+    }
+
   }
 
   private static updateGroupJoin(sourcePaths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string)
