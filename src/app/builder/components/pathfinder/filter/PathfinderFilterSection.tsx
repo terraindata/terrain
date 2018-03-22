@@ -59,7 +59,7 @@ import CustomDragLayer from 'app/common/components/CustomDragLayer';
 import DragDropGroup from 'app/common/components/DragDropGroup';
 import DragDropItem from 'app/common/components/DragDropItem';
 import DropZone from 'app/common/components/DropZone';
-import { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
+import { RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import Util from 'app/util/Util';
 import FadeInOut from 'common/components/FadeInOut';
 import SingleRouteSelector from 'common/components/SingleRouteSelector';
@@ -78,7 +78,9 @@ export interface Props
   onStepChange?: (oldStep: PathfinderSteps) => void;
   toSkip?: number;
   isSoftFilter?: boolean; // does this section apply to soft filters?
-
+  onAddScript?: (fieldName: string, lat: any, lon: any, name: string) => string;
+  onDeleteScript?: (scriptName: string) => void;
+  onUpdateScript?: (fieldName: string, name: string, lat?: any, lon?: any) => void;
   builderActions?: typeof BuilderActions;
   colorsActions?: typeof ColorsActions;
 }
@@ -88,10 +90,14 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   public state:
     {
       dragging: boolean,
+      canDrag: boolean,
       fieldOptionSet: RouteSelectorOptionSet,
+      valueOptions: List<RouteSelectorOption>,
     } = {
       dragging: false,
+      canDrag: true,
       fieldOptionSet: undefined,
+      valueOptions: undefined,
     };
 
   public componentWillMount()
@@ -113,6 +119,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     });
     this.setState({
       fieldOptionSet: this.getFieldOptionSet(this.props),
+      valueOptions: this.getValueOptions(this.props),
     });
   }
 
@@ -123,6 +130,21 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     {
       this.setState({
         fieldOptionSet: this.getFieldOptionSet(nextProps),
+      });
+    }
+    // If inputs changes, or parent query data source changes, update value possibilities
+    if (nextProps.pathfinderContext.builderState.query &&
+      this.props.pathfinderContext.builderState.query &&
+      nextProps.pathfinderContext.builderState.query.inputs !==
+      this.props.pathfinderContext.builderState.query.inputs ||
+      !_.isEqual(nextProps.pathfinderContext.parentSource,
+        this.props.pathfinderContext.parentSource) ||
+      nextProps.pathfinderContext.parentName !==
+      this.props.pathfinderContext.parentName
+    )
+    {
+      this.setState({
+        valueOptions: this.getValueOptions(nextProps),
       });
     }
   }
@@ -153,6 +175,21 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     return fieldSet;
   }
 
+  public getValueOptions(props: Props)
+  {
+    const { pathfinderContext, keyPath } = props;
+    const { source } = pathfinderContext;
+    const valueOptions = source.dataSource.getChoiceOptions({
+      type: 'input',
+      source: pathfinderContext.parentSource,
+      builderState: pathfinderContext.builderState,
+      schemaState: pathfinderContext.schemaState,
+      isNested: keyPath.includes('nested'),
+      parentName: pathfinderContext.parentName,
+    });
+    return valueOptions;
+  }
+
   public shouldComponentUpdate(nextProps, nextState)
   {
     return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
@@ -162,6 +199,10 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   {
     const newLines = this.props.filterGroup.lines.push(_FilterLine());
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
+    // When a line is created, it is automatically open so we should disable dradgging
+    this.setState({
+      canDrag: false,
+    });
   }
 
   public insertIn(items, keyPath, item): List<any>
@@ -207,14 +248,17 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     this.props.builderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
 
-  public handleFilterDelete(keyPath: KeyPath)
+  public handleFilterDelete(keyPath: KeyPath, filter?: FilterLine | FilterGroup)
   {
+    if (filter && (filter as FilterLine).addScript)
+    {
+      this.props.onDeleteScript((filter as FilterLine).scriptName);
+    }
     const skip: number = this.props.toSkip !== undefined ? this.props.toSkip : 3;
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(skip).toList());
     const index = keyPath.last();
     this.props.builderActions.changePath(parentKeyPath, parent.splice(index, 1));
-    // TODO consider 'removeIn' instead
   }
 
   public renderFilterLine(filterLine, keyPath: List<string | number>)
@@ -238,8 +282,20 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         comesBeforeAGroup={successor && this.isGroup(successor)}
         isSoftFilter={isSoftFilter}
         fieldOptionSet={this.state.fieldOptionSet}
+        valueOptions={this.state.valueOptions}
+        onToggleOpen={this.handleFilterOpen}
+        onAddScript={this.props.onAddScript}
+        onDeleteScript={this.props.onDeleteScript}
+        onUpdateScript={this.props.onUpdateScript}
       />
     );
+  }
+
+  public handleFilterOpen(open: boolean)
+  {
+    this.setState({
+      canDrag: !open,
+    });
   }
 
   public renderGroupHeader(group, keyPath)
@@ -436,10 +492,10 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           canExpand={true}
           onExpand={this.toggleExpanded}
           expanded={!filterGroup.collapsed}
+          contentCount={filterGroup.lines.count()}
         />
         <FadeInOut
           open={!filterGroup.collapsed}
-        // POSSIBLY DONT UNMOUNT
         >
           <CustomDragLayer />
           <DropZone
@@ -463,11 +519,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
                       onDragStart={this._toggle('dragging')}
                       onDragStop={this._toggle('dragging')}
                       dropZoneStyle={dropZoneStyle}
-                      canDrag={canEdit}
+                      canDrag={canEdit && this.state.canDrag}
                     />
                     :
                     <DragDropGroup
-                      canDrag={canEdit}
+                      canDrag={canEdit && this.state.canDrag}
                       items={line.filterGroup.lines}
                       data={line.filterGroup}
                       onDrop={this.handleGroupDrop}

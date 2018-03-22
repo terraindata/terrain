@@ -49,11 +49,12 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import Colors, { getStyle } from 'app/colors/Colors';
+import Colors, { backgroundColor, borderColor, getStyle } from 'app/colors/Colors';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import LinearSelector from 'app/common/components/LinearSelector';
 import ExpandIcon from 'common/components/ExpandIcon';
@@ -91,7 +92,12 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
     const { filterGroup, canEdit, depth } = this.props;
 
     return (
-      <div className='pf-filter-group-header'>
+      <div
+        className='pf-filter-group-header'
+        style={_.extend({},
+          backgroundColor(Colors().blockBg),
+          borderColor(Colors().blockOutline))}
+      >
         {
           this.state.editingName
             ?
@@ -100,7 +106,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
               keyPath={this._ikeyPath(this.props.keyPath, 'name')}
               canEdit={canEdit}
               action={this.props.onChange}
-              onBlur={this._toggle('editingName')}
+              // onBlur={this._toggle('editingName')}
               onKeyDown={this.handleKeyDown}
               autoFocus={true}
               autoDisabled={true}

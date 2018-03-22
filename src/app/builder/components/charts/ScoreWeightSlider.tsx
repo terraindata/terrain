@@ -67,6 +67,7 @@ interface ScoreWeightSliderProps
   onChange: (value: number) => void;
   onAfterChange: (value: number) => void;
   height: number;
+  lengthOffset: number;
   noLeftLine?: boolean;
   rounded?: boolean;
   noPadding?: boolean;
@@ -85,8 +86,8 @@ const styles = {
     height,
     backgroundColor: 'transparent',
   }),
-  innerSliderWrapper: (height) => ({
-    width: `calc(100% - ${height}px)`,
+  innerSliderWrapper: (lengthOffset) => ({
+    width: `calc(100% - ${lengthOffset}px)`,
     position: 'relative' as 'relative',
     marginLeft: 0, // not sure why this used to have 14px margin
   }),
@@ -168,6 +169,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
       background,
       noLeftLine,
       step,
+      lengthOffset,
     } = this.props;
 
     const handleStyle = this.getHandleStyle();
@@ -191,7 +193,7 @@ export default class ScoreWeightSlider extends TerrainComponent<ScoreWeightSlide
         })}
       >
         <div style={customRailStyle} />
-        <div style={styles.innerSliderWrapper(height)}>
+        <div style={styles.innerSliderWrapper(lengthOffset)}>
           {
             !noLeftLine &&
             <div style={styles.leftLine(height)}

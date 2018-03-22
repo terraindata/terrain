@@ -54,7 +54,7 @@ import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, Zo
 import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
 
 import Switch from 'common/components/Switch';
-import { backgroundColor, Colors } from '../../colors/Colors';
+import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
 import BuilderTextbox from './BuilderTextbox';
@@ -147,17 +147,21 @@ export const units =
 class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
   public debouncedExecuteChange;
+  public map;
+  public circle;
 
   public state: {
     mapExpanded: boolean,
     zoom: number;
     coordinateSearch: boolean;
     inputValue: string;
+    circleSet: boolean;
   } = {
       mapExpanded: false,
       zoom: 15,
       coordinateSearch: false,
       inputValue: this.props.inputValue,
+      circleSet: false,
     };
   public geoCache = {};
   public reverseGeoCache = {};
@@ -232,6 +236,23 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
       className: 'map-marker-container',
     });
     return styledIcon;
+  }
+
+  public componentDidUpdate(prevProps, prevState)
+  {
+    // initial update
+    if (!this.state.circleSet && this.circle && this.props.distance && this.map)
+    {
+      this.map.leafletElement.fitBounds(this.circle.leafletElement.getBounds());
+      this.setState({
+        circleSet: true,
+      });
+    }
+    else if (this.state.circleSet && this.circle && this.map &&
+      (this.props.distance !== prevProps.distance || this.props.distanceUnit !== prevProps.distanceUnit))
+    {
+      this.map.leafletElement.fitBounds(this.circle.leafletElement.getBounds());
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props & InjectedOnClickOutProps)
@@ -474,23 +495,23 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     if (coordinates !== undefined)
     {
       location = MapUtil.getCoordinatesFromGeopoint(coordinates);
-      if (!this.isValidCoordinate(location))
+    }
+    if (!this.isValidCoordinate(location) || coordinates === undefined)
+    {
+      // Try to see if it inputValue is an input, in that case get the coordinates from there
+      const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
+      if (inputs[inputValue] !== undefined)
       {
-        // Try to see if it inputValue is an input, in that case get the coordinates from there
-        const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
-        if (inputs[inputValue] !== undefined)
-        {
-          location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
-        }
-        // Double check, because input coordinates could also be invalid
-        if (location[0] === undefined || String(location[0]) === '')
-        {
-          location[0] = 0;
-        }
-        if (location[1] === undefined || String(location[1]) === '')
-        {
-          location[1] = 0;
-        }
+        location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
+      }
+      // Double check, because input coordinates could also be invalid
+      if (location[0] === undefined || String(location[0]) === '')
+      {
+        location[0] = 0;
+      }
+      if (location[1] === undefined || String(location[1]) === '')
+      {
+        location[1] = 0;
       }
     }
     return location;
@@ -504,15 +525,15 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     }
   }
 
-  public renderMap()
+  public renderMap(location)
   {
     const { coordinates, zoom } = this.props;
     const { inputValue } = this.state;
-    const location = this.parseLocation(coordinates, inputValue);
+    const mapProps = this.getMapProps(location);
     return (
       <div className={this.props.className} >
         <Map
-          {...this.getMapProps(location)}
+          {...mapProps}
           zoom={zoom !== undefined ? zoom : this.state.zoom}
           onViewportChanged={this.setZoomLevel}
           maxBounds={[[85, -180], [-85, 180]]}
@@ -520,9 +541,9 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
           zoomControl={!this.props.hideZoomControl}
           onClick={this.handleOnMapClick}
           onMouseDown={this.handleOnMapClick}
+          ref={(map) => { this.map = map; }}
         >
           {
-            this.props.coordinates !== undefined &&
             this.renderMarker(inputValue, location, 'black')
           }
           {
@@ -535,6 +556,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
               width={7}
               fillColor={Colors().builder.cards.categories.filter}
               fillOpacity={0.2}
+              ref={(circle) => { this.circle = circle; }}
             />}
           {
             // Render addition locations (spotlights, aggregation map, etc.)
@@ -647,8 +669,40 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
     });
   }
 
+  public renderDisabledOverlay()
+  {
+    return (
+      <div
+        className='map-component-disabled'
+        style={_.extend({}, backgroundColor('white'), fontColor(Colors().fontColor))}
+      >
+        <span>Enter a valid location above to view correct map.</span>
+        <br />
+        <span>Note: Some input values may not have known coordinates (ex. parent fields).</span>
+      </div>
+    );
+  }
+
+  public renderMapWrapper(location)
+  {
+    return (
+      <div style={{ position: 'relative' }}>
+        {
+          this.renderMap(location)
+        }
+        {
+          (_.isEqual(location, [0, 0]) || location === undefined) &&
+          this.renderDisabledOverlay()
+        }
+      </div>
+    );
+  }
+
   public render()
   {
+    const { coordinates } = this.props;
+    const { inputValue } = this.state;
+    const location = this.parseLocation(coordinates, inputValue);
     return (
       <div
         className={this.props.wrapperClassName}
@@ -662,10 +716,12 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
                 'map-component-fade-in-out-hidden': !this.state.mapExpanded,
               })}
             >
-              {this.renderMap()}
+              {
+                this.renderMapWrapper(location)
+              }
             </div>
             :
-            this.renderMap()
+            this.renderMapWrapper(location)
         }
       </div>
     );

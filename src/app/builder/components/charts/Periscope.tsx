@@ -66,7 +66,6 @@ const scaleMin = (scale) => scale.range()[0];
 const scaleMax = (scale) => scale.range()[scale.range().length - 1];
 
 const Periscope = {
-
   create(el, state)
   {
     d3.select(el).attr('class', 'periscope-wrapper');
@@ -237,6 +236,15 @@ const Periscope = {
     bd.on('mouseleave', offFn);
   },
 
+  _doubleClickFactory: (el, onMove, scale, domain, onMoveStart) => function(event)
+  {
+    const handle = d3.select(this)[0][0];
+    d3.select('#input-' + handle['id'])
+      .style('display', 'block');
+    d3.select('#readonly-' + handle['id'])
+      .style('display', 'none');
+  },
+
   _drawHandles(el, scales, domain, onDomainChange, onMoveStart)
   {
     const g = d3.select(el).selectAll('.handles');
@@ -257,17 +265,23 @@ const Periscope = {
       .attr('r', 20);
 
     handle
-      .attr('_id', (d, i) => i);
+      .attr('_id', (d, i) => i)
+      .attr('id', (d, i) => i);
 
     handle.on('mousedown', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
     handle.on('touchstart', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
-
+    handle.on('dblclick', this._doubleClickFactory(el));
+    // handle.on('dblclick', function() {
+    //   const handle = d3.select(this);
+    //   console.log(handle);
+    // }.bind(this));
     handle.exit().remove();
   },
 
   _drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange)
   {
     d3.select(el).selectAll('.domain-input').remove();
+    d3.select(el).selectAll('.readonly-domain-input').remove();
     const div = d3.select(el).selectAll('.inputs');
     const handles = d3.select(el).selectAll('.handle');
     const cCr = d3.select(el)[0][0] && d3.select(el)[0][0]['getBoundingClientRect']();
@@ -280,17 +294,31 @@ const Periscope = {
     {
       const cr = handles[0][0]['getBoundingClientRect']();
       const left = (cr.left - cCr.left) - 16;
-      div.append('input')
+
+      const readonlyInput = div.append('span')
+        .attr('class', 'readonly-domain-input')
+        .attr('id', 'readonly-0')
+        .style('left', left + 'px')
+        .text(Util.formatNumber(domain.x[0]).replace(/\s/g, ''));
+
+      const input = div.append('input')
         .attr('class', 'domain-input')
         .attr('id', 'input-0')
         .attr('value', Util.formatNumber(domain.x[0]).replace(/\s/g, ''))
+        .attr('autofocus', true)
         .style('left', left + 'px')
         .style('color', Colors().active)
+        .style('display', 'none')
         .on('change', function()
         {
           let value = d3.select(el).select('#input-0').node().value;
           value = Util.formattedToNumber(value);
           onDomainLowChange(value);
+        }.bind(this))
+        .on('blur', function()
+        {
+          input.style('display', 'none');
+          readonlyInput.style('display', 'block');
         }.bind(this))
         ;
     }
@@ -299,17 +327,30 @@ const Periscope = {
     {
       const cr2 = handles[0][1]['getBoundingClientRect']();
       const left2 = (cr2.left - cCr.left) - 16;
-      div.append('input')
+
+      const readonlyInput = div.append('span')
+        .attr('class', 'readonly-domain-input')
+        .attr('id', 'readonly-1')
+        .style('left', left2 + 'px')
+        .text(Util.formatNumber(domain.x[1]).replace(/\s/g, ''));
+
+      const input = div.append('input')
         .attr('class', 'domain-input')
         .attr('id', 'input-1')
         .attr('value', Util.formatNumber(domain.x[1]).replace(/\s/g, ''))
         .style('left', left2 + 'px')
         .style('color', Colors().active)
+        .style('display', 'none')
         .on('change', function()
         {
           let value = d3.select(el).select('#input-1').node().value;
           value = Util.formattedToNumber(value);
           onDomainHighChange(value);
+        }.bind(this))
+        .on('blur', function()
+        {
+          input.style('display', 'none');
+          readonlyInput.style('display', 'block');
         }.bind(this))
         ;
     }

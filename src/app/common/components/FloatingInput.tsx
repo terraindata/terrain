@@ -59,6 +59,8 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 export let LARGE_FONT_SIZE = '52px';
 export let SEMI_LARGE_FONT_SIZE = '38px';
 export let FONT_SIZE = '18px';
+export let SMALL_FONT_SIZE = '16px';
+export let SMALL_LABEL_FLOATING_FONT_SIZE = '10px';
 export let LARGE_LABEL_FLOATING_FONT_SIZE = '16px';
 export let LABEL_FLOATING_FONT_SIZE = '12px';
 
@@ -108,10 +110,13 @@ const Label = LabelC`
   {
     if (props.isFloating)
     {
-      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
+      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE
+        : props.small ? SMALL_LABEL_FLOATING_FONT_SIZE :
+          LABEL_FLOATING_FONT_SIZE;
     }
 
-    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE : FONT_SIZE;
+    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
+      props.small ? SMALL_FONT_SIZE : FONT_SIZE;
   }};
 `;
 
@@ -131,12 +136,13 @@ const inputStyle = `
   transition: all 0.15s;
   color: ${Colors().active};
 
-  &:hover {
-    background-color: transparent;
-  }
+  // &:hover {
+  //   background-color: transparent;
+  // }
 `;
 
-const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE : FONT_SIZE;
+const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
+  props.small ? SMALL_FONT_SIZE : FONT_SIZE;
 
 // duplication of code because the functions don't work if you put them
 //  in inputStyle
@@ -146,6 +152,7 @@ const Input = InputC`
   padding-left: ${LEFT};
   padding-right: ${RIGHT};
   font-size: ${fontSizeFn};
+  ${(props) => props['showEllipsis'] ? `text-overflow: ellipsis;` : ''}
   ${(props) => props['noBg'] && (`
     background-color: transparent;
   `)}
@@ -178,9 +185,11 @@ interface InputProps
   onBlur?: () => void;
   value?: any;
   large?: boolean;
+  small?: boolean;
   semilarge?: boolean;
   isFloating?: boolean;
   extendRight?: boolean;
+  showEllipsis?: boolean;
 }
 
 interface InputDivProps
@@ -190,6 +199,7 @@ interface InputDivProps
   onClick?: () => void;
   large?: boolean;
   semilarge?: boolean;
+  small?: boolean;
   isFloating?: boolean;
   extendRight?: boolean;
 }
@@ -216,12 +226,15 @@ export interface Props
   className?: string;
   debounce?: boolean;
   extendRight?: boolean;
+  small?: boolean;
+  showEllipsis?: boolean;
 }
 
 export class FloatingInput extends TerrainComponent<Props>
 {
   static defaultProps = {
     semilarge: false,
+    showEllipsis: false,
   };
 
   state = {
@@ -293,6 +306,7 @@ export class FloatingInput extends TerrainComponent<Props>
         <Label
           large={props.large}
           semilarge={props.semilarge}
+          small={props.small}
           noBorder={props.noBorder}
           noBg={props.noBg}
           isFloating={isFloating}
@@ -343,6 +357,7 @@ export class FloatingInput extends TerrainComponent<Props>
           large={props.large}
           semilarge={props.semilarge}
           value={value === null || value === undefined ? '' : value}
+          title={value === null || value === undefined ? '' : value}
           onChange={this.handleChange}
           autoFocus={props.autoFocus}
           noBorder={props.noBorder}
@@ -353,6 +368,9 @@ export class FloatingInput extends TerrainComponent<Props>
           ref={this.getValueRef}
           onKeyDown={this.handleKeyDown}
           extendRight={props.extendRight}
+          small={props.small}
+          disabled={!props.canEdit}
+          showEllipsis={props.showEllipsis}
         />
       );
     }

@@ -55,6 +55,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { BuilderState } from 'app/builder/data/BuilderState';
+import { notificationManager } from 'app/common/components/InAppNotification';
 import { SchemaState } from 'app/schema/SchemaTypes';
 import Ajax from 'app/util/Ajax';
 import Util from 'app/util/Util';
@@ -81,7 +82,7 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const HITS_PAGE_SIZE = 20;
+const HITS_PAGE_SIZE = 15;
 
 export interface Props
 {
@@ -109,7 +110,6 @@ interface State
   expanded?: boolean;
   expandedHitIndex?: number;
 
-  hitsPages: number;
   onHitsLoaded?: (unchanged?: boolean) => void;
 
   showingExport?: boolean;
@@ -129,17 +129,11 @@ const MAP_MIN_HEIGHT = 30; // height of top bar on map
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
-  public static handleConfigChange(config: ResultsConfig, builderActions)
-  {
-    builderActions.changeResultsConfig(config);
-  }
-
   public state: State = {
     expanded: false,
     expandedHitIndex: null,
     showingConfig: false,
     showingExport: false,
-    hitsPages: 1,
     hitFormat: 'icon',
     mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
@@ -150,7 +144,6 @@ class HitsArea extends TerrainComponent<Props>
     resultsConfig: undefined,
     nestedFields: List([]),
   };
-
   public hitsFodderRange = _.range(0, 25);
   public locations = {};
 
@@ -160,27 +153,57 @@ class HitsArea extends TerrainComponent<Props>
     this.getNestedFields(this.props);
   }
 
+  public handleConfigChange(config: ResultsConfig, builderActions)
+  {
+    builderActions.changeResultsConfig(config);
+    this.getNestedFields(this.props, config);
+  }
+
+  public shouldComponentUpdate(nextProps: Props, nextState: State)
+  {
+
+    for (const key in nextProps)
+    {
+      if (!_.isEqual(this.props[key], nextProps[key]))
+      {
+        if (key === 'builder' && !_.isEqual(
+          this.props.builder.query.path.source.dataSource,
+          nextProps.builder.query.path.source.dataSource) ||
+          this.props.builder.db.name !==
+          nextProps.builder.db.name)
+        {
+          return true;
+        }
+        else
+        {
+          return true;
+        }
+      }
+    }
+
+    for (const key in nextState)
+    {
+      if (!_.isEqual(this.state[key], nextState[key]))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.db.name !== nextProps.db.name ||
       this.props.query.path.source !== nextProps.query.path.source ||
       this.props.query.resultsConfig !== nextProps.query.resultsConfig)
     {
-      this.setIndexAndResultsConfig(nextProps);
+      const indexChange = (this.props.query.path.source.dataSource as any).index !==
+        (nextProps.query.path.source.dataSource as any).index;
+      this.setIndexAndResultsConfig(nextProps, indexChange);
     }
-    if (this.props.query.resultsConfig !== nextProps.query.resultsConfig ||
-      this.props.resultsState.fields !== nextProps.resultsState.fields)
+    if (!_.isEqual(this.props.resultsState.fields, nextProps.resultsState.fields))
     {
       this.getNestedFields(nextProps);
-    }
-    if (nextProps.query.cards !== this.props.query.cards
-      || nextProps.query.inputs !== this.props.query.inputs)
-    {
-      if (this.state.onHitsLoaded)
-      {
-        // reset infinite scroll
-        this.state.onHitsLoaded(false);
-      }
     }
     if (this.props.resultsState.hits !== nextProps.resultsState.hits)
     {
@@ -202,18 +225,16 @@ class HitsArea extends TerrainComponent<Props>
     }
   }
 
-  public getNestedFields(props: Props)
+  public getNestedFields(props: Props, overrideConfig?)
   {
     // Get the fields that are nested
     const { builder, schema, resultsState } = props;
-    const dataSource = props.query.path.source.dataSource;
     let nestedFields = resultsState.fields.filter((field) =>
     {
       const type = ElasticBlockHelpers.getTypeOfField(
         schema,
         builder,
         field,
-        dataSource,
         true,
       );
       return type === 'nested' || type === '';
@@ -226,10 +247,11 @@ class HitsArea extends TerrainComponent<Props>
       ).toList();
     }
     // If there is a results config in use, only use nested fields in that config
-    if (props.query.resultsConfig && props.query.resultsConfig.enabled)
+    const resultsConfig = overrideConfig || this.state.resultsConfig || props.query.resultsConfig;
+    if (resultsConfig && resultsConfig.enabled)
     {
       nestedFields = nestedFields.filter((field) =>
-        props.query.resultsConfig.fields.indexOf(field) !== -1,
+        resultsConfig.fields.indexOf(field) !== -1,
       ).toList();
     }
     this.setState({
@@ -237,9 +259,9 @@ class HitsArea extends TerrainComponent<Props>
     });
   }
 
-  public setIndexAndResultsConfig(props: Props)
+  public setIndexAndResultsConfig(props: Props, indexChange = false)
   {
-    let indexName = props.db.name + '/' + getIndex('', this.props.builder);
+    let indexName = '';
     if (props.query.path &&
       props.query.path.source &&
       props.query.path.source.dataSource)
@@ -250,7 +272,9 @@ class HitsArea extends TerrainComponent<Props>
       indexName,
     });
     if (props.query.resultsConfig !== undefined &&
-      props.query.resultsConfig.enabled)
+      props.query.resultsConfig.enabled &&
+      !indexChange
+    )
     {
       this.setState({
         resultsConfig: props.query.resultsConfig,
@@ -331,26 +355,10 @@ class HitsArea extends TerrainComponent<Props>
           hitSize={'large'}
           nestedFields={this.state.nestedFields}
           builder={this.props.builder}
+          isVisible={true}
         />
       </div>
     );
-  }
-
-  public handleRequestMoreHits(onHitsLoaded: (unchanged?: boolean) => void)
-  {
-    const { hitsPages } = this.state;
-
-    if (hitsPages * HITS_PAGE_SIZE < MAX_HITS)
-    {
-      this.setState({
-        hitsPages: hitsPages + 1,
-        onHitsLoaded,
-      });
-    }
-    else
-    {
-      onHitsLoaded(true);
-    }
   }
 
   public componentDidUpdate()
@@ -542,7 +550,8 @@ class HitsArea extends TerrainComponent<Props>
                 geocoder='photon'
                 canEdit={false}
               />,
-            )}
+            )
+          }
         </div>
       );
     }
@@ -666,41 +675,36 @@ class HitsArea extends TerrainComponent<Props>
       catch (e)
       { }
       hitsContent = (
-        <div
+        <InfiniteScroll
           className={classNames({
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
+          // onScroll={this.checkScroll}
+          id='hits-area'
+          pageSize={HITS_PAGE_SIZE}
+          totalSize={MAX_HITS}
         >
           {
             hits.map((hit, index) =>
-            {
-              if (index > this.state.hitsPages * HITS_PAGE_SIZE)
-              {
-                return null;
-              }
-
-              return (
-                <Hit
-                  hit={hit}
-                  resultsConfig={resultsConfig}
-                  onExpand={this.handleExpand}
-                  index={index}
-                  key={hit.primaryKey}
-                  primaryKey={hit.primaryKey}
-                  allowSpotlights={this.props.allowSpotlights}
-                  locations={this.locations}
-                  onSpotlightAdded={this.handleSpotlightAdded}
-                  onSpotlightRemoved={this.handleSpotlightRemoved}
-                  hitSize={this.state.hitSize}
-                  nestedFields={this.state.nestedFields}
-                  builder={this.props.builder}
-                />
-              );
-            })
+              <Hit
+                hit={hit}
+                resultsConfig={resultsConfig}
+                onExpand={this.handleExpand}
+                index={index}
+                key={hit.primaryKey}
+                primaryKey={hit.primaryKey}
+                allowSpotlights={this.props.allowSpotlights}
+                locations={this.locations}
+                onSpotlightAdded={this.handleSpotlightAdded}
+                onSpotlightRemoved={this.handleSpotlightRemoved}
+                hitSize={this.state.hitSize}
+                nestedFields={this.state.nestedFields}
+                builder={this.props.builder}
+              />,
+            )
           }
-
-        </div>
+        </InfiniteScroll>
       );
     }
 
@@ -874,6 +878,8 @@ column if you have customized the results view.');
 
   public toggleHitSize()
   {
+    // Need to scroll this to the top to avoid weird bugs with infinite scroller
+    document.getElementById('hits-area').scrollTop = 0;
     this.setState({
       hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
     });
@@ -900,13 +906,25 @@ column if you have customized the results view.');
     });
   }
 
+  public saveConfigAsDefault(config: ResultsConfig)
+  {
+    if (config.enabled)
+    {
+      Ajax.updateResultsConfig(this.state.indexName, config, (resp) =>
+      {
+        notificationManager.addNotification(
+          'Saved',
+          'Saved as default config for ' + this.state.indexName,
+          'info',
+          3,
+        );
+      });
+    }
+  }
+
   public hideConfig(config: ResultsConfig)
   {
     // Update the default config for this index
-    if (config.enabled)
-    {
-      Ajax.updateResultsConfig(this.state.indexName, config);
-    }
     this.setState({
       showingConfig: false,
     });
@@ -969,10 +987,12 @@ column if you have customized the results view.');
         config={resultsConfig !== undefined ? resultsConfig : this.props.query.resultsConfig}
         fields={fields}
         onClose={this.hideConfig}
-        onConfigChange={HitsArea.handleConfigChange}
+        onSaveAsDefault={this.saveConfigAsDefault}
+        onConfigChange={this.handleConfigChange}
         builder={this.props.builder}
         schema={this.props.schema}
         dataSource={this.props.query.path.source.dataSource}
+        sampleHit={props.resultsState.hits && props.resultsState.hits.get(0)}
       />;
     }
   }

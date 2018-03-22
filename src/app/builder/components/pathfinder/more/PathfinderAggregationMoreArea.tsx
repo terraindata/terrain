@@ -233,14 +233,14 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                   <BuilderTextbox
                     value={script.id}
                     canEdit={this.props.pathfinderContext.canEdit}
-                    keyPath={this._ikeyPath(this.props.keyPath, 'scripts', i, 'id')}
+                    keyPath={this._ikeyPath(this.props.keyPath, 'scripts', i, 'name')}
                     placeholder={'Script Name'}
                     action={this.props.builderActions.changePath}
                   />
                 </div>
                 <BuilderTextbox
                   value={script.script}
-                  keyPath={this._ikeyPath(this.props.keyPath, 'scripts', i, 'id')}
+                  keyPath={this._ikeyPath(this.props.keyPath, 'scripts', i, 'script')}
                   canEdit={this.props.pathfinderContext.canEdit}
                   textarea={true}
                   action={this.props.builderActions.changePath}

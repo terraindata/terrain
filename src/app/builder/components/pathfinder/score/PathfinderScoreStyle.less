@@ -11,10 +11,20 @@
 	
 	.drag-drop-pf-score {
 		.pf-line-wrapper
-		{
+		{	
+			border: 1px solid;
+	    	border-radius: 4px;
 		    padding-top: 6px;
 		    padding-bottom: 6px;
-		    padding-left: 30px;
+		    padding-left: 22px;
+		    left: -1px;
+		    position: relative;
+		    margin-right: -2px;
+		    min-height: 58px;
+		    .pf-line {
+		    	position: relative;
+		    	top: 6px;
+		    }
 			.close{
 				opacity: 0;
 				.transition;
@@ -22,6 +32,28 @@
 			&:hover {
 				.close {
 					opacity: 1;
+				}
+			}
+			.score-bar {
+				position: relative;
+				top: -2px;
+			}
+			&.pf-linear-score-line-wrapper
+			{
+				padding: 0px;
+				margin-bottom: 2px;
+				display: block;
+				border: none;
+				left: 0px;
+				width: 100%;
+				.pf-line {
+					display: block;
+					top: 0px;
+					margin: 0px;
+					height: 72px;
+				}
+				.pf-linear-score-line {
+					width: 100%;
 				}
 			}
 		}
@@ -35,21 +67,19 @@
 			}
 		}
 	}
-	
-	.pf-linear-score-line {
-		width: 90%;
-	}
-	
 	.pf-score-line-transform-preview {
 		margin-left: 12px;
     margin-right: 6px;
 	}
 	
 	.pf-score-line-transform {
-	    left: 12px;
-	    margin-right: 38px;
-	    margin-top: 12px;
+        margin-top: 32px;
 	    position: relative;
+	    width: calc(~"100% - 51x");
+	    border-radius: 4px;
+	    padding-left: 24px;
+	    left: -10px;
+	    padding-right: 26px;
 		.transform-card-inner {
 			margin-left: -17px;
 			width: 100%;
@@ -64,17 +94,25 @@
 			left: 30px;
 		}
 		.linear-selector-wrapper {
-			width: 100%;
-			margin-bottom: 12px;
-			margin-left: 12px;
+		    width: calc(~"100% + 14px");
+		    margin-left: -12px;
+		    height: 50px;
+		    background: white;
+		    top: 15px;
+		    border-radius: 4px;
+		    padding-left: 12px;
+		    margin-bottom: 17px;
+		    font-size: 12px;
 			.linear-selector-options {
 				width: 100%;
+				top: 13px;
 				.linear-selector-option {
 					text-transform: uppercase;
 					flex-grow: 1;
 					text-align: center;
 					padding-top: 4px;
-					height: 20px;
+					height: 17px;
+					border-radius: 12px;
 				}
 			}
 		}
@@ -123,7 +161,8 @@
 					border: none;
 					text-align: right;
 					color: #1eb4fa;
-					background: #f8f8f8;
+					background: white;
+					border: 1px solid #f4f5f7;
 				}
 				flex-basis: unset;
 				flex-grow: unset;
@@ -132,9 +171,9 @@
 			.field-name {
 				text-align: left;
 				color: #1eb4fa;
-				font-size: 16px;
+				font-size: 18px;
 				width: 33.33%;
-				padding-left: 10px;
+				padding-left: 15px;
 				min-width: 150px;
 				overflow: hidden;
 				text-overflow: ellipsis;

@@ -395,7 +395,9 @@ class FilterLineC extends LineC
   public value: string | number | DistanceValue = null;
   public valueType: ValueType = null;
   public boost: number = 1;
-
+  // Some filter lines ( like geo_distance ones ) have the ability to generate scripts
+  public addScript: boolean = false;
+  public scriptName: string = '';
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
 }
@@ -447,6 +449,7 @@ class DistanceValueC extends BaseClass
   public address: string = '';
   public distance?: number = 10;
   public units?: string = 'mi';
+  public zoom: number = 15;
 }
 
 export type DistanceValue = DistanceValueC & IRecord<DistanceValueC>;
@@ -539,6 +542,8 @@ class PathfinderContextC extends BaseClass
   public canEdit: boolean = null;
   public schemaState: SchemaState = null;
   public builderState: BuilderState = null;
+  public parentSource?: Source = null;
+  public parentName?: string = null;
 }
 export type PathfinderContext = PathfinderContextC & IRecord<PathfinderContextC>;
 export const _PathfinderContext = (config?: { [key: string]: any }) =>
@@ -558,6 +563,7 @@ type ChoiceContext = {
     schemaState: SchemaState,
     builderState: BuilderState,
     subtype?: 'transform' | 'match',
+    noNested?: boolean,
   } | {
     type: 'comparison',
     source: Source,
@@ -566,16 +572,12 @@ type ChoiceContext = {
     field: string,
     fieldType?: FieldType,
   } | {
-    type: 'valueType',
+    type: 'input',
     source: Source,
     schemaState: SchemaState,
     builderState: BuilderState,
-    field: string,
-    comparison: string,
-  } | {
-    type: 'input',
-    builderState: BuilderState,
-    // TODO builder state
+    isNested: boolean,
+    parentName: string,
   };
 
 class ElasticDataSourceC extends DataSource
@@ -724,7 +726,7 @@ class ElasticDataSourceC extends DataSource
       const defaultOptions = List(metaFields.map((option) =>
       {
         return _ChoiceOption({
-          displayName: option,
+          displayName: option === '_score' ? 'Match Quality' : option,
           value: option,
           meta: {
             fieldType: ['_score', '_size'].indexOf(option) !== -1 ? FieldType.Numerical : FieldType.Text,
@@ -745,7 +747,7 @@ class ElasticDataSourceC extends DataSource
         {
           const fieldType = ReverseFieldTypeMapping[col.datatype];
           // If a column is nested, pull out the properties of that column to be filtered on
-          if (fieldType === FieldType.Nested)
+          if (fieldType === FieldType.Nested && !context.noNested)
           {
             _.keys(col.properties).forEach((property) =>
             {
@@ -784,24 +786,64 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'comparison')
     {
       const { field, fieldType, schemaState, source } = context;
+      const server = context.builderState.db.name;
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)
       {
         options = options.filter((opt) => opt.fieldTypes.indexOf(fieldType) !== -1);
+        if (fieldType === FieldType.Text)
+        {
+          const { dataSource } = context.source;
+          const { index } = dataSource as any;
+          const col = schemaState.columns.filter(
+            (column) =>
+              column.serverId === String(server) &&
+              column.databaseId === String(index) &&
+              column.name === field,
+          ).toList().get(0);
+          // If it is analyzed, remove 'equal' / 'notequal' (term)
+          if (col && col.analyzed)
+          {
+            options = options.filter((opt) => opt.value !== 'equal' && opt.value !== 'notequal');
+          }
+          // If it is not-analyzed, remove 'contain' / 'notcontain' (match)
+          else
+          {
+            options = options.filter((opt) => opt.value !== 'contains' && opt.value !== 'notcontain');
+          }
+        }
       }
 
       return List(options.map((c) => _ChoiceOption(c)));
     }
     if (context.type === 'input')
     {
-      // TODO use current builder state
-      const inputs = context.builderState.query.inputs;
-      return inputs.map((input) =>
+      // Get all of the inputs
+      let inputs = context.builderState.query.inputs;
+      inputs = inputs.map((input) =>
         _ChoiceOption({
           displayName: '@' + String(input.key),
           value: '@' + String(input.key),
         }),
       ).toList();
+      // If this is a nested query, also get all of the parents fields (@{parentName}.{parentField})
+      let parentFields = List([]);
+      if (context.isNested)
+      {
+        parentFields = context.source.dataSource
+          .getChoiceOptions({
+            type: 'fields',
+            builderState: context.builderState,
+            schemaState: context.schemaState,
+            source: context.source,
+          });
+        parentFields = parentFields.map((field) =>
+          _ChoiceOption({
+            displayName: `@${context.parentName}.${field.displayName}`,
+            value: `@${context.parentName}.${field.value}`,
+          })).toList();
+      }
+      return inputs.concat(parentFields).toList();
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));
@@ -835,73 +877,87 @@ const ElasticComparisons = [
   },
   {
     value: 'equal',
-    displayName: '=', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
+    displayName: 'equals', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
     fieldTypes: List([FieldType.Numerical, FieldType.Text]),
+    placeholder: 'e.g. 100 or apple',
   },
   {
     value: 'contains',
-    displayName: 'contains',
+    displayName: 'equals',
     fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple',
   },
   {
     value: 'notequal',
-    displayName: '≠', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
+    displayName: 'does not equal', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
     fieldTypes: List([FieldType.Text, FieldType.Numerical]),
+    placeholder: 'e.g. 100 or apple',
   },
   {
     value: 'isin',
     displayName: 'is in',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
+    fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple, banana, kiwi',
   },
   {
     value: 'isnotin',
     displayName: 'is not in',
     fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
+    placeholder: 'e.g. apple, banana, kiwi',
   },
   {
     value: 'notcontain',
-    displayName: 'does not contain',
+    displayName: 'does not equal',
     fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple',
   },
   {
     value: 'greater',
-    displayName: '>', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than' : '>',
+    displayName: 'is greater than', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than' : '>',
     fieldTypes: List([FieldType.Numerical]),
+    placeholder: 'e.g. 100',
   },
   {
     value: 'less',
-    displayName: '<', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than' : '<',
+    displayName: 'is less than', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than' : '<',
     fieldTypes: List([FieldType.Numerical]),
+    placeholder: 'e.g. 100',
   },
   {
     value: 'greaterequal',
-    displayName: '≥', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than or equal to' : '≥',
+    displayName: 'is greater or equal to', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is greater than or equal to' : '≥',
     fieldTypes: List([FieldType.Numerical]),
+    placeholder: 'e.g. 100',
   },
   {
     value: 'lessequal',
-    displayName: '≤', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than or equal to' : '≤',
+    displayName: 'is less or equal to', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'is less than or equal to' : '≤',
     fieldTypes: List([FieldType.Numerical]),
+    placeholder: 'e.g. 100',
   },
   {
     value: 'alphabefore',
     displayName: 'comes before',
     fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple',
   },
   {
     value: 'alphaafter',
     displayName: 'comes after',
     fieldTypes: List([FieldType.Text]),
+    placeholder: 'e.g. apple',
   },
   {
     value: 'datebefore',
     displayName: 'starts before',
     fieldTypes: List([FieldType.Date]),
+    placeholder: 'e.g. 3/15/1995',
   },
   {
     value: 'dateafter',
     displayName: 'starts after',
     fieldTypes: List([FieldType.Date]),
+    placeholder: 'e.g. 3/15/1995',
   },
   {
     value: 'located',

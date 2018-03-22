@@ -247,6 +247,7 @@ export function parseElasticDb(elasticServer: object,
                 tableId,
                 datatype: fieldProperties['type'],
                 properties: fieldProperties['properties'],
+                analyzed: fieldProperties['analyzer'] !== undefined ? true : false,
               });
 
               column = column.set(
@@ -296,22 +297,6 @@ export function parseElasticDb(elasticServer: object,
             });
 
             didSetServer = true;
-            if (!didSetServer)
-            {
-              // empty server, no dbs/indexes, need to set it manually
-              // TODO change this terrible code flow
-              directDispatch({
-                actionType: 'setServer',
-                server,
-                databases,
-                tables: Map<string, Table>(),
-                columns: Map<string, Column>(),
-                indexes: Map<string, Index>(),
-                fieldProperties: Map<string, FieldProperty>(),
-                tableNames: List<string>(),
-                columnNames: Map<string, List<string>>(),
-              });
-            }
           },
           (err) =>
           {
@@ -319,4 +304,20 @@ export function parseElasticDb(elasticServer: object,
           });
       });
   });
+
+  if (!didSetServer)
+  {
+    // empty server, no dbs/indexes, need to set it manually
+    directDispatch({
+      actionType: 'setServer',
+      server,
+      databases,
+      tables: Map<string, Table>(),
+      columns: Map<string, Column>(),
+      indexes: Map<string, Index>(),
+      fieldProperties: Map<string, FieldProperty>(),
+      tableNames: List<string>(),
+      columnNames: Map<string, List<string>>(),
+    });
+  }
 }

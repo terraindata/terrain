@@ -49,6 +49,7 @@ import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import StatusHistory from '../statusHistory/StatusHistory';
 import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
@@ -177,10 +178,10 @@ export class Items
   {
     return new Promise<ItemConfig>(async (resolve, reject) =>
     {
-      // check privileges if setting to live/default
-      if (!user.isSuperUser && (item.status === 'LIVE' || item.status === 'DEFAULT'))
+      // check privileges if setting to live/lock/default
+      if (!user.isSuperUser && (item.status === 'LIVE' || item.status === 'DEPLOYED' || item.status === 'DEFAULT'))
       {
-        return reject('Cannot set item status as LIVE or DEFAULT as non-superuser');
+        return reject('Cannot set item status as LIVE, DEPLOYED or DEFAULT as non-superuser');
       }
 
       // if modifying existing item, check for existence and check privileges
@@ -194,10 +195,10 @@ export class Items
         }
 
         const status = items[0].status;
-        if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
+        if (!user.isSuperUser && (status === 'LIVE' || status === 'DEPLOYED' || status === 'DEFAULT'))
         {
           // only superusers can update live / default items
-          return reject('Cannot update LIVE or DEFAULT item as non-superuser');
+          return reject('Cannot update LIVE, DEPLOYED or DEFAULT item as non-superuser');
         }
 
         const id = items[0].id;
@@ -208,9 +209,15 @@ export class Items
 
         // insert a version to save the past state of this item
         await versions.create(user, 'items', id, items[0]);
+        if (items[0].status !== item.status)
+        {
+          const statusHistory = new StatusHistory();
+          await statusHistory.create(user, id, items[0], item.status as string);
+        }
 
         item = Util.updateObject(items[0], item);
       }
+
       resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);
     });
   }
@@ -257,17 +264,17 @@ export class Items
         {
           return resolve('Item is not an Algorithm');
         }
-        if (resp['_id'] === deployedName && resp['found'] === true && items[0].status === 'LIVE')
+        if (resp['_id'] === deployedName && resp['found'] === true && (items[0].status === 'LIVE' || items[0].status === 'DEPLOYED'))
         {
-          return resolve('Algorithm is LIVE as ' + (deployedName as string));
+          return resolve(`Algorithm is ${items[0].status} ${deployedName}`);
         }
-        else if (resp['_id'] === deployedName && resp['found'] === true && items[0].status !== 'LIVE')
+        else if (resp['_id'] === deployedName && resp['found'] === true && items[0].status !== 'LIVE' && items[0].status !== 'DEPLOYED')
         {
-          return resolve('Error: Algorithm found in ES instance but not LIVE');
+          return resolve('Error: Algorithm found in ES instance but not LIVE or DEPLOYED');
         }
-        else if (resp['_id'] === deployedName && resp['found'] === false && items[0].status === 'LIVE')
+        else if (resp['_id'] === deployedName && resp['found'] === false && (items[0].status === 'LIVE' || items[0].status === 'DEPLOYED'))
         {
-          return resolve('Error: LIVE Algorithm not found in ES instance');
+          return resolve(`Error: ${items[0].status} Algorithm not found in ES instance`);
         }
         else
         {

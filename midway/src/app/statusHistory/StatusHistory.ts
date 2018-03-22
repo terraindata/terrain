@@ -44,70 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import UserConfig from '../users/UserConfig';
+import StatusHistoryConfig from './StatusHistoryConfig';
 
-/**
- * Consumes an input source stream and turns it into an array
- */
-export default class BufferTransform
+export class StatusHistory
 {
-  public static toArray(stream: Readable): Promise<any[]>
+  private statusHistoryTable: Tasty.Table;
+
+  constructor()
   {
-    return new Promise<any[]>((resolve, reject) =>
+    this.statusHistoryTable = new Tasty.Table(
+      'statusHistory',
+      ['id'],
+      [
+        'createdAt',
+        'userId',
+        'algorithmId',
+        'fromStatus',
+        'toStatus',
+      ],
+    );
+  }
+
+  public async create(user: UserConfig, id: number, obj: object, newStatus: string): Promise<StatusHistoryConfig>
+  {
+    if (user.id === undefined)
     {
-      const bufferTransform = new BufferTransform(stream,
-        (err, arr) =>
-        {
-          if (err !== null || err !== undefined)
-          {
-            reject(err);
-          }
-          else
-          {
-            resolve(arr);
-          }
-        });
-    });
-  }
-
-  private arr: any[];
-  private stream: Readable;
-  private callback: (err, arr) => void;
-
-  private _onData: (doc) => void;
-  private _onEvent: (err) => void;
-
-  constructor(stream: Readable, callback: (err: Error, arr: any[]) => void)
-  {
-    this.arr = [];
-    this.stream = stream;
-    this.callback = callback;
-
-    this._onData = this.onData.bind(this);
-    this._onEvent = this.onEvent.bind(this);
-
-    this.stream.on('data', this._onData);
-    this.stream.on('end', this._onEvent);
-    this.stream.on('error', this._onEvent);
-    this.stream.on('close', this._onEvent);
-  }
-
-  private onData(doc: any): void
-  {
-    this.arr.push(doc);
-  }
-
-  private onEvent(err: any): void
-  {
-    this._final();
-    this.callback(err, this.arr);
-  }
-
-  private _final(): void
-  {
-    this.stream.removeListener('data', this._onData);
-    this.stream.removeListener('end', this._onEvent);
-    this.stream.removeListener('error', this._onEvent);
-    this.stream.removeListener('close', this._onEvent);
+      throw new Error('User ID unknown');
+    }
+    // can only insert
+    const newVersion: StatusHistoryConfig =
+      {
+        userId: user.id,
+        algorithmId: id,
+        fromStatus: obj['status'],
+        toStatus: newStatus,
+      };
+    return App.DB.upsert(this.statusHistoryTable, newVersion) as Promise<StatusHistoryConfig>;
   }
 }
+
+export default StatusHistory;

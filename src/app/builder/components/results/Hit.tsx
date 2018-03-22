@@ -95,13 +95,15 @@ export interface Props
   allowSpotlights: boolean;
   onSpotlightAdded: (id, spotlightData) => void;
   onSpotlightRemoved: (id) => void;
-  hitSize?: 'large' | 'small';
+  hitSize?: 'large' | 'small' | 'smaller';
   style?: any;
   depth?: any;
+  isNestedHit?: boolean;
   nestedFields?: List<string>;
   hideNested?: boolean;
   hideFieldNames?: boolean;
   firstVisibleField?: number;
+  isVisible?: boolean;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -137,7 +139,7 @@ class HitComponent extends TerrainComponent<Props> {
     {
       hovered: false,
       nestedStates: Map<string, NestedState>({}),
-      nestedFields: undefined,
+      nestedFields: [],
       scrollState: Map<string, number>({}),
     };
 
@@ -148,15 +150,19 @@ class HitComponent extends TerrainComponent<Props> {
 
   public componentWillMount()
   {
-    this.setState({
-      nestedFields: getResultNestedFields(this.props.hit, this.props.resultsConfig),
-    });
+    if (this.props.nestedFields === undefined)
+    {
+      this.setState({
+        nestedFields: getResultNestedFields(this.props.hit, this.props.resultsConfig),
+      });
+    }
   }
 
   public componentWillReceiveProps(nextProps)
   {
     if (!_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS())
-      || !_.isEqual(Util.asJS(this.props.resultsConfig), Util.asJS(nextProps.resultsConfig)))
+      || !_.isEqual(Util.asJS(this.props.resultsConfig), Util.asJS(nextProps.resultsConfig))
+      && nextProps.nestedFields === undefined)
     {
       this.setState({
         nestedFields: getResultNestedFields(nextProps.hit, nextProps.resultsConfig),
@@ -166,6 +172,11 @@ class HitComponent extends TerrainComponent<Props> {
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
+    // Never update the component if it's not visible (unless it's a size change)
+    if (!nextProps.isVisible && nextProps.hitSize === this.props.hitSize)
+    {
+      return false;
+    }
     for (const key in nextProps)
     {
       if (nextProps.hasOwnProperty(key))
@@ -177,7 +188,7 @@ class HitComponent extends TerrainComponent<Props> {
           return true;
         }
         else if (key !== 'hit' && key !== 'builder'
-          && this.props[key] !== nextProps[key])
+          && !_.isEqual(this.props[key], nextProps[key]))
         {
           return true;
         }
@@ -186,12 +197,20 @@ class HitComponent extends TerrainComponent<Props> {
 
     for (const key in nextState)
     {
-      if (this.state[key] !== nextState[key])
+      if (!_.isEqual(this.state[key], nextState[key]))
       {
         return true;
       }
     }
-    return !_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS());
+    // If only the id has changed, we don't need to update the result
+    for (const key in nextProps.hit.toJS())
+    {
+      if (key !== 'id' && !_.isEqual(nextProps.hit.toJS()[key], this.props.hit.toJS()[key]))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   public renderExpandedField(value, field)
@@ -209,8 +228,9 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
-  public renderNestedFieldHeader(field, depth, size, expandState: NestedState)
+  public renderNestedFieldHeader(field, depth, size, expandState: NestedState, maxFields: number, thumbnail: boolean)
   {
+    const scrollState = this.state.scrollState.get(field) || 0;
     return (
       <div>
         <div
@@ -239,17 +259,37 @@ class HitComponent extends TerrainComponent<Props> {
           >
             {field} ({size})
           </div>
-          <div className='hit-nested-column-names'>
-            <span className='column-name-image'>Image</span>
-            <span className='column-name-number'>No.</span>
-            <span className='column-name-name'>Name</span>
+          <div
+            className='hit-nested-column-names'
+            style={fontColor(Colors().fontColorLightest)}
+          >
+            {
+              thumbnail &&
+              <span className='column-name-image'>Image</span>
+            }
+            <span
+              className={classNames({
+                'column-name-number': true,
+                'column-name-number-no-thumbnail': !thumbnail,
+              })}
+            >
+              No.
+            </span>
+            <span
+              className={classNames({
+                'column-name-name': true,
+                'column-name-name-no-thumbnail': !thumbnail,
+              })}
+            >
+              Name
+              </span>
           </div>
         </div>
         {
           expandState !== NestedState.Collapsed &&
           <div>
             {
-              this.state.scrollState.get(field) ?
+              scrollState ?
                 <div
                   onClick={this._fn(this.handleScroll, field, -1)}
                   className='hit-content-scroll-back'
@@ -261,14 +301,17 @@ class HitComponent extends TerrainComponent<Props> {
                 :
                 null
             }
-            <div
-              onClick={this._fn(this.handleScroll, field, 1)}
-              className='hit-content-scroll-forward'
-              style={getStyle('fill', Colors().iconColor)}
-              key='back-icon'
-            >
-              <CarrotIcon />
-            </div>
+            {
+              (scrollState < maxFields - 2) &&
+              <div
+                onClick={this._fn(this.handleScroll, field, 1)}
+                className='hit-content-scroll-forward'
+                style={getStyle('fill', Colors().iconColor)}
+                key='back-icon'
+              >
+                <CarrotIcon />
+              </div>
+            }
           </div>
         }
       </div>
@@ -296,6 +339,15 @@ class HitComponent extends TerrainComponent<Props> {
               fields = _.extend({}, fields, fields['_source']);
               canSpotlight = true;
             }
+            if (fields['fields'] !== undefined)
+            {
+              const scriptFields = {};
+              _.keys(fields['fields']).forEach((f) =>
+              {
+                scriptFields[f] = fields['fields'][f][0];
+              });
+              fields = _.extend({}, fields, scriptFields);
+            }
             // This happens when the source isn't properly set, such as in the Schema Browser
             if (typeof fields !== 'object')
             {
@@ -310,7 +362,7 @@ class HitComponent extends TerrainComponent<Props> {
                 allowSpotlights={canSpotlight}
                 key={fields['_id'] !== undefined ? fields['_id'] : i}
                 style={borderColor(Colors().blockOutline)}
-                hitSize='small'
+                hitSize={this.props.hitSize === 'small' ? 'smaller' : 'small'}
                 hit={_Hit({
                   fields: Map(fields),
                 })}
@@ -320,12 +372,35 @@ class HitComponent extends TerrainComponent<Props> {
                 firstVisibleField={this.state.scrollState.get(field)}
                 primaryKey={fields['_id']}
                 onExpand={undefined}
+                isNestedHit={true}
               />);
           },
           )
         }
       </div>
     );
+  }
+
+  public getNumberOfFields(fields, format)
+  {
+    if (typeof fields !== 'object')
+    {
+      return 0;
+    }
+    if (fields['_source'])
+    {
+      fields = _.extend({}, fields, fields['_source']);
+    }
+    const nestedFields = getResultNestedFields(_Hit({ fields: Map(fields) }), format && format.config);
+    // Get sample set of result fields to set max length
+    const allFields = getResultFields(
+      _Hit({ fields: Map(fields) }),
+      format && format.config,
+      nestedFields,
+      this.props.schema,
+      this.props.builder,
+    );
+    return allFields.length;
   }
 
   public renderNestedField(field)
@@ -345,6 +420,7 @@ class HitComponent extends TerrainComponent<Props> {
       allValues = allValues.slice(0, 1);
     }
     const depth = this.props.depth ? this.props.depth : 0;
+    const maxFields = this.getNumberOfFields(allValues[0], format);
     return (
       <div
         className='hit-nested-content'
@@ -357,7 +433,13 @@ class HitComponent extends TerrainComponent<Props> {
         ]}
       >
         {
-          this.renderNestedFieldHeader(field, depth, size, expandState)
+          this.renderNestedFieldHeader(
+            field,
+            depth,
+            size,
+            expandState,
+            maxFields,
+            format && format.config && format.config.thumbnail)
         }
         <div
           className='hit-nested-content-values'
@@ -382,11 +464,16 @@ class HitComponent extends TerrainComponent<Props> {
 
   public renderField(field, i?, fields?, overrideFormat?)
   {
-    if (!resultsConfigHasFields(this.props.resultsConfig) && i >= MAX_DEFAULT_FIELDS && this.props.hitSize !== 'small')
+    if (
+      !resultsConfigHasFields(this.props.resultsConfig) &&
+      i >= MAX_DEFAULT_FIELDS &&
+      this.props.hitSize !== 'small' &&
+      this.props.hitSize !== 'smaller'
+    )
     {
       return null;
     }
-    const { hideFieldNames, index } = this.props;
+    const { hideFieldNames, index, isNestedHit } = this.props;
     const spotlights = this.props.spotlights.spotlights;
     const isSpotlit = spotlights.get(this.props.primaryKey);
     const color = isSpotlit ? spotlights.get(this.props.primaryKey).color : 'black';
@@ -403,7 +490,7 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className={classNames({
           'result-field': true,
-          'results-are-small': this.props.hitSize === 'small',
+          'results-are-small': this.props.hitSize === 'small' || this.props.hitSize === 'smaller',
           'result-field-hide-field': this.props.hideFieldNames,
         })}
         style={style}
@@ -417,10 +504,13 @@ class HitComponent extends TerrainComponent<Props> {
               'result-field-name': true,
               'result-field-name-header': hideFieldNames && index === 0,
             })}
-            style={hideFieldNames && index !== 0 ? { opacity: 0 } : {}} // Keep them there to make sizing work
+            style={hideFieldNames && index !== 0 ?
+              { opacity: 0, color: Colors().fontColorLightest } :
+              { color: Colors().fontColorLightest }
+            } // Keep them there to make sizing work
           >
             {
-              field
+              field === '_score' ? 'Match quality' : field
             }
           </div>
         }
@@ -443,6 +533,7 @@ class HitComponent extends TerrainComponent<Props> {
             'result-field-value-number': typeof value === 'number',
             'result-field-value-show-overflow': format && format.type === 'map',
             'result-field-value-header': hideFieldNames && index === 0,
+            'nested-results-are-small': this.props.hitSize === 'smaller' && isNestedHit,
           })}
         >
           {
@@ -514,7 +605,7 @@ class HitComponent extends TerrainComponent<Props> {
           {_.padStart((this.props.index + 1).toString(), 2, '0')}
         </div>
       </div>,
-      spotlight !== undefined ? 'Unspotlight' : 'Spotlight',
+      this.props.allowSpotlights ? spotlight !== undefined ? 'Unspotlight' : 'Spotlight' : '',
     );
   }
 
@@ -528,7 +619,16 @@ class HitComponent extends TerrainComponent<Props> {
 
   public render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, hit, hitSize, expanded } = this.props;
+    const {
+      isDragging,
+      connectDragSource,
+      isOver,
+      connectDropTarget,
+      hit,
+      hitSize,
+      expanded,
+      isNestedHit,
+    } = this.props;
     let { resultsConfig } = this.props;
     const classes = classNames({
       'result': true,
@@ -564,9 +664,10 @@ class HitComponent extends TerrainComponent<Props> {
       const start = this.props.firstVisibleField || 0;
       fields = fields.slice(start, start + 2);
     }
+
     const configHasFields = resultsConfigHasFields(resultsConfig);
     let bottomContent: any;
-    if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small')
+    if (!configHasFields && fields.length > 4 && !expanded && hitSize !== 'small' && this.props.hitSize !== 'smaller')
     {
       bottomContent = (
         <div className='result-bottom' onClick={this.expand}>
@@ -597,7 +698,8 @@ class HitComponent extends TerrainComponent<Props> {
     {
       resultsConfig = _ResultsConfig();
     }
-    const thumbnailWidth = hitSize === 'small' ? resultsConfig.smallThumbnailWidth :
+
+    const thumbnailWidth = hitSize === 'small' || hitSize === 'smaller' ? resultsConfig.smallThumbnailWidth :
       resultsConfig.thumbnailWidth;
     const depth = this.props.depth !== undefined ? this.props.depth : 0;
     return ((
@@ -610,7 +712,8 @@ class HitComponent extends TerrainComponent<Props> {
         <div
           className={classNames({
             'result-inner': true,
-            'results-are-small': hitSize === 'small',
+            'results-are-small': hitSize === 'small' || hitSize === 'smaller',
+            'nested-results-are-small': hitSize === 'smaller' && isNestedHit,
           })}
           style={[
             borderColor(Colors().resultLine),
@@ -624,7 +727,7 @@ class HitComponent extends TerrainComponent<Props> {
               <div
                 className={classNames({
                   'result-thumbnail-wrapper': true,
-                  'results-are-small': hitSize === 'small',
+                  'results-are-small': hitSize === 'small' || hitSize === 'smaller',
                 })}
                 style={{
                   backgroundImage: `url(${thumbnail})`,
@@ -655,13 +758,13 @@ class HitComponent extends TerrainComponent<Props> {
           <div
             className={classNames({
               'result-details-wrapper': true,
-              'results-are-small': hitSize === 'small',
+              'results-are-small': hitSize === 'small' || hitSize === 'smaller',
             })}
           >
             <div
               className={classNames({
                 'result-name': true,
-                'results-are-small': hitSize === 'small',
+                'results-are-small': hitSize === 'small' || hitSize === 'smaller',
               })}
             >
               <div
@@ -691,7 +794,8 @@ class HitComponent extends TerrainComponent<Props> {
             <div
               className={classNames({
                 'result-fields-wrapper': true,
-                'results-are-small': hitSize === 'small',
+                'results-are-small': hitSize === 'small' || hitSize === 'smaller',
+                'nested-results-are-small': this.props.hitSize === 'smaller' && isNestedHit,
               })}
             >
               {score}
@@ -732,7 +836,7 @@ class HitComponent extends TerrainComponent<Props> {
     const { x, y } = data;
 
     let config = this.props.resultsConfig;
-    const key = this.props.hitSize === 'small' ? 'smallThumbnailWidth' : 'thumbnailWidth';
+    const key = this.props.hitSize === 'small' || this.props.hitSize === 'smaller' ? 'smallThumbnailWidth' : 'thumbnailWidth';
     config = config.set(key, Math.max(config[key] + data.deltaX, 15));
 
     Actions.changeResultsConfig(config);
@@ -760,7 +864,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
 {
   let fields: string[];
 
-  if (resultsConfigHasFields(config))
+  if (config && config.fields)
   {
     fields = config.fields.filter((field) =>
       nested.indexOf(field) === -1,
@@ -883,10 +987,70 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   {
     if (List.isList(value))
     {
-      value = JSON.stringify(value);
-      value = value.replace(/\"/g, '').replace(/,/g, ', ').replace(/\[/g, '').replace(/\]/g, '');
       tooltipText = JSON.stringify(value, null, 2);
-      tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
+      tooltipText = tooltipText
+        .replace(/\"/g, '')
+        .replace(/\\/g, '')
+        .replace(/:/g, ': ')
+        .replace(/,/g, ', ')
+        .replace(/\[/g, '')
+        .replace(/\]/g, '');
+      const valueString = '';
+
+      const content = (
+        <div>
+          {
+            value.map((val, i) =>
+            {
+              if (typeof val === 'object')
+              {
+                val = Util.asJS(val);
+                return (
+                  <div key={i}>
+                    {
+                      _.keys(val).map((key, j) =>
+                        <div key={j}>
+                          <span
+                            style={{ marginRight: 6, opacity: 0.35 }}
+                          >
+                            <b>{key}: </b>
+                          </span>
+                          <span>
+                            {JSON.stringify(val[key])}
+                          </span>
+                          <br />
+                        </div>,
+                      )
+                    }
+                    <br />
+                  </div>
+                );
+              }
+              return <span key={i}>{i !== 0 ? ', ' + val : val} </span>;
+            })
+          }
+        </div>
+      );
+      if (value.size && typeof value.get(0) !== 'object')
+      {
+        return tooltip(content, {
+          html: <div style={{
+            overflowY: 'auto',
+            maxHeight: '200px',
+            maxWidth: '300px',
+            display: 'inline-block',
+            textAlign: 'left',
+            zIndex: 9999,
+            background: 'white',
+            borderRadius: 0,
+          }}
+          >
+            {tooltipText}
+          </div>,
+          arrow: false,
+        });
+      }
+      return content;
     }
   }
   if (typeof value === 'object')
@@ -937,7 +1101,19 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
             </div>
           </div>
         );
-
+      case 'date':
+        value = Util.formatDate(value, true);
+        if (!expanded && !bgUrlOnly)
+        {
+          return tooltip(
+            value,
+            {
+              title: value,
+              position: 'left-start',
+              arrow: false,
+            });
+        }
+        break;
       // case 'map':
       //   const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
       //   let targetLocation: [number, number];
@@ -966,7 +1142,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       //   );
 
       case 'text':
-
         break;
     }
   }
@@ -977,16 +1152,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     value = value.toLocaleString();
   }
 
-  // check if its a date and format it nicely if so
-  if (typeof value === 'string')
-  {
-    const dateValue = Util.formatDate(value, true); // If it's not a valid date, nothing will change in value
-    if (dateValue !== value)
-    {
-      tooltipText = value;
-      value = dateValue;
-    }
-  }
   if (!tooltipText)
   {
     tooltipText = value;
@@ -998,8 +1163,12 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
       html: <div style={{
         overflowY: 'auto',
         maxHeight: '200px',
+        maxWidth: '300px',
         display: 'inline-block',
         textAlign: 'left',
+        zIndex: 9999,
+        background: 'white',
+        borderRadius: 0,
       }}
       >
         {tooltipText}

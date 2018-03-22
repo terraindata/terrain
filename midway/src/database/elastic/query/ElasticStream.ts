@@ -133,23 +133,20 @@ export class ElasticStream extends Stream.Readable
       return;
     }
 
-    let hits: ElasticQueryHit[] = response.hits.hits;
+    const hits: ElasticQueryHit[] = response.hits.hits;
     let length: number = hits.length;
 
     // trim off excess results
     if (this.rowsProcessed + length > this.size)
     {
       length = this.size - this.rowsProcessed;
-      hits = hits.slice(0, length);
+      response.hits.hits = hits.slice(0, length);
     }
 
     this.rowsProcessed += length;
     this.numRequested = Math.max(0, this.numRequested - length);
 
-    for (let i = 0; i < hits.length; ++i)
-    {
-      this.push(hits[i]);
-    }
+    this.push(response);
 
     this.querying = false;
     this.doneReading = this.doneReading

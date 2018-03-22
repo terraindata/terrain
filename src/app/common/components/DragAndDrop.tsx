@@ -66,6 +66,7 @@ export interface Props
   onDrop: (items) => void;
   onDragStart?: () => void;
   className: string; // used for selection of this list
+  style?: any;
 }
 
 const grid = 8;
@@ -158,7 +159,10 @@ class DragAndDrop extends TerrainComponent<Props>
     const draggableItems = this.props.draggableItems.map((i) => Object.assign({}, i, { key: i.key.toString() }));
 
     return (
-      <div className={this.props.className}>
+      <div
+        className={this.props.className}
+        style={this.props.style}
+      >
         <DragDropContext
           onDragEnd={this.onDragEnd}
           onDragStart={this.onDragStart}
