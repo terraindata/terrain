@@ -50,14 +50,14 @@ import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import { instanceFnDecorator } from 'src/app/Classes';
-
 import Dropdown from 'common/components/Dropdown';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { instanceFnDecorator } from 'src/app/Classes';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
@@ -65,19 +65,22 @@ import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import './FieldPicker.less';
+
 interface Props
 {
   selectedIds: List<number>;
   onChange: (ids: List<number>) => void;
   engine: TransformationEngine;
-  availableFields?: List<number>;
+  availableFields: List<number>;
 }
 
 export class FieldPicker extends TerrainComponent<Props>
 {
   public stringifyKeyPath(kp: EnginePath)
   {
-    return kp.reduce((reduction, value) => {
+    return kp.reduce((reduction, value) =>
+    {
       return reduction === undefined ? `${value}` : `${reduction}, ${value}`;
     }, undefined);
   }
@@ -86,43 +89,37 @@ export class FieldPicker extends TerrainComponent<Props>
   public translateFieldsToStrings(availableFields: List<number>, engine: TransformationEngine)
   {
     return availableFields.map((id, i) =>
-      this.stringifyKeyPath(engine.getOutputKeyPath(id))
+      this.stringifyKeyPath(engine.getOutputKeyPath(id)),
     ).toList();
   }
 
   @instanceFnDecorator(memoizeOne)
   public findIdIndexFactory(avail: List<number>): (id: number) => number
   {
-    const fn = _.memoize((id: number) => {
+    const fn = _.memoize((id: number) =>
+    {
       return avail.indexOf(id);
     });
     return fn;
   }
 
-  public renderSelectedField(id, i)
+  public renderSelectedField(id, index)
   {
     const { engine, onChange, availableFields } = this.props;
-    const avail = availableFields !== undefined ? availableFields : List([]);
-    const options = this.translateFieldsToStrings(avail, engine);
-    const idIndex = this.findIdIndexFactory(avail)(id);
+    const options = this.translateFieldsToStrings(availableFields, engine);
+    const idIndex = this.findIdIndexFactory(availableFields)(id);
     return (
       <div
-        key={i}
+        key={index}
+        className='field-picker-field'
       >
         <Dropdown
           selectedIndex={idIndex}
           options={options}
-          onChange={this.handleChangeFactory(id)}
+          onChange={this.handleChangeFactory(index)}
+          canEdit={true}
+          textColor={this.computeOptionColorFactory(index)}
         />
-      </div>
-    );
-  }
-
-  public renderNewFieldButton()
-  {
-    return (
-      <div onClick={this.handleAddNewField}>
-        Add Another
       </div>
     );
   }
@@ -131,23 +128,49 @@ export class FieldPicker extends TerrainComponent<Props>
   {
     const { selectedIds } = this.props;
     return (
-      <div>
-        {selectedIds.map(this.renderSelectedField)}
-        {this.renderNewFieldButton()}
+      <div
+        className='engine-field-picker'
+      >
+        <div
+          className='engine-field-picker-title'
+        >
+          Fields to Join
+        </div>
+        <div
+          className='field-options-section'
+        >
+          {selectedIds.map(this.renderSelectedField)}
+        </div>
       </div>
     );
   }
 
   @instanceFnDecorator(_.memoize)
-  public handleChangeFactory(id: number)
+  public computeOptionColorFactory(rowIndex)
   {
-    return (value) => {
-      
+    return (index) =>
+    {
+      const { selectedIds, availableFields } = this.props;
+      const id = availableFields.get(index);
+      if (selectedIds.get(rowIndex) === id || selectedIds.indexOf(id) === -1)
+      {
+        return Colors().text2;
+      }
+      else
+      {
+        return Colors().text3;
+      }
     };
   }
 
-  public handleAddNewField()
+  @instanceFnDecorator(_.memoize)
+  public handleChangeFactory(indexInList: number)
   {
-
+    return (newIndex) =>
+    {
+      const { onChange, selectedIds, availableFields } = this.props;
+      const newId = availableFields.get(newIndex);
+      onChange(selectedIds.set(indexInList, newId));
+    };
   }
 }

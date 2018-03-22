@@ -85,6 +85,7 @@ export interface TransformationArgs<Type extends TransformationNodeType>
 export abstract class TransformationForm<State, Type extends TransformationNodeType>
   extends TerrainComponent<TFProps>
 {
+  public state: State;
   // override these to configure
   protected readonly abstract inputMap: InputDeclarationMap<State>;
   protected readonly abstract initialState: State;

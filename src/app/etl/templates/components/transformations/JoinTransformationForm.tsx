@@ -52,6 +52,7 @@ import * as React from 'react';
 
 import { instanceFnDecorator } from 'src/app/Classes';
 
+import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
 import { TransformationNode } from 'etl/templates/FieldTypes';
@@ -59,10 +60,8 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
-import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
-import { DynamicForm } from 'common/components/DynamicForm';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
-
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -81,9 +80,10 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     otherFieldIds: {
       type: DisplayType.Custom,
       displayName: 'Fields to Join',
+      widthFactor: 4,
       options: {
         render: this.renderFieldPicker,
-      }
+      },
     },
     outputName: {
       type: DisplayType.TextBox,
@@ -93,15 +93,17 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
       type: DisplayType.TextBox,
       displayName: 'Delimiter',
       group: 'row2',
+      widthFactor: 2,
     },
     preserveOldFields: {
       type: DisplayType.CheckBox,
       displayName: 'Keep Original Field',
       group: 'row2',
+      widthFactor: 3,
     },
   };
   protected readonly initialState = {
-    otherFieldIds: List([]),
+    otherFieldIds: List([-1]),
     outputName: 'Joined Field',
     preserveOldFields: false,
     delimiter: '-',
@@ -110,12 +112,15 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
 
   public renderFieldPicker()
   {
+    const { fieldId, engine } = this.props;
+    const { otherFieldIds } = this.state;
+
     return (
       <FieldPicker
         selectedIds={this.state.otherFieldIds}
         onChange={this._setStateWrapper('otherFieldIds')}
-        engine={this.props.engine}
-        availableFields={this.computeAvailableFields(this.props.fieldId)}
+        engine={engine}
+        availableFields={this.computeAvailableFields(fieldId)}
       />
     );
   }
@@ -127,7 +132,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
     const currentKP = engine.getOutputKeyPath(fieldId);
     return engine.getAllFieldIDs().filter((id, i) => fieldId !== id
       && areFieldsLocal(currentKP, engine.getOutputKeyPath(id))
-      && engine.getFieldType(id) === 'string'
+      && engine.getFieldType(id) === 'string',
     ).toList();
   }
 
@@ -139,16 +144,18 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;
-    const { leftName, rightName, delimiter, preserveOldFields } = this.state;
-    const args = super.computeArgs();
+    const { otherFieldIds, outputName, delimiter, preserveOldFields } = this.state;
 
     const currentKeyPath = engine.getOutputKeyPath(fieldId);
     const changeIndex = currentKeyPath.size - 1;
-
     const newFieldKeyPaths = List([
-      currentKeyPath.set(changeIndex, leftName),
-      currentKeyPath.set(changeIndex, rightName),
+      currentKeyPath.set(changeIndex, outputName),
     ]);
+
+    const inputFields = List([fieldId])
+      .concat(otherFieldIds)
+      .map((id) => engine.getInputKeyPath(id))
+      .toList();
 
     return {
       options: {
@@ -156,7 +163,7 @@ export class JoinTFF extends TransformationForm<JoinOptions, TransformationNodeT
         delimiter,
         preserveOldFields,
       },
-      fields: args.fields,
+      fields: inputFields,
     };
   }
 }

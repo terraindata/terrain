@@ -181,10 +181,10 @@ class Dropdown extends TerrainComponent<Props>
     if (selected)
     {
       _.extend(style, {
-        'backgroundColor': customColor || Colors().active,
+        'backgroundColor': Colors().active,
         'color': Colors().activeText,
         ':hover': {
-          backgroundColor: customColor || Colors().active,
+          backgroundColor: Colors().active,
           color: Colors().activeText,
           stroke: Colors().activeText,
         },
@@ -353,8 +353,8 @@ class Dropdown extends TerrainComponent<Props>
     const dropdownValueStyle = [
       this.props.canEdit ?
         backgroundColor(
-          !this.state.open ? Colors().inputBg : customColor || Colors().active,
-          customColor || Colors().inactiveHover,
+          !this.state.open ? Colors().inputBg : Colors().active,
+          Colors().inactiveHover,
         )
         :
         backgroundColor(Colors().darkerHighlight)

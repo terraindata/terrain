@@ -85,6 +85,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Split this field into 2 or more fields',
         type: SplitTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return engine.getFieldType(fieldId) === 'string';
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
@@ -98,12 +102,15 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Join this field with another field',
         type: JoinTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return engine.getFieldType(fieldId) === 'string';
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
           visitor.visitJoinNode(transformationNode, docCopy, options),
-
       },
     [TransformationNodeType.FilterNode]: // what does this do?
       {
@@ -195,6 +202,19 @@ export abstract class TransformationInfo
   public static getInfo(type: TransformationNodeType): InfoType // get the whole info object
   {
     return TransformationNodeInfo[type];
+  }
+
+  public static isAvailable(type: TransformationNodeType, engine: TransformationEngine, field: number)
+  {
+    const info = TransformationNodeInfo[type];
+    if (info.isAvailable === undefined)
+    {
+      return true;
+    }
+    else
+    {
+      return info.isAvailable(engine, field);
+    }
   }
 
   public static canCreate(type: TransformationNodeType): boolean

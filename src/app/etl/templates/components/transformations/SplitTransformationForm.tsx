@@ -83,21 +83,25 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
       type: DisplayType.TextBox,
       displayName: 'New Field Name 1',
       group: 'new name',
+      widthFactor: 3,
     },
     rightName: {
       type: DisplayType.TextBox,
       displayName: 'New Field Name 2',
       group: 'new name',
+      widthFactor: 3,
     },
     delimiter: {
       type: DisplayType.TextBox,
       displayName: 'Delimiter',
       group: 'row2',
+      widthFactor: 2,
     },
     preserveOldFields: {
       type: DisplayType.CheckBox,
       displayName: 'Keep Original Field',
       group: 'row2',
+      widthFactor: 3,
     },
   };
   protected readonly initialState = {
