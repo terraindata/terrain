@@ -54,11 +54,29 @@ export interface Props
 {
   open: boolean;
   children?: any;
-  style?: any;
+  dontUnmount?: boolean;
 }
 
 class FadeInOut extends TerrainComponent<Props>
 {
+  public renderChildren()
+  {
+    if (this.props.dontUnmount)
+    {
+      return (
+        <div
+          style={!this.props.open ? { opacity: 0, zIndex: -10, height: 0 } : {}}
+        >
+          {this.props.children}
+        </div>;
+      )
+    }
+    if (this.props.open)
+    {
+      return this.props.children;
+    }
+    return null;
+  }
   public render()
   {
     return (
@@ -69,7 +87,7 @@ class FadeInOut extends TerrainComponent<Props>
         }}
         duration={250}
       >
-        <div style={this.props.style}>
+        <div>
           <VelocityTransitionGroup
             enter={
               { animation: 'slideDown', duration: 250, easing: 'easeOut' }
@@ -79,8 +97,7 @@ class FadeInOut extends TerrainComponent<Props>
             }
           >
             {
-              this.props.open &&
-              this.props.children
+              this.renderChildren()
             }
           </VelocityTransitionGroup>
         </div>
