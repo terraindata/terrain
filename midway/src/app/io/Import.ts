@@ -366,7 +366,7 @@ export class Import
             }
             if ((key as string).length !== 32)
             {
-              throw new Error('Key must be exactly 32 characters.');
+              throw new Error('Encryption key must be exactly 32 characters.');
             }
             const byteKey: any = aesjs.utils.utf8.toBytes(key as string);
             const msgToEncrypt: string = typeof obj[oldColEncryptName as string] === 'string'
@@ -374,13 +374,24 @@ export class Import
             const msgBytes: any = aesjs.utils.utf8.toBytes(msgToEncrypt);
             const aesCtr = new aesjs.ModeOfOperation.ctr(byteKey, new aesjs.Counter(5));
             obj[oldColEncryptName as string] = aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes));
-
-            /*
-            winston.info('Encrypted value: ' + JSON.stringify(obj[oldColEncryptName as string]));
-            const decryptedMsgBytes: any = aesjs.utils.hex.toBytes(obj[oldColEncryptName as string]);
-            const aesCtrDecrypt = new aesjs.ModeOfOperation.ctr(byteKey, new aesjs.Counter(5));
-            winston.info('Decrypted value: ' + aesjs.utils.utf8.fromBytes(aesCtrDecrypt.decrypt(decryptedMsgBytes)));
-            */
+            break;
+          case 'decrypt':
+            const oldColDecryptName: string | undefined = transform['colName'];
+            const keyDecrypt: string | undefined = transform['args']['key'];
+            if (oldColDecryptName === undefined || keyDecrypt === undefined)
+            {
+              throw new Error('Column name and key must be provided.');
+            }
+            if ((keyDecrypt as string).length !== 32)
+            {
+              throw new Error('Decryption key must be exactly 32 characters.');
+            }
+            const byteKeyDecrypt: any = aesjs.utils.utf8.toBytes(keyDecrypt as string);
+            const msgToDecrypt: string = typeof obj[oldColDecryptName as string] === 'string'
+              ? obj[oldColDecryptName as string] : JSON.stringify(obj[oldColDecryptName as string]);
+            const decryptedMsgBytes: any = aesjs.utils.hex.toBytes(msgToDecrypt);
+            const aesCtrDecrypt = new aesjs.ModeOfOperation.ctr(byteKeyDecrypt, new aesjs.Counter(5));
+            obj[oldColDecryptName as string] = aesjs.utils.utf8.fromBytes(aesCtrDecrypt.decrypt(decryptedMsgBytes));
             break;
           case 'hash':
             const oldColHashName: string | undefined = transform['colName'];
