@@ -90,67 +90,97 @@ class GraphHelpers extends ETLHelpers
     // 1: create a merge node
     // 2: split the left edge using the merge node
     // 3: connect the right edge to the merge node
-    const proxy = this._templateProxy();
-    const leftEdgeId = this._template.findEdges((edge) => edge.from === leftId).first();
-    const rightEdgeId = this._template.findEdges((edge) => edge.from === rightId).first();
-    const destinationNodeId = this._template.getEdge(leftEdgeId).to;
 
-    const mergeNodeId = proxy.addMerge(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
-    proxy.setEdgeTo(leftEdgeId, mergeNodeId);
-    proxy.setEdgeTo(rightEdgeId, mergeNodeId);
+    this._try((proxy) => {
+      const leftEdgeId = proxy.value().findEdges((edge) => edge.from === leftId).first();
+      const rightEdgeId = proxy.value().findEdges((edge) => edge.from === rightId).first();
+      const destinationNodeId = proxy.value().getEdge(leftEdgeId).to;
 
-    const newEdgeId = proxy.addEdge(mergeNodeId, destinationNodeId);
-    const newEngine = mergeJoinEngines(
-      this._template.getTransformationEngine(leftEdgeId),
-      this._template.getTransformationEngine(rightEdgeId),
-      outputKey,
-    );
-    proxy.setEdgeTransformations(newEdgeId, newEngine);
+      const mergeNodeId = proxy.addMerge(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
+      proxy.setEdgeTo(leftEdgeId, mergeNodeId);
+      proxy.setEdgeTo(rightEdgeId, mergeNodeId);
+
+      const newEdgeId = proxy.addEdge(mergeNodeId, destinationNodeId);
+      const newEngine = mergeJoinEngines(
+        proxy.value().getTransformationEngine(leftEdgeId),
+        proxy.value().getTransformationEngine(rightEdgeId),
+        outputKey,
+      );
+      proxy.setEdgeTransformations(newEdgeId, newEngine);
+    }).catch(this._logError);
   }
+
+  // public createEngineForEdge(edgeId: number): Promise<TransformationEngine>
+  // {
+  //   // todo do it for other node types
+  //   return new Promise<TransformationEngine>((resolve, reject) => {
+  //     const template = this._template;
+  //     const edge = template.getEdge(edgeId);
+  //     const fromNode = template.getNode(edge.from);
+  //     if (fromNode.type === NodeTypes.Source)
+  //     {
+  //       const source = template.getSources().get(fromNode.endpoint);
+  //       DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
+  //       {
+  //         const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
+  //         resolve(engine);
+  //       }).catch(this._logError);
+  //     }
+  //   });
+  // }
 
   public createEngineForEdge(edgeId: number)
   {
     const template = this._template;
     const edge = template.getEdge(edgeId);
     const fromNode = template.getNode(edge.from);
-    const proxy = this._templateProxy();
     if (fromNode.type === NodeTypes.Source)
     {
       const source = template.getSources().get(fromNode.endpoint);
       DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
       {
         const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
-        proxy.setEdgeTransformations(edgeId, engine);
+        this._try((proxy) => {
+          proxy.setEdgeTransformations(edgeId, engine);
+        }).catch(this._logError);
       }).catch(this._logError);
     }
-    // todo do it for other node types
   }
 
   public updateSources(newSources: SourcesMap)
   {
     const { newKeys, deletedKeys, differentKeys } =
       getChangedKeys(this._template.getSources(), newSources);
-    const proxy = this._templateProxy();
 
-    newKeys.forEach((key) =>
-    {
-      const sourceId = proxy.addSource(key, newSources.get(key));
-      const edgeId = proxy.addEdge(sourceId, -1);
-      this.createEngineForEdge(edgeId);
-    });
-    differentKeys.forEach((key) =>
-    {
-      proxy.setSource(key, newSources.get(key));
-    });
-    deletedKeys.forEach((key) =>
-    {
-      proxy.deleteSource(key);
-      this.editorAct({
-        actionType: 'deleteInMergeDocuments',
-        key,
+    let newEdges = List([]);
+
+    this._try((proxy) => {
+      newKeys.forEach((key) =>
+      {
+        const sourceId = proxy.addSource(key, newSources.get(key));
+        const edgeId = proxy.addEdge(sourceId, -1);
+        newEdges = newEdges.push(edgeId);
       });
-    });
-    DocumentsHelpers.fetchSources(differentKeys);
+      differentKeys.forEach((key) =>
+      {
+        proxy.setSource(key, newSources.get(key));
+      });
+      deletedKeys.forEach((key) =>
+      {
+        proxy.deleteSource(key);
+      });
+    }).then(() => {
+      deletedKeys.forEach((key) => {
+        this.editorAct({
+          actionType: 'deleteInMergeDocuments',
+          key,
+        });
+      });
+      newEdges.forEach((edgeId) => {
+        this.createEngineForEdge(edgeId);
+      });
+      DocumentsHelpers.fetchSources(differentKeys);
+    }).catch(this._logError);
   }
 
   public updateSinks(newSinks: SinksMap)
@@ -158,25 +188,20 @@ class GraphHelpers extends ETLHelpers
     const { newKeys, deletedKeys, differentKeys } =
       getChangedKeys(this._template.getSinks(), newSinks);
 
-    const proxy = this._templateProxy(true);
-
-    newKeys.forEach((key) =>
-    {
-      proxy.addSink(key, newSinks.get(key));
-    });
-    differentKeys.forEach((key) =>
-    {
-      proxy.setSink(key, newSinks.get(key));
-    });
-    deletedKeys.forEach((key) =>
-    {
-      proxy.deleteSink(key);
-    });
-
-    this.editorAct({
-      actionType: 'setTemplate',
-      template: proxy.getTemplate(),
-    });
+    this._try((proxy) => {
+      newKeys.forEach((key) =>
+      {
+        proxy.addSink(key, newSinks.get(key));
+      });
+      differentKeys.forEach((key) =>
+      {
+        proxy.setSink(key, newSinks.get(key));
+      });
+      deletedKeys.forEach((key) =>
+      {
+        proxy.deleteSink(key);
+      });
+    }).catch(this._logError);
   }
 
   public switchEdge(edgeId: number)

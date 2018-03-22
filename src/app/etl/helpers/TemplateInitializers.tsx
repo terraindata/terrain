@@ -67,16 +67,15 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
+import { TemplateProxy } from 'etl/templates/TemplateProxy';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
-import { TemplateProxy } from 'etl/templates/TemplateProxy';
 
 import DocumentsHelpers from './DocumentsHelpers';
-
 
 class Initializers extends ETLHelpers
 {
@@ -180,7 +179,7 @@ class Initializers extends ETLHelpers
 
     const fieldMap = createTreeFromEngine(engine);
 
-    let template = _ETLTemplate({
+    const template = _ETLTemplate({
       id: -1,
       templateName: name,
     });
@@ -192,10 +191,8 @@ class Initializers extends ETLHelpers
     const sinkId = proxy.addSink('_default', sinkToAdd);
     const initialEdge = proxy.addEdge(sourceId, sinkId, engine);
 
-    template = proxy.getTemplate();
-
     return {
-      template,
+      template: proxy.value(),
       fieldMap,
       warnings,
       softWarnings,

@@ -86,7 +86,7 @@ export class TemplateProxy
     this.cacheTemplate = typeof _template !== 'function';
   }
 
-  public getTemplate()
+  public value()
   {
     return this.template;
   }

@@ -118,20 +118,41 @@ export default abstract class ETLHelpers
     {
       this.store.dispatch(ETLActions(action));
     };
-    this.templateGetter = this.templateGetter.bind(this);
-    this.templateSetter = this.templateSetter.bind(this);
   }
 
-  protected _templateProxy(cache = false)
+  protected _try(tryFn: (proxy: TemplateProxy) => void): Promise<void>
   {
-    if (cache)
+    return new Promise<void>((resolve, reject) =>
     {
-      return new TemplateProxy(this._template);
-    }
-    else
-    {
-      return new TemplateProxy(this.templateGetter, this.templateSetter);
-    }
+      // todo copy the template
+      let template = this._template;
+      const mutator = (newTemplate: ETLTemplate) =>
+      {
+        template = newTemplate;
+      };
+      const accessor = () => template;
+      const proxy = new TemplateProxy(accessor, mutator);
+      tryFn(proxy);
+      if (1 === 1) // placeholder, todo check if engine is in valid state
+      {
+        this.editorAct({
+          actionType: 'setTemplate',
+          template,
+        });
+        if (!this._templateEditor.isDirty)
+        {
+          this.editorAct({
+            actionType: 'setIsDirty',
+            isDirty: true,
+          });
+        }
+        resolve();
+      }
+      else
+      {
+        reject();
+      }
+    });
   }
 
   protected _grabOne<T>(resolve, reject)
@@ -166,25 +187,5 @@ export default abstract class ETLHelpers
   {
     // tslint:disable-next-line
     console.error(ev);
-  }
-
-  private templateSetter(template: ETLTemplate)
-  {
-    this.editorAct({
-      actionType: 'setTemplate',
-      template,
-    });
-    if (!this._templateEditor.isDirty)
-    {
-      this.editorAct({
-        actionType: 'setIsDirty',
-        isDirty: true,
-      });
-    }
-  }
-
-  private templateGetter()
-  {
-    return this._template;
   }
 }
