@@ -61,7 +61,7 @@ declare global
 
 if (!DEV)
 {
-  //TerrainTools.setDefaultLogLevel('warn');
+  // TerrainTools.setDefaultLogLevel('warn');
   // report uncaught errors in production
   window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
   {
@@ -98,7 +98,7 @@ if (!DEV)
   };
 } else
 {
-  TerrainTools.setLogLevel('info');
+  // TerrainTools.setLogLevel('info');
   window.TerrainTools = TerrainTools;
   TerrainTools.welcome();
 }

@@ -502,7 +502,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     const oldSize = points.size;
     if (oldSize < newSize)
     {
-      let scorePoints: ScorePoints = List([]);
+      let newScorePoints: ScorePoints = List([]);
       points = List([]);
       for (let i = 0; i < newSize; i++)
       {
@@ -515,10 +515,10 @@ export class TransformCardChart extends TerrainComponent<Props>
           id: p.id,
           selected: false,
         });
-        scorePoints = scorePoints.push(p);
+        newScorePoints = newScorePoints.push(p);
       }
-      scorePoints = scorePoints.sortBy((pt) => pt.value).toList();
-      this.updatePoints(scorePoints, true);
+      newScorePoints = newScorePoints.sortBy((pt) => pt.value).toList();
+      this.updatePoints(newScorePoints, true);
     }
     else if (oldSize > newSize)
     {

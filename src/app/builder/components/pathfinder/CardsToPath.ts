@@ -43,7 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import Query from '../../../../items/types/Query';
+// tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
+
 import
 {
   _FilterGroup,
@@ -55,16 +56,16 @@ import
   Score,
   ScoreLine,
   Source,
-  sourceCountOptions
+  sourceCountOptions,
 } from 'builder/components/pathfinder/PathfinderTypes';
-import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
+import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
+import { FieldType } from '../../../../../shared/builder/FieldTypes';
+import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import Block from '../../../../blocks/types/Block';
-import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
-import { List } from 'immutable';
-import { FieldType } from '../../../../../shared/builder/FieldTypes';
-import PathfinderLine from 'builder/components/pathfinder/PathfinderLine';
+import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
+import Query from '../../../../items/types/Query';
 
 export class CardsToPath
 {
@@ -166,7 +167,7 @@ export class CardsToPath
     return newLine;
   }
 
-  private static BoolToFilterGroup(filterGroup: FilterGroup, parser: ESCardParser, boolValueInfo, sectionType: "hard" | "soft", isInnerGroup: boolean = false): FilterGroup
+  private static BoolToFilterGroup(filterGroup: FilterGroup, parser: ESCardParser, boolValueInfo, sectionType: 'hard' | 'soft', isInnerGroup: boolean = false): FilterGroup
   {
     const boolCard = boolValueInfo.card;
 
@@ -193,7 +194,7 @@ export class CardsToPath
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'all');
         newLines = newLines.concat(filterRowMap.filter.map(
-          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null)
+          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
         );
       } else if (isInnerGroup === true)
       {
@@ -203,7 +204,7 @@ export class CardsToPath
           // set the filtergroup to
           filterGroup = filterGroup.set('minMatches', 'any');
           newLines = newLines.concat(filterRowMap.should.map(
-            (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null)
+            (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
           );
         }
       }
@@ -215,7 +216,7 @@ export class CardsToPath
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'any');
         newLines = newLines.concat(filterRowMap.should.map(
-          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null)
+          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
         );
       }
     }
@@ -225,9 +226,9 @@ export class CardsToPath
     const newNestedQueryLines = this.processNestedQueryFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
     newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines);
 
-    TerrainLog.debug('B->P(Bool): Generate ' + newLines.length + ' filter lines ' +
-      '(Nested Group' + newNestedGroupLines.length + ').' +
-      '(Nested Query' + newNestedQueryLines.length + ').');
+    TerrainLog.debug('B->P(Bool): Generate ' + String(newLines.length) + ' filter lines ' +
+      '(Nested Group' + String(newNestedGroupLines.length) + ').' +
+      '(Nested Query' + String(newNestedQueryLines.length) + ').');
     filterGroup = filterGroup.set('lines', List(newLines)).set('groupCount', newNestedGroupLines.length + newNestedQueryLines.length + 1);
     return filterGroup;
   }
@@ -273,7 +274,7 @@ export class CardsToPath
     return newLines;
   }
 
-  private static processInnerFilterGroup(parentFilterGroup: FilterGroup, parser, parentBool: ESValueInfo, sectionType: "hard" | "soft")
+  private static processInnerFilterGroup(parentFilterGroup: FilterGroup, parser, parentBool: ESValueInfo, sectionType: 'hard' | 'soft')
   {
     // let search whether we have an inner bool or not
     let from;
@@ -309,7 +310,6 @@ export class CardsToPath
     return newLines;
   }
 
-
   private static BodyToFilterSection(filterGroup: FilterGroup, parser: ESCardParser, body: ESValueInfo, filterSection: 'hard' | 'soft')
   {
     let boolType;
@@ -323,12 +323,12 @@ export class CardsToPath
     }
     const theBool = parser.searchCard(
       {
-        "query:query": {
+        'query:query': {
           'bool:elasticFilter': {
             [boolType]:
-              [{ "bool:elasticFilter": true }]
-          }
-        }
+              [{ 'bool:elasticFilter': true }],
+          },
+        },
       }, body);
     if (theBool === null)
     {
@@ -377,7 +377,6 @@ export class CardsToPath
 
     paths.map((path: Path) =>
     {
-      console.log(path);
       if (path && path.name)
       {
         pathMap[path.name] = path;
@@ -397,7 +396,7 @@ export class CardsToPath
       }
       const p = this.BodyCardToPath(oldPath, parser, joinBodyMap[key]).set('name', key);
       TerrainLog.debug('(B->P) Turn groupJoin body ', joinBodyMap[key], ' to path', p);
-      newPaths.push(p)
+      newPaths.push(p);
     }
     return newPaths;
   }
@@ -460,7 +459,7 @@ export class CardsToPath
   private static elasticScoreToLines(scoreCard)
   {
     return scoreCard['weights'].map((weightBlock) =>
-      this.elasticTransformToScoreLine(weightBlock['key'], weightBlock.weight)
+      this.elasticTransformToScoreLine(weightBlock['key'], weightBlock.weight),
     );
   }
 

@@ -43,22 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import Query from '../../../../items/types/Query';
-import Card from '../../../../blocks/types/Card';
-import { ElasticDataSource, FilterGroup, FilterLine, Path } from 'builder/components/pathfinder/PathfinderTypes';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { make } from '../../../../blocks/BlockUtils';
-import ElasticBlocks from '../../../../database/elastic/blocks/ElasticBlocks';
-import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
-import Block from '../../../../blocks/types/Block';
-import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
-import { FieldType } from '../../../../../shared/builder/FieldTypes';
-import { parseElasticWeightBlock } from '../../../../database/elastic/conversion/ElasticToCards';
-import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
-import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
+// tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 import { parseScore, PathFinderDefaultSize } from 'builder/components/pathfinder/PathfinderParser';
+import { ElasticDataSource, FilterGroup, FilterLine, Path } from 'builder/components/pathfinder/PathfinderTypes';
 import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
+import { FieldType } from '../../../../../shared/builder/FieldTypes';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
+import { make } from '../../../../blocks/BlockUtils';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
+import Block from '../../../../blocks/types/Block';
+import Card from '../../../../blocks/types/Card';
+import ElasticBlocks from '../../../../database/elastic/blocks/ElasticBlocks';
+import { parseElasticWeightBlock } from '../../../../database/elastic/conversion/ElasticToCards';
+import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
+import Query from '../../../../items/types/Query';
 
 export class PathToCards
 {
@@ -76,17 +77,17 @@ export class PathToCards
               { 'term:term_query': { '_index:string': (path.source.dataSource as ElasticDataSource).index } },
               {
                 'bool:elasticFilter': {
-                  'filter:query[]': [{ 'term:term_query': { ' :string': '' } }]
-                }
-              }
+                  'filter:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                },
+              },
             ],
             'should:query[]': [
               {
                 'bool:elasticFilter': {
-                  'should:query[]': [{ 'term:term_query': { ' :string': '' } }]
-                }
-              }]
-          }
+                  'should:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                },
+              }],
+          },
         },
         'from:from': 0,
         'size:size': PathFinderDefaultSize,
@@ -164,31 +165,31 @@ export class PathToCards
   }
 
   private static ComparisonsToFilterOpMap = {
-    'greater': '>',
-    'greaterequal': '≥',
-    'less': '<',
-    'lessequal': '≤',
-    'equal': '=',
-    'notequal': '=',
-    'isin': 'in',
-    'isnotin': 'in',
-    'exists': 'exists',
-    'contains': '≈',
-    'notcontain': '≈',
+    greater: '>',
+    greaterequal: '≥',
+    less: '<',
+    lessequal: '≤',
+    equal: '=',
+    notequal: '=',
+    isin: 'in',
+    isnotin: 'in',
+    exists: 'exists',
+    contains: '≈',
+    notcontain: '≈',
   };
 
   private static ComparisonsToBoolType = {
-    'greater': { 'filter': 'filter', 'should': 'should' },
-    'greaterequal': { 'filter': 'filter', 'should': 'should' },
-    'less': { 'filter': 'filter', 'should': 'should' },
-    'lessequal': { 'filter': 'filter', 'should': 'should' },
-    'equal': { 'filter': 'filter', 'should': 'should' },
-    'isin': { 'filter': 'filter', 'should': 'should' },
-    'exists': { 'filter': 'filter', 'should': 'should' },
-    'contains': { 'filter': 'filter', 'should': 'should' },
-    'notequal': { 'filter': 'filter_not', 'should': 'should_not' },
-    'isnotin': { 'filter': 'filter_not', 'should': 'should_not' },
-    'notcontain': { 'filter': 'filter_not', 'should': 'should_not' }
+    greater: { filter: 'filter', should: 'should' },
+    greaterequal: { filter: 'filter', should: 'should' },
+    less: { filter: 'filter', should: 'should' },
+    lessequal: { filter: 'filter', should: 'should' },
+    equal: { filter: 'filter', should: 'should' },
+    isin: { filter: 'filter', should: 'should' },
+    exists: { filter: 'filter', should: 'should' },
+    contains: { filter: 'filter', should: 'should' },
+    notequal: { filter: 'filter_not', should: 'should_not' },
+    isnotin: { filter: 'filter_not', should: 'should_not' },
+    notcontain: { filter: 'filter_not', should: 'should_not' },
   };
 
   private static filterLineToFilterBlock(boolType: 'filter' | 'should', line: FilterLine): Block[]
@@ -245,9 +246,9 @@ export class PathToCards
               'path:field': theLine.field,
               'score_mode:nested_score_mode': 'avg',
               'query:query': {
-                'bool:elasticFilter': {}
-              }
-            }
+                'bool:elasticFilter': {},
+              },
+            },
           };
           const queryCard = BlockUtils.make(ElasticBlocks, 'eqlquery', {
             key: i,
@@ -282,9 +283,9 @@ export class PathToCards
               'path:field': theLine.field,
               'score_mode:nested_score_mode': 'avg',
               'query:query': {
-                'bool:elasticFilter': {}
-              }
-            }
+                'bool:elasticFilter': {},
+              },
+            },
           };
           const boolQueryCard = BlockUtils.make(ElasticBlocks, 'eqlquery', {
             key: i,
@@ -323,7 +324,7 @@ export class PathToCards
       {
         nestedQuery.objectChildren.path.propertyValue.card = nestedQuery.objectChildren.path.propertyValue.card.set('value', thePath);
       }
-    }
+    };
   }
 
   private static processInnerGroup(filterLines: FilterLine[], parser: ESCardParser, boolValueInfo: ESValueInfo, boolType, filterSection: 'soft' | 'hard')
@@ -395,7 +396,7 @@ export class PathToCards
       // this is an inner filter group
       const innerBoolValueInfo = innerBools[index];
       this.FilterGroupToBool(line.filterGroup, parser, innerBoolValueInfo, filterSection);
-    }
+    };
   }
 
   private static FilterGroupToBool(filterGroup: FilterGroup, parser: ESCardParser, boolValueInfo: ESValueInfo, filterSection: 'hard' | 'soft' = 'hard')
@@ -460,7 +461,6 @@ export class PathToCards
     boolValueInfo.card = boolCard.set('otherFilters', List(keepFilters.concat(blocks)));
     parser.isMutated = true;
     TerrainLog.debug('P->B( end filtergroup -> bool) ', filterGroup, boolValueInfo);
-
 
     // handle inner filter group
     this.processInnerGroup(filterLineMap.group, parser, boolValueInfo, boolType, filterSection);
@@ -550,22 +550,22 @@ export class PathToCards
                     { 'term:term_query': { '_index:string': '' } },
                     {
                       'bool:elasticFilter': {
-                        'filter:query[]': [{ 'term:term_query': { ' :string': '' } }]
-                      }
-                    }
+                        'filter:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                      },
+                    },
                   ],
                   'should:query[]': [
                     {
                       'bool:elasticFilter': {
-                        'should:query[]': [{ 'term:term_query': { ' :string': '' } }]
-                      }
-                    }]
-                }
+                        'should:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                      },
+                    }],
+                },
               },
               'from:from': 0,
               'size:size': PathFinderDefaultSize,
               'track_scores:track_scores': true,
-            }
+            },
           }, groupJoinV);
         const b = groupJoinV.objectChildren[pathKey].propertyValue;
         this.PathToBody(pathMap[pathKey], parser, b);
@@ -645,33 +645,32 @@ export class PathToCards
     }
   }
 
-
   private static distributeSourceBoolFilters(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
     const sourceBool = parser.searchCard({
       'query:query': {
-        'bool:elasticFilter': true
-      }
+        'bool:elasticFilter': true,
+      },
     }, body);
     console.assert(sourceBool !== null);
     const hardBool = parser.searchCard(
       {
-        "query:query": {
+        'query:query': {
           'bool:elasticFilter': {
             'filter:query[]':
-              [{ "bool:elasticFilter": true }]
-          }
-        }
+              [{ 'bool:elasticFilter': true }],
+          },
+        },
       }, body);
     console.assert(hardBool !== null);
     const softBool = parser.searchCard(
       {
-        "query:query": {
+        'query:query': {
           'bool:elasticFilter': {
             'should:query[]':
-              [{ "bool:elasticFilter": true }]
-          }
-        }
+              [{ 'bool:elasticFilter': true }],
+          },
+        },
       }, body);
     console.assert(softBool !== null);
     const newHardFilters = [];
@@ -710,8 +709,8 @@ export class PathToCards
       {
         const typeString = t + ':query[]';
         const searchNestedTemplate = {
-          [typeString]: [{ 'nested:nested_query': true }]
-        }
+          [typeString]: [{ 'nested:nested_query': true }],
+        };
         const nestedQuery = parser.searchCard(searchNestedTemplate, sourceBool, false, true);
         if (nestedQuery !== null)
         {
@@ -727,7 +726,7 @@ export class PathToCards
           {
             const targetClausePattern = targetClause + ':query[]';
             parser.createCardIfNotExist({
-              [targetClausePattern]: []
+              [targetClausePattern]: [],
             }, targetBool);
           }
           const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
@@ -740,7 +739,7 @@ export class PathToCards
               const nestedBool = parser.searchCard({ 'query:query': { 'bool:elasticFilter': true } }, nestedValueInfo);
               if (nestedBool === null)
               {
-                TerrainLog.debug('(P->B) There is no bool card in the must_not:nested query, avoid translating it.')
+                TerrainLog.debug('(P->B) There is no bool card in the must_not:nested query, avoid translating it.');
               } else
               {
                 if (t === 'must_not')
@@ -767,8 +766,8 @@ export class PathToCards
     // get the source bool card
     const sourceBool = parser.searchCard({
       'query:query': {
-        'bool:elasticFilter': true
-      }
+        'bool:elasticFilter': true,
+      },
     }, body);
 
     if (sourceBool == null)
@@ -776,8 +775,8 @@ export class PathToCards
       const sourceBoolTemplate =
         {
           'query:query': {
-            'bool:elasticFilter': { 'filter:query[]': [{ 'term:term_query': { '_index:string': indexValue } }] }
-          }
+            'bool:elasticFilter': { 'filter:query[]': [{ 'term:term_query': { '_index:string': indexValue } }] },
+          },
         };
       TerrainLog.debug('(P->B) Source card is missing, create a new one with index ' + indexValue);
       parser.createCardIfNotExist(sourceBoolTemplate, body);
@@ -812,38 +811,37 @@ export class PathToCards
     }
     let theBool = parser.searchCard(
       {
-        "query:query": {
+        'query:query': {
           'bool:elasticFilter': {
             [boolType]:
-              [{ "bool:elasticFilter": true }]
-          }
-        }
+              [{ 'bool:elasticFilter': true }],
+          },
+        },
       }, bodyValueInfo);
     if (theBool === null)
     {
       // slow path
       parser.createCardIfNotExist(
         {
-          "query:query": {
+          'query:query': {
             'bool:elasticFilter': {
               [boolType]:
-                [{ "bool:elasticFilter": {} }]
-            }
-          }
+                [{ 'bool:elasticFilter': {} }],
+            },
+          },
         }, bodyValueInfo);
       theBool = parser.searchCard(
         {
-          "query:query": {
+          'query:query': {
             'bool:elasticFilter': {
               [boolType]:
-                [{ "bool:elasticFilter": true }]
-            }
-          }
+                [{ 'bool:elasticFilter': true }],
+            },
+          },
         }, bodyValueInfo);
     }
     this.FilterGroupToBool(filterGroup, parser, theBool, filterSection);
   }
-
 
   private static fromScore(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
@@ -860,7 +858,7 @@ export class PathToCards
       }
       return;
     }
-    //const scoreObj = parseScore(path.score)._script;
+    // const scoreObj = parseScore(path.score)._script;
     const factors = parseScore(path.score);
     const weights = [];
     for (const factor of factors)
@@ -875,8 +873,7 @@ export class PathToCards
     }
     const sortOrder = 'desc';
     const sortMode = 'auto';
-    let sortType = 'number';
-
+    const sortType = 'number';
 
     const scoreCard = make(
       ElasticBlocks, 'elasticScore',

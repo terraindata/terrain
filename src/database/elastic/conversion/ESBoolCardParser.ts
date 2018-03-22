@@ -43,18 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 
-import Block, { BlockConfig } from '../../../blocks/types/Block';
-import { ElasticElasticCards } from '../blocks/ElasticElasticCards';
+import { List } from 'immutable';
+import * as TerrainLog from 'loglevel';
+import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
+import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
+import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import * as BlockUtils from '../../../blocks/BlockUtils';
+import Block, { BlockConfig } from '../../../blocks/types/Block';
+import { ElasticBlocks } from '../blocks/ElasticBlocks';
+import { ElasticElasticCards } from '../blocks/ElasticElasticCards';
 import { FilterUtils } from '../blocks/ElasticFilterCard';
 import ESCardParser from './ESCardParser';
-import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
-import * as TerrainLog from 'loglevel';
-import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
-import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
-import { List } from 'immutable';
-import { ElasticBlocks } from '../blocks/ElasticBlocks';
 
 // Translate an Elastic bool card to the format of terrain filter card.
 export default class ESBoolCardParser
@@ -78,8 +79,6 @@ export default class ESBoolCardParser
     }
     return null;
   }
-
-
 
   private filterQueryOp =
     {
@@ -120,13 +119,11 @@ export default class ESBoolCardParser
       return this.boolCard;
     }
 
-    console.log('extracing blocks from ' + JSON.stringify(this.cardValueInfo.value));
     const clauseChildren = this.cardValueInfo.objectChildren;
 
     let filterBlocks = [];
     for (const key of Object.keys(this.ElasticFilterClauseOp))
     {
-      console.log('extracing ' + key);
       if (clauseChildren[key] !== undefined)
       {
         const value = clauseChildren[key].propertyValue;
@@ -169,15 +166,12 @@ export default class ESBoolCardParser
 
   private extractFilterFromQuery(boolClauseType: string, query: ESValueInfo, deleteCard: boolean = true): Block[]
   {
-    console.log('extracing from query ' + JSON.stringify(query.value));
-    let blocks = []
+    let blocks = [];
     for (const filterName of Object.keys(this.filterQueryOp))
     {
-      console.log('Lookin at clause ' + filterName, query.objectChildren[filterName]);
       if (query.objectChildren[filterName] !== undefined)
       {
         const clauseBlocks = this.filterQueryOp[filterName].clauseToBlocks(boolClauseType, query.objectChildren[filterName]);
-        console.log(filterName + ' generate blocks ', clauseBlocks);
         blocks = blocks.concat(clauseBlocks);
         if (blocks.length > 0)
         {
@@ -190,9 +184,6 @@ export default class ESBoolCardParser
     }
     return blocks;
   }
-
-
-
 
   /**
    * Return the field name of the first field key.
@@ -219,7 +210,6 @@ export default class ESBoolCardParser
   public static TermsClauseToBlocks(boolTypeName, termsClause: ESPropertyInfo): Block[]
   {
     // terms: {field : terms_value, boost : boost, _name : string}
-    console.log('Terms Clause to blocks');
     const blocks = [];
     const termsQuery = termsClause.propertyValue;
     const termsQueryKVs = termsQuery.objectChildren;
@@ -261,7 +251,6 @@ export default class ESBoolCardParser
    */
   public static RangeClauseToBlocks(boolTypeName, rangeClause: ESPropertyInfo): Block[]
   {
-    console.log('Range Clause to blocks');
     const blocks = [];
     const rangeQuery = rangeClause.propertyValue;
     const field = this.GetFilterClauseField(rangeQuery);
@@ -294,7 +283,6 @@ export default class ESBoolCardParser
     }
     return blocks;
   }
-
 
   /**
    *
@@ -359,7 +347,6 @@ export default class ESBoolCardParser
     return blocks;
   }
 
-
   /**
    *
    * @param {ESPropertyInfo} termClause "term":term_query
@@ -370,7 +357,6 @@ export default class ESBoolCardParser
     // term : {field : term_value}
     // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
     // term_settings: { value: 'base', boost: 'boost' }
-    console.log('Exists Clause to blocks');
     const blocks = [];
     const existsQuery = existsClause.propertyValue;
     const field = this.GetFilterClauseField(existsQuery);
@@ -416,10 +402,9 @@ export default class ESBoolCardParser
   {
     const boolCard = boolClause.propertyValue.card;
     const boolValueInfo = boolClause.propertyValue;
-    console.log('boolClauseToBlocks, val ' + JSON.stringify(boolValueInfo.value) + ' cardtype: ' + boolCard.type);
     if (boolTypeName !== 'should' && boolTypeName !== 'filter')
     {
-      return []
+      return [];
     }
 
     if (boolValueInfo.childrenSize() > 0)
@@ -457,7 +442,6 @@ export default class ESBoolCardParser
     // term : {field : term_value}
     // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
     // term_settings: { value: 'base', boost: 'boost' }
-    console.log('Term Clause to blocks');
     const blocks = [];
     const termQuery = termClause.propertyValue;
     const field = this.GetFilterClauseField(termQuery);

@@ -146,7 +146,6 @@ export default class GroupJoinTransform extends Readable
     }
   }
 
-
   public _destroy(error, callback)
   {
     this._final(callback);
@@ -161,7 +160,7 @@ export default class GroupJoinTransform extends Readable
     this.continueReading = false;
     this.sourceIsEmpty = true;
     if (callback !== undefined)
-{
+    {
       callback();
     }
   }

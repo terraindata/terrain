@@ -237,7 +237,6 @@ export const _ScoreLine = (config?: { [key: string]: any }) =>
   let scoreLine = New<ScoreLine>(new ScoreLineC(config), config);
   if (config && config.weight !== undefined)
   {
-    console.log('weight: ' + config.weight + ',' + scoreLine.weight);
     scoreLine = scoreLine.set('weight', config.weight);
   }
   scoreLine = scoreLine

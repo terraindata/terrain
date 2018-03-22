@@ -128,7 +128,6 @@ export default class ESValueInfo
     return Object.keys(this.objectChildren).length;
   }
 
-
   public addObjectChild(name: string, info: ESPropertyInfo): void
   {
     this._objectChildren = this.objectChildren;
@@ -147,7 +146,6 @@ export default class ESValueInfo
   {
     this._arrayChildren = children;
   }
-
 
   public addArrayChild(info: ESValueInfo, index?: number): void
   {

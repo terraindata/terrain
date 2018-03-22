@@ -63,14 +63,14 @@ import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseTyp
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
+import ESParserError from '../../../../shared/database/elastic/parser/ESParserError';
 import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import ESBoolCardParser from '../conversion/ESBoolCardParser';
 import ESCardParser from '../conversion/ESCardParser';
+import { TerrainFilterCardParser } from '../conversion/TerrainFilterCardParser';
 import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
-import ESParserError from '../../../../shared/database/elastic/parser/ESParserError';
-import ESBoolCardParser from '../conversion/ESBoolCardParser';
-import { TerrainFilterCardParser } from '../conversion/TerrainFilterCardParser';
 
 export class FilterUtils
 {
@@ -181,7 +181,6 @@ export class FilterUtils
     return block;
   }
 }
-
 
 export const elasticFilterBlock = _block(
   {

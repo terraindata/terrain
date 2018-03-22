@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESInterpreter, { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
@@ -67,11 +67,11 @@ import ESStructureClause from '../../../../shared/database/elastic/parser/clause
 import { DisplayType } from '../../../blocks/displays/Display';
 import { Card } from '../../../blocks/types/Card';
 
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import Util from 'util/Util';
-import { List } from 'immutable';
-import ElasticBlocks from '../blocks/ElasticBlocks';
 import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ESArrayClause';
+import ElasticBlocks from '../blocks/ElasticBlocks';
 
 import * as TerrainLog from 'loglevel';
 
@@ -321,7 +321,6 @@ export default class ESCardParser extends ESParser
     {
       if (parent.objectChildren[index] !== undefined)
       {
-        console.log('delete ' + index);
         delete parent.objectChildren[index];
         this.isMutated = true;
       }
@@ -329,7 +328,6 @@ export default class ESCardParser extends ESParser
     {
       if (parent.arrayChildren[index] !== undefined)
       {
-        console.log('delete ' + index);
         delete parent.arrayChildren[index];
         this.isMutated = true;
       }
@@ -348,7 +346,6 @@ export default class ESCardParser extends ESParser
     {
       if (parent.objectChildren[index] === undefined)
       {
-        console.log('add ' + index, newChild);
         if (newChild instanceof ESPropertyInfo)
         {
           parent.addObjectChild(index, newChild);
@@ -368,7 +365,6 @@ export default class ESCardParser extends ESParser
     {
       if (parent.arrayChildren[index] === undefined)
       {
-        console.log('add ' + index);
         parent.addArrayChild(newChild as ESValueInfo, index);
         this.isMutated = true;
       }
@@ -382,7 +378,7 @@ export default class ESCardParser extends ESParser
    */
   public createCardIfNotExist(template, valueInfo = this.getValueInfo())
   {
-    console.log('search/create ' + JSON.stringify(template) + ' from ' + JSON.stringify(valueInfo.value));
+    TerrainLog.debug('CardParser: search/create ' + JSON.stringify(template) + ' from ' + JSON.stringify(valueInfo.value));
     switch (valueInfo.jsonType)
     {
       case ESJSONType.object:
@@ -397,10 +393,10 @@ export default class ESCardParser extends ESParser
           {
             return null;
           }
-          const cardKey = q[0]
+          const cardKey = q[0];
           const cardType = GetCardVisitor.getCardType(q[1]);
           // now try to search { "index:cardType": {}}
-          const newVal = valueInfo.objectChildren[cardKey]
+          const newVal = valueInfo.objectChildren[cardKey];
           if (newVal)
           {
             // if both the key and
@@ -413,7 +409,7 @@ export default class ESCardParser extends ESParser
           {
             // create the card
             const cardTemplate = { [k]: template[k] };
-            console.log('Crate Child Card with template ' + JSON.stringify(cardTemplate));
+            TerrainLog.debug('CardParser: Create Child Card with template ' + JSON.stringify(cardTemplate));
             const newCard = BlockUtils.make(ElasticBlocks, cardType, { key: cardKey, template: template[k] });
             const newCardParser = new ESCardParser(newCard);
             if (newCardParser.hasError())
@@ -449,7 +445,7 @@ export default class ESCardParser extends ESParser
           {
             // create the card
             const cardTemplate = t;
-            console.log('Crate Array Card with template ' + JSON.stringify(cardTemplate));
+            TerrainLog.debug('CardParser: Create Array Card with template ' + JSON.stringify(cardTemplate));
             const cardType = GetCardVisitor.getCardType((valueInfo.clause as ESArrayClause).elementID);
             const newCard = BlockUtils.make(ElasticBlocks, cardType, { key: valueInfo.arrayChildren.length, template: cardTemplate });
             const newCardParser = new ESCardParser(newCard);
@@ -457,7 +453,6 @@ export default class ESCardParser extends ESParser
             {
               return null;
             }
-            console.log('Add card ' + JSON.stringify(newCardParser.value));
             this.addChild(valueInfo, valueInfo.arrayChildren.length, newCardParser.getValueInfo());
           } else
           {
@@ -490,7 +485,7 @@ export default class ESCardParser extends ESParser
           return null;
         }
         const k = Object.keys(pattern)[0];
-        let q = k.split(':');
+        const q = k.split(':');
         if (q.length !== 2)
         {
           return null;
@@ -498,7 +493,7 @@ export default class ESCardParser extends ESParser
         // now try to search { "index:cardType": {}}
         const cardKey = q[0];
         const cardTypeName = GetCardVisitor.getCardType(q[1]);
-        const newVal = valueInfo.objectChildren[cardKey]
+        const newVal = valueInfo.objectChildren[cardKey];
         if (newVal)
         {
           if (newVal.propertyValue.card.type === cardTypeName)

@@ -43,20 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
+// tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 
 // Insert query blocks generated from the filter rows to a card
 // Please take care the order when pushing rows to cards
 // [Row1, Row2, ... block's child1, child2...]
-import { ElasticBlocks } from '../blocks/ElasticBlocks';
-import * as BlockUtils from '../../../blocks/BlockUtils';
-import ESCardParser from './ESCardParser';
-import { Block } from '../../../blocks/types/Block';
-import { FilterUtils } from '../blocks/ElasticFilterCard';
-import * as Immutable from "immutable";
-import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
-import * as TerrainLog from 'loglevel';
-import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
+import * as Immutable from 'immutable';
 import { List } from 'immutable';
+import * as TerrainLog from 'loglevel';
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
+import * as BlockUtils from '../../../blocks/BlockUtils';
+import { Block } from '../../../blocks/types/Block';
+import { ElasticBlocks } from '../blocks/ElasticBlocks';
+import { FilterUtils } from '../blocks/ElasticFilterCard';
+import ESCardParser from './ESCardParser';
 
 // utilities of translating a Terrain filter card to an Elastic bool card
 export class TerrainFilterCardParser
@@ -81,10 +82,6 @@ export class TerrainFilterCardParser
     const filterRowMap = { filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: [] };
     filterRows.map((row: Block) =>
     {
-      if (filterRowMap[row.boolQuery] === undefined)
-      {
-        console.log('row is ' + row.boolQuery, row);
-      }
       filterRowMap[row.boolQuery].push(row);
     });
     filterRowMap.filter = filterRowMap.filter.concat(filterRowMap.filter_not);
@@ -130,7 +127,6 @@ export class TerrainFilterCardParser
     }
     return block;
   }
-
 
   private static GetTemplateTypeOfValueString(valueString: string, defaultType: string = null)
   {
@@ -225,7 +221,6 @@ export class TerrainFilterCardParser
     return queryCard;
   }
 
-
   private static MatchClauseBlockToCard(block: Block): Block
   {
     let queryCard;
@@ -263,7 +258,6 @@ export class TerrainFilterCardParser
     }
     return queryCard;
   }
-
 
   private static TermClauseBlockToCard(block: Block): Block
   {
@@ -303,7 +297,6 @@ export class TerrainFilterCardParser
     }
     return queryCard;
   }
-
 
   private static TermsClauseBlockToCard(block: Block): Block
   {
@@ -384,14 +377,13 @@ export class TerrainFilterCardParser
       let boolCard = BlockUtils.make(ElasticBlocks, 'eqlquery',
         {
           template: {
-            'bool:bool_query': {}
+            'bool:bool_query': {},
           },
           key: 'bool',
-          doNotCustom: true
+          doNotCustom: true,
         });
       queryCard = queryCard.set('key', 'must_not');
       const mustNotCard = boolCard.cards.get(0);
-      console.log('must not card is ' + mustNotCard.type);
       boolCard = boolCard.setIn(['cards', 0, 'cards'], List([queryCard]));
       return boolCard;
     }

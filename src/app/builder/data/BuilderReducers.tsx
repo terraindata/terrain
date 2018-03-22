@@ -46,6 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
 
+import { CardsToPath } from 'builder/components/pathfinder/CardsToPath';
+import { ElasticDataSource } from 'builder/components/pathfinder/PathfinderTypes';
+import { PathToCards } from 'builder/components/pathfinder/PathToCards';
 import * as Immutable from 'immutable';
 import { invert } from 'lodash';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -58,6 +61,7 @@ import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
+import ActionTypes from './BuilderActionTypes';
 import
 {
   BuilderActionTypes,
@@ -65,11 +69,7 @@ import
   BuilderDirtyActionTypes,
   BuilderPathActionTypes,
 } from './BuilderActionTypes';
-import ActionTypes from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
-import { CardsToPath } from 'builder/components/pathfinder/CardsToPath';
-import { ElasticDataSource } from 'builder/components/pathfinder/PathfinderTypes';
-import { PathToCards } from 'builder/components/pathfinder/PathToCards';
 const { List, Map } = Immutable;
 
 const BuilderReducers =
@@ -565,7 +565,6 @@ const BuilderReducersWrapper = (
     state = (BuilderReducers[action.type] as any)(state, action);
   }
 
-
   if (BuilderCardActionTypes[action.type] || BuilderPathActionTypes[action.type])
   {
     // path -> card
@@ -596,7 +595,6 @@ const BuilderReducersWrapper = (
     if (BuilderCardActionTypes[action.type])
     {
       // update path
-      console.log('New index is ' + (state.query.path.source.dataSource as ElasticDataSource).index);
       state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query));
     }
   }
