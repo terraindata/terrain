@@ -89,7 +89,6 @@ export const ElasticBlockHelpers = {
     }
     const serverName = builderState.db.name;
     const index = getIndex('', builderState);
-
     const key = serverName + '/' + String(index) + '.' + 'data' + '.c.' + column;
 
     if (schemaState.columns instanceof Map)

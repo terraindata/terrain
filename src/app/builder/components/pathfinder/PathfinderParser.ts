@@ -54,7 +54,7 @@ import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import { isInput } from '../../../../blocks/types/Input';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
-import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
+import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;
 
@@ -73,6 +73,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     sort: Map({}),
     aggs: Map({}),
     from: 0,
+    size: PathFinderDefaultSize,
     _source: true,
     track_scores: true,
   });
@@ -167,7 +168,7 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : 'all',
+    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : PathFinderDefaultSize,
     index: (source.dataSource as any).index,
   };
 }
