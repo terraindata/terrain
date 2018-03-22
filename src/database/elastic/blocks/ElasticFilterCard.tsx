@@ -325,9 +325,9 @@ export const elasticFilter = _card({
                         must: 'Must',
                         must_not: 'Must Not',
                         should: 'Should',
-                        should_not: 'Snot',
+                        should_not: 'Should Not',
                         filter: 'Filter',
-                        filter_not: 'Fnot',
+                        filter_not: 'Filter Not',
                       } as any,
                     ),
                     dropdownTooltips: List([
