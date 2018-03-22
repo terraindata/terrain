@@ -49,6 +49,7 @@ import * as Immutable from 'immutable';
 
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
+import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
@@ -363,4 +364,54 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       document: doc,
     } as TransformationVisitResult;
   }
+
+  public visitCastNode(node: CastTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.CastNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      switch (opts.toTypename)
+      {
+        case 'string': {
+          if (typeof el === 'object')
+          {
+            yadeep.set(doc, field, JSON.stringify(el));
+          }
+          else
+          {
+            yadeep.set(doc, field, el.toString());
+          }
+          break;
+        }
+        case 'number': {
+          yadeep.set(doc, field, Number(el));
+          break;
+        }
+        case 'object': {
+          yadeep.set(doc, field, {});
+          break;
+        }
+        case 'array': {
+          yadeep.set(doc, field, []);
+          break;
+        }
+        default: {
+          return {
+            errors: [
+              {
+                message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
+              } as TransformationVisitError,
+            ],
+          } as TransformationVisitResult;
+        }
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
 }

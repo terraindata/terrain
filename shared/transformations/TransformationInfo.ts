@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
 import InsertTransformationNode from './nodes/InsertTransformationNode';
@@ -184,6 +185,19 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitSubstringNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.CastNode]:
+      {
+        humanName: 'Cast',
+        editable: true,
+        creatable: true,
+        description: `Convert this field to a different type`,
+        type: CastTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitCastNode(transformationNode, docCopy, options),
       },
   };
 
