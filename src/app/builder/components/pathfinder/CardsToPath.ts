@@ -107,14 +107,13 @@ export class CardsToPath
     const softFilterGroup = this.BodyToFilterSection(path.softFilterGroup, parser, bodyValueInfo, 'soft');
     const parentAlias = this.getParentAlias(parser, bodyValueInfo);
     const groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
-    const more = path.more.set('references', List([parentAlias]));
-
+    console.log('PATH IS ', path);
     const newPath = path
       .set('source', newSource)
       .set('score', newScore)
       .set('filterGroup', filterGroup)
       .set('softFilterGroup', softFilterGroup)
-      .set('more', more)
+      .set('reference', parentAlias)
       .set('nested', List(groupJoinPaths));
     return newPath;
   }
