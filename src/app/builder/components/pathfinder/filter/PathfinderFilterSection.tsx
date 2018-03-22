@@ -93,11 +93,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       canDrag: boolean,
       fieldOptionSet: RouteSelectorOptionSet,
       valueOptions: List<RouteSelectorOption>,
+      addingFilterLine: boolean,
     } = {
       dragging: false,
       canDrag: true,
       fieldOptionSet: undefined,
       valueOptions: undefined,
+      addingFilterLine: false,
     };
 
   public componentWillMount()
@@ -197,12 +199,16 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public handleAddFilter()
   {
-    const newLines = this.props.filterGroup.lines.push(_FilterLine());
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
-    // When a line is created, it is automatically open so we should disable dradgging
-    this.setState({
-      canDrag: false,
-    });
+    if (!this.state.addingFilterLine)
+    {
+      const newLines = this.props.filterGroup.lines.push(_FilterLine());
+      this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'lines'), newLines);
+      // When a line is created, it is automatically open so we should disable dradgging
+      this.setState({
+        canDrag: false,
+        addingFilterLine: true,
+      });
+    }
   }
 
   public insertIn(items, keyPath, item): List<any>
@@ -295,6 +301,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   {
     this.setState({
       canDrag: !open,
+      addingFilterLine: open,
     });
   }
 
@@ -554,11 +561,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
               </div>,
             )
           }
-          <PathfinderCreateLine
-            canEdit={pathfinderContext.canEdit}
-            text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
-            onCreate={this.handleAddFilter}
-          />
+          {
+            !this.state.addingFilterLine ?
+              <PathfinderCreateLine
+                canEdit={pathfinderContext.canEdit}
+                text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
+                onCreate={this.handleAddFilter}
+              /> : null
+          }
+
         </FadeInOut>
       </div>
     );
