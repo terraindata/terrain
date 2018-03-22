@@ -117,7 +117,7 @@ export class PathToCards
     this.FilterSectionToBodyBool(path.filterGroup, parser, body, 'hard');
     // soft bool
     this.FilterSectionToBodyBool(path.softFilterGroup, parser, body, 'soft');
-    // groupJoin
+    // groupJoi
     let parentAliasName = 'parent';
     if (path.more.references.size > 0)
     {
@@ -125,7 +125,10 @@ export class PathToCards
     }
     this.updateGroupJoin(path.nested, parser, body, parentAliasName);
     // score card
-    this.fromScore(path, parser, body);
+    //this.fromScore(path, parser, body);
+
+    // finally, let's distribute filters from the sourcebool to the hard/soft bool.
+    this.distributeSourceBoolFilters(path, parser, body);
   }
   private static updateSize(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
@@ -568,6 +571,193 @@ export class PathToCards
     }
   }
 
+  private static transformBoolFilters(bool: ESValueInfo, flip: boolean = false)
+  {
+    if (bool.card.otherFilters)
+    {
+      const newfilters = [];
+      bool.card.otherFilters.map( (filter: Block) =>
+      {
+        switch (filter.boolQuery)
+        {
+          case 'must':
+            if (flip)
+            {
+              newfilters.push(filter.set('boolQuery', 'should_not'));
+            } else
+            {
+              newfilters.push(filter.set('boolQuery', 'filter'));
+            }
+            break;
+          case 'must_not':
+            if (flip)
+            {
+              newfilters.push(filter.set('boolQuery', 'should'));
+            } else
+            {
+              newfilters.push(filter.set('boolQuery', 'filter_not'));
+            }
+            break;
+          case 'filter':
+            if (flip)
+            {
+              newfilters.push(filter.set('boolQuery', 'should_not'));
+            } else
+            {
+              newfilters.push(filter.set('boolQuery', 'filter'));
+            }
+            break;
+          case 'filter_not':
+            if (flip)
+            {
+              newfilters.push(filter.set('boolQuery', 'should'));
+            } else
+            {
+              newfilters.push(filter.set('boolQuery', 'filter_not'));
+            }
+            break;
+          case 'should':
+            if (flip)
+            {
+              newfilters.push(filter.set('boolQuery', 'filter_not'));
+            } else
+            {
+              newfilters.push(filter.set('boolQuery', 'should'));
+            }
+            break;
+          case 'should_not':
+            if (flip)
+            {
+              newfilters.push(filter.set('boolQuery', 'filter'));
+            } else
+            {
+              newfilters.push(filter.set('boolQuery', 'should_not'));
+            }
+            break;
+          default:
+            TerrainLog.error('(P->B, distribute source filters) unknown filter type', filter);
+            break;
+        }
+      });
+      bool.card = bool.card.set('otherFilters', List(newfilters));
+    }
+  }
+
+
+  private static distributeSourceBoolFilters(path: Path, parser: ESCardParser, body: ESValueInfo)
+  {
+    const sourceBool = parser.searchCard({
+      'query:query': {
+        'bool:elasticFilter': true
+      }
+    }, body);
+    console.assert(sourceBool !== null);
+    const hardBool = parser.searchCard(
+    {
+      "query:query": {
+        'bool:elasticFilter': {
+          'filter:query[]':
+            [{"bool:elasticFilter": true}]
+        }
+      }
+    }, body);
+    console.assert(hardBool !== null);
+    const softBool = parser.searchCard(
+      {
+        "query:query": {
+          'bool:elasticFilter': {
+            'should:query[]':
+              [{"bool:elasticFilter": true}]
+          }
+        }
+      }, body);
+    console.assert(softBool !== null);
+    const newHardFilters = [];
+    const newSoftFilters = [];
+    if (sourceBool.card.otherFilters)
+    {
+      sourceBool.card.otherFilters.map((filter: Block) =>
+      {
+        switch (filter.boolQuery)
+        {
+          case 'must':
+            newHardFilters.push(filter.set('boolQuery', 'filter'));
+            break;
+          case 'must_not':
+            newHardFilters.push(filter.set('boolQuery', 'filter_not'));
+            break;
+          default:
+            newSoftFilters.push(filter);
+            break;
+        }
+      });
+      sourceBool.card = sourceBool.card.set('otherFilters', List([]));
+
+      if (newHardFilters.length > 0)
+      {
+        hardBool.card = hardBool.card.set('otherFilters', hardBool.card.otherFilters.concat(List(newHardFilters)));
+      }
+      if (newSoftFilters.length > 0)
+      {
+        softBool.card = softBool.card.set('otherFilters', softBool.card.otherFilters.concat(List(newSoftFilters)));
+      }
+
+      // now let's check the nested query
+      // TODO: how to handle must_not?
+      for (const t of ['filter', 'must' , 'should', 'must_not' ])
+      {
+        const typeString = t + ':query[]';
+        const searchNestedTemplate = {
+          [typeString]: [{'nested:nested_query': true}]
+        }
+        const nestedQuery = parser.searchCard(searchNestedTemplate, sourceBool, false, true);
+        if (nestedQuery !== null)
+        {
+          const oldFilterValueInfo = sourceBool.objectChildren[t].propertyValue;
+          let targetBool = hardBool;
+          let targetClause = 'filter';
+          if (t === 'should')
+          {
+            targetBool = softBool;
+            targetClause = 'should';
+          }
+          if (targetBool.objectChildren[targetClause] === undefined)
+          {
+            const targetClausePattern = targetClause + ':query[]';
+            parser.createCardIfNotExist({
+              [targetClausePattern]: []
+            }, targetBool);
+          }
+          const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
+          TerrainLog.debug('(P->B) Move nested queries from ', oldFilterValueInfo, ' to new place ', targetClauseValueInfo);
+          oldFilterValueInfo.forEachElement((query: ESValueInfo, index) =>
+          {
+            if (query.objectChildren.nested)
+            {
+                const nestedValueInfo = query.objectChildren.nested.propertyValue;
+                const nestedBool = parser.searchCard({'query:query': {'bool:elasticFilter': true}}, nestedValueInfo);
+                if (nestedBool === null)
+                {
+                  TerrainLog.debug('(P->B) There is no bool card in the must_not:nested query, avoid translating it.')
+                } else
+                {
+                  if ( t === 'must_not')
+                  {
+                    this.transformBoolFilters(nestedBool, true);
+                  } else
+                  {
+                    this.transformBoolFilters(nestedBool, false);
+                  }
+                  parser.deleteChild(oldFilterValueInfo, index);
+                  parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, query);
+                }
+            }
+          });
+        }
+      }
+      parser.isMutated = true;
+    }
+  }
 
   private static updateSourceBool(path: Path, parser: ESCardParser, body: ESValueInfo)
   {

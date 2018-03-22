@@ -342,15 +342,16 @@ export class CardsToPath
 
   private static getParentAlias(parser: ESCardParser, bodyValueInfo: ESValueInfo)
   {
-    const parentAliasValueInfo = parser.searchCard({'groupJoin:groupjoin_clause': {'parentAlias:string': true}}, bodyValueInfo);
+    const parentAliasValueInfo = parser.searchCard(
+      {'groupJoin:groupjoin_clause': {'parentAlias:string': true}}, bodyValueInfo);
     if (parentAliasValueInfo === null)
     {
       TerrainLog.debug('(B->P) no parentAlias card, set the parentaAlias to parent.');
       return 'parent';
     } else
     {
-      TerrainLog.debug('(B->P) current parent alias is ' + parentAliasValueInfo.value());
-      return parentAliasValueInfo.value();
+      TerrainLog.debug('(B->P) current parent alias is ' + parentAliasValueInfo.value);
+      return parentAliasValueInfo.value;
     }
   }
 
@@ -424,7 +425,7 @@ export class CardsToPath
 
     // index from the sourceBool
     let cardIndex = '';
-    const sourceBool = parser.searchCard({'query:query': {'bool:elasticFilter': true}});
+    const sourceBool = parser.searchCard({'query:query': {'bool:elasticFilter': true}}, body);
     if (sourceBool)
     {
       cardIndex = sourceBool.card.currentIndex;
