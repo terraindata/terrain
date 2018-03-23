@@ -232,6 +232,38 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     node.fields.forEach((field) =>
     {
       const el: any = yadeep.get(doc, field);
+      let split: string[];
+      if (el.constructor === Array)
+      {
+        for (let i: number = 0; i < Object.keys(el).length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+
+          split = this.splitHelper(yadeep.get(doc, kpi), opts);
+
+          for (let j: number = 0; j < split.length; j++)
+          {
+            let newkpi: KeyPath = opts.newFieldKeyPaths.get(j);
+            if (newkpi.contains('*'))
+            {
+              newkpi = newkpi.set(newkpi.indexOf('*'), i.toString());
+            }
+            else
+            {
+              newkpi = newkpi.push(i.toString());
+            }
+            yadeep.set(doc, newkpi, split[j], { create: true });
+          }
+        }
+      }
       if (typeof el !== 'string')
       {
         return {
@@ -243,18 +275,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         } as TransformationVisitResult;
       }
 
-      let split: string[];
-      if (typeof opts.delimiter === 'number')
-      {
-        split = [
-          (el as string).slice(0, opts.delimiter as number),
-          (el as string).slice(opts.delimiter as number),
-        ];
-      }
-      else
-      {
-        split = (el as string).split(opts.delimiter as string | RegExp);
-      }
+      split = this.splitHelper(el, opts);
 
       if (split.length !== opts.newFieldKeyPaths.size)
       {
@@ -421,6 +442,23 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return {
       document: doc,
     } as TransformationVisitResult;
+  }
+
+  private splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+  {
+    let split: string[];
+    if (typeof opts.delimiter === 'number')
+    {
+      split = [
+        (el as string).slice(0, opts.delimiter as number),
+        (el as string).slice(opts.delimiter as number),
+      ];
+    }
+    else
+    {
+      split = (el as string).split(opts.delimiter as string | RegExp);
+    }
+    return split;
   }
 
 }
