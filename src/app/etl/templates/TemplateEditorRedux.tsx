@@ -152,6 +152,16 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       setTemplate: (state, action) =>
       {
+        switch (action.payload.history)
+        {
+          case 'push':
+            
+            break;
+          case 'clear':
+            break;
+          default:
+            break;
+        }
         return state.set('template', action.payload.template);
       },
       rebuildFieldMap: (state, action) =>

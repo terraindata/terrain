@@ -289,10 +289,10 @@ function injectInstanceMethods(constructor, instance)
   }
 }
 
-type ConfigType<T> = {
+export type ConfigType<T> = {
   [k in keyof T]?: T[k];
 };
-type ConfigTransformer<T> = (config?: ConfigType<T>, deep?: boolean) => ConfigType<T>;
+export type ConfigTransformer<T> = (config?: ConfigType<T>, deep?: boolean) => ConfigType<T>;
 /**
  * If injectMethods is true, then the resultant object creator will add the Type's instance methods to the object's prototype.
  * You should use deepConfigOverride if the immutable record can be rebuilt from a pure js object (e.g. an object returned by recordForSave)

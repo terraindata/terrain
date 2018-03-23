@@ -52,6 +52,7 @@ const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
+import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
@@ -65,6 +66,7 @@ class TemplateEditorStateC
 {
   public template: ETLTemplate = _ETLTemplate();
   public fieldMap: FieldMap = Map();
+  public history: HistoryStack<ETLTemplate> = _HistoryStack<ETLTemplate>();
   public isDirty: boolean = true;
   public loadingDocuments: number = 0;
   public uiState: EditorDisplayState = _EditorDisplayState();

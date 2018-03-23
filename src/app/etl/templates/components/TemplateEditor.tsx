@@ -215,6 +215,22 @@ class TemplateEditor extends TerrainComponent<Props>
             className='editor-top-bar-item'
             style={topBarItemStyle}
             onClick={this.openTemplateUI}
+            key='undo'
+          >
+            Undo
+          </div>
+          <div
+            className='editor-top-bar-item'
+            style={topBarItemStyle}
+            onClick={this.openTemplateUI}
+            key='redo'
+          >
+            Redo
+          </div>
+          <div
+            className='editor-top-bar-item'
+            style={topBarItemStyle}
+            onClick={this.openTemplateUI}
             key='load'
           >
             Load
