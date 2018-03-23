@@ -260,9 +260,22 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
   public handleTransformationChange(structuralChanges: boolean)
   {
-    this._try((proxy) =>
+    const { act, fieldId } = this.props;
+    if (structuralChanges)
     {
-      proxy.syncWithEngine(structuralChanges);
+      act({
+        actionType: 'rebuildFieldMap',
+      });
+    }
+    else
+    {
+      act({
+        actionType: 'rebuildField',
+        fieldId,
+      });
+    }
+    this.props.act({
+      actionType: 'updateEngineVersion',
     });
   }
 

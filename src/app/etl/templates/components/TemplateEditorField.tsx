@@ -60,7 +60,6 @@ import { instanceFnDecorator } from 'src/app/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
-import { MutateEngineInfo } from 'etl/helpers/GraphHelpers';
 import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -183,30 +182,25 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     GraphHelpers.mutateEngine((engineProxy: EngineProxy) =>
     {
       tryFn(engineProxy.makeFieldProxy(this.props.fieldId));
-    })
-      .then((payload: MutateEngineInfo) =>
+    }).then((isStructural: boolean) =>
+    {
+      if (isStructural)
       {
-        if (payload.allDirty)
-        {
-          this.props.act({
-            actionType: 'rebuildFieldMap',
-          });
-        }
-        else
-        {
-          payload.dirty.forEach((id) =>
-          {
-            this.props.act({
-              actionType: 'rebuildField',
-              fieldId: id,
-            });
-          });
-        }
         this.props.act({
-          actionType: 'updateEngineVersion',
+          actionType: 'rebuildFieldMap',
         });
-      })
-      .catch(this._logError);
+      }
+      else
+      {
+        this.props.act({
+          actionType: 'rebuildField',
+          fieldId: this.props.fieldId,
+        });
+      }
+      this.props.act({
+        actionType: 'updateEngineVersion',
+      });
+    }).catch(this._logError);
   }
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps

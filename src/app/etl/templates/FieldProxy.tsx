@@ -98,6 +98,18 @@ export class EngineProxy
   {
     return new FieldProxy(this, fieldId);
   }
+
+  public addTransformation(type: TransformationNodeType, fields: List<EnginePath>, options)
+  {
+    this.engine.appendTransformation(type, fields, options);
+    this.requestRebuild();
+  }
+
+  public editTransformation(id: number, fields: List<EnginePath>, options)
+  {
+    this.engine.editTransformation(id, fields, options);
+    this.requestRebuild(id);
+  }
 }
 
 export class FieldProxy
@@ -187,7 +199,7 @@ export class FieldProxy
     this.syncWithEngine();
   }
 
-  public syncWithEngine(structuralChanges = false) // This function will mutate the field from which it was called
+  private syncWithEngine(structuralChanges = false)
   {
     if (structuralChanges)
     {

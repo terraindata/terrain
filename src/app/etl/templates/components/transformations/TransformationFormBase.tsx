@@ -53,6 +53,7 @@ import * as React from 'react';
 import { instanceFnDecorator } from 'src/app/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
@@ -155,7 +156,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   // override this to specify if editing / creating the transformation will cause structural changes
   protected isStructuralChange(): boolean
   {
-    return false;
+    return undefined;
   }
 
   // override this to specify transformation args if they need to be computed from state
@@ -195,19 +196,44 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected handleMainAction()
   {
     const { isCreate, engine, fieldId, onEditOrCreate, onClose } = this.props;
+    const args = this.computeArgs();
+    const overrideStructuralChange = this.isStructuralChange();
     if (isCreate)
     {
-      const args = this.computeArgs();
-      engine.appendTransformation(this.type, args.fields, args.options);
-      onEditOrCreate(this.isStructuralChange());
-      onClose();
+      GraphHelpers.mutateEngine((proxy) =>
+      {
+        proxy.addTransformation(this.type, args.fields, args.options);
+      }).then((structuralChange) =>
+      {
+        if (overrideStructuralChange !== undefined)
+        {
+          onEditOrCreate(overrideStructuralChange);
+        }
+        else
+        {
+          onEditOrCreate(structuralChange);
+        }
+        onClose();
+      }).catch(onClose);
     }
     else
     {
       const { transformation } = this.props;
-      const args = this.computeArgs();
-      engine.editTransformation(transformation.id, args.fields, args.options);
-      onEditOrCreate(this.isStructuralChange());
+      GraphHelpers.mutateEngine((proxy) =>
+      {
+        proxy.editTransformation(transformation.id, args.fields, args.options);
+      }).then((structuralChange) =>
+      {
+        if (overrideStructuralChange !== undefined)
+        {
+          onEditOrCreate(overrideStructuralChange);
+        }
+        else
+        {
+          onEditOrCreate(structuralChange);
+        }
+        onClose();
+      }).catch(onClose);
     }
   }
 }

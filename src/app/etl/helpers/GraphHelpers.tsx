@@ -77,33 +77,22 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import { createEngineFromDocuments, mergeJoinEngines } from 'shared/transformations/util/EngineUtil';
 import DocumentsHelpers from './DocumentsHelpers';
 
-export interface MutateEngineInfo
-{
-  allDirty: boolean;
-  dirty: number[];
-}
-
 class GraphHelpers extends ETLHelpers
 {
   // does the same thing as _try except its specialized for the currently edited transformation engine
   // returns a promise whose type specifies which fields are dirty and need to be rebuilt
-  public mutateEngine(tryFn: (proxy: EngineProxy) => void): Promise<MutateEngineInfo>
+  public mutateEngine(tryFn: (proxy: EngineProxy) => void): Promise<boolean>
   {
-    return new Promise<MutateEngineInfo>((resolve, reject) =>
+    return new Promise<boolean>((resolve, reject) =>
     {
       const currentEdge = this._templateEditor.getCurrentEdgeId();
 
-      const dirty = [];
-      let allDirty = false;
+      let structuralChanges = false;
       const handleRequestRebuild = (id?: number) =>
       {
         if (id === undefined)
         {
-          allDirty = true;
-        }
-        else
-        {
-          dirty.push(id);
+          structuralChanges = true;
         }
       };
 
@@ -111,12 +100,10 @@ class GraphHelpers extends ETLHelpers
       {
         const engine = templateProxy.value().getTransformationEngine(currentEdge);
         tryFn(new EngineProxy(engine, handleRequestRebuild));
-      })
-        .then(() =>
-        {
-          resolve({ dirty, allDirty });
-        })
-        .catch(reject);
+      }).then(() =>
+      {
+        resolve(structuralChanges);
+      }).catch(reject);
     });
   }
 
