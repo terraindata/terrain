@@ -260,7 +260,10 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
   public handleTransformationChange(structuralChanges: boolean)
   {
-    this._proxy().syncWithEngine(structuralChanges);
+    this._try((proxy) =>
+    {
+      proxy.syncWithEngine(structuralChanges);
+    });
   }
 
   public handleEditTransformationFactory(index: number)

@@ -59,6 +59,8 @@ const { List, Map } = Immutable;
 import { instanceFnDecorator } from 'src/app/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
+import { MutateEngineInfo } from 'etl/helpers/GraphHelpers';
 import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -104,7 +106,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   constructor(props)
   {
     super(props);
-    this.handleRequestRebuild = this.handleRequestRebuild.bind(this);
   }
 
   public componentWillUpdate(nextProps, nextState)
@@ -176,19 +177,37 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
   }
 
-  protected _proxy(): FieldProxy
+  // todo should this return a promise to be consistent with ETLHelpers?
+  protected _try(tryFn: (proxy: FieldProxy) => void)
   {
-    const engine = this._currentEngine();
-    const proxy = new EngineProxy(engine, this.handleRequestRebuild);
-    return proxy.makeFieldProxy(this.props.fieldId);
+    GraphHelpers.mutateEngine((engineProxy: EngineProxy) =>
+    {
+      tryFn(engineProxy.makeFieldProxy(this.props.fieldId));
+    })
+      .then((payload: MutateEngineInfo) =>
+      {
+        if (payload.allDirty)
+        {
+          this.props.act({
+            actionType: 'rebuildFieldMap',
+          });
+        }
+        else
+        {
+          payload.dirty.forEach((id) =>
+          {
+            this.props.act({
+              actionType: 'rebuildField',
+              fieldId: id,
+            });
+          });
+        }
+        this.props.act({
+          actionType: 'updateEngineVersion',
+        });
+      })
+      .catch(this._logError);
   }
-
-  // protected _try(tryFn: (proxy: FieldNodeProxy) => void): Promise<void>
-  // {
-  //   // return new Promise<void>((resolve, reject) => {
-
-  //   // });
-  // }
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps
   {
@@ -269,24 +288,10 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return (this.props as Props & Injected).templateEditor.uiState;
   }
 
-  private handleRequestRebuild(id?: number)
+  protected _logError(ev)
   {
-    if (id === undefined)
-    {
-      this.props.act({
-        actionType: 'rebuildFieldMap',
-      });
-    }
-    else
-    {
-      this.props.act({
-        actionType: 'rebuildField',
-        fieldId: id,
-      });
-    }
-    this.props.act({
-      actionType: 'updateEngineVersion',
-    });
+    // tslint:disable-next-line
+    console.error(ev);
   }
 }
 

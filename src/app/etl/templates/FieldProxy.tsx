@@ -102,9 +102,6 @@ export class EngineProxy
 
 export class FieldProxy
 {
-  private pauseSync = false;
-  private shouldSync = false;
-
   private get engine(): TransformationEngine
   {
     return this.engineProxy.getEngine();
@@ -181,7 +178,7 @@ export class FieldProxy
     {
       this.engine.setFieldType(this.fieldId, newType);
     }
-    this.syncWithEngine();
+    this.syncWithEngine(true);
   }
 
   public setFieldProps(newFormState: object, language: Languages)
@@ -192,33 +189,13 @@ export class FieldProxy
 
   public syncWithEngine(structuralChanges = false) // This function will mutate the field from which it was called
   {
-    if (this.pauseSync === false)
+    if (structuralChanges)
     {
-      if (structuralChanges)
-      {
-        this.engineProxy.rebuildAll();
-      }
-      else
-      {
-        this.engineProxy.rebuildField(this.fieldId);
-      }
-      this.shouldSync = false;
+      this.engineProxy.rebuildAll();
     }
     else
     {
-      this.shouldSync = true;
-    }
-  }
-
-  public withEngineMutations(fn: (proxy: FieldProxy) => void) // sort of like immutable withMutations
-  {
-    this.pauseSync = true;
-    this.shouldSync = false;
-    fn(this);
-    this.pauseSync = false;
-    if (this.shouldSync)
-    {
-      this.syncWithEngine();
+      this.engineProxy.rebuildField(this.fieldId);
     }
   }
 }

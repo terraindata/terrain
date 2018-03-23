@@ -66,6 +66,7 @@ import
   _ETLEdge, _ETLNode, _ETLProcess,
   _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
 } from 'etl/templates/ETLProcess';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
@@ -74,11 +75,51 @@ import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { createEngineFromDocuments, mergeJoinEngines } from 'shared/transformations/util/EngineUtil';
-
 import DocumentsHelpers from './DocumentsHelpers';
+
+export interface MutateEngineInfo
+{
+  allDirty: boolean;
+  dirty: number[];
+}
 
 class GraphHelpers extends ETLHelpers
 {
+  // does the same thing as _try except its specialized for the currently edited transformation engine
+  // returns a promise whose type specifies which fields are dirty and need to be rebuilt
+  public mutateEngine(tryFn: (proxy: EngineProxy) => void): Promise<MutateEngineInfo>
+  {
+    return new Promise<MutateEngineInfo>((resolve, reject) =>
+    {
+      const currentEdge = this._templateEditor.getCurrentEdgeId();
+
+      const dirty = [];
+      let allDirty = false;
+      const handleRequestRebuild = (id?: number) =>
+      {
+        if (id === undefined)
+        {
+          allDirty = true;
+        }
+        else
+        {
+          dirty.push(id);
+        }
+      };
+
+      this._try((templateProxy) =>
+      {
+        const engine = templateProxy.value().getTransformationEngine(currentEdge);
+        tryFn(new EngineProxy(engine, handleRequestRebuild));
+      })
+        .then(() =>
+        {
+          resolve({ dirty, allDirty });
+        })
+        .catch(reject);
+    });
+  }
+
   public createMergeJoin(
     leftId: number,
     rightId: number,

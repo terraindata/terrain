@@ -172,7 +172,8 @@ class FieldMainSettings extends TemplateEditorField<Props>
   {
     const field = this._field();
     const { formState } = this.state;
-    this._proxy().withEngineMutations((proxy) =>
+
+    this._try((proxy) =>
     {
       if (field.isIncluded !== formState.isIncluded)
       {
