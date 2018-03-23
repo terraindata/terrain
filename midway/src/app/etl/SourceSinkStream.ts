@@ -54,6 +54,7 @@ import
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
 
+import util from 'shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
@@ -61,10 +62,15 @@ import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
 import { QueryHandler } from '../query/QueryHandler';
 
+import { databases } from '../database/DatabaseRouter';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
+import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
+import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
+import { ElasticMapping } from '../../../../shared/etl/mapping/ElasticMapping';
 
-export async function getSourceStream(sources: DefaultSourceConfig): Promise<stream.Readable>
+export async function getSourceStream(sources: DefaultSourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
@@ -83,18 +89,18 @@ export async function getSourceStream(sources: DefaultSourceConfig): Promise<str
         const query: string = await Util.getQueryFromAlgorithm(algorithmId);
         const dbId: number = await Util.getDBFromAlgorithm(algorithmId);
 
-        const database: DatabaseController | undefined = DatabaseRegistry.get(dbId);
-        if (database === undefined)
+        const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
+        if (controller === undefined)
         {
           throw new Error(`Database ${String(dbId)} not found.`);
         }
 
-        if (database.getType() !== 'ElasticController')
+        if (controller.getType() !== 'ElasticController')
         {
-          throw new Error('Algorithm source only supports Elastic databases.');
+          throw new Error('Algorithm source only supports Elastic databases');
         }
 
-        const qh: QueryHandler = database.getQueryHandler();
+        const qh: QueryHandler = controller.getQueryHandler();
         const payload = {
           database: dbId,
           type: 'search',
@@ -106,10 +112,29 @@ export async function getSourceStream(sources: DefaultSourceConfig): Promise<str
         sourceStream = await qh.handleQuery(payload) as stream.Readable;
         if (sourceStream === undefined)
         {
-          throw new Error('Error creating new source stream');
+          throw new Error('Error creating new source stream from algorithm');
         }
         break;
       case 'Upload':
+        if (files === undefined || files.length === 0)
+        {
+          throw new Error('No file(s) found in multipart formdata');
+        }
+
+        // TODO: multi-source import
+        const importStream = files[0];
+        switch (src.fileConfig.fileType)
+        {
+          case 'json':
+            sourceStream = importStream.pipe(JSONTransform.createImportStream());
+            break;
+          case 'csv':
+            sourceStream = importStream.pipe(CSVTransform.createImportStream());
+            break;
+          default:
+            throw new Error('Download file type must be either CSV or JSON.');
+        }
+        break;
       case 'Sftp':
       case 'Http':
       default:
@@ -119,7 +144,7 @@ export async function getSourceStream(sources: DefaultSourceConfig): Promise<str
   });
 }
 
-export async function getSinkStream(sinks: DefaultSinkConfig): Promise<stream.Transform>
+export async function getSinkStream(sinks: DefaultSinkConfig, engine: TransformationEngine): Promise<stream.Transform>
 {
   return new Promise<stream.Transform>(async (resolve, reject) =>
   {
@@ -147,6 +172,43 @@ export async function getSinkStream(sinks: DefaultSinkConfig): Promise<stream.Tr
         }
         break;
       case 'Database':
+        if (sink.options.language !== 'elastic')
+        {
+          throw new Error('Can only import into Elastic at the moment.');
+        }
+
+        const { serverId, database, table } = sink.options;
+        const db = await databases.select([], { name: serverId });
+        if (db.length < 1)
+        {
+          throw new Error(`Database ${String(serverId)} not found.`);
+        }
+
+        const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id);
+        if (controller === undefined)
+        {
+          throw new Error(`Database id ${String(db[0].id)} is invalid.`);
+        }
+
+        const client: ElasticClient = controller.getClient() as ElasticClient;
+        const elasticMapping = new ElasticMapping(engine);
+        const primaryKey = elasticMapping.getPrimaryKey();
+
+        // create mapping
+        await new Promise((res, rej) =>
+        {
+          client.indices.putMapping(
+            {
+              index: database,
+              type: table,
+              body: elasticMapping.getMapping(),
+            },
+            util.promise.makeCallback(res, rej));
+        });
+
+        sinkStream = new ElasticWriter(client, database, table, primaryKey);
+
+        break;
       case 'Sftp':
       case 'Http':
       default:

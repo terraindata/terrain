@@ -198,7 +198,7 @@ export default class Templates
     });
   }
 
-  public async execute(id: number): Promise<Readable>
+  public async execute(id: number, files?: Readable[]): Promise<Readable>
   {
     return new Promise<Readable>(async (resolve, reject) =>
     {
@@ -209,6 +209,8 @@ export default class Templates
       }
       const template = ts[0];
       winston.info('Executing template', template.templateName);
+
+      console.log(template);
 
       const numSources = Object.keys(template.sources).length;
       const numSinks = Object.keys(template.sinks).length;
@@ -225,8 +227,8 @@ export default class Templates
       const exportTransform = new ExportTransform();
       const transformationEngine: TransformationEngine = TransformationEngine.load(template.process.edges['0'].transformations);
       const transformationEngineTransform = new TransformationEngineTransform([], transformationEngine);
-      const sourceStream = await getSourceStream(template.sources);
-      const sinkStream = await getSinkStream(template.sinks);
+      const sourceStream = await getSourceStream(template.sources, files);
+      const sinkStream = await getSinkStream(template.sinks, transformationEngine);
 
       resolve(
         sourceStream

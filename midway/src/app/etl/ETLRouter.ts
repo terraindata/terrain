@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
@@ -51,6 +52,7 @@ import * as stream from 'stream';
 
 import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
+import { users } from '../users/UserRouter';
 import TemplateRouter, { templates } from './TemplateRouter';
 
 const Router = new KoaRouter();
@@ -58,13 +60,21 @@ const perm: Permissions = new Permissions();
 
 Router.use('/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
 
-Router.post('/execute', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/execute', async (ctx, next) =>
 {
-  const req: object = ctx.request.body.body;
-  Util.verifyParameters(req, ['templateID']);
+  const { fields, files } = await asyncBusboy(ctx.req);
 
-  const templateID = ctx.params.templateID;
-  ctx.body = await templates.execute(templateID);
+  Util.verifyParameters(fields, ['id', 'accessToken', 'templateID']);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
+  {
+    ctx.body = 'Unauthorized';
+    ctx.status = 400;
+    return;
+  }
+
+  const templateID = fields['templateID'];
+  ctx.body = await templates.execute(templateID, files);
 });
 
 export default Router;
