@@ -626,3 +626,34 @@ test('super deep transformation preserves arrays', () =>
 
   expect(e.transform(doc)).toEqual(doc);
 });
+
+test('split a nested field', () =>
+{
+  const doc = {
+    foo: [
+      { bar: 'Apples and Oranges' },
+      { bar: 'Milk and Cookies' },
+    ],
+  };
+
+  const e = new TransformationEngine(doc);
+
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List([List(['foo', '*', 'bar'])]),
+    {
+      newFieldKeyPaths: List([List(['foo', '*', 'a']), List(['foo', '*', 'b'])]),
+      preserveOldFields: true,
+      delimiter: ' and ',
+    },
+  );
+
+  expect(e.transform(doc)).toEqual(
+    {
+      foo: [
+        { bar: 'Apples and Oranges', a: 'Apples', b: 'Oranges' },
+        { bar: 'Milk and Cookies', a: 'Milk', b: 'Cookies' },
+      ],
+    },
+  );
+});
