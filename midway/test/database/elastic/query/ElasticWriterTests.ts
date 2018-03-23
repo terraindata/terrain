@@ -90,12 +90,7 @@ test('simple elastic writer', (done) =>
     const writer = new ElasticWriter(elasticClient, 'movies', 'data', 'movieid');
     readable.pipe(writer);
     writer.on('finish', done);
-    writer.on('error', (err: Error) =>
-    {
-      winston.error(String(err));
-      fail(err);
-    });
-
+    writer.on('error', fail);
     movies.forEach((movie) => readable.push(movie));
     readable.push(null);
   }

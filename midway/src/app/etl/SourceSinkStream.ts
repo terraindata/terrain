@@ -206,8 +206,8 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
             util.promise.makeCallback(res, rej));
         });
 
-        sinkStream = new ElasticWriter(client, database, table, primaryKey);
-
+        const writer = new ElasticWriter(client, database, table, primaryKey);
+        sinkStream = writer.pipe(new stream.PassThrough());
         break;
       case 'Sftp':
       case 'Http':

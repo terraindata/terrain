@@ -52,14 +52,13 @@ import * as winston from 'winston';
 import { ElasticMapping } from '../../../../../shared/etl/mapping/ElasticMapping';
 import ElasticClient from '../client/ElasticClient';
 
-export class ElasticWriter extends Stream.Duplex
+export class ElasticWriter extends Stream.Writable
 {
   private client: ElasticClient;
   private primaryKey: string | undefined;
   private index: string;
   private type: string;
 
-  private doneWriting: boolean = false;
   private docsUpserted: number = 0;
   private numErrors: number = 0;
 
@@ -68,9 +67,8 @@ export class ElasticWriter extends Stream.Duplex
   constructor(client: ElasticClient, index: string, type: string, primaryKey?: string)
   {
     super({
-      readableObjectMode: true,
-      writableObjectMode: true,
-      highWaterMark: 4,
+      objectMode: true,
+      highWaterMark: 1024 * 128,
     });
 
     this.client = client;
@@ -81,12 +79,6 @@ export class ElasticWriter extends Stream.Duplex
 
   public _write(chunk: any, encoding: string, callback: (err?: Error) => void): void
   {
-    if (chunk === null)
-    {
-      this.doneWriting = true;
-      return;
-    }
-
     if (Array.isArray(chunk))
     {
       const chunks = chunk.map((c) =>
@@ -107,28 +99,14 @@ export class ElasticWriter extends Stream.Duplex
 
   public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
   {
-    if (chunks === null)
-    {
-      this.doneWriting = true;
-      return;
-    }
-
-    console.log(JSON.stringify(chunks, null, 2));
-
     const numChunks = chunks.length;
     if (numChunks < this.BULK_THRESHOLD)
     {
       let numPending = numChunks;
       const done = new EventEmitter();
-      done.on('done', (err?) => callback(err));
+      done.on('done', callback);
       for (const chunk of chunks)
       {
-        console.log(chunk['next']);
-        if (chunk['next'] === null)
-        {
-          this.doneWriting = true;
-        }
-
         this._write(chunk.chunk, chunk.encoding, (err?) =>
         {
           if (--numPending === 0)
@@ -144,23 +122,6 @@ export class ElasticWriter extends Stream.Duplex
     }
   }
 
-  public _read(size: number = 1024)
-  {
-    console.log('read!!!', size, this.doneWriting);
-    if (!this.doneWriting)
-    {
-      this.push(JSON.stringify({
-        successful: this.docsUpserted,
-        failed: this.numErrors,
-      }));
-    }
-    else
-    {
-      this.push(null);
-    }
-  }
-
-
   public _destroy(error, callback)
   {
     this._final(callback);
@@ -172,6 +133,14 @@ export class ElasticWriter extends Stream.Duplex
     {
       callback();
     }
+  }
+
+  public progress(): object
+  {
+    return {
+      successful: this.docsUpserted,
+      failed: this.numErrors,
+    };
   }
 
   private upsert(body: object, callback: (err?: Error) => void): void
@@ -191,11 +160,11 @@ export class ElasticWriter extends Stream.Duplex
       {
         if (err !== null && err !== undefined)
         {
-          this.docsUpserted++;
+          this.numErrors++;
         }
         else
         {
-          this.numErrors++;
+          this.docsUpserted++;
         }
         callback(err);
       }).bind(this));
@@ -227,12 +196,12 @@ export class ElasticWriter extends Stream.Duplex
     {
       if (err !== null && err !== undefined)
       {
-        this.docsUpserted += chunks.length;
+        // TODO: better error counting
+        this.numErrors += chunks.length;
       }
       else
       {
-        // TODO: better error counting
-        this.numErrors += chunks.length;
+        this.docsUpserted += chunks.length;
       }
       callback(err);
     }).bind(this));
