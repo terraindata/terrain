@@ -47,14 +47,14 @@ THE SOFTWARE.
 import * as equal from 'deep-equal';
 import * as _ from 'lodash';
 
+import { getParsedQuery } from '../../../../shared/database/elastic/ElasticUtil';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
-import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { QueryHandler } from '../query/QueryHandler';
+import * as Common from './Common';
 import { Export } from './Export';
-import * as Transform from './Transform';
 
 export class ExportTypes
 {
@@ -152,7 +152,7 @@ export class ExportTypes
     {
       for (let doc of docs)
       {
-        doc = Transform.mergeDocument(doc);
+        doc = Common.mergeDocument(doc);
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {

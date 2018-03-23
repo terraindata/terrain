@@ -45,19 +45,21 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as fs from 'fs';
-import * as naturalSort from 'javascript-natural-sort';
 import * as _ from 'lodash';
 import * as request from 'request';
-import * as stream from 'stream';
+import { Readable } from 'stream';
 import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
+import TransformationEngineTransform from '../io/streams/TransformationEngineTransform';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 
+import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
+import { getSinkStream, getSourceStream } from './SourceSinkStream';
 import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
 export default class Templates
@@ -192,6 +194,43 @@ export default class Templates
       {
         return reject(`Failed to destringify saved templates: ${String(e)}`);
       }
+    });
+  }
+
+  public async execute(id: number, files?: Readable[]): Promise<Readable>
+  {
+    return new Promise<Readable>(async (resolve, reject) =>
+    {
+      const ts: TemplateConfig[] = await this.get(id);
+      if (ts.length < 1)
+      {
+        return reject(`Template ID ${String(id)} not found.`);
+      }
+      const template = ts[0];
+      winston.info('Executing template', template.templateName);
+
+      const numSources = Object.keys(template.sources).length;
+      const numSinks = Object.keys(template.sinks).length;
+      const numEdges = Object.keys(template.process.edges).length;
+
+      // TODO: multi-source import and exports
+      if (numSources > 1 || template.sources._default === undefined
+        || numSinks > 1 || template.sinks._default === undefined
+        || numEdges > 1)
+      {
+        return reject('Only single source export is supported.');
+      }
+
+      const transformationEngine: TransformationEngine = TransformationEngine.load(template.process.edges['0'].transformations);
+      const transformationEngineTransform = new TransformationEngineTransform([], transformationEngine);
+      const sourceStream = await getSourceStream(template.sources, files);
+      const transformedStream = sourceStream.pipe(transformationEngineTransform);
+
+      winston.info('Beginning ETL pipline...');
+
+      const sinkStream = await getSinkStream(template.sinks, transformationEngine);
+      const ETLStream = transformedStream.pipe(sinkStream);
+      resolve(ETLStream);
     });
   }
 }

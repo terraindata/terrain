@@ -50,7 +50,7 @@ import * as Tasty from '../tasty/Tasty';
 
 /**
  * An client which acts as a selective isomorphic wrapper around
- * the sqlite3 API
+ * midway databases
  */
 abstract class DatabaseController
 {

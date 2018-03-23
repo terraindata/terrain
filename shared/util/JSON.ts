@@ -44,112 +44,78 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request';
-
-import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
-import ESParser from '../../../shared/database/elastic/parser/ESParser';
-import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
-
-export function doRequest(url)
+export function parseObjectListJSON(file: string, numLines: number): object[]
 {
-  return new Promise((resolve, reject) =>
+  let lineCount = 0;
+  let openBracketCount = 0;
+  let closeBracketCount = 0;
+  let c = 0;
+
+  while (lineCount < numLines)
   {
-    request(url, (error, res, body) =>
+    const curChar = file[c];
+    if (c >= file.length - 1)
     {
-      if ((error === null || error === undefined) && res.statusCode === 200)
+      if (curChar === '\n')
       {
-        resolve(body);
+        c--;
       }
-      else
-      {
-        reject(error);
-      }
-    });
-  });
+      break;
+    }
+
+    if (curChar === '{')
+    {
+      openBracketCount++;
+    }
+    else if (curChar === '}')
+    {
+      closeBracketCount++;
+    }
+    c++;
+
+    if (openBracketCount === closeBracketCount && openBracketCount !== 0)
+    {
+      lineCount++;
+      openBracketCount = 0;
+      closeBracketCount = 0;
+    }
+  }
+  return JSON.parse(file.substring(0, c) + ']');
 }
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+export function parseNewlineJSON(file: string, numLines: number): object[] | string
 {
-  return (error: Error, response: T) =>
+  const items: object[] = [];
+  let ind: number = 0;
+  while (ind < file.length)
   {
-    if (error !== null && error !== undefined)
+    let rInd: number = file.indexOf('\r', ind);
+    rInd = rInd === -1 ? file.length : rInd;
+    let nInd: number = file.indexOf('\n', ind);
+    nInd = nInd === -1 ? file.length : nInd;
+    const end: number = Math.min(rInd, nInd);
+
+    const line: string = file.substring(ind, end);
+    if (line !== '')
     {
-      reject(error);
+      try
+      {
+        items.push(JSON.parse(file.substring(ind, end)));
+        if (items.length === numLines)
+        {
+          return items;
+        }
+      }
+      catch (e)
+      {
+        return 'JSON format incorrect. Could not parse object: ' + line;
+      }
+      ind = end;
     }
     else
     {
-      resolve(response);
-    }
-  };
-}
-
-export function makePromiseCallbackVoid(resolve: () => void, reject: (Error) => void)
-{
-  return (error: Error) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve();
-    }
-  };
-}
-
-export function updateObject<T>(obj: T, newObj: T): T
-{
-  for (const key in newObj)
-  {
-    if (newObj.hasOwnProperty(key))
-    {
-      obj[key] = newObj[key];
+      ind++;
     }
   }
-  return obj;
-}
-
-export function verifyParameters(parameters: any, required: string[]): void
-{
-  if (parameters === undefined)
-  {
-    throw new Error('No parameters found.');
-  }
-
-  for (const key of required)
-  {
-    if (parameters.hasOwnProperty(key) === false)
-    {
-      throw new Error('Parameter "' + key + '" not found in request object.');
-    }
-  }
-}
-
-export function getParsedQuery(body: string): ESParser
-{
-  const parser = new ESJSONParser(body, true);
-  if (parser.hasError())
-  {
-    const es = parser.getErrors();
-    const errors: MidwayErrorItem[] = [];
-
-    es.forEach((e) =>
-    {
-      const row = (e.token !== null) ? e.token.row : 0;
-      const col = (e.token !== null) ? e.token.col : 0;
-      const pos = (e.token !== null) ? e.token.charNumber : 0;
-      const title: string = String(row) + ':' + String(col) + ':' + String(pos) + ' ' + String(e.message);
-      errors.push({ status: -1, title, detail: '', source: {} });
-    });
-
-    if (errors.length === 0)
-    {
-      errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
-    }
-
-    throw errors;
-  }
-
-  return parser;
+  return items;
 }

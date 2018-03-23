@@ -52,7 +52,7 @@ import MySQLController from '../../../../src/database/mysql/MySQLController';
 import * as Tasty from '../../../../src/tasty/Tasty';
 import MySQLQueries from '../../../tasty/MySQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../../Utils';
+import * as Utils from '../../TestUtil';
 
 function getExpectedFile(): string
 {

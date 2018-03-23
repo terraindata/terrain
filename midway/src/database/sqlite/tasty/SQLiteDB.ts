@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import util from '../../../../../shared/Util';
 import SQLGenerator from '../../../tasty/MySQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
-import { makePromiseCallback, makePromiseCallback0 } from '../../../tasty/Utils';
 import SQLiteClient from '../client/SQLiteClient';
 import SQLiteConfig from '../SQLiteConfig';
 
@@ -124,7 +124,7 @@ export class SQLiteDB implements TastyDB
     {
       const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.all(statement, [], makePromiseCallback(resolve, reject));
+        this.client.all(statement, [], util.promise.makeCallback(resolve, reject));
       });
 
       results = results.concat(result);
@@ -181,7 +181,7 @@ export class SQLiteDB implements TastyDB
   {
     return new Promise<void>((resolve, reject) =>
     {
-      this.client.close(makePromiseCallback0(resolve, reject));
+      this.client.close(util.promise.makeCallback(resolve, reject) as (err: Error) => void);
     });
   }
 

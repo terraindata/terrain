@@ -58,7 +58,8 @@ import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor 
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser } from './../../../../shared/etl/CSVTypeParser';
-import { parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from './../../../../shared/Util';
+import SharedUtil from './../../../../shared/Util';
+import { ParseCSVConfig } from './../../../../shared/util/CSV';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -220,7 +221,7 @@ class FileImport extends TerrainComponent<any>
     let items: object[] = [];
     if (isNewlineSeparatedJSON)
     {
-      const newlineJSON: object[] | string = parseNewlineJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+      const newlineJSON: object[] | string = SharedUtil.json.parseNewlineJSON(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
       if (typeof newlineJSON === 'string')
       {
         Actions.setErrorMsg(newlineJSON);
@@ -232,7 +233,7 @@ class FileImport extends TerrainComponent<any>
     {
       try
       {
-        items = parseObjectListJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+        items = SharedUtil.json.parseObjectListJSON(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
       }
       catch (e)
       {
@@ -258,7 +259,7 @@ class FileImport extends TerrainComponent<any>
         error: this._fn(this.setError),
       };
 
-      const columnHeaders: object[] = parseCSV(file, testDuplicateConfig);
+      const columnHeaders: object[] = SharedUtil.csv.parseCSV(file, testDuplicateConfig);
       if (columnHeaders === undefined)
       {
         return undefined;
@@ -287,7 +288,7 @@ class FileImport extends TerrainComponent<any>
       hasHeaderRow: hasCsvHeader,
       error: this._fn(this.setError),
     };
-    return parseCSV(file, config);
+    return SharedUtil.csv.parseCSV(file, config);
   }
 
   public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean, incrementStep?: boolean)

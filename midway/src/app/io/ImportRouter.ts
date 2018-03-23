@@ -48,9 +48,9 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
 import { Import } from './Import';
 import { ImportSourceConfig, Sources } from './sources/Sources';
 import * as Auth from './templates/Authenticate';

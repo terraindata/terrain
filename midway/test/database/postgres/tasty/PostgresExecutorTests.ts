@@ -52,7 +52,7 @@ import PostgresController from '../../../../src/database/pg/PostgreSQLController
 import * as Tasty from '../../../../src/tasty/Tasty';
 import PostgreSQLQueries from '../../../tasty/PostgreSQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../../Utils';
+import * as Utils from '../../TestUtil';
 
 function getExpectedFile(): string
 {

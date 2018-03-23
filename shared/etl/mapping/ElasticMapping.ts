@@ -46,10 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions
 
-import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-const { List, Map } = Immutable;
 
 import { defaultProps, ElasticFieldProps, ElasticTypes, JsAutoMap } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';

@@ -44,13 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as path from 'path';
+import * as util from 'util';
 import * as winston from 'winston';
 
+import sharedUtil from '../../../shared/Util';
 import DatabaseController from '../database/DatabaseController';
 import ElasticClient from '../database/elastic/client/ElasticClient';
-import { makePromiseCallback } from '../tasty/Utils';
-import * as Util from './Utils';
 
 export interface ScriptConfig
 {
@@ -64,13 +65,15 @@ export async function findScripts(dir: string): Promise<ScriptConfig[]>
   return new Promise<ScriptConfig[]>(async (resolve, reject) =>
   {
     const scripts: ScriptConfig[] = [];
-    for (const file of await Util.readDirAsync(dir))
+    const readDirAsync = util.promisify(fs.readdir);
+    const readFileAsync = util.promisify(fs.readFile);
+    for (const file of await readDirAsync(dir))
     {
       const lang = path.extname(file).substr(1);
       if (lang === 'painless')
       {
         const id = path.basename(file, '.' + lang);
-        const body = await Util.readFileAsync(path.resolve(dir, file), 'utf8');
+        const body = await readFileAsync(path.resolve(dir, file), 'utf8');
         scripts.push({ id, lang, body });
       }
       else
@@ -115,7 +118,7 @@ export async function provisionScripts(controller: DatabaseController)
                 lang: script.lang,
                 body: script.body,
               },
-              makePromiseCallback(resolve, reject));
+              sharedUtil.promise.makeCallback(resolve, reject));
           });
 
         winston.info('Provisioned script ' + script.id + ' to database ' + controller.getName());

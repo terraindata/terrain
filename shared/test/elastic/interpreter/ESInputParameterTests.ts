@@ -45,13 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
-import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
-import * as winston from 'winston';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import { makePromiseCallback } from '../../Utils';
-
 import * as Immutable from 'immutable';
+import * as winston from 'winston';
+
+import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
 import ESParserError from 'shared/database/elastic/parser/ESParserError';
+import SharedUtil from '../../../../shared/Util';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 
 function getExpectedFile(): string
 {
@@ -67,7 +67,7 @@ beforeAll(async (done) =>
 
   const contents: any = await new Promise((resolve, reject) =>
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+    fs.readFile(getExpectedFile(), SharedUtil.promise.makeCallback(resolve, reject));
   });
   expected = JSON.parse(contents);
   done();

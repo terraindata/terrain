@@ -130,7 +130,7 @@ class ElasticClient
     request({
       method: 'DELETE',
       url: String(host) + '/_scripts/' + params.id,
-    }, (err, resp, body) => callback(err, body));
+    }, (err, resp, body) => callback(err, JSON.parse(body)));
 
     // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
     // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html

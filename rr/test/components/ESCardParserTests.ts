@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as ip from 'ip';
+import * as puppeteer from 'puppeteer';
 import * as winston from 'winston';
 
-import * as puppeteer from 'puppeteer';
-import { makePromiseCallback } from '../../../shared/test/Utils';
+import SharedUtil from '../../../shared/Util';
 import { getChromeDebugAddress } from '../../FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
@@ -75,7 +75,7 @@ describe('Testing the card parser', () =>
     // TODO: get rid of this monstrosity once @types/winston is updated.
     const contents: any = await new Promise((resolve, reject) =>
     {
-      fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+      fs.readFile(getExpectedFile(), SharedUtil.promise.makeCallback(resolve, reject));
     });
 
     expected = JSON.parse(contents);

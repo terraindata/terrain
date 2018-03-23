@@ -45,14 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as _ from 'lodash';
-import sha1 = require('sha1');
 import * as stream from 'stream';
 import * as winston from 'winston';
 
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
-import * as SharedUtil from '../../../../shared/Util';
-import { getParsedQuery } from '../../app/Util';
+import SharedUtil from '../../../../shared/Util';
+import { getQueryFromAlgorithm } from '../../app/AppUtil';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import ItemConfig from '../items/ItemConfig';
@@ -60,14 +59,15 @@ import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
 import AExportTransform from './streams/AExportTransform';
-import CSVExportTransform from './streams/CSVExportTransform';
+import CSVTransform from './streams/CSVTransform';
 import ExportTransform from './streams/ExportTransform';
-import JSONExportTransform from './streams/JSONExportTransform';
+import JSONTransform from './streams/JSONTransform';
+import TransformationEngineTransform from './streams/TransformationEngineTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
 
-import * as Transform from './Transform';
+import * as Common from './Common';
 
 const exportTemplates = new ExportTemplates();
 const TastyItems: Items = new Items();
@@ -134,7 +134,7 @@ export class Export
       }
       if (exportConfig.algorithmId !== undefined && exportConfig.query === undefined)
       {
-        query = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
+        query = await getQueryFromAlgorithm(exportConfig.algorithmId);
       }
       else if (exportConfig.algorithmId === undefined && exportConfig.query !== undefined)
       {
@@ -170,20 +170,23 @@ export class Export
       {
         winston.info('Beginning export transformations.');
         const documentTransform: ExportTransform = new ExportTransform(this, exportConfig);
-        let exportTransform: AExportTransform;
+        const transformationEngineTransform = new TransformationEngineTransform(exportConfig.transformations);
+        let exportTransform: stream.Transform;
         switch (exportConfig.filetype)
         {
           case 'json':
-            exportTransform = new JSONExportTransform();
+            exportTransform = JSONTransform.createExportStream();
             break;
           case 'csv':
-            exportTransform = new CSVExportTransform(Object.keys(exportConfig.columnTypes));
+            exportTransform = CSVTransform.createExportStream();
             break;
           default:
             throw new Error('File type must be either CSV or JSON.');
         }
 
-        resolve(respStream.pipe(documentTransform).pipe(exportTransform));
+        resolve(respStream.pipe(documentTransform)
+          .pipe(transformationEngineTransform)
+          .pipe(exportTransform));
       }
       catch (e)
       {
@@ -195,61 +198,10 @@ export class Export
   public _postProcessDoc(doc: object, exportConfig: ExportConfig): object
   {
     // merge top-level fields with _source if necessary
-    doc = Transform.mergeDocument(doc);
+    doc = Common.mergeDocument(doc);
 
     // verify schema mapping with documents and fix documents accordingly
     return this._transformAndCheck(doc, exportConfig, false);
-  }
-
-  private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
-      if (algorithms.length === 0)
-      {
-        return reject('Algorithm not found.');
-      }
-
-      try
-      {
-        if (algorithms[0].meta !== undefined)
-        {
-          return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
-        }
-      }
-      catch (e)
-      {
-        return reject('Malformed algorithm');
-      }
-    });
-  }
-
-  /* return the target hash an object with the specified field names and types should have
-     * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _buildDesiredHash(nameToType: object): string
-  {
-    let strToHash: string = 'object';
-    const nameToTypeArr: string[] = Object.keys(nameToType).sort();
-    nameToTypeArr.forEach((name) =>
-    {
-      strToHash += '|' + name + ':' + this._buildDesiredHashHelper(nameToType[name]) + '|';
-    });
-    return sha1(strToHash);
-  }
-  /* recursive helper to handle arrays */
-
-  private _buildDesiredHashHelper(typeObj: object): string
-  {
-    if (this.NUMERIC_TYPES.has(typeObj['type']))
-    {
-      return 'number';
-    }
-    if (typeObj['type'] === 'array')
-    {
-      return 'array-' + this._buildDesiredHashHelper(typeObj['innerType']);
-    }
-    return typeObj['type'];
   }
 
   /* checks whether obj has the fields and types specified by nameToType
@@ -257,7 +209,7 @@ export class Export
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _checkTypes(obj: object, exportConfig: ExportConfig): void
   {
-    const targetHash: string = this._buildDesiredHash(exportConfig.columnTypes);
+    const targetHash: string = SharedUtil.elastic.buildDesiredHash(exportConfig.columnTypes);
     const targetKeys: string = JSON.stringify(Object.keys(exportConfig.columnTypes).sort());
 
     // parse dates
@@ -277,7 +229,7 @@ export class Export
       });
     }
 
-    if (this._hashObjectStructure(obj) !== targetHash)
+    if (SharedUtil.elastic.hashObjectStructure(obj) !== targetHash)
     {
       if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
       {
@@ -301,22 +253,12 @@ export class Export
     {
       if (exportConfig.columnTypes[field]['type'] === 'array')
       {
-        if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
+        if (obj[field] !== null && !SharedUtil.elastic.isTypeConsistent(obj[field]))
         {
           throw new Error('Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj));
         }
       }
     }
-  }
-
-  /* assumes arrays are of uniform depth */
-  private _getArrayDepth(obj: any): number
-  {
-    if (Array.isArray(obj))
-    {
-      return this._getArrayDepth(obj[0]) + 1;
-    }
-    return 0;
   }
 
   /* return ES type from type specification format of ImportConfig
@@ -334,43 +276,10 @@ export class Export
     }
   }
 
-  private _getObjectStructureStr(payload: object): string
-  {
-    let structStr: string = SharedUtil.getType(payload);
-    if (structStr === 'object')
-    {
-      structStr = Object.keys(payload).sort().reduce((res, item) =>
-      {
-        res += '|' + item + ':' + this._getObjectStructureStr(payload[item]) + '|';
-        return res;
-      },
-        structStr);
-    }
-    else if (structStr === 'array')
-    {
-      if (Object.keys(structStr).length > 0)
-      {
-        structStr += '-' + this._getObjectStructureStr(payload[0]);
-      }
-      else
-      {
-        structStr += '-empty';
-      }
-    }
-    return structStr;
-  }
-
-  /* returns a hash based on the object's field names and data types
-   * handles object fields recursively ; only checks the type of the first element of arrays */
-  private _hashObjectStructure(payload: object): string
-  {
-    return sha1(this._getObjectStructureStr(payload));
-  }
-
   // manually checks types (rather than checking hashes) ; handles arrays recursively
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
-    const type: string = SharedUtil.getType(item);
+    const type: string = SharedUtil.elastic.getType(item);
     if (type === 'null')
     {
       return true;
@@ -430,15 +339,6 @@ export class Export
   // asynchronously perform transformations on each item to upsert, and check against expected resultant types
   private _transformAndCheck(doc: object, exportConfig: ExportConfig, dontCheck?: boolean): object
   {
-    try
-    {
-      doc = Transform.applyTransforms(doc, exportConfig.transformations);
-    }
-    catch (e)
-    {
-      throw new Error('Failed to apply transforms: ' + String(e));
-    }
-
     // only include the specified columns
     // NOTE: unclear if faster to copy everything over or delete the unused ones
     const trimmedDoc: object = {};

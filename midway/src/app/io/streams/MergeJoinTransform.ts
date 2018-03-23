@@ -49,7 +49,7 @@ import { Readable } from 'stream';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import BufferedElasticStream from './BufferedElasticStream';
+import ElasticReader from '../../../database/elastic/streams/ElasticReader';
 
 /**
  * Types of merge joins
@@ -74,12 +74,12 @@ export default class MergeJoinTransform extends Readable
   private client: ElasticClient;
   private type: MergeJoinType;
 
-  private leftSource: BufferedElasticStream;
-  private leftBuffer: object | null;
-  private leftPosition: number;
-  private rightSource: BufferedElasticStream;
-  private rightBuffer: object | null;
-  private rightPosition: number;
+  private leftSource: ElasticReader;
+  private leftBuffer: object | null = null;
+  private leftPosition: number = 0;
+  private rightSource: ElasticReader;
+  private rightBuffer: object | null = null;
+  private rightPosition: number = 0;
 
   private mergeJoinName: string;
   private joinKey: string;
@@ -119,18 +119,36 @@ export default class MergeJoinTransform extends Readable
 
     // set up the left source
     const leftQuery = this.setSortClause(query);
-    this.leftBuffer = null;
-    this.leftSource = new BufferedElasticStream(client, leftQuery,
-      ((buffer: object[]) => this.accumulateBuffer(buffer, StreamType.Left)).bind(this));
-    this.leftPosition = 0;
+    this.leftSource = new ElasticReader(client, leftQuery, true);
+    this.leftSource.on('readable', (() =>
+    {
+      const buffers: object[] = [];
+      let buffer = this.leftSource.read();
+      while (buffer !== null)
+      {
+        buffers.push(buffer);
+        buffer = this.leftSource.read();
+      }
+      this.accumulateBuffer(buffers, StreamType.Left);
+    }).bind(this));
+    this.leftSource.on('error', ((e) => this.emit('error', e)).bind(this));
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
-    this.rightBuffer = null;
-    this.rightSource = new BufferedElasticStream(client, rightQuery,
-      ((buffer: object[]) => this.accumulateBuffer(buffer, StreamType.Right)).bind(this));
-    this.rightPosition = 0;
+    this.rightSource = new ElasticReader(client, rightQuery, true);
+    this.rightSource.on('readable', (() =>
+    {
+      const buffers: object[] = [];
+      let buffer = this.rightSource.read();
+      while (buffer !== null)
+      {
+        buffers.push(buffer);
+        buffer = this.rightSource.read();
+      }
+      this.accumulateBuffer(buffers, StreamType.Right);
+    }).bind(this));
+    this.rightSource.on('error', ((e) => this.emit('error', e)).bind(this));
   }
 
   public _read(size: number = 1024)
@@ -145,28 +163,33 @@ export default class MergeJoinTransform extends Readable
     this.rightSource._destroy(error, callback);
   }
 
-  private accumulateBuffer(buffer: object[], type: StreamType): void
+  private accumulateBuffer(buffers: object[], type: StreamType): void
   {
-    if (buffer.length !== 0)
+    if (buffers.length === 0)
     {
-      if (buffer[0]['hits'].hits === undefined)
+      return;
+    }
+
+    if (buffers.length > 1)
+    {
+      if (buffers[0]['hits'].hits === undefined)
       {
-        buffer[0]['hits'].hits = [];
+        buffers[0]['hits'].hits = [];
       }
 
-      for (let i = 1; i < buffer.length; ++i)
+      for (let i = 1; i < buffers.length; ++i)
       {
-        buffer[0]['hits'].hits = buffer[0]['hits'].hits.concat(buffer[i]['hits'].hits);
+        buffers[0]['hits'].hits = buffers[0]['hits'].hits.concat(buffers[i]['hits'].hits);
       }
     }
 
     if (type === StreamType.Left)
     {
-      this.leftBuffer = buffer[0];
+      this.leftBuffer = buffers[0];
     }
     else if (type === StreamType.Right)
     {
-      this.rightBuffer = buffer[0];
+      this.rightBuffer = buffers[0];
     }
     else
     {
@@ -228,14 +251,14 @@ export default class MergeJoinTransform extends Readable
         if (this.leftPosition === left.length)
         {
           this.push(this.leftBuffer);
-          this.leftBuffer = [];
+          this.leftBuffer = null;
           this.leftPosition = 0;
           return;
         }
 
         if (this.rightPosition === right.length)
         {
-          this.rightBuffer = [];
+          this.rightBuffer = null;
           this.rightPosition = 0;
           return;
         }
@@ -253,7 +276,7 @@ export default class MergeJoinTransform extends Readable
 
       if (j === right.length)
       {
-        this.rightBuffer = [];
+        this.rightBuffer = null;
         return;
       }
 
@@ -263,7 +286,7 @@ export default class MergeJoinTransform extends Readable
 
     // push the merged result out to the stream
     this.push(this.leftBuffer);
-    this.leftBuffer = [];
+    this.leftBuffer = null;
 
     // check if we are done
     if (this.leftSource.isEmpty())

@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+export function makeCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {
   return (error: Error, response: T) =>
   {
@@ -59,19 +57,4 @@ export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => 
       resolve(response);
     }
   };
-}
-
-export async function readFile(fileName: string)
-{
-  return new Promise((resolve, reject) =>
-  {
-    fs.readFile(fileName, makePromiseCallback(resolve, reject));
-  });
-}
-
-export async function checkResults(fileName: string, testName: string, results: any)
-{
-  const contents: any = await readFile(fileName);
-  const expected = JSON.parse(contents);
-  expect(results).toMatchObject(expected[testName]);
 }

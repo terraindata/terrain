@@ -44,32 +44,35 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
+import * as asyncBusboy from 'async-busboy';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
 
-export function makePromiseCallback0(resolve: () => void, reject: (Error) => void)
+import * as Util from '../AppUtil';
+import { Permissions } from '../permissions/Permissions';
+import { users } from '../users/UserRouter';
+import TemplateRouter, { templates } from './TemplateRouter';
+
+const Router = new KoaRouter();
+const perm: Permissions = new Permissions();
+
+Router.use('/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
+
+Router.post('/execute', async (ctx, next) =>
 {
-  return (error: Error) =>
+  const { fields, files } = await asyncBusboy(ctx.req);
+
+  Util.verifyParameters(fields, ['id', 'accessToken', 'templateID']);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
   {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve();
-    }
-  };
-}
+    ctx.body = 'Unauthorized';
+    ctx.status = 400;
+    return;
+  }
+
+  const templateID = fields['templateID'];
+  ctx.body = await templates.execute(templateID, files);
+});
+
+export default Router;
