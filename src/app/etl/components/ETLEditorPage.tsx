@@ -112,7 +112,7 @@ class ETLEditorPage extends TerrainComponent<Props>
         editorAct({
           actionType: 'setTemplate',
           template: savedTemplate,
-          history: 'push',
+          history: 'void',
         });
         editorAct({
           actionType: 'rebuildFieldMap',

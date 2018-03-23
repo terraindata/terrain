@@ -87,8 +87,6 @@ export interface Props
   // below from container
   templateEditor?: TemplateEditorState;
   editorAct?: typeof TemplateEditorActions;
-  etl?: ETLState;
-  etlAct?: typeof ETLActions;
 }
 
 class TemplateEditor extends TerrainComponent<Props>
@@ -193,7 +191,7 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public renderTopBar()
   {
-    const { template, isDirty } = this.props.templateEditor;
+    const { history, template, isDirty } = this.props.templateEditor;
     let titleName = template.id === -1 ?
       'Unsaved Template' :
       template.templateName;
@@ -213,16 +211,16 @@ class TemplateEditor extends TerrainComponent<Props>
           </div>
           <div
             className='editor-top-bar-item'
-            style={topBarItemStyle}
-            onClick={this.openTemplateUI}
+            style={history.canUndo() ? topBarItemStyle : topBarItemDisabledStyle}
+            onClick={this.handleUndo}
             key='undo'
           >
             Undo
           </div>
           <div
             className='editor-top-bar-item'
-            style={topBarItemStyle}
-            onClick={this.openTemplateUI}
+            style={history.canRedo() ? topBarItemStyle : topBarItemDisabledStyle}
+            onClick={this.handleRedo}
             key='redo'
           >
             Redo
@@ -389,7 +387,6 @@ class TemplateEditor extends TerrainComponent<Props>
   public handleSaveClicked()
   {
     const { template } = this.props.templateEditor;
-    const { editorAct } = this.props;
     if (template.id === -1)
     {
       this.setState({
@@ -401,10 +398,36 @@ class TemplateEditor extends TerrainComponent<Props>
       this.props.onSave(template);
     }
   }
+
+  public handleUndo()
+  {
+    const { editorAct, templateEditor } = this.props;
+    if (templateEditor.history.canUndo())
+    {
+      editorAct({
+        actionType: 'undoHistory',
+      });
+    }
+  }
+
+  public handleRedo()
+  {
+    const { editorAct, templateEditor } = this.props;
+    if (templateEditor.history.canRedo())
+    {
+      editorAct({
+        actionType: 'redoHistory',
+      });
+    }
+  }
 }
 
 const emptyList = List([]);
 const topBarItemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
+const topBarItemDisabledStyle = [
+  backgroundColor(Colors().fadedOutBg, Colors().fadedOutBg),
+  fontColor(Colors().text3),
+];
 const topBarNameStyle = [fontColor(Colors().text2)];
 const templateListItemStyle = [
   { cursor: 'pointer' },
@@ -418,12 +441,8 @@ const templateListItemCurrentStyle = [
 
 export default Util.createContainer(
   TemplateEditor,
-  [
-    ['templateEditor'],
-    ['etl'],
-  ],
+  ['templateEditor'],
   {
     editorAct: TemplateEditorActions,
-    etlAct: ETLActions,
   },
 );

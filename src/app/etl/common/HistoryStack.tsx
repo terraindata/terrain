@@ -49,15 +49,16 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
-import {
+import
+{
   ConfigType,
   instanceFnDecorator,
   makeConstructor,
   makeExtendedConstructor,
-  WithIRecord
+  WithIRecord,
 } from 'src/app/Classes';
 
-type ImmHistory<T> = WithIRecord<HistoryStackC<T>>
+type ImmHistory<T> = WithIRecord<HistoryStackC<T>>;
 class HistoryStackC<T>
 {
   private pastItems: List<T> = List([]);
@@ -79,6 +80,25 @@ class HistoryStackC<T>
     return this.currentItem !== null && this.nextItems.size > 0;
   }
 
+  public clearHistory(): ImmHistory<T>
+  {
+    let history: ImmHistory<T> = this as any;
+    history = history
+      .update('pastItems', (items) => items.clear())
+      .update('nextItems', (items) => items.clear())
+      .set('currentItem', null);
+    return history;
+  }
+
+  // set the current item without mutating the history
+  // be careful when using this
+  public setItem(item: T): ImmHistory<T>
+  {
+    const history: ImmHistory<T> = this as any;
+    return history.set('currentItem', item);
+  }
+
+  // add a new item to the history. If there is a nextItems stack, then it will be cleared
   public pushItem(item: T): ImmHistory<T>
   {
     let history: ImmHistory<T> = this as any;
@@ -128,7 +148,7 @@ class HistoryStackC<T>
 
 export type HistoryStack<T> = WithIRecord<HistoryStackC<T>>;
 
-const _RealHistoryStack = makeExtendedConstructor(HistoryStackC);
+const _RealHistoryStack = makeExtendedConstructor(HistoryStackC, true);
 export function _HistoryStack<T>(config?: ConfigType<T>, deep?: boolean): WithIRecord<HistoryStackC<T>>
 {
   return _RealHistoryStack(config, deep) as any;

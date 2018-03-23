@@ -63,6 +63,7 @@ import
 } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 
+import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
@@ -84,8 +85,14 @@ export interface TemplateEditorActionTypes
   setTemplate: { // this should be the only way to mutate the template graph
     actionType: 'setTemplate';
     template: ETLTemplate;
-    // push adds the template to the history, clear clears the history, void does not interact
+    // push adds the template to the history, clear clears the history, void replaces the current value
     history: 'push' | 'clear' | 'void';
+  };
+  undoHistory: { // undo/redo
+    actionType: 'undoHistory';
+  };
+  redoHistory: {
+    actionType: 'redoHistory';
   };
   rebuildFieldMap: {
     actionType: 'rebuildFieldMap';
@@ -152,17 +159,44 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       setTemplate: (state, action) =>
       {
+        let newState = state;
         switch (action.payload.history)
         {
           case 'push':
-            
+            newState = newState.update('history',
+              (history: History) => history.pushItem(action.payload.template),
+            );
             break;
           case 'clear':
+            newState = newState.update('history',
+              (history: History) => history.clearHistory().pushItem(action.payload.template),
+            );
+            break;
+          case 'void':
+            newState = newState.update('history',
+              (history: History) => history.setItem(action.payload.template),
+            );
             break;
           default:
-            break;
+            break; // todo throw error?
         }
-        return state.set('template', action.payload.template);
+        return newState.set('template', newState.history.getCurrentItem());
+      },
+      undoHistory: (state, action) =>
+      {
+        let newState = state;
+        newState = newState.update('history',
+          (history: History) => history.undoHistory(),
+        );
+        return newState.set('template', newState.history.getCurrentItem());
+      },
+      redoHistory: (state, action) =>
+      {
+        let newState = state;
+        newState = newState.update('history',
+          (history: History) => history.redoHistory(),
+        );
+        return newState.set('template', newState.history.getCurrentItem());
       },
       rebuildFieldMap: (state, action) =>
       {
@@ -254,17 +288,46 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
     });
   }
 
+  public undoHistory(action: TemplateEditorActionType<'setCurrentEdge'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'undoHistory',
+    });
+    directDispatch({
+      actionType: 'rebuildFieldMap',
+    });
+  }
+
+  public redoHistory(action: TemplateEditorActionType<'setCurrentEdge'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'redoHistory',
+    });
+    directDispatch({
+      actionType: 'rebuildFieldMap',
+    });
+  }
+
   public overrideAct(action: Unroll<TemplateEditorActionTypes>)
   {
     switch (action.actionType)
     {
       case 'setCurrentEdge':
         return this.setCurrentEdge.bind(this, action);
+      case 'undoHistory':
+        return this.undoHistory.bind(this, action);
+      case 'redoHistory':
+        return this.redoHistory.bind(this, action);
       default:
         return undefined;
     }
   }
 }
+
+// convenience alias
+type History = HistoryStack<ETLTemplate>;
 
 const ReduxInstance = new TemplateEditorRedux();
 export const TemplateEditorActions = ReduxInstance._actionsForExport();
