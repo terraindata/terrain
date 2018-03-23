@@ -216,7 +216,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine } = this.props;
 
-    if ((filterLine.field === undefined) || (filterLine.comparison === undefined))
+    if (!filterLine.field || !filterLine.comparison)
     {
       return false;
     }
@@ -238,7 +238,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const fieldSet = this.props.fieldOptionSet;
     let comparisonOptions = List<RouteSelectorOption>();
     let comparisonHeader = 'Choose a data field first';
-    if (filterLine.field !== undefined)
+    if (filterLine.field)
     {
       comparisonHeader = '';
 
@@ -246,6 +246,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         type: 'comparison',
         field: filterLine.field,
         fieldType: filterLine.fieldType,
+        analyzed: filterLine.analyzed,
         source,
         schemaState: pathfinderContext.schemaState,
         builderState: pathfinderContext.builderState,
@@ -261,7 +262,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         return option;
       }).toList();
     }
-
     const comparisonSet: RouteSelectorOptionSet = {
       key: 'comparison',
       options: comparisonOptions,
@@ -274,19 +274,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     };
 
     const shouldShowValue = this.shouldShowValue();
-    let valueOptions = shouldShowValue ? this.props.valueOptions : List<RouteSelectorOption>();
+    const valueOptions = shouldShowValue ? this.props.valueOptions : List<RouteSelectorOption>();
     let valueHeader = '';
 
-    if (shouldShowValue)
-    {
-      // TODO add more value options
-      // TODO add value component selector for Other
-      valueOptions = pathfinderContext.source.dataSource.getChoiceOptions({
-        type: 'input',
-        builderState: pathfinderContext.builderState,
-      });
-    }
-    else if (filterLine.field !== undefined && !filterLine.comparison)
+    if (filterLine.field && !filterLine.comparison)
     {
       valueHeader = 'Choose a method next';
     }
@@ -338,17 +329,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       case 0:
         // TODO get from state?
-        const fieldOptions = source.dataSource.getChoiceOptions({
-          type: 'fields',
-          source,
-          schemaState: props.pathfinderContext.schemaState,
-          builderState: props.pathfinderContext.builderState,
-        });
+        const fieldOptions = this.props.fieldOptionSet.options;
         const fieldChoice = fieldOptions.find((option) => option.value === value);
         this.handleChange(
           'field',
           value,
-          fieldChoice.meta !== undefined ? fieldChoice.meta.fieldType : FieldType.Any,
+          (fieldChoice as any).meta,
           true,
         );
         return;
@@ -441,6 +427,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       source,
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
+      analyzed: filterLine.analyzed,
     });
 
     switch (filterLine.fieldType)
@@ -620,24 +607,28 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return null;
   }
 
-  private handleChange(key, value, fieldType?, fieldChange?)
+  private handleChange(key, value, meta?, fieldChange?)
   {
     let filterLine = this.props.filterLine.set(key, value);
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;
     if (key === 'field')
     {
-      filterLine = filterLine.set('fieldType', fieldType);
+      const fieldType = (meta && meta.fieldType) || FieldType.Any;
+      const analyzed = (meta && meta.analyzed) || true;
+      filterLine = filterLine
+        .set('fieldType', fieldType)
+        .set('analyzed', analyzed);
       // this code picks a default comparison to use
       const comparisonOptions = source.dataSource.getChoiceOptions({
         type: 'comparison',
         field: filterLine.field,
         fieldType,
+        analyzed,
         source,
         schemaState: pathfinderContext.schemaState,
         builderState: pathfinderContext.builderState,
       });
-
       if (comparisonOptions.findIndex((option) => option.value === filterLine.comparison) === -1
         && comparisonOptions.size)
       {
@@ -648,7 +639,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       {
         this.props.onUpdateScript(filterLine.field, filterLine.scriptName);
       }
-
     }
     this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }

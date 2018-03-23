@@ -276,9 +276,9 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     const format = this.props.config.formats.get(field);
     // Get fields from the schema - this is for if nested is part of the object (not groupJoined)
     const { dataSource, schema, builder } = this.props;
-    let index = dataSource && dataSource.index.split('/')[1] || getIndex('', builder);
+    let index = dataSource && dataSource.index || getIndex('', builder);
     const server = builder.db.name;
-    let indexId = `${builder.db.name}/${String(index)}`;
+    let indexId = `${server}/${String(index)}`;
     let columns;
     if (this.props.columns)
     {
@@ -312,7 +312,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       const { path } = this.props.builder.query;
       const referenceIndex = path.more.references.indexOf(field);
       index = (path.nested.get(referenceIndex).source.dataSource as any).index;
-      index = index && index.split('/')[1];
       indexId = `${builder.db.name}/${String(index)}`;
       columns = schema.columns.filter((col) =>
         col.serverId === String(server) &&

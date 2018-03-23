@@ -178,7 +178,7 @@ export const ElasticBlockHelpers = {
 
   getFieldsOfType(schemaState, builderState, fieldType, dataSource?): List<string>
   {
-    const index = dataSource && dataSource.index.split('/')[1] || getIndex('', builderState);
+    const index = dataSource && dataSource.index || getIndex('', builderState);
     const server = builderState.db.name;
     if (index !== null)
     {
@@ -230,7 +230,7 @@ export const ElasticBlockHelpers = {
     }
     const { source } = builderState.query.path;
     let index = source && source.dataSource && source.dataSource.index ?
-      source.dataSource.index.split('/')[1] : getIndex('', builderState);
+      source.dataSource.index : getIndex('', builderState);
     index = overrideIndex || index;
     const server = builderState.db.name;
     if (index !== null)

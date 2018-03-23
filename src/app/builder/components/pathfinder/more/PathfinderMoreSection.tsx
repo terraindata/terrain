@@ -162,7 +162,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public handleAddNested()
   {
-    const currIndex = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
+    const currIndex = (this.props.pathfinderContext.source.dataSource as any).index;
     this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references'),
       this.props.more.references.push(currIndex));
     const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');

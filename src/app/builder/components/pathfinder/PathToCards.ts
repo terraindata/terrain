@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 import { parseScore, PathFinderDefaultSize } from 'builder/components/pathfinder/PathfinderParser';
-import { ElasticDataSource, FilterGroup, FilterLine, Path } from 'builder/components/pathfinder/PathfinderTypes';
+import { DistanceValue, ElasticDataSource, FilterGroup, FilterLine, Path } from 'builder/components/pathfinder/PathfinderTypes';
 import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
@@ -77,14 +77,14 @@ export class PathToCards
               { 'term:term_query': { '_index:string': (path.source.dataSource as ElasticDataSource).index } },
               {
                 'bool:elasticFilter': {
-                  'filter:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                  'filter:query[]': [],
                 },
               },
             ],
             'should:query[]': [
               {
                 'bool:elasticFilter': {
-                  'should:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                  'should:query[]': [],
                 },
               }],
           },
@@ -219,6 +219,60 @@ export class PathToCards
     }, true);
     TerrainLog.debug('(P->B) line -> block ', line, block);
     return [block];
+  }
+
+  private static processGeoDistanceFilter(filterLines: FilterLine[], parser: ESCardParser, boolValueInfo: ESValueInfo, boolType, filterSection: 'soft' | 'hard')
+  {
+    // Find any geo_distance filter lines
+    const geoFilterLines = filterLines.filter((line) => line.comparison === 'located');
+    console.log('Geo filter lines are ', geoFilterLines);
+    const boolTypeFiltersType = boolType + ':query[]';
+    const cardFilterLines = parser.searchCard(
+      {
+        [boolTypeFiltersType]: {
+          'geo_distance:geo_distance': true,
+        }
+      },
+      boolValueInfo, false, true
+    );
+    // Find all the geodistance cards and delete them
+    if (cardFilterLines)
+    {
+      // Delete them
+    }
+    // If there are supposed to be geo distance cards, add them in
+    if (geoFilterLines.length)
+    {
+      parser.createCardIfNotExist({ [boolTypeFiltersType]: [] }, boolValueInfo);
+      const filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
+      console.log('going to add to ', filterCard);
+      for (let i = 0; i < geoFilterLines.length; i++)
+      {
+        const filterLine = geoFilterLines[i];
+        const value = filterLine.value as DistanceValue;
+        const distanceCard = BlockUtils.make(ElasticBlocks, 'elasticDistance',
+        {
+          field: filterLine.field,
+          distance: value.distance,
+          distanceUnit: value.units,
+          locationValue: value.location,
+          mapInputValue: value.address,
+          mapZoomValue: value.zoom,
+        });
+        const parsedDistanceCard = new ESCardParser(distanceCard);
+        console.log('distance card', distanceCard);
+        const queryCard = BlockUtils.make(ElasticBlocks, 'eqlquery', {
+          key: i,
+        });
+        console.log('query card ', queryCard);
+        const parsedCard = new ESCardParser(queryCard);
+        console.log('parsed query card ', parsedCard.getValueInfo());
+        console.log('adding to ', filterCard);
+        console.log(filterCard.arrayChildren.length);
+//        parser.addChild(filterCard, filterCard.arrayChildren.length, parsedCard.getValueInfo());
+       // parser.addChild(filterCard, filterCard.arrayChildren.length, parsedDistanceCard.getValueInfo());
+      }
+    }
   }
 
   private static processNestedQueryFilterGroup(filterLines: FilterLine[], parser: ESCardParser, boolValueInfo: ESValueInfo, boolType, filterSection: 'soft' | 'hard')
@@ -462,10 +516,12 @@ export class PathToCards
     parser.isMutated = true;
     TerrainLog.debug('P->B( end filtergroup -> bool) ', filterGroup, boolValueInfo);
 
+    // Handle geo_distance filters
+    this.processGeoDistanceFilter(filterLineMap.filter, parser, boolValueInfo, boolType, filterSection);
     // handle inner filter group
     this.processInnerGroup(filterLineMap.group, parser, boolValueInfo, boolType, filterSection);
-    this.processNestedQueryFilterGroup(filterLineMap.nested, parser, boolValueInfo, boolType, filterSection);
     // handle nested query filter group
+    this.processNestedQueryFilterGroup(filterLineMap.nested, parser, boolValueInfo, boolType, filterSection);
   }
 
   private static updateGroupJoin(sourcePaths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string)

@@ -64,7 +64,7 @@ import LinearSelector from 'common/components/LinearSelector';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
-  _ElasticDataSource, ChoiceOption, Path, PathfinderContext, PathfinderSteps,
+  _ElasticDataSource, ChoiceOption, ElasticDataSource, Path, PathfinderContext, PathfinderSteps,
   Source, sourceCountDropdownOptions, sourceCountOptions,
 } from '../PathfinderTypes';
 
@@ -157,9 +157,8 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     const keyPath = this._ikeyPath(props.keyPath, 'dataSource');
     const t = value.split('/');
     console.assert(t.length === 2); // 'serverID/index'
-
-    props.builderActions.changePath(this._ikeyPath(keyPath, 'index'), t[1]);
-    props.builderActions.changePath(this._ikeyPath(keyPath, 'server'), t[0]);
+    props.builderActions.changePath(keyPath,
+      (this.props.source.dataSource as ElasticDataSource).set('index', t[1]).set('server', t[0]));
 
     if (props.pathfinderContext.step === PathfinderSteps.Source)
     {
@@ -167,7 +166,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     }
     if (this.props.onSourceChange)
     {
-      this.props.onSourceChange(value.split('/')[1]);
+      props.onSourceChange(t[1]);
     }
   }
 

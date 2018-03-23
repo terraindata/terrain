@@ -105,6 +105,8 @@ export class CardsToPath
     const newScore = this.updateScore(path.score, parser, bodyValueInfo);
     const filterGroup = this.BodyToFilterSection(path.filterGroup, parser, bodyValueInfo, 'hard');
     const softFilterGroup = this.BodyToFilterSection(path.softFilterGroup, parser, bodyValueInfo, 'soft');
+    console.log('HARD FILTERS ARE ', filterGroup.toJS());
+    console.log('SOFT FILTERS ARE ', softFilterGroup.toJS());
     const parentAlias = this.getParentAlias(parser, bodyValueInfo);
     const groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
     const more = path.more.set('references', List([parentAlias]));
@@ -173,7 +175,6 @@ export class CardsToPath
 
     const filterRows = boolCard['otherFilters'];
     const filterRowMap = { filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: [] };
-
     // regroup the filters
     filterRows.map((row: Block) =>
     {
@@ -183,7 +184,7 @@ export class CardsToPath
     filterRowMap.filter = filterRowMap.filter.concat(filterRowMap.filter_not);
     filterRowMap.should = filterRowMap.should.concat(filterRowMap.should_not);
 
-    let newLines = [];
+    let newLines = List([]);
 
     // handle normal filter lines first
     if (sectionType === 'hard')
@@ -193,9 +194,8 @@ export class CardsToPath
       {
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'all');
-        newLines = newLines.concat(filterRowMap.filter.map(
-          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
-        );
+        newLines = List(filterRowMap.filter.map(
+                  (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
       } else if (isInnerGroup === true)
       {
         // any hard bool has lower priority
@@ -203,34 +203,96 @@ export class CardsToPath
         {
           // set the filtergroup to
           filterGroup = filterGroup.set('minMatches', 'any');
-          newLines = newLines.concat(filterRowMap.should.map(
-            (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
-          );
+          newLines = List(filterRowMap.should.map(
+                      (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
         }
       }
-    } else
+    }
+    else
     {
       // only check any bool in the soft section
       if (filterRowMap.should.length > 0)
       {
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'any');
-        newLines = newLines.concat(filterRowMap.should.map(
-          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
-        );
+        newLines = List(filterRowMap.should.map(
+                  (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
       }
     }
-
+    // Look for Geo Distance Queries
+    const geoDistanceLines = this.processGeoDistanceFilters(filterGroup, parser, boolValueInfo, sectionType);
     // handle nested groups
     const newNestedGroupLines = this.processInnerFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
     const newNestedQueryLines = this.processNestedQueryFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
-    newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines);
-
-    TerrainLog.debug('B->P(Bool): Generate ' + String(newLines.length) + ' filter lines ' +
-      '(Nested Group' + String(newNestedGroupLines.length) + ').' +
-      '(Nested Query' + String(newNestedQueryLines.length) + ').');
-    filterGroup = filterGroup.set('lines', List(newLines)).set('groupCount', newNestedGroupLines.length + newNestedQueryLines.length + 1);
+    newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines).concat(geoDistanceLines).toList();
+    TerrainLog.debug('B->P(Bool): Generate ' + String(newLines.size) + ' filter lines ' +
+      '(Nested Group' + String(newNestedGroupLines.size) + ').' +
+      '(Nested Query' + String(newNestedQueryLines.size) + ').');
+    filterGroup = filterGroup.set('lines', newLines);
     return filterGroup;
+  }
+
+  private static processGeoDistanceFilters(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, section: 'soft'| 'hard')
+  {
+    let from;
+    let filterLines = List([]);
+    if (parentFilterGroup.minMatches === 'all' && section === 'hard')
+    {
+      // let's search childBool from parentBool: { filter : [Bool, Bool, Bool]
+      from = parentBool.objectChildren.filter;
+    }
+    else if (parentFilterGroup.minMatches === 'any' || section === 'soft')
+    {
+      from = parentBool.objectChildren.should;
+    }
+    if (from)
+    {
+      const queries = from.propertyValue;
+      if (queries.jsonType === ESJSONType.array)
+      {
+        queries.forEachElement((query: ESValueInfo) =>
+        {
+          if (query.card.cards.get(0) && query.card.cards.get(0).type === 'elasticDistance')
+          {
+            const distanceCard = query.card.cards.get(0);
+            const filterLine = _FilterLine({
+              field: distanceCard.field,
+              fieldType: FieldType.Geopoint,
+              comparison: 'located',
+              value: {
+                location: [distanceCard.locationValue.lat, distanceCard.locationValue.lon],
+                address: distanceCard.mapInputValue,
+                distance: distanceCard.distance,
+                units: distanceCard.distanceUnit,
+                zoom: distanceCard.mapZoomValue
+              }
+            });
+            filterLines = filterLines.push(filterLine);
+          }
+        });
+      }
+      else if (queries.jsonType === ESJSONType.object)
+      {
+        if (queries.card.cards.get(0) && queries.card.cards.get(0).type === 'elasticDistance')
+        {
+          const distanceCard = queries.card.cards.get(0);
+          const filterLine = _FilterLine({
+            field: distanceCard.field,
+            fieldType: FieldType.Geopoint,
+            comparison: 'located',
+            value: {
+              location: [distanceCard.locationValue.lat, distanceCard.locationValue.lon],
+              address: distanceCard.mapInputValue,
+              distance: distanceCard.distance,
+              units: distanceCard.distanceUnit,
+              zoom: distanceCard.mapZoomValue
+            }
+          });
+          filterLines = filterLines.push(filterLine);
+        }
+      }
+    }
+    return filterLines;
   }
 
   private static processNestedQueryFilterGroup(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, sectionType: 'hard' | 'soft')
@@ -271,7 +333,7 @@ export class CardsToPath
         });
       }
     }
-    return newLines;
+    return List(newLines);
   }
 
   private static processInnerFilterGroup(parentFilterGroup: FilterGroup, parser, parentBool: ESValueInfo, sectionType: 'hard' | 'soft')
@@ -307,7 +369,7 @@ export class CardsToPath
         });
       }
     }
-    return newLines;
+    return List(newLines);
   }
 
   private static BodyToFilterSection(filterGroup: FilterGroup, parser: ESCardParser, body: ESValueInfo, filterSection: 'hard' | 'soft')
@@ -335,7 +397,8 @@ export class CardsToPath
       // no source, return empty filterGroup
       TerrainLog.debug('B->P(BodySection): there is no ' + filterSection + 'bool, return empty filterGroup.');
       return _FilterGroup();
-    } else
+    }
+    else
     {
       return this.BoolToFilterGroup(filterGroup, parser, theBool, filterSection);
     }

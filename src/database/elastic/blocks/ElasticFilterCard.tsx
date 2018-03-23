@@ -345,7 +345,7 @@ export const elasticFilter = _card({
                     centerDropdown: true,
                     style: {
                       maxWidth: 150,
-                      minWidth: 105,
+                      minWidth: 115,
                       marginRight: 3,
                     },
                   },

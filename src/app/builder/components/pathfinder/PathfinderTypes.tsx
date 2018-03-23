@@ -391,6 +391,7 @@ class FilterLineC extends LineC
   // Members for when it is a single line condition
   public field: string = null; // autocomplete
   public fieldType: FieldType = null;
+  public analyzed: boolean = true;
   public comparison: string = null; // autocomplete
   public value: string | number | DistanceValue = null;
   public valueType: ValueType = null;
@@ -571,6 +572,7 @@ type ChoiceContext = {
     builderState: BuilderState,
     field: string,
     fieldType?: FieldType,
+    analyzed?: boolean,
   } | {
     type: 'input',
     source: Source,
@@ -751,7 +753,7 @@ class ElasticDataSourceC extends DataSource
           {
             _.keys(col.properties).forEach((property) =>
             {
-              const { type } = col.properties[property];
+              const { type, analyzer } = col.properties[property];
               fields = fields.push(
                 _ChoiceOption({
                   displayName: col.name + '.' + property,
@@ -759,6 +761,7 @@ class ElasticDataSourceC extends DataSource
                   icon: fieldTypeToIcon[type],
                   meta: {
                     fieldType: ReverseFieldTypeMapping[type],
+                    analyzed: analyzer !== undefined,
                   },
                 }),
               );
@@ -770,6 +773,7 @@ class ElasticDataSourceC extends DataSource
             icon: fieldTypeToIcon[fieldType],
             meta: {
               fieldType,
+              analyzed: col.analyzed,
             },
           }));
         });
@@ -785,7 +789,7 @@ class ElasticDataSourceC extends DataSource
 
     if (context.type === 'comparison')
     {
-      const { field, fieldType, schemaState, source } = context;
+      const { field, fieldType, schemaState, source, analyzed} = context;
       const server = context.builderState.db.name;
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)
@@ -793,16 +797,8 @@ class ElasticDataSourceC extends DataSource
         options = options.filter((opt) => opt.fieldTypes.indexOf(fieldType) !== -1);
         if (fieldType === FieldType.Text)
         {
-          const { dataSource } = context.source;
-          const { index } = dataSource as any;
-          const col = schemaState.columns.filter(
-            (column) =>
-              column.serverId === String(server) &&
-              column.databaseId === String(index) &&
-              column.name === field,
-          ).toList().get(0);
           // If it is analyzed, remove 'equal' / 'notequal' (term)
-          if (col && col.analyzed)
+          if (analyzed)
           {
             options = options.filter((opt) => opt.value !== 'equal' && opt.value !== 'notequal');
           }

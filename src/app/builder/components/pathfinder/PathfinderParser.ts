@@ -73,7 +73,6 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     sort: Map({}),
     aggs: Map({}),
     from: 0,
-    size: PathFinderDefaultSize,
     _source: true,
     track_scores: true,
   });
@@ -88,7 +87,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   baseQuery = baseQuery.setIn(['query', 'bool', 'filter'], List([
     Map({
       term: Map({
-        _index: sourceInfo.index.split('/')[1],
+        _index: sourceInfo.index,
       }),
     }),
   ]));
@@ -119,7 +118,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   // Scores
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
-    let sortObj = parseScore(path.score);
+    let sortObj = parseScore(path.score, true);
     if (path.score.type !== 'random')
     {
       baseQuery = baseQuery.set('sort', sortObj);
@@ -168,18 +167,17 @@ function parseSource(source: Source): any
   const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : PathFinderDefaultSize,
-
+    size: !isNaN(parseFloat(String(count))) ? parseFloat(String(count)) : 'all',
     index: (source.dataSource as any).index,
   };
 }
 
-export function parseScore(score: Score): any
+export function parseScore(score: Score, simpleParser: boolean = false): any
 {
   switch (score.type)
   {
     case 'terrain':
-      return parseTerrainScore(score);
+      return parseTerrainScore(score, simpleParser);
     case 'linear':
       return parseLinearScore(score);
     case 'elastic':
@@ -210,8 +208,20 @@ function parseLinearScore(score: Score)
   return sortObj;
 }
 
-function parseTerrainScore(score: Score)
+function parseTerrainScore(score: Score, simpleParser: boolean = false)
 {
+  const sortObj = {    
+    _script: {    
+     type: 'number',    
+      order: 'desc',    
+     script: {    
+      stored: 'Terrain.Score.PWL',    
+        params: {    
+         factors: [],    
+      },    
+      },    
+    },    
+  };
   // This is a weird race condition where the path starts loading with the old path and then switches to new path...
   let dirty = false;
   const factors = score.lines.map((line) =>
@@ -255,6 +265,18 @@ function parseTerrainScore(score: Score)
       ranges = data.ranges;
       outputs = data.outputs;
     }
+    if (simpleParser)
+    {
+      return {
+        a: 0,
+        b: 1,
+        weight: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
+        numerators: [[line.field, 1]],
+        denominators: [],
+        ranges,
+        outputs,
+      };
+    }
     return {
       dataDomain: List(line.transformData.dataDomain),
       domain: List(line.transformData.domain),
@@ -266,11 +288,12 @@ function parseTerrainScore(score: Score)
       weight: line.weight,
     };
   }).toArray();
+  sortObj._script.script.params.factors = factors;
   if (dirty)
   {
-    return [];
+    return simpleParser ? {} : [];
   }
-  return factors || [];
+  return simpleParser ? sortObj : factors || [];
 }
 
 function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = false): any
@@ -381,8 +404,6 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
     // In this case it is a nested query, disguised as a normal filter line
     const path = line.field.split('.')[0];
     const negatives = ['notcontain', 'noteequal', 'notisin'];
-    const boolQueryType = negatives.indexOf(line.comparison) !== -1 ? 'must_not' :
-      useShould ? 'should' : 'must';
     const innerLine = parseFilterLine(line, useShould, inputs, true).toJS();
     return Map({
       nested: {
@@ -391,7 +412,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         ignore_unmapped: true,
         query: {
           bool: {
-            [boolQueryType]: innerLine,
+            must: innerLine,
           },
         },
       },

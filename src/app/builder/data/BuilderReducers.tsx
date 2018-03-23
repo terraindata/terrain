@@ -61,6 +61,7 @@ import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
+import TerrainTools from '../../util/TerrainTools';
 import ActionTypes from './BuilderActionTypes';
 import
 {
@@ -573,7 +574,15 @@ const BuilderReducersWrapper = (
       if (!action.payload.notDirty)
       {
         const path = state.query.path;
-        state = state.setIn(['query', 'cards'], PathToCards.updateRootCard(state.query));
+        if (TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
+        {
+          state = state.setIn(['query', 'tql'],
+            AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
+        }
+        else
+        {
+          state = state.setIn(['query', 'cards'], PathToCards.updateRootCard(state.query));
+        }
         // console.log('Path would generates TQL: ' + AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
       }
     }
@@ -581,21 +590,24 @@ const BuilderReducersWrapper = (
     // path/card -> tql
     // a card changed and we need to re-translate the tql
     //  needs to be after the card change has affected the state
-    const newCards = ESCardParser.parseAndUpdateCards(state.query.cards, state.query);
-    state = state.setIn(['query', 'cards'], newCards);
-    // update query
-    state = state
-      .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
-    state = state
-      .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
-      .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
-      .setIn(['query', 'cardsAndCodeInSync'], true);
-
-    // card -> path
-    if (BuilderCardActionTypes[action.type])
+    if (!TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
     {
-      // update path
-      state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query));
+      const newCards = ESCardParser.parseAndUpdateCards(state.query.cards, state.query);
+      state = state.setIn(['query', 'cards'], newCards);
+      // update query
+      state = state
+        .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
+      state = state
+        .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
+        .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
+        .setIn(['query', 'cardsAndCodeInSync'], true);
+
+      // card -> path
+      if (BuilderCardActionTypes[action.type])
+      {
+        // update path
+        state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query));
+      }
     }
   }
 
