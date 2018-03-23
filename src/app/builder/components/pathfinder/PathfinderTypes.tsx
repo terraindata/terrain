@@ -132,7 +132,7 @@ class PathC extends BaseClass
   public reference: string = undefined; // what the outer query will be refered to by inner queries
   public expanded?: boolean = true;
   public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
-  public minMatches?: string = 'any'; // also helpful for inner-queries of groupjoins
+  public minMatches?: number = 0; // also helpful for inner-queries of groupjoins
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
