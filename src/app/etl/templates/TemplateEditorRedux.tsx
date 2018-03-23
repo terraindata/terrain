@@ -303,6 +303,10 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       actionType: 'undoHistory',
     });
     directDispatch({
+      actionType: 'setIsDirty',
+      isDirty: true,
+    });
+    directDispatch({
       actionType: 'rebuildFieldMap',
     });
   }
@@ -312,6 +316,10 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
       actionType: 'redoHistory',
+    });
+    directDispatch({
+      actionType: 'setIsDirty',
+      isDirty: true,
     });
     directDispatch({
       actionType: 'rebuildFieldMap',
