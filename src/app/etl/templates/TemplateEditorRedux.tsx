@@ -160,22 +160,24 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       setTemplate: (state, action) =>
       {
-        // A bit tricky. Whenever we change the history (including redo/undo), we actually
+        // A bit tricky. Whenever we push, undo, or redo, we actually
         // set the current history item's uiState to be the current uiState.
         // This basically makes sure that the uiState is always the last
         // uiState associated with each unique template
-        let newState = state.update('history', (history: History) =>
-          history.updateItem(
-            (item) => _.defaults({ uiState: state.uiState }, item),
-          ));
+
+        let newState = state;
+
         const newItem = {
           template: action.payload.template,
           uiState: state.uiState,
         };
-
         switch (action.payload.history)
         {
           case 'push':
+            newState = state.update('history', (history: History) =>
+              history.updateItem(
+                (item) => _.defaults({ uiState: state.uiState }, item),
+              ));
             newState = newState.update('history',
               (history: History) => history.pushItem(newItem),
             );
