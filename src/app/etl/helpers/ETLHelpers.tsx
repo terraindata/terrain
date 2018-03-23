@@ -71,7 +71,7 @@ import
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
 import { TemplateProxy } from 'etl/templates/TemplateProxy';
-import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, copyTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
@@ -124,8 +124,7 @@ export default abstract class ETLHelpers
   {
     return new Promise<void>((resolve, reject) =>
     {
-      // todo copy the template
-      let template = this._template;
+      let template = copyTemplate(this._template);
       const mutator = (newTemplate: ETLTemplate) =>
       {
         template = newTemplate;
@@ -138,6 +137,7 @@ export default abstract class ETLHelpers
         this.editorAct({
           actionType: 'setTemplate',
           template,
+          history: 'push',
         });
         if (!this._templateEditor.isDirty)
         {

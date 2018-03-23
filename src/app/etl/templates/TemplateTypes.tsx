@@ -173,6 +173,14 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
   process: _ETLProcess,
 });
 
+// todo, please do this more efficiently
+export function copyTemplate(template: ETLTemplate): ETLTemplate
+{
+  const objTemplate = templateForBackend(template);
+  const objTemplateCopy = JSON.parse(JSON.stringify(objTemplate));
+  return _ETLTemplate(objTemplateCopy, true);
+}
+
 export function templateForBackend(template: ETLTemplate): TemplateBase
 {
   const obj: TemplateObject = (template as any).toObject(); // shallow js object

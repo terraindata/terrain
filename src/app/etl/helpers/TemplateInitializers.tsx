@@ -90,6 +90,7 @@ class Initializers extends ETLHelpers
         this.editorAct({
           actionType: 'setTemplate',
           template,
+          history: 'clear',
         });
         const edge = template.getLastEdgeId();
         this.editorAct({ // todo find the last edge
@@ -147,6 +148,7 @@ class Initializers extends ETLHelpers
       this.editorAct({
         actionType: 'setTemplate',
         template,
+        history: 'clear',
       });
       this.editorAct({
         actionType: 'setFieldMap',

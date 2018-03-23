@@ -84,6 +84,8 @@ export interface TemplateEditorActionTypes
   setTemplate: { // this should be the only way to mutate the template graph
     actionType: 'setTemplate';
     template: ETLTemplate;
+    // push adds the template to the history, clear clears the history, void does not interact
+    history: 'push' | 'clear' | 'void';
   };
   rebuildFieldMap: {
     actionType: 'rebuildFieldMap';
