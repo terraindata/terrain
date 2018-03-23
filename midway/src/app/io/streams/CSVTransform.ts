@@ -66,7 +66,7 @@ export default class CSVTransform
 
   public static createExportStream(
     headers: boolean = true,
-    rowDelimiter: string = ',',
+    rowDelimiter: string = '\r\n',
   ): Transform
   {
     return csv.createWriteStream({

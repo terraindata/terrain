@@ -1501,7 +1501,7 @@ describe('File io templates route tests', () =>
           numLines++;
           indexOfDelim = respBuffer.indexOf(delim); // don't include header
         }
-        expect(numLines).toEqual(15 + 1);
+        expect(numLines).toEqual(15);
       })
       .catch((error) =>
       {
@@ -1543,7 +1543,7 @@ describe('File io templates route tests', () =>
           numLines++;
           indexOfDelim = respBuffer.indexOf(delim);
         }
-        expect(numLines).toEqual(11000 + 1); // don't include header
+        expect(numLines).toEqual(11000);
       })
       .catch((error) =>
       {

@@ -122,7 +122,7 @@ export default class GroupJoinTransform extends Readable
     this.maxBufferedOutputs = this.maxPendingQueries;
     this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
-    this.source = new ElasticReader(client, query);
+    this.source = new ElasticReader(client, query, streaming);
     this.source.on('readable', (() =>
     {
       let response = this.source.read();

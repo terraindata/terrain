@@ -186,6 +186,7 @@ export class ElasticReader extends Stream.Readable
 
     if (this.doneReading)
     {
+      this._isEmpty = true;
       // stop scrolling
       if (this.scrollID !== undefined)
       {
@@ -194,7 +195,6 @@ export class ElasticReader extends Stream.Readable
         }, (_err, _resp) =>
           {
             this.push(null);
-            this._isEmpty = true;
           });
 
         this.scrollID = undefined;
