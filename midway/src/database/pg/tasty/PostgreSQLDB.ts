@@ -44,13 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import util from '../../../../../shared/Util';
 import PostgreSQLGenerator from '../../../tasty/PostgreSQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
-import { makePromiseCallback } from '../../../tasty/Utils';
 import PostgreSQLClient from '../client/PostgreSQLClient';
 
 export class PostgreSQLDB implements TastyDB
@@ -110,7 +110,7 @@ export class PostgreSQLDB implements TastyDB
     {
       const result: object[] = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.query(statement, [], makePromiseCallback(resolve, reject));
+        this.client.query(statement, [], util.promise.makeCallback(resolve, reject));
       });
 
       if (result !== undefined && result['rows'] !== undefined)
@@ -134,7 +134,7 @@ export class PostgreSQLDB implements TastyDB
       const value = values[i];
       const result = await new Promise<object[]>((resolve, reject) =>
       {
-        this.client.query(statement, value, makePromiseCallback(resolve, reject));
+        this.client.query(statement, value, util.promise.makeCallback(resolve, reject));
       });
 
       upserted = upserted.concat(result['rows']);

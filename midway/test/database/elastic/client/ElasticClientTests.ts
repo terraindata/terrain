@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
-import * as Utils from '../../../Utils';
+import SharedUtil from '../../../../../shared/Util';
+import * as Utils from '../../TestUtil';
 
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
@@ -79,7 +79,7 @@ test('elastic health', async (done) =>
   {
     elasticClient.cluster.health(
       {},
-      makePromiseCallback(resolve, reject));
+      SharedUtil.promise.makeCallback(resolve, reject));
   });
   winston.info(JSON.stringify(result));
   done();
@@ -100,7 +100,7 @@ test('search', async (done) =>
           },
           size: 1,
         },
-        makePromiseCallback(resolve, reject));
+        SharedUtil.promise.makeCallback(resolve, reject));
     });
     winston.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'search', result.hits);
@@ -121,7 +121,7 @@ test('indices.getMapping', async (done) =>
     {
       elasticClient.indices.getMapping(
         {},
-        makePromiseCallback(resolve, reject));
+        SharedUtil.promise.makeCallback(resolve, reject));
     });
     winston.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'indices.getMapping', result);
@@ -146,7 +146,7 @@ test('putScript', async (done) =>
           lang: 'painless',
           body: `return doc['revenue'].value - doc['budget'].value;`,
         },
-        makePromiseCallback(resolve, reject));
+        SharedUtil.promise.makeCallback(resolve, reject));
     });
 
     const result: any = await new Promise((resolve, reject) =>
@@ -169,7 +169,7 @@ test('putScript', async (done) =>
           },
           size: 1,
         },
-        makePromiseCallback(resolve, reject));
+        SharedUtil.promise.makeCallback(resolve, reject));
     });
     winston.info(JSON.stringify(result, null, 2));
     await Utils.checkResults(getExpectedFile(), 'putScript', result.hits);

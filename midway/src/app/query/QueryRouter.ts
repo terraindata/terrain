@@ -46,18 +46,17 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-import * as Util from '../Util';
-
 import { Readable } from 'stream';
+import * as winston from 'winston';
 
 import QueryRequest from '../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../shared/database/types/QueryResponse';
-import { QueryHandler } from './QueryHandler';
-
+import SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import * as Util from '../AppUtil';
+import { QueryHandler } from './QueryHandler';
 
 const QueryRouter = new KoaRouter();
 
@@ -165,7 +164,7 @@ QueryRouter.post('/template', passport.authenticate('access-token-local'), async
     };
   ctx.body = await new Promise<any>(async (resolve, reject) =>
   {
-    elasticClient.msearchTemplate(params, Util.makePromiseCallback(resolve, reject));
+    elasticClient.msearchTemplate(params, SharedUtil.promise.makeCallback(resolve, reject));
   });
 });
 

@@ -48,8 +48,8 @@ import * as srs from 'secure-random-string';
 
 import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
+import * as Util from '../../AppUtil';
 import UserConfig from '../../users/UserConfig';
-import * as Util from '../../Util';
 import ImportTemplateBaseStringified from './ImportTemplateBaseStringified';
 import ImportTemplateConfig from './ImportTemplateConfig';
 

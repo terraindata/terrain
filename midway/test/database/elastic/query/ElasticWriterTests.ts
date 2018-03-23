@@ -44,87 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import * as Stream from 'stream';
+import * as winston from 'winston';
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import DatabaseController from '../../../database/DatabaseController';
-import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import { Credentials } from '../../credentials/Credentials';
-import CSVTransform from '../streams/CSVTransform';
+import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
+import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
+import ElasticController from '../../../../src/database/elastic/ElasticController';
+import ElasticReader from '../../../../src/database/elastic/streams/ElasticReader';
+import ElasticWriter from '../../../../src/database/elastic/streams/ElasticWriter';
 
-export const credentials: Credentials = new Credentials();
+let elasticController: ElasticController;
+let elasticClient: ElasticClient;
 
-let tasty: Tasty.Tasty;
-
-export interface MySQLSourceConfig
+beforeAll(() =>
 {
-  id: number;
-  tablename: string;
-  query: string;
-}
+  (winston as any).level = 'debug';
+  const config: ElasticConfig = {
+    hosts: ['http://localhost:9200'],
+  };
 
-export interface MySQLRowConfig
-{
-  rows: object[];
-}
+  elasticController = new ElasticController(config, 0, 'ElasticWriterTests');
+  elasticClient = elasticController.getClient();
+});
 
-export class MySQL
-{
-
-  public async getQueryAsCSVStream(mysqlRowConfig: MySQLRowConfig | string): Promise<stream.Readable | string>
+const movies = [
   {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
-    {
-      if (typeof mysqlRowConfig === 'string')
-      {
-        return resolve(mysqlRowConfig);
-      }
-
-      const writer = CSVTransform.createExportStream();
-      if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
-      {
-        (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
-        {
-          writer.write(row);
-        });
-      }
-      writer.end();
-      resolve(writer);
-    });
-  }
-
-  public async runQuery(mysqlConfig: MySQLSourceConfig): Promise<MySQLRowConfig | string>
+    movieid: 12121212,
+    title: 'Toy Story (1995)',
+  },
   {
-    return new Promise<MySQLRowConfig | string>(async (resolve, reject) =>
-    {
-      try
-      {
-        const mysqlRowConfig: MySQLRowConfig =
-          {
-            rows: [],
-          };
-        const database: DatabaseController | undefined = DatabaseRegistry.get(mysqlConfig.id);
-        if (database !== undefined)
-        {
-          if (database.getType() !== 'MySQLController')
-          {
-            return resolve('MySQL source requires a MySQL database ID.');
-          }
-          tasty = database.getTasty() as Tasty.Tasty;
-          mysqlRowConfig.rows = await tasty.getDB().execute([mysqlConfig.query]) as object[];
-          resolve(mysqlRowConfig);
-        }
-        else
-        {
-          return resolve('Database not found.');
-        }
-      }
-      catch (e)
-      {
-        resolve((e as any).toString());
-      }
-    });
-  }
-}
+    movieid: 13131313,
+    title: 'Jumanji (1995)',
+  },
+  {
+    movieid: 14141414,
+    title: 'Grumpier Old Men (1995)',
+  },
+];
 
-export default MySQL;
+test('simple elastic writer', (done) =>
+{
+  try
+  {
+    const readable = new Stream.Readable({ objectMode: true });
+    const writer = new ElasticWriter(elasticClient, 'movies', 'data', 'movieid');
+    readable.pipe(writer);
+    writer.on('finish', done);
+    writer.on('error', fail);
+    movies.forEach((movie) => readable.push(movie));
+    readable.push(null);
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+});

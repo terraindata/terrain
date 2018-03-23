@@ -44,87 +44,76 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import { Transform } from 'stream';
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import DatabaseController from '../../../database/DatabaseController';
-import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import { Credentials } from '../../credentials/Credentials';
-import CSVTransform from '../streams/CSVTransform';
-
-export const credentials: Credentials = new Credentials();
-
-let tasty: Tasty.Tasty;
-
-export interface MySQLSourceConfig
+/**
+ * Abstract class for converting a string stream to an object stream for import
+ */
+export default abstract class AImportTransform extends Transform
 {
-  id: number;
-  tablename: string;
-  query: string;
-}
+  private chunkNumber: number = 0;
 
-export interface MySQLRowConfig
-{
-  rows: object[];
-}
-
-export class MySQL
-{
-
-  public async getQueryAsCSVStream(mysqlRowConfig: MySQLRowConfig | string): Promise<stream.Readable | string>
+  constructor()
   {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
-    {
-      if (typeof mysqlRowConfig === 'string')
-      {
-        return resolve(mysqlRowConfig);
-      }
-
-      const writer = CSVTransform.createExportStream();
-      if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
-      {
-        (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
-        {
-          writer.write(row);
-        });
-      }
-      writer.end();
-      resolve(writer);
+    super({
+      writableObjectMode: true,
+      readableObjectMode: false,
     });
   }
 
-  public async runQuery(mysqlConfig: MySQLSourceConfig): Promise<MySQLRowConfig | string>
+  public _transform(chunk, encoding, callback)
   {
-    return new Promise<MySQLRowConfig | string>(async (resolve, reject) =>
+    const preamble = this.preamble();
+    const chunkNumber = this.chunkNumber++;
+    if (chunkNumber === 0)
     {
-      try
+      if (preamble !== null)
       {
-        const mysqlRowConfig: MySQLRowConfig =
-          {
-            rows: [],
-          };
-        const database: DatabaseController | undefined = DatabaseRegistry.get(mysqlConfig.id);
-        if (database !== undefined)
-        {
-          if (database.getType() !== 'MySQLController')
-          {
-            return resolve('MySQL source requires a MySQL database ID.');
-          }
-          tasty = database.getTasty() as Tasty.Tasty;
-          mysqlRowConfig.rows = await tasty.getDB().execute([mysqlConfig.query]) as object[];
-          resolve(mysqlRowConfig);
-        }
-        else
-        {
-          return resolve('Database not found.');
-        }
+        this.push(preamble);
       }
-      catch (e)
+    }
+
+    const out = this.transform(chunk as string, chunkNumber);
+    if (Array.isArray(out))
+    {
+      out.forEach((o) => this.push(o));
+      callback();
+    }
+    else
+    {
+      callback(null, out);
+    }
+  }
+
+  public _flush(callback)
+  {
+    const preamble = this.preamble();
+    const conclusion = this.conclusion(this.chunkNumber);
+    if (this.chunkNumber === 0)
+    {
+      if (preamble !== null)
       {
-        resolve((e as any).toString());
+        this.push(preamble);
       }
-    });
+    }
+
+    if (conclusion !== null)
+    {
+      this.push(conclusion);
+    }
+
+    callback();
+  }
+
+  protected preamble(): object
+  {
+    return null;
+  }
+
+  protected abstract transform(input: string, chunkNumber: number): object | object[];
+
+  protected conclusion(chunkNumber: number): object
+  {
+    return null;
   }
 }
-
-export default MySQL;

@@ -327,10 +327,10 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     node.fields.forEach((field) =>
     {
-      const el: any = yadeep.get(doc, field);
-      if (el.constructor === Array)
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
       {
-        for (let i: number = 0; i < Object.keys(el).length; i++)
+        for (let i: number = 0; i < el.length; i++)
         {
           let kpi: KeyPath = field;
           if (kpi.contains('*'))

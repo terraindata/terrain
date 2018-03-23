@@ -51,7 +51,7 @@ import * as Papa from 'papaparse';
 import { FileTypes } from './types/ETLTypes';
 
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
-import { parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from 'shared/Util';
+import Util from 'shared/Util';
 
 export function getFileType(file: File): FileTypes
 {
@@ -117,9 +117,9 @@ export function getSampleRows(
       try
       {
         items = options.jsonNewlines ?
-          parseNewlineJSONSubset(fr.result, numRows)
+          Util.json.parseNewlineJSON(fr.result, numRows)
           :
-          parseObjectListJSONSubset(fr.result, numRows);
+          Util.json.parseObjectListJSON(fr.result, numRows);
       }
       catch (e)
       {

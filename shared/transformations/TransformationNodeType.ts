@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable no-unused-expression
 import { List } from 'immutable';
-import { KeyPath } from 'sharedutil/KeyPath';
+import { KeyPath } from 'shared/util/KeyPath';
 
 enum TransformationNodeType
 {

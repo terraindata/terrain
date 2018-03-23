@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 import * as Elastic from 'elasticsearch';
 
+import util from '../../../../../shared/Util';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
-import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
 import ElasticGenerator from './ElasticGenerator';
 import ElasticQuery from './ElasticQuery';
@@ -80,7 +80,7 @@ export class ElasticDB implements TastyDB
     {
       this.client.indices.getMapping(
         {},
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
 
     return TastySchema.fromElasticTree(result);
@@ -102,7 +102,7 @@ export class ElasticDB implements TastyDB
       {
         this.client.search(
           queries[i],
-          makePromiseCallback(resolve, reject));
+          util.promise.makeCallback(resolve, reject));
       });
 
       if (i === queries.length - 1)
@@ -151,7 +151,7 @@ export class ElasticDB implements TastyDB
       {
         this.client.putScript(
           procedure,
-          makePromiseCallback(resolve, reject));
+          util.promise.makeCallback(resolve, reject));
       });
   }
 
@@ -160,31 +160,15 @@ export class ElasticDB implements TastyDB
    */
   public async upsert(table: TastyTable, elements: object[])
   {
-    const upserted = await this.upsertObjects(table, elements);
-    const primaryKeys = table.getPrimaryKeys();
-    const results = new Array(upserted.length);
-    for (let i = 0; i < upserted.length; i++)
-    {
-      results[i] = elements[i];
-      if (upserted[i]['_id'] !== undefined)
-      {
-        if ((primaryKeys.length === 1) &&
-          (elements[i][primaryKeys[0]] === undefined))
-        {
-          results[i][primaryKeys[0]] = upserted[i]['_id'];
-        }
-      }
-    }
-
-    return results;
+    return this.update(table, elements, true);
   }
 
-  /**-----------------------------------------------------------------------
+  /**
    * Updates the given objects, based on primary key ('id' in elastic).
    */
-  public async update(table: TastyTable, elements: object[])
+  public async update(table: TastyTable, elements: object[], upsert: boolean = false)
   {
-    const updated = await this.updateObjects(table, elements);
+    const updated = await this.updateObjects(table, elements, upsert);
     const primaryKeys = table.getPrimaryKeys();
     const results = new Array(updated.length);
     for (let i = 0; i < updated.length; i++)
@@ -199,7 +183,6 @@ export class ElasticDB implements TastyDB
         }
       }
     }
-
     return results;
   }
 
@@ -216,7 +199,7 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.create(
         params,
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -233,7 +216,7 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.delete(
         params,
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -254,7 +237,7 @@ export class ElasticDB implements TastyDB
           type: table.getTableName(),
           body: payload,
         },
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
@@ -278,7 +261,7 @@ export class ElasticDB implements TastyDB
 
           this.client.delete(
             params,
-            makePromiseCallback(resolve, reject));
+            util.promise.makeCallback(resolve, reject));
         }));
     }
     return Promise.all(promises);
@@ -297,15 +280,15 @@ export class ElasticDB implements TastyDB
 
       this.client.indices.refresh(
         params,
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 
-  private async upsertObjects(table: TastyTable, elements: object[])
+  private async updateObjects(table: TastyTable, elements: object[], upsert: boolean)
   {
     if (elements.length > 2)
     {
-      await this.bulkUpsert(table, elements);
+      await this.bulkUpdate(table, elements, upsert);
       return elements;
     }
 
@@ -315,46 +298,21 @@ export class ElasticDB implements TastyDB
       promises.push(
         new Promise((resolve, reject) =>
         {
-          const query = {
-            body: element,
-            index: table.getDatabaseName(),
-            type: table.getTableName(),
-          };
-
-          const compositePrimaryKey = this.makeID(table, element);
-          if (compositePrimaryKey !== '')
+          let body = {};
+          if (upsert)
           {
-            query['id'] = compositePrimaryKey;
+            body = element;
           }
-
-          this.client.index(
-            query as any,
-            makePromiseCallback(resolve, reject));
-        }),
-      );
-    }
-    return Promise.all(promises);
-  }
-
-  private async updateObjects(table: TastyTable, elements: object[])
-  {
-    if (elements.length > 2)
-    {
-      await this.bulkUpdate(table, elements);
-      return elements;
-    }
-
-    const promises: Array<Promise<any>> = [];
-    for (const element of elements)
-    {
-      promises.push(
-        new Promise((resolve, reject) =>
-        {
-          const query = {
-            body: {
+          else
+          {
+            body = {
               doc: element,
               doc_as_upsert: true,
-            },
+            };
+          }
+
+          const query = {
+            body,
             index: table.getDatabaseName(),
             type: table.getTableName(),
           };
@@ -365,23 +323,33 @@ export class ElasticDB implements TastyDB
             query['id'] = compositePrimaryKey;
           }
 
-          this.client.update(
-            query as any,
-            makePromiseCallback(resolve, reject));
+          if (upsert)
+          {
+            this.client.index(
+              query as any,
+              util.promise.makeCallback(resolve, reject));
+          }
+          else
+          {
+            this.client.update(
+              query as any,
+              util.promise.makeCallback(resolve, reject));
+          }
         }),
       );
     }
     return Promise.all(promises);
   }
 
-  private async bulkUpsert(table: TastyTable, elements: object[]): Promise<any>
+  private async bulkUpdate(table: TastyTable, elements: object[], upsert: boolean): Promise<any>
   {
     const body: any[] = [];
     for (const element of elements)
     {
+      const cmd = upsert ? 'index' : 'update';
       const command =
         {
-          index: {
+          [cmd]: {
             _index: table.getDatabaseName(),
             _type: table.getTableName(),
           },
@@ -390,47 +358,24 @@ export class ElasticDB implements TastyDB
       const compositePrimaryKey = this.makeID(table, element);
       if (compositePrimaryKey !== '')
       {
-        command.index['_id'] = compositePrimaryKey;
+        command[cmd]['_id'] = compositePrimaryKey;
       }
 
-      body.push(command);
-      body.push(element);
-    }
-
-    return new Promise((resolve, reject) =>
-    {
-      this.client.bulk(
-        {
-          body,
-        },
-        makePromiseCallback(resolve, reject));
-    });
-  }
-
-  private async bulkUpdate(table: TastyTable, elements: object[]): Promise<any>
-  {
-    const body: any[] = [];
-    for (const element of elements)
-    {
-      const command =
-        {
-          update: {
-            _index: table.getDatabaseName(),
-            _type: table.getTableName(),
-          },
-        };
-
-      const compositePrimaryKey = this.makeID(table, element);
-      if (compositePrimaryKey !== '')
+      let obj = {};
+      if (upsert)
       {
-        command.update['_id'] = compositePrimaryKey;
+        obj = element;
+      }
+      else
+      {
+        obj = {
+          doc: element,
+          doc_as_upsert: true,
+        };
       }
 
       body.push(command);
-      body.push({
-        doc: element,
-        doc_as_upsert: true,
-      });
+      body.push(obj);
     }
 
     return new Promise((resolve, reject) =>
@@ -439,7 +384,7 @@ export class ElasticDB implements TastyDB
         {
           body,
         },
-        makePromiseCallback(resolve, reject));
+        util.promise.makeCallback(resolve, reject));
     });
   }
 

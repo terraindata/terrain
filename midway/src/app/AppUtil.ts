@@ -44,107 +44,101 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import AExportTransform from './AExportTransform';
+import * as request from 'request';
 
-/**
- * Export to CSV format.
- * Conforms to RFC 4180: https://tools.ietf.org/html/rfc4180
- *
- * Additional configuration options are possible.
- */
-export default class CSVExportTransform extends AExportTransform
+import { ItemConfig } from '../app/items/ItemConfig';
+import { items } from '../app/items/ItemRouter';
+
+export function doRequest(url)
 {
-
-  private columnNames: string[];
-  private separator: string = ',';
-  private nullValue: string = 'null';
-
-  constructor(columnNames: string[],
-    separator: string = ',',
-    nullValue: string = 'null')
+  return new Promise((resolve, reject) =>
   {
-    super();
-    this.columnNames = columnNames;
-    this.separator = separator;
-    this.nullValue = nullValue;
-  }
-
-  protected preamble(): string
-  {
-    const headerObject: object = {};
-    for (let i: number = 0; i < this.columnNames.length; ++i)
+    request(url, (error, res, body) =>
     {
-      const name: string = this.columnNames[i];
-      headerObject[name] = name;
-    }
-
-    return this.transform(headerObject, 0) + this.delimiter();
-  }
-
-  protected transform(input: object, chunkNumber: number): string
-  {
-    let result: string = '';
-
-    for (let i: number = 0; i < this.columnNames.length; ++i)
-    {
-      const name: string = this.columnNames[i];
-      const value: any = input[name];
-
-      if (i > 0)
+      if ((error === null || error === undefined) && res.statusCode === 200)
       {
-        result += this.separator;
+        resolve(body);
       }
+      else
+      {
+        reject(error);
+      }
+    });
+  });
+}
 
-      result += this.translation(value);
-    }
-    return result;
-  }
-
-  protected delimiter(): string
+export function updateObject<T>(obj: T, newObj: T): T
+{
+  for (const key in newObj)
   {
-    return '\r\n';
-  }
-
-  protected conclusion(chunkNumber: number): string
-  {
-    return this.delimiter();
-  }
-
-  private translation(value: any): string
-  {
-    switch (typeof value)
+    if (newObj.hasOwnProperty(key))
     {
-      case 'boolean':
-        return (value === true) ? 'true' : 'false';
-      case 'number':
-        return value.toString();
-      case 'string':
-        return this.escapeString(value as string);
-      case 'object':
-        if (value === null)
-        {
-          return this.nullValue;
-        }
-        else
-        {
-          return this.escapeString(JSON.stringify(value));
-        }
-      case 'undefined':
-        return this.nullValue;
-      default:
-        throw Error('Unable to convert value to valid CSV: ' + JSON.stringify(value));
+      obj[key] = newObj[key];
     }
   }
+  return obj;
+}
 
-  private escapeString(input: string): string
+export function verifyParameters(parameters: any, required: string[]): void
+{
+  if (parameters === undefined)
   {
-    if (!(/[,\n\r"]/.test(input)))
+    throw new Error('No parameters found.');
+  }
+
+  for (const key of required)
+  {
+    if (parameters.hasOwnProperty(key) === false)
     {
-      return input; // no need to escape
+      throw new Error('Parameter "' + key + '" not found in request object.');
+    }
+  }
+}
+
+export async function getQueryFromAlgorithm(algorithmId: number): Promise<string>
+{
+  return new Promise<string>(async (resolve, reject) =>
+  {
+    const algorithms: ItemConfig[] = await items.get(algorithmId);
+    if (algorithms.length === 0)
+    {
+      return reject('Algorithm not found.');
     }
 
-    // CSV escapes quotes by doubling them
-    input = input.replace(/"/g, '""');
-    return '"' + input + '"';
-  }
+    try
+    {
+      if (algorithms[0].meta !== undefined)
+      {
+        return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
+      }
+    }
+    catch (e)
+    {
+      return reject('Malformed algorithm');
+    }
+  });
+}
+
+export async function getDBFromAlgorithm(algorithmId: number): Promise<number>
+{
+  return new Promise<number>(async (resolve, reject) =>
+  {
+    const algorithms: ItemConfig[] = await items.get(algorithmId);
+    if (algorithms.length === 0)
+    {
+      return reject('Algorithm not found.');
+    }
+
+    try
+    {
+      if (algorithms[0].meta !== undefined)
+      {
+        return resolve(JSON.parse(algorithms[0].meta as string)['db']['id']);
+      }
+    }
+    catch (e)
+    {
+      return reject('Malformed algorithm');
+    }
+  });
 }

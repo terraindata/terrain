@@ -48,13 +48,13 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
 import DatabaseController from '../../database/DatabaseController';
-import * as DBUtil from '../../database/Util';
+import DatabaseControllerConfig from '../../database/DatabaseControllerConfig';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Scripts from '../../scripts/Scripts';
+import * as Util from '../AppUtil';
+import DatabaseConfig from '../database/DatabaseConfig';
 import { metrics } from '../events/EventRouter';
 import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
-import DatabaseConfig from './DatabaseConfig';
 
 export class Databases
 {
@@ -147,7 +147,8 @@ export class Databases
       throw new Error('Database does not have an ID');
     }
 
-    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.id, db.dsn, db.analyticsIndex, db.analyticsType);
+    const controller: DatabaseController = DatabaseControllerConfig.makeDatabaseController(
+      db.type, db.id, db.dsn, db.analyticsIndex, db.analyticsType);
     DatabaseRegistry.set(db.id, controller);
 
     // try to provision built-in scripts to the connected database

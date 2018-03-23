@@ -48,7 +48,8 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as stream from 'stream';
 
-import { CSVTypeParser, isTypeConsistent } from '../Util';
+import util from '../Util';
+import CSVTypeParser from './CSVTypeParser';
 
 export class FieldTypes
 {
@@ -169,7 +170,7 @@ export class FieldTypes
               else
               {
                 type = { type: 'array', innerType: {} };
-                type['innerType'] = isTypeConsistent(value) ? await this.getFullTypeFromAny(value[0])
+                type['innerType'] = util.elastic.isTypeConsistent(value) ? await this.getFullTypeFromAny(value[0])
                   : { type: 'text', index: 'analyzed', analyzer: 'standard' };
               }
             }

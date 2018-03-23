@@ -44,21 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import { makePromiseCallback } from '../tasty/Utils';
+import * as _ from 'lodash';
 
-export async function readDirAsync(path: string)
-{
-  return new Promise<string[]>(async (resolve, reject) =>
-  {
-    fs.readdir(path, makePromiseCallback(resolve, reject));
-  });
-}
+import { Import, ImportConfig } from '../Import';
+import ADocumentTransform from './ADocumentTransform';
 
-export async function readFileAsync(file: string, encoding: string)
+/**
+ * Applies import transformations to a result stream
+ */
+export default class ImportTransform extends ADocumentTransform
 {
-  return new Promise<string>(async (resolve, reject) =>
+  private importt: Import;
+  private config: ImportConfig;
+  private mapping: object;
+
+  constructor(importt: Import, config: ImportConfig)
   {
-    fs.readFile(file, encoding, makePromiseCallback(resolve, reject));
-  });
+    super();
+    this.importt = importt;
+    this.config = config;
+  }
+
+  protected transform(input: object | object[], chunkNumber: number): object | object[]
+  {
+    if (Array.isArray(input))
+    {
+      return input.map((i) => this.transform(i, chunkNumber++));
+    }
+
+    let transformed;
+    try
+    {
+      transformed = this.importt._transformAndCheck(input, this.config);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+    return transformed;
+  }
 }

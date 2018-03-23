@@ -51,7 +51,7 @@ import * as winston from 'winston';
 
 import { CredentialConfig } from '../../credentials/CredentialConfig';
 import Credentials from '../../credentials/Credentials';
-import CSVExportTransform from '../streams/CSVExportTransform';
+import CSVTransform from '../streams/CSVTransform';
 
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();
@@ -104,10 +104,10 @@ export class GoogleAPI
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const writer = new CSVExportTransform(Object.keys(values[0]));
+      const writer = CSVTransform.createExportStream();
       if (values.length > 0)
       {
-        for (let i = 1; i < values.length; ++i)
+        for (let i = 0; i < values.length; ++i)
         {
           writer.write(_.zipObject(values[0], values[i]));
         }

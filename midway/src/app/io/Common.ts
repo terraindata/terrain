@@ -42,39 +42,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import AExportTransform from './AExportTransform';
+import * as _ from 'lodash';
 
-/**
- * Converts result stream to JSON text stream
- *
- * Could add additional config options.
- */
-export default class JSONExportTransform extends AExportTransform
+export function mergeDocument(doc: object): object
 {
-  constructor()
+  if (doc['_source'] !== undefined)
   {
-    super();
+    const sourceKeys = Object.keys(doc['_source']);
+    const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
+    if (rootKeys.length > 0) // there were other top-level objects in the document
+    {
+      const duplicateRootKeys: string[] = [];
+      rootKeys.forEach((rootKey) =>
+      {
+        if (sourceKeys.indexOf(rootKey) > -1)
+        {
+          duplicateRootKeys.push(rootKey);
+        }
+      });
+      if (duplicateRootKeys.length !== 0)
+      {
+        throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+      }
+      rootKeys.forEach((rootKey) =>
+      {
+        doc['_source'][rootKey] = doc[rootKey];
+        delete doc[rootKey];
+      });
+    }
   }
-
-  protected preamble(): string
-  {
-    return '[\n';
-  }
-
-  protected transform(input: object, chunkNumber: number): string
-  {
-    return JSON.stringify(input);
-  }
-
-  protected delimiter(): string
-  {
-    return ',\n';
-  }
-
-  protected conclusion(chunkNumber: number): string
-  {
-    return '\n]\n';
-  }
+  return doc;
 }
