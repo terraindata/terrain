@@ -68,7 +68,7 @@ import { MidwayError } from 'shared/error/MidwayError';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
+import { createTreeFromEngine, updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import Ajax from 'util/Ajax';
 
 const { List, Map } = Immutable;
@@ -87,6 +87,10 @@ export interface TemplateEditorActionTypes
   };
   rebuildFieldMap: {
     actionType: 'rebuildFieldMap';
+  };
+  rebuildField: {
+    actionType: 'rebuildField';
+    fieldId: number;
   };
   setFieldMap: { // this should be the only way to mutate the template tree
     actionType: 'setFieldMap';
@@ -153,6 +157,14 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         const engine = state.getCurrentEngine();
         const newFieldMap = createTreeFromEngine(engine);
         return state.set('fieldMap', newFieldMap);
+      },
+      rebuildField: (state, action) =>
+      {
+        const engine = state.getCurrentEngine();
+        const fieldId = action.payload.fieldId;
+        const oldField = state.fieldMap.get(fieldId);
+        const newField = updateFieldFromEngine(engine, fieldId, oldField);
+        return state.update('fieldMap', (fieldMap) => fieldMap.set(fieldId, newField));
       },
       setFieldMap: (state, action) =>
       {

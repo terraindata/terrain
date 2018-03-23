@@ -91,7 +91,8 @@ class GraphHelpers extends ETLHelpers
     // 2: split the left edge using the merge node
     // 3: connect the right edge to the merge node
 
-    this._try((proxy) => {
+    this._try((proxy) =>
+    {
       const leftEdgeId = proxy.value().findEdges((edge) => edge.from === leftId).first();
       const rightEdgeId = proxy.value().findEdges((edge) => edge.from === rightId).first();
       const destinationNodeId = proxy.value().getEdge(leftEdgeId).to;
@@ -121,7 +122,8 @@ class GraphHelpers extends ETLHelpers
       DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
       {
         const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
-        this._try((proxy) => {
+        this._try((proxy) =>
+        {
           proxy.setEdgeTransformations(edgeId, engine);
         }).catch(this._logError);
       }).catch(this._logError);
@@ -135,7 +137,8 @@ class GraphHelpers extends ETLHelpers
 
     let newEdges = List([]);
 
-    this._try((proxy) => {
+    this._try((proxy) =>
+    {
       newKeys.forEach((key) =>
       {
         const sourceId = proxy.addSource(key, newSources.get(key));
@@ -150,14 +153,17 @@ class GraphHelpers extends ETLHelpers
       {
         proxy.deleteSource(key);
       });
-    }).then(() => {
-      deletedKeys.forEach((key) => {
+    }).then(() =>
+    {
+      deletedKeys.forEach((key) =>
+      {
         this.editorAct({
           actionType: 'deleteInMergeDocuments',
           key,
         });
       });
-      newEdges.forEach((edgeId) => {
+      newEdges.forEach((edgeId) =>
+      {
         this.createEngineForEdge(edgeId);
       });
       DocumentsHelpers.fetchSources(differentKeys);
@@ -169,7 +175,8 @@ class GraphHelpers extends ETLHelpers
     const { newKeys, deletedKeys, differentKeys } =
       getChangedKeys(this._template.getSinks(), newSinks);
 
-    this._try((proxy) => {
+    this._try((proxy) =>
+    {
       newKeys.forEach((key) =>
       {
         proxy.addSink(key, newSinks.get(key));

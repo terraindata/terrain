@@ -59,7 +59,7 @@ const { List, Map } = Immutable;
 import { instanceFnDecorator } from 'src/app/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
-import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
@@ -98,16 +98,13 @@ interface Injected
 
 export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
 {
-  private onRootMutationBound: (fieldMap: FieldMap) => void;
-  private updateEngineVersionBound: () => void;
   private uiStateTracker: PropertyTracker<EditorDisplayState> = new PropertyTracker(this.getUIStateValue.bind(this));
   private updateChecker: UpdateChecker = new UpdateChecker();
 
   constructor(props)
   {
     super(props);
-    this.onRootMutationBound = this.onRootMutation.bind(this);
-    this.updateEngineVersionBound = this.updateEngineVersion.bind(this);
+    this.handleRequestRebuild = this.handleRequestRebuild.bind(this);
   }
 
   public componentWillUpdate(nextProps, nextState)
@@ -179,19 +176,19 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
   }
 
-  protected _proxy(): FieldNodeProxy
+  protected _proxy(): FieldProxy
   {
     const engine = this._currentEngine();
-    const tree = new FieldTreeProxy(this._fieldMap(), engine, this.onRootMutationBound, this.updateEngineVersionBound);
-    return new FieldNodeProxy(tree, this.props.fieldId);
+    const proxy = new EngineProxy(engine, this.handleRequestRebuild);
+    return proxy.makeFieldProxy(this.props.fieldId);
   }
 
-  protected _try(tryFn: (proxy: FieldNodeProxy) => void): Promise<void>
-  {
-    return new Promise<void>((resolve, reject) => {
+  // protected _try(tryFn: (proxy: FieldNodeProxy) => void): Promise<void>
+  // {
+  //   // return new Promise<void>((resolve, reject) => {
 
-    });
-  }
+  //   // });
+  // }
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps
   {
@@ -257,22 +254,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this._inputDisabled() ? undefined : fn;
   }
 
-  private onRootMutation(fieldMap: FieldMap)
-  {
-    this.props.act({
-      actionType: 'setFieldMap',
-      fieldMap,
-    });
-  }
-
-  private updateEngineVersion()
-  {
-    this.props.act({
-      actionType: 'updateEngineVersion',
-    });
-  }
-
-  // gets memoizedOne'd
+  @instanceFnDecorator(memoizeOne)
   private getDKPCachedFn(displayKeyPath, cacheDependency)
   {
     return _.memoize((index) =>
@@ -285,6 +267,26 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   private getUIStateValue(): EditorDisplayState
   {
     return (this.props as Props & Injected).templateEditor.uiState;
+  }
+
+  private handleRequestRebuild(id?: number)
+  {
+    if (id === undefined)
+    {
+      this.props.act({
+        actionType: 'rebuildFieldMap',
+      });
+    }
+    else
+    {
+      this.props.act({
+        actionType: 'rebuildField',
+        fieldId: id,
+      });
+    }
+    this.props.act({
+      actionType: 'updateEngineVersion',
+    });
   }
 }
 

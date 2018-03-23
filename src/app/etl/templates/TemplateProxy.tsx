@@ -51,7 +51,6 @@ const { List, Map } = Immutable;
 
 import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { ETLTemplate, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';

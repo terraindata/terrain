@@ -120,7 +120,7 @@ export default abstract class ETLHelpers
     };
   }
 
-  protected _try(tryFn: (proxy: TemplateProxy) => void): Promise<void>
+  public _try(tryFn: (proxy: TemplateProxy) => void): Promise<void>
   {
     return new Promise<void>((resolve, reject) =>
     {
@@ -150,7 +150,7 @@ export default abstract class ETLHelpers
       }
       else
       {
-        reject();
+        reject('failure');
       }
     });
   }

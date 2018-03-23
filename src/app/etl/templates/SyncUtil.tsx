@@ -93,7 +93,8 @@ export function createTreeFromEngine(engine: TransformationEngine): FieldMap
   });
 
   let fieldMap = Map() as FieldMap;
-  sortedIds.forEach((id, index) => {
+  sortedIds.forEach((id, index) =>
+  {
     const enginePath = engine.getOutputKeyPath(id).toJS();
     const field = enginePathToField[JSON.stringify(enginePath)];
     if (field != null)

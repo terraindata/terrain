@@ -50,38 +50,27 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { createTreeFromEngine, updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import { isWildcardField } from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-import { isWildcardField } from 'shared/transformations/util/EngineUtil';
 /*
  *  The FieldProxy structures act as the binding between the TemplateEditorField
  *  tree structure and the flattened structure of the transformation engine
  *  The proxy objects are generated synchronously and aren't meant to be persisted
  *  (don't hold references to proxies across call contexts!)
  */
-export class FieldTreeProxy
+export class EngineProxy
 {
-  private onMutate: (fieldMap: FieldMap) => void;
-  private updateVersion: () => void;
-  private fieldMap: FieldMap;
-  private engine: TransformationEngine;
-
   constructor(
-    fieldMap: FieldMap,
-    engine: TransformationEngine,
-    onMutate?: (fieldMap: FieldMap) => void,
-    updateVersion?: () => void
+    private engine: TransformationEngine,
+    private requestRebuild?: (id?: number) => void,
   )
   {
-    this.fieldMap = fieldMap;
-    this.engine = engine;
-    this.onMutate = onMutate !== undefined ? onMutate : doNothing;
-    this.updateVersion = updateVersion !== undefined ? updateVersion : doNothing;
+
   }
 
   public getEngine(): TransformationEngine
@@ -89,53 +78,52 @@ export class FieldTreeProxy
     return this.engine;
   }
 
-  public updateEngineVersion()
-  {
-    this.updateVersion();
-  }
-
-  public setField(fieldId: number, newField: TemplateField)
-  {
-    this.fieldMap = this.fieldMap.set(fieldId, newField);
-    this.onMutate(this.fieldMap);
-  }
-
   public rebuildAll()
   {
-    this.fieldMap = createTreeFromEngine(this.engine);
-    this.onMutate(this.fieldMap);
+    if (this.requestRebuild !== undefined)
+    {
+      this.requestRebuild();
+    }
   }
 
-  public getField(fieldId: number): TemplateField
+  public rebuildField(fieldId: number)
   {
-    return this.fieldMap.get(fieldId);
+    if (this.requestRebuild !== undefined)
+    {
+      this.requestRebuild(fieldId);
+    }
+  }
+
+  public makeFieldProxy(fieldId: number)
+  {
+    return new FieldProxy(this, fieldId);
   }
 }
 
-export class FieldNodeProxy
+export class FieldProxy
 {
   private pauseSync = false;
   private shouldSync = false;
 
-  constructor(private tree: FieldTreeProxy, private fieldId: number)
+  private get engine(): TransformationEngine
   {
-
+    return this.engineProxy.getEngine();
   }
 
-  public field(): TemplateField
+  constructor(private engineProxy: EngineProxy, private fieldId: number)
   {
-    return this.tree.getField(this.fieldId);
+
   }
 
   public setFieldEnabled(enabled: boolean)
   {
     if (enabled)
     {
-      this.tree.getEngine().enableField(this.fieldId);
+      this.engine.enableField(this.fieldId);
     }
     else
     {
-      this.tree.getEngine().disableField(this.fieldId);
+      this.engine.disableField(this.fieldId);
     }
     this.syncWithEngine();
   }
@@ -147,62 +135,58 @@ export class FieldNodeProxy
       // TODO: handle error
       return this;
     }
-    const engine = this.tree.getEngine();
     value = value.toString();
-    let outputPath = engine.getOutputKeyPath(this.fieldId);
+    let outputPath = this.engine.getOutputKeyPath(this.fieldId);
     outputPath = outputPath.set(outputPath.size - 1, value);
-    engine.setOutputKeyPath(this.fieldId, outputPath);
+    this.engine.setOutputKeyPath(this.fieldId, outputPath);
     this.syncWithEngine();
   }
 
   public structuralChangeName(newPath: EnginePath)
   {
-    const engine = this.tree.getEngine();
-    if (validateRename(engine, this.fieldId, newPath).isValid)
+    if (validateRename(this.engine, this.fieldId, newPath).isValid)
     {
-      engine.setOutputKeyPath(this.fieldId, newPath);
+      this.engine.setOutputKeyPath(this.fieldId, newPath);
 
       for (let i = 1; i < newPath.size; i++)
       {
         const ancestorPath = newPath.slice(0, i).toList();
-        const parentId = engine.getOutputFieldID(ancestorPath);
+        const parentId = this.engine.getOutputFieldID(ancestorPath);
         if (parentId === undefined)
         {
-          engine.addField(ancestorPath, 'object');
+          this.engine.addField(ancestorPath, 'object');
         }
       }
       this.syncWithEngine(true);
     }
   }
 
+  // add a field under this field
   public addNewField(newPath: EnginePath)
   {
-    const engine = this.tree.getEngine();
-    if (validateNewFieldName(engine, this.fieldId, newPath).isValid)
+    if (validateNewFieldName(this.engine, this.fieldId, newPath).isValid)
     {
-      engine.addField(newPath, 'string');
+      this.engine.addField(newPath, 'string');
       this.syncWithEngine(true);
     }
   }
 
   public changeType(newType: FieldTypes)
   {
-    const engine = this.tree.getEngine();
-    if (isWildcardField(engine.getInputKeyPath(this.fieldId)))
+    if (isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
     {
-      engine.setFieldProp(this.fieldId, List(['valueType']), newType);
+      this.engine.setFieldProp(this.fieldId, List(['valueType']), newType);
     }
     else
     {
-      engine.setFieldType(this.fieldId, newType);
+      this.engine.setFieldType(this.fieldId, newType);
     }
     this.syncWithEngine();
   }
 
   public setFieldProps(newFormState: object, language: Languages)
   {
-    const engine = this.tree.getEngine();
-    engine.setFieldProp(this.fieldId, EnginePath([language]), newFormState);
+    this.engine.setFieldProp(this.fieldId, EnginePath([language]), newFormState);
     this.syncWithEngine();
   }
 
@@ -212,14 +196,12 @@ export class FieldNodeProxy
     {
       if (structuralChanges)
       {
-        this.tree.rebuildAll();
+        this.engineProxy.rebuildAll();
       }
       else
       {
-        const updatedField = updateFieldFromEngine(this.tree.getEngine(), this.fieldId, this.field());
-        this.tree.setField(this.fieldId, updatedField);
+        this.engineProxy.rebuildField(this.fieldId);
       }
-      this.tree.updateEngineVersion();
       this.shouldSync = false;
     }
     else
@@ -228,7 +210,7 @@ export class FieldNodeProxy
     }
   }
 
-  public withEngineMutations(fn: (proxy: FieldNodeProxy) => void) // sort of like immutable withMutations
+  public withEngineMutations(fn: (proxy: FieldProxy) => void) // sort of like immutable withMutations
   {
     this.pauseSync = true;
     this.shouldSync = false;
