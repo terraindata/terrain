@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
 {
   DefaultSinkConfig,
@@ -53,9 +54,12 @@ import
   SinkConfig,
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import util from 'shared/Util';
+import util from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
+import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
 import CSVTransform from '../io/streams/CSVTransform';
@@ -63,12 +67,9 @@ import JSONTransform from '../io/streams/JSONTransform';
 import { QueryHandler } from '../query/QueryHandler';
 
 import { databases } from '../database/DatabaseRouter';
+import ExportTransform from './ExportTransform';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
-import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
-import ElasticClient from '../../database/elastic/client/ElasticClient';
-import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
-import { ElasticMapping } from '../../../../shared/etl/mapping/ElasticMapping';
 
 export async function getSourceStream(sources: DefaultSourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
@@ -109,11 +110,14 @@ export async function getSourceStream(sources: DefaultSourceConfig, files?: stre
           body: query,
         };
 
-        sourceStream = await qh.handleQuery(payload) as stream.Readable;
-        if (sourceStream === undefined)
+        const algorithmStream = await qh.handleQuery(payload) as stream.Readable;
+        if (algorithmStream === undefined)
         {
           throw new Error('Error creating new source stream from algorithm');
         }
+
+        const exportTransform = new ExportTransform();
+        sourceStream = algorithmStream.pipe(exportTransform);
         break;
       case 'Upload':
         if (files === undefined || files.length === 0)
@@ -144,9 +148,9 @@ export async function getSourceStream(sources: DefaultSourceConfig, files?: stre
   });
 }
 
-export async function getSinkStream(sinks: DefaultSinkConfig, engine: TransformationEngine): Promise<stream.Transform>
+export async function getSinkStream(sinks: DefaultSinkConfig, engine: TransformationEngine): Promise<stream.Duplex>
 {
-  return new Promise<stream.Transform>(async (resolve, reject) =>
+  return new Promise<stream.Duplex>(async (resolve, reject) =>
   {
     if (sinks._default === undefined)
     {
@@ -154,7 +158,7 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
     }
 
     const sink: SinkConfig = sinks._default;
-    let sinkStream: stream.Transform;
+    let sinkStream: stream.Duplex;
 
     switch (sink.type)
     {
@@ -172,12 +176,12 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
         }
         break;
       case 'Database':
-        if (sink.options.language !== 'elastic')
+        if (sink.options['language'] !== 'elastic')
         {
           throw new Error('Can only import into Elastic at the moment.');
         }
 
-        const { serverId, database, table } = sink.options;
+        const { serverId, database, table } = sink.options as any;
         const db = await databases.select([], { name: serverId });
         if (db.length < 1)
         {
@@ -206,8 +210,7 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
             util.promise.makeCallback(res, rej));
         });
 
-        const writer = new ElasticWriter(client, database, table, primaryKey);
-        sinkStream = writer.pipe(new stream.PassThrough());
+        sinkStream = new ElasticWriter(client, database, table, primaryKey);
         break;
       case 'Sftp':
       case 'Http':

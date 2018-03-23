@@ -47,8 +47,6 @@ THE SOFTWARE.
 import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as _ from 'lodash';
-import * as stream from 'stream';
 
 import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';

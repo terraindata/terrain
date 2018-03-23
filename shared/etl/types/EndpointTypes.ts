@@ -47,6 +47,8 @@ THE SOFTWARE.
 
 import { FileTypes, Languages } from './ETLTypes';
 
+type ID = number;
+
 export enum Sources
 {
   Upload = 'Upload', // from a browser

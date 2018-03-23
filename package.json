@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "yarn start-postgres && yarn start-midway",
-    "start-midway": "nodemon --exec ./node_modules/.bin/ts-node -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./midway/src/Midway.ts",
+    "start-midway": "nodemon --exec ./node_modules/.bin/ts-node -r tsconfig-paths/register -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./midway/src/Midway.ts",
     "start-postgres": "docker-compose -f midway-postgres-docker.yml up -d",
     "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback --compress --progress --info",
     "stop-postgres": "docker-compose -f midway-postgres-docker.yml down",
@@ -282,6 +282,7 @@
     "ts-jest": "^22.4.0",
     "ts-loader": "^3.5.0",
     "ts-node": "^4.1.0",
+    "tsconfig-paths": "^3.1.3",
     "tslint": "^5.9.1",
     "typescript": "^2.7.2",
     "typescript-formatter": "^7.1.0",

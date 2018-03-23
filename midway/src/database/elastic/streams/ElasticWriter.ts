@@ -52,13 +52,14 @@ import * as winston from 'winston';
 import { ElasticMapping } from '../../../../../shared/etl/mapping/ElasticMapping';
 import ElasticClient from '../client/ElasticClient';
 
-export class ElasticWriter extends Stream.Writable
+export class ElasticWriter extends Stream.Duplex
 {
   private client: ElasticClient;
   private primaryKey: string | undefined;
   private index: string;
   private type: string;
 
+  private doneWriting: boolean = false;
   private docsUpserted: number = 0;
   private numErrors: number = 0;
 
@@ -67,7 +68,7 @@ export class ElasticWriter extends Stream.Writable
   constructor(client: ElasticClient, index: string, type: string, primaryKey?: string)
   {
     super({
-      objectMode: true,
+      writableObjectMode: true,
       highWaterMark: 1024 * 128,
     });
 
@@ -129,10 +130,21 @@ export class ElasticWriter extends Stream.Writable
 
   public _final(callback)
   {
+    this.doneWriting = true;
     if (callback !== undefined)
     {
       callback();
     }
+  }
+
+  public _read(size: number = 1024)
+  {
+    if (this.doneWriting)
+    {
+      this.push(null);
+      return;
+    }
+    setTimeout((() => this.push(JSON.stringify(this.progress()))).bind(this), 500);
   }
 
   public progress(): object
@@ -157,17 +169,17 @@ export class ElasticWriter extends Stream.Writable
     }
 
     this.client.index(query, ((err: Error, response: any) =>
+    {
+      if (err !== null && err !== undefined)
       {
-        if (err !== null && err !== undefined)
-        {
-          this.numErrors++;
-        }
-        else
-        {
-          this.docsUpserted++;
-        }
-        callback(err);
-      }).bind(this));
+        this.numErrors++;
+      }
+      else
+      {
+        this.docsUpserted++;
+      }
+      callback(err);
+    }).bind(this));
   }
 
   private bulkUpsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void

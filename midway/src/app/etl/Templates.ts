@@ -59,7 +59,6 @@ import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
-import ExportTransform from './ExportTransform';
 import { getSinkStream, getSourceStream } from './SourceSinkStream';
 import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
@@ -210,8 +209,6 @@ export default class Templates
       const template = ts[0];
       winston.info('Executing template', template.templateName);
 
-      console.log(template);
-
       const numSources = Object.keys(template.sources).length;
       const numSinks = Object.keys(template.sinks).length;
       const numEdges = Object.keys(template.process.edges).length;
@@ -224,18 +221,16 @@ export default class Templates
         return reject('Only single source export is supported.');
       }
 
-      const exportTransform = new ExportTransform();
       const transformationEngine: TransformationEngine = TransformationEngine.load(template.process.edges['0'].transformations);
       const transformationEngineTransform = new TransformationEngineTransform([], transformationEngine);
       const sourceStream = await getSourceStream(template.sources, files);
-      const sinkStream = await getSinkStream(template.sinks, transformationEngine);
+      const transformedStream = sourceStream.pipe(transformationEngineTransform);
 
-      resolve(
-        sourceStream
-          .pipe(exportTransform)
-          .pipe(transformationEngineTransform)
-          .pipe(sinkStream),
-      );
+      winston.info('Beginning ETL pipline...');
+
+      const sinkStream = await getSinkStream(template.sinks, transformationEngine);
+      const ETLStream = transformedStream.pipe(sinkStream);
+      resolve(ETLStream);
     });
   }
 }
