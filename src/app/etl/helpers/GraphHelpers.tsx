@@ -110,25 +110,6 @@ class GraphHelpers extends ETLHelpers
     }).catch(this._logError);
   }
 
-  // public createEngineForEdge(edgeId: number): Promise<TransformationEngine>
-  // {
-  //   // todo do it for other node types
-  //   return new Promise<TransformationEngine>((resolve, reject) => {
-  //     const template = this._template;
-  //     const edge = template.getEdge(edgeId);
-  //     const fromNode = template.getNode(edge.from);
-  //     if (fromNode.type === NodeTypes.Source)
-  //     {
-  //       const source = template.getSources().get(fromNode.endpoint);
-  //       DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
-  //       {
-  //         const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
-  //         resolve(engine);
-  //       }).catch(this._logError);
-  //     }
-  //   });
-  // }
-
   public createEngineForEdge(edgeId: number)
   {
     const template = this._template;

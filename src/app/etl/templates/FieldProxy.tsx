@@ -57,6 +57,7 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { isWildcardField } from 'shared/transformations/util/EngineUtil';
 /*
  *  The FieldProxy structures act as the binding between the TemplateEditorField
  *  tree structure and the flattened structure of the transformation engine
@@ -95,19 +96,6 @@ export class FieldTreeProxy
     this.fieldMap = this.fieldMap.set(field.fieldId, field);
     this.onMutate(this.fieldMap);
     return new FieldNodeProxy(this, field.fieldId);
-  }
-
-  // create a 'field' as a child under parentId
-  public createField(parentId: number, childField: TemplateField): FieldNodeProxy
-  {
-    const childId = childField.fieldId;
-    const parentField: TemplateField = this.fieldMap.get(parentId)
-      .update('childrenIds', (ids) => ids.push(childId));
-    this.fieldMap = this.fieldMap
-      .set(childId, childField)
-      .set(parentId, parentField);
-    this.onMutate(this.fieldMap);
-    return new FieldNodeProxy(this, childId);
   }
 
   public setField(fieldId: number, newField: TemplateField)
@@ -161,19 +149,9 @@ export class FieldNodeProxy
     return this.tree.getFieldMap().has(this.fieldId);
   }
 
-  public id(): number
-  {
-    return this.fieldId;
-  }
-
   public field(): TemplateField
   {
     return this.tree.getField(this.fieldId);
-  }
-
-  public discoverChild(field: TemplateField): FieldNodeProxy
-  {
-    return this.tree.createField(this.fieldId, field);
   }
 
   public setFieldEnabled(enabled: boolean)
@@ -196,12 +174,11 @@ export class FieldNodeProxy
       // TODO: handle error
       return this;
     }
-    const field = this.field();
     const engine = this.tree.getEngine();
     value = value.toString();
-    let outputPath = engine.getOutputKeyPath(field.fieldId);
+    let outputPath = engine.getOutputKeyPath(this.fieldId);
     outputPath = outputPath.set(outputPath.size - 1, value);
-    engine.setOutputKeyPath(field.fieldId, outputPath);
+    engine.setOutputKeyPath(this.fieldId, outputPath);
     this.syncWithEngine();
   }
 
@@ -237,24 +214,22 @@ export class FieldNodeProxy
 
   public changeType(newType: FieldTypes)
   {
-    const field = this.field();
     const engine = this.tree.getEngine();
-    if (field.isWildcardField())
+    if (isWildcardField(engine.getInputKeyPath(this.fieldId)))
     {
-      engine.setFieldProp(field.fieldId, List(['valueType']), newType);
+      engine.setFieldProp(this.fieldId, List(['valueType']), newType);
     }
     else
     {
-      engine.setFieldType(field.fieldId, newType);
+      engine.setFieldType(this.fieldId, newType);
     }
     this.syncWithEngine();
   }
 
   public setFieldProps(newFormState: object, language: Languages)
   {
-    const field = this.field();
     const engine = this.tree.getEngine();
-    engine.setFieldProp(field.fieldId, EnginePath([language]), newFormState);
+    engine.setFieldProp(this.fieldId, EnginePath([language]), newFormState);
     this.syncWithEngine();
   }
 

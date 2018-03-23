@@ -186,6 +186,13 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return new FieldNodeProxy(tree, this.props.fieldId);
   }
 
+  protected _try(tryFn: (proxy: FieldNodeProxy) => void): Promise<void>
+  {
+    return new Promise<void>((resolve, reject) => {
+
+    });
+  }
+
   protected _passProps(config: object = {}): TemplateEditorFieldProps
   {
     return _.extend(_.pick(this.props, ['fieldId', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);

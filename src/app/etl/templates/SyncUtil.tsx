@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
+
 import
 {
   _TemplateField, _TransformationNode,
@@ -67,14 +67,10 @@ export function createTreeFromEngine(engine: TransformationEngine): FieldMap
   const ids = engine.getAllFieldIDs();
   // sort the paths to ensure we visit parents before children
   const sortedIds = ids.sort((a, b) => engine.getOutputKeyPath(a).size - engine.getOutputKeyPath(b).size);
-  const fieldMap = Map() as FieldMap;
-  const tree = new FieldTreeProxy(fieldMap, engine);
 
-  const enginePathToNode: {
-    [kp: string]: FieldNodeProxy,
-  } = {
-
-    };
+  const enginePathToField: {
+    [kp: string]: TemplateField,
+  } = {};
 
   sortedIds.forEach((id, index) =>
   {
@@ -84,14 +80,28 @@ export function createTreeFromEngine(engine: TransformationEngine): FieldMap
       return;
     }
     const parentPath = enginePath.slice(0, -1);
-    const parentNode: FieldNodeProxy = enginePathToNode[JSON.stringify(parentPath)];
+    const parentHash = JSON.stringify(parentPath);
+    const parentField: TemplateField = enginePathToField[parentHash];
     const newField = createFieldFromEngine(engine, id);
-    const newNode = parentNode != null ?
-      parentNode.discoverChild(newField) :
-      tree.createParentlessField(newField);
-    enginePathToNode[JSON.stringify(enginePath)] = newNode;
+
+    if (parentField != null)
+    {
+      const newParentField = parentField.update('childrenIds', (childIds): List<number> => childIds.push(id));
+      enginePathToField[parentHash] = newParentField;
+    }
+    enginePathToField[JSON.stringify(enginePath)] = newField;
   });
-  return tree.getFieldMap();
+
+  let fieldMap = Map() as FieldMap;
+  sortedIds.forEach((id, index) => {
+    const enginePath = engine.getOutputKeyPath(id).toJS();
+    const field = enginePathToField[JSON.stringify(enginePath)];
+    if (field != null)
+    {
+      fieldMap = fieldMap.set(id, field);
+    }
+  });
+  return fieldMap;
 }
 
 // takes a field id and and engine and constructs a TemplateField object (does not construct children)
