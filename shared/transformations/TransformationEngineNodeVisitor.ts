@@ -372,6 +372,11 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     node.fields.forEach((field) =>
     {
       const el: any = yadeep.get(doc, field);
+      if (typeof el === opts.toTypename)
+      {
+        return;
+      }
+
       switch (opts.toTypename)
       {
         case 'string': {
@@ -387,6 +392,10 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         }
         case 'number': {
           yadeep.set(doc, field, Number(el));
+          break;
+        }
+        case 'boolean': {
+          yadeep.set(doc, field, Boolean(el));
           break;
         }
         case 'object': {
