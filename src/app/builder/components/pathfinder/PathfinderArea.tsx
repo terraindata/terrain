@@ -65,6 +65,7 @@ import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
+import PathfinderNestedSection from './more/PathfinderNestedSection';
 import './Pathfinder.less';
 import { _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
@@ -301,8 +302,17 @@ class PathfinderArea extends TerrainComponent<Props>
             <PathfinderMoreSection
               pathfinderContext={pathfinderContext}
               more={path.more}
-              path={path}
+              count={path.source.count}
+              scoreType={path.score.type}
+              minMatches={path.minMatches}
               keyPath={this._ikeyPath(keyPath, 'more')}
+              toSkip={toSkip !== undefined ? toSkip : 3}
+            />
+            <PathfinderNestedSection
+              pathfinderContext={pathfinderContext}
+              nested={path.nested}
+              reference={path.reference}
+              keyPath={this._ikeyPath(keyPath, 'nested')}
               toSkip={toSkip !== undefined ? toSkip : 3}
             />
           </FadeInOut>

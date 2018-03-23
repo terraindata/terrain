@@ -119,11 +119,7 @@ export class PathToCards
     // soft bool
     this.FilterSectionToBodyBool(path.softFilterGroup, parser, body, 'soft');
     // groupJoi
-    let parentAliasName = 'parent';
-    if (path.more.references.size > 0)
-    {
-      parentAliasName = path.more.references.get(0);
-    }
+    const parentAliasName = path.reference || 'parent';
     this.updateGroupJoin(path.nested, parser, body, parentAliasName);
     // score card
     this.fromScore(path, parser, body);

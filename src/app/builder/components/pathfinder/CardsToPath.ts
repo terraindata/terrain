@@ -117,16 +117,13 @@ export class CardsToPath
     const groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
     const newScripts = this.getScripts(path.more.scripts, parser, bodyValueInfo);
     const more = path.more
-      .set('references', groupJoinPaths.length !== 0 ? List([parentAlias]) : List([]))
       .set('scripts', newScripts);
-    console.log(more);
-
     const newPath = path
       .set('source', newSource)
       .set('score', newScore)
       .set('filterGroup', filterGroup)
       .set('softFilterGroup', softFilterGroup)
-      .set('more', more)
+      .set('reference', parentAlias)
       .set('nested', List(groupJoinPaths));
     return newPath;
   }
