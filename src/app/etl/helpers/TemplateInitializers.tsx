@@ -87,15 +87,18 @@ class Initializers extends ETLHelpers
         this.editorAct({
           actionType: 'resetState',
         });
+        const edge = template.getLastEdgeId();
+        this.editorAct({ // todo find the last edge
+          actionType: 'setCurrentEdge',
+          edge,
+        });
         this.editorAct({
           actionType: 'setTemplate',
           template,
           history: 'clear',
         });
-        const edge = template.getLastEdgeId();
-        this.editorAct({ // todo find the last edge
-          actionType: 'setCurrentEdge',
-          edge,
+        this.editorAct({
+          actionType: 'rebuildFieldMap',
         });
         this.editorAct({
           actionType: 'setIsDirty',
@@ -146,6 +149,10 @@ class Initializers extends ETLHelpers
         throw new Error('Failed to create initial edge');
       }
       this.editorAct({
+        actionType: 'setCurrentEdge',
+        edge: initialEdge,
+      });
+      this.editorAct({
         actionType: 'setTemplate',
         template,
         history: 'clear',
@@ -154,7 +161,7 @@ class Initializers extends ETLHelpers
         actionType: 'setFieldMap',
         fieldMap,
       });
-      GraphHelpers.switchEdge(initialEdge);
+      DocumentsHelpers.computeDocuments();
     };
   }
 

@@ -98,6 +98,14 @@ class HistoryStackC<T>
     return history.set('currentItem', item);
   }
 
+  // like setItem, but updates the item like with immutable update()
+  public updateItem(fn: (item: T) => T): ImmHistory<T>
+  {
+    let history: ImmHistory<T> = this as any;
+    history = history.set('currentItem', fn(this.currentItem));
+    return history;
+  }
+
   // add a new item to the history. If there is a nextItems stack, then it will be cleared
   public pushItem(item: T): ImmHistory<T>
   {

@@ -59,6 +59,7 @@ import
   DefaultDocumentLimit,
   EditorDisplayState,
   FieldMap,
+  TemplateEditorHistory,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
@@ -159,44 +160,61 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       setTemplate: (state, action) =>
       {
-        let newState = state;
+        // A bit tricky. Whenever we change the history (including redo/undo), we actually
+        // set the current history item's uiState to be the current uiState.
+        // This basically makes sure that the uiState is always the last
+        // uiState associated with each unique template
+        let newState = state.update('history', (history: History) =>
+          history.updateItem(
+            (item) => _.defaults({ uiState: state.uiState }, item),
+          ));
+        const newItem = {
+          template: action.payload.template,
+          uiState: state.uiState,
+        };
+
         switch (action.payload.history)
         {
           case 'push':
             newState = newState.update('history',
-              (history: History) => history.pushItem(action.payload.template),
+              (history: History) => history.pushItem(newItem),
             );
             break;
           case 'clear':
             newState = newState.update('history',
-              (history: History) => history.clearHistory().pushItem(action.payload.template),
+              (history: History) => history.clearHistory().pushItem(newItem),
             );
             break;
           case 'void':
             newState = newState.update('history',
-              (history: History) => history.setItem(action.payload.template),
+              (history: History) => history.setItem(newItem),
             );
             break;
           default:
             break; // todo throw error?
         }
-        return newState.set('template', newState.history.getCurrentItem());
+        const newTemplate = newState.history.getCurrentItem().template;
+        return newState.set('template', newTemplate);
       },
       undoHistory: (state, action) =>
       {
-        let newState = state;
-        newState = newState.update('history',
-          (history: History) => history.undoHistory(),
+        const newState = state.update('history',
+          (history: History) => history.updateItem(
+            (item) => _.defaults({ uiState: state.uiState }, item),
+          ).undoHistory(),
         );
-        return newState.set('template', newState.history.getCurrentItem());
+        const { template, uiState } = newState.history.getCurrentItem();
+        return newState.set('template', template).set('uiState', uiState);
       },
       redoHistory: (state, action) =>
       {
-        let newState = state;
-        newState = newState.update('history',
-          (history: History) => history.redoHistory(),
+        const newState = state.update('history',
+          (history: History) => history.updateItem(
+            (item) => _.defaults({ uiState: state.uiState }, item),
+          ).redoHistory(),
         );
-        return newState.set('template', newState.history.getCurrentItem());
+        const { template, uiState } = newState.history.getCurrentItem();
+        return newState.set('template', template).set('uiState', uiState);
       },
       rebuildFieldMap: (state, action) =>
       {
@@ -276,19 +294,7 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
     };
 
-  public setCurrentEdge(action: TemplateEditorActionType<'setCurrentEdge'>, dispatch)
-  {
-    const directDispatch = this._dispatchReducerFactory(dispatch);
-    directDispatch({
-      actionType: 'setCurrentEdge',
-      edge: action.edge,
-    });
-    directDispatch({
-      actionType: 'rebuildFieldMap',
-    });
-  }
-
-  public undoHistory(action: TemplateEditorActionType<'setCurrentEdge'>, dispatch)
+  public undoHistory(action: TemplateEditorActionType<'undoHistory'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
@@ -299,7 +305,7 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
     });
   }
 
-  public redoHistory(action: TemplateEditorActionType<'setCurrentEdge'>, dispatch)
+  public redoHistory(action: TemplateEditorActionType<'undoHistory'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
@@ -314,8 +320,6 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
   {
     switch (action.actionType)
     {
-      case 'setCurrentEdge':
-        return this.setCurrentEdge.bind(this, action);
       case 'undoHistory':
         return this.undoHistory.bind(this, action);
       case 'redoHistory':
@@ -327,7 +331,7 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
 }
 
 // convenience alias
-type History = HistoryStack<ETLTemplate>;
+type History = HistoryStack<TemplateEditorHistory>;
 
 const ReduxInstance = new TemplateEditorRedux();
 export const TemplateEditorActions = ReduxInstance._actionsForExport();

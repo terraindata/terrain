@@ -226,6 +226,9 @@ class GraphHelpers extends ETLHelpers
       actionType: 'setCurrentEdge',
       edge: edgeId,
     });
+    this.editorAct({
+      actionType: 'rebuildFieldMap',
+    });
     DocumentsHelpers.computeDocuments();
   }
 }

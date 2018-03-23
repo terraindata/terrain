@@ -62,11 +62,17 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
 
+export interface TemplateEditorHistory
+{
+  template: ETLTemplate;
+  uiState: EditorDisplayState;
+}
+
 class TemplateEditorStateC
 {
   public template: ETLTemplate = _ETLTemplate();
   public fieldMap: FieldMap = Map();
-  public history: HistoryStack<ETLTemplate> = _HistoryStack<ETLTemplate>();
+  public history: HistoryStack<TemplateEditorHistory> = _HistoryStack<TemplateEditorHistory>();
   public isDirty: boolean = true;
   public loadingDocuments: number = 0;
   public uiState: EditorDisplayState = _EditorDisplayState();
