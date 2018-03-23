@@ -70,10 +70,13 @@ export class FieldTreeProxy
   private updateVersion: () => void;
   private fieldMap: FieldMap;
   private engine: TransformationEngine;
-  constructor(fieldMap: FieldMap,
+
+  constructor(
+    fieldMap: FieldMap,
     engine: TransformationEngine,
     onMutate?: (fieldMap: FieldMap) => void,
-    updateVersion?: () => void)
+    updateVersion?: () => void
+  )
   {
     this.fieldMap = fieldMap;
     this.engine = engine;
@@ -91,13 +94,6 @@ export class FieldTreeProxy
     this.updateVersion();
   }
 
-  public createParentlessField(field: TemplateField): FieldNodeProxy
-  {
-    this.fieldMap = this.fieldMap.set(field.fieldId, field);
-    this.onMutate(this.fieldMap);
-    return new FieldNodeProxy(this, field.fieldId);
-  }
-
   public setField(fieldId: number, newField: TemplateField)
   {
     this.fieldMap = this.fieldMap.set(fieldId, newField);
@@ -108,24 +104,6 @@ export class FieldTreeProxy
   {
     this.fieldMap = createTreeFromEngine(this.engine);
     this.onMutate(this.fieldMap);
-  }
-
-  public updateField<K extends keyof TemplateField>(fieldId: number, key: K, value: TemplateField[K])
-  {
-    const newField = this.fieldMap.get(fieldId).set(key, value);
-    this.fieldMap = this.fieldMap.set(fieldId, newField);
-    this.onMutate(this.fieldMap);
-  }
-
-  public deleteField(fieldId: number)
-  {
-    this.fieldMap = this.fieldMap.delete(fieldId);
-    this.onMutate(this.fieldMap);
-  }
-
-  public getFieldMap(): FieldMap
-  {
-    return this.fieldMap;
   }
 
   public getField(fieldId: number): TemplateField
@@ -142,11 +120,6 @@ export class FieldNodeProxy
   constructor(private tree: FieldTreeProxy, private fieldId: number)
   {
 
-  }
-
-  public exists()
-  {
-    return this.tree.getFieldMap().has(this.fieldId);
   }
 
   public field(): TemplateField
@@ -265,16 +238,6 @@ export class FieldNodeProxy
     {
       this.syncWithEngine();
     }
-  }
-
-  public deleteSelf()
-  {
-    this.tree.deleteField(this.fieldId);
-  }
-
-  public clearChildren()
-  {
-    this.tree.updateField(this.fieldId, 'childrenIds', List([]));
   }
 }
 
