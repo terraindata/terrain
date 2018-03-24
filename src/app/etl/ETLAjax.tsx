@@ -183,9 +183,9 @@ class ETLAjax
       const payload: any = {
         templateID: String(templateId)
       };
-      if (options.files !== undefined)
+      if (options.file !== undefined)
       {
-        payload.files = options.files;
+        payload.file = options.file;
       }
 
       this.reqFormData(
@@ -270,7 +270,7 @@ interface ReqConfig
 
 export interface ExecuteConfig
 {
-  files?: File[];
+  file?: File;
   download?: {
     downloadFilename?: string;
     mimeType?: string;

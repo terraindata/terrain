@@ -222,7 +222,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       else if (defaultSource.type === Sources.Upload)
       {
         const file = (defaultSource.options as SourceOptionsType<Sources.Upload>).file;
-        options.files = [file];
+        options.file = file;
       }
       else
       {
