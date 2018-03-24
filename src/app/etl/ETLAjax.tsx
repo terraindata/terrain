@@ -76,94 +76,87 @@ class ETLAjax
     }
   }
 
-  public fetchTemplates(
-    onLoad: (response: List<ETLTemplate>) => void,
-    onError: ErrorHandler,
-  )
+  public fetchTemplates(): Promise<List<ETLTemplate>>
   {
-    const handleResponse = (templates: TemplateBase[]) =>
-    {
-      onLoad(this.templatesToImmutable(templates));
-    };
-    return Ajax.req(
-      'get',
-      'etl/templates',
-      {},
-      handleResponse,
+    return new Promise((resolve, reject) => {
+      const handleResponse = (templates: TemplateBase[]) =>
       {
-        onError,
-      },
-    );
+        resolve(this.templatesToImmutable(templates));
+      };
+      return Ajax.req(
+        'get',
+        'etl/templates',
+        {},
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
   }
 
-  public getTemplate(
-    id: number,
-    onLoad: (response: List<ETLTemplate>) => void,
-    onError: ErrorHandler,
-  )
+  public getTemplate(id: number): Promise<List<ETLTemplate>>
   {
-    const handleResponse = (templates: TemplateBase[]) =>
-    {
-      onLoad(this.templatesToImmutable(templates));
-    };
-    return Ajax.req(
-      'get',
-      `etl/templates/${id}`,
-      {},
-      handleResponse,
+    return new Promise((resolve, reject) => {
+      const handleResponse = (templates: TemplateBase[]) =>
       {
-        onError,
-      },
-    );
+        resolve(this.templatesToImmutable(templates));
+      };
+      return Ajax.req(
+        'get',
+        `etl/templates/${id}`,
+        {},
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
   }
 
-  public createTemplate(
-    template: ETLTemplate,
-    onLoad: (response: List<ETLTemplate>) => void,
-    onError: ErrorHandler,
-  )
+  public createTemplate(template: ETLTemplate): Promise<List<ETLTemplate>>
   {
     const templateToSave = templateForBackend(template);
-    const handleResponse = (templates: TemplateBase[]) =>
-    {
-      onLoad(this.templatesToImmutable(templates));
-    };
-    return Ajax.req(
-      'post',
-      `etl/templates/create`,
-      templateToSave,
-      handleResponse,
+    return new Promise((resolve, reject) => {
+      const handleResponse = (templates: TemplateBase[]) =>
       {
-        onError,
-      },
-    );
+        resolve(this.templatesToImmutable(templates));
+      };
+      return Ajax.req(
+        'post',
+        `etl/templates/create`,
+        templateToSave,
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
   }
 
-  public saveTemplate(
-    template: ETLTemplate,
-    onLoad: (response: List<ETLTemplate>) => void,
-    onError: ErrorHandler,
-  )
+  public saveTemplate(template: ETLTemplate): Promise<List<ETLTemplate>>
   {
-    const id = template.id;
-    const templateToSave = templateForBackend(template);
-    const handleResponse = (templates: TemplateBase[]) =>
-    {
-      onLoad(this.templatesToImmutable(templates));
-    };
-    if (typeof id !== 'number')
-    {
-      onError(`id "${id}" is invalid`);
-    }
-    return Ajax.req(
-      'post',
-      `etl/templates/update/${id}`,
-      templateToSave,
-      handleResponse,
+    return new Promise((resolve, reject) => {
+      const id = template.id;
+      const templateToSave = templateForBackend(template);
+      const handleResponse = (templates: TemplateBase[]) =>
       {
-        onError,
-      },
-    );
+        resolve(this.templatesToImmutable(templates));
+      };
+      if (typeof id !== 'number')
+      {
+        reject(`id "${id}" is invalid`);
+      }
+      return Ajax.req(
+        'post',
+        `etl/templates/update/${id}`,
+        templateToSave,
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
   }
 }
 

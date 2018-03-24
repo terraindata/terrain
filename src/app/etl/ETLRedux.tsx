@@ -208,10 +208,9 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       loadFunctions.push(action.onLoad);
     }
 
-    ETLAjax.fetchTemplates(
-      this.onLoadFactory(loadFunctions, directDispatch, name),
-      this.onErrorFactory(action.onError, directDispatch, name),
-    );
+    ETLAjax.fetchTemplates()
+      .then(this.onLoadFactory(loadFunctions, directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public getTemplate(action: ETLActionType<'getTemplate'>, dispatch)
@@ -223,11 +222,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       isLoading: true,
       key: name,
     });
-    ETLAjax.getTemplate(
-      action.id,
-      this.onLoadFactory([action.onLoad], directDispatch, name),
-      this.onErrorFactory(action.onError, directDispatch, name),
-    );
+
+    ETLAjax.getTemplate(action.id)
+      .then(this.onLoadFactory([action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name))
   }
 
   public createTemplate(action: ETLActionType<'createTemplate'>, dispatch)
@@ -254,11 +252,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         // TODO error?
       }
     };
-    ETLAjax.createTemplate(
-      action.template,
-      this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name),
-      this.onErrorFactory(action.onError, directDispatch, name),
-    );
+
+    ETLAjax.createTemplate(action.template)
+      .then(this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public saveTemplate(action: ETLActionType<'saveTemplate'>, dispatch)
@@ -285,11 +282,9 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         // TODO error?
       }
     };
-    ETLAjax.saveTemplate(
-      action.template,
-      this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name),
-      this.onErrorFactory(action.onError, directDispatch, name),
-    );
+    ETLAjax.saveTemplate(action.template)
+      .then(this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public overrideAct(action: Unroll<ETLActionTypes>)
