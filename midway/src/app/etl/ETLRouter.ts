@@ -71,7 +71,7 @@ Router.post('/execute', async (ctx, next) =>
     return;
   }
 
-  const templateID = fields['templateID'];
+  const templateID = Number(fields['templateID']);
   ctx.body = await templates.execute(templateID, files);
 });
 
