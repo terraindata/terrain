@@ -195,6 +195,27 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
         }
 
         const client: ElasticClient = controller.getClient() as ElasticClient;
+
+        // create the index if it doesn't exist
+        await new Promise((res, rej) =>
+        {
+          client.indices.getMapping(
+            {
+              index: database,
+            },
+            util.promise.makeCallback(res, rej));
+        }).then((mapping) => {
+
+        }).catch(async (e) => {
+          await new Promise((res, rej) => {
+
+            client.indices.create({
+              index: database,
+            },
+            util.promise.makeCallback(res, rej));
+          });
+        });
+
         const elasticMapping = new ElasticMapping(engine);
         const primaryKey = elasticMapping.getPrimaryKey();
 
@@ -209,7 +230,6 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
             },
             util.promise.makeCallback(res, rej));
         });
-
         sinkStream = new ElasticWriter(client, database, table, primaryKey);
         break;
       case 'Sftp':

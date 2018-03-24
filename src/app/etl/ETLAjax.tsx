@@ -230,7 +230,6 @@ class ETLAjax
 
     xhr.onerror = (err: any) =>
     {
-      console.log(String(err));
       const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
       config.onError(routeError);
     };
@@ -246,7 +245,7 @@ class ETLAjax
         config.onError(xhr.responseText);
         return;
       }
-      console.log(String(xhr.responseText));
+
       if (isDownload)
       {
         download((ev.target as any).response, config.downloadName, config.mimeType);
