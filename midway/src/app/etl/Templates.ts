@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as request from 'request';
-import { Readable } from 'stream';
+import { Readable, Transform } from 'stream';
 import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
@@ -59,7 +59,14 @@ import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
-import { getSinkStream, getSourceStream } from './SourceSinkStream';
+import
+{
+  getMergeStream,
+  getSinkStream,
+  getSinkStreams,
+  getSourceStream,
+  getSourceStreams,
+} from './SourceSinkStream';
 import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
 export default class Templates
@@ -214,23 +221,42 @@ export default class Templates
       const numEdges = Object.keys(template.process.edges).length;
 
       // TODO: multi-source import and exports
-      if (numSources > 1 || template.sources._default === undefined
-        || numSinks > 1 || template.sinks._default === undefined
-        || numEdges > 1)
+      if (numSinks > 1 || template.sinks._default === undefined)
       {
-        return reject('Only single source export is supported.');
+        return reject('Only single sinks are supported.');
       }
-
-      const transformationEngine: TransformationEngine = TransformationEngine.load(template.process.edges['0'].transformations);
-      const transformationEngineTransform = new TransformationEngineTransform([], transformationEngine);
-      const sourceStream = await getSourceStream(template.sources, files);
-      const transformedStream = sourceStream.pipe(transformationEngineTransform);
 
       winston.info('Beginning ETL pipline...');
 
-      const sinkStream = await getSinkStream(template.sinks, transformationEngine);
-      const ETLStream = transformedStream.pipe(sinkStream);
-      resolve(ETLStream);
+      const transformationEngines: TransformationEngine[] =
+      Object.keys(template.process.edges).map(
+        (k) => TransformationEngine.load(template.process.edges[k].transformations),
+      );
+
+      const transformStreams = transformationEngines.map((e) => new TransformationEngineTransform([], e));
+      console.log(JSON.stringify(template, null, 2));
+
+      let transformedStreams: Transform[];
+      if (numEdges === 1)
+      {
+        // assume that it's an edge from source node to sink node
+        // TODO: verify that it really is...
+
+        const sourceStreams = await getSourceStreams(template.sources, files);
+        transformedStreams = sourceStreams.map((s) => s.pipe(transformStreams[0]));
+      }
+      else
+      {
+        // assume that we are wanting to merge join multiple sources
+        const sourceStreams = await getSourceStreams(template.sources, files);
+
+        transformedStreams = sourceStreams.map((s, i) => s.pipe(transformStreams[i]));
+        transformedStreams = await getMergeStream(transformedStreams, template.sinks, transformationEngines);
+      }
+
+      const sinkStream = await getSinkStream(template.sinks._default, transformationEngines);
+      transformedStreams.forEach((s) => s.pipe(sinkStream));
+      resolve(sinkStream);
     });
   }
 }

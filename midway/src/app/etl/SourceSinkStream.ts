@@ -71,22 +71,15 @@ import ExportTransform from './ExportTransform';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
 
-export async function getSourceStream(sources: DefaultSourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
+export async function getSourceStream(source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
-    if (sources._default === undefined)
-    {
-      throw new Error('Default source not found.');
-    }
-
-    const src: SourceConfig = sources._default;
     let sourceStream: stream.Readable;
-
-    switch (src.type)
+    switch (source.type)
     {
       case 'Algorithm':
-        const algorithmId = src.options['algorithmId'];
+        const algorithmId = source.options['algorithmId'];
         const query: string = await Util.getQueryFromAlgorithm(algorithmId);
         const dbId: number = await Util.getDBFromAlgorithm(algorithmId);
 
@@ -127,7 +120,7 @@ export async function getSourceStream(sources: DefaultSourceConfig, files?: stre
 
         // TODO: multi-source import
         const importStream = files[0];
-        switch (src.fileConfig.fileType)
+        switch (source.fileConfig.fileType)
         {
           case 'json':
             sourceStream = importStream.pipe(JSONTransform.createImportStream());
@@ -148,18 +141,26 @@ export async function getSourceStream(sources: DefaultSourceConfig, files?: stre
   });
 }
 
-export async function getSinkStream(sinks: DefaultSinkConfig, engine: TransformationEngine): Promise<stream.Duplex>
+export async function getSourceStreams(sources: DefaultSourceConfig, files?: stream.Readable[]): Promise<stream.Readable[]>
+{
+  if (sources._default === undefined)
+  {
+    throw new Error('Default source not found.');
+  }
+
+  const promises: Array<Promise<stream.Readable>> = [];
+  for (const source of Object.keys(sources))
+  {
+    promises.push(getSourceStream(sources[source], files));
+  }
+  return Promise.all(promises);
+}
+
+export async function getSinkStream(sink: SinkConfig, engines: TransformationEngine[]): Promise<stream.Duplex>
 {
   return new Promise<stream.Duplex>(async (resolve, reject) =>
   {
-    if (sinks._default === undefined)
-    {
-      throw new Error('Default sink not found.');
-    }
-
-    const sink: SinkConfig = sinks._default;
     let sinkStream: stream.Duplex;
-
     switch (sink.type)
     {
       case 'Download':
@@ -195,7 +196,7 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
         }
 
         const client: ElasticClient = controller.getClient() as ElasticClient;
-        const elasticMapping = new ElasticMapping(engine);
+        const elasticMapping = new ElasticMapping(engines[0]);
         const primaryKey = elasticMapping.getPrimaryKey();
 
         // create mapping
@@ -220,4 +221,43 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
 
     resolve(sinkStream);
   });
+}
+
+export async function getSinkStreams(sinks: DefaultSinkConfig, engines: TransformationEngine[]): Promise<stream.Duplex[]>
+{
+  if (sinks._default === undefined)
+  {
+    throw new Error('Default sink not found.');
+  }
+
+  const promises: Array<Promise<stream.Duplex>> = [];
+  for (const sink of Object.keys(sinks))
+  {
+    promises.push(getSinkStream(sinks[sink], engines));
+  }
+  return Promise.all(promises);
+}
+
+export async function getMergeStream(
+  inputStreams: stream.Transform[],
+  sinks: DefaultSinkConfig,
+  engines: TransformationEngine[])
+{
+  const tempSinkConfigs: DefaultSinkConfig = {};
+  inputStreams.forEach((v, i) =>
+  {
+    // TODO: pick a better name for temp index
+    const tempIndex = 'temp_' + i;
+
+    const defaultSink = sinks._default;
+    defaultSink['options']['database'] = tempIndex;
+    tempSinkConfigs[tempIndex] = defaultSink;
+  });
+
+  const sinkStreams = await getSinkStreams(tempSinkConfigs, engines);
+  inputStreams.forEach((s, i) => s.pipe(sinkStreams[i]));
+
+  // TODO: wait for these streams to finish...
+
+  // TODO: create merge query and return merged stream
 }
