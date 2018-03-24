@@ -97,11 +97,12 @@ class BuilderTextboxCards extends React.Component<Props, any>
     }
 
     const closedKey = this.props.tuningMode ? 'tuningClosed' : 'closed';
-
+    const notClosedCard = (this.props.value as Card).set(closedKey, false);
     // We're in card mode
     return (
       <FadeInOut
         open={!this.props.value[closedKey]}
+        dontUnmount
       >
         <div
           className={classNames({
@@ -112,7 +113,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
           <CardComponent
             {...this.props}
             singleCard={true}
-            card={this.props.value as Card}
+            card={notClosedCard as Card}
             index={null}
             display={this.props.display}
             tuningMode={this.props.tuningMode}
