@@ -54,7 +54,7 @@ import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 's
 import { SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import ETLAjax, { ExecuteConfig } from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
-import { Sinks, Sources, SinkOptionsType, SourceOptionsType } from 'shared/etl/types/EndpointTypes';
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _ETLState, ETLState } from './ETLTypes';
@@ -217,7 +217,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         options.download = {
           downloadFilename,
           mimeType,
-        }
+        };
       }
       else if (defaultSource.type === Sources.Upload)
       {
@@ -282,7 +282,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 
     ETLAjax.getTemplate(action.id)
       .then(this.onLoadFactory([action.onLoad], directDispatch, name))
-      .catch(this.onErrorFactory(action.onError, directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public createTemplate(action: ETLActionType<'createTemplate'>, dispatch)

@@ -443,7 +443,7 @@ class TemplateEditor extends TerrainComponent<Props>
         props: {
           title: 'Please Save',
           message: `You Have Unsaved Changes. Please Save Them Before Running This Template`,
-        }
+        },
       });
     }
     else

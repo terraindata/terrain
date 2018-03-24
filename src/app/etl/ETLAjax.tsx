@@ -82,7 +82,8 @@ class ETLAjax
 
   public fetchTemplates(): Promise<List<ETLTemplate>>
   {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) =>
+    {
       const handleResponse = (templates: TemplateBase[]) =>
       {
         resolve(this.templatesToImmutable(templates));
@@ -101,7 +102,8 @@ class ETLAjax
 
   public getTemplate(id: number): Promise<List<ETLTemplate>>
   {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) =>
+    {
       const handleResponse = (templates: TemplateBase[]) =>
       {
         resolve(this.templatesToImmutable(templates));
@@ -121,7 +123,8 @@ class ETLAjax
   public createTemplate(template: ETLTemplate): Promise<List<ETLTemplate>>
   {
     const templateToSave = templateForBackend(template);
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) =>
+    {
       const handleResponse = (templates: TemplateBase[]) =>
       {
         resolve(this.templatesToImmutable(templates));
@@ -140,7 +143,8 @@ class ETLAjax
 
   public saveTemplate(template: ETLTemplate): Promise<List<ETLTemplate>>
   {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) =>
+    {
       const id = template.id;
       const templateToSave = templateForBackend(template);
       const handleResponse = (templates: TemplateBase[]) =>
@@ -169,10 +173,11 @@ class ETLAjax
     options: ExecuteConfig,
   ): Promise<void>
   {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) =>
+    {
 
       const config: ReqConfig = {
-        onError: reject
+        onError: reject,
       };
       if (options.download !== undefined)
       {
@@ -181,7 +186,7 @@ class ETLAjax
       }
 
       const payload: any = {
-        templateID: String(templateId)
+        templateID: String(templateId),
       };
       if (options.file !== undefined)
       {
@@ -200,10 +205,10 @@ class ETLAjax
   private reqFormData(
     route: string,
     data: {
-      [k: string]: string | File
+      [k: string]: string | File,
     },
     handleResponse: (response: any) => void,
-    cfg: ReqConfig
+    cfg: ReqConfig,
   )
   {
     const isDownload = cfg.downloadName !== undefined;
@@ -264,9 +269,9 @@ class ETLAjax
 
 interface ReqConfig
 {
-  onError?: (response: any) => void,
-  downloadName?: string,
-  mimeType?: string,
+  onError?: (response: any) => void;
+  downloadName?: string;
+  mimeType?: string;
 }
 
 export interface ExecuteConfig
@@ -275,7 +280,7 @@ export interface ExecuteConfig
   download?: {
     downloadFilename?: string;
     mimeType?: string;
-  }
+  };
 }
 
 export default new ETLAjax();

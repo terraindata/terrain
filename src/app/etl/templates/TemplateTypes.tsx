@@ -54,7 +54,7 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { Sinks, Sources, SourceOptionsType } from 'shared/etl/types/EndpointTypes';
+import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
@@ -193,10 +193,11 @@ export function copyTemplate(template: ETLTemplate): ETLTemplate
   return restoreSourceFiles(copiedTemplate, files);
 }
 
-export function getSourceFiles(template: ETLTemplate): {[k: string]: File}
+export function getSourceFiles(template: ETLTemplate): { [k: string]: File }
 {
   const files = {};
-  template.sources.forEach((source, key) => {
+  template.sources.forEach((source, key) =>
+  {
     if (source.type === Sources.Upload)
     {
       const file = (source.options as SourceOptionsType<Sources.Upload>).file;
@@ -209,20 +210,21 @@ export function getSourceFiles(template: ETLTemplate): {[k: string]: File}
   return files;
 }
 
-export function restoreSourceFiles(template: ETLTemplate, files: {[k: string]: File}): ETLTemplate
+export function restoreSourceFiles(template: ETLTemplate, files: { [k: string]: File }): ETLTemplate
 {
   return template.update('sources', (sources) =>
-    sources.map((source, key) => {
+    sources.map((source, key) =>
+    {
       if (source.type === Sources.Upload)
       {
-        let options = source.options as SourceOptionsType<Sources.Upload>;
-        return source.set('options', _.extend({}, options, { file: files[key]}));
+        const options = source.options as SourceOptionsType<Sources.Upload>;
+        return source.set('options', _.extend({}, options, { file: files[key] }));
       }
       else
       {
         return source;
       }
-    }).toMap()
+    }).toMap(),
   );
 }
 

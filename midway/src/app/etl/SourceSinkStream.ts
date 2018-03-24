@@ -204,15 +204,18 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
               index: database,
             },
             util.promise.makeCallback(res, rej));
-        }).then((mapping) => {
+        }).then((mapping) =>
+        {
 
-        }).catch(async (e) => {
-          await new Promise((res, rej) => {
+        }).catch(async (e) =>
+        {
+          await new Promise((res, rej) =>
+          {
 
             client.indices.create({
               index: database,
             },
-            util.promise.makeCallback(res, rej));
+              util.promise.makeCallback(res, rej));
           });
         });
 
