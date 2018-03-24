@@ -163,7 +163,10 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public executeTemplate(template: ETLTemplate)
   {
-
+    this.props.etlAct({
+      actionType: 'executeTemplate',
+      template,
+    });
   }
 
   // is there a better pattern for this?

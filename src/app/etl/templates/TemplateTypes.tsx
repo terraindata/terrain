@@ -87,6 +87,16 @@ class ETLTemplateC implements ETLTemplateI
     return this.sinks;
   }
 
+  public getSource(key): SourceConfig
+  {
+    return this.sources.get(key);
+  }
+
+  public getSink(key): SinkConfig
+  {
+    return this.sinks.get(key);
+  }
+
   public getSourceName(key)
   {
     const source = this.sources.get(key);
@@ -128,12 +138,12 @@ class ETLTemplateC implements ETLTemplateI
 
   public getLastEdgeId(): number
   {
-    const defaultSink = this.getDefaultSink();
+    const defaultSink = this.getDefaultSinkId();
     const edges = this.findEdges((edge) => edge.to === defaultSink);
     return edges.size > 0 ? edges.first() : -1;
   }
 
-  public getDefaultSink(): number
+  public getDefaultSinkId(): number
   {
     return this.process.nodes.findKey(
       (node) => node.type === NodeTypes.Sink && node.endpoint === '_default',

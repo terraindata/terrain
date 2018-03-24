@@ -76,6 +76,28 @@ class ETLAjax
     }
   }
 
+  public executeTemplate(templateId: number, downloadFilename?: string): Promise<void>
+  {
+    return new Promise((resolve, reject) => {
+      const options = {
+        onError: reject
+      };
+      if (downloadFilename !== undefined)
+      {
+        options['downloadFilename'] = downloadFilename;
+        options['download'] = true;
+      }
+
+      return Ajax.req(
+        'post',
+        `etl/execute`,
+        { templateId },
+        (resp?) => resolve(),
+        options,
+      );
+    });
+  }
+
   public fetchTemplates(): Promise<List<ETLTemplate>>
   {
     return new Promise((resolve, reject) => {

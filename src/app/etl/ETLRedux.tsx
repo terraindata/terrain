@@ -51,8 +51,10 @@ const { List, Map } = Immutable;
 import MidwayError from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
+import { SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import ETLAjax from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
+import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _ETLState, ETLState } from './ETLTypes';
@@ -71,6 +73,10 @@ export interface ETLActionTypes
     id: number;
     onLoad: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
+  };
+  executeTemplate: {
+    actionType: 'executeTemplate',
+    template: ETLTemplate,
   };
   fetchTemplates: {
     actionType: 'fetchTemplates';
@@ -107,6 +113,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     {
       getTemplate: (state, action) => state, // overriden reducers
       fetchTemplates: (state, action) => state,
+      executeTemplate: (state, action) => state,
       createTemplate: (state, action) => state,
       saveTemplate: (state, action) => state,
       setLoading: (state, action) =>
@@ -184,15 +191,48 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     };
   }
 
-  public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch, getState?)
+  public executeTemplate(action: ETLActionType<'executeTemplate'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+
+    const template = action.template;
+    const defaultSink = template.getSink('_default');
+
+    if (defaultSink === undefined)
+    {
+      return; // todo error
+    }
+    else
+    {
+      if (defaultSink.type === Sinks.Download)
+      {
+        const extension = defaultSink.fileConfig.fileType === FileTypes.Json ?
+          '.json' : '.csv';
+        const filename = `Export_${template.id}${extension}`
+        ETLAjax.executeTemplate(template.id, filename)
+          .then(this.onLoadFactory([], directDispatch, name))
+          .catch(this.onErrorFactory(undefined, directDispatch, name));
+      }
+      else
+      {
+        // tslint:disable-next-line
+        console.log(`Sink Type ${defaultSink.type} not implemented yet`);
+      }
+    }
+  }
+
+  public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+
     directDispatch({
       actionType: 'setLoading',
       isLoading: true,
       key: name,
     });
+
     const setTemplates = (templates: List<ETLTemplate>) =>
     {
       directDispatch({
@@ -217,6 +257,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+
     directDispatch({
       actionType: 'setLoading',
       isLoading: true,
@@ -232,11 +273,13 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+
     directDispatch({
       actionType: 'setLoading',
       isLoading: true,
       key: name,
     });
+
     const updateTemplate = (templates: List<ETLTemplate>) =>
     {
       if (templates.size > 0)
@@ -262,11 +305,13 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+
     directDispatch({
       actionType: 'setLoading',
       isLoading: true,
       key: name,
     });
+
     const updateTemplate = (templates: List<ETLTemplate>) =>
     {
       if (templates.size > 0)
@@ -295,6 +340,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.fetchTemplates.bind(this, action);
       case 'getTemplate':
         return this.getTemplate.bind(this, action);
+      case 'executeTemplate':
+        return this.executeTemplate.bind(this, action);
       case 'createTemplate':
         return this.createTemplate.bind(this, action);
       case 'saveTemplate':
