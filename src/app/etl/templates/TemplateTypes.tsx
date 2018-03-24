@@ -54,7 +54,7 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Sinks, Sources, SourceOptionsType } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
@@ -186,9 +186,44 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
 // todo, please do this more efficiently
 export function copyTemplate(template: ETLTemplate): ETLTemplate
 {
+  const files = getSourceFiles(template);
   const objTemplate = templateForBackend(template);
   const objTemplateCopy = JSON.parse(JSON.stringify(objTemplate));
-  return _ETLTemplate(objTemplateCopy, true);
+  const copiedTemplate = _ETLTemplate(objTemplateCopy, true);
+  return restoreSourceFiles(copiedTemplate, files);
+}
+
+export function getSourceFiles(template: ETLTemplate): {[k: string]: File}
+{
+  const files = {};
+  template.sources.forEach((source, key) => {
+    if (source.type === Sources.Upload)
+    {
+      const file = (source.options as SourceOptionsType<Sources.Upload>).file;
+      if (file != null)
+      {
+        files[key] = file;
+      }
+    }
+  });
+  return files;
+}
+
+export function restoreSourceFiles(template: ETLTemplate, files: {[k: string]: File}): ETLTemplate
+{
+  return template.update('sources', (sources) =>
+    sources.map((source, key) => {
+      if (source.type === Sources.Upload)
+      {
+        let options = source.options as SourceOptionsType<Sources.Upload>;
+        return source.set('options', _.extend({}, options, { file: files[key]}));
+      }
+      else
+      {
+        return source;
+      }
+    }).toMap()
+  );
 }
 
 export function templateForBackend(template: ETLTemplate): TemplateBase
@@ -209,7 +244,10 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
   {
     if (source.type === Sources.Upload)
     {
-      _.set(obj, ['sources', key, 'options', 'file'], null);
+      let options = _.get(obj, ['sources', key, 'options'], {});
+      options = _.extend({}, options);
+      options['file'] = null;
+      _.set(obj, ['sources', key, 'options'], options);
     }
   });
   return obj;

@@ -62,7 +62,7 @@ import
   TemplateEditorHistory,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { ETLTemplate, getSourceFiles } from 'etl/templates/TemplateTypes';
 
 import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { Algorithm, LibraryState } from 'library/LibraryTypes';

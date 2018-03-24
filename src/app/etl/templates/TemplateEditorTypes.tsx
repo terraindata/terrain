@@ -128,6 +128,7 @@ class EditorDisplayStateC
   public moveFieldId: number = null;
   public addFieldId: number = null;
   public mergeIntoEdgeId: number = null;
+  public fileCache: {[k: string]: File};
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);
