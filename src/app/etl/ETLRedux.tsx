@@ -52,9 +52,9 @@ import MidwayError from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
 import { SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import ETLAjax from 'etl/ETLAjax';
+import ETLAjax, { ExecuteConfig } from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Sinks, Sources, SinkOptionsType, SourceOptionsType } from 'shared/etl/types/EndpointTypes';
 
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _ETLState, ETLState } from './ETLTypes';
@@ -198,6 +198,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 
     const template = action.template;
     const defaultSink = template.getSink('_default');
+    const defaultSource = template.getSource('_default');
 
     if (defaultSink === undefined)
     {
@@ -205,20 +206,35 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     }
     else
     {
+      const options: ExecuteConfig = {};
       if (defaultSink.type === Sinks.Download)
       {
         const extension = defaultSink.fileConfig.fileType === FileTypes.Json ?
           '.json' : '.csv';
-        const filename = `Export_${template.id}${extension}`
-        ETLAjax.executeTemplate(template.id, filename)
-          .then(this.onLoadFactory([], directDispatch, name))
-          .catch(this.onErrorFactory(undefined, directDispatch, name));
+        const mimeType = defaultSink.fileConfig.fileType === FileTypes.Json ?
+          'application/json' : 'text/csv';
+        const downloadFilename = `Export_${template.id}${extension}`;
+        options.download = {
+          downloadFilename,
+          mimeType,
+        }
+      }
+      else if (defaultSource.type === Sources.Upload)
+      {
+        const file = (defaultSource.options as SourceOptionsType<Sources.Upload>).file;
+        options.files = [file];
       }
       else
       {
         // tslint:disable-next-line
-        console.log(`Sink Type ${defaultSink.type} not implemented yet`);
+        console.log(`Sink Type ${defaultSink.type} not implemented yet, ` +
+          `or Source Type ${defaultSource.type} not implemented yet`);
+        return;
       }
+
+      ETLAjax.executeTemplate(template.id, options)
+        .then(this.onLoadFactory<any>([], directDispatch, name))
+        .catch(this.onErrorFactory(undefined, directDispatch, name));
     }
   }
 

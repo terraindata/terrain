@@ -53,6 +53,8 @@ import { Ajax } from 'util/Ajax';
 
 import { AuthActions as Actions } from 'src/app/auth/data/AuthRedux';
 
+import * as download from 'downloadjs';
+
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
 import { TemplateBase } from 'shared/etl/types/ETLTypes';
 
@@ -76,37 +78,6 @@ class ETLAjax
       console.error(`Error trying to parse templates ${String(e)}`);
       return List([]);
     }
-  }
-
-  public executeTemplate(templateId: number, downloadFilename?: string): Promise<void>
-  {
-    return new Promise((resolve, reject) => {
-      // const options = {
-      //   onError: reject
-      // };
-      // if (downloadFilename !== undefined)
-      // {
-      //   options['downloadFilename'] = downloadFilename;
-      //   options['download'] = true;
-      // }
-
-      // return Ajax.req(
-      //   'post',
-      //   `etl/execute`,
-      //   { templateId },
-      //   (resp?) => resolve(),
-      //   options,
-      // );
-      const payload = {
-        templateID: String(templateId)
-      };
-      this.reqFormData(
-        'etl/execute',
-        payload,
-        (resp) => console.log(resp),
-        { onError: reject }
-      );
-    });
   }
 
   public fetchTemplates(): Promise<List<ETLTemplate>>
@@ -192,33 +163,39 @@ class ETLAjax
     });
   }
 
-  // private reqDownload(
-  //   route: string,
-  //   data: {
-  //     [k: string]: string | File
-  //   },
-  //   config: {
-  //     fileName?: string,
-  //   }
-  // )
-  // {
-  //   const fullUrl = MIDWAY_HOST + '/midway/v1/' + route;
-  //   console.log(fullUrl);
-  //   const form = document.createElement('form');
-  //   form.setAttribute('action', fullUrl);
-  //   form.setAttribute('method', 'post');
-  //   form.setAttribute('target', '_blank');
+  // if download is provided, then the response will be downloaded as the mime type with provided filename
+  public executeTemplate(
+    templateId: number,
+    options: ExecuteConfig,
+  ): Promise<void>
+  {
+    return new Promise((resolve, reject) => {
 
-  //   const input = document.createElement('input');
-  //   input.setAttribute('type', 'hidden');
-  //   input.setAttribute('test', 'yoyoyoyo');
-  //   input.setAttribute('value', 'wtf yo');
-  //   form.appendChild(input);
+      const config: ReqConfig = {
+        onError: reject
+      };
+      if (options.download !== undefined)
+      {
+        config.downloadName = options.download.downloadFilename;
+        config.mimeType = options.download.mimeType;
+      }
 
-  //   document.body.appendChild(form);
-  //   form.submit();
-  //   form.remove();
-  // }
+      const payload: any = {
+        templateID: String(templateId)
+      };
+      if (options.files !== undefined)
+      {
+        payload.files = options.files;
+      }
+
+      this.reqFormData(
+        'etl/execute',
+        payload,
+        (resp) => resolve(resp),
+        config,
+      );
+    });
+  }
 
   private reqFormData(
     route: string,
@@ -226,46 +203,36 @@ class ETLAjax
       [k: string]: string | File
     },
     handleResponse: (response: any) => void,
-    config: {
-      onError?: (response: any) => void,
-    }
+    cfg: ReqConfig
   )
   {
+    const isDownload = cfg.downloadName !== undefined;
+    const config: ReqConfig = _.extend({
+      onError: () => null,
+      downloadName: 'file.txt',
+      mimeType: 'text/plain',
+    }, cfg);
+
     const formData = new FormData();
     formData.append('id', String(localStorage['id']));
     formData.append('accessToken', localStorage['accessToken']);
-
     for (const key of Object.keys(data))
     {
       formData.append(key, data[key]);
     }
 
     const xhr = new XMLHttpRequest();
-    xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
-    xhr.send(formData);
 
-    const onError = config.onError !== undefined ? config.onError : () => null;
-    const onLoad = (response: any) => {
-      // let responseData: object = null;
-      // try {
-      //   responseData = JSON.parse(response);
-      // }
-      // catch (e) {
-      //   onError(e);
-      // }
-      // if (responseData !== null)
-      // {
-      //   handleResponse(responseData);
-      // }
-      handleResponse(response);
-    };
+    if (isDownload)
+    {
+      xhr.responseType = 'blob';
+    }
 
     xhr.onerror = (err: any) =>
     {
       const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-      onError(routeError);
+      config.onError(routeError);
     };
-
     xhr.onload = (ev: Event) =>
     {
       if (xhr.status === 401)
@@ -273,14 +240,40 @@ class ETLAjax
         // TODO re-enable
         Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
       }
-
       if (xhr.status !== 200)
       {
-        onError(xhr.responseText);
+        config.onError(xhr.responseText);
         return;
       }
-      onLoad(xhr.responseText);
+      if (isDownload)
+      {
+        download((ev.target as any).response, config.downloadName, config.mimeType);
+        handleResponse('');
+      }
+      else
+      {
+        handleResponse(xhr.responseText);
+      }
     };
+
+    xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
+    xhr.send(formData);
+  }
+}
+
+interface ReqConfig
+{
+  onError?: (response: any) => void,
+  downloadName?: string,
+  mimeType?: string,
+}
+
+export interface ExecuteConfig
+{
+  files?: File[];
+  download?: {
+    downloadFilename?: string;
+    mimeType?: string;
   }
 }
 
