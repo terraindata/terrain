@@ -897,7 +897,7 @@ const ElasticComparisons = [
   {
     value: 'isnotin',
     displayName: 'is not in',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
+    fieldTypes: List([FieldType.Text]),
     placeholder: 'e.g. apple, banana, kiwi',
   },
   {

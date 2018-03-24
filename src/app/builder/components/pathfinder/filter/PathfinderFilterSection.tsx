@@ -160,7 +160,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       builderState: pathfinderContext.builderState,
       // subtype: isSoftFilter ? 'match' : undefined,
     });
-    console.log('Field options are ', fieldOptions.toJS());
 
     const fieldSet: RouteSelectorOptionSet = {
       key: 'field',

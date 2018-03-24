@@ -318,31 +318,37 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         key: 'value',
         options: List([
           {
-            value: '1',
+            value: 0,
+            displayName: 'None',
+            hasOther: true,
+            sampleData: List([]),
+          },
+          {
+            value: 1,
             displayName: '1',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '2',
+            value: 2,
             displayName: '2',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '3',
+            value: 3,
             displayName: '3',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '5',
+            value: 5,
             displayName: '5',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '10',
+            value: 10,
             displayName: '10',
             hasOther: true,
             sampleData: List([]),
@@ -379,8 +385,9 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleMinMatchesChange(optionSetIndex: number, value: any)
   {
     const { keyPath } = this.props;
-    const nestedKeyPath = this._ikeyPath(keyPath.butLast().toList(), 'minMatches');
-    this.props.builderActions.changePath(nestedKeyPath, value);
+    const nestedKeyPath = this._ikeyPath(keyPath.skipLast(3).toList(), 'minMatches');
+    this.props.builderActions.changePath(nestedKeyPath, value, true);
+    this.props.builderActions.changePath(this._ikeyPath(keyPath.butLast().toList(), 'minMatches'), value);
   }
 
   public handleCollapseChange(optionSetIndex: number, value)

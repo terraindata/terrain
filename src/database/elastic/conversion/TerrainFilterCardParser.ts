@@ -302,16 +302,21 @@ export class TerrainFilterCardParser
   {
     let queryCard;
     const boost = block['boost'];
-    const valueParser = new ESJSONParser(block['value']);
-    let cardValue;
-    if (valueParser.hasError() === false)
-    {
-      cardValue = valueParser.getValueInfo().value;
-    } else
-    {
-      cardValue = String(block['value']);
+    let value = block['value'] || '';
+    const valueParser = new ESJSONParser(value);
+    let cardValue = value;
+    // Try to split it along , to create list
+    try {
+      cardValue = JSON.parse(value);
     }
-
+    catch {
+      if (value[0] !== '@')
+      {
+        value = value.replace(/\[/g, '').replace(/\]/g, '');
+        const pieces = value.split(',');
+        cardValue = pieces.map((piece) => piece.toLowerCase().trim());
+      }
+    }
     if (boost !== '')
     {
       const valueField = block['field'] + ':base[]';

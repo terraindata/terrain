@@ -120,11 +120,12 @@ export class PathToCards
     this.FilterSectionToBodyBool(path.softFilterGroup, parser, body, 'soft');
     // groupJoi
     const parentAliasName = path.reference || 'parent';
-    this.updateGroupJoin(path.nested, parser, body, parentAliasName);
+    this.updateGroupJoin(path.nested, parser, body, parentAliasName, path.minMatches);
     // score card
     this.fromScore(path, parser, body);
 
     this.updateScripts(path.more.scripts, parser, body);
+    this.updateCollapse(path.more.collapse, parser, body);
 
     // finally, let's distribute filters from the sourcebool to the hard/soft bool.
     this.distributeSourceBoolFilters(path, parser, body);
@@ -136,7 +137,9 @@ export class PathToCards
     let sourceSize;
     if (path.source.count === 'all')
     {
-      sourceSize = PathFinderDefaultSize;
+      // Delete the size card so it doesn't limit the size
+      parser.deleteChild(body, 'size');
+      return;
     } else
     {
       sourceSize = Number(path.source.count);
@@ -150,6 +153,7 @@ export class PathToCards
       }
     } else
     {
+      parser.createCardIfNotExist({'size:size': sourceSize}, body);
       updateSize = true;
     }
 
@@ -223,7 +227,7 @@ export class PathToCards
   {
     // Find any geo_distance filter lines
     const geoFilterLines = filterLines.filter((line) => line.comparison === 'located');
-    console.log('Geo filter lines are ', geoFilterLines);
+  //   console.log('Geo filter lines are ', geoFilterLines);
     const boolTypeFiltersType = boolType + ':query[]';
     const cardFilterLines = parser.searchCard(
       {
@@ -522,6 +526,18 @@ export class PathToCards
     this.processNestedQueryFilterGroup(filterLineMap.nested, parser, boolValueInfo, boolType, filterSection);
   }
 
+  private static updateCollapse(collapse: string, parser: ESCardParser, body: ESValueInfo)
+  {
+    if (body.objectChildren.collapse)
+    {
+      parser.deleteChild(body, 'collapse');
+    }
+    if (collapse && collapse !== 'None')
+    {
+      parser.createCardIfNotExist({ 'collapse:collapse': {'field:field': collapse} }, body);
+    }
+  }
+
   private static updateScripts(scripts: List<Script>, parser: ESCardParser, body: ESValueInfo)
   {
     if (scripts.size === 0)
@@ -582,7 +598,7 @@ export class PathToCards
 
   }
 
-  private static updateGroupJoin(sourcePaths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string)
+  private static updateGroupJoin(sourcePaths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string, dropIfLessThan: number)
   {
     const paths = [];
     sourcePaths.map((path: Path) =>
@@ -613,13 +629,32 @@ export class PathToCards
       if (parentAliasValueInfo === null)
       {
         parser.createCardIfNotExist({ 'groupJoin:groupjoin_clause': { 'parentAlias:string': parentAlias } }, body);
-      } else
+      }
+      else
       {
         if (parentAliasValueInfo.value !== parentAlias)
         {
           parentAliasValueInfo.card = parentAliasValueInfo.card.set('value', parentAlias);
           parser.isMutated = true;
         }
+      }
+    }
+    if (dropIfLessThan)
+    {
+      parser.createCardIfNotExist({ 'groupJoin:groupjoin_clause': { 'dropIfLessThan:number': dropIfLessThan } }, body);
+      const dropIfLessThanValue = parser.searchCard({ 'groupJoin:groupjoin_clause': {'dropIfLessThan:number': true}}, body);
+      if (dropIfLessThan !== dropIfLessThanValue.value)
+      {
+        dropIfLessThanValue.card = dropIfLessThanValue.card.set('value', dropIfLessThan);
+        parser.isMutated = true;
+      }
+    }
+    else {
+      // Delete the drop if less than card if it exists and dropIfLessThan = 0
+      const groupJoinCard = parser.searchCard({'groupJoin:groupjoin_clause': true}, body);
+      if (groupJoinCard !== null && groupJoinCard.objectChildren.dropIfLessThan)
+      {
+        parser.deleteChild(groupJoinCard, 'dropIfLessThan');
       }
     }
 
@@ -664,14 +699,14 @@ export class PathToCards
                     { 'term:term_query': { '_index:string': '' } },
                     {
                       'bool:elasticFilter': {
-                        'filter:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                        'filter:query[]': [],
                       },
                     },
                   ],
                   'should:query[]': [
                     {
                       'bool:elasticFilter': {
-                        'should:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                        'should:query[]': [],
                       },
                     }],
                 },

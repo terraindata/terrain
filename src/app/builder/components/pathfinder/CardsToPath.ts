@@ -53,10 +53,12 @@ import
   _Path,
   _ScoreLine,
   _Script,
+  ElasticDataSource,
   FilterGroup,
   FilterLine,
   Param,
   Path,
+  PathfinderSteps,
   Score,
   ScoreLine,
   Script,
@@ -111,20 +113,29 @@ export class CardsToPath
     const newScore = this.updateScore(path.score, parser, bodyValueInfo);
     const filterGroup = this.BodyToFilterSection(path.filterGroup, parser, bodyValueInfo, 'hard');
     const softFilterGroup = this.BodyToFilterSection(path.softFilterGroup, parser, bodyValueInfo, 'soft');
-    console.log('HARD FILTERS ARE ', filterGroup.toJS());
-    console.log('SOFT FILTERS ARE ', softFilterGroup.toJS());
     const parentAlias = this.getParentAlias(parser, bodyValueInfo);
-    const groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
+    const dropIfLessThan = this.getDropIfLessThan(parser, bodyValueInfo);
+    let groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
+    groupJoinPaths = groupJoinPaths.map((p, i) =>
+      p.set('minMatches', dropIfLessThan),
+    );
     const newScripts = this.getScripts(path.more.scripts, parser, bodyValueInfo);
+    const collapse = this.getCollapse(path.more.collapse, parser, bodyValueInfo);
     const more = path.more
-      .set('scripts', newScripts);
+      .set('scripts', newScripts)
+      .set('collapse', collapse);
+
     const newPath = path
       .set('source', newSource)
       .set('score', newScore)
       .set('filterGroup', filterGroup)
       .set('softFilterGroup', softFilterGroup)
       .set('reference', parentAlias)
-      .set('nested', List(groupJoinPaths));
+      .set('nested', List(groupJoinPaths))
+      .set('more', more)
+      .set('step', (
+        newSource.dataSource as ElasticDataSource).index ?
+          PathfinderSteps.Source + 1 : path.step);
     return newPath;
   }
 
@@ -190,7 +201,7 @@ export class CardsToPath
 
     filterRowMap.filter = filterRowMap.filter.concat(filterRowMap.filter_not);
     filterRowMap.should = filterRowMap.should.concat(filterRowMap.should_not);
-
+    // console.log('filter rows ', filterRowMap);
     let newLines = List([]);
 
     // handle normal filter lines first
@@ -227,14 +238,15 @@ export class CardsToPath
       }
     }
     // Look for Geo Distance Queries
-    const geoDistanceLines = this.processGeoDistanceFilters(filterGroup, parser, boolValueInfo, sectionType);
+    // const geoDistanceLines = this.processGeoDistanceFilters(filterGroup, parser, boolValueInfo, sectionType);
     // handle nested groups
     const newNestedGroupLines = this.processInnerFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
     const newNestedQueryLines = this.processNestedQueryFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
-    newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines).concat(geoDistanceLines).toList();
+    newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines).toList();
     TerrainLog.debug('B->P(Bool): Generate ' + String(newLines.size) + ' filter lines ' +
       '(Nested Group' + String(newNestedGroupLines.size) + ').' +
       '(Nested Query' + String(newNestedQueryLines.size) + ').');
+  //  console.log('lines for group are ', newLines);
     filterGroup = filterGroup.set('lines', newLines);
     return filterGroup;
   }
@@ -411,6 +423,20 @@ export class CardsToPath
     }
   }
 
+  private static getDropIfLessThan(parser: ESCardParser, bodyValueInfo: ESValueInfo)
+  {
+    const dropIfLessThanValueInfo = parser.searchCard(
+      { 'groupJoin:groupjoin_clause': {'dropIfLessThan:number': true}}, bodyValueInfo);
+    if (dropIfLessThanValueInfo === null)
+    {
+      return 0;
+    }
+    else
+    {
+      return dropIfLessThanValueInfo.value;
+    }
+  }
+
   private static getParentAlias(parser: ESCardParser, bodyValueInfo: ESValueInfo)
   {
     const parentAliasValueInfo = parser.searchCard(
@@ -471,10 +497,19 @@ export class CardsToPath
     return newPaths;
   }
 
+  private static getCollapse(collapse: string, parser: ESCardParser, body: ESValueInfo): string | undefined
+  {
+    const rootVal = body.value;
+    if (rootVal.hasOwnProperty('collapse'))
+    {
+      return rootVal.collapse.field;
+    }
+    return undefined;
+  }
+
   private static getScripts(scripts: List<Script>, parser: ESCardParser, body: ESValueInfo): List<Script>
   {
     const rootVal = body.value;
-    console.log(rootVal);
     if (rootVal.hasOwnProperty('script_fields'))
     {
       return List(_.keys(rootVal.script_fields).map((key) =>
@@ -521,7 +556,7 @@ export class CardsToPath
     } else
     {
       // default count
-      source = source.set('count', sourceCountOptions.get(0));
+      source = source.set('count', 'all');
     }
 
     // index from the sourceBool

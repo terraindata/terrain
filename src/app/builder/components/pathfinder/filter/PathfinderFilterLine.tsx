@@ -238,6 +238,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const fieldSet = this.props.fieldOptionSet;
     let comparisonOptions = List<RouteSelectorOption>();
     let comparisonHeader = 'Choose a data field first';
+    console.log('Filter line is ', filterLine);
     if (filterLine.field)
     {
       comparisonHeader = '';
@@ -251,6 +252,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         schemaState: pathfinderContext.schemaState,
         builderState: pathfinderContext.builderState,
       });
+      console.log('comparison options', comparisonOptions);
       comparisonOptions = comparisonOptions.map((option) =>
       {
         option = option['toJS'](); // TODO perhaps a better conversion between ChoiceOption and RouteOption
@@ -614,7 +616,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const { source } = pathfinderContext;
     if (key === 'field')
     {
-      const fieldType = (meta && meta.fieldType) || FieldType.Any;
+      const fieldType = (meta && meta.fieldType !== undefined) ? meta.fieldType : FieldType.Any;
       const analyzed = (meta && meta.analyzed) || true;
       filterLine = filterLine
         .set('fieldType', fieldType)
