@@ -161,6 +161,11 @@ class ETLEditorPage extends TerrainComponent<Props>
     Initializers.loadExistingTemplate(template.id);
   }
 
+  public executeTemplate(template: ETLTemplate)
+  {
+
+  }
+
   // is there a better pattern for this?
   public componentWillReceiveProps(nextProps)
   {
@@ -242,6 +247,7 @@ class ETLEditorPage extends TerrainComponent<Props>
         <TemplateEditor
           onSave={this.saveTemplate}
           onSwitchTemplate={this.switchTemplate}
+          onExecuteTemplate={this.executeTemplate}
         />
       </div>
     );
@@ -253,7 +259,6 @@ export default withRouter(Util.createContainer(
   [
     ['walkthrough'],
     ['etl', 'templates'],
-    ['templateEditor', 'template'],
   ],
   { editorAct: TemplateEditorActions, etlAct: ETLActions },
 ));

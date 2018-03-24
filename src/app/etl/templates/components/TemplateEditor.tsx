@@ -84,6 +84,7 @@ export interface Props
 {
   onSave: (template: ETLTemplate) => void;
   onSwitchTemplate: (template: ETLTemplate) => void;
+  onExecuteTemplate: (template: ETLTemplate) => void;
   // below from container
   templateEditor?: TemplateEditorState;
   editorAct?: typeof TemplateEditorActions;
@@ -148,7 +149,7 @@ class TemplateEditor extends TerrainComponent<Props>
           <div className='template-editor-title-bar'>
             <div className='template-editor-title-bar-spacer' />
             <div className='template-editor-title'>
-              Preview
+              Edit
             </div>
             <div className='template-editor-preview-control-spacer'>
               <EditorPreviewControl />
@@ -202,6 +203,16 @@ class TemplateEditor extends TerrainComponent<Props>
     return (
       <Quarantine>
         <div className='template-editor-top-bar'>
+          <div className='top-bar-left-side'>
+            <div
+              className='editor-top-bar-item'
+              style={topBarRunStyle}
+              onClick={this.handleRun}
+              key='run'
+            >
+              Run
+            </div>
+          </div>
           <div
             className='editor-top-bar-name'
             style={topBarNameStyle}
@@ -420,6 +431,26 @@ class TemplateEditor extends TerrainComponent<Props>
       });
     }
   }
+
+  public handleRun()
+  {
+    const { editorAct, templateEditor } = this.props;
+    const template = templateEditor.template;
+    if (templateEditor.isDirty || template.id === -1)
+    {
+      editorAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Please Save',
+          message: `You Have Unsaved Changes. Please Save Them Before Running This Template`,
+        }
+      });
+    }
+    else
+    {
+      this.props.onExecuteTemplate(template);
+    }
+  }
 }
 
 const emptyList = List([]);
@@ -428,6 +459,7 @@ const topBarItemDisabledStyle = [
   backgroundColor(Colors().fadedOutBg, Colors().fadedOutBg),
   fontColor(Colors().text3),
 ];
+const topBarRunStyle = [backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)];
 const topBarNameStyle = [fontColor(Colors().text2)];
 const templateListItemStyle = [
   { cursor: 'pointer' },
