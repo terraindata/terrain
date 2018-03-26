@@ -129,6 +129,7 @@ class PathC extends BaseClass
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
   public nested: List<Path> = List([]);
+  public reference: string = undefined; // what the outer query will be refered to by inner queries
   public expanded?: boolean = true;
   public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
   public minMatches?: number = 0; // also helpful for inner-queries of groupjoins
@@ -279,7 +280,6 @@ export const _ScorePoint = (config?: { [key: string]: any }) =>
 class MoreC extends BaseClass
 {
   public aggregations: List<AggregationLine> = List([]);
-  public references: List<string> = List([]); // What should this query be referred to in other queries (@parent in US query)
   public collapse: string = undefined;
   public scripts: List<Script> = List();
   public expanded: boolean = false;
@@ -291,8 +291,7 @@ export const _More = (config?: { [key: string]: any }) =>
   let more = New<More>(new MoreC(config || {}), config);
   more = more
     .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
-    .set('scripts', List(more['scripts'].map((agg) => _Script(agg))))
-    .set('references', List(more['references']));
+    .set('scripts', List(more['scripts'].map((agg) => _Script(agg))));
 
   return more;
 };
