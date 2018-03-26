@@ -60,6 +60,7 @@ import util from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
+import { ElasticDB } from '../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
 import CSVTransform from '../io/streams/CSVTransform';
@@ -195,44 +196,13 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
         }
 
         const client: ElasticClient = controller.getClient() as ElasticClient;
-
-        // create the index if it doesn't exist
-        await new Promise((res, rej) =>
-        {
-          client.indices.getMapping(
-            {
-              index: database,
-            },
-            util.promise.makeCallback(res, rej));
-        }).then((mapping) =>
-        {
-
-        }).catch(async (e) =>
-        {
-          await new Promise((res, rej) =>
-          {
-
-            client.indices.create({
-              index: database,
-            },
-              util.promise.makeCallback(res, rej));
-          });
-        });
-
-        const elasticMapping = new ElasticMapping(engine);
-        const primaryKey = elasticMapping.getPrimaryKey();
+        const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
 
         // create mapping
-        await new Promise((res, rej) =>
-        {
-          client.indices.putMapping(
-            {
-              index: database,
-              type: table,
-              body: elasticMapping.getMapping(),
-            },
-            util.promise.makeCallback(res, rej));
-        });
+        const elasticMapping = new ElasticMapping(engine);
+        await elasticDB.putESMapping(database, table, elasticMapping.getMapping());
+
+        const primaryKey = elasticMapping.getPrimaryKey();
         sinkStream = new ElasticWriter(client, database, table, primaryKey);
         break;
       case 'Sftp':
