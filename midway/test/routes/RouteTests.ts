@@ -1084,7 +1084,7 @@ describe('File import route tests', () =>
       });
   });
 
-  test('Invalid import: POST /midway/v1/import/', async () =>
+  /*test('Invalid import: POST /midway/v1/import/', async () =>
   {
     await request(server)
       .post('/midway/v1/import/')
@@ -1121,7 +1121,7 @@ describe('File import route tests', () =>
       {
         fail('POST /midway/v1/import/ request returned an error: ' + String(error));
       });
-  });
+  });*/
 
 });
 
