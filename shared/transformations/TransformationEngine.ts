@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import arrayTypeOfValues = require('array-typeof-values');
-import GraphLib = require('graphlib');
+import * as GraphLib from 'graphlib';
 import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
@@ -132,7 +132,7 @@ export class TransformationEngine
     return parsed;
   }
 
-  private dag: any = new Graph({ isDirected: true });
+  private dag: any = new Graph({ directed: true });
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
@@ -354,6 +354,17 @@ export class TransformationEngine
 
     this.uidField++;
     return this.uidField - 1;
+  }
+
+  public deleteField(id: number): void
+  {
+    this.fieldNameToIDMap = this.fieldNameToIDMap.delete(this.fieldNameToIDMap.keyOf(id));
+    this.fieldProps = this.fieldProps.delete(id);
+    this.fieldEnabled = this.fieldEnabled.delete(id);
+    this.IDToFieldNameMap = this.IDToFieldNameMap.delete(id);
+    this.fieldTypes = this.fieldTypes.delete(id);
+
+    this.getTransformations(id).forEach((t: number) => this.deleteTransformation(t));
   }
 
   /**
