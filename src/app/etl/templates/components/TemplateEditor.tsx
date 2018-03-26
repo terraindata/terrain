@@ -72,6 +72,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 
 import './TemplateEditor.less';
 
@@ -83,11 +84,10 @@ export interface Props
 {
   onSave: (template: ETLTemplate) => void;
   onSwitchTemplate: (template: ETLTemplate) => void;
+  onExecuteTemplate: (template: ETLTemplate) => void;
   // below from container
   templateEditor?: TemplateEditorState;
   editorAct?: typeof TemplateEditorActions;
-  etl?: ETLState;
-  etlAct?: typeof ETLActions;
 }
 
 class TemplateEditor extends TerrainComponent<Props>
@@ -149,7 +149,7 @@ class TemplateEditor extends TerrainComponent<Props>
           <div className='template-editor-title-bar'>
             <div className='template-editor-title-bar-spacer' />
             <div className='template-editor-title'>
-              Preview
+              Edit
             </div>
             <div className='template-editor-preview-control-spacer'>
               <EditorPreviewControl />
@@ -192,7 +192,7 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public renderTopBar()
   {
-    const { template, isDirty } = this.props.templateEditor;
+    const { history, template, isDirty } = this.props.templateEditor;
     let titleName = template.id === -1 ?
       'Unsaved Template' :
       template.templateName;
@@ -203,12 +203,38 @@ class TemplateEditor extends TerrainComponent<Props>
     return (
       <Quarantine>
         <div className='template-editor-top-bar'>
+          <div className='top-bar-left-side'>
+            <div
+              className='editor-top-bar-item'
+              style={topBarRunStyle}
+              onClick={this.handleRun}
+              key='run'
+            >
+              Run
+            </div>
+          </div>
           <div
             className='editor-top-bar-name'
             style={topBarNameStyle}
             key='title'
           >
             {titleName}
+          </div>
+          <div
+            className='editor-top-bar-item'
+            style={history.canUndo() ? topBarItemStyle : topBarItemDisabledStyle}
+            onClick={this.handleUndo}
+            key='undo'
+          >
+            Undo
+          </div>
+          <div
+            className='editor-top-bar-item'
+            style={history.canRedo() ? topBarItemStyle : topBarItemDisabledStyle}
+            onClick={this.handleRedo}
+            key='redo'
+          >
+            Redo
           </div>
           <div
             className='editor-top-bar-item'
@@ -372,7 +398,6 @@ class TemplateEditor extends TerrainComponent<Props>
   public handleSaveClicked()
   {
     const { template } = this.props.templateEditor;
-    const { editorAct } = this.props;
     if (template.id === -1)
     {
       this.setState({
@@ -384,10 +409,57 @@ class TemplateEditor extends TerrainComponent<Props>
       this.props.onSave(template);
     }
   }
+
+  public handleUndo()
+  {
+    const { editorAct, templateEditor } = this.props;
+    if (templateEditor.history.canUndo())
+    {
+      editorAct({
+        actionType: 'undoHistory',
+      });
+    }
+  }
+
+  public handleRedo()
+  {
+    const { editorAct, templateEditor } = this.props;
+    if (templateEditor.history.canRedo())
+    {
+      editorAct({
+        actionType: 'redoHistory',
+      });
+    }
+  }
+
+  public handleRun()
+  {
+    const { editorAct, templateEditor } = this.props;
+    const template = templateEditor.template;
+    if (templateEditor.isDirty || template.id === -1)
+    {
+      editorAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Please Save',
+          message: `You Have Unsaved Changes. Please Save Them Before Running This Template`,
+        },
+      });
+    }
+    else
+    {
+      this.props.onExecuteTemplate(template);
+    }
+  }
 }
 
 const emptyList = List([]);
 const topBarItemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
+const topBarItemDisabledStyle = [
+  backgroundColor(Colors().fadedOutBg, Colors().fadedOutBg),
+  fontColor(Colors().text3),
+];
+const topBarRunStyle = [backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)];
 const topBarNameStyle = [fontColor(Colors().text2)];
 const templateListItemStyle = [
   { cursor: 'pointer' },
@@ -401,12 +473,8 @@ const templateListItemCurrentStyle = [
 
 export default Util.createContainer(
   TemplateEditor,
-  [
-    ['templateEditor'],
-    ['etl'],
-  ],
+  ['templateEditor'],
   {
     editorAct: TemplateEditorActions,
-    etlAct: ETLActions,
   },
 );

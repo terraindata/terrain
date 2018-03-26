@@ -54,10 +54,9 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TemplateProxy } from './TemplateProxy';
 
 export type SourcesMap = Immutable.Map<string, SourceConfig>;
 export type SinksMap = Immutable.Map<string, SinkConfig>;
@@ -78,11 +77,6 @@ class ETLTemplateC implements ETLTemplateI
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
 
-  public proxy()
-  {
-    return new TemplateProxy(this as any);
-  }
-
   public getSources()
   {
     return this.sources;
@@ -91,6 +85,16 @@ class ETLTemplateC implements ETLTemplateI
   public getSinks()
   {
     return this.sinks;
+  }
+
+  public getSource(key): SourceConfig
+  {
+    return this.sources.get(key);
+  }
+
+  public getSink(key): SinkConfig
+  {
+    return this.sinks.get(key);
   }
 
   public getSourceName(key)
@@ -134,11 +138,12 @@ class ETLTemplateC implements ETLTemplateI
 
   public getLastEdgeId(): number
   {
-    const edges = this.findEdges((edge) => edge.to === this.getDefaultSink());
+    const defaultSink = this.getDefaultSinkId();
+    const edges = this.findEdges((edge) => edge.to === defaultSink);
     return edges.size > 0 ? edges.first() : -1;
   }
 
-  public getDefaultSink(): number
+  public getDefaultSinkId(): number
   {
     return this.process.nodes.findKey(
       (node) => node.type === NodeTypes.Sink && node.endpoint === '_default',
@@ -178,6 +183,51 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
   process: _ETLProcess,
 });
 
+// todo, please do this more efficiently
+export function copyTemplate(template: ETLTemplate): ETLTemplate
+{
+  const files = getSourceFiles(template);
+  const objTemplate = templateForBackend(template);
+  const objTemplateCopy = JSON.parse(JSON.stringify(objTemplate));
+  const copiedTemplate = _ETLTemplate(objTemplateCopy, true);
+  return restoreSourceFiles(copiedTemplate, files);
+}
+
+export function getSourceFiles(template: ETLTemplate): { [k: string]: File }
+{
+  const files = {};
+  template.sources.forEach((source, key) =>
+  {
+    if (source.type === Sources.Upload)
+    {
+      const file = (source.options as SourceOptionsType<Sources.Upload>).file;
+      if (file != null)
+      {
+        files[key] = file;
+      }
+    }
+  });
+  return files;
+}
+
+export function restoreSourceFiles(template: ETLTemplate, files: { [k: string]: File }): ETLTemplate
+{
+  return template.update('sources', (sources) =>
+    sources.map((source, key) =>
+    {
+      if (source.type === Sources.Upload)
+      {
+        const options = source.options as SourceOptionsType<Sources.Upload>;
+        return source.set('options', _.extend({}, options, { file: files[key] }));
+      }
+      else
+      {
+        return source;
+      }
+    }).toMap(),
+  );
+}
+
 export function templateForBackend(template: ETLTemplate): TemplateBase
 {
   const obj: TemplateObject = (template as any).toObject(); // shallow js object
@@ -196,7 +246,10 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
   {
     if (source.type === Sources.Upload)
     {
-      _.set(obj, ['sources', key, 'options', 'file'], null);
+      let options = _.get(obj, ['sources', key, 'options'], {});
+      options = _.extend({}, options);
+      options['file'] = null;
+      _.set(obj, ['sources', key, 'options'], options);
     }
   });
   return obj;

@@ -59,16 +59,18 @@ import
   DefaultDocumentLimit,
   EditorDisplayState,
   FieldMap,
+  TemplateEditorHistory,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { ETLTemplate, getSourceFiles } from 'etl/templates/TemplateTypes';
 
+import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
-import { createTreeFromEngine } from 'etl/templates/SyncUtil';
+import { createTreeFromEngine, updateFieldFromEngine } from 'etl/templates/SyncUtil';
 import Ajax from 'util/Ajax';
 
 const { List, Map } = Immutable;
@@ -84,9 +86,21 @@ export interface TemplateEditorActionTypes
   setTemplate: { // this should be the only way to mutate the template graph
     actionType: 'setTemplate';
     template: ETLTemplate;
+    // push adds the template to the history, clear clears the history, void replaces the current value
+    history: 'push' | 'clear' | 'void';
+  };
+  undoHistory: { // undo/redo
+    actionType: 'undoHistory';
+  };
+  redoHistory: {
+    actionType: 'redoHistory';
   };
   rebuildFieldMap: {
     actionType: 'rebuildFieldMap';
+  };
+  rebuildField: {
+    actionType: 'rebuildField';
+    fieldId: number;
   };
   setFieldMap: { // this should be the only way to mutate the template tree
     actionType: 'setFieldMap';
@@ -146,13 +160,77 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       setTemplate: (state, action) =>
       {
-        return state.set('template', action.payload.template);
+        // A bit tricky. Whenever we push, undo, or redo, we actually
+        // set the current history item's uiState to be the current uiState.
+        // This basically makes sure that the uiState is always the last
+        // uiState associated with each unique template
+
+        let newState = state;
+
+        const newItem = {
+          template: action.payload.template,
+          uiState: state.uiState,
+        };
+        switch (action.payload.history)
+        {
+          case 'push':
+            newState = state.update('history', (history: History) =>
+              history.updateItem(
+                (item) => _.defaults({ uiState: state.uiState }, item),
+              ));
+            newState = newState.update('history',
+              (history: History) => history.pushItem(newItem),
+            );
+            break;
+          case 'clear':
+            newState = newState.update('history',
+              (history: History) => history.clearHistory().pushItem(newItem),
+            );
+            break;
+          case 'void':
+            newState = newState.update('history',
+              (history: History) => history.setItem(newItem),
+            );
+            break;
+          default:
+            break; // todo throw error?
+        }
+        const newTemplate = newState.history.getCurrentItem().template;
+        return newState.set('template', newTemplate);
+      },
+      undoHistory: (state, action) =>
+      {
+        const newState = state.update('history',
+          (history: History) => history.updateItem(
+            (item) => _.defaults({ uiState: state.uiState }, item),
+          ).undoHistory(),
+        );
+        const { template, uiState } = newState.history.getCurrentItem();
+        return newState.set('template', template).set('uiState', uiState);
+      },
+      redoHistory: (state, action) =>
+      {
+        const newState = state.update('history',
+          (history: History) => history.updateItem(
+            (item) => _.defaults({ uiState: state.uiState }, item),
+          ).redoHistory(),
+        );
+        const { template, uiState } = newState.history.getCurrentItem();
+        return newState.set('template', template).set('uiState', uiState);
       },
       rebuildFieldMap: (state, action) =>
       {
         const engine = state.getCurrentEngine();
         const newFieldMap = createTreeFromEngine(engine);
         return state.set('fieldMap', newFieldMap);
+      },
+      rebuildField: (state, action) =>
+      {
+        const engine = state.getCurrentEngine();
+        const fieldId = action.payload.fieldId;
+        const oldField = state.fieldMap.get(fieldId);
+        const newField = updateFieldFromEngine(engine, fieldId, oldField);
+        return state.update('fieldMap', (fieldMap) => fieldMap.set(fieldId, newField));
       },
       setFieldMap: (state, action) =>
       {
@@ -218,12 +296,30 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
     };
 
-  public setCurrentEdge(action: TemplateEditorActionType<'setCurrentEdge'>, dispatch)
+  public undoHistory(action: TemplateEditorActionType<'undoHistory'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
-      actionType: 'setCurrentEdge',
-      edge: action.edge,
+      actionType: 'undoHistory',
+    });
+    directDispatch({
+      actionType: 'setIsDirty',
+      isDirty: true,
+    });
+    directDispatch({
+      actionType: 'rebuildFieldMap',
+    });
+  }
+
+  public redoHistory(action: TemplateEditorActionType<'undoHistory'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'redoHistory',
+    });
+    directDispatch({
+      actionType: 'setIsDirty',
+      isDirty: true,
     });
     directDispatch({
       actionType: 'rebuildFieldMap',
@@ -234,13 +330,18 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
   {
     switch (action.actionType)
     {
-      case 'setCurrentEdge':
-        return this.setCurrentEdge.bind(this, action);
+      case 'undoHistory':
+        return this.undoHistory.bind(this, action);
+      case 'redoHistory':
+        return this.redoHistory.bind(this, action);
       default:
         return undefined;
     }
   }
 }
+
+// convenience alias
+type History = HistoryStack<TemplateEditorHistory>;
 
 const ReduxInstance = new TemplateEditorRedux();
 export const TemplateEditorActions = ReduxInstance._actionsForExport();

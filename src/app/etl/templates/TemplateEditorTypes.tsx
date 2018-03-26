@@ -52,6 +52,7 @@ const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
 
+import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
@@ -61,10 +62,17 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 
 export type FieldMap = Immutable.Map<number, TemplateField>;
 
+export interface TemplateEditorHistory
+{
+  template: ETLTemplate;
+  uiState: EditorDisplayState;
+}
+
 class TemplateEditorStateC
 {
   public template: ETLTemplate = _ETLTemplate();
   public fieldMap: FieldMap = Map();
+  public history: HistoryStack<TemplateEditorHistory> = _HistoryStack<TemplateEditorHistory>();
   public isDirty: boolean = true;
   public loadingDocuments: number = 0;
   public uiState: EditorDisplayState = _EditorDisplayState();
@@ -120,6 +128,7 @@ class EditorDisplayStateC
   public moveFieldId: number = null;
   public addFieldId: number = null;
   public mergeIntoEdgeId: number = null;
+  public fileCache: { [k: string]: File };
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);

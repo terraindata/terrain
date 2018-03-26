@@ -62,7 +62,7 @@ import Initializers from 'etl/helpers/TemplateInitializers';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate, getSourceFiles, restoreSourceFiles } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
@@ -104,14 +104,18 @@ class ETLEditorPage extends TerrainComponent<Props>
   {
     const { etlAct, editorAct } = this.props;
 
+    // important for user-uploaded files
+    const fileCache = getSourceFiles(template);
+
     const handleLoad = (savedTemplates: List<ETLTemplate>) =>
     {
       if (savedTemplates.size > 0)
       {
-        const savedTemplate = savedTemplates.get(0);
+        const savedTemplate = restoreSourceFiles(savedTemplates.get(0), fileCache);
         editorAct({
           actionType: 'setTemplate',
           template: savedTemplate,
+          history: 'void',
         });
         editorAct({
           actionType: 'rebuildFieldMap',
@@ -158,6 +162,14 @@ class ETLEditorPage extends TerrainComponent<Props>
   public switchTemplate(template: ETLTemplate)
   {
     Initializers.loadExistingTemplate(template.id);
+  }
+
+  public executeTemplate(template: ETLTemplate)
+  {
+    this.props.etlAct({
+      actionType: 'executeTemplate',
+      template,
+    });
   }
 
   // is there a better pattern for this?
@@ -241,6 +253,7 @@ class ETLEditorPage extends TerrainComponent<Props>
         <TemplateEditor
           onSave={this.saveTemplate}
           onSwitchTemplate={this.switchTemplate}
+          onExecuteTemplate={this.executeTemplate}
         />
       </div>
     );
@@ -252,7 +265,6 @@ export default withRouter(Util.createContainer(
   [
     ['walkthrough'],
     ['etl', 'templates'],
-    ['templateEditor', 'template'],
   ],
   { editorAct: TemplateEditorActions, etlAct: ETLActions },
 ));

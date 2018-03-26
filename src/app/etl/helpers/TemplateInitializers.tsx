@@ -67,6 +67,7 @@ import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
+import { TemplateProxy } from 'etl/templates/TemplateProxy';
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
@@ -86,14 +87,18 @@ class Initializers extends ETLHelpers
         this.editorAct({
           actionType: 'resetState',
         });
-        this.editorAct({
-          actionType: 'setTemplate',
-          template,
-        });
         const edge = template.getLastEdgeId();
         this.editorAct({ // todo find the last edge
           actionType: 'setCurrentEdge',
           edge,
+        });
+        this.editorAct({
+          actionType: 'setTemplate',
+          template,
+          history: 'clear',
+        });
+        this.editorAct({
+          actionType: 'rebuildFieldMap',
         });
         this.editorAct({
           actionType: 'setIsDirty',
@@ -144,14 +149,19 @@ class Initializers extends ETLHelpers
         throw new Error('Failed to create initial edge');
       }
       this.editorAct({
+        actionType: 'setCurrentEdge',
+        edge: initialEdge,
+      });
+      this.editorAct({
         actionType: 'setTemplate',
         template,
+        history: 'clear',
       });
       this.editorAct({
         actionType: 'setFieldMap',
         fieldMap,
       });
-      GraphHelpers.switchEdge(initialEdge);
+      DocumentsHelpers.computeDocuments();
     };
   }
 
@@ -178,23 +188,20 @@ class Initializers extends ETLHelpers
 
     const fieldMap = createTreeFromEngine(engine);
 
-    let template = _ETLTemplate({
+    const template = _ETLTemplate({
       id: -1,
       templateName: name,
     });
     const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
     const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
     // default source and sink is upload and download
-
-    const proxy = template.proxy();
+    const proxy = new TemplateProxy(template);
     const sourceId = proxy.addSource('_default', sourceToAdd);
     const sinkId = proxy.addSink('_default', sinkToAdd);
     const initialEdge = proxy.addEdge(sourceId, sinkId, engine);
 
-    template = proxy.getTemplate();
-
     return {
-      template,
+      template: proxy.value(),
       fieldMap,
       warnings,
       softWarnings,

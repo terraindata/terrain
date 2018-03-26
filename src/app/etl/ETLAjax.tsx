@@ -51,6 +51,10 @@ const { List, Map } = Immutable;
 import MidwayError from 'shared/error/MidwayError';
 import { Ajax } from 'util/Ajax';
 
+import { AuthActions as Actions } from 'src/app/auth/data/AuthRedux';
+
+import * as download from 'downloadjs';
+
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
 import { TemplateBase } from 'shared/etl/types/ETLTypes';
 
@@ -76,95 +80,207 @@ class ETLAjax
     }
   }
 
-  public fetchTemplates(
-    onLoad: (response: List<ETLTemplate>) => void,
-    onError: ErrorHandler,
-  )
+  public fetchTemplates(): Promise<List<ETLTemplate>>
   {
-    const handleResponse = (templates: TemplateBase[]) =>
+    return new Promise((resolve, reject) =>
     {
-      onLoad(this.templatesToImmutable(templates));
-    };
-    return Ajax.req(
-      'get',
-      'etl/templates',
-      {},
-      handleResponse,
+      const handleResponse = (templates: TemplateBase[]) =>
       {
-        onError,
-      },
-    );
+        resolve(this.templatesToImmutable(templates));
+      };
+      return Ajax.req(
+        'get',
+        'etl/templates',
+        {},
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
   }
 
-  public getTemplate(
-    id: number,
-    onLoad: (response: List<ETLTemplate>) => void,
-    onError: ErrorHandler,
-  )
+  public getTemplate(id: number): Promise<List<ETLTemplate>>
   {
-    const handleResponse = (templates: TemplateBase[]) =>
+    return new Promise((resolve, reject) =>
     {
-      onLoad(this.templatesToImmutable(templates));
-    };
-    return Ajax.req(
-      'get',
-      `etl/templates/${id}`,
-      {},
-      handleResponse,
+      const handleResponse = (templates: TemplateBase[]) =>
       {
-        onError,
-      },
-    );
+        resolve(this.templatesToImmutable(templates));
+      };
+      return Ajax.req(
+        'get',
+        `etl/templates/${id}`,
+        {},
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
   }
 
-  public createTemplate(
-    template: ETLTemplate,
-    onLoad: (response: List<ETLTemplate>) => void,
-    onError: ErrorHandler,
-  )
+  public createTemplate(template: ETLTemplate): Promise<List<ETLTemplate>>
   {
     const templateToSave = templateForBackend(template);
-    const handleResponse = (templates: TemplateBase[]) =>
+    return new Promise((resolve, reject) =>
     {
-      onLoad(this.templatesToImmutable(templates));
-    };
-    return Ajax.req(
-      'post',
-      `etl/templates/create`,
-      templateToSave,
-      handleResponse,
+      const handleResponse = (templates: TemplateBase[]) =>
       {
-        onError,
-      },
-    );
+        resolve(this.templatesToImmutable(templates));
+      };
+      return Ajax.req(
+        'post',
+        `etl/templates/create`,
+        templateToSave,
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
   }
 
-  public saveTemplate(
-    template: ETLTemplate,
-    onLoad: (response: List<ETLTemplate>) => void,
-    onError: ErrorHandler,
+  public saveTemplate(template: ETLTemplate): Promise<List<ETLTemplate>>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const id = template.id;
+      const templateToSave = templateForBackend(template);
+      const handleResponse = (templates: TemplateBase[]) =>
+      {
+        resolve(this.templatesToImmutable(templates));
+      };
+      if (typeof id !== 'number')
+      {
+        reject(`id "${id}" is invalid`);
+      }
+      return Ajax.req(
+        'post',
+        `etl/templates/update/${id}`,
+        templateToSave,
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
+  }
+
+  // if download is provided, then the response will be downloaded as the mime type with provided filename
+  public executeTemplate(
+    templateId: number,
+    options: ExecuteConfig,
+  ): Promise<void>
+  {
+    return new Promise((resolve, reject) =>
+    {
+
+      const config: ReqConfig = {
+        onError: reject,
+      };
+      if (options.download !== undefined)
+      {
+        config.downloadName = options.download.downloadFilename;
+        config.mimeType = options.download.mimeType;
+      }
+
+      const payload: any = {
+        templateID: String(templateId),
+      };
+      if (options.file !== undefined)
+      {
+        payload.file = options.file;
+      }
+
+      this.reqFormData(
+        'etl/execute',
+        payload,
+        (resp) => resolve(resp),
+        config,
+      );
+    });
+  }
+
+  private reqFormData(
+    route: string,
+    data: {
+      [k: string]: string | File,
+    },
+    handleResponse: (response: any) => void,
+    cfg: ReqConfig,
   )
   {
-    const id = template.id;
-    const templateToSave = templateForBackend(template);
-    const handleResponse = (templates: TemplateBase[]) =>
+    const isDownload = cfg.downloadName !== undefined;
+    const config: ReqConfig = _.extend({
+      onError: () => null,
+      downloadName: 'file.txt',
+      mimeType: 'text/plain',
+    }, cfg);
+
+    const formData = new FormData();
+    formData.append('id', String(localStorage['id']));
+    formData.append('accessToken', localStorage['accessToken']);
+    for (const key of Object.keys(data))
     {
-      onLoad(this.templatesToImmutable(templates));
-    };
-    if (typeof id !== 'number')
-    {
-      onError(`id "${id}" is invalid`);
+      formData.append(key, data[key]);
     }
-    return Ajax.req(
-      'post',
-      `etl/templates/update/${id}`,
-      templateToSave,
-      handleResponse,
+
+    const xhr = new XMLHttpRequest();
+
+    if (isDownload)
+    {
+      xhr.responseType = 'blob';
+    }
+
+    xhr.onerror = (err: any) =>
+    {
+      const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+      config.onError(routeError);
+    };
+    xhr.onload = (ev: Event) =>
+    {
+      if (xhr.status === 401)
       {
-        onError,
-      },
-    );
+        // TODO re-enable
+        Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
+      }
+      if (xhr.status !== 200)
+      {
+        config.onError(xhr.responseText);
+        return;
+      }
+
+      if (isDownload)
+      {
+        download((ev.target as any).response, config.downloadName, config.mimeType);
+        handleResponse('');
+      }
+      else
+      {
+        handleResponse(xhr.responseText);
+      }
+    };
+
+    xhr.open('post', MIDWAY_HOST + '/midway/v1/' + route);
+    xhr.send(formData);
   }
+}
+
+interface ReqConfig
+{
+  onError?: (response: any) => void;
+  downloadName?: string;
+  mimeType?: string;
+}
+
+export interface ExecuteConfig
+{
+  file?: File;
+  download?: {
+    downloadFilename?: string;
+    mimeType?: string;
+  };
 }
 
 export default new ETLAjax();

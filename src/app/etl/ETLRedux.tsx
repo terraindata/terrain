@@ -51,8 +51,10 @@ const { List, Map } = Immutable;
 import MidwayError from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
-import ETLAjax from 'etl/ETLAjax';
+import { SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import ETLAjax, { ExecuteConfig } from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
+import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _ETLState, ETLState } from './ETLTypes';
@@ -71,6 +73,10 @@ export interface ETLActionTypes
     id: number;
     onLoad: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
+  };
+  executeTemplate: {
+    actionType: 'executeTemplate',
+    template: ETLTemplate,
   };
   fetchTemplates: {
     actionType: 'fetchTemplates';
@@ -107,6 +113,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     {
       getTemplate: (state, action) => state, // overriden reducers
       fetchTemplates: (state, action) => state,
+      executeTemplate: (state, action) => state,
       createTemplate: (state, action) => state,
       saveTemplate: (state, action) => state,
       setLoading: (state, action) =>
@@ -184,15 +191,64 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     };
   }
 
-  public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch, getState?)
+  public executeTemplate(action: ETLActionType<'executeTemplate'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+
+    const template = action.template;
+    const defaultSink = template.getSink('_default');
+    const defaultSource = template.getSource('_default');
+
+    if (defaultSink === undefined)
+    {
+      return; // todo error
+    }
+    else
+    {
+      const options: ExecuteConfig = {};
+      if (defaultSink.type === Sinks.Download)
+      {
+        const extension = defaultSink.fileConfig.fileType === FileTypes.Json ?
+          '.json' : '.csv';
+        const mimeType = defaultSink.fileConfig.fileType === FileTypes.Json ?
+          'application/json' : 'text/csv';
+        const downloadFilename = `Export_${template.id}${extension}`;
+        options.download = {
+          downloadFilename,
+          mimeType,
+        };
+      }
+      else if (defaultSource.type === Sources.Upload)
+      {
+        const file = (defaultSource.options as SourceOptionsType<Sources.Upload>).file;
+        options.file = file;
+      }
+      else
+      {
+        // tslint:disable-next-line
+        console.log(`Sink Type ${defaultSink.type} not implemented yet, ` +
+          `or Source Type ${defaultSource.type} not implemented yet`);
+        return;
+      }
+
+      ETLAjax.executeTemplate(template.id, options)
+        .then(this.onLoadFactory<any>([], directDispatch, name))
+        .catch(this.onErrorFactory(undefined, directDispatch, name));
+    }
+  }
+
+  public fetchTemplates(action: ETLActionType<'fetchTemplates'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+
     directDispatch({
       actionType: 'setLoading',
       isLoading: true,
       key: name,
     });
+
     const setTemplates = (templates: List<ETLTemplate>) =>
     {
       directDispatch({
@@ -208,37 +264,38 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       loadFunctions.push(action.onLoad);
     }
 
-    ETLAjax.fetchTemplates(
-      this.onLoadFactory(loadFunctions, directDispatch, name),
-      this.onErrorFactory(action.onError, directDispatch, name),
-    );
+    ETLAjax.fetchTemplates()
+      .then(this.onLoadFactory(loadFunctions, directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public getTemplate(action: ETLActionType<'getTemplate'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+
     directDispatch({
       actionType: 'setLoading',
       isLoading: true,
       key: name,
     });
-    ETLAjax.getTemplate(
-      action.id,
-      this.onLoadFactory([action.onLoad], directDispatch, name),
-      this.onErrorFactory(action.onError, directDispatch, name),
-    );
+
+    ETLAjax.getTemplate(action.id)
+      .then(this.onLoadFactory([action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public createTemplate(action: ETLActionType<'createTemplate'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+
     directDispatch({
       actionType: 'setLoading',
       isLoading: true,
       key: name,
     });
+
     const updateTemplate = (templates: List<ETLTemplate>) =>
     {
       if (templates.size > 0)
@@ -254,22 +311,23 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         // TODO error?
       }
     };
-    ETLAjax.createTemplate(
-      action.template,
-      this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name),
-      this.onErrorFactory(action.onError, directDispatch, name),
-    );
+
+    ETLAjax.createTemplate(action.template)
+      .then(this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public saveTemplate(action: ETLActionType<'saveTemplate'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+
     directDispatch({
       actionType: 'setLoading',
       isLoading: true,
       key: name,
     });
+
     const updateTemplate = (templates: List<ETLTemplate>) =>
     {
       if (templates.size > 0)
@@ -285,11 +343,9 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         // TODO error?
       }
     };
-    ETLAjax.saveTemplate(
-      action.template,
-      this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name),
-      this.onErrorFactory(action.onError, directDispatch, name),
-    );
+    ETLAjax.saveTemplate(action.template)
+      .then(this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
   public overrideAct(action: Unroll<ETLActionTypes>)
@@ -300,6 +356,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.fetchTemplates.bind(this, action);
       case 'getTemplate':
         return this.getTemplate.bind(this, action);
+      case 'executeTemplate':
+        return this.executeTemplate.bind(this, action);
       case 'createTemplate':
         return this.createTemplate.bind(this, action);
       case 'saveTemplate':

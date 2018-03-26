@@ -253,7 +253,10 @@ class MoveFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public onConfirm()
   {
-    this._proxy().structuralChangeName(this.state.pathKP);
+    this._try((proxy) =>
+    {
+      proxy.structuralChangeName(this.state.pathKP);
+    });
   }
 }
 

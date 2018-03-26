@@ -77,7 +77,6 @@ class SourceConfigC implements SourceConfigI
   public type = null;
   public fileConfig = _FileConfig();
   public options = {};
-  // public transformations = new TransformationEngine();
 }
 export type SourceConfig = WithIRecord<SourceConfigC>;
 export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {

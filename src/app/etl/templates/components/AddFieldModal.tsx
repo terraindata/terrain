@@ -171,7 +171,11 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
 
   public onConfirm()
   {
-    this._proxy().addNewField(this.computeKeyPath());
+    const kp = this.computeKeyPath();
+    this._try((proxy) =>
+    {
+      proxy.addNewField(kp);
+    });
   }
 }
 

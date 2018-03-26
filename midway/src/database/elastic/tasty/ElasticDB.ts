@@ -189,16 +189,11 @@ export class ElasticDB implements TastyDB
   /*
    * Creates the given index
    */
-  public async createIndex(indexName)
+  public async createIndex(index: string)
   {
     return new Promise((resolve, reject) =>
     {
-      const params = {
-        index: indexName,
-      };
-
-      this.client.indices.create(
-        params,
+      this.client.indices.create({ index },
         util.promise.makeCallback(resolve, reject));
     });
   }
@@ -206,36 +201,38 @@ export class ElasticDB implements TastyDB
   /*
    * Deletes the given index
    */
-  public async deleteIndex(indexName)
+  public async deleteIndex(index: string)
   {
     return new Promise((resolve, reject) =>
     {
-      const params = {
-        index: indexName,
-      };
-
-      this.client.indices.delete(
-        params,
+      this.client.indices.delete({ index },
         util.promise.makeCallback(resolve, reject));
     });
   }
 
   public async putMapping(table: TastyTable): Promise<object>
   {
+    const index = table.getDatabaseName();
+    const type = table.getTableName();
+    const mapping = table.getMapping();
+    return this.putESMapping(index, type, mapping);
+  }
+
+  public async putESMapping(index: string, type: string, mapping: object): Promise<object>
+  {
     const schema: TastySchema = await this.schema();
-    if (schema.databaseNames().indexOf(table.getDatabaseName()) === -1)
+    if (schema.databaseNames().indexOf(index) === -1)
     {
-      await this.createIndex(table.getDatabaseName());
+      await this.createIndex(index);
     }
 
-    const payload: object = table.getMapping();
     return new Promise((resolve, reject) =>
     {
       this.client.indices.putMapping(
         {
-          index: table.getDatabaseName(),
-          type: table.getTableName(),
-          body: payload,
+          index,
+          type,
+          body: mapping,
         },
         util.promise.makeCallback(resolve, reject));
     });

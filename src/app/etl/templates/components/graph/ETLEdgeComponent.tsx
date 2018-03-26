@@ -60,6 +60,7 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import ExpandableView from 'common/components/ExpandableView';
 import Menu from 'common/components/Menu';
+import { MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'src/app/Classes';
 import Quarantine from 'util/RadiumQuarantine';
@@ -88,16 +89,24 @@ export interface Props
 @Radium
 class ETLEdgeComponent extends TerrainComponent<Props>
 {
-  public menuOptions = List([
+  public computeMenuOptions(): List<MenuOption>
+  {
+    const { edge } = this.props;
+    let options = List([
+      {
+        text: 'Edit This Step',
+        onClick: this.makeThisActive,
+      },
+    ]);
+    if (edge.to !== -1)
     {
-      text: 'Edit This Step',
-      onClick: this.makeThisActive,
-    },
-    {
-      text: 'Merge Into This Step',
-      onClick: this.openMergeUI,
-    },
-  ]);
+      options = options.push({
+        text: 'Merge Into This Step',
+        onClick: this.openMergeUI,
+      });
+    }
+    return options;
+  }
 
   public renderNode(node: ETLNode, id: number)
   {
@@ -156,7 +165,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
         {this.renderBetween()}
         {this.renderNode(toNode, to)}
         <div className='edge-item-menu-wrapper'>
-          <Menu options={this.menuOptions} />
+          <Menu options={this.computeMenuOptions()} />
         </div>
       </div>
     );

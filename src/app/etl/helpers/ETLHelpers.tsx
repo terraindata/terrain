@@ -71,7 +71,7 @@ import
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
 import { TemplateProxy } from 'etl/templates/TemplateProxy';
-import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, copyTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
@@ -118,20 +118,41 @@ export default abstract class ETLHelpers
     {
       this.store.dispatch(ETLActions(action));
     };
-    this.templateGetter = this.templateGetter.bind(this);
-    this.templateSetter = this.templateSetter.bind(this);
   }
 
-  protected _templateProxy(cache = false)
+  public _try(tryFn: (proxy: TemplateProxy) => void): Promise<void>
   {
-    if (cache)
+    return new Promise<void>((resolve, reject) =>
     {
-      return this._template.proxy();
-    }
-    else
-    {
-      return new TemplateProxy(this.templateGetter, this.templateSetter);
-    }
+      let template = copyTemplate(this._template);
+      const mutator = (newTemplate: ETLTemplate) =>
+      {
+        template = newTemplate;
+      };
+      const accessor = () => template;
+      const proxy = new TemplateProxy(accessor, mutator);
+      tryFn(proxy);
+      if (1 === 1) // placeholder, todo check if engine is in valid state
+      {
+        this.editorAct({
+          actionType: 'setTemplate',
+          template,
+          history: 'push',
+        });
+        if (!this._templateEditor.isDirty)
+        {
+          this.editorAct({
+            actionType: 'setIsDirty',
+            isDirty: true,
+          });
+        }
+        resolve();
+      }
+      else
+      {
+        reject('failure');
+      }
+    });
   }
 
   protected _grabOne<T>(resolve, reject)
@@ -166,25 +187,5 @@ export default abstract class ETLHelpers
   {
     // tslint:disable-next-line
     console.error(ev);
-  }
-
-  private templateSetter(template: ETLTemplate)
-  {
-    this.editorAct({
-      actionType: 'setTemplate',
-      template,
-    });
-    if (!this._templateEditor.isDirty)
-    {
-      this.editorAct({
-        actionType: 'setIsDirty',
-        isDirty: true,
-      });
-    }
-  }
-
-  private templateGetter()
-  {
-    return this._template;
   }
 }

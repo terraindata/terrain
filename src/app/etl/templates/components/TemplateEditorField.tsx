@@ -59,7 +59,8 @@ const { List, Map } = Immutable;
 import { instanceFnDecorator } from 'src/app/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
-import { FieldNodeProxy, FieldTreeProxy } from 'etl/templates/FieldProxy';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
@@ -98,16 +99,12 @@ interface Injected
 
 export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
 {
-  private onRootMutationBound: (fieldMap: FieldMap) => void;
-  private updateEngineVersionBound: () => void;
   private uiStateTracker: PropertyTracker<EditorDisplayState> = new PropertyTracker(this.getUIStateValue.bind(this));
   private updateChecker: UpdateChecker = new UpdateChecker();
 
   constructor(props)
   {
     super(props);
-    this.onRootMutationBound = this.onRootMutation.bind(this);
-    this.updateEngineVersionBound = this.updateEngineVersion.bind(this);
   }
 
   public componentWillUpdate(nextProps, nextState)
@@ -179,11 +176,31 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.getDKPCachedFn(this.props.displayKeyPath, cacheKey)(index);
   }
 
-  protected _proxy(): FieldNodeProxy
+  // todo should this return a promise to be consistent with ETLHelpers?
+  protected _try(tryFn: (proxy: FieldProxy) => void)
   {
-    const engine = this._currentEngine();
-    const tree = new FieldTreeProxy(this._fieldMap(), engine, this.onRootMutationBound, this.updateEngineVersionBound);
-    return new FieldNodeProxy(tree, this.props.fieldId);
+    GraphHelpers.mutateEngine((engineProxy: EngineProxy) =>
+    {
+      tryFn(engineProxy.makeFieldProxy(this.props.fieldId));
+    }).then((isStructural: boolean) =>
+    {
+      if (isStructural)
+      {
+        this.props.act({
+          actionType: 'rebuildFieldMap',
+        });
+      }
+      else
+      {
+        this.props.act({
+          actionType: 'rebuildField',
+          fieldId: this.props.fieldId,
+        });
+      }
+      this.props.act({
+        actionType: 'updateEngineVersion',
+      });
+    }).catch(this._logError);
   }
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps
@@ -250,22 +267,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this._inputDisabled() ? undefined : fn;
   }
 
-  private onRootMutation(fieldMap: FieldMap)
-  {
-    this.props.act({
-      actionType: 'setFieldMap',
-      fieldMap,
-    });
-  }
-
-  private updateEngineVersion()
-  {
-    this.props.act({
-      actionType: 'updateEngineVersion',
-    });
-  }
-
-  // gets memoizedOne'd
+  @instanceFnDecorator(memoizeOne)
   private getDKPCachedFn(displayKeyPath, cacheDependency)
   {
     return _.memoize((index) =>
@@ -278,6 +280,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   private getUIStateValue(): EditorDisplayState
   {
     return (this.props as Props & Injected).templateEditor.uiState;
+  }
+
+  protected _logError(ev)
+  {
+    // tslint:disable-next-line
+    console.error(ev);
   }
 }
 
