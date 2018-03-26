@@ -189,16 +189,11 @@ export class ElasticDB implements TastyDB
   /*
    * Creates the given index
    */
-  public async createIndex(indexName)
+  public async createIndex(index: string)
   {
     return new Promise((resolve, reject) =>
     {
-      const params = {
-        index: indexName,
-      };
-
-      this.client.indices.create(
-        params,
+      this.client.indices.create({ index },
         util.promise.makeCallback(resolve, reject));
     });
   }
@@ -206,16 +201,11 @@ export class ElasticDB implements TastyDB
   /*
    * Deletes the given index
    */
-  public async deleteIndex(indexName)
+  public async deleteIndex(index: string)
   {
     return new Promise((resolve, reject) =>
     {
-      const params = {
-        index: indexName,
-      };
-
-      this.client.indices.delete(
-        params,
+      this.client.indices.delete({ index },
         util.promise.makeCallback(resolve, reject));
     });
   }
