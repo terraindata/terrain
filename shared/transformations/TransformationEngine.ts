@@ -60,8 +60,6 @@ import TransformationNodeType from './TransformationNodeType';
 import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
-const Graph = GraphLib.Graph;
-
 /**
  * A TransformationEngine performs transformations on complex JSON documents.
  *
@@ -89,8 +87,7 @@ export class TransformationEngine
   {
     const parsedJSON: object = typeof json === 'string' ? TransformationEngine.parseSerializedString(json as string) : json as object;
     const e: TransformationEngine = new TransformationEngine();
-    const dag: any = GraphLib.json.read(parsedJSON['dag']);
-    e.dag = dag;
+    e.dag = GraphLib.json.read(parsedJSON['dag']);
     e.doc = parsedJSON['doc'];
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
@@ -132,7 +129,7 @@ export class TransformationEngine
     return parsed;
   }
 
-  private dag: any = new Graph({ directed: true });
+  private dag: GraphLib.Graph = new GraphLib.Graph({ directed: true });
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
@@ -255,7 +252,7 @@ export class TransformationEngine
 
     for (const nodeKey of this.dag.sources())
     {
-      const toTraverse: string[] = GraphLib.alg.preorder(this.dag, nodeKey);
+      const toTraverse: string[] = GraphLib.alg.preorder(this.dag, [nodeKey]);
       for (let i = 0; i < toTraverse.length; i++)
       {
         const preprocessedNode: TransformationNode = this.preprocessNode(this.dag.node(toTraverse[i]), output);
@@ -433,12 +430,12 @@ export class TransformationEngine
 
     if (fieldNames !== undefined)
     {
-      (this.dag.node(transformationID) as TransformationNode).fields = fieldNames;
+      (this.dag.node(transformationID.toString()) as TransformationNode).fields = fieldNames;
     }
 
     if (options !== undefined)
     {
-      (this.dag.node(transformationID) as TransformationNode).meta = options;
+      (this.dag.node(transformationID.toString()) as TransformationNode).meta = options;
     }
   }
 
@@ -449,17 +446,19 @@ export class TransformationEngine
    */
   public deleteTransformation(transformationID: number): void
   {
-    const inEdges: GraphLib.Edge[] = this.dag.inEdges(transformationID.toString());
-    const outEdges: GraphLib.Edge[] = this.dag.outEdges(transformationID.toString());
+    const inEdges: void | GraphLib.Edge[] = this.dag.inEdges(transformationID.toString());
+    const outEdges: void | GraphLib.Edge[] = this.dag.outEdges(transformationID.toString());
 
-    for (let i: number = 0; i < inEdges.length; i++)
+    if (typeof inEdges !== 'undefined' && typeof outEdges !== 'undefined')
     {
-
+      if (inEdges.length === 1 && outEdges.length === 1)
+      {
+        // re-link in node with out node
+        this.dag.setEdge(inEdges[0].v, outEdges[0].w);
+      } // else not supported yet
     }
 
-    this.dag.removeNode(transformationID);
-    // TODO need to handle case where transformation is not at the top of the stack (add new edges etc.)
-
+    this.dag.removeNode(transformationID.toString());
   }
 
   /**
