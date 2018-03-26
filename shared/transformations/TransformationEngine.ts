@@ -356,6 +356,15 @@ export class TransformationEngine
     return this.uidField - 1;
   }
 
+  public deleteField(id: number): void
+  {
+    this.fieldNameToIDMap = this.fieldNameToIDMap.delete(this.fieldNameToIDMap.keyOf(id));
+    this.fieldProps = this.fieldProps.delete(id);
+    this.fieldEnabled = this.fieldEnabled.delete(id);
+    this.IDToFieldNameMap = this.IDToFieldNameMap.delete(id);
+    this.fieldTypes = this.fieldTypes.delete(id);
+  }
+
   /**
    * Get the IDs of all transformations that act on a given field.
    *
