@@ -212,20 +212,27 @@ export class ElasticDB implements TastyDB
 
   public async putMapping(table: TastyTable): Promise<object>
   {
+    const index = table.getDatabaseName();
+    const type = table.getTableName();
+    const mapping = table.getMapping();
+    return this.putESMapping(index, type, mapping);
+  }
+
+  public async putESMapping(index: string, type: string, mapping: object): Promise<object>
+  {
     const schema: TastySchema = await this.schema();
-    if (schema.databaseNames().indexOf(table.getDatabaseName()) === -1)
+    if (schema.databaseNames().indexOf(index) === -1)
     {
-      await this.createIndex(table.getDatabaseName());
+      await this.createIndex(index);
     }
 
-    const payload: object = table.getMapping();
     return new Promise((resolve, reject) =>
     {
       this.client.indices.putMapping(
         {
-          index: table.getDatabaseName(),
-          type: table.getTableName(),
-          body: payload,
+          index,
+          type,
+          body: mapping,
         },
         util.promise.makeCallback(resolve, reject));
     });
