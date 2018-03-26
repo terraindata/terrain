@@ -70,6 +70,7 @@ import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
+import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
 import
 {
   _DistanceValue, _Param, _Script, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
@@ -120,6 +121,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     this.setState({
       boost: nextProps.filterLine && nextProps.filterLine.boost,
     });
+    this.updateFieldType(nextProps);
     if (nextProps.filterLine &&
       nextProps.filterLine.fieldType === FieldType.Geopoint &&
       nextProps.filterLine.comparison === 'located' &&
@@ -128,6 +130,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       // UPDATE SCRIPT
     }
+  }
+
+  public componentWillMount()
+  {
+    this.updateFieldType(this.props);
   }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
@@ -196,6 +203,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           index: (props.pathfinderContext.source.dataSource as any).index,
           fieldValue,
           comparisonValue,
+          fieldType: props.filterLine.fieldType,
         }}
         // optionSets={this.getOptionSets() /* TODO store in state? */}
         values={values}
@@ -229,6 +237,22 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return true;
   }
 
+  // Check if the field is defined and field type isnt (may occur when filter was created by cards)
+  // Update the fieldType if necessary
+  private updateFieldType(props)
+  {
+    let fieldType = props.filterLine.fieldType
+    if (props.filterLine.field &&
+        (fieldType === undefined ||
+        fieldType === null ||
+        fieldType === FieldType.Any))
+    {
+      const { schemaState, builderState } = props.pathfinderContext;
+      fieldType = ElasticBlockHelpers.getTypeOfField(schemaState, builderState, props.filterLine.field) as FieldType;
+      props.onChange(props.keyPath, props.filterLine.set('fieldType', parseFloat(fieldType)));
+    }
+  }
+
   private getOptionSets(): List<RouteSelectorOptionSet>
   {
     const { filterLine, canEdit, pathfinderContext, isSoftFilter } = this.props;
@@ -238,7 +262,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const fieldSet = this.props.fieldOptionSet;
     let comparisonOptions = List<RouteSelectorOption>();
     let comparisonHeader = 'Choose a data field first';
-    console.log('Filter line is ', filterLine);
     if (filterLine.field)
     {
       comparisonHeader = '';
@@ -252,7 +275,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         schemaState: pathfinderContext.schemaState,
         builderState: pathfinderContext.builderState,
       });
-      console.log('comparison options', comparisonOptions);
       comparisonOptions = comparisonOptions.map((option) =>
       {
         option = option['toJS'](); // TODO perhaps a better conversion between ChoiceOption and RouteOption
@@ -611,6 +633,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleChange(key, value, meta?, fieldChange?)
   {
+    console.log('changing ', key, value);
     let filterLine = this.props.filterLine.set(key, value);
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;

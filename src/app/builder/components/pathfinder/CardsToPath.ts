@@ -181,6 +181,7 @@ export class CardsToPath
       value: row.value,
       comparison,
       boost: row.boost === '' ? 1 : Number(row.boost),
+      fieldType: row.fieldType,
     };
     const newLine = _FilterLine(template);
     TerrainLog.debug('FilterBlock', row, 'to FilterLine', newLine);

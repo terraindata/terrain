@@ -432,7 +432,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       return Map({
         term: Map({
           [line.field]: Map({
-            value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
+            value:
+              !isNaN(parseFloat(value)) && line.fieldType !== FieldType.Date ? parseFloat(value) : value,
             boost,
           }),
         }),
@@ -465,7 +466,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       return Map({
         term: Map({
           [line.field]: Map({
-            value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
+            value:  
+              !isNaN(parseFloat(value)) && line.fieldType !== FieldType.Date ? parseFloat(value) : value,
             boost,
           }),
         }),

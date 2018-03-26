@@ -873,7 +873,7 @@ const ElasticComparisons = [
   {
     value: 'equal',
     displayName: 'equals', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
-    fieldTypes: List([FieldType.Numerical, FieldType.Text]),
+    fieldTypes: List([FieldType.Numerical, FieldType.Text, FieldType.Date]),
     placeholder: 'e.g. 100 or apple',
   },
   {
@@ -885,7 +885,7 @@ const ElasticComparisons = [
   {
     value: 'notequal',
     displayName: 'does not equal', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical]),
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
     placeholder: 'e.g. 100 or apple',
   },
   {

@@ -218,6 +218,7 @@ export class PathToCards
       boolQuery,
       filterOp,
       boost: line.boost,
+      fieldType: line.fieldType,
     }, true);
     TerrainLog.debug('(P->B) line -> block ', line, block);
     return [block];
@@ -830,9 +831,11 @@ export class PathToCards
       {
         switch (filter.boolQuery)
         {
+          case 'filter':
           case 'must':
             newHardFilters.push(filter.set('boolQuery', 'filter'));
             break;
+          case 'filter_not':
           case 'must_not':
             newHardFilters.push(filter.set('boolQuery', 'filter_not'));
             break;

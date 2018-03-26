@@ -71,6 +71,7 @@ import ESCardParser from '../conversion/ESCardParser';
 import { TerrainFilterCardParser } from '../conversion/TerrainFilterCardParser';
 import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
+import {FieldType} from '../../../../shared/builder/FieldTypes';
 
 export class FilterUtils
 {
@@ -190,6 +191,7 @@ export const elasticFilterBlock = _block(
     boolQuery: 'must',
     filterOp: '=',
     boost: '',
+    fieldType: FieldType.Any,
     static: {
       language: 'elastic',
       tql: null,
@@ -207,6 +209,8 @@ export const elasticFilterBlock = _block(
           ? extraConfig.value : '';
         config['boost'] = (extraConfig && extraConfig.boost !== undefined && extraConfig.value !== null)
           ? extraConfig.boost : '';
+        config['fieldType'] = (extraConfig && extraConfig.boost !== undefined && extraConfig.field !== null)
+          ? extraConfig.fieldType : FieldType.Any;
         config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'must';
         config['filterOp'] = (extraConfig && extraConfig.filterOp) || '=';
         return config;
