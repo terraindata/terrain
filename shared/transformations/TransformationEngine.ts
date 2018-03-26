@@ -449,8 +449,17 @@ export class TransformationEngine
    */
   public deleteTransformation(transformationID: number): void
   {
+    const inEdges: GraphLib.Edge[] = this.dag.inEdges(transformationID.toString());
+    const outEdges: GraphLib.Edge[] = this.dag.outEdges(transformationID.toString());
+
+    for (let i: number = 0; i < inEdges.length; i++)
+    {
+
+    }
+
     this.dag.removeNode(transformationID);
     // TODO need to handle case where transformation is not at the top of the stack (add new edges etc.)
+
   }
 
   /**
