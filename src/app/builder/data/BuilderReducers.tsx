@@ -59,9 +59,9 @@ import { MySQLBackend } from '../../../database/mysql/MySQLBackend';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
+import TerrainTools from '../../util/TerrainTools';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
-import TerrainTools from '../../util/TerrainTools';
 import ActionTypes from './BuilderActionTypes';
 import
 {

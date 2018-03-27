@@ -135,14 +135,22 @@ export class CardsToPath
       .set('more', more)
       .set('step', (
         newSource.dataSource as ElasticDataSource).index ?
-          PathfinderSteps.Source + 1 : path.step);
+        PathfinderSteps.Source + 1 : path.step);
     return newPath;
   }
 
   private static filterOpToComparisonsMap = {
-    '>': 'greater',
+    '>': {
+      [FieldType.Numerical]: 'greater',
+      [FieldType.Date]: 'dateafter',
+      [FieldType.Text]: 'alphaafter',
+    },
     '≥': 'greaterequal',
-    '<': 'less',
+    '<': {
+      [FieldType.Numerical]: 'less',
+      [FieldType.Date]: 'datebefore',
+      [FieldType.Text]: 'alphabefore',
+    },
     '≤': 'lessequal',
     '=': 'equal',
     '≈': 'contains',
@@ -152,9 +160,17 @@ export class CardsToPath
 
   private static filterNotOpToComparisonsMap = {
     '>': 'lessequal',
-    '≥': 'less',
+    '≥': {
+      [FieldType.Numerical]: 'less',
+      [FieldType.Date]: 'datebefore',
+      [FieldType.Text]: 'alphabefore',
+    },
     '<': 'greaterequal',
-    '≤': 'greater',
+    '≤': {
+      [FieldType.Numerical]: 'greater',
+      [FieldType.Date]: 'dateafter',
+      [FieldType.Text]: 'alphaafter',
+    },
     '=': 'notequal',
     '≈': 'notcontain',
     'in': 'isnotin',
@@ -166,6 +182,11 @@ export class CardsToPath
     if (row.boolQuery === 'should_not' || row.boolQuery === 'filter_not')
     {
       comparison = this.filterNotOpToComparisonsMap[row.filterOp];
+      if (typeof comparison === 'object')
+      {
+        comparison = row.fieldType !== undefined && row.fieldType !== null && row.fieldType !== FieldType.Any ?
+          comparison[row.fieldType] : comparison[FieldType.Numerical];
+      }
       if (comparison === undefined)
       {
         // we can't express this comparison in the pathfinder
@@ -174,6 +195,11 @@ export class CardsToPath
     } else
     {
       comparison = this.filterOpToComparisonsMap[row.filterOp];
+      if (typeof comparison === 'object')
+      {
+        comparison = row.fieldType !== undefined && row.fieldType !== null && row.fieldType !== FieldType.Any ?
+          comparison[row.fieldType] : comparison[FieldType.Numerical];
+      }
     }
 
     const template = {
@@ -202,7 +228,6 @@ export class CardsToPath
 
     filterRowMap.filter = filterRowMap.filter.concat(filterRowMap.filter_not);
     filterRowMap.should = filterRowMap.should.concat(filterRowMap.should_not);
-    // console.log('filter rows ', filterRowMap);
     let newLines = List([]);
 
     // handle normal filter lines first
@@ -214,7 +239,7 @@ export class CardsToPath
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'all');
         newLines = List(filterRowMap.filter.map(
-                  (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
+          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
       } else if (isInnerGroup === true)
       {
         // any hard bool has lower priority
@@ -223,7 +248,7 @@ export class CardsToPath
           // set the filtergroup to
           filterGroup = filterGroup.set('minMatches', 'any');
           newLines = List(filterRowMap.should.map(
-                      (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
+            (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
         }
       }
     }
@@ -235,24 +260,23 @@ export class CardsToPath
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'any');
         newLines = List(filterRowMap.should.map(
-                  (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
+          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
       }
     }
     // Look for Geo Distance Queries
-    // const geoDistanceLines = this.processGeoDistanceFilters(filterGroup, parser, boolValueInfo, sectionType);
+    const geoDistanceLines = this.processGeoDistanceFilters(filterGroup, parser, boolValueInfo, sectionType);
     // handle nested groups
     const newNestedGroupLines = this.processInnerFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
     const newNestedQueryLines = this.processNestedQueryFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
-    newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines).toList();
+    newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines).concat(geoDistanceLines).toList();
     TerrainLog.debug('B->P(Bool): Generate ' + String(newLines.size) + ' filter lines ' +
       '(Nested Group' + String(newNestedGroupLines.size) + ').' +
       '(Nested Query' + String(newNestedQueryLines.size) + ').');
-  //  console.log('lines for group are ', newLines);
     filterGroup = filterGroup.set('lines', newLines);
     return filterGroup;
   }
 
-  private static processGeoDistanceFilters(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, section: 'soft'| 'hard')
+  private static processGeoDistanceFilters(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, section: 'soft' | 'hard')
   {
     let from;
     let filterLines = List([]);
@@ -280,12 +304,12 @@ export class CardsToPath
               fieldType: FieldType.Geopoint,
               comparison: 'located',
               value: {
-                location: [distanceCard.locationValue.lat, distanceCard.locationValue.lon],
+                location: distanceCard.locationValue,
                 address: distanceCard.mapInputValue,
                 distance: distanceCard.distance,
                 units: distanceCard.distanceUnit,
-                zoom: distanceCard.mapZoomValue
-              }
+                zoom: distanceCard.mapZoomValue,
+              },
             });
             filterLines = filterLines.push(filterLine);
           }
@@ -305,8 +329,8 @@ export class CardsToPath
               address: distanceCard.mapInputValue,
               distance: distanceCard.distance,
               units: distanceCard.distanceUnit,
-              zoom: distanceCard.mapZoomValue
-            }
+              zoom: distanceCard.mapZoomValue,
+            },
           });
           filterLines = filterLines.push(filterLine);
         }
@@ -427,7 +451,7 @@ export class CardsToPath
   private static getDropIfLessThan(parser: ESCardParser, bodyValueInfo: ESValueInfo)
   {
     const dropIfLessThanValueInfo = parser.searchCard(
-      { 'groupJoin:groupjoin_clause': {'dropIfLessThan:number': true}}, bodyValueInfo);
+      { 'groupJoin:groupjoin_clause': { 'dropIfLessThan:number': true } }, bodyValueInfo);
     if (dropIfLessThanValueInfo === null)
     {
       return 0;

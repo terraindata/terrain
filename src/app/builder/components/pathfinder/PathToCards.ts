@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 import { parseScore, PathFinderDefaultSize } from 'builder/components/pathfinder/PathfinderParser';
-import { DistanceValue, ElasticDataSource, FilterGroup, FilterLine, Path, Script } from 'builder/components/pathfinder/PathfinderTypes';
+import { _DistanceValue, DistanceValue, ElasticDataSource, FilterGroup, FilterLine, Path, Script } from 'builder/components/pathfinder/PathfinderTypes';
 import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
@@ -153,7 +153,7 @@ export class PathToCards
       }
     } else
     {
-      parser.createCardIfNotExist({'size:size': sourceSize}, body);
+      parser.createCardIfNotExist({ 'size:size': sourceSize }, body);
       updateSize = true;
     }
 
@@ -178,6 +178,10 @@ export class PathToCards
     exists: 'exists',
     contains: '≈',
     notcontain: '≈',
+    alphabefore: '<',
+    alphaafter: '>',
+    datebefore: '<',
+    dateafter: '>',
   };
 
   private static ComparisonsToBoolType = {
@@ -192,6 +196,11 @@ export class PathToCards
     notequal: { filter: 'filter_not', should: 'should_not' },
     isnotin: { filter: 'filter_not', should: 'should_not' },
     notcontain: { filter: 'filter_not', should: 'should_not' },
+    datebefore: { filter: 'filter', should: 'should' },
+    alphabefore: { filter: 'filter', should: 'should' },
+    dateafter: { filter: 'filter', should: 'should' },
+    alphaafter: { filter: 'filter', should: 'should' },
+
   };
 
   private static filterLineToFilterBlock(boolType: 'filter' | 'should', line: FilterLine): Block[]
@@ -226,54 +235,58 @@ export class PathToCards
 
   private static processGeoDistanceFilter(filterLines: FilterLine[], parser: ESCardParser, boolValueInfo: ESValueInfo, boolType, filterSection: 'soft' | 'hard')
   {
+    if (filterSection !== 'hard')
+    {
+      return List([]);
+    }
     // Find any geo_distance filter lines
-    const geoFilterLines = filterLines.filter((line) => line.comparison === 'located');
-  //   console.log('Geo filter lines are ', geoFilterLines);
+    const geoFilterLines = List(filterLines).filter((line) => line.comparison === 'located').toList();
     const boolTypeFiltersType = boolType + ':query[]';
-    const cardFilterLines = parser.searchCard(
+    const boolFilters = parser.searchCard(
       {
-        [boolTypeFiltersType]: {
-          'geo_distance:geo_distance': true,
-        }
+        [boolTypeFiltersType]: true,
       },
-      boolValueInfo, false, true
+      boolValueInfo,
     );
     // Find all the geodistance cards and delete them
-    if (cardFilterLines)
+    if (boolFilters && boolFilters.arrayChildren && boolFilters.arrayChildren.length)
     {
       // Delete them
+      for (let i = boolFilters.arrayChildren.length - 1; i >= 0; i--)
+      {
+        const child = boolFilters.arrayChildren[i];
+        if (child.objectChildren.geo_distance)
+        {
+          parser.deleteChild(boolFilters, i);
+        }
+      }
     }
     // If there are supposed to be geo distance cards, add them in
-    if (geoFilterLines.length)
+    if (geoFilterLines.size)
     {
       parser.createCardIfNotExist({ [boolTypeFiltersType]: [] }, boolValueInfo);
       const filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
-      console.log('going to add to ', filterCard);
-      for (let i = 0; i < geoFilterLines.length; i++)
+      for (let i = 0; i < geoFilterLines.size; i++)
       {
-        const filterLine = geoFilterLines[i];
+        const filterLine = geoFilterLines.get(i);
         const value = filterLine.value as DistanceValue;
         const distanceCard = BlockUtils.make(ElasticBlocks, 'elasticDistance',
-        {
-          field: filterLine.field,
-          distance: value.distance,
-          distanceUnit: value.units,
-          locationValue: value.location,
-          mapInputValue: value.address,
-          mapZoomValue: value.zoom,
-        });
-        const parsedDistanceCard = new ESCardParser(distanceCard);
-        console.log('distance card', distanceCard);
+          {
+            field: filterLine.field,
+            distance: value ? value.distance : 10,
+            distanceUnit: value ? value.units : 'mi',
+            locationValue: value && value.location ? value.location : { lat: 0, lon: 0 },
+            mapInputValue: value ? value.address : '',
+            mapZoomValue: value ? value.zoom : 15,
+            cards: List([]),
+          });
+        // const parsedDistanceCard = new ESCardParser(distanceCard);
         const queryCard = BlockUtils.make(ElasticBlocks, 'eqlquery', {
           key: i,
+          cards: List([distanceCard]),
         });
-        console.log('query card ', queryCard);
         const parsedCard = new ESCardParser(queryCard);
-        console.log('parsed query card ', parsedCard.getValueInfo());
-        console.log('adding to ', filterCard);
-        console.log(filterCard.arrayChildren.length);
-//        parser.addChild(filterCard, filterCard.arrayChildren.length, parsedCard.getValueInfo());
-       // parser.addChild(filterCard, filterCard.arrayChildren.length, parsedDistanceCard.getValueInfo());
+        parser.addChild(filterCard, filterCard.arrayChildren.length, parsedCard.getValueInfo());
       }
     }
   }
@@ -535,7 +548,7 @@ export class PathToCards
     }
     if (collapse && collapse !== 'None')
     {
-      parser.createCardIfNotExist({ 'collapse:collapse': {'field:field': collapse} }, body);
+      parser.createCardIfNotExist({ 'collapse:collapse': { 'field:field': collapse } }, body);
     }
   }
 
@@ -643,16 +656,17 @@ export class PathToCards
     if (dropIfLessThan)
     {
       parser.createCardIfNotExist({ 'groupJoin:groupjoin_clause': { 'dropIfLessThan:number': dropIfLessThan } }, body);
-      const dropIfLessThanValue = parser.searchCard({ 'groupJoin:groupjoin_clause': {'dropIfLessThan:number': true}}, body);
+      const dropIfLessThanValue = parser.searchCard({ 'groupJoin:groupjoin_clause': { 'dropIfLessThan:number': true } }, body);
       if (dropIfLessThan !== dropIfLessThanValue.value)
       {
         dropIfLessThanValue.card = dropIfLessThanValue.card.set('value', dropIfLessThan);
         parser.isMutated = true;
       }
     }
-    else {
+    else
+    {
       // Delete the drop if less than card if it exists and dropIfLessThan = 0
-      const groupJoinCard = parser.searchCard({'groupJoin:groupjoin_clause': true}, body);
+      const groupJoinCard = parser.searchCard({ 'groupJoin:groupjoin_clause': true }, body);
       if (groupJoinCard !== null && groupJoinCard.objectChildren.dropIfLessThan)
       {
         parser.deleteChild(groupJoinCard, 'dropIfLessThan');

@@ -306,7 +306,8 @@ export class TerrainFilterCardParser
     const valueParser = new ESJSONParser(value);
     let cardValue = value;
     // Try to split it along , to create list
-    try {
+    try
+    {
       cardValue = JSON.parse(value);
     }
     catch {

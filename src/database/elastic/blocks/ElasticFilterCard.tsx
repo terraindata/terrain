@@ -59,6 +59,7 @@ import { _card, Card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreateCardTool';
+import { FieldType } from '../../../../shared/builder/FieldTypes';
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
@@ -71,7 +72,6 @@ import ESCardParser from '../conversion/ESCardParser';
 import { TerrainFilterCardParser } from '../conversion/TerrainFilterCardParser';
 import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
-import {FieldType} from '../../../../shared/builder/FieldTypes';
 
 export class FilterUtils
 {

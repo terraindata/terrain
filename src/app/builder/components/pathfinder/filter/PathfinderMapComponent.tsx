@@ -90,10 +90,13 @@ class BuilderMapComponent extends TerrainComponent<Props>
     }
   }
 
-  // TODO ADD ZOOM STATE SAVING
   public handleZoomChange(zoom)
   {
     let filterLine;
+    if (this.props.filterLine.value && zoom === this.props.filterLine.value['zoom'])
+    {
+      return;
+    }
 
     if (this.props.filterLine.value && this.props.filterLine.value['zoom'] !== undefined)
     {

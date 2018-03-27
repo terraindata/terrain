@@ -68,9 +68,9 @@ import { units } from 'app/common/components/MapComponent';
 import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
+import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
-import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
 import
 {
   _DistanceValue, _Param, _Script, BoostOptions, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext,
@@ -241,9 +241,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   // Update the fieldType if necessary
   private updateFieldType(props)
   {
-    let fieldType = props.filterLine.fieldType
+    let fieldType = props.filterLine.fieldType;
     if (props.filterLine.field &&
-        (fieldType === undefined ||
+      (fieldType === undefined ||
         fieldType === null ||
         fieldType === FieldType.Any))
     {
@@ -633,7 +633,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleChange(key, value, meta?, fieldChange?)
   {
-    console.log('changing ', key, value);
     let filterLine = this.props.filterLine.set(key, value);
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;

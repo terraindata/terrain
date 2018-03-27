@@ -788,7 +788,7 @@ class ElasticDataSourceC extends DataSource
 
     if (context.type === 'comparison')
     {
-      const { field, fieldType, schemaState, source, analyzed} = context;
+      const { field, fieldType, schemaState, source, analyzed } = context;
       const server = context.builderState.db.name;
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)

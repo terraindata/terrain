@@ -210,17 +210,17 @@ function parseLinearScore(score: Score)
 
 function parseTerrainScore(score: Score, simpleParser: boolean = false)
 {
-  const sortObj = {    
-    _script: {    
-     type: 'number',    
-      order: 'desc',    
-     script: {    
-      stored: 'Terrain.Score.PWL',    
-        params: {    
-         factors: [],    
-      },    
-      },    
-    },    
+  const sortObj = {
+    _script: {
+      type: 'number',
+      order: 'desc',
+      script: {
+        stored: 'Terrain.Score.PWL',
+        params: {
+          factors: [],
+        },
+      },
+    },
   };
   // This is a weird race condition where the path starts loading with the old path and then switches to new path...
   let dirty = false;
@@ -466,7 +466,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       return Map({
         term: Map({
           [line.field]: Map({
-            value:  
+            value:
               !isNaN(parseFloat(value)) && line.fieldType !== FieldType.Date ? parseFloat(value) : value,
             boost,
           }),
