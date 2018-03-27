@@ -245,10 +245,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     if (props.filterLine.field &&
       (fieldType === undefined ||
         fieldType === null ||
-        fieldType === FieldType.Any))
+        fieldType === FieldType.Any ||
+        isNaN(fieldType)))
     {
-      const { schemaState, builderState } = props.pathfinderContext;
-      fieldType = ElasticBlockHelpers.getTypeOfField(schemaState, builderState, props.filterLine.field) as FieldType;
+      const { schemaState, builderState, source } = props.pathfinderContext;
+      fieldType =
+        ElasticBlockHelpers.getTypeOfField(schemaState, builderState, props.filterLine.field, false, source.dataSource.index) as FieldType;
       props.onChange(props.keyPath, props.filterLine.set('fieldType', parseFloat(fieldType)));
     }
   }

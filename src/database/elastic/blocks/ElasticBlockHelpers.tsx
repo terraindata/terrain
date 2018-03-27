@@ -246,7 +246,13 @@ export const ElasticBlockHelpers = {
       ).map(
         (column) => column.name,
       ).toList();
-      const col = schemaState.columns.filter(
+      let wholeField = '';
+      if (field && field.indexOf('.') !== -1)
+      {
+        wholeField = field;
+        field = field.split('.')[0];
+      }
+      let col = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
           column.databaseId === String(indexId) &&
           column.name === field,
@@ -255,7 +261,19 @@ export const ElasticBlockHelpers = {
       {
         return '';
       }
-      const dataType = col.datatype;
+      if (wholeField) // it was nested, now look in the column properties for the path
+      {
+        const pieces = wholeField.split('.');
+        for (let i = 1; i < pieces.length; i++)
+        {
+          if (col.properties && pieces[i])
+          {
+            col = col.properties[pieces[i]];
+          }
+        }
+      }
+
+      const dataType = col.type !== undefined ? col.type : col.datatype;
       if (returnDatatype)
       {
         return dataType;
