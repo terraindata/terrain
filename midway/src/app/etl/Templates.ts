@@ -254,7 +254,7 @@ export default class Templates
     console.log(JSON.stringify(template, null, 2));
 
     const streamMap = await this.executeGraph(template, dag, nodes, files);
-    return streamMap[defaultSink][0];
+    return streamMap[defaultSink][defaultSink];
   }
 
   private async executeGraph(template: TemplateConfig, dag: any, nodes: any[], files?: Readable[], streamMap?: object): Promise<object>
@@ -269,7 +269,7 @@ export default class Templates
       streamMap = {};
       nodes.forEach((n) =>
       {
-        (streamMap as object)[n] = [];
+        (streamMap as object)[n] = {};
       });
     }
 
@@ -287,7 +287,7 @@ export default class Templates
         {
           const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
           const transformStream = new TransformationEngineTransform([], transformationEngine);
-          streamMap[e.w].push(sourceStream.pipe(transformStream));
+          streamMap[e.w][e.v] = sourceStream.pipe(transformStream);
         }
         return this.executeGraph(template, dag, nodes, files, streamMap);
 
@@ -304,7 +304,7 @@ export default class Templates
         const e = inEdges[0];
         const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
         const sinkStream = await getSinkStream(sink, transformationEngine);
-        streamMap[e.w][0] = streamMap[e.w][0].pipe(sinkStream);
+        streamMap[e.w][e.w] = streamMap[e.w][e.v].pipe(sinkStream);
         return this.executeGraph(template, dag, nodes, files, streamMap);
 
       case 'MergeJoin':
