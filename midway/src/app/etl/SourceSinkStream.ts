@@ -173,9 +173,15 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
   });
 }
 
-export async function getMergeJoinStream(): Promise<stream.Readable>
+export async function getMergeJoinStream(indices: string[]): Promise<stream.Readable>
 {
-
+  const query = {
+    match_all: {},
+    mergeJoin: {
+      joinKey: 'foo',
+    },
+  };
+  return getElasticReaderStream(0, query);
 }
 
 async function getElasticReaderStream(dbId: number, query: any): Promise<stream.Readable>

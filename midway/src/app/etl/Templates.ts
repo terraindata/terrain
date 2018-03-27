@@ -316,6 +316,7 @@ export default class Templates
 
         const done = new EventEmitter();
         let numPending = inEdges.length;
+        const tempIndices: string[] = [];
         for (const e of inEdges)
         {
           const inputStream = streamMap[nodeId][e.v];
@@ -323,6 +324,7 @@ export default class Templates
           const tempIndex = 'temp_' + e.v + '_' + e.w;
           const tempSink = _.clone(template.sinks._default);
           tempSink['options']['database'] = tempIndex;
+          tempIndices.push(tempIndex);
 
           const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
           const tempSinkStream = await getSinkStream(tempSink, transformationEngine);
