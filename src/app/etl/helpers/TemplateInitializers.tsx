@@ -121,7 +121,7 @@ class Initializers extends ETLHelpers
         algorithmId,
       },
     });
-    DocumentsHelpers.fetchDocuments(source, '_default')
+    DocumentsHelpers.fetchDocuments(source)
       .then(this.createInitialTemplateFn(source))
       .catch(this._logError);
   }
@@ -131,7 +131,7 @@ class Initializers extends ETLHelpers
     const source = walkthrough.source;
     const sink = walkthrough.sink;
     const file = walkthrough.getFile();
-    DocumentsHelpers.fetchDocuments(source, '_default')
+    DocumentsHelpers.fetchDocuments(source)
       .then(this.createInitialTemplateFn(source, sink))
       .catch(this._logError);
   }
@@ -151,6 +151,11 @@ class Initializers extends ETLHelpers
       this.editorAct({
         actionType: 'setCurrentEdge',
         edge: initialEdge,
+      });
+      this.editorAct({
+        actionType: 'setInMergeDocuments',
+        key: '_default',
+        documents: hits,
       });
       this.editorAct({
         actionType: 'setTemplate',

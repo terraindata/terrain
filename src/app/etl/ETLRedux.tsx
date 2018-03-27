@@ -197,11 +197,12 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     const name = action.actionType;
 
     const template = action.template;
-    const defaultSink = template.getSink('_default');
-    const defaultSource = template.getSource('_default');
+    const defaultSink = template.getDefaultSink();
 
     if (defaultSink === undefined)
     {
+      // tslint:disable-next-line
+      console.error('default sink not defined');
       return; // todo error
     }
     else
@@ -219,19 +220,13 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
           mimeType,
         };
       }
-      else if (defaultSource.type === Sources.Upload)
+      template.getSources().forEach((source, key) =>
       {
-        const file = (defaultSource.options as SourceOptionsType<Sources.Upload>).file;
-        options.file = file;
-      }
-      else
-      {
-        // tslint:disable-next-line
-        console.log(`Sink Type ${defaultSink.type} not implemented yet, ` +
-          `or Source Type ${defaultSource.type} not implemented yet`);
-        return;
-      }
-
+        if (source.type === Sources.Upload)
+        {
+          _.set(options, ['files', key], (source.options as SourceOptionsType<Sources.Upload>).file);
+        }
+      });
       ETLAjax.executeTemplate(template.id, options)
         .then(this.onLoadFactory<any>([], directDispatch, name))
         .catch(this.onErrorFactory(undefined, directDispatch, name));
