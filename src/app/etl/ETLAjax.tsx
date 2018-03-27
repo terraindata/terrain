@@ -184,13 +184,12 @@ class ETLAjax
         config.downloadName = options.download.downloadFilename;
         config.mimeType = options.download.mimeType;
       }
-
       const payload: any = {
         templateID: String(templateId),
       };
-      if (options.file !== undefined)
+      if (options.files !== undefined)
       {
-        payload.file = options.file;
+        _.extend(payload, options.files);
       }
 
       this.reqFormData(
@@ -276,7 +275,9 @@ interface ReqConfig
 
 export interface ExecuteConfig
 {
-  file?: File;
+  files?: {
+    [id: string]: File;
+  };
   download?: {
     downloadFilename?: string;
     mimeType?: string;

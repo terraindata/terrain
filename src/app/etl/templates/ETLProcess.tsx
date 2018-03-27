@@ -117,7 +117,7 @@ class ETLNodeC implements ETLNodeI
 {
   public type: NodeTypes = NodeTypes.MergeJoin;
   public options: MergeJoinOptions = _MergeJoinOptions();
-  public endpoint: string = '_default'; // if source or sink, which one is it?
+  public endpoint: string = ''; // if source or sink, which one is it?
 }
 export type ETLNode = WithIRecord<ETLNodeC>;
 export const _ETLNode = makeExtendedConstructor(ETLNodeC, true, {

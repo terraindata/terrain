@@ -169,8 +169,8 @@ class GraphHelpers extends ETLHelpers
     {
       newKeys.forEach((key) =>
       {
-        const sourceId = proxy.addSource(key, newSources.get(key));
-        const edgeId = proxy.addEdge(sourceId, -1);
+        const { nodeId } = proxy.addSource(newSources.get(key));
+        const edgeId = proxy.addEdge(nodeId, -1);
         newEdges = newEdges.push(edgeId);
       });
       differentKeys.forEach((key) =>
@@ -207,7 +207,7 @@ class GraphHelpers extends ETLHelpers
     {
       newKeys.forEach((key) =>
       {
-        proxy.addSink(key, newSinks.get(key));
+        proxy.addSink(newSinks.get(key));
       });
       differentKeys.forEach((key) =>
       {

@@ -101,14 +101,14 @@ class ETLTemplateC implements ETLTemplateI
   {
     const source = this.sources.get(key);
     const type = (source != null && source.type != null) ? source.type : '';
-    return `${key} (${type})`;
+    return `${source != null ? source.name : ''} (${type})`;
   }
 
   public getSinkName(key)
   {
     const sink = this.sinks.get(key);
     const type = (sink != null && sink.type != null) ? sink.type : '';
-    return `${key} (${type})`;
+    return `${sink.name} (${type})`;
   }
 
   public getNodeName(id: number)
@@ -138,16 +138,26 @@ class ETLTemplateC implements ETLTemplateI
 
   public getLastEdgeId(): number
   {
-    const defaultSink = this.getDefaultSinkId();
+    const defaultSink = this.getDefaultSinkNodeId();
     const edges = this.findEdges((edge) => edge.to === defaultSink);
     return edges.size > 0 ? edges.first() : -1;
   }
 
-  public getDefaultSinkId(): number
+  public getDefaultSinkNodeId(): number
   {
     return this.process.nodes.findKey(
       (node) => node.type === NodeTypes.Sink && node.endpoint === '_default',
     );
+  }
+
+  public getDefaultSource(): SourceConfig
+  {
+    return this.getSource('_default');
+  }
+
+  public getDefaultSink(): SinkConfig
+  {
+    return this.getSink('_default');
   }
 
   public getMergeableNodes(): List<number>

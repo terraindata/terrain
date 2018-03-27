@@ -147,8 +147,8 @@ class ETLReviewStep extends ETLStepComponent<Props>
       const chosenTemplate = templates.find((template, i) => template.id === chosenTemplateId);
       if (chosenTemplate !== undefined)
       {
-        source = chosenTemplate.getIn(['sources', '_default']);
-        sink = chosenTemplate.getIn(['sinks', '_default']);
+        source = chosenTemplate.getDefaultSource();
+        sink = chosenTemplate.getDefaultSink();
       }
     }
 
