@@ -398,7 +398,9 @@ const BuilderReducers =
         query,
         action.payload.changeQuery,
       );
+
       state = state.set('query', query);
+      state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query, state.db.name));
       return state;
     },
 

@@ -251,7 +251,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public renderLineContents()
   {
     const { fieldIndex } = this.state;
-
+    console.log('options ', this.props.dropdownOptions.map((v) => v.displayName as string).toList());
     return (
       <div
         className='pf-line pf-score-line-inner'

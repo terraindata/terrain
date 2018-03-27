@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 import { parseScore, PathFinderDefaultSize } from 'builder/components/pathfinder/PathfinderParser';
-import { _DistanceValue, DistanceValue, ElasticDataSource, FilterGroup, FilterLine, Path, Script } from 'builder/components/pathfinder/PathfinderTypes';
+import { _DistanceValue, _FilterGroup, DistanceValue, ElasticDataSource, FilterGroup, FilterLine, Path, Script } from 'builder/components/pathfinder/PathfinderTypes';
 import { List } from 'immutable';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
@@ -309,7 +309,7 @@ export class PathToCards
           const theLine = filterLines[i];
           const template = {
             'nested:nested_query': {
-              'path:field': theLine.field,
+              'path:field': theLine.field.split('.')[0],
               'score_mode:nested_score_mode': 'avg',
               'query:query': {
                 'bool:elasticFilter': {},
@@ -346,7 +346,7 @@ export class PathToCards
           const theLine = filterLines[i];
           const template = {
             'nested:nested_query': {
-              'path:field': theLine.field,
+              'path:field': theLine.field.split('.')[0],
               'score_mode:nested_score_mode': 'avg',
               'query:query': {
                 'bool:elasticFilter': {},
@@ -380,16 +380,13 @@ export class PathToCards
 
     filterLines.map((line: FilterLine, index) =>
     {
-      console.assert((line.fieldType === FieldType.Nested) && line.filterGroup);
       const thePath = line.field.split('.')[0];
       // this is an inner filter group
       const nestedQuery = nestedQueries[index];
-      this.FilterGroupToBool(line.filterGroup, parser, nestedQuery.objectChildren.query.propertyValue.objectChildren.bool.propertyValue, filterSection);
-      // update nestedQuery's path
-      if (nestedQuery.objectChildren.path.propertyValue.value !== thePath)
-      {
-        nestedQuery.objectChildren.path.propertyValue.card = nestedQuery.objectChildren.path.propertyValue.card.set('value', thePath);
-      }
+      const filterGroup = _FilterGroup({
+        lines: List([line]),
+      });
+      this.FilterGroupToBool(filterGroup, parser, nestedQuery.objectChildren.query.propertyValue.objectChildren.bool.propertyValue, filterSection, true);
     });
   }
 
@@ -465,7 +462,7 @@ export class PathToCards
     });
   }
 
-  private static FilterGroupToBool(filterGroup: FilterGroup, parser: ESCardParser, boolValueInfo: ESValueInfo, filterSection: 'hard' | 'soft' = 'hard')
+  private static FilterGroupToBool(filterGroup: FilterGroup, parser: ESCardParser, boolValueInfo: ESValueInfo, filterSection: 'hard' | 'soft' = 'hard', ignoreNested = false)
   {
     TerrainLog.debug('P->B( start filtergroup -> bool) ', filterGroup, boolValueInfo);
     // collect all potential
@@ -487,12 +484,9 @@ export class PathToCards
     const filterLineMap = { filter: [], nested: [], group: [] };
     filterGroup.lines.map((line: FilterLine) =>
     {
-      if (line.fieldType === FieldType.Nested)
+      if (line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
       {
-        if (line.field && line.field.indexOf('.') !== -1)
-        {
-          filterLineMap.nested.push(line);
-        }
+        filterLineMap.nested.push(line);
       } else if (line.filterGroup)
       {
         filterLineMap.group.push(line);
@@ -527,7 +521,6 @@ export class PathToCards
     boolValueInfo.card = boolCard.set('otherFilters', List(keepFilters.concat(blocks)));
     parser.isMutated = true;
     TerrainLog.debug('P->B( end filtergroup -> bool) ', filterGroup, boolValueInfo);
-
     // Handle geo_distance filters
     this.processGeoDistanceFilter(filterLineMap.filter, parser, boolValueInfo, boolType, filterSection);
     // handle inner filter group

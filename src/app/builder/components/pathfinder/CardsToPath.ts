@@ -345,17 +345,16 @@ export class CardsToPath
   {
     // let search whether we have an inner bool or not
     let from;
-    if (parentFilterGroup.minMatches === 'all')
+    if (parentFilterGroup.minMatches === 'all' && sectionType === 'hard')
     {
       // let's search childBool from parentBool: { filter : [Bool, Bool, Bool]
       from = parentBool.objectChildren.filter;
-    } else if (parentFilterGroup.minMatches === 'any')
+    } else
     {
       from = parentBool.objectChildren.should;
     }
 
     const newLines = [];
-
     if (from)
     {
       const queries = from.propertyValue;
@@ -373,7 +372,9 @@ export class CardsToPath
               const pathName = nestedQuery.objectChildren.path.propertyValue.value;
               let newFilterGroup = _FilterGroup();
               newFilterGroup = this.BoolToFilterGroup(newFilterGroup, parser, boolQuery, sectionType, true);
-              newLines.push(_FilterLine().set('filterGroup', newFilterGroup).set('fieldType', FieldType.Nested).set('field', pathName + '.'));
+              newFilterGroup.lines.forEach((line) =>
+                newLines.push(line)
+              );
             }
           }
         });

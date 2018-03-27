@@ -228,6 +228,10 @@ export const ElasticBlockHelpers = {
       }
       return FieldType.Text;
     }
+    if (!builderState.query)
+    {
+      return '';
+    }
     const { source } = builderState.query.path;
     let index = source && source.dataSource && source.dataSource.index ?
       source.dataSource.index : getIndex('', builderState);
