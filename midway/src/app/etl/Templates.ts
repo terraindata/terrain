@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-shadowed-variable
 
+import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import GraphLib = require('graphlib');
 import * as _ from 'lodash';
@@ -62,7 +63,7 @@ import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
-import { getMergeStream, getSinkStream, getSourceStream } from './SourceSinkStream';
+import { getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
 import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
 export default class Templates
@@ -279,6 +280,7 @@ export default class Templates
     switch (node.type)
     {
       case 'Source':
+      {
         const source = template.sources[node.endpoint];
         const sourceStream = await getSourceStream(source, files);
 
@@ -287,14 +289,13 @@ export default class Templates
         {
           const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
           const transformStream = new TransformationEngineTransform([], transformationEngine);
-          streamMap[e.w][e.v] = sourceStream.pipe(transformStream);
+          streamMap[nodeId][e.v] = sourceStream.pipe(transformStream);
         }
         return this.executeGraph(template, dag, nodes, files, streamMap);
+      }
 
       case 'Sink':
-        const transformStreams = streamMap[nodeId];
-        const sink = template.sinks[node.endpoint];
-
+      {
         const inEdges: any[] = dag.inEdges(nodeId);
         if (inEdges.length > 1)
         {
@@ -303,12 +304,56 @@ export default class Templates
 
         const e = inEdges[0];
         const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+        const sink = template.sinks[node.endpoint];
         const sinkStream = await getSinkStream(sink, transformationEngine);
-        streamMap[e.w][e.w] = streamMap[e.w][e.v].pipe(sinkStream);
+        streamMap[nodeId][nodeId] = streamMap[nodeId][nodeId].pipe(sinkStream);
         return this.executeGraph(template, dag, nodes, files, streamMap);
+      }
 
       case 'MergeJoin':
-      // transformedStreams = await getMergeStream(transformedStreams, template.sinks, transformationEngines);
+      {
+        const inEdges: any[] = dag.inEdges(nodeId);
+
+        const done = new EventEmitter();
+        let numPending = inEdges.length;
+        for (const e of inEdges)
+        {
+          const inputStream = streamMap[nodeId][e.v];
+
+          const tempIndex = 'temp_' + e.v + '_' + e.w;
+          const tempSink = _.clone(template.sinks._default);
+          tempSink['options']['database'] = tempIndex;
+
+          const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+          const tempSinkStream = await getSinkStream(tempSink, transformationEngine);
+
+          const outputStream = inputStream.pipe(tempSinkStream);
+          outputStream.on('finish', () =>
+          {
+            if (--numPending === 0)
+            {
+              done.emit('done');
+            }
+          });
+        }
+
+        // wait for all the streams to finish
+        await new Promise((resolve, reject) =>
+        {
+          done.on('done', resolve);
+          done.on('error', reject);
+        });
+
+        // create merge join stream
+        const outEdges: any[] = dag.outEdges(nodeId);
+        for (const e of outEdges)
+        {
+          const mergeJoinStream = await getMergeJoinStream();
+          streamMap[nodeId][e.v] = mergeJoinStream;
+        }
+        return this.executeGraph(template, dag, nodes, files, streamMap);
+      }
+
       default:
         throw new Error('Unknown node in process graph');
     }

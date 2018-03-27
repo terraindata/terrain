@@ -83,35 +83,7 @@ export async function getSourceStream(source: SourceConfig, files?: stream.Reada
         const algorithmId = source.options['algorithmId'];
         const query: string = await Util.getQueryFromAlgorithm(algorithmId);
         const dbId: number = await Util.getDBFromAlgorithm(algorithmId);
-
-        const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
-        if (controller === undefined)
-        {
-          throw new Error(`Database ${String(dbId)} not found.`);
-        }
-
-        if (controller.getType() !== 'ElasticController')
-        {
-          throw new Error('Algorithm source only supports Elastic databases');
-        }
-
-        const qh: QueryHandler = controller.getQueryHandler();
-        const payload = {
-          database: dbId,
-          type: 'search',
-          streaming: true,
-          databasetype: 'elastic',
-          body: query,
-        };
-
-        const algorithmStream = await qh.handleQuery(payload) as stream.Readable;
-        if (algorithmStream === undefined)
-        {
-          throw new Error('Error creating new source stream from algorithm');
-        }
-
-        const exportTransform = new ExportTransform();
-        sourceStream = algorithmStream.pipe(exportTransform);
+        sourceStream = await getElasticReaderStream(dbId, query);
         break;
       case 'Upload':
         if (files === undefined || files.length === 0)
@@ -201,26 +173,39 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
   });
 }
 
-export async function getMergeStream(
-  inputStreams: stream.Transform[],
-  sinks: DefaultSinkConfig,
-  engines: TransformationEngine[])
+export async function getMergeJoinStream(): Promise<stream.Readable>
 {
-  const tempSinkConfigs: DefaultSinkConfig = {};
-  inputStreams.forEach((v, i) =>
+
+}
+
+async function getElasticReaderStream(dbId: number, query: any): Promise<stream.Readable>
+{
+  const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
+  if (controller === undefined)
   {
-    // TODO: pick a better name for temp index
-    const tempIndex = 'temp_' + String(i);
+    throw new Error(`Database ${String(dbId)} not found.`);
+  }
 
-    const defaultSink = sinks._default;
-    defaultSink['options']['database'] = tempIndex;
-    tempSinkConfigs[tempIndex] = defaultSink;
-  });
+  if (controller.getType() !== 'ElasticController')
+  {
+    throw new Error('Algorithm source only supports Elastic databases');
+  }
 
-  const sinkStreams = await getSinkStreams(tempSinkConfigs, engines);
-  inputStreams.forEach((s, i) => s.pipe(sinkStreams[i]));
+  const qh: QueryHandler = controller.getQueryHandler();
+  const payload = {
+    database: dbId,
+    type: 'search',
+    streaming: true,
+    databasetype: 'elastic',
+    body: query,
+  };
 
-  // TODO: wait for these streams to finish...
+  const algorithmStream = await qh.handleQuery(payload) as stream.Readable;
+  if (algorithmStream === undefined)
+  {
+    throw new Error('Error creating new source stream from algorithm');
+  }
 
-  // TODO: create merge query and return merged stream
+  const exportTransform = new ExportTransform();
+  return algorithmStream.pipe(exportTransform);
 }
