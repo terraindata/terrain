@@ -101,14 +101,14 @@ class ETLTemplateC implements ETLTemplateI
   {
     const source = this.sources.get(key);
     const type = (source != null && source.type != null) ? source.type : '';
-    return `${key} (${type})`;
+    return `${source != null ? source.name : ''} (${type})`;
   }
 
   public getSinkName(key)
   {
     const sink = this.sinks.get(key);
     const type = (sink != null && sink.type != null) ? sink.type : '';
-    return `${key} (${type})`;
+    return `${sink.name} (${type})`;
   }
 
   public getNodeName(id: number)

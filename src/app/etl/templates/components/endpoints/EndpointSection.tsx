@@ -300,8 +300,9 @@ class EndpointSection extends TerrainComponent<Props>
   public handleAddNewSource()
   {
     const { endpoints, newSourceModalName, newSource } = this.state;
+    const source = newSource.set('name', newSourceModalName);
     this.setState({
-      endpoints: (endpoints as LooseEndpointsType).set(newSourceModalName, newSource),
+      endpoints: (endpoints as LooseEndpointsType).set(newSourceModalName, source),
     }, () => this.handleApplyChanges());
   }
 
