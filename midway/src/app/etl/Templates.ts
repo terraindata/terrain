@@ -289,7 +289,7 @@ export default class Templates
         {
           const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
           const transformStream = new TransformationEngineTransform([], transformationEngine);
-          streamMap[nodeId][e.v] = sourceStream.pipe(transformStream);
+          streamMap[nodeId][e.w] = sourceStream.pipe(transformStream);
         }
         return this.executeGraph(template, dag, nodes, files, streamMap);
       }
@@ -306,7 +306,7 @@ export default class Templates
         const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
         const sink = template.sinks[node.endpoint];
         const sinkStream = await getSinkStream(sink, transformationEngine);
-        streamMap[nodeId][nodeId] = streamMap[nodeId][nodeId].pipe(sinkStream);
+        streamMap[nodeId][nodeId] = streamMap[e.v][nodeId].pipe(sinkStream);
         return this.executeGraph(template, dag, nodes, files, streamMap);
       }
 
@@ -319,8 +319,7 @@ export default class Templates
         const tempIndices: string[] = [];
         for (const e of inEdges)
         {
-          const inputStream = streamMap[nodeId][e.v];
-
+          const inputStream = streamMap[e.v][nodeId];
           const tempIndex = 'temp_' + e.v + '_' + e.w;
           const tempSink = _.clone(template.sinks._default);
           tempSink['options']['database'] = tempIndex;
@@ -350,7 +349,7 @@ export default class Templates
         const outEdges: any[] = dag.outEdges(nodeId);
         for (const e of outEdges)
         {
-          const mergeJoinStream = await getMergeJoinStream();
+          const mergeJoinStream = await getMergeJoinStream(tempIndices, node.options);
           streamMap[nodeId][e.v] = mergeJoinStream;
         }
         return this.executeGraph(template, dag, nodes, files, streamMap);
