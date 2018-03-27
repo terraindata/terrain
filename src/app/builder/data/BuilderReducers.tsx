@@ -569,6 +569,10 @@ const BuilderReducersWrapper = (
 
   if (BuilderCardActionTypes[action.type] || BuilderPathActionTypes[action.type])
   {
+    if (!state.query)
+    {
+      return state;
+    }
     // path -> card
     if (BuilderPathActionTypes[action.type])
     {

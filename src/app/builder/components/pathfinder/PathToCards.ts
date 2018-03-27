@@ -859,7 +859,6 @@ export class PathToCards
       }
 
       // now let's check the nested query
-      // TODO: how to handle must_not?
       for (const t of ['filter', 'must', 'should', 'must_not'])
       {
         const typeString = t + ':query[]';
@@ -909,6 +908,49 @@ export class PathToCards
               }
             }
           });
+        }
+      }
+      // Look for geo distance queries to move into correct bools
+      for (const t of ['filter', 'must', 'should'])
+      {
+        const typeString = t + ':query[]';
+        const boolFilters = parser.searchCard(
+          {
+            [typeString]: true,
+          },
+          sourceBool,
+        );
+        if (boolFilters && boolFilters.arrayChildren && boolFilters.arrayChildren.length)
+        {
+          const oldFilterValueInfo = sourceBool.objectChildren[t].propertyValue;
+          let targetBool = hardBool;
+          let targetClause = 'filter';
+          if (t === 'should')
+          {
+            targetBool = softBool;
+            targetClause = 'should';
+          }
+          if (targetBool.objectChildren[targetClause] === undefined)
+          {
+            const targetClausePattern = targetClause + ':query[]';
+            parser.createCardIfNotExist({
+              [targetClausePattern]: [],
+            }, targetBool);
+          }
+          const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
+          // Delete them and move them into the target bool
+          let movedGeo = false;
+          for (let i = boolFilters.arrayChildren.length - 1; i >= 0; i--)
+          {
+            const child = boolFilters.arrayChildren[i];
+            if (child.objectChildren.geo_distance)
+            {
+              movedGeo = true;
+              parser.deleteChild(boolFilters, i);
+              parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+            }
+            //  parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+          }
         }
       }
       parser.isMutated = true;

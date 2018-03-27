@@ -74,6 +74,7 @@ import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueIn
 import Block from '../../../../blocks/types/Block';
 import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
 import Query from '../../../../items/types/Query';
+import { PathToCards } from './PathToCards';
 
 export class CardsToPath
 {
@@ -99,6 +100,7 @@ export class CardsToPath
     TerrainLog.debug('B->P: The parsed card is ' + JSON.stringify(parser.getValueInfo().value));
 
     const newPath = this.BodyCardToPath(query.path, parser, parser.getValueInfo(), dbName);
+    // PathToCards.distributeSourceBoolFilters(newPath, parser, parser.getValueInfo());
     return newPath;
   }
 
@@ -109,6 +111,8 @@ export class CardsToPath
 
   public static BodyCardToPath(path: Path, parser: ESCardParser, bodyValueInfo: ESValueInfo, dbName: string)
   {
+    // Redistribute the bools from the source bool to the soft and hard filter bools
+    this.distributeSourceBoolFilters(parser, bodyValueInfo);
     const newSource = this.updateSource(path.source, parser, bodyValueInfo, dbName);
     const newScore = this.updateScore(path.score, parser, bodyValueInfo);
     const filterGroup = this.BodyToFilterSection(path.filterGroup, parser, bodyValueInfo, 'hard');
@@ -175,6 +179,169 @@ export class CardsToPath
     '≈': 'notcontain',
     'in': 'isnotin',
   };
+
+  private static distributeSourceBoolFilters(parser: ESCardParser, body: ESValueInfo)
+  {
+    const sourceBool = parser.searchCard({
+      'query:query': {
+        'bool:elasticFilter': true,
+      },
+    }, body);
+    console.assert(sourceBool !== null);
+    const hardBoolTemplate = {
+      'query:query': {
+        'bool:elasticFilter': {
+          'filter:query[]':
+            [{ 'bool:elasticFilter': true }],
+        },
+      },
+    };
+    parser.createCardIfNotExist(hardBoolTemplate, body);
+    const hardBool = parser.searchCard(hardBoolTemplate, body);
+    console.assert(hardBool !== null);
+
+    const softBoolTemplate = {
+      'query:query': {
+        'bool:elasticFilter': {
+          'should:query[]':
+            [{ 'bool:elasticFilter': true }],
+        },
+      },
+    };
+    parser.createCardIfNotExist(softBoolTemplate, body);
+    const softBool = parser.searchCard(softBoolTemplate, body);
+    console.assert(softBool !== null);
+
+    const newHardFilters = [];
+    const newSoftFilters = [];
+    if (sourceBool.card.otherFilters)
+    {
+      sourceBool.card.otherFilters.map((filter: Block) =>
+      {
+        switch (filter.boolQuery)
+        {
+          case 'filter':
+          case 'must':
+            newHardFilters.push(filter.set('boolQuery', 'filter'));
+            break;
+          case 'filter_not':
+          case 'must_not':
+            newHardFilters.push(filter.set('boolQuery', 'filter_not'));
+            break;
+          default:
+            newSoftFilters.push(filter);
+            break;
+        }
+      });
+      sourceBool.card = sourceBool.card.set('otherFilters', List([]));
+
+      if (newHardFilters.length > 0)
+      {
+        hardBool.card = hardBool.card.set('otherFilters', hardBool.card.otherFilters.concat(List(newHardFilters)));
+      }
+      if (newSoftFilters.length > 0)
+      {
+        softBool.card = softBool.card.set('otherFilters', softBool.card.otherFilters.concat(List(newSoftFilters)));
+      }
+
+      // now let's check the nested query
+      // for (const t of ['filter', 'must', 'should', 'must_not'])
+      // {
+      //   const typeString = t + ':query[]';
+      //   const searchNestedTemplate = {
+      //     [typeString]: [{ 'nested:nested_query': true }],
+      //   };
+      //   const nestedQuery = parser.searchCard(searchNestedTemplate, sourceBool, false, true);
+      //   if (nestedQuery !== null)
+      //   {
+      //     const oldFilterValueInfo = sourceBool.objectChildren[t].propertyValue;
+      //     let targetBool = hardBool;
+      //     let targetClause = 'filter';
+      //     if (t === 'should')
+      //     {
+      //       targetBool = softBool;
+      //       targetClause = 'should';
+      //     }
+      //     if (targetBool.objectChildren[targetClause] === undefined)
+      //     {
+      //       const targetClausePattern = targetClause + ':query[]';
+      //       parser.createCardIfNotExist({
+      //         [targetClausePattern]: [],
+      //       }, targetBool);
+      //     }
+      //     const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
+      //     TerrainLog.debug('(P->B) Move nested queries from ', oldFilterValueInfo, ' to new place ', targetClauseValueInfo);
+      //     oldFilterValueInfo.forEachElement((query: ESValueInfo, index) =>
+      //     {
+      //       if (query.objectChildren.nested)
+      //       {
+      //         const nestedValueInfo = query.objectChildren.nested.propertyValue;
+      //         const nestedBool = parser.searchCard({ 'query:query': { 'bool:elasticFilter': true } }, nestedValueInfo);
+      //         if (nestedBool === null)
+      //         {
+      //           TerrainLog.debug('(P->B) There is no bool card in the must_not:nested query, avoid translating it.');
+      //         } else
+      //         {
+      //           if (t === 'must_not')
+      //           {
+      //             // this.transformBoolFilters(nestedBool, true);
+      //           } else
+      //           {
+      //             // this.transformBoolFilters(nestedBool, false);
+      //           }
+      //           parser.deleteChild(oldFilterValueInfo, index);
+      //           parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, query);
+      //         }
+      //       }
+      //     });
+      //   }
+      // }
+      // Look for geo distance queries to move into correct bools
+      for (const t of ['filter', 'must', 'should'])
+      {
+        const typeString = t + ':query[]';
+        const boolFilters = parser.searchCard(
+          {
+            [typeString]: true,
+          },
+          sourceBool,
+        );
+        if (boolFilters && boolFilters.arrayChildren && boolFilters.arrayChildren.length)
+        {
+          const oldFilterValueInfo = sourceBool.objectChildren[t].propertyValue;
+          let targetBool = hardBool;
+          let targetClause = 'filter';
+          if (t === 'should')
+          {
+            targetBool = softBool;
+            targetClause = 'should';
+          }
+          if (targetBool.objectChildren[targetClause] === undefined)
+          {
+            const targetClausePattern = targetClause + ':query[]';
+            parser.createCardIfNotExist({
+              [targetClausePattern]: [],
+            }, targetBool);
+          }
+          const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
+          // Delete them and move them into the target bool
+          let movedGeo = false;
+          for (let i = boolFilters.arrayChildren.length - 1; i >= 0; i--)
+          {
+            const child = boolFilters.arrayChildren[i];
+            if (child.objectChildren.geo_distance)
+            {
+              movedGeo = true;
+              parser.deleteChild(boolFilters, i);
+              parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+            }
+            //  parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+          }
+        }
+      }
+      parser.isMutated = true;
+    }
+  }
 
   private static TerrainFilterBlockToFilterLine(row: Block): FilterLine
   {
