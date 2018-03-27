@@ -80,7 +80,6 @@ export class CardsToPath
 {
   public static updatePath(query: Query, dbName: string): {path: Path, parser: ESCardParser}
   {
-    console.log('CARDS TO PATH');
     const rootCard = query.cards.get(0);
     if (rootCard === undefined)
     {
@@ -101,8 +100,7 @@ export class CardsToPath
     TerrainLog.debug('B->P: The parsed card is ' + JSON.stringify(parser.getValueInfo().value));
 
     const newPath = this.BodyCardToPath(query.path, parser, parser.getValueInfo(), dbName);
-    parser.updateCard();
-    console.log(parser.getValueInfo());
+    // parser.updateCard();
     return {path: newPath, parser};
   }
 
@@ -118,7 +116,6 @@ export class CardsToPath
     parser.updateCard();
     bodyValueInfo = parser.getValueInfo();
     const newSource = this.updateSource(path.source, parser, bodyValueInfo, dbName);
-    console.log('the source is ', newSource);
     const newScore = this.updateScore(path.score, parser, bodyValueInfo);
     const filterGroup = this.BodyToFilterSection(path.filterGroup, parser, bodyValueInfo, 'hard');
     const softFilterGroup = this.BodyToFilterSection(path.softFilterGroup, parser, bodyValueInfo, 'soft');
@@ -145,7 +142,6 @@ export class CardsToPath
       .set('step', (
         newSource.dataSource as ElasticDataSource).index ?
         PathfinderSteps.Source + 1 : path.step);
-    console.log('Path is ', newPath);
     return newPath;
   }
 
@@ -542,12 +538,13 @@ export class CardsToPath
             if (boolQuery !== null)
             {
               // create filter group
-              const pathName = nestedQuery.objectChildren.path.propertyValue.value;
-              let newFilterGroup = _FilterGroup();
-              newFilterGroup = this.BoolToFilterGroup(newFilterGroup, parser, boolQuery, sectionType, true);
-              newFilterGroup.lines.forEach((line) =>
-                newLines.push(line),
-              );
+             // let newFilterGroup = _FilterGroup();
+              boolQuery.card.otherFilters.forEach((filter) =>
+              {
+                // TODO convert boolQuery from must to filter ?
+                const line = this.TerrainFilterBlockToFilterLine(filter);
+                newLines.push(line);
+              })
             }
           }
         });

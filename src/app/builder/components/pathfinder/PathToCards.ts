@@ -943,13 +943,12 @@ export class PathToCards
           for (let i = boolFilters.arrayChildren.length - 1; i >= 0; i--)
           {
             const child = boolFilters.arrayChildren[i];
-            if (child.objectChildren.geo_distance)
+            if (child && child.objectChildren.geo_distance)
             {
               movedGeo = true;
               parser.deleteChild(boolFilters, i);
               parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
             }
-            //  parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
           }
         }
       }
