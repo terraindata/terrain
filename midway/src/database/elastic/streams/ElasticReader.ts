@@ -92,8 +92,8 @@ export class ElasticReader extends Stream.Readable
 
       if (this.streaming)
       {
-        body['scroll'] = this.scroll,
-          body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
+        body['scroll'] = this.scroll;
+        body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
       }
 
       this.querying = true;
