@@ -100,7 +100,7 @@ function getTemplateId(params): number
 @Radium
 class ETLEditorPage extends TerrainComponent<Props>
 {
-  public saveTemplate(template: ETLTemplate)
+  public saveTemplate(template: ETLTemplate, isSaveAs: boolean)
   {
     const { etlAct, editorAct } = this.props;
 
@@ -139,7 +139,16 @@ class ETLEditorPage extends TerrainComponent<Props>
       // TODO
     };
 
-    if (template.id === -1) // then its a new template
+    if (isSaveAs)
+    {
+      etlAct({
+        actionType: 'saveAsTemplate',
+        template,
+        onLoad: handleLoad,
+        onError: handleError,
+      });
+    }
+    else if (template.id === -1) // then its a new template
     {
       etlAct({
         actionType: 'createTemplate',
