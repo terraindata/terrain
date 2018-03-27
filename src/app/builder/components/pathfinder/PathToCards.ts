@@ -127,7 +127,7 @@ export class PathToCards
     this.updateScripts(path.more.scripts, parser, body);
     this.updateCollapse(path.more.collapse, parser, body);
     // finally, let's distribute filters from the sourcebool to the hard/soft bool.
-    this.distributeSourceBoolFilters(path, parser, body);
+    // this.distributeSourceBoolFilters(path, parser, body);
   }
   private static updateSize(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
@@ -726,7 +726,7 @@ export class PathToCards
     }
   }
 
-  private static transformBoolFilters(bool: ESValueInfo, flip: boolean = false)
+  public static transformBoolFilters(bool: ESValueInfo, flip: boolean = false)
   {
     if (bool.card.otherFilters)
     {

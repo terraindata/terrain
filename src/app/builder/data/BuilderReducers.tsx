@@ -172,6 +172,10 @@ const BuilderReducers =
         },
       }) =>
     {
+      if (!state.query)
+      {
+        return state;
+      }
       return state.setIn(
         action.payload.keyPath,
         action.payload.value,
@@ -400,7 +404,18 @@ const BuilderReducers =
       );
 
       state = state.set('query', query);
-      state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query, state.db.name));
+      const {parser, path} = CardsToPath.updatePath(state.query, state.db.name);
+      state = state.setIn(['query', 'path'], path);
+      if (parser)
+      {
+        state = state.setIn(['query', 'cards'], List([parser.getValueInfo().card]));
+        state = state
+          .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
+        state = state
+          .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
+          .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
+          .setIn(['query', 'cardsAndCodeInSync'], true);
+      }
       return state;
     },
 
@@ -611,7 +626,18 @@ const BuilderReducersWrapper = (
       if (BuilderCardActionTypes[action.type])
       {
         // update path
-        state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query, state.db.name));
+        const { path, parser } = CardsToPath.updatePath(state.query, state.db.name)
+        state = state.setIn(['query', 'path'], path);
+        if (parser)
+        {
+          state = state.setIn(['query', 'cards'], List([parser.getValueInfo().card]));
+          state = state
+            .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
+          state = state
+            .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
+            .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
+            .setIn(['query', 'cardsAndCodeInSync'], true);
+        }
       }
     }
   }
