@@ -142,22 +142,7 @@ export async function getSourceStream(source: SourceConfig, files?: stream.Reada
   });
 }
 
-export async function getSourceStreams(sources: DefaultSourceConfig, files?: stream.Readable[]): Promise<stream.Readable[]>
-{
-  if (sources._default === undefined)
-  {
-    throw new Error('Default source not found.');
-  }
-
-  const promises: Array<Promise<stream.Readable>> = [];
-  for (const source of Object.keys(sources))
-  {
-    promises.push(getSourceStream(sources[source], files));
-  }
-  return Promise.all(promises);
-}
-
-export async function getSinkStream(sink: SinkConfig, engines: TransformationEngine[]): Promise<stream.Duplex>
+export async function getSinkStream(sink: SinkConfig, engine: TransformationEngine): Promise<stream.Duplex>
 {
   return new Promise<stream.Duplex>(async (resolve, reject) =>
   {
@@ -200,7 +185,7 @@ export async function getSinkStream(sink: SinkConfig, engines: TransformationEng
         const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
 
         // create mapping
-        const elasticMapping = new ElasticMapping(engines[0]);
+        const elasticMapping = new ElasticMapping(engine);
         await elasticDB.putESMapping(database, table, elasticMapping.getMapping());
 
         const primaryKey = elasticMapping.getPrimaryKey();
@@ -216,21 +201,6 @@ export async function getSinkStream(sink: SinkConfig, engines: TransformationEng
   });
 }
 
-export async function getSinkStreams(sinks: DefaultSinkConfig, engines: TransformationEngine[]): Promise<stream.Duplex[]>
-{
-  if (sinks._default === undefined)
-  {
-    throw new Error('Default sink not found.');
-  }
-
-  const promises: Array<Promise<stream.Duplex>> = [];
-  for (const sink of Object.keys(sinks))
-  {
-    promises.push(getSinkStream(sinks[sink], engines));
-  }
-  return Promise.all(promises);
-}
-
 export async function getMergeStream(
   inputStreams: stream.Transform[],
   sinks: DefaultSinkConfig,
@@ -240,7 +210,7 @@ export async function getMergeStream(
   inputStreams.forEach((v, i) =>
   {
     // TODO: pick a better name for temp index
-    const tempIndex = 'temp_' + i;
+    const tempIndex = 'temp_' + String(i);
 
     const defaultSink = sinks._default;
     defaultSink['options']['database'] = tempIndex;

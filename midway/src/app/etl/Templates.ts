@@ -44,7 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+// tslint:disable:no-shadowed-variable
+
 import * as fs from 'fs';
+import GraphLib = require('graphlib');
 import * as _ from 'lodash';
 import * as request from 'request';
 import { Readable, Transform } from 'stream';
@@ -59,14 +62,7 @@ import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
-import
-{
-  getMergeStream,
-  getSinkStream,
-  getSinkStreams,
-  getSourceStream,
-  getSourceStreams,
-} from './SourceSinkStream';
+import { getMergeStream, getSinkStream, getSourceStream } from './SourceSinkStream';
 import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
 export default class Templates
@@ -206,57 +202,116 @@ export default class Templates
 
   public async execute(id: number, files?: Readable[]): Promise<Readable>
   {
-    return new Promise<Readable>(async (resolve, reject) =>
+    const ts: TemplateConfig[] = await this.get(id);
+    if (ts.length < 1)
     {
-      const ts: TemplateConfig[] = await this.get(id);
-      if (ts.length < 1)
+      throw new Error(`Template ID ${String(id)} not found.`);
+    }
+    const template = ts[0];
+    winston.info('Executing template', template.templateName);
+
+    const numSources = Object.keys(template.sources).length;
+    const numSinks = Object.keys(template.sinks).length;
+    const numEdges = Object.keys(template.process.edges).length;
+
+    // TODO: multi-source import and exports
+    if (numSinks > 1 || template.sinks._default === undefined)
+    {
+      throw new Error('Only single sinks are supported.');
+    }
+
+    winston.info('Beginning ETL pipline...');
+
+    // construct a "process" graph
+    let defaultSink;
+    const dag: any = new GraphLib.Graph({ isDirected: true });
+    Object.keys(template.process.nodes).map(
+      (n) =>
       {
-        return reject(`Template ID ${String(id)} not found.`);
-      }
-      const template = ts[0];
-      winston.info('Executing template', template.templateName);
+        const node = template.process.nodes[n];
+        if (node.type === 'Sink' && node.endpoint === '_default')
+        {
+          defaultSink = n;
+        }
+        dag.setNode(n, node);
+      },
+    );
 
-      const numSources = Object.keys(template.sources).length;
-      const numSinks = Object.keys(template.sinks).length;
-      const numEdges = Object.keys(template.process.edges).length;
+    Object.keys(template.process.edges).map(
+      (e) => dag.setEdge(
+        template.process.edges[e].from,
+        template.process.edges[e].to,
+        template.process.edges[e].transformations,
+      ),
+    );
 
-      // TODO: multi-source import and exports
-      if (numSinks > 1 || template.sinks._default === undefined)
+    if (defaultSink === undefined)
+    {
+      throw new Error('Default sink not found.');
+    }
+
+    const nodes: any[] = GraphLib.alg.topsort(dag);
+    console.log(JSON.stringify(template, null, 2));
+
+    const streamMap = await this.executeGraph(template, dag, nodes, files);
+    return streamMap[defaultSink][0];
+  }
+
+  private async executeGraph(template: TemplateConfig, dag: any, nodes: any[], files?: Readable[], streamMap?: object): Promise<object>
+  {
+    if (nodes.length === 0)
+    {
+      return Promise.resolve(streamMap as object);
+    }
+
+    if (streamMap === undefined)
+    {
+      streamMap = {};
+      nodes.forEach((n) =>
       {
-        return reject('Only single sinks are supported.');
-      }
+        (streamMap as object)[n] = [];
+      });
+    }
 
-      winston.info('Beginning ETL pipline...');
+    const nodeId = nodes.shift();
+    const node = dag.node(nodeId);
 
-      const transformationEngines: TransformationEngine[] =
-      Object.keys(template.process.edges).map(
-        (k) => TransformationEngine.load(template.process.edges[k].transformations),
-      );
+    switch (node.type)
+    {
+      case 'Source':
+        const source = template.sources[node.endpoint];
+        const sourceStream = await getSourceStream(source, files);
 
-      const transformStreams = transformationEngines.map((e) => new TransformationEngineTransform([], e));
-      console.log(JSON.stringify(template, null, 2));
+        const outEdges: any[] = dag.outEdges(nodeId);
+        for (const e of outEdges)
+        {
+          const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+          const transformStream = new TransformationEngineTransform([], transformationEngine);
+          streamMap[e.w].push(sourceStream.pipe(transformStream));
+        }
+        return this.executeGraph(template, dag, nodes, files, streamMap);
 
-      let transformedStreams: Transform[];
-      if (numEdges === 1)
-      {
-        // assume that it's an edge from source node to sink node
-        // TODO: verify that it really is...
+      case 'Sink':
+        const transformStreams = streamMap[nodeId];
+        const sink = template.sinks[node.endpoint];
 
-        const sourceStreams = await getSourceStreams(template.sources, files);
-        transformedStreams = sourceStreams.map((s) => s.pipe(transformStreams[0]));
-      }
-      else
-      {
-        // assume that we are wanting to merge join multiple sources
-        const sourceStreams = await getSourceStreams(template.sources, files);
+        const inEdges: any[] = dag.inEdges(nodeId);
+        if (inEdges.length > 1)
+        {
+          throw new Error('Sinks can only have one incoming edge.');
+        }
 
-        transformedStreams = sourceStreams.map((s, i) => s.pipe(transformStreams[i]));
-        transformedStreams = await getMergeStream(transformedStreams, template.sinks, transformationEngines);
-      }
+        const e = inEdges[0];
+        const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+        const sinkStream = await getSinkStream(sink, transformationEngine);
+        streamMap[e.w][0] = streamMap[e.w][0].pipe(sinkStream);
+        return this.executeGraph(template, dag, nodes, files, streamMap);
 
-      const sinkStream = await getSinkStream(template.sinks._default, transformationEngines);
-      transformedStreams.forEach((s) => s.pipe(sinkStream));
-      resolve(sinkStream);
-    });
+      case 'MergeJoin':
+      // transformedStreams = await getMergeStream(transformedStreams, template.sinks, transformationEngines);
+      default:
+        throw new Error('Unknown node in process graph');
+    }
+
   }
 }
