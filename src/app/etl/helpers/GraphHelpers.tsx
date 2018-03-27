@@ -80,7 +80,7 @@ import DocumentsHelpers from './DocumentsHelpers';
 class GraphHelpers extends ETLHelpers
 {
   // does the same thing as _try except its specialized for the currently edited transformation engine
-  // returns a promise whose type specifies which fields are dirty and need to be rebuilt
+  // returns a promise which indicates if the structure of the engine / template is dirtied
   public mutateEngine(tryFn: (proxy: EngineProxy) => void): Promise<boolean>
   {
     return new Promise<boolean>((resolve, reject) =>
@@ -118,7 +118,6 @@ class GraphHelpers extends ETLHelpers
     // 1: create a merge node
     // 2: split the left edge using the merge node
     // 3: connect the right edge to the merge node
-
     this._try((proxy) =>
     {
       const leftEdgeId = proxy.value().findEdges((edge) => edge.from === leftId).first();

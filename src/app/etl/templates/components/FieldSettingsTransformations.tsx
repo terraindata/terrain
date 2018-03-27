@@ -75,7 +75,7 @@ import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 import './transformations/TransformationEditor.less';
 
 const EditIcon = require('images/icon_edit.svg');
-const AddIcon = require('images/icon_add.svg');
+const DeleteIcon = require('images/icon_close.svg');
 
 export type Props = TemplateEditorFieldProps;
 
@@ -166,11 +166,24 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         <div className='transformation-row-text' style={style.textStyle}>
           {TransformationInfo.getReadableName(value.typeCode)}
         </div>
-        <div className='edit-transformation-spacer'>
+        <div className='tef-transformation-spacer'>
           {
             canEdit ?
               <div
-                className='edit-transformation-button'
+                className='tef-transformation-button'
+                key={`delete ${index}`}
+                style={style.buttonStyle}
+                onClick={this.handleDeleteTransformationFactory(index)}
+              >
+                <DeleteIcon />
+              </div>
+              :
+              null
+          }
+          {
+            canEdit ?
+              <div
+                className='tef-transformation-button'
                 key={`edit ${index}`}
                 style={style.buttonStyle}
                 onClick={this.handleEditTransformationFactory(index)}
@@ -203,7 +216,6 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         <div className='transformation-row-text'>
           {buttonText}
         </div>
-
       </div>
     );
   }
@@ -286,6 +298,18 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
       this.setState({
         viewState: ViewState.EDIT,
         currentIndex: index,
+      });
+    };
+  }
+
+  public handleDeleteTransformationFactory(index: number)
+  {
+    const toDelete = this._field().transformations.get(index);
+    return () =>
+    {
+      this._try((proxy) =>
+      {
+        proxy.deleteTransformation(toDelete.id);
       });
     };
   }

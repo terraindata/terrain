@@ -50,6 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { postorderForEach } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -110,6 +111,11 @@ export class EngineProxy
     this.engine.editTransformation(id, fields, options);
     this.requestRebuild(id);
   }
+
+  public deleteTransformation(id: number)
+  {
+    this.engine.deleteTransformation(id);
+  }
 }
 
 export class FieldProxy
@@ -135,6 +141,16 @@ export class FieldProxy
       this.engine.disableField(this.fieldId);
     }
     this.syncWithEngine();
+  }
+
+  // delete this field and all child fields
+  public deleteField(rootId: number)
+  {
+    postorderForEach(this.engine, rootId, (fieldId) =>
+    {
+      this.engine.deleteField(fieldId);
+    });
+    this.syncWithEngine(true);
   }
 
   public changeName(value: string)
@@ -196,6 +212,12 @@ export class FieldProxy
   public setFieldProps(newFormState: object, language: Languages)
   {
     this.engine.setFieldProp(this.fieldId, EnginePath([language]), newFormState);
+    this.syncWithEngine();
+  }
+
+  public deleteTransformation(transformationId: number)
+  {
+    this.engine.deleteTransformation(transformationId);
     this.syncWithEngine();
   }
 
