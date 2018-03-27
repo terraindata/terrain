@@ -150,6 +150,33 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
       );
     }
 
+    public revertLinkOptions(step: ViewEnum)
+    {
+      const graphNode = graph[step as any];
+      graphNode.options.forEach((option, j) =>
+      {
+        if (option.onRevert != null)
+        {
+          option.onRevert(this.props.transitionParams);
+        }
+      });
+    }
+
+    public arriveLinkOptions(step: ViewEnum)
+    {
+      const graphNode = graph[step as any];
+      if (graphNode != null)
+      {
+        graphNode.options.forEach((option, i) =>
+        {
+          if (option.onArrive != null)
+          {
+            option.onArrive(this.props.transitionParams);
+          }
+        });
+      }
+    }
+
     public moveToNext(link: ViewEnum)
     {
       const { stepIndex, stepHistory } = this.props;
@@ -169,35 +196,18 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
           const removedSteps = stepHistory.slice(stepIndex + 1);
           removedSteps.forEach((step, i) =>
           {
-            const graphNode = graph[step as any];
-            graphNode.options.forEach((option, j) =>
-            {
-              if (option.onRevert != null)
-              {
-                option.onRevert(this.props.transitionParams);
-              }
-            });
+            this.revertLinkOptions(step);
           });
           this.props.setSteps(stepIndex + 1, nextHistory);
+          this.arriveLinkOptions(link);
         }
       }
       else
       {
         const nextHistory = stepHistory.push(link);
         this.props.setSteps(stepIndex + 1, nextHistory);
-
         // call onArrive for next options
-        const graphNode = graph[link as any];
-        if (graphNode != null)
-        {
-          graphNode.options.forEach((option, i) =>
-          {
-            if (option.onArrive != null)
-            {
-              option.onArrive(this.props.transitionParams);
-            }
-          });
-        }
+        this.arriveLinkOptions(link);
       }
 
     }

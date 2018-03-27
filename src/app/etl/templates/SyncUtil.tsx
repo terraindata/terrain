@@ -146,3 +146,30 @@ export function updateFieldFromEngine(
   const updatedField = createFieldFromEngine(engine, id);
   return updatedField.set('childrenIds', oldField.childrenIds);
 }
+
+export function postorderForEach(
+  engine: TransformationEngine,
+  fromId: number,
+  fn: (id: number) => void,
+)
+{
+  const fieldMap = createTreeFromEngine(engine);
+  for (const id of postorder(fieldMap, fromId))
+  {
+    fn(id);
+  }
+}
+
+function* postorder(fieldMap: FieldMap, id: number)
+{
+  const field = fieldMap.get(id);
+  if (field !== undefined)
+  {
+    const ids = field.childrenIds;
+    for (let i = 0; i < ids.size; i++)
+    {
+      yield* postorder(fieldMap, ids.get(i));
+    }
+    yield id;
+  }
+}
