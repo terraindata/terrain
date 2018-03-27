@@ -117,7 +117,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     const { dataSourceOptions } = this.state;
 
     const pickerIsForcedOpen = step === PathfinderSteps.Source;
-
     return (
       <div
         className='pf-section pf-source-section'

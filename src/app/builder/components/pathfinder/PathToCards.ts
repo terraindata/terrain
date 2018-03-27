@@ -113,6 +113,7 @@ export class PathToCards
   private static PathToBody(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
     this.updateSize(path, parser, body);
+
     this.updateSourceBool(path, parser, body);
     // hard bool
     this.FilterSectionToBodyBool(path.filterGroup, parser, body, 'hard');
@@ -123,10 +124,8 @@ export class PathToCards
     this.updateGroupJoin(path.nested, parser, body, parentAliasName, path.minMatches);
     // score card
     this.fromScore(path, parser, body);
-
     this.updateScripts(path.more.scripts, parser, body);
     this.updateCollapse(path.more.collapse, parser, body);
-
     // finally, let's distribute filters from the sourcebool to the hard/soft bool.
     this.distributeSourceBoolFilters(path, parser, body);
   }

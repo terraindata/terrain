@@ -269,10 +269,8 @@ class PathfinderArea extends TerrainComponent<Props>
             source={path.source}
             onSourceChange={this.props.onSourceChange}
           />
-
           <FadeInOut
             open={path.step >= PathfinderSteps.Filter}
-
           >
             <PathfinderFilterSection
               pathfinderContext={pathfinderContext}

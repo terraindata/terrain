@@ -690,7 +690,6 @@ class ElasticDataSourceC extends DataSource
 
         const { dataSource } = context.source;
         const { server, index, types } = dataSource as ElasticDataSource;
-
         if (!index)
         {
           return defaultOptions;

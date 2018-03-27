@@ -122,7 +122,7 @@ export class ElasticStream extends Stream.Readable
 
   private scrollCallback(error, response): void
   {
-    if (typeof response._scroll_id === 'string')
+    if (response && typeof response._scroll_id === 'string')
     {
       this.scrollID = response._scroll_id;
     }

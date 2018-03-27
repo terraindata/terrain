@@ -77,7 +77,7 @@ import Query from '../../../../items/types/Query';
 
 export class CardsToPath
 {
-  public static updatePath(query: Query): Path
+  public static updatePath(query: Query, dbName: string): Path
   {
     const rootCard = query.cards.get(0);
     if (rootCard === undefined)
@@ -98,7 +98,7 @@ export class CardsToPath
     //
     TerrainLog.debug('B->P: The parsed card is ' + JSON.stringify(parser.getValueInfo().value));
 
-    const newPath = this.BodyCardToPath(query.path, parser, parser.getValueInfo());
+    const newPath = this.BodyCardToPath(query.path, parser, parser.getValueInfo(), dbName);
     return newPath;
   }
 
@@ -107,15 +107,15 @@ export class CardsToPath
     return _Path();
   }
 
-  public static BodyCardToPath(path: Path, parser: ESCardParser, bodyValueInfo: ESValueInfo)
+  public static BodyCardToPath(path: Path, parser: ESCardParser, bodyValueInfo: ESValueInfo, dbName: string)
   {
-    const newSource = this.updateSource(path.source, parser, bodyValueInfo);
+    const newSource = this.updateSource(path.source, parser, bodyValueInfo, dbName);
     const newScore = this.updateScore(path.score, parser, bodyValueInfo);
     const filterGroup = this.BodyToFilterSection(path.filterGroup, parser, bodyValueInfo, 'hard');
     const softFilterGroup = this.BodyToFilterSection(path.softFilterGroup, parser, bodyValueInfo, 'soft');
     const parentAlias = this.getParentAlias(parser, bodyValueInfo);
     const dropIfLessThan = this.getDropIfLessThan(parser, bodyValueInfo);
-    let groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
+    let groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias, dbName);
     groupJoinPaths = groupJoinPaths.map((p, i) =>
       p.set('minMatches', dropIfLessThan),
     );
@@ -479,7 +479,7 @@ export class CardsToPath
     }
   }
 
-  private static getGroupJoinPaths(paths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string)
+  private static getGroupJoinPaths(paths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string, dbName: string)
   {
     const joinBodyMap = {};
     const pathMap = {};
@@ -517,7 +517,7 @@ export class CardsToPath
       {
         oldPath = _Path();
       }
-      const p = this.BodyCardToPath(oldPath, parser, joinBodyMap[key]).set('name', key);
+      const p = this.BodyCardToPath(oldPath, parser, joinBodyMap[key], dbName).set('name', key);
       TerrainLog.debug('(B->P) Turn groupJoin body ', joinBodyMap[key], ' to path', p);
       newPaths.push(p);
     }
@@ -563,7 +563,7 @@ export class CardsToPath
     return List([]);
   }
 
-  private static updateSource(source: Source, parser: ESCardParser, body: ESValueInfo): Source
+  private static updateSource(source: Source, parser: ESCardParser, body: ESValueInfo, dbName: string): Source
   {
     const rootVal = body.value;
 
@@ -595,6 +595,7 @@ export class CardsToPath
     }
     TerrainLog.debug('B->P: card index is ' + cardIndex);
     source = source.setIn(['dataSource', 'index'], cardIndex);
+    source = source.setIn(['dataSource', 'server'], dbName);
 
     return source;
   }

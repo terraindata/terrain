@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
-
 import { CardsToPath } from 'builder/components/pathfinder/CardsToPath';
 import { ElasticDataSource } from 'builder/components/pathfinder/PathfinderTypes';
 import { PathToCards } from 'builder/components/pathfinder/PathToCards';
@@ -606,7 +605,7 @@ const BuilderReducersWrapper = (
       if (BuilderCardActionTypes[action.type])
       {
         // update path
-        state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query));
+        state = state.setIn(['query', 'path'], CardsToPath.updatePath(state.query, state.db.name));
       }
     }
   }
