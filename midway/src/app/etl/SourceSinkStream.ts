@@ -173,26 +173,59 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
   });
 }
 
-export async function getMergeJoinStream(indices: string[], options: object): Promise<stream.Readable>
+export async function getMergeJoinStream(dbName: string, indices: object[], options: object): Promise<stream.Readable>
 {
-  const mergeJoinKey = indices.join('_');
+  const db = await databases.select([], { name: dbName });
+  if (db.length < 1 || db[0].id === undefined)
+  {
+    throw new Error(`Database ${dbName} not found.`);
+  }
+
+  const dbId = db[0].id;
+  const mergeJoinKey = indices.map((i) => i['index']).join('_');
   const query = {
     query: {
-      match_all: {},
-      mergeJoin: {
-        joinKey: options['leftJoinKey'],
-        [mergeJoinKey]: {
-          query: {
-            match_all: {},
+      bool: {
+        filter: [
+          {
+            term: {
+              _index: indices[0]['index'],
+            },
+          },
+          {
+            term: {
+              _type: indices[0]['type'],
+            },
+          },
+        ],
+      },
+    },
+    mergeJoin: {
+      joinKey: options['leftJoinKey'],
+      [mergeJoinKey]: {
+        query: {
+          bool: {
+            filter: [
+              {
+                term: {
+                  _index: indices[1]['index'],
+                },
+              },
+              {
+                term: {
+                  _type: indices[1]['type'],
+                },
+              },
+            ],
           },
         },
       },
     },
   };
-  return getElasticReaderStream(0, query);
+  return getElasticReaderStream(dbId, JSON.stringify(query));
 }
 
-async function getElasticReaderStream(dbId: number, query: any): Promise<stream.Readable>
+async function getElasticReaderStream(dbId: number, query: string): Promise<stream.Readable>
 {
   const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
   if (controller === undefined)

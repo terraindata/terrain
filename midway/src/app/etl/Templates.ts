@@ -225,7 +225,7 @@ export default class Templates
 
     // construct a "process" graph
     let defaultSink;
-    const dag: any = new GraphLib.Graph({ isDirected: true });
+    const dag: any = new GraphLib.Graph({ directed: true });
     Object.keys(template.process.nodes).map(
       (n) =>
       {
@@ -316,14 +316,17 @@ export default class Templates
 
         const done = new EventEmitter();
         let numPending = inEdges.length;
-        const tempIndices: string[] = [];
+        const tempIndices: object[] = [];
         for (const e of inEdges)
         {
           const inputStream = streamMap[e.v][nodeId];
           const tempIndex = 'temp_' + e.v + '_' + e.w;
           const tempSink = _.clone(template.sinks._default);
           tempSink['options']['database'] = tempIndex;
-          tempIndices.push(tempIndex);
+          tempIndices.push({
+            index: tempIndex,
+            type: tempSink['options']['table'],
+          });
 
           const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
           const tempSinkStream = await getSinkStream(tempSink, transformationEngine);
@@ -346,12 +349,14 @@ export default class Templates
         });
 
         // create merge join stream
+        const dbName: string = template.sinks._default['options']['serverId'];
         const outEdges: any[] = dag.outEdges(nodeId);
         for (const e of outEdges)
         {
-          const mergeJoinStream = await getMergeJoinStream(tempIndices, node.options);
-          streamMap[nodeId][e.v] = mergeJoinStream;
+          const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
+          streamMap[nodeId][e.w] = mergeJoinStream;
         }
+
         return this.executeGraph(template, dag, nodes, files, streamMap);
       }
 
