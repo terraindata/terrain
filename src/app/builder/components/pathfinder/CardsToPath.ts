@@ -310,6 +310,7 @@ export class CardsToPath
                 units: distanceCard.distanceUnit,
                 zoom: distanceCard.mapZoomValue,
               },
+              boost: distanceCard.boost,
             });
             filterLines = filterLines.push(filterLine);
           }
@@ -331,6 +332,7 @@ export class CardsToPath
               units: distanceCard.distanceUnit,
               zoom: distanceCard.mapZoomValue,
             },
+            boost: distanceCard.boost,
           });
           filterLines = filterLines.push(filterLine);
         }

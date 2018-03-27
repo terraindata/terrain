@@ -1752,6 +1752,7 @@ const EQLSpec: ESClause[] =
       {
         distance: 'distance',
         distance_type: 'distance_type',
+        boost: 'boost',
       },
       'field',
       'geo_point',

@@ -566,6 +566,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
           geo_distance: Map({
             distance: '10mi',
             [line.field]: '',
+            boost,
           }),
         });
       }
@@ -573,6 +574,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         geo_distance: Map({
           distance: String(distanceObj.distance) + distanceObj.units,
           [line.field]: distanceObj.location || distanceObj.address,
+          boost,
         }),
       });
     case 'isin':

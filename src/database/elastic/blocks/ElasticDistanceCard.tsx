@@ -83,6 +83,7 @@ export const elasticDistance = _card({
   locationValue: {},
   mapInputValue: '',
   mapZoomValue: 15,
+  boost: 1,
 
   static: {
     language: 'elastic',
@@ -98,6 +99,7 @@ export const elasticDistance = _card({
       return {
         distance: (block['distance']).toString() + block['distanceUnit'],
         distance_type: block['distanceType'],
+        boost: block['boost'],
         [block['field']]: locationValue,
       };
     },

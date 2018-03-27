@@ -235,10 +235,6 @@ export class PathToCards
 
   private static processGeoDistanceFilter(filterLines: FilterLine[], parser: ESCardParser, boolValueInfo: ESValueInfo, boolType, filterSection: 'soft' | 'hard')
   {
-    if (filterSection !== 'hard')
-    {
-      return List([]);
-    }
     // Find any geo_distance filter lines
     const geoFilterLines = List(filterLines).filter((line) => line.comparison === 'located').toList();
     const boolTypeFiltersType = boolType + ':query[]';
@@ -275,10 +271,11 @@ export class PathToCards
             field: filterLine.field,
             distance: value ? value.distance : 10,
             distanceUnit: value ? value.units : 'mi',
-            locationValue: value && value.location ? value.location : { lat: 0, lon: 0 },
+            locationValue: value && value.location ? value.location : value ? value.address : undefined,
             mapInputValue: value ? value.address : '',
             mapZoomValue: value ? value.zoom : 15,
             cards: List([]),
+            boost: filterLine.boost,
           });
         // const parsedDistanceCard = new ESCardParser(distanceCard);
         const queryCard = BlockUtils.make(ElasticBlocks, 'eqlquery', {
