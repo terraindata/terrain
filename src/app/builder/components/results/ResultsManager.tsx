@@ -255,12 +255,12 @@ export class ResultsManager extends TerrainComponent<Props>
                       fields = _.extend({}, nestedHit, nestedHit['_source']);
                       fields = { fields, primaryKey: '' } as Hit;
                     }
-                    return hitStillInNestedResult.reduce((result, r) => result || r);
+                    return hitStillInNestedResult.reduce((result, r) => result || r, false);
                   },
                 );
 
                 hitStillInResults = hitStillInResults ||
-                  hitStillInNestedResults.reduce((result, r) => result || r);
+                  hitStillInNestedResults.reduce((result, r) => result || r, false);
               }
 
               return hitStillInResults;
