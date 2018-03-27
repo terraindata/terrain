@@ -169,16 +169,16 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
         <div className='tef-transformation-spacer'>
           {
             canEdit ?
-            <div
-              className='tef-transformation-button'
-              key={`delete ${index}`}
-              style={style.buttonStyle}
-              onClick={this.handleDeleteTransformationFactory(index)}
-            >
-              <DeleteIcon />
-            </div>
-            :
-            null
+              <div
+                className='tef-transformation-button'
+                key={`delete ${index}`}
+                style={style.buttonStyle}
+                onClick={this.handleDeleteTransformationFactory(index)}
+              >
+                <DeleteIcon />
+              </div>
+              :
+              null
           }
           {
             canEdit ?
@@ -304,13 +304,14 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
 
   public handleDeleteTransformationFactory(index: number)
   {
-    const toDelete = this._field().transformations.get(index)
+    const toDelete = this._field().transformations.get(index);
     return () =>
     {
-      this._try((proxy) => {
-        proxy.deleteTransformation(toDelete.id)
-      })
-    }
+      this._try((proxy) =>
+      {
+        proxy.deleteTransformation(toDelete.id);
+      });
+    };
   }
 
   public handleUIClose()

@@ -93,18 +93,22 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         onClick: this.openSettings,
       });
     }
-    if (canMove)
-    {
-      options.push({
-        text: 'Move this Field',
-        onClick: this.moveField,
-      });
-    }
     if (isNested)
     {
       options.push({
         text: 'Add a subfield',
-        onClick: this.addField,
+        onClick: this.requestAddField,
+      });
+    }
+    if (canMove)
+    {
+      options.push({
+        text: 'Move this Field',
+        onClick: this.requestMoveField,
+      });
+      options.push({
+        text: 'Delete this Field',
+        onClick: this.requestDeleteField,
       });
     }
     return List(options);
@@ -215,7 +219,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     });
   }
 
-  public moveField()
+  public requestMoveField()
   {
     this.props.act({
       actionType: 'setDisplayState',
@@ -225,7 +229,33 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     });
   }
 
-  public addField()
+  public deleteThisField()
+  {
+    this._try((proxy) =>
+    {
+      proxy.deleteField(this.props.fieldId);
+    });
+  }
+
+  public requestDeleteField()
+  {
+    let message = 'Are you sure you want to delete this field?';
+    if (this._field().childrenIds.size > 0)
+    {
+      message = 'Deleting this field will remove all child fields. ' + message;
+    }
+    this.props.act({
+      actionType: 'addModal',
+      props: {
+        title: 'Confirm Action',
+        message,
+        confirm: true,
+        onConfirm: this.deleteThisField.bind(this),
+      },
+    });
+  }
+
+  public requestAddField()
   {
     this.props.act({
       actionType: 'setDisplayState',

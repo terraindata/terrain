@@ -50,6 +50,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { postorderForEach } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -140,6 +141,16 @@ export class FieldProxy
       this.engine.disableField(this.fieldId);
     }
     this.syncWithEngine();
+  }
+
+  // delete this field and all child fields
+  public deleteField(rootId: number)
+  {
+    postorderForEach(this.engine, rootId, (fieldId) =>
+    {
+      this.engine.deleteField(fieldId);
+    });
+    this.syncWithEngine(true);
   }
 
   public changeName(value: string)
