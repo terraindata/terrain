@@ -321,7 +321,7 @@ export default class Templates
         {
           const inputStream = streamMap[e.v][nodeId];
           const tempIndex = 'temp_' + e.v + '_' + e.w;
-          const tempSink = _.clone(template.sinks._default);
+          const tempSink = JSON.parse(JSON.stringify(template.sinks._default));
           tempSink['options']['database'] = tempIndex;
           tempIndices.push({
             index: tempIndex,
@@ -331,8 +331,8 @@ export default class Templates
           const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
           const tempSinkStream = await getSinkStream(tempSink, transformationEngine);
 
-          const outputStream = inputStream.pipe(tempSinkStream);
-          outputStream.on('finish', () =>
+          inputStream.pipe(tempSinkStream);
+          tempSinkStream.on('finish', () =>
           {
             if (--numPending === 0)
             {
@@ -353,10 +353,8 @@ export default class Templates
         const outEdges: any[] = dag.outEdges(nodeId);
         for (const e of outEdges)
         {
-          const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
-          streamMap[nodeId][e.w] = mergeJoinStream;
+          streamMap[nodeId][e.w] = await getMergeJoinStream(dbName, tempIndices, node.options);
         }
-
         return this.executeGraph(template, dag, nodes, files, streamMap);
       }
 

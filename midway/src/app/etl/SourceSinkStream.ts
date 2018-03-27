@@ -83,7 +83,9 @@ export async function getSourceStream(source: SourceConfig, files?: stream.Reada
         const algorithmId = source.options['algorithmId'];
         const query: string = await Util.getQueryFromAlgorithm(algorithmId);
         const dbId: number = await Util.getDBFromAlgorithm(algorithmId);
-        sourceStream = await getElasticReaderStream(dbId, query);
+        const algorithmStream = await getElasticReaderStream(dbId, query);
+        const exportTransform = new ExportTransform();
+        sourceStream = algorithmStream.pipe(exportTransform);
         break;
       case 'Upload':
         if (files === undefined || files.length === 0)
@@ -142,12 +144,12 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
 
         const { serverId, database, table } = sink.options as any;
         const db = await databases.select([], { name: serverId });
-        if (db.length < 1)
+        if (db.length < 1 || db[0].id === undefined)
         {
           throw new Error(`Database ${String(serverId)} not found.`);
         }
 
-        const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id);
+        const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id as number);
         if (controller === undefined)
         {
           throw new Error(`Database id ${String(db[0].id)} is invalid.`);
@@ -181,9 +183,10 @@ export async function getMergeJoinStream(dbName: string, indices: object[], opti
     throw new Error(`Database ${dbName} not found.`);
   }
 
-  const dbId = db[0].id;
+  const dbId: number = db[0].id as number;
   const mergeJoinKey = indices.map((i) => i['index']).join('_');
   const query = {
+    size: 100, // FIXME!!!
     query: {
       bool: {
         filter: [
@@ -222,7 +225,9 @@ export async function getMergeJoinStream(dbName: string, indices: object[], opti
       },
     },
   };
-  return getElasticReaderStream(dbId, JSON.stringify(query));
+  const elasticStream = await getElasticReaderStream(dbId, JSON.stringify(query));
+  // elasticStream.on('data', console.log);
+  return elasticStream;
 }
 
 async function getElasticReaderStream(dbId: number, query: string): Promise<stream.Readable>
@@ -247,12 +252,11 @@ async function getElasticReaderStream(dbId: number, query: string): Promise<stre
     body: query,
   };
 
-  const algorithmStream = await qh.handleQuery(payload) as stream.Readable;
-  if (algorithmStream === undefined)
+  const elasticStream = await qh.handleQuery(payload) as stream.Readable;
+  if (elasticStream === undefined)
   {
     throw new Error('Error creating new source stream from algorithm');
   }
 
-  const exportTransform = new ExportTransform();
-  return algorithmStream.pipe(exportTransform);
+  return elasticStream;
 }
