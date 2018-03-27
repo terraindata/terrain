@@ -99,9 +99,9 @@ export class GoogleAPI
       }
       delete analytics['credentialId'];
       const analyticsBody =
-      {
-        reportRequests: [analytics],
-      };
+        {
+          reportRequests: [analytics],
+        };
       console.log(this.storedEmail);
       console.log(this.storedKeyFilePath);
       console.log(JSON.stringify(analyticsBody, null, 2));
