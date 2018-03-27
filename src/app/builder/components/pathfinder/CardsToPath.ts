@@ -373,7 +373,7 @@ export class CardsToPath
               let newFilterGroup = _FilterGroup();
               newFilterGroup = this.BoolToFilterGroup(newFilterGroup, parser, boolQuery, sectionType, true);
               newFilterGroup.lines.forEach((line) =>
-                newLines.push(line)
+                newLines.push(line),
               );
             }
           }

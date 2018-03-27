@@ -277,7 +277,7 @@ class SearchableDropdown extends TerrainComponent<Props & InjectedOnClickOutProp
         className='dropdown-option-inner'
       >
         {
-          _.upperFirst(this.props.options.get(index))
+          this.props.options.get(index)
         }
       </div>
     </div>
@@ -512,7 +512,7 @@ class SearchableDropdown extends TerrainComponent<Props & InjectedOnClickOutProp
                 })}
               >
                 {
-                  _.upperFirst(this.props.options.get(index))
+                  this.props.options.get(index)
                 }
               </div>,
             )

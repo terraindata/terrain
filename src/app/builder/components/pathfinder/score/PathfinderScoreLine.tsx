@@ -251,7 +251,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public renderLineContents()
   {
     const { fieldIndex } = this.state;
-    console.log('options ', this.props.dropdownOptions.map((v) => v.displayName as string).toList());
     return (
       <div
         className='pf-line pf-score-line-inner'
@@ -273,7 +272,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           }
           readOnlyComponent={
             <div className='field-name' onClick={this.editingField}>
-              {_.upperFirst(this.props.dropdownOptions.get(fieldIndex).displayName as string)}
+              {this.props.dropdownOptions.get(fieldIndex).displayName as string}
             </div>
           }
         />
