@@ -100,24 +100,28 @@ export class TemplateProxy
     this.sinks = this.sinks.set(key, sink);
   }
 
-  public addSource(key: string, source: SourceConfig): number
+  public addSource(source: SourceConfig): { sourceKey: string, nodeId: number }
   {
+    const key = this.newSourceId();
     this.sources = this.sources.set(key, source);
     const sourceNode = _ETLNode({
       endpoint: key,
       type: NodeTypes.Source,
     });
-    return this.createNode(sourceNode);
+    const nodeId = this.createNode(sourceNode);
+    return { sourceKey: key, nodeId };
   }
 
-  public addSink(key: string, sink: SinkConfig): number
+  public addSink(sink: SinkConfig): { sinkKey: string, nodeId }
   {
+    const key = this.newSinkId();
     this.sinks = this.sinks.set(key, sink);
     const sinkNode = _ETLNode({
       endpoint: key,
       type: NodeTypes.Sink,
     });
-    return this.createNode(sinkNode);
+    const nodeId = this.createNode(sinkNode);
+    return { sinkKey: key, nodeId };
   }
 
   public addMerge(leftId: number, rightId: number, leftJoinKey: string, rightJoinKey: string, outputKey: string): number
@@ -215,6 +219,35 @@ export class TemplateProxy
       return false;
     }
     return true;
+  }
+
+  private newSourceId(): string
+  {
+    if (this.sources.size === 0)
+    {
+      return '_default';
+    }
+    else
+    {
+      return this.randomId();
+    }
+  }
+
+  private newSinkId(): string
+  {
+    if (this.sinks.size === 0)
+    {
+      return '_default';
+    }
+    else
+    {
+      return this.randomId();
+    }
+  }
+
+  private randomId(): string
+  {
+    return Math.random().toString(36).substring(2);
   }
 
   private get process()

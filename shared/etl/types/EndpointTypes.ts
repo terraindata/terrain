@@ -75,6 +75,7 @@ export interface FileConfig
 export interface SourceConfig
 {
   type: SourceTypes;
+  name: string;
   fileConfig: FileConfig;
   options: SourceOptionsType<SourceTypes>;
   // a union of all possible option types
@@ -89,6 +90,7 @@ export interface DefaultSourceConfig
 export interface SinkConfig
 {
   type: SinkTypes;
+  name: string;
   fileConfig: FileConfig;
   options: SinkOptionsType<SinkTypes>;
   // a union of all possible option types

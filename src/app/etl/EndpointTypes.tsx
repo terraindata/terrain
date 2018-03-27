@@ -75,6 +75,7 @@ export const _FileConfig = makeConstructor(FileConfigC);
 class SourceConfigC implements SourceConfigI
 {
   public type = null;
+  public name = 'Default Source';
   public fileConfig = _FileConfig();
   public options = {};
 }
@@ -97,6 +98,7 @@ export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
 class SinkConfigC implements SinkConfigI
 {
   public type = null;
+  public name = 'Default Sink';
   public fileConfig = _FileConfig();
   public options = {};
 }

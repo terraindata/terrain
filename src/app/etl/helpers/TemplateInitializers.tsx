@@ -121,7 +121,7 @@ class Initializers extends ETLHelpers
         algorithmId,
       },
     });
-    DocumentsHelpers.fetchDocuments(source, '_default')
+    DocumentsHelpers.fetchDocuments(source)
       .then(this.createInitialTemplateFn(source))
       .catch(this._logError);
   }
@@ -131,7 +131,7 @@ class Initializers extends ETLHelpers
     const source = walkthrough.source;
     const sink = walkthrough.sink;
     const file = walkthrough.getFile();
-    DocumentsHelpers.fetchDocuments(source, '_default')
+    DocumentsHelpers.fetchDocuments(source)
       .then(this.createInitialTemplateFn(source, sink))
       .catch(this._logError);
   }
@@ -143,7 +143,7 @@ class Initializers extends ETLHelpers
   {
     return (hits) =>
     {
-      const { template, fieldMap, initialEdge } = this.createInitialTemplate(hits, source, sink);
+      const { template, sourceKey, fieldMap, initialEdge } = this.createInitialTemplate(hits, source, sink);
       if (initialEdge === -1)
       {
         throw new Error('Failed to create initial edge');
@@ -151,6 +151,11 @@ class Initializers extends ETLHelpers
       this.editorAct({
         actionType: 'setCurrentEdge',
         edge: initialEdge,
+      });
+      this.editorAct({
+        actionType: 'setInMergeDocuments',
+        key: sourceKey,
+        documents: hits,
       });
       this.editorAct({
         actionType: 'setTemplate',
@@ -168,6 +173,7 @@ class Initializers extends ETLHelpers
   private createInitialTemplate(documents: List<object>, source?: SourceConfig, sink?: SinkConfig):
     {
       template: ETLTemplate,
+      sourceKey: string,
       fieldMap: FieldMap,
       initialEdge: number,
       warnings: string[],
@@ -178,6 +184,7 @@ class Initializers extends ETLHelpers
     {
       return {
         template: _ETLTemplate(),
+        sourceKey: '',
         fieldMap: Map(),
         warnings: ['No documents provided for initial Template construction'],
         softWarnings: [],
@@ -196,12 +203,14 @@ class Initializers extends ETLHelpers
     const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
     // default source and sink is upload and download
     const proxy = new TemplateProxy(template);
-    const sourceId = proxy.addSource('_default', sourceToAdd);
-    const sinkId = proxy.addSink('_default', sinkToAdd);
-    const initialEdge = proxy.addEdge(sourceId, sinkId, engine);
+    const sourceIds = proxy.addSource(sourceToAdd);
+    const sinkIds = proxy.addSink(sinkToAdd);
+
+    const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId, engine);
 
     return {
       template: proxy.value(),
+      sourceKey: sourceIds.sourceKey,
       fieldMap,
       warnings,
       softWarnings,

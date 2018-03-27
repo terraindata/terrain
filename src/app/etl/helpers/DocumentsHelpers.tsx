@@ -173,24 +173,33 @@ class DocumentsHelpers extends ETLHelpers
 
   public fetchDocuments(
     source: SourceConfig,
-    key: string,
+    key?: string,
   ): Promise<List<object>>
   {
     return new Promise<List<object>>((resolve, reject) =>
     {
       const onFetchLoad = (documents: List<object>) =>
       {
-        this.onLoadDocuments(documents, key);
+        if (key !== undefined)
+        {
+          this.onLoadDocuments(documents, key);
+        }
         resolve(documents);
       };
       const catchError = (ev) =>
       {
-        this.onFetchDocumentsError(ev, key);
+        if (key !== undefined)
+        {
+          this.onFetchDocumentsError(ev, key);
+        }
+        reject(ev);
       };
-
       try
       {
-        this.updateStateBeforeFetch();
+        if (key !== undefined)
+        {
+          this.updateStateBeforeFetch();
+        }
         switch (source.type)
         {
           case Sources.Algorithm: {

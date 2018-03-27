@@ -66,7 +66,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { SinkConfig, SinkOptionsType, Sinks, SourceConfig, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
-import { Languages } from 'shared/etl/types/ETLTypes';
+import { Languages, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 /*
@@ -217,16 +217,26 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _getSinkLanguage(): Languages
   {
-    const sinks = this._template().getSinks();
-    if (sinks.has('_default'))
+    this.updateChecker.setChecker('currentEdgeId', getCurrentEdgeId);
+    const edgeId = getCurrentEdgeId(this.props);
+    try
     {
-      const sink: SinkConfig = sinks.get('_default');
-      if (sink.type === Sinks.Database)
+      const edge = this._template().getEdge(edgeId);
+      const toNode = this._template().getNode(edge.to);
+      if (toNode.type === NodeTypes.Sink)
       {
-        return (sink.options as SinkOptionsType<Sinks.Database>).language;
+        const sink = this._template().getSink(toNode.endpoint);
+        if (sink.type === Sinks.Database)
+        {
+          return (sink.options as SinkOptionsType<Sinks.Database>).language;
+        }
       }
+      return Languages.JavaScript;
     }
-    return Languages.JavaScript;
+    catch (e)
+    {
+      return Languages.JavaScript;
+    }
   }
 
   protected _inputDisabled(): boolean
@@ -292,6 +302,11 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 function getCurrentEngine(props: TemplateEditorFieldProps)
 {
   return (props as TemplateEditorFieldProps & Injected).templateEditor.getCurrentEngine();
+}
+
+function getCurrentEdgeId(props: TemplateEditorFieldProps)
+{
+  return (props as TemplateEditorFieldProps & Injected).templateEditor.getCurrentEdgeId();
 }
 
 function settingsAreOpen(props: TemplateEditorFieldProps)
