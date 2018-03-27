@@ -110,6 +110,11 @@ export class EngineProxy
     this.engine.editTransformation(id, fields, options);
     this.requestRebuild(id);
   }
+
+  public deleteTransformation(id: number)
+  {
+    this.engine.deleteTransformation(id);
+  }
 }
 
 export class FieldProxy
@@ -196,6 +201,12 @@ export class FieldProxy
   public setFieldProps(newFormState: object, language: Languages)
   {
     this.engine.setFieldProp(this.fieldId, EnginePath([language]), newFormState);
+    this.syncWithEngine();
+  }
+
+  public deleteTransformation(transformationId: number)
+  {
+    this.engine.deleteTransformation(transformationId);
     this.syncWithEngine();
   }
 

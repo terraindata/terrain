@@ -197,14 +197,6 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
           removedSteps.forEach((step, i) =>
           {
             this.revertLinkOptions(step);
-            // const graphNode = graph[step as any];
-            // graphNode.options.forEach((option, j) =>
-            // {
-            //   if (option.onRevert != null)
-            //   {
-            //     option.onRevert(this.props.transitionParams);
-            //   }
-            // });
           });
           this.props.setSteps(stepIndex + 1, nextHistory);
           this.arriveLinkOptions(link);
