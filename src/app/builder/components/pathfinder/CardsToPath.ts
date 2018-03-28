@@ -81,6 +81,7 @@ export class CardsToPath
 
     // let's parse the card
     const parser = new ESCardParser(rootCard);
+    // TODO: Maybe it is safe to ignore the errors.
     if (parser.hasError())
     {
       TerrainLog.debug('Avoid updating path since card side has errors: ', parser.getErrors());

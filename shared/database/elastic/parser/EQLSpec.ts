@@ -347,6 +347,15 @@ const EQLSpec: ESClause[] =
         path: ['groupjoin'],
         desc: 'Whether groupJoin should ignore documents with less than a given number of results.',
       }),
+/*    new ESMapClause('groupjoin_clause',
+        'groupjoin_name',
+        'body',
+      {
+        path: ['groupjoin'],
+        name: 'groupJoin query',
+        desc: 'Create and name a groupJoin query.',
+        url: '',
+      }),*/
     new ESWildcardStructureClause('groupjoin_clause',
       {
         parentAlias: 'string',
@@ -360,7 +369,7 @@ const EQLSpec: ESClause[] =
         desc: 'Create and name a groupJoin query.',
         url: '',
       }),
-    new ESStringClause('groupjoin_name',
+    new ESFieldClause('groupjoin_name',
       {
         path: ['groupjoin'],
         desc: 'names this groupJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',

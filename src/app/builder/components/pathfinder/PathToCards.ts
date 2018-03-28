@@ -770,7 +770,7 @@ export class PathToCards
       },
     }, body);
 
-    if (sourceBool == null)
+    if (sourceBool === null)
     {
       const sourceBoolTemplate =
         {
