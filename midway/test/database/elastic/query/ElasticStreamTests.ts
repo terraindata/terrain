@@ -46,13 +46,12 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
-import { makePromiseCallback } from '../../../../src/tasty/Utils';
-import * as Utils from '../../../Utils';
-
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
 import ElasticStream from '../../../../src/database/elastic/query/ElasticStream';
+
+import BufferTransform from '../../../../src/app/io/streams/BufferTransform';
 
 let elasticController: ElasticController;
 let elasticClient: ElasticClient;
@@ -68,77 +67,81 @@ beforeAll(() =>
   elasticClient = elasticController.getClient();
 });
 
+const query = {
+  size: 3,
+  _source: ['movieid', 'title'],
+  sort: { movieid: 'asc' },
+  query: {
+    bool: {
+      filter: [
+        {
+          term: {
+            _index: 'movies',
+          },
+        },
+        {
+          term: {
+            _type: 'data',
+          },
+        },
+      ],
+    },
+  },
+};
+
+const expectedResponse = [
+  {
+    _index: 'movies',
+    _type: 'data',
+    _id: '1',
+    _score: null,
+    _source: {
+      movieid: 1,
+      title: 'Toy Story (1995)',
+    },
+  },
+  {
+    _index: 'movies',
+    _type: 'data',
+    _id: '2',
+    _score: null,
+    _source: {
+      movieid: 2,
+      title: 'Jumanji (1995)',
+    },
+  },
+  {
+    _index: 'movies',
+    _type: 'data',
+    _id: '3',
+    _score: null,
+    _source: {
+      movieid: 3,
+      title: 'Grumpier Old Men (1995)',
+    },
+  },
+];
+
 test('simple elastic stream', async (done) =>
 {
   try
   {
-    const query = {
-      size: 3,
-      _source: ['movieid', 'title'],
-      query: {
-        bool: {
-          filter: [
-            {
-              term: {
-                _index: 'movies',
-              },
-            },
-            {
-              term: {
-                _type: 'data',
-              },
-            },
-          ],
-        },
-      },
-    };
-
-    const stream = new ElasticStream(elasticClient, query, { objectMode: true });
+    const stream = new ElasticStream(elasticClient, query);
     let results = [];
     stream.on('data', (chunk) =>
     {
-      results = results.concat(chunk);
+      if (chunk['hits'] !== undefined)
+      {
+        results = results.concat(chunk['hits'].hits);
+      }
     });
 
     stream.on('end', () =>
     {
       expect(results.length).toEqual(3);
-      expect(results).toMatchObject(
-        [
-          {
-            _index: 'movies',
-            _type: 'data',
-            _id: '14',
-            _score: 0,
-            _source: {
-              movieid: 14,
-              title: 'Nixon (1995)',
-            },
-          },
-          {
-            _index: 'movies',
-            _type: 'data',
-            _id: '270',
-            _score: 0,
-            _source: {
-              movieid: 270,
-              title: 'Love Affair (1994)',
-            },
-          },
-          {
-            _index: 'movies',
-            _type: 'data',
-            _id: '295',
-            _score: 0,
-            _source: {
-              movieid: 295,
-              title: 'Pyromaniac\'s Love Story, A (1995)',
-            },
-          },
-        ],
-      );
+      expect(results).toMatchObject(expectedResponse);
+      done();
     });
-    done();
   }
   catch (e)
   {
@@ -146,77 +149,22 @@ test('simple elastic stream', async (done) =>
   }
 });
 
-test('elastic stream transforms', async (done) =>
+test('elastic stream (buffer transform)', async (done) =>
 {
   try
   {
-    const query = {
-      size: 3,
-      _source: ['movieid', 'title'],
-      query: {
-        bool: {
-          filter: [
-            {
-              term: {
-                _index: 'movies',
-              },
-            },
-            {
-              term: {
-                _type: 'data',
-              },
-            },
-          ],
-        },
-      },
-    };
-
-    const transform = (error, response) =>
-    {
-      for (const d of response.hits.hits)
+    const stream = new ElasticStream(elasticClient, query);
+    const bufferTransform = new BufferTransform(stream,
+      (err, response) =>
       {
-        delete d['_index'];
-        delete d['_type'];
-        delete d['_id'];
-        delete d['_score'];
-      }
-      return response;
-    };
-
-    const stream = new ElasticStream(elasticClient, query, { objectMode: true }, transform);
-    let results = [];
-    stream.on('data', (chunk) =>
-    {
-      results = results.concat(chunk);
-    });
-
-    stream.on('end', () =>
-    {
-      expect(results.length).toEqual(3);
-      expect(results).toMatchObject(
-        [
-          {
-            _source: {
-              movieid: 14,
-              title: 'Nixon (1995)',
-            },
-          },
-          {
-            _source: {
-              movieid: 270,
-              title: 'Love Affair (1994)',
-            },
-          },
-          {
-            _source: {
-              movieid: 295,
-              title: 'Pyromaniac\'s Love Story, A (1995)',
-            },
-          },
-        ],
-      );
-    });
-    done();
+        expect(err).toBeUndefined();
+        expect(response).toBeDefined();
+        expect(response[0]['hits']).toBeDefined();
+        const results = response[0]['hits'].hits;
+        expect(results.length).toEqual(3);
+        expect(results).toMatchObject(expectedResponse);
+        done();
+      });
   }
   catch (e)
   {

@@ -134,7 +134,7 @@ class HitsArea extends TerrainComponent<Props>
     mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
     mapMaxHeight: undefined,
-    spotlightHits: Immutable.Map<string, any>({}),
+    spotlightHits: Immutable.Map<string, any>(),
   };
 
   public hitsFodderRange = _.range(0, 25);
@@ -218,7 +218,7 @@ class HitsArea extends TerrainComponent<Props>
           onExpand={this.handleCollapse}
           expanded={true}
           allowSpotlights={this.props.allowSpotlights}
-          index={-1}
+          index={this.state.expandedHitIndex}
           primaryKey={hit.primaryKey}
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}

@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 import readline from 'readline-promise';
 import * as sleep from 'sleep';
+import * as request from 'then-request';
+import * as winston from 'winston';
 
 function ignoreBuilderAction(action: string): boolean
 {
@@ -59,6 +61,21 @@ function ignoreBuilderAction(action: string): boolean
   return false;
 }
 
+export async function getChromeDebugAddress()
+{
+  try
+  {
+    const res = await (request as any)('GET', 'http://localhost:9222/json');
+    const resBody = JSON.parse(res.getBody());
+    const wsAddress = resBody[resBody.length - 1]['webSocketDebuggerUrl'];
+    return wsAddress;
+  } catch (err)
+  {
+    winston.error(err);
+    return undefined;
+  }
+}
+
 export async function waitForInput(msg: string)
 {
   const rl = readline.createInterface(
@@ -67,7 +84,7 @@ export async function waitForInput(msg: string)
       output: process.stdout,
       terminal: true,
     });
-  const answer = await rl.questionAsync(msg);
+  await rl.questionAsync(msg);
   rl.close();
 }
 
@@ -94,6 +111,7 @@ export async function replayBuilderActions(page, url, actions, records, actionCa
       console.log('Ignoring action: ' + String(action));
       continue;
     }
+    await page.mouse.move(0, 0);
     await page.evaluate((act) =>
     {
       return window['TerrainTools'].terrainStoreLogger.replayAction(window['TerrainTools'].terrainStore, act);

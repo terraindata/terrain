@@ -56,18 +56,18 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
-import DatabaseConfig from '../database/DatabaseConfig';
-import { Export, ExportConfig } from '../io/Export';
-import { Import } from '../io/Import';
-import { Sources } from '../io/sources/Sources';
+import { ExportConfig } from '../io/Export';
+import { exprt } from '../io/ExportRouter';
+import { imprt } from '../io/ImportRouter';
+import { ImportSourceConfig, Sources } from '../io/sources/Sources';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 import SchedulerConfig from './SchedulerConfig';
+import SchedulerLogs from './SchedulerLogs';
 
-export const exprt: Export = new Export();
-export const imprt: Import = new Import();
 export const credentials: Credentials = new Credentials();
-const sources = new Sources();
+export const schedulerLogs: SchedulerLogs = new SchedulerLogs();
+export const sources = new Sources();
 
 export class Scheduler
 {
@@ -222,9 +222,19 @@ export class Scheduler
         jobId = 7;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
-      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'mailchimp')
+      else if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'spreadsheets')
       {
         jobId = 8;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'spreadsheets')
+      {
+        jobId = 9;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'mailchimp')
+      {
+        jobId = 10;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
 
@@ -303,13 +313,17 @@ export class Scheduler
     // 5: export via local filesystem
     // 6: import via magento (not implemented yet)
     // 7: export via magento
-    // 8: export via mailchimp
+    // 8: import via spreadsheets
+    // 9: export via spreadsheets (not implemented yet)
+    // 10: export via mailchimp
     await this.createJob(async (scheduleID: number, fields: object, // 0
       transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
         const sftp = new Client();
+        let successMsg: string = '';
+        let errMsg: string = '';
         let sftpconfig: object = {};
         try
         {
@@ -318,7 +332,9 @@ export class Scheduler
           const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
           if (creds.length === 0)
           {
-            return rejectJob('No SFTP credentials matched parameters.');
+            errMsg = 'No SFTP credentials matched parameters.';
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+            return rejectJob(errMsg);
           }
           try
           {
@@ -326,6 +342,7 @@ export class Scheduler
           }
           catch (e)
           {
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, e.message);
             return rejectJob(e.message);
           }
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
@@ -363,15 +380,19 @@ export class Scheduler
             {
               readStream = await sftp.get(importFilename, false, encoding);
               winston.info('Schedule ' + scheduleID.toString() + ': Starting import with sftp');
-              const result = await imprt.upsert(readStream, fields, true);
+              await imprt.upsert(readStream, fields, true);
               await this.setJobStatus(scheduleID, 0);
               await sftp.end();
-              winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with sftp.');
-              return resolveJob('Successfully completed scheduled import with sftp.');
+              successMsg = 'Successfully completed scheduled import with sftp.';
+              winston.info('Schedule ' + scheduleID.toString() + ': ' + successMsg);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
+              return resolveJob(successMsg);
             }
             catch (e)
             {
-              winston.info('Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string));
+              errMsg = ((e as any).toString() as string);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+              winston.info('Schedule ' + scheduleID.toString() + ': Error while importing: ' + errMsg);
             }
             return rejectJob('Failure to import.');
           }
@@ -380,13 +401,17 @@ export class Scheduler
             winston.info('Schedule ' + scheduleID.toString() + ': Failed to complete scheduled import with sftp.');
           }
           await this.setJobStatus(scheduleID, 0);
-          return rejectJob('Failed to import.');
+          errMsg = 'Failed to import: if statement conditions failed requirements.';
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          return rejectJob(errMsg);
         }
         catch (e)
         {
-          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
           await this.setJobStatus(scheduleID, 0);
           await sftp.end();
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
           return rejectJob(e.toString());
         }
       });
@@ -398,6 +423,8 @@ export class Scheduler
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
         const sftp = new Client();
+        let successMsg: string = '';
+        let errMsg: string = '';
         let sftpconfig: object = {};
         try
         {
@@ -414,6 +441,8 @@ export class Scheduler
           }
           catch (e)
           {
+            errMsg = e.message;
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
             return rejectJob(e.message);
           }
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
@@ -433,34 +462,44 @@ export class Scheduler
             }
             catch (e)
             {
-              winston.info('Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string));
+              errMsg = 'Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string);
+              winston.info(errMsg);
               await this.setJobStatus(scheduleID, 0);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
               return rejectJob('Failed to export.');
             }
-            let readStream: stream.Readable;
+
             try
             {
-              readStream = await sftp.put(writeStream, path, false, encoding);
+              await sftp.put(writeStream, path, false, encoding);
               await sftp.end();
-              winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export with sftp.');
+              successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export with sftp.';
+              winston.info(successMsg);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
               return resolveJob('Successfully completed scheduled export with sftp.');
             }
             catch (e)
             {
-              winston.info('Schedule ' + scheduleID.toString() +
-                ': Error while trying to write file. Do you have write permission?');
+              errMsg = 'Schedule ' + scheduleID.toString() +
+                ': Error while trying to write file. Do you have write permission?';
+              winston.info(errMsg);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
             }
             await this.setJobStatus(scheduleID, 0);
             return rejectJob('Failed to export.');
           }
           else
           {
-            winston.info('Unable to export to that file. Are you sure that path exists?');
+            errMsg = 'Unable to export to that file. Are you sure that path exists?';
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
           }
         }
         catch (e)
         {
-          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
           await this.setJobStatus(scheduleID, 0);
           await sftp.end();
           return rejectJob(e.toString());
@@ -474,6 +513,8 @@ export class Scheduler
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
         let httpJobConfig;
+        let successMsg: string = '';
+        let errMsg: string = '';
         try
         {
           await this.setJobStatus(scheduleID, 1);
@@ -488,13 +529,17 @@ export class Scheduler
           }
           catch (e)
           {
-            return rejectJob(e.message);
+            errMsg = e.message;
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+            return rejectJob(errMsg);
           }
           if (httpJobConfig['baseURL'] === undefined ||
             (httpJobConfig['baseURL'] !== undefined && transport['filename'] !== undefined
               && transport['filename'].substr(0, httpJobConfig['baseURL'].length) !== httpJobConfig['baseURL']))
           {
-            return rejectJob('Invalid base URL ' + (transport['filename'].substr(0, httpJobConfig['baseURL'].length) as string));
+            errMsg = 'Invalid base URL ' + (transport['filename'].substr(0, httpJobConfig['baseURL'].length) as string);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+            return rejectJob(errMsg);
           }
           delete httpJobConfig['baseURL'];
           httpJobConfig['uri'] = transport['filename'];
@@ -504,14 +549,18 @@ export class Scheduler
           {
             request(httpJobConfig).pipe(readStream);
             winston.info('Schedule ' + scheduleID.toString() + ': Starting import with http');
-            const result = await imprt.upsert(readStream, fields, true);
+            await imprt.upsert(readStream, fields, true);
             await this.setJobStatus(scheduleID, 0);
             winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with http.');
-            return resolveJob('Successfully completed scheduled import with http.');
+            successMsg = 'Successfully completed scheduled import with http.';
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
+            return resolveJob(successMsg);
           }
           catch (e)
           {
-            winston.info('Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string));
+            errMsg = 'Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string);
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
           }
 
           await this.setJobStatus(scheduleID, 0);
@@ -519,9 +568,11 @@ export class Scheduler
         }
         catch (e)
         {
-          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
           await this.setJobStatus(scheduleID, 0);
-          return rejectJob(e.toString());
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          return rejectJob(errMsg);
         }
       });
     });
@@ -540,6 +591,8 @@ export class Scheduler
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
+        let successMsg: string = '';
+        let errMsg: string = '';
         try
         {
           let readStream: stream.Readable | string;
@@ -549,27 +602,36 @@ export class Scheduler
             readStream = await this._readFromFilesystem(transport['filename']);
             if (typeof readStream === 'string')
             {
-              winston.info('Schedule ' + scheduleID.toString() + ': Failed to complete scheduled import from local filesystem.');
-              return rejectJob(readStream as string);
+              errMsg = 'Schedule ' + scheduleID.toString() +
+                ': Failed to complete scheduled import from local filesystem. Error: ' + (readStream as string);
+              winston.info(errMsg);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+              return rejectJob(errMsg);
             }
             winston.info('Schedule ' + scheduleID.toString() + ': Starting import with sftp');
-            const result = await imprt.upsert(readStream as stream.Readable, fields, true);
+            await imprt.upsert(readStream as stream.Readable, fields, true);
             await this.setJobStatus(scheduleID, 0);
-            winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from local filesystem.');
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from local filesystem.';
+            winston.info(successMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
             return resolveJob('Successfully completed scheduled import from local filesystem.');
           }
           catch (e)
           {
-            winston.info('Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string));
+            errMsg = 'Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string);
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
           }
           await this.setJobStatus(scheduleID, 0);
           return rejectJob('Failed to import.');
         }
         catch (e)
         {
-          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
           await this.setJobStatus(scheduleID, 0);
-          return rejectJob(e.toString());
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          return rejectJob(errMsg);
         }
       });
     });
@@ -579,6 +641,8 @@ export class Scheduler
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
+        let successMsg: string = '';
+        let errMsg: string = '';
         try
         {
           const path: string = transport['filename'];
@@ -591,8 +655,10 @@ export class Scheduler
           }
           catch (e)
           {
-            winston.info('Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string));
+            errMsg = 'Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string);
+            winston.info(errMsg);
             await this.setJobStatus(scheduleID, 0);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
             return rejectJob('Failed to export.');
           }
           try
@@ -602,26 +668,35 @@ export class Scheduler
             {
               throw new Error(didWriteToFile);
             }
-            winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to local filesystem.');
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to local filesystem.';
+            winston.info(successMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
             return resolveJob('Successfully completed scheduled export to local filesystem.');
           }
           catch (e)
           {
+            errMsg = '';
             if (e.message !== undefined)
             {
-              winston.info('Error: ' + ((e.message as string).toString() as string));
+              errMsg += 'Error: ' + ((e.message as string).toString() as string) + '.\n';
+              winston.info(errMsg);
             }
+            errMsg += 'Schedule ' + scheduleID.toString() +
+              ': Error while trying to write file. Do you have write permission?';
             winston.info('Schedule ' + scheduleID.toString() +
               ': Error while trying to write file. Do you have write permission?');
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
           }
           await this.setJobStatus(scheduleID, 0);
           return rejectJob('Failed to export.');
         }
         catch (e)
         {
-          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
           await this.setJobStatus(scheduleID, 0);
-          return rejectJob(e.toString());
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          return rejectJob(errMsg);
         }
       });
     });
@@ -641,6 +716,8 @@ export class Scheduler
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
+        let successMsg: string = '';
+        let errMsg: string = '';
         try
         {
           await this.setJobStatus(scheduleID, 1);
@@ -658,12 +735,16 @@ export class Scheduler
                 body:
                   JSON.parse(transport['filename']),
               };
-            const result = await sources.handleTemplateSourceExport(magentoArgs, jsonStream as stream.Readable);
+            const result = await sources.handleTemplateExportSource(magentoArgs, jsonStream as stream.Readable);
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to magento. Response: ' + result;
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
           }
         }
         catch (e)
         {
-          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string);
+          winston.info(errMsg);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
           await this.setJobStatus(scheduleID, 0);
           return rejectJob(e.toString());
         }
@@ -671,6 +752,71 @@ export class Scheduler
     });
 
     await this.createJob(async (scheduleID: number, fields: object, transport: object, // 8
+      sort: string, encoding?: string | null) => // import from spreadsheets
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        let successMsg: string = '';
+        let errMsg: string = '';
+        try
+        {
+          try
+          {
+            await this.setJobStatus(scheduleID, 1);
+            const spreadsheetArgs =
+              {
+                body:
+                  JSON.parse(transport['filename']),
+              };
+            spreadsheetArgs['body']['source']['params']['credentialId'] = transport['id'];
+            const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateImportSource(spreadsheetArgs);
+            if (typeof imprtSourceConfig === 'string')
+            {
+              errMsg = 'Schedule ' + scheduleID.toString() +
+                ': Failed to complete scheduled import from Google spreadsheets. Error: ' + (imprtSourceConfig as string);
+              winston.info(errMsg);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+              return rejectJob(errMsg);
+            }
+            winston.info('Schedule ' + scheduleID.toString() + ': Starting import with Google spreadsheets');
+            await imprt.upsert(imprtSourceConfig.stream as stream.Readable, fields, true);
+            await this.setJobStatus(scheduleID, 0);
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from Google spreadsheets.';
+            winston.info(successMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
+            return resolveJob('Successfully completed scheduled import from Google spreadsheets.');
+          }
+          catch (e)
+          {
+            errMsg = 'Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string);
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          }
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob('Failed to import.');
+        }
+        catch (e)
+        {
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
+          await this.setJobStatus(scheduleID, 0);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          return rejectJob(errMsg);
+        }
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 9
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // export to spreadsheets
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        // TODO add this after adding Google spreadsheets as an ETL source
+        resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 10
                                 sort: string, encoding?: string | null) => // export to mailchimp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>

@@ -44,18 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
-
-import * as _ from 'lodash';
 import * as stream from 'stream';
-import * as winston from 'winston';
-
-import { Credentials } from '../../credentials/Credentials';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import DatabaseController from '../../../database/DatabaseController';
-import MySQLClient from '../../../database/mysql/client/MySQLClient';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
+import { Credentials } from '../../credentials/Credentials';
+import CSVExportTransform from '../streams/CSVExportTransform';
 
 export const credentials: Credentials = new Credentials();
 
@@ -80,13 +75,12 @@ export class MySQL
   {
     return new Promise<stream.Readable | string>(async (resolve, reject) =>
     {
-      const writer = csvWriter();
-      const pass = new stream.PassThrough();
-      writer.pipe(pass);
       if (typeof mysqlRowConfig === 'string')
       {
         return resolve(mysqlRowConfig);
       }
+
+      const writer = new CSVExportTransform(Object.keys(mysqlRowConfig.rows[0]));
       if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
       {
         (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
@@ -95,7 +89,7 @@ export class MySQL
         });
       }
       writer.end();
-      resolve(pass);
+      resolve(writer);
     });
   }
 

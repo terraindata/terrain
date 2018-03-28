@@ -64,12 +64,13 @@ const ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-c
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { getChromeDebugAddress } from '../../FullstackUtils';
 
 expect.extend({ toMatchImageSnapshot } as any);
 
 async function takeAndCompareScreenShot(page, options?)
 {
-  const localOption = {failureThreshold: '0.01', failureThresholdType: 'percent'};
+  const localOption = { failureThreshold: '0.01', failureThresholdType: 'percent' };
   if (options)
   {
     Object.assign(localOption, options);
@@ -127,31 +128,16 @@ async function loginToBuilder(page, url)
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(ALGORITHM_SELECTOR);
-  await page.click(ALGORITHM_SELECTOR, {clickCount: 2});
+  await page.click(ALGORITHM_SELECTOR, { clickCount: 2 });
   winston.info('Select algorithm');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(CARDSTARTER_SELECTOR);
-  await page.click(CARDSTARTER_SELECTOR, {clickCOunt: 2});
+  await page.click(CARDSTARTER_SELECTOR, { clickCOunt: 2 });
   winston.info('Start builder');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
-}
-
-async function getChromeDebugAddress()
-{
-  try
-  {
-    const res = await (request as any)('GET', 'http://localhost:9222/json');
-    const resBody = JSON.parse(res.getBody());
-    const wsAddress = resBody[resBody.length - 1]['webSocketDebuggerUrl'];
-    return wsAddress;
-  } catch (err)
-  {
-    winston.error(err);
-    return undefined;
-  }
 }
 
 describe('jest-image-snapshot usage with an image received from puppeteer', () =>
@@ -170,11 +156,11 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
 
   it('login', async () =>
   {
-      page = await browser.newPage();
-      winston.info('Created a new page.');
-      await page.setViewport({width: 1600, height: 1200});
-      const url = `http://${ip.address()}:3000`;
-      await loginToBuilder(page, url);
+    page = await browser.newPage();
+    winston.info('Created a new page.');
+    await page.setViewport({ width: 1600, height: 1200 });
+    const url = `http://${ip.address()}:3000`;
+    await loginToBuilder(page, url);
   }, 60000);
 
   afterAll(async () =>

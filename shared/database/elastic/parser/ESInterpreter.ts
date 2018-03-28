@@ -113,23 +113,32 @@ export default class ESInterpreter
         root.clause = this.config.getClause('body');
       }
 
+      let alias: string | null = null;
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
           if (info.parameter !== undefined)
           {
-            if (info.parameter.split('.')[0] === 'parent')
+            const ps = info.parameter.split('.');
+            if (alias !== null && ps[0] === alias)
             {
               // give a special value to parameterValue
               info.parameterValue = new ESJSONParser(info.value);
             }
             else
             {
-              const value: null | any = this.params[info.parameter];
-              if (value === undefined)
+              let value: any = this.params;
+              for (const p of ps)
               {
-                this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
+                value = value[p];
+
+                if (value === undefined)
+                {
+                  this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
+                  return true;
+                }
               }
+
               info.parameterValue = new ESJSONParser(JSON.stringify(value));
               if (info.parameterValue.hasError())
               {
@@ -144,7 +153,20 @@ export default class ESInterpreter
           }
 
           return true;
-        });
+        },
+        (info: ESValueInfo): boolean =>
+        {
+          if (info.clause !== undefined && info.clause.type === 'groupjoin_name' && alias === null)
+          {
+            alias = 'parent';
+          }
+          else if (info.clause !== undefined && info.clause.type === 'parentAlias' && alias !== null)
+          {
+            alias = info.value;
+          }
+          return true;
+        },
+      );
     } catch (e)
     {
       this.accumulateError(this.rootValueInfo, 'Failed to mark the json object ' + String(e.message));

@@ -44,37 +44,31 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
-import sha1 = require('sha1');
-
-import * as equal from 'deep-equal';
 import * as _ from 'lodash';
+import sha1 = require('sha1');
 import * as stream from 'stream';
 import * as winston from 'winston';
 
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
-import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
 import { ESJSONParser } from '../../../../shared/database/elastic/parser/ESJSONParser';
-import ESParser from '../../../../shared/database/elastic/parser/ESParser';
-import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
-
 import { getParsedQuery } from '../../app/Util';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Tasty from '../../tasty/Tasty';
 import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
+import AExportTransform from './streams/AExportTransform';
+import CSVExportTransform from './streams/CSVExportTransform';
+import ExportTransform from './streams/ExportTransform';
+import JSONExportTransform from './streams/JSONExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
 
 const exportTemplates = new ExportTemplates();
-
 const TastyItems: Items = new Items();
-const typeParser: CSVTypeParser = new CSVTypeParser();
 
 export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 {
@@ -84,123 +78,123 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 
 export class Export
 {
-  private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
-  private SCROLL_TIMEOUT: string = '60s';
-  private MAX_ROW_THRESHOLD: number = 2000;
-
-  public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
+  public static mergeGroupJoin(doc: object): object
   {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
+    if (doc['_source'] !== undefined)
     {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(exprt.dbid);
-      if (database === undefined)
+      const sourceKeys = Object.keys(doc['_source']);
+      const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
+      if (rootKeys.length > 0) // there were group join objects
       {
-        return reject('Database "' + exprt.dbid.toString() + '" not found.');
-      }
-
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
-
-      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
-      {
-        return reject('Filetype must be either CSV or JSON.');
-      }
-
-      let objectKeyValue: string | undefined;
-      if (exprt.filetype === 'json [type object]' && exprt.objectKey !== undefined)
-      {
-        objectKeyValue = exprt.objectKey;
-      }
-
-      if (headless)
-      {
-        // get a template given the template ID
-        const templates: ExportTemplateConfig[] = await exportTemplates.get(exprt.templateId);
-        if (templates.length === 0)
+        const duplicateRootKeys: string[] = [];
+        rootKeys.forEach((rootKey) =>
         {
-          return reject('Template not found. Did you supply an export template ID?');
-        }
-        const template = templates[0] as object;
-        if (exprt.dbid !== template['dbid'])
+          if (sourceKeys.indexOf(rootKey) > -1)
+          {
+            duplicateRootKeys.push(rootKey);
+          }
+        });
+        if (duplicateRootKeys.length !== 0)
         {
-          return reject('Template database ID does not match supplied database ID.');
+          throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
         }
-        for (const templateKey of Object.keys(template))
+        rootKeys.forEach((rootKey) =>
         {
-          exprt[templateKey] = template[templateKey];
-        }
+          doc['_source'][rootKey] = doc[rootKey];
+          delete doc[rootKey];
+        });
       }
+    }
+    return doc;
+  }
 
-      if (exprt.columnTypes === undefined)
-      {
-        return reject('Must provide export template column types.');
-      }
-      if (exprt.filetype === 'json [type object]' && objectKeyValue !== undefined)
-      {
-        exprt.objectKey = objectKeyValue;
-      }
+  private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
 
+  public async export(exportConfig: ExportConfig, headless: boolean): Promise<stream.Readable>
+  {
+    const database: DatabaseController | undefined = DatabaseRegistry.get(exportConfig.dbid);
+    if (database === undefined)
+    {
+      throw Error('Database "' + exportConfig.dbid.toString() + '" not found.');
+    }
+
+    if (database.getType() !== 'ElasticController')
+    {
+      throw Error('File export currently is only supported for Elastic databases.');
+    }
+
+    if (exportConfig.filetype !== 'csv' && exportConfig.filetype !== 'json' && exportConfig.filetype !== 'json [type object]')
+    {
+      throw Error('Filetype must be either CSV or JSON.');
+    }
+
+    if (headless)
+    {
+      // get a template given the template ID
+      const templates: ExportTemplateConfig[] = await exportTemplates.get(exportConfig.templateId);
+      if (templates.length === 0)
+      {
+        throw Error('Template not found. Did you supply an export template ID?');
+      }
+      const template = templates[0] as object;
+      if (exportConfig.dbid !== template['dbid'])
+      {
+        throw Error('Template database ID does not match supplied database ID.');
+      }
+      for (const templateKey of Object.keys(template))
+      {
+        exportConfig[templateKey] = template[templateKey];
+      }
+    }
+
+    const mapping: object = exportConfig.columnTypes;
+    if (mapping === undefined)
+    {
+      throw Error('Must provide export template column types.');
+    }
+
+    return new Promise<stream.Readable>(async (resolve, reject) =>
+    {
       // get query data from algorithmId or query (or variant Id if necessary)
       let qry: string = '';
-      if ((exprt as any).variantId !== undefined && exprt.algorithmId === undefined)
+      if (exportConfig['variantId'] !== undefined && exportConfig.algorithmId === undefined)
       {
-        exprt.algorithmId = (exprt as any).variantId;
+        exportConfig.algorithmId = exportConfig['variantId'];
       }
-      if (exprt.algorithmId !== undefined && exprt.query === undefined)
+      if (exportConfig.algorithmId !== undefined && exportConfig.query === undefined)
       {
-        qry = await this._getQueryFromAlgorithm(exprt.algorithmId);
+        qry = await this._getQueryFromAlgorithm(exportConfig.algorithmId);
       }
-      else if (exprt.algorithmId === undefined && exprt.query !== undefined)
+      else if (exportConfig.algorithmId === undefined && exportConfig.query !== undefined)
       {
-        qry = exprt.query;
+        qry = exportConfig.query;
       }
       else
       {
-        return reject('Must provide either algorithm ID or query, not both or neither.');
+        throw Error('Must provide either algorithm ID or query, not both or neither.');
       }
+
       if (qry === '')
       {
-        return reject('Empty query provided.');
+        throw Error('Empty query provided.');
       }
 
-      const mapping: object = exprt.columnTypes;
-      if (typeof mapping === 'string')
+      // get list of export column names
+      const columnNames: string[] = Object.keys(mapping);
+      if (exportConfig.rank === true && columnNames.indexOf('TERRAINRANK') === -1)
       {
-        return reject(mapping);
-      }
-
-      let writer: any;
-      if (exprt.filetype === 'csv')
-      {
-        writer = csvWriter();
-      }
-      else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        writer = new stream.PassThrough();
-      }
-
-      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        if (exprt.filetype === 'json [type object]')
-        {
-          writer.write('{ \"');
-          writer.write(exprt.objectKey);
-          writer.write('\":');
-        }
-        writer.write('[');
+        columnNames.push('TERRAINRANK');
       }
 
       const originalMapping: object = {};
       // generate original mapping if there were any renames
-      const allNames = Object.keys(exprt.columnTypes);
+      const allNames = Object.keys(mapping);
       allNames.forEach((value, i) =>
       {
         originalMapping[value] = value;
       });
 
-      const renameTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'rename');
+      const renameTransformations: object[] = exportConfig.transformations.filter((transformation) => transformation['name'] === 'rename');
       renameTransformations.forEach((transformation) =>
       {
         originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
@@ -209,117 +203,60 @@ export class Export
       // TODO add transformation check for addcolumn and update mapping accordingly
       const qh: QueryHandler = database.getQueryHandler();
       const payload = {
-        database: exprt.dbid,
+        database: exportConfig.dbid,
         type: 'search',
         streaming: true,
         databasetype: 'elastic',
         body: qry,
       };
 
-      const respStream: any = await qh.handleQuery(payload);
-      if (respStream === undefined || (respStream.hasError !== undefined && respStream.hasError()))
+      const respStream: stream.Readable = await qh.handleQuery(payload) as stream.Readable;
+      if (respStream === undefined)
       {
-        writer.end();
-        return reject('Nothing to export.');
+        throw Error('Nothing to export.');
       }
 
       try
       {
-        const extractTransformations = exprt.transformations.filter((transformation) => transformation['name'] === 'extract');
-        exprt.transformations = exprt.transformations.filter((transformation) => transformation['name'] !== 'extract');
+        const extractTransformations = exportConfig.transformations.filter((transformation) => transformation['name'] === 'extract');
+        exportConfig.transformations = exportConfig.transformations.filter((transformation) => transformation['name'] !== 'extract');
 
         winston.info('Beginning export transformations.');
-        const cfg = {
+        const exportTransformConfig = {
           extractTransformations,
-          exprt,
+          exportConfig,
           fieldArrayDepths: {},
           id: 1,
           mapping: originalMapping,
         };
 
-        let isFirstJSONObj: boolean = true;
-        await new Promise(async (res, rej) =>
+        const documentTransform: ExportTransform = new ExportTransform(this, exportTransformConfig);
+        let exportTransform: AExportTransform;
+        switch (exportConfig.filetype)
         {
-          respStream.on('data', (docs) =>
-          {
-            if (docs === undefined || docs === null)
-            {
-              return res();
-            }
+          case 'json':
+            exportTransform = new JSONExportTransform();
+            break;
+          case 'csv':
+            exportTransform = new CSVExportTransform(columnNames);
+            break;
+          default:
+            throw Error('File type must be either CSV or JSON.');
+        }
 
-            try
-            {
-              for (let doc of docs)
-              {
-                doc = this._postProcessDoc(doc, cfg);
-                if (exprt.filetype === 'csv')
-                {
-                  writer.write(doc);
-                }
-                else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-                {
-                  isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-                  writer.write(JSON.stringify(doc));
-                }
-
-                if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-                {
-                  writer.write(']');
-                  if (exprt.filetype === 'json [type object]')
-                  {
-                    writer.write('}');
-                  }
-                }
-              }
-            }
-            catch (e)
-            {
-              return rej(e);
-            }
-          });
-
-          respStream.on('end', () =>
-          {
-            return res();
-          });
-
-          respStream.on('error', (err) =>
-          {
-            winston.error(err);
-            return rej(err);
-          });
-        });
-
-        writer.end();
-        return resolve(writer);
+        resolve(respStream.pipe(documentTransform).pipe(exportTransform));
       }
       catch (e)
       {
-        respStream.close();
-        return reject(e);
+        reject(e);
       }
     });
   }
 
-  public async getNamesAndTypesFromQuery(dbid: number, qry: string): Promise<object | string>
-  {
-    qry = this._shouldRandomSample(qry);
-    const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-    if (database === undefined)
-    {
-      throw new Error('Database "' + dbid.toString() + '" not found.');
-    }
-    if (database.getType() !== 'ElasticController')
-    {
-      throw new Error('File export currently is only supported for Elastic databases.');
-    }
-    return this._getAllFieldsAndTypesFromQuery(database, qry, dbid);
-  }
-
-  private _postProcessDoc(doc: object, cfg: any): object
+  public _postProcessDoc(doc: object, cfg: any): object
   {
     // merge groupJoins with _source if necessary
-    doc = this._mergeGroupJoin(doc);
+    doc = Export.mergeGroupJoin(doc);
 
     // extract field after doing all merge joins
     cfg.extractTransformations.forEach((transform) =>
@@ -352,15 +289,15 @@ export class Export
           cfg.fieldArrayDepths[field] = this._getArrayDepth(doc[field]);
         }
 
-        if (Array.isArray(doc[field]) && cfg.exprt.filetype === 'csv')
+        if (Array.isArray(doc[field]) && cfg.exportConfig.filetype === 'csv')
         {
           doc[field] = this._convertArrayToCSVArray(doc[field]);
         }
       }
     }
 
-    doc = this._transformAndCheck(doc, cfg.exprt, false);
-    if (cfg.exprt.rank === true)
+    doc = this._transformAndCheck(doc, cfg.exportConfig, false);
+    if (cfg.exportConfig.rank === true)
     {
       if (doc['TERRAINRANK'] !== undefined)
       {
@@ -370,28 +307,6 @@ export class Export
       cfg.id++;
     }
     return doc;
-  }
-
-  private _shouldRandomSample(qry: string): string
-  {
-    let parser = getParsedQuery(qry);
-    const query = parser.getValue();
-    if (query['size'] !== undefined)
-    {
-      if (typeof query['size'] === 'number' && query['size'] > this.MAX_ROW_THRESHOLD)
-      {
-        query['size'] = this.MAX_ROW_THRESHOLD;
-      }
-    }
-
-    query.query = {
-      function_score: {
-        random_score: {},
-        query: query.query,
-      },
-    };
-    parser = new ESJSONParser(JSON.stringify(query), true);
-    return ESConverter.formatES(parser as ESJSONParser);
   }
 
   private async _getQueryFromAlgorithm(algorithmId: number): Promise<string>
@@ -416,216 +331,6 @@ export class Export
         return reject('Malformed algorithm');
       }
     });
-  }
-
-  private async _getAllFieldsAndTypesFromQuery(database: DatabaseController, qry: string,
-    dbid?: number, maxSize?: number): Promise<object | string>
-  {
-    return new Promise<object | string>(async (resolve, reject) =>
-    {
-      const fieldObj: object = {};
-      let fieldsAndTypes: object = {};
-      let rankCounter = 1;
-      const qh: QueryHandler = database.getQueryHandler();
-      const payload = {
-        database: dbid as number,
-        type: 'search',
-        streaming: false,
-        databasetype: 'elastic',
-        body: qry,
-      };
-      const qryResponse: any = await qh.handleQuery(payload);
-      if (qryResponse === undefined || qryResponse.hasError())
-      {
-        return resolve(fieldObj);
-      }
-      const resp = qryResponse.result;
-      if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
-      {
-        return resolve(fieldObj);
-      }
-      const newDocs: object[] = resp.hits.hits as object[];
-      if (newDocs.length === undefined)
-      {
-        return resolve('Something was wrong with the query.');
-      }
-      if (newDocs.length === 0)
-      {
-        return resolve(fieldObj);
-      }
-      fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
-      rankCounter += newDocs.length;
-      for (const field of Object.keys(fieldsAndTypes))
-      {
-        fieldObj[field] = this._getPriorityType(fieldsAndTypes[field]);
-      }
-      return resolve(fieldObj);
-    });
-  }
-
-  // boolean, long, double, string, array, object ({...})
-  // returns an object with keys as the fields and values as arrays of the detected types
-  private async _getFieldsAndTypesFromDocuments(docs: object[], fieldObj: object): Promise<object>
-  {
-    if (fieldObj === undefined)
-    {
-      fieldObj = {};
-    }
-    return new Promise<object>(async (resolve, reject) =>
-    {
-      for (const doc of docs)
-      {
-        const mergeDoc = this._mergeGroupJoin(doc);
-        const fields: string[] = Object.keys(doc['_source']);
-        for (const field of fields)
-        {
-          const fullTypeObj = { type: 'text', index: 'not_analyzed', analyzer: null as (string | null) };
-          switch (typeof doc['_source'][field])
-          {
-            case 'number':
-              fullTypeObj.type = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
-              if (!fieldObj.hasOwnProperty(field))
-              {
-                fieldObj[field] = [fullTypeObj];
-              }
-              else
-              {
-                if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
-                  .indexOf(true) > -1)
-                {
-                  fieldObj[field].concat(fullTypeObj);
-                }
-              }
-              break;
-            case 'boolean':
-              fullTypeObj.type = 'boolean';
-              if (!fieldObj.hasOwnProperty(field))
-              {
-                fieldObj[field] = [fullTypeObj];
-              }
-              else
-              {
-                if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
-                  .indexOf(true) < 0)
-                {
-                  fieldObj[field].concat(fullTypeObj);
-                }
-              }
-              break;
-            case 'object':
-              fullTypeObj.type = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
-              if (!fieldObj.hasOwnProperty(field))
-              {
-                fieldObj[field] = [fullTypeObj.type === 'array' ?
-                  this._recursiveArrayTypeHelper(doc['_source'][field]) : fullTypeObj];
-              }
-              else
-              {
-                if (fullTypeObj.type === 'array')
-                {
-                  const fullArrayObj: object = this._recursiveArrayTypeHelper(doc['_source'][field]);
-                  if (fieldObj[field].indexOf(fullArrayObj) < 0)
-                  {
-                    fieldObj[field].concat(fullArrayObj);
-                  }
-                }
-                else
-                {
-                  if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
-                    .indexOf(true) < 0)
-                  {
-                    fieldObj[field].concat(fullTypeObj);
-                  }
-                }
-              }
-              break;
-            default:
-              fullTypeObj.index = 'analyzed';
-              fullTypeObj.analyzer = 'standard';
-              if (!fieldObj.hasOwnProperty(field))
-              {
-                fieldObj[field] = [fullTypeObj];
-              }
-              else
-              {
-                fieldObj[field].concat(fullTypeObj);
-              }
-          }
-        }
-      }
-      return resolve(fieldObj);
-    });
-  }
-
-  private _recursiveArrayTypeHelper(fieldValue: any): object
-  {
-    if (Array.isArray(fieldValue))
-    {
-      return { type: 'array', innerType: this._recursiveArrayTypeHelper(fieldValue[0]) };
-    }
-    else
-    {
-      switch (typeof fieldValue)
-      {
-        case 'number':
-          return { type: fieldValue % 1 === 0 ? 'long' : 'double', innerType: null, index: 'not_analyzed', analyzer: null };
-        case 'boolean':
-          return { type: 'boolean', innerType: null, index: 'not_analyzed', analyzer: null };
-        case 'object':
-          return { type: 'object', innerType: null, index: 'not_analyzed', analyzer: null };
-        default:
-          return { type: 'text', innerType: null, index: 'analyzed', analyzer: 'standard' };
-      }
-    }
-  }
-
-  private _getInnermostType(arrayType: object): string
-  {
-    while (arrayType['type'] === 'array' && arrayType['innerType'] !== undefined && typeof arrayType['innerType'] === 'object')
-    {
-      arrayType = arrayType['innerType'];
-    }
-    return arrayType['type'];
-  }
-
-  private _getPriorityType(types: object[]): object
-  {
-    const topPriorityTypes: string[] = ['array', 'object']; // string is default case
-    if (types.length === 1)
-    {
-      return types[0];
-    }
-
-    for (const type of topPriorityTypes)
-    {
-      if (types.map((typesObj) => typesObj['type']).indexOf('array') >= 0)
-      {
-        const arrayTypes: object[] = types.filter((typeObj) => typeObj['type'] === 'array');
-        const innermostTypes: string[] = arrayTypes.map((arrayType) =>
-        {
-          return this._getInnermostType(arrayType);
-        });
-        if (types.length === 1)
-        {
-          return arrayTypes[0];
-        }
-        if (equal(innermostTypes.sort(), ['double', 'long']))
-        {
-          return { type: 'double', index: 'not_analyzed', analyzer: null };
-        }
-        return { type: 'text', index: 'analyzed', analyzer: 'standard' };
-      }
-      else if (types.map((typesObj) => typesObj['type']).indexOf('object') >= 0)
-      {
-        return { type: 'object', index: 'not_analyzed', analyzer: null };
-      }
-    }
-
-    if (equal(types.map((typeObj) => typeObj['type']).sort(), ['double', 'long']))
-    {
-      return { type: 'double', index: 'not_analyzed', analyzer: null };
-    }
-    return { type: 'text', index: 'analyzed', analyzer: 'standard' };
   }
 
   private _applyTransforms(obj: object, transforms: object[]): object
@@ -789,16 +494,16 @@ export class Export
   /* checks whether obj has the fields and types specified by nameToType
    * returns an error message if there is one; else returns empty string
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
-  private _checkTypes(obj: object, exprt: ExportConfig): void
+  private _checkTypes(obj: object, exportConfig: ExportConfig): void
   {
-    const targetHash: string = this._buildDesiredHash(exprt.columnTypes);
-    const targetKeys: string = JSON.stringify(Object.keys(exprt.columnTypes).sort());
+    const targetHash: string = this._buildDesiredHash(exportConfig.columnTypes);
+    const targetKeys: string = JSON.stringify(Object.keys(exportConfig.columnTypes).sort());
 
     // parse dates
     const dateColumns: string[] = [];
-    for (const colName of Object.keys(exprt.columnTypes))
+    for (const colName of Object.keys(exportConfig.columnTypes))
     {
-      if (exprt.columnTypes.hasOwnProperty(colName) && this._getESType(exprt.columnTypes[colName]) === 'date')
+      if (exportConfig.columnTypes.hasOwnProperty(colName) && this._getESType(exportConfig.columnTypes[colName]) === 'date')
       {
         dateColumns.push(colName);
       }
@@ -821,19 +526,19 @@ export class Export
       {
         if (obj.hasOwnProperty(key))
         {
-          if (!this._jsonCheckTypesHelper(obj[key], exprt.columnTypes[key]))
+          if (!this._jsonCheckTypesHelper(obj[key], exportConfig.columnTypes[key]))
           {
             throw new Error('Encountered an object whose field "' + key + '"does not match the specified type (' +
-              JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj));
+              JSON.stringify(exportConfig.columnTypes[key]) + '): ' + JSON.stringify(obj));
           }
         }
       }
     }
 
     // check that all elements of arrays are of the same type
-    for (const field of Object.keys(exprt.columnTypes))
+    for (const field of Object.keys(exportConfig.columnTypes))
     {
-      if (exprt.columnTypes[field]['type'] === 'array')
+      if (exportConfig.columnTypes[field]['type'] === 'array')
       {
         if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
         {
@@ -846,113 +551,6 @@ export class Export
   private _convertArrayToCSVArray(arr: any[]): string
   {
     return JSON.stringify(arr);
-  }
-
-  /* parses string input from CSV and checks against expected types ; handles arrays recursively */
-  private _csvCheckTypesHelper(item: object, typeObj: object, field: string): boolean
-  {
-    switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
-    {
-      case 'double':
-        if (item[field] === '' || item[field] === 'null')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          const parsedValue: number | boolean = typeParser.getDoubleFromString(String(item[field]));
-          if (typeof parsedValue === 'number')
-          {
-            item[field] = parsedValue;
-            return true;
-          }
-          return false;
-        }
-        break;
-      case 'long':
-        if (item[field] === '' || item[field] === 'null')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          const parsedValue: number | boolean = typeParser.getDoubleFromString(String(item[field]));
-          if (typeof parsedValue === 'number')
-          {
-            item[field] = parsedValue;
-            return true;
-          }
-          return false;
-        }
-        break;
-      case 'boolean':
-        if (item[field] === 'true')
-        {
-          item[field] = true;
-        }
-        else if (item[field] === 'false')
-        {
-          item[field] = false;
-        }
-        else if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          return false;
-        }
-        break;
-      case 'date':
-        const date: number = Date.parse(item[field]);
-        if (!isNaN(date))
-        {
-          item[field] = new Date(date);
-        }
-        else if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          return false;
-        }
-        break;
-      case 'array':
-        if (item[field] === '')
-        {
-          item[field] = null;
-        }
-        else
-        {
-          try
-          {
-            if (typeof item[field] === 'string')
-            {
-              item[field] = JSON.parse(item[field]);
-            }
-          } catch (e)
-          {
-            return false;
-          }
-          if (!Array.isArray(item[field]))
-          {
-            return false;
-          }
-          let i: number = 0;
-          while (i < Object.keys(item[field]).length)    // lint hack to get around not recognizing item[field] as an array
-          {
-            if (!this._csvCheckTypesHelper(item[field], typeObj['innerType'], String(i)))
-            {
-              return false;
-            }
-            i++;
-          }
-        }
-        break;
-      default:  // "text" case, leave as string
-    }
-    return true;
   }
 
   /* assumes arrays are of uniform depth */
@@ -1051,36 +649,6 @@ export class Export
     return true;
   }
 
-  private _mergeGroupJoin(doc: object): object
-  {
-    if (doc['_source'] !== undefined)
-    {
-      const sourceKeys = Object.keys(doc['_source']);
-      const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
-      if (rootKeys.length > 0) // there were group join objects
-      {
-        const duplicateRootKeys: string[] = [];
-        rootKeys.forEach((rootKey) =>
-        {
-          if (sourceKeys.indexOf(rootKey) > -1)
-          {
-            duplicateRootKeys.push(rootKey);
-          }
-        });
-        if (duplicateRootKeys.length !== 0)
-        {
-          throw new Error('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
-        }
-        rootKeys.forEach((rootKey) =>
-        {
-          doc['_source'][rootKey] = doc[rootKey];
-          delete doc[rootKey];
-        });
-      }
-    }
-    return doc;
-  }
-
   // recursively attempts to parse strings to dates
   private _parseDatesHelper(item: string | object, field: string)
   {
@@ -1104,11 +672,11 @@ export class Export
   }
 
   // asynchronously perform transformations on each item to upsert, and check against expected resultant types
-  private _transformAndCheck(doc: object, exprt: ExportConfig, dontCheck?: boolean): object
+  private _transformAndCheck(doc: object, exportConfig: ExportConfig, dontCheck?: boolean): object
   {
     try
     {
-      doc = this._applyTransforms(doc, exprt.transformations);
+      doc = this._applyTransforms(doc, exportConfig.transformations);
     }
     catch (e)
     {
@@ -1117,9 +685,9 @@ export class Export
     // only include the specified columns
     // NOTE: unclear if faster to copy everything over or delete the unused ones
     const trimmedDoc: object = {};
-    for (const name of Object.keys(exprt.columnTypes))
+    for (const name of Object.keys(exportConfig.columnTypes))
     {
-      if (exprt.columnTypes.hasOwnProperty(name))
+      if (exportConfig.columnTypes.hasOwnProperty(name))
       {
         if (typeof doc[name] === 'string')
         {
@@ -1135,7 +703,7 @@ export class Export
     {
       try
       {
-        this._checkTypes(trimmedDoc, exprt);
+        this._checkTypes(trimmedDoc, exportConfig);
       }
       catch (e)
       {

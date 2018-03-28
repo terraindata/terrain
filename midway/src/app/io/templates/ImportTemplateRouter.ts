@@ -53,7 +53,6 @@ import { Permissions } from '../../permissions/Permissions';
 import * as Util from '../../Util';
 
 import UserConfig from '../../users/UserConfig';
-import { Import } from '../Import';
 import * as Auth from './Authenticate';
 import ImportTemplateConfig from './ImportTemplateConfig';
 import { ImportTemplates } from './ImportTemplates';
@@ -62,7 +61,6 @@ export const fieldTypes = new FieldTypes();
 export const importTemplates = new ImportTemplates();
 
 const Router = new KoaRouter();
-const imprt: Import = new Import();
 const perm: Permissions = new Permissions();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>

@@ -59,7 +59,6 @@ function getExpectedFile(): string
   return __filename.split('.')[0] + '.expected';
 }
 
-const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
 let tasty: Tasty.Tasty;
 let postgresController: PostgresController;
 

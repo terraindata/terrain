@@ -154,7 +154,7 @@ class ElasticClient
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-getscript
    */
-  public getScript<T>(params: Elastic.GetScriptParams,
+  public getScript(params: Elastic.GetScriptParams,
     callback: (error: any, response: any) => void): void
   {
     this.log('get script', params);
@@ -182,7 +182,7 @@ class ElasticClient
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-update
    */
-  public update<T>(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
+  public update(params: Elastic.UpdateDocumentParams, callback: (error: any, response: any) => void): void
   {
     this.log('update', params);
     this.delegate.update(params, callback);

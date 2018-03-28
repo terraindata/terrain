@@ -54,7 +54,6 @@ import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
 import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
 import * as Tasty from '../../src/tasty/Tasty';
-import { readFile } from '../Utils';
 
 let elasticDB: ElasticDB;
 let server;
@@ -814,14 +813,13 @@ describe('Query route tests', () =>
               }
             },
             "groupJoin": {
+              "parentAlias": "movie",
               "englishMovies": {
                 "_source": ["movieid", "overview"],
                 "query" : {
                   "bool" : {
                     "filter": [
-                      { "term": {"movieid" : @parent.movieid} }
-                    ],
-                    "must" : [
+                      { "term": {"movieid" : @movie.movieid} },
                       { "match": {"_index" : "movies"} },
                       { "match": {"_type" : "data"} }
                     ]
@@ -845,6 +843,88 @@ describe('Query route tests', () =>
         expect(respData['errors'].length).toEqual(0);
         expect(respData['result'].hits.hits.length).toEqual(5);
         expect(respData['result'].hits.hits[0]._id === respData['result'].hits.hits[0].englishMovies[0]._id);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Elastic mergeJoin query Result: POST /midway/v1/query', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          database: 1,
+          type: 'search',
+          body: `{
+            "size": 5,
+            "_source": ["movieid", "title"],
+            "query": {
+              "bool": {
+                "filter": [
+                  {
+                    "term": {
+                      "_index": "movies"
+                    }
+                  },
+                  {
+                    "term": {
+                      "_type": "data"
+                    }
+                  }
+                ],
+                "must": [
+                  { "match": { "status": "Released" } },
+                  { "match": { "language": "en" } }
+                ],
+                "must_not": [
+                  { "term": { "budget": 0 } },
+                  { "term": { "revenue": 0 } }
+                ]
+              }
+            },
+            "mergeJoin": {
+              "joinKey": "movieid",
+              "selfMergeJoin": {
+                "_source": ["movieid", "overview"],
+                "query" : {
+                  "bool": {
+                    "filter": [
+                      { "match": {"_index" : "movies"} },
+                      { "match": {"_type" : "data"} }
+                    ],
+                    "must_not": [
+                      { "term": { "budget": 0 } },
+                    ]
+                  }
+                },
+                "sort": "revenue",
+              }
+            }
+          }`,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(response.text);
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['errors'].length).toEqual(0);
+        expect(respData['result'].hits.hits.length).toEqual(5);
+        for (let i = 0; i < respData['result'].hits.hits.length; ++i)
+        {
+          expect(respData['result'].hits.hits[i]._id === respData['result'].hits.hits[i].selfMergeJoin[0]._id);
+          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin[0]._source.movieid);
+        }
       })
       .catch((error) =>
       {
@@ -1174,14 +1254,14 @@ describe('File io templates route tests', () =>
           dbid: 1,
           dbname: 'movies',
           tablename: 'data',
-          originalNames: ['pkey', 'column1', 'column2'],
+          originalNames: ['movieid', 'title', 'budget'],
           columnTypes:
             {
-              pkey: { type: 'long' },
-              column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
-              column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              movieid: { type: 'long' },
+              title: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              budget: { type: 'long' },
             },
-          primaryKeys: ['pkey'],
+          primaryKeys: ['movieid'],
           transformations: [],
         },
       })
@@ -1200,14 +1280,14 @@ describe('File io templates route tests', () =>
             dbname: 'movies',
             tablename: 'data',
             objectKey: '',
-            originalNames: ['pkey', 'column1', 'column2'],
+            originalNames: ['movieid', 'title', 'budget'],
             columnTypes:
               {
-                pkey: { type: 'long' },
-                column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
-                column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+                movieid: { type: 'long' },
+                title: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+                budget: { type: 'long' },
               },
-            primaryKeys: ['pkey'],
+            primaryKeys: ['movieid'],
             transformations: [],
             persistentAccessToken: persistentExportAccessToken,
           });
@@ -1239,14 +1319,14 @@ describe('File io templates route tests', () =>
           dbname: 'movies',
           tablename: 'data',
           objectKey: '',
-          originalNames: ['pkey', 'column1', 'column2'],
+          originalNames: ['movieid', 'title', 'budget'],
           columnTypes:
             {
-              pkey: { type: 'long' },
-              column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
-              column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              movieid: { type: 'long' },
+              title: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              budget: { type: 'long' },
             },
-          primaryKeys: ['pkey'],
+          primaryKeys: ['movieid'],
           transformations: [],
           persistentAccessToken,
         });
@@ -1394,7 +1474,8 @@ describe('File io templates route tests', () =>
           dbname: 'movies',
           templateId: exportTemplateID,
           filetype: 'csv',
-          query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+          query: '{\"sort\":[{\"movieid\":{\"order\":\"asc\"}}],\"query\":{\"bool\":'
+            + '{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
             + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
         },
       })
@@ -1403,10 +1484,65 @@ describe('File io templates route tests', () =>
       {
         expect(response.text).toBe(undefined);
         expect(response.body).not.toBe(undefined);
+        let respBuffer = response.body;
+        let numLines: number = 0;
+        const delim: string = '\r\n';
+        const firstLine: string = '1,Toy Story (1995),30000000\r\n';
+        let indexOfDelim: number = respBuffer.indexOf(delim);
+        expect(respBuffer.indexOf(firstLine)).toEqual(22);
+        while (indexOfDelim !== -1)
+        {
+          respBuffer = respBuffer.slice(indexOfDelim + delim.length);
+          numLines++;
+          indexOfDelim = respBuffer.indexOf(delim); // don't include header
+        }
+        expect(numLines).toEqual(15 + 1);
       })
       .catch((error) =>
       {
         fail('POST /midway/v1/export/headless request returned an error: ' + String(error));
+      });
+  });
+
+  test('Post headless export with 10k+ results: POST /midway/v1/export/headless', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/export/headless')
+      .send({
+        templateId: exportTemplateID,
+        persistentAccessToken: persistentExportAccessToken,
+        body: {
+          dbid: 1,
+          dbname: 'movies',
+          templateId: exportTemplateID,
+          filetype: 'csv',
+          query: '{\"sort\":[{\"movieid\":{\"order\":\"asc\"}}],\"query\":{\"bool\":'
+            + '{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+            + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":11000}',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe(undefined);
+        expect(response.body).not.toBe(undefined);
+        let respBuffer = response.body;
+        let numLines: number = 0;
+        const delim: string = '\r\n';
+        const firstLine: string = '1,Toy Story (1995),30000000\r\n';
+        let indexOfDelim: number = respBuffer.indexOf(delim);
+        expect(respBuffer.indexOf(firstLine)).toEqual(22);
+        while (indexOfDelim !== -1)
+        {
+          respBuffer = respBuffer.slice(indexOfDelim + delim.length);
+          numLines++;
+          indexOfDelim = respBuffer.indexOf(delim);
+        }
+        expect(numLines).toEqual(11000 + 1); // don't include header
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/export/headless request (10k+) returned an error: ' + String(error));
       });
   });
 });
@@ -1644,10 +1780,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2018, 1, 16, 7, 24, 4),
-        end: new Date(2018, 1, 16, 7, 36, 4),
+        start: new Date(2018, 2, 16, 7, 24, 4),
+        end: new Date(2018, 2, 16, 7, 36, 4),
         eventname: 'impression',
-        algorithmid: 'terrain_5',
+        algorithmid: 'bestMovies3',
         agg: 'select',
       })
       .expect(200)
@@ -1659,7 +1795,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(3);
+        expect(respData['bestMovies3'].length).toEqual(4);
       });
   });
 
@@ -1671,10 +1807,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2018, 1, 16, 7, 24, 4),
-        end: new Date(2018, 1, 16, 7, 36, 4),
+        start: new Date(2018, 2, 16, 7, 24, 4),
+        end: new Date(2018, 2, 16, 7, 36, 4),
         eventname: 'impression',
-        algorithmid: 'terrain_5',
+        algorithmid: 'bestMovies3',
         agg: 'histogram',
         interval: 'minute',
       })
@@ -1687,7 +1823,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(5);
+        expect(respData['bestMovies3'].length).toEqual(8);
       });
   });
 
@@ -1699,10 +1835,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2018, 1, 31, 7, 24, 4),
-        end: new Date(2018, 1, 31, 10, 24, 4),
+        start: new Date(2018, 3, 3, 7, 24, 4),
+        end: new Date(2018, 3, 3, 10, 24, 4),
         eventname: 'click,impression',
-        algorithmid: 'terrain_5',
+        algorithmid: 'bestMovies3',
         agg: 'rate',
         interval: 'hour',
       })
@@ -1715,7 +1851,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(4);
+        expect(respData['bestMovies3'].length).toEqual(4);
       });
   });
 

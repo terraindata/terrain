@@ -87,7 +87,7 @@ export class FieldTypes
       switch (value['type'])
       {
         case 'nested':
-          const innerTypeNested = this.getESMappingFromDocument(value['innerType']);
+          const innerTypeNested = await this.getESMappingFromDocument(value['innerType']);
           innerTypeNested['type'] = 'nested';
           type = innerTypeNested;
           break;
@@ -97,7 +97,14 @@ export class FieldTypes
           {
             innerTypeArray = value['innerType'];
           }
-          type = this.getESTypeFromFullType(innerTypeArray);
+          type = await this.getESTypeFromFullType(innerTypeArray);
+
+          // https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html
+          // special case from the ES docs where an array of nested objects must contain the type: nested kv pair
+          if (innerTypeArray['type'] === 'nested')
+          {
+            type['type'] = 'nested';
+          }
           break;
         case 'null': // treat as text
           type = {
@@ -219,7 +226,6 @@ export class FieldTypes
       }
       resolve(returnObj);
     });
-
   }
 
   public async getFieldTypesFromMySQLFormatStream(files: stream.Readable[] | stream.Readable, params: object): Promise<stream.Readable>

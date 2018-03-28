@@ -114,7 +114,7 @@ export class TransformCardChart extends TerrainComponent<Props>
   } = {
       pointsCache: this.props.points,
       pointsBuffer: null,
-      selectedPointIds: Map<string, boolean>({}),
+      selectedPointIds: Map<string, boolean>(),
       moveSeed: 0,
       movedSeed: -1,
       dragging: false,
@@ -195,9 +195,9 @@ export class TransformCardChart extends TerrainComponent<Props>
       pointsCache: points,
       pointsBuffer: null,
     });
-    this.debouncedUpdatePoints(points, isConcrete);
     if (isConcrete)
     {
+      this.debouncedUpdatePoints(points, true);
       this.debouncedUpdatePoints.flush();
     }
   }
@@ -315,16 +315,15 @@ export class TransformCardChart extends TerrainComponent<Props>
     // However, we are not sure why that was necessary.
     // It's now disabled, so that actions are only dispatched when the point is released,
     //  to help with performance concerns.
-    const isConcrete = false; // this.state.moveSeed !== this.state.movedSeed;
     this.setState({
       movedSeed: this.state.moveSeed,
     });
-    this.updatePoints(points.toList(), isConcrete);
+    this.updatePoints(points.toList(), false);
   }
 
   public onPointRelease()
   {
-    this.debouncedUpdatePoints.flush();
+    this.updatePoints(this.state.pointsCache, true);
     this.setState({
       dragging: false,
     });
@@ -447,7 +446,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       point = point.set('value', newValue);
       return point;
     });
-    this.updatePoints(points.toList());
+    this.updatePoints(points.toList(), true);
   }
 
   public onZoomToData(el, mouse)
@@ -496,7 +495,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       });
       scorePoints = scorePoints.push(p);
     }
-    this.updatePoints(scorePoints);
+    this.updatePoints(scorePoints, true);
     return points;
   }
 
@@ -521,7 +520,7 @@ export class TransformCardChart extends TerrainComponent<Props>
         scorePoints = scorePoints.push(p);
       }
       scorePoints = scorePoints.sortBy((pt) => pt.value).toList();
-      this.updatePoints(scorePoints);
+      this.updatePoints(scorePoints, true);
     }
     else if (oldSize > newSize)
     {

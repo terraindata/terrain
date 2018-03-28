@@ -63,7 +63,7 @@ class UserC extends BaseClass
   public timeZone = 158;
   public phone = '';
   public imgSrc = '';
-  public tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>({});
+  public tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>();
 
   // notifications fields
   public sound = 'chime';
@@ -87,7 +87,7 @@ class UserC extends BaseClass
   // "static" fields to exclude
   public excludeFields = ['dbFields', 'excludeFields'];
 
-  // groupRoles: Immutable.Map({}),
+  // groupRoles: Immutable.Map(),
 }
 export type User = UserC & IRecord<UserC>;
 export const _User = (config: { [key: string]: any } = {}) =>
@@ -102,7 +102,7 @@ class UserStateC extends BaseClass
 {
   public loading = false;
   public loaded = false;
-  public users = Immutable.Map<ID, User>({});
+  public users = Immutable.Map<ID, User>();
   public currentUser: User = null;
 }
 export type UserState = UserStateC & IRecord<UserStateC>;

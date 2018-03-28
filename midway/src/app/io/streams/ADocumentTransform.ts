@@ -44,35 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
-import QueryRequest from './QueryRequest';
+import { Transform } from 'stream';
 
-export interface QueryResult
+/**
+ * Abstract class for transforming a result stream
+ */
+export default abstract class ADocumentTransform extends Transform
 {
-  [key: string]: any;
-}
+  private chunkNumber: number = 0;
 
-export default class QueryResponse
-{
-  public request?: QueryRequest;
-  public result: QueryResult;
-  public errors: MidwayErrorItem[];
-
-  public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request?: QueryRequest)
+  constructor()
   {
-    // QueryResult can't be null
-    this.result = result;
-    this.errors = errors;
-    this.request = request;
+    super({
+      writableObjectMode: true,
+      readableObjectMode: true,
+    });
   }
 
-  public setQueryRequest(req: QueryRequest)
+  public _transform(chunk: object, encoding, callback)
   {
-    this.request = req;
+    const out = this.transform(chunk, this.chunkNumber++);
+    if (Array.isArray(out))
+    {
+      out.forEach((e) => this.push(e));
+      callback();
+    }
+    else
+    {
+      callback(null, out);
+    }
   }
 
-  public hasError(): boolean
+  public _flush(callback)
   {
-    return this.errors.length > 0;
+    this.conclusion(this.chunkNumber);
+    callback();
+  }
+
+  protected abstract transform(input: object, chunkNumber: number): object | object[];
+
+  protected conclusion(chunkNumber: number): void
+  {
   }
 }

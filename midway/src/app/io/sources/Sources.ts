@@ -45,10 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as stream from 'stream';
-import * as winston from 'winston';
 
 import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
-import { Magento, MagentoSourceConfig } from './Magento';
+import { Magento } from './Magento';
 import { Mailchimp, MailchimpSourceConfig } from './Mailchimp';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
@@ -79,7 +78,7 @@ export interface ImportSourceConfig
 export class Sources
 {
 
-  public async handleTemplateSourceExport(body: object, readStream: stream.Readable): Promise<string>
+  public async handleTemplateExportSource(body: object, readStream: stream.Readable): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {

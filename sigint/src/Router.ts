@@ -49,7 +49,6 @@ import jsurl = require('jsurl');
 import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
 import stringHash = require('string-hash');
-import * as winston from 'winston';
 
 import { Config } from './Config';
 import * as Demo from './Demo';

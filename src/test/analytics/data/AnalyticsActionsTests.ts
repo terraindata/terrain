@@ -74,7 +74,7 @@ describe('AnalyticsActions', () =>
         analyticsType: 'events',
       },
     }),
-  });
+  } as any);
 
   const algorithmId = '1';
   const metric = 'impressions';

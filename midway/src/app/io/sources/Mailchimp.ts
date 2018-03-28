@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import csvWriter = require('csv-write-stream');
 import jsonStream = require('JSONStream');
-import soap = require('strong-soap');
 
 import * as _ from 'lodash';
 import * as stream from 'stream';

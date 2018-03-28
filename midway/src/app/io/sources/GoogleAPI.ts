@@ -44,21 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
-
 import * as googleoauthjwt from 'google-oauth-jwt';
 import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import CredentialConfig from '../../credentials/CredentialConfig';
+import { CredentialConfig } from '../../credentials/CredentialConfig';
 import Credentials from '../../credentials/Credentials';
+import CSVExportTransform from '../streams/CSVExportTransform';
 
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();
 
 export interface GoogleSpreadsheetConfig
 {
+  credentialId: number;
   id: string;
   name: string;
   range: string;
@@ -75,13 +75,13 @@ export class GoogleAPI
     {
       if (this.storedEmail === undefined && this.storedKeyFilePath === undefined)
       {
-        await this._getStoredGoogleAPICredentials();
+        await this._getStoredGoogleAPICredentials(spreadsheet.credentialId, 'spreadsheets');
       }
       request({
         url: 'https://sheets.googleapis.com/v4/spreadsheets/' + spreadsheet.id + '/values/' + spreadsheet.name + '!' + spreadsheet.range,
         jwt: {
           email: this.storedEmail,
-          keyFile: this.storedKeyFilePath,
+          key: this.storedKeyFilePath,
           scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
         },
       }, (err, res, body) =>
@@ -93,8 +93,7 @@ export class GoogleAPI
           }
           catch (e)
           {
-            winston.info(e);
-            winston.info('Potentially incorrect credentials.');
+            winston.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
             reject('Potentially incorrect Google API credentials.');
           }
         });
@@ -105,9 +104,7 @@ export class GoogleAPI
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const writer = csvWriter();
-      const pass = new stream.PassThrough();
-      writer.pipe(pass);
+      const writer = new CSVExportTransform(Object.keys(values[0]));
       if (values.length > 0)
       {
         for (let i = 1; i < values.length; ++i)
@@ -116,20 +113,20 @@ export class GoogleAPI
         }
       }
       writer.end();
-      resolve(pass);
+      resolve(writer);
     });
   }
 
-  private async _getStoredGoogleAPICredentials()
+  private async _getStoredGoogleAPICredentials(id: number, type: string)
   {
-    const creds: string[] = await credentials.getByType('googleapi');
+    const creds: CredentialConfig[] = await credentials.get(id, type);
     if (creds.length === 0)
     {
-      winston.info('No credential found for type googleapi.');
+      winston.info('No credential found for type ' + type + '.');
     }
     else
     {
-      const cred: object = JSON.parse(creds[0]);
+      const cred: object = JSON.parse(creds[0].meta);
       this.storedEmail = cred['storedEmail'];
       this.storedKeyFilePath = cred['storedKeyFilePath'];
     }

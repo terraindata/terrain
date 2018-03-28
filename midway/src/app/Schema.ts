@@ -134,6 +134,22 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      database integer NOT NULL,
      label text NOT NULL,
      events text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS schedulerLogs
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     lastFailure date,
+     lastRun date,
+     lastSuccess date,
+     meta text NOT NULL,
+     numberOfRuns integer NOT NULL,
+     scheduleId integer NOT NULL,
+     status text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS statusHistory
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     userId integer NOT NULL,
+     algorithmId integer NOT NULL,
+     fromStatus text NOT NULL,
+     toStatus text NOT NULL); `,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)

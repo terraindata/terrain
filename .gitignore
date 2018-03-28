@@ -27,3 +27,4 @@ package-lock.json
 yarn-error.log
 .cache
 postgres-data
+midway/test/routes/scheduler/test_scheduled_export.json
