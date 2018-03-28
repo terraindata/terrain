@@ -58,6 +58,7 @@ export const request = googleoauthjwt.requestWithJWT();
 
 export interface GoogleAnalyticsConfig
 {
+  credentialId: number;
   dateRanges: GoogleAnalyticsDateRangeConfig[];
   metrics: GoogleAnalyticsMetricConfig[];
   pageToken?: string;
@@ -105,13 +106,15 @@ export class GoogleAPI
         winston.warn('Day interval must be specified in numerical format');
       }
       const currDate: any = new Date();
+      // @ts-ignore
+      const padDate = (str: string): string => str.padStart(2, '0');
       const startDate: any = new Date(currDate - 1000 * 3600 * 24 * dayInterval);
       const currDateStr = (currDate.getFullYear().toString() as string) + '-'
-        + ((currDate.getMonth() as number + 1).toString().padStart(2, '0') as string) + '-'
-        + (currDate.getDate().toString().padStart(2, '0') as string);
+        + (padDate((currDate.getMonth() as number + 1).toString()) as string) + '-'
+        + (padDate(currDate.getDate().toString()) as string);
       const startDateStr = (startDate.getFullYear().toString() as string) + '-'
-        + ((startDate.getMonth() as number + 1).toString().padStart(2, '0') as string) + '-'
-        + (startDate.getDate().toString().padStart(2, '0') as string);
+        + (padDate((startDate.getMonth() as number + 1).toString()) as string) + '-'
+        + (padDate(startDate.getDate().toString()) as string);
       const dateRange: object[] = [];
       dateRange.push({ startDate: startDateStr, endDate: currDateStr });
       analytics[0]['dateRanges'] = dateRange;
@@ -123,7 +126,7 @@ export class GoogleAPI
         };
       let colNames: string[] = [];
       let constructedHeader: boolean = false;
-      let writeStream: stream.Readable = new stream.PassThrough();
+      let writeStream: any = new stream.PassThrough();
       const analyticsBatchGet = function(analyticsBodyPassed)
       {
         request({
