@@ -186,17 +186,17 @@ export async function getMergeJoinStream(dbName: string, indices: object[], opti
   const dbId: number = db[0].id as number;
   const mergeJoinKey = indices.map((i) => i['index']).join('_');
   const query = {
-    size: 100, // FIXME!!!
+    size: 10, // FIXME!!!
     query: {
       bool: {
         filter: [
           {
-            term: {
+            match: {
               _index: indices[0]['index'],
             },
           },
           {
-            term: {
+            match: {
               _type: indices[0]['type'],
             },
           },
@@ -210,12 +210,12 @@ export async function getMergeJoinStream(dbName: string, indices: object[], opti
           bool: {
             filter: [
               {
-                term: {
+                match: {
                   _index: indices[1]['index'],
                 },
               },
               {
-                term: {
+                match: {
                   _type: indices[1]['type'],
                 },
               },
