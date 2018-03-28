@@ -117,7 +117,7 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
             </div>
             <Modal
               open={this.state.deleteIndexModalOpen}
-              message={`Are you sure you want to delete Elastic Index '${db.name}'`}
+              message={`Are you sure you want to delete Elastic Index '${db.name}'?`}
               confirm={true}
               onConfirm={this.handleConfirmDeleteIndex}
               confirmButtonText={'Delete'}
