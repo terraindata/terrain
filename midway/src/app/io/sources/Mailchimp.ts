@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import csvWriter = require('csv-write-stream');
 import jsonStream = require('JSONStream');
 
 import * as _ from 'lodash';

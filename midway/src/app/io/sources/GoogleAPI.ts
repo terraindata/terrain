@@ -56,6 +56,26 @@ import CSVExportTransform from '../streams/CSVExportTransform';
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();
 
+export interface GoogleAnalyticsConfig
+{
+  dateRanges: GoogleAnalyticsDateRangeConfig[];
+  metrics: GoogleAnalyticsMetricConfig[];
+  pageToken?: string;
+  pageSize?: number;
+  viewId: number;
+}
+
+export interface GoogleAnalyticsDateRangeConfig
+{
+  endDate: string;
+  startDate: string;
+}
+
+export interface GoogleAnalyticsMetricConfig
+{
+  alias: string;
+}
+
 export interface GoogleSpreadsheetConfig
 {
   credentialId: number;
@@ -68,6 +88,101 @@ export class GoogleAPI
 {
   private storedEmail: string;
   private storedKeyFilePath: string;
+
+  public async getAnalytics(analytics: GoogleAnalyticsConfig): Promise<stream.Readable>
+  {
+    return new Promise<stream.Readable>(async (resolve, reject) =>
+    {
+      if (this.storedEmail === undefined && this.storedKeyFilePath === undefined)
+      {
+        await this._getStoredGoogleAPICredentials(analytics.credentialId, 'spreadsheets');
+      }
+      delete analytics['credentialId'];
+      // get the dateRange from the dayInterval
+      const dayInterval: number = analytics[0]['dayInterval'];
+      if (dayInterval === undefined || typeof dayInterval !== 'number')
+      {
+        winston.warn('Day interval must be specified in numerical format');
+      }
+      const currDate: any = new Date();
+      const startDate: any = new Date(currDate - 1000 * 3600 * 24 * dayInterval);
+      const currDateStr = (currDate.getFullYear().toString() as string) + '-'
+        + ((currDate.getMonth() as number + 1).toString().padStart(2, '0') as string) + '-'
+        + (currDate.getDate().toString().padStart(2, '0') as string);
+      const startDateStr = (startDate.getFullYear().toString() as string) + '-'
+        + ((startDate.getMonth() as number + 1).toString().padStart(2, '0') as string) + '-'
+        + (startDate.getDate().toString().padStart(2, '0') as string);
+      const dateRange: object[] = [];
+      dateRange.push({ startDate: startDateStr, endDate: currDateStr });
+      analytics[0]['dateRanges'] = dateRange;
+      delete analytics[0]['dayInterval'];
+      winston.info('Retrieving analytics for date range ' + JSON.stringify(dateRange));
+      const analyticsBody =
+        {
+          reportRequests: [analytics],
+        };
+      let colNames: string[] = [];
+      let constructedHeader: boolean = false;
+      let writeStream: stream.Readable = new stream.PassThrough();
+      const analyticsBatchGet = function(analyticsBodyPassed)
+      {
+        request({
+          method: 'POST',
+          url: 'https://analyticsreporting.googleapis.com/v4/reports:batchGet',
+          jwt: {
+            email: this.storedEmail,
+            key: this.storedKeyFilePath,
+            scopes: ['https://www.googleapis.com/auth/analytics.readonly'],
+          },
+          json: true,
+          body: analyticsBody,
+        }, (err, res, body) =>
+          {
+            try
+            {
+              const report: object = body['reports'][0];
+              if (constructedHeader === false)
+              {
+                colNames = colNames.concat(report['columnHeader']['dimensions']);
+                report['columnHeader']['metricHeader']['metricHeaderEntries'].forEach((entity) =>
+                {
+                  colNames.push(entity['name']);
+                });
+                writeStream = new CSVExportTransform(colNames);
+              }
+              const rows: object[] = report['data']['rows'];
+              if (Array.isArray(rows))
+              {
+                rows.forEach((row) =>
+                {
+                  writeStream.write(_.zipObject(colNames, [].concat(row['dimensions'], row['metrics'][0]['values'])));
+                });
+              }
+              constructedHeader = true;
+              if (report['nextPageToken'] !== undefined)
+              {
+                winston.info('Fetching the next page of reports... pageToken ' + (report['nextPageToken'] as string));
+                analyticsBodyPassed['reportRequests'][0][0]['pageToken'] = report['nextPageToken'];
+                analyticsBatchGet(analyticsBodyPassed);
+              }
+              else
+              {
+                // unfortunately old import doesnt like streaming imports if you resolve immediately
+                // so you have to wait until everything is written
+                writeStream.end();
+                resolve(writeStream);
+              }
+            }
+            catch (e)
+            {
+              winston.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
+              reject('Potentially incorrect Google API credentials.');
+            }
+          });
+      }.bind(this);
+      analyticsBatchGet(analyticsBody);
+    });
+  }
 
   public async getSpreadsheets(spreadsheet: GoogleSpreadsheetConfig): Promise<any>
   {
@@ -104,7 +219,7 @@ export class GoogleAPI
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const writer = new CSVExportTransform(Object.keys(values[0]));
+      const writer = new CSVExportTransform(values[0]);
       if (values.length > 0)
       {
         for (let i = 1; i < values.length; ++i)

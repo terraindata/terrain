@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
-import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
-import { Magento } from './Magento';
+import { GoogleAnalyticsConfig, GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
+import { Magento, MagentoSourceConfig } from './Magento';
 import { Mailchimp, MailchimpSourceConfig } from './Mailchimp';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
@@ -59,12 +59,12 @@ export const mySQL: MySQL = new MySQL();
 export interface SourceConfig
 {
   type: string;
-  params: object;
+  params: object | object[];
 }
 
 export interface ExportSourceConfig
 {
-  params: object;
+  params: object[];
   stream: stream.Readable;
 }
 
@@ -86,7 +86,7 @@ export class Sources
       let result = '';
       const exprtSourceConfig: ExportSourceConfig | string =
         {
-          params: {},
+          params: [],
           stream: readStream,
         };
       console.log('\n\nABACADABRA 2\\n\n');
@@ -122,11 +122,17 @@ export class Sources
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
       switch (sourceConfig.type)
       {
-        case 'spreadsheets':
-          imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
+        case 'analytics':
+          imprtSourceConfig = await this._getStreamFromGoogleAnalytics(sourceConfig, body['body'], body['templateId']);
           break;
         case 'mysql':
           imprtSourceConfig = await this._getStreamFromMySQL(sourceConfig, body['body'], body['templateId']);
+          break;
+        case 'magento':
+          result = await this._getStreamFromMagento(sourceConfig, body['body'], body['templateId']);
+          break;
+        case 'spreadsheets':
+          imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
           break;
         default:
           break;
@@ -139,6 +145,28 @@ export class Sources
       {
         return resolve(imprtSourceConfig);
       }
+    });
+  }
+
+  private async _getStreamFromGoogleAnalytics(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig>
+  {
+    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream = await googleAPI.getAnalytics(source['params']) as stream.Readable;
+
+      delete body['source'];
+      body['filetype'] = 'csv';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'csv',
+          params: body,
+          stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
     });
   }
 
@@ -160,6 +188,33 @@ export class Sources
           filetype: 'csv',
           params: body,
           stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
+    });
+  }
+
+  private async _getStreamFromMagento(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig | string>
+  {
+    return new Promise<ImportSourceConfig | string>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream: stream.Readable | string = await magento._getJSONFromCSV(
+        await magento.runQuery(source['params'] as MagentoSourceConfig[]));
+      if (typeof writeStream === 'string')
+      {
+        return resolve(writeStream);
+      }
+
+      delete body['source'];
+      body['filetype'] = 'json';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'json',
+          params: body,
+          stream: writeStream as stream.Readable,
         };
       return resolve(imprtSourceConfig);
     });
