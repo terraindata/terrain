@@ -383,94 +383,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
     );
   }
 
-  public render1()
-  {
-    const { schema, type, id } = this.props;
-    const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
-    const { isSelected, isHighlighted } = this.state;
-
-    const hasChildren = this.state.childCount > 0;
-
-    const showing = SchemaTypes.searchIncludes(item, this.props.search);
-
-    return (
-      <div
-        style={Styles.treeItem}
-      >
-        <FadeInOut
-          open={showing}
-          key='one'
-        >
-          {
-            showing &&
-            <div
-              data-rel='schema-item'
-              data-id={this.props.id}
-              data-search={this.props.inSearchResults}
-            >
-              <div
-                style={[
-                  Styles.treeItemHeader,
-                  isHighlighted && Styles.treeItemHeaderHighlighted,
-                  isSelected && Styles.treeItemHeaderSelected,
-                ]}
-                onClick={this.handleHeaderClick}
-                onDoubleClick={this.handleHeaderDoubleClick}
-              >
-                {
-                  hasChildren && !this.props.search &&
-                  <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='arrow'>
-                    <ArrowIcon
-                      className={'schema-arrow-icon'}
-                      onClick={this.handleArrowClick}
-                      style={{
-                        width: 12,
-                        height: 12,
-                      }}
-                    />
-                  </div>
-                }
-                {
-                  !hasChildren &&
-                  <div style={Styles.arrow} key='no-arrow'>
-                  </div>
-                }
-                {
-                  this.renderName()
-                }
-                <div
-                  style={Styles.itemInfoRow as any}
-                >
-                  {
-                    this.renderItemInfo()
-                  }
-                </div>
-              </div>
-            </div>
-          }
-        </FadeInOut>
-
-        {
-          hasChildren &&
-          <FadeInOut
-            open={this.state.open}
-            key='two'
-          >
-            {
-              this.renderItemChildren()
-            }
-          </FadeInOut>
-        }
-      </div>
-    );
-  }
-
   public render()
-  {
-    return this.render2();
-  }
-
-  public render2()
   {
     const { schema, type, id } = this.props;
     const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
@@ -526,10 +439,10 @@ class SchemaTreeItem extends TerrainComponent<Props>
         style={Styles.treeItem}
       >
         <ExpandableView
-          hideContent={!showing}
           content={content}
           open={this.state.open}
           onToggle={this.handleArrowClick}
+          hideArrow={Boolean(!hasChildren || this.props.search)}
         >
           {
             hasChildren ?

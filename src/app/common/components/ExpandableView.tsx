@@ -67,10 +67,11 @@ export interface Props
   children?: any;
   injectedContent?: any;
   hideContent?: boolean;
+  hideArrow?: boolean;
 }
 
 const arrowSize = 12;
-const arrowPadding = 6;
+const arrowPadding = 2;
 const containerLeftPadding = arrowPadding + arrowSize / 2;
 const containerLeftMargin = containerLeftPadding - 1;
 
@@ -87,42 +88,44 @@ class ExpandableView extends TerrainComponent<Props>
         style={this.props.style || {}}
       >
         {
-          this.props.hideContent ? <div/> :
-          <div className='expandable-view-content-row'>
-            <div
-              className='expandable-view-arrow-column'
-              style={fontColor(Colors().text3)}
-            >
-              <div className='expandable-view-arrow-spacer-top' />
-              <ArrowIcon
-                className={classNames({
-                  'expandable-view-arrow-icon': true,
-                  'expandable-view-open': this.props.open,
-                  'expandable-view-has-children': hasChildren,
-                })}
-                onClick={hasChildren ? this.props.onToggle : undefined}
-                style={{
-                  width: arrowSize,
-                  height: arrowSize,
-                  padding: `${arrowPadding}px`,
-                  margin: `-${arrowPadding}px 0px`,
-                }}
-              />
-              <div
-                className={classNames({
-                  'expandable-view-arrow-spacer-bottom': true,
-                  'expandable-view-open': this.props.open,
-                  'expandable-view-has-children': hasChildren,
-                })}
-                style={{
-                  borderColor: leftBorderColor,
-                }}
-              />
+          this.props.hideContent ? <div /> :
+            <div className='expandable-view-content-row'>
+              {this.props.hideArrow ? null :
+                <div
+                  className='expandable-view-arrow-column'
+                  style={fontColor(Colors().text3)}
+                >
+                  <div className='expandable-view-arrow-spacer-top' />
+                  <ArrowIcon
+                    className={classNames({
+                      'expandable-view-arrow-icon': true,
+                      'expandable-view-open': this.props.open,
+                      'expandable-view-has-children': hasChildren,
+                    })}
+                    onClick={hasChildren ? this.props.onToggle : undefined}
+                    style={{
+                      width: arrowSize,
+                      height: arrowSize,
+                      padding: `${arrowPadding}px`,
+                      margin: `-${arrowPadding}px 0px`,
+                    }}
+                  />
+                  <div
+                    className={classNames({
+                      'expandable-view-arrow-spacer-bottom': true,
+                      'expandable-view-open': this.props.open,
+                      'expandable-view-has-children': hasChildren,
+                    })}
+                    style={{
+                      borderColor: leftBorderColor,
+                    }}
+                  />
+                </div>
+              }
+              <div className='expandable-view-content'>
+                {this.props.content}
+              </div>
             </div>
-            <div className='expandable-view-content'>
-              {this.props.content}
-            </div>
-          </div>
         }
         {(this.props.injectedContent !== null && this.props.injectedContent !== undefined) &&
           <div
@@ -146,9 +149,9 @@ class ExpandableView extends TerrainComponent<Props>
               'expandable-view-open': this.props.open,
             })}
             style={{
-              marginLeft: containerLeftMargin,
-              paddingLeft: containerLeftPadding,
-              borderColor: leftBorderColor,
+              marginLeft: this.props.hideArrow ? '' : containerLeftMargin,
+              paddingLeft: this.props.hideArrow ? '' : containerLeftPadding,
+              borderLeft: this.props.hideArrow ? '0px solid' : `1px solid ${leftBorderColor}`,
             }}
           >
             {this.props.children}
