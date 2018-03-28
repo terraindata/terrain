@@ -99,6 +99,11 @@ export interface SchemaActionTypes
     actionType: 'selectId';
     id: ID;
   };
+  deleteElasticIndex: {
+    actionType: 'deleteElasticIndex';
+    dbid: number,
+    dbname: string,
+  };
 }
 
 class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
@@ -170,6 +175,11 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
       selectId: (state, action) =>
       {
         return state.set('selectedId', action.payload.id);
+      },
+
+      deleteElasticIndex: (state, action) =>
+      {
+        return state;
       },
     };
 
@@ -246,11 +256,32 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
     );
   }
 
+  public deleteElasticIndexAction(action: SchemaActionType<'deleteElasticIndex'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+
+    Ajax.deleteDatabase(
+      action.dbid,
+      action.dbname,
+      'elastic',
+    ).then((result: any) =>
+    {
+      this.fetchAction(dispatch);
+    }).catch((err) =>
+    {
+      // todo show error
+    });
+  }
+
   public overrideAct(action: Unroll<SchemaActionTypes>)
   {
     if (action.actionType === 'fetch')
     {
       return this.fetchAction.bind(this);
+    }
+    else if (action.actionType === 'deleteElasticIndex')
+    {
+      return this.deleteElasticIndexAction.bind(this, action);
     }
   }
 }

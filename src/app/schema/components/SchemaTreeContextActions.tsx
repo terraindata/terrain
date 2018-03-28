@@ -44,27 +44,25 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
+// tslint:disable:strict-boolean-expressions no-var-requires
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import * as Radium from 'radium';
 import * as React from 'react';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
-const Radium = require('radium');
-import Styles from './SchemaTreeStyles';
-const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
-import Util from 'util/Util';
-import FadeInOut from '../../common/components/FadeInOut';
-import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
-import SchemaTreeList from './SchemaTreeList';
-
+import { borderColor, Colors, fontColor } from 'app/colors/Colors';
 import ExpandableView from 'common/components/ExpandableView';
-import Menu from 'common/components/Menu';
+import FadeInOut from 'common/components/FadeInOut';
+import Modal from 'common/components/Modal';
+import Util from 'util/Util';
 
+const DeleteIcon = require('images/icon_trash');
 import './SchemaTreeContextActions.less';
+import Styles from './SchemaTreeStyles';
 
 export interface Props
 {
@@ -78,21 +76,20 @@ export interface Props
 @Radium
 class SchemaTreeContextActions extends TerrainComponent<Props>
 {
-  private typeToRendering = {
+  public typeToRendering = {
     server: this.renderDefault,
     database: this.renderDatabase,
     table: this.renderDefault,
     column: this.renderDefault,
     fieldProperty: this.renderDefault,
     index: this.renderDefault,
-  }
+  };
 
-  private elasticMenuOptions = List([
-    {
-      text: 'Delete Index',
-      onClick: this.requestDeleteIndex,
-    }
-  ]);
+  public state: {
+    deleteIndexModalOpen: boolean,
+  } = {
+      deleteIndexModalOpen: false,
+    };
 
   public renderDefault()
   {
@@ -111,12 +108,24 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
           <div
             className='schema-tree-context-wrapper'
           >
-            <Menu
-              options={this.elasticMenuOptions}
-              small={true}
+            <div
+              onClick={this.requestDeleteIndex}
+              style={fontColor(Colors().text3, Colors().text2)}
+              className='schema-context-icon-wrapper'
+            >
+              <DeleteIcon />
+            </div>
+            <Modal
+              open={this.state.deleteIndexModalOpen}
+              message={`Are you sure you want to delete Elastic Index '${db.name}'`}
+              confirm={true}
+              onConfirm={this.handleConfirmDeleteIndex}
+              confirmButtonText={'Delete'}
+              onClose={this.handleCloseDeleteIndex}
+              closeOnConfirm={true}
             />
           </div>
-        )
+        );
       }
       default:
         return null;
@@ -137,9 +146,34 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
     }
   }
 
-  public requestDeleteIndex()
+  public requestDeleteIndex(event)
   {
+    event.stopPropagation();
 
+    this.setState({
+      deleteIndexModalOpen: true,
+    });
+  }
+
+  public handleConfirmDeleteIndex()
+  {
+    const database = this.props.schema.databases.get(this.props.id as any);
+    const server = this.props.schema.servers.get(database.serverId);
+    const dbid = server.connectionId;
+    const dbname = database.name;
+
+    this.props.schemaActions({
+      actionType: 'deleteElasticIndex',
+      dbname,
+      dbid,
+    });
+  }
+
+  public handleCloseDeleteIndex()
+  {
+    this.setState({
+      deleteIndexModalOpen: false,
+    });
   }
 }
 

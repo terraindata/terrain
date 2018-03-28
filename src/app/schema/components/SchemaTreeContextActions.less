@@ -3,10 +3,18 @@
 .schema-tree-context-wrapper {
   margin-left: @spacing;
   display: flex;
+  padding-top: 1px;
   align-items: center;
   position: relative;
-  width: 12px;
-  height: 12px;
   align-self: center;
-  top: -1 * @half-spacing;
+  
+  .schema-context-icon-wrapper {
+    .transition;
+
+    svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+  }
 }

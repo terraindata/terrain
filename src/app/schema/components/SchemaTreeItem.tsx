@@ -56,13 +56,12 @@ import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
 import { serverChildrenConfig, ServerTreeInfo } from './items/ServerTreeInfo';
 import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
-import Styles from './SchemaTreeStyles';
-const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
 import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
 import SchemaTreeContextActions from './SchemaTreeContextActions';
 import SchemaTreeList from './SchemaTreeList';
+import Styles from './SchemaTreeStyles';
 
 import ExpandableView from 'common/components/ExpandableView';
 
@@ -425,12 +424,12 @@ class SchemaTreeItem extends TerrainComponent<Props>
                 }
                 {
                   isSelected ?
-                  <SchemaTreeContextActions
-                    id={this.props.id}
-                    type={this.props.type}
-                  />
-                  :
-                  null
+                    <SchemaTreeContextActions
+                      id={this.props.id}
+                      type={this.props.type}
+                    />
+                    :
+                    null
                 }
               </div>
             </div>
