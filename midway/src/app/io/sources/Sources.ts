@@ -87,11 +87,11 @@ export class Sources
           stream: readStream,
         };
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
-      exprtSourceConfig.params = sourceConfig.params;
+      exprtSourceConfig.params = sourceConfig.params as object[];
       switch (sourceConfig.type)
       {
         case 'magento':
-          result = await this._putJSONStreamIntoMagento(exprtSourceConfig);
+          // result = await this._putJSONStreamIntoMagento(exprtSourceConfig);
           break;
         default:
           break;
@@ -120,7 +120,7 @@ export class Sources
           imprtSourceConfig = await this._getStreamFromMySQL(sourceConfig, body['body'], body['templateId']);
           break;
         case 'magento':
-          result = await this._getStreamFromMagento(sourceConfig, body['body'], body['templateId']);
+          imprtSourceConfig = await this._getStreamFromMagento(sourceConfig, body['body'], body['templateId']);
           break;
         case 'spreadsheets':
           imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
@@ -147,7 +147,7 @@ export class Sources
       {
         body['templateId'] = Number(parseInt(templateId, 10));
       }
-      const writeStream = await googleAPI.getAnalytics(source['params']) as stream.Readable;
+      const writeStream: stream.Readable = await googleAPI.getAnalytics(source['params'] as GoogleAnalyticsConfig) as stream.Readable;
 
       delete body['source'];
       body['filetype'] = 'csv';
@@ -192,8 +192,9 @@ export class Sources
       {
         body['templateId'] = Number(parseInt(templateId, 10));
       }
-      const writeStream: stream.Readable | string = await magento._getJSONFromCSV(
-        await magento.runQuery(source['params'] as MagentoSourceConfig[]));
+      // const writeStream: stream.Readable | string = await magento._getJSONFromCSV(
+      //   await magento.runQuery(source['params'] as MagentoSourceConfig[]));
+      const writeStream: any = new stream.PassThrough();
       if (typeof writeStream === 'string')
       {
         return resolve(writeStream);
@@ -239,13 +240,13 @@ export class Sources
   }
 
   // export private methods
-  private async _putJSONStreamIntoMagento(exprtSourceConfig: ExportSourceConfig): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(exprtSourceConfig)));
-    });
-  }
+  // private async _putJSONStreamIntoMagento(exprtSourceConfig: ExportSourceConfig): Promise<string>
+  // {
+  //   return new Promise<string>(async (resolve, reject) =>
+  //   {
+  //     resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(exprtSourceConfig)));
+  //   });
+  // }
 }
 
 export default Sources;
