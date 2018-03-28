@@ -143,7 +143,7 @@ const SchemaTreeStyles =
     childrenWrapper: {
       normal: [
         {
-          paddingLeft: 11,
+          paddingLeft: 0,
         },
         Styles.transition,
       ],

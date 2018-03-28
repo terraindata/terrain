@@ -63,6 +63,8 @@ import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
 import SchemaTreeList from './SchemaTreeList';
 
+import ExpandableView from 'common/components/ExpandableView';
+
 export interface Props
 {
   id: ID;
@@ -381,7 +383,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
     );
   }
 
-  public render()
+  public render1()
   {
     const { schema, type, id } = this.props;
     const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
@@ -459,6 +461,85 @@ class SchemaTreeItem extends TerrainComponent<Props>
             }
           </FadeInOut>
         }
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return this.render2();
+  }
+
+  public render2()
+  {
+    const { schema, type, id } = this.props;
+    const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
+    const { isSelected, isHighlighted } = this.state;
+
+    const hasChildren = this.state.childCount > 0;
+    const showing = SchemaTypes.searchIncludes(item, this.props.search);
+
+    const content = (
+      <FadeInOut
+        open={showing}
+        key='one'
+      >
+        {
+          showing &&
+          <div
+            data-rel='schema-item'
+            data-id={this.props.id}
+            data-search={this.props.inSearchResults}
+          >
+            <div
+              style={[
+                Styles.treeItemHeader,
+                isHighlighted && Styles.treeItemHeaderHighlighted,
+                isSelected && Styles.treeItemHeaderSelected,
+              ]}
+              onClick={this.handleHeaderClick}
+              onDoubleClick={this.handleHeaderDoubleClick}
+            >
+              {
+                !hasChildren &&
+                <div style={Styles.arrow} key='no-arrow'>
+                </div>
+              }
+              {
+                this.renderName()
+              }
+              <div
+                style={Styles.itemInfoRow as any}
+              >
+                {
+                  this.renderItemInfo()
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </FadeInOut>
+    );
+
+    return (
+      <div
+        style={Styles.treeItem}
+      >
+        <ExpandableView
+          hideContent={!showing}
+          content={content}
+          open={this.state.open}
+          onToggle={this.handleArrowClick}
+        >
+          {
+            hasChildren ?
+              <span>
+                {this.renderItemChildren()}
+              </span>
+              :
+              null
+          }
+        </ExpandableView>
       </div>
     );
   }
