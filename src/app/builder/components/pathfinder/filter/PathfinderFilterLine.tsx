@@ -685,6 +685,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
 export const COMPARISONS_WITHOUT_VALUES = [
   'exists',
+  'notexists',
 ];
 
 export function getCustomValueDisplayName(filterLine: FilterLine, value, setIndex: number)
