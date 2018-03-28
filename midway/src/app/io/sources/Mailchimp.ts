@@ -80,7 +80,8 @@ export class Mailchimp
         let results: object[] = [];
         const jsonParser = jsonStream.parse();
         exportSourceConfig.stream.pipe(jsonParser);
-        jsonParser.on('data', console.log);/* (data) => {
+        jsonParser.on('data', (data) => {
+            console.log(data.length);
           results = data;
           const mailchimpSourceConfig: MailchimpSourceConfig =
             {
@@ -91,9 +92,9 @@ export class Mailchimp
           console.log('mailchimpSourceConfig = ');
           //console.log(JSON.stringify(mailchimpSourceConfig));
           console.log('happy');
-          resolve(JSON.stringify({}));
-        });*/
-        resolve(JSON.stringify({}));
+          resolve("done herere");
+        });
+        resolve('roroijgor');
       } catch (e) {
         console.log('esagegg');
         console.log(e);

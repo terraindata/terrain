@@ -271,7 +271,7 @@ export class Scheduler
   {
     return new Promise<number>(async (resolve, reject) =>
     {
-      let lastKey: number = Number(Object.keys(this.jobMap).sort().reverse()[0]);
+      let lastKey: number = Number(Object.keys(this.jobMap).sort(naturalSort).reverse()[0]);
       if (lastKey === undefined || isNaN(lastKey))
       {
         lastKey = -1;
@@ -934,7 +934,7 @@ export class Scheduler
     });
 
     await this.createJob(async (scheduleID: number, fields: object, // 12
-      transport: object, sort: string, encoding?: string | null): Promise<any> => // export to analytics
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // import from mailchimp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
@@ -990,7 +990,7 @@ export class Scheduler
                 },
               };
             console.log(mailchimpArgs);
-            const result = await sources.handleTemplateSourceExport(mailchimpArgs, jsonStream as stream.Readable);
+            const result = await sources.handleTemplateExportSource(mailchimpArgs, jsonStream as stream.Readable);
           }
         }
         catch (e)

@@ -247,6 +247,14 @@ export class Sources
     });
   }
 
+    private async _putJSONStreamIntoMailchimp(exprtSourceConfig: ExportSourceConfig): Promise<string>
+    {
+      return new Promise<string>(async (resolve, reject) =>
+      {
+        resolve(await mailchimp.getJSONStreamAsMailchimpSourceConfig(exprtSourceConfig));
+      });
+    }
+
   // export private methods
   // private async _putJSONStreamIntoMagento(exprtSourceConfig: ExportSourceConfig): Promise<string>
   // {
