@@ -57,6 +57,7 @@ import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;
+const NEGATIVES = ['notcontain', 'noteequal', 'notisin', 'notexists'];
 
 export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
@@ -330,11 +331,12 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
     if (!line.filterGroup && line.comparison)
     {
       const lineInfo = parseFilterLine(line, useShould, inputs);
+
       if (useShould)
       {
         should = should.push(lineInfo);
       }
-      else if (line.comparison === 'notequal' || line.comparison === 'notcontain' || line.comparison === 'isnotin')
+      else if (NEGATIVES.indexOf(line.comparison) !== -1)
       {
         mustNot = mustNot.push(lineInfo);
       }
@@ -403,7 +405,6 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
   {
     // In this case it is a nested query, disguised as a normal filter line
     const path = line.field.split('.')[0];
-    const negatives = ['notcontain', 'noteequal', 'notisin'];
     const innerLine = parseFilterLine(line, useShould, inputs, true).toJS();
     return Map({
       nested: {
@@ -428,6 +429,26 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
           boost,
         }),
       });
+    case 'notexists':
+      if (useShould)
+      {
+        return Map({
+          bool: Map({
+            must_not: Map({
+              exists: Map({
+                field: line.field
+              }),
+            }),
+            boost,
+          }),
+        });
+      }
+      return Map({
+        exists: Map({
+            field: line.field,
+            boost,
+          }),
+        });
     case 'equal':
       return Map({
         term: Map({

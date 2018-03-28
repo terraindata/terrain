@@ -196,6 +196,7 @@ export class CardsToPath
     '=': 'notequal',
     '≈': 'notcontain',
     'in': 'isnotin',
+    'exists': 'notexists',
   };
 
   private static distributeSourceBoolFilters(parser: ESCardParser, body: ESValueInfo)

@@ -870,6 +870,18 @@ const ElasticComparisons = [
       ]),
   },
   {
+    value: 'notexists',
+    displayName: 'does not exist',
+    fieldTypes: List(
+      [FieldType.Numerical,
+      FieldType.Text,
+      FieldType.Date,
+      FieldType.Geopoint,
+      FieldType.Ip,
+      FieldType.Nested,
+      ]),
+  },
+  {
     value: 'equal',
     displayName: 'equals', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
     fieldTypes: List([FieldType.Numerical, FieldType.Text, FieldType.Date]),
