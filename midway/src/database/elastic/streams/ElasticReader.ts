@@ -67,7 +67,7 @@ export class ElasticReader extends Stream.Readable
   private scrollID: string | undefined = undefined;
 
   private MAX_SEARCH_SIZE: number = 10 * 1000;
-  private DEFAULT_SEARCH_SIZE: number = 8 * 1024;
+  private DEFAULT_SEARCH_SIZE: number = 1024;
   private DEFAULT_SCROLL_TIMEOUT: string = '5m';
 
   private numRequested: number = 0;
@@ -94,6 +94,10 @@ export class ElasticReader extends Stream.Readable
       {
         body['scroll'] = this.scroll;
         body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
+      }
+      else
+      {
+        body.body['size'] = this.size;
       }
 
       this.querying = true;
@@ -163,8 +167,6 @@ export class ElasticReader extends Stream.Readable
     this.rowsProcessed += length;
     this.numRequested = Math.max(0, this.numRequested - length);
 
-    console.log(JSON.stringify(this.query, null, 2));
-    console.log(JSON.stringify(response, null, 2));
     const shouldContinue = this.push(response);
     if (!shouldContinue)
     {

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { mergeDocument } from '../io/Common';
 import ADocumentTransform from '../io/streams/ADocumentTransform';
 
 /**
@@ -66,7 +67,11 @@ export default class ExportTransform extends ADocumentTransform
       return input;
     }
 
-    return input['hits'].hits.map((hit) => this.process(hit['_source']));
+    return input['hits'].hits.map((hit) =>
+    {
+      const doc = mergeDocument(hit);
+      return this.process(doc['_source']);
+    });
   }
 
   private process(doc: object): object

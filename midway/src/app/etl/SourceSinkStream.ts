@@ -72,7 +72,7 @@ import ExportTransform from './ExportTransform';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
 
-export async function getSourceStream(source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
+export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
@@ -93,8 +93,12 @@ export async function getSourceStream(source: SourceConfig, files?: stream.Reada
           throw new Error('No file(s) found in multipart formdata');
         }
 
-        // TODO: multi-source import
-        const importStream = files[0];
+        const importStream = files.find((f) => f['fieldname'] === name);
+        if (importStream === undefined)
+        {
+          throw new Error('Error finding source stream ' + name);
+        }
+
         switch (source.fileConfig.fileType)
         {
           case 'json':
@@ -184,7 +188,7 @@ export async function getMergeJoinStream(dbName: string, indices: object[], opti
   }
 
   const dbId: number = db[0].id as number;
-  const mergeJoinKey = indices.map((i) => i['index']).join('_');
+  const mergeJoinKey = options['outputKey'];
   const query = {
     size: 10, // FIXME!!!
     query: {
@@ -226,8 +230,8 @@ export async function getMergeJoinStream(dbName: string, indices: object[], opti
     },
   };
   const elasticStream = await getElasticReaderStream(dbId, JSON.stringify(query));
-  // elasticStream.on('data', console.log);
-  return elasticStream;
+  const exportTransform = new ExportTransform();
+  return elasticStream.pipe(exportTransform);
 }
 
 async function getElasticReaderStream(dbId: number, query: string): Promise<stream.Readable>

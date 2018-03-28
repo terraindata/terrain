@@ -269,7 +269,7 @@ export default class MergeJoinTransform extends Readable
       let j = this.rightPosition;
       while (l === r && j < right.length)
       {
-        left[this.leftPosition][this.mergeJoinName].push(right[j]);
+        left[this.leftPosition][this.mergeJoinName].push(right[j]['_source']);
         j++;
         r = right[j]['_source'][this.joinKey];
       }
