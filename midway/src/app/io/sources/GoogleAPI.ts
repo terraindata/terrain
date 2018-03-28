@@ -98,6 +98,25 @@ export class GoogleAPI
         await this._getStoredGoogleAPICredentials(analytics.credentialId, 'spreadsheets');
       }
       delete analytics['credentialId'];
+      // get the dateRange from the dayInterval
+      const dayInterval: number = analytics[0]['dayInterval'];
+      if (dayInterval === undefined || typeof dayInterval !== 'number')
+      {
+        winston.warn('Day interval must be specified in numerical format');
+      }
+      const currDate: any = new Date();
+      const startDate: any = new Date(currDate - 1000 * 3600 * 24 * dayInterval);
+      const currDateStr = (currDate.getFullYear().toString() as string) + '-'
+        + ((currDate.getMonth() as number + 1).toString().padStart(2, '0') as string) + '-'
+        + (currDate.getDate().toString().padStart(2, '0') as string);
+      const startDateStr = (startDate.getFullYear().toString() as string) + '-'
+        + ((startDate.getMonth() as number + 1).toString().padStart(2, '0') as string) + '-'
+        + (startDate.getDate().toString().padStart(2, '0') as string);
+      const dateRange: object[] = [];
+      dateRange.push({ startDate: startDateStr, endDate: currDateStr });
+      analytics[0]['dateRanges'] = dateRange;
+      delete analytics[0]['dayInterval'];
+      winston.info('Retrieving analytics for date range ' + JSON.stringify(dateRange));
       const analyticsBody =
         {
           reportRequests: [analytics],
