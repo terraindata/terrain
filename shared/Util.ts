@@ -722,4 +722,3 @@ export function getValueFromDocPath(doc: object, path: string): any | undefined
     return undefined;
   }
 }
-

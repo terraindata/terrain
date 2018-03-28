@@ -89,9 +89,9 @@ export class GoogleAPI
   private storedEmail: string;
   private storedKeyFilePath: string;
 
-  public async getAnalytics(analytics: GoogleAnalyticsConfig): Promise<any>
+  public async getAnalytics(analytics: GoogleAnalyticsConfig): Promise<stream.Readable>
   {
-    return new Promise<any>(async (resolve, reject) =>
+    return new Promise<stream.Readable>(async (resolve, reject) =>
     {
       if (this.storedEmail === undefined && this.storedKeyFilePath === undefined)
       {
@@ -102,11 +102,10 @@ export class GoogleAPI
         {
           reportRequests: [analytics],
         };
-      console.log(this.storedEmail);
-      console.log(this.storedKeyFilePath);
-      console.log(JSON.stringify(analyticsBody, null, 2));
-
-      const analyticsBatchGet = function()
+      let colNames: string[] = [];
+      let constructedHeader: boolean = false;
+      let writeStream: stream.Readable = new stream.PassThrough();
+      const analyticsBatchGet = function(analyticsBodyPassed)
       {
         request({
           method: 'POST',
@@ -122,10 +121,38 @@ export class GoogleAPI
           {
             try
             {
-              // const bodyObj = JSON.parse(body);
-              console.log(JSON.stringify(body, null, 2));
-              resolve(body);
-              // resolve(body['values']);
+              const report: object = body['reports'][0];
+              if (constructedHeader === false)
+              {
+                colNames = colNames.concat(report['columnHeader']['dimensions']);
+                report['columnHeader']['metricHeader']['metricHeaderEntries'].forEach((entity) =>
+                {
+                  colNames.push(entity['name']);
+                });
+                writeStream = new CSVExportTransform(colNames);
+              }
+              const rows: object[] = report['data']['rows'];
+              if (Array.isArray(rows))
+              {
+                rows.forEach((row) =>
+                {
+                  writeStream.write(_.zipObject(colNames, [].concat(row['dimensions'], row['metrics'][0]['values'])));
+                });
+              }
+              constructedHeader = true;
+              if (report['nextPageToken'] !== undefined)
+              {
+                winston.info('Fetching the next page of reports... pageToken ' + (report['nextPageToken'] as string));
+                analyticsBodyPassed['reportRequests'][0][0]['pageToken'] = report['nextPageToken'];
+                analyticsBatchGet(analyticsBodyPassed);
+              }
+              else
+              {
+                // unfortunately old import doesnt like streaming imports if you resolve immediately
+                // so you have to wait until everything is written
+                writeStream.end();
+                resolve(writeStream);
+              }
             }
             catch (e)
             {
@@ -134,7 +161,7 @@ export class GoogleAPI
             }
           });
       }.bind(this);
-      analyticsBatchGet();
+      analyticsBatchGet(analyticsBody);
     });
   }
 

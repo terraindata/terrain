@@ -147,8 +147,7 @@ export class Sources
       {
         body['templateId'] = Number(parseInt(templateId, 10));
       }
-      const writeStream = await googleAPI.getAnalyticsValuesAsCSVStream(
-        await googleAPI.getAnalytics(source['params'] as GoogleAnalyticsConfig)) as stream.Readable;
+      const writeStream = await googleAPI.getAnalytics(source['params']) as stream.Readable;
 
       delete body['source'];
       body['filetype'] = 'csv';
