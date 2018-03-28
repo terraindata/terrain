@@ -119,7 +119,7 @@ Router.post('/database/delete', passport.authenticate('access-token-local'), asy
       await deleteElasticIndex(params.dbid, params.dbname);
       break;
     default:
-      throw new Error(`Deleting database of type '${params.langauge}' is unsupported`);
+      throw new Error(`Deleting database of type '${params.language}' is unsupported`);
   }
   ctx.body = { message: 'successfully deleted database' };
 });
