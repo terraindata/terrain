@@ -512,7 +512,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         range: Map({
           [line.field]:
             Map({
-              gt: value,
+              gte: value,
               boost,
             }),
         }),
@@ -533,7 +533,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
         range: Map({
           [line.field]:
             Map({
-              lt: value,
+              lte: value,
               boost,
             }),
         }),

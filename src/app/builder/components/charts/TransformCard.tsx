@@ -356,6 +356,10 @@ class TransformCard extends TerrainComponent<Props>
     const max = this.state.maxDomain.get(1);
 
     const elasticHistogram = (resp.result as ElasticQueryResult).aggregations;
+    if (!elasticHistogram)
+    {
+      return;
+    }
     const hits = (resp.result as ElasticQueryResult).hits;
     let totalDoc = 0;
     if (hits && hits.total)

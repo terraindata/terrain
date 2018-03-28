@@ -292,7 +292,12 @@ const TransformUtil = {
     const y3: number = pointsData[3].y !== undefined ? pointsData[3].y : pointsData[3].score;
     const L: number = y3 - a;
     const k: number = (-1 * Math.log(L / (yVal - a) - 1)) / (xVal - x0);
-
+    domainMin = parseFloat(String(domainMin));
+    domainMax = parseFloat(String(domainMax));
+    if (isNaN(domainMin) || isNaN(domainMax))
+    {
+      return {ranges: [], outputs: []};
+    }
     const ranges = [];
     const outputs = [];
     const stepSize: number = (domainMax - domainMin) * (1 / numPoints);

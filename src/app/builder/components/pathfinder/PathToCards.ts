@@ -177,10 +177,10 @@ export class PathToCards
     exists: 'exists',
     contains: '≈',
     notcontain: '≈',
-    alphabefore: '<',
-    alphaafter: '>',
-    datebefore: '<',
-    dateafter: '>',
+    alphabefore: '≤',
+    alphaafter: '≥',
+    datebefore: '≤',
+    dateafter: '≥',
   };
 
   private static ComparisonsToBoolType = {
@@ -484,13 +484,13 @@ export class PathToCards
     const filterLineMap = { filter: [], nested: [], group: [] };
     filterGroup.lines.map((line: FilterLine) =>
     {
-      if (line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
+      if (line && line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
       {
         filterLineMap.nested.push(line);
-      } else if (line.filterGroup)
+      } else if (line && line.filterGroup)
       {
         filterLineMap.group.push(line);
-      } else
+      } else if (line)
       {
         filterLineMap.filter.push(line);
       }

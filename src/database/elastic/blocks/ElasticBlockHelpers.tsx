@@ -257,11 +257,7 @@ export const ElasticBlockHelpers = {
           column.databaseId === String(indexId) &&
           column.name === field,
       ).toList().get(0);
-      if (col === undefined)
-      {
-        return '';
-      }
-      if (wholeField) // it was nested, now look in the column properties for the path
+      if (wholeField && col) // it was nested, now look in the column properties for the path
       {
         const pieces = wholeField.split('.');
         for (let i = 1; i < pieces.length; i++)
@@ -272,8 +268,11 @@ export const ElasticBlockHelpers = {
           }
         }
       }
-
-      const dataType = col.type !== undefined ? col.type : col.datatype;
+      if (col === undefined)
+      {
+        return '';
+      }
+      const dataType = col.datatype !== undefined ? col.datatype : col.type;
       if (returnDatatype)
       {
         return dataType;

@@ -448,7 +448,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public isGroup(item)
   {
-    return item.filterGroup;
+    return item && item.filterGroup;
   }
 
   public handleStepChange()

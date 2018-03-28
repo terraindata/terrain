@@ -100,7 +100,7 @@ export class CardsToPath
     TerrainLog.debug('B->P: The parsed card is ' + JSON.stringify(parser.getValueInfo().value));
 
     const newPath = this.BodyCardToPath(query.path, parser, parser.getValueInfo(), dbName);
-    // parser.updateCard();
+    parser.updateCard();
     return {path: newPath, parser};
   }
 
@@ -151,13 +151,21 @@ export class CardsToPath
       [FieldType.Date]: 'dateafter',
       [FieldType.Text]: 'alphaafter',
     },
-    '≥': 'greaterequal',
+    '≥': {
+      [FieldType.Numerical]: 'greaterequal',
+      [FieldType.Date]: 'dateafter',
+      [FieldType.Text]: 'alphaafter',
+    },
     '<': {
       [FieldType.Numerical]: 'less',
       [FieldType.Date]: 'datebefore',
       [FieldType.Text]: 'alphabefore',
     },
-    '≤': 'lessequal',
+    '≤': {
+      [FieldType.Numerical]: 'lessequal',
+      [FieldType.Date]: 'datebefore',
+      [FieldType.Text]: 'alphabefore',
+    },
     '=': 'equal',
     '≈': 'contains',
     'in': 'isin',
@@ -165,13 +173,21 @@ export class CardsToPath
   };
 
   private static filterNotOpToComparisonsMap = {
-    '>': 'lessequal',
+    '>': {
+      [FieldType.Numerical]: 'lessequal',
+      [FieldType.Date]: 'datebefore',
+      [FieldType.Text]: 'alphabefore',
+    },
     '≥': {
       [FieldType.Numerical]: 'less',
       [FieldType.Date]: 'datebefore',
       [FieldType.Text]: 'alphabefore',
     },
-    '<': 'greaterequal',
+    '<': {
+      [FieldType.Numerical]: 'greaterequal',
+      [FieldType.Date]: 'dateafter',
+      [FieldType.Text]: 'alphaafter',
+    },
     '≤': {
       [FieldType.Numerical]: 'greater',
       [FieldType.Date]: 'dateafter',
@@ -189,7 +205,10 @@ export class CardsToPath
         'bool:elasticFilter': true,
       },
     }, body);
-    console.assert(sourceBool !== null);
+    if (!sourceBool)
+    {
+      return;
+    }
     const hardBoolTemplate = {
       'query:query': {
         'bool:elasticFilter': {
@@ -198,10 +217,6 @@ export class CardsToPath
         },
       },
     };
-    parser.createCardIfNotExist(hardBoolTemplate, body);
-    const hardBool = parser.searchCard(hardBoolTemplate, body);
-    console.assert(hardBool !== null);
-
     const softBoolTemplate = {
       'query:query': {
         'bool:elasticFilter': {
@@ -210,10 +225,6 @@ export class CardsToPath
         },
       },
     };
-    parser.createCardIfNotExist(softBoolTemplate, body);
-    const softBool = parser.searchCard(softBoolTemplate, body);
-    console.assert(softBool !== null);
-
     const newHardFilters = [];
     const newSoftFilters = [];
     if (sourceBool.card.otherFilters)
@@ -236,13 +247,17 @@ export class CardsToPath
         }
       });
       sourceBool.card = sourceBool.card.set('otherFilters', List([]));
-
+      let hardBool, softBool;
       if (newHardFilters.length > 0)
       {
+        parser.createCardIfNotExist(hardBoolTemplate, body);
+        hardBool = parser.searchCard(hardBoolTemplate, body);
         hardBool.card = hardBool.card.set('otherFilters', hardBool.card.otherFilters.concat(List(newHardFilters)));
       }
       if (newSoftFilters.length > 0)
       {
+        parser.createCardIfNotExist(softBoolTemplate, body);
+        softBool = parser.searchCard(softBoolTemplate, body);
         softBool.card = softBool.card.set('otherFilters', softBool.card.otherFilters.concat(List(newSoftFilters)));
       }
 
@@ -263,6 +278,11 @@ export class CardsToPath
           {
             targetBool = softBool;
             targetClause = 'should';
+          }
+          if (!targetBool)
+          {
+            parser.createCardIfNotExist(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
+            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body)
           }
           if (targetBool.objectChildren[targetClause] === undefined)
           {
@@ -317,6 +337,11 @@ export class CardsToPath
           {
             targetBool = softBool;
             targetClause = 'should';
+          }
+          if (!targetBool)
+          {
+            parser.createCardIfNotExist(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
+            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body)
           }
           if (targetBool.objectChildren[targetClause] === undefined)
           {
@@ -543,7 +568,10 @@ export class CardsToPath
               {
                 // TODO convert boolQuery from must to filter ?
                 const line = this.TerrainFilterBlockToFilterLine(filter);
-                newLines.push(line);
+                if (line)
+                {
+                  newLines.push(line);
+                }
               })
             }
           }
@@ -688,7 +716,8 @@ export class CardsToPath
       {
         oldPath = _Path();
       }
-      const p = this.BodyCardToPath(oldPath, parser, joinBodyMap[key], dbName).set('name', key);
+      const newParser = new ESCardParser(joinBodyMap[key].card);
+      const p = this.BodyCardToPath(oldPath, newParser, joinBodyMap[key], dbName).set('name', key);
       TerrainLog.debug('(B->P) Turn groupJoin body ', joinBodyMap[key], ' to path', p);
       newPaths.push(p);
     }

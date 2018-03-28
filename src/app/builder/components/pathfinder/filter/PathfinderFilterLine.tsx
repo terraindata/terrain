@@ -161,6 +161,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   public render()
   {
     const { filterLine, canEdit, pathfinderContext } = this.props;
+    console.log('filter line is ', filterLine);
     const { source } = pathfinderContext;
     return (
       <div
@@ -239,7 +240,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   // Check if the field is defined and field type isnt (may occur when filter was created by cards)
   // Update the fieldType if necessary
-  private updateFieldType(props)
+  private updateFieldType(props: Props)
   {
     let fieldType = props.filterLine.fieldType;
     if (props.filterLine.field &&
@@ -249,9 +250,26 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         isNaN(fieldType)))
     {
       const { schemaState, builderState, source } = props.pathfinderContext;
-      fieldType =
-        ElasticBlockHelpers.getTypeOfField(schemaState, builderState, props.filterLine.field, false, source.dataSource.index) as FieldType;
-      props.onChange(props.keyPath, props.filterLine.set('fieldType', parseFloat(fieldType)));
+      fieldType = ElasticBlockHelpers.getTypeOfField(
+        schemaState,
+        builderState,
+        props.filterLine.field,
+        false,
+        (source.dataSource as any).index) as FieldType;
+      let comparison = props.filterLine.comparison;
+      if (String(fieldType) === String(FieldType.Date) &&
+        ['less', 'lessequal', 'greater', 'greaterequal'].indexOf(comparison) !== -1)
+      {
+        comparison = comparison === 'less' || comparison === 'lessequal' ? 'datebefore' : 'dateafter';
+      }
+      else if (String(fieldType) === String(FieldType.Text) &&
+        ['less', 'lessequal', 'greater', 'greaterequal'].indexOf(comparison) !== -1)
+      {
+        comparison = comparison === 'less' || comparison === 'lessequal' ? 'alphabefore' : 'alphaafter';
+      }
+      props.onChange(props.keyPath, props.filterLine
+        .set('fieldType', parseFloat(String(fieldType)))
+        .set('comparison', comparison), true);
     }
   }
 
@@ -380,11 +398,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       default:
         throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
     }
-  }
-
-  private addBoost()
-  {
-    this.props.onChange(this.props.keyPath, this.props.filterLine.set('weightSet', true));
   }
 
   private handleBoostChange(value)
