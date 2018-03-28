@@ -138,6 +138,7 @@ const SchemaTreeStyles =
 
     itemInfoRow: {
       flexGrow: '1',
+      display: 'flex',
     },
 
     childrenWrapper: {

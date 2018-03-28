@@ -61,6 +61,7 @@ const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
 import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
+import SchemaTreeContextActions from './SchemaTreeContextActions';
 import SchemaTreeList from './SchemaTreeList';
 
 import ExpandableView from 'common/components/ExpandableView';
@@ -414,11 +415,6 @@ class SchemaTreeItem extends TerrainComponent<Props>
               onDoubleClick={this.handleHeaderDoubleClick}
             >
               {
-                !hasChildren &&
-                <div style={Styles.arrow} key='no-arrow'>
-                </div>
-              }
-              {
                 this.renderName()
               }
               <div
@@ -426,6 +422,15 @@ class SchemaTreeItem extends TerrainComponent<Props>
               >
                 {
                   this.renderItemInfo()
+                }
+                {
+                  isSelected ?
+                  <SchemaTreeContextActions
+                    id={this.props.id}
+                    type={this.props.type}
+                  />
+                  :
+                  null
                 }
               </div>
             </div>
