@@ -843,7 +843,7 @@ export class CardsToPath
       domain: transCard.domain.toJS(),
       dataDomain: transCard.dataDomain.toJS(),
       hasCustomDomain: transCard.hasCustomDomain,
-      mode: transCard.mode,
+      mode: transCard.mode || 'linear',
     };
     const l = _ScoreLine({ field: transCard.input, transformData, weight });
     TerrainLog.debug('(C->P): transCard ', transCard, ' to scoreline ', l);

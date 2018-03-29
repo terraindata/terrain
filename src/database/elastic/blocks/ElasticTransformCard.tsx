@@ -220,7 +220,7 @@ export const elasticTransform = _card(
         return {
           a: 0,
           b: 1,
-          mode: block['mode'],
+          mode: block['mode'] || 'linear',
           visiblePoints: {
             ranges: block['visiblePoints'].map((scorePt) => scorePt.value).toArray(),
             outputs: block['visiblePoints'].map((scorePt) => scorePt.score).toArray(),

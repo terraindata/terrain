@@ -287,7 +287,7 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
     return {
       dataDomain: List(line.transformData.dataDomain),
       domain: List(line.transformData.domain),
-      mode: line.transformData.mode,
+      mode: line.transformData.mode || 'linear',
       hasCustomDomain: line.transformData.hasCustomDomain,
       input: line.field,
       scorePoints: line.transformData.scorePoints,
