@@ -1,0 +1,67 @@
+@import "../Common.less";
+
+@arrow-spacer-size: 4px;
+.expandable-view-container {
+  .transition;
+  .expandable-view-content-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .expandable-view-arrow-column {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .expandable-view-arrow-spacer-top {
+    flex: 1 0 @arrow-spacer-size;
+  }
+
+  .expandable-view-arrow-spacer-bottom {
+    flex: 1 0 0px;
+    width: 1px;
+    align-self: center;
+    margin-top: @arrow-spacer-size;
+    &.expandable-view-open {
+      &.expandable-view-has-children {
+        border-left: 1px solid;
+      }
+    }
+  }
+
+  .expandable-view-arrow-icon {
+    cursor: pointer;
+    position: relative;
+    fill: currentColor;
+    flex-grow: 0;
+    transform: rotate(90deg);
+    .transition;
+    &.expandable-view-open {
+      transform: rotate(180deg);
+    }
+    &:not(.expandable-view-has-children) {
+      opacity: 0;
+    }
+  }
+
+  .expandable-view-content {
+    flex-grow: 1;
+  }
+
+  .expandable-view-children-container {
+    overflow: visible;
+    display: none;
+    &.expandable-view-open {
+      border-left: 1px solid;
+      display: block;
+    }
+  }
+
+  .expandable-view-injected-container {
+    &.expandable-view-open {
+      border-left: 1px solid;
+    }
+  }
+}

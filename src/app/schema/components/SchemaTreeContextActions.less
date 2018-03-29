@@ -1,0 +1,37 @@
+@import "~common/Common.less";
+
+.schema-tree-context-wrapper {
+  display: flex;
+  padding-top: 1px;
+  align-items: center;
+  position: relative;
+  align-self: center;
+  
+  .schema-context-icon-wrapper {
+    .transition;
+
+    svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+  }
+}
+
+.confirm-delete-index-section {
+  padding: @spacing;
+  margin-left: @half-spacing;
+  padding-top: 0px;
+  display: flex;
+  font-size: 14px;
+
+  .confirm-delete-index-label {
+    padding: @quarter-spacing;
+  }
+
+  .confirm-delete-checkbox-spacer {
+    top: 4px;
+    left: 4px;
+    position: relative;
+  }
+}
