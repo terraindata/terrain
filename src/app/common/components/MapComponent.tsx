@@ -534,7 +534,7 @@ class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
       <div className={this.props.className} >
         <Map
           {...mapProps}
-          zoom={zoom !== undefined ? zoom : this.state.zoom}
+          zoom={zoom !== undefined ? parseFloat(String(zoom)) : this.state.zoom}
           onViewportChanged={this.setZoomLevel}
           maxBounds={[[85, -180], [-85, 180]]}
           minZoom={1}

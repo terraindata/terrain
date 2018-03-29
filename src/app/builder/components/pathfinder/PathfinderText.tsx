@@ -117,6 +117,11 @@ export const PathfinderText = {
   // Collapse
   collapseTitle: 'Group by',
   collapseTootlip: 'Force algorithm to only show the top result with matching values for this field',
+  // Track scores
+  trackScoreTitle: 'Track Match Quality',
+  trackScoreTooltip: 'Track match quality of results',
+  // Source
+  sourceTitle: 'Returned Fields',
   // `Add nested algorithms to create a set of results for each result of your parent algorithm.`,
   referenceName: 'Parent Alias',
   referenceExplanation: 'What the results of this algorithm will be referred to in nested algorithms',

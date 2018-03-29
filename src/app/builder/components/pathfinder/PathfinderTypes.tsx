@@ -129,9 +129,10 @@ class PathC extends BaseClass
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
   public nested: List<Path> = List([]);
+  public reference: string = undefined; // what the outer query will be refered to by inner queries
   public expanded?: boolean = true;
   public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
-  public minMatches?: string = 'any'; // also helpful for inner-queries of groupjoins
+  public minMatches?: number = 0; // also helpful for inner-queries of groupjoins
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
@@ -285,10 +286,12 @@ export const _ScorePoint = (config?: { [key: string]: any }) =>
 class MoreC extends BaseClass
 {
   public aggregations: List<AggregationLine> = List([]);
-  public references: List<string> = List([]); // What should this query be referred to in other queries (@parent in US query)
   public collapse: string = undefined;
   public scripts: List<Script> = List();
   public expanded: boolean = false;
+  public trackScores: boolean = true;
+  public source: List<string> = List([]);
+  public customSource: boolean = false;
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -298,7 +301,7 @@ export const _More = (config?: { [key: string]: any }) =>
   more = more
     .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
     .set('scripts', List(more['scripts'].map((agg) => _Script(agg))))
-    .set('references', List(more['references']));
+    .set('source', List(more['source']));
 
   return more;
 };
@@ -391,6 +394,7 @@ class FilterLineC extends LineC
   // Members for when it is a single line condition
   public field: string = null; // autocomplete
   public fieldType: FieldType = null;
+  public analyzed: boolean = true;
   public comparison: string = null; // autocomplete
   public value: string | number | DistanceValue = null;
   public valueType: ValueType = null;
@@ -571,6 +575,7 @@ type ChoiceContext = {
     builderState: BuilderState,
     field: string,
     fieldType?: FieldType,
+    analyzed?: boolean,
   } | {
     type: 'input',
     source: Source,
@@ -689,7 +694,6 @@ class ElasticDataSourceC extends DataSource
 
         const { dataSource } = context.source;
         const { server, index, types } = dataSource as ElasticDataSource;
-
         if (!index)
         {
           return defaultOptions;
@@ -751,7 +755,7 @@ class ElasticDataSourceC extends DataSource
           {
             _.keys(col.properties).forEach((property) =>
             {
-              const { type } = col.properties[property];
+              const { type, analyzer } = col.properties[property];
               fields = fields.push(
                 _ChoiceOption({
                   displayName: col.name + '.' + property,
@@ -759,6 +763,7 @@ class ElasticDataSourceC extends DataSource
                   icon: fieldTypeToIcon[type],
                   meta: {
                     fieldType: ReverseFieldTypeMapping[type],
+                    analyzed: analyzer !== undefined,
                   },
                 }),
               );
@@ -770,6 +775,7 @@ class ElasticDataSourceC extends DataSource
             icon: fieldTypeToIcon[fieldType],
             meta: {
               fieldType,
+              analyzed: col.analyzed,
             },
           }));
         });
@@ -785,7 +791,7 @@ class ElasticDataSourceC extends DataSource
 
     if (context.type === 'comparison')
     {
-      const { field, fieldType, schemaState, source } = context;
+      const { field, fieldType, schemaState, source, analyzed } = context;
       const server = context.builderState.db.name;
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)
@@ -793,16 +799,8 @@ class ElasticDataSourceC extends DataSource
         options = options.filter((opt) => opt.fieldTypes.indexOf(fieldType) !== -1);
         if (fieldType === FieldType.Text)
         {
-          const { dataSource } = context.source;
-          const { index } = dataSource as any;
-          const col = schemaState.columns.filter(
-            (column) =>
-              column.serverId === String(server) &&
-              column.databaseId === String(index) &&
-              column.name === field,
-          ).toList().get(0);
           // If it is analyzed, remove 'equal' / 'notequal' (term)
-          if (col && col.analyzed)
+          if (analyzed)
           {
             options = options.filter((opt) => opt.value !== 'equal' && opt.value !== 'notequal');
           }
@@ -876,9 +874,21 @@ const ElasticComparisons = [
       ]),
   },
   {
+    value: 'notexists',
+    displayName: 'does not exist',
+    fieldTypes: List(
+      [FieldType.Numerical,
+      FieldType.Text,
+      FieldType.Date,
+      FieldType.Geopoint,
+      FieldType.Ip,
+      FieldType.Nested,
+      ]),
+  },
+  {
     value: 'equal',
     displayName: 'equals', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
-    fieldTypes: List([FieldType.Numerical, FieldType.Text]),
+    fieldTypes: List([FieldType.Numerical, FieldType.Text, FieldType.Date]),
     placeholder: 'e.g. 100 or apple',
   },
   {
@@ -890,7 +900,7 @@ const ElasticComparisons = [
   {
     value: 'notequal',
     displayName: 'does not equal', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical]),
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
     placeholder: 'e.g. 100 or apple',
   },
   {
@@ -902,7 +912,7 @@ const ElasticComparisons = [
   {
     value: 'isnotin',
     displayName: 'is not in',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
+    fieldTypes: List([FieldType.Text]),
     placeholder: 'e.g. apple, banana, kiwi',
   },
   {

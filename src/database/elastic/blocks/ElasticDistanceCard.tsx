@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands
 
+import Util from 'app/util/Util';
 import * as Immutable from 'immutable';
 import { List } from 'immutable';
 import * as _ from 'lodash';
-
 import BuilderMapComponent from '../../../app/builder/components/BuilderMapComponent';
 import { Colors, getCardColors } from '../../../app/colors/Colors';
 import { DisplayType } from '../../../blocks/displays/Display';
@@ -83,6 +83,7 @@ export const elasticDistance = _card({
   locationValue: {},
   mapInputValue: '',
   mapZoomValue: 15,
+  boost: 1,
 
   static: {
     language: 'elastic',
@@ -93,10 +94,12 @@ export const elasticDistance = _card({
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      const locationValue = block['locationValue'].toJS !== undefined ? block['locationValue'].toJS() : block['locationValue'];
+      const locationValue = Util.asJS(block['locationValue']);
+
       return {
         distance: (block['distance']).toString() + block['distanceUnit'],
         distance_type: block['distanceType'],
+        boost: block['boost'],
         [block['field']]: locationValue,
       };
     },

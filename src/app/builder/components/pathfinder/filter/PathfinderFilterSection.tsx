@@ -448,7 +448,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public isGroup(item)
   {
-    return item.filterGroup;
+    return item && item.filterGroup;
   }
 
   public handleStepChange()
@@ -481,7 +481,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       title = PathfinderText.softFilterSectionTitle;
       tooltip = PathfinderText.softFilterSectionSubtitle;
     }
-
     return (
       <div
         className='pf-section pf-filter-section'

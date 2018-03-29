@@ -579,6 +579,21 @@ export default class ESCardParser extends ESParser
     if (block.static.clause === undefined)
     {
       // must be a custom card, ignore it now
+      if (block.key === 'geo_distance')
+      {
+        const valueInfo = new ESValueInfo();
+        valueInfo.card = block;
+        valueInfo.card.cards = List([]);
+        valueInfo.clause = block.static.clause;
+        valueInfo.cardPath = blockPath;
+        const { distance, distanceUnit, distanceType, locationValue, mapInputValue, field } = valueInfo.card;
+        valueInfo.value = {
+          distance: String(distance) + distanceUnit,
+          distance_type: distanceType,
+          [field]: locationValue,
+        };
+        return valueInfo;
+      }
       return null;
     }
     switch (block.static.clause.clauseType)
@@ -618,7 +633,7 @@ export default class ESCardParser extends ESParser
       case ESClauseType.ESScriptClause:
         return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESWildcardStructureClause:
-        return this.parseESWildcardClause(block, blockPath);
+        return this.parseESWildcardStructureClause(block, blockPath);
       default:
         return this.parseESClause(block, blockPath);
     }
@@ -748,6 +763,39 @@ export default class ESCardParser extends ESParser
         childName.card = card;
         childName.cardPath = childrenCard.push(key);
         childName.clause = ESInterpreterDefaultConfig.getClause(block.static.clause.nameType);
+        const childValue = this.parseCard(card, childrenCard.push(key));
+        if (childValue !== null)
+        {
+          const propertyInfo = new ESPropertyInfo(childName, childValue);
+          valueInfo.addObjectChild(keyName, propertyInfo);
+          theValue[keyName] = childValue.value;
+        } else
+        {
+          // console.log('card ' + keyName + ' has value null');
+        }
+      },
+    );
+    return valueInfo;
+  }
+
+  private parseESWildcardStructureClause(block, blockPath)
+  {
+    const valueInfo = new ESValueInfo();
+    valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
+    valueInfo.cardPath = blockPath;
+    const theValue = {};
+    valueInfo.jsonType = ESJSONType.object;
+    valueInfo.value = theValue;
+    const childrenCard = blockPath.push('cards');
+    block['cards'].map(
+      (card, key) =>
+      {
+        const keyName = card['key'];
+        const childName = new ESJSONParser(JSON.stringify(keyName)).getValueInfo();
+        childName.card = card;
+        childName.cardPath = childrenCard.push(key);
+        childName.clause = ESInterpreterDefaultConfig.getClause('string');
         const childValue = this.parseCard(card, childrenCard.push(key));
         if (childValue !== null)
         {

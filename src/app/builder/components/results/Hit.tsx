@@ -228,7 +228,7 @@ class HitComponent extends TerrainComponent<Props> {
     });
   }
 
-  public renderNestedFieldHeader(field, depth, size, expandState: NestedState, maxFields: number, thumbnail: boolean)
+  public renderNestedFieldHeader(field, depth, size, expandState: NestedState, maxFields: number, thumbnail: string)
   {
     const scrollState = this.state.scrollState.get(field) || 0;
     return (
