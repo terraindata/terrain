@@ -56,14 +56,8 @@ import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-import {
-  addInitialTypeCasts,
-  autodetectElasticTypes,
-  createEngineFromDocuments,
-  interpretTextFields,
-  mergeJoinEngines
-} from 'shared/transformations/util/EngineUtil';
 
 import
 {
@@ -137,7 +131,7 @@ export class TemplateProxy
       leftJoinKey: string,
       rightJoinKey: string,
       outputKey: string,
-    }
+    },
   )
   {
     const leftEdge = this.template.getEdge(leftEdgeId);
@@ -159,7 +153,7 @@ export class TemplateProxy
     this.setEdgeTo(rightEdgeId, mergeNodeId);
 
     const newEdgeId = this.addEdge(mergeNodeId, leftEdge.to);
-    const newEngine = mergeJoinEngines(
+    const newEngine = EngineUtil.mergeJoinEngines(
       leftEdge.transformations,
       rightEdge.transformations,
       options.outputKey,
@@ -200,7 +194,7 @@ export class TemplateProxy
 
   public createInitialEdgeEngine(edgeId: number, documents: List<object>)
   {
-    const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
+    const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
 
     let interpretText = false;
     const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
@@ -239,7 +233,7 @@ export class TemplateProxy
     documentConfig?: {
       documents: List<object>,
       interpretText?: boolean,
-    }
+    },
   )
   {
     const engine = this.template.getTransformationEngine(edgeId);
@@ -248,19 +242,19 @@ export class TemplateProxy
     {
       if (documentConfig.interpretText === true)
       {
-        interpretTextFields(engine, documentConfig.documents);
+        EngineUtil.interpretTextFields(engine, documentConfig.documents);
       }
       const language = this.template.getEdgeLanguage(edgeId);
       switch (language)
       {
         case 'elastic':
-          autodetectElasticTypes(engine, documentConfig.documents);
+          EngineUtil.autodetectElasticTypes(engine, documentConfig.documents);
           break;
         default:
           break;
       }
     }
-    addInitialTypeCasts(engine);
+    EngineUtil.addInitialTypeCasts(engine);
   }
 
   private createNode(node: ETLNode): number
@@ -383,7 +377,7 @@ export class TemplateProxy
 
   private get template()
   {
-    return this._template()
+    return this._template();
   }
 
   private set template(val: ETLTemplate)

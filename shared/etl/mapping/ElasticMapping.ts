@@ -52,7 +52,7 @@ import * as _ from 'lodash';
 import { defaultProps, ElasticFieldProps, ElasticTypes, JsAutoMap } from 'shared/etl/types/ETLElasticTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { getRepresentedType, hashPath, isNamedField, PathHashMap } from 'shared/transformations/util/EngineUtil';
+import EngineUtil, { PathHashMap } from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 export interface TypeConfig
@@ -252,7 +252,7 @@ export class ElasticMapping
 
   protected getRepresentedType(fieldID: number): FieldTypes
   {
-    return getRepresentedType(fieldID, this.engine);
+    return EngineUtil.getRepresentedType(fieldID, this.engine);
   }
 
   // converts engine keypaths to keypaths in the elastic mapping
@@ -262,7 +262,7 @@ export class ElasticMapping
   protected enginePathToMappingPath(path: EnginePath): EnginePath
   {
     return path.flatMap(
-      (value, i) => isNamedField(path, i) ? ['properties', value] : [],
+      (value, i) => EngineUtil.isNamedField(path, i) ? ['properties', value] : [],
     ).toList() as EnginePath;
   }
 
@@ -282,7 +282,7 @@ export class ElasticMapping
     const config = this.getTypeConfig(id);
     const enginePath = this.engine.getOutputKeyPath(id);
     const cleanedPath = this.enginePathToMappingPath(enginePath);
-    const hashed = hashPath(cleanedPath);
+    const hashed = EngineUtil.hashPath(cleanedPath);
 
     if (config !== null)
     {

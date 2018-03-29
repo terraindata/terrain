@@ -55,7 +55,7 @@ import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { isWildcardField } from 'shared/transformations/util/EngineUtil';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 /*
@@ -198,7 +198,7 @@ export class FieldProxy
 
   public changeType(newType: FieldTypes)
   {
-    if (isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
+    if (EngineUtil.isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
     {
       this.engine.setFieldProp(this.fieldId, List(['valueType']), newType);
     }
