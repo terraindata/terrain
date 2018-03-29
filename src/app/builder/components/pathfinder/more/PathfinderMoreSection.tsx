@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, getStyle } from '../../../../colors/Colors';
+import { backgroundColor, borderColor, fontColor, Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
@@ -67,6 +67,8 @@ import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
+import RadioButtons from 'app/common/components/RadioButtons';
+import MultiInput from 'app/common/components/MultiInput';
 import
 {
   _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
@@ -95,6 +97,15 @@ export interface Props
 
 class PathfinderMoreSection extends TerrainComponent<Props>
 {
+
+  public state: {
+    sourceOpen: boolean,
+    fieldOptions: List<any>,
+  } = {
+    sourceOpen: false,
+    fieldOptions: List([]),
+  }
+
   public componentWillMount()
   {
     this.props.colorsActions({
@@ -286,6 +297,27 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     };
     return List([optionSet]);
   }
+  public getTrackScoresOptionSets()
+  {
+    const optionSet = {
+      key: 'trackScore',
+      options: List([{
+        value: true,
+        displayName: 'True',
+      },
+      {
+        value: false,
+        displayName: 'False',
+      }]),
+      shortNameText: PathfinderText.trackScoreTitle,
+      headerText: PathfinderText.trackScoreTooltip,
+      column: true,
+      hideSampleData: true,
+      hasSearch: false,
+      forceFloat: true,
+    };
+    return List([optionSet]);
+  }
 
   public getCollapseOptionSets()
   {
@@ -318,31 +350,37 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         key: 'value',
         options: List([
           {
-            value: '1',
+            value: 0,
+            displayName: 'None',
+            hasOther: true,
+            sampleData: List([]),
+          },
+          {
+            value: 1,
             displayName: '1',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '2',
+            value: 2,
             displayName: '2',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '3',
+            value: 3,
             displayName: '3',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '5',
+            value: 5,
             displayName: '5',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '10',
+            value: 10,
             displayName: '10',
             hasOther: true,
             sampleData: List([]),
@@ -379,8 +417,9 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleMinMatchesChange(optionSetIndex: number, value: any)
   {
     const { keyPath } = this.props;
-    const nestedKeyPath = this._ikeyPath(keyPath.butLast().toList(), 'minMatches');
-    this.props.builderActions.changePath(nestedKeyPath, value);
+    const nestedKeyPath = this._ikeyPath(keyPath.skipLast(3).toList(), 'minMatches');
+    this.props.builderActions.changePath(nestedKeyPath, value, true);
+    this.props.builderActions.changePath(this._ikeyPath(keyPath.butLast().toList(), 'minMatches'), value);
   }
 
   public handleCollapseChange(optionSetIndex: number, value)
@@ -393,7 +432,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     {
       value += '.keyword';
     }
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath.push('collapse')), value);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'collapse'), value);
+  }
+
+  public handleTrackScoresChange(optionSetIndex: number, value)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'trackScores'), value);
   }
 
   public handleScoreTypeChange(optionSetIndex: number, value)
@@ -554,8 +598,92 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       expanded);
   }
 
+  public renderSourceInputs(source: List<string>, customSource)
+  {
+    return (
+      <div
+        className='more-section-source-inputs'
+      >
+        <MultiInput
+          canEdit={this.props.pathfinderContext.canEdit && customSource}
+          items={source}
+          onChange={this.handleSourceChange}
+        />
+      </div>
+    );
+  }
+
+  public handleSourceChange(items: List<string>)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'source'), items);
+  }
+
+  public handleSourceTypeChange(key)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'customSource'), key === 'custom');
+  }
+
+  public renderSourceSection(source: List<string>, customSource: boolean)
+  {
+    const {sourceOpen} = this.state;
+    return (
+      <div
+        className={classNames({
+          'more-section-source-wrapper': true,
+          'more-section-source-wrapper-closed': !sourceOpen,
+        })}
+        style={backgroundColor(Colors().fontWhite)}
+      >
+        <div
+          className='more-section-source-title-wrapper'
+          onClick={this._toggle('sourceOpen')}
+          style={borderColor(Colors().blockOutline)}
+        >
+          <div
+            className='more-section-source-title'
+            style={fontColor(Colors().text3)}
+          >
+            {PathfinderText.sourceTitle}
+          </div>
+          {
+            <div
+              className='more-section-source-preview'
+              style={fontColor(Colors().active)}
+            >
+              {
+                !customSource ? 'All' :
+                  source.map((val, i) => i === 0 ? val  : ', ' + val)
+              }
+            </div>
+          }
+          </div>
+          <FadeInOut
+            open={sourceOpen}
+          >
+            <RadioButtons
+              selected={customSource ? 'custom' : 'all'}
+              canEdit={this.props.pathfinderContext.canEdit}
+              options={List([
+                {
+                  key: 'all',
+                  label: 'All'
+                },
+                {
+                  key: 'custom',
+                  label: 'Select Fields',
+                  display: this.renderSourceInputs(source, customSource)
+                }
+              ])}
+              onSelectOption={this.handleSourceTypeChange}
+            />
+          </FadeInOut>
+      </div>
+    );
+  }
+
   public render()
   {
+    const { more } = this.props;
     const { canEdit } = this.props.pathfinderContext;
     const collapseValue = this.props.more.collapse ?
       this.props.more.collapse.replace('.keyword', '') : undefined;
@@ -570,11 +698,11 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               tooltipText={PathfinderText.moreSectionSubtitle}
               onExpand={this.toggleExpanded}
               canExpand={true}
-              expanded={this.props.more.expanded}
+              expanded={more.expanded}
             />
           }
           <FadeInOut
-            open={this.props.more.expanded}
+            open={more.expanded}
           >
             {
               <RouteSelector
@@ -595,14 +723,23 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               defaultOpen={false}
               autoFocus={true}
             />
-            {
-              <RouteSelector
+            <RouteSelector
+              optionSets={this.getTrackScoresOptionSets()}
+              values={List([more.trackScores])}
+              onChange={this.handleTrackScoresChange}
+              canEdit={canEdit}
+              defaultOpen={false}
+              autoFocus={true}
+            />
+            <RouteSelector
                 optionSets={this.getScoreTypeOptionSets()}
                 values={List([this.props.scoreType])}
                 onChange={this.handleScoreTypeChange}
                 canEdit={canEdit}
                 defaultOpen={false}
-              />
+            />
+            {
+              this.renderSourceSection(more.source, more.customSource)
             }
             {
               this.props.keyPath.includes('nested') ?

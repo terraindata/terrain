@@ -64,8 +64,10 @@ export const elasticScore = _card(
     sortOrder: 'desc',
     sortType: 'number',
     sortMode: 'auto',
+    cards: List([]),
 
     static: {
+      clause: ESInterpreterDefaultConfig.getClause('script_sort'),
       language: 'elastic',
       title: 'Terrain Score Sort',
       description: 'Sort results using Terrain\'s proprietary scoring method: Transform \

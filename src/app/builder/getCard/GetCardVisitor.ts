@@ -134,6 +134,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       return 'eql' + clause.type;
     } else
     {
+      if (clause.startsWith('elastic'))
+      {
+        return clause;
+      }
       return 'eql' + clause;
     }
   }

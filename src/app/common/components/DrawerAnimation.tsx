@@ -170,7 +170,6 @@ class DrawerAnimation extends TerrainComponent<Props>
           setTimeout(() =>
           {
             const el = ReactDOM.findDOMNode(this.state.contentRef);
-
             if (el !== undefined)
             {
               el.scrollIntoView({

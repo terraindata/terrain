@@ -142,10 +142,21 @@ export default class ESValueInfo
     return (this._arrayChildren === undefined) ? [] : this._arrayChildren;
   }
 
-  public addArrayChild(info: ESValueInfo): void
+  public set arrayChildren(children: ESValueInfo[])
+  {
+    this._arrayChildren = children;
+  }
+
+  public addArrayChild(info: ESValueInfo, index?: number): void
   {
     this._arrayChildren = this.arrayChildren;
-    this._arrayChildren.push(info);
+    if (index === undefined)
+    {
+      this._arrayChildren.push(info);
+    } else
+    {
+      this._arrayChildren[index] = info;
+    }
   }
 
   /**
@@ -176,7 +187,7 @@ export default class ESValueInfo
       });
   }
 
-  public forEachElement(func: (element: ESValueInfo) => void): void
+  public forEachElement(func: (element: ESValueInfo, index?: number, array?: ESValueInfo[]) => void): void
   {
     this.arrayChildren.forEach(func);
   }
