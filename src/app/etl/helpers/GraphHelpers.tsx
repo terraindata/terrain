@@ -74,7 +74,6 @@ import { SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { mergeJoinEngines } from 'shared/transformations/util/EngineUtil';
 import DocumentsHelpers from './DocumentsHelpers';
 
 class GraphHelpers extends ETLHelpers
@@ -122,19 +121,12 @@ class GraphHelpers extends ETLHelpers
     {
       const leftEdgeId = proxy.value().findEdges((edge) => edge.from === leftId).first();
       const rightEdgeId = proxy.value().findEdges((edge) => edge.from === rightId).first();
-      const destinationNodeId = proxy.value().getEdge(leftEdgeId).to;
 
-      const mergeNodeId = proxy.addMergeNode(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
-      proxy.setEdgeTo(leftEdgeId, mergeNodeId);
-      proxy.setEdgeTo(rightEdgeId, mergeNodeId);
-
-      const newEdgeId = proxy.addEdge(mergeNodeId, destinationNodeId);
-      const newEngine = mergeJoinEngines(
-        proxy.value().getTransformationEngine(leftEdgeId),
-        proxy.value().getTransformationEngine(rightEdgeId),
+      proxy.createMergeJoin(leftEdgeId, rightEdgeId, {
+        leftJoinKey,
+        rightJoinKey,
         outputKey,
-      );
-      proxy.setEdgeTransformations(newEdgeId, newEngine);
+      });
     }).catch(this._logError);
   }
 

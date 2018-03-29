@@ -124,26 +124,41 @@ export class TemplateProxy
     return { sinkKey: key, nodeId };
   }
 
-  // adds a merge node
-  public addMergeNode(
-    leftId: number,
-    rightId: number,
-    leftJoinKey: string,
-    rightJoinKey: string,
-    outputKey: string
-  ): number
+  public createMergeJoin(
+    leftEdgeId: number,
+    rightEdgeId: number,
+    options: {
+      leftJoinKey: string,
+      rightJoinKey: string,
+      outputKey: string,
+    }
+  )
   {
+    const leftEdge = this.template.getEdge(leftEdgeId);
+    const rightEdge = this.template.getEdge(rightEdgeId);
+
     const mergeNode = _ETLNode({
       type: NodeTypes.MergeJoin,
       options: _MergeJoinOptions({
-        leftId,
-        rightId,
-        leftJoinKey,
-        rightJoinKey,
-        outputKey,
+        leftId: leftEdge.from,
+        rightId: rightEdge.from,
+        leftJoinKey: options.leftJoinKey,
+        rightJoinKey: options.rightJoinKey,
+        outputKey: options.outputKey,
       }),
     });
-    return this.createNode(mergeNode);
+    const mergeNodeId = this.createNode(mergeNode);
+
+    this.setEdgeTo(leftEdgeId, mergeNodeId);
+    this.setEdgeTo(rightEdgeId, mergeNodeId);
+
+    const newEdgeId = this.addEdge(mergeNodeId, leftEdge.to);
+    const newEngine = mergeJoinEngines(
+      leftEdge.transformations,
+      rightEdge.transformations,
+      options.outputKey,
+    );
+    this.setEdgeTransformations(newEdgeId, newEngine);
   }
 
   // delete a source and its node
@@ -196,7 +211,7 @@ export class TemplateProxy
   private createNode(node: ETLNode): number
   {
     const id = this.process.uidNode;
-    this.nodes = this.nodes.set(id, node);
+    this.nodes = this.nodes.set(id, node.set('id', id));
     this.process = this.process.set('uidNode', id + 1);
     return id;
   }
@@ -209,7 +224,7 @@ export class TemplateProxy
       return -1;
     }
     const id = this.process.uidEdge;
-    this.edges = this.edges.set(id, edge);
+    this.edges = this.edges.set(id, edge.set('id', id));
     this.process = this.process.set('uidEdge', id + 1);
     return id;
   }
