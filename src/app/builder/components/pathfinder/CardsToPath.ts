@@ -132,7 +132,7 @@ export class CardsToPath
     const newScripts = this.getScripts(path.more.scripts, parser, bodyValueInfo);
     const collapse = this.getCollapse(path.more.collapse, parser, bodyValueInfo);
     const trackScores = this.getTrackScores(parser, bodyValueInfo);
-    const {source, customSource} = this.getSourceFields(path, parser, bodyValueInfo);
+    const { source, customSource } = this.getSourceFields(path, parser, bodyValueInfo);
     const more = path.more
       .set('scripts', newScripts)
       .set('collapse', collapse)
@@ -784,14 +784,14 @@ export class CardsToPath
     return true;
   }
 
-  private static getSourceFields(path: Path, parser: ESCardParser, body: ESValueInfo): {source: List<string>, customSource: boolean}
+  private static getSourceFields(path: Path, parser: ESCardParser, body: ESValueInfo): { source: List<string>, customSource: boolean }
   {
     const rootVal = body.value;
     if (rootVal.hasOwnProperty('_source') && Array.isArray(rootVal._source))
     {
-      return {source: List(rootVal._source), customSource: true}
+      return { source: List(rootVal._source), customSource: true };
     }
-    return {source: path.more.source, customSource: false}
+    return { source: path.more.source, customSource: false };
   }
 
   private static updateSource(source: Source, parser: ESCardParser, body: ESValueInfo, dbName: string): Source

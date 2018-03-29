@@ -277,7 +277,7 @@ export const ElasticBlockHelpers = {
       {
         if (returnAnalyzed)
         {
-          return {fieldType: dataType, analyzed: col.analyzed};
+          return { fieldType: dataType, analyzed: col.analyzed };
         }
         return dataType;
       }
@@ -292,7 +292,7 @@ export const ElasticBlockHelpers = {
       });
       if (returnAnalyzed)
       {
-        return {fieldType, analyzed: col.analyzed};
+        return { fieldType, analyzed: col.analyzed };
       }
       return fieldType;
     }

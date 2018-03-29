@@ -177,11 +177,11 @@ export class PathToCards
 
     if (!path.more.customSource)
     {
-      parser.createCardIfNotExist({'_source:boolean': true}, body);
+      parser.createCardIfNotExist({ '_source:boolean': true }, body);
     }
     else
     {
-      parser.createCardIfNotExist({'_source:field[]': path.more.source.toJS()}, body);
+      parser.createCardIfNotExist({ '_source:field[]': path.more.source.toJS() }, body);
     }
   }
 
@@ -192,7 +192,7 @@ export class PathToCards
     {
       parser.createCardIfNotExist({ 'track_scores:track_scores': path.more.trackScores }, body);
     }
-    const trackScoreCard = BlockUtils.make(ElasticBlocks, 'eqltrack_scores', {key: 'track_scores', value: path.more.trackScores});
+    const trackScoreCard = BlockUtils.make(ElasticBlocks, 'eqltrack_scores', { key: 'track_scores', value: path.more.trackScores });
     const parsedCard = new ESCardParser(trackScoreCard);
     rootValueInfo.objectChildren['track_scores'].propertyValue = parsedCard.getValueInfo();
     parser.isMutated = true;
@@ -445,15 +445,15 @@ export class PathToCards
     {
       const nestedQuery = nestedQueries[i];
       this.FilterGroupToBool(
-        _FilterGroup({lines: List(filterLinePathMap[key])}),
+        _FilterGroup({ lines: List(filterLinePathMap[key]) }),
         parser,
         nestedQuery.objectChildren.query.propertyValue.objectChildren.bool.propertyValue,
         filterSection,
         true);
-        if (nestedQuery.objectChildren.path.propertyValue.value !== key)
-        {
-          nestedQuery.objectChildren.path.propertyValue.card = nestedQuery.objectChildren.path.propertyValue.card.set('value', key);
-        }
+      if (nestedQuery.objectChildren.path.propertyValue.value !== key)
+      {
+        nestedQuery.objectChildren.path.propertyValue.card = nestedQuery.objectChildren.path.propertyValue.card.set('value', key);
+      }
     });
   }
 

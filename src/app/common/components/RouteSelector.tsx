@@ -1013,7 +1013,6 @@ export class RouteSelector extends TerrainComponent<Props>
         key={index}
         isVisible={true}
         hideNested={true}
-        isVisible={true}
       />
     );
   }

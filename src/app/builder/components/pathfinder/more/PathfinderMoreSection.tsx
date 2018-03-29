@@ -50,12 +50,14 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { backgroundColor, borderColor, fontColor, Colors, getStyle } from '../../../../colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import FadeInOut from 'app/common/components/FadeInOut';
 import FloatingInput from 'app/common/components/FloatingInput';
+import MultiInput from 'app/common/components/MultiInput';
+import RadioButtons from 'app/common/components/RadioButtons';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import TQLEditor from 'app/tql/components/TQLEditor';
 import Util from 'app/util/Util';
@@ -67,8 +69,6 @@ import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
-import RadioButtons from 'app/common/components/RadioButtons';
-import MultiInput from 'app/common/components/MultiInput';
 import
 {
   _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
@@ -102,9 +102,9 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     sourceOpen: boolean,
     fieldOptions: List<any>,
   } = {
-    sourceOpen: false,
-    fieldOptions: List([]),
-  }
+      sourceOpen: false,
+      fieldOptions: List([]),
+    };
 
   public componentWillMount()
   {
@@ -625,7 +625,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
 
   public renderSourceSection(source: List<string>, customSource: boolean)
   {
-    const {sourceOpen} = this.state;
+    const { sourceOpen } = this.state;
     return (
       <div
         className={classNames({
@@ -652,31 +652,31 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             >
               {
                 !customSource ? 'All' :
-                  source.map((val, i) => i === 0 ? val  : ', ' + val)
+                  source.map((val, i) => i === 0 ? val : ', ' + val)
               }
             </div>
           }
-          </div>
-          <FadeInOut
-            open={sourceOpen}
-          >
-            <RadioButtons
-              selected={customSource ? 'custom' : 'all'}
-              canEdit={this.props.pathfinderContext.canEdit}
-              options={List([
-                {
-                  key: 'all',
-                  label: 'All'
-                },
-                {
-                  key: 'custom',
-                  label: 'Select Fields',
-                  display: this.renderSourceInputs(source, customSource)
-                }
-              ])}
-              onSelectOption={this.handleSourceTypeChange}
-            />
-          </FadeInOut>
+        </div>
+        <FadeInOut
+          open={sourceOpen}
+        >
+          <RadioButtons
+            selected={customSource ? 'custom' : 'all'}
+            canEdit={this.props.pathfinderContext.canEdit}
+            options={List([
+              {
+                key: 'all',
+                label: 'All',
+              },
+              {
+                key: 'custom',
+                label: 'Select Fields',
+                display: this.renderSourceInputs(source, customSource),
+              },
+            ])}
+            onSelectOption={this.handleSourceTypeChange}
+          />
+        </FadeInOut>
       </div>
     );
   }
@@ -732,11 +732,11 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               autoFocus={true}
             />
             <RouteSelector
-                optionSets={this.getScoreTypeOptionSets()}
-                values={List([this.props.scoreType])}
-                onChange={this.handleScoreTypeChange}
-                canEdit={canEdit}
-                defaultOpen={false}
+              optionSets={this.getScoreTypeOptionSets()}
+              values={List([this.props.scoreType])}
+              onChange={this.handleScoreTypeChange}
+              canEdit={canEdit}
+              defaultOpen={false}
             />
             {
               this.renderSourceSection(more.source, more.customSource)

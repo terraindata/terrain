@@ -440,7 +440,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
   {
     // In this case it is a nested query, disguised as a normal filter line
     const path = line.get(0).field.split('.')[0];
-    const inner = parseFilters(_FilterGroup({lines: line}), inputs, useShould, true).toJS());
+    const inner = parseFilters(_FilterGroup({ lines: line }), inputs, useShould, true).toJS());
     return Map({
       nested: {
         path,

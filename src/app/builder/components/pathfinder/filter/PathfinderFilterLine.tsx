@@ -272,10 +272,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       }
       // If the field is analyzed text, make sure it is using match comparison (not term)
       if (
-          String(fieldType) === String(FieldType.Text) &&
-          analyzed &&
-          ['equal', 'notequal'].indexOf(comparison) !== -1
-        )
+        String(fieldType) === String(FieldType.Text) &&
+        analyzed &&
+        ['equal', 'notequal'].indexOf(comparison) !== -1
+      )
       {
         comparison = comparison === 'equal' ? 'contains' : 'notcontain';
       }
