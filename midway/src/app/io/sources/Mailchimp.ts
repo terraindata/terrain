@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import jsonStream = require('JSONStream');
 
@@ -50,16 +50,10 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { CredentialConfig } from '../../credentials/CredentialConfig';
 import { Credentials } from '../../credentials/Credentials';
 import { ExportSourceConfig } from './Sources';
 
 export const credentials: Credentials = new Credentials();
-
-export interface MailchimpJSONConfig
-{
-  data: object[];
-}
 
 export interface MailchimpSourceConfig
 {
@@ -76,12 +70,11 @@ export class Mailchimp
     return new Promise<string>(async (resolve, reject) =>
     {
       try {
-        // TODO: parse JSON stream as JSON objects
         let results: object[] = [];
         const jsonParser = jsonStream.parse();
         exportSourceConfig.stream.pipe(jsonParser);
         jsonParser.on('data', (data) => {
-            console.log(data.length);
+          winston.debug(`Mailchimp got data (onData) with ${data.length} objects`);
           results = data;
           const mailchimpSourceConfig: MailchimpSourceConfig =
             {
@@ -89,15 +82,12 @@ export class Mailchimp
               key: exportSourceConfig.params['key'],
               host: exportSourceConfig.params['host'],
             };
-          console.log('mailchimpSourceConfig = ');
-          //console.log(JSON.stringify(mailchimpSourceConfig));
-          console.log('happy');
-          resolve("done herere");
+          this.runQuery(mailchimpSourceConfig);
+          resolve('Finished getJSONStreamAsMailchimpSourceConfig.onData');
         });
-        resolve('roroijgor');
+        resolve('Finished getJSONStreamAsMailchimpSourceConfig');
       } catch (e) {
-        console.log('esagegg');
-        console.log(e);
+        reject(`Mailchimp export failed in getJSONStreamAsMailchimpSourceConfig: ${e}`);
       }
     });
   }
@@ -109,10 +99,15 @@ export class Mailchimp
 
         console.log('here5555');
 
+        // TODO batch POST requests to Mailchimp here... `mailchimpSourceConfig.data` is row array
+
         mailchimpSourceConfig.data.forEach(async (row) => {
           try {
-            console.log('processing row =');
-            console.log(row);
+            // console.log('processing row =');
+            // console.log(row);
+
+            // TODO POST `row` to Mailchimp...
+
             //thisResolve({ args: {}, status: 'true' });
             /*const requestArgs: object = {};
             Object.keys(mailchimpSourceConfig.updateParams).forEach((key) =>

@@ -225,11 +225,14 @@ export class App
     const dbs = await databases.select(['id'], {});
     for (const db of dbs)
     {
-      await databases.connect({} as any, db.id);
-
-      if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
+      if (db.id !== undefined)
       {
-        await events.initializeEventMetadata(DB, db.analyticsIndex, db.analyticsType);
+          await databases.connect({} as any, db.id);
+
+          if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
+          {
+              await events.initializeEventMetadata(DB, db.analyticsIndex, db.analyticsType);
+          }
       }
     }
     winston.debug('Finished connecting to configured databases...');
