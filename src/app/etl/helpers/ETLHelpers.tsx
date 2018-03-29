@@ -188,4 +188,27 @@ export default abstract class ETLHelpers
     // tslint:disable-next-line
     console.error(ev);
   }
+
+  protected _errorHandler(description: string, showModal = false): (ev: any) => void
+  {
+    return (ev) => {
+      const message = `${description}: ${String(ev)}`;
+      if (showModal)
+      {
+        this.editorAct({
+          actionType: 'addModal',
+          props: {
+            title: 'Error',
+            message,
+            error: true,
+          }
+        });
+      }
+      else
+      {
+        // tslint:disable-next-line
+        console.error(description, ev);
+      }
+    }
+  }
 }

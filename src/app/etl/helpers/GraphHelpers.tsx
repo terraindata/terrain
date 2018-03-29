@@ -145,7 +145,7 @@ class GraphHelpers extends ETLHelpers
     const fromNode = template.getNode(edge.from);
     if (fromNode.type === NodeTypes.Source)
     {
-      const source = template.getSources().get(fromNode.endpoint);
+      const source = template.getSource(fromNode.endpoint);
       DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
       {
         const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
