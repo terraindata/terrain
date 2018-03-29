@@ -129,7 +129,7 @@ class PathfinderNestedSection extends TerrainComponent<Props>
   {
     if (this.props.reference === undefined)
     {
-      const currIndex = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
+      const currIndex = (this.props.pathfinderContext.source.dataSource as any).index;
       this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath.butLast().toList(), 'reference'),
         currIndex);
     }
@@ -214,8 +214,8 @@ class PathfinderNestedSection extends TerrainComponent<Props>
 
   public renderNestedPaths()
   {
-    const { nested, reference, keyPath } = this.props;
-    const { canEdit, source } = this.props.pathfinderContext;
+    const { nested, reference, keyPath, pathfinderContext } = this.props;
+    const { canEdit, source } = pathfinderContext;
     return (
       <div>
         {

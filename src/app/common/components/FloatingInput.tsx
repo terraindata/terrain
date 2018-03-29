@@ -69,7 +69,6 @@ export let LABEL_FLOATING_FONT_SIZE = '12px';
 
 const containerStyle = {
   borderColor: Colors().inputBorder,
-  background: Colors().textboxBg,
 
   color: Colors().active, // used for hover / focus color
 };
@@ -155,7 +154,10 @@ export class FloatingInput extends TerrainComponent<Props>
     const { value, onClick } = props;
 
     const isFloating = this.isFloating();
-
+    const containerFullStyle = _.extend(
+      {},
+      containerStyle, backgroundColor(props.noBg ? '' : Colors().fontWhite)
+    );
     return (
       <div
         className={classNames({
@@ -170,7 +172,7 @@ export class FloatingInput extends TerrainComponent<Props>
           'floating-input-container-showEllipsis': props.showEllipsis,
           [props.className]: props.className !== undefined,
         })}
-        style={containerStyle}
+        style={containerFullStyle}
         onClick={this._fn(props.onClick)}
       >
         {
