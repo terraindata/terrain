@@ -54,7 +54,7 @@ import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import { isInput } from '../../../../blocks/types/Input';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
-import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
+import { _FilterGroup, DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;
 const NEGATIVES = ['notcontain', 'noteequal', 'notisin', 'notexists'];
@@ -75,7 +75,7 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
     aggs: Map({}),
     from: 0,
     _source: true,
-    track_scores: true,
+    track_scores: path.more.trackScores,
   });
 
   // Sources
@@ -140,6 +140,12 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   {
     baseQuery = baseQuery.set('collapse', { field: collapse });
   }
+  // _source
+  if (path.more.customSource)
+  {
+    baseQuery = baseQuery.set('_source', path.more.source.toJS());
+  }
+
   // Scripts
   const scripts = parseScripts(path.more.scripts);
   baseQuery = baseQuery.set('script_fields', scripts);
@@ -297,7 +303,32 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
   return simpleParser ? sortObj : factors || [];
 }
 
-function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = false): any
+function groupNestedFilters(filterGroup: FilterGroup): FilterGroup
+{
+  const nestedLines = filterGroup.lines.filter((line) => line.field && line.field.indexOf('.') !== -1).toList();
+  let nestedPathMap: Map<string, List<FilterLine>> = Map({});
+  nestedLines.forEach((line) =>
+  {
+    const nestedPath = line.field.split('.')[0];
+    if (nestedPathMap.get(nestedPath) !== undefined)
+    {
+      nestedPathMap = nestedPathMap.set(nestedPath, nestedPathMap.get(nestedPath).push(line));
+    }
+    else
+    {
+      nestedPathMap = nestedPathMap.set(nestedPath, List([line]));
+    }
+  });
+
+  let newLines: List<any> = filterGroup.lines.filter((line) => nestedLines.indexOf(line) === -1).toList();
+  _.keys(nestedPathMap.toJS()).forEach((key) =>
+  {
+    newLines = newLines.push(nestedPathMap.get(key));
+  });
+  return filterGroup.set('lines', newLines);
+}
+
+function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = false, ignoreNested = false): any
 {
   // init must, mustNot, filter, should
   // If the minMatches is all of the above
@@ -326,11 +357,15 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   {
     useShould = true;
   }
+  if (!ignoreNested)
+  {
+    filterGroup = groupNestedFilters(filterGroup);
+  }
   filterGroup.lines.forEach((line) =>
   {
-    if (!line.filterGroup && line.comparison)
+    if ((!line.filterGroup && line.comparison) || List.isList(line))
     {
-      const lineInfo = parseFilterLine(line, useShould, inputs);
+      const lineInfo = parseFilterLine(line, useShould, inputs, ignoreNested);
 
       if (useShould)
       {
@@ -401,23 +436,18 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       value = date;
     }
   }
-  if (line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
+  if (List.isList(line) && !ignoreNested)
   {
     // In this case it is a nested query, disguised as a normal filter line
-    const path = line.field.split('.')[0];
-    const innerLine = parseFilterLine(line, useShould, inputs, true).toJS();
+    const path = line.get(0).field.split('.')[0];
+    const inner = parseFilters(_FilterGroup({lines: line}), inputs, useShould, true).toJS());
     return Map({
       nested: {
         path,
         score_mode: 'avg',
         ignore_unmapped: true,
-        query: {
-          bool: {
-            must: innerLine,
-          },
-        },
+        query: inner,
       },
-
     });
   }
   switch (line.comparison)

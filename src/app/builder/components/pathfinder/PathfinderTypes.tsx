@@ -289,6 +289,9 @@ class MoreC extends BaseClass
   public collapse: string = undefined;
   public scripts: List<Script> = List();
   public expanded: boolean = false;
+  public trackScores: boolean = true;
+  public source: List<string> = List([]);
+  public customSource: boolean = false;
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -297,7 +300,8 @@ export const _More = (config?: { [key: string]: any }) =>
   let more = New<More>(new MoreC(config || {}), config);
   more = more
     .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
-    .set('scripts', List(more['scripts'].map((agg) => _Script(agg))));
+    .set('scripts', List(more['scripts'].map((agg) => _Script(agg))))
+    .set('source', List(more['source']));
 
   return more;
 };

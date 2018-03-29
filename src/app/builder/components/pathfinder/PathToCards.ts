@@ -46,7 +46,8 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions max-line-length member-ordering no-console
 import { parseScore, PathFinderDefaultSize } from 'builder/components/pathfinder/PathfinderParser';
 import { _DistanceValue, _FilterGroup, DistanceValue, ElasticDataSource, FilterGroup, FilterLine, Path, Script } from 'builder/components/pathfinder/PathfinderTypes';
-import { List } from 'immutable';
+import { List, Set } from 'immutable';
+import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
@@ -92,6 +93,7 @@ export class PathToCards
         'from:from': 0,
         'size:size': PathFinderDefaultSize,
         'track_scores:track_scores': true,
+        '_source:boolean': true,
       };
       rootCard = BlockUtils.make(ElasticBlocks, 'eqlbody', { key: 'body', template });
     }
@@ -113,6 +115,8 @@ export class PathToCards
   private static PathToBody(path: Path, parser: ESCardParser, body: ESValueInfo)
   {
     this.updateSize(path, parser, body);
+    this.updateTrackScores(path, parser, body);
+    this.updateSourceFields(path, parser, body);
 
     this.updateSourceBool(path, parser, body);
     // hard bool
@@ -163,6 +167,35 @@ export class PathToCards
       rootValueInfo.objectChildren['size'].propertyValue = parsedCard.getValueInfo();
       parser.isMutated = true;
     }
+  }
+
+  private static updateSourceFields(path: Path, parser: ESCardParser, body: ESValueInfo)
+  {
+    const rootValueInfo = body;
+    // Delete old source card
+    parser.deleteChild(rootValueInfo, '_source');
+
+    if (!path.more.customSource)
+    {
+      parser.createCardIfNotExist({'_source:boolean': true}, body);
+    }
+    else
+    {
+      parser.createCardIfNotExist({'_source:field[]': path.more.source.toJS()}, body);
+    }
+  }
+
+  private static updateTrackScores(path: Path, parser: ESCardParser, body: ESValueInfo)
+  {
+    const rootValueInfo = body;
+    if (!rootValueInfo.objectChildren.hasOwnProperty('track_scores'))
+    {
+      parser.createCardIfNotExist({ 'track_scores:track_scores': path.more.trackScores }, body);
+    }
+    const trackScoreCard = BlockUtils.make(ElasticBlocks, 'eqltrack_scores', {key: 'track_scores', value: path.more.trackScores});
+    const parsedCard = new ESCardParser(trackScoreCard);
+    rootValueInfo.objectChildren['track_scores'].propertyValue = parsedCard.getValueInfo();
+    parser.isMutated = true;
   }
 
   private static ComparisonsToFilterOpMap = {
@@ -296,22 +329,29 @@ export class PathToCards
     let nestedQueries;
     TerrainLog.debug('P->B: ' + filterLines.length + ' nestedGroup ');
     nestedQueries = parser.searchCard({ [boolTypeFiltersType]: [{ 'nested:nested_query': true }] }, boolValueInfo, false, true);
-
+    const paths = Set(filterLines.map((line) => line.field.split('.')[0])).toArray();
     if (nestedQueries === null)
     {
       TerrainLog.debug('P->B: found 0(null) nestedBools from the boolCard', boolValueInfo);
-      if (filterLines.length > 0)
+      if (paths.length > 0)
       {
         parser.createCardIfNotExist({ [boolTypeFiltersType]: [] }, boolValueInfo);
         filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
         // create filterGroup.groupCount queries
         nestedQueries = [];
-        for (let i = 0; i < filterLines.length; i = i + 1)
+        const usedPaths = [];
+        for (let i = 0; i < paths.length; i = i + 1)
         {
           const theLine = filterLines[i];
+          const path = theLine.field.split('.')[0];
+          if (usedPaths.indexOf(path) !== -1)
+          {
+            continue;
+          }
+          usedPaths.push(path);
           const template = {
             'nested:nested_query': {
-              'path:field': theLine.field.split('.')[0],
+              'path:field': path,
               'score_mode:nested_score_mode': 'avg',
               'query:query': {
                 'bool:elasticFilter': {},
@@ -341,14 +381,21 @@ export class PathToCards
       });
       TerrainLog.debug('P->B: found ' + nestedQueries.length + ' nestedBools from the boolCard', boolValueInfo);
       filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
-      if (nestedQueries.length < filterLines.length)
+      if (nestedQueries.length < paths.length)
       {
-        for (let i = nestedQueries.length; i < filterLines.length; i = i + 1)
+        const usedPaths = [];
+        for (let i = nestedQueries.length; i < paths.length; i = i + 1)
         {
           const theLine = filterLines[i];
+          const path = theLine.field.split('.')[0];
+          if (usedPaths.indexOf(path) !== -1)
+          {
+            continue;
+          }
+          usedPaths.push(path);
           const template = {
             'nested:nested_query': {
-              'path:field': theLine.field.split('.')[0],
+              'path:field': path,
               'score_mode:nested_score_mode': 'avg',
               'query:query': {
                 'bool:elasticFilter': {},
@@ -363,12 +410,12 @@ export class PathToCards
           nestedQueries.push(parsedBoolCard.getValueInfo().objectChildren.nested.propertyValue);
           parser.addChild(filterCard, filterCard.arrayChildren.length, parsedBoolCard.getValueInfo());
         }
-      } else if (nestedQueries.length > filterLines.length)
+      } else if (nestedQueries.length > paths.length)
       {
-        if (filterLines.length > 0)
+        if (paths.length > 0)
         {
           filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
-          for (let i = nestedQueries.length; i > filterLines.length; i = i - 1)
+          for (let i = nestedQueries.length; i > paths.length; i = i - 1)
           {
             parser.deleteChild(filterCard, i - 1);
           }
@@ -380,15 +427,33 @@ export class PathToCards
       }
     }
 
-    filterLines.map((line: FilterLine, index) =>
+    const filterLinePathMap = {};
+    filterLines.forEach((line: FilterLine) =>
     {
-      const thePath = line.field.split('.')[0];
-      // this is an inner filter group
-      const nestedQuery = nestedQueries[index];
-      const filterGroup = _FilterGroup({
-        lines: List([line]),
-      });
-      this.FilterGroupToBool(filterGroup, parser, nestedQuery.objectChildren.query.propertyValue.objectChildren.bool.propertyValue, filterSection, true);
+      const path = line.field.split('.')[0];
+      if (filterLinePathMap[path])
+      {
+        filterLinePathMap[path].push(line);
+      }
+      else
+      {
+        filterLinePathMap[path] = [line];
+      }
+    });
+
+    _.keys(filterLinePathMap).forEach((key, i) =>
+    {
+      const nestedQuery = nestedQueries[i];
+      this.FilterGroupToBool(
+        _FilterGroup({lines: List(filterLinePathMap[key])}),
+        parser,
+        nestedQuery.objectChildren.query.propertyValue.objectChildren.bool.propertyValue,
+        filterSection,
+        true);
+        if (nestedQuery.objectChildren.path.propertyValue.value !== key)
+        {
+          nestedQuery.objectChildren.path.propertyValue.card = nestedQuery.objectChildren.path.propertyValue.card.set('value', key);
+        }
     });
   }
 

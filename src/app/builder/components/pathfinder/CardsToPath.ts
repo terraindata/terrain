@@ -131,9 +131,14 @@ export class CardsToPath
     );
     const newScripts = this.getScripts(path.more.scripts, parser, bodyValueInfo);
     const collapse = this.getCollapse(path.more.collapse, parser, bodyValueInfo);
+    const trackScores = this.getTrackScores(parser, bodyValueInfo);
+    const {source, customSource} = this.getSourceFields(path, parser, bodyValueInfo);
     const more = path.more
       .set('scripts', newScripts)
-      .set('collapse', collapse);
+      .set('collapse', collapse)
+      .set('trackScores', trackScores)
+      .set('source', source)
+      .set('customSource', customSource);
 
     const newPath = path
       .set('source', newSource)
@@ -767,6 +772,26 @@ export class CardsToPath
       ));
     }
     return List([]);
+  }
+
+  private static getTrackScores(parser: ESCardParser, body: ESValueInfo): boolean
+  {
+    const rootVal = body.value;
+    if (rootVal.hasOwnProperty('track_scores'))
+    {
+      return rootVal.track_scores;
+    }
+    return true;
+  }
+
+  private static getSourceFields(path: Path, parser: ESCardParser, body: ESValueInfo): {source: List<string>, customSource: boolean}
+  {
+    const rootVal = body.value;
+    if (rootVal.hasOwnProperty('_source') && Array.isArray(rootVal._source))
+    {
+      return {source: List(rootVal._source), customSource: true}
+    }
+    return {source: path.more.source, customSource: false}
   }
 
   private static updateSource(source: Source, parser: ESCardParser, body: ESValueInfo, dbName: string): Source
