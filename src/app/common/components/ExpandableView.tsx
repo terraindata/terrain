@@ -62,91 +62,142 @@ export interface Props
 {
   content: any;
   open: boolean;
-  onToggle: () => void;
+  onToggle: (ev?) => void;
   style?: any;
   children?: any;
   injectedContent?: any;
+  hideContent?: boolean;
+  hideArrow?: boolean;
 }
 
 const arrowSize = 12;
-const arrowPadding = 6;
+const arrowPadding = 2;
 const containerLeftPadding = arrowPadding + arrowSize / 2;
 const containerLeftMargin = containerLeftPadding - 1;
 
 class ExpandableView extends TerrainComponent<Props>
 {
+  public renderArrowSection()
+  {
+    if (this.props.hideArrow)
+    {
+      return null;
+    }
+
+    const hasChildren = this.props.children !== undefined && this.props.children !== null;
+    return (
+      <div
+        className='expandable-view-arrow-column'
+        style={fontColor(Colors().text3)}
+      >
+        <div className='expandable-view-arrow-spacer-top' />
+        <ArrowIcon
+          className={classNames({
+            'expandable-view-arrow-icon': true,
+            'expandable-view-open': this.props.open,
+            'expandable-view-has-children': hasChildren,
+          })}
+          onClick={hasChildren ? this.props.onToggle : undefined}
+          style={{
+            width: arrowSize,
+            height: arrowSize,
+            padding: `${arrowPadding}px`,
+            margin: `-${arrowPadding}px 0px`,
+          }}
+        />
+        <div
+          className={classNames({
+            'expandable-view-arrow-spacer-bottom': true,
+            'expandable-view-open': this.props.open,
+            'expandable-view-has-children': hasChildren,
+          })}
+          style={{
+            borderColor: this.getBorderColor(),
+          }}
+        />
+      </div>
+    );
+  }
+
+  public renderChildren()
+  {
+    const leftBorderColor = this.getBorderColor();
+
+    return (
+      <FadeInOut open={this.props.open}>
+        <div
+          className={classNames({
+            'expandable-view-children-container': true,
+            'expandable-view-open': this.props.open,
+          })}
+          style={{
+            marginLeft: this.props.hideArrow ? '' : containerLeftMargin,
+            paddingLeft: this.props.hideArrow ? '' : containerLeftPadding,
+            borderLeft: this.props.hideArrow ? '0px solid' : `1px solid ${leftBorderColor}`,
+          }}
+        >
+          {this.props.children}
+        </div>
+      </FadeInOut>
+    );
+  }
+
+  public renderInjectedContent()
+  {
+    if (this.props.injectedContent !== null && this.props.injectedContent !== undefined)
+    {
+      return (
+        <div
+          className={classNames({
+            'expandable-view-injected-container': true,
+            'expandable-view-open': this.props.open,
+          })}
+          style={{
+            marginLeft: containerLeftMargin,
+            paddingLeft: containerLeftPadding,
+            borderColor: this.getBorderColor(),
+          }}
+        >
+          {this.props.injectedContent}
+        </div>
+      );
+    }
+    else
+    {
+      return null;
+    }
+  }
+
+  public getBorderColor()
+  {
+    return Colors().inactiveHover;
+  }
+
   public render()
   {
-    const hasChildren = this.props.children !== undefined && this.props.children !== null;
-    const leftBorderColor = Colors().inactiveHover;
     return (
       <div className={classNames({
         'expandable-view-container': true,
       })}
         style={this.props.style || {}}
       >
-        <div className='expandable-view-content-row' style={fontColor(Colors().text3)}>
-          <div className='expandable-view-arrow-column'>
-            <div className='expandable-view-arrow-spacer-top' />
-            <ArrowIcon
-              className={classNames({
-                'expandable-view-arrow-icon': true,
-                'expandable-view-open': this.props.open,
-                'expandable-view-has-children': hasChildren,
-              })}
-              onClick={hasChildren ? this.props.onToggle : undefined}
-              style={{
-                width: arrowSize,
-                height: arrowSize,
-                padding: `${arrowPadding}px`,
-                margin: `-${arrowPadding}px 0px`,
-              }}
-            />
-            <div
-              className={classNames({
-                'expandable-view-arrow-spacer-bottom': true,
-                'expandable-view-open': this.props.open,
-                'expandable-view-has-children': hasChildren,
-              })}
-              style={{
-                borderColor: leftBorderColor,
-              }}
-            />
-          </div>
-          <div className='expandable-view-content'>
-            {this.props.content}
-          </div>
-        </div>
-        {(this.props.injectedContent !== null && this.props.injectedContent !== undefined) &&
-          <div
-            className={classNames({
-              'expandable-view-injected-container': true,
-              'expandable-view-open': this.props.open,
-            })}
-            style={{
-              marginLeft: containerLeftMargin,
-              paddingLeft: containerLeftPadding,
-              borderColor: leftBorderColor,
-            }}
-          >
-            {this.props.injectedContent}
-          </div>
+        {
+          this.props.hideContent ? <div /> :
+            <div className='expandable-view-content-row'>
+              {
+                this.renderArrowSection()
+              }
+              <div className='expandable-view-content'>
+                {this.props.content}
+              </div>
+            </div>
         }
-        <FadeInOut open={this.props.open}>
-          <div
-            className={classNames({
-              'expandable-view-children-container': true,
-              'expandable-view-open': this.props.open,
-            })}
-            style={{
-              marginLeft: containerLeftMargin,
-              paddingLeft: containerLeftPadding,
-              borderColor: leftBorderColor,
-            }}
-          >
-            {this.props.children}
-          </div>
-        </FadeInOut>
+        {
+          this.renderInjectedContent()
+        }
+        {
+          this.renderChildren()
+        }
       </div>
     );
   }

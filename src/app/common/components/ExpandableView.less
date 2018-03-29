@@ -1,5 +1,6 @@
 @import "../Common.less";
 
+@arrow-spacer-size: 4px;
 .expandable-view-container {
   .transition;
   .expandable-view-content-row {
@@ -15,14 +16,14 @@
   }
 
   .expandable-view-arrow-spacer-top {
-    flex: 1 0 @half-spacing;
+    flex: 1 0 @arrow-spacer-size;
   }
 
   .expandable-view-arrow-spacer-bottom {
     flex: 1 0 0px;
     width: 1px;
     align-self: center;
-    margin-top: @half-spacing;
+    margin-top: @arrow-spacer-size;
     &.expandable-view-open {
       &.expandable-view-has-children {
         border-left: 1px solid;

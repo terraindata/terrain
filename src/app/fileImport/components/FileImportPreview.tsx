@@ -57,6 +57,7 @@ import { BuilderState } from 'builder/data/BuilderState';
 import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Util from 'util/Util';
 
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { ESParseTreeToCode } from './../../../database/elastic/conversion/ParseElasticQuery';
@@ -119,6 +120,7 @@ export interface Props
   // export only
   algorithmName?: string;
 
+  schemaActions?: typeof SchemaActions;
   builder?: BuilderState;
 }
 @Radium
@@ -740,7 +742,7 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     else
     {
-      Actions.importFile(this.props.handleFileImportSuccess);
+      Actions.importFile(this.props.handleFileImportSuccess, this.props.schemaActions);
     }
   }
 
@@ -1472,5 +1474,5 @@ class FileImportPreview extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   FileImportPreview,
   ['builder'],
-  {},
+  { schemaActions: SchemaActions },
 );

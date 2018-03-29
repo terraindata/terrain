@@ -82,7 +82,7 @@ const { List } = Immutable;
 
 export interface Props
 {
-  onSave: (template: ETLTemplate) => void;
+  onSave: (template: ETLTemplate, isSaveAs: boolean) => void;
   onSwitchTemplate: (template: ETLTemplate) => void;
   onExecuteTemplate: (template: ETLTemplate) => void;
   // below from container
@@ -94,12 +94,14 @@ class TemplateEditor extends TerrainComponent<Props>
 {
   public state: {
     newTemplateName: string,
-    saveNewTemplateOpen: boolean,
+    saveTemplateModalOpen: boolean,
     loadTemplateOpen: boolean,
+    isSaveAs: boolean,
   } = {
       newTemplateName: 'New Template',
-      saveNewTemplateOpen: false,
+      saveTemplateModalOpen: false,
       loadTemplateOpen: false,
+      isSaveAs: false,
     };
 
   constructor(props)
@@ -252,6 +254,14 @@ class TemplateEditor extends TerrainComponent<Props>
           >
             Save
           </div>
+          <div
+            className='editor-top-bar-item'
+            style={topBarItemStyle}
+            onClick={this.handleSaveAsClicked}
+            key='save as'
+          >
+            Save As
+          </div>
         </div>
       </Quarantine>
     );
@@ -279,15 +289,15 @@ class TemplateEditor extends TerrainComponent<Props>
         </Modal>,
       );
     }
-    else if (this.state.saveNewTemplateOpen)
+    else if (this.state.saveTemplateModalOpen)
     {
       modals.push(
         <Modal
           key='saveNew'
-          title='Save New Template'
-          open={this.state.saveNewTemplateOpen}
+          title='Save Template'
+          open={this.state.saveTemplateModalOpen}
           showTextbox={true}
-          onConfirm={this.handleSave}
+          onConfirm={this.handleSaveConfirm}
           onClose={this.handleCloseSave}
           confirmDisabled={this.state.newTemplateName === ''}
           textboxValue={this.state.newTemplateName}
@@ -374,17 +384,17 @@ class TemplateEditor extends TerrainComponent<Props>
     });
   }
 
-  public handleSave()
+  public handleSaveConfirm()
   {
     const { template } = this.props.templateEditor;
-    this.props.onSave(template.set('templateName', this.state.newTemplateName));
+    this.props.onSave(template.set('templateName', this.state.newTemplateName), this.state.isSaveAs);
   }
 
   public handleCloseSave()
   {
     this.setState({
       newTemplateName: 'New Template',
-      saveNewTemplateOpen: false,
+      saveTemplateModalOpen: false,
     });
   }
 
@@ -401,13 +411,23 @@ class TemplateEditor extends TerrainComponent<Props>
     if (template.id === -1)
     {
       this.setState({
-        saveNewTemplateOpen: true,
+        saveTemplateModalOpen: true,
+        isSaveAs: false,
       });
     }
     else
     {
-      this.props.onSave(template);
+      this.props.onSave(template, false);
     }
+  }
+
+  public handleSaveAsClicked()
+  {
+    const { template } = this.props.templateEditor;
+    this.setState({
+      saveTemplateModalOpen: true,
+      isSaveAs: true,
+    });
   }
 
   public handleUndo()

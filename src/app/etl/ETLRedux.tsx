@@ -93,6 +93,12 @@ export interface ETLActionTypes
     onLoad: (response: List<ETLTemplate>) => void;
     onError?: ErrorHandler;
   };
+  saveAsTemplate: {
+    actionType: 'saveAsTemplate';
+    template: ETLTemplate;
+    onLoad: (response: List<ETLTemplate>) => void;
+    onError?: ErrorHandler;
+  };
   saveTemplate: {
     actionType: 'saveTemplate';
     template: ETLTemplate;
@@ -115,6 +121,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       fetchTemplates: (state, action) => state,
       executeTemplate: (state, action) => state,
       createTemplate: (state, action) => state,
+      saveAsTemplate: (state, action) => state,
       saveTemplate: (state, action) => state,
       setLoading: (state, action) =>
       {
@@ -280,18 +287,9 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
-  public createTemplate(action: ETLActionType<'createTemplate'>, dispatch)
+  public handleResponseFactory(directDispatch)
   {
-    const directDispatch = this._dispatchReducerFactory(dispatch);
-    const name = action.actionType;
-
-    directDispatch({
-      actionType: 'setLoading',
-      isLoading: true,
-      key: name,
-    });
-
-    const updateTemplate = (templates: List<ETLTemplate>) =>
+    return (templates: List<ETLTemplate>) =>
     {
       if (templates.size > 0)
       {
@@ -306,8 +304,38 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         // TODO error?
       }
     };
+  }
+
+  public beforeSaveOrCreate(name, directDispatch)
+  {
+    directDispatch({
+      actionType: 'setLoading',
+      isLoading: true,
+      key: name,
+    });
+  }
+
+  public createTemplate(action: ETLActionType<'createTemplate'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    const updateTemplate = this.handleResponseFactory(directDispatch);
+    this.beforeSaveOrCreate(name, directDispatch);
 
     ETLAjax.createTemplate(action.template)
+      .then(this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
+  }
+
+  public saveAsTemplate(action: ETLActionType<'saveAsTemplate'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    const updateTemplate = this.handleResponseFactory(directDispatch);
+    this.beforeSaveOrCreate(name, directDispatch);
+
+    const newTemplate = action.template.set('id', -1);
+    ETLAjax.createTemplate(newTemplate)
       .then(this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name))
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
@@ -316,28 +344,9 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
+    const updateTemplate = this.handleResponseFactory(directDispatch);
+    this.beforeSaveOrCreate(name, directDispatch);
 
-    directDispatch({
-      actionType: 'setLoading',
-      isLoading: true,
-      key: name,
-    });
-
-    const updateTemplate = (templates: List<ETLTemplate>) =>
-    {
-      if (templates.size > 0)
-      {
-        const template = templates.get(0);
-        directDispatch({
-          actionType: 'updateLocalTemplates',
-          template,
-        });
-      }
-      else
-      {
-        // TODO error?
-      }
-    };
     ETLAjax.saveTemplate(action.template)
       .then(this.onLoadFactory([updateTemplate, action.onLoad], directDispatch, name))
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
@@ -355,6 +364,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.executeTemplate.bind(this, action);
       case 'createTemplate':
         return this.createTemplate.bind(this, action);
+      case 'saveAsTemplate':
+        return this.saveAsTemplate.bind(this, action);
       case 'saveTemplate':
         return this.saveTemplate.bind(this, action);
       default:
