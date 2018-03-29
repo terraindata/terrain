@@ -217,8 +217,6 @@ export default class ESCardParser extends ESParser
     if (element.clause instanceof ESStructureClause &&
       (element.clause instanceof ESWildcardStructureClause) === false)
     {
-
-      //(element.clause instanceof ESWildcardStructureClause) === false)
       const card = element.card;
       card.cards.map((childCard, i) =>
       {
