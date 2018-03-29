@@ -51,10 +51,13 @@ import * as winston from 'winston';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticDB from '../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import { Permissions } from '../permissions/Permissions';
+
 import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../Util';
 
 const Router = new KoaRouter();
+const perm: Permissions = new Permissions();
 
 async function getSchema(databaseID: number): Promise<string>
 {
@@ -112,7 +115,7 @@ Router.post('/database/delete', passport.authenticate('access-token-local'), asy
 {
   const params = ctx.request.body.body;
   Util.verifyParameters(params, ['language', 'dbname', 'dbid']);
-
+  await perm.ImportPermissions.verifyDefaultRoute(ctx.state.user, params);
   switch (params.language)
   {
     case 'elastic':

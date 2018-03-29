@@ -55,6 +55,7 @@ import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 import { borderColor, Colors, fontColor } from 'app/colors/Colors';
+import CheckBox from 'common/components/CheckBox';
 import ExpandableView from 'common/components/ExpandableView';
 import FadeInOut from 'common/components/FadeInOut';
 import Modal from 'common/components/Modal';
@@ -87,8 +88,10 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
 
   public state: {
     deleteIndexModalOpen: boolean,
+    canConfirm: boolean,
   } = {
       deleteIndexModalOpen: false,
+      canConfirm: false,
     };
 
   public renderDefault()
@@ -117,13 +120,29 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
             </div>
             <Modal
               open={this.state.deleteIndexModalOpen}
-              message={`Are you sure you want to delete Elastic Index '${db.name}'?`}
+              message={`Are you sure you want to delete Elastic Index '${db.name}'? This action cannot be undone.`}
               confirm={true}
               onConfirm={this.handleConfirmDeleteIndex}
               confirmButtonText={'Delete'}
               onClose={this.handleCloseDeleteIndex}
               closeOnConfirm={true}
-            />
+              confirmDisabled={!this.state.canConfirm}
+            >
+              <div className='confirm-delete-index-section'>
+                <div className='confirm-delete-checkbox-spacer'>
+                  <CheckBox
+                    checked={this.state.canConfirm}
+                    onChange={this.handleCanConfirmCheckboxChange}
+                  />
+                </div>
+                <div
+                  className='confirm-delete-index-label'
+                  style={fontColor(Colors().text2)}
+                >
+                  I Understand
+                </div>
+              </div>
+            </Modal>
           </div>
         );
       }
@@ -173,6 +192,14 @@ class SchemaTreeContextActions extends TerrainComponent<Props>
   {
     this.setState({
       deleteIndexModalOpen: false,
+      canConfirm: false,
+    });
+  }
+
+  public handleCanConfirmCheckboxChange()
+  {
+    this.setState({
+      canConfirm: !this.state.canConfirm,
     });
   }
 }

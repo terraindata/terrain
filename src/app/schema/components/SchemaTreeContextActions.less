@@ -1,7 +1,6 @@
 @import "~common/Common.less";
 
 .schema-tree-context-wrapper {
-  margin-left: @spacing;
   display: flex;
   padding-top: 1px;
   align-items: center;
@@ -16,5 +15,23 @@
       height: 15px;
       fill: currentColor;
     }
+  }
+}
+
+.confirm-delete-index-section {
+  padding: @spacing;
+  margin-left: @half-spacing;
+  padding-top: 0px;
+  display: flex;
+  font-size: 14px;
+
+  .confirm-delete-index-label {
+    padding: @quarter-spacing;
+  }
+
+  .confirm-delete-checkbox-spacer {
+    top: 4px;
+    left: 4px;
+    position: relative;
   }
 }

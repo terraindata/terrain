@@ -50,8 +50,10 @@ import * as _ from 'lodash';
 import { _SchemaState, Column, Database, FieldProperty, Index, SchemaState, Server, Table } from 'schema/SchemaTypes';
 const { List, Map } = Immutable;
 
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import BackendInstance from 'database/types/BackendInstance';
 import * as SchemaParser from 'schema/data/SchemaParser';
+import MidwayError from 'shared/error/MidwayError';
 import Ajax from 'util/Ajax';
 import AjaxM1 from 'util/AjaxM1';
 
@@ -59,6 +61,9 @@ export interface SchemaActionTypes
 {
   fetch: {
     actionType: 'fetch';
+  };
+  reset: {
+    actionType: 'reset';
   };
   setServer: {
     actionType: 'setServer';
@@ -104,6 +109,15 @@ export interface SchemaActionTypes
     dbid: number,
     dbname: string,
   };
+  addModal: {
+    actionType: 'addModal';
+    props: ModalProps;
+  };
+  setModalRequests: {
+    actionType: 'setModalRequests';
+    requests: List<ModalProps>;
+  };
+
 }
 
 class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
@@ -116,6 +130,11 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
       {
         return state
           .set('loading', true);
+      },
+
+      reset: (state, action) =>
+      {
+        return _SchemaState();
       },
 
       setServer: (state, action) =>
@@ -181,11 +200,25 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
       {
         return state;
       },
+
+      addModal: (state, action) =>
+      {
+        return state.set('modalRequests',
+          MultiModal.addRequest(state.modalRequests, action.payload.props));
+      },
+
+      setModalRequests: (state, action) =>
+      {
+        return state.set('modalRequests', action.payload.requests);
+      },
     };
 
   public fetchAction(dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'reset',
+    });
     directDispatch({
       actionType: 'fetch',
     });
@@ -269,7 +302,23 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
       this.fetchAction(dispatch);
     }).catch((err) =>
     {
-      // todo show error
+      let errMessage = '';
+      try
+      {
+        errMessage = MidwayError.fromJSON(err).getDetail();
+      }
+      catch (e)
+      {
+        errMessage = String(err);
+      }
+      directDispatch({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Error attempting to delete index: ${errMessage}`,
+          error: true,
+        },
+      });
     });
   }
 
