@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands
+// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands no-var-requires
 
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
@@ -55,6 +55,8 @@ import * as ReactDOM from 'react-dom';
 import styled, { StyledFunction } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+
+const InfoIcon = require('images/icon_info.svg');
 
 export let LARGE_FONT_SIZE = '52px';
 export let SEMI_LARGE_FONT_SIZE = '38px';
@@ -127,6 +129,7 @@ const floatingLabelStyle = {
 const inputStyle = `
   padding-top: 20px;
   padding-bottom: 4px;
+  padding-right: 30px;
   border-radius: 3px;
   width: 100%;
   box-sizing: border-box;
@@ -228,6 +231,8 @@ export interface Props
   extendRight?: boolean;
   small?: boolean;
   showEllipsis?: boolean;
+  showWarning?: boolean;
+  warningText?: string;
 }
 
 export class FloatingInput extends TerrainComponent<Props>
@@ -352,26 +357,45 @@ export class FloatingInput extends TerrainComponent<Props>
     {
       // Return a text input
       return (
-        <Input
-          type='text'
-          large={props.large}
-          semilarge={props.semilarge}
-          value={value === null || value === undefined ? '' : value}
-          title={value === null || value === undefined ? '' : value}
-          onChange={this.handleChange}
-          autoFocus={props.autoFocus}
-          noBorder={props.noBorder}
-          noBg={props.noBg}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          id={state.myId}
-          ref={this.getValueRef}
-          onKeyDown={this.handleKeyDown}
-          extendRight={props.extendRight}
-          small={props.small}
-          disabled={!props.canEdit}
-          showEllipsis={props.showEllipsis}
-        />
+        <div>
+          <Input
+            type='text'
+            large={props.large}
+            semilarge={props.semilarge}
+            value={value === null || value === undefined ? '' : value}
+            title={value === null || value === undefined ? '' : value}
+            onChange={this.handleChange}
+            autoFocus={props.autoFocus}
+            noBorder={props.noBorder}
+            noBg={props.noBg}
+            onFocus={this.handleFocus}
+            onBlur={this.handleBlur}
+            id={state.myId}
+            ref={this.getValueRef}
+            onKeyDown={this.handleKeyDown}
+            extendRight={props.extendRight}
+            small={props.small}
+            disabled={!props.canEdit}
+            showEllipsis={props.showEllipsis}
+          />
+          {
+            props.showWarning ?
+              <div className='pf-more-nested-name-input-warning'>
+                {
+                  tooltip(
+                    <InfoIcon
+                      className='tooltip-icon tooltip-is-error'
+                    />,
+                    {
+                      title: props.warningText,
+                      position: 'top-end',
+                      theme: 'error',
+                    },
+                  )
+                }
+              </div> : null
+          }
+        </div>
       );
     }
 
