@@ -993,10 +993,11 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private renderSampleDatum(data: any, index: number, dataIndex: string)
   {
+    const config = this.state.resultsConfig.get(dataIndex);
     return (
       <Hit
         hit={data}
-        resultsConfig={_ResultsConfig(this.state.resultsConfig.get(dataIndex))}
+        resultsConfig={config && _ResultsConfig(config) || undefined}
         index={index}
         dataIndex={dataIndex}
         primaryKey={data._id}
@@ -1006,6 +1007,7 @@ export class RouteSelector extends TerrainComponent<Props>
         onSpotlightRemoved={_.noop}
         key={index}
         hideNested={true}
+        isVisible={true}
       />
     );
   }

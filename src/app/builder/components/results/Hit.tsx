@@ -150,7 +150,7 @@ class HitComponent extends TerrainComponent<Props> {
 
   public componentWillMount()
   {
-    if (this.props.nestedFields === undefined)
+    if (this.props.nestedFields === undefined && !this.props.hideNested)
     {
       this.setState({
         nestedFields: getResultNestedFields(this.props.hit, this.props.resultsConfig),
@@ -162,7 +162,7 @@ class HitComponent extends TerrainComponent<Props> {
   {
     if (!_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS())
       || !_.isEqual(Util.asJS(this.props.resultsConfig), Util.asJS(nextProps.resultsConfig))
-      && nextProps.nestedFields === undefined)
+      && nextProps.nestedFields === undefined && !this.props.hideNested)
     {
       this.setState({
         nestedFields: getResultNestedFields(nextProps.hit, nextProps.resultsConfig),
