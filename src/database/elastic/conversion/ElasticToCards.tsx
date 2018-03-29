@@ -358,9 +358,8 @@ export function parseElasticWeightBlock(obj: object): Block
           alue: obj['ranges'][i],
           score: obj['outputs'][i],
         }, true));
-    }    
+    }
   }
-
 
   const card = make(Blocks, 'elasticTransform', {
     mode: obj['mode'],
