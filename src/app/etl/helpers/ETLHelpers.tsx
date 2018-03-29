@@ -190,7 +190,8 @@ export default abstract class ETLHelpers
 
   protected _errorHandler(description: string, showModal = false): (ev: any) => void
   {
-    return (ev) => {
+    return (ev) =>
+    {
       const message = `${description}: ${String(ev)}`;
       if (showModal)
       {
@@ -200,7 +201,7 @@ export default abstract class ETLHelpers
             title: 'Error',
             message,
             error: true,
-          }
+          },
         });
       }
       else
@@ -208,6 +209,6 @@ export default abstract class ETLHelpers
         // tslint:disable-next-line
         console.error(description, ev);
       }
-    }
+    };
   }
 }

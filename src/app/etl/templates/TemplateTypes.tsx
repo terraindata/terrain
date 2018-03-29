@@ -54,7 +54,7 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
-import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
+import { Sinks, SourceOptionsType, Sources, SinkOptionsType } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
@@ -148,6 +148,28 @@ class ETLTemplateC implements ETLTemplateI
     return this.process.nodes.findKey(
       (node) => node.type === NodeTypes.Sink && node.endpoint === '_default',
     );
+  }
+
+  public getEdgeLanguage(edgeId: number): Languages
+  {
+    try
+    {
+      const edge = this.getEdge(edgeId);
+      const toNode = this.getNode(edge.to);
+      if (toNode.type === NodeTypes.Sink)
+      {
+        const sink = this.getSink(toNode.endpoint);
+        if (sink.type === Sinks.Database)
+        {
+          return (sink.options as SinkOptionsType<Sinks.Database>).language;
+        }
+      }
+      return Languages.JavaScript;
+    }
+    catch (e)
+    {
+      return Languages.JavaScript;
+    }
   }
 
   public getDefaultSource(): SourceConfig

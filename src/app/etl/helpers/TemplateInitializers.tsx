@@ -203,9 +203,9 @@ class Initializers extends ETLHelpers
     const sourceIds = proxy.addSource(sourceToAdd);
     const sinkIds = proxy.addSink(sinkToAdd);
     const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId);
-    const { engine, warnings, softWarnings } = proxy.autodetectEdgeEngine(initialEdge, documents);
+    const { warnings, softWarnings } = proxy.createInitialEdgeEngine(initialEdge, documents);
 
-    const fieldMap = createTreeFromEngine(engine);
+    const fieldMap = createTreeFromEngine(template.getTransformationEngine(initialEdge));
 
     return {
       template,

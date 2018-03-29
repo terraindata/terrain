@@ -48,6 +48,7 @@ import * as _ from 'lodash';
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import { KeyPath } from 'shared/util/KeyPath';
 
 export type PathHash = string;
@@ -217,6 +218,53 @@ export function mergeJoinEngines(
     const newId = transferField(id, newKeyPath, rightEngine, newEngine);
   });
   return newEngine;
+}
+
+// attempt to convert fields to text and guess if they should be numbers or booleans
+export function interpretTextFields(engine: TransformationEngine, documents: List<object>)
+{
+
+}
+
+// attempt to detect date types and integer float
+export function autodetectElasticTypes(engine: TransformationEngine, documents: List<object>)
+{
+
+}
+
+// for each field that doesn't have any transformations, make an initial type cast based on the js type
+export function addInitialTypeCasts(engine: TransformationEngine)
+{
+  engine.getAllFieldIDs().forEach((id) => {
+    if (engine.getTransformations(id).size === 0)
+    {
+      const type = engine.getFieldType(id);
+      const valueType = engine.getFieldProp(id, valueTypeKeyPath);
+      const ikp = engine.getInputKeyPath(id);
+      if (isNamedField(ikp))
+      {
+        if (type !== 'array' && type !== 'object')
+        {
+          // remove check above when arrays are properly deobjectified
+          const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
+            toTypename: type,
+          };
+          engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
+        }
+      }
+      else
+      {
+        if (valueType !== 'array' && valueType !== 'object')
+        {
+          // remove check above when arrays are properly deobjectified
+          const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
+            toTypename: valueType,
+          };
+          engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
+        }
+      }
+    }
+  });
 }
 
 export function createEngineFromDocuments(documents: List<object>):

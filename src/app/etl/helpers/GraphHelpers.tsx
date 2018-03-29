@@ -143,7 +143,7 @@ class GraphHelpers extends ETLHelpers
       {
         this._try((proxy) =>
         {
-          proxy.autodetectEdgeEngine(edgeId, documents);
+          proxy.createInitialEdgeEngine(edgeId, documents);
         }).catch(this._logError);
       }).catch(this._logError);
     }

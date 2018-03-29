@@ -57,7 +57,13 @@ import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
-import { createEngineFromDocuments, mergeJoinEngines } from 'shared/transformations/util/EngineUtil';
+import {
+  addInitialTypeCasts,
+  autodetectElasticTypes,
+  createEngineFromDocuments,
+  interpretTextFields,
+  mergeJoinEngines
+} from 'shared/transformations/util/EngineUtil';
 
 import
 {
@@ -70,7 +76,7 @@ import
   ETLProcess,
   MergeJoinOptions,
 } from 'etl/templates/ETLProcess';
-import { NodeTypes } from 'shared/etl/types/ETLTypes';
+import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 
 export type Mutator<T> = (newItem: T) => void;
 
@@ -159,6 +165,7 @@ export class TemplateProxy
       options.outputKey,
     );
     this.setEdgeTransformations(newEdgeId, newEngine);
+    this.performTypeDetection(newEdgeId);
   }
 
   // delete a source and its node
@@ -191,11 +198,28 @@ export class TemplateProxy
     return this.createEdge(edge);
   }
 
-  public autodetectEdgeEngine(edgeId: number, documents: List<object>)
+  public createInitialEdgeEngine(edgeId: number, documents: List<object>)
   {
     const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
+
+    let interpretText = false;
+    const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
+    if (fromNode.type === NodeTypes.Source)
+    {
+      const source = this.template.getSource(fromNode.endpoint);
+      if (source.fileConfig.fileType === FileTypes.Csv)
+      {
+        interpretText = true;
+      }
+    }
+
     this.setEdgeTransformations(edgeId, engine);
-    return { engine, warnings, softWarnings };
+    this.performTypeDetection(edgeId,
+      {
+        documents,
+        interpretText,
+      });
+    return { warnings, softWarnings };
   }
 
   public setEdgeTransformations(edgeId: number, transformations: TransformationEngine)
@@ -206,6 +230,37 @@ export class TemplateProxy
   public setEdgeTo(edgeId: number, toNode: number)
   {
     this.edges = this.edges.update(edgeId, (edge) => edge.set('to', toNode));
+  }
+
+  // Add automatic type casts to fields, and apply language specific type checking
+  // if documentConfig is provided, do additional type checking / inference
+  private performTypeDetection(
+    edgeId: number,
+    documentConfig?: {
+      documents: List<object>,
+      interpretText?: boolean,
+    }
+  )
+  {
+    const engine = this.template.getTransformationEngine(edgeId);
+
+    if (documentConfig !== undefined)
+    {
+      if (documentConfig.interpretText === true)
+      {
+        interpretTextFields(engine, documentConfig.documents);
+      }
+      const language = this.template.getEdgeLanguage(edgeId);
+      switch (language)
+      {
+        case 'elastic':
+          autodetectElasticTypes(engine, documentConfig.documents);
+          break;
+        default:
+          break;
+      }
+    }
+    addInitialTypeCasts(engine);
   }
 
   private createNode(node: ETLNode): number
