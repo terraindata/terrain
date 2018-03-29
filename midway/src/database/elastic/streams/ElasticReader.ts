@@ -158,22 +158,19 @@ export class ElasticReader extends Stream.Readable
     let length: number = hits.length;
 
     // trim off excess results
-    if (length > 0)
+    if (this.rowsProcessed + length > this.size)
     {
-      if (this.rowsProcessed + length > this.size)
-      {
-        length = this.size - this.rowsProcessed;
-        response.hits.hits = hits.slice(0, length);
-      }
+      length = this.size - this.rowsProcessed;
+      response.hits.hits = hits.slice(0, length);
+    }
 
-      this.rowsProcessed += length;
-      this.numRequested = Math.max(0, this.numRequested - length);
+    this.rowsProcessed += length;
+    this.numRequested = Math.max(0, this.numRequested - length);
 
-      const shouldContinue = this.push(response);
-      if (!shouldContinue)
-      {
-        this.numRequested = 0;
-      }
+    const shouldContinue = this.push(response);
+    if (!shouldContinue)
+    {
+      this.numRequested = 0;
     }
 
     this.querying = false;
