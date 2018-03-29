@@ -78,14 +78,14 @@ import { PathToCards } from './PathToCards';
 
 export class CardsToPath
 {
-  public static updatePath(query: Query, dbName: string): {path: Path, parser: ESCardParser}
+  public static updatePath(query: Query, dbName: string): { path: Path, parser: ESCardParser }
   {
     const rootCard = query.cards.get(0);
     if (rootCard === undefined)
     {
       // the card is empty
       TerrainLog.debug('The builder is empty, clear the path too.');
-      return {path: this.emptyPath(), parser: null};
+      return { path: this.emptyPath(), parser: null };
     }
 
     // let's parse the card
@@ -94,14 +94,14 @@ export class CardsToPath
     {
       TerrainLog.debug('Avoid updating path since card side has errors: ', parser.getErrors());
       // TODO: add the error message to the query.path
-      return {path: query.path, parser: null};
+      return { path: query.path, parser: null };
     }
     //
     TerrainLog.debug('B->P: The parsed card is ' + JSON.stringify(parser.getValueInfo().value));
 
     const newPath = this.BodyCardToPath(query.path, parser, parser.getValueInfo(), dbName);
     parser.updateCard();
-    return {path: newPath, parser};
+    return { path: newPath, parser };
   }
 
   public static emptyPath()
@@ -109,12 +109,16 @@ export class CardsToPath
     return _Path();
   }
 
-  public static BodyCardToPath(path: Path, parser: ESCardParser, bodyValueInfo: ESValueInfo, dbName: string)
+  public static BodyCardToPath(path: Path, parser: ESCardParser, bodyValueInfo: ESValueInfo, dbName: string, groupJoinKey?: string)
   {
     // Redistribute the bools from the source bool to the soft and hard filter bools
     this.distributeSourceBoolFilters(parser, bodyValueInfo);
     parser.updateCard();
     bodyValueInfo = parser.getValueInfo();
+    if (groupJoinKey)
+    {
+      bodyValueInfo = bodyValueInfo.objectChildren.groupJoin.propertyValue.objectChildren[groupJoinKey].propertyValue;
+    }
     const newSource = this.updateSource(path.source, parser, bodyValueInfo, dbName);
     const newScore = this.updateScore(path.score, parser, bodyValueInfo);
     const filterGroup = this.BodyToFilterSection(path.filterGroup, parser, bodyValueInfo, 'hard');
@@ -248,7 +252,8 @@ export class CardsToPath
         }
       });
       sourceBool.card = sourceBool.card.set('otherFilters', List([]));
-      let hardBool, softBool;
+      let hardBool;
+      let softBool;
       if (newHardFilters.length > 0)
       {
         parser.createCardIfNotExist(hardBoolTemplate, body);
@@ -283,7 +288,7 @@ export class CardsToPath
           if (!targetBool)
           {
             parser.createCardIfNotExist(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
-            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body)
+            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
           }
           if (targetBool.objectChildren[targetClause] === undefined)
           {
@@ -342,7 +347,7 @@ export class CardsToPath
           if (!targetBool)
           {
             parser.createCardIfNotExist(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
-            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body)
+            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
           }
           if (targetBool.objectChildren[targetClause] === undefined)
           {
@@ -564,7 +569,7 @@ export class CardsToPath
             if (boolQuery !== null)
             {
               // create filter group
-             // let newFilterGroup = _FilterGroup();
+              // let newFilterGroup = _FilterGroup();
               boolQuery.card.otherFilters.forEach((filter) =>
               {
                 // TODO convert boolQuery from must to filter ?
@@ -573,7 +578,7 @@ export class CardsToPath
                 {
                   newLines.push(line);
                 }
-              })
+              });
             }
           }
         });
@@ -718,7 +723,7 @@ export class CardsToPath
         oldPath = _Path();
       }
       const newParser = new ESCardParser(joinBodyMap[key].card);
-      const p = this.BodyCardToPath(oldPath, newParser, joinBodyMap[key], dbName).set('name', key);
+      const p = this.BodyCardToPath(oldPath, parser, joinBodyMap[key], dbName, key).set('name', key);
       TerrainLog.debug('(B->P) Turn groupJoin body ', joinBodyMap[key], ' to path', p);
       newPaths.push(p);
     }

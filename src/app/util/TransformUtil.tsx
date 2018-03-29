@@ -296,7 +296,7 @@ const TransformUtil = {
     domainMax = parseFloat(String(domainMax));
     if (isNaN(domainMin) || isNaN(domainMax))
     {
-      return {ranges: [], outputs: []};
+      return { ranges: [], outputs: [] };
     }
     const ranges = [];
     const outputs = [];

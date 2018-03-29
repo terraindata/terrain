@@ -436,7 +436,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
           bool: Map({
             must_not: Map({
               exists: Map({
-                field: line.field
+                field: line.field,
               }),
             }),
             boost,
@@ -445,10 +445,10 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNes
       }
       return Map({
         exists: Map({
-            field: line.field,
-            boost,
-          }),
-        });
+          field: line.field,
+          boost,
+        }),
+      });
     case 'equal':
       return Map({
         term: Map({

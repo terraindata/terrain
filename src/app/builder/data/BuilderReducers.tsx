@@ -402,21 +402,23 @@ const BuilderReducers =
         query,
         action.payload.changeQuery,
       );
-
       state = state.set('query', query);
-      const {parser, path} = CardsToPath.updatePath(query, state.db.name);
-      state = state.setIn(['query', 'path'], path);
-      if (parser)
+      if (!TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
       {
-        const newCards = ESCardParser.parseAndUpdateCards(List([parser.getValueInfo().card]), state.query);
-        state = state.setIn(['query', 'cards'], newCards);
-        const tql = AllBackendsMap[state.query.language].queryToCode(state.query, {});
-        state = state
-           .setIn(['query', 'tql'], tql);
-         state = state
-           .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
-           .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
-           .setIn(['query', 'cardsAndCodeInSync'], true);
+        const { parser, path } = CardsToPath.updatePath(query, state.db.name);
+        state = state.setIn(['query', 'path'], path);
+        if (parser)
+        {
+          const newCards = ESCardParser.parseAndUpdateCards(List([parser.getValueInfo().card]), state.query);
+          state = state.setIn(['query', 'cards'], newCards);
+          const tql = AllBackendsMap[state.query.language].queryToCode(state.query, {});
+          state = state
+            .setIn(['query', 'tql'], tql);
+          state = state
+            .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
+            .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
+            .setIn(['query', 'cardsAndCodeInSync'], true);
+        }
       }
       return state;
     },
@@ -627,7 +629,7 @@ const BuilderReducersWrapper = (
       if (BuilderCardActionTypes[action.type])
       {
         // update path
-        const { path, parser } = CardsToPath.updatePath(state.query, state.db.name)
+        const { path, parser } = CardsToPath.updatePath(state.query, state.db.name);
         state = state.setIn(['query', 'path'], path);
         if (parser)
         {

@@ -286,24 +286,24 @@ class PathfinderArea extends TerrainComponent<Props>
                 onUpdateScript={this.handleUpdateScript}
               />
             }
-           {
-            <PathfinderFilterSection
-              isSoftFilter={true}
-              pathfinderContext={pathfinderContext}
-              filterGroup={path.softFilterGroup}
-              keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
-              onStepChange={this.incrementStep}
-              toSkip={toSkip}
-            />
-          }
-          {
-            <PathfinderScoreSection
-              pathfinderContext={pathfinderContext}
-              score={path.score}
-              keyPath={this._ikeyPath(keyPath, 'score')}
-              onStepChange={this.incrementStep}
-            />
-          }
+            {
+              <PathfinderFilterSection
+                isSoftFilter={true}
+                pathfinderContext={pathfinderContext}
+                filterGroup={path.softFilterGroup}
+                keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
+                onStepChange={this.incrementStep}
+                toSkip={toSkip}
+              />
+            }
+            {
+              <PathfinderScoreSection
+                pathfinderContext={pathfinderContext}
+                score={path.score}
+                keyPath={this._ikeyPath(keyPath, 'score')}
+                onStepChange={this.incrementStep}
+              />
+            }
             <PathfinderMoreSection
               pathfinderContext={pathfinderContext}
               more={path.more}
