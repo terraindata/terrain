@@ -542,6 +542,7 @@ class TransformCard extends TerrainComponent<Props>
         },
       });
     }
+
     if (recomputeDomain)
     {
       let domainQuery;

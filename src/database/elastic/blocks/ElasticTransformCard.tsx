@@ -80,6 +80,7 @@ export const scorePoint = _block(
     },
   });
 
+const transformModes = ['linear', 'sigmoid', 'exponential', 'normal', 'logarithmic'];
 // When a paramaterized transform curve is used, a linear interpolation of the curve is passed
 // to the PWL script. It uses this number of points to get a good approximation of the curve
 // while maintaining efficiency.
@@ -220,7 +221,7 @@ export const elasticTransform = _card(
         return {
           a: 0,
           b: 1,
-          mode: block['mode'] || 'linear',
+          mode: transformModes.indexOf(block['mode']) !== -1 ? block['mode'] : 'linear',
           visiblePoints: {
             ranges: block['visiblePoints'].map((scorePt) => scorePt.value).toArray(),
             outputs: block['visiblePoints'].map((scorePt) => scorePt.score).toArray(),

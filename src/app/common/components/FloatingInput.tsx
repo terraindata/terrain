@@ -156,7 +156,7 @@ export class FloatingInput extends TerrainComponent<Props>
     const isFloating = this.isFloating();
     const containerFullStyle = _.extend(
       {},
-      containerStyle, backgroundColor(props.noBg ? '' : Colors().fontWhite)
+      containerStyle, backgroundColor(props.noBg ? '' : Colors().fontWhite),
     );
     return (
       <div
@@ -235,21 +235,21 @@ export class FloatingInput extends TerrainComponent<Props>
       // Return a text input
       return (
         <div>
-        <input
-          type='text'
-          className='floating-input-input'
-          value={value === null || value === undefined ? '' : value}
-          title={value === null || value === undefined ? '' : value}
-          onChange={this.handleChange}
-          autoFocus={props.autoFocus}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          id={state.myId}
-          ref={this.getValueRef}
-          onKeyDown={this.handleKeyDown}
-          disabled={!props.canEdit}
-          style={style}
-        />
+          <input
+            type='text'
+            className='floating-input-input'
+            value={value === null || value === undefined ? '' : value}
+            title={value === null || value === undefined ? '' : value}
+            onChange={this.handleChange}
+            autoFocus={props.autoFocus}
+            onFocus={this.handleFocus}
+            onBlur={this.handleBlur}
+            id={state.myId}
+            ref={this.getValueRef}
+            onKeyDown={this.handleKeyDown}
+            disabled={!props.canEdit}
+            style={style}
+          />
           {
             props.showWarning ?
               <div className='pf-more-nested-name-input-warning'>

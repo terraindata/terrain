@@ -95,6 +95,10 @@ export class ElasticStream extends Stream.Readable
         body['scroll'] = this.scroll,
           body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
       }
+      else
+      {
+        body.body['size'] = this.size;
+      }
 
       this.querying = true;
       this.client.search(body,
