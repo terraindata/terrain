@@ -46,13 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access restrict-plus-operands no-var-requires
 
+import './FloatingInputStyle.less';
+
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import styled, { StyledFunction } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -66,146 +67,14 @@ export let SMALL_LABEL_FLOATING_FONT_SIZE = '10px';
 export let LARGE_LABEL_FLOATING_FONT_SIZE = '16px';
 export let LABEL_FLOATING_FONT_SIZE = '12px';
 
-const ContainerC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
-const Container = ContainerC`
-  position: relative;
-  flex-grow: 1;
-  line-height: normal;
-  border: 1px solid ${Colors().inputBorder};
-  border-radius: 3px;
-  height: ${(props) => props.large ? '86px' : props.semilarge ? '56px' : '48px'};
-  width: 100%;
-  box-sizing: border-box;
-  min-width: 100px;
-  background: ${Colors().textboxBg};
+const containerStyle = {
+  borderColor: Colors().inputBorder,
+  background: Colors().textboxBg,
 
-  &:hover {
-    border-color: ${Colors().active};
-  }
-
-  ${(props) => props['noBorder'] && (`
-    border: none !important;
-    background: none;
-  `)}
-
-  ${(props) => props['noBg'] && (`
-    background: transparent;
-    border: none !important;
-  `)}
-`;
-
-const LEFT = (props) => props.large ? '18px' : '12px';
-const RIGHT = (props) => props.extendRight ? '0px' : props.large ? '18px' : '12px';
-
-const LabelC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = styled.label;
-const Label = LabelC`
-  position: absolute;
-  left: ${LEFT};
-  top: 14px;
-  font-size: 16px;
-  transition: all 0.15s;
-  color: ${Colors().text3};
-  cursor: pointer;
-  text-transform: uppercase;
-
-  font-size: ${(props) =>
-  {
-    if (props.isFloating)
-    {
-      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE
-        : props.small ? SMALL_LABEL_FLOATING_FONT_SIZE :
-          LABEL_FLOATING_FONT_SIZE;
-    }
-
-    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
-      props.small ? SMALL_FONT_SIZE : FONT_SIZE;
-  }};
-`;
-
-const floatingLabelStyle = {
-  top: 4,
+  color: Colors().active, // used for hover / focus color
 };
 
-const inputStyle = `
-  padding-top: 20px;
-  padding-bottom: 4px;
-  padding-right: 30px;
-  border-radius: 3px;
-  width: 100%;
-  box-sizing: border-box;
-  border: none;
-  outline: none;
-  color: ${Colors().text1};
-  transition: all 0.15s;
-  color: ${Colors().active};
-
-  // &:hover {
-  //   background-color: transparent;
-  // }
-`;
-
-const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
-  props.small ? SMALL_FONT_SIZE : FONT_SIZE;
-
-// duplication of code because the functions don't work if you put them
-//  in inputStyle
-const InputC: StyledFunction<InputProps & React.HTMLProps<HTMLInputElement>> = styled.input;
-const Input = InputC`
-  ${inputStyle}
-  padding-left: ${LEFT};
-  padding-right: ${RIGHT};
-  font-size: ${fontSizeFn};
-  ${(props) => props['showEllipsis'] ? `text-overflow: ellipsis;` : ''}
-  ${(props) => props['noBg'] && (`
-    background-color: transparent;
-  `)}
-  &:focus {
-    ${(props) => props['noBg'] && (`
-      background-color: transparent;
-    `)}
-  }
-`;
-
-const InputDivC: StyledFunction<InputDivProps & React.HTMLProps<HTMLInputElement>> = styled.div;
-const InputDiv = InputDivC`
-  ${inputStyle}
-  padding-left: ${LEFT};
-  padding-right: ${RIGHT};
-  font-size: ${fontSizeFn};
-  cursor: pointer;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-`;
-
-interface InputProps
-{
-  noBorder?: boolean;
-  noBg?: boolean;
-  id?: string;
-  onChange?: (value) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  value?: any;
-  large?: boolean;
-  small?: boolean;
-  semilarge?: boolean;
-  isFloating?: boolean;
-  extendRight?: boolean;
-  showEllipsis?: boolean;
-}
-
-interface InputDivProps
-{
-  noBorder?: boolean;
-  noBg?: boolean;
-  onClick?: () => void;
-  large?: boolean;
-  semilarge?: boolean;
-  small?: boolean;
-  isFloating?: boolean;
-  extendRight?: boolean;
-}
+const labelStyle = fontColor(Colors().text3);
 
 export interface Props
 {
@@ -235,6 +104,7 @@ export interface Props
   warningText?: string;
 }
 
+@Radium
 export class FloatingInput extends TerrainComponent<Props>
 {
   static defaultProps = {
@@ -279,16 +149,6 @@ export class FloatingInput extends TerrainComponent<Props>
     }
   }
 
-  public componentDidMount()
-  {
-    //
-  }
-
-  public componentDidUpdate(prevProps: Props, prevState)
-  {
-    //
-  }
-
   public render()
   {
     const { props, state } = this;
@@ -297,32 +157,40 @@ export class FloatingInput extends TerrainComponent<Props>
     const isFloating = this.isFloating();
 
     return (
-      <Container
-        large={props.large}
-        semilarge={props.semilarge}
-        noBorder={props.noBorder}
-        noBg={props.noBg}
+      <div
+        className={classNames({
+          'floating-input-container': true,
+          'floating-input-container-isFloating': isFloating,
+          'floating-input-container-extendRight': props.extendRight,
+          'floating-input-container-large': props.large,
+          'floating-input-container-semilarge': props.semilarge,
+          'floating-input-container-small': props.small,
+          'floating-input-container-noBorder': props.noBorder,
+          'floating-input-container-noBg': props.noBg,
+          'floating-input-container-showEllipsis': props.showEllipsis,
+          [props.className]: props.className !== undefined,
+        })}
+        style={containerStyle}
         onClick={this._fn(props.onClick)}
-        className={props.className}
       >
         {
           this.renderValue()
         }
-        <Label
-          large={props.large}
-          semilarge={props.semilarge}
-          small={props.small}
-          noBorder={props.noBorder}
-          noBg={props.noBg}
-          isFloating={isFloating}
+        <label
+          className='floating-input-label'
           htmlFor={state.myId}
-          style={isFloating ? floatingLabelStyle : undefined}
+          style={[
+            labelStyle,
+            {
+              fontSize: this.getLabelFontSize(),
+            },
+          ]}
         >
           {
             props.label
           }
-        </Label>
-      </Container>
+        </label>
+      </div>
     );
   }
 
@@ -353,31 +221,33 @@ export class FloatingInput extends TerrainComponent<Props>
     const { props, state } = this;
     const { value } = state;
 
+    const style = [
+      fontColor(Colors().active),
+      {
+        fontSize: this.getFontSize(),
+      },
+    ];
+
     if (props.isTextInput)
     {
       // Return a text input
       return (
         <div>
-          <Input
-            type='text'
-            large={props.large}
-            semilarge={props.semilarge}
-            value={value === null || value === undefined ? '' : value}
-            title={value === null || value === undefined ? '' : value}
-            onChange={this.handleChange}
-            autoFocus={props.autoFocus}
-            noBorder={props.noBorder}
-            noBg={props.noBg}
-            onFocus={this.handleFocus}
-            onBlur={this.handleBlur}
-            id={state.myId}
-            ref={this.getValueRef}
-            onKeyDown={this.handleKeyDown}
-            extendRight={props.extendRight}
-            small={props.small}
-            disabled={!props.canEdit}
-            showEllipsis={props.showEllipsis}
-          />
+        <input
+          type='text'
+          className='floating-input-input'
+          value={value === null || value === undefined ? '' : value}
+          title={value === null || value === undefined ? '' : value}
+          onChange={this.handleChange}
+          autoFocus={props.autoFocus}
+          onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
+          id={state.myId}
+          ref={this.getValueRef}
+          onKeyDown={this.handleKeyDown}
+          disabled={!props.canEdit}
+          style={style}
+        />
           {
             props.showWarning ?
               <div className='pf-more-nested-name-input-warning'>
@@ -401,18 +271,16 @@ export class FloatingInput extends TerrainComponent<Props>
 
     // Return a normal div, uneditable
     return (
-      <InputDiv
-        {...props as any}
+      <div
+        className='floating-input-div'
         ref={props.getValueRef}
         onClick={this.handleClick}
-        noBorder={props.noBorder}
-        noBg={props.noBg}
-        extendRight={props.extendRight}
+        style={style}
       >
         {
           value
         }
-      </InputDiv>
+      </div>
     );
   }
 
@@ -506,6 +374,29 @@ export class FloatingInput extends TerrainComponent<Props>
       }
     }
   }
+
+  private getLabelFontSize()
+  {
+    const { props } = this;
+
+    if (this.isFloating())
+    {
+      return props.large || props.semilarge ? LARGE_LABEL_FLOATING_FONT_SIZE
+        : props.small ? SMALL_LABEL_FLOATING_FONT_SIZE :
+          LABEL_FLOATING_FONT_SIZE;
+    }
+
+    return this.getFontSize();
+  }
+
+  private getFontSize()
+  {
+    const { props } = this;
+
+    return props.large ? LARGE_FONT_SIZE : props.semilarge ? SEMI_LARGE_FONT_SIZE :
+      props.small ? SMALL_FONT_SIZE : FONT_SIZE;
+  }
+
 }
 
 export default FloatingInput;
