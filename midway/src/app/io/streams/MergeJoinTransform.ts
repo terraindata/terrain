@@ -296,6 +296,7 @@ export default class MergeJoinTransform extends Readable
     // check if we are done
     if (this.leftSource.isEmpty())
     {
+      this.rightSource.destroy();
       this.push(null);
     }
   }
