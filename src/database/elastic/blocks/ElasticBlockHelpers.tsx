@@ -89,9 +89,8 @@ export const ElasticBlockHelpers = {
     }
     const serverName = builderState.db.name;
     const index = getIndex('', builderState);
-    const type = getType('', builderState);
+    const key = serverName + '/' + String(index) + '.' + 'data' + '.c.' + column;
 
-    const key = serverName + '/' + String(index) + '.' + String(type) + '.c.' + column;
     if (schemaState.columns instanceof Map)
     {
       const col = schemaState.columns.get(key);
@@ -137,7 +136,7 @@ export const ElasticBlockHelpers = {
       // else we are in the Field or Transform case...
 
       // 2. Need to get current type
-      const type = getType('', builderState);
+      const type = 'data';
 
       // 3. If Transform, return columns matching server/index/type that can be transformed
       if (matchType === AutocompleteMatchType.Transform)
@@ -179,7 +178,7 @@ export const ElasticBlockHelpers = {
 
   getFieldsOfType(schemaState, builderState, fieldType, dataSource?): List<string>
   {
-    const index = dataSource && dataSource.index.split('/')[1] || getIndex('', builderState);
+    const index = dataSource && dataSource.index || getIndex('', builderState);
     const server = builderState.db.name;
     if (index !== null)
     {
@@ -211,7 +210,7 @@ export const ElasticBlockHelpers = {
 
   // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
   // If the field is a metaField, return string / number accrodingly
-  getTypeOfField(schemaState, builderState, field, returnDatatype?, overrideIndex?): FieldType | string
+  getTypeOfField(schemaState, builderState, field, returnDatatype?, overrideIndex?, returnAnalyzed?): any
   {
     if (metaFields.indexOf(field) !== -1)
     {
@@ -229,9 +228,13 @@ export const ElasticBlockHelpers = {
       }
       return FieldType.Text;
     }
+    if (!builderState.query)
+    {
+      return '';
+    }
     const { source } = builderState.query.path;
     let index = source && source.dataSource && source.dataSource.index ?
-      source.dataSource.index.split('/')[1] : getIndex('', builderState);
+      source.dataSource.index : getIndex('', builderState);
     index = overrideIndex || index;
     const server = builderState.db.name;
     if (index !== null)
@@ -243,18 +246,39 @@ export const ElasticBlockHelpers = {
       ).map(
         (column) => column.name,
       ).toList();
-      const col = schemaState.columns.filter(
+      let wholeField = '';
+      if (field && field.indexOf('.') !== -1)
+      {
+        wholeField = field;
+        field = field.split('.')[0];
+      }
+      let col = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
           column.databaseId === String(indexId) &&
           column.name === field,
       ).toList().get(0);
+      if (wholeField && col) // it was nested, now look in the column properties for the path
+      {
+        const pieces = wholeField.split('.');
+        for (let i = 1; i < pieces.length; i++)
+        {
+          if (col.properties && pieces[i])
+          {
+            col = col.properties[pieces[i]];
+          }
+        }
+      }
       if (col === undefined)
       {
         return '';
       }
-      const dataType = col.datatype;
+      const dataType = col.datatype !== undefined ? col.datatype : col.type;
       if (returnDatatype)
       {
+        if (returnAnalyzed)
+        {
+          return { fieldType: dataType, analyzed: col.analyzed };
+        }
         return dataType;
       }
       let fieldType: any = 0;
@@ -266,6 +290,10 @@ export const ElasticBlockHelpers = {
           fieldType = ft;
         }
       });
+      if (returnAnalyzed)
+      {
+        return { fieldType, analyzed: col.analyzed };
+      }
       return fieldType;
     }
     return undefined;
@@ -320,31 +348,7 @@ export function getIndex(notSetIndex: string = null, builderState: BuilderState)
 
 export function getType(notSetType: string = null, builderState: BuilderState): string | List<string> | null
 {
-  const cards = findCardType('elasticFilter', builderState);
-  if (cards.size === 0)
-  {
-    return notSetType;
-  }
-  else if (cards.size === 1)
-  {
-    const c = cards.get(0);
-    if (c['currentType'] === '')
-    {
-      return notSetType;
-    }
-    return c['currentType'];
-  }
-  // multiple filter cards, return all possible indexes
-  let types = List([]);
-  cards.forEach((c) =>
-  {
-    if (c['currentType'] !== '')
-    {
-      types = types.push(c['currentType']);
-    }
-  });
-  // If no types, return not set. If one, return as string. Otherwise return list
-  return (types.size === 0) ? notSetType : (types.size === 1) ? types.get(0) : types;
+  return 'data';
 }
 
 export default ElasticBlockHelpers;

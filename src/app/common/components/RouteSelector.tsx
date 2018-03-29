@@ -973,7 +973,8 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private getResultConfigs(options)
   {
-    options.forEach((option) =>
+    let resultsConfig = Map();
+    options.forEach((option, i) =>
     {
       Ajax.getResultsConfig(option.value, (resp) =>
       {
@@ -983,9 +984,13 @@ export class RouteSelector extends TerrainComponent<Props>
           resp[0]['formats'] = JSON.parse(resp[0]['formats']);
           resp[0]['primaryKeys'] = JSON.parse(resp[0]['primaryKeys']);
           resp[0]['enabled'] = true;
-          this.setState({
-            resultsConfig: this.state.resultsConfig.set(option.value, _ResultsConfig(resp[0])),
-          });
+          resultsConfig = resultsConfig.set(option.value, _ResultsConfig(resp[0]));
+          if (i === options.size - 1)
+          {
+            this.setState({
+              resultsConfig,
+            });
+          }
         }
       });
     });
@@ -993,10 +998,11 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private renderSampleDatum(data: any, index: number, dataIndex: string)
   {
+    const config = this.state.resultsConfig.get(dataIndex);
     return (
       <Hit
         hit={data}
-        resultsConfig={_ResultsConfig(this.state.resultsConfig.get(dataIndex))}
+        resultsConfig={config && _ResultsConfig(config) || undefined}
         index={index}
         dataIndex={dataIndex}
         primaryKey={data._id}
@@ -1005,6 +1011,7 @@ export class RouteSelector extends TerrainComponent<Props>
         onSpotlightAdded={_.noop}
         onSpotlightRemoved={_.noop}
         key={index}
+        isVisible={true}
         hideNested={true}
       />
     );

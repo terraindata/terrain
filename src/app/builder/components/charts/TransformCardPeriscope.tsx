@@ -262,6 +262,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
       colors: this.props.colors,
       onDomainLowChange: this.handleDomainLowChange,
       onDomainHighChange: this.handleDomainHighChange,
+      inputKey: overrideState['inputKey'] || this.props.inputKey,
     });
 
     return chartState;

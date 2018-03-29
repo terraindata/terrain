@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions no-console
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -64,7 +64,7 @@ import LinearSelector from 'common/components/LinearSelector';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
-  _ElasticDataSource, ChoiceOption, Path, PathfinderContext, PathfinderSteps,
+  _ElasticDataSource, ChoiceOption, ElasticDataSource, Path, PathfinderContext, PathfinderSteps,
   Source, sourceCountDropdownOptions, sourceCountOptions,
 } from '../PathfinderTypes';
 
@@ -117,7 +117,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     const { dataSourceOptions } = this.state;
 
     const pickerIsForcedOpen = step === PathfinderSteps.Source;
-
     return (
       <div
         className='pf-section pf-source-section'
@@ -155,8 +154,10 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const { props } = this;
     const keyPath = this._ikeyPath(props.keyPath, 'dataSource');
-
-    props.builderActions.changePath(this._ikeyPath(keyPath, 'index'), value);
+    const t = value.split('/');
+    console.assert(t.length === 2); // 'serverID/index'
+    props.builderActions.changePath(keyPath,
+      (this.props.source.dataSource as ElasticDataSource).set('index', t[1]).set('server', t[0]));
 
     if (props.pathfinderContext.step === PathfinderSteps.Source)
     {
@@ -164,7 +165,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     }
     if (this.props.onSourceChange)
     {
-      this.props.onSourceChange(value.split('/')[1]);
+      props.onSourceChange(t[1]);
     }
   }
 

@@ -126,7 +126,14 @@ class MultiInput extends TerrainComponent<Props>
     {
       newValue = parseFloat(newValue);
     }
-    this.props.action(this.props.keyPath, this.props.items.push(newValue));
+    if (this.props.action !== undefined)
+    {
+      this.props.action(this.props.keyPath, this.props.items.push(newValue));
+    }
+    if (this.props.onChange !== undefined)
+    {
+      this.props.onChange(this.props.items.push(newValue));
+    }
     this.setState({
       newValue: '',
     });

@@ -301,8 +301,20 @@ const EQLSpec: ESClause[] =
         template: {
           'query:query': {
             'bool:elasticFilter': {
-              'filter:query[]': [{ 'term:term_query': { '_index:string': '' } }, { 'term:term_query': { '_type:string': '' } }],
-              'must:query[]': [{ 'term:term_query': { ' :string': '' } }],
+              'filter:query[]': [
+                { 'term:term_query': { '_index:string': '' } },
+                {
+                  'bool:elasticFilter': {
+                    'filter:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                  },
+                },
+              ],
+              'should:query[]': [
+                {
+                  'bool:elasticFilter': {
+                    'should:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                  },
+                }],
             },
           },
           'sort:elasticScore': null,
@@ -335,9 +347,13 @@ const EQLSpec: ESClause[] =
         path: ['groupjoin'],
         desc: 'Whether groupJoin should ignore documents with less than a given number of results.',
       }),
-    new ESMapClause('groupjoin_clause',
+    new ESWildcardStructureClause('groupjoin_clause',
+      {
+        parentAlias: 'string',
+        dropIfLessThan: 'number',
+      },
       'groupjoin_name',
-      'groupjoin_body',
+      'body',
       {
         path: ['groupjoin'],
         name: 'groupJoin query',
@@ -1736,6 +1752,7 @@ const EQLSpec: ESClause[] =
       {
         distance: 'distance',
         distance_type: 'distance_type',
+        boost: 'boost',
       },
       'field',
       'geo_point',
@@ -1922,7 +1939,6 @@ const EQLSpec: ESClause[] =
     new ESStructureClause('exists_query',
       {
         field: 'field',
-        null_value: 'base',
         boost: 'boost',
       },
       {

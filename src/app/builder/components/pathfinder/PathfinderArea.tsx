@@ -255,7 +255,8 @@ class PathfinderArea extends TerrainComponent<Props>
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
-
+    // console.log('PATH IS ', path);
+    // console.log("CONTEXT ", pathfinderContext);
     return (
       <ScrollingComponent
         className='pf-area'
@@ -270,35 +271,39 @@ class PathfinderArea extends TerrainComponent<Props>
             source={path.source}
             onSourceChange={this.props.onSourceChange}
           />
-
           <FadeInOut
             open={path.step >= PathfinderSteps.Filter}
-
           >
-            <PathfinderFilterSection
-              pathfinderContext={pathfinderContext}
-              filterGroup={path.filterGroup}
-              keyPath={this._ikeyPath(keyPath, 'filterGroup')}
-              onStepChange={this.incrementStep}
-              toSkip={toSkip}
-              onAddScript={this.handleAddScript}
-              onDeleteScript={this.handleDeleteScript}
-              onUpdateScript={this.handleUpdateScript}
-            />
-            <PathfinderFilterSection
-              isSoftFilter={true}
-              pathfinderContext={pathfinderContext}
-              filterGroup={path.softFilterGroup}
-              keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
-              onStepChange={this.incrementStep}
-              toSkip={toSkip}
-            />
-            <PathfinderScoreSection
-              pathfinderContext={pathfinderContext}
-              score={path.score}
-              keyPath={this._ikeyPath(keyPath, 'score')}
-              onStepChange={this.incrementStep}
-            />
+            {
+              <PathfinderFilterSection
+                pathfinderContext={pathfinderContext}
+                filterGroup={path.filterGroup}
+                keyPath={this._ikeyPath(keyPath, 'filterGroup')}
+                onStepChange={this.incrementStep}
+                toSkip={toSkip}
+                onAddScript={this.handleAddScript}
+                onDeleteScript={this.handleDeleteScript}
+                onUpdateScript={this.handleUpdateScript}
+              />
+            }
+            {
+              <PathfinderFilterSection
+                isSoftFilter={true}
+                pathfinderContext={pathfinderContext}
+                filterGroup={path.softFilterGroup}
+                keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
+                onStepChange={this.incrementStep}
+                toSkip={toSkip}
+              />
+            }
+            {
+              <PathfinderScoreSection
+                pathfinderContext={pathfinderContext}
+                score={path.score}
+                keyPath={this._ikeyPath(keyPath, 'score')}
+                onStepChange={this.incrementStep}
+              />
+            }
             <PathfinderMoreSection
               pathfinderContext={pathfinderContext}
               more={path.more}

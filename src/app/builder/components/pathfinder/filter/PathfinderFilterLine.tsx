@@ -68,6 +68,7 @@ import { units } from 'app/common/components/MapComponent';
 import { RouteSelector, RouteSelectorOption, RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
+import ElasticBlockHelpers from 'database/elastic/blocks/ElasticBlockHelpers';
 import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import
@@ -120,6 +121,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     this.setState({
       boost: nextProps.filterLine && nextProps.filterLine.boost,
     });
+    this.updateFieldType(nextProps);
     if (nextProps.filterLine &&
       nextProps.filterLine.fieldType === FieldType.Geopoint &&
       nextProps.filterLine.comparison === 'located' &&
@@ -128,6 +130,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       // UPDATE SCRIPT
     }
+  }
+
+  public componentWillMount()
+  {
+    this.updateFieldType(this.props);
   }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
@@ -196,6 +203,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           index: (props.pathfinderContext.source.dataSource as any).index,
           fieldValue,
           comparisonValue,
+          fieldType: props.filterLine.fieldType,
         }}
         // optionSets={this.getOptionSets() /* TODO store in state? */}
         values={values}
@@ -229,6 +237,63 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return true;
   }
 
+  // Check if the field is defined and field type isnt (may occur when filter was created by cards)
+  // Update the fieldType if necessary
+  private updateFieldType(props: Props)
+  {
+    let fieldType = props.filterLine.fieldType;
+    if (props.filterLine.field &&
+      (fieldType === undefined ||
+        fieldType === null ||
+        fieldType === FieldType.Any ||
+        isNaN(fieldType)))
+    {
+      const { schemaState, builderState, source } = props.pathfinderContext;
+      const data = ElasticBlockHelpers.getTypeOfField(
+        schemaState,
+        builderState,
+        props.filterLine.field,
+        false,
+        (source.dataSource as any).index,
+        true);
+      fieldType = data.fieldType;
+      const analyzed = data.analyzed;
+      let comparison = props.filterLine.comparison;
+      // If the field type is date or text, update < > filters to be alpha or date
+      if (String(fieldType) === String(FieldType.Date) &&
+        ['less', 'lessequal', 'greater', 'greaterequal'].indexOf(comparison) !== -1)
+      {
+        comparison = comparison === 'less' || comparison === 'lessequal' ? 'datebefore' : 'dateafter';
+      }
+      else if (String(fieldType) === String(FieldType.Text) &&
+        ['less', 'lessequal', 'greater', 'greaterequal'].indexOf(comparison) !== -1)
+      {
+        comparison = comparison === 'less' || comparison === 'lessequal' ? 'alphabefore' : 'alphaafter';
+      }
+      // If the field is analyzed text, make sure it is using match comparison (not term)
+      if (
+        String(fieldType) === String(FieldType.Text) &&
+        analyzed &&
+        ['equal', 'notequal'].indexOf(comparison) !== -1
+      )
+      {
+        comparison = comparison === 'equal' ? 'contains' : 'notcontain';
+      }
+      // If the field is unanalyzed text, make sure it is using term comparison (not match)
+      else if (
+        String(fieldType) === String(FieldType.Text) &&
+        !analyzed &&
+        ['contains', 'notcontain'].indexOf(comparison) !== -1
+      )
+      {
+        comparison = comparison === 'contains' ? 'equal' : 'notequal';
+      }
+      props.onChange(props.keyPath, props.filterLine
+        .set('fieldType', parseFloat(String(fieldType)))
+        .set('comparison', comparison), true);
+    }
+  }
+
   private getOptionSets(): List<RouteSelectorOptionSet>
   {
     const { filterLine, canEdit, pathfinderContext, isSoftFilter } = this.props;
@@ -246,6 +311,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         type: 'comparison',
         field: filterLine.field,
         fieldType: filterLine.fieldType,
+        analyzed: filterLine.analyzed,
         source,
         schemaState: pathfinderContext.schemaState,
         builderState: pathfinderContext.builderState,
@@ -261,7 +327,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         return option;
       }).toList();
     }
-
     const comparisonSet: RouteSelectorOptionSet = {
       key: 'comparison',
       options: comparisonOptions,
@@ -329,17 +394,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     {
       case 0:
         // TODO get from state?
-        const fieldOptions = source.dataSource.getChoiceOptions({
-          type: 'fields',
-          source,
-          schemaState: props.pathfinderContext.schemaState,
-          builderState: props.pathfinderContext.builderState,
-        });
+        const fieldOptions = this.props.fieldOptionSet.options;
         const fieldChoice = fieldOptions.find((option) => option.value === value);
         this.handleChange(
           'field',
           value,
-          fieldChoice.meta !== undefined ? fieldChoice.meta.fieldType : FieldType.Any,
+          (fieldChoice as any).meta,
           true,
         );
         return;
@@ -359,11 +419,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       default:
         throw new Error('Unrecognized option set index in PathfinderFilterLine: ' + optionSetIndex);
     }
-  }
-
-  private addBoost()
-  {
-    this.props.onChange(this.props.keyPath, this.props.filterLine.set('weightSet', true));
   }
 
   private handleBoostChange(value)
@@ -432,6 +487,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       source,
       schemaState: pathfinderContext.schemaState,
       builderState: pathfinderContext.builderState,
+      analyzed: filterLine.analyzed,
     });
 
     switch (filterLine.fieldType)
@@ -611,24 +667,28 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return null;
   }
 
-  private handleChange(key, value, fieldType?, fieldChange?)
+  private handleChange(key, value, meta?, fieldChange?)
   {
     let filterLine = this.props.filterLine.set(key, value);
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;
     if (key === 'field')
     {
-      filterLine = filterLine.set('fieldType', fieldType);
+      const fieldType = (meta && meta.fieldType !== undefined) ? meta.fieldType : FieldType.Any;
+      const analyzed = (meta && meta.analyzed) || true;
+      filterLine = filterLine
+        .set('fieldType', fieldType)
+        .set('analyzed', analyzed);
       // this code picks a default comparison to use
       const comparisonOptions = source.dataSource.getChoiceOptions({
         type: 'comparison',
         field: filterLine.field,
         fieldType,
+        analyzed,
         source,
         schemaState: pathfinderContext.schemaState,
         builderState: pathfinderContext.builderState,
       });
-
       if (comparisonOptions.findIndex((option) => option.value === filterLine.comparison) === -1
         && comparisonOptions.size)
       {
@@ -639,7 +699,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       {
         this.props.onUpdateScript(filterLine.field, filterLine.scriptName);
       }
-
     }
     this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }
@@ -647,6 +706,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
 export const COMPARISONS_WITHOUT_VALUES = [
   'exists',
+  'notexists',
 ];
 
 export function getCustomValueDisplayName(filterLine: FilterLine, value, setIndex: number)

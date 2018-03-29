@@ -214,7 +214,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         type: db.type,
         source: db.source,
       };
-      const index: string = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
+      const index: string = (this.props.pathfinderContext.source.dataSource as any).index;
       const domainQuery = {
         query: {
           bool: {

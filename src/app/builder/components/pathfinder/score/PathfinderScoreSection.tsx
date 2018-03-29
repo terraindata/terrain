@@ -347,20 +347,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       <div
         className='pf-section pf-score-section'
       >
-        {
-          // <SingleRouteSelector
-          //   options={ScoreTypesChoices}
-          //   value={score.type}
-          //   onChange={this.handleScoreTypeChange}
-          //   canEdit={canEdit}
-          //   shortNameText={PathfinderText.scoreTypeLabel}
-          //   headerText={PathfinderText.scoreTypeExplanation}
-          //   hasOther={false}
-          //   semilarge={true}
-          //   hideLine={true}
-          //   hideSampleData={true /* TODO eventually could have sample data showing different ideas? */}
-          // />
-        }
         <PathfinderSectionTitle
           title={PathfinderText.scoreSectionTitle}
           tooltipText={PathfinderText.scoreSectionSubtitle}
@@ -369,14 +355,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           expanded={score.expanded}
           contentCount={score.lines.count()}
         />
-        {
-          // <CheckBox
-          //   checked={score.type === 'random'}
-          //   onChange={this._fn(this.handleScoreTypeChange,
-          //     score.type === 'random' ? 'terrain' : 'random')}
-          //   label='Random'
-          // />
-        }
         <FadeInOut
           open={score.expanded}
         >

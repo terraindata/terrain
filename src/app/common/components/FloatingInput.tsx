@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands
+// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands no-var-requires
 
 import './FloatingInputStyle.less';
 
@@ -56,6 +56,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+
+const InfoIcon = require('images/icon_info.svg');
 
 export let LARGE_FONT_SIZE = '52px';
 export let SEMI_LARGE_FONT_SIZE = '38px';
@@ -98,6 +100,8 @@ export interface Props
   extendRight?: boolean;
   small?: boolean;
   showEllipsis?: boolean;
+  showWarning?: boolean;
+  warningText?: string;
 }
 
 @Radium
@@ -228,6 +232,7 @@ export class FloatingInput extends TerrainComponent<Props>
     {
       // Return a text input
       return (
+        <div>
         <input
           type='text'
           className='floating-input-input'
@@ -243,6 +248,24 @@ export class FloatingInput extends TerrainComponent<Props>
           disabled={!props.canEdit}
           style={style}
         />
+          {
+            props.showWarning ?
+              <div className='pf-more-nested-name-input-warning'>
+                {
+                  tooltip(
+                    <InfoIcon
+                      className='tooltip-icon tooltip-is-error'
+                    />,
+                    {
+                      title: props.warningText,
+                      position: 'top-end',
+                      theme: 'error',
+                    },
+                  )
+                }
+              </div> : null
+          }
+        </div>
       );
     }
 

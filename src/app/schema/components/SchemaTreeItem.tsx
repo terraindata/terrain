@@ -56,13 +56,16 @@ import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
 import { serverChildrenConfig, ServerTreeInfo } from './items/ServerTreeInfo';
 import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
-import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
 const StarIcon = require('images/icon_star.svg?name=StarIcon');
 import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
+import SchemaTreeContextActions from './SchemaTreeContextActions';
 import SchemaTreeList from './SchemaTreeList';
+import Styles from './SchemaTreeStyles';
+
+import ExpandableView from 'common/components/ExpandableView';
 
 export interface Props
 {
@@ -415,47 +418,37 @@ class SchemaTreeItem extends TerrainComponent<Props>
     const { isSelected, isHighlighted } = this.state;
 
     const hasChildren = this.state.childCount > 0;
-
     const showing = SchemaTypes.searchIncludes(item, this.props.search);
-    // If the schema item is a field, then there should be a star somewhere near
-    // it that can be toggled on and off
-    // Toggling this will change the field's starred status in midway so that it is persistent
-    return (
-      <div
-        style={Styles.treeItem}
+
+    const content = (
+      <FadeInOut
+        open={showing}
+        key='one'
       >
-        <FadeInOut
-          open={showing}
-          key='one'
-        >
-          {
-            showing &&
+        {
+          showing &&
+          <div
+            data-rel='schema-item'
+            data-id={this.props.id}
+            data-search={this.props.inSearchResults}
+          >
             <div
-              data-rel='schema-item'
-              data-id={this.props.id}
-              data-search={this.props.inSearchResults}
+              style={[
+                Styles.treeItemHeader,
+                isHighlighted && Styles.treeItemHeaderHighlighted,
+                isSelected && Styles.treeItemHeaderSelected,
+              ]}
+              onClick={this.handleHeaderClick}
+              onDoubleClick={this.handleHeaderDoubleClick}
             >
+              {
+                this.renderName()
+              }
               <div
-                style={[
-                  Styles.treeItemHeader,
-                  isHighlighted && Styles.treeItemHeaderHighlighted,
-                  isSelected && Styles.treeItemHeaderSelected,
-                ]}
-                onClick={this.handleHeaderClick}
-                onDoubleClick={this.handleHeaderDoubleClick}
+                style={Styles.itemInfoRow as any}
               >
                 {
-                  hasChildren && !this.props.search &&
-                  <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='arrow'>
-                    <ArrowIcon
-                      className={'schema-arrow-icon'}
-                      onClick={this.handleArrowClick}
-                      style={{
-                        width: 12,
-                        height: 12,
-                      }}
-                    />
-                  </div>
+                  this.renderItemInfo()
                 }
                 {
                   this.props.type === 'column' &&
@@ -474,29 +467,41 @@ class SchemaTreeItem extends TerrainComponent<Props>
                 {
                   this.renderName()
                 }
-                <div
-                  style={Styles.itemInfoRow as any}
-                >
-                  {
-                    this.renderItemInfo()
-                  }
-                </div>
+                {
+                  isSelected ?
+                    <SchemaTreeContextActions
+                      id={this.props.id}
+                      type={this.props.type}
+                    />
+                    :
+                    null
+                }
               </div>
             </div>
-          }
-        </FadeInOut>
-
-        {
-          hasChildren &&
-          <FadeInOut
-            open={this.state.open}
-            key='two'
-          >
-            {
-              this.renderItemChildren()
-            }
-          </FadeInOut>
+          </div>
         }
+      </FadeInOut>
+    );
+
+    return (
+      <div
+        style={Styles.treeItem}
+      >
+        <ExpandableView
+          content={content}
+          open={this.state.open}
+          onToggle={this.handleArrowClick}
+          hideArrow={Boolean(!hasChildren || this.props.search)}
+        >
+          {
+            hasChildren ?
+              <span>
+                {this.renderItemChildren()}
+              </span>
+              :
+              null
+          }
+        </ExpandableView>
       </div>
     );
   }

@@ -124,7 +124,7 @@ class PathC extends BaseClass
 {
   public source: Source = _Source();
   public filterGroup: FilterGroup = _FilterGroup();
-  public softFilterGroup: FilterGroup = _FilterGroup();
+  public softFilterGroup: FilterGroup = _FilterGroup({ minMatches: 'any' });
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
@@ -236,6 +236,10 @@ export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
 export const _ScoreLine = (config?: { [key: string]: any }) =>
 {
   let scoreLine = New<ScoreLine>(new ScoreLineC(config), config);
+  if (config && config.weight !== undefined)
+  {
+    scoreLine = scoreLine.set('weight', config.weight);
+  }
   scoreLine = scoreLine
     .set('transformData', _TransformData(scoreLine['transformData']));
   return scoreLine;
@@ -244,6 +248,7 @@ export const _ScoreLine = (config?: { [key: string]: any }) =>
 class TransformDataC extends BaseClass
 {
   public scorePoints: List<ScorePoint> = List([]);
+  public visiblePoints: List<ScorePoint> = List([]);
   public domain: List<number> = List([0, 10]);
   public dataDomain: List<number> = List([0, 10]);
   public hasCustomDomain: boolean = false;
@@ -256,6 +261,7 @@ export const _TransformData = (config?: { [key: string]: any }) =>
   let transform = New<TransformData>(new TransformDataC(config), config);
   transform = transform
     .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
+    .set('visiblePoints', List(transform['visiblePoints'].map((p) => _ScorePoint(p))))
     .set('domain', List(transform['domain']));
   return transform;
 };
@@ -283,6 +289,9 @@ class MoreC extends BaseClass
   public collapse: string = undefined;
   public scripts: List<Script> = List();
   public expanded: boolean = false;
+  public trackScores: boolean = true;
+  public source: List<string> = List([]);
+  public customSource: boolean = false;
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -291,7 +300,8 @@ export const _More = (config?: { [key: string]: any }) =>
   let more = New<More>(new MoreC(config || {}), config);
   more = more
     .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
-    .set('scripts', List(more['scripts'].map((agg) => _Script(agg))));
+    .set('scripts', List(more['scripts'].map((agg) => _Script(agg))))
+    .set('source', List(more['source']));
 
   return more;
 };
@@ -384,6 +394,7 @@ class FilterLineC extends LineC
   // Members for when it is a single line condition
   public field: string = null; // autocomplete
   public fieldType: FieldType = null;
+  public analyzed: boolean = true;
   public comparison: string = null; // autocomplete
   public value: string | number | DistanceValue = null;
   public valueType: ValueType = null;
@@ -564,6 +575,7 @@ type ChoiceContext = {
     builderState: BuilderState,
     field: string,
     fieldType?: FieldType,
+    analyzed?: boolean,
   } | {
     type: 'input',
     source: Source,
@@ -576,6 +588,7 @@ type ChoiceContext = {
 class ElasticDataSourceC extends DataSource
 {
   public index: string = '';
+  public server: string = '';
 
   // TODO remove
   public types: List<string> = List([]);
@@ -680,16 +693,16 @@ class ElasticDataSourceC extends DataSource
         }
 
         const { dataSource } = context.source;
-        const { index, types } = dataSource as any;
-
+        const { server, index, types } = dataSource as ElasticDataSource;
         if (!index)
         {
           return defaultOptions;
         }
 
+        const theDatabaseId = `${server}/${index}`;
         const acceptableCols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
-            column.databaseId === String(index) &&
+            column.databaseId === theDatabaseId &&
             acceptableFieldTypes.indexOf(column.datatype) !== -1,
         );
 
@@ -701,7 +714,7 @@ class ElasticDataSourceC extends DataSource
           });
         }).toSet().toList();
         let fieldNames = acceptableOptions.map((f) => f.value).toList();
-        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+        fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, theDatabaseId);
         acceptableOptions = acceptableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
 
         return acceptableOptions.concat(defaultOptions).toList();
@@ -726,12 +739,13 @@ class ElasticDataSourceC extends DataSource
         });
       }));
       const { dataSource } = context.source;
-      const { index } = dataSource as any;
+      const { server, index } = dataSource as any;
       if (index)
       {
+        const theDatabaseId = `${server}/${index}`;
         const cols = context.schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
-            column.databaseId === String(index));
+            column.databaseId === theDatabaseId);
         let fields = List([]);
         cols.forEach((col) =>
         {
@@ -741,7 +755,7 @@ class ElasticDataSourceC extends DataSource
           {
             _.keys(col.properties).forEach((property) =>
             {
-              const { type } = col.properties[property];
+              const { type, analyzer } = col.properties[property];
               fields = fields.push(
                 _ChoiceOption({
                   displayName: col.name + '.' + property,
@@ -749,6 +763,7 @@ class ElasticDataSourceC extends DataSource
                   icon: fieldTypeToIcon[type],
                   meta: {
                     fieldType: ReverseFieldTypeMapping[type],
+                    analyzed: analyzer !== undefined,
                   },
                 }),
               );
@@ -760,6 +775,7 @@ class ElasticDataSourceC extends DataSource
             icon: fieldTypeToIcon[fieldType],
             meta: {
               fieldType,
+              analyzed: col.analyzed,
             },
           }));
         });
@@ -775,7 +791,7 @@ class ElasticDataSourceC extends DataSource
 
     if (context.type === 'comparison')
     {
-      const { field, fieldType, schemaState, source } = context;
+      const { field, fieldType, schemaState, source, analyzed } = context;
       const server = context.builderState.db.name;
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)
@@ -783,16 +799,8 @@ class ElasticDataSourceC extends DataSource
         options = options.filter((opt) => opt.fieldTypes.indexOf(fieldType) !== -1);
         if (fieldType === FieldType.Text)
         {
-          const { dataSource } = context.source;
-          const { index } = dataSource as any;
-          const col = schemaState.columns.filter(
-            (column) =>
-              column.serverId === String(server) &&
-              column.databaseId === String(index) &&
-              column.name === field,
-          ).toList().get(0);
           // If it is analyzed, remove 'equal' / 'notequal' (term)
-          if (col && col.analyzed)
+          if (analyzed)
           {
             options = options.filter((opt) => opt.value !== 'equal' && opt.value !== 'notequal');
           }
@@ -851,7 +859,7 @@ export const _ElasticDataSource = (config?: { [key: string]: any }) =>
   elasticSource = elasticSource.set('types', List(elasticSource['types']));
   return elasticSource;
 };
-≈
+
 const ElasticComparisons = [
   {
     value: 'exists',
@@ -866,9 +874,21 @@ const ElasticComparisons = [
       ]),
   },
   {
+    value: 'notexists',
+    displayName: 'does not exist',
+    fieldTypes: List(
+      [FieldType.Numerical,
+      FieldType.Text,
+      FieldType.Date,
+      FieldType.Geopoint,
+      FieldType.Ip,
+      FieldType.Nested,
+      ]),
+  },
+  {
     value: 'equal',
     displayName: 'equals', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'equals' : '=',
-    fieldTypes: List([FieldType.Numerical, FieldType.Text]),
+    fieldTypes: List([FieldType.Numerical, FieldType.Text, FieldType.Date]),
     placeholder: 'e.g. 100 or apple',
   },
   {
@@ -880,7 +900,7 @@ const ElasticComparisons = [
   {
     value: 'notequal',
     displayName: 'does not equal', // TerrainTools.isFeatureEnabled(TerrainTools.OPERATORS) ? 'does not equal' : '≠',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical]),
+    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
     placeholder: 'e.g. 100 or apple',
   },
   {
@@ -892,7 +912,7 @@ const ElasticComparisons = [
   {
     value: 'isnotin',
     displayName: 'is not in',
-    fieldTypes: List([FieldType.Text, FieldType.Numerical, FieldType.Date]),
+    fieldTypes: List([FieldType.Text]),
     placeholder: 'e.g. apple, banana, kiwi',
   },
   {

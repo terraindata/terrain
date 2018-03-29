@@ -89,8 +89,30 @@ export interface Props
   builderActions?: typeof BuilderActions;
 }
 
+export interface State
+{
+  childNames: { string: number } | {};
+}
+
 class PathfinderNestedSection extends TerrainComponent<Props>
 {
+  public state: State;
+
+  public constructor(props)
+  {
+    super(props);
+
+    this.state = {
+      childNames: this.getChildNames(props),
+    };
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    this.state = {
+      childNames: this.getChildNames(nextProps),
+    };
+  }
 
   public shouldComponentUpdate(nextProps, nextState)
   {
@@ -164,6 +186,32 @@ class PathfinderNestedSection extends TerrainComponent<Props>
     this.props.builderActions.changePath(keyPath, expanded);
   }
 
+  // Nested fields cannot have the same Child name
+  public isValidChildName(childName)
+  {
+    return childName === undefined ||
+      childName === '' ||
+      this.state.childNames[childName] < 2;
+  }
+
+  public getChildNames(props)
+  {
+    const childNames = {};
+
+    props.nested.map((n) =>
+    {
+      if (childNames[n.name] === undefined)
+      {
+        childNames[n.name] = 1;
+      } else
+      {
+        childNames[n.name] += 1;
+      }
+    });
+
+    return childNames;
+  }
+
   public renderNestedPaths()
   {
     const { nested, reference, keyPath } = this.props;
@@ -227,6 +275,8 @@ class PathfinderNestedSection extends TerrainComponent<Props>
                       noBorder={false}
                       debounce={true}
                       showEllipsis={true}
+                      showWarning={!this.isValidChildName(nestedPath.name)}
+                      warningText={'Cannot have two nested queries with the same name'}
                     />
                   </FadeInOut>
                   {
