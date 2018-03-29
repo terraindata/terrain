@@ -73,7 +73,6 @@ import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthro
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
 
 import DocumentsHelpers from './DocumentsHelpers';
 
@@ -191,25 +190,25 @@ class Initializers extends ETLHelpers
         initialEdge: 0,
       };
     }
-    const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
 
-    const fieldMap = createTreeFromEngine(engine);
-
-    const template = _ETLTemplate({
+    let template = _ETLTemplate({
       id: -1,
       templateName: name,
     });
     const sourceToAdd = source !== undefined ? source : _SourceConfig({ type: Sources.Upload });
     const sinkToAdd = sink !== undefined ? sink : _SinkConfig({ type: Sinks.Download });
     // default source and sink is upload and download
-    const proxy = new TemplateProxy(template);
+    const proxy = new TemplateProxy(() => template, (t) => template = t);
+
     const sourceIds = proxy.addSource(sourceToAdd);
     const sinkIds = proxy.addSink(sinkToAdd);
+    const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId);
+    const { engine, warnings, softWarnings } = proxy.autodetectEdgeEngine(initialEdge);
 
-    const initialEdge = proxy.addEdge(sourceIds.nodeId, sinkIds.nodeId, engine);
+    const fieldMap = createTreeFromEngine(engine);
 
     return {
-      template: proxy.value(),
+      template,
       sourceKey: sourceIds.sourceKey,
       fieldMap,
       warnings,

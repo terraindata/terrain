@@ -57,6 +57,7 @@ import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import { createEngineFromDocuments, mergeJoinEngines } from 'shared/transformations/util/EngineUtil';
 
 import
 {
@@ -75,14 +76,12 @@ export type Mutator<T> = (newItem: T) => void;
 
 export class TemplateProxy
 {
-  private cacheTemplate: boolean;
-
   constructor(
-    private _template: (() => ETLTemplate) | ETLTemplate,
+    private _template: (() => ETLTemplate),
     private onMutate: Mutator<ETLTemplate> = doNothing,
   )
   {
-    this.cacheTemplate = typeof _template !== 'function';
+
   }
 
   public value()
@@ -112,6 +111,7 @@ export class TemplateProxy
     return { sourceKey: key, nodeId };
   }
 
+  // adds a sink and a node for the sink
   public addSink(sink: SinkConfig): { sinkKey: string, nodeId }
   {
     const key = this.newSinkId();
@@ -124,7 +124,14 @@ export class TemplateProxy
     return { sinkKey: key, nodeId };
   }
 
-  public addMerge(leftId: number, rightId: number, leftJoinKey: string, rightJoinKey: string, outputKey: string): number
+  // adds a merge node
+  public addMergeNode(
+    leftId: number,
+    rightId: number,
+    leftJoinKey: string,
+    rightJoinKey: string,
+    outputKey: string
+  ): number
   {
     const mergeNode = _ETLNode({
       type: NodeTypes.MergeJoin,
@@ -139,6 +146,7 @@ export class TemplateProxy
     return this.createNode(mergeNode);
   }
 
+  // delete a source and its node
   public deleteSource(key: string)
   {
     this.sources = this.sources.delete(key);
@@ -148,6 +156,7 @@ export class TemplateProxy
     this.nodes = this.nodes.delete(nodeToDelete);
   }
 
+  // delete a sink and its node
   public deleteSink(key: string)
   {
     this.sinks = this.sinks.delete(key);
@@ -167,6 +176,13 @@ export class TemplateProxy
     return this.createEdge(edge);
   }
 
+  public autodetectEdgeEngine(edgeId: number, documents: List<object>)
+  {
+    const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
+    this.setEdgeTransformations(edgeId, engine);
+    return { engine, warnings, softWarnings };
+  }
+
   public setEdgeTransformations(edgeId: number, transformations: TransformationEngine)
   {
     this.edges = this.edges.update(edgeId, (edge) => edge.set('transformations', transformations));
@@ -175,11 +191,6 @@ export class TemplateProxy
   public setEdgeTo(edgeId: number, toNode: number)
   {
     this.edges = this.edges.update(edgeId, (edge) => edge.set('to', toNode));
-  }
-
-  public splitEdge(edgeId: number)
-  {
-    // TODO
   }
 
   private createNode(node: ETLNode): number
@@ -302,26 +313,12 @@ export class TemplateProxy
 
   private get template()
   {
-    if (this.cacheTemplate)
-    {
-      return this._template as ETLTemplate;
-    }
-    else
-    {
-      return (this._template as () => ETLTemplate)();
-    }
+    return this._template()
   }
 
   private set template(val: ETLTemplate)
   {
-    if (this.cacheTemplate)
-    {
-      this._template = val;
-    }
-    else
-    {
-      this.onMutate(val);
-    }
+    this.onMutate(val);
   }
 }
 

@@ -74,7 +74,7 @@ import { SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createEngineFromDocuments, mergeJoinEngines } from 'shared/transformations/util/EngineUtil';
+import { mergeJoinEngines } from 'shared/transformations/util/EngineUtil';
 import DocumentsHelpers from './DocumentsHelpers';
 
 class GraphHelpers extends ETLHelpers
@@ -124,7 +124,7 @@ class GraphHelpers extends ETLHelpers
       const rightEdgeId = proxy.value().findEdges((edge) => edge.from === rightId).first();
       const destinationNodeId = proxy.value().getEdge(leftEdgeId).to;
 
-      const mergeNodeId = proxy.addMerge(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
+      const mergeNodeId = proxy.addMergeNode(leftId, rightId, leftJoinKey, rightJoinKey, outputKey);
       proxy.setEdgeTo(leftEdgeId, mergeNodeId);
       proxy.setEdgeTo(rightEdgeId, mergeNodeId);
 
@@ -138,20 +138,20 @@ class GraphHelpers extends ETLHelpers
     }).catch(this._logError);
   }
 
-  public createEngineForEdge(edgeId: number)
+  public createEngineForSourceEdge(edgeId: number)
   {
     const template = this._template;
     const edge = template.getEdge(edgeId);
     const fromNode = template.getNode(edge.from);
+
     if (fromNode.type === NodeTypes.Source)
     {
       const source = template.getSource(fromNode.endpoint);
       DocumentsHelpers.fetchDocuments(source, fromNode.endpoint).then((documents) =>
       {
-        const { engine, warnings, softWarnings } = createEngineFromDocuments(documents);
         this._try((proxy) =>
         {
-          proxy.setEdgeTransformations(edgeId, engine);
+          proxy.autodetectEdgeEngine(edgeId, documents);
         }).catch(this._logError);
       }).catch(this._logError);
     }
@@ -191,7 +191,7 @@ class GraphHelpers extends ETLHelpers
       });
       newEdges.forEach((edgeId) =>
       {
-        this.createEngineForEdge(edgeId);
+        this.createEngineForSourceEdge(edgeId);
       });
       DocumentsHelpers.fetchSources(differentKeys);
     }).catch(this._logError);
