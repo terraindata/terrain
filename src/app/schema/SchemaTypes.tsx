@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import { BaseClass, makeConstructor, New, WithIRecord } from '../Classes';
 
 type stringList = string[] | List<string>;
@@ -74,6 +75,7 @@ class SchemaStateC
   public schemaError: boolean = false;
 
   // view state
+  public modalRequests: List<ModalProps> = List([]);
   public selectedId: string = null;
   public highlightedId: string = null;
   public highlightedInSearchResults: boolean = false;
