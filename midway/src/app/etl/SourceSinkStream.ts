@@ -188,7 +188,7 @@ export async function getMergeJoinStream(name: string, indices: object[], option
 {
   const mergeJoinKey = options['outputKey'];
   const query = {
-    size: 10, // FIXME!!!
+    size: 2147483647,
     query: {
       bool: {
         filter: [

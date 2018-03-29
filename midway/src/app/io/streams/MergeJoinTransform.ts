@@ -132,6 +132,11 @@ export default class MergeJoinTransform extends Readable
       this.accumulateBuffer(buffers, StreamType.Left);
     }).bind(this));
     this.leftSource.on('error', ((e) => this.emit('error', e)).bind(this));
+    this.leftSource.on('end', (() =>
+    {
+      this.rightSource.destroy();
+      this.push(null);
+    }).bind(this));
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
@@ -149,6 +154,11 @@ export default class MergeJoinTransform extends Readable
       this.accumulateBuffer(buffers, StreamType.Right);
     }).bind(this));
     this.rightSource.on('error', ((e) => this.emit('error', e)).bind(this));
+    this.rightSource.on('end', (() =>
+    {
+      this.leftSource.destroy();
+      this.push(null);
+    }).bind(this));
   }
 
   public _read(size: number = 1024)
@@ -248,7 +258,7 @@ export default class MergeJoinTransform extends Readable
         }
 
         // if either of the streams went dry, request more
-        if (this.leftPosition === left.length - 1)
+        if (this.leftPosition === left.length - 1 && this.rightPosition < right.length - 1)
         {
           this.push(this.leftBuffer);
           this.leftBuffer = null;
@@ -256,7 +266,7 @@ export default class MergeJoinTransform extends Readable
           return;
         }
 
-        if (this.rightPosition === right.length - 1)
+        if (this.rightPosition === right.length - 1 && this.leftPosition < left.length - 1)
         {
           this.rightBuffer = null;
           this.rightPosition = 0;
@@ -292,13 +302,6 @@ export default class MergeJoinTransform extends Readable
     // push the merged result out to the stream
     this.push(this.leftBuffer);
     this.leftBuffer = null;
-
-    // check if we are done
-    if (this.leftSource.isEmpty())
-    {
-      this.rightSource.destroy();
-      this.push(null);
-    }
   }
 
   private setSortClause(query: object)
