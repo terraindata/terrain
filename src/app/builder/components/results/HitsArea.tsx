@@ -879,7 +879,12 @@ column if you have customized the results view.');
   public toggleHitSize()
   {
     // Need to scroll this to the top to avoid weird bugs with infinite scroller
-    document.getElementById('hits-area').scrollTop = 0;
+    const el = document.getElementById('hits-area');
+    if (el)
+    {
+      el.scrollTop = 0;
+    }
+
     this.setState({
       hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
     });
