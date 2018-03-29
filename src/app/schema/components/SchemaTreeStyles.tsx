@@ -158,12 +158,13 @@ const SchemaTreeStyles =
 
     itemInfoRow: {
       flexGrow: '1',
+      display: 'flex',
     },
 
     childrenWrapper: {
       normal: [
         {
-          paddingLeft: 11,
+          paddingLeft: 0,
         },
         Styles.transition,
       ],

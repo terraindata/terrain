@@ -1576,6 +1576,31 @@ export const Ajax =
         },
         { onError });
     },
+
+    // not to be confused with deleteDb, which actually deletes a server connection
+    deleteDatabase(
+      dbid: number,
+      dbname: string,
+      language: string,
+    ): Promise<any>
+    {
+      return new Promise<any>((resolve, reject) =>
+      {
+        return Ajax.req(
+          'post',
+          'schema/database/delete',
+          {
+            dbid,
+            dbname,
+            language,
+          },
+          resolve,
+          {
+            onError: reject,
+          },
+        );
+      });
+    },
   };
 
 export default Ajax;

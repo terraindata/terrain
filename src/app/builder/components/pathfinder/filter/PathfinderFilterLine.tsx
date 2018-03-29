@@ -249,13 +249,17 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         isNaN(fieldType)))
     {
       const { schemaState, builderState, source } = props.pathfinderContext;
-      fieldType = ElasticBlockHelpers.getTypeOfField(
+      const data = ElasticBlockHelpers.getTypeOfField(
         schemaState,
         builderState,
         props.filterLine.field,
         false,
-        (source.dataSource as any).index) as FieldType;
+        (source.dataSource as any).index,
+        true);
+      fieldType = data.fieldType;
+      const analyzed = data.analyzed;
       let comparison = props.filterLine.comparison;
+      // If the field type is date or text, update < > filters to be alpha or date
       if (String(fieldType) === String(FieldType.Date) &&
         ['less', 'lessequal', 'greater', 'greaterequal'].indexOf(comparison) !== -1)
       {
@@ -265,6 +269,24 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         ['less', 'lessequal', 'greater', 'greaterequal'].indexOf(comparison) !== -1)
       {
         comparison = comparison === 'less' || comparison === 'lessequal' ? 'alphabefore' : 'alphaafter';
+      }
+      // If the field is analyzed text, make sure it is using match comparison (not term)
+      if (
+          String(fieldType) === String(FieldType.Text) &&
+          analyzed &&
+          ['equal', 'notequal'].indexOf(comparison) !== -1
+        )
+      {
+        comparison = comparison === 'equal' ? 'contains' : 'notcontain';
+      }
+      // If the field is unanalyzed text, make sure it is using term comparison (not match)
+      else if (
+        String(fieldType) === String(FieldType.Text) &&
+        !analyzed &&
+        ['contains', 'notcontain'].indexOf(comparison) !== -1
+      )
+      {
+        comparison = comparison === 'contains' ? 'equal' : 'notequal';
       }
       props.onChange(props.keyPath, props.filterLine
         .set('fieldType', parseFloat(String(fieldType)))

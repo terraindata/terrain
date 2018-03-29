@@ -210,7 +210,7 @@ export const ElasticBlockHelpers = {
 
   // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
   // If the field is a metaField, return string / number accrodingly
-  getTypeOfField(schemaState, builderState, field, returnDatatype?, overrideIndex?): FieldType | string
+  getTypeOfField(schemaState, builderState, field, returnDatatype?, overrideIndex?, returnAnalyzed?): any
   {
     if (metaFields.indexOf(field) !== -1)
     {
@@ -275,6 +275,10 @@ export const ElasticBlockHelpers = {
       const dataType = col.datatype !== undefined ? col.datatype : col.type;
       if (returnDatatype)
       {
+        if (returnAnalyzed)
+        {
+          return {fieldType: dataType, analyzed: col.analyzed};
+        }
         return dataType;
       }
       let fieldType: any = 0;
@@ -286,6 +290,10 @@ export const ElasticBlockHelpers = {
           fieldType = ft;
         }
       });
+      if (returnAnalyzed)
+      {
+        return {fieldType, analyzed: col.analyzed};
+      }
       return fieldType;
     }
     return undefined;
