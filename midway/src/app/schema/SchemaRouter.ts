@@ -54,7 +54,7 @@ import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { Permissions } from '../permissions/Permissions';
 
 import * as Tasty from '../../tasty/Tasty';
-import * as Util from '../Util';
+import * as Util from '../AppUtil';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
