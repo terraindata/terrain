@@ -301,8 +301,8 @@ const EQLSpec: ESClause[] =
         template: {
           'query:query': {
             'bool:elasticFilter': {
-              'filter:query[]': [{ 'term:term_query': { '_index:string': '' } }, { 'term:term_query': { '_type:string': '' } }],
-              'must:query[]': [{ 'term:term_query': { ' :string': '' } }],
+              'filter:query[]': [{ 'term:term_query': { '_index:string': '' } }, { 'term:term_query': { '_type:string': '' },
+               { 'term:term_query': { ' :string': '' } }]
             },
           },
           'sort:elasticScore': null,

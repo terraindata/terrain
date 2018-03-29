@@ -1069,7 +1069,7 @@ export const elasticFilterBlock = _block(
     field: '',
     value: '',
     key: 'term',
-    boolQuery: 'must',
+    boolQuery: 'filter',
     filterOp: '=',
     boost: '',
     static: {
@@ -1089,7 +1089,7 @@ export const elasticFilterBlock = _block(
           ? extraConfig.value : '';
         config['boost'] = (extraConfig && extraConfig.boost !== undefined && extraConfig.value !== null)
           ? extraConfig.boost : '';
-        config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'must';
+        config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'filter';
         config['filterOp'] = (extraConfig && extraConfig.filterOp) || '=';
         return config;
       },
