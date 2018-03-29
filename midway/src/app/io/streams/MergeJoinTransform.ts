@@ -248,7 +248,7 @@ export default class MergeJoinTransform extends Readable
         }
 
         // if either of the streams went dry, request more
-        if (this.leftPosition === left.length)
+        if (this.leftPosition === left.length - 1)
         {
           this.push(this.leftBuffer);
           this.leftBuffer = null;
@@ -256,7 +256,7 @@ export default class MergeJoinTransform extends Readable
           return;
         }
 
-        if (this.rightPosition === right.length)
+        if (this.rightPosition === right.length - 1)
         {
           this.rightBuffer = null;
           this.rightPosition = 0;
@@ -271,12 +271,17 @@ export default class MergeJoinTransform extends Readable
       {
         left[this.leftPosition][this.mergeJoinName].push(right[j]['_source']);
         j++;
+        if (j === right.length)
+        {
+          break;
+        }
         r = right[j]['_source'][this.joinKey];
       }
 
-      if (j === right.length)
+      if (j === right.length && this.leftPosition < left.length - 1)
       {
         this.rightBuffer = null;
+        this.rightPosition = 0;
         return;
       }
 

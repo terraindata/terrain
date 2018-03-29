@@ -56,7 +56,6 @@ import
 } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import util from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
@@ -147,18 +146,7 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
         }
 
         const { serverId, database, table } = sink.options as any;
-        const db = await databases.select([], { name: serverId });
-        if (db.length < 1 || db[0].id === undefined)
-        {
-          throw new Error(`Database ${String(serverId)} not found.`);
-        }
-
-        const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id as number);
-        if (controller === undefined)
-        {
-          throw new Error(`Database id ${String(db[0].id)} is invalid.`);
-        }
-
+        const controller = await getControllerByName(serverId);
         const client: ElasticClient = controller.getClient() as ElasticClient;
         const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
 
@@ -179,15 +167,25 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
   });
 }
 
-export async function getMergeJoinStream(dbName: string, indices: object[], options: object): Promise<stream.Readable>
+export async function getControllerByName(name: string): Promise<DatabaseController>
 {
-  const db = await databases.select([], { name: dbName });
+  const db = await databases.select([], { name });
   if (db.length < 1 || db[0].id === undefined)
   {
-    throw new Error(`Database ${dbName} not found.`);
+    throw new Error(`Database ${String(name)} not found.`);
   }
 
-  const dbId: number = db[0].id as number;
+  const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id as number);
+  if (controller === undefined)
+  {
+    throw new Error(`Database id ${String(db[0].id)} is invalid.`);
+  }
+
+  return controller;
+}
+
+export async function getMergeJoinStream(name: string, indices: object[], options: object): Promise<stream.Readable>
+{
   const mergeJoinKey = options['outputKey'];
   const query = {
     size: 10, // FIXME!!!
@@ -229,6 +227,9 @@ export async function getMergeJoinStream(dbName: string, indices: object[], opti
       },
     },
   };
+
+  const controller = await getControllerByName(name);
+  const dbId: number = controller.getID();
   const elasticStream = await getElasticReaderStream(dbId, JSON.stringify(query));
   const exportTransform = new ExportTransform();
   return elasticStream.pipe(exportTransform);

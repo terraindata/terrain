@@ -63,7 +63,9 @@ import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
-import { getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
+import DatabaseController from '../../database/DatabaseController';
+import ElasticDB from '../../database/elastic/tasty/ElasticDB';
+import { getControllerByName, getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
 import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
 export default class Templates
@@ -356,25 +358,39 @@ export default class Templates
             });
           }
 
+          const dbName: string = template.sinks._default['options']['serverId'];
+
           // listen for the done event on the EventEmitter
           // nb: we use a promise here so as to not block the thread, and not have to write the
           // following code in an event-passing style
-          await new Promise((resolve, reject) =>
-          {
-            done.on('done', resolve);
-            done.on('error', reject);
-          });
+          await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
 
-          // create merge join stream
-          const dbName: string = template.sinks._default['options']['serverId'];
+          // we refresh all temporary elastic indexes to make them ready for search
+          const controller: DatabaseController = await getControllerByName(dbName);
+          const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
+          const indices = tempIndices.map((i) => i['index']);
+          await elasticDB.refreshIndex(indices);
+
+          // pipe the merge stream to all outgoing edges
           const outEdges: any[] = dag.outEdges(nodeId);
+          numPending = outEdges.length;
           for (const e of outEdges)
           {
             const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
             const transformStream = new TransformationEngineTransform([], transformationEngine);
             const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
-            streamMap[nodeId][e.w] = mergeJoinStream; // .pipe(transformStream);
+            streamMap[nodeId][e.w] = mergeJoinStream.pipe(transformStream);
+            streamMap[nodeId][e.w].on('finish', async () =>
+            {
+              if (--numPending === 0)
+              {
+                // delete the temporary indices once the merge stream has been piped
+                // out to all outgoing edges
+                await elasticDB.deleteIndex(indices);
+              }
+            });
           }
+
           return this.executeGraph(template, dag, nodes, files, streamMap);
         }
 
