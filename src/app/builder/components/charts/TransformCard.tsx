@@ -572,18 +572,15 @@ class TransformCard extends TerrainComponent<Props>
           },
         };
       }
-     // console.log('querying domain');
       const domainAggregationAjax = Ajax.query(
         JSON.stringify(domainQuery),
         db,
         (resp) =>
         {
-       //   console.log(resp);
           this.handleElasticDomainAggregationResponse(resp);
         },
         (err) =>
         {
-         // console.log(err);
           this.handleElasticDomainAggregationError(err);
         },
       );

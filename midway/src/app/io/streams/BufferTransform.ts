@@ -89,6 +89,7 @@ export default class BufferTransform
     this.stream.on('data', this._onData);
     this.stream.on('end', this._onEvent);
     this.stream.on('error', this._onEvent);
+    this.stream.on('close', this._onEvent);
   }
 
   private onData(doc: any): void
@@ -107,5 +108,6 @@ export default class BufferTransform
     this.stream.removeListener('data', this._onData);
     this.stream.removeListener('end', this._onEvent);
     this.stream.removeListener('error', this._onEvent);
+    this.stream.removeListener('close', this._onEvent);
   }
 }

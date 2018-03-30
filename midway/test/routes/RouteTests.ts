@@ -739,11 +739,6 @@ describe('Query route tests', () =>
         }).expect(200).then((response) =>
         {
           winston.info(response.text);
-          const respData = JSON.parse(response.text);
-          expect(respData['result']).toMatchObject(
-            {
-              acknowledged: true,
-            });
         });
 
       await request(server)

@@ -151,15 +151,15 @@ export class ElasticQueryHandler extends QueryHandler
         let stream: Readable;
         if (query['groupJoin'] !== undefined)
         {
-          stream = new GroupJoinTransform(client, request.body, request.streaming);
+          stream = new GroupJoinTransform(client, request.body);
         }
         else if (query['mergeJoin'] !== undefined)
         {
-          stream = new MergeJoinTransform(client, request.body, request.streaming);
+          stream = new MergeJoinTransform(client, request.body);
         }
         else
         {
-          stream = new ElasticStream(client, query, request.streaming);
+          stream = new ElasticStream(client, query);
         }
 
         if (request.streaming === true)

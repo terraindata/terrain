@@ -56,10 +56,8 @@ export class ElasticStream extends Stream.Readable
   private client: ElasticClient;
   private query: any;
 
-  private _isEmpty: boolean = false;
   private querying: boolean = false;
   private doneReading: boolean = false;
-  private streaming: boolean = false;
   private rowsProcessed: number = 0;
   private scroll: string;
   private size: number;
@@ -72,40 +70,27 @@ export class ElasticStream extends Stream.Readable
 
   private numRequested: number = 0;
 
-  constructor(client: ElasticClient, query: any, streaming: boolean = false)
+  constructor(client: ElasticClient, query: any)
   {
     super({ objectMode: true, highWaterMark: 1024 * 128 });
 
     this.client = client;
     this.query = query;
-    this.streaming = streaming;
 
     this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
-    this.numRequested = this.size;
 
     try
     {
-      const body = {
-        body: this.query,
-      };
-
-      if (this.streaming)
-      {
-        body['scroll'] = this.scroll,
-          body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
-      }
-      else
-      {
-        body.body['size'] = this.size;
-      }
-
       this.querying = true;
-      this.client.search(body,
+      this.client.search({
+        body: this.query,
+        scroll: this.scroll,
+        size: Math.min(this.size, this.MAX_SEARCH_SIZE),
+      },
         (error, response): void =>
         {
-          const scrollCallback = this.scrollCallback.bind(this);
-          scrollCallback(error, response);
+          this.scrollCallback(error, response);
         });
     }
     catch (e)
@@ -135,11 +120,6 @@ export class ElasticStream extends Stream.Readable
     }
   }
 
-  public isEmpty(): boolean
-  {
-    return this._isEmpty;
-  }
-
   private scrollCallback(error, response): void
   {
     if (response && typeof response._scroll_id === 'string')
@@ -167,11 +147,7 @@ export class ElasticStream extends Stream.Readable
     this.rowsProcessed += length;
     this.numRequested = Math.max(0, this.numRequested - length);
 
-    const shouldContinue = this.push(response);
-    if (!shouldContinue)
-    {
-      this.numRequested = 0;
-    }
+    this.push(response);
 
     this.querying = false;
     this.doneReading = this.doneReading
@@ -190,7 +166,6 @@ export class ElasticStream extends Stream.Readable
 
     if (this.doneReading)
     {
-      this._isEmpty = true;
       // stop scrolling
       if (this.scrollID !== undefined)
       {
@@ -203,31 +178,22 @@ export class ElasticStream extends Stream.Readable
 
         this.scrollID = undefined;
       }
-      else
-      {
-        this.push(null);
-      }
 
       return;
     }
 
     if (this.numRequested > 0)
     {
+      // continue scrolling
       this.querying = true;
-
-      if (this.scrollID !== undefined)
-      {
-        // continue scrolling
-        this.client.scroll({
-          scrollId: this.scrollID,
-          scroll: this.scroll,
-        } as Elastic.ScrollParams,
-          (error, response) =>
-          {
-            const scrollCallback = this.scrollCallback.bind(this);
-            scrollCallback(error, response);
-          });
-      }
+      this.client.scroll({
+        scrollId: this.scrollID,
+        scroll: this.scroll,
+      } as Elastic.ScrollParams,
+        (error, response) =>
+        {
+          this.scrollCallback(error, response);
+        });
     }
   }
 }

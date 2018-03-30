@@ -125,35 +125,35 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     });
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-    this.setState({
-      fieldOptions: source.dataSource.getChoiceOptions({
-        type: 'fields',
-        source,
-        schemaState: pathfinderContext.schemaState,
-        builderState: pathfinderContext.builderState,
-        noNested: true,
-      }),
-    });
+    // this.setState({
+    //   fieldOptions: source.dataSource.getChoiceOptions({
+    //     type: 'fields',
+    //     source,
+    //     schemaState: pathfinderContext.schemaState,
+    //     builderState: pathfinderContext.builderState,
+    //     noNested: true,
+    //   }),
+    // });
   }
 
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    if (this.props.pathfinderContext.source.dataSource
-      !== nextProps.pathfinderContext.source.dataSource)
-    {
-      const { pathfinderContext } = nextProps;
-      const { source } = pathfinderContext;
-      this.setState({
-        fieldOptions: source.dataSource.getChoiceOptions({
-          type: 'fields',
-          source,
-          schemaState: pathfinderContext.schemaState,
-          builderState: pathfinderContext.builderState,
-          noNested: true,
-        }),
-      });
-    }
-  }
+  // public componentWillReceiveProps(nextProps: Props)
+  // {
+  //   if (this.props.pathfinderContext.source.dataSource
+  //     !== nextProps.pathfinderContext.source.dataSource)
+  //   {
+  //     const { pathfinderContext } = nextProps;
+  //     const { source } = pathfinderContext;
+  //     this.setState({
+  //       fieldOptions: source.dataSource.getChoiceOptions({
+  //         type: 'fields',
+  //         source,
+  //         schemaState: pathfinderContext.schemaState,
+  //         builderState: pathfinderContext.builderState,
+  //         noNested: true,
+  //       }),
+  //     });
+  //   }
+  // }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
@@ -715,14 +715,16 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 autoFocus={true}
               />
             }
-            <RouteSelector
-              optionSets={this.getCollapseOptionSets()}
-              values={List([collapseValue])}
-              onChange={this.handleCollapseChange}
-              canEdit={canEdit}
-              defaultOpen={false}
-              autoFocus={true}
-            />
+            {
+              //  <RouteSelector
+              //   optionSets={this.getCollapseOptionSets()}
+              //   values={List([collapseValue])}
+              //   onChange={this.handleCollapseChange}
+              //   canEdit={canEdit}
+              //   defaultOpen={false}
+              //   autoFocus={true}
+              // />
+            }
             <RouteSelector
               optionSets={this.getTrackScoresOptionSets()}
               values={List([more.trackScores])}

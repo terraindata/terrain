@@ -49,8 +49,7 @@ import { Readable } from 'stream';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import ElasticStream from '../../../database/elastic/query/ElasticStream';
-
+import BufferedElasticStream from './BufferedElasticStream';
 /**
  * Types of merge joins
  */
@@ -74,17 +73,17 @@ export default class MergeJoinTransform extends Readable
   private client: ElasticClient;
   private type: MergeJoinType;
 
-  private leftSource: ElasticStream;
-  private leftBuffer: object | null = null;
-  private leftPosition: number = 0;
-  private rightSource: ElasticStream;
-  private rightBuffer: object | null = null;
-  private rightPosition: number = 0;
+  private leftSource: BufferedElasticStream;
+  private leftBuffer: object | null;
+  private leftPosition: number;
+  private rightSource: BufferedElasticStream;
+  private rightBuffer: object | null;
+  private rightPosition: number;
 
   private mergeJoinName: string;
   private joinKey: string;
 
-  constructor(client: ElasticClient, queryStr: string, streaming: boolean = false, type: MergeJoinType = MergeJoinType.LEFT_OUTER_JOIN)
+  constructor(client: ElasticClient, queryStr: string, type: MergeJoinType = MergeJoinType.LEFT_OUTER_JOIN)
   {
     super({
       objectMode: true,
@@ -119,36 +118,19 @@ export default class MergeJoinTransform extends Readable
 
     // set up the left source
     const leftQuery = this.setSortClause(query);
-    this.leftSource = new ElasticStream(client, leftQuery, true);
-    this.leftSource.on('readable', (() =>
-    {
-      const buffers: object[] = [];
-      let buffer = this.leftSource.read();
-      while (buffer !== null)
-      {
-        buffers.push(buffer);
-        buffer = this.leftSource.read();
-      }
-      this.accumulateBuffer(buffers, StreamType.Left);
-    }).bind(this));
-    this.leftSource.on('error', ((e) => this.emit('error', e)).bind(this));
+    this.leftBuffer = null;
+    this.leftSource = new BufferedElasticStream(client, leftQuery,
+      ((buffer: object[]) => this.accumulateBuffer(buffer, StreamType.Left)).bind(this));
+    this.leftPosition = 0;
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
-    this.rightSource = new ElasticStream(client, rightQuery, true);
-    this.rightSource.on('readable', (() =>
-    {
-      const buffers: object[] = [];
-      let buffer = this.rightSource.read();
-      while (buffer !== null)
-      {
-        buffers.push(buffer);
-        buffer = this.rightSource.read();
-      }
-      this.accumulateBuffer(buffers, StreamType.Right);
-    }).bind(this));
-    this.rightSource.on('error', ((e) => this.emit('error', e)).bind(this));
+    this.rightBuffer = null;
+    this.rightSource = new BufferedElasticStream(client, rightQuery,
+      ((buffer: object[]) => this.accumulateBuffer(buffer, StreamType.Right)).bind(this));
+    this.rightPosition = 0;
+
   }
 
   public _read(size: number = 1024)
@@ -163,33 +145,28 @@ export default class MergeJoinTransform extends Readable
     this.rightSource._destroy(error, callback);
   }
 
-  private accumulateBuffer(buffers: object[], type: StreamType): void
+  private accumulateBuffer(buffer: object[], type: StreamType): void
   {
-    if (buffers.length === 0)
+    if (buffer.length !== 0)
     {
-      return;
-    }
-
-    if (buffers.length > 1)
-    {
-      if (buffers[0]['hits'].hits === undefined)
+      if (buffer[0]['hits'].hits === undefined)
       {
-        buffers[0]['hits'].hits = [];
+        buffer[0]['hits'].hits = [];
       }
 
-      for (let i = 1; i < buffers.length; ++i)
+      for (let i = 1; i < buffer.length; ++i)
       {
-        buffers[0]['hits'].hits = buffers[0]['hits'].hits.concat(buffers[i]['hits'].hits);
+        buffer[0]['hits'].hits = buffer[0]['hits'].hits.concat(buffer[i]['hits'].hits);
       }
     }
 
     if (type === StreamType.Left)
     {
-      this.leftBuffer = buffers[0];
+      this.leftBuffer = buffer[0];
     }
     else if (type === StreamType.Right)
     {
-      this.rightBuffer = buffers[0];
+      this.rightBuffer = buffer[0];
     }
     else
     {
@@ -251,14 +228,14 @@ export default class MergeJoinTransform extends Readable
         if (this.leftPosition === left.length)
         {
           this.push(this.leftBuffer);
-          this.leftBuffer = null;
+          this.leftBuffer = [];
           this.leftPosition = 0;
           return;
         }
 
         if (this.rightPosition === right.length)
         {
-          this.rightBuffer = null;
+          this.rightBuffer = [];
           this.rightPosition = 0;
           return;
         }
@@ -276,7 +253,7 @@ export default class MergeJoinTransform extends Readable
 
       if (j === right.length)
       {
-        this.rightBuffer = null;
+        this.rightBuffer = [];
         return;
       }
 
@@ -286,7 +263,7 @@ export default class MergeJoinTransform extends Readable
 
     // push the merged result out to the stream
     this.push(this.leftBuffer);
-    this.leftBuffer = null;
+    this.leftBuffer = [];
 
     // check if we are done
     if (this.leftSource.isEmpty())
