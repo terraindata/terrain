@@ -49,6 +49,11 @@ import * as _ from 'lodash';
 
 export default class TypeUtil
 {
+  public static isNullHelper(value: string): boolean
+  {
+    return value === null || value === undefined || value === '' || value === 'null' || value === 'undefined';
+  }
+
   public static isBooleanHelper(value: string): boolean
   {
     let parsedValue: any;

@@ -50,7 +50,9 @@ import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import objectify from 'shared/util/deepObjectify';
 import { KeyPath } from 'shared/util/KeyPath';
+import * as yadeep from 'shared/util/yadeep';
 
 export type PathHash = string;
 export interface PathHashMap<T>
@@ -205,12 +207,23 @@ export default class EngineUtil
     return newEngine;
   }
 
-  // attempt to convert fields to text and guess if they should be numbers or booleans
+  // attempt to convert fields from text and guess if they should be numbers or booleans
   public static interpretTextFields(engine: TransformationEngine, documents: List<object>)
   {
+    const docs = EngineUtil.preprocessDocuments(documents);
     engine.getAllFieldIDs().forEach((id) =>
     {
-
+      const kp = engine.getInputKeyPath(id);
+      if (EngineUtil.getRepresentedType(id, engine) !== 'string')
+      {
+        return;
+      }
+      let values = [];
+      docs.forEach((doc) =>
+      {
+        const vals = yadeep.get(doc, kp);
+        values = values.concat(vals);
+      });
     });
   }
 
@@ -225,30 +238,15 @@ export default class EngineUtil
   {
     engine.getAllFieldIDs().forEach((id) =>
     {
-      const type = engine.getFieldType(id);
-      const valueType = engine.getFieldProp(id, valueTypeKeyPath);
       const ikp = engine.getInputKeyPath(id);
-      if (EngineUtil.isNamedField(ikp))
+      const repType = EngineUtil.getRepresentedType(id, engine);
+      if (repType !== 'array' && repType !== 'object')
       {
-        if (type !== 'array' && type !== 'object')
-        {
-          // remove check above when arrays are properly deobjectified
-          const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
-            toTypename: type,
-          };
-          engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
-        }
-      }
-      else
-      {
-        if (valueType !== 'array' && valueType !== 'object')
-        {
-          // remove check above when arrays are properly deobjectified
-          const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
-            toTypename: valueType,
-          };
-          engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
-        }
+        // remove check above when arrays are properly deobjectified
+        const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
+          toTypename: repType,
+        };
+        engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
       }
     });
   }
@@ -318,6 +316,11 @@ export default class EngineUtil
       warnings,
       softWarnings,
     };
+  }
+
+  private static preprocessDocuments(documents: List<object>): List<object>
+  {
+    return documents.map((doc) => objectify(doc)).toList();
   }
 
   // copy a field from e1 to e2 with specified keypath
