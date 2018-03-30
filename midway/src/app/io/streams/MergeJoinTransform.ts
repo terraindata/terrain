@@ -169,8 +169,7 @@ export default class MergeJoinTransform extends Readable
 
   public _destroy(error, callback)
   {
-    this.leftSource._destroy(error, callback);
-    this.rightSource._destroy(error, callback);
+    this.rightSource._destroy(error, () => this.leftSource._destroy(error, callback));
   }
 
   private accumulateBuffer(buffers: object[], type: StreamType): void
