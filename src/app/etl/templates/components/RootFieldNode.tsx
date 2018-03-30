@@ -53,6 +53,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import Quarantine from 'util/RadiumQuarantine';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
@@ -62,6 +63,7 @@ import FadeInOut from 'common/components/FadeInOut';
 import ExpandableView from 'common/components/ExpandableView';
 import EditorFieldNode from 'etl/templates/components/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
@@ -75,6 +77,7 @@ interface Props
   noInteract: boolean;
   // injected props
   templateEditor?: TemplateEditorState;
+  act?: typeof TemplateEditorActions;
 }
 
 class RootFieldNode extends TerrainComponent<Props>
@@ -130,8 +133,27 @@ class RootFieldNode extends TerrainComponent<Props>
     return (
       <div className='template-editor-children-container'>
         {this.renderChildFields()}
+        <Quarantine>
+          <div
+            className='add-another-field-button'
+            style={fontColor(Colors().text3, Colors().text2)}
+            onClick={this.handleAddAnotherFieldClicked}
+          >
+            Add Another Field
+          </div>
+        </Quarantine>
       </div>
     );
+  }
+
+  public handleAddAnotherFieldClicked()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        addFieldId: -1,
+      },
+    });
   }
 }
 
@@ -140,5 +162,5 @@ const emptyList = List([]);
 export default Util.createTypedContainer(
   RootFieldNode,
   ['templateEditor'],
-  {},
+  { act: TemplateEditorActions },
 );

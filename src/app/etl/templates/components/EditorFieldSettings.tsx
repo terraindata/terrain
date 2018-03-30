@@ -135,7 +135,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
 
   public renderExtraCategories(): any[]
   {
-    const language = this._getSinkLanguage();
+    const language = this._getCurrentLanguage();
     const categories = [];
     if (language === Languages.Elastic)
     {

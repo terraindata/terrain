@@ -215,28 +215,10 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return kp.size === 1;
   }
 
-  protected _getSinkLanguage(): Languages
+  protected _getCurrentLanguage(): Languages
   {
-    this.updateChecker.setChecker('currentEdgeId', getCurrentEdgeId);
-    const edgeId = getCurrentEdgeId(this.props);
-    try
-    {
-      const edge = this._template().getEdge(edgeId);
-      const toNode = this._template().getNode(edge.to);
-      if (toNode.type === NodeTypes.Sink)
-      {
-        const sink = this._template().getSink(toNode.endpoint);
-        if (sink.type === Sinks.Database)
-        {
-          return (sink.options as SinkOptionsType<Sinks.Database>).language;
-        }
-      }
-      return Languages.JavaScript;
-    }
-    catch (e)
-    {
-      return Languages.JavaScript;
-    }
+    this.updateChecker.setChecker('currentLanguage', getCurrentLanguage);
+    return getCurrentLanguage(this.props);
   }
 
   protected _inputDisabled(): boolean
@@ -304,9 +286,10 @@ function getCurrentEngine(props: TemplateEditorFieldProps)
   return (props as TemplateEditorFieldProps & Injected).templateEditor.getCurrentEngine();
 }
 
-function getCurrentEdgeId(props: TemplateEditorFieldProps)
+function getCurrentLanguage(props: TemplateEditorFieldProps)
 {
-  return (props as TemplateEditorFieldProps & Injected).templateEditor.getCurrentEdgeId();
+  const templateEditor = (props as TemplateEditorFieldProps & Injected).templateEditor;
+  return templateEditor.template.getEdgeLanguage(templateEditor.getCurrentEdgeId());
 }
 
 function settingsAreOpen(props: TemplateEditorFieldProps)

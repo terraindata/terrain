@@ -416,7 +416,14 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           break;
         }
         case 'boolean': {
-          yadeep.set(doc, field, Boolean(el));
+          if (typeof el === 'string')
+          {
+            yadeep.set(doc, field, el.toLowerCase() === 'true');
+          }
+          else
+          {
+            yadeep.set(doc, field, Boolean(el));
+          }
           break;
         }
         case 'object': {

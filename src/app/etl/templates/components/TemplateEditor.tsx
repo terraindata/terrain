@@ -125,6 +125,7 @@ class TemplateEditor extends TerrainComponent<Props>
     {
       return {};
     }
+
     return engine.transform(previewDocument);
   }
 
@@ -195,7 +196,7 @@ class TemplateEditor extends TerrainComponent<Props>
   public renderTopBar()
   {
     const { history, template, isDirty } = this.props.templateEditor;
-    let titleName = template.id === -1 ?
+    let titleName = (template !== null && template.id === -1) ?
       'Unsaved Template' :
       template.templateName;
     if (isDirty)
@@ -357,7 +358,7 @@ class TemplateEditor extends TerrainComponent<Props>
   public getTemplateItemStyle(templateInList: ETLTemplate)
   {
     const { template } = this.props.templateEditor;
-    return template.id !== templateInList.id ? templateListItemStyle : templateListItemCurrentStyle;
+    return (template !== null && template.id === templateInList.id) ? templateListItemCurrentStyle : templateListItemStyle;
   }
 
   public handleLoadTemplateItemClicked(template: ETLTemplate)

@@ -55,7 +55,7 @@ import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { isWildcardField } from 'shared/transformations/util/EngineUtil';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 /*
@@ -115,6 +115,24 @@ export class EngineProxy
   public deleteTransformation(id: number)
   {
     this.engine.deleteTransformation(id);
+  }
+
+  public addRootField(name: string, type: string)
+  {
+    const pathToAdd = List([name]);
+    if (validateNewFieldName(this.engine, -1, pathToAdd).isValid)
+    {
+      if (type === 'array')
+      {
+        this.engine.addField(pathToAdd, type, { valueType: 'string' });
+        this.engine.addField(pathToAdd.push('*'), 'array', { valueType: 'string' });
+      }
+      else
+      {
+        this.engine.addField(pathToAdd, type);
+      }
+      this.requestRebuild();
+    }
   }
 }
 
@@ -187,18 +205,32 @@ export class FieldProxy
   }
 
   // add a field under this field
-  public addNewField(newPath: EnginePath)
+  public addNewField(name: string, type: FieldTypes)
   {
+    const newPath = this.engine.getOutputKeyPath(this.fieldId).push(name);
     if (validateNewFieldName(this.engine, this.fieldId, newPath).isValid)
     {
-      this.engine.addField(newPath, 'string');
+      if (type === 'array')
+      {
+        this.engine.addField(newPath, type, { valueType: 'string' });
+        this.engine.addField(newPath.push('*'), 'array', { valueType: 'string' });
+      }
+      else
+      {
+        this.engine.addField(newPath, type);
+      }
       this.syncWithEngine(true);
+    }
+    else
+    {
+      // todo error
     }
   }
 
+  // todo add cast transformation
   public changeType(newType: FieldTypes)
   {
-    if (isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
+    if (EngineUtil.isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
     {
       this.engine.setFieldProp(this.fieldId, List(['valueType']), newType);
     }
