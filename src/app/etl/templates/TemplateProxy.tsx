@@ -244,6 +244,9 @@ export class TemplateProxy
       {
         EngineUtil.interpretTextFields(engine, documentConfig.documents);
       }
+
+      EngineUtil.addInitialTypeCasts(engine);
+
       const language = this.template.getEdgeLanguage(edgeId);
       switch (language)
       {
@@ -254,7 +257,11 @@ export class TemplateProxy
           break;
       }
     }
-    EngineUtil.addInitialTypeCasts(engine);
+    else
+    {
+      EngineUtil.addInitialTypeCasts(engine);
+    }
+
   }
 
   private createNode(node: ETLNode): number

@@ -208,29 +208,74 @@ export default class EngineUtil
   }
 
   // attempt to convert fields from text and guess if they should be numbers or booleans
+  // adds type casts
   public static interpretTextFields(engine: TransformationEngine, documents: List<object>)
   {
     const docs = EngineUtil.preprocessDocuments(documents);
     engine.getAllFieldIDs().forEach((id) =>
     {
-      const kp = engine.getInputKeyPath(id);
       if (EngineUtil.getRepresentedType(id, engine) !== 'string')
       {
         return;
       }
+      const okp = engine.getOutputKeyPath(id);
+      const ikp = engine.getInputKeyPath(id);
       let values = [];
       docs.forEach((doc) =>
       {
-        const vals = yadeep.get(doc, kp);
+        const vals = yadeep.get(engine.transform(doc), okp);
         values = values.concat(vals);
       });
+      const bestType = TypeUtil.getCommonJsType(values);
+      if (bestType !== EngineUtil.getRepresentedType(id, engine))
+      {
+        const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
+          toTypename: bestType,
+        };
+        if (EngineUtil.isNamedField(ikp))
+        {
+          engine.setFieldType(id, bestType);
+        }
+        else
+        {
+          engine.setFieldProp(id, valueTypeKeyPath, bestType);
+        }
+        engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
+      }
     });
   }
 
   // attempt to detect date types and integer float
+  // does not add type casts
   public static autodetectElasticTypes(engine: TransformationEngine, documents: List<object>)
   {
+    const docs = EngineUtil.preprocessDocuments(documents);
+    engine.getAllFieldIDs().forEach((id) =>
+    {
+      if (engine.getFieldProp(id, List(['elastic', 'isPrimaryKey'])))
+      {
+        return;
+      }
+      const okp = engine.getOutputKeyPath(id);
 
+      let values = [];
+      docs.forEach((doc) =>
+      {
+        const vals = yadeep.get(engine.transform(doc), okp);
+        values = values.concat(vals);
+      });
+      const repType = EngineUtil.getRepresentedType(id, engine);
+      if (repType === 'string')
+      {
+        const type = TypeUtil.getCommonElasticType(values);
+        engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
+      }
+      else if (repType === 'number')
+      {
+        const type = TypeUtil.getCommonElasticNumberType(values);
+        engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
+      }
+    });
   }
 
   // for each field make an initial type cast based on the js type
@@ -238,6 +283,18 @@ export default class EngineUtil
   {
     engine.getAllFieldIDs().forEach((id) =>
     {
+      const firstCastIndex = engine.getTransformations(id).findIndex((transformId) =>
+      {
+        const node = engine.getTransformationInfo(transformId);
+        return node.typeCode === TransformationNodeType.CastNode;
+      });
+
+      // do not perform casts if there is already a cast
+      if (firstCastIndex !== -1)
+      {
+        return;
+      }
+
       const ikp = engine.getInputKeyPath(id);
       const repType = EngineUtil.getRepresentedType(id, engine);
       if (repType !== 'array' && repType !== 'object')

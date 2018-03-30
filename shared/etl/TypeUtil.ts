@@ -46,12 +46,101 @@ THE SOFTWARE.
 // tslint:disable:max-line-length
 
 import * as _ from 'lodash';
+import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
 
 export default class TypeUtil
 {
+  // return the most specific primitive type of the provided values
+  public static getCommonJsType(values: string[]): string
+  {
+    let type = null;
+    for (const val of values)
+    {
+      if (TypeUtil.isNullHelper(val))
+      {
+        // do nothing
+      }
+      else if (TypeUtil.isNumberHelper(val))
+      {
+        type = (type === null || type === 'boolean') ? 'boolean' : 'string';
+      }
+      else if (TypeUtil.isNumberHelper(val))
+      {
+        type = (type === null || type === 'number') ? 'number' : 'string';
+      }
+      else
+      {
+        type = 'string';
+      }
+    }
+    return type === null ? 'string' : type;
+  }
+
+  // todo deal with things like $500
+  public static getCommonElasticType(values: string[]): ElasticTypes
+  {
+    let type: ElasticTypes = null;
+
+    for (const val of values)
+    {
+      if (TypeUtil.isNullHelper(val))
+      {
+        // do nothing
+      }
+      else if (TypeUtil.isDateHelper(val))
+      {
+        type = (type === null || type === ElasticTypes.Date) ? ElasticTypes.Date : ElasticTypes.Auto;
+      }
+      else if (TypeUtil.isGeoHelper(val))
+      {
+        type = (type === null || type === ElasticTypes.GeoPoint) ? ElasticTypes.GeoPoint : ElasticTypes.Auto;
+      }
+    }
+    return type === null ? ElasticTypes.Auto : type;
+  }
+
+  public static getCommonElasticNumberType(values: number[]): ElasticTypes
+  {
+    let type: ElasticTypes = null;
+
+    for (const val of values)
+    {
+      if (val == null || Number.isNaN(val))
+      {
+        // do nothing
+      }
+      else if (TypeUtil.numberIsInteger(val))
+      {
+        type = (type === null || type === ElasticTypes.Integer) ? ElasticTypes.Integer : ElasticTypes.Auto;
+      }
+    }
+    return type === null ? ElasticTypes.Auto : type;
+  }
+
+  public static numberIsInteger(value: number): boolean
+  {
+    return Number.isInteger(value);
+  }
+
   public static isNullHelper(value: string): boolean
   {
     return value === null || value === undefined || value === '' || value === 'null' || value === 'undefined';
+  }
+
+  public static isGeoHelper(value: string | object): boolean
+  {
+    try
+    {
+      if (typeof value === 'string')
+      {
+        value = JSON.parse(value) as object;
+      }
+      return Object.keys(value).length === 2 && value['lat'] !== undefined && value['long'] !== undefined;
+    }
+    catch (e)
+    {
+      return false;
+    }
   }
 
   public static isBooleanHelper(value: string): boolean
@@ -74,6 +163,11 @@ export default class TypeUtil
     const YYYYMMDDRegex = new RegExp(/([0-9]{4}-[0,1]{1}[0-9]{1}-[0-3]{1}[0-9]{1})/);
     const ISORegex = new RegExp(/^([0-9]{4})-([0,1]{1}[0-9]{1})-([0-3]{1}[0-9]{1})( |T){0,1}([0-2]{1}[0-9]{1}):{0,1}([0-5]{1}[0-9]{1}):{0,1}([0-9]{2})(\.([0-9]{3,6})|((-|\+)?[0-9]{2}:[0-9]{2}))?Z?$/);
     return MMDDYYYYRegex.test(value) || YYYYMMDDRegex.test(value) || ISORegex.test(value);
+  }
+
+  public static isNumberHelper(value: string): boolean
+  {
+    return !Number.isNaN(Number(value));
   }
 
   public static isDoubleHelper(value: string): boolean
