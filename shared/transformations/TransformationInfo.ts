@@ -57,6 +57,7 @@ import { TransformationEngine } from './TransformationEngine';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitResult from './TransformationVisitResult';
+import EngineUtil from './util/EngineUtil';
 
 type AllNodeInfoType =
   {
@@ -88,7 +89,7 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: SplitTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -105,7 +106,7 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: JoinTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -135,7 +136,7 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: DuplicateTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+         return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -164,7 +165,7 @@ const TransformationNodeInfo: AllNodeInfoType =
         description: 'Make all the text in this field uppercase',
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         type: UppercaseTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -181,7 +182,7 @@ const TransformationNodeInfo: AllNodeInfoType =
         description: `Extract a piece from this field's text`,
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         type: SubstringTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,

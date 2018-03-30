@@ -196,6 +196,7 @@ export class FieldProxy
     }
   }
 
+  // todo add cast transformation
   public changeType(newType: FieldTypes)
   {
     if (EngineUtil.isWildcardField(this.engine.getInputKeyPath(this.fieldId)))

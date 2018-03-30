@@ -60,7 +60,7 @@ export default class TypeUtil
       {
         // do nothing
       }
-      else if (TypeUtil.isNumberHelper(val))
+      else if (TypeUtil.isBooleanHelper(val))
       {
         type = (type === null || type === 'boolean') ? 'boolean' : 'string';
       }
