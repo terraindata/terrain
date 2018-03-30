@@ -63,9 +63,9 @@ import FadeInOut from 'common/components/FadeInOut';
 import ExpandableView from 'common/components/ExpandableView';
 import EditorFieldNode from 'etl/templates/components/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
@@ -152,7 +152,7 @@ class RootFieldNode extends TerrainComponent<Props>
       actionType: 'setDisplayState',
       state: {
         addFieldId: -1,
-      }
+      },
     });
   }
 }
@@ -162,5 +162,5 @@ const emptyList = List([]);
 export default Util.createTypedContainer(
   RootFieldNode,
   ['templateEditor'],
-  { act: TemplateEditorActions},
+  { act: TemplateEditorActions },
 );

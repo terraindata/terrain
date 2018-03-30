@@ -57,18 +57,18 @@ import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle
 import Util from 'util/Util';
 const { List, Map } = Immutable;
 
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import Autocomplete from 'common/components/Autocomplete';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import GraphHelpers from 'etl/helpers/GraphHelpers';
-import Autocomplete from 'common/components/Autocomplete';
 import Modal from 'common/components/Modal';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 
 import './MoveFieldModal.less';
 
@@ -107,21 +107,21 @@ interface FormState
 }
 
 const addFieldMap: InputDeclarationMap<FormState> =
-{
-  name: {
-    type: DisplayType.TextBox,
-    displayName: 'Name',
-    group: 'file type',
-  },
-  type: {
-    type: DisplayType.Pick,
-    displayName: 'Field Type',
-    options: {
-      pickOptions: (s) => typeOptions,
-      indexResolver: (value) => typeOptions.indexOf(value),
+  {
+    name: {
+      type: DisplayType.TextBox,
+      displayName: 'Name',
+      group: 'file type',
     },
-  }
-};
+    type: {
+      type: DisplayType.Pick,
+      displayName: 'Field Type',
+      options: {
+        pickOptions: (s) => typeOptions,
+        indexResolver: (value) => typeOptions.indexOf(value),
+      },
+    },
+  };
 const typeOptions = List(['string', 'number', 'boolean', 'array', 'object']);
 
 // UI to add a new field underneath this field
@@ -220,7 +220,8 @@ const AddFieldModal = Util.createTypedContainer(
   mapDispatchKeys,
 );
 
-interface RootFieldProps {
+interface RootFieldProps
+{
   fieldId: number;
   // injected
   act?: typeof TemplateEditorActions;
@@ -300,16 +301,19 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
 
   public onConfirm()
   {
-    GraphHelpers.mutateEngine((proxy) => {
+    GraphHelpers.mutateEngine((proxy) =>
+    {
       proxy.addRootField(this.state.name, this.state.type);
-    }).then((isStructural) => {
+    }).then((isStructural) =>
+    {
       if (isStructural)
       {
         this.props.act({
           actionType: 'rebuildFieldMap',
         });
       }
-    }).catch((e) => {
+    }).catch((e) =>
+    {
       // TODO
     });
   }

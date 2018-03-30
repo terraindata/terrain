@@ -120,12 +120,12 @@ export class EngineProxy
   public addRootField(name: string, type: string)
   {
     const pathToAdd = List([name]);
-    if (validateNewFieldName(this.engine, -1, pathToAdd))
+    if (validateNewFieldName(this.engine, -1, pathToAdd).isValid)
     {
       if (type === 'array')
       {
-        this.engine.addField(pathToAdd, type, {valueType: 'string'});
-        this.engine.addField(pathToAdd.push('*'), 'array', {valueType: 'string'});
+        this.engine.addField(pathToAdd, type, { valueType: 'string' });
+        this.engine.addField(pathToAdd.push('*'), 'array', { valueType: 'string' });
       }
       else
       {
@@ -212,8 +212,8 @@ export class FieldProxy
     {
       if (type === 'array')
       {
-        this.engine.addField(newPath, type, {valueType: 'string'});
-        this.engine.addField(newPath.push('*'), 'array', {valueType: 'string'});
+        this.engine.addField(newPath, type, { valueType: 'string' });
+        this.engine.addField(newPath.push('*'), 'array', { valueType: 'string' });
       }
       else
       {
