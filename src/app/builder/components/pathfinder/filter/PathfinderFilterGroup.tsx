@@ -90,7 +90,6 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
   public render()
   {
     const { filterGroup, canEdit, depth } = this.props;
-
     return (
       <div
         className='pf-filter-group-header'

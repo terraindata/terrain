@@ -149,7 +149,7 @@ export const _Path = (config?: { [key: string]: any }) =>
 
 class FilterGroupC extends BaseClass
 {
-  public minMatches: number | string = 100;
+  public minMatches: number | string = 'all';
   public name: string = 'Group';
   public collapsed: boolean = false;
   // Only maintained on the top-level group, keeps track of what number group we are on to create names
@@ -512,7 +512,7 @@ export const sourceCountDropdownOptions = List<AdvancedDropdownOption>([
 class SourceC extends BaseClass
 {
   public dataSource: DataSource = _ElasticDataSource();
-  public count: number | string = sourceCountOptions.get(0);
+  public count: number | string = 100;
   public start: number = 0;
 }
 export type Source = SourceC & IRecord<SourceC>;
