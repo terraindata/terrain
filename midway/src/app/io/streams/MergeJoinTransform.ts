@@ -132,11 +132,7 @@ export default class MergeJoinTransform extends Readable
       this.accumulateBuffer(buffers, StreamType.Left);
     }).bind(this));
     this.leftSource.on('error', ((e) => this.emit('error', e)).bind(this));
-    this.leftSource.on('end', (() =>
-    {
-      this.rightSource.destroy();
-      this.push(null);
-    }).bind(this));
+    this.leftSource.on('end', this.mergeJoin.bind(this));
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
@@ -154,11 +150,7 @@ export default class MergeJoinTransform extends Readable
       this.accumulateBuffer(buffers, StreamType.Right);
     }).bind(this));
     this.rightSource.on('error', ((e) => this.emit('error', e)).bind(this));
-    this.rightSource.on('end', (() =>
-    {
-      this.leftSource.destroy();
-      this.push(null);
-    }).bind(this));
+    this.rightSource.on('end', this.mergeJoin.bind(this));
   }
 
   public _read(size: number = 1024)
@@ -211,7 +203,13 @@ export default class MergeJoinTransform extends Readable
 
   private mergeJoin(): void
   {
-    if (this.leftBuffer === null || this.rightBuffer === null)
+    if (this.leftBuffer === null)
+    {
+      this.push(null);
+      return;
+    }
+
+    if (this.rightBuffer === null)
     {
       return;
     }
@@ -219,8 +217,17 @@ export default class MergeJoinTransform extends Readable
     const left = this.leftBuffer['hits'].hits;
     const right = this.rightBuffer['hits'].hits;
 
-    if (left.length === 0 || right.length === 0)
+    if (left.length === 0)
     {
+      this.leftPosition = 0;
+      this.leftBuffer = null;
+      return;
+    }
+
+    if (right.length === 0)
+    {
+      this.rightPosition = 0;
+      this.rightBuffer = null;
       return;
     }
 
@@ -233,68 +240,47 @@ export default class MergeJoinTransform extends Readable
 
       while (l !== r)
       {
+        left[this.leftPosition][this.mergeJoinName] = [];
         if (l < r)
         {
+          if (this.type === MergeJoinType.INNER_JOIN)
+          {
+            delete this.leftBuffer['hits'].hits[this.leftPosition];
+          }
+
           this.leftPosition++;
           l = left[this.leftPosition]['_source'][this.joinKey];
-
-          if (l < r)
-          {
-            if (this.type === MergeJoinType.LEFT_OUTER_JOIN)
-            {
-              this.leftBuffer['hits'].hits[this.leftPosition][this.mergeJoinName] = [];
-            }
-            else if (this.type === MergeJoinType.INNER_JOIN)
-            {
-              delete this.leftBuffer['hits'].hits[this.leftPosition];
-            }
-          }
         }
         else if (r < l)
         {
           this.rightPosition++;
           r = right[this.rightPosition]['_source'][this.joinKey];
         }
-
-        // if either of the streams went dry, request more
-        if (this.leftPosition === left.length - 1 && this.rightPosition < right.length - 1)
-        {
-          this.push(this.leftBuffer);
-          this.leftBuffer = null;
-          this.leftPosition = 0;
-          return;
-        }
-
-        if (this.rightPosition === right.length - 1 && this.leftPosition < left.length - 1)
-        {
-          this.rightBuffer = null;
-          this.rightPosition = 0;
-          return;
-        }
       }
 
-      // start merging
-      left[this.leftPosition][this.mergeJoinName] = [];
-      let j = this.rightPosition;
-      while (l === r && j < right.length)
+      if (this.leftPosition === left.length - 1)
       {
-        left[this.leftPosition][this.mergeJoinName].push(right[j]['_source']);
-        j++;
-        if (j === right.length)
-        {
-          break;
-        }
-        r = right[j]['_source'][this.joinKey];
+        this.push(this.leftBuffer);
+        this.leftBuffer = null;
+        this.leftPosition = 0;
+        return;
       }
 
-      if (j === right.length && this.leftPosition < left.length - 1)
+      if (this.rightPosition === right.length - 1)
       {
         this.rightBuffer = null;
         this.rightPosition = 0;
         return;
       }
 
-      this.rightPosition++;
+      // start merging
+      left[this.leftPosition][this.mergeJoinName] = [];
+      for (let j = this.rightPosition; l === r && j < right.length; j++)
+      {
+        r = right[j]['_source'][this.joinKey];
+        left[this.leftPosition][this.mergeJoinName].push(right[j]['_source']);
+      }
+
       this.leftPosition++;
     }
 
