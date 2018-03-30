@@ -74,6 +74,7 @@ import ESArrayClause from '../../../../shared/database/elastic/parser/clauses/ES
 import ElasticBlocks from '../blocks/ElasticBlocks';
 
 import * as TerrainLog from 'loglevel';
+import ESWildcardStructureClause from '../../../../shared/database/elastic/parser/clauses/ESWildcardStructureClause';
 
 export default class ESCardParser extends ESParser
 {
@@ -199,19 +200,24 @@ export default class ESCardParser extends ESParser
     return rootCard.setIn(cardPath.push('keyDisplayType'), DisplayType.LABEL);
   }
 
+  private static updateRootCardKey(element: ESValueInfo, rootCard: Block)
+  {
+    // label the root card
+    if ((rootCard as Card).keyDisplayType !== DisplayType.LABEL)
+    {
+      rootCard = ESCardParser.labelCardKey(rootCard, rootCard, element.cardPath);
+    }
+
+    // label children
+    return this.updateCardKey(element, rootCard);
+  }
+
   private static updateCardKey(element: ESValueInfo, rootCard)
   {
-    if (element.clause instanceof ESStructureClause)
+    if (element.clause instanceof ESStructureClause &&
+      (element.clause instanceof ESWildcardStructureClause) === false)
     {
       const card = element.card;
-      if (card.type === rootCard.type)
-      {
-        // root card
-        if ((card as Card).keyDisplayType !== DisplayType.LABEL)
-        {
-          rootCard = ESCardParser.labelCardKey(rootCard, card, element.cardPath);
-        }
-      }
       card.cards.map((childCard, i) =>
       {
         if (childCard._isCard === true)
@@ -239,7 +245,7 @@ export default class ESCardParser extends ESParser
           return true;
         }
         rootCard = ESCardParser.updateCardErrors(element, rootCard);
-        rootCard = ESCardParser.updateCardKey(element, rootCard);
+        rootCard = ESCardParser.updateRootCardKey(element, rootCard);
         return true;
       });
     }
