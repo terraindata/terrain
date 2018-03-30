@@ -985,12 +985,12 @@ export class RouteSelector extends TerrainComponent<Props>
           resp[0]['primaryKeys'] = JSON.parse(resp[0]['primaryKeys']);
           resp[0]['enabled'] = true;
           resultsConfig = resultsConfig.set(option.value, _ResultsConfig(resp[0]));
-          if (i === options.size - 1)
-          {
-            this.setState({
-              resultsConfig,
-            });
-          }
+        }
+        if (i === options.size - 1)
+        {
+          this.setState({
+            resultsConfig,
+          });
         }
       });
     });
