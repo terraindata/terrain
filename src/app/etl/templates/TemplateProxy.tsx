@@ -56,6 +56,7 @@ import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 
 import
@@ -69,20 +70,18 @@ import
   ETLProcess,
   MergeJoinOptions,
 } from 'etl/templates/ETLProcess';
-import { NodeTypes } from 'shared/etl/types/ETLTypes';
+import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 
 export type Mutator<T> = (newItem: T) => void;
 
 export class TemplateProxy
 {
-  private cacheTemplate: boolean;
-
   constructor(
-    private _template: (() => ETLTemplate) | ETLTemplate,
+    private _template: (() => ETLTemplate),
     private onMutate: Mutator<ETLTemplate> = doNothing,
   )
   {
-    this.cacheTemplate = typeof _template !== 'function';
+
   }
 
   public value()
@@ -112,6 +111,7 @@ export class TemplateProxy
     return { sourceKey: key, nodeId };
   }
 
+  // adds a sink and a node for the sink
   public addSink(sink: SinkConfig): { sinkKey: string, nodeId }
   {
     const key = this.newSinkId();
@@ -124,21 +124,45 @@ export class TemplateProxy
     return { sinkKey: key, nodeId };
   }
 
-  public addMerge(leftId: number, rightId: number, leftJoinKey: string, rightJoinKey: string, outputKey: string): number
+  public createMergeJoin(
+    leftEdgeId: number,
+    rightEdgeId: number,
+    options: {
+      leftJoinKey: string,
+      rightJoinKey: string,
+      outputKey: string,
+    },
+  )
   {
+    const leftEdge = this.template.getEdge(leftEdgeId);
+    const rightEdge = this.template.getEdge(rightEdgeId);
+
     const mergeNode = _ETLNode({
       type: NodeTypes.MergeJoin,
       options: _MergeJoinOptions({
-        leftId,
-        rightId,
-        leftJoinKey,
-        rightJoinKey,
-        outputKey,
+        leftId: leftEdge.from,
+        rightId: rightEdge.from,
+        leftJoinKey: options.leftJoinKey,
+        rightJoinKey: options.rightJoinKey,
+        outputKey: options.outputKey,
       }),
     });
-    return this.createNode(mergeNode);
+    const mergeNodeId = this.createNode(mergeNode);
+
+    this.setEdgeTo(leftEdgeId, mergeNodeId);
+    this.setEdgeTo(rightEdgeId, mergeNodeId);
+
+    const newEdgeId = this.addEdge(mergeNodeId, leftEdge.to);
+    const newEngine = EngineUtil.mergeJoinEngines(
+      leftEdge.transformations,
+      rightEdge.transformations,
+      options.outputKey,
+    );
+    this.setEdgeTransformations(newEdgeId, newEngine);
+    // this.performTypeDetection(newEdgeId); TODO when 1943 is fixed
   }
 
+  // delete a source and its node
   public deleteSource(key: string)
   {
     this.sources = this.sources.delete(key);
@@ -148,6 +172,7 @@ export class TemplateProxy
     this.nodes = this.nodes.delete(nodeToDelete);
   }
 
+  // delete a sink and its node
   public deleteSink(key: string)
   {
     this.sinks = this.sinks.delete(key);
@@ -167,6 +192,30 @@ export class TemplateProxy
     return this.createEdge(edge);
   }
 
+  public createInitialEdgeEngine(edgeId: number, documents: List<object>)
+  {
+    const { engine, warnings, softWarnings } = EngineUtil.createEngineFromDocuments(documents);
+
+    let interpretText = false;
+    const fromNode = this.template.getNode(this.template.getEdge(edgeId).from);
+    if (fromNode.type === NodeTypes.Source)
+    {
+      const source = this.template.getSource(fromNode.endpoint);
+      if (source.fileConfig.fileType === FileTypes.Csv)
+      {
+        interpretText = true;
+      }
+    }
+
+    this.setEdgeTransformations(edgeId, engine);
+    this.performTypeDetection(edgeId,
+      {
+        documents,
+        interpretText,
+      });
+    return { warnings, softWarnings };
+  }
+
   public setEdgeTransformations(edgeId: number, transformations: TransformationEngine)
   {
     this.edges = this.edges.update(edgeId, (edge) => edge.set('transformations', transformations));
@@ -177,15 +226,48 @@ export class TemplateProxy
     this.edges = this.edges.update(edgeId, (edge) => edge.set('to', toNode));
   }
 
-  public splitEdge(edgeId: number)
+  // Add automatic type casts to fields, and apply language specific type checking
+  // if documentConfig is provided, do additional type checking / inference
+  private performTypeDetection(
+    edgeId: number,
+    documentConfig?: {
+      documents: List<object>,
+      interpretText?: boolean,
+    },
+  )
   {
-    // TODO
+    const engine = this.template.getTransformationEngine(edgeId);
+
+    if (documentConfig !== undefined)
+    {
+      if (documentConfig.interpretText === true)
+      {
+        EngineUtil.interpretTextFields(engine, documentConfig.documents);
+      }
+
+      EngineUtil.addInitialTypeCasts(engine);
+
+      const language = this.template.getEdgeLanguage(edgeId);
+      switch (language)
+      {
+        case 'elastic':
+          EngineUtil.autodetectElasticTypes(engine, documentConfig.documents);
+          break;
+        default:
+          break;
+      }
+    }
+    else
+    {
+      EngineUtil.addInitialTypeCasts(engine);
+    }
+
   }
 
   private createNode(node: ETLNode): number
   {
     const id = this.process.uidNode;
-    this.nodes = this.nodes.set(id, node);
+    this.nodes = this.nodes.set(id, node.set('id', id));
     this.process = this.process.set('uidNode', id + 1);
     return id;
   }
@@ -198,7 +280,7 @@ export class TemplateProxy
       return -1;
     }
     const id = this.process.uidEdge;
-    this.edges = this.edges.set(id, edge);
+    this.edges = this.edges.set(id, edge.set('id', id));
     this.process = this.process.set('uidEdge', id + 1);
     return id;
   }
@@ -302,26 +384,12 @@ export class TemplateProxy
 
   private get template()
   {
-    if (this.cacheTemplate)
-    {
-      return this._template as ETLTemplate;
-    }
-    else
-    {
-      return (this._template as () => ETLTemplate)();
-    }
+    return this._template();
   }
 
   private set template(val: ETLTemplate)
   {
-    if (this.cacheTemplate)
-    {
-      this._template = val;
-    }
-    else
-    {
-      this.onMutate(val);
-    }
+    this.onMutate(val);
   }
 }
 

@@ -76,7 +76,6 @@ import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthro
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { createEngineFromDocuments } from 'shared/transformations/util/EngineUtil';
 
 export default abstract class ETLHelpers
 {
@@ -187,5 +186,29 @@ export default abstract class ETLHelpers
   {
     // tslint:disable-next-line
     console.error(ev);
+  }
+
+  protected _errorHandler(description: string, showModal = false): (ev: any) => void
+  {
+    return (ev) =>
+    {
+      const message = `${description}: ${String(ev)}`;
+      if (showModal)
+      {
+        this.editorAct({
+          actionType: 'addModal',
+          props: {
+            title: 'Error',
+            message,
+            error: true,
+          },
+        });
+      }
+      else
+      {
+        // tslint:disable-next-line
+        console.error(description, ev);
+      }
+    };
   }
 }

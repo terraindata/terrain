@@ -49,7 +49,7 @@ const { List, Map } = Immutable;
 
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { isNamedField } from 'shared/transformations/util/EngineUtil';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath } from 'shared/util/KeyPath';
 // turns 'foo, bar, baz' into ['foo', 'bar', 'baz']
 // commas should be escaped by \ e.g. 'foo\, bar' is ['foo,', 'bar']
@@ -128,6 +128,8 @@ export function kpToString(kp: KeyPath): string
 // });
 
 // return true if the given keypath would be a valid new child field under provided fieldId
+// if fieldId is not provided or -1, then it does not consider the new field as a child field
+// (e.g. a root level field)
 export function validateNewFieldName(
   engine: TransformationEngine,
   fieldId: number,
@@ -161,13 +163,16 @@ export function validateNewFieldName(
     };
   }
 
-  const parentType = engine.getFieldType(fieldId);
-  if (parentType !== 'object' && parentType !== 'array')
+  if (fieldId !== undefined && fieldId !== -1)
   {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Parent fields is not a nested object',
-    };
+    const parentType = engine.getFieldType(fieldId);
+    if (parentType !== 'object' && parentType !== 'array')
+    {
+      return {
+        isValid: false,
+        message: 'Invalid Rename. Parent fields is not a nested object',
+      };
+    }
   }
 
   return {
@@ -210,7 +215,7 @@ export function validateRename(
       message: 'Invalid Rename. This field already exists',
     };
   }
-  else if (!isNamedField(existingKp))
+  else if (!EngineUtil.isNamedField(existingKp))
   {
     return {
       isValid: false,
@@ -256,9 +261,9 @@ export function validateRename(
 // [a] would not be local to [c, *, d]
 export function areFieldsLocal(kp1, kp2): boolean
 {
-  const lastIndex1: number = kp1.findLastIndex((value, index) => !isNamedField(kp1, index));
+  const lastIndex1: number = kp1.findLastIndex((value, index) => !EngineUtil.isNamedField(kp1, index));
   const concretePath1 = kp1.slice(0, lastIndex1 + 1);
-  const lastIndex2: number = kp2.findLastIndex((value, index) => !isNamedField(kp2, index));
+  const lastIndex2: number = kp2.findLastIndex((value, index) => !EngineUtil.isNamedField(kp2, index));
   const concretePath2 = kp2.slice(0, lastIndex2 + 1);
 
   if (lastIndex2 !== lastIndex1 || !concretePath1.equals(concretePath2))

@@ -93,6 +93,7 @@ export const _ETLProcess = makeExtendedConstructor(ETLProcessC, true, {
 
 class ETLEdgeC implements ETLEdgeI
 {
+  public id: number = -1;
   public from: number = -1;
   public to: number = -1;
   public transformations: TransformationEngine = new TransformationEngine();
@@ -104,8 +105,8 @@ export const _ETLEdge = makeExtendedConstructor(ETLEdgeC, true, {
 
 class MergeJoinOptionsC implements MergeJoinOptionsI
 {
-  public leftId: number = -1;
-  public rightId: number = -1;
+  public leftId: number = -1; // id of the left node
+  public rightId: number = -1; // id of the right node
   public leftJoinKey: string = '';
   public rightJoinKey: string = '';
   public outputKey: string = '';
@@ -115,6 +116,7 @@ export const _MergeJoinOptions = makeExtendedConstructor(MergeJoinOptionsC);
 
 class ETLNodeC implements ETLNodeI
 {
+  public id: number = -1;
   public type: NodeTypes = NodeTypes.MergeJoin;
   public options: MergeJoinOptions = _MergeJoinOptions();
   public endpoint: string = ''; // if source or sink, which one is it?

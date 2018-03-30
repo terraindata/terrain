@@ -106,7 +106,8 @@ class DocumentsHelpers extends ETLHelpers
     const mergeDocuments: List<object> = leftDocuments.map((document: object) =>
     {
       const leftDocument = leftTE.transform(document);
-      const innerDocs = rightDocuments.slice(0, 3).map((innerDoc) => rightTE.transform(innerDoc)).toArray();
+      const innerDocs = rightDocuments.slice(0, rightDocuments.size > 3 ? 3 : rightDocuments.size)
+        .map((innerDoc) => rightTE.transform(innerDoc)).toArray();
       leftDocument[outputKey] = innerDocs;
       return leftDocument;
     }).toList();
