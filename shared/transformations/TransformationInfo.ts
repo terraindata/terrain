@@ -89,7 +89,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: SplitTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -106,7 +109,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: JoinTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -136,7 +142,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         type: DuplicateTransformationNode,
         isAvailable: (engine, fieldId) =>
         {
-         return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,

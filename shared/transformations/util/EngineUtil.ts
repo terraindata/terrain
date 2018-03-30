@@ -186,7 +186,6 @@ export default class EngineUtil
     outputKey: string,
   ): TransformationEngine
   {
-    // const newEngine = leftEngine.clone();
     const newEngine = new TransformationEngine();
     leftEngine.getAllFieldIDs().forEach((id) =>
     {
@@ -299,7 +298,7 @@ export default class EngineUtil
       const repType = EngineUtil.getRepresentedType(id, engine);
       if (repType !== 'array' && repType !== 'object')
       {
-        // remove check above when arrays are properly deobjectified
+        // TODO 1942 remove check above when arrays are properly deobjectified
         const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
           toTypename: repType,
         };

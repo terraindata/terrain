@@ -56,8 +56,8 @@ import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 
 import
 {
@@ -131,7 +131,7 @@ export class TemplateProxy
       leftJoinKey: string,
       rightJoinKey: string,
       outputKey: string,
-    },
+    }
   )
   {
     const leftEdge = this.template.getEdge(leftEdgeId);
@@ -159,7 +159,7 @@ export class TemplateProxy
       options.outputKey,
     );
     this.setEdgeTransformations(newEdgeId, newEngine);
-    this.performTypeDetection(newEdgeId);
+    // this.performTypeDetection(newEdgeId); TODO when 1943 is fixed
   }
 
   // delete a source and its node
@@ -233,7 +233,7 @@ export class TemplateProxy
     documentConfig?: {
       documents: List<object>,
       interpretText?: boolean,
-    },
+    }
   )
   {
     const engine = this.template.getTransformationEngine(edgeId);
@@ -261,7 +261,7 @@ export class TemplateProxy
     {
       EngineUtil.addInitialTypeCasts(engine);
     }
-
+    
   }
 
   private createNode(node: ETLNode): number
@@ -384,7 +384,7 @@ export class TemplateProxy
 
   private get template()
   {
-    return this._template();
+    return this._template()
   }
 
   private set template(val: ETLTemplate)
