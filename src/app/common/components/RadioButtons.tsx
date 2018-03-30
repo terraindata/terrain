@@ -53,7 +53,8 @@ import './RadioButtons.less';
 export interface RadioButtonOption
 {
   key: string;
-  display: string | El;
+  display?: string | El;
+  label?: string;
 }
 
 export interface Props
@@ -65,6 +66,7 @@ export interface Props
   radioKey?: string;
   action?: (keyPath, value) => void;
   builderActions?: typeof BuilderActions;
+  canEdit?: boolean;
 }
 
 class RadioButtons extends TerrainComponent<Props>
@@ -72,6 +74,10 @@ class RadioButtons extends TerrainComponent<Props>
 
   public handleSelectOption(option)
   {
+    if (!this.props.canEdit)
+    {
+      return;
+    }
     if (this.props.onSelectOption !== undefined)
     {
       this.props.onSelectOption(option, this.props.radioKey);
@@ -101,6 +107,7 @@ class RadioButtons extends TerrainComponent<Props>
           })}
         >
         </div>
+        <span className='radio-button-label'>{option.label}</span>
         {option.display}
         <br />
       </div>

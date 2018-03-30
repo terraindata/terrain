@@ -277,6 +277,7 @@ class TransformCard extends TerrainComponent<Props>
     const spotlights = this.props.spotlights.spotlights;
     const { data } = this.props;
     const width = this.props.containerWidth ? this.props.containerWidth + 55 : 300;
+    const points = data.visiblePoints && data.visiblePoints.size ? data.visiblePoints : data.scorePoints;
     return (
       <div
         className='transform-card-inner'
@@ -285,7 +286,7 @@ class TransformCard extends TerrainComponent<Props>
           onRequestDomainChange={this.handleRequestDomainChange}
           onRequestZoomToData={this.handleZoomToData}
           canEdit={this.props.canEdit}
-          points={data.visiblePoints || data.scorePoints}
+          points={points}
           bars={this.state.bars}
           domain={this.state.chartDomain}
           range={this.state.range}
@@ -355,6 +356,10 @@ class TransformCard extends TerrainComponent<Props>
     const max = this.state.maxDomain.get(1);
 
     const elasticHistogram = (resp.result as ElasticQueryResult).aggregations;
+    if (!elasticHistogram)
+    {
+      return;
+    }
     const hits = (resp.result as ElasticQueryResult).hits;
     let totalDoc = 0;
     if (hits && hits.total)

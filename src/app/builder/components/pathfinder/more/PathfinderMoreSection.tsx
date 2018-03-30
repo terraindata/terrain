@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, getStyle } from '../../../../colors/Colors';
+import { backgroundColor, borderColor, fontColor, Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
@@ -67,6 +67,8 @@ import PathfinderArea from '../PathfinderArea';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
+import RadioButtons from 'app/common/components/RadioButtons';
+import MultiInput from 'app/common/components/MultiInput';
 import
 {
   _AggregationLine, _ChoiceOption, _Param, _Path, _Script,
@@ -82,7 +84,9 @@ const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 export interface Props
 {
   pathfinderContext: PathfinderContext;
-  path: Path;
+  count: number;
+  scoreType: string;
+  minMatches: number;
   more: More;
   keyPath: KeyPath;
   hideTitle?: boolean;
@@ -93,6 +97,15 @@ export interface Props
 
 class PathfinderMoreSection extends TerrainComponent<Props>
 {
+
+  public state: {
+    sourceOpen: boolean,
+    fieldOptions: List<any>,
+  } = {
+    sourceOpen: false,
+    fieldOptions: List([]),
+  }
+
   public componentWillMount()
   {
     this.props.colorsActions({
@@ -142,15 +155,9 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     }
   }
 
-  public shouldComponentUpdate(nextProps, nextState)
+  public shouldComponentUpdate(nextProps: Props, nextState)
   {
     return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
-  }
-
-  public handleReferenceChange(i, value)
-  {
-    const { keyPath } = this.props;
-    this.props.builderActions.changePath(this._ikeyPath(keyPath, 'references', i), value);
   }
 
   public handleAddScript()
@@ -158,43 +165,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     const newScript = _Script();
     const keyPath = this._ikeyPath(this.props.keyPath, 'scripts');
     this.props.builderActions.changePath(keyPath, this.props.more.scripts.push(newScript));
-  }
-
-  public handleAddNested()
-  {
-    const currIndex = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'references'),
-      this.props.more.references.push(currIndex));
-    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
-    this.props.builderActions.changePath(nestedKeyPath,
-      this.props.path.nested.push(_Path({ name: undefined, step: 0 })), true);
-  }
-
-  public handleDeleteNested(i)
-  {
-    if (this.props.pathfinderContext.canEdit)
-    {
-      this.props.builderActions.changePath(
-        this._ikeyPath(this.props.keyPath, 'references'),
-        this.props.more.references.splice(i, 1),
-        true,
-      );
-      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested');
-      this.props.builderActions.changePath(
-        nestedKeyPath,
-        this.props.path.nested.splice(i, 1));
-    }
-  }
-
-  public handleSourceChange(i, value)
-  {
-    if (this.props.pathfinderContext.canEdit)
-    {
-      const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i, 'name');
-      this.props.builderActions.changePath(
-        nestedKeyPath,
-        value);
-    }
   }
 
   public handleAddLine()
@@ -238,22 +208,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       };
     }).toList();
     return lines;
-  }
-
-  public renderPath(path: Path, i: number)
-  {
-    return (
-      <PathfinderArea
-        path={path}
-        canEdit={this.props.pathfinderContext.canEdit}
-        schema={this.props.pathfinderContext.schemaState}
-        keyPath={this.props.keyPath.butLast().toList().push('nested').push(i)}
-        toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
-        parentSource={this.props.pathfinderContext.source}
-        parentName={this.props.more.references.get(i)}
-        onSourceChange={this._fn(this.handleSourceChange, i)}
-      />
-    );
   }
 
   public getSizeOptionSets()
@@ -343,6 +297,27 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     };
     return List([optionSet]);
   }
+  public getTrackScoresOptionSets()
+  {
+    const optionSet = {
+      key: 'trackScore',
+      options: List([{
+        value: true,
+        displayName: 'True',
+      },
+      {
+        value: false,
+        displayName: 'False',
+      }]),
+      shortNameText: PathfinderText.trackScoreTitle,
+      headerText: PathfinderText.trackScoreTooltip,
+      column: true,
+      hideSampleData: true,
+      hasSearch: false,
+      forceFloat: true,
+    };
+    return List([optionSet]);
+  }
 
   public getCollapseOptionSets()
   {
@@ -375,31 +350,37 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         key: 'value',
         options: List([
           {
-            value: '1',
+            value: 0,
+            displayName: 'None',
+            hasOther: true,
+            sampleData: List([]),
+          },
+          {
+            value: 1,
             displayName: '1',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '2',
+            value: 2,
             displayName: '2',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '3',
+            value: 3,
             displayName: '3',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '5',
+            value: 5,
             displayName: '5',
             hasOther: true,
             sampleData: List([]),
           },
           {
-            value: '10',
+            value: 10,
             displayName: '10',
             hasOther: true,
             sampleData: List([]),
@@ -433,25 +414,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     }
   }
 
-  public handleNestedSizePickerChange(i: number, optionSetIndex: number, value: any)
-  {
-    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i);
-
-    this.props.builderActions.changePath
-      (nestedKeyPath.concat(List(['source', 'count'])).toList(), value);
-  }
-
-  public handleAlgorithmNameChange(i: number, value: any)
-  {
-    const nestedKeyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'nested', i, 'name');
-    this.props.builderActions.changePath(nestedKeyPath, value);
-  }
-
   public handleMinMatchesChange(optionSetIndex: number, value: any)
   {
     const { keyPath } = this.props;
-    const nestedKeyPath = this._ikeyPath(keyPath.butLast().toList(), 'minMatches');
-    this.props.builderActions.changePath(nestedKeyPath, value);
+    const nestedKeyPath = this._ikeyPath(keyPath.skipLast(3).toList(), 'minMatches');
+    this.props.builderActions.changePath(nestedKeyPath, value, true);
+    this.props.builderActions.changePath(this._ikeyPath(keyPath.butLast().toList(), 'minMatches'), value);
   }
 
   public handleCollapseChange(optionSetIndex: number, value)
@@ -464,107 +432,18 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     {
       value += '.keyword';
     }
-    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath.push('collapse')), value);
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'collapse'), value);
+  }
+
+  public handleTrackScoresChange(optionSetIndex: number, value)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'trackScores'), value);
   }
 
   public handleScoreTypeChange(optionSetIndex: number, value)
   {
     const keyPath = this._ikeyPath(this.props.keyPath.butLast().toList(), 'score', 'type');
     this.props.builderActions.changePath(keyPath, value);
-  }
-
-  public handleExpandNested(keyPath, expanded)
-  {
-    this.props.builderActions.changePath(keyPath, expanded);
-  }
-
-  public renderNestedPaths()
-  {
-    const { references } = this.props.more;
-    const { nested } = this.props.path;
-    const { canEdit, source } = this.props.pathfinderContext;
-    const { keyPath } = this.props;
-    return (
-      <div>
-        {
-          nested.map((nestedPath, i) =>
-          {
-            const ref = references.get(0);
-            const expanded = nested.get(i) !== undefined ? nested.get(i).expanded : false;
-            return (
-              <div
-                className='pf-more-nested'
-                key={i}
-                style={
-                  _.extend({},
-                    backgroundColor(Colors().blockBg),
-                    borderColor(Colors().blockOutline),
-                    { paddingBottom: expanded ? 6 : 0 },
-                  )}
-              >
-                <div className='pf-more-nested-reference'>
-                  <ExpandIcon
-                    onClick={this._fn(
-                      this.handleExpandNested,
-                      this._ikeyPath(keyPath.butLast().toList(), 'nested', i, 'expanded'),
-                      !expanded)}
-                    open={expanded}
-                  />
-                  <span className='nested-reference-header'>@</span>
-                  {
-                    tooltip(
-                      <FloatingInput
-                        label={PathfinderText.referenceName}
-                        isTextInput={true}
-                        value={ref}
-                        onChange={this._fn(this.handleReferenceChange, i)}
-                        canEdit={canEdit}
-                        className='pf-more-nested-reference-input'
-                        noBg={true}
-                        debounce={true}
-                        forceFloat={true}
-                        noBorder={false}
-                        showEllipsis={true}
-                      />,
-                      PathfinderText.referenceExplanation,
-                    )
-                  }
-                  <FadeInOut
-                    open={nested.get(i) !== undefined}
-                  >
-                    <FloatingInput
-                      value={nestedPath.name}
-                      onChange={this._fn(this.handleAlgorithmNameChange, i)}
-                      label={PathfinderText.innerQueryName}
-                      isTextInput={true}
-                      canEdit={canEdit}
-                      className='pf-more-nested-name-input'
-                      noBg={true}
-                      forceFloat={true}
-                      noBorder={false}
-                      debounce={true}
-                      showEllipsis={true}
-                    />
-                  </FadeInOut>
-                  {
-                    canEdit &&
-                    <RemoveIcon
-                      onClick={this._fn(this.handleDeleteNested, i)}
-                      className='pf-more-nested-remove close'
-                    />
-                  }
-                </div>
-                <FadeInOut
-                  open={expanded}
-                >
-                  {this.renderPath(nested.get(i), i)}
-                </FadeInOut>
-              </div>
-            );
-          })
-        }
-      </div>
-    );
   }
 
   public handleScriptValueChange(keys, value)
@@ -719,8 +598,92 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       expanded);
   }
 
+  public renderSourceInputs(source: List<string>, customSource)
+  {
+    return (
+      <div
+        className='more-section-source-inputs'
+      >
+        <MultiInput
+          canEdit={this.props.pathfinderContext.canEdit && customSource}
+          items={source}
+          onChange={this.handleSourceChange}
+        />
+      </div>
+    );
+  }
+
+  public handleSourceChange(items: List<string>)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'source'), items);
+  }
+
+  public handleSourceTypeChange(key)
+  {
+    this.props.builderActions.changePath(this._ikeyPath(this.props.keyPath, 'customSource'), key === 'custom');
+  }
+
+  public renderSourceSection(source: List<string>, customSource: boolean)
+  {
+    const {sourceOpen} = this.state;
+    return (
+      <div
+        className={classNames({
+          'more-section-source-wrapper': true,
+          'more-section-source-wrapper-closed': !sourceOpen,
+        })}
+        style={backgroundColor(Colors().fontWhite)}
+      >
+        <div
+          className='more-section-source-title-wrapper'
+          onClick={this._toggle('sourceOpen')}
+          style={borderColor(Colors().blockOutline)}
+        >
+          <div
+            className='more-section-source-title'
+            style={fontColor(Colors().text3)}
+          >
+            {PathfinderText.sourceTitle}
+          </div>
+          {
+            <div
+              className='more-section-source-preview'
+              style={fontColor(Colors().active)}
+            >
+              {
+                !customSource ? 'All' :
+                  source.map((val, i) => i === 0 ? val  : ', ' + val)
+              }
+            </div>
+          }
+          </div>
+          <FadeInOut
+            open={sourceOpen}
+          >
+            <RadioButtons
+              selected={customSource ? 'custom' : 'all'}
+              canEdit={this.props.pathfinderContext.canEdit}
+              options={List([
+                {
+                  key: 'all',
+                  label: 'All'
+                },
+                {
+                  key: 'custom',
+                  label: 'Select Fields',
+                  display: this.renderSourceInputs(source, customSource)
+                }
+              ])}
+              onSelectOption={this.handleSourceTypeChange}
+            />
+          </FadeInOut>
+      </div>
+    );
+  }
+
   public render()
   {
+    const { more } = this.props;
     const { canEdit } = this.props.pathfinderContext;
     const collapseValue = this.props.more.collapse ?
       this.props.more.collapse.replace('.keyword', '') : undefined;
@@ -735,16 +698,16 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               tooltipText={PathfinderText.moreSectionSubtitle}
               onExpand={this.toggleExpanded}
               canExpand={true}
-              expanded={this.props.more.expanded}
+              expanded={more.expanded}
             />
           }
           <FadeInOut
-            open={this.props.more.expanded}
+            open={more.expanded}
           >
             {
               <RouteSelector
                 optionSets={this.getSizeOptionSets() /* TODO store in state? */}
-                values={List([this.props.path.source.count])}
+                values={List([this.props.count])}
                 onChange={this.handleSizePickerChange}
                 canEdit={canEdit}
                 defaultOpen={false}
@@ -760,20 +723,29 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               defaultOpen={false}
               autoFocus={true}
             />
-            {
-              <RouteSelector
+            <RouteSelector
+              optionSets={this.getTrackScoresOptionSets()}
+              values={List([more.trackScores])}
+              onChange={this.handleTrackScoresChange}
+              canEdit={canEdit}
+              defaultOpen={false}
+              autoFocus={true}
+            />
+            <RouteSelector
                 optionSets={this.getScoreTypeOptionSets()}
-                values={List([this.props.path.score.type])}
+                values={List([this.props.scoreType])}
                 onChange={this.handleScoreTypeChange}
                 canEdit={canEdit}
                 defaultOpen={false}
-              />
+            />
+            {
+              this.renderSourceSection(more.source, more.customSource)
             }
             {
               this.props.keyPath.includes('nested') ?
                 <RouteSelector
                   optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
-                  values={List([this.props.path.minMatches])}
+                  values={List([this.props.minMatches])}
                   onChange={this.handleMinMatchesChange}
                   canEdit={canEdit}
                   defaultOpen={false}
@@ -814,25 +786,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             </div>
 
           </FadeInOut>
-        </div>
-        <div className='pf-nested-section'>
-          {this.renderNestedPaths()}
-          {
-            !this.props.keyPath.includes('nested') ?
-              tooltip(
-                <PathfinderCreateLine
-                  canEdit={canEdit}
-                  onCreate={this.handleAddNested}
-                  text={PathfinderText.createNestedLine}
-                  // style={{ marginLeft: -110 }}
-                  showText={true}
-                />,
-                {
-                  title: PathfinderText.nestedExplanation,
-                  arrow: false,
-                },
-              ) : null
-          }
         </div>
       </div>
     );

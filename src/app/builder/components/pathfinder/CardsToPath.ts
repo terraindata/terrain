@@ -48,17 +48,25 @@ THE SOFTWARE.
 import
 {
   _FilterGroup,
-  _FilterLine, _Path,
+  _FilterLine,
+  _Param,
+  _Path,
   _ScoreLine,
+  _Script,
+  ElasticDataSource,
   FilterGroup,
   FilterLine,
+  Param,
   Path,
+  PathfinderSteps,
   Score,
   ScoreLine,
+  Script,
   Source,
   sourceCountOptions,
 } from 'builder/components/pathfinder/PathfinderTypes';
 import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
@@ -66,17 +74,18 @@ import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueIn
 import Block from '../../../../blocks/types/Block';
 import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
 import Query from '../../../../items/types/Query';
+import { PathToCards } from './PathToCards';
 
 export class CardsToPath
 {
-  public static updatePath(query: Query): Path
+  public static updatePath(query: Query, dbName: string): { path: Path, parser: ESCardParser }
   {
     const rootCard = query.cards.get(0);
     if (rootCard === undefined)
     {
       // the card is empty
       TerrainLog.debug('The builder is empty, clear the path too.');
-      return this.emptyPath();
+      return { path: this.emptyPath(), parser: null };
     }
 
     // let's parse the card
@@ -86,13 +95,14 @@ export class CardsToPath
     {
       TerrainLog.debug('Avoid updating path since card side has errors: ', parser.getErrors());
       // TODO: add the error message to the query.path
-      return query.path;
+      return { path: query.path, parser: null };
     }
     //
     TerrainLog.debug('B->P: The parsed card is ' + JSON.stringify(parser.getValueInfo().value));
 
-    const newPath = this.BodyCardToPath(query.path, parser, parser.getValueInfo());
-    return newPath;
+    const newPath = this.BodyCardToPath(query.path, parser, parser.getValueInfo(), dbName);
+    parser.updateCard();
+    return { path: newPath, parser };
   }
 
   public static emptyPath()
@@ -100,31 +110,72 @@ export class CardsToPath
     return _Path();
   }
 
-  public static BodyCardToPath(path: Path, parser: ESCardParser, bodyValueInfo: ESValueInfo)
+  public static BodyCardToPath(path: Path, parser: ESCardParser, bodyValueInfo: ESValueInfo, dbName: string, groupJoinKey?: string)
   {
-    const newSource = this.updateSource(path.source, parser, bodyValueInfo);
+    // Redistribute the bools from the source bool to the soft and hard filter bools
+    this.distributeSourceBoolFilters(parser, bodyValueInfo);
+    parser.updateCard();
+    bodyValueInfo = parser.getValueInfo();
+    if (groupJoinKey)
+    {
+      bodyValueInfo = bodyValueInfo.objectChildren.groupJoin.propertyValue.objectChildren[groupJoinKey].propertyValue;
+    }
+    const newSource = this.updateSource(path.source, parser, bodyValueInfo, dbName);
     const newScore = this.updateScore(path.score, parser, bodyValueInfo);
     const filterGroup = this.BodyToFilterSection(path.filterGroup, parser, bodyValueInfo, 'hard');
     const softFilterGroup = this.BodyToFilterSection(path.softFilterGroup, parser, bodyValueInfo, 'soft');
     const parentAlias = this.getParentAlias(parser, bodyValueInfo);
-    const groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias);
-    const more = path.more.set('references', List([parentAlias]));
+    const dropIfLessThan = this.getDropIfLessThan(parser, bodyValueInfo);
+    let groupJoinPaths = this.getGroupJoinPaths(path.nested, parser, bodyValueInfo, parentAlias, dbName);
+    groupJoinPaths = groupJoinPaths.map((p, i) =>
+      p.set('minMatches', dropIfLessThan),
+    );
+    const newScripts = this.getScripts(path.more.scripts, parser, bodyValueInfo);
+    const collapse = this.getCollapse(path.more.collapse, parser, bodyValueInfo);
+    const trackScores = this.getTrackScores(parser, bodyValueInfo);
+    const {source, customSource} = this.getSourceFields(path, parser, bodyValueInfo);
+    const more = path.more
+      .set('scripts', newScripts)
+      .set('collapse', collapse)
+      .set('trackScores', trackScores)
+      .set('source', source)
+      .set('customSource', customSource);
 
     const newPath = path
       .set('source', newSource)
       .set('score', newScore)
       .set('filterGroup', filterGroup)
       .set('softFilterGroup', softFilterGroup)
+      .set('reference', parentAlias)
+      .set('nested', List(groupJoinPaths))
       .set('more', more)
-      .set('nested', List(groupJoinPaths));
+      .set('step', (
+        newSource.dataSource as ElasticDataSource).index ?
+        PathfinderSteps.Source + 1 : path.step);
     return newPath;
   }
 
   private static filterOpToComparisonsMap = {
-    '>': 'greater',
-    '≥': 'greaterequal',
-    '<': 'less',
-    '≤': 'lessequal',
+    '>': {
+      [FieldType.Numerical]: 'greater',
+      [FieldType.Date]: 'dateafter',
+      [FieldType.Text]: 'alphaafter',
+    },
+    '≥': {
+      [FieldType.Numerical]: 'greaterequal',
+      [FieldType.Date]: 'dateafter',
+      [FieldType.Text]: 'alphaafter',
+    },
+    '<': {
+      [FieldType.Numerical]: 'less',
+      [FieldType.Date]: 'datebefore',
+      [FieldType.Text]: 'alphabefore',
+    },
+    '≤': {
+      [FieldType.Numerical]: 'lessequal',
+      [FieldType.Date]: 'datebefore',
+      [FieldType.Text]: 'alphabefore',
+    },
     '=': 'equal',
     '≈': 'contains',
     'in': 'isin',
@@ -132,14 +183,204 @@ export class CardsToPath
   };
 
   private static filterNotOpToComparisonsMap = {
-    '>': 'lessequal',
-    '≥': 'less',
-    '<': 'greaterequal',
-    '≤': 'greater',
+    '>': {
+      [FieldType.Numerical]: 'lessequal',
+      [FieldType.Date]: 'datebefore',
+      [FieldType.Text]: 'alphabefore',
+    },
+    '≥': {
+      [FieldType.Numerical]: 'less',
+      [FieldType.Date]: 'datebefore',
+      [FieldType.Text]: 'alphabefore',
+    },
+    '<': {
+      [FieldType.Numerical]: 'greaterequal',
+      [FieldType.Date]: 'dateafter',
+      [FieldType.Text]: 'alphaafter',
+    },
+    '≤': {
+      [FieldType.Numerical]: 'greater',
+      [FieldType.Date]: 'dateafter',
+      [FieldType.Text]: 'alphaafter',
+    },
     '=': 'notequal',
     '≈': 'notcontain',
     'in': 'isnotin',
+    'exists': 'notexists',
   };
+
+  private static distributeSourceBoolFilters(parser: ESCardParser, body: ESValueInfo)
+  {
+    const sourceBool = parser.searchCard({
+      'query:query': {
+        'bool:elasticFilter': true,
+      },
+    }, body);
+    if (!sourceBool)
+    {
+      return;
+    }
+    const hardBoolTemplate = {
+      'query:query': {
+        'bool:elasticFilter': {
+          'filter:query[]':
+            [{ 'bool:elasticFilter': true }],
+        },
+      },
+    };
+    const softBoolTemplate = {
+      'query:query': {
+        'bool:elasticFilter': {
+          'should:query[]':
+            [{ 'bool:elasticFilter': true }],
+        },
+      },
+    };
+    const newHardFilters = [];
+    const newSoftFilters = [];
+    if (sourceBool.card.otherFilters)
+    {
+      sourceBool.card.otherFilters.map((filter: Block) =>
+      {
+        switch (filter.boolQuery)
+        {
+          case 'filter':
+          case 'must':
+            newHardFilters.push(filter.set('boolQuery', 'filter'));
+            break;
+          case 'filter_not':
+          case 'must_not':
+            newHardFilters.push(filter.set('boolQuery', 'filter_not'));
+            break;
+          default:
+            newSoftFilters.push(filter);
+            break;
+        }
+      });
+      sourceBool.card = sourceBool.card.set('otherFilters', List([]));
+      let hardBool;
+      let softBool;
+      if (newHardFilters.length > 0)
+      {
+        parser.createCardIfNotExist(hardBoolTemplate, body);
+        hardBool = parser.searchCard(hardBoolTemplate, body);
+        hardBool.card = hardBool.card.set('otherFilters', hardBool.card.otherFilters.concat(List(newHardFilters)));
+      }
+      if (newSoftFilters.length > 0)
+      {
+        parser.createCardIfNotExist(softBoolTemplate, body);
+        softBool = parser.searchCard(softBoolTemplate, body);
+        softBool.card = softBool.card.set('otherFilters', softBool.card.otherFilters.concat(List(newSoftFilters)));
+      }
+
+      // now let's check the nested query
+      for (const t of ['filter', 'must', 'should', 'must_not'])
+      {
+        const typeString = t + ':query[]';
+        const searchNestedTemplate = {
+          [typeString]: [{ 'nested:nested_query': true }],
+        };
+        const nestedQuery = parser.searchCard(searchNestedTemplate, sourceBool, false, true);
+        if (nestedQuery !== null)
+        {
+          const oldFilterValueInfo = sourceBool.objectChildren[t].propertyValue;
+          let targetBool = hardBool;
+          let targetClause = 'filter';
+          if (t === 'should')
+          {
+            targetBool = softBool;
+            targetClause = 'should';
+          }
+          if (!targetBool)
+          {
+            parser.createCardIfNotExist(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
+            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
+          }
+          if (targetBool.objectChildren[targetClause] === undefined)
+          {
+            const targetClausePattern = targetClause + ':query[]';
+            parser.createCardIfNotExist({
+              [targetClausePattern]: [],
+            }, targetBool);
+          }
+          const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
+          TerrainLog.debug('(P->B) Move nested queries from ', oldFilterValueInfo, ' to new place ', targetClauseValueInfo);
+          oldFilterValueInfo.forEachElement((query: ESValueInfo, index) =>
+          {
+            if (query.objectChildren.nested)
+            {
+              const nestedValueInfo = query.objectChildren.nested.propertyValue;
+              const nestedBool = parser.searchCard({ 'query:query': { 'bool:elasticFilter': true } }, nestedValueInfo);
+              if (nestedBool === null)
+              {
+                TerrainLog.debug('(P->B) There is no bool card in the must_not:nested query, avoid translating it.');
+              } else
+              {
+                if (t === 'must_not')
+                {
+                  PathToCards.transformBoolFilters(nestedBool, true);
+                } else
+                {
+                  PathToCards.transformBoolFilters(nestedBool, false);
+                }
+                parser.deleteChild(oldFilterValueInfo, index);
+                parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, query);
+              }
+            }
+          });
+        }
+      }
+      // Look for geo distance queries to move into correct bools
+      for (const t of ['filter', 'must', 'should'])
+      {
+        const typeString = t + ':query[]';
+        const boolFilters = parser.searchCard(
+          {
+            [typeString]: true,
+          },
+          sourceBool,
+        );
+        if (boolFilters && boolFilters.arrayChildren && boolFilters.arrayChildren.length)
+        {
+          const oldFilterValueInfo = sourceBool.objectChildren[t].propertyValue;
+          let targetBool = hardBool;
+          let targetClause = 'filter';
+          if (t === 'should')
+          {
+            targetBool = softBool;
+            targetClause = 'should';
+          }
+          if (!targetBool)
+          {
+            parser.createCardIfNotExist(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
+            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
+          }
+          if (targetBool.objectChildren[targetClause] === undefined)
+          {
+            const targetClausePattern = targetClause + ':query[]';
+            parser.createCardIfNotExist({
+              [targetClausePattern]: [],
+            }, targetBool);
+          }
+          const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
+          // Delete them and move them into the target bool
+          let movedGeo = false;
+          for (let i = boolFilters.arrayChildren.length - 1; i >= 0; i--)
+          {
+            const child = boolFilters.arrayChildren[i];
+            if (child && child.objectChildren.geo_distance)
+            {
+              movedGeo = true;
+              parser.deleteChild(boolFilters, i);
+              parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+            }
+            //  parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+          }
+        }
+      }
+      parser.isMutated = true;
+    }
+  }
 
   private static TerrainFilterBlockToFilterLine(row: Block): FilterLine
   {
@@ -147,6 +388,11 @@ export class CardsToPath
     if (row.boolQuery === 'should_not' || row.boolQuery === 'filter_not')
     {
       comparison = this.filterNotOpToComparisonsMap[row.filterOp];
+      if (typeof comparison === 'object')
+      {
+        comparison = row.fieldType !== undefined && row.fieldType !== null && row.fieldType !== FieldType.Any ?
+          comparison[row.fieldType] : comparison[FieldType.Numerical];
+      }
       if (comparison === undefined)
       {
         // we can't express this comparison in the pathfinder
@@ -155,6 +401,11 @@ export class CardsToPath
     } else
     {
       comparison = this.filterOpToComparisonsMap[row.filterOp];
+      if (typeof comparison === 'object')
+      {
+        comparison = row.fieldType !== undefined && row.fieldType !== null && row.fieldType !== FieldType.Any ?
+          comparison[row.fieldType] : comparison[FieldType.Numerical];
+      }
     }
 
     const template = {
@@ -162,6 +413,7 @@ export class CardsToPath
       value: row.value,
       comparison,
       boost: row.boost === '' ? 1 : Number(row.boost),
+      fieldType: row.fieldType,
     };
     const newLine = _FilterLine(template);
     TerrainLog.debug('FilterBlock', row, 'to FilterLine', newLine);
@@ -174,7 +426,6 @@ export class CardsToPath
 
     const filterRows = boolCard['otherFilters'];
     const filterRowMap = { filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: [] };
-
     // regroup the filters
     filterRows.map((row: Block) =>
     {
@@ -183,8 +434,7 @@ export class CardsToPath
 
     filterRowMap.filter = filterRowMap.filter.concat(filterRowMap.filter_not);
     filterRowMap.should = filterRowMap.should.concat(filterRowMap.should_not);
-
-    let newLines = [];
+    let newLines = List([]);
 
     // handle normal filter lines first
     if (sectionType === 'hard')
@@ -194,9 +444,8 @@ export class CardsToPath
       {
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'all');
-        newLines = newLines.concat(filterRowMap.filter.map(
-          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
-        );
+        newLines = List(filterRowMap.filter.map(
+          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
       } else if (isInnerGroup === true)
       {
         // any hard bool has lower priority
@@ -204,51 +453,114 @@ export class CardsToPath
         {
           // set the filtergroup to
           filterGroup = filterGroup.set('minMatches', 'any');
-          newLines = newLines.concat(filterRowMap.should.map(
-            (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
-          );
+          newLines = List(filterRowMap.should.map(
+            (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
         }
       }
-    } else
+    }
+    else
     {
       // only check any bool in the soft section
       if (filterRowMap.should.length > 0)
       {
         // set the filtergroup to
         filterGroup = filterGroup.set('minMatches', 'any');
-        newLines = newLines.concat(filterRowMap.should.map(
-          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null),
-        );
+        newLines = List(filterRowMap.should.map(
+          (row) => this.TerrainFilterBlockToFilterLine(row)).filter((filter) => filter !== null));
       }
     }
-
+    // Look for Geo Distance Queries
+    const geoDistanceLines = this.processGeoDistanceFilters(filterGroup, parser, boolValueInfo, sectionType);
     // handle nested groups
     const newNestedGroupLines = this.processInnerFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
     const newNestedQueryLines = this.processNestedQueryFilterGroup(filterGroup, parser, boolValueInfo, sectionType);
-    newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines);
-
-    TerrainLog.debug('B->P(Bool): Generate ' + String(newLines.length) + ' filter lines ' +
-      '(Nested Group' + String(newNestedGroupLines.length) + ').' +
-      '(Nested Query' + String(newNestedQueryLines.length) + ').');
-    filterGroup = filterGroup.set('lines', List(newLines)).set('groupCount', newNestedGroupLines.length + newNestedQueryLines.length + 1);
+    newLines = newLines.concat(newNestedGroupLines).concat(newNestedQueryLines).concat(geoDistanceLines).toList();
+    TerrainLog.debug('B->P(Bool): Generate ' + String(newLines.size) + ' filter lines ' +
+      '(Nested Group' + String(newNestedGroupLines.size) + ').' +
+      '(Nested Query' + String(newNestedQueryLines.size) + ').');
+    filterGroup = filterGroup.set('lines', newLines);
     return filterGroup;
+  }
+
+  private static processGeoDistanceFilters(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, section: 'soft' | 'hard')
+  {
+    let from;
+    let filterLines = List([]);
+    if (parentFilterGroup.minMatches === 'all' && section === 'hard')
+    {
+      // let's search childBool from parentBool: { filter : [Bool, Bool, Bool]
+      from = parentBool.objectChildren.filter;
+    }
+    else if (parentFilterGroup.minMatches === 'any' || section === 'soft')
+    {
+      from = parentBool.objectChildren.should;
+    }
+    if (from)
+    {
+      const queries = from.propertyValue;
+      if (queries.jsonType === ESJSONType.array)
+      {
+        queries.forEachElement((query: ESValueInfo) =>
+        {
+          if (query.card.cards.get(0) && query.card.cards.get(0).type === 'elasticDistance')
+          {
+            const distanceCard = query.card.cards.get(0);
+            const filterLine = _FilterLine({
+              field: distanceCard.field,
+              fieldType: FieldType.Geopoint,
+              comparison: 'located',
+              value: {
+                location: distanceCard.locationValue,
+                address: distanceCard.mapInputValue,
+                distance: distanceCard.distance,
+                units: distanceCard.distanceUnit,
+                zoom: distanceCard.mapZoomValue,
+              },
+              boost: distanceCard.boost,
+            });
+            filterLines = filterLines.push(filterLine);
+          }
+        });
+      }
+      else if (queries.jsonType === ESJSONType.object)
+      {
+        if (queries.card.cards.get(0) && queries.card.cards.get(0).type === 'elasticDistance')
+        {
+          const distanceCard = queries.card.cards.get(0);
+          const filterLine = _FilterLine({
+            field: distanceCard.field,
+            fieldType: FieldType.Geopoint,
+            comparison: 'located',
+            value: {
+              location: [distanceCard.locationValue.lat, distanceCard.locationValue.lon],
+              address: distanceCard.mapInputValue,
+              distance: distanceCard.distance,
+              units: distanceCard.distanceUnit,
+              zoom: distanceCard.mapZoomValue,
+            },
+            boost: distanceCard.boost,
+          });
+          filterLines = filterLines.push(filterLine);
+        }
+      }
+    }
+    return filterLines;
   }
 
   private static processNestedQueryFilterGroup(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, sectionType: 'hard' | 'soft')
   {
     // let search whether we have an inner bool or not
     let from;
-    if (parentFilterGroup.minMatches === 'all')
+    if (parentFilterGroup.minMatches === 'all' && sectionType === 'hard')
     {
       // let's search childBool from parentBool: { filter : [Bool, Bool, Bool]
       from = parentBool.objectChildren.filter;
-    } else if (parentFilterGroup.minMatches === 'any')
+    } else
     {
       from = parentBool.objectChildren.should;
     }
 
     const newLines = [];
-
     if (from)
     {
       const queries = from.propertyValue;
@@ -263,16 +575,22 @@ export class CardsToPath
             if (boolQuery !== null)
             {
               // create filter group
-              const pathName = nestedQuery.objectChildren.path.propertyValue.value;
-              let newFilterGroup = _FilterGroup();
-              newFilterGroup = this.BoolToFilterGroup(newFilterGroup, parser, boolQuery, sectionType, true);
-              newLines.push(_FilterLine().set('filterGroup', newFilterGroup).set('fieldType', FieldType.Nested).set('field', pathName + '.'));
+              // let newFilterGroup = _FilterGroup();
+              boolQuery.card.otherFilters.forEach((filter) =>
+              {
+                // TODO convert boolQuery from must to filter ?
+                const line = this.TerrainFilterBlockToFilterLine(filter);
+                if (line)
+                {
+                  newLines.push(line);
+                }
+              });
             }
           }
         });
       }
     }
-    return newLines;
+    return List(newLines);
   }
 
   private static processInnerFilterGroup(parentFilterGroup: FilterGroup, parser, parentBool: ESValueInfo, sectionType: 'hard' | 'soft')
@@ -308,7 +626,7 @@ export class CardsToPath
         });
       }
     }
-    return newLines;
+    return List(newLines);
   }
 
   private static BodyToFilterSection(filterGroup: FilterGroup, parser: ESCardParser, body: ESValueInfo, filterSection: 'hard' | 'soft')
@@ -336,9 +654,24 @@ export class CardsToPath
       // no source, return empty filterGroup
       TerrainLog.debug('B->P(BodySection): there is no ' + filterSection + 'bool, return empty filterGroup.');
       return _FilterGroup();
-    } else
+    }
+    else
     {
       return this.BoolToFilterGroup(filterGroup, parser, theBool, filterSection);
+    }
+  }
+
+  private static getDropIfLessThan(parser: ESCardParser, bodyValueInfo: ESValueInfo)
+  {
+    const dropIfLessThanValueInfo = parser.searchCard(
+      { 'groupJoin:groupjoin_clause': { 'dropIfLessThan:number': true } }, bodyValueInfo);
+    if (dropIfLessThanValueInfo === null)
+    {
+      return 0;
+    }
+    else
+    {
+      return dropIfLessThanValueInfo.value;
     }
   }
 
@@ -357,7 +690,7 @@ export class CardsToPath
     }
   }
 
-  private static getGroupJoinPaths(paths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string)
+  private static getGroupJoinPaths(paths: List<Path>, parser: ESCardParser, body: ESValueInfo, parentAlias: string, dbName: string)
   {
     const joinBodyMap = {};
     const pathMap = {};
@@ -395,14 +728,74 @@ export class CardsToPath
       {
         oldPath = _Path();
       }
-      const p = this.BodyCardToPath(oldPath, parser, joinBodyMap[key]).set('name', key);
+      const newParser = new ESCardParser(joinBodyMap[key].card);
+      const p = this.BodyCardToPath(oldPath, parser, joinBodyMap[key], dbName, key).set('name', key);
       TerrainLog.debug('(B->P) Turn groupJoin body ', joinBodyMap[key], ' to path', p);
       newPaths.push(p);
     }
     return newPaths;
   }
 
-  private static updateSource(source: Source, parser: ESCardParser, body: ESValueInfo): Source
+  private static getCollapse(collapse: string, parser: ESCardParser, body: ESValueInfo): string | undefined
+  {
+    const rootVal = body.value;
+    if (rootVal.hasOwnProperty('collapse'))
+    {
+      return rootVal.collapse.field;
+    }
+    return undefined;
+  }
+
+  private static getScripts(scripts: List<Script>, parser: ESCardParser, body: ESValueInfo): List<Script>
+  {
+    const rootVal = body.value;
+    if (rootVal.hasOwnProperty('script_fields'))
+    {
+      return List(_.keys(rootVal.script_fields).map((key) =>
+      {
+        const script = rootVal.script_fields[key];
+        const oldScript = scripts.filter((scr) => scr.name === key).toList().get(0); // Look at old script
+        return _Script({
+          name: key,
+          script: script.script && script.script.inline,
+          params: (script.script && script.script.params) ?
+            _.keys(script.script.params).map((paramKey) =>
+            {
+              return {
+                name: paramKey,
+                value: script.script.params[paramKey],
+              };
+            })
+            : [],
+          userAdded: oldScript !== undefined ? oldScript.userAdded : true,
+        });
+      },
+      ));
+    }
+    return List([]);
+  }
+
+  private static getTrackScores(parser: ESCardParser, body: ESValueInfo): boolean
+  {
+    const rootVal = body.value;
+    if (rootVal.hasOwnProperty('track_scores'))
+    {
+      return rootVal.track_scores;
+    }
+    return true;
+  }
+
+  private static getSourceFields(path: Path, parser: ESCardParser, body: ESValueInfo): {source: List<string>, customSource: boolean}
+  {
+    const rootVal = body.value;
+    if (rootVal.hasOwnProperty('_source') && Array.isArray(rootVal._source))
+    {
+      return {source: List(rootVal._source), customSource: true}
+    }
+    return {source: path.more.source, customSource: false}
+  }
+
+  private static updateSource(source: Source, parser: ESCardParser, body: ESValueInfo, dbName: string): Source
   {
     const rootVal = body.value;
 
@@ -422,7 +815,7 @@ export class CardsToPath
     } else
     {
       // default count
-      source = source.set('count', sourceCountOptions.get(0));
+      source = source.set('count', 'all');
     }
 
     // index from the sourceBool
@@ -434,6 +827,7 @@ export class CardsToPath
     }
     TerrainLog.debug('B->P: card index is ' + cardIndex);
     source = source.setIn(['dataSource', 'index'], cardIndex);
+    source = source.setIn(['dataSource', 'server'], dbName);
 
     return source;
   }

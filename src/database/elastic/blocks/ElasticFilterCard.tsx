@@ -59,6 +59,7 @@ import { _card, Card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreateCardTool';
+import { FieldType } from '../../../../shared/builder/FieldTypes';
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
@@ -190,6 +191,7 @@ export const elasticFilterBlock = _block(
     boolQuery: 'must',
     filterOp: '=',
     boost: '',
+    fieldType: FieldType.Any,
     static: {
       language: 'elastic',
       tql: null,
@@ -207,6 +209,8 @@ export const elasticFilterBlock = _block(
           ? extraConfig.value : '';
         config['boost'] = (extraConfig && extraConfig.boost !== undefined && extraConfig.value !== null)
           ? extraConfig.boost : '';
+        config['fieldType'] = (extraConfig && extraConfig.boost !== undefined && extraConfig.field !== null)
+          ? extraConfig.fieldType : FieldType.Any;
         config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'must';
         config['filterOp'] = (extraConfig && extraConfig.filterOp) || '=';
         return config;
@@ -325,9 +329,9 @@ export const elasticFilter = _card({
                         must: 'Must',
                         must_not: 'Must Not',
                         should: 'Should',
-                        should_not: 'Snot',
+                        should_not: 'Should Not',
                         filter: 'Filter',
-                        filter_not: 'Fnot',
+                        filter_not: 'Filter Not',
                       } as any,
                     ),
                     dropdownTooltips: List([
@@ -345,7 +349,7 @@ export const elasticFilter = _card({
                     centerDropdown: true,
                     style: {
                       maxWidth: 150,
-                      minWidth: 105,
+                      minWidth: 115,
                       marginRight: 3,
                     },
                   },

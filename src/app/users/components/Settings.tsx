@@ -106,6 +106,7 @@ class Settings extends TerrainComponent<Props>
       errorModal: false,
       advancedResultsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS)),
       analyticsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS)),
+      simpleParser: Number(TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER)),
     };
   }
 
@@ -502,6 +503,23 @@ class Settings extends TerrainComponent<Props>
     }
   }
 
+  public handleSimpleParserSwitch(selected)
+  {
+    this.setState((state) =>
+    {
+      return { simpleParser: selected };
+    });
+
+    if (TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
+    {
+      TerrainTools.deactivate(TerrainTools.SIMPLE_PARSER);
+    }
+    else
+    {
+      TerrainTools.activate(TerrainTools.SIMPLE_PARSER);
+    }
+  }
+
   public renderTerrainSettingsContent()
   {
     const terrainSettingsAnalyticsContent = TerrainTools.isAdmin() ? (
@@ -539,6 +557,24 @@ class Settings extends TerrainComponent<Props>
 
     ) : undefined;
 
+    const terrainSettingsSimpleParser = TerrainTools.isAdmin() ? (
+      <div>
+        <div className='settings-field-title'>
+          Simple Parser (Pathfinder to Code Connection Only)
+        </div>
+        <div className='settings-row'>
+          <Switch
+            medium={true}
+            first='On'
+            second='Off'
+            selected={this.state.simpleParser}
+            onChange={this.handleSimpleParserSwitch}
+          />
+        </div>
+      </div>
+
+    ) : undefined;
+
     return (
       <div>
         <div className='settings-field-title'>
@@ -556,6 +592,7 @@ class Settings extends TerrainComponent<Props>
         <br />
         {terrainSettingsAnalyticsContent}
         {terrainSettingsAdvancedResultsContent}
+        {terrainSettingsSimpleParser}
       </div>
     );
   }

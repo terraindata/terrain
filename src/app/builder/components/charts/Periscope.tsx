@@ -131,7 +131,7 @@ const Periscope = {
     state.numBars = 10;
     const scales = this._scales(el, state.maxDomain, state.domain, state.barsData, state.width, state.height);
     this._draw(el, scales, state.domain, state.barsData, state.onDomainChange, state.onDomainChangeStart, state.colors,
-      state.onDomainLowChange, state.onDomainHighChange);
+      state.onDomainLowChange, state.onDomainHighChange, state.inputKey);
   },
 
   destroy(el)
@@ -236,16 +236,16 @@ const Periscope = {
     bd.on('mouseleave', offFn);
   },
 
-  _doubleClickFactory: (el, onMove, scale, domain, onMoveStart) => function(event)
+  _doubleClickFactory: (el, field) => function(event)
   {
     const handle = d3.select(this)[0][0];
-    d3.select('#input-' + handle['id'])
+    d3.select('#input-' + field + '-' + handle['id'])
       .style('display', 'block');
-    d3.select('#readonly-' + handle['id'])
+    d3.select('#readonly-' + field + '-' + handle['id'])
       .style('display', 'none');
   },
 
-  _drawHandles(el, scales, domain, onDomainChange, onMoveStart)
+  _drawHandles(el, scales, domain, onDomainChange, onMoveStart, field)
   {
     const g = d3.select(el).selectAll('.handles');
     const handle = g.selectAll('.handle')
@@ -270,7 +270,7 @@ const Periscope = {
 
     handle.on('mousedown', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
     handle.on('touchstart', this._mousedownFactory(el, onDomainChange, scales.x, domain, onMoveStart));
-    handle.on('dblclick', this._doubleClickFactory(el));
+    handle.on('dblclick', this._doubleClickFactory(el, field));
     // handle.on('dblclick', function() {
     //   const handle = d3.select(this);
     //   console.log(handle);
@@ -278,7 +278,7 @@ const Periscope = {
     handle.exit().remove();
   },
 
-  _drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange)
+  _drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange, field)
   {
     d3.select(el).selectAll('.domain-input').remove();
     d3.select(el).selectAll('.readonly-domain-input').remove();
@@ -297,13 +297,13 @@ const Periscope = {
 
       const readonlyInput = div.append('span')
         .attr('class', 'readonly-domain-input')
-        .attr('id', 'readonly-0')
+        .attr('id', `readonly-${field}-0`)
         .style('left', left + 'px')
         .text(Util.formatNumber(domain.x[0]).replace(/\s/g, ''));
 
       const input = div.append('input')
         .attr('class', 'domain-input')
-        .attr('id', 'input-0')
+        .attr('id', `input-${field}-0`)
         .attr('value', Util.formatNumber(domain.x[0]).replace(/\s/g, ''))
         .attr('autofocus', true)
         .style('left', left + 'px')
@@ -311,7 +311,7 @@ const Periscope = {
         .style('display', 'none')
         .on('change', function()
         {
-          let value = d3.select(el).select('#input-0').node().value;
+          let value = d3.select(el).select(`#input-${field}-0`).node().value;
           value = Util.formattedToNumber(value);
           onDomainLowChange(value);
         }.bind(this))
@@ -330,20 +330,20 @@ const Periscope = {
 
       const readonlyInput = div.append('span')
         .attr('class', 'readonly-domain-input')
-        .attr('id', 'readonly-1')
+        .attr('id', `readonly-${field}-1`)
         .style('left', left2 + 'px')
         .text(Util.formatNumber(domain.x[1]).replace(/\s/g, ''));
 
       const input = div.append('input')
         .attr('class', 'domain-input')
-        .attr('id', 'input-1')
+        .attr('id', `input-${field}-1`)
         .attr('value', Util.formatNumber(domain.x[1]).replace(/\s/g, ''))
         .style('left', left2 + 'px')
         .style('color', Colors().active)
         .style('display', 'none')
         .on('change', function()
         {
-          let value = d3.select(el).select('#input-1').node().value;
+          let value = d3.select(el).select(`#input-${field}-1`).node().value;
           value = Util.formattedToNumber(value);
           onDomainHighChange(value);
         }.bind(this))
@@ -356,7 +356,7 @@ const Periscope = {
     }
   },
 
-  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors, onDomainLowChange, onDomainHighChange)
+  _draw(el, scales, domain, barsData, onDomainChange, onDomainChangeStart, colors, onDomainLowChange, onDomainHighChange, field)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -365,8 +365,8 @@ const Periscope = {
     this._drawBg(el, scales);
     this._drawBars(el, scales, domain, barsData, colors);
     this._drawLine(el, scales, domain);
-    this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart);
-    this._drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange);
+    this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart, field);
+    this._drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange, field);
   },
 
   _scales(el, maxDomain, domainAndRange, barsData, stateWidth, stateHeight)

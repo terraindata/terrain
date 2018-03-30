@@ -65,6 +65,7 @@ import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
+import PathfinderNestedSection from './more/PathfinderNestedSection';
 import './Pathfinder.less';
 import { _PathfinderContext, _Script, Path, PathfinderSteps, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
@@ -254,7 +255,8 @@ class PathfinderArea extends TerrainComponent<Props>
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
-
+    // console.log('PATH IS ', path);
+    // console.log("CONTEXT ", pathfinderContext);
     return (
       <ScrollingComponent
         className='pf-area'
@@ -269,40 +271,53 @@ class PathfinderArea extends TerrainComponent<Props>
             source={path.source}
             onSourceChange={this.props.onSourceChange}
           />
-
           <FadeInOut
             open={path.step >= PathfinderSteps.Filter}
-
           >
-            <PathfinderFilterSection
-              pathfinderContext={pathfinderContext}
-              filterGroup={path.filterGroup}
-              keyPath={this._ikeyPath(keyPath, 'filterGroup')}
-              onStepChange={this.incrementStep}
-              toSkip={toSkip}
-              onAddScript={this.handleAddScript}
-              onDeleteScript={this.handleDeleteScript}
-              onUpdateScript={this.handleUpdateScript}
-            />
-            <PathfinderFilterSection
-              isSoftFilter={true}
-              pathfinderContext={pathfinderContext}
-              filterGroup={path.softFilterGroup}
-              keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
-              onStepChange={this.incrementStep}
-              toSkip={toSkip}
-            />
-            <PathfinderScoreSection
-              pathfinderContext={pathfinderContext}
-              score={path.score}
-              keyPath={this._ikeyPath(keyPath, 'score')}
-              onStepChange={this.incrementStep}
-            />
+            {
+              <PathfinderFilterSection
+                pathfinderContext={pathfinderContext}
+                filterGroup={path.filterGroup}
+                keyPath={this._ikeyPath(keyPath, 'filterGroup')}
+                onStepChange={this.incrementStep}
+                toSkip={toSkip}
+                onAddScript={this.handleAddScript}
+                onDeleteScript={this.handleDeleteScript}
+                onUpdateScript={this.handleUpdateScript}
+              />
+            }
+            {
+              <PathfinderFilterSection
+                isSoftFilter={true}
+                pathfinderContext={pathfinderContext}
+                filterGroup={path.softFilterGroup}
+                keyPath={this._ikeyPath(keyPath, 'softFilterGroup')}
+                onStepChange={this.incrementStep}
+                toSkip={toSkip}
+              />
+            }
+            {
+              <PathfinderScoreSection
+                pathfinderContext={pathfinderContext}
+                score={path.score}
+                keyPath={this._ikeyPath(keyPath, 'score')}
+                onStepChange={this.incrementStep}
+              />
+            }
             <PathfinderMoreSection
               pathfinderContext={pathfinderContext}
               more={path.more}
-              path={path}
+              count={path.source.count}
+              scoreType={path.score.type}
+              minMatches={path.minMatches}
               keyPath={this._ikeyPath(keyPath, 'more')}
+              toSkip={toSkip !== undefined ? toSkip : 3}
+            />
+            <PathfinderNestedSection
+              pathfinderContext={pathfinderContext}
+              nested={path.nested}
+              reference={path.reference}
+              keyPath={this._ikeyPath(keyPath, 'nested')}
               toSkip={toSkip !== undefined ? toSkip : 3}
             />
           </FadeInOut>

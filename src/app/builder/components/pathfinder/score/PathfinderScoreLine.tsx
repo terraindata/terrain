@@ -188,7 +188,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           language={'elastic'}
           onChange={this.props.builderActions.changePath}
           parentData={undefined}
-          index={(pathfinderContext.source.dataSource as any).index.split('/')[1]}
+          index={(pathfinderContext.source.dataSource as any).index}
         />
       </div>);
   }
@@ -251,7 +251,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public renderLineContents()
   {
     const { fieldIndex } = this.state;
-
     return (
       <div
         className='pf-line pf-score-line-inner'
@@ -273,7 +272,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           }
           readOnlyComponent={
             <div className='field-name' onClick={this.editingField}>
-              {_.upperFirst(this.props.dropdownOptions.get(fieldIndex).displayName as string)}
+              {this.props.dropdownOptions.get(fieldIndex).displayName as string}
             </div>
           }
         />

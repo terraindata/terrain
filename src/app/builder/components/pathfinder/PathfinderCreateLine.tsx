@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
+const PFAddIcon = require('./../../../../images/icon_add.svg?name=PFAddIcon');
 
 export interface Props
 {
@@ -85,7 +85,7 @@ class PathfinderCreateLine extends TerrainComponent<Props>
           onClick={onCreate}
         >
           <div className='pf-create-content'>
-            <AddIcon />
+            <PFAddIcon />
             {
               this.props.showText &&
               <span>{text}</span>
