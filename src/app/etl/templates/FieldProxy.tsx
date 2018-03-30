@@ -116,6 +116,24 @@ export class EngineProxy
   {
     this.engine.deleteTransformation(id);
   }
+
+  public addRootField(name: string, type: string)
+  {
+    const pathToAdd = List([name]);
+    if (validateNewFieldName(this.engine, -1, pathToAdd))
+    {
+      if (type === 'array')
+      {
+        this.engine.addField(pathToAdd, type, {valueType: 'string'});
+        this.engine.addField(pathToAdd.push('*'), 'array', {valueType: 'string'});
+      }
+      else
+      {
+        this.engine.addField(pathToAdd, type);
+      }
+      this.requestRebuild();
+    }
+  }
 }
 
 export class FieldProxy
@@ -187,12 +205,25 @@ export class FieldProxy
   }
 
   // add a field under this field
-  public addNewField(newPath: EnginePath)
+  public addNewField(name: string, type: FieldTypes)
   {
+    const newPath = this.engine.getOutputKeyPath(this.fieldId).push(name);
     if (validateNewFieldName(this.engine, this.fieldId, newPath).isValid)
     {
-      this.engine.addField(newPath, 'string');
+      if (type === 'array')
+      {
+        this.engine.addField(newPath, type, {valueType: 'string'});
+        this.engine.addField(newPath.push('*'), 'array', {valueType: 'string'});
+      }
+      else
+      {
+        this.engine.addField(newPath, type);
+      }
       this.syncWithEngine(true);
+    }
+    else
+    {
+      // todo error
     }
   }
 

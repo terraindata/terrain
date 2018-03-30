@@ -128,6 +128,8 @@ export function kpToString(kp: KeyPath): string
 // });
 
 // return true if the given keypath would be a valid new child field under provided fieldId
+// if fieldId is not provided or -1, then it does not consider the new field as a child field
+// (e.g. a root level field)
 export function validateNewFieldName(
   engine: TransformationEngine,
   fieldId: number,
@@ -161,13 +163,16 @@ export function validateNewFieldName(
     };
   }
 
-  const parentType = engine.getFieldType(fieldId);
-  if (parentType !== 'object' && parentType !== 'array')
+  if (fieldId !== undefined && fieldId !== -1)
   {
-    return {
-      isValid: false,
-      message: 'Invalid Rename. Parent fields is not a nested object',
-    };
+    const parentType = engine.getFieldType(fieldId);
+    if (parentType !== 'object' && parentType !== 'array')
+    {
+      return {
+        isValid: false,
+        message: 'Invalid Rename. Parent fields is not a nested object',
+      };
+    }
   }
 
   return {
