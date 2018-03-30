@@ -715,16 +715,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 autoFocus={true}
               />
             }
-            {
-              //  <RouteSelector
-              //   optionSets={this.getCollapseOptionSets()}
-              //   values={List([collapseValue])}
-              //   onChange={this.handleCollapseChange}
-              //   canEdit={canEdit}
-              //   defaultOpen={false}
-              //   autoFocus={true}
-              // />
-            }
             <RouteSelector
               optionSets={this.getTrackScoresOptionSets()}
               values={List([more.trackScores])}

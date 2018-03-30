@@ -358,7 +358,6 @@ class TransformCard extends TerrainComponent<Props>
 
     const min = this.state.maxDomain.get(0);
     const max = this.state.maxDomain.get(1);
-
     const elasticHistogram = (resp.result as ElasticQueryResult).aggregations;
     if (!elasticHistogram)
     {
@@ -622,7 +621,7 @@ class TransformCard extends TerrainComponent<Props>
               },
             },
           },
-          size: 0,
+          size: 1,
         };
       }
       const aggregationAjax = Ajax.query(
