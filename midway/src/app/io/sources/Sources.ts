@@ -82,14 +82,12 @@ export class Sources
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      console.log('\n\nABACADABRA 1\\n\n');
       let result = '';
       const exprtSourceConfig: ExportSourceConfig | string =
         {
           params: [],
           stream: readStream,
         };
-      console.log('\n\nABACADABRA 2\\n\n');
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
       exprtSourceConfig.params = sourceConfig.params as object[];
       switch (sourceConfig.type)
@@ -98,7 +96,6 @@ export class Sources
           // result = await this._putJSONStreamIntoMagento(exprtSourceConfig);
           break;
         case 'mailchimp':
-          console.log('\n\nABACADABRA 4\\n\n');
           result = await this._putJSONStreamIntoMailchimp(exprtSourceConfig);
           break;
         default:
@@ -247,13 +244,13 @@ export class Sources
     });
   }
 
-    private async _putJSONStreamIntoMailchimp(exprtSourceConfig: ExportSourceConfig): Promise<string>
+  private async _putJSONStreamIntoMailchimp(exprtSourceConfig: ExportSourceConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
     {
-      return new Promise<string>(async (resolve, reject) =>
-      {
-        resolve(await mailchimp.getJSONStreamAsMailchimpSourceConfig(exprtSourceConfig));
-      });
-    }
+      resolve(await mailchimp.getJSONStreamAsMailchimpSourceConfig(exprtSourceConfig));
+    });
+  }
 
   // export private methods
   // private async _putJSONStreamIntoMagento(exprtSourceConfig: ExportSourceConfig): Promise<string>

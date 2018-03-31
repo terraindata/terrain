@@ -227,12 +227,12 @@ export class App
     {
       if (db.id !== undefined)
       {
-          await databases.connect({} as any, db.id);
+        await databases.connect({} as any, db.id);
 
-          if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
-          {
-              await events.initializeEventMetadata(DB, db.analyticsIndex, db.analyticsType);
-          }
+        if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
+        {
+          await events.initializeEventMetadata(DB, db.analyticsIndex, db.analyticsType);
+        }
       }
     }
     winston.debug('Finished connecting to configured databases...');

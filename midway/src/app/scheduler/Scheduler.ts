@@ -944,11 +944,10 @@ export class Scheduler
     });
 
     await this.createJob(async (scheduleID: number, fields: object, transport: object, // 13
-                                sort: string, encoding?: string | null) => // export to mailchimp
+      sort: string, encoding?: string | null) => // export to mailchimp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
-        console.log('\n\nABACADABRA 0000000000000000000\\n\n');
         try
         {
           let mailchimpConfig: object = {};
@@ -967,17 +966,13 @@ export class Scheduler
           }
           await this.setJobStatus(scheduleID, 1);
           fields['filetype'] = 'json';
-          console.log('\n\nABACADABRA 01\\n\n');
           const jsonStream: stream.Readable | string = await exprt.export(fields as ExportConfig, true);
-          console.log('\n\nABACADABRA 02\\n\n');
-          //winston.info(typeof jsonStream === 'string' ? jsonStream as string : JSON.stringify(jsonStream));
           if (typeof jsonStream === 'string')
           {
             winston.info(jsonStream as string);
           }
           else
           {
-            console.log(mailchimpConfig);
             const mailchimpArgs =
               {
                 body: {
@@ -989,7 +984,6 @@ export class Scheduler
                   },
                 },
               };
-            console.log(mailchimpArgs);
             const result = await sources.handleTemplateExportSource(mailchimpArgs, jsonStream as stream.Readable);
           }
         }

@@ -371,7 +371,7 @@ export class Magento
         }
         catch (e)
         {
-          return resolve(resultStr + ((e as any).toString()));
+          return resolve((resultStr.toString() as string) + (((e as any).toString() as string)));
         }
       });
       return resolve(resultStr);

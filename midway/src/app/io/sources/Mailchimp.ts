@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import crypto = require('crypto');
 import jsonStream = require('JSONStream');
 
-import * as _ from 'lodash';
-import * as stream from 'stream';
 import * as winston from 'winston';
 
+import * as request from 'request';
 import { Credentials } from '../../credentials/Credentials';
 import { ExportSourceConfig } from './Sources';
 
@@ -69,11 +69,13 @@ export class Mailchimp
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      try {
+      try
+      {
         let results: object[] = [];
         const jsonParser = jsonStream.parse();
         exportSourceConfig.stream.pipe(jsonParser);
-        jsonParser.on('data', (data) => {
+        jsonParser.on('data', (data) =>
+        {
           winston.debug(`Mailchimp got data (onData) with ${data.length} objects`);
           results = data;
           const mailchimpSourceConfig: MailchimpSourceConfig =
@@ -82,77 +84,122 @@ export class Mailchimp
               key: exportSourceConfig.params['key'],
               host: exportSourceConfig.params['host'],
             };
-          this.runQuery(mailchimpSourceConfig);
-          resolve('Finished getJSONStreamAsMailchimpSourceConfig.onData');
+          this.runQuery(mailchimpSourceConfig).then(() =>
+          {
+            resolve('Finished getJSONStreamAsMailchimpSourceConfig.onData');
+          }).catch((e) =>
+          {
+            reject(`Mailchimp export failed in runQuery: ${e}`);
+          });
         });
-        resolve('Finished getJSONStreamAsMailchimpSourceConfig');
-      } catch (e) {
+      } catch (e)
+      {
         reject(`Mailchimp export failed in getJSONStreamAsMailchimpSourceConfig: ${e}`);
       }
     });
   }
 
-  public async runQuery(mailchimpSourceConfig: MailchimpSourceConfig): Promise<string> {
-    return new Promise<string>(async (resolve, reject) => {
-      try {
+  public async runQuery(mailchimpSourceConfig: MailchimpSourceConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      try
+      {
         const resultArr: Array<Promise<object>> = [];
 
-        console.log('here5555');
+        const batchSize: number = 1000;
+        const batches: object[][] = [[]];
 
-        // TODO batch POST requests to Mailchimp here... `mailchimpSourceConfig.data` is row array
+        let currBatch: number = 0;
+        for (let i: number = 1; i <= mailchimpSourceConfig.data.length; i++)
+        {
+          batches[currBatch][(i - 1) % batchSize] = mailchimpSourceConfig.data[i - 1];
 
-        mailchimpSourceConfig.data.forEach(async (row) => {
-          try {
-            // console.log('processing row =');
-            // console.log(row);
+          if (i % batchSize === 0)
+          {
+            currBatch++;
+            batches[currBatch] = [];
+          }
+        }
 
-            // TODO POST `row` to Mailchimp...
+        // console.log('STATS: ' + mailchimpSourceConfig.data.length
+        // + ' ' + batches.length + ' ' + batches[0].length + ' ' + batches[1].length + ' ' + batches[2].length);
 
-            //thisResolve({ args: {}, status: 'true' });
-            /*const requestArgs: object = {};
-            Object.keys(mailchimpSourceConfig.updateParams).forEach((key) =>
-            {
-              requestArgs[key] = mailchimpSourceConfig.updateParams[key];
+        batches.forEach((batch: object[]) =>
+        {
+          const batchBody: object = { operations: [] };
+          batch.forEach((row: object) =>
+          {
+            batchBody['operations'].push({
+              method: 'PUT',
+              path: 'lists/' + '245b9c19d8' // TODO don't hardcode list ID!
+                + '/members/'
+                + crypto.createHash('md5').update(row['parentEmail']).digest('hex').toString(),
+              body: JSON.stringify({
+                email_address: row['parentEmail'],
+                status_if_new: 'subscribed',
+                merge_fields: {
+                  'EMAIL': row['parentEmail'],
+                  'UID': row['parentId'],
+                  'SIGNUPDATE': row['parentCreatedAt'],
+                  'PARENTLOC': row['parentLoc'],
+                  '1SITNAME': row['FirstSitterFormattedName'],
+                  '1SITID': row['FirstID'],
+                  '1SITSAT': row['FirstSatForParent'],
+                  '1DISTANCE': row['FirstDistance'],
+                  '1NUMJOBS': row['FirstNumJobs'],
+                  '2SITNAME': row['SecondSitterFormattedName'],
+                  '2SITID': row['SecondID'],
+                  '2SITSAT': row['SecondSatForParent'],
+                  '2DISTANCE': row['SecondDistance'],
+                  '2NUMJOBS': row['SecondNumJobs'],
+                  '3SITNAME': row['ThirdSitterFormattedName'],
+                  '3SITID': row['ThirdID'],
+                  '3SITSAT': row['ThirdSatForParent'],
+                  '3DISTANCE': row['ThirdDistance'],
+                  '3NUMJOBS': row['ThirdNumJobs'],
+                  'MMERGE25': row['dateNightDate'],
+                },
+              }),
             });
-            Object.keys(mailchimpSourceConfig.mappedParams).forEach((key) =>
+          });
+
+          request.post({
+            headers: {
+              'content-type': 'application/json',
+            },
+            auth: {
+              user: 'any',
+              password: mailchimpSourceConfig.key,
+            },
+            url: mailchimpSourceConfig.host + 'batches',
+            json: batchBody,
+          }, (error, response, body) =>
             {
-              requestArgs[key] = row[mailchimpSourceConfig.mappedParams[key]];
-            });
-            const sanitizedRequestArgs = _.cloneDeep(requestArgs);
-            resultArr.push(new Promise<object>((thisResolve, thisReject) =>
-            {
-              method(requestArgs, (error, result, envelope, soapHeader) =>
+              winston.info('Mailchimp response: ' + JSON.stringify(response));
+              const batchid: string = response['body']['id'];
+              setTimeout(() =>
               {
-                if (error)
-                {
-                  thisResolve({
-                    args: sanitizedRequestArgs, status: 'false',
-                    error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
+                request.get({
+                  url: mailchimpSourceConfig.host + 'batches/' + batchid,
+                  auth: {
+                    user: 'any',
+                    password: mailchimpSourceConfig.key,
+                  },
+                }, (e2, r2, b2) =>
+                  {
+                    winston.info('Mailchimp response 2: ' + JSON.stringify(r2));
                   });
-                }
-                else
-                {
-                  if (result && result['result'] !== undefined)
-                  {
-                    thisResolve({ args: sanitizedRequestArgs, status: result['result']['$value'] });
-                  }
-                  else
-                  {
-                    thisResolve({ args: sanitizedRequestArgs, status: 'true' });
-                  }
-                }
-              });
-            }));*/
-          }
-          catch (e) {
-            resolve((e as any).toString());
-          }
+              }, 60000);
+            });
         });
+
         const resultAsString: string = JSON.stringify(await Promise.all(resultArr));
         winston.info('Result of Mailchimp request: ' + resultAsString);
         resolve(resultAsString);
       }
-      catch (e) {
+      catch (e)
+      {
         resolve((e as any).toString());
       }
     });
