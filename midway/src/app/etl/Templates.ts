@@ -93,6 +93,28 @@ export default class Templates
     });
   }
 
+  public async validateTemplateExists(templateId: number):
+    Promise<{ valid: boolean, message: string }>
+  {
+    let valid = true;
+    const messages: string[] = [];
+    if (templateId == null || typeof templateId !== 'number')
+    {
+      valid = false;
+      messages.push(`id is missing or invalid type: ${templateId}`);
+    }
+    else
+    {
+      const searchForTemplates = await this.get(templateId);
+      if (searchForTemplates.length === 0)
+      {
+        valid = false;
+        messages.push(`no template with the specified id exists`);
+      }
+    }
+    return { valid, message: `${messages}` };
+  }
+
   public async validateTemplate(template: TemplateConfig, requireExistingId?: boolean):
     Promise<{ valid: boolean, message: string }>
   {
@@ -101,19 +123,11 @@ export default class Templates
     const messages: string[] = [];
     if (requireExistingId === true)
     {
-      if (template.id == null || typeof template.id !== 'number')
+      const res = await this.validateTemplateExists(template.id);
+      if (!res.valid)
       {
         valid = false;
-        messages.push(`id is missing or invalid type: ${template.id}`);
-      }
-      else
-      {
-        const searchForTemplates = await this.get(template.id);
-        if (searchForTemplates.length === 0)
-        {
-          valid = false;
-          messages.push(`no template with the specified id exists`);
-        }
+        messages.push(res.message);
       }
     }
     if (sources == null || typeof sources !== 'object')
@@ -127,6 +141,20 @@ export default class Templates
       messages.push(`sinks is missing or invalid type: ${sinks}`);
     }
     return { valid, message: `${messages}` };
+  }
+
+  public async delete(templateId: number)
+  {
+    return new Promise<void>(async (resolve, reject) =>
+    {
+      const { valid, message } = await this.validateTemplateExists(templateId);
+      if (!valid)
+      {
+        return reject(message);
+      }
+      await App.DB.delete(this.templateTable, { id: templateId });
+      resolve();
+    });
   }
 
   public async create(template: TemplateConfig): Promise<TemplateConfig[]>
