@@ -48,10 +48,12 @@ import * as stream from 'stream';
 
 import { GoogleAnalyticsConfig, GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
 import { Magento, MagentoSourceConfig } from './Magento';
+import { Mailchimp, MailchimpSourceConfig } from './Mailchimp';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
 export const magento: Magento = new Magento();
+export const mailchimp: Mailchimp = new Mailchimp();
 export const mySQL: MySQL = new MySQL();
 
 export interface SourceConfig
@@ -91,7 +93,10 @@ export class Sources
       switch (sourceConfig.type)
       {
         case 'magento':
-          // result = await this._putJSONStreamIntoMagento(exprtSourceConfig);
+          result = await this._putJSONStreamIntoMagento(exprtSourceConfig);
+          break;
+        case 'mailchimp':
+          result = await this._putJSONStreamIntoMailchimp(exprtSourceConfig);
           break;
         default:
           break;
@@ -192,9 +197,9 @@ export class Sources
       {
         body['templateId'] = Number(parseInt(templateId, 10));
       }
-      // const writeStream: stream.Readable | string = await magento._getJSONFromCSV(
-      //   await magento.runQuery(source['params'] as MagentoSourceConfig[]));
-      const writeStream: any = new stream.PassThrough();
+      const writeStream: stream.Readable = await magento.getMagentoRowsAsCSVStream(
+        await magento.runQuery(source['params'] as MagentoSourceConfig[]) as object[]);
+      // const writeStream: any = new stream.PassThrough();
       if (typeof writeStream === 'string')
       {
         return resolve(writeStream);
@@ -239,14 +244,22 @@ export class Sources
     });
   }
 
-  // export private methods
-  // private async _putJSONStreamIntoMagento(exprtSourceConfig: ExportSourceConfig): Promise<string>
-  // {
-  //   return new Promise<string>(async (resolve, reject) =>
-  //   {
-  //     resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(exprtSourceConfig)));
-  //   });
-  // }
+  private async _putJSONStreamIntoMagento(exprtSourceConfig: ExportSourceConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(
+        exprtSourceConfig) as MagentoSourceConfig[]) as string);
+    });
+  }
+
+  private async _putJSONStreamIntoMailchimp(exprtSourceConfig: ExportSourceConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      resolve(await mailchimp.getJSONStreamAsMailchimpSourceConfig(exprtSourceConfig));
+    });
+  }
 }
 
 export default Sources;

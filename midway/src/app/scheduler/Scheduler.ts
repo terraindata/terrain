@@ -261,7 +261,7 @@ export class Scheduler
   {
     return new Promise<number>(async (resolve, reject) =>
     {
-      let lastKey: number = Number(Object.keys(this.jobMap).sort().reverse()[0]);
+      let lastKey: number = Number(Object.keys(this.jobMap).sort(naturalSort).reverse()[0]);
       if (lastKey === undefined || isNaN(lastKey))
       {
         lastKey = -1;
