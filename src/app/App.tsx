@@ -100,17 +100,11 @@ import LibraryActions from './library/data/LibraryActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
 import { UserActions } from './users/data/UserRedux';
-// const GilroySrc = require('app/common/fonts/Gilroy-Regular.woff');
-// const GilroyLightSrc = require('app/common/fonts/Gilroy-Light.woff');
-// const GilroyLightItalicSrc = require('app/common/fonts/Gilroy-LightItalic.woff');
-// const GilroyBoldSrc = require('app/common/fonts/Gilroy-Bold.woff');
-// const GilroySemiBoldSrc = require('app/common/fonts/Gilroy-SemiBold.woff');
-const GilroySrc = require('./../../midway/src/assets/8e8705d069fbb9099b3a1e1d779fa5c5.woff');
-const GilroyLightSrc = require('./../../midway/src/assets/0cf6584c45aa11ddc60d113d1c0cb12d.woff');
-const GilroyLightItalicSrc = require('./../../midway/src/assets/8e8705d069fbb9099b3a1e1d779fa5c5.woff');
-const GilroyBoldSrc = require('./../../midway/src/assets/8e8705d069fbb9099b3a1e1d779fa5c5.woff');
-const GilroySemiBoldSrc = require('./../../midway/src/assets/8e8705d069fbb9099b3a1e1d779fa5c5.woff');
-
+const GilroySrc = require('app/common/fonts/Gilroy-Regular.woff');
+const GilroyLightSrc = require('app/common/fonts/Gilroy-Light.woff');
+const GilroyLightItalicSrc = require('app/common/fonts/Gilroy-LightItalic.woff');
+const GilroyBoldSrc = require('app/common/fonts/Gilroy-Bold.woff');
+const GilroySemiBoldSrc = require('app/common/fonts/Gilroy-SemiBold.woff');
 
 // Icons
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
@@ -127,40 +121,40 @@ const BackgroundImage = require('./../images/background.png');
 injectGlobal`
   @font-face {
     font-family: 'Gilroy';
-     src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     src: url(${GilroySrc}) format('woff');
+    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     font-weight: normal;
     font-style: normal;
   }
 
 @font-face {
     font-family: 'Gilroy-Light-Italic';
-    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     src: url(${GilroyLightItalicSrc}) format('woff');
+    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     font-weight: 300;
     font-style: italic;
 }
 
 @font-face {
     font-family: 'Gilroy-Light';
-     src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     src: url(${GilroyLightSrc}) format('woff');
+    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     font-weight: 300;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Gilroy-Bold';
-    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     src: url(${GilroyBoldSrc}) format('woff');
+    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     font-weight: bold;
     font-style: normal;
 }
 
   @font-face {
       font-family: 'Gilroy-Semi-Bold';
-      src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
       src: url(${GilroySemiBoldSrc}) format('woff');
+      src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
       font-weight: 600;
       font-style: normal;
   }

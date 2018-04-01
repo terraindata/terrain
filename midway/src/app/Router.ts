@@ -128,19 +128,20 @@ MidwayRouter.get('/assets/:asset', async (ctx, next) =>
   // Allow these specific filenames
   const allowedNames: string[] = [
     'bundle.js',
-    'vendor.bundle.js'
+    'vendor.bundle.js',
   ];
 
   // Allow any files matching these extensions
   const allowedExtensions: string[] = [
-    '.woff'
+    '.woff',
   ];
 
   let rejectRequest: boolean = false;
   if (!allowedNames.includes(ctx.params['asset']))
   {
     rejectRequest = true;
-    allowedExtensions.forEach((ext) => {
+    allowedExtensions.forEach((ext) =>
+    {
       if (ctx.params['asset'].endsWith(ext))
       {
         rejectRequest = false;
