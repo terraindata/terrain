@@ -123,27 +123,43 @@ MidwayRouter.get('/', async (ctx, next) =>
   await send(ctx, '/src/app/index.html');
 });
 
-MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
+MidwayRouter.get('/assets/:asset', async (ctx, next) =>
 {
-  if (process.env.NODE_ENV === 'production')
-  {
-    await send(ctx, '/midway/src/assets/bundle.js');
-  }
-  else
-  {
-    ctx.body = await Util.doRequest('http://localhost:8080/assets/bundle.js');
-  }
-});
+  // Allow these specific filenames
+  const allowedNames: string[] = [
+    'bundle.js',
+    'vendor.bundle.js'
+  ];
 
-MidwayRouter.get('/assets/vendor.bundle.js', async (ctx, next) =>
-{
+  // Allow any files matching these extensions
+  const allowedExtensions: string[] = [
+    '.woff'
+  ];
+
+  let rejectRequest: boolean = false;
+  if (!allowedNames.includes(ctx.params['asset']))
+  {
+    rejectRequest = true;
+    allowedExtensions.forEach((ext) => {
+      if (ctx.params['asset'].endsWith(ext))
+      {
+        rejectRequest = false;
+      }
+    });
+  }
+
+  if (rejectRequest === true)
+  {
+    return;
+  }
+
   if (process.env.NODE_ENV === 'production')
   {
-    await send(ctx, '/midway/src/assets/vendor.bundle.js');
+    await send(ctx, `/midway/src/assets/${ctx.params['asset']}`);
   }
   else
   {
-    ctx.body = await Util.doRequest('http://localhost:8080/assets/vendor.bundle.js');
+    ctx.body = await Util.doRequest(`http://localhost:8080/assets/${ctx.params['asset']}`);
   }
 });
 
