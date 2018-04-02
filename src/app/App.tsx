@@ -122,7 +122,6 @@ injectGlobal`
   @font-face {
     font-family: 'Gilroy';
     src: url(${GilroySrc}) format('woff');
-    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     font-weight: normal;
     font-style: normal;
   }
@@ -130,7 +129,6 @@ injectGlobal`
 @font-face {
     font-family: 'Gilroy-Light-Italic';
     src: url(${GilroyLightItalicSrc}) format('woff');
-    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     font-weight: 300;
     font-style: italic;
 }
@@ -138,7 +136,6 @@ injectGlobal`
 @font-face {
     font-family: 'Gilroy-Light';
     src: url(${GilroyLightSrc}) format('woff');
-    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     font-weight: 300;
     font-style: normal;
 }
@@ -146,7 +143,6 @@ injectGlobal`
 @font-face {
     font-family: 'Gilroy-Bold';
     src: url(${GilroyBoldSrc}) format('woff');
-    src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
     font-weight: bold;
     font-style: normal;
 }
@@ -154,7 +150,6 @@ injectGlobal`
   @font-face {
       font-family: 'Gilroy-Semi-Bold';
       src: url(${GilroySemiBoldSrc}) format('woff');
-      src: url('./8e8705d069fbb9099b3a1e1d779fa5c5.woff') format('woff);
       font-weight: 600;
       font-style: normal;
   }
