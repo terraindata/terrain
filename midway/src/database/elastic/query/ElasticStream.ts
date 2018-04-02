@@ -85,7 +85,7 @@ export class ElasticStream extends SafeReadable
       body: this.query,
       scroll: this.scroll,
       size: Math.min(this.size, this.MAX_SEARCH_SIZE),
-    }, this.safeCallback(this.scrollCallback.bind(this)));
+    }, this.makeSafe(this.scrollCallback.bind(this)));
   }
 
   public _read(size: number = 1024)
@@ -152,7 +152,7 @@ export class ElasticStream extends SafeReadable
       if (this.scrollID !== undefined)
       {
         this.client.clearScroll({ scrollId: this.scrollID },
-          this.safeCallback(() => this.push(null)));
+          this.makeSafe(() => this.push(null)));
         this.scrollID = undefined;
       }
 
@@ -168,7 +168,7 @@ export class ElasticStream extends SafeReadable
 
       // continue scrolling
       this.querying = true;
-      this.client.scroll(params, this.safeCallback(this.scrollCallback.bind(this)));
+      this.client.scroll(params, this.makeSafe(this.scrollCallback.bind(this)));
     }
   }
 }

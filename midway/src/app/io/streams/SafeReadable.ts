@@ -81,7 +81,7 @@ export class SafeReadable extends Readable
 
     try
     {
-      super._destroy(error, callback);
+      super._destroy(error, this.makeSafe(callback));
     }
     catch (e)
     {
@@ -93,7 +93,7 @@ export class SafeReadable extends Readable
   {
     try
     {
-      return super.addListener(event, listener);
+      return super.addListener(event, this.makeSafe(listener, event));
     }
     catch (e)
     {
@@ -105,7 +105,7 @@ export class SafeReadable extends Readable
   {
     try
     {
-      return super.prependListener(event, listener);
+      return super.prependListener(event, this.makeSafe(listener, event));
     }
     catch (e)
     {
@@ -117,7 +117,7 @@ export class SafeReadable extends Readable
   {
     try
     {
-      return super.prependOnceListener(event, listener);
+      return super.prependOnceListener(event, this.makeSafe(listener, event));
     }
     catch (e)
     {
@@ -129,7 +129,7 @@ export class SafeReadable extends Readable
   {
     try
     {
-      return super.removeListener(event, listener);
+      return super.removeListener(event, this.makeSafe(listener, event));
     }
     catch (e)
     {
@@ -141,7 +141,7 @@ export class SafeReadable extends Readable
   {
     try
     {
-      return super.on(event, listener);
+      return super.on(event, this.makeSafe(listener, event));
     }
     catch (e)
     {
@@ -153,7 +153,7 @@ export class SafeReadable extends Readable
   {
     try
     {
-      return super.once(event, listener);
+      return super.once(event, this.makeSafe(listener, event));
     }
     catch (e)
     {
@@ -161,25 +161,24 @@ export class SafeReadable extends Readable
     }
   }
 
-  public safeCallback(callback: (error?: Error, response?: any) => void)
+  public makeSafe(listener: (...args: any[]) => void, event?: string): (...args: any[]) => void
   {
-    return ((error?: Error, response?: any) =>
+    if (event === 'error')
     {
-      if (error !== null && error !== undefined)
-      {
-        this.emit('error', error);
-        return;
-      }
+      return listener;
+    }
 
+    return (...args: any[]): void =>
+    {
       try
       {
-        callback(error, response);
+        listener(...args);
       }
       catch (e)
       {
         this.emit('error', e);
       }
-    });
+    };
   }
 }
 

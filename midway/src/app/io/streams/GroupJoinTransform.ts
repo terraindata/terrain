@@ -200,77 +200,69 @@ export default class GroupJoinTransform extends SafeReadable
         continue;
       }
 
-      try
-      {
-        this.client.msearch(
+      this.client.msearch(
+        {
+          body,
+        },
+        this.makeSafe((error: Error | null | undefined, resp: any) =>
+        {
+          if (error !== null && error !== undefined)
           {
-            body,
-          },
-          (error: Error | null, resp: any) =>
+            this.emit('error', error);
+            return;
+          }
+
+          if (resp.error !== undefined)
           {
-            if (error !== null && error !== undefined)
+            this.emit('error', resp.error);
+            return;
+          }
+
+          for (let j = 0; j < numInputs; ++j)
+          {
+            if (resp.responses[j] !== undefined && resp.responses[j].hits !== undefined)
             {
-              this.emit('error', error);
-              return;
+              ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
             }
-
-            if (resp.error !== undefined)
+            else
             {
-              this.emit('error', resp.error);
-              return;
+              ticket.response['hits'].hits[j][subQuery] = [];
             }
+          }
 
-            for (let j = 0; j < numInputs; ++j)
+          ticket.count--;
+
+          // check if we have anything to push to the output stream
+          let done = false;
+          while (!done && this.bufferedOutputs.length > 0)
+          {
+            const front = this.bufferedOutputs.peekFront();
+            if (front !== undefined && front.count === 0)
             {
-              if (resp.responses[j] !== undefined && resp.responses[j].hits !== undefined)
-              {
-                ticket.response['hits'].hits[j][subQuery] = resp.responses[j].hits.hits;
-              }
-              else
-              {
-                ticket.response['hits'].hits[j][subQuery] = [];
-              }
-            }
-
-            ticket.count--;
-
-            // check if we have anything to push to the output stream
-            let done = false;
-            while (!done && this.bufferedOutputs.length > 0)
-            {
-              const front = this.bufferedOutputs.peekFront();
-              if (front !== undefined && front.count === 0)
-              {
-                front.response['hits'].hits = front.response['hits'].hits.filter(
-                  (obj) =>
+              front.response['hits'].hits = front.response['hits'].hits.filter(
+                (obj) =>
+                {
+                  return Object.keys(query).reduce((acc, q) =>
                   {
-                    return Object.keys(query).reduce((acc, q) =>
-                    {
-                      return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
-                    }, true);
-                  },
-                );
-                this.push(front.response);
-                this.bufferedOutputs.shift();
-              }
-              else
-              {
-                done = true;
-              }
+                    return acc && (obj[q] !== undefined && obj[q].length >= this.dropIfLessThan);
+                  }, true);
+                },
+              );
+              this.push(front.response);
+              this.bufferedOutputs.shift();
             }
-
-            if (this.source.isEmpty()
-              && this.bufferedOutputs.length === 0)
+            else
             {
-              this.push(null);
+              done = true;
             }
-          });
-      }
-      catch (e)
-      {
-        this.emit('error', e);
-        return;
-      }
+          }
+
+          if (this.source.isEmpty()
+            && this.bufferedOutputs.length === 0)
+          {
+            this.push(null);
+          }
+        }));
     }
   }
 }
