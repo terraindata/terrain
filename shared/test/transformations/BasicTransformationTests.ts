@@ -657,3 +657,93 @@ test('split a nested field', () =>
     },
   );
 });
+
+test('cast array to array should be no-op', () =>
+{
+  const doc = {
+    foo: [
+      { bar: 'Apples and Oranges' },
+      { bar: 'Milk and Cookies' },
+    ],
+  };
+
+  const e = new TransformationEngine(doc);
+
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List([List(['foo'])]),
+    {
+      toTypename: 'array',
+    },
+  );
+
+  expect(e.transform(doc)).toEqual(doc);
+});
+
+test('delete a field that has transformations', () =>
+{
+  const e = new TransformationEngine();
+  const id1 = e.addField(List(['foo']), 'string');
+  e.addField(List(['bar']), 'string');
+  e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]),
+    {
+      toTypename: 'string',
+    });
+  e.deleteField(id1);
+  const doc = {
+    foo: 'hi',
+    bar: 'yo',
+  };
+  expect(e.transform(doc)).toEqual({ bar: 'yo' });
+});
+
+test('cast on a field inside a nested object inside an array', () =>
+{
+  const e = new TransformationEngine();
+  e.addField(List(['foo']), 'array', { valueType: 'object' });
+  e.addField(List(['foo', '*']), 'array', { valueType: 'object' });
+  const id3 = e.addField(List(['foo', '*', 'bar']), 'string');
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List([e.getInputKeyPath(id3)]),
+    {
+      toTypename: 'string',
+    },
+  );
+  const doc = {
+    foo: [
+      {
+        bar: 'hello',
+      },
+      {
+        bar: 'hey there',
+      },
+    ],
+  };
+  expect(e.transform(doc)).toEqual(doc);
+});
+
+test('hash transformation', () =>
+{
+  const doc = { email: 'david@terraindata.com' };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(TransformationNodeType.HashNode, List([List(['email'])]));
+  expect(e.transform(doc)).toEqual({ email: 'e93ab880bff504138a6bf08b1519bdd34d1d30f16dce9a0fba4bd460ae832797' });
+});
+
+test('array sum transformation', () =>
+{
+  const doc = {
+    foo: [1, 2, 3, 4],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.ArraySumNode,
+    List<KeyPath>([KeyPath(['foo'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['foosum'])]),
+    });
+  const r = e.transform(doc);
+  expect(r['foosum']).toBe(10);
+});

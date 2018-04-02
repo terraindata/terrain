@@ -137,6 +137,7 @@
     "json-file": "^0.1.0",
     "json-immutable": "^0.4.0",
     "kcors": "^2.2.1",
+    "keccak": "^1.4.0",
     "koa": "^2.4.1",
     "koa-bodyparser": "^4.2.0",
     "koa-favicon": "^2.0.0",

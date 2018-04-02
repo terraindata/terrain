@@ -46,7 +46,9 @@ THE SOFTWARE.
 
 // import * as winston from 'winston';
 import * as Immutable from 'immutable';
+import createKeccakHash = require('keccak');
 
+import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 import CastTransformationNode from './nodes/CastTransformationNode';
@@ -65,6 +67,23 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
+  private static splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+  {
+    let split: string[];
+    if (typeof opts.delimiter === 'number')
+    {
+      split = [
+        (el as string).slice(0, opts.delimiter as number),
+        (el as string).slice(opts.delimiter as number),
+      ];
+    }
+    else
+    {
+      split = (el as string).split(opts.delimiter as string | RegExp);
+    }
+    return split;
+  }
+
   public applyTransformationNode(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     if (node === undefined)
@@ -247,7 +266,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
             kpi = kpi.push(i.toString());
           }
 
-          split = this.splitHelper(yadeep.get(doc, kpi), opts);
+          split = TransformationEngineNodeVisitor.splitHelper(yadeep.get(doc, kpi), opts);
 
           for (let j: number = 0; j < split.length; j++)
           {
@@ -275,7 +294,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         } as TransformationVisitResult;
       }
 
-      split = this.splitHelper(el, opts);
+      split = TransformationEngineNodeVisitor.splitHelper(el, opts);
 
       if (split.length !== opts.newFieldKeyPaths.size)
       {
@@ -390,59 +409,133 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.CastNode>;
 
-    node.fields.forEach((field) =>
+    node.fields.forEach((field: KeyPath) =>
     {
-      const el: any = yadeep.get(doc, field);
-      if (typeof el === opts.toTypename)
+      const originalElement: any = yadeep.get(doc, field);
+
+      if (typeof originalElement === opts.toTypename || originalElement.constructor === Array && opts.toTypename === 'array')
       {
         return;
       }
 
-      switch (opts.toTypename)
+      let newFields: KeyPath[] = [field];
+
+      if (Array.isArray(originalElement))
       {
-        case 'string': {
-          if (typeof el === 'object')
+        newFields = [];
+        for (let i: number = 0; i < originalElement.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
           {
-            yadeep.set(doc, field, JSON.stringify(el));
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
           }
           else
           {
-            yadeep.set(doc, field, el.toString());
+            kpi = kpi.push(i.toString());
           }
-          break;
+          newFields.push(kpi);
         }
-        case 'number': {
-          yadeep.set(doc, field, Number(el));
-          break;
+      }
+
+      newFields.forEach((f: KeyPath) =>
+      {
+        const el: any = yadeep.get(doc, f);
+
+        if (typeof el === opts.toTypename || el.constructor === Array && opts.toTypename === 'array')
+        {
+          return;
         }
-        case 'boolean': {
-          if (typeof el === 'string')
+
+        switch (opts.toTypename)
+        {
+          case 'string': {
+            if (typeof el === 'object')
+            {
+              yadeep.set(doc, f, JSON.stringify(el));
+            }
+            else
+            {
+              yadeep.set(doc, f, el.toString());
+            }
+            break;
+          }
+          case 'number': {
+            yadeep.set(doc, f, Number(el));
+            break;
+          }
+          case 'boolean': {
+            if (typeof el === 'string')
+            {
+              yadeep.set(doc, f, el.toLowerCase() === 'true');
+            }
+            else
+            {
+              yadeep.set(doc, f, Boolean(el));
+            }
+            break;
+          }
+          case 'object': {
+            yadeep.set(doc, f, {});
+            break;
+          }
+          case 'array': {
+            yadeep.set(doc, f, []);
+            break;
+          }
+          default: {
+            return {
+              errors: [
+                {
+                  message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
+                } as TransformationVisitError,
+              ],
+            } as TransformationVisitResult;
+          }
+        }
+
+      });
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitHashNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
           {
-            yadeep.set(doc, field, el.toLowerCase() === 'true');
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
           }
           else
           {
-            yadeep.set(doc, field, Boolean(el));
+            kpi = kpi.push(i.toString());
           }
-          break;
+          yadeep.set(doc, kpi, createKeccakHash('keccak256').update(yadeep.get(doc, kpi)).digest('hex'));
         }
-        case 'object': {
-          yadeep.set(doc, field, {});
-          break;
-        }
-        case 'array': {
-          yadeep.set(doc, field, []);
-          break;
-        }
-        default: {
-          return {
-            errors: [
-              {
-                message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
-              } as TransformationVisitError,
-            ],
-          } as TransformationVisitResult;
-        }
+      }
+      else if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to hash a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, createKeccakHash('keccak256').update(el).digest('hex'));
       }
     });
 
@@ -451,21 +544,45 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     } as TransformationVisitResult;
   }
 
-  private splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+  public visitArraySumNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    let split: string[];
-    if (typeof opts.delimiter === 'number')
-    {
-      split = [
-        (el as string).slice(0, opts.delimiter as number),
-        (el as string).slice(opts.delimiter as number),
-      ];
-    }
-    else
-    {
-      split = (el as string).split(opts.delimiter as string | RegExp);
-    }
-    return split;
-  }
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.ArraySumNode>;
 
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        let sum: number = 0;
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          sum += yadeep.get(doc, kpi);
+        }
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to sum a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
 }
