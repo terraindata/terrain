@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Deque from 'double-ended-queue';
-import { Readable } from 'stream';
 
 import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';

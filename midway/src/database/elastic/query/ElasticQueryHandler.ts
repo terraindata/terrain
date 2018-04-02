@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import { Readable } from 'stream';
 import * as winston from 'winston';
 
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
@@ -56,6 +55,7 @@ import QueryRequest from '../../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../../shared/database/types/QueryResponse';
 import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
+import SafeReadable from '../../../app/io/streams/SafeReadable';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
@@ -118,7 +118,7 @@ export class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
+  public async handleQuery(request: QueryRequest): Promise<QueryResponse | SafeReadable>
   {
     winston.debug('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
@@ -142,7 +142,7 @@ export class ElasticQueryHandler extends QueryHandler
             throw new Error('Specifying multiple join types is not supported at the moment.');
           }
 
-          let stream: Readable;
+          let stream: SafeReadable;
           if (query['groupJoin'] !== undefined)
           {
             stream = new GroupJoinTransform(client, request.body);
