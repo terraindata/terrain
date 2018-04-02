@@ -59,12 +59,12 @@ if (cluster.isMaster)
 
   cluster.on('online', (worker: cluster.Worker) =>
   {
-    winston.info('Spawned a backup worker: ' + worker.process.pid);
+    winston.info('Spawned a backup worker: ' + String(worker.process.pid));
   });
 
   cluster.on('exit', (worker: cluster.Worker, code: number, signal: string) =>
   {
-    winston.info('Worker ' + worker.process.pid + ' died with code: ' + code + ' and signal: ' + signal);
+    winston.info('Worker ' + worker.process.pid + ' died with code: ' + String(code) + ' and signal: ' + signal);
     cluster.fork();
   });
 }
