@@ -154,7 +154,14 @@ export default class BufferedElasticStream extends SafeReadable
       this._isSourceEmpty && this.buffer.length > 0)
     {
       const buffer = this.resetBuffer();
-      this._onBufferFull(buffer);
+      try
+      {
+        this._onBufferFull(buffer);
+      }
+      catch (e)
+      {
+        throw e;
+      }
     }
   }
 }
