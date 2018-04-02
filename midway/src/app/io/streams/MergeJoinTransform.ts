@@ -44,12 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
 import BufferedElasticStream from './BufferedElasticStream';
+import SafeReadable from './SafeReadable';
 /**
  * Types of merge joins
  */
@@ -68,7 +67,7 @@ export enum StreamType
 /**
  * Applies a group join to an output stream
  */
-export default class MergeJoinTransform extends Readable
+export default class MergeJoinTransform extends SafeReadable
 {
   private client: ElasticClient;
   private type: MergeJoinType;
