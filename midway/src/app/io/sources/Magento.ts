@@ -339,16 +339,16 @@ export class Magento
                     }
                     break;
                   case 'trim':
-                    // magentoSourceConfig.data
-                    result = await this._runSoapOperation(deepCopyMagentoSourceConfig, soapCreds, options) as object[];
-                    const excludedProducts: object[] = result.filter((row) =>
-                    {
-                      return row;
-                    });
-                    i++;
                     deepCopyMagentoSourceConfig.url = [magentoSourceConfig.url[i]];
-                    deepCopyMagentoSourceConfig.data = excludedProducts;
-                    result = await this._runSoapOperation(deepCopyMagentoSourceConfig, soapCreds, options) as object[];
+                    const untrimedResult: object[] = storedResult[i - 1];
+                    const keysToInclude: string[] = deepCopyMagentoSourcConfig.url[0]['keys'];
+                    const excludedProducts: object[] = untrimedResult.filter((row) =>
+                    {
+                      return _.pick(row, keysToInclude);
+                    });
+                    storedResult.push(excludedProducts);
+                    // deepCopyMagentoSourceConfig.data = excludedProducts;
+                    i++;
                     break;
                   default:
                     break;
