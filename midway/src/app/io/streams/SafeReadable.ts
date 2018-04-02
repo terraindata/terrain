@@ -89,6 +89,78 @@ export class SafeReadable extends Readable
     }
   }
 
+  public addListener(event: string, listener: (...args: any[]) => void): this
+  {
+    try
+    {
+      return super.addListener(event, listener);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public prependListener(event: string, listener: (...args: any[]) => void): this
+  {
+    try
+    {
+      return super.prependListener(event, listener);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public prependOnceListener(event: string, listener: (...args: any[]) => void): this
+  {
+    try
+    {
+      return super.prependOnceListener(event, listener);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public removeListener(event: string, listener: (...args: any[]) => void): this
+  {
+    try
+    {
+      return super.removeListener(event, listener);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public on(event: string, listener: (...args: any[]) => void): this
+  {
+    try
+    {
+      return super.on(event, listener);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public once(event: string, listener: (...args: any[]) => void): this
+  {
+    try
+    {
+      return super.once(event, listener);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
   public safeCallback(callback: (error?: Error, response?: any) => void)
   {
     return ((error?: Error, response?: any) =>
