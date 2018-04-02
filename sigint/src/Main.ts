@@ -64,7 +64,7 @@ if (cluster.isMaster)
 
   cluster.on('exit', (worker: cluster.Worker, code: number, signal: string) =>
   {
-    winston.info('Worker ' + worker.process.pid + ' died with code: ' + String(code) + ' and signal: ' + signal);
+    winston.info('Worker ' + String(worker.process.pid) + ' died with code: ' + String(code) + ' and signal: ' + signal);
     cluster.fork();
   });
 }
