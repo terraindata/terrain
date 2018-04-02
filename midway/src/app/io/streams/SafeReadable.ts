@@ -51,10 +51,6 @@ import * as stream from 'stream';
  */
 export class SafeReadable extends stream.Readable
 {
-  private _onRead: () => void;
-  private _onError: () => void;
-  private _onEnd: () => void;
-
   constructor(opts?: stream.ReadableOptions)
   {
     super(opts);
