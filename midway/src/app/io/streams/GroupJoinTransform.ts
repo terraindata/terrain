@@ -264,7 +264,6 @@ export default class GroupJoinTransform extends SafeReadable
             this.push(null);
           }
         }));
-      }
     }
   }
 }

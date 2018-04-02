@@ -168,7 +168,8 @@ export class SafeReadable extends Readable
       return listener;
     }
 
-    return (...args: any[]): void => {
+    return (...args: any[]): void =>
+    {
       try
       {
         listener(...args);
