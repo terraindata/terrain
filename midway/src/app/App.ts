@@ -91,8 +91,10 @@ export class App
   private static uncaughtExceptionHandler(err: Error): void
   {
     winston.error('Uncaught Exception: ' + err.toString());
-    // this is a good place to clean tangled resources
-    process.abort();
+    if (err.stack !== undefined)
+    {
+      winston.error(err.stack);
+    }
   }
 
   private static unhandledRejectionHandler(err: Error): void
