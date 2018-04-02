@@ -59,6 +59,36 @@ export class SafeReadable extends Readable
     this.on('error', this.emit);
   }
 
+  public _read(size?: number)
+  {
+    try
+    {
+      super._read(size);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
+  public _destroy(error: Error, callback: any)
+  {
+    if (error !== null && error !== undefined)
+    {
+      this.emit('error', error);
+      return;
+    }
+
+    try
+    {
+      super._destroy(error, callback);
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+  }
+
   public safeCallback(callback: (error?: Error, response?: any) => void)
   {
     return ((error?: Error, response?: any) =>
