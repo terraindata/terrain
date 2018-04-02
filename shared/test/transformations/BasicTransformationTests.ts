@@ -722,3 +722,11 @@ test('cast on a field inside a nested object inside an array', () =>
   };
   expect(e.transform(doc)).toEqual(doc);
 });
+
+test('hash transformation', () =>
+{
+  const doc = { email: 'david@terraindata.com' };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(TransformationNodeType.HashNode, List([List(['email'])]));
+  expect(e.transform(doc)).toEqual({ email: 'e93ab880bff504138a6bf08b1519bdd34d1d30f16dce9a0fba4bd460ae832797' });
+});

@@ -46,7 +46,9 @@ THE SOFTWARE.
 
 // import * as winston from 'winston';
 import * as Immutable from 'immutable';
+import createKeccakHash = require('keccak');
 
+import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 import CastTransformationNode from './nodes/CastTransformationNode';
@@ -65,6 +67,23 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
+  private static splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+  {
+    let split: string[];
+    if (typeof opts.delimiter === 'number')
+    {
+      split = [
+        (el as string).slice(0, opts.delimiter as number),
+        (el as string).slice(opts.delimiter as number),
+      ];
+    }
+    else
+    {
+      split = (el as string).split(opts.delimiter as string | RegExp);
+    }
+    return split;
+  }
+
   public applyTransformationNode(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     if (node === undefined)
@@ -247,7 +266,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
             kpi = kpi.push(i.toString());
           }
 
-          split = this.splitHelper(yadeep.get(doc, kpi), opts);
+          split = TransformationEngineNodeVisitor.splitHelper(yadeep.get(doc, kpi), opts);
 
           for (let j: number = 0; j < split.length; j++)
           {
@@ -275,7 +294,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         } as TransformationVisitResult;
       }
 
-      split = this.splitHelper(el, opts);
+      split = TransformationEngineNodeVisitor.splitHelper(el, opts);
 
       if (split.length !== opts.newFieldKeyPaths.size)
       {
@@ -483,21 +502,45 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     } as TransformationVisitResult;
   }
 
-  private splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+  public visitHashNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    let split: string[];
-    if (typeof opts.delimiter === 'number')
+    node.fields.forEach((field) =>
     {
-      split = [
-        (el as string).slice(0, opts.delimiter as number),
-        (el as string).slice(opts.delimiter as number),
-      ];
-    }
-    else
-    {
-      split = (el as string).split(opts.delimiter as string | RegExp);
-    }
-    return split;
-  }
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, createKeccakHash('keccak256').update(yadeep.get(doc, kpi)).digest('hex'));
+        }
+      }
+      else if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to hash a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, createKeccakHash('keccak256').update(el).digest('hex'));
+      }
+    });
 
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
 }

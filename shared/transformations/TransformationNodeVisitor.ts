@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
@@ -90,6 +91,11 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitCastNode(node: CastTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitHashNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
