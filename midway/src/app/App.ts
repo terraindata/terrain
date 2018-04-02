@@ -124,12 +124,6 @@ export class App
     this.app = new Koa();
     this.app.proxy = true;
     this.app.keys = [srs({ length: 256 })];
-    this.app.use(async (ctx, next) =>
-    {
-      // tslint:disable-next-line:no-empty
-      ctx.req.setTimeout(0, () => { });
-      await next();
-    });
 
     this.app.use(async (ctx, next) =>
     {
