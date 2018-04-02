@@ -167,7 +167,12 @@ export class ElasticQueryHandler extends QueryHandler
               const bufferTransform = new BufferTransform(stream,
                 (err, res) =>
                 {
-                  ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, res[0]);
+                  let response;
+                  if (res !== undefined && Array.isArray(res))
+                  {
+                    response = res[0];
+                  }
+                  ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, response);
                 });
             });
           }
