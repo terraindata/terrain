@@ -343,13 +343,15 @@ export class TransformationEngine
 
   public deleteField(id: number): void
   {
+    // Order matters!  Must do this first, else getTransformations can't work because
+    // it relies on the entry in fieldNameToIDMap.
+    this.getTransformations(id).forEach((t: number) => this.deleteTransformation(t));
+
     this.fieldNameToIDMap = this.fieldNameToIDMap.delete(this.fieldNameToIDMap.keyOf(id));
     this.fieldProps = this.fieldProps.delete(id);
     this.fieldEnabled = this.fieldEnabled.delete(id);
     this.IDToFieldNameMap = this.IDToFieldNameMap.delete(id);
     this.fieldTypes = this.fieldTypes.delete(id);
-
-    this.getTransformations(id).forEach((t: number) => this.deleteTransformation(t));
   }
 
   /**

@@ -679,3 +679,20 @@ test('cast array to array should be no-op', () =>
 
   expect(e.transform(doc)).toEqual(doc);
 });
+
+test('delete a field that has transformations', () =>
+{
+  const e = new TransformationEngine();
+  const id1 = e.addField(List(['foo']), 'string');
+  e.addField(List(['bar']), 'string');
+  e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]),
+    {
+      toTypename: 'string',
+    });
+  e.deleteField(id1);
+  const doc = {
+    foo: 'hi',
+    bar: 'yo',
+  };
+  expect(e.transform(doc)).toEqual({ bar: 'yo' });
+});
