@@ -120,6 +120,12 @@ export interface TemplateEditorActionTypes
       [k in keyof EditorDisplayState]: EditorDisplayState[k];
     }>;
   };
+  updateDisplayState: {
+    actionType: 'updateDisplayState';
+    updaters: Partial<{
+      [k in keyof EditorDisplayState]: (item: EditorDisplayState[k]) => EditorDisplayState[k];
+    }>;
+  }
   changeLoadingDocuments: {
     actionType: 'changeLoadingDocuments',
     increment: boolean,
@@ -252,6 +258,15 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         for (const k of Object.keys(toUpdate))
         {
           newState = newState.set(k, toUpdate[k]);
+        }
+        return state.set('uiState', newState);
+      },
+      updateDisplayState: (state, action) => {
+        let newState = state.uiState;
+        const updaters = action.payload.updaters;
+        for (const k of Object.keys(updaters))
+        {
+          newState = newState.update(k, updaters[k]);
         }
         return state.set('uiState', newState);
       },

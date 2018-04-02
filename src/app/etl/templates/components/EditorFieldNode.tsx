@@ -177,6 +177,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
   public renderSettingsContainer()
   {
     const showSettings = this._settingsAreOpen();
+
     return (
       <FadeInOut open={showSettings}>
         <div className='injected-content-container'>
@@ -192,6 +193,17 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     );
   }
 
+  public getCheckboxState()
+  {
+    const canEditField = this._canEditField();
+    const checkedState = this._checkedState();
+
+    return { 
+      checked: checkedState === true,
+      showCheckbox: (canEditField && checkedState !== null),
+    }
+  }
+
   public render()
   {
     const { canEdit, preview, displayKeyPath, previewLabel } = this.props;
@@ -200,6 +212,8 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const injectedContent = this.renderSettingsContainer();
     const style = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.5') : {};
+
+    const { checked, showCheckbox } = this.getCheckboxState();
 
     if (field.isArray() || field.isNested())
     {
@@ -228,6 +242,9 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           children={childrenComponent}
           injectedContent={injectedContent}
           style={style}
+          showCheckbox={showCheckbox}
+          checked={checked}
+          onCheckboxClicked={this.handleCheckboxClicked}
         />
       );
     }
@@ -247,8 +264,26 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           children={null}
           injectedContent={injectedContent}
           style={style}
+          showCheckbox={showCheckbox}
+          checked={checked}
+          onCheckboxClicked={this.handleCheckboxClicked}
         />
       );
+    }
+  }
+
+  public handleCheckboxClicked()
+  {
+    const { act, fieldId } = this.props;
+    const { checked, showCheckbox } = this.getCheckboxState();
+    if (showCheckbox)
+    {
+      this.props.act({
+        actionType: 'updateDisplayState',
+        updaters: {
+          checkedFields: (fields) => fields.set(fieldId, !Boolean(checked)),
+        }
+      })
     }
   }
 

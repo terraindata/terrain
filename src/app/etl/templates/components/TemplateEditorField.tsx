@@ -163,6 +163,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.uiStateTracker;
   }
 
+  protected _checkedState(): boolean | null
+  {
+    this.updateChecker.setChecker('checkedState', getCheckedState);
+    return getCheckedState(this.props);
+  }
+
   protected _currentEngine(): TransformationEngine
   {
     this.updateChecker.setChecker('currentEngine', getCurrentEngine);
@@ -278,6 +284,19 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     // tslint:disable-next-line
     console.error(ev);
+  }
+}
+
+function getCheckedState(props: TemplateEditorFieldProps): boolean | null
+{
+  const uiState = (props as TemplateEditorFieldProps & Injected).templateEditor.uiState;
+  if (uiState.checkedFields === null)
+  {
+    return null;
+  }
+  else
+  {
+    return uiState.checkedFields.get(props.fieldId) === true;
   }
 }
 
