@@ -44,17 +44,25 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// import Bottleneck = require('bottleneck');
 import jsonStream = require('JSONStream');
 import soap = require('strong-soap');
 
+import Bottleneck from 'bottleneck';
 import * as _ from 'lodash';
+import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { getValueFromDocPath } from '../../../../../shared/Util';
 import { Credentials } from '../../credentials/Credentials';
+import CSVExportTransform from '../streams/CSVExportTransform';
 import { ExportSourceConfig } from './Sources';
 
 export const credentials: Credentials = new Credentials();
+const limiter: any = new Bottleneck({
+  maxConcurrent: 1,
+  minTime: 2000,
+});
 
 export interface MagentoJSONConfig
 {
@@ -116,7 +124,7 @@ export class Magento
             options: exportSourceConfig.params['options'],
             updateParams: exportSourceConfig.params['updateParams'],
             url: exportSourceConfig.params['url'],
-          } as magentoSourceConfig);
+          } as MagentoSourceConfig);
         }
         return resolve(magentoSourceConfigs);
       });
@@ -128,11 +136,29 @@ export class Magento
     });
   }
 
+  public async getMagentoRowsAsCSVStream(values: any[]): Promise<stream.Readable>
+  {
+    return new Promise<stream.Readable>(async (resolve, reject) =>
+    {
+      const colNames: string[] = Object.keys(values[0]);
+      const writer = new CSVExportTransform(colNames);
+      if (values.length > 0)
+      {
+        for (let i = 1; i < values.length; ++i)
+        {
+          writer.write(values[i]);
+        }
+      }
+      writer.end();
+      resolve(writer);
+    });
+  }
+
   public async runQuery(magentoSourceConfigs: MagentoSourceConfig[]): Promise<string | object[]>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      const resultStr: string = '';
+      let resultStr: string = '';
       magentoSourceConfigs.forEach(async (magentoSourceConfig) =>
       {
         try
@@ -169,6 +195,149 @@ export class Magento
                 const op: string = magentoSourceConfig.url[i]['name'].substring(1, magentoSourceConfig.url[i]['name'].length - 1);
                 switch (op)
                 {
+                  case 'aggregate':
+                    // look at the previous 2 elements in storedResult and add a new field
+                    // params: primaryKey (field to aggregate on, is a RegExp string), aggParams (array of keys to merge)
+                    // dump #2 into a dictionary with the primary key as the key and the value as the object
+                    deepCopyMagentoSourceConfig.url = [magentoSourceConfig.url[i]];
+                    let aggFirstObjDict: object = {};
+                    const aggSecondObjDict: object = {};
+                    const aggregatedObjDict: object = {};
+                    const aggPrimaryKey: string = deepCopyMagentoSourceConfig.url[0]['primaryKey'];
+                    const aggParams: string[] = deepCopyMagentoSourceConfig.url[0]['aggParams'];
+                    const aggOffset: number[] = deepCopyMagentoSourceConfig.url[0]['offset'] !== undefined
+                      ? deepCopyMagentoSourceConfig.url[0]['offset'] : [1, 2];
+                    const aggPrimaryKeyRegexStr: string = deepCopyMagentoSourceConfig.url[0]['primaryKeyRegex']
+                      !== undefined ? deepCopyMagentoSourceConfig.url[0]['primaryKeyRegex'] : '.*$';
+                    const aggSecondObjLst: any[] = storedResult[i - aggOffset[0]];
+                    if (!Array.isArray(aggSecondObjLst))
+                    {
+                      winston.warn('Previous stored element is not an array.');
+                    }
+                    if (deepCopyMagentoSourceConfig.url[0]['primaryKey'] === undefined
+                      || !Array.isArray(deepCopyMagentoSourceConfig.url[0]['aggParams']))
+                    {
+                      winston.warn('Requires primaryKey and an array of aggregation params');
+                    }
+                    try
+                    {
+                      if (Array.isArray(storedResult[i - aggOffset[1]]))
+                      {
+                        storedResult[i - aggOffset[1]].forEach((firstObjObj) =>
+                        {
+                          aggFirstObjDict[firstObjObj[aggPrimaryKey]] = firstObjObj;
+                        });
+                      }
+                      else // already in kv format
+                      {
+                        aggFirstObjDict = storedResult[i - aggOffset[1]];
+                      }
+                      aggSecondObjLst.forEach((secondObj) =>
+                      {
+                        aggSecondObjDict[secondObj[aggPrimaryKey]] = secondObj;
+                      });
+                      Object.keys(aggFirstObjDict).forEach((aggFirstObjDictKey) =>
+                      {
+                        const primaryKeyRegex: any = new RegExp(aggFirstObjDictKey + aggPrimaryKeyRegexStr);
+                        const matchedKeys: string[] = Object.keys(aggSecondObjDict).filter((aggSecondObjDictKey) =>
+                          primaryKeyRegex.test(aggSecondObjDictKey));
+                        matchedKeys.forEach((matchedKey) =>
+                        {
+                          if (aggregatedObjDict[aggFirstObjDictKey] === undefined)
+                          {
+                            aggregatedObjDict[aggFirstObjDictKey] = this._upsertParams(aggFirstObjDict[aggFirstObjDictKey],
+                              aggSecondObjDict[matchedKey], aggParams);
+                          }
+                          else
+                          {
+                            aggregatedObjDict[aggFirstObjDictKey] = this._upsertParams(aggregatedObjDict[aggFirstObjDictKey],
+                              aggSecondObjDict[matchedKey], aggParams);
+                          }
+                        });
+                        if (matchedKeys.length === 0)
+                        {
+                          aggregatedObjDict[aggFirstObjDictKey] = this._fillDefaultParams(aggFirstObjDict[aggFirstObjDictKey], aggParams);
+                        }
+                      });
+                      storedResult.push(aggregatedObjDict);
+                    }
+                    catch (e)
+                    {
+                      winston.warn((e as any).toString() as string);
+                    }
+                    break;
+                  case 'getValuesAsElements':
+                    const storedResultKeys: string[] = Object.keys(storedResult[i - 1]);
+                    const resultArr: object[] = [];
+                    storedResultKeys.forEach((storedResultKey) =>
+                    {
+                      resultArr.push(storedResult[i - 1][storedResultKey]);
+                    });
+                    storedResult.push(resultArr);
+                    break;
+                  case 'sum':
+                    deepCopyMagentoSourceConfig.url = [magentoSourceConfig.url[i]];
+                    const sumOffsetObjDict: object = {};
+                    // const sumSecondObjDict: object = {};
+                    const sumObjDict: object = {};
+                    const sumPrimaryKey: string = deepCopyMagentoSourceConfig.url[0]['primaryKey'];
+                    // sumParams format:
+                    // [{ field: <qty>, newFieldName: <inventory>, includedObjFieldName: <inventoryDetails>,
+                    // includedObjFields: <[product_id, qty, is_in_stock]> }...]
+                    const sumParam: object = deepCopyMagentoSourceConfig.url[0]['sumParam'];
+                    const sumOffset: number = deepCopyMagentoSourceConfig.url[0]['offset'] !== undefined
+                      ? deepCopyMagentoSourceConfig.url[0]['offset'] : 1;
+                    const sumOffsetObjLst: any[] = storedResult[i - sumOffset];
+                    const returnLst: object[] = [];
+                    if (!Array.isArray(sumOffsetObjLst))
+                    {
+                      winston.warn('Previous stored element is not an array.');
+                    }
+                    if (deepCopyMagentoSourceConfig.url[0]['primaryKey'] === undefined
+                      || deepCopyMagentoSourceConfig.url[0]['sumParam'] === undefined)
+                    {
+                      winston.warn('Requires primaryKey and an array of sum params');
+                    }
+                    try
+                    {
+                      sumOffsetObjLst.forEach((offsetObj) =>
+                      {
+                        if (sumOffsetObjDict[offsetObj[sumPrimaryKey]] !== undefined)
+                        {
+                          // already exists
+                          sumOffsetObjDict[offsetObj[sumPrimaryKey]].push(offsetObj);
+                        }
+                        else
+                        {
+                          sumOffsetObjDict[offsetObj[sumPrimaryKey]] = [].concat(offsetObj);
+                        }
+                      });
+
+                      Object.keys(sumOffsetObjDict).forEach((offsetObjKey) =>
+                      {
+                        const offsetObjArr: object[] = sumOffsetObjDict[offsetObjKey];
+                        const includedObjs: object[] = [];
+                        let sumCount: number = 0.0;
+                        offsetObjArr.forEach((offsetObjElem) =>
+                        {
+                          sumCount += typeof offsetObjElem[sumParam['field']] === 'number'
+                            ? offsetObjElem[sumParam['field']]
+                            : parseInt(offsetObjElem[sumParam['field']], 10);
+                          includedObjs.push(_.pick(offsetObjElem, sumParam['includedObjFields']));
+                        });
+                        const fullOffsetObj: object = {};
+                        fullOffsetObj[sumPrimaryKey] = offsetObjKey;
+                        fullOffsetObj[sumParam['newFieldName']] = sumCount;
+                        fullOffsetObj[sumParam['includedObjFieldName']] = includedObjs;
+                        returnLst.push(fullOffsetObj);
+                      });
+                      storedResult.push(returnLst);
+                    }
+                    catch (e)
+                    {
+                      winston.warn((e as any).toString() as string);
+                    }
+                    break;
                   case 'trim':
                     // magentoSourceConfig.data
                     result = await this._runSoapOperation(deepCopyMagentoSourceConfig, soapCreds, options) as object[];
@@ -180,73 +349,6 @@ export class Magento
                     deepCopyMagentoSourceConfig.url = [magentoSourceConfig.url[i]];
                     deepCopyMagentoSourceConfig.data = excludedProducts;
                     result = await this._runSoapOperation(deepCopyMagentoSourceConfig, soapCreds, options) as object[];
-                    break;
-                  case 'aggregate':
-                    // look at the previous 2 elements in storedResult and add a new field
-                    // params: primaryKey (field to aggregate on, is a RegExp string), aggParams (array of keys to merge)
-                    // dump #2 into a dictionary with the primary key as the key and the value as the object
-                    deepCopyMagentoSourceConfig.url = [magentoSourceConfig.url[i]];
-                    let firstObjDict: object = {};
-                    const secondObjDict: object = {};
-                    const aggregatedObjDict: object = {};
-                    const aggPrimaryKey: string = deepCopyMagentoSourceConfig.url[0]['primaryKey'];
-                    const aggParams: string[] = deepCopyMagentoSourceConfig.url[0]['aggParams'];
-                    const offset: number[] = deepCopyMagentoSourceConfig.url[0]['offset'] !== undefined
-                      ? deepCopyMagentoSourceConfig.url[0]['offset'] : [1, 2];
-                    const primaryKeyRegexStr: string = deepCopyMagentoSourceConfig.url[0]['primaryKeyRegex']
-                      !== undefined ? deepCopyMagentoSourceConfig.url[0]['primaryKeyRegex'] : '.*$';
-                    const secondObjLst: any[] = storedResult[i - offset[0]];
-                    if (!Array.isArray(secondObjLst))
-                    {
-                      winston.warn('Previous stored element is not an array.');
-                    }
-                    if (deepCopyMagentoSourceConfig.url[0]['primaryKey'] === undefined
-                      || !Array.isArray(deepCopyMagentoSourceConfig.url[0]['aggParams']))
-                    {
-                      winston.warn('Requires primaryKey and an array of aggregation params');
-                    }
-                    try
-                    {
-                      if (Array.isArray(storedResult[i - offset[1]]))
-                      {
-                        storedResult[i - offset[1]].forEach((firstObjObj) =>
-                        {
-                          firstObjDict[firstObjObj[aggPrimaryKey]] = firstObjObj;
-                        });
-                      }
-                      else // already in kv format
-                      {
-                        firstObjDict = storedResult[i - offset[1]];
-                      }
-                      secondObjLst.forEach((secondObj) =>
-                      {
-                        secondObjDict[secondObj[aggPrimaryKey]] = secondObj;
-                      });
-                      Object.keys(firstObjDict).forEach((firstObjDictKey) =>
-                      {
-                        const primaryKeyRegex: any = new RegExp(firstObjDictKey + primaryKeyRegexStr);
-                        const matchedKeys: string[] = Object.keys(secondObjDict).filter((secondObjDictKey)
-                          => primaryKeyRegex.test(secondObjDictKey));
-                        matchedKeys.forEach((matchedKey) =>
-                        {
-                          if (aggregatedObjDict[firstObjDictKey] === undefined)
-                          {
-                            aggregatedObjDict[firstObjDictKey] = this._upsertParams(firstObjDict[firstObjDictKey],
-                              secondObjDict[matchedKey], aggParams);
-                          }
-                          else
-                          {
-                            aggregatedObjDict[firstObjDictKey] = this._upsertParams(aggregatedObjDict[firstObjDictKey],
-                              secondObjDict[matchedKey], aggParams);
-                          }
-                        });
-                      });
-                      storedResult.push(aggregatedObjDict);
-                    }
-                    catch (e)
-                    {
-                      winston.warn((e as any).toString() as string);
-                    }
                     break;
                   default:
                     break;
@@ -277,17 +379,29 @@ export class Magento
                     { sku: '665023' },
                   ];
                   */
+                  /*
+                  deepCopyMagentoSourceConfig.data =
+                  [
+                    { products: { item: ['5447', '5445', '5444', '5438', '5437', '5436', '5435', '5434', '5433', '5429', '5424'] } },
+                  ];
+                  deepCopyMagentoSourceConfig.mappedKeys =
+                  [
+                    { sku: '118010-731' },
+                  ];
+                  */
+
                   deepCopyMagentoSourceConfig.data = [];
                   deepCopyMagentoSourceConfig.mappedKeys = [];
                   const dataKey: string = deepCopyMagentoSourceConfig.url[0]['dataKey'];
                   const originalKey: string = deepCopyMagentoSourceConfig.url[0]['originalKey'];
                   const mappedKey: string = deepCopyMagentoSourceConfig.url[0]['mappedKey'];
+                  const useFullArray: boolean = deepCopyMagentoSourceConfig.url[0]['useFullArray'];
                   Object.keys(storedResult[i - 1]).forEach((key) =>
                   {
                     const dataObj: object = {};
                     const mappedObj: object = {};
-                    dataObj[dataKey] = Array.isArray(storedResult[i - 1][key][originalKey])
-                      ? storedResult[i - 1][key][originalKey][0] : storedResult[i - 1][key][originalKey];
+                    _.set(dataObj, dataKey, Array.isArray(storedResult[i - 1][key][originalKey]) && useFullArray !== true
+                      ? storedResult[i - 1][key][originalKey][0] : storedResult[i - 1][key][originalKey]);
                     mappedObj[mappedKey] = key;
                     deepCopyMagentoSourceConfig.data.push(dataObj);
                     deepCopyMagentoSourceConfig.mappedKeys.push(mappedObj);
@@ -313,6 +427,7 @@ export class Magento
                             break;
                           }
                           const row = res['status'][k];
+                          // console.log(row);
                           const newRow: object = {};
                           Object.keys(row).forEach((rowKey) =>
                           {
@@ -350,7 +465,46 @@ export class Magento
                           k++;
                         }
                       }
+                      else if (res['status'] !== undefined)
+                      {
+                        const row = res['status'];
+                        const newRow: object = {};
+                        Object.keys(row).forEach((rowKey) =>
+                        {
+                          if (row[rowKey] !== null
+                            && row[rowKey]['$attributes'] !== undefined
+                            && row[rowKey]['$attributes']['arrayType'] !== undefined)
+                          {
+                            // this is an array
+                            const itemArr: any[] = [];
+                            if (row[rowKey]['item'] !== undefined && Array.isArray(row[rowKey]['item']))
+                            {
+                              row[rowKey]['item'].forEach((itemElem) =>
+                              {
+                                itemArr.push(itemElem['$value']);
+                              });
+                            }
+                            newRow[rowKey] = itemArr;
+                          }
+                          else if (row[rowKey] !== null && row[rowKey] !== undefined
+                            && row[rowKey]['$value'] !== undefined)
+                          {
+                            newRow[rowKey] = row[rowKey]['$value'];
+                          }
+                        });
+                        if (res['mappedKey'] !== undefined)
+                        {
+                          const mappedKeyKey: string = res['mappedKey'][deepCopyMagentoSourceConfig.url[0]['mappedKey']];
+                          newRow[deepCopyMagentoSourceConfig.url[0]['mappedKey']] = mappedKeyKey;
+                          newResults.push(newRow);
+                        }
+                        else
+                        {
+                          newResults.push(newRow);
+                        }
+                      }
                     });
+                    // console.log(JSON.stringify(newResults, null, 2));
                     storedResult.push(newResults);
                   }
                   catch (e)
@@ -362,11 +516,30 @@ export class Magento
               i++;
               winston.info('Moving on to ' + i.toString() as string + '...');
             }
+            storedResult.forEach((sr) =>
+            {
+              if (Array.isArray(sr))
+              {
+                console.log(sr.length);
+              }
+              else
+              {
+                console.log(Object.keys(sr).length);
+              }
+            });
+
+            // Object.keys(storedResult[storedResult.length - 1]).sort().slice(0, 50).forEach((wat) =>
+            // {
+            //   console.log(JSON.stringify(storedResult[storedResult.length - 1][wat], null, 2));
+            // });
+            console.log('Finis');
+            // console.log(JSON.stringify(storedResult[storedResult.length - 1].slice(0, 50), null, 2));
             return resolve(storedResult[storedResult.length - 1]);
           }
           else
           {
-            resultStr += await this._runSoapOperation(magentoSourceConfig, soapCreds, options, resultStr) as string;
+            resultStr += await this._runSoapOperation(magentoSourceConfig, soapCreds, options) as string;
+            return resolve(resultStr);
           }
         }
         catch (e)
@@ -374,8 +547,26 @@ export class Magento
           return resolve((resultStr.toString() as string) + (((e as any).toString() as string)));
         }
       });
-      return resolve(resultStr);
     });
+  }
+
+  private _fillDefaultParams(origObj: object, aggParams: string[]): object
+  {
+    aggParams.forEach((aggParam) =>
+    {
+      if (origObj[aggParam] !== undefined) // already exists
+      {
+        if (!Array.isArray(origObj[aggParam]))
+        {
+          origObj[aggParam] = [].concat(origObj[aggParam]);
+        }
+      }
+      else // does not exist yet
+      {
+        origObj[aggParam] = null;
+      }
+    });
+    return origObj;
   }
 
   private async _runSoapOperation(magentoSourceConfig: MagentoSourceConfig, soapCreds: object,
@@ -383,7 +574,8 @@ export class Magento
   {
     return new Promise<string | object[]>(async (resolve, reject) =>
     {
-      const resultArr: Array<Promise<object>> = [];
+      const THRESHOLD: number = 30;
+      const resultArr: object[] = [];
       soap.soap.createClient(soapCreds['baseUrl'], options, async (err, client) =>
       {
         if (err)
@@ -423,7 +615,8 @@ export class Magento
                   {
                     magentoSourceConfig.data.push({});
                   }
-                  while (rowCounter < magentoSourceConfig.data.length)
+                  let callbackCounter: number = 0;
+                  while (rowCounter < magentoSourceConfig.data.length && rowCounter < THRESHOLD) // TODO: remove restriction at 10
                   {
                     let mappedKey: object;
                     if (magentoSourceConfig.mappedKeys !== undefined && Array.isArray(magentoSourceConfig.mappedKeys))
@@ -432,7 +625,6 @@ export class Magento
                     }
                     const row = magentoSourceConfig.data[rowCounter];
                     const requestArgs: object = row;
-                    const sanitizedRequestArgs = _.cloneDeep(requestArgs);
                     requestArgs['sessionId'] = sessionId;
                     if (magentoSourceConfig.updateParams !== undefined)
                     {
@@ -448,32 +640,39 @@ export class Magento
                         requestArgs[key] = row[magentoSourceConfig.mappedParams[key]];
                       });
                     }
-                    resultArr.push(new Promise<object>((thisResolve, thisReject) =>
+
+                    winston.info('Request: ' + JSON.stringify(requestArgs));
+                    limiter.submit(method, requestArgs, (error, result, envelope, soapHeader) =>
                     {
-                      winston.info('Request: ' + JSON.stringify(requestArgs));
-                      method(requestArgs, (error, result, envelope, soapHeader) =>
+                      winston.info('In callback GET ' + (callbackCounter.toString() as string)
+                        + ' with request ' + JSON.stringify(requestArgs));
+                      const sanitizedRequestArgs = _.cloneDeep(requestArgs);
+                      delete sanitizedRequestArgs['sessionId'];
+                      if (error)
                       {
-                        if (error)
+                        resultArr.push({
+                          args: sanitizedRequestArgs, status: 'false',
+                          error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
+                        });
+                      }
+                      else
+                      {
+                        if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
                         {
-                          thisResolve({
-                            args: sanitizedRequestArgs, status: 'false',
-                            error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
-                          });
+                          const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
+                          resultArr.push({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
                         }
                         else
                         {
-                          if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
-                          {
-                            const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
-                            thisResolve({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
-                          }
-                          else
-                          {
-                            thisResolve({ args: sanitizedRequestArgs, status: result });
-                          }
+                          resultArr.push({ args: sanitizedRequestArgs, status: result });
                         }
-                      });
-                    }));
+                      }
+                      if (callbackCounter >= THRESHOLD - 1 || callbackCounter >= magentoSourceConfig.data.length - 1) // TODO remove 10
+                      {
+                        return resolve(resultArr);
+                      }
+                      callbackCounter++;
+                    });
                     rowCounter++;
                   }
                 }
@@ -486,7 +685,8 @@ export class Magento
               {
                 let j: number = 0;
                 // while (j < magentoSourceConfig.data.length)
-                while (j < 3)
+                let callbackCounter: number = 0;
+                while (j < THRESHOLD) // TODO THRESHOLD
                 {
                   const row = magentoSourceConfig.data[j];
                   let mappedKey: object;
@@ -507,36 +707,39 @@ export class Magento
                     });
                     const sanitizedRequestArgs = _.cloneDeep(requestArgs);
                     requestArgs['sessionId'] = sessionId;
-                    resultArr.push(new Promise<object>((thisResolve, thisReject) =>
+                    limiter.submit(method, requestArgs, (error, result, envelope, soapHeader) =>
                     {
-                      method(requestArgs, (error, result, envelope, soapHeader) =>
+                      winston.info('In callback POST ' + (callbackCounter.toString() as string)
+                        + ' with request ' + JSON.stringify(requestArgs));
+                      if (error)
                       {
-                        // console.log('Response: ' + JSON.stringify(result, null, 2));
-                        if (error)
+                        resultArr.push({
+                          args: sanitizedRequestArgs, status: 'false',
+                          error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
+                        });
+                      }
+                      else
+                      {
+                        if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
                         {
-                          thisResolve({
-                            args: sanitizedRequestArgs, status: 'false',
-                            error: _.get(error, 'root.Envelope.Body.Fault.faultstring'),
-                          });
+                          const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
+                          resultArr.push({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
+                        }
+                        else if (result && result['result'] !== undefined)
+                        {
+                          resultArr.push({ args: sanitizedRequestArgs, status: result['result']['$value'] });
                         }
                         else
                         {
-                          if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
-                          {
-                            const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
-                            thisResolve({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
-                          }
-                          else if (result && result['result'] !== undefined)
-                          {
-                            thisResolve({ args: sanitizedRequestArgs, status: result['result']['$value'] });
-                          }
-                          else
-                          {
-                            thisResolve({ args: sanitizedRequestArgs, status: 'true' });
-                          }
+                          resultArr.push({ args: sanitizedRequestArgs, status: 'true' });
                         }
-                      });
-                    }));
+                      }
+                      if (callbackCounter >= THRESHOLD - 1 || callbackCounter >= magentoSourceConfig.data.length - 1)
+                      {
+                        return resolve(resultArr);
+                      }
+                      callbackCounter++;
+                    });
                   }
                   catch (e)
                   {
@@ -546,9 +749,8 @@ export class Magento
                 }
               }
             }
-            const resultObj: object[] = await Promise.all(resultArr);
+            // const resultObj: object[] = await Promise.all(resultArr);
             // winston.info('Result of Magento request: ' + JSON.stringify(resultObj, null, 2));
-            return resolve(resultObj);
           });
       });
     });
@@ -560,7 +762,7 @@ export class Magento
     {
       if (origObj[aggParam] !== undefined) // already exists
       {
-        if (Array.isArray(origObj[aggParams]))
+        if (Array.isArray(origObj[aggParam]))
         {
           origObj[aggParam] = origObj[aggParam].concat(objToMerge[aggParam]);
         }
@@ -571,7 +773,7 @@ export class Magento
       }
       else // does not exist yet
       {
-        origObj[aggParam] = objToMerge[aggParam];
+        origObj[aggParam] = objToMerge[aggParam] !== undefined ? objToMerge[aggParam] : null;
       }
     });
     return origObj;
