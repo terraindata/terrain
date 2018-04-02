@@ -48,7 +48,7 @@ import * as stream from 'stream';
 
 import { GoogleAnalyticsConfig, GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
 import { Magento, MagentoSourceConfig } from './Magento';
-import { Mailchimp, MailchimpSourceConfig } from './Mailchimp';
+import { Mailchimp } from './Mailchimp';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
@@ -98,11 +98,8 @@ export class Sources
         case 'mailchimp':
           result = await this._putJSONStreamIntoMailchimp(exprtSourceConfig);
           break;
-        case 'mailchimp':
-          result = await this._putJSONStreamIntoMailchimp(exprtSourceConfig);
-          break;
         default:
-          break;
+          return reject('Unsupported export type specified in handleTemplateExportSource');
       }
       return resolve(result);
     });
@@ -202,11 +199,6 @@ export class Sources
       }
       const writeStream: stream.Readable = await magento.getMagentoRowsAsCSVStream(
         await magento.runQuery(source['params'] as MagentoSourceConfig[]) as object[]);
-      // const writeStream: any = new stream.PassThrough();
-      if (typeof writeStream === 'string')
-      {
-        return resolve(writeStream);
-      }
 
       delete body['source'];
       body['filetype'] = 'json';
