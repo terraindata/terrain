@@ -59,22 +59,9 @@ export class SafeReadable extends stream.Readable
     this.on('error', this.emit);
   }
 
-  public _destroy(error: Error, callback: any)
-  {
-    this._final(callback);
-  }
-
-  public _final(callback: any)
-  {
-    if (callback !== undefined)
-    {
-      callback();
-    }
-  }
-
   public safeCallback(callback: (error?: Error, response?: any) => void)
   {
-    return ((error: Error, response: any) =>
+    return ((error?: Error, response?: any) =>
     {
       if (error !== null && error !== undefined)
       {
