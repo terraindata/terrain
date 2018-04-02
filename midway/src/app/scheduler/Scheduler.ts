@@ -242,6 +242,16 @@ export class Scheduler
         jobId = 11;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
+      else if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'mailchimp')
+      {
+        jobId = 12;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'mailchimp')
+      {
+        jobId = 13;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
 
       req.active = true;
       req.archived = false;
@@ -322,6 +332,8 @@ export class Scheduler
     // 9: export via spreadsheets (not implemented yet)
     // 10: import via analytics
     // 11: export via analytics (not implemented yet)
+    // 12: import via mailchimp
+    // 13: export via mailchimp
     await this.createJob(async (scheduleID: number, fields: object, // 0
       transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
@@ -918,6 +930,69 @@ export class Scheduler
       {
         // TODO add this after adding Google analytics as an ETL source
         resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 12
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // import from mailchimp
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        // TODO add this after adding mailchimp as an ETL source
+        resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 13
+      sort: string, encoding?: string | null) => // export to mailchimp
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        try
+        {
+          let mailchimpConfig: object = {};
+          const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
+          if (creds.length === 0)
+          {
+            return rejectJob('No Mailchimp credentials matched parameters.');
+          }
+          try
+          {
+            mailchimpConfig = JSON.parse(creds[0].meta);
+          }
+          catch (e)
+          {
+            return rejectJob(e.message);
+          }
+          await this.setJobStatus(scheduleID, 1);
+          fields['filetype'] = 'json';
+          const jsonStream: stream.Readable | string = await exprt.export(fields as ExportConfig, true);
+          if (typeof jsonStream === 'string')
+          {
+            winston.info(jsonStream as string);
+          }
+          else
+          {
+            const mailchimpArgs =
+              {
+                body: {
+                  source: {
+                    type: 'mailchimp',
+                    params: {
+                      ...mailchimpConfig,
+                    },
+                  },
+                },
+              };
+            const result = await sources.handleTemplateExportSource(mailchimpArgs, jsonStream as stream.Readable);
+          }
+        }
+        catch (e)
+        {
+          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob(e.toString());
+        }
       });
     });
   }

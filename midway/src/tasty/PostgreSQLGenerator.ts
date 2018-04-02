@@ -174,7 +174,7 @@ export default class SQLGenerator
     }
 
     // write FROM clause
-    this.newLine();
+    // this.newLine();
     this.queryString += 'FROM ';
     this.queryString += this.escapeString(query.table.getTableName());
 

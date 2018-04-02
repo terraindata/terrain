@@ -291,6 +291,8 @@ export function nameForStatus(status: ItemStatus): string
       return 'Build';
     case ItemStatus.Live:
       return 'Live';
+    case ItemStatus.Deployed:
+      return 'Deployed';
     case ItemStatus.Default:
       return 'Default';
     default:
@@ -309,6 +311,8 @@ export function colorForStatus(status: ItemStatus): string
     case ItemStatus.Build:
       return '#00a7f7';
     case ItemStatus.Live:
+      return '#48b14b';
+    case ItemStatus.Deployed:
       return '#48b14b';
     case ItemStatus.Default:
       return '#957048';

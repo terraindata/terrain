@@ -44,66 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+import ConfigType from '../ConfigType';
 
-import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
-
-export interface Props
+export class StatusHistoryConfig extends ConfigType
 {
-  open: boolean;
-  children?: any;
-  dontUnmount?: boolean;
-}
+  public createdAt?: string = undefined;
+  public userId: number = -1;
+  public id?: number = undefined;
+  public algorithmId: number = -1;
+  public fromStatus: string = '';
+  public toStatus: string = '';
 
-class FadeInOut extends TerrainComponent<Props>
-{
-  public renderChildren()
+  constructor(props: object)
   {
-    if (this.props.dontUnmount)
-    {
-      return (
-        <div
-          style={!this.props.open ? { opacity: 0, zIndex: -10, height: 0 } : {}}
-        >
-          {this.props.children}
-        </div>;
-      )
-    }
-    if (this.props.open)
-    {
-      return this.props.children;
-    }
-    return null;
-  }
-  public render()
-  {
-    return (
-      <VelocityComponent
-        animation={{
-          opacity: this.props.open ? 1 : 0,
-          // translateY: this.props.open ? 0 : 20,
-        }}
-        duration={250}
-      >
-        <div>
-          <VelocityTransitionGroup
-            enter={
-              { animation: 'slideDown', duration: 250, easing: 'easeOut' }
-            }
-            leave={
-              { animation: 'slideUp', duration: 250, easing: 'easeOut' }
-            }
-          >
-            {
-              this.renderChildren()
-            }
-          </VelocityTransitionGroup>
-        </div>
-      </VelocityComponent>
-    );
+    super();
+    ConfigType.initialize(this, props);
   }
 }
 
-export default FadeInOut;
+export default StatusHistoryConfig;

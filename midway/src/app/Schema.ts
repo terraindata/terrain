@@ -143,6 +143,13 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      numberOfRuns integer NOT NULL,
      scheduleId integer NOT NULL,
      status text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS statusHistory
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     userId integer NOT NULL,
+     algorithmId integer NOT NULL,
+     fromStatus text NOT NULL,
+     toStatus text NOT NULL); `,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)

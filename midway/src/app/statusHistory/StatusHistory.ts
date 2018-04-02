@@ -44,66 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import UserConfig from '../users/UserConfig';
+import StatusHistoryConfig from './StatusHistoryConfig';
 
-import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
-
-export interface Props
+export class StatusHistory
 {
-  open: boolean;
-  children?: any;
-  dontUnmount?: boolean;
-}
+  private statusHistoryTable: Tasty.Table;
 
-class FadeInOut extends TerrainComponent<Props>
-{
-  public renderChildren()
+  constructor()
   {
-    if (this.props.dontUnmount)
-    {
-      return (
-        <div
-          style={!this.props.open ? { opacity: 0, zIndex: -10, height: 0 } : {}}
-        >
-          {this.props.children}
-        </div>;
-      )
-    }
-    if (this.props.open)
-    {
-      return this.props.children;
-    }
-    return null;
-  }
-  public render()
-  {
-    return (
-      <VelocityComponent
-        animation={{
-          opacity: this.props.open ? 1 : 0,
-          // translateY: this.props.open ? 0 : 20,
-        }}
-        duration={250}
-      >
-        <div>
-          <VelocityTransitionGroup
-            enter={
-              { animation: 'slideDown', duration: 250, easing: 'easeOut' }
-            }
-            leave={
-              { animation: 'slideUp', duration: 250, easing: 'easeOut' }
-            }
-          >
-            {
-              this.renderChildren()
-            }
-          </VelocityTransitionGroup>
-        </div>
-      </VelocityComponent>
+    this.statusHistoryTable = new Tasty.Table(
+      'statusHistory',
+      ['id'],
+      [
+        'createdAt',
+        'userId',
+        'algorithmId',
+        'fromStatus',
+        'toStatus',
+      ],
     );
   }
+
+  public async create(user: UserConfig, id: number, obj: object, newStatus: string): Promise<StatusHistoryConfig>
+  {
+    if (user.id === undefined)
+    {
+      throw new Error('User ID unknown');
+    }
+    // can only insert
+    const newVersion: StatusHistoryConfig =
+      {
+        userId: user.id,
+        algorithmId: id,
+        fromStatus: obj['status'],
+        toStatus: newStatus,
+      };
+    return App.DB.upsert(this.statusHistoryTable, newVersion) as Promise<StatusHistoryConfig>;
+  }
 }
 
-export default FadeInOut;
+export default StatusHistory;
