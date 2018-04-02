@@ -157,7 +157,7 @@ test('elastic stream (buffer transform)', async (done) =>
     const bufferTransform = new BufferTransform(stream,
       (err, response) =>
       {
-        expect(err).toBeUndefined();
+        expect(err).toBeFalsy();
         expect(response).toBeDefined();
         expect(response[0]['hits']).toBeDefined();
         const results = response[0]['hits'].hits;

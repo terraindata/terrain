@@ -91,8 +91,10 @@ export class App
   private static uncaughtExceptionHandler(err: Error): void
   {
     winston.error('Uncaught Exception: ' + err.toString());
-    // this is a good place to clean tangled resources
-    process.abort();
+    if (err.stack !== undefined)
+    {
+      winston.error(err.stack);
+    }
   }
 
   private static unhandledRejectionHandler(err: Error): void
@@ -122,12 +124,6 @@ export class App
     this.app = new Koa();
     this.app.proxy = true;
     this.app.keys = [srs({ length: 256 })];
-    this.app.use(async (ctx, next) =>
-    {
-      // tslint:disable-next-line:no-empty
-      ctx.req.setTimeout(0, () => { });
-      await next();
-    });
 
     this.app.use(async (ctx, next) =>
     {
@@ -150,7 +146,8 @@ export class App
       try
       {
         await next();
-      } catch (e)
+      }
+      catch (e)
       {
         err = e;
         appStats.numRequestsThatThrew++;
@@ -225,7 +222,7 @@ export class App
     const dbs = await databases.select(['id'], {});
     for (const db of dbs)
     {
-      await databases.connect({} as any, db.id);
+      await databases.connect({} as any, db.id as number);
 
       if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
       {

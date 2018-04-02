@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Deque from 'double-ended-queue';
-import { Readable } from 'stream';
 
 import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
@@ -53,6 +52,7 @@ import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONPa
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
 import BufferedElasticStream from './BufferedElasticStream';
+import SafeReadable from './SafeReadable';
 
 interface Ticket
 {
@@ -63,7 +63,7 @@ interface Ticket
 /**
  * Applies a group join to an output stream
  */
-export default class GroupJoinTransform extends Readable
+export default class GroupJoinTransform extends SafeReadable
 {
   private client: ElasticClient;
   private source: BufferedElasticStream;
@@ -86,50 +86,56 @@ export default class GroupJoinTransform extends Readable
 
     this.client = client;
 
-    const parser = new ESJSONParser(queryStr, true);
-    if (parser.hasError())
+    try
     {
-      throw parser.getErrors();
-    }
-
-    const query = parser.getValue();
-    const groupJoinQuery = query['groupJoin'];
-    delete query['groupJoin'];
-
-    // read groupJoin options from the query
-    if (groupJoinQuery['dropIfLessThan'] !== undefined)
-    {
-      this.dropIfLessThan = groupJoinQuery['dropIfLessThan'];
-      delete groupJoinQuery['dropIfLessThan'];
-    }
-
-    if (groupJoinQuery['parentAlias'] !== undefined)
-    {
-      this.parentAlias = groupJoinQuery['parentAlias'];
-      delete groupJoinQuery['parentAlias'];
-    }
-
-    this.query = groupJoinQuery;
-    for (const k of Object.keys(groupJoinQuery))
-    {
-      const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
-      if (valueInfo !== null)
+      const parser = new ESJSONParser(queryStr, true);
+      if (parser.hasError())
       {
-        this.subqueryValueInfos[k] = valueInfo.objectChildren[k].propertyValue;
+        throw parser.getErrors();
       }
-    }
 
-    this.maxBufferedOutputs = this.maxPendingQueries;
-    this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
+      const query = parser.getValue();
+      const groupJoinQuery = query['groupJoin'];
+      delete query['groupJoin'];
 
-    this.source = new BufferedElasticStream(client, query, ((responses) =>
-    {
-      for (const r of responses)
+      // read groupJoin options from the query
+      if (groupJoinQuery['dropIfLessThan'] !== undefined)
       {
-        this.dispatchSubqueryBlock(r);
+        this.dropIfLessThan = groupJoinQuery['dropIfLessThan'];
+        delete groupJoinQuery['dropIfLessThan'];
       }
-    }).bind(this));
 
+      if (groupJoinQuery['parentAlias'] !== undefined)
+      {
+        this.parentAlias = groupJoinQuery['parentAlias'];
+        delete groupJoinQuery['parentAlias'];
+      }
+
+      this.query = groupJoinQuery;
+      for (const k of Object.keys(groupJoinQuery))
+      {
+        const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
+        if (valueInfo !== null)
+        {
+          this.subqueryValueInfos[k] = valueInfo.objectChildren[k].propertyValue;
+        }
+      }
+
+      this.maxBufferedOutputs = this.maxPendingQueries;
+      this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
+
+      this.source = new BufferedElasticStream(client, query, (responses) =>
+      {
+        for (const r of responses)
+        {
+          this.dispatchSubqueryBlock(r);
+        }
+      });
+    }
+    catch (e)
+    {
+      throw e;
+    }
   }
 
   public _read(size: number = 1024)
