@@ -82,7 +82,6 @@ export default class BufferTransform
     this.stream.on('data', (doc) => this.arr.push(doc));
     this.stream.on('end', () => callback(null, this.arr));
     this.stream.on('error', callback);
-    this.stream.on('close', callback);
   }
 
   private onEvent(err: any): void
