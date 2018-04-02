@@ -696,3 +696,29 @@ test('delete a field that has transformations', () =>
   };
   expect(e.transform(doc)).toEqual({ bar: 'yo' });
 });
+
+test('cast on a field inside a nested object inside an array', () =>
+{
+  const e = new TransformationEngine();
+  e.addField(List(['foo']), 'array', { valueType: 'object' });
+  e.addField(List(['foo', '*']), 'array', { valueType: 'object' });
+  const id3 = e.addField(List(['foo', '*', 'bar']), 'string');
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List([e.getInputKeyPath(id3)]),
+    {
+      toTypename: 'string',
+    },
+  );
+  const doc = {
+    foo: [
+      {
+        bar: 'hello',
+      },
+      {
+        bar: 'hey there',
+      },
+    ],
+  };
+  expect(e.transform(doc)).toEqual(doc);
+});

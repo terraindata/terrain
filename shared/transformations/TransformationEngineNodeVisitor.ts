@@ -390,60 +390,92 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.CastNode>;
 
-    node.fields.forEach((field) =>
+    node.fields.forEach((field: KeyPath) =>
     {
-      const el: any = yadeep.get(doc, field);
-      if (typeof el === opts.toTypename || el.constructor === Array && opts.toTypename === 'array')
+      const originalElement: any = yadeep.get(doc, field);
+
+      if (typeof originalElement === opts.toTypename || originalElement.constructor === Array && opts.toTypename === 'array')
       {
         return;
       }
 
-      switch (opts.toTypename)
+      let newFields: KeyPath[] = [field];
+
+      if (Array.isArray(originalElement))
       {
-        case 'string': {
-          if (typeof el === 'object')
+        newFields = [];
+        for (let i: number = 0; i < originalElement.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
           {
-            yadeep.set(doc, field, JSON.stringify(el));
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
           }
           else
           {
-            yadeep.set(doc, field, el.toString());
+            kpi = kpi.push(i.toString());
           }
-          break;
-        }
-        case 'number': {
-          yadeep.set(doc, field, Number(el));
-          break;
-        }
-        case 'boolean': {
-          if (typeof el === 'string')
-          {
-            yadeep.set(doc, field, el.toLowerCase() === 'true');
-          }
-          else
-          {
-            yadeep.set(doc, field, Boolean(el));
-          }
-          break;
-        }
-        case 'object': {
-          yadeep.set(doc, field, {});
-          break;
-        }
-        case 'array': {
-          yadeep.set(doc, field, []);
-          break;
-        }
-        default: {
-          return {
-            errors: [
-              {
-                message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
-              } as TransformationVisitError,
-            ],
-          } as TransformationVisitResult;
+          newFields.push(kpi);
         }
       }
+
+      newFields.forEach((f: KeyPath) =>
+      {
+        const el: any = yadeep.get(doc, f);
+
+        if (typeof el === opts.toTypename || el.constructor === Array && opts.toTypename === 'array')
+        {
+          return;
+        }
+
+        switch (opts.toTypename)
+        {
+          case 'string': {
+            if (typeof el === 'object')
+            {
+              yadeep.set(doc, f, JSON.stringify(el));
+            }
+            else
+            {
+              yadeep.set(doc, f, el.toString());
+            }
+            break;
+          }
+          case 'number': {
+            yadeep.set(doc, f, Number(el));
+            break;
+          }
+          case 'boolean': {
+            if (typeof el === 'string')
+            {
+              yadeep.set(doc, f, el.toLowerCase() === 'true');
+            }
+            else
+            {
+              yadeep.set(doc, f, Boolean(el));
+            }
+            break;
+          }
+          case 'object': {
+            yadeep.set(doc, f, {});
+            break;
+          }
+          case 'array': {
+            yadeep.set(doc, f, []);
+            break;
+          }
+          default: {
+            return {
+              errors: [
+                {
+                  message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
+                } as TransformationVisitError,
+              ],
+            } as TransformationVisitResult;
+          }
+        }
+
+      });
     });
 
     return {
