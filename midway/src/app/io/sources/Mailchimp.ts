@@ -60,6 +60,7 @@ export interface MailchimpSourceConfig
   data: object[];
   key: string;
   host: string;
+  listID: string;
 }
 
 export class Mailchimp
@@ -83,6 +84,7 @@ export class Mailchimp
               data: results,
               key: exportSourceConfig.params['key'],
               host: exportSourceConfig.params['host'],
+              listID: exportSourceConfig.params['listID'],
             };
           this.runQuery(mailchimpSourceConfig).then(() =>
           {
@@ -91,6 +93,7 @@ export class Mailchimp
           {
             reject(`Mailchimp export failed in runQuery: ${e}`);
           });
+          resolve('Finished getJSONStreamAsMailchimpSourceConfig');
         });
       } catch (e)
       {
@@ -123,7 +126,7 @@ export class Mailchimp
         }
 
         // console.log('STATS: ' + mailchimpSourceConfig.data.length
-        // + ' ' + batches.length + ' ' + batches[0].length + ' ' + batches[1].length + ' ' + batches[2].length);
+        //   + ' ' + batches.length + ' ' + batches[0].length);// + ' ' + batches[1].length + ' ' + batches[2].length);
 
         batches.forEach((batch: object[]) =>
         {
@@ -132,34 +135,12 @@ export class Mailchimp
           {
             batchBody['operations'].push({
               method: 'PUT',
-              path: 'lists/' + '245b9c19d8' // TODO don't hardcode list ID!
-                + '/members/'
-                + crypto.createHash('md5').update(row['parentEmail']).digest('hex').toString(),
+              path: 'lists/' + mailchimpSourceConfig.listID + '/members/'
+                + crypto.createHash('md5').update(row['EMAIL']).digest('hex').toString(),
               body: JSON.stringify({
-                email_address: row['parentEmail'],
+                email_address: row['EMAIL'],
                 status_if_new: 'subscribed',
-                merge_fields: {
-                  'EMAIL': row['parentEmail'],
-                  'UID': row['parentId'],
-                  'SIGNUPDATE': row['parentCreatedAt'],
-                  'PARENTLOC': row['parentLoc'],
-                  '1SITNAME': row['FirstSitterFormattedName'],
-                  '1SITID': row['FirstID'],
-                  '1SITSAT': row['FirstSatForParent'],
-                  '1DISTANCE': row['FirstDistance'],
-                  '1NUMJOBS': row['FirstNumJobs'],
-                  '2SITNAME': row['SecondSitterFormattedName'],
-                  '2SITID': row['SecondID'],
-                  '2SITSAT': row['SecondSatForParent'],
-                  '2DISTANCE': row['SecondDistance'],
-                  '2NUMJOBS': row['SecondNumJobs'],
-                  '3SITNAME': row['ThirdSitterFormattedName'],
-                  '3SITID': row['ThirdID'],
-                  '3SITSAT': row['ThirdSatForParent'],
-                  '3DISTANCE': row['ThirdDistance'],
-                  '3NUMJOBS': row['ThirdNumJobs'],
-                  'MMERGE25': row['dateNightDate'],
-                },
+                merge_fields: row,
               }),
             });
           });
@@ -176,7 +157,7 @@ export class Mailchimp
             json: batchBody,
           }, (error, response, body) =>
             {
-              winston.info('Mailchimp response: ' + JSON.stringify(response));
+              winston.debug('Mailchimp response: ' + JSON.stringify(response));
               const batchid: string = response['body']['id'];
               setTimeout(() =>
               {
@@ -188,7 +169,7 @@ export class Mailchimp
                   },
                 }, (e2, r2, b2) =>
                   {
-                    winston.info('Mailchimp response 2: ' + JSON.stringify(r2));
+                    winston.debug('Mailchimp response 2: ' + JSON.stringify(r2));
                   });
               }, 60000);
             });
@@ -200,7 +181,7 @@ export class Mailchimp
       }
       catch (e)
       {
-        resolve((e as any).toString());
+        reject((e as any).toString());
       }
     });
   }
