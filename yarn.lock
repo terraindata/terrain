@@ -5649,6 +5649,15 @@ kcors@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/kcors/-/kcors-2.2.1.tgz#7160a94f2eae633436d2cef8eadd0ce232386779"
 
+keccak@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/keccak/-/keccak-1.4.0.tgz#572f8a6dbee8e7b3aa421550f9e6408ca2186f80"
+  dependencies:
+    bindings "^1.2.1"
+    inherits "^2.0.3"
+    nan "^2.2.1"
+    safe-buffer "^5.1.0"
+
 keygrip@~1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/keygrip/-/keygrip-1.0.2.tgz#ad3297c557069dea8bcfe7a4fa491b75c5ddeb91"
@@ -6371,6 +6380,10 @@ nan@2.6.2:
 nan@>=2.5.1, nan@^2.3.0, nan@^2.3.3:
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.9.2.tgz#f564d75f5f8f36a6d9456cca7a6c4fe488ab7866"
+
+nan@^2.2.1:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
 
 nan@~2.7.0:
   version "2.7.0"

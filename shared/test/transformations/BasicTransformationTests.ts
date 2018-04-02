@@ -730,3 +730,20 @@ test('hash transformation', () =>
   e.appendTransformation(TransformationNodeType.HashNode, List([List(['email'])]));
   expect(e.transform(doc)).toEqual({ email: 'e93ab880bff504138a6bf08b1519bdd34d1d30f16dce9a0fba4bd460ae832797' });
 });
+
+test('array sum transformation', () =>
+{
+  const doc = {
+    foo: [1, 2, 3, 4],
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.ArraySumNode,
+    List<KeyPath>([KeyPath(['foo'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['foosum'])]),
+    });
+  const r = e.transform(doc);
+  expect(r['foosum']).toBe(10);
+});

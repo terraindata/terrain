@@ -543,4 +543,46 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       document: doc,
     } as TransformationVisitResult;
   }
+
+  public visitArraySumNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.ArraySumNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        let sum: number = 0;
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          sum += yadeep.get(doc, kpi);
+        }
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to sum a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
 }
