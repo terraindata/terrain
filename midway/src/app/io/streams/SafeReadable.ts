@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import { Readable, ReadableOptions } from 'stream';
 
 /**
  * A safe readable stream wrapper
  */
-export class SafeReadable extends stream.Readable
+export class SafeReadable extends Readable
 {
-  constructor(opts?: stream.ReadableOptions)
+  constructor(opts?: ReadableOptions)
   {
     super(opts);
 

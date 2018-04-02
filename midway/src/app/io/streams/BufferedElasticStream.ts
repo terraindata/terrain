@@ -44,28 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
 import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
+import SafeReadable from './SafeReadable';
 
 /**
  * A buffered ElasticStream source
  */
-export default class BufferedElasticStream extends Readable
+export default class BufferedElasticStream extends SafeReadable
 {
   public maxBufferSize: number = 8;
   public buffer: object[] = [];
 
   private query: any;
-  private stream: Readable;
+  private stream: SafeReadable;
 
   private _shouldContinue: boolean = true;
   private _isSourceEmpty: boolean = false;
 
   private _onBufferFull: (buffer: object[]) => void;
   private _onRead: () => void;
-  private _onError: () => void;
+  private _onError: (e: any) => void;
   private _onEnd: () => void;
 
   constructor(client: ElasticClient, query: any, onBufferFull: (buffer: object[]) => void, size: number = 8)
@@ -80,7 +79,7 @@ export default class BufferedElasticStream extends Readable
 
     this._onBufferFull = onBufferFull;
     this._onRead = this.readStream.bind(this);
-    this._onError = ((e) => this.emit('error', e)).bind(this);
+    this._onError = (e) => this.emit('error', e);
     this._onEnd = this._final.bind(this);
 
     this.stream.on('readable', this._onRead);
