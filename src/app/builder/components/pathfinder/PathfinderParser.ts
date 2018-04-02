@@ -305,7 +305,10 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
 
 function groupNestedFilters(filterGroup: FilterGroup): FilterGroup
 {
-  const nestedLines = filterGroup.lines.filter((line) => line.field && line.field.indexOf('.') !== -1).toList();
+  const nestedLines = filterGroup.lines.filter((line) =>
+  {
+    return line.field && line.field.indexOf('.') !== -1 && line.comparison !== 'notexists';
+  }).toList();
   let nestedPathMap: Map<string, List<FilterLine>> = Map({});
   nestedLines.forEach((line) =>
   {
@@ -363,7 +366,20 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   }
   filterGroup.lines.forEach((line) =>
   {
-    if ((!line.filterGroup && line.comparison) || List.isList(line))
+    // Special case for a nested filter that is do not exist
+    if (line.field && line.field.indexOf('.') !== -1 && line.comparison === 'notexists')
+    {
+      const inner = parseFilterLine(List([line.set('comparison', 'exists')]), useShould, inputs, ignoreNested);
+      if (useShould)
+      {
+        should = should.push(Map({ bool: Map({ must_not: inner }) }));
+      }
+      else
+      {
+        mustNot = mustNot.push(inner);
+      }
+    }
+    else if ((!line.filterGroup && line.comparison) || List.isList(line))
     {
       const lineInfo = parseFilterLine(line, useShould, inputs, ignoreNested);
 
@@ -421,8 +437,9 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   return filterObj;
 }
 
-function parseFilterLine(line: FilterLine, useShould: boolean, inputs, ignoreNested = false)
+function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean, inputs, ignoreNested = false)
 {
+  line = line as FilterLine;
   const lineValue = String(line.value);
   let value: any = String(line.value || '');
   const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
