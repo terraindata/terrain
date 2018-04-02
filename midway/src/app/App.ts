@@ -146,7 +146,8 @@ export class App
       try
       {
         await next();
-      } catch (e)
+      }
+      catch (e)
       {
         err = e;
         appStats.numRequestsThatThrew++;
@@ -221,7 +222,7 @@ export class App
     const dbs = await databases.select(['id'], {});
     for (const db of dbs)
     {
-      await databases.connect({} as any, db.id);
+      await databases.connect({} as any, db.id as number);
 
       if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
       {
