@@ -657,3 +657,25 @@ test('split a nested field', () =>
     },
   );
 });
+
+test('cast array to array should be no-op', () =>
+{
+  const doc = {
+    foo: [
+      { bar: 'Apples and Oranges' },
+      { bar: 'Milk and Cookies' },
+    ],
+  };
+
+  const e = new TransformationEngine(doc);
+
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List([List(['foo'])]),
+    {
+      toTypename: 'array',
+    },
+  );
+
+  expect(e.transform(doc)).toEqual(doc);
+});
