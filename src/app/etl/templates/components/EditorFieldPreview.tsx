@@ -65,6 +65,8 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import './TemplateEditorField.less';
 
+const KeyIcon = require('images/icon_key-2.svg');
+
 export interface Props extends TemplateEditorFieldProps
 {
   toggleOpen?: () => void;
@@ -167,6 +169,17 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             >
               {labelOverride != null ? labelOverride : field.name}
             </div>
+            {
+              this._isPrimaryKey() ?
+                <div
+                  className='primary-key-icon'
+                  style={fontColor(Colors().active)}
+                >
+                  <KeyIcon />
+                </div>
+                :
+                null
+            }
             <div
               className={classNames({
                 'field-preview-menu': true,

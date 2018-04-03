@@ -96,7 +96,7 @@ class ETLEdgeC implements ETLEdgeI
   public id: number = -1;
   public from: number = -1;
   public to: number = -1;
-  public transformations: TransformationEngine = new TransformationEngine();
+  public transformations: TransformationEngine = null;
 }
 export type ETLEdge = WithIRecord<ETLEdgeC>;
 export const _ETLEdge = makeExtendedConstructor(ETLEdgeC, true, {

@@ -112,7 +112,11 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   {
     if (node == null)
     {
-      return null;
+      return (
+        <div className='edge-component-spacing'>
+          N/A
+        </div>
+      );
     }
 
     const { template } = this.props.templateEditor;
@@ -140,7 +144,7 @@ class ETLEdgeComponent extends TerrainComponent<Props>
   public renderBetween()
   {
     return (
-      <div className='edge-component-spacing'>
+      <div className='edge-component-spacing-small'>
         to
       </div>
     );
