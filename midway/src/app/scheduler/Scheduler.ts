@@ -52,7 +52,6 @@ import * as App from '../App';
 import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
 import { Sources } from '../io/sources/Sources';
-import UserConfig from '../users/UserConfig';
 import { Job } from './Job';
 import SchedulerConfig from './SchedulerConfig';
 import { TaskConfig, TaskOutputConfig } from './TaskConfig';
@@ -103,18 +102,37 @@ export class Scheduler
     return false;
   }
 
-  public async delete(user: UserConfig, scheduleId: number): Promise<SchedulerConfig[] | string>
+  public async delete(id: number): Promise<SchedulerConfig[] | string>
   {
-    if (user.isSuperUser === false)
+    return App.DB.delete(this.schedulerTable, [id]) as Promise<SchedulerConfig[]>;
+  }
+
+  public async duplicate(id: number): Promise<SchedulerConfig[]>
+  {
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      return Promise.resolve('User must be superuser.');
-    }
-    return App.DB.delete(this.schedulerTable, [scheduleId]) as Promise<SchedulerConfig[]>;
+      const schedules: SchedulerConfig[] = await this.get(id);
+      if (schedules.length !== 0)
+      {
+        delete schedules[0].id;
+        schedules[0].name = schedules[0].name + ' - Copy';
+        resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
+      }
+    });
   }
 
   public async get(id?: number, running?: boolean): Promise<SchedulerConfig[]>
   {
     return this._select([], { id, running });
+  }
+
+  public async getLog(id?: number): Promise<object[]>
+  {
+    return new Promise<object[]>(async (resolve, reject) =>
+    {
+      // TODO add extensive logging support
+      resolve([{}]);
+    });
   }
 
   public async runSchedule(id: number): Promise<TaskOutputConfig | string>
@@ -160,7 +178,41 @@ export class Scheduler
     });
   }
 
-  public async upsert(user: UserConfig, schedule: SchedulerConfig): Promise<SchedulerConfig[]>
+  public pause(id: number): boolean
+  {
+    if (this.runningSchedules[id] !== undefined)
+    {
+      this.runningSchedules[id].pause();
+      // TODO: unlock row
+      return true;
+    }
+    return false;
+  }
+
+  public async setStatus(id: number, status: boolean): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      if (typeof status !== 'boolean' || status === undefined)
+      {
+        return reject(false);
+      }
+      return this._setStatus(id, status);
+    });
+  }
+
+  public async unpause(id: number): Promise<boolean>
+  {
+    if (this.runningSchedules[id] !== undefined)
+    {
+      await this.runningSchedules[id].unpause();
+      // TODO: unlock row
+      return true;
+    }
+    return false;
+  }
+
+  public async upsert(schedule: SchedulerConfig): Promise<SchedulerConfig[]>
   {
     // TODO: sanitize inputs
     return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
@@ -230,14 +282,46 @@ export class Scheduler
     });
   }
 
-  private async _setRunning(id: number, running: boolean): Promise<void>
+  private async _setRunning(id: number, running: boolean): Promise<boolean>
   {
-    const schedules: SchedulerConfig[] = await this.get(id);
-    if (schedules.length !== 0)
+    return new Promise<boolean>(async (resolve, reject) =>
     {
-      schedules[0].running = running;
-      await App.DB.upsert(this.schedulerTable, schedules[0]);
-    }
+      const schedules: SchedulerConfig[] = await this.get(id);
+      if (schedules.length !== 0)
+      {
+        schedules[0].running = running;
+        const result: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[];
+        if (Array.isArray(result) && result.length > 0)
+        {
+          return resolve(true);
+        }
+        else
+        {
+          return resolve(false);
+        }
+      }
+    });
+  }
+
+  private async _setStatus(id: number, status: boolean): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      const schedules: SchedulerConfig[] = await this.get(id);
+      if (schedules.length !== 0)
+      {
+        schedules[0].shouldRunNext = status;
+        const result: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[];
+        if (Array.isArray(result) && result.length > 0)
+        {
+          return resolve(true);
+        }
+        else
+        {
+          return resolve(false);
+        }
+      }
+    });
   }
 }
 

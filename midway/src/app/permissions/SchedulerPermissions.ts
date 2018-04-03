@@ -44,26 +44,65 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as CredentialP from './CredentialPermissions';
-import * as ImportP from './ImportPermissions';
-import * as SchedulerP from './SchedulerPermissions';
+import UserConfig from '../users/UserConfig';
+import PermissionUtil from './PermissionUtil';
 
-export let CredentialPermissions: CredentialP.CredentialPermissions = new CredentialP.CredentialPermissions();
-export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
-export let SchedulerPermissions: SchedulerP.SchedulerPermissions = new SchedulerP.SchedulerPermissions();
-
-export class Permissions
+export class SchedulerPermissions
 {
-  public ImportPermissions: ImportP.ImportPermissions;
-  public CredentialPermissions: CredentialP.CredentialPermissions;
-  public SchedulerPermissions: SchedulerP.SchedulerPermissions;
-
-  constructor()
+  public async verifyCancelRoute(user: UserConfig, params: object): Promise<string>
   {
-    this.ImportPermissions = ImportPermissions;
-    this.CredentialPermissions = CredentialPermissions;
-    this.SchedulerPermissions = SchedulerPermissions;
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyCreateRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyDeleteRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyDuplicateRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyGetRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyGetLogRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyPauseRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyRunRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyUnpauseRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyUpdateRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
+  }
+
+  public async verifyStatusRoute(user: UserConfig, params: object): Promise<string>
+  {
+    return PermissionUtil.defaultSuperUser(user, params);
   }
 }
 
-export default Permissions;
+export default SchedulerPermissions;

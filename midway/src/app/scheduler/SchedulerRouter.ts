@@ -67,43 +67,89 @@ Router.get('/connections', passport.authenticate('access-token-local'), async (c
   ctx.body = await credentials.getNames(ctx.query.type);
 });
 
-// Get job by search parameter, or all if none provided
+// Get schedule by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  await perm.SchedulerPermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await scheduler.get(ctx.params.id);
 });
 
-Router.get('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.cancel(ctx.params.id);
+  await perm.SchedulerPermissions.verifyCancelRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = scheduler.cancel(ctx.params.id);
 });
 
-Router.get('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+// Delete schedules by id
+Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  await perm.SchedulerPermissions.verifyDeleteRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await scheduler.delete(ctx.params.id);
+});
+
+// Duplicate schedule by id; creates an identical schedule with '- Copy' appended to name
+Router.post('/duplicate/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.SchedulerPermissions.verifyDuplicateRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await scheduler.duplicate(ctx.params.id);
+});
+
+// Retrieve schedule log by id
+Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.SchedulerPermissions.verifyGetLogRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await scheduler.getLog(ctx.params.id);
+});
+
+// pause schedule by id
+Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.SchedulerPermissions.verifyPauseRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = scheduler.pause(ctx.params.id);
+});
+
+// run schedule immediately by id
+Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.SchedulerPermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await scheduler.runSchedule(ctx.params.id);
 });
 
-// Delete schedules by parameter
-Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+// unpause paused schedule by id
+Router.post('/unpause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.delete(ctx.state.user, ctx.params.id);
+  await perm.SchedulerPermissions.verifyUnpauseRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await scheduler.unpause(ctx.params.id);
 });
 
+// set status of schedule by id: whether it should run next time or not
+Router.post('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.SchedulerPermissions.verifyStatusRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await scheduler.setStatus(ctx.params.id, ctx.request.body.body.status);
+});
+
+// Create schedule
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
-  schedule.id = ctx.params.id;
+  if (schedule.id !== undefined)
+  {
+    delete schedule.id;
+  }
   Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
-  ctx.body = await scheduler.upsert(ctx.state.user, schedule);
+  await perm.SchedulerPermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await scheduler.upsert(schedule);
 });
 
-// Update job
+// Update schedule
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
   schedule.id = ctx.params.id;
   Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
-  ctx.body = await scheduler.upsert(ctx.state.user, schedule);
+  await perm.SchedulerPermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await scheduler.upsert(schedule);
 });
 
 export default Router;

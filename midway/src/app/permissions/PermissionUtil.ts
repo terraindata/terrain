@@ -44,26 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as CredentialP from './CredentialPermissions';
-import * as ImportP from './ImportPermissions';
-import * as SchedulerP from './SchedulerPermissions';
+import UserConfig from '../users/UserConfig';
 
-export let CredentialPermissions: CredentialP.CredentialPermissions = new CredentialP.CredentialPermissions();
-export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
-export let SchedulerPermissions: SchedulerP.SchedulerPermissions = new SchedulerP.SchedulerPermissions();
-
-export class Permissions
+export class PermissionUtil
 {
-  public ImportPermissions: ImportP.ImportPermissions;
-  public CredentialPermissions: CredentialP.CredentialPermissions;
-  public SchedulerPermissions: SchedulerP.SchedulerPermissions;
-
-  constructor()
+  public static defaultSuperUser(user: UserConfig, params: any): Promise<string>
   {
-    this.ImportPermissions = ImportPermissions;
-    this.CredentialPermissions = CredentialPermissions;
-    this.SchedulerPermissions = SchedulerPermissions;
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (!user.isSuperUser)
+      {
+        return reject('User must be a super user.');
+      }
+      return resolve();
+    });
   }
 }
 
-export default Permissions;
+export default PermissionUtil;

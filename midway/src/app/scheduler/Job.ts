@@ -92,6 +92,14 @@ export class Job
     }
   }
 
+  public async unpause(): Promise<void>
+  {
+    if (this.taskTree.isCancelled() === true)
+    {
+      await this.run();
+    }
+  }
+
   public async printTree(): Promise<void>
   {
     await this.taskTree.printTree();
