@@ -340,14 +340,36 @@ export class Magento
                     break;
                   case 'trim':
                     deepCopyMagentoSourceConfig.url = [magentoSourceConfig.url[i]];
-                    const untrimedResult: object[] = storedResult[i - 1];
-                    const keysToInclude: string[] = deepCopyMagentoSourcConfig.url[0]['keys'];
-                    const excludedProducts: object[] = untrimedResult.filter((row) =>
+                    const origKeyToFilterOn: string = deepCopyMagentoSourceConfig.url[0]['origKeyToFilterOn'];
+                    const returnedKeyToFilterOn: string = deepCopyMagentoSourceConfig.url[0]['returnedKeyToFilterOn'];
+                    const keysToInclude: string[] = deepCopyMagentoSourceConfig.url[0]['fieldsToKeep'];
+                    const untrimmedResults: object[] = storedResult[i - 1];
+                    const excludedProducts: object[] = [];
+                    const origDataPrimaryKeys: object = {};
+
+                    // origKeyToFilterOn: id
+                    // returnedKeyToFilterOn: sku
+                    // dump the untrimmed dataset into an object for quick lookup
+                    if (Array.isArray(deepCopyMagentoSourceConfig.data) === false)
                     {
-                      return _.pick(row, keysToInclude);
+                      winston.warn('data is not an array.');
+                    }
+
+                    deepCopyMagentoSourceConfig.data.forEach((row) =>
+                    {
+                      origDataPrimaryKeys[row[origKeyToFilterOn]] = row;
+                    });
+
+                    untrimmedResults.forEach((row) =>
+                    {
+                      if (origDataPrimaryKeys[row[returnedKeyToFilterOn]] === undefined) // not found in the exported dataset
+                      {
+                        const rowObj: object = {};
+                        rowObj[returnedKeyToFilterOn] = _.pick(row, keysToInclude);
+                        excludedProducts.push(rowObj); // id : row
+                      }
                     });
                     storedResult.push(excludedProducts);
-                    // deepCopyMagentoSourceConfig.data = excludedProducts;
                     i++;
                     break;
                   default:
@@ -365,31 +387,6 @@ export class Magento
                   && deepCopyMagentoSourceConfig.url[0]['originalKey'] !== undefined
                   && deepCopyMagentoSourceConfig.url[0]['mappedKey'] !== undefined)
                 {
-                  /*
-                  deepCopyMagentoSourceConfig.data =
-                  [
-                    { product: '5449' },
-                    { product: '5450' },
-                    { product: '6116' },
-                  ];
-                  deepCopyMagentoSourceConfig.mappedKeys =
-                  [
-                    { sku: '118010-731' },
-                    { sku: '118010-270' },
-                    { sku: '665023' },
-                  ];
-                  */
-                  /*
-                  deepCopyMagentoSourceConfig.data =
-                  [
-                    { products: { item: ['5447', '5445', '5444', '5438', '5437', '5436', '5435', '5434', '5433', '5429', '5424'] } },
-                  ];
-                  deepCopyMagentoSourceConfig.mappedKeys =
-                  [
-                    { sku: '118010-731' },
-                  ];
-                  */
-
                   deepCopyMagentoSourceConfig.data = [];
                   deepCopyMagentoSourceConfig.mappedKeys = [];
                   const dataKey: string = deepCopyMagentoSourceConfig.url[0]['dataKey'];
@@ -414,7 +411,6 @@ export class Magento
                   try
                   {
                     const newResults: object[] = [];
-                    // console.log(JSON.stringify(result, null, 2));
                     result.forEach((res) =>
                     {
                       if (res['status'] !== undefined && Array.isArray(res['status']))
@@ -427,7 +423,6 @@ export class Magento
                             break;
                           }
                           const row = res['status'][k];
-                          // console.log(row);
                           const newRow: object = {};
                           Object.keys(row).forEach((rowKey) =>
                           {
@@ -504,7 +499,6 @@ export class Magento
                         }
                       }
                     });
-                    // console.log(JSON.stringify(newResults, null, 2));
                     storedResult.push(newResults);
                   }
                   catch (e)
@@ -516,24 +510,6 @@ export class Magento
               i++;
               winston.info('Moving on to ' + i.toString() as string + '...');
             }
-            storedResult.forEach((sr) =>
-            {
-              if (Array.isArray(sr))
-              {
-                console.log(sr.length);
-              }
-              else
-              {
-                console.log(Object.keys(sr).length);
-              }
-            });
-
-            // Object.keys(storedResult[storedResult.length - 1]).sort().slice(0, 50).forEach((wat) =>
-            // {
-            //   console.log(JSON.stringify(storedResult[storedResult.length - 1][wat], null, 2));
-            // });
-            console.log('Finis');
-            // console.log(JSON.stringify(storedResult[storedResult.length - 1].slice(0, 50), null, 2));
             return resolve(storedResult[storedResult.length - 1]);
           }
           else
@@ -619,11 +595,23 @@ export class Magento
                   while (rowCounter < magentoSourceConfig.data.length && rowCounter < THRESHOLD) // TODO: remove restriction at 10
                   {
                     let mappedKey: object;
-                    if (magentoSourceConfig.mappedKeys !== undefined && Array.isArray(magentoSourceConfig.mappedKeys))
+                    if (magentoSourceConfig.mappedKeys !== undefined && Array.isArray(magentoSourceConfig.mappedKeys)
+                      && magentoSourceConfig.mappedKeys.length > 0)
                     {
                       mappedKey = magentoSourceConfig.mappedKeys[rowCounter];
                     }
-                    const row = magentoSourceConfig.data[rowCounter];
+                    let row = magentoSourceConfig.data[rowCounter];
+                    if (magentoSourceConfig.url[0]['excludeData'] === true)
+                    {
+                      if (rowCounter > 0)
+                      {
+                        break;
+                      }
+                      else
+                      {
+                        row = {};
+                      }
+                    }
                     const requestArgs: object = row;
                     requestArgs['sessionId'] = sessionId;
                     if (magentoSourceConfig.updateParams !== undefined)
@@ -667,7 +655,8 @@ export class Magento
                           resultArr.push({ args: sanitizedRequestArgs, status: result });
                         }
                       }
-                      if (callbackCounter >= THRESHOLD - 1 || callbackCounter >= magentoSourceConfig.data.length - 1) // TODO remove 10
+                      if (callbackCounter >= THRESHOLD - 1 || callbackCounter >= magentoSourceConfig.data.length - 1
+                        || magentoSourceConfig.url[0]['excludeData'] === true) // TODO THRESHOLD
                       {
                         return resolve(resultArr);
                       }
@@ -684,9 +673,8 @@ export class Magento
               else
               {
                 let j: number = 0;
-                // while (j < magentoSourceConfig.data.length)
                 let callbackCounter: number = 0;
-                while (j < THRESHOLD) // TODO THRESHOLD
+                while (j < THRESHOLD && j < magentoSourceConfig.data.length) // TODO THRESHOLD
                 {
                   const row = magentoSourceConfig.data[j];
                   let mappedKey: object;
@@ -704,6 +692,10 @@ export class Magento
                     Object.keys(magentoSourceConfig.mappedParams).forEach((key) =>
                     {
                       requestArgs[key] = row[magentoSourceConfig.mappedParams[key]];
+                      if (requestArgs[magentoSourceConfig.mappedParams[key]] !== undefined)
+                      {
+                        delete requestArgs[magentoSourceConfig.mappedParams[key]];
+                      }
                     });
                     const sanitizedRequestArgs = _.cloneDeep(requestArgs);
                     requestArgs['sessionId'] = sessionId;
@@ -749,8 +741,6 @@ export class Magento
                 }
               }
             }
-            // const resultObj: object[] = await Promise.all(resultArr);
-            // winston.info('Result of Magento request: ' + JSON.stringify(resultObj, null, 2));
           });
       });
     });
