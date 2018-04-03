@@ -127,6 +127,21 @@ export class App
 
     this.app.use(async (ctx, next) =>
     {
+      // tslint:disable-next-line:no-empty
+      ctx.req.setTimeout(0, () => { });
+      try
+      {
+        await next();
+      }
+      catch (e)
+      {
+        winston.error(e);
+        throw e;
+      }
+    });
+
+    this.app.use(async (ctx, next) =>
+    {
       const requestNumber: number = ++appStats.numRequests;
       const logPrefix: string = 'Request #' + requestNumber.toString() + ': ';
 
