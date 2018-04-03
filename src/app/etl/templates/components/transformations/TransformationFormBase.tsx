@@ -52,9 +52,9 @@ import * as React from 'react';
 
 import { instanceFnDecorator } from 'src/app/Classes';
 
-import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
