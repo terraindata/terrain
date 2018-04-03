@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import { Readable } from 'stream';
 import * as winston from 'winston';
 
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
@@ -56,6 +55,7 @@ import QueryRequest from '../../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../../shared/database/types/QueryResponse';
 import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
+import SafeReadable from '../../../app/io/streams/SafeReadable';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
@@ -118,7 +118,7 @@ export class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
+  public async handleQuery(request: QueryRequest): Promise<QueryResponse | SafeReadable>
   {
     winston.debug('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
@@ -135,47 +135,51 @@ export class ElasticQueryHandler extends QueryHandler
         try
         {
           parser = getParsedQuery(request.body);
+          const query = parser.getValue();
+          // TODO: remove this restriction
+          if (query['groupJoin'] !== undefined && query['mergeJoin'] !== undefined)
+          {
+            throw new Error('Specifying multiple join types is not supported at the moment.');
+          }
+
+          let stream: SafeReadable;
+          if (query['groupJoin'] !== undefined)
+          {
+            stream = new GroupJoinTransform(client, request.body);
+          }
+          else if (query['mergeJoin'] !== undefined)
+          {
+            stream = new MergeJoinTransform(client, request.body);
+          }
+          else
+          {
+            stream = new ElasticStream(client, query);
+          }
+
+          if (request.streaming === true)
+          {
+            return stream;
+          }
+          else
+          {
+            return new Promise<QueryResponse>((resolve, reject) =>
+            {
+              const bufferTransform = new BufferTransform(stream,
+                (err, res) =>
+                {
+                  let response;
+                  if (res !== undefined && Array.isArray(res))
+                  {
+                    response = res[0];
+                  }
+                  ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, response);
+                });
+            });
+          }
         }
         catch (errors)
         {
           return new QueryResponse({}, errors);
-        }
-
-        const query = parser.getValue();
-        // TODO: remove this restriction
-        if (query['groupJoin'] !== undefined && query['mergeJoin'] !== undefined)
-        {
-          throw new Error('Specifying multiple join types is not supported at the moment.');
-        }
-
-        let stream: Readable;
-        if (query['groupJoin'] !== undefined)
-        {
-          stream = new GroupJoinTransform(client, request.body);
-        }
-        else if (query['mergeJoin'] !== undefined)
-        {
-          stream = new MergeJoinTransform(client, request.body);
-        }
-        else
-        {
-          stream = new ElasticStream(client, query);
-        }
-
-        if (request.streaming === true)
-        {
-          return stream;
-        }
-        else
-        {
-          return new Promise<QueryResponse>((resolve, reject) =>
-          {
-            const bufferTransform = new BufferTransform(stream,
-              (err, res) =>
-              {
-                ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, res[0]);
-              });
-          });
         }
 
       case 'deleteTemplate':
