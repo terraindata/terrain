@@ -157,13 +157,13 @@ export class EngineProxy
   public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
   {
     const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
-      newFieldKeyPaths: List([destKP])
+      newFieldKeyPaths: List([destKP]),
     };
 
     this.addTransformation(
       TransformationNodeType.DuplicateNode,
       List([this.engine.getInputKeyPath(sourceId)]),
-      options
+      options,
     );
 
     const newFieldId = this.engine.getInputFieldID(destKP);
@@ -178,7 +178,8 @@ export class EngineProxy
     }
 
     const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
-    preorderForEach(this.engine, idToCopy, (childId) => {
+    preorderForEach(this.engine, idToCopy, (childId) =>
+    {
       // do not copy root
       if (childId !== idToCopy)
       {

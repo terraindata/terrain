@@ -118,7 +118,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       options.push({
         text: 'Extract this array element',
         onClick: this.requestExtractElement,
-      })
+      });
     }
     return List(options);
   }
@@ -130,7 +130,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       field.canEditField(),
       field.canMoveField(),
       field.isNested(),
-      field.isNamedField()
+      field.isNamedField(),
     );
   }
 
@@ -298,8 +298,8 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         extractField: {
           fieldId: this.props.fieldId,
           index: this._getArrayIndex(),
-        }
-      }
+        },
+      },
     });
   }
 

@@ -125,7 +125,8 @@ export default class EngineUtil
   public static findChildField(fieldId: number, engine: TransformationEngine): number | undefined
   {
     const myKP = engine.getOutputKeyPath(fieldId);
-    const key = engine.getAllFieldIDs().findKey((id: number) => {
+    const key = engine.getAllFieldIDs().findKey((id: number) =>
+    {
       const childKP = engine.getOutputKeyPath(id);
       if (childKP.size === myKP.size + 1)
       {

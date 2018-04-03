@@ -57,19 +57,19 @@ import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle
 import Util from 'util/Util';
 const { List, Map } = Immutable;
 
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import Autocomplete from 'common/components/Autocomplete';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import Modal from 'common/components/Modal';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
-import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
@@ -128,7 +128,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
       return {
         name: `Item ${displayIndex}`,
         index: displayIndex,
-      }
+      };
     }
   }
 
@@ -155,7 +155,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
           className='editor-field-message-wrapper'
           style={fontColor(Colors().error)}
         >
-          { message }
+          {message}
         </div>
       </div>
     );
@@ -226,7 +226,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
     fieldId: number,
     keypath: EnginePath,
     index: string | number,
-  ): { isValid: boolean, message: string}
+  ): { isValid: boolean, message: string }
   {
     const asNum = Number(index);
     if (!Number.isInteger(asNum) || asNum < 0)
@@ -266,7 +266,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
       actionType: 'setDisplayState',
       state: {
         extractField: null,
-      }
+      },
     });
   }
 
@@ -278,49 +278,19 @@ class ExtractFieldModal extends TerrainComponent<Props>
     {
       return;
     }
-    GraphHelpers.mutateEngine((proxy) => {
-
+    GraphHelpers.mutateEngine((proxy) =>
+    {
       let extractedKeypath = proxy.getEngine().getInputKeyPath(extractField.fieldId);
       extractedKeypath = extractedKeypath.set(extractedKeypath.size - 1, String(this.state.index));
-
       proxy.extractArrayField(extractField.fieldId, Number(this.state.index), newKeypath);
-      // proxy.duplicateField(extractedKeypath, newKeypath);
-      // const type = EngineUtil.getRepresentedType(extractField.fieldId, proxy.getEngine());
-      // let childType;
-      // if (type === 'array')
-      // {
-      //   const childField = EngineUtil.findChildField(extractField.fieldId, proxy.getEngine());
-      //   if (childField === -1)
-      //   {
-      //     throw new Error('Field type is array, but could not find any children in the Transformation Engine');
-      //   }
-      //   childType = EngineUtil.getRepresentedType(childField, proxy.getEngine());
-      // }
-
-      // if (proxy.getEngine().getInputFieldID(extractedKeypath) === undefined)
-      // {
-      //   proxy.getEngine().addField(extractedKeypath, type, childType);
-      // }
-      // proxy.addTransformation(
-      //   TransformationNodeType.DuplicateNode,
-      //   List([extractedKeypath]),
-      //   {newFieldKeyPaths: List([newKeypath])}
-      // );
-
-      // const addedField = proxy.getEngine().getInputFieldID(newKeypath);
-      // proxy.getEngine().setFieldType(addedField, type);
-      // if (type === 'array')
-      // {
-      //   proxy.getEngine().setFieldProp(addedField, List(['valueType']), childType);
-      //   proxy.getEngine().addField(newKeypath.push('*'), 'array', {valueType: childType});
-      // }
-
-    }).then((isStructural) => {
+    }).then((isStructural) =>
+    {
       this.props.editorAct({
         actionType: 'rebuildFieldMap',
-      })
-    }).catch((e) => {
-      console.error(e);
+      });
+    }).catch((e) =>
+    {
+      // Todo handle
     });
   }
 }

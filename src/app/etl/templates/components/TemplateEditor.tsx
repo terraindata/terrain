@@ -53,21 +53,21 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import AddFieldModal from 'etl/templates/components/AddFieldModal';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
-import ExtractFieldModal from 'etl/templates/components/ExtractFieldModal';
 import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
+import ExtractFieldModal from 'etl/templates/components/ExtractFieldModal';
 import MoveFieldModal from 'etl/templates/components/MoveFieldModal';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
@@ -228,7 +228,7 @@ class TemplateEditor extends TerrainComponent<Props>
           fieldId={addFieldId}
           {...fieldModalProps}
         />
-        <ExtractFieldModal/>
+        <ExtractFieldModal />
         <MultiModal
           requests={modalRequests}
           setRequests={this.setModalRequests}
