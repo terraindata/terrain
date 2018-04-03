@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import { ElasticStream } from '../../../database/elastic/query/ElasticStream';
+import { ElasticReader } from '../../../database/elastic/streams/ElasticReader';
 import SafeReadable from './SafeReadable';
 
 /**
@@ -74,7 +74,7 @@ export default class BufferedElasticStream extends SafeReadable
     });
 
     this.query = query;
-    this.stream = new ElasticStream(client, query);
+    this.stream = new ElasticReader(client, query);
     this.maxBufferSize = size;
 
     this._onBufferFull = onBufferFull;
