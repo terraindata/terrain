@@ -57,7 +57,7 @@ import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database
 import { _FilterGroup, DistanceValue, FilterGroup, FilterLine, More, Path, Score, Script, Source } from './PathfinderTypes';
 
 export const PathFinderDefaultSize = 101;
-const NEGATIVES = ['notcontain', 'noteequal', 'isnotin', 'notexists'];
+const NEGATIVES = ['notcontain', 'notequal', 'isnotin', 'notexists'];
 
 export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
