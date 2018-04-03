@@ -51,7 +51,7 @@ import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQL
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import BufferedElasticStream from './BufferedElasticStream';
+import ElasticReader from '../../../database/elastic/streams/ElasticReader';
 import SafeReadable from './SafeReadable';
 
 interface Ticket
@@ -66,7 +66,7 @@ interface Ticket
 export default class GroupJoinTransform extends SafeReadable
 {
   private client: ElasticClient;
-  private source: BufferedElasticStream;
+  private source: ElasticReader;
   private query: object;
 
   private maxPendingQueries: number = 4;
@@ -78,7 +78,7 @@ export default class GroupJoinTransform extends SafeReadable
 
   private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
-  constructor(client: ElasticClient, queryStr: string)
+  constructor(client: ElasticClient, queryStr: string, streaming: boolean = false)
   {
     super({
       objectMode: true,
@@ -123,13 +123,18 @@ export default class GroupJoinTransform extends SafeReadable
       this.maxBufferedOutputs = this.maxPendingQueries;
       this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
-      this.source = new BufferedElasticStream(client, query, (responses) =>
+      this.source = new ElasticReader(client, query, streaming);
+      this.source.on('readable', () =>
       {
-        for (const r of responses)
+        let response = this.source.read();
+        while (response !== null)
         {
-          this.dispatchSubqueryBlock(r);
+          this.dispatchSubqueryBlock(response);
+          response = this.source.read();
         }
       });
+      this.source.on('error', (e) => this.emit('error', e));
+
     }
     catch (e)
     {
