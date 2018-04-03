@@ -45,13 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import * as Stream from 'stream';
 import * as winston from 'winston';
 
 import { ElasticQueryHit } from '../../../../../shared/database/elastic/ElasticQueryResponse';
+import SafeReadable from '../../../app/io/streams/SafeReadable';
 import ElasticClient from '../client/ElasticClient';
 
-export class ElasticReader extends Stream.Readable
+export class ElasticReader extends SafeReadable
 {
   private client: ElasticClient;
   private query: any;
@@ -92,17 +92,14 @@ export class ElasticReader extends Stream.Readable
 
       if (this.streaming)
       {
-        body['scroll'] = this.scroll,
-          body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
+        body['scroll'] = this.scroll;
+        body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
       }
 
       this.querying = true;
-      this.client.search(body,
-        (error, response): void =>
-        {
-          const scrollCallback = this.scrollCallback.bind(this);
-          scrollCallback(error, response);
-        });
+      this.client.search(
+        body,
+        this.makeSafe(this.scrollCallback.bind(this)));
     }
     catch (e)
     {
@@ -138,16 +135,16 @@ export class ElasticReader extends Stream.Readable
 
   private scrollCallback(error, response): void
   {
-    if (typeof response._scroll_id === 'string')
-    {
-      this.scrollID = response._scroll_id;
-    }
-
     if (error !== null && error !== undefined)
     {
       winston.error(error);
       this.emit('error', error);
       return;
+    }
+
+    if (typeof response._scroll_id === 'string')
+    {
+      this.scrollID = response._scroll_id;
     }
 
     const hits: ElasticQueryHit[] = response.hits.hits;
@@ -190,13 +187,8 @@ export class ElasticReader extends Stream.Readable
       // stop scrolling
       if (this.scrollID !== undefined)
       {
-        this.client.clearScroll({
-          scrollId: this.scrollID,
-        }, (_err, _resp) =>
-          {
-            this.push(null);
-          });
-
+        this.client.clearScroll({ scrollId: this.scrollID },
+          this.makeSafe(() => this.push(null)));
         this.scrollID = undefined;
       }
       else
@@ -207,23 +199,16 @@ export class ElasticReader extends Stream.Readable
       return;
     }
 
-    if (this.numRequested > 0)
+    if (this.numRequested > 0 && this.scrollID !== undefined)
     {
+      const params: Elastic.ScrollParams = {
+        scrollId: this.scrollID,
+        scroll: this.scroll,
+      };
+
       // continue scrolling
       this.querying = true;
-
-      if (this.scrollID !== undefined)
-      {
-        this.client.scroll({
-          scrollId: this.scrollID,
-          scroll: this.scroll,
-        } as Elastic.ScrollParams,
-          (error, response) =>
-          {
-            const scrollCallback = this.scrollCallback.bind(this);
-            scrollCallback(error, response);
-          });
-      }
+      this.client.scroll(params, this.makeSafe(this.scrollCallback.bind(this)));
     }
   }
 }
