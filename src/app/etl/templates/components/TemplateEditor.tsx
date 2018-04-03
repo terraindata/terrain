@@ -58,6 +58,7 @@ import { ETLActions } from 'etl/ETLRedux';
 import AddFieldModal from 'etl/templates/components/AddFieldModal';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
+import ExtractFieldModal from 'etl/templates/components/ExtractFieldModal';
 import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
 import MoveFieldModal from 'etl/templates/components/MoveFieldModal';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
@@ -225,6 +226,7 @@ class TemplateEditor extends TerrainComponent<Props>
           fieldId={addFieldId}
           {...fieldModalProps}
         />
+        <ExtractFieldModal/>
         <MultiModal
           requests={modalRequests}
           setRequests={this.setModalRequests}
