@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // import * as winston from 'winston';
 import * as Immutable from 'immutable';
-import createKeccakHash = require('keccak');
+import { keccak256 } from 'js-sha3';
 
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import { KeyPath } from '../util/KeyPath';
@@ -520,7 +520,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           {
             kpi = kpi.push(i.toString());
           }
-          yadeep.set(doc, kpi, createKeccakHash('keccak256').update(yadeep.get(doc, kpi)).digest('hex'));
+          yadeep.set(doc, kpi, keccak256.update(yadeep.get(doc, kpi)).hex());
         }
       }
       else if (typeof el !== 'string')
@@ -535,7 +535,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, field, createKeccakHash('keccak256').update(el).digest('hex'));
+        yadeep.set(doc, field, keccak256.update(el).hex());
       }
     });
 

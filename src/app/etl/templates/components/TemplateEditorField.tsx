@@ -163,6 +163,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.uiStateTracker;
   }
 
+  protected _checkedState(): boolean | null
+  {
+    this.updateChecker.setChecker('checkedState', getCheckedState);
+    return getCheckedState(this.props);
+  }
+
   protected _currentEngine(): TransformationEngine
   {
     this.updateChecker.setChecker('currentEngine', getCurrentEngine);
@@ -208,6 +214,18 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return _.extend(_.pick(this.props, ['fieldId', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);
   }
 
+  protected _isPrimaryKey()
+  {
+    const language = this._getCurrentLanguage();
+    switch (language)
+    {
+      case 'elastic':
+        return _.get(this._field().fieldProps, ['elastic', 'isPrimaryKey']) === true;
+      default:
+        return false;
+    }
+  }
+
   protected _isRootField()
   {
     const { fieldId } = this.props;
@@ -230,21 +248,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     this.updateChecker.setChecker('settingsOpen', settingsAreOpen);
     return settingsAreOpen(this.props);
-  }
-
-  protected _canMoveField(): boolean
-  {
-    return this._field().isNamedField();
-  }
-
-  protected _canEditField(): boolean
-  {
-    return this._field().isNamedField() || this._field().isPrimitive();
-  }
-
-  protected _canEditName(): boolean
-  {
-    return !this._field().isWildcardField();
   }
 
   protected _willFieldChange(nextProps)
@@ -278,6 +281,19 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     // tslint:disable-next-line
     console.error(ev);
+  }
+}
+
+function getCheckedState(props: TemplateEditorFieldProps): boolean | null
+{
+  const uiState = (props as TemplateEditorFieldProps & Injected).templateEditor.uiState;
+  if (uiState.checkedFields === null)
+  {
+    return null;
+  }
+  else
+  {
+    return uiState.checkedFields.get(props.fieldId) === true;
   }
 }
 

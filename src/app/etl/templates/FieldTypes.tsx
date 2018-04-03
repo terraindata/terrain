@@ -91,6 +91,21 @@ class TemplateFieldC
     }
   }
 
+  public canMoveField(): boolean
+  {
+    return this.isNamedField();
+  }
+
+  public canEditField(): boolean
+  {
+    return this.isNamedField() || this.isPrimitive();
+  }
+
+  public canEditName(): boolean
+  {
+    return !this.isWildcardField();
+  }
+
   public isPrimitive(): boolean
   {
     const repType = this.representedType();

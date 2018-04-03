@@ -79,6 +79,7 @@
     display: flex;
     justify-content: flex-end;
     flex: 1 1 0;
+    align-self: flex-end;
   }
 
   .template-editor-title-bar {
@@ -87,15 +88,27 @@
     align-items: center;
     justify-content: space-between;
 
-    .template-editor-title-bar-spacer {
-      align-self: flex-start;
+    .template-editor-title-bar-actions {
       flex: 1 1 0;
       width: 1px;
+      display: flex;
+      align-self: flex-end;
     }
 
-    .template-editor-title {
-      text-align: center;
-      .title-text;
+    .title-bar-action {
+      padding: @half-spacing;
+      .transition;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .title-bar-menu-wrapper {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      margin-left: @half-spacing;
+      top: 1px;
     }
   }
 

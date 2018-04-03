@@ -246,7 +246,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
   }
 
-  public componentWillMount()
+  public componentDidMount()
   {
     this.initFromRoute();
   }
