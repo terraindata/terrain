@@ -249,6 +249,9 @@ export class TransformationEngine
   public transform(doc: object): object
   {
     let output: object = this.rename(doc);
+    this.restoreArrays(output);
+    // console.log('BLAM');
+    // console.log(JSON.stringify(output));
 
     for (const nodeKey of this.dag.sources())
     {
@@ -272,21 +275,6 @@ export class TransformationEngine
         output = transformationResult.document;
       }
     }
-
-    // If a field is supposed to be an array but is an object in its flattened
-    // representation, convert it back to an array
-    this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
-    {
-      if (yadeep.get(output, value) !== undefined && this.fieldEnabled.get(key) === true)
-      {
-        if (this.fieldTypes.get(key) === 'array' && !value.includes('*'))
-        {
-          const x = yadeep.get(output, value);
-          x['length'] = Object.keys(x).length;
-          yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
-        }
-      }
-    });
 
     // Exclude disabled fields (must do this as a postprocess, because e.g. join node)
     this.fieldEnabled.map((enabled: boolean, fieldID: number) =>
@@ -355,13 +343,15 @@ export class TransformationEngine
 
   public deleteField(id: number): void
   {
+    // Order matters!  Must do this first, else getTransformations can't work because
+    // it relies on the entry in fieldNameToIDMap.
+    this.getTransformations(id).forEach((t: number) => this.deleteTransformation(t));
+
     this.fieldNameToIDMap = this.fieldNameToIDMap.delete(this.fieldNameToIDMap.keyOf(id));
     this.fieldProps = this.fieldProps.delete(id);
     this.fieldEnabled = this.fieldEnabled.delete(id);
     this.IDToFieldNameMap = this.IDToFieldNameMap.delete(id);
     this.fieldTypes = this.fieldTypes.delete(id);
-
-    this.getTransformations(id).forEach((t: number) => this.deleteTransformation(t));
   }
 
   /**
@@ -753,9 +743,10 @@ export class TransformationEngine
   private rename(doc: object): object
   {
     const r: object = {};
-    const o: object = objectify(doc);
+    const o: object = doc; // objectify(doc);
     this.fieldNameToIDMap.forEach((value: number, key: KeyPath) =>
     {
+      // console.log('rn key = ' + key);
       this.renameHelper(r, o, key, value);
     });
 
@@ -764,14 +755,20 @@ export class TransformationEngine
 
   private renameHelper(r: object, o: object, key: KeyPath, value?: number, oldKey?: KeyPath)
   {
+    // console.log('rh key = ' + key + ' val = ' + value);
     if (value === undefined)
     {
+      // console.log(JSON.stringify(o));
+      // console.log(oldKey);
+      // console.log(yadeep.get(o, oldKey));
+
       // setting new array element
       yadeep.set(r, key, yadeep.get(o, oldKey), { create: true });
     }
-    else// if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
+    else // if (this.fieldEnabled.has(value) === false || this.fieldEnabled.get(value) === true)
     {
       const el: any = yadeep.get(o, key);
+      // console.log('el = ' + el + ' for key ' + key);
       if (el !== undefined)
       {
         if (isPrimitive(el))
@@ -788,18 +785,39 @@ export class TransformationEngine
             {
               const newKeyReplaced: KeyPath = newKey.set(newKey.indexOf('*'), j.toString());
               const oldKeyReplaced: KeyPath = key.set(key.indexOf('*'), j.toString());
+              // console.log('r here1');
               this.renameHelper(r, o, newKeyReplaced, this.fieldNameToIDMap.get(newKeyReplaced), oldKeyReplaced);
             }
-          } else
+          }
+          /*else
           {
             for (let i: number = 0; i < Object.keys(el).length; i++)
             {
               const kpi: KeyPath = key.push(i.toString());
+              console.log('r here2 ' + kpi);
               this.renameHelper(r, o, kpi);
             }
-          }
+          }*/
         }
       }
     }
+  }
+
+  private restoreArrays(output: object)
+  {
+    // If a field is supposed to be an array but is an object in its flattened
+    // representation, convert it back to an array
+    this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
+    {
+      if (yadeep.get(output, value) !== undefined && this.fieldEnabled.get(key) === true)
+      {
+        if (this.fieldTypes.get(key) === 'array' && !value.includes('*'))
+        {
+          const x = yadeep.get(output, value);
+          x['length'] = Object.keys(x).length;
+          yadeep.set(output, value, Array.prototype.slice.call(x), { create: true });
+        }
+      }
+    });
   }
 }

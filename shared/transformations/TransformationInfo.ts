@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
+import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
@@ -212,6 +214,32 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitCastNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.HashNode]:
+      {
+        humanName: 'Hash',
+        editable: true,
+        creatable: true,
+        description: `Hash this field using SHA3/Keccak256`,
+        type: HashTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitHashNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.ArraySumNode]:
+      {
+        humanName: 'Array Sum',
+        editable: true,
+        creatable: true,
+        description: `Sums the values of this array`,
+        type: ArraySumTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitArraySumNode(transformationNode, docCopy, options),
       },
   };
 
