@@ -85,7 +85,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     };
 
   @instanceFnDecorator(memoizeOne)
-  public _getMenuOptions(canEdit, canMove, isNested)
+  public _getMenuOptions(canEdit, canMove, isNested, isNamed)
   {
     const options = [];
     if (canEdit)
@@ -113,13 +113,25 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         onClick: this.requestDeleteField,
       });
     }
+    if (!isNamed)
+    {
+      options.push({
+        text: 'Extract this array element',
+        onClick: this.requestExtractElement,
+      });
+    }
     return List(options);
   }
 
   public getMenuOptions()
   {
     const field = this._field();
-    return this._getMenuOptions(field.canEditField(), field.canMoveField(), field.isNested());
+    return this._getMenuOptions(
+      field.canEditField(),
+      field.canMoveField(),
+      field.isNested(),
+      field.isNamedField(),
+    );
   }
 
   public render()
@@ -274,6 +286,19 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       actionType: 'setDisplayState',
       state: {
         addFieldId: this.props.fieldId,
+      },
+    });
+  }
+
+  public requestExtractElement()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        extractField: {
+          fieldId: this.props.fieldId,
+          index: this._getArrayIndex(),
+        },
       },
     });
   }

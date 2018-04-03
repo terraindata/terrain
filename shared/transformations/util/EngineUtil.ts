@@ -121,6 +121,25 @@ export default class EngineUtil
     return scrubbed;
   }
 
+  // returns the first child field
+  public static findChildField(fieldId: number, engine: TransformationEngine): number | undefined
+  {
+    const myKP = engine.getOutputKeyPath(fieldId);
+    const key = engine.getAllFieldIDs().findKey((id: number) =>
+    {
+      const childKP = engine.getOutputKeyPath(id);
+      if (childKP.size === myKP.size + 1)
+      {
+        return childKP.slice(0, -1).equals(myKP);
+      }
+      else
+      {
+        return false;
+      }
+    });
+    return key;
+  }
+
   // takes an engine path and the path type mapping and returns true if
   // all of the path's parent paths represent array
   public static isAValidField(keypath: KeyPath, pathTypes: PathHashMap<FieldTypes>): boolean
@@ -374,16 +393,24 @@ export default class EngineUtil
     };
   }
 
-  private static preprocessDocuments(documents: List<object>): List<object>
+  // copy a field from e1 to e2 with specified keypath
+  // if e2 is not provided, then transfer from e1 to itself
+  // does not transfer transformations
+  public static transferField(id1: number, keypath: KeyPath, e1: TransformationEngine, e2?: TransformationEngine)
   {
-    return documents.map((doc) => objectify(doc)).toList();
+    if (e2 === undefined)
+    {
+      e2 = e1;
+    }
+    const id2 = e2.addField(keypath, e1.getFieldType(id1));
+    EngineUtil.transferFieldData(id1, id2, e1, e2);
+    return id2;
   }
 
-  // copy a field from e1 to e2 with specified keypath
-  // does not transfer transformations
-  private static transferField(id1: number, keypath: KeyPath, e1: TransformationEngine, e2: TransformationEngine)
+  // copies a field's configuration from e1 to e2. id1 and id2 should both exist in e1 and e2 respectively
+  public static transferFieldData(id1: number, id2: number, e1: TransformationEngine, e2: TransformationEngine)
   {
-    const id2 = e2.addField(keypath, e1.getFieldType(id1));
+    e2.setFieldType(id2, e1.getFieldType(id1));
     e2.setFieldProps(id2, e1.getFieldProps(id1));
     if (e1.getFieldEnabled(id1))
     {
@@ -393,7 +420,11 @@ export default class EngineUtil
     {
       e2.disableField(id2);
     }
-    return id2;
+  }
+
+  private static preprocessDocuments(documents: List<object>): List<object>
+  {
+    return documents.map((doc) => objectify(doc)).toList();
   }
 
   // warning types get typed as strings, but should emit a warning

@@ -145,7 +145,6 @@ const TransformationNodeInfo: AllNodeInfoType =
         isAvailable: (engine, fieldId) =>
         {
           return (
-            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
