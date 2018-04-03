@@ -53,9 +53,9 @@ import sha1 = require('sha1');
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import * as Util from '../AppUtil';
 import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
-import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
 import CredentialConfig from './CredentialConfig';
 

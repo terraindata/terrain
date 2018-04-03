@@ -242,7 +242,7 @@ class SchemaResults extends TerrainComponent<Props>
                 query={this.state.resultsQuery}
                 canEdit={false}
                 db={this.state.resultsServer}
-                algorithmName={''}
+                algorithmId={-1}
                 onNavigationException={PropTypes.func}
                 resultsState={this.state.resultsState}
                 showExport={false}

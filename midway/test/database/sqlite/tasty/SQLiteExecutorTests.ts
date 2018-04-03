@@ -52,7 +52,7 @@ import SQLiteController from '../../../../src/database/sqlite/SQLiteController';
 import * as Tasty from '../../../../src/tasty/Tasty';
 import MySQLQueries from '../../../tasty/MySQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../../Utils';
+import * as Utils from '../../TestUtil';
 
 function getExpectedFile(): string
 {

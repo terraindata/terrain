@@ -44,26 +44,76 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import Export from '../Export';
+import { Export, ExportConfig } from '../Export';
 import ADocumentTransform from './ADocumentTransform';
 
 /**
  * Applies export transformations to a result stream
  */
-export default abstract class ExportTransform extends ADocumentTransform
+export default class ExportTransform extends ADocumentTransform
 {
   private exportt: Export;
-  private configuration: object;
+  private config: ExportConfig;
+  private rank: number;
+  private mapping: object;
 
-  constructor(exportt: Export, configuration: object)
+  constructor(exportt: Export, config: ExportConfig)
   {
     super();
+    this.rank = 1;
     this.exportt = exportt;
-    this.configuration = configuration;
+
+    if (config.rank === true)
+    {
+      config.columnTypes['TERRAINRANK'] = { type: 'long' };
+    }
+
+    config.transformations.forEach((transformation) =>
+    {
+      if (transformation['name'] === 'rename')
+      {
+        config.columnTypes[transformation['colName']] = config.columnTypes[transformation['args']['newName']];
+      }
+    });
+
+    this.config = config;
   }
 
-  protected transform(input: object, chunkNumber: number): object
+  protected transform(input: object, chunkNumber: number): object | object[]
   {
-    return this.exportt._postProcessDoc(input, this.configuration);
+    if (input['hits'] === undefined)
+    {
+      return input;
+    }
+
+    return input['hits'].hits.map((hit) => this.process(hit['_source']));
+  }
+
+  private process(doc: object): object
+  {
+    if (this.config.rank === true && doc['TERRAINRANK'] === undefined)
+    {
+      doc['TERRAINRANK'] = this.rank++;
+    }
+
+    // fields in document not in mapping
+    for (const field of Object.keys(doc))
+    {
+      if (this.config.columnTypes[field] === undefined)
+      {
+        delete doc[field];
+      }
+    }
+
+    // fields in mapping not in document
+    for (const field of Object.keys(this.config.columnTypes))
+    {
+      if (doc[field] === undefined)
+      {
+        doc[field] = null;
+      }
+    }
+
+    return this.exportt._postProcessDoc(doc, this.config);
   }
 }

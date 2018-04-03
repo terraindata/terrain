@@ -47,10 +47,11 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as util from 'util';
 import * as winston from 'winston';
+
+import SharedUtil from '../../../../shared/Util';
 import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
 import ESParserError from '../../../database/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../Utils';
 
 function getExpectedFile(): string
 {
@@ -66,7 +67,7 @@ beforeAll(async (done) =>
 
   const expectedString: any = await new Promise((resolve, reject) =>
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+    fs.readFile(getExpectedFile(), SharedUtil.promise.makeCallback(resolve, reject));
   });
 
   expected = JSON.parse(expectedString);

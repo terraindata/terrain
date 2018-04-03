@@ -44,6 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESJSONParser from '../../database/elastic/parser/ESJSONParser';
+import ESParser from '../../database/elastic/parser/ESParser';
+import MidwayErrorItem from '../../error/MidwayErrorItem';
+
 /* returns an error message if there are any; else returns empty string */
 export function isValidIndexName(name: string): string
 {
@@ -65,6 +69,7 @@ export function isValidIndexName(name: string): string
   }
   return '';
 }
+
 /* returns an error message if there are any; else returns empty string */
 export function isValidTypeName(name: string): string
 {
@@ -78,6 +83,7 @@ export function isValidTypeName(name: string): string
   }
   return '';
 }
+
 /* returns an error message if there are any; else returns empty string */
 export function isValidFieldName(name: string): string
 {
@@ -94,4 +100,32 @@ export function isValidFieldName(name: string): string
     return 'Field name may not contain periods.';
   }
   return '';
+}
+
+export function getParsedQuery(body: string): ESParser
+{
+  const parser = new ESJSONParser(body, true);
+  if (parser.hasError())
+  {
+    const es = parser.getErrors();
+    const errors: MidwayErrorItem[] = [];
+
+    es.forEach((e) =>
+    {
+      const row = (e.token !== null) ? e.token.row : 0;
+      const col = (e.token !== null) ? e.token.col : 0;
+      const pos = (e.token !== null) ? e.token.charNumber : 0;
+      const title: string = String(row) + ':' + String(col) + ':' + String(pos) + ' ' + String(e.message);
+      errors.push({ status: -1, title, detail: '', source: {} });
+    });
+
+    if (errors.length === 0)
+    {
+      errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
+    }
+
+    throw errors;
+  }
+
+  return parser;
 }

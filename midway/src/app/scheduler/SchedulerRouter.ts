@@ -50,7 +50,7 @@ import * as KoaRouter from 'koa-router';
 import Credentials from '../credentials/Credentials';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
+import * as AppUtil from '../AppUtil';
 import Scheduler from './Scheduler';
 import SchedulerConfig from './SchedulerConfig';
 
@@ -137,7 +137,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   {
     delete schedule.id;
   }
-  Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
+  AppUtil.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
   await perm.SchedulerPermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await scheduler.upsert(schedule);
 });
@@ -147,7 +147,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
   schedule.id = ctx.params.id;
-  Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
+  AppUtil.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
   await perm.SchedulerPermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await scheduler.upsert(schedule);
 });

@@ -126,7 +126,6 @@ const BuilderColumn = createReactClass<any, any>(
       {
         query: PropTypes.object.isRequired,
         resultsState: PropTypes.object.isRequired,
-        exportState: PropTypes.object.isRequired,
         algorithm: PropTypes.object.isRequired,
         className: PropTypes.string,
         index: PropTypes.number,
@@ -221,6 +220,11 @@ const BuilderColumn = createReactClass<any, any>(
       };
     },
 
+    shouldShowExport()
+    {
+      return ['DEPLOYED', 'LIVE', 'DEFAULT'].indexOf(this.props.algorithm.status) > -1;
+    }
+
     renderContent()
     {
       if (!this.props.query)
@@ -261,13 +265,12 @@ const BuilderColumn = createReactClass<any, any>(
             query={query}
             canEdit={canEdit}
             db={this.props.algorithm.db}
-            algorithmName={this.props.algorithm.name}
+            algorithmId={this.props.algorithm.id}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
-            showExport={true}
+            showExport={this.shouldShowExport()}
             showCustomizeView={true}
             allowSpotlights={true}
-            exportState={this.props.exportState}
           />;
 
         case COLUMNS.Editor:

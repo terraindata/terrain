@@ -46,11 +46,12 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as winston from 'winston';
+
+import * as Util from './AppUtil';
 import { CmdLineUsage } from './CmdLineArgs';
 import DatabaseConfig from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
 import UserConfig from './users/UserConfig';
-import * as Util from './Util';
 
 export interface Config
 {

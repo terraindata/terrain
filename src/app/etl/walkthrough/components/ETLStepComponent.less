@@ -1,0 +1,157 @@
+@import "~common/Common.less";
+
+
+.etl-button-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .etl-transition-element {
+    .transition;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    flex-grow: 0;
+    flex-shrink: 0;
+  } 
+
+  .etl-alt-button {
+    border: 1px solid;
+    padding: @spacing;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    font-size: @pretty-large-font-size;
+    width: 192px;
+
+    svg {
+      margin-bottom: 3px;
+      fill: currentColor;
+      width: 32px;
+    }
+    .alt-button-text {
+      margin: 0px @spacing;
+    }
+
+    .transition;
+    &.button-disabled {
+      cursor: default;
+    }
+
+    .upload-filename {
+      justify-content: center;
+    }
+  }
+}
+
+.etl-walkthrough {
+  .etl-step-big-button {
+    padding: @half-spacing @spacing;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: @pretty-large-font-size;
+    .transition;
+    &.button-disabled {
+      cursor: default;
+    }
+  }
+
+  .etl-transition-column {
+
+    .etl-transition-element {
+      .transition;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .etl-step-next-button-spacer {
+    padding: @half-spacing;
+    margin-top: @half-spacing;
+  }
+
+  // ETLUploadStep
+  .etl-upload-step {
+
+    .step-upload-filename {
+      justify-content: center;
+    }
+
+    .field-type-q {
+      justify-content: center;
+    }
+  }
+
+  // SourceFileOptions
+  .source-file-type-options {
+    display: flex;
+    flex-direction: column;
+
+    .source-file-type-row-button {
+      display: flex;
+      padding: @quarter-spacing;
+      align-items: center;
+      cursor: pointer;
+
+      .source-file-type-checkbox-label {
+
+      }
+    }
+  }
+
+  // PickDatabaseStep
+  .etl-walkthrough-db-step {
+    
+  }
+
+  // ETLReviewStep
+  .etl-review-step {
+    .etl-review-step-row {
+      display: flex;
+      padding: @quarter-spacing;
+      justify-content: flex-start;
+      .big-text;
+    }
+
+    .etl-review-step-label {
+      width: 130px;
+      padding: 0px @half-spacing;
+      display: flex;
+      align-items: center;
+    }
+    .etl-review-step-value {
+      max-width: 300px;
+      padding: 0px @half-spacing;
+      display: flex;
+      align-items: center;
+    }
+
+    .etl-review-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .etl-review-gap {
+      margin: @quarter-spacing;
+    }
+  }
+
+  // pick template step
+  .etl-pick-template {
+    padding: @double-spacing;
+    padding-bottom: @double-spacing + @spacing;
+    border-radius: 3px;
+  }
+}

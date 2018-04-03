@@ -43,25 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-var-requires
-import AppendTransformationNode from 'shared/transformations/nodes/AppendTransformationNode';
-import DuplicateTransformationNode from 'shared/transformations/nodes/DuplicateTransformationNode';
-import FilterTransformationNode from 'shared/transformations/nodes/FilterTransformationNode';
-import GetTransformationNode from 'shared/transformations/nodes/GetTransformationNode';
-import JoinTransformationNode from 'shared/transformations/nodes/JoinTransformationNode';
-import LoadTransformationNode from 'shared/transformations/nodes/LoadTransformationNode';
-import PlusTransformationNode from 'shared/transformations/nodes/PlusTransformationNode';
-import PrependTransformationNode from 'shared/transformations/nodes/PrependTransformationNode';
-import PutTransformationNode from 'shared/transformations/nodes/PutTransformationNode';
-import SplitTransformationNode from 'shared/transformations/nodes/SplitTransformationNode';
-import StoreTransformationNode from 'shared/transformations/nodes/StoreTransformationNode';
-import SubstringTransformationNode from 'shared/transformations/nodes/SubstringTransformationNode';
-import TransformationNode from 'shared/transformations/nodes/TransformationNode';
-import UppercaseTransformationNode from 'shared/transformations/nodes/UppercaseTransformationNode';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import TransformationNodeVisitor from 'shared/transformations/TransformationNodeVisitor';
-import TransformationVisitResult from 'shared/transformations/TransformationVisitResult';
+
+import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
+import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
+import CastTransformationNode from './nodes/CastTransformationNode';
+import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
+import FilterTransformationNode from './nodes/FilterTransformationNode';
+import InsertTransformationNode from './nodes/InsertTransformationNode';
+import JoinTransformationNode from './nodes/JoinTransformationNode';
+import SplitTransformationNode from './nodes/SplitTransformationNode';
+import SubstringTransformationNode from './nodes/SubstringTransformationNode';
+import TransformationNode from './nodes/TransformationNode';
+import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
+import { TransformationEngine } from './TransformationEngine';
+import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeVisitor from './TransformationNodeVisitor';
+import TransformationVisitResult from './TransformationVisitResult';
+import EngineUtil from './util/EngineUtil';
 
 type AllNodeInfoType =
   {
@@ -84,46 +82,6 @@ export interface InfoType
 
 const TransformationNodeInfo: AllNodeInfoType =
   {
-    [TransformationNodeType.LoadNode]:
-      {
-        humanName: 'Load',
-        type: LoadTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitLoadNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.StoreNode]:
-      {
-        humanName: 'Store',
-        type: StoreTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitStoreNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.PutNode]:
-      {
-        humanName: 'Put',
-        type: PutTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitPutNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.GetNode]:
-      {
-        humanName: 'Get',
-        type: GetTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitGetNode(transformationNode, docCopy, options),
-      },
     [TransformationNodeType.SplitNode]:
       {
         humanName: 'Split Field',
@@ -131,6 +89,13 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Split this field into 2 or more fields',
         type: SplitTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
@@ -144,12 +109,18 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Join this field with another field',
         type: JoinTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
           visitor.visitJoinNode(transformationNode, docCopy, options),
-
       },
     [TransformationNodeType.FilterNode]: // what does this do?
       {
@@ -171,50 +142,31 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: 'Duplicate this field',
         type: DuplicateTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
           visitor.visitDuplicateNode(transformationNode, docCopy, options),
       },
-    [TransformationNodeType.PlusNode]:
+    [TransformationNodeType.InsertNode]:
       {
-        humanName: 'Add',
+        humanName: 'Insert String',
         editable: true,
         creatable: true,
-        description: `Add a value to this field's value`,
-        type: PlusTransformationNode,
+        description: `Insert a string at a given position in this field's value`,
+        type: InsertTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
           options: object) =>
-          visitor.visitPlusNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.PrependNode]:
-      {
-        humanName: 'Prepend',
-        editable: true,
-        creatable: true,
-        description: `Add text before this field's value`,
-        type: PrependTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitPrependNode(transformationNode, docCopy, options),
-      },
-    [TransformationNodeType.AppendNode]:
-      {
-        humanName: 'Append',
-        editable: true,
-        creatable: true,
-        description: `Add text after this field's value`,
-        type: AppendTransformationNode,
-        targetedVisitor: (visitor: TransformationNodeVisitor,
-          transformationNode: TransformationNode,
-          docCopy: object,
-          options: object) =>
-          visitor.visitAppendNode(transformationNode, docCopy, options),
+          visitor.visitInsertNode(transformationNode, docCopy, options),
       },
     [TransformationNodeType.UppercaseNode]:
       {
@@ -224,7 +176,7 @@ const TransformationNodeInfo: AllNodeInfoType =
         description: 'Make all the text in this field uppercase',
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         type: UppercaseTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -241,7 +193,7 @@ const TransformationNodeInfo: AllNodeInfoType =
         description: `Extract a piece from this field's text`,
         isAvailable: (engine, fieldId) =>
         {
-          return engine.getFieldType(fieldId) === 'string';
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
         type: SubstringTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -249,6 +201,45 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitSubstringNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.CastNode]:
+      {
+        humanName: 'Cast',
+        editable: true,
+        creatable: true,
+        description: `Convert this field to a different type`,
+        type: CastTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitCastNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.HashNode]:
+      {
+        humanName: 'Hash',
+        editable: true,
+        creatable: true,
+        description: `Hash this field using SHA3/Keccak256`,
+        type: HashTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitHashNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.ArraySumNode]:
+      {
+        humanName: 'Array Sum',
+        editable: true,
+        creatable: true,
+        description: `Sums the values of this array`,
+        type: ArraySumTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitArraySumNode(transformationNode, docCopy, options),
       },
   };
 
@@ -267,6 +258,29 @@ export abstract class TransformationInfo
   public static getInfo(type: TransformationNodeType): InfoType // get the whole info object
   {
     return TransformationNodeInfo[type];
+  }
+
+  public static isAvailable(type: TransformationNodeType, engine: TransformationEngine, field: number)
+  {
+    const info = TransformationNodeInfo[type];
+    if (info.isAvailable === undefined)
+    {
+      return true;
+    }
+    else
+    {
+      return info.isAvailable(engine, field);
+    }
+  }
+
+  public static canCreate(type: TransformationNodeType): boolean
+  {
+    return TransformationNodeInfo[type].creatable;
+  }
+
+  public static canEdit(type: TransformationNodeType): boolean
+  {
+    return TransformationNodeInfo[type].editable;
   }
 
   public static getType(type: TransformationNodeType): any

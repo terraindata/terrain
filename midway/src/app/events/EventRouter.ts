@@ -50,7 +50,7 @@ import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Util from '../Util';
+import * as Util from '../AppUtil';
 import { Events } from './Events';
 import { Metrics } from './Metrics';
 

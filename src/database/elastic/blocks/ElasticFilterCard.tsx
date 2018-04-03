@@ -62,6 +62,7 @@ import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreat
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
 import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import ESCardParser from '../conversion/ESCardParser';
@@ -75,6 +76,8 @@ const esFilterOperatorsMap = {
   '≤': 'lte',
   '=': 'term',
   '≈': 'match',
+  'in': 'terms',
+  'exists': 'exists',
 };
 
 const esRangeOperatorMap = {
@@ -84,6 +87,8 @@ const esRangeOperatorMap = {
   lte: '≤',
   term: '=',
   match: '≈',
+  terms: 'in',
+  exists: 'exists',
 };
 
 const esFilterOperatorsTooltips = {
@@ -93,6 +98,8 @@ const esFilterOperatorsTooltips = {
   '≤': "The data's field must be less than or equal to your specified valued.",
   '=': "The data's field must match your specified value exactly.",
   '≈': "The data's field must contain your specified value.",
+  'in': "The data's field must be an array.",
+  'exists': "The data's field must be existed.",
 };
 
 export class FilterUtils
@@ -242,33 +249,23 @@ export class FilterUtils
     {
       if (termBlock.key === 'term' && termBlock.type === 'eqlterm_query')
       {
-        const blockValue = new ESCardParser(termBlock);
-        const field = this.GetFilterClauseField(blockValue.getValueInfo());
-        if (field === null)
-        {
-          return null;
-        }
-        return this.IsTermClauseFilter(blockValue.getValueInfo().objectChildren[field].propertyValue);
+        return this.IsTermClauseFilter(termBlock);
+      }
+      if (termBlock.key === 'terms' && termBlock.type === 'eqlterms_query')
+      {
+        return this.IsTermsClauseFilter(termBlock);
       }
       if (termBlock.key === 'range' && termBlock.type === 'eqlrange_query')
       {
-        const blockValue = new ESCardParser(termBlock);
-        const field = this.GetFilterClauseField(blockValue.getValueInfo());
-        if (field === null)
-        {
-          return null;
-        }
-        return this.IsRangeClauseFilter(blockValue.getValueInfo().objectChildren[field].propertyValue);
+        return this.IsRangeClauseFilter(termBlock);
       }
       if (termBlock.key === 'match' && termBlock.type === 'eqlmatch')
       {
-        const blockValue = new ESCardParser(termBlock);
-        const field = this.GetFilterClauseField(blockValue.getValueInfo());
-        if (field === null)
-        {
-          return null;
-        }
-        return this.IsMatchClauseFilter(blockValue.getValueInfo().objectChildren[field].propertyValue);
+        return this.IsMatchClauseFilter(termBlock);
+      }
+      if (termBlock.key === 'exists' && termBlock.type === 'eqlexists_query')
+      {
+        return this.IsExistsClauseFilter(termBlock);
       }
       return false;
     }) === undefined)
@@ -365,30 +362,165 @@ export class FilterUtils
   }
 
   /**
-   * When we update cards, we extract filter rows from the query blocks, then delete qualified
-   * query blocks that are extracted into filter rows.
-   * Thus it is important that extracting filter rows uses the same checking function as deleting
-   * qualified blocks.
-   * @param obj : a term or match query object
-   * @returns {boolean} : true if we can turn this query object to a filter row
+   * Return the field name of the first field key.
    */
-  private static GetFilterClauseField(filterValueInfo: ESValueInfo)
+  private static GetFilterClauseField(filterValueInfo: ESValueInfo): string
   {
-    console.assert(filterValueInfo.clause.clauseType === ESClauseType.ESMapClause);
-    const keys = Object.keys(filterValueInfo.objectChildren);
-    if (keys.length > 1)
+    for (const name of Object.keys(filterValueInfo.objectChildren))
     {
-      TerrainLog.error(filterValueInfo, ' has more than one fields: ' + keys);
+      const kv = filterValueInfo.objectChildren[name];
+      if (kv.propertyName.clause.type === 'field')
+      {
+        return String(kv.propertyName.value);
+      }
+      if (name === 'field' && kv.propertyValue.clause.type === 'field')
+      {
+        return 'field';
+      }
     }
-    if (keys.length === 0)
-    {
-      return null;
-    }
-    return keys[0];
+    return null;
   }
 
-  private static IsRangeClauseFilter(rangeValue: ESValueInfo)
+  /**
+   * Return the field name of the first field key.
+   */
+  private static GetBoostValue(filterValueInfo: ESValueInfo): ESValueInfo
   {
+    if (filterValueInfo.objectChildren.hasOwnProperty('boost'))
+    {
+      if (filterValueInfo.objectChildren['boost'].propertyValue.clause.type === 'boost')
+      {
+        return filterValueInfo.objectChildren['boost'].propertyValue;
+      }
+    }
+    return null;
+  }
+
+  private static GetTemplateTypeOfValueString(valueString: string, defaultType: string = null)
+  {
+    const valueParser = new ESJSONParser(valueString);
+    if (valueParser.hasError() === false)
+    {
+      // number has a higher priority
+      switch (valueParser.getValueInfo().jsonType)
+      {
+        case ESJSONType.number:
+          return ':number';
+        case ESJSONType.boolean:
+          return ':boolean';
+        default:
+          TerrainLog.warn('valueType is neither a number nor a string, but a ' + valueParser.getValueInfo().jsonType);
+          return defaultType;
+      }
+    }
+    return defaultType;
+  }
+
+  private static IsExistsClauseFilter(rangeCard: Block)
+  {
+    const blockValue = new ESCardParser(rangeCard);
+    const field = this.GetFilterClauseField(blockValue.getValueInfo());
+    if (field === null)
+    {
+      return false;
+    }
+    const existsValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
+    console.assert(existsValue.clause.type === 'field');
+    return true;
+  }
+
+  /**
+   *
+   * @param {ESPropertyInfo} termClause "term":term_query
+   * @return elasticFilterBlocks generated from the filter clause
+   */
+  private static ExistsClauseToBlocks(boolTypeName, existsClause: ESPropertyInfo): Block[]
+  {
+    // term : {field : term_value}
+    // term_value: object (term_settings), null ('null'), boolean ('boolean'), number ('number'), string: 'string)
+    // term_settings: { value: 'base', boost: 'boost' }
+    const blocks = [];
+    const existsQuery = existsClause.propertyValue;
+    const field = this.GetFilterClauseField(existsQuery);
+    const boostValueInfo = this.GetBoostValue(existsQuery);
+    if (field === null)
+    {
+      return blocks;
+    }
+    const existsValue = existsQuery.objectChildren[field].propertyValue;
+    let blockValue;
+    console.assert(existsValue.clause.type === 'field');
+    blockValue = String(existsValue.value);
+
+    if (blockValue !== undefined)
+    {
+      if (boostValueInfo === null)
+      {
+        blocks.push(
+          BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+            field: blockValue,
+            value: blockValue,
+            boolQuery: boolTypeName,
+            filterOp: 'exists',
+          }, true),
+        );
+      } else
+      {
+        blocks.push(
+          BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+            field: blockValue,
+            value: blockValue,
+            boolQuery: boolTypeName,
+            filterOp: 'exists',
+            boost: String(boostValueInfo.value),
+          }, true),
+        );
+      }
+    }
+    return blocks;
+  }
+
+  private static ExistsClauseBlockToCard(block: Block): Block
+  {
+    const boost = block['boost'];
+    const valueString = String(block['field']);
+    let queryCard;
+    if (boost !== '')
+    {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'exists:exists_query': {
+              'field:field': valueString,
+              'boost:boost': boost,
+            },
+          },
+        });
+    } else
+    {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'exists:exists_query': {
+              'field:field': valueString,
+            },
+          },
+        });
+    }
+    return queryCard;
+  }
+
+  private static IsRangeClauseFilter(rangeCard: Block)
+  {
+    const blockValue = new ESCardParser(rangeCard);
+    const field = this.GetFilterClauseField(blockValue.getValueInfo());
+    if (field === null)
+    {
+      return false;
+    }
+    const rangeValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
     for (const k of Object.keys(rangeValue.objectChildren))
     {
       if (esRangeOperatorMap[k] !== undefined)
@@ -439,11 +571,70 @@ export class FilterUtils
     return blocks;
   }
 
-  private static IsMatchClauseFilter(termValue)
+  private static RangeClauseBlockToCard(block: Block): Block
   {
-    if (termValue.clause.type === 'match_settings')
+    let queryCard;
+    const boost = block['boost'];
+    const valueString = String(block['value']);
+    const valueType = this.GetTemplateTypeOfValueString(valueString, ':string');
+    // range
+    // match
+    const rangeField = String(block['field']) + ':range_value';
+    const rangeOp = String(esFilterOperatorsMap[block['filterOp']]) + ':base';
+    if (boost !== '')
+    {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'range:range_query': {
+              [rangeField]: {
+                [rangeOp]: valueString,
+                'boost:boost': boost,
+              },
+            },
+          },
+        });
+    } else
+    {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'range:range_query': {
+              [rangeField]: {
+                [rangeOp]: valueString,
+              },
+            },
+          },
+        });
+    }
+    return queryCard;
+  }
+
+  private static IsMatchClauseFilter(matchCard: Block): boolean
+  {
+    const blockValue = new ESCardParser(matchCard);
+    const field = this.GetFilterClauseField(blockValue.getValueInfo());
+    if (field === null)
     {
       return false;
+    }
+    const matchValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
+    if (matchValue.clause.type === 'match_settings')
+    {
+      if (matchValue.childrenSize() === 0)
+      {
+        return false;
+      }
+
+      for (const k of Object.keys(matchValue.childrenSize()))
+      {
+        if (k !== 'query' && k !== 'boost')
+        {
+          return false;
+        }
+      }
     }
     return true;
   }
@@ -461,6 +652,7 @@ export class FilterUtils
     const blocks = [];
     const termQuery = rangeClause.propertyValue;
     const field = this.GetFilterClauseField(termQuery);
+    let boost = '';
     if (field === null)
     {
       return blocks;
@@ -469,6 +661,16 @@ export class FilterUtils
     let blockValue;
     switch (termValue.clause.type)
     {
+      case 'match_settings':
+        if (termValue.objectChildren['query'] !== undefined)
+        {
+          blockValue = String(termValue.value['query']);
+          if (termValue.objectChildren['boost'] !== undefined)
+          {
+            boost = String(termValue.value['boost']);
+          }
+        }
+        break;
       case 'null':
         blockValue = String(termValue.value);
         break;
@@ -493,14 +695,60 @@ export class FilterUtils
           value: blockValue,
           boolQuery: boolTypeName,
           filterOp: '≈',
+          boost,
         }, true),
       );
     }
     return blocks;
   }
 
-  private static IsTermClauseFilter(termValue)
+  private static MatchClauseBlockToCard(block: Block): Block
   {
+    let queryCard;
+    const boost = block['boost'];
+    const valueString = String(block['value']);
+    const valueType = this.GetTemplateTypeOfValueString(valueString, ':string');
+    const templateField = String(block['field']) + valueType;
+
+    if (boost !== '')
+    {
+      const matchSettingField = String(block['field']) + ':match_settings';
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'match:match': {
+              [matchSettingField]: {
+                'query:string': valueString,
+                'boost:boost': boost,
+              },
+            },
+          },
+        });
+    } else
+    {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'match:match': {
+              [templateField]: valueString,
+            },
+          },
+        });
+    }
+    return queryCard;
+  }
+
+  private static IsTermClauseFilter(termCard: Block): boolean
+  {
+    const blockValue = new ESCardParser(termCard);
+    const field = this.GetFilterClauseField(blockValue.getValueInfo());
+    if (field === null)
+    {
+      return false;
+    }
+    const termValue = blockValue.getValueInfo().objectChildren[field].propertyValue;
     switch (termValue.clause.type)
     {
       case 'term_settings':
@@ -587,6 +835,152 @@ export class FilterUtils
     return blocks;
   }
 
+  private static TermClauseBlockToCard(block: Block): Block
+  {
+    const boost = block['boost'];
+    const valueString = String(block['value']);
+    const valueType = this.GetTemplateTypeOfValueString(valueString, ':string');
+    let queryCard;
+    const templateField = String(block['field']) + valueType;
+    if (boost !== '')
+    {
+      const termSettingField = String(block['field']) + ':term_settings';
+      const valueField = 'value' + valueType;
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'term:term_query': {
+              [termSettingField]: {
+                [valueField]: valueString,
+                'boost:boost': boost,
+              },
+            },
+          },
+        });
+    } else
+    {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'term:term_query': {
+              [templateField]: valueString,
+            },
+          },
+        });
+    }
+    return queryCard;
+  }
+
+  private static IsTermsClauseFilter(termsCard: Block): boolean
+  {
+    const cardParser = new ESCardParser(termsCard);
+    const termsValueInfo = cardParser.getValueInfo();
+    const nrFields = termsValueInfo.childrenSize();
+    if (nrFields === 0 || nrFields > 2)
+    {
+      return false;
+    }
+
+    let ret = true;
+
+    termsValueInfo.forEachProperty((kv: ESPropertyInfo) =>
+    {
+      if (kv.propertyValue.clause.type === 'terms_settings')
+      {
+        ret = false;
+      }
+    });
+    return ret;
+  }
+
+  /**
+   *
+   * @param boolTypeName: [must, must_not, should, filter]
+   * @param {ESPropertyInfo}: termClause : {terms: TERMS_QUERY}
+   * @returns {Block[]}: a list of elasticFilterBlock
+   * @constructor
+   */
+  private static TermsClauseToBlocks(boolTypeName, termsClause: ESPropertyInfo): Block[]
+  {
+    // terms: {field : terms_value, boost : boost, _name : string}
+    const blocks = [];
+    const termsQuery = termsClause.propertyValue;
+    const termsQueryKVs = termsQuery.objectChildren;
+    let boost = '';
+    let field;
+    let blockValue;
+    for (const k of Object.keys(termsQueryKVs))
+    {
+      if (k === 'boost')
+      {
+        boost = String(termsQueryKVs[k].propertyValue.value);
+      } else
+      {
+        console.assert(termsQueryKVs[k].propertyValue.clause.type === 'base[]');
+        field = k;
+        blockValue = JSON.stringify(termsQueryKVs[k].propertyValue.value);
+      }
+    }
+    if (blockValue !== undefined)
+    {
+      blocks.push(
+        BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+          field,
+          value: blockValue,
+          boolQuery: boolTypeName,
+          filterOp: 'in',
+          boost,
+        }, true),
+      );
+    }
+
+    return blocks;
+  }
+
+  private static TermsClauseBlockToCard(block: Block): Block
+  {
+    let queryCard;
+    const boost = block['boost'];
+    const valueParser = new ESJSONParser(block['value']);
+    let cardValue;
+    if (valueParser.hasError() === false)
+    {
+      cardValue = valueParser.getValueInfo().value;
+    } else
+    {
+      cardValue = String(block['value']);
+    }
+
+    if (boost !== '')
+    {
+      const valueField = block['field'] + ':base[]';
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'terms:terms_query': {
+              [valueField]: cardValue,
+              'boost:boost': boost,
+            },
+          },
+        });
+    } else
+    {
+      const valueField = block['field'] + ':base[]';
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'terms:terms_query': {
+              [valueField]: cardValue,
+            },
+          },
+        });
+    }
+    return queryCard;
+  }
   /**
    *
    * @param {string} queryName : must, must_not, filter, should
@@ -615,12 +1009,19 @@ export class FilterUtils
       if (query.objectChildren['term'])
       {
         newBlocks = this.TermClauseToBlocks(boolTypeName, query.objectChildren['term']);
-      } else if (query.objectChildren['range'])
+      } else if (query.objectChildren['terms'])
+      {
+        newBlocks = this.TermsClauseToBlocks(boolTypeName, query.objectChildren['terms']);
+      }
+      else if (query.objectChildren['range'])
       {
         newBlocks = this.RangeClauseToBlocks(boolTypeName, query.objectChildren['range']);
       } else if (query.objectChildren['match'])
       {
         newBlocks = this.MatchClauseToBlocks(boolTypeName, query.objectChildren['match']);
+      } else if (query.objectChildren['exists'])
+      {
+        newBlocks = this.ExistsClauseToBlocks(boolTypeName, query.objectChildren['exists']);
       }
       if (newBlocks.length > 0)
       {
@@ -635,96 +1036,29 @@ export class FilterUtils
   {
     console.assert(block.type === 'elasticFilterBlock', 'Rows of the Elastic filter card must be elasticFilterBlock');
     let queryCard;
-    // detect the type of the value string
-    let valueType = ':string';
-    const valueString = String(block['value']);
-    const boost = block['boost'];
-    const valueParser = new ESJSONParser(valueString);
 
-    if (valueParser.hasError() === false)
+    switch (block['filterOp'])
     {
-      if (typeof valueParser.getValue() === 'number')
-      {
-        valueType = ':number';
-      }
-    }
-    const templateField = String(block['field']) + valueType;
-
-    if (block['filterOp'] === '=')
-    {
-      if (boost !== '')
-      {
-        const termSettingField = String(block['field']) + ':term_settings';
-        const valueField = 'value' + valueType;
-        queryCard = BlockUtils.make(ElasticBlocks,
-          'eqlquery',
-          {
-            template: {
-              'term:term_query': {
-                [termSettingField]: {
-                  [valueField]: valueString,
-                  'boost:boost': boost,
-                },
-              },
-            },
-          });
-      } else
-      {
-        queryCard = BlockUtils.make(ElasticBlocks,
-          'eqlquery',
-          {
-            template: {
-              'term:term_query': {
-                [templateField]: valueString,
-              },
-            },
-          });
-      }
-    } else if (block['filterOp'] === '≈')
-    {
-      queryCard = BlockUtils.make(ElasticBlocks,
-        'eqlquery',
-        {
-          template: {
-            'match:match': {
-              [templateField]: valueString,
-            },
-          },
-        });
-    } else
-    {
-      // range
-      // match
-      const rangeField = String(block['field']) + ':range_value';
-      const rangeOp = String(esFilterOperatorsMap[block['filterOp']]) + ':base';
-      if (boost !== '')
-      {
-        queryCard = BlockUtils.make(ElasticBlocks,
-          'eqlquery',
-          {
-            template: {
-              'range:range_query': {
-                [rangeField]: {
-                  [rangeOp]: valueString,
-                  'boost:boost': boost,
-                },
-              },
-            },
-          });
-      } else
-      {
-        queryCard = BlockUtils.make(ElasticBlocks,
-          'eqlquery',
-          {
-            template: {
-              'range:range_query': {
-                [rangeField]: {
-                  [rangeOp]: valueString,
-                },
-              },
-            },
-          });
-      }
+      case '=':
+        queryCard = this.TermClauseBlockToCard(block);
+        break;
+      case '≈':
+        queryCard = this.MatchClauseBlockToCard(block);
+        break;
+      case 'in':
+        queryCard = this.TermsClauseBlockToCard(block);
+        break;
+      case 'exists':
+        queryCard = this.ExistsClauseBlockToCard(block);
+        break;
+      case '>':
+      case '<':
+      case '≥':
+      case '≤':
+        queryCard = this.RangeClauseBlockToCard(block);
+        break;
+      default:
+        TerrainLog.error('Unknown filterOp ' + block['filterOp']);
     }
     return queryCard;
   }

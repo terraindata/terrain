@@ -44,53 +44,68 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable no-unused-expression
+import { List } from 'immutable';
+import { KeyPath } from 'shared/util/KeyPath';
+
 enum TransformationNodeType
 {
-  LoadNode = 'LoadNode',
-  StoreNode = 'StoreNode',
-  PutNode = 'PutNode',
-  GetNode = 'GetNode',
   SplitNode = 'SplitNode',
   JoinNode = 'JoinNode',
   FilterNode = 'FilterNode',
   DuplicateNode = 'DuplicateNode',
-  PlusNode = 'PlusNode',
-  PrependNode = 'PrependNode',
-  AppendNode = 'AppendNode',
+  InsertNode = 'InsertNode',
   UppercaseNode = 'UppercaseNode',
   SubstringNode = 'SubstringNode',
+  CastNode = 'CastNode',
+  HashNode = 'HashNode',
+  ArraySumNode = 'ArraySumNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
 type AssertEnumValuesEqualKeys = {
   [K in keyof typeof TransformationNodeType]: K
 };
+// noinspection BadExpressionStatementJS
 TransformationNodeType as AssertEnumValuesEqualKeys;
 
 // if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
+// noinspection JSUnusedLocalSymbols
 type AssertOptionTypesExhaustive = {
   [K in TransformationNodeType]: TransformationOptionTypes[K]
 };
 
 interface TransformationOptionTypes
 {
-  LoadNode: any;
-  StoreNode: any;
-  PutNode: any;
-  GetNode: any;
-  SplitNode: any;
-  JoinNode: any;
+  SplitNode: {
+    newFieldKeyPaths: List<KeyPath>;
+    preserveOldFields: boolean;
+    delimiter: string | RegExp | number;
+  };
+  JoinNode: {
+    newFieldKeyPaths: List<KeyPath>;
+    preserveOldFields: boolean;
+    delimiter: string;
+  };
   FilterNode: any;
-  DuplicateNode: any;
-  PlusNode: any;
-  PrependNode: any;
-  AppendNode: any;
+  DuplicateNode: {
+    newFieldKeyPaths: List<KeyPath>;
+  };
+  InsertNode: {
+    at?: number;
+    value: string | KeyPath;
+  };
   UppercaseNode: {
-
   };
   SubstringNode: {
     from: number;
     length: number;
+  };
+  CastNode: {
+    toTypename: string;
+  };
+  HashNode: any;
+  ArraySumNode: {
+    newFieldKeyPaths: List<KeyPath>;
   };
 }
 

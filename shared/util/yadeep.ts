@@ -52,6 +52,7 @@ THE SOFTWARE.
  * on all children.
  */
 
+import isPrimitive = require('is-primitive');
 import { KeyPath, WayPoint } from './KeyPath';
 
 /**
@@ -99,11 +100,19 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
     const results: any[] = [];
     for (let j: number = 0; j < keys.length; j++)
     {
-      find(obj[keys[j]], path.shift(), (found) =>
+      if (!isPrimitive(obj[keys[j]]))
       {
-        results[j] = found;
-        return next(found);
-      }, options);
+        find(obj[keys[j]], path.shift(), (found) =>
+        {
+          results[j] = found;
+          return next(found);
+        }, options);
+      }
+      else if (path.size === 1)
+      {
+        // else push undefined?
+        results[j] = obj[keys[j]];
+      }
     }
     obj = next(results);
     return;
@@ -123,7 +132,14 @@ export function find(obj: object, path: KeyPath, next: (found) => any, options: 
       // Don't be fooled, this is the real base case...
       if (path.size === 1)
       {
-        obj[keys[i]] = next(obj[keys[i]]);
+        if (options['delete'] === true)
+        {
+          delete obj[keys[i]];
+        }
+        else
+        {
+          obj[keys[i]] = next(obj[keys[i]]);
+        }
         return;
       } else
       {
@@ -173,4 +189,18 @@ export function set(obj: object, path: KeyPath, value: any, options: object = {}
   {
     return value;
   }, options);
+}
+
+/**
+ * Deletes the value(s) specified by the provided
+ * `KeyPath` from the document `obj`.
+ *
+ * NOTE: this modifies `obj`.
+ *
+ * @param obj  The object to modify.
+ * @param path The path of the value(s) to delete.
+ */
+export function remove(obj: object, path: KeyPath): void
+{
+  set(obj, path, undefined, { delete: true });
 }

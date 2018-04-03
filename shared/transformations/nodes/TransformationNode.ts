@@ -44,7 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { TransformationInfo } from 'shared/transformations/TransformationInfo';
+import { List } from 'immutable';
+
+import { KeyPath } from '../../util/KeyPath';
+import { TransformationInfo } from '../TransformationInfo';
 import TransformationNodeType from '../TransformationNodeType';
 import TransformationNodeVisitor from '../TransformationNodeVisitor';
 import TransformationVisitError from '../TransformationVisitError';
@@ -54,13 +57,13 @@ export default abstract class TransformationNode
 {
   public id: number;
   public typeCode: TransformationNodeType;
-  public fieldIDs: List<number>;
+  public fields: List<KeyPath>;
   public meta: object;
 
-  public constructor(id: number, fieldIDs: List<number>, options: object = {}, typeCode: TransformationNodeType)
+  public constructor(id: number, fields: List<KeyPath>, options: object = {}, typeCode: TransformationNodeType)
   {
     this.id = id;
-    this.fieldIDs = fieldIDs;
+    this.fields = fields;
     this.meta = options;
     this.typeCode = typeCode;
   }

@@ -61,9 +61,18 @@ export default abstract class ADocumentTransform extends Transform
     });
   }
 
-  public _transform(chunk, encoding, callback)
+  public _transform(chunk: object, encoding, callback)
   {
-    callback(null, this.transform(chunk as object, this.chunkNumber++));
+    const out = this.transform(chunk, this.chunkNumber++);
+    if (Array.isArray(out))
+    {
+      out.forEach((o) => this.push(o));
+      callback();
+    }
+    else
+    {
+      callback(null, out);
+    }
   }
 
   public _flush(callback)
@@ -72,7 +81,7 @@ export default abstract class ADocumentTransform extends Transform
     callback();
   }
 
-  protected abstract transform(input: object, chunkNumber: number): object;
+  protected abstract transform(input: object, chunkNumber: number): object | object[];
 
   protected conclusion(chunkNumber: number): void
   {

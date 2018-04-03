@@ -3,11 +3,10 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # this is the tagged version of moviedb docker image we are using
-deploy_version=1.0a
-elastic_image="terrain/moviesdb-elk:$deploy_version"
-mysql_image="terrain/moviesdb-mysql:$deploy_version"
-postgres_image="terrain/moviesdb-postgres:$deploy_version"
-sqlite_image="terrain/moviesdb-sqlite:$deploy_version"
+elastic_image="terrain/moviesdb-elk:1.1a"
+mysql_image="terrain/moviesdb-mysql:1.0a"
+postgres_image="terrain/moviesdb-postgres:1.0a"
+sqlite_image="terrain/moviesdb-sqlite:1.0a"
 chrome_image="yukinying/chrome-headless-browser"
 
 orig_mysql_port=3306

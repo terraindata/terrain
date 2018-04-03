@@ -49,21 +49,16 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
+import ElasticDB from '../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import { Permissions } from '../permissions/Permissions';
+
 import * as Tasty from '../../tasty/Tasty';
+import * as Util from '../AppUtil';
+import { deleteElasticIndex, getSchema } from '../Schema';
 
 const Router = new KoaRouter();
-
-async function getSchema(databaseID: number): Promise<string>
-{
-  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
-  if (database === undefined)
-  {
-    throw new Error('Database "' + databaseID.toString() + '" not found.');
-  }
-  const schema: Tasty.Schema = await database.getTasty().schema();
-  return schema.toString();
-}
+const perm: Permissions = new Permissions();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -88,6 +83,22 @@ Router.get('/:database', passport.authenticate('access-token-local'), async (ctx
 {
   winston.info('get schema');
   ctx.body = await getSchema(ctx.params.database);
+});
+
+Router.post('/database/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const params = ctx.request.body.body;
+  Util.verifyParameters(params, ['language', 'dbname', 'dbid']);
+  await perm.ImportPermissions.verifyDefaultRoute(ctx.state.user, params);
+  switch (params.language)
+  {
+    case 'elastic':
+      await deleteElasticIndex(params.dbid, params.dbname);
+      break;
+    default:
+      throw new Error(`Deleting database of type '${params.language}' is unsupported`);
+  }
+  ctx.body = { message: 'successfully deleted database' };
 });
 
 export default Router;

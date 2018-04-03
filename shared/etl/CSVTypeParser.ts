@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 
-import { isTypeConsistent } from '../Util';
+import util from '../Util';
 
 export class CSVTypeParser
 {
@@ -252,7 +252,7 @@ export class CSVTypeParser
       {
         return ['array', 'null'];
       }
-      return isTypeConsistent(innerValue) ? ['array'].concat(this._getCSVTypeAsArray(JSON.stringify(innerValue[0]))) : ['text'];
+      return util.elastic.isTypeConsistent(innerValue) ? ['array'].concat(this._getCSVTypeAsArray(JSON.stringify(innerValue[0]))) : ['text'];
     }
     if (this.isIntHelper(value))
     {
@@ -268,6 +268,7 @@ export class CSVTypeParser
     }
     return ['text'];
   }
+
   // typeSet should already have JSON.stringify(['null']) removed
   private _matchInSet(typeSet: Set<string>, types: string[]): boolean
   {
@@ -282,3 +283,5 @@ export class CSVTypeParser
     return counter === typeSet.size;
   }
 }
+
+export default CSVTypeParser;

@@ -1,0 +1,69 @@
+@import "../Common.less";
+
+.dynamic-form {
+  display: flex;
+  flex-direction: column;
+
+  .dynamic-form-matrix-row {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .dynamic-form-cell {
+    box-sizing: border-box;
+    padding: @quarter-spacing;
+    box-sizing: border-box;
+    .transition;
+  }
+
+  .dynamic-form-checkbox-row {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    .dynamic-form-checkbox {
+      margin-bottom: 1px;
+    }
+
+    .dynamic-form-label {
+      .normal-text;
+    }
+  }
+
+  .dynamic-form-default-block {
+    display: flex;
+    flex-direction: column;
+
+    .dynamic-form-label {
+      .normal-text;
+    }
+  }
+
+  .dynamic-form-confirm-bar {
+    display: flex;
+    flex: 1 0 32px;
+    margin-top: @half-spacing;
+    padding: @half-spacing @quarter-spacing;
+    justify-content: flex-end;
+    align-items: flex-end;
+    box-sizing: border-box;
+
+    .dynamic-form-button {
+      .transition;
+      cursor: pointer;
+      padding: @half-spacing @spacing;
+      box-sizing: border-box;
+      border-radius: 3px;
+      &:not(:first-child) {
+        margin-left: @spacing;
+      }
+      &.dynamic-form-button-active {
+
+      }
+      &.dynamic-form-button-disabled {
+        cursor: default;
+      }
+    }
+  }
+
+}

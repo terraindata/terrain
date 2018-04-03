@@ -55,6 +55,7 @@ import Dropdown from 'common/components/Dropdown';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { LibraryState } from 'library/LibraryTypes';
 import { LibraryItem } from 'library/LibraryTypes';
+import Util from 'util/Util';
 
 import './AlgorithmSelector.less';
 
@@ -62,10 +63,11 @@ const Color = require('color');
 
 export interface Props
 {
-  libraryState: LibraryState;
   ids: List<number>; // [category id, group id, algorithm id]
   onChangeSelection: (ids: List<number>) => void;
-  dropdownWidth: string;
+  dropdownWidth?: string;
+  // injected props
+  library?: LibraryState;
 }
 
 type AvailableItemsType = [List<LibraryItem>, List<string>, number];
@@ -83,7 +85,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
   public handleCategoryChange(index, event)
   {
     const [categories, categoryNames, categoryIndex] =
-      this.getAvailableCategories(this.props.libraryState, this.props.ids.get(0));
+      this.getAvailableCategories(this.props.library, this.props.ids.get(0));
     const id = categories.get(index).id;
     if (id === this.props.ids.get(0)) // nothing changed
     {
@@ -95,7 +97,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
   public handleGroupChange(index, event)
   {
     const [groups, groupNames, groupIndex] =
-      this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
+      this.getAvailableGroups(this.props.library, this.props.ids.get(0), this.props.ids.get(1));
     const id = groups.get(index).id;
     if (id === this.props.ids.get(1)) // nothing changed
     {
@@ -107,7 +109,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
   public handleAlgorithmChange(index, event)
   {
     const [algorithms, algorithmNames, algorithmIndex] =
-      this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
+      this.getAvailableAlgorithms(this.props.library, this.props.ids.get(1), this.props.ids.get(2));
     const id = algorithms.get(index).id;
     if (id === this.props.ids.get(2)) // nothing changed
     {
@@ -147,12 +149,11 @@ class AlgorithmSelector extends TerrainComponent<Props>
   public render()
   {
     const [categories, categoryNames, categoryIndex] =
-      this.getAvailableCategories(this.props.libraryState, this.props.ids.get(0));
+      this.getAvailableCategories(this.props.library, this.props.ids.get(0));
     const [groups, groupNames, groupIndex] =
-      this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
+      this.getAvailableGroups(this.props.library, this.props.ids.get(0), this.props.ids.get(1));
     const [algorithms, algorithmNames, algorithmIndex] =
-      this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
-
+      this.getAvailableAlgorithms(this.props.library, this.props.ids.get(1), this.props.ids.get(2));
     return (
       <div className='algorithm-selector-wrapper'>
         <div className='algorithm-selector-column'>
@@ -166,7 +167,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleCategoryChange}
               openDown={true}
-              width={this.props.dropdownWidth}
+              className='alg-selector-grow-to-fit'
             />
           </div>
         </div>
@@ -181,7 +182,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleGroupChange}
               openDown={true}
-              width={this.props.dropdownWidth}
+              className='alg-selector-grow-to-fit'
             />
           </div>
         </div>
@@ -196,7 +197,7 @@ class AlgorithmSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleAlgorithmChange}
               openDown={true}
-              width={this.props.dropdownWidth}
+              className='alg-selector-grow-to-fit'
             />
           </div>
         </div>
@@ -206,4 +207,8 @@ class AlgorithmSelector extends TerrainComponent<Props>
   }
 }
 
-export default AlgorithmSelector;
+export default Util.createTypedContainer(
+  AlgorithmSelector,
+  ['library'],
+  {},
+);

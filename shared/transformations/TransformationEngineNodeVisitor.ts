@@ -45,17 +45,18 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 // import * as winston from 'winston';
-import AppendTransformationNode from './nodes/AppendTransformationNode';
+import * as Immutable from 'immutable';
+import { keccak256 } from 'js-sha3';
+
+import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
+import { KeyPath } from '../util/KeyPath';
+import * as yadeep from '../util/yadeep';
+import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
-import GetTransformationNode from './nodes/GetTransformationNode';
+import InsertTransformationNode from './nodes/InsertTransformationNode';
 import JoinTransformationNode from './nodes/JoinTransformationNode';
-import LoadTransformationNode from './nodes/LoadTransformationNode';
-import PlusTransformationNode from './nodes/PlusTransformationNode';
-import PrependTransformationNode from './nodes/PrependTransformationNode';
-import PutTransformationNode from './nodes/PutTransformationNode';
 import SplitTransformationNode from './nodes/SplitTransformationNode';
-import StoreTransformationNode from './nodes/StoreTransformationNode';
 import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
@@ -66,6 +67,23 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 export default class TransformationEngineNodeVisitor extends TransformationNodeVisitor
 {
+  private static splitHelper(el: any, opts: NodeOptionsType<TransformationNodeType.SplitNode>): string[]
+  {
+    let split: string[];
+    if (typeof opts.delimiter === 'number')
+    {
+      split = [
+        (el as string).slice(0, opts.delimiter as number),
+        (el as string).slice(opts.delimiter as number),
+      ];
+    }
+    else
+    {
+      split = (el as string).split(opts.delimiter as string | RegExp);
+    }
+    return split;
+  }
+
   public applyTransformationNode(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     if (node === undefined)
@@ -81,16 +99,18 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return {} as TransformationVisitResult;
   }
 
-  public visitAppendNode(node: AppendTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitDuplicateNode(node: DuplicateTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    // TODO
-    return this.visitDefault(node, doc, options);
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.DuplicateNode>;
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      yadeep.set(doc, opts.newFieldKeyPaths.get(0), el, { create: true });
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
   public visitFilterNode(node: FilterTransformationNode, doc: object, options: object = {}): TransformationVisitResult
@@ -99,60 +119,212 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return this.visitDefault(node, doc, options);
   }
 
-  public visitGetNode(node: GetTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
-
   public visitJoinNode(node: JoinTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    // TODO
-    return this.visitDefault(node, doc, options);
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.JoinNode>;
+    let joined: string;
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to join using a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      if (joined === undefined)
+      {
+        joined = el as string;
+      }
+      else
+      {
+        joined = joined + opts.delimiter + (el as string);
+      }
+    });
+    yadeep.set(doc, opts.newFieldKeyPaths.get(0), joined, { create: true });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
-  public visitLoadNode(node: LoadTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  public visitInsertNode(node: InsertTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.InsertNode>;
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to insert in a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
 
-  public visitPlusNode(node: PlusTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
+      let at: number = 0;
+      if (typeof opts['at'] === 'number')
+      {
+        at = opts['at'];
+        if (opts['at'] < 0)
+        {
+          at += el.length + 1;
+        }
+      }
+      else if (opts['at'] === undefined)
+      {
+        at = el.length;
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Insert node: "at" property is invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
 
-  public visitPrependNode(node: PrependTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
+      let value;
+      if (Immutable.Iterable.isIterable(opts['value']) || opts['value'] instanceof KeyPath)
+      {
+        value = yadeep.get(doc, opts['value'] as KeyPath);
+        if (typeof value !== 'string')
+        {
+          return {
+            errors: [
+              {
+                message: 'Insert: field denoted by "value" keypath is not a string',
+              } as TransformationVisitError,
+            ],
+          } as TransformationVisitResult;
+        }
+      }
+      else if (typeof opts['value'] === 'string')
+      {
+        value = opts['value'];
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Insert: "value" property is missing or invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
 
-  public visitPutNode(node: PutTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
+      // Currently assumes a single from and length for all fieldIDs
+      yadeep.set(doc, field, el.slice(0, at) + String(value) + el.slice(at), { create: true });
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
   public visitSplitNode(node: SplitTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    // TODO
-    return this.visitDefault(node, doc, options);
-  }
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.SplitNode>;
 
-  public visitStoreNode(node: StoreTransformationNode, doc: object, options: object = {}): TransformationVisitResult
-  {
-    // TODO
-    return this.visitDefault(node, doc, options);
+    if (node.fields.size > 1)
+    {
+      return {
+        errors: [
+          {
+            message: 'Attempted to split multiple fields at once (this is not supported)',
+          } as TransformationVisitError,
+        ],
+      } as TransformationVisitResult;
+    }
+
+    node.fields.forEach((field) =>
+    {
+      const el: any = yadeep.get(doc, field);
+      let split: string[];
+      if (el.constructor === Array)
+      {
+        for (let i: number = 0; i < Object.keys(el).length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+
+          split = TransformationEngineNodeVisitor.splitHelper(yadeep.get(doc, kpi), opts);
+
+          for (let j: number = 0; j < split.length; j++)
+          {
+            let newkpi: KeyPath = opts.newFieldKeyPaths.get(j);
+            if (newkpi.contains('*'))
+            {
+              newkpi = newkpi.set(newkpi.indexOf('*'), i.toString());
+            }
+            else
+            {
+              newkpi = newkpi.push(i.toString());
+            }
+            yadeep.set(doc, newkpi, split[j], { create: true });
+          }
+        }
+      }
+      if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to split a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      split = TransformationEngineNodeVisitor.splitHelper(el, opts);
+
+      if (split.length !== opts.newFieldKeyPaths.size)
+      {
+        return {
+          errors: [
+            {
+              message: 'Number of split field names does not match number of split elements',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+
+      for (let i: number = 0; i < split.length; i++)
+      {
+        yadeep.set(doc, opts.newFieldKeyPaths.get(i), split[i], { create: true });
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
   }
 
   public visitSubstringNode(node: SubstringTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     const opts = node.meta as NodeOptionsType<TransformationNodeType.SubstringNode>;
-    for (const fieldID of node.fieldIDs.toJS())
+    node.fields.forEach((field) =>
     {
-      if (typeof doc[fieldID] !== 'string')
+      const el: any = yadeep.get(doc, field);
+      if (typeof el !== 'string')
       {
         return {
           errors: [
@@ -183,8 +355,8 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         } as TransformationVisitResult;
       }
       // Currently assumes a single from and length for all fieldIDs
-      doc[fieldID] = doc[fieldID].substr(opts['from'], opts['length']);
-    }
+      yadeep.set(doc, field, el.substr(opts['from'], opts['length']), { create: true });
+    });
 
     return {
       document: doc,
@@ -193,9 +365,26 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
-    for (const fieldID of node.fieldIDs.toJS())
+    node.fields.forEach((field) =>
     {
-      if (typeof doc[fieldID] !== 'string')
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, yadeep.get(doc, kpi).toUpperCase());
+        }
+      }
+      else if (typeof el !== 'string')
       {
         return {
           errors: [
@@ -205,8 +394,192 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           ],
         } as TransformationVisitResult;
       }
-      doc[fieldID] = doc[fieldID].toUpperCase();
-    }
+      else
+      {
+        yadeep.set(doc, field, el.toUpperCase());
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitCastNode(node: CastTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.CastNode>;
+
+    node.fields.forEach((field: KeyPath) =>
+    {
+      const originalElement: any = yadeep.get(doc, field);
+
+      if (typeof originalElement === opts.toTypename || originalElement.constructor === Array && opts.toTypename === 'array')
+      {
+        return;
+      }
+
+      let newFields: KeyPath[] = [field];
+
+      if (Array.isArray(originalElement))
+      {
+        newFields = [];
+        for (let i: number = 0; i < originalElement.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          newFields.push(kpi);
+        }
+      }
+
+      newFields.forEach((f: KeyPath) =>
+      {
+        const el: any = yadeep.get(doc, f);
+
+        if (typeof el === opts.toTypename || el.constructor === Array && opts.toTypename === 'array')
+        {
+          return;
+        }
+
+        switch (opts.toTypename)
+        {
+          case 'string': {
+            if (typeof el === 'object')
+            {
+              yadeep.set(doc, f, JSON.stringify(el));
+            }
+            else
+            {
+              yadeep.set(doc, f, el.toString());
+            }
+            break;
+          }
+          case 'number': {
+            yadeep.set(doc, f, Number(el));
+            break;
+          }
+          case 'boolean': {
+            if (typeof el === 'string')
+            {
+              yadeep.set(doc, f, el.toLowerCase() === 'true');
+            }
+            else
+            {
+              yadeep.set(doc, f, Boolean(el));
+            }
+            break;
+          }
+          case 'object': {
+            yadeep.set(doc, f, {});
+            break;
+          }
+          case 'array': {
+            yadeep.set(doc, f, []);
+            break;
+          }
+          default: {
+            return {
+              errors: [
+                {
+                  message: `Attempted to cast to an unsupported type ${opts.toTypename}`,
+                } as TransformationVisitError,
+              ],
+            } as TransformationVisitResult;
+          }
+        }
+
+      });
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitHashNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, keccak256.update(yadeep.get(doc, kpi)).hex());
+        }
+      }
+      else if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to hash a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, keccak256.update(el).hex());
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitArraySumNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.ArraySumNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        let sum: number = 0;
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          sum += yadeep.get(doc, kpi);
+        }
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), sum, { create: true });
+      }
+      else
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to sum a non-array (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+    });
 
     return {
       document: doc,

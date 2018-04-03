@@ -44,11 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as csvString from 'csv-string';
+// import * as csvString from 'csv-string';
 import * as _ from 'lodash';
 import * as stream from 'stream';
 
-import { CSVTypeParser, isTypeConsistent } from '../Util';
+import util from '../Util';
+import CSVTypeParser from './CSVTypeParser';
 
 export class FieldTypes
 {
@@ -72,6 +73,7 @@ export class FieldTypes
       {
         documentMapping['properties'][key] = await this.getESTypeFromFullType(value[key]);
       }
+
       return resolve(documentMapping);
     });
   }
@@ -168,7 +170,7 @@ export class FieldTypes
               else
               {
                 type = { type: 'array', innerType: {} };
-                type['innerType'] = isTypeConsistent(value) ? await this.getFullTypeFromAny(value[0])
+                type['innerType'] = util.elastic.isTypeConsistent(value) ? await this.getFullTypeFromAny(value[0])
                   : { type: 'text', index: 'analyzed', analyzer: 'standard' };
               }
             }
@@ -228,103 +230,103 @@ export class FieldTypes
     });
   }
 
-  public async getFieldTypesFromMySQLFormatStream(files: stream.Readable[] | stream.Readable, params: object): Promise<stream.Readable>
-  {
-    return new Promise<stream.Readable>(async (resolve, reject) =>
-    {
-      let file: stream.Readable | null = null;
-      if (Array.isArray(files))
-      {
-        for (const f of files)
-        {
-          if (f['fieldname'] === 'file')
-          {
-            file = f;
-          }
-        }
-      }
-      else
-      {
-        file = files;
-      }
-      if (file === null)
-      {
-        return reject('No file specified.');
-      }
+  // public async getFieldTypesFromMySQLFormatStream(files: stream.Readable[] | stream.Readable, params: object): Promise<stream.Readable>
+  // {
+  //   return new Promise<stream.Readable>(async (resolve, reject) =>
+  //   {
+  //     let file: stream.Readable | null = null;
+  //     if (Array.isArray(files))
+  //     {
+  //       for (const f of files)
+  //       {
+  //         if (f['fieldname'] === 'file')
+  //         {
+  //           file = f;
+  //         }
+  //       }
+  //     }
+  //     else
+  //     {
+  //       file = files;
+  //     }
+  //     if (file === null)
+  //     {
+  //       return reject('No file specified.');
+  //     }
 
-      let completeFieldTypeObj: object = {};
-      let contents: string = '';
-      const writeFile = new stream.PassThrough();
-      const newlineSplitOptions: string[] = ['\r\n', '\n'];
-      file.on('data', async (chunk) =>
-      {
-        const chunkStr: string = chunk.toString();
-        let hasNextLine: boolean = false;
-        let chunkSplitArr: string[] = [];
-        for (const newlineSplit of newlineSplitOptions)
-        {
-          chunkSplitArr = chunkStr.split(newlineSplit);
-          if (chunkSplitArr.length > 1) // chunk also includes next line
-          {
-            contents += chunkSplitArr[0];
-            hasNextLine = true;
-            break;
-          }
-        }
-        if (!hasNextLine)
-        {
-          contents += chunkStr;
-        }
-        else
-        {
-          let fieldTypeObjStr: object | string = await this._getFieldTypeFromChunk(contents);
-          if (typeof fieldTypeObjStr === 'object')
-          {
-            completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
-          }
-          for (let i = 1; i < chunkSplitArr.length - 1; ++i)
-          {
-            fieldTypeObjStr = await this._getFieldTypeFromChunk(contents);
-            if (typeof fieldTypeObjStr === 'object')
-            {
-              completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
-            }
-          }
-          if (chunkSplitArr.length >= 2)
-          {
-            contents = chunkSplitArr[chunkSplitArr.length - 1];
-          }
-          else
-          {
-            contents = '';
-          }
+  //     let completeFieldTypeObj: object = {};
+  //     let contents: string = '';
+  //     const writeFile = new stream.PassThrough();
+  //     const newlineSplitOptions: string[] = ['\r\n', '\n'];
+  //     file.on('data', async (chunk) =>
+  //     {
+  //       const chunkStr: string = chunk.toString();
+  //       let hasNextLine: boolean = false;
+  //       let chunkSplitArr: string[] = [];
+  //       for (const newlineSplit of newlineSplitOptions)
+  //       {
+  //         chunkSplitArr = chunkStr.split(newlineSplit);
+  //         if (chunkSplitArr.length > 1) // chunk also includes next line
+  //         {
+  //           contents += chunkSplitArr[0];
+  //           hasNextLine = true;
+  //           break;
+  //         }
+  //       }
+  //       if (!hasNextLine)
+  //       {
+  //         contents += chunkStr;
+  //       }
+  //       else
+  //       {
+  //         let fieldTypeObjStr: object | string = await this._getFieldTypeFromChunk(contents);
+  //         if (typeof fieldTypeObjStr === 'object')
+  //         {
+  //           completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
+  //         }
+  //         for (let i = 1; i < chunkSplitArr.length - 1; ++i)
+  //         {
+  //           fieldTypeObjStr = await this._getFieldTypeFromChunk(contents);
+  //           if (typeof fieldTypeObjStr === 'object')
+  //           {
+  //             completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
+  //           }
+  //         }
+  //         if (chunkSplitArr.length >= 2)
+  //         {
+  //           contents = chunkSplitArr[chunkSplitArr.length - 1];
+  //         }
+  //         else
+  //         {
+  //           contents = '';
+  //         }
 
-        }
-      });
-      file.on('error', async (e) =>
-      {
-        writeFile.end();
-        return reject(e);
-      });
-      file.on('end', async () =>
-      {
-        if (contents.length !== 0)
-        {
-          const fieldTypeObjStr: object | string = await this._getFieldTypeFromChunk(contents);
-          if (typeof fieldTypeObjStr === 'object')
-          {
-            completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
-          }
-        }
-        completeFieldTypeObj = this._replaceNullWithText(completeFieldTypeObj);
-        writeFile.write(JSON.stringify(Object.keys(completeFieldTypeObj)));
-        writeFile.write('\n');
-        writeFile.write(JSON.stringify(completeFieldTypeObj));
-        writeFile.end();
-        resolve(writeFile);
-      });
-    });
-  }
+  //       }
+  //     });
+  //     file.on('error', async (e) =>
+  //     {
+  //       writeFile.end();
+  //       return reject(e);
+  //     });
+  //     file.on('end', async () =>
+  //     {
+  //       if (contents.length !== 0)
+  //       {
+  //         const fieldTypeObjStr: object | string = await this._getFieldTypeFromChunk(contents);
+  //         if (typeof fieldTypeObjStr === 'object')
+  //         {
+  //           completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
+  //         }
+  //       }
+  //       completeFieldTypeObj = this._replaceNullWithText(completeFieldTypeObj);
+  //       writeFile.write(JSON.stringify(Object.keys(completeFieldTypeObj)));
+  //       writeFile.write('\n');
+  //       writeFile.write(JSON.stringify(completeFieldTypeObj));
+  //       writeFile.end();
+  //       resolve(writeFile);
+  //     });
+  //   });
+  // }
 
   public getInnermostType(arrayType: object, stopNested?: boolean): string
   {
@@ -336,128 +338,128 @@ export class FieldTypes
     return arrayType['type'];
   }
 
-  public async getJSONFromMySQLFormatStream(files: stream.Readable[] | stream.Readable, params: object): Promise<stream.Readable>
-  {
-    return new Promise<stream.Readable>(async (resolve, reject) =>
-    {
-      let file: stream.Readable | null = null;
-      if (Array.isArray(files))
-      {
-        for (const f of files)
-        {
-          if (f['fieldname'] === 'file')
-          {
-            file = f;
-          }
-        }
-      }
-      else
-      {
-        file = files;
-      }
-      if (file === null)
-      {
-        return reject('No file specified.');
-      }
-      let contents: string = '';
-      const writeFile = new stream.PassThrough();
-      const newlineSplitOptions: string[] = ['\r\n', '\n'];
-      let didWriteFirstLine: boolean = false;
-      file.on('data', async (chunk) =>
-      {
-        const chunkStr: string = chunk.toString();
-        let hasNextLine: boolean = false;
-        let chunkSplitArr: string[] = [];
-        for (const newlineSplit of newlineSplitOptions)
-        {
-          chunkSplitArr = chunkStr.split(newlineSplit);
-          if (chunkSplitArr.length > 1) // chunk also includes next line
-          {
-            contents += chunkSplitArr[0];
-            hasNextLine = true;
-            break;
-          }
-        }
-        if (!hasNextLine)
-        {
-          contents += chunkStr;
-        }
-        else
-        {
-          const contentAsJSONArr: object[] = await this._getJSONFromMySQLJSON(contents);
-          if (Array.isArray(contentAsJSONArr) && contentAsJSONArr.length > 0)
-          {
-            const contentAsJSON: object = contentAsJSONArr[0];
-            if (didWriteFirstLine)
-            {
-              writeFile.write(',\n');
-            }
-            else
-            {
-              didWriteFirstLine = true;
-              writeFile.write('[');
-            }
-            writeFile.write(contentAsJSON);
-          }
-          for (let i = 1; i < chunkSplitArr.length - 1; ++i)
-          {
-            const jsonObjArr: object[] = await this._getJSONFromMySQLJSON(chunkSplitArr[i]);
-            if (Array.isArray(jsonObjArr) && jsonObjArr.length > 0)
-            {
-              const jsonObj: object = jsonObjArr[0];
-              if (didWriteFirstLine)
-              {
-                writeFile.write(',\n');
-              }
-              else
-              {
-                didWriteFirstLine = true;
-                writeFile.write('[');
-              }
-              writeFile.write(jsonObj);
-            }
-          }
-          if (chunkSplitArr.length >= 2)
-          {
-            contents = chunkSplitArr[chunkSplitArr.length - 1];
-          }
-          else
-          {
-            contents = '';
-          }
-        }
-      });
-      file.on('error', async (e) =>
-      {
-        writeFile.end();
-        return reject(e);
-      });
-      file.on('end', async () =>
-      {
-        if (contents.length !== 0)
-        {
-          const contentAsJSONArr: object[] = await this._getJSONFromMySQLJSON(contents);
-          if (Array.isArray(contentAsJSONArr) && contentAsJSONArr.length > 0)
-          {
-            const contentAsJSON: object = contentAsJSONArr[0];
-            if (didWriteFirstLine)
-            {
-              writeFile.write(',\n');
-            }
-            else
-            {
-              didWriteFirstLine = true;
-              writeFile.write('[');
-            }
-            writeFile.write(contentAsJSON);
-          }
-        }
-        writeFile.write(']');
-        writeFile.end();
-        resolve(writeFile);
-      });
-    });
-  }
+  // public async getJSONFromMySQLFormatStream(files: stream.Readable[] | stream.Readable, params: object): Promise<stream.Readable>
+  // {
+  //   return new Promise<stream.Readable>(async (resolve, reject) =>
+  //   {
+  //     let file: stream.Readable | null = null;
+  //     if (Array.isArray(files))
+  //     {
+  //       for (const f of files)
+  //       {
+  //         if (f['fieldname'] === 'file')
+  //         {
+  //           file = f;
+  //         }
+  //       }
+  //     }
+  //     else
+  //     {
+  //       file = files;
+  //     }
+  //     if (file === null)
+  //     {
+  //       return reject('No file specified.');
+  //     }
+  //     let contents: string = '';
+  //     const writeFile = new stream.PassThrough();
+  //     const newlineSplitOptions: string[] = ['\r\n', '\n'];
+  //     let didWriteFirstLine: boolean = false;
+  //     file.on('data', async (chunk) =>
+  //     {
+  //       const chunkStr: string = chunk.toString();
+  //       let hasNextLine: boolean = false;
+  //       let chunkSplitArr: string[] = [];
+  //       for (const newlineSplit of newlineSplitOptions)
+  //       {
+  //         chunkSplitArr = chunkStr.split(newlineSplit);
+  //         if (chunkSplitArr.length > 1) // chunk also includes next line
+  //         {
+  //           contents += chunkSplitArr[0];
+  //           hasNextLine = true;
+  //           break;
+  //         }
+  //       }
+  //       if (!hasNextLine)
+  //       {
+  //         contents += chunkStr;
+  //       }
+  //       else
+  //       {
+  //         const contentAsJSONArr: object[] = await this._getJSONFromMySQLJSON(contents);
+  //         if (Array.isArray(contentAsJSONArr) && contentAsJSONArr.length > 0)
+  //         {
+  //           const contentAsJSON: object = contentAsJSONArr[0];
+  //           if (didWriteFirstLine)
+  //           {
+  //             writeFile.write(',\n');
+  //           }
+  //           else
+  //           {
+  //             didWriteFirstLine = true;
+  //             writeFile.write('[');
+  //           }
+  //           writeFile.write(contentAsJSON);
+  //         }
+  //         for (let i = 1; i < chunkSplitArr.length - 1; ++i)
+  //         {
+  //           const jsonObjArr: object[] = await this._getJSONFromMySQLJSON(chunkSplitArr[i]);
+  //           if (Array.isArray(jsonObjArr) && jsonObjArr.length > 0)
+  //           {
+  //             const jsonObj: object = jsonObjArr[0];
+  //             if (didWriteFirstLine)
+  //             {
+  //               writeFile.write(',\n');
+  //             }
+  //             else
+  //             {
+  //               didWriteFirstLine = true;
+  //               writeFile.write('[');
+  //             }
+  //             writeFile.write(jsonObj);
+  //           }
+  //         }
+  //         if (chunkSplitArr.length >= 2)
+  //         {
+  //           contents = chunkSplitArr[chunkSplitArr.length - 1];
+  //         }
+  //         else
+  //         {
+  //           contents = '';
+  //         }
+  //       }
+  //     });
+  //     file.on('error', async (e) =>
+  //     {
+  //       writeFile.end();
+  //       return reject(e);
+  //     });
+  //     file.on('end', async () =>
+  //     {
+  //       if (contents.length !== 0)
+  //       {
+  //         const contentAsJSONArr: object[] = await this._getJSONFromMySQLJSON(contents);
+  //         if (Array.isArray(contentAsJSONArr) && contentAsJSONArr.length > 0)
+  //         {
+  //           const contentAsJSON: object = contentAsJSONArr[0];
+  //           if (didWriteFirstLine)
+  //           {
+  //             writeFile.write(',\n');
+  //           }
+  //           else
+  //           {
+  //             didWriteFirstLine = true;
+  //             writeFile.write('[');
+  //           }
+  //           writeFile.write(contentAsJSON);
+  //         }
+  //       }
+  //       writeFile.write(']');
+  //       writeFile.end();
+  //       resolve(writeFile);
+  //     });
+  //   });
+  // }
 
   private async _chooseBestType(types: object[]): Promise<object>
   {
@@ -520,82 +522,82 @@ export class FieldTypes
     });
   }
 
-  private _getJSONFromCSV(chunk: string): string // NOT BEING USED ATM
-  {
-    const csvRows: any = csvString.parse(chunk);
-    if (Array.isArray(csvRows))
-    {
-      for (let rowIndex = 0; rowIndex < csvRows.length; ++rowIndex)
-      {
-        for (let colIndex = 0; colIndex < csvRows[rowIndex].length; ++colIndex)
-        {
-          try
-          {
-            csvRows[rowIndex][colIndex] = JSON.parse(csvRows[rowIndex][colIndex]);
-          }
-          catch (e)
-          {
-            // do nothing
-          }
-        }
-      }
-    }
-    return csvString.stringify(csvRows);
-  }
+  // private _getJSONFromCSV(chunk: string): string // NOT BEING USED ATM
+  // {
+  //   const csvRows: any = csvString.parse(chunk);
+  //   if (Array.isArray(csvRows))
+  //   {
+  //     for (let rowIndex = 0; rowIndex < csvRows.length; ++rowIndex)
+  //     {
+  //       for (let colIndex = 0; colIndex < csvRows[rowIndex].length; ++colIndex)
+  //       {
+  //         try
+  //         {
+  //           csvRows[rowIndex][colIndex] = JSON.parse(csvRows[rowIndex][colIndex]);
+  //         }
+  //         catch (e)
+  //         {
+  //           // do nothing
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return csvString.stringify(csvRows);
+  // }
 
-  private async _getFieldTypeFromChunk(chunk: string): Promise<object | string>
-  {
-    return new Promise<object | string>(async (resolve, reject) =>
-    {
-      if (chunk === undefined || chunk.length === 0)
-      {
-        return resolve('');
-      }
-      const parsedLines: object[] = await this._getJSONFromMySQLJSON(chunk);
-      if (parsedLines.length === 1) // TODO: allow type detection from multiple lines
-      {
-        const anything = await this.getFullTypeFromDocument(parsedLines[0]);
-        return resolve(anything);
-      }
-    });
-  }
+  // private async _getFieldTypeFromChunk(chunk: string): Promise<object | string>
+  // {
+  //   return new Promise<object | string>(async (resolve, reject) =>
+  //   {
+  //     if (chunk === undefined || chunk.length === 0)
+  //     {
+  //       return resolve('');
+  //     }
+  //     const parsedLines: object[] = await this._getJSONFromMySQLJSON(chunk);
+  //     if (parsedLines.length === 1) // TODO: allow type detection from multiple lines
+  //     {
+  //       const anything = await this.getFullTypeFromDocument(parsedLines[0]);
+  //       return resolve(anything);
+  //     }
+  //   });
+  // }
 
-  private async _getJSONFromMySQLJSON(chunk: string): Promise<object[]>
-  {
-    return new Promise<object[]>(async (resolve, reject) =>
-    {
-      try
-      {
-        const returnArr: object[] = [];
-        const csvRows: any = csvString.parse(chunk);
-        if (Array.isArray(csvRows))
-        {
-          for (let rowIndex = 0; rowIndex < csvRows.length; ++rowIndex)
-          {
-            if (Array.isArray(csvRows[rowIndex]) && csvRows[rowIndex].length > 0)
-            {
-              try
-              {
-                JSON.parse(csvRows[rowIndex][0]);
-                returnArr.push(csvRows[rowIndex][0]);
-              }
-              catch (e)
-              {
-                // do not push this line
-              }
-            }
-          }
-        }
-        return resolve(returnArr);
+  // private async _getJSONFromMySQLJSON(chunk: string): Promise<object[]>
+  // {
+  //   return new Promise<object[]>(async (resolve, reject) =>
+  //   {
+  //     try
+  //     {
+  //       const returnArr: object[] = [];
+  //       const csvRows: any = csvString.parse(chunk);
+  //       if (Array.isArray(csvRows))
+  //       {
+  //         for (let rowIndex = 0; rowIndex < csvRows.length; ++rowIndex)
+  //         {
+  //           if (Array.isArray(csvRows[rowIndex]) && csvRows[rowIndex].length > 0)
+  //           {
+  //             try
+  //             {
+  //               JSON.parse(csvRows[rowIndex][0]);
+  //               returnArr.push(csvRows[rowIndex][0]);
+  //             }
+  //             catch (e)
+  //             {
+  //               // do not push this line
+  //             }
+  //           }
+  //         }
+  //       }
+  //       return resolve(returnArr);
 
-      }
-      catch (e)
-      {
-        // winston.info('Error occurred while parsing: ' + (e.message as any).toString());
-        return resolve([]);
-      }
-    });
-  }
+  //     }
+  //     catch (e)
+  //     {
+  //       // winston.info('Error occurred while parsing: ' + (e.message as any).toString());
+  //       return resolve([]);
+  //     }
+  //   });
+  // }
 
   private _convertToJSONFormat(chunk: string): string
   {

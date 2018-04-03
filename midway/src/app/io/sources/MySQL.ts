@@ -50,7 +50,7 @@ import * as Tasty from '../../../../src/tasty/Tasty';
 import DatabaseController from '../../../database/DatabaseController';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
 import { Credentials } from '../../credentials/Credentials';
-import CSVExportTransform from '../streams/CSVExportTransform';
+import CSVTransform from '../streams/CSVTransform';
 
 export const credentials: Credentials = new Credentials();
 
@@ -80,7 +80,7 @@ export class MySQL
         return resolve(mysqlRowConfig);
       }
 
-      const writer = new CSVExportTransform(Object.keys(mysqlRowConfig.rows[0]));
+      const writer = CSVTransform.createExportStream();
       if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
       {
         (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>

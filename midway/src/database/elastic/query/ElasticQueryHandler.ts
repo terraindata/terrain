@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
-import { Readable } from 'stream';
 import * as winston from 'winston';
 
+import { getParsedQuery } from '../../../../../shared/database/elastic/ElasticUtil';
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
@@ -56,14 +56,13 @@ import QueryRequest from '../../../../../shared/database/types/QueryRequest';
 import QueryResponse from '../../../../../shared/database/types/QueryResponse';
 import BufferTransform from '../../../app/io/streams/BufferTransform';
 import GroupJoinTransform from '../../../app/io/streams/GroupJoinTransform';
+import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
+import SafeReadable from '../../../app/io/streams/SafeReadable';
 import QueryHandler from '../../../app/query/QueryHandler';
-import { getParsedQuery } from '../../../app/Util';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
-
-import ElasticStream from './ElasticStream';
-import { handleMergeJoin } from './MergeJoin';
+import ElasticReader from '../streams/ElasticReader';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -118,7 +117,7 @@ export class ElasticQueryHandler extends QueryHandler
     this.controller = controller;
   }
 
-  public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
+  public async handleQuery(request: QueryRequest): Promise<QueryResponse | SafeReadable>
   {
     winston.debug('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
@@ -135,66 +134,53 @@ export class ElasticQueryHandler extends QueryHandler
         try
         {
           parser = getParsedQuery(request.body);
+          const query = parser.getValue();
+          // TODO: remove this restriction
+          if (query['groupJoin'] !== undefined && query['mergeJoin'] !== undefined)
+          {
+            throw new Error('Specifying multiple join types is not supported at the moment.');
+          }
+
+          let stream: SafeReadable;
+          if (query['groupJoin'] !== undefined)
+          {
+            stream = new GroupJoinTransform(client, request.body);
+          }
+          else if (query['mergeJoin'] !== undefined)
+          {
+            stream = new MergeJoinTransform(client, request.body);
+          }
+          else
+          {
+            stream = new ElasticReader(client, query);
+          }
+
+          if (request.streaming === true)
+          {
+            return stream;
+          }
+          else
+          {
+            return new Promise<QueryResponse>((resolve, reject) =>
+            {
+              const bufferTransform = new BufferTransform(stream,
+                (err, res) =>
+                {
+                  let response;
+                  if (res !== undefined && Array.isArray(res))
+                  {
+                    response = res[0];
+                  }
+                  ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, response);
+                });
+            });
+          }
         }
         catch (errors)
         {
           return new QueryResponse({}, errors);
         }
 
-        const query = parser.getValue();
-        // TODO: remove this restriction
-        if (query['groupJoin'] !== undefined && query['mergeJoin'] !== undefined)
-        {
-          throw new Error('Specifying multiple join types is not supported at the moment.');
-        }
-
-        if (query['groupJoin'] !== undefined)
-        {
-          const groupJoinQuery = query['groupJoin'];
-          query['groupJoin'] = undefined;
-
-          const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
-          const childQueryStr = ESConverter.formatValueInfo(valueInfo);
-          const elasticStream = new ElasticStream(client, query);
-          const groupJoinStream = new GroupJoinTransform(client, elasticStream, childQueryStr);
-          if (request.streaming === true)
-          {
-            return groupJoinStream;
-          }
-          else
-          {
-            return new Promise<QueryResponse>((resolve, reject) =>
-            {
-              const bufferTransform = new BufferTransform(groupJoinStream,
-                (err, res) =>
-                {
-                  ElasticQueryHandler.makeQueryCallback(resolve, reject)(err, {
-                    hits: {
-                      hits: res,
-                    },
-                  });
-                });
-            });
-          }
-        }
-        else if (query['mergeJoin'] !== undefined)
-        {
-          return handleMergeJoin(client, request, parser, query);
-        }
-        else
-        {
-          if (request.streaming === true)
-          {
-            return new ElasticStream(client, query);
-          }
-          else
-          {
-            return new Promise<QueryResponse>((resolve, reject) =>
-            {
-              client.search({ body: query } as Elastic.SearchParams, ElasticQueryHandler.makeQueryCallback(resolve, reject));
-            });
-          }
-        }
       case 'deleteTemplate':
       case 'getTemplate':
       case 'putTemplate':

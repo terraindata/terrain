@@ -1,0 +1,29 @@
+@import "~common/Common.less";
+@import "~etl/templates/components/TemplateEditor.less";
+
+.move-field-modal {
+  display: flex;
+  padding: @spacing;
+  flex-direction: column;
+  width: calc(~"100% - @{double-spacing}");
+
+  .move-field-edit-section {
+    .big-text;
+  }
+
+  .field-location-visual {
+    display: flex;
+    padding: @spacing;
+    flex-direction: column;
+  }
+
+  .field-location-key {
+    padding: @quarter-spacing;
+    position: relative;
+    cursor: default;
+  }
+}
+
+.add-field-modal-wrapper {
+  padding: @spacing;
+}

@@ -47,8 +47,9 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as util from 'util';
 import * as winston from 'winston';
+
+import SharedUtil from '../../../../shared/Util';
 import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import { makePromiseCallback } from '../../Utils';
 
 function getExpectedFile(): string
 {
@@ -64,7 +65,7 @@ beforeAll(async (done) =>
 
   const contents: any = await new Promise((resolve, reject) =>
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+    fs.readFile(getExpectedFile(), SharedUtil.promise.makeCallback(resolve, reject));
   });
 
   expected = JSON.parse(contents);
@@ -80,10 +81,9 @@ function testParse(testString: string,
   const value = parser.getValue();
   const errors = parser.getErrors();
 
-  winston.info(util.inspect(parser.getValueInfo()));
+  // winston.info(util.inspect(parser.getValueInfo()));
   // winston.info(util.inspect(parser.getValueInfos()));
   // winston.info(util.inspect(parser.getTokens()));
-
   winston.info(util.inspect(errors));
 
   expect(value).toEqual(expectedValue);

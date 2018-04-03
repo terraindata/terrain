@@ -55,8 +55,11 @@ import Modal from 'common/components/Modal';
 import { Props as _ModalProps } from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 
-export type ModalProps = {
+export type ModalPropsObject = {
   [key in keyof _ModalProps]?: _ModalProps[key];
+};
+export type ModalProps = ModalPropsObject & {
+  computeProps?: () => ModalPropsObject; // if props should be computed at the moment that the modal gets shown
 };
 // ModalProps is the same as the Props type from Modal.tsx, however all the props are optional.
 // This is important because MultiModal overrides the open prop.
@@ -103,9 +106,14 @@ export class MultiModal extends TerrainComponent<Props>
     }
     else
     {
+      let props = firstProps;
+      if (firstProps.computeProps !== undefined && typeof firstProps.computeProps === 'function')
+      {
+        props = firstProps.computeProps();
+      }
       return (
         <Modal
-          {...firstProps}
+          {...props}
           onClose={this.handleCloseModal}
           open={true}
         />

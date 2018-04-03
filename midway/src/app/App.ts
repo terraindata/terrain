@@ -54,17 +54,18 @@ import serve = require('koa-static-server');
 import srs = require('secure-random-string');
 import v8 = require('v8');
 
-import * as DBUtil from '../database/Util';
+import './auth/Passport';
+import './Logging';
+
+import DatabaseControllerConfig from '../database/DatabaseControllerConfig';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
 import appStats from './AppStats';
-import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import { credentials } from './credentials/CredentialRouter';
 import { databases } from './database/DatabaseRouter';
 import { events } from './events/EventRouter';
-import './Logging';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
@@ -84,15 +85,17 @@ export class App
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DBUtil.makeDatabaseController(type, 0, dsn);
+    const controller = DatabaseControllerConfig.makeDatabaseController(type, 0, dsn);
     return controller.getTasty();
   }
 
   private static uncaughtExceptionHandler(err: Error): void
   {
     winston.error('Uncaught Exception: ' + err.toString());
-    // this is a good place to clean tangled resources
-    process.abort();
+    if (err.stack !== undefined)
+    {
+      winston.error(err.stack);
+    }
   }
 
   private static unhandledRejectionHandler(err: Error): void
@@ -122,12 +125,6 @@ export class App
     this.app = new Koa();
     this.app.proxy = true;
     this.app.keys = [srs({ length: 256 })];
-    this.app.use(async (ctx, next) =>
-    {
-      // tslint:disable-next-line:no-empty
-      ctx.req.setTimeout(0, () => { });
-      await next();
-    });
 
     this.app.use(async (ctx, next) =>
     {
@@ -150,7 +147,8 @@ export class App
       try
       {
         await next();
-      } catch (e)
+      }
+      catch (e)
       {
         err = e;
         appStats.numRequestsThatThrew++;
@@ -228,6 +226,11 @@ export class App
     const dbs = await databases.select(['id'], {});
     for (const db of dbs)
     {
+      if (db.id === undefined)
+      {
+        continue;
+      }
+
       await databases.connect({} as any, db.id);
 
       if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)

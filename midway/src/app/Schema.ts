@@ -47,6 +47,10 @@ THE SOFTWARE.
 import * as winston from 'winston';
 import * as Tasty from '../tasty/Tasty';
 
+import DatabaseController from '../database/DatabaseController';
+import ElasticDB from '../database/elastic/tasty/ElasticDB';
+import DatabaseRegistry from '../databaseRegistry/DatabaseRegistry';
+
 const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeName: string, primaryKeyType: string) => [
   `CREATE TABLE IF NOT EXISTS versions
     (id ` + primaryKeyType + ` PRIMARY KEY,
@@ -135,6 +139,29 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      database integer NOT NULL,
      label text NOT NULL,
      events text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS templates
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     archived bool NOT NULL,
+     templateName text NOT NULL,
+     process text NOT NULL,
+     sources text NOT NULL,
+     sinks text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS schedulerLogs
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     lastFailure date,
+     lastRun date,
+     lastSuccess date,
+     meta text NOT NULL,
+     numberOfRuns integer NOT NULL,
+     scheduleId integer NOT NULL,
+     status text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS statusHistory
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     userId integer NOT NULL,
+     algorithmId integer NOT NULL,
+     fromStatus text NOT NULL,
+     toStatus text NOT NULL); `,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
@@ -151,6 +178,38 @@ export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
   {
     winston.warn('Auto-provisioning of app schema not supported for DB of type ' + dbtype);
   }
+}
+
+export async function deleteElasticIndex(dbid: number, dbname: string): Promise<string>
+{
+  return new Promise<string>(async (resolve, reject) =>
+  {
+    const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+    if (database === undefined)
+    {
+      throw new Error('Database "' + dbid.toString() + '" not found.');
+    }
+
+    winston.info(`Deleting Elastic Index ${dbname} of database ${dbid}`);
+    const elasticDb = database.getTasty().getDB() as ElasticDB;
+    await elasticDb.deleteIndex(dbname);
+    winston.info(`Deleted Elastic Index ${dbname} of database ${dbid}`);
+    return resolve('ok');
+  });
+}
+
+export async function getSchema(databaseID: number): Promise<string>
+{
+  return new Promise<string>(async (resolve, reject) =>
+  {
+    const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
+    if (database === undefined)
+    {
+      throw new Error('Database "' + databaseID.toString() + '" not found.');
+    }
+    const schema: Tasty.Schema = await database.getTasty().schema();
+    return resolve(schema.toString());
+  });
 }
 
 export default createAppSchema;

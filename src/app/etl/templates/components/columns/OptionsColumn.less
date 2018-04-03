@@ -1,0 +1,35 @@
+@import "~common/Common.less";
+@import "~etl/templates/components/TemplateEditor.less";
+
+.template-editor-options-column {
+  align-self: stretch;
+  border-radius: 3px;
+  height: 100%;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-y: overlay; // webkit only
+
+  .options-column-content {
+    padding: @spacing;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.options-column-button {
+  .transition;
+  display: flex;
+  width: 80px;
+  padding: @quarter-spacing;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  margin: @quarter-spacing;
+  cursor: pointer;
+
+  &.options-column-button-disabled {
+    cursor: default;
+  }
+}
