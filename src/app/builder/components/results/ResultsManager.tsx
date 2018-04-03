@@ -503,6 +503,7 @@ export class ResultsManager extends TerrainComponent<Props>
       {
         const parser: ESJSONParser = new ESJSONParser(query.tql, true);
         eql = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
+        eql = this.postprocessEQL(eql);
       }
       catch (e)
       {
@@ -517,7 +518,6 @@ export class ResultsManager extends TerrainComponent<Props>
           replaceInputs: true,
         },
       );
-
       if (query.tqlMode !== 'manual')
       {
         eql = this.postprocessEQL(eql);
