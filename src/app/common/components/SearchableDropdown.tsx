@@ -138,10 +138,11 @@ class SearchableDropdown extends TerrainComponent<Props & InjectedOnClickOutProp
 
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.selectedIndex !== this.props.selectedIndex)
+    if (nextProps.selectedIndex !== this.props.selectedIndex || !_.isEqual(nextProps.options, this.props.options))
     {
       this.setState({
         inputValue: nextProps.options.get(nextProps.selectedIndex),
+        open: false,
       });
     }
     if (nextProps.selectedIndex < 0)

@@ -374,7 +374,6 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public changeResults(changes: { [key: string]: any }, exportChanges?: { [key: string]: any })
   {
-    console.log('results changes ', changes);
     let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
@@ -544,7 +543,6 @@ export class ResultsManager extends TerrainComponent<Props>
         },
       ),
     });
-    console.log('query m2 results');
     this.changeResults({
       loading: true,
       hasLoadedResults: false,
@@ -672,7 +670,6 @@ export class ResultsManager extends TerrainComponent<Props>
         });
       })),
     };
-    console.log('update results');
     this.changeResults(changes, exportChanges);
   }
 

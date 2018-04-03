@@ -54,6 +54,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import TransformCard from 'app/builder/components/charts/TransformCard';
 import ExpandIcon from 'app/common/components/ExpandIcon';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { BuilderState } from 'builder/data/BuilderState';
@@ -62,7 +63,6 @@ import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
 import SearchableDropdown from '../../../../common/components/SearchableDropdown';
 import ScoreBar from '../../charts/ScoreBar';
-import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
@@ -109,7 +109,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (this.props.line !== nextProps.line)
+    if (this.props.line !== nextProps.line || !_.isEqual(nextProps.dropdownOptions, this.props.dropdownOptions))
     {
       const weight = nextProps.line.weight;
       this.setState({
