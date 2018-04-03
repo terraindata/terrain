@@ -214,7 +214,7 @@ export class ResultsManager extends TerrainComponent<Props>
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
-      if (!this.props.query || nextProps.query.id !== this.props.query.id)
+      if (!nextProps.query || (this.props.query && nextProps.query && nextProps.query.id !== this.props.query.id))
       {
         this.changeResults({
           hits: undefined,
@@ -374,6 +374,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public changeResults(changes: { [key: string]: any }, exportChanges?: { [key: string]: any })
   {
+    console.log('results changes ', changes);
     let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
@@ -543,7 +544,7 @@ export class ResultsManager extends TerrainComponent<Props>
         },
       ),
     });
-
+    console.log('query m2 results');
     this.changeResults({
       loading: true,
       hasLoadedResults: false,
@@ -671,6 +672,7 @@ export class ResultsManager extends TerrainComponent<Props>
         });
       })),
     };
+    console.log('update results');
     this.changeResults(changes, exportChanges);
   }
 

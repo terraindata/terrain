@@ -590,21 +590,17 @@ class HitsArea extends TerrainComponent<Props>
         small={resultsState.errorMessage}
       />;
     }
-
-    if (!hits)
+    if (resultsState.loading)
     {
-      if (resultsState.loading)
-      {
-        infoAreaContent = <InfoArea
-          large='Querying results...'
-        />;
-      }
-      else
-      {
-        infoAreaContent = <InfoArea
-          large='Compose a query to view results here.'
-        />;
-      }
+      infoAreaContent = <InfoArea
+        large='Querying results...'
+      />;
+    }
+    else if (!hits)
+    {
+      infoAreaContent = <InfoArea
+        large='Compose a query to view results here.'
+      />;
     }
     else if (!hits.size)
     {
