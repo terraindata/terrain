@@ -53,6 +53,8 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
 import AddFieldModal from 'etl/templates/components/AddFieldModal';
@@ -109,6 +111,13 @@ class TemplateEditor extends TerrainComponent<Props>
     {
       return {};
     }
+
+    console.log('----------------------------')
+    engine.getAllFieldIDs().forEach((id, i) => {
+      console.log(engine.getInputKeyPath(id).toJS(), engine.getOutputKeyPath(id).toJS());
+      console.log(engine.getFieldType(id));
+      console.log(engine.getFieldProps(id)['valueType']);
+    });
 
     return engine.transform(previewDocument);
   }

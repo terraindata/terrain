@@ -50,11 +50,11 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { postorderForEach } from 'etl/templates/SyncUtil';
+import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
@@ -115,6 +115,82 @@ export class EngineProxy
   public deleteTransformation(id: number)
   {
     this.engine.deleteTransformation(id);
+  }
+
+  // if sourceKeypath is a new keypath, then it is assumed that it is an array extraction
+  public duplicateField(sourceKeypath: List<string>, destKeypath: List<string>)
+  {
+    const isArrayExtraction = this.engine.getInputFieldID(sourceKeypath) === undefined
+    let rootKeypathToTransfer;
+    let toCopyId;
+    let toDuplicateId;
+    let parentValueType;
+
+    if (isArrayExtraction)
+    {
+      rootKeypathToTransfer = EngineUtil.turnIndicesIntoValue(sourceKeypath);
+      toCopyId = this.engine.getInputFieldID(rootKeypathToTransfer);
+      toDuplicateId = this.engine.addField(
+          sourceKeypath,
+          this.engine.getFieldProp(toCopyId, List(['valueType'])),
+        );
+    }
+    else
+    {
+      toDuplicateId = this.engine.getInputFieldID(sourceKeypath);
+      rootKeypathToTransfer = sourceKeypath;
+      toCopyId = this.engine.getInputFieldID(rootKeypathToTransfer);
+    }
+
+    const rootOutputKeypathToTransfer = this.engine.getOutputKeyPath(toCopyId);
+    preorderForEach(this.engine, toCopyId, (fieldId) =>
+    {
+      if (fieldId !== toCopyId)
+      {
+        if (parentValueType === undefined)
+        {
+          parentValueType = EngineUtil.getRepresentedType(fieldId, this.engine); // gets first child type
+        }
+        const toTransferKeypath = this.engine.getOutputKeyPath(fieldId);
+        const pathAfterRoot = toTransferKeypath.slice(rootOutputKeypathToTransfer.size);
+        EngineUtil.transferField(fieldId, destKeypath.concat(pathAfterRoot).toList(), this.engine);
+      }
+    });
+    const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
+      newFieldKeyPaths: List([destKeypath]),
+    }
+    this.addTransformation(TransformationNodeType.DuplicateNode, List([sourceKeypath]), options);
+
+    const duplicatedFieldId = this.engine.getInputFieldID(destKeypath);
+    if (isArrayExtraction)
+    {
+      console.log('hello', EngineUtil.getRepresentedType(toCopyId, this.engine), parentValueType);
+      this.engine.setFieldType(duplicatedFieldId, EngineUtil.getRepresentedType(toCopyId, this.engine));
+      this.engine.setFieldProp(duplicatedFieldId, List(['valueType']), parentValueType);
+
+      this.engine.setFieldProp(toDuplicateId, List(['valueType']), parentValueType);
+    }
+    else
+    {
+      this.engine.setFieldType(duplicatedFieldId, this.engine.getFieldType(toCopyId));
+      this.engine.setFieldProps(duplicatedFieldId, this.engine.getFieldProps(toCopyId));
+    }
+
+    this.requestRebuild();
+  }
+
+  public addField(keypath: List<string>, type: string, valueType?: string)
+  {
+    if (type === 'array')
+    {
+      this.engine.addField(keypath, type, { valueType });
+      this.engine.addField(keypath.push('*'), 'array', { valueType });
+    }
+    else
+    {
+      this.engine.addField(keypath, type);
+    }
+    this.requestRebuild();
   }
 
   public addRootField(name: string, type: string)

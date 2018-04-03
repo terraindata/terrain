@@ -57,6 +57,7 @@ import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle
 import Util from 'util/Util';
 const { List, Map } = Immutable;
 
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import Autocomplete from 'common/components/Autocomplete';
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
@@ -84,7 +85,7 @@ interface Props
 interface FormState
 {
   name: string;
-  index: string;
+  index: string | number;
 }
 
 class ExtractFieldModal extends TerrainComponent<Props>
@@ -206,7 +207,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
         }
         else
         {
-          return okp.slice(0, lastIndex + 1).toList().push(name);
+          return okp.slice(0, lastIndex).toList().push(name);
         }
       }
     }
@@ -224,7 +225,7 @@ class ExtractFieldModal extends TerrainComponent<Props>
     engineVersion: number,
     fieldId: number,
     keypath: EnginePath,
-    index: number,
+    index: string | number,
   ): { isValid: boolean, message: string}
   {
     const asNum = Number(index);
@@ -271,11 +272,54 @@ class ExtractFieldModal extends TerrainComponent<Props>
 
   public handleConfirmModal()
   {
-    this.props.editorAct({
-      actionType: 'setDisplayState',
-      state: {
-        extractField: null,
-      }
+    const newKeypath = this.computeKeyPath();
+    const { extractField } = this.props.templateEditor.uiState;
+    if (extractField === null)
+    {
+      return;
+    }
+    GraphHelpers.mutateEngine((proxy) => {
+
+      let extractedKeypath = proxy.getEngine().getInputKeyPath(extractField.fieldId);
+      extractedKeypath = extractedKeypath.set(extractedKeypath.size - 1, String(this.state.index));
+
+      proxy.duplicateField(extractedKeypath, newKeypath);
+      // const type = EngineUtil.getRepresentedType(extractField.fieldId, proxy.getEngine());
+      // let childType;
+      // if (type === 'array')
+      // {
+      //   const childField = EngineUtil.findChildField(extractField.fieldId, proxy.getEngine());
+      //   if (childField === -1)
+      //   {
+      //     throw new Error('Field type is array, but could not find any children in the Transformation Engine');
+      //   }
+      //   childType = EngineUtil.getRepresentedType(childField, proxy.getEngine());
+      // }
+
+      // if (proxy.getEngine().getInputFieldID(extractedKeypath) === undefined)
+      // {
+      //   proxy.getEngine().addField(extractedKeypath, type, childType);
+      // }
+      // proxy.addTransformation(
+      //   TransformationNodeType.DuplicateNode,
+      //   List([extractedKeypath]),
+      //   {newFieldKeyPaths: List([newKeypath])}
+      // );
+
+      // const addedField = proxy.getEngine().getInputFieldID(newKeypath);
+      // proxy.getEngine().setFieldType(addedField, type);
+      // if (type === 'array')
+      // {
+      //   proxy.getEngine().setFieldProp(addedField, List(['valueType']), childType);
+      //   proxy.getEngine().addField(newKeypath.push('*'), 'array', {valueType: childType});
+      // }
+
+    }).then((isStructural) => {
+      this.props.editorAct({
+        actionType: 'rebuildFieldMap',
+      })
+    }).catch((e) => {
+      console.error(e);
     });
   }
 }
