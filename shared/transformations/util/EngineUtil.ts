@@ -93,6 +93,11 @@ export default class EngineUtil
     return KeyPath(JSON.parse(keypath));
   }
 
+  public static getValueType(fieldId: number, engine: TransformationEngine): FieldTypes
+  {
+    return engine.getFieldProp(fieldId, valueTypeKeyPath);
+  }
+
   // turn all indices into a particular value, based on
   // an existing engine that has fields with indices in them
   public static turnIndicesIntoValue(

@@ -220,6 +220,10 @@ const TransformationNodeInfo: AllNodeInfoType =
         editable: true,
         creatable: true,
         description: `Hash this field using SHA3/Keccak256`,
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
         type: HashTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -230,10 +234,18 @@ const TransformationNodeInfo: AllNodeInfoType =
     [TransformationNodeType.ArraySumNode]:
       {
         humanName: 'Array Sum',
-        editable: true,
+        editable: false,
         creatable: true,
         description: `Sums the values of this array`,
         type: ArraySumTransformationNode,
+        isAvailable: (engine, fieldId) =>
+        {
+          return (
+            EngineUtil.getRepresentedType(fieldId, engine) === 'array' &&
+            EngineUtil.getValueType(fieldId, engine) === 'number' &&
+            EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
+          );
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,

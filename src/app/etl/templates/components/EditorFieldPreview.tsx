@@ -85,13 +85,13 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     };
 
   @instanceFnDecorator(memoizeOne)
-  public _getMenuOptions(canEdit, canMove, isNested, isNamed)
+  public _getMenuOptions(canEdit, canMove, isNested, isNamed, canTransform)
   {
     const options = [];
-    if (canEdit)
+    if (canEdit || canTransform)
     {
       options.push({
-        text: 'Edit this Field',
+        text: `${canEdit ? 'Edit' : 'Transform'} this Field`,
         onClick: this.openSettings,
       });
     }
@@ -131,6 +131,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       field.canMoveField(),
       field.isNested(),
       field.isNamedField(),
+      field.canTransformField(),
     );
   }
 
