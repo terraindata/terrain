@@ -125,7 +125,7 @@ export interface TemplateEditorActionTypes
     updaters: Partial<{
       [k in keyof EditorDisplayState]: (item: EditorDisplayState[k]) => EditorDisplayState[k];
     }>;
-  }
+  };
   changeLoadingDocuments: {
     actionType: 'changeLoadingDocuments',
     increment: boolean,
@@ -261,7 +261,8 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
         }
         return state.set('uiState', newState);
       },
-      updateDisplayState: (state, action) => {
+      updateDisplayState: (state, action) =>
+      {
         let newState = state.uiState;
         const updaters = action.payload.updaters;
         for (const k of Object.keys(updaters))

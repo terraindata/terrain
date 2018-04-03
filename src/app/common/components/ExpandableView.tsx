@@ -133,7 +133,7 @@ class ExpandableView extends TerrainComponent<Props>
         <div
           className='expandable-view-checkbox-column expandable-view-checkbox-hidden'
           style={{
-            width:'0px',
+            width: '0px',
             height: '0px',
             paddingLeft: '0px',
           }}
@@ -147,9 +147,9 @@ class ExpandableView extends TerrainComponent<Props>
         <div
           className='expandable-view-checkbox-column'
           style={{
-            width:`${checkboxSize}px`,
+            width: `${checkboxSize}px`,
             height: `${checkboxSize}px`,
-            marginLeft: `${checkboxMargin}px`
+            marginLeft: `${checkboxMargin}px`,
           }}
         >
           <CheckBox

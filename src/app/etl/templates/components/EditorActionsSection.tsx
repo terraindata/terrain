@@ -57,9 +57,9 @@ import Util from 'util/Util';
 import Modal from 'common/components/Modal';
 
 import TemplateList from 'etl/templates/components/TemplateList';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 
 export interface Props
 {

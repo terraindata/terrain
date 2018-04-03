@@ -67,6 +67,7 @@ import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 
 import EditorActionsSection from './EditorActionsSection';
+import EditorColumnActionsSection from './EditorColumnActionsSection';
 
 import './TemplateEditor.less';
 
@@ -123,24 +124,7 @@ class TemplateEditor extends TerrainComponent<Props>
   public renderTitleActions()
   {
     return (
-      <Quarantine>
-        <div className='template-editor-title-bar-actions'>
-          <div
-            key='all'
-            className='title-bar-action'
-            style={backgroundColor('rgba(0,0,0,0)', Colors().highlight)}
-          >
-            Select All
-          </div>
-          <div
-            key='none'
-            className='title-bar-action'
-            style={backgroundColor('rgba(0,0,0,0)', Colors().highlight)}
-          >
-            Select None
-          </div>
-        </div>
-      </Quarantine>
+      <EditorColumnActionsSection />
     );
   }
 

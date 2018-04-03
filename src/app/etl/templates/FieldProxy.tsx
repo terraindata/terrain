@@ -134,6 +134,19 @@ export class EngineProxy
       this.requestRebuild();
     }
   }
+
+  public setFieldEnabled(fieldId: number, enabled: boolean)
+  {
+    if (enabled)
+    {
+      this.engine.enableField(fieldId);
+    }
+    else
+    {
+      this.engine.disableField(fieldId);
+    }
+    this.requestRebuild(fieldId);
+  }
 }
 
 export class FieldProxy
@@ -150,15 +163,7 @@ export class FieldProxy
 
   public setFieldEnabled(enabled: boolean)
   {
-    if (enabled)
-    {
-      this.engine.enableField(this.fieldId);
-    }
-    else
-    {
-      this.engine.disableField(this.fieldId);
-    }
-    this.syncWithEngine();
+    this.engineProxy.setFieldEnabled(this.fieldId, enabled);
   }
 
   // delete this field and all child fields

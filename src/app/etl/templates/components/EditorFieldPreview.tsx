@@ -117,7 +117,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
   public getMenuOptions()
   {
     const field = this._field();
-    return this._getMenuOptions(this._canEditField(), this._canMoveField(), field.isNested());
+    return this._getMenuOptions(field.canEditField(), field.canMoveField(), field.isNested());
   }
 
   public render()

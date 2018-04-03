@@ -195,13 +195,13 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
 
   public getCheckboxState()
   {
-    const canEditField = this._canEditField();
+    const canEditField = this._field().canEditField();
     const checkedState = this._checkedState();
 
-    return { 
+    return {
       checked: checkedState === true,
       showCheckbox: (canEditField && checkedState !== null),
-    }
+    };
   }
 
   public render()
@@ -282,8 +282,8 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         actionType: 'updateDisplayState',
         updaters: {
           checkedFields: (fields) => fields.set(fieldId, !Boolean(checked)),
-        }
-      })
+        },
+      });
     }
   }
 
