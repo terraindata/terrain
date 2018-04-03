@@ -244,7 +244,13 @@ export class Export
             throw Error('File type must be either CSV or JSON.');
         }
 
-        resolve(respStream.pipe(documentTransform).pipe(exportTransform));
+        const str = respStream
+          .on('error', (e) => str.destroy())
+          .pipe(documentTransform)
+          .on('error', (e) => str.destroy())
+          .pipe(exportTransform)
+          .on('error', (e) => str.destroy());
+        resolve(str);
       }
       catch (e)
       {
