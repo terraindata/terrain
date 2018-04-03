@@ -725,10 +725,16 @@ test('cast on a field inside a nested object inside an array', () =>
 
 test('hash transformation', () =>
 {
-  const doc = { email: 'david@terraindata.com' };
+  const doc = { email1: 'david@terraindata.com', email2: 'alex@terraindata.com' };
   const e = new TransformationEngine(doc);
-  e.appendTransformation(TransformationNodeType.HashNode, List([List(['email'])]));
-  expect(e.transform(doc)).toEqual({ email: 'e93ab880bff504138a6bf08b1519bdd34d1d30f16dce9a0fba4bd460ae832797' });
+  const salt1 = 'CIerTrDRYQPBAL7FOjxh1pQm';
+  const salt2 = 'bQtO7Ne2dfg5qVRNsmCvCzwx';
+  e.appendTransformation(TransformationNodeType.HashNode, List([List(['email1'])]), { salt: salt1 });
+  e.appendTransformation(TransformationNodeType.HashNode, List([List(['email2'])]), { salt: salt2 });
+  expect(e.transform(doc)).toEqual({
+    email1: '88dc9d027e21e2b07b506f0f0bfe8ad2b63251e0fae77a8b66b88797ee8e4b35',
+    email2: '67b92944abc44598c08ca7c1921c6e6af7f1f8db61694dfb2928f61e3a9aecb6',
+  });
 });
 
 test('array sum transformation', () =>
