@@ -53,13 +53,8 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import MidwayError from 'shared/error/MidwayError';
-
-import Modal from 'common/components/Modal';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
-import ETLRouteUtil from 'etl/ETLRouteUtil';
-import { ETLState } from 'etl/ETLTypes';
 import AddFieldModal from 'etl/templates/components/AddFieldModal';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
@@ -67,12 +62,12 @@ import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/O
 import MoveFieldModal from 'etl/templates/components/MoveFieldModal';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
-import TemplateList from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+
+import EditorActionsSection from './EditorActionsSection';
+import EditorColumnActionsSection from './EditorColumnActionsSection';
 
 import './TemplateEditor.less';
 
@@ -92,18 +87,6 @@ export interface Props
 
 class TemplateEditor extends TerrainComponent<Props>
 {
-  public state: {
-    newTemplateName: string,
-    saveTemplateModalOpen: boolean,
-    loadTemplateOpen: boolean,
-    isSaveAs: boolean,
-  } = {
-      newTemplateName: 'New Template',
-      saveTemplateModalOpen: false,
-      loadTemplateOpen: false,
-      isSaveAs: false,
-    };
-
   constructor(props)
   {
     super(props);
@@ -138,6 +121,13 @@ class TemplateEditor extends TerrainComponent<Props>
     return this.transformDocument(previewDocument, templateEditor.getCurrentEngine(), engineVersion);
   }
 
+  public renderTitleActions()
+  {
+    return (
+      <EditorColumnActionsSection />
+    );
+  }
+
   public renderEditorSection(showEditor: boolean = true)
   {
     const transformedPreviewDocument = this.getDocument();
@@ -150,10 +140,7 @@ class TemplateEditor extends TerrainComponent<Props>
       return (
         <div className='template-editor-column main-document-column'>
           <div className='template-editor-title-bar'>
-            <div className='template-editor-title-bar-spacer' />
-            <div className='template-editor-title'>
-              Edit
-            </div>
+            {this.renderTitleActions()}
             <div className='template-editor-preview-control-spacer'>
               <EditorPreviewControl />
             </div>
@@ -195,121 +182,13 @@ class TemplateEditor extends TerrainComponent<Props>
 
   public renderTopBar()
   {
-    const { history, template, isDirty } = this.props.templateEditor;
-    let titleName = (template !== null && template.id === -1) ?
-      'Unsaved Template' :
-      template.templateName;
-    if (isDirty)
-    {
-      titleName += '*';
-    }
     return (
-      <Quarantine>
-        <div className='template-editor-top-bar'>
-          <div className='top-bar-left-side'>
-            <div
-              className='editor-top-bar-item'
-              style={topBarRunStyle}
-              onClick={this.handleRun}
-              key='run'
-            >
-              Run
-            </div>
-          </div>
-          <div
-            className='editor-top-bar-name'
-            style={topBarNameStyle}
-            key='title'
-          >
-            {titleName}
-          </div>
-          <div
-            className='editor-top-bar-item'
-            style={history.canUndo() ? topBarItemStyle : topBarItemDisabledStyle}
-            onClick={this.handleUndo}
-            key='undo'
-          >
-            Undo
-          </div>
-          <div
-            className='editor-top-bar-item'
-            style={history.canRedo() ? topBarItemStyle : topBarItemDisabledStyle}
-            onClick={this.handleRedo}
-            key='redo'
-          >
-            Redo
-          </div>
-          <div
-            className='editor-top-bar-item'
-            style={topBarItemStyle}
-            onClick={this.openTemplateUI}
-            key='load'
-          >
-            Load
-          </div>
-          <div
-            className='editor-top-bar-item'
-            style={topBarItemStyle}
-            onClick={this.handleSaveClicked}
-            key='save'
-          >
-            Save
-          </div>
-          <div
-            className='editor-top-bar-item'
-            style={topBarItemStyle}
-            onClick={this.handleSaveAsClicked}
-            key='save as'
-          >
-            Save As
-          </div>
-        </div>
-      </Quarantine>
+      <EditorActionsSection
+        onSave={this.props.onSave}
+        onSwitchTemplate={this.props.onSwitchTemplate}
+        onExecuteTemplate={this.props.onExecuteTemplate}
+      />
     );
-  }
-
-  public renderRootLevelModals(): any[]
-  {
-    const modals = [];
-    if (this.state.loadTemplateOpen)
-    {
-      modals.push(
-        <Modal
-          key='loadTemplate'
-          title={'Load a Template'}
-          open={this.state.loadTemplateOpen}
-          onClose={this.closeTemplateUI}
-          wide={true}
-        >
-          <div className='template-list-wrapper' style={backgroundColor(Colors().bg3)}>
-            <TemplateList
-              onClick={this.handleLoadTemplateItemClicked}
-              getRowStyle={this.getTemplateItemStyle}
-            />
-          </div>
-        </Modal>,
-      );
-    }
-    else if (this.state.saveTemplateModalOpen)
-    {
-      modals.push(
-        <Modal
-          key='saveNew'
-          title='Save Template'
-          open={this.state.saveTemplateModalOpen}
-          showTextbox={true}
-          onConfirm={this.handleSaveConfirm}
-          onClose={this.handleCloseSave}
-          confirmDisabled={this.state.newTemplateName === ''}
-          textboxValue={this.state.newTemplateName}
-          onTextboxValueChange={this.handleNewTemplateNameChange}
-          textboxPlaceholderValue='Template Name'
-          closeOnConfirm={true}
-          confirm={true}
-        />,
-      );
-    }
-    return modals;
   }
 
   public render()
@@ -338,7 +217,6 @@ class TemplateEditor extends TerrainComponent<Props>
             {this.renderDocumentsSection()}
           </div>
         </div>
-        {... this.renderRootLevelModals()}
         <MoveFieldModal
           fieldId={moveFieldId}
           {...fieldModalProps}
@@ -354,143 +232,9 @@ class TemplateEditor extends TerrainComponent<Props>
       </div>
     );
   }
-
-  public getTemplateItemStyle(templateInList: ETLTemplate)
-  {
-    const { template } = this.props.templateEditor;
-    return (template !== null && template.id === templateInList.id) ? templateListItemCurrentStyle : templateListItemStyle;
-  }
-
-  public handleLoadTemplateItemClicked(template: ETLTemplate)
-  {
-    const currentTemplate = this.props.templateEditor.template;
-    if (template.id !== currentTemplate.id)
-    {
-      this.props.onSwitchTemplate(template);
-      this.closeTemplateUI();
-    }
-  }
-
-  public openTemplateUI()
-  {
-    this.setState({
-      loadTemplateOpen: true,
-    });
-  }
-
-  public closeTemplateUI()
-  {
-    this.setState({
-      loadTemplateOpen: false,
-    });
-  }
-
-  public handleSaveConfirm()
-  {
-    const { template } = this.props.templateEditor;
-    this.props.onSave(template.set('templateName', this.state.newTemplateName), this.state.isSaveAs);
-  }
-
-  public handleCloseSave()
-  {
-    this.setState({
-      newTemplateName: 'New Template',
-      saveTemplateModalOpen: false,
-    });
-  }
-
-  public handleNewTemplateNameChange(newValue: string)
-  {
-    this.setState({
-      newTemplateName: newValue,
-    });
-  }
-
-  public handleSaveClicked()
-  {
-    const { template } = this.props.templateEditor;
-    if (template.id === -1)
-    {
-      this.setState({
-        saveTemplateModalOpen: true,
-        isSaveAs: false,
-      });
-    }
-    else
-    {
-      this.props.onSave(template, false);
-    }
-  }
-
-  public handleSaveAsClicked()
-  {
-    const { template } = this.props.templateEditor;
-    this.setState({
-      saveTemplateModalOpen: true,
-      isSaveAs: true,
-    });
-  }
-
-  public handleUndo()
-  {
-    const { editorAct, templateEditor } = this.props;
-    if (templateEditor.history.canUndo())
-    {
-      editorAct({
-        actionType: 'undoHistory',
-      });
-    }
-  }
-
-  public handleRedo()
-  {
-    const { editorAct, templateEditor } = this.props;
-    if (templateEditor.history.canRedo())
-    {
-      editorAct({
-        actionType: 'redoHistory',
-      });
-    }
-  }
-
-  public handleRun()
-  {
-    const { editorAct, templateEditor } = this.props;
-    const template = templateEditor.template;
-    if (templateEditor.isDirty || template.id === -1)
-    {
-      editorAct({
-        actionType: 'addModal',
-        props: {
-          title: 'Please Save',
-          message: `You Have Unsaved Changes. Please Save Them Before Running This Template`,
-        },
-      });
-    }
-    else
-    {
-      this.props.onExecuteTemplate(template);
-    }
-  }
 }
 
 const emptyList = List([]);
-const topBarItemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
-const topBarItemDisabledStyle = [
-  backgroundColor(Colors().fadedOutBg, Colors().fadedOutBg),
-  fontColor(Colors().text3),
-];
-const topBarRunStyle = [backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)];
-const topBarNameStyle = [fontColor(Colors().text2)];
-const templateListItemStyle = [
-  { cursor: 'pointer' },
-  backgroundColor('rgba(0,0,0,0)', Colors().activeHover),
-];
-const templateListItemCurrentStyle = [
-  { cursor: 'default' },
-  backgroundColor(Colors().active),
-  fontColor(Colors().activeText),
-];
 
 export default Util.createContainer(
   TemplateEditor,

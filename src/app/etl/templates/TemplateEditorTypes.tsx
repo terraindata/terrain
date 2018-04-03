@@ -119,8 +119,8 @@ class EditorDisplayStateC
   public documents: List<object> = List([]);
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
-  public previewIndex: number = 0;
-  public settingsFieldId: number = null;
+  public previewIndex: number = 0; // which preview document we are looking at
+  public settingsFieldId: number = null; // which field are the settings open for
   public settingsDisplayKeyPath: KeyPath = null;
   public currentEdge: number = -1;
   public engineVersion: number = 0;
@@ -128,6 +128,7 @@ class EditorDisplayStateC
   public moveFieldId: number = null;
   public addFieldId: number = null;
   public mergeIntoEdgeId: number = null;
+  public checkedFields: Immutable.Map<number, boolean> = null; // if null then don't display checkboxes
   public fileCache: { [k: string]: File };
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;

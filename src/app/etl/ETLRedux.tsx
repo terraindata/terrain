@@ -87,6 +87,12 @@ export interface ETLActionTypes
     actionType: 'setTemplates';
     templates: List<ETLTemplate>;
   };
+  deleteTemplate: {
+    actionType: 'deleteTemplate';
+    template: ETLTemplate;
+    onLoad?: () => void;
+    onError?: ErrorHandler;
+  };
   createTemplate: {
     actionType: 'createTemplate';
     template: ETLTemplate;
@@ -120,6 +126,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       getTemplate: (state, action) => state, // overriden reducers
       fetchTemplates: (state, action) => state,
       executeTemplate: (state, action) => state,
+      deleteTemplate: (state, action) => state,
       createTemplate: (state, action) => state,
       saveAsTemplate: (state, action) => state,
       saveTemplate: (state, action) => state,
@@ -193,7 +200,10 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       });
       for (const onLoad of onLoads)
       {
-        onLoad(response);
+        if (onLoad !== undefined)
+        {
+          onLoad(response);
+        }
       }
     };
   }
@@ -315,6 +325,22 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     });
   }
 
+  public deleteTemplate(action: ETLActionType<'deleteTemplate'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    this.beforeSaveOrCreate(name, directDispatch);
+
+    const onLoad = () =>
+    {
+      this.fetchTemplates({ actionType: 'fetchTemplates' }, dispatch);
+    };
+
+    ETLAjax.deleteTemplate(action.template)
+      .then(this.onLoadFactory([onLoad, action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
+  }
+
   public createTemplate(action: ETLActionType<'createTemplate'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
@@ -362,6 +388,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.getTemplate.bind(this, action);
       case 'executeTemplate':
         return this.executeTemplate.bind(this, action);
+      case 'deleteTemplate':
+        return this.deleteTemplate.bind(this, action);
       case 'createTemplate':
         return this.createTemplate.bind(this, action);
       case 'saveAsTemplate':

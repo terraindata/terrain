@@ -55,36 +55,10 @@ import { Permissions } from '../permissions/Permissions';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as Util from '../AppUtil';
+import { deleteElasticIndex, getSchema } from '../Schema';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
-
-async function getSchema(databaseID: number): Promise<string>
-{
-  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
-  if (database === undefined)
-  {
-    throw new Error('Database "' + databaseID.toString() + '" not found.');
-  }
-  const schema: Tasty.Schema = await database.getTasty().schema();
-  return schema.toString();
-}
-
-async function deleteElasticIndex(dbid: number, dbname: string)
-{
-  const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-  if (database === undefined)
-  {
-    throw new Error('Database "' + dbid.toString() + '" not found.');
-  }
-
-  winston.info(`Deleting Elastic Index ${dbname} of database ${dbid}`);
-  const elasticDb = database.getTasty().getDB() as ElasticDB;
-  await elasticDb.deleteIndex(dbname);
-  winston.info(`Deleted Elastic Index ${dbname} of database ${dbid}`);
-
-  return 'ok';
-}
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

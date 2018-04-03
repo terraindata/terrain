@@ -120,6 +120,28 @@ class ETLAjax
     });
   }
 
+  public deleteTemplate(template: ETLTemplate): Promise<void>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        resolve();
+      };
+      return Ajax.req(
+        'post',
+        'etl/templates/delete',
+        {
+          templateId: template.id,
+        },
+        handleResponse,
+        {
+          onError: reject,
+        },
+      );
+    });
+  }
+
   public createTemplate(template: ETLTemplate): Promise<List<ETLTemplate>>
   {
     const templateToSave = templateForBackend(template);

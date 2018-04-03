@@ -69,7 +69,7 @@ export interface Props
 
 class ETLPage extends TerrainComponent<Props>
 {
-  public componentWillMount()
+  public componentDidMount()
   {
     this.props.act({
       actionType: 'fetchTemplates',

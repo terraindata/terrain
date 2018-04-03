@@ -126,7 +126,7 @@ class FieldMainSettings extends TemplateEditorField<Props>
 
   public getFieldNameDisplayState(s: SettingsState)
   {
-    return this._canEditName() ? DisplayState.Active : DisplayState.Hidden;
+    return this._field().canEditName() ? DisplayState.Active : DisplayState.Hidden;
   }
 
   public getFormStateFromField(props)
