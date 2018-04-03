@@ -117,80 +117,96 @@ export class EngineProxy
     this.engine.deleteTransformation(id);
   }
 
-  // if sourceKeypath is a new keypath, then it is assumed that it is an array extraction
-  public duplicateField(sourceKeypath: List<string>, destKeypath: List<string>)
+  /*
+   *  This is a rather complicated operation
+   *  If the given keypath is [foo, *], then we need to create the specific field [foo, index]
+   *  If extracted field is still an array type, then we also need to create the wildcard for that field
+   *  After creating the extracted field, we need to perform the duplication operation on the extracted field
+   */
+  public extractArrayField(sourceId: number, index: number, destKP: List<string>)
   {
-    const isArrayExtraction = this.engine.getInputFieldID(sourceKeypath) === undefined
-    let rootKeypathToTransfer;
-    let toCopyId;
-    let toDuplicateId;
-    let parentValueType;
-
-    if (isArrayExtraction)
+    const sourceKP = this.engine.getOutputKeyPath(sourceId);
+    if (sourceKP.size === 0)
     {
-      rootKeypathToTransfer = EngineUtil.turnIndicesIntoValue(sourceKeypath);
-      toCopyId = this.engine.getInputFieldID(rootKeypathToTransfer);
-      toDuplicateId = this.engine.addField(
-          sourceKeypath,
-          this.engine.getFieldProp(toCopyId, List(['valueType'])),
-        );
+      throw new Error('Cannot extract array field, source keypath is empty');
+    }
+    const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, String(index));
+    const specifiedSourceType = EngineUtil.getRepresentedType(sourceId, this.engine);
+
+    let specifiedSourceId: number;
+
+    if (specifiedSourceType === 'array')
+    {
+      const anyChildId = EngineUtil.findChildField(sourceId, this.engine);
+      if (anyChildId === undefined)
+      {
+        throw new Error('Field type is array, but could not find any children in the Transformation Engine');
+      }
+      const childType = EngineUtil.getRepresentedType(anyChildId, this.engine);
+      specifiedSourceId = this.addField(specifiedSourceKP, 'array', childType);
     }
     else
     {
-      toDuplicateId = this.engine.getInputFieldID(sourceKeypath);
-      rootKeypathToTransfer = sourceKeypath;
-      toCopyId = this.engine.getInputFieldID(rootKeypathToTransfer);
+      specifiedSourceId = this.addField(specifiedSourceKP, specifiedSourceType);
     }
 
-    const rootOutputKeypathToTransfer = this.engine.getOutputKeyPath(toCopyId);
-    preorderForEach(this.engine, toCopyId, (fieldId) =>
+    this.requestRebuild();
+    this.duplicateField(specifiedSourceId, destKP, true);
+  }
+
+  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
+  {
+    const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
+      newFieldKeyPaths: List([destKP])
+    };
+
+    this.addTransformation(
+      TransformationNodeType.DuplicateNode,
+      List([this.engine.getInputKeyPath(sourceId)]),
+      options
+    );
+
+    const newFieldId = this.engine.getInputFieldID(destKP);
+
+    EngineUtil.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
+
+    let idToCopy = sourceId;
+    if (despecify)
     {
-      if (fieldId !== toCopyId)
+      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getOutputKeyPath(sourceId));
+      idToCopy = this.engine.getOutputFieldID(kpToCopy);
+    }
+
+    const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
+    preorderForEach(this.engine, idToCopy, (childId) => {
+      // do not copy root
+      if (childId !== idToCopy)
       {
-        if (parentValueType === undefined)
-        {
-          parentValueType = EngineUtil.getRepresentedType(fieldId, this.engine); // gets first child type
-        }
-        const toTransferKeypath = this.engine.getOutputKeyPath(fieldId);
-        const pathAfterRoot = toTransferKeypath.slice(rootOutputKeypathToTransfer.size);
-        EngineUtil.transferField(fieldId, destKeypath.concat(pathAfterRoot).toList(), this.engine);
+        const toTransferKeypath = this.engine.getOutputKeyPath(childId);
+        const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
+        EngineUtil.transferField(childId, destKP.concat(pathAfterRoot).toList(), this.engine);
       }
     });
-    const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
-      newFieldKeyPaths: List([destKeypath]),
-    }
-    this.addTransformation(TransformationNodeType.DuplicateNode, List([sourceKeypath]), options);
-
-    const duplicatedFieldId = this.engine.getInputFieldID(destKeypath);
-    if (isArrayExtraction)
-    {
-      console.log('hello', EngineUtil.getRepresentedType(toCopyId, this.engine), parentValueType);
-      this.engine.setFieldType(duplicatedFieldId, EngineUtil.getRepresentedType(toCopyId, this.engine));
-      this.engine.setFieldProp(duplicatedFieldId, List(['valueType']), parentValueType);
-
-      this.engine.setFieldProp(toDuplicateId, List(['valueType']), parentValueType);
-    }
-    else
-    {
-      this.engine.setFieldType(duplicatedFieldId, this.engine.getFieldType(toCopyId));
-      this.engine.setFieldProps(duplicatedFieldId, this.engine.getFieldProps(toCopyId));
-    }
-
     this.requestRebuild();
   }
 
-  public addField(keypath: List<string>, type: string, valueType?: string)
+  public addField(keypath: List<string>, type: string, valueType?: string, dontAddWildcard?: boolean)
   {
+    let newId: number;
     if (type === 'array')
     {
-      this.engine.addField(keypath, type, { valueType });
-      this.engine.addField(keypath.push('*'), 'array', { valueType });
+      newId = this.engine.addField(keypath, type, { valueType });
+      if (!dontAddWildcard)
+      {
+        this.engine.addField(keypath.push('*'), 'array', { valueType });
+      }
     }
     else
     {
-      this.engine.addField(keypath, type);
+      newId = this.engine.addField(keypath, type);
     }
     this.requestRebuild();
+    return newId;
   }
 
   public addRootField(name: string, type: string)

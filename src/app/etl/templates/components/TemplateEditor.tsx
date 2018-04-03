@@ -112,13 +112,6 @@ class TemplateEditor extends TerrainComponent<Props>
       return {};
     }
 
-    console.log('----------------------------')
-    engine.getAllFieldIDs().forEach((id, i) => {
-      console.log(engine.getInputKeyPath(id).toJS(), engine.getOutputKeyPath(id).toJS());
-      console.log(engine.getFieldType(id));
-      console.log(engine.getFieldProps(id)['valueType']);
-    });
-
     return engine.transform(previewDocument);
   }
 

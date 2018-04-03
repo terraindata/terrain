@@ -283,7 +283,8 @@ class ExtractFieldModal extends TerrainComponent<Props>
       let extractedKeypath = proxy.getEngine().getInputKeyPath(extractField.fieldId);
       extractedKeypath = extractedKeypath.set(extractedKeypath.size - 1, String(this.state.index));
 
-      proxy.duplicateField(extractedKeypath, newKeypath);
+      proxy.extractArrayField(extractField.fieldId, Number(this.state.index), newKeypath);
+      // proxy.duplicateField(extractedKeypath, newKeypath);
       // const type = EngineUtil.getRepresentedType(extractField.fieldId, proxy.getEngine());
       // let childType;
       // if (type === 'array')

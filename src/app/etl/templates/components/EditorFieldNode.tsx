@@ -50,8 +50,10 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import memoizeOne from 'memoize-one';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
+import { instanceFnDecorator } from 'src/app/Classes';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -108,18 +110,27 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
+  @instanceFnDecorator(memoizeOne)
+  public _getAppropriateChild(field: TemplateField, fieldMap: Immutable.Map<number, TemplateField>)
+  {
+    return _.memoize((arrayIndex) => {
+      if (field.childrenIds.size > 0)
+      {
+        const wildcard = field.childrenIds.find((id) => fieldMap.get(id).isWildcardField());
+        return wildcard !== undefined ? wildcard : field.childrenIds.get(0);
+      }
+      else
+      {
+        return -1;
+      }
+    });
+
+  }
+
   // TODO, if there are special index children that match get those
   public getAppropriateChild(arrayIndex): number
   {
-    const field = this._field();
-    if (field.childrenIds.size > 0)
-    {
-      return field.childrenIds.get(0);
-    }
-    else
-    {
-      return -1;
-    }
+    return this._getAppropriateChild(this._field(), this._fieldMap())(arrayIndex);
   }
 
   // -1 if there is no available preview

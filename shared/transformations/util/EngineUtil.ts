@@ -121,7 +121,8 @@ export default class EngineUtil
     return scrubbed;
   }
 
-  public static findChildField(fieldId: number, engine: TransformationEngine): number
+  // returns the first child field
+  public static findChildField(fieldId: number, engine: TransformationEngine): number | undefined
   {
     const myKP = engine.getOutputKeyPath(fieldId);
     const key = engine.getAllFieldIDs().findKey((id: number) => {
@@ -401,6 +402,14 @@ export default class EngineUtil
       e2 = e1;
     }
     const id2 = e2.addField(keypath, e1.getFieldType(id1));
+    EngineUtil.transferFieldData(id1, id2, e1, e2);
+    return id2;
+  }
+
+  // copies a field's configuration from e1 to e2. id1 and id2 should both exist in e1 and e2 respectively
+  public static transferFieldData(id1: number, id2: number, e1: TransformationEngine, e2: TransformationEngine)
+  {
+    e2.setFieldType(id2, e1.getFieldType(id1));
     e2.setFieldProps(id2, e1.getFieldProps(id1));
     if (e1.getFieldEnabled(id1))
     {
@@ -410,7 +419,6 @@ export default class EngineUtil
     {
       e2.disableField(id2);
     }
-    return id2;
   }
 
   private static preprocessDocuments(documents: List<object>): List<object>
