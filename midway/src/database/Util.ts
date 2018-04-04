@@ -98,7 +98,7 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
   {
     return {
       hosts: [dsnString],
-      keepAlive: true,
+      keepAlive: false,
       requestTimeout: 600000,
     } as ElasticConfig;
   }
