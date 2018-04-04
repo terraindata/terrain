@@ -244,13 +244,32 @@ export class Export
             throw Error('File type must be either CSV or JSON.');
         }
 
-        const str = respStream
-          .on('error', (e) => str.destroy())
+        resolve(
+          respStream
+          .on('error', (e) =>
+          {
+            winston.error('Error in response stream: ', e.toString());
+            respStream.destroy();
+            documentTransform.destroy();
+            exportTransform.destroy();
+          })
           .pipe(documentTransform)
-          .on('error', (e) => str.destroy())
+          .on('error', (e) =>
+          {
+            winston.error('Error in document stream: ', e.toString());
+            respStream.destroy();
+            documentTransform.destroy();
+            exportTransform.destroy();
+          })
           .pipe(exportTransform)
-          .on('error', (e) => str.destroy());
-        resolve(str);
+          .on('error', (e) =>
+          {
+            winston.error('Error in export stream: ', e.toString());
+            respStream.destroy();
+            documentTransform.destroy();
+            exportTransform.destroy();
+          }),
+        );
       }
       catch (e)
       {
@@ -302,7 +321,7 @@ export class Export
       }
     }
 
-    doc = this._transformAndCheck(doc, cfg.exportConfig, false);
+    doc = this._transformAndCheck(doc, cfg.exportConfig, true);
     if (cfg.exportConfig.rank === true)
     {
       if (doc['TERRAINRANK'] !== undefined)

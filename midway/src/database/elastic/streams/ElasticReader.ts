@@ -66,15 +66,15 @@ export class ElasticReader extends SafeReadable
 
   private scrollID: string | undefined = undefined;
 
-  private MAX_SEARCH_SIZE: number = 10 * 1000;
-  private DEFAULT_SEARCH_SIZE: number = 8 * 1024;
-  private DEFAULT_SCROLL_TIMEOUT: string = '5m';
+  private MAX_SEARCH_SIZE: number = 2 * 1000;
+  private DEFAULT_SEARCH_SIZE: number = 200;
+  private DEFAULT_SCROLL_TIMEOUT: string = '45m';
 
   private numRequested: number = 0;
 
   constructor(client: ElasticClient, query: any, streaming: boolean = false)
   {
-    super({ objectMode: true, highWaterMark: 1024 * 128 });
+    super({ objectMode: true, highWaterMark: 1024 * 8 });
 
     this.client = client;
     this.query = query;

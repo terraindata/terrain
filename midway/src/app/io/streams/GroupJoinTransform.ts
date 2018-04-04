@@ -69,7 +69,7 @@ export default class GroupJoinTransform extends SafeReadable
   private source: ElasticReader;
   private query: object;
 
-  private maxPendingQueries: number = 4;
+  private maxPendingQueries: number = 1;
   private maxBufferedOutputs: number;
   private bufferedOutputs: Deque<Ticket>;
 
