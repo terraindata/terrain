@@ -66,222 +66,193 @@ import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
 import './EditorFieldModal.less';
 
-export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
+interface Props
 {
-  public render()
-  {
-    const { fieldId } = this.props;
-    if (fieldId === null)
-    {
-      return null;
-    }
-    else if (fieldId === -1)
-    {
-      return (
-        <AddRootFieldModal
-          fieldId={fieldId}
-        />
-      );
-    }
-    else
-    {
-      return (
-        <AddFieldModal
-          {... this.props}
-        />
-      );
-    }
-  }
+  // below from container
+  templateEditor?: TemplateEditorState;
+  editorAct?: typeof TemplateEditorActions;
 }
 
 interface FormState
 {
   name: string;
-  type: FieldTypes;
+  index: string | number;
 }
 
-const addFieldMap: InputDeclarationMap<FormState> =
-  {
+class ExtractFieldModal extends TerrainComponent<Props>
+{
+  public state: FormState;
+
+  public inputMap: InputDeclarationMap<FormState> = {
     name: {
       type: DisplayType.TextBox,
-      displayName: 'Name',
-      group: 'file type',
+      displayName: 'New Field Name',
+      group: 'row 1',
     },
-    type: {
-      type: DisplayType.Pick,
-      displayName: 'Field Type',
-      options: {
-        pickOptions: (s) => typeOptions,
-        indexResolver: (value) => typeOptions.indexOf(value),
-      },
+    index: {
+      type: DisplayType.TextBox,
+      displayName: 'Array Index',
+      group: 'row 1',
     },
   };
-const typeOptions = List(['string', 'number', 'boolean', 'array', 'object']);
 
-// UI to add a new field underneath this field
-class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
-{
-  public state: FormState = {
-    name: 'new_field',
-    type: 'string',
-  };
-
-  @instanceFnDecorator(memoizeOne)
-  public _validateKeyPath(engine, engineVersion, field, pathKP: List<string>)
+  constructor(props)
   {
-    return validateNewFieldName(engine, field.fieldId, pathKP);
+    super(props);
+    this.state = this.computeStateFromProps(props);
   }
 
-  public validateKeyPath(): { isValid: boolean, message: string }
+  public computeStateFromProps(props): FormState
   {
-    const engineVersion = this._uiState().get('engineVersion');
-    const engine = this._currentEngine();
-    const field = this._field();
-    return this._validateKeyPath(engine, engineVersion, field, this.computeKeyPath());
+    const { extractField } = props.templateEditor.uiState;
+
+    if (extractField === null)
+    {
+      return {
+        name: '',
+        index: -1,
+      };
+    }
+    else
+    {
+      const displayIndex = extractField.index !== -1 ? extractField.index : 0;
+      return {
+        name: `Item ${displayIndex}`,
+        index: displayIndex,
+      };
+    }
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.templateEditor.uiState.extractField !== this.props.templateEditor.uiState.extractField)
+    {
+      this.setState(this.computeStateFromProps(nextProps));
+    }
+  }
+
+  public renderInnerForm()
+  {
+    const { isValid, message } = this.validateState();
+
+    return (
+      <div className='editor-field-form-wrapper'>
+        <DynamicForm
+          inputMap={this.inputMap}
+          inputState={this.state}
+          onStateChange={this.handleFormChange}
+        />
+        <div
+          className='editor-field-message-wrapper'
+          style={fontColor(Colors().error)}
+        >
+          {message}
+        </div>
+      </div>
+    );
+  }
+
+  public render()
+  {
+    const { extractField } = this.props.templateEditor.uiState;
+    const { isValid, message } = this.validateState();
+
+    return (
+      <Modal
+        open={extractField !== null}
+        title='Extract Array Element'
+        confirm={true}
+        confirmDisabled={!isValid}
+        closeOnConfirm={true}
+        onClose={this.handleCloseModal}
+        onConfirm={this.handleConfirmModal}
+      >
+        {extractField !== null ? this.renderInnerForm() : null}
+      </Modal>
+    );
   }
 
   @instanceFnDecorator(memoizeOne)
-  public _computeKeyPath(oldKp: EnginePath, value: string): EnginePath
+  public _computeKeyPath(fieldId: number, name: string): EnginePath
   {
-    return oldKp.push(value);
+    if (fieldId === -1)
+    {
+      return List([name]);
+    }
+    else
+    {
+      const { templateEditor } = this.props;
+      const engine = templateEditor.getCurrentEngine();
+      const okp = engine.getOutputKeyPath(fieldId);
+
+      if (okp === undefined)
+      {
+        return List([name]);
+      }
+      else
+      {
+        const lastIndex = okp.findLastIndex((val, i) => EngineUtil.isNamedField(okp, i));
+        if (lastIndex === -1)
+        {
+          return List([name]);
+        }
+        else
+        {
+          return okp.slice(0, lastIndex).toList().push(name);
+        }
+      }
+    }
   }
 
   public computeKeyPath(): EnginePath
   {
-    const field = this._field();
-    return this._computeKeyPath(field.outputKeyPath, this.state.name);
+    const { extractField } = this.props.templateEditor.uiState;
+    return this._computeKeyPath(extractField !== null ? extractField.fieldId : -1, this.state.name);
   }
-
-  public renderInner()
-  {
-    const { isValid, message } = this.validateKeyPath();
-    return (
-      <div className='editor-field-form-wrapper'>
-        <DynamicForm
-          inputMap={addFieldMap}
-          inputState={this.state}
-          onStateChange={this.handleFormChange}
-        />
-      </div>
-    );
-  }
-
-  public render()
-  {
-    const { isValid, message } = this.validateKeyPath();
-    return (
-      <Modal
-        open={this.props.fieldId !== null}
-        title='Add Field'
-        onClose={this.closeModal}
-        onConfirm={this.onConfirm}
-        confirm={true}
-        closeOnConfirm={true}
-        confirmDisabled={!isValid}
-      >
-        {this.renderInner()}
-      </Modal>
-    );
-  }
-
-  public handleFormChange(state)
-  {
-    this.setState(state);
-  }
-
-  public closeModal()
-  {
-    this.props.act({
-      actionType: 'setDisplayState',
-      state: {
-        addFieldId: null,
-      },
-    });
-  }
-
-  public onConfirm()
-  {
-    this._try((proxy) =>
-    {
-      proxy.addNewField(this.state.name, this.state.type);
-    });
-  }
-}
-
-const AddFieldModal = Util.createTypedContainer(
-  AddFieldModalC,
-  mapStateKeys,
-  mapDispatchKeys,
-);
-
-interface RootFieldProps
-{
-  fieldId: number;
-  // injected
-  act?: typeof TemplateEditorActions;
-  templateEditor?: TemplateEditorState;
-}
-// UI to add a new field under root level
-class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
-{
-  public state: FormState = {
-    name: 'new_field',
-    type: 'string',
-  };
 
   @instanceFnDecorator(memoizeOne)
-  public _validateKeyPath(engine, engineVersion, name: string)
+  public _validateState(
+    engine: TransformationEngine,
+    engineVersion: number,
+    fieldId: number,
+    keypath: EnginePath,
+    index: string | number,
+  ): { isValid: boolean, message: string }
   {
-    const pathKP = List([name]);
-    return validateNewFieldName(engine, -1, pathKP);
+    const asNum = Number(index);
+    if (!Number.isInteger(asNum) || asNum < 0)
+    {
+      return {
+        isValid: false,
+        message: 'Index is Invalid',
+      };
+    }
+    return validateNewFieldName(engine, -1, keypath);
   }
 
-  public validateKeyPath(): { isValid: boolean, message: string }
+  public validateState(): { isValid: boolean, message: string }
   {
     const { templateEditor } = this.props;
-    const engineVersion = templateEditor.uiState.engineVersion;
+    const { extractField, engineVersion } = templateEditor.uiState;
+    if (extractField === null)
+    {
+      return {
+        isValid: false,
+        message: 'Selected field is null',
+      };
+    }
     const engine = templateEditor.getCurrentEngine();
-
-    return this._validateKeyPath(engine, engineVersion, this.state.name);
-  }
-
-  public renderInner()
-  {
-    const { isValid, message } = this.validateKeyPath();
-    return (
-      <div className='add-field-modal-wrapper'>
-        <DynamicForm
-          inputMap={addFieldMap}
-          inputState={this.state}
-          onStateChange={this.handleFormChange}
-        />
-      </div>
-    );
-  }
-
-  public render()
-  {
-    const { isValid, message } = this.validateKeyPath();
-
-    return (
-      <Modal
-        open={this.props.fieldId !== null}
-        title='Add Field'
-        onClose={this.closeModal}
-        onConfirm={this.onConfirm}
-        confirm={true}
-        closeOnConfirm={true}
-        confirmDisabled={!isValid}
-      >
-        {this.renderInner()}
-      </Modal>
-    );
+    const keypath = this.computeKeyPath();
+    return this._validateState(engine, engineVersion, extractField.fieldId, keypath, this.state.index);
   }
 
   public handleFormChange(state)
@@ -289,38 +260,43 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
     this.setState(state);
   }
 
-  public closeModal()
+  public handleCloseModal()
   {
-    this.props.act({
+    this.props.editorAct({
       actionType: 'setDisplayState',
       state: {
-        addFieldId: null,
+        extractField: null,
       },
     });
   }
 
-  public onConfirm()
+  public handleConfirmModal()
   {
+    const newKeypath = this.computeKeyPath();
+    const { extractField } = this.props.templateEditor.uiState;
+    if (extractField === null)
+    {
+      return;
+    }
     GraphHelpers.mutateEngine((proxy) =>
     {
-      proxy.addRootField(this.state.name, this.state.type);
+      let extractedKeypath = proxy.getEngine().getInputKeyPath(extractField.fieldId);
+      extractedKeypath = extractedKeypath.set(extractedKeypath.size - 1, String(this.state.index));
+      proxy.extractArrayField(extractField.fieldId, Number(this.state.index), newKeypath);
     }).then((isStructural) =>
     {
-      if (isStructural)
-      {
-        this.props.act({
-          actionType: 'rebuildFieldMap',
-        });
-      }
+      this.props.editorAct({
+        actionType: 'rebuildFieldMap',
+      });
     }).catch((e) =>
     {
-      // TODO
+      // Todo handle
     });
   }
 }
 
-const AddRootFieldModal = Util.createTypedContainer(
-  AddRootFieldModalC,
+export default Util.createTypedContainer(
+  ExtractFieldModal,
   ['templateEditor'],
-  { act: TemplateEditorActions },
+  { editorAct: TemplateEditorActions },
 );

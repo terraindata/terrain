@@ -130,6 +130,10 @@ class EditorDisplayStateC
   public mergeIntoEdgeId: number = null;
   public checkedFields: Immutable.Map<number, boolean> = null; // if null then don't display checkboxes
   public fileCache: { [k: string]: File };
+  public extractField: {
+    fieldId: number,
+    index: number,
+  } = null;
 }
 export type EditorDisplayState = WithIRecord<EditorDisplayStateC>;
 export const _EditorDisplayState = makeConstructor(EditorDisplayStateC);

@@ -101,6 +101,11 @@ class TemplateFieldC
     return this.isNamedField() || this.isPrimitive();
   }
 
+  public canTransformField(): boolean
+  {
+    return true;
+  }
+
   public canEditName(): boolean
   {
     return !this.isWildcardField();

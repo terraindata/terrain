@@ -52,58 +52,58 @@ import * as React from 'react';
 
 import { instanceFnDecorator } from 'src/app/Classes';
 
+import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { FieldPicker } from 'etl/common/components/FieldPicker.tsx';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
-
-import { DynamicForm } from 'common/components/DynamicForm';
+import { areFieldsLocal } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-type SubstringOptions = NodeOptionsType<TransformationNodeType.SubstringNode>;
-export class SubstringTFF extends TransformationForm<SubstringOptions, TransformationNodeType.SubstringNode>
+interface ArraySumOptions
 {
-  protected readonly type = TransformationNodeType.SubstringNode;
-  protected readonly inputMap: InputDeclarationMap<SubstringOptions> = {
-    from: {
-      type: DisplayType.NumberBox,
-      displayName: 'From Position',
-    },
-    length: {
-      type: DisplayType.NumberBox,
-      displayName: 'SubstringLength',
-    },
-  };
-  protected readonly initialState = {
-    from: 0,
-    length: 5,
-  };
+  outputName: string;
 }
 
-type UppercaseOptions = NodeOptionsType<TransformationNodeType.UppercaseNode>;
-export class UppercaseTFF extends TransformationForm<UppercaseOptions, TransformationNodeType.UppercaseNode>
+export class ArraySumTFF extends TransformationForm<ArraySumOptions, TransformationNodeType.ArraySumNode>
 {
-  protected readonly type = TransformationNodeType.UppercaseNode;
-  protected readonly inputMap: InputDeclarationMap<UppercaseOptions> = {};
-  protected readonly initialState = {};
-}
-
-type HashOptions = NodeOptionsType<TransformationNodeType.HashNode>;
-export class HashTFF extends TransformationForm<HashOptions, TransformationNodeType.HashNode>
-{
-  protected readonly type = TransformationNodeType.HashNode;
-  protected readonly inputMap: InputDeclarationMap<HashOptions> = {
-    salt: {
+  protected readonly inputMap: InputDeclarationMap<ArraySumOptions> = {
+    outputName: {
       type: DisplayType.TextBox,
-      displayName: 'Salt',
+      displayName: 'Output Field Name',
     },
   };
   protected readonly initialState = {
-    salt: '',
+    outputName: 'Field Sum',
   };
+  protected readonly type = TransformationNodeType.ArraySumNode;
+
+  protected isStructuralChange()
+  {
+    return true;
+  }
+
+  protected createTransformation(proxy: EngineProxy)
+  {
+    const { engine, fieldId } = this.props;
+    const { outputName } = this.state;
+
+    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const newFieldKeyPaths = List([
+      currentKeyPath.set(currentKeyPath.size - 1, outputName),
+    ]);
+
+    const inputFields = List([engine.getInputKeyPath(fieldId)]);
+    proxy.addTransformation(this.type, inputFields, { newFieldKeyPaths });
+
+    const newlyAdded = engine.getInputFieldID(newFieldKeyPaths.get(0));
+    engine.setFieldType(newlyAdded, 'number');
+  }
 }
