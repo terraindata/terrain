@@ -366,7 +366,8 @@ const Periscope = {
     this._drawBars(el, scales, domain, barsData, colors);
     this._drawLine(el, scales, domain);
     this._drawHandles(el, scales, domain, onDomainChange, onDomainChangeStart, field);
-    this._drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange, field);
+    setTimeout(() => this._drawHandleInputs(el, scales, domain, onDomainLowChange, onDomainHighChange, field), 100);
+
   },
 
   _scales(el, maxDomain, domainAndRange, barsData, stateWidth, stateHeight)
