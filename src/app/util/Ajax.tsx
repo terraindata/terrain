@@ -51,6 +51,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import axios from 'axios';
 
 import { QueryRequest } from '../../../shared/database/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
@@ -106,23 +107,7 @@ export const Ajax =
         JSON.stringify(data),
         (response) =>
         {
-          let responseData: object = null;
-          try
-          {
-            responseData = JSON.parse(response);
-          }
-          catch (e)
-          {
-            // parsing error, we create a new QueryResponse so that callers wont need to worry about the format
-            // anymore.
-            config.onError && config.onError(e);
-          }
-
-          if (responseData !== undefined)
-          {
-            // needs to be outside of the try/catch so that any errors it throws aren't caught
-            onLoad(responseData);
-          }
+          onLoad(response);
         },
         _.extend({
           onError: config.onError,
@@ -183,31 +168,6 @@ export const Ajax =
         return;
       }
 
-      const xhr = new XMLHttpRequest();
-      xhr.timeout = 180000;
-      xhr.onerror = (err: any) =>
-      {
-        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-        config && config.onError && config.onError(routeError);
-      };
-
-      xhr.onload = (ev: Event) =>
-      {
-        if (xhr.status === 401)
-        {
-          // TODO re-enable
-          Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
-        }
-
-        if (xhr.status !== 200)
-        {
-          config && config.onError && config.onError(xhr.responseText);
-          return;
-        }
-
-        onLoad(xhr.responseText);
-      };
-
       // NOTE: MIDWAY_HOST will be replaced by the build process.
       if (method === 'get')
       {
@@ -231,28 +191,53 @@ export const Ajax =
         fullUrl += '?' + $.param(config.urlArgs);
       }
 
-      xhr.open(method, fullUrl, true);
+      axios.interceptors.response.use(
+        response => response,
+        (error) => {
+          if (error.response.status === 401)
+          {
+            Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
+            return Promise.reject(error.statusText)
+          }
 
-      if (config.json)
+          if (error.response.status !== 200)
+          {
+            config && config.onError && config.onError(error.data);
+            return;
+          }
+        }
+      );
+
+      const headers = {};
+      if (config.crossDomain)
       {
-        xhr.setRequestHeader('Content-Type', 'application/json');
+        headers['Access-Control-Allow-Origin'] = '*';
+        headers['Access-Control-Allow-Headers'] = 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin';
       }
 
       if (!config.noToken)
       {
-        const token = 'L9DcAxWyyeAuZXwb-bJRtA'; // hardcoded token in pa-terraformer02. TODO change?
-        xhr.setRequestHeader('token', token);
+        headers['token'] = 'L9DcAxWyyeAuZXwb-bJRtA';
       }
 
-      if (config.crossDomain)
-      {
-        xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-        xhr.setRequestHeader('Access-Control-Allow-Headers',
-          'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
-      }
+      const xhr = axios.request({
+        method,
+        url: fullUrl,
+        timeout: 180000,
+        withCredentials: config.crossDomain,
+        headers,
+        params: method === 'get' ? data : {},
+        data: method !== 'get' ? JSON.parse(data) : {},
+      }).then((response) => {
+          onLoad(response.data);
+        })
+        .catch((err) =>
+        {
+          const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+          config && config.onError && config.onError(routeError);
+        });
 
-      xhr.send(data);
-      return xhr;
+      return new XMLHttpRequest();
     },
 
     midwayStatus(success: () => void,

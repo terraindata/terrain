@@ -103,6 +103,7 @@
     "aes-js": "^3.1.0",
     "array-typeof-values": "^1.0.1",
     "async-busboy": "^0.6.2",
+    "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
     "bcrypt": "^1.0.3",
