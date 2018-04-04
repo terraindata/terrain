@@ -42,51 +42,148 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-// tslint:disable:no-unused-variable
+import crypto = require('crypto');
+import jsonStream = require('JSONStream');
 
 import * as winston from 'winston';
 
-import Credentials from '../../credentials/Credentials';
+import * as request from 'request';
+import { Credentials } from '../../credentials/Credentials';
+import { ExportSourceConfig } from './Sources';
 
 export const credentials: Credentials = new Credentials();
 
-export interface MailchimpConfig
+export interface MailchimpSourceConfig
 {
-  id: string;
-  name: string;
-  range: string;
+  data: object[];
+  key: string;
+  host: string;
+  listID: string;
 }
 
 export class Mailchimp
 {
-  private storedEmail: string;
-  private storedKeyFilePath: string;
 
-  public getStoredEmail(): string
+  public async getJSONStreamAsMailchimpSourceConfig(exportSourceConfig: ExportSourceConfig): Promise<string>
   {
-    return this.storedEmail;
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      try
+      {
+        let results: object[] = [];
+        const jsonParser = jsonStream.parse();
+        exportSourceConfig.stream.pipe(jsonParser);
+        jsonParser.on('data', (data) =>
+        {
+          winston.debug(`Mailchimp got data (onData) with ${data.length} objects`);
+          results = data;
+          const mailchimpSourceConfig: MailchimpSourceConfig =
+            {
+              data: results,
+              key: exportSourceConfig.params['key'],
+              host: exportSourceConfig.params['host'],
+              listID: exportSourceConfig.params['listID'],
+            };
+          this.runQuery(mailchimpSourceConfig).then(() =>
+          {
+            resolve('Finished getJSONStreamAsMailchimpSourceConfig.onData');
+          }).catch((e) =>
+          {
+            reject(`Mailchimp export failed in runQuery: ${e}`);
+          });
+          resolve('Finished getJSONStreamAsMailchimpSourceConfig');
+        });
+      } catch (e)
+      {
+        reject(`Mailchimp export failed in getJSONStreamAsMailchimpSourceConfig: ${e}`);
+      }
+    });
   }
 
-  public getStoredKeyFilePath(): string
+  public async runQuery(mailchimpSourceConfig: MailchimpSourceConfig): Promise<string>
   {
-    return this.storedKeyFilePath;
-  }
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      try
+      {
+        const resultArr: Array<Promise<object>> = [];
 
-  private async _getStoredGoogleAPICredentials()
-  {
-    const creds: string[] = await credentials.getByType('googleapi');
-    if (creds.length === 0)
-    {
-      winston.info('No credential found for type googleapi.');
-    }
-    else
-    {
-      const cred: object = JSON.parse(creds[0]);
-      this.storedEmail = cred['storedEmail'];
-      this.storedKeyFilePath = cred['storedKeyFilePath'];
-    }
+        const batchSize: number = 1000;
+        const batches: object[][] = [[]];
+
+        let currBatch: number = 0;
+        for (let i: number = 1; i <= mailchimpSourceConfig.data.length; i++)
+        {
+          batches[currBatch][(i - 1) % batchSize] = mailchimpSourceConfig.data[i - 1];
+
+          if (i % batchSize === 0)
+          {
+            currBatch++;
+            batches[currBatch] = [];
+          }
+        }
+
+        // console.log('STATS: ' + mailchimpSourceConfig.data.length
+        //   + ' ' + batches.length + ' ' + batches[0].length);// + ' ' + batches[1].length + ' ' + batches[2].length);
+
+        batches.forEach((batch: object[]) =>
+        {
+          const batchBody: object = { operations: [] };
+          batch.forEach((row: object) =>
+          {
+            batchBody['operations'].push({
+              method: 'PUT',
+              path: 'lists/' + mailchimpSourceConfig.listID + '/members/'
+                + crypto.createHash('md5').update(row['EMAIL']).digest('hex').toString(),
+              body: JSON.stringify({
+                email_address: row['EMAIL'],
+                status_if_new: 'subscribed',
+                merge_fields: row,
+              }),
+            });
+          });
+
+          request.post({
+            headers: {
+              'content-type': 'application/json',
+            },
+            auth: {
+              user: 'any',
+              password: mailchimpSourceConfig.key,
+            },
+            url: mailchimpSourceConfig.host + 'batches',
+            json: batchBody,
+          }, (error, response, body) =>
+            {
+              winston.debug('Mailchimp response: ' + JSON.stringify(response));
+              const batchid: string = response['body']['id'];
+              setTimeout(() =>
+              {
+                request.get({
+                  url: mailchimpSourceConfig.host + 'batches/' + batchid,
+                  auth: {
+                    user: 'any',
+                    password: mailchimpSourceConfig.key,
+                  },
+                }, (e2, r2, b2) =>
+                  {
+                    winston.debug('Mailchimp response 2: ' + JSON.stringify(r2));
+                  });
+              }, 60000);
+            });
+        });
+
+        const resultAsString: string = JSON.stringify(await Promise.all(resultArr));
+        winston.info('Result of Mailchimp request: ' + resultAsString);
+        resolve(resultAsString);
+      }
+      catch (e)
+      {
+        reject((e as any).toString());
+      }
+    });
   }
 }
 

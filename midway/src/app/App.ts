@@ -222,7 +222,7 @@ export class App
     const dbs = await databases.select(['id'], {});
     for (const db of dbs)
     {
-      await databases.connect({} as any, db.id as number);
+      await databases.connect({} as any, db.id);
 
       if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
       {
