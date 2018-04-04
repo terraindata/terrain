@@ -321,7 +321,7 @@ export function getIndex(notSetIndex: string = null, builderState: BuilderState)
 {
   if (builderState.query && builderState.query.path && builderState.query.path.source.dataSource)
   {
-    const {index} = builderState.query.path.source.dataSource; 
+    const { index } = builderState.query.path.source.dataSource as any;
     if (index)
     {
       return index;

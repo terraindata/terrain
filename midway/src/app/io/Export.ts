@@ -246,32 +246,32 @@ export class Export
 
         resolve(
           respStream
-          .on('error', (e) =>
-          {
-            winston.error('Error in response stream: ', e.toString());
-            respStream.destroy();
-            documentTransform.destroy();
-            exportTransform.destroy();
-            reject(e);
-          })
-          .pipe(documentTransform)
-          .on('error', (e) =>
-          {
-            winston.error('Error in document stream: ', e.toString());
-            respStream.destroy();
-            documentTransform.destroy();
-            exportTransform.destroy();
-            reject(e);
-          })
-          .pipe(exportTransform)
-          .on('error', (e) =>
-          {
-            winston.error('Error in export stream: ', e.toString());
-            respStream.destroy();
-            documentTransform.destroy();
-            exportTransform.destroy();
-            reject(e);
-          }),
+            .on('error', (e) =>
+            {
+              winston.error('Error in response stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            })
+            .pipe(documentTransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in document stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            })
+            .pipe(exportTransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in export stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            }),
         );
       }
       catch (e)
