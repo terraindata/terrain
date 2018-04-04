@@ -319,6 +319,14 @@ export function findCardType(name: string, builderState: BuilderState): List<Blo
 
 export function getIndex(notSetIndex: string = null, builderState: BuilderState): string | List<string> | null
 {
+  if (builderState.query && builderState.query.path && builderState.query.path.source.dataSource)
+  {
+    const {index} = builderState.query.path.source.dataSource; 
+    if (index)
+    {
+      return index;
+    }
+  }
   const cards = findCardType('elasticFilter', builderState);
   if (cards.size === 0)
   {
