@@ -168,13 +168,25 @@ class TemplateList extends TerrainComponent<Props>
   {
     return (event) =>
     {
+      const onConfirm = () =>
+      {
+        this.props.etlAct({
+          actionType: 'deleteTemplate',
+          template,
+        });
+      };
       this.props.etlAct({
-        actionType: 'deleteTemplate',
-        template,
+        actionType: 'addModal',
+        props: {
+          title: 'Confirm Action',
+          message: 'Are you sure you want to delete this template?',
+          closeOnConfirm: true,
+          confirm: true,
+          onConfirm,
+        },
       });
     };
   }
-
 }
 
 const templateListItemStyle = {};
