@@ -55,6 +55,7 @@ import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
@@ -83,6 +84,7 @@ export interface Props
   templates?: List<ETLTemplate>;
   editorAct?: typeof TemplateEditorActions;
   etlAct?: typeof ETLActions;
+  schemaAct?: typeof SchemaActions;
 }
 
 function getAlgorithmId(params): number
@@ -178,6 +180,11 @@ class ETLEditorPage extends TerrainComponent<Props>
     this.props.etlAct({
       actionType: 'executeTemplate',
       template,
+      onSuccess: () => {
+        this.props.schemaAct({
+          actionType: 'fetch'
+        });
+      }
     });
   }
 
@@ -275,5 +282,5 @@ export default withRouter(Util.createContainer(
     ['walkthrough'],
     ['etl', 'templates'],
   ],
-  { editorAct: TemplateEditorActions, etlAct: ETLActions },
+  { editorAct: TemplateEditorActions, etlAct: ETLActions, schemaAct: SchemaActions },
 ));

@@ -86,6 +86,7 @@ export interface ETLActionTypes
   executeTemplate: {
     actionType: 'executeTemplate',
     template: ETLTemplate,
+    onSuccess?: () => void,
   };
   fetchTemplates: {
     actionType: 'fetchTemplates';
@@ -262,8 +263,16 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
           _.set(options, ['files', key], (source.options as SourceOptionsType<Sources.Upload>).file);
         }
       });
+
+      const onLoad = () => {
+        if (action.onSuccess !== undefined)
+        {
+          action.onSuccess();
+        }
+      }
+
       ETLAjax.executeTemplate(template.id, options)
-        .then(this.onLoadFactory<any>([], directDispatch, name))
+        .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
         .catch(this.onErrorFactory(undefined, directDispatch, name));
     }
   }
