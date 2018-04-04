@@ -906,13 +906,13 @@ const ElasticComparisons = [
   {
     value: 'isin',
     displayName: 'is in',
-    fieldTypes: List([FieldType.Text]),
+    fieldTypes: List([FieldType.Text, FieldType.Numerical]),
     placeholder: 'e.g. apple, banana, kiwi',
   },
   {
     value: 'isnotin',
     displayName: 'is not in',
-    fieldTypes: List([FieldType.Text]),
+    fieldTypes: List([FieldType.Text, FieldType.Numerical]),
     placeholder: 'e.g. apple, banana, kiwi',
   },
   {
