@@ -264,12 +264,13 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         }
       });
 
-      const onLoad = () => {
+      const onLoad = () =>
+      {
         if (action.onSuccess !== undefined)
         {
           action.onSuccess();
         }
-      }
+      };
 
       ETLAjax.executeTemplate(template.id, options)
         .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
