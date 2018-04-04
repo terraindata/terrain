@@ -204,6 +204,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 small={true}
                 openRight={true}
                 onChangeState={this.handleMenuStateChange}
+                overrideMultiplier={7}
               />
             </div>
           </div>

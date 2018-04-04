@@ -320,14 +320,10 @@ export default class EngineUtil
 
       const ikp = engine.getInputKeyPath(id);
       const repType = EngineUtil.getRepresentedType(id, engine);
-      if (repType !== 'array' && repType !== 'object')
-      {
-        // TODO 1942 remove check above when arrays are properly deobjectified
-        const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
-          toTypename: repType,
-        };
-        engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
-      }
+      const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
+        toTypename: repType,
+      };
+      engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
     });
   }
 
