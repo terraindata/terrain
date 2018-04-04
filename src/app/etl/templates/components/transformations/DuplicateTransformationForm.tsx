@@ -53,6 +53,7 @@ import * as React from 'react';
 import { instanceFnDecorator } from 'src/app/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
@@ -103,6 +104,7 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
     return true;
   }
 
+  // this shouldn't be called since duplicate transformations cannot be edited.. todo remove it?
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;
@@ -117,5 +119,14 @@ export class DuplicateTFF extends TransformationForm<DuplicateOptions, Transform
       },
       fields: args.fields,
     };
+  }
+
+  protected createTransformation(proxy: EngineProxy)
+  {
+    const { engine, fieldId } = this.props;
+    const { outputName } = this.state;
+    const currentKeyPath = engine.getOutputKeyPath(fieldId);
+    const newKeyPath = currentKeyPath.set(currentKeyPath.size - 1, outputName);
+    proxy.duplicateField(fieldId, newKeyPath);
   }
 }

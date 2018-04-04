@@ -51,6 +51,7 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 
 import FilePicker from 'common/components/FilePicker';
+import { MultiModal } from 'common/components/overlay/MultiModal';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -69,7 +70,7 @@ export interface Props
 
 class ETLPage extends TerrainComponent<Props>
 {
-  public componentWillMount()
+  public componentDidMount()
   {
     this.props.act({
       actionType: 'fetchTemplates',
@@ -77,13 +78,26 @@ class ETLPage extends TerrainComponent<Props>
     // TODO lock UI until done?
   }
 
+  public setModalRequests(requests)
+  {
+    this.props.act({
+      actionType: 'setModalRequests',
+      requests,
+    });
+  }
+
   public render()
   {
+    const { modalRequests } = this.props.etl;
     return (
       <div className='etl-page-root'>
         {
           this.props.children
         }
+        <MultiModal
+          requests={modalRequests}
+          setRequests={this.setModalRequests}
+        />
       </div>
     );
   }

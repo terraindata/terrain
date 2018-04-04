@@ -65,6 +65,8 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import './TemplateEditorField.less';
 
+const KeyIcon = require('images/icon_key-2.svg');
+
 export interface Props extends TemplateEditorFieldProps
 {
   toggleOpen?: () => void;
@@ -83,13 +85,13 @@ class EditorFieldPreview extends TemplateEditorField<Props>
     };
 
   @instanceFnDecorator(memoizeOne)
-  public _getMenuOptions(canEdit, canMove, isNested)
+  public _getMenuOptions(canEdit, canMove, isNested, isNamed, canTransform)
   {
     const options = [];
-    if (canEdit)
+    if (canEdit || canTransform)
     {
       options.push({
-        text: 'Edit this Field',
+        text: `${canEdit ? 'Edit' : 'Transform'} this Field`,
         onClick: this.openSettings,
       });
     }
@@ -111,13 +113,26 @@ class EditorFieldPreview extends TemplateEditorField<Props>
         onClick: this.requestDeleteField,
       });
     }
+    if (!isNamed)
+    {
+      options.push({
+        text: 'Extract this array element',
+        onClick: this.requestExtractElement,
+      });
+    }
     return List(options);
   }
 
   public getMenuOptions()
   {
     const field = this._field();
-    return this._getMenuOptions(this._canEditField(), this._canMoveField(), field.isNested());
+    return this._getMenuOptions(
+      field.canEditField(),
+      field.canMoveField(),
+      field.isNested(),
+      field.isNamedField(),
+      field.canTransformField(),
+    );
   }
 
   public render()
@@ -167,6 +182,17 @@ class EditorFieldPreview extends TemplateEditorField<Props>
             >
               {labelOverride != null ? labelOverride : field.name}
             </div>
+            {
+              this._isPrimaryKey() ?
+                <div
+                  className='primary-key-icon'
+                  style={fontColor(Colors().active)}
+                >
+                  <KeyIcon />
+                </div>
+                :
+                null
+            }
             <div
               className={classNames({
                 'field-preview-menu': true,
@@ -178,6 +204,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 small={true}
                 openRight={true}
                 onChangeState={this.handleMenuStateChange}
+                overrideMultiplier={7}
               />
             </div>
           </div>
@@ -261,6 +288,19 @@ class EditorFieldPreview extends TemplateEditorField<Props>
       actionType: 'setDisplayState',
       state: {
         addFieldId: this.props.fieldId,
+      },
+    });
+  }
+
+  public requestExtractElement()
+  {
+    this.props.act({
+      actionType: 'setDisplayState',
+      state: {
+        extractField: {
+          fieldId: this.props.fieldId,
+          index: this._getArrayIndex(),
+        },
       },
     });
   }

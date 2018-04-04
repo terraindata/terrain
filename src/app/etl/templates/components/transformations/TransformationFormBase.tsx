@@ -54,6 +54,7 @@ import { instanceFnDecorator } from 'src/app/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
@@ -187,6 +188,21 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
     }
   }
 
+  // override this to customize how transformations are created
+  protected createTransformation(proxy: EngineProxy)
+  {
+    const args = this.computeArgs();
+    proxy.addTransformation(this.type, args.fields, args.options);
+  }
+
+  // override this to customize how transformations are edited
+  protected editTransformation(proxy: EngineProxy)
+  {
+    const { transformation } = this.props;
+    const args = this.computeArgs();
+    proxy.editTransformation(transformation.id, args.fields, args.options);
+  }
+
   // the below shouldn't need to be overidden
   protected handleFormChange(state: State)
   {
@@ -196,13 +212,12 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
   protected handleMainAction()
   {
     const { isCreate, engine, fieldId, onEditOrCreate, onClose } = this.props;
-    const args = this.computeArgs();
     const overrideStructuralChange = this.isStructuralChange();
     if (isCreate)
     {
       GraphHelpers.mutateEngine((proxy) =>
       {
-        proxy.addTransformation(this.type, args.fields, args.options);
+        this.createTransformation(proxy);
       }).then((structuralChange) =>
       {
         if (overrideStructuralChange !== undefined)
@@ -221,7 +236,7 @@ export abstract class TransformationForm<State, Type extends TransformationNodeT
       const { transformation } = this.props;
       GraphHelpers.mutateEngine((proxy) =>
       {
-        proxy.editTransformation(transformation.id, args.fields, args.options);
+        this.editTransformation(proxy);
       }).then((structuralChange) =>
       {
         if (overrideStructuralChange !== undefined)

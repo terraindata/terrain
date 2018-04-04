@@ -50,11 +50,11 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { postorderForEach } from 'etl/templates/SyncUtil';
+import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import TransformationNodeType from 'shared/transformations/TransformationNodeType';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
@@ -117,6 +117,99 @@ export class EngineProxy
     this.engine.deleteTransformation(id);
   }
 
+  /*
+   *  This is a rather complicated operation
+   *  If the given keypath is [foo, *], then we need to create the specific field [foo, index]
+   *  If extracted field is still an array type, then we also need to create the wildcard for that field
+   *  After creating the extracted field, we need to perform the duplication operation on the extracted field
+   */
+  public extractArrayField(sourceId: number, index: number, destKP: List<string>)
+  {
+    const sourceKP = this.engine.getOutputKeyPath(sourceId);
+    if (sourceKP.size === 0)
+    {
+      throw new Error('Cannot extract array field, source keypath is empty');
+    }
+    const specifiedSourceKP = sourceKP.set(sourceKP.size - 1, String(index));
+    const specifiedSourceType = EngineUtil.getRepresentedType(sourceId, this.engine);
+
+    let specifiedSourceId: number;
+
+    if (specifiedSourceType === 'array')
+    {
+      const anyChildId = EngineUtil.findChildField(sourceId, this.engine);
+      if (anyChildId === undefined)
+      {
+        throw new Error('Field type is array, but could not find any children in the Transformation Engine');
+      }
+      const childType = EngineUtil.getRepresentedType(anyChildId, this.engine);
+      specifiedSourceId = this.addField(specifiedSourceKP, 'array', childType);
+    }
+    else
+    {
+      specifiedSourceId = this.addField(specifiedSourceKP, specifiedSourceType);
+    }
+
+    this.requestRebuild();
+    this.duplicateField(specifiedSourceId, destKP, true);
+  }
+
+  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
+  {
+    const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
+      newFieldKeyPaths: List([destKP]),
+    };
+
+    this.addTransformation(
+      TransformationNodeType.DuplicateNode,
+      List([this.engine.getInputKeyPath(sourceId)]),
+      options,
+    );
+
+    const newFieldId = this.engine.getInputFieldID(destKP);
+
+    EngineUtil.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
+
+    let idToCopy = sourceId;
+    if (despecify)
+    {
+      const kpToCopy = EngineUtil.turnIndicesIntoValue(this.engine.getOutputKeyPath(sourceId));
+      idToCopy = this.engine.getOutputFieldID(kpToCopy);
+    }
+
+    const rootOutputKP = this.engine.getOutputKeyPath(sourceId);
+    preorderForEach(this.engine, idToCopy, (childId) =>
+    {
+      // do not copy root
+      if (childId !== idToCopy)
+      {
+        const toTransferKeypath = this.engine.getOutputKeyPath(childId);
+        const pathAfterRoot = toTransferKeypath.slice(rootOutputKP.size);
+        EngineUtil.transferField(childId, destKP.concat(pathAfterRoot).toList(), this.engine);
+      }
+    });
+    this.requestRebuild();
+  }
+
+  public addField(keypath: List<string>, type: string, valueType?: string, dontAddWildcard?: boolean)
+  {
+    let newId: number;
+    if (type === 'array')
+    {
+      newId = this.engine.addField(keypath, type, { valueType });
+      if (!dontAddWildcard)
+      {
+        this.engine.addField(keypath.push('*'), 'array', { valueType });
+      }
+    }
+    else
+    {
+      newId = this.engine.addField(keypath, type);
+    }
+    this.requestRebuild();
+    return newId;
+  }
+
   public addRootField(name: string, type: string)
   {
     const pathToAdd = List([name]);
@@ -134,6 +227,19 @@ export class EngineProxy
       this.requestRebuild();
     }
   }
+
+  public setFieldEnabled(fieldId: number, enabled: boolean)
+  {
+    if (enabled)
+    {
+      this.engine.enableField(fieldId);
+    }
+    else
+    {
+      this.engine.disableField(fieldId);
+    }
+    this.requestRebuild(fieldId);
+  }
 }
 
 export class FieldProxy
@@ -150,15 +256,7 @@ export class FieldProxy
 
   public setFieldEnabled(enabled: boolean)
   {
-    if (enabled)
-    {
-      this.engine.enableField(this.fieldId);
-    }
-    else
-    {
-      this.engine.disableField(this.fieldId);
-    }
-    this.syncWithEngine();
+    this.engineProxy.setFieldEnabled(this.fieldId, enabled);
   }
 
   // delete this field and all child fields

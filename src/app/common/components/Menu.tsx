@@ -82,6 +82,7 @@ export interface Props
   vertical?: boolean;
   openRight?: boolean; // menu will open to the right
   onChangeState?: (open: boolean) => void;
+  overrideMultiplier?: number;
 }
 
 @Radium
@@ -191,7 +192,7 @@ class Menu extends TerrainComponent<Props>
 
   public render()
   {
-    const { options } = this.props;
+    const { options, overrideMultiplier } = this.props;
     if (!options || !options.size)
     {
       return null;
@@ -202,6 +203,8 @@ class Menu extends TerrainComponent<Props>
     {
       multiplier = 14;
     }
+    multiplier = overrideMultiplier === undefined ? multiplier : overrideMultiplier;
+
     const width = multiplier * options.reduce((max, option) =>
       option.text && (option.text.length > max) ? option.text.length : max, 1);
 

@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import cronstrue from 'cronstrue';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -60,6 +59,7 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { ETLActions } from 'etl/ETLRedux';
 import { MidwayError } from 'shared/error/MidwayError';
 import { instanceFnDecorator } from 'src/app/Classes';
 
@@ -74,6 +74,7 @@ export interface Props
   getRowStyle?: (template: ETLTemplate) => object | object[];
   filter?: (template: ETLTemplate) => boolean;
   // injected props
+  etlAct: typeof ETLActions;
   templates: List<ETLTemplate>;
 }
 
@@ -130,6 +131,16 @@ class TemplateList extends TerrainComponent<Props>
     }
   }
 
+  public computeMenuOptions(template: ETLTemplate, index: number)
+  {
+    return List([
+      {
+        text: 'Delete Template',
+        onClick: this.deleteTemplateClickFactory(template),
+      },
+    ]);
+  }
+
   public render()
   {
     return (
@@ -138,6 +149,7 @@ class TemplateList extends TerrainComponent<Props>
         columnConfig={this.displayConfig}
         onRowClicked={this.handleOnClick}
         getRowStyle={this.getRowStyle}
+        getMenuOptions={this.computeMenuOptions}
       />
     );
   }
@@ -151,6 +163,30 @@ class TemplateList extends TerrainComponent<Props>
       this.props.onClick(template);
     }
   }
+
+  public deleteTemplateClickFactory(template: ETLTemplate)
+  {
+    return (event) =>
+    {
+      const onConfirm = () =>
+      {
+        this.props.etlAct({
+          actionType: 'deleteTemplate',
+          template,
+        });
+      };
+      this.props.etlAct({
+        actionType: 'addModal',
+        props: {
+          title: 'Confirm Action',
+          message: 'Are you sure you want to delete this template?',
+          closeOnConfirm: true,
+          confirm: true,
+          onConfirm,
+        },
+      });
+    };
+  }
 }
 
 const templateListItemStyle = {};
@@ -158,5 +194,5 @@ const templateListItemStyle = {};
 export default Util.createContainer(
   TemplateList,
   [['etl', 'templates']],
-  {},
+  { etlAct: ETLActions },
 );

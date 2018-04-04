@@ -48,8 +48,10 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { instanceFnDecorator } from 'src/app/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -108,18 +110,28 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
+  @instanceFnDecorator(memoizeOne)
+  public _getAppropriateChild(field: TemplateField, fieldMap: Immutable.Map<number, TemplateField>)
+  {
+    return _.memoize((arrayIndex) =>
+    {
+      if (field.childrenIds.size > 0)
+      {
+        const wildcard = field.childrenIds.find((id) => fieldMap.get(id).isWildcardField());
+        return wildcard !== undefined ? wildcard : field.childrenIds.get(0);
+      }
+      else
+      {
+        return -1;
+      }
+    });
+
+  }
+
   // TODO, if there are special index children that match get those
   public getAppropriateChild(arrayIndex): number
   {
-    const field = this._field();
-    if (field.childrenIds.size > 0)
-    {
-      return field.childrenIds.get(0);
-    }
-    else
-    {
-      return -1;
-    }
+    return this._getAppropriateChild(this._field(), this._fieldMap())(arrayIndex);
   }
 
   // -1 if there is no available preview
@@ -177,6 +189,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
   public renderSettingsContainer()
   {
     const showSettings = this._settingsAreOpen();
+
     return (
       <FadeInOut open={showSettings}>
         <div className='injected-content-container'>
@@ -192,6 +205,17 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     );
   }
 
+  public getCheckboxState()
+  {
+    const canEditField = this._field().canEditField();
+    const checkedState = this._checkedState();
+
+    return {
+      checked: checkedState === true,
+      showCheckbox: (canEditField && checkedState !== null),
+    };
+  }
+
   public render()
   {
     const { canEdit, preview, displayKeyPath, previewLabel } = this.props;
@@ -200,6 +224,8 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     const injectedContent = this.renderSettingsContainer();
     const style = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.5') : {};
+
+    const { checked, showCheckbox } = this.getCheckboxState();
 
     if (field.isArray() || field.isNested())
     {
@@ -228,6 +254,9 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           children={childrenComponent}
           injectedContent={injectedContent}
           style={style}
+          showCheckbox={showCheckbox}
+          checked={checked}
+          onCheckboxClicked={this.handleCheckboxClicked}
         />
       );
     }
@@ -247,8 +276,26 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
           children={null}
           injectedContent={injectedContent}
           style={style}
+          showCheckbox={showCheckbox}
+          checked={checked}
+          onCheckboxClicked={this.handleCheckboxClicked}
         />
       );
+    }
+  }
+
+  public handleCheckboxClicked()
+  {
+    const { act, fieldId } = this.props;
+    const { checked, showCheckbox } = this.getCheckboxState();
+    if (showCheckbox)
+    {
+      this.props.act({
+        actionType: 'updateDisplayState',
+        updaters: {
+          checkedFields: (fields) => fields.set(fieldId, !Boolean(checked)),
+        },
+      });
     }
   }
 
