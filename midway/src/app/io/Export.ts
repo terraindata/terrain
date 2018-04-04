@@ -321,7 +321,7 @@ export class Export
       }
     }
 
-    doc = this._transformAndCheck(doc, cfg.exportConfig, true);
+    doc = this._transformAndCheck(doc, cfg.exportConfig, false);
     if (cfg.exportConfig.rank === true)
     {
       if (doc['TERRAINRANK'] !== undefined)
