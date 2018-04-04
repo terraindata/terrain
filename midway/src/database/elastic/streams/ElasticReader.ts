@@ -66,7 +66,7 @@ export class ElasticReader extends SafeReadable
 
   private scrollID: string | undefined = undefined;
 
-  private MAX_SEARCH_SIZE: number = 1000;
+  private MAX_SEARCH_SIZE: number = 500;
   private DEFAULT_SEARCH_SIZE: number = 200;
   private DEFAULT_SCROLL_TIMEOUT: string = '45m';
 
@@ -160,11 +160,7 @@ export class ElasticReader extends SafeReadable
     this.rowsProcessed += length;
     this.numRequested = Math.max(0, this.numRequested - length);
 
-    const shouldContinue = this.push(response);
-    if (!shouldContinue)
-    {
-      this.numRequested = 0;
-    }
+    this.push(response);
 
     this.querying = false;
     this.doneReading = this.doneReading
