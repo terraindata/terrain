@@ -252,6 +252,7 @@ export class Export
             respStream.destroy();
             documentTransform.destroy();
             exportTransform.destroy();
+            reject(e);
           })
           .pipe(documentTransform)
           .on('error', (e) =>
@@ -260,6 +261,7 @@ export class Export
             respStream.destroy();
             documentTransform.destroy();
             exportTransform.destroy();
+            reject(e);
           })
           .pipe(exportTransform)
           .on('error', (e) =>
@@ -268,6 +270,7 @@ export class Export
             respStream.destroy();
             documentTransform.destroy();
             exportTransform.destroy();
+            reject(e);
           }),
         );
       }

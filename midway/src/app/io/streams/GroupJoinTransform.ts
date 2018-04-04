@@ -75,6 +75,7 @@ export default class GroupJoinTransform extends SafeReadable
 
   private dropIfLessThan: number = 0;
   private parentAlias: string = 'parent';
+  private _isSourceEmpty = false;
 
   private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
@@ -133,6 +134,7 @@ export default class GroupJoinTransform extends SafeReadable
           response = this.source.read();
         }
       });
+      this.source.on('end', () => { this._isSourceEmpty = true; });
       this.source.on('error', (e) => this.emit('error', e));
 
     }
@@ -152,7 +154,11 @@ export default class GroupJoinTransform extends SafeReadable
 
   public _destroy(error, callback)
   {
-    this.source._destroy(error, callback);
+    this.source._destroy(error, (e) =>
+    {
+      this.push(null);
+      callback(e);
+    });
   }
 
   private dispatchSubqueryBlock(response: object): void
@@ -262,7 +268,7 @@ export default class GroupJoinTransform extends SafeReadable
             }
           }
 
-          if (this.source.isEmpty()
+          if (this._isSourceEmpty
             && this.bufferedOutputs.length === 0)
           {
             this.push(null);
