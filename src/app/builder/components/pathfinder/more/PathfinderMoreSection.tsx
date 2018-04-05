@@ -752,7 +752,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 canEdit={canEdit}
                 defaultOpen={false}
                 autoFocus={true}
-              /> 
+              />
             }
             {
               this.renderSourceSection(more.source, more.customSource)
