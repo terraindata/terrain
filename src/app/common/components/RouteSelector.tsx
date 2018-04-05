@@ -966,8 +966,11 @@ export class RouteSelector extends TerrainComponent<Props>
 
   private handleValueChange(optionSetIndex: number, value: any)
   {
-    const { props } = this;
-    props.onChange(optionSetIndex, value);
+    if (this.props.canEdit)
+    {
+      const { props } = this;
+      props.onChange(optionSetIndex, value);
+    }
     // setTimeout(this.cleanUpAnimation, 150);
   }
 
