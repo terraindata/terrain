@@ -87,6 +87,7 @@ export interface ETLActionTypes
     actionType: 'executeTemplate',
     template: ETLTemplate,
     onSuccess?: () => void,
+    onError?: (ev: any) => void,
   };
   fetchTemplates: {
     actionType: 'fetchTemplates';
@@ -124,6 +125,20 @@ export interface ETLActionTypes
   updateLocalTemplates: { // find the given template and update our list
     actionType: 'updateLocalTemplates';
     template: ETLTemplate;
+  };
+  setRunningTemplate: {
+    actionType: 'setRunningTemplate',
+    templateId: number,
+    template: ETLTemplate,
+  };
+  clearRunningTemplate: {
+    actionType: 'clearRunningTemplate',
+    templateId: number,
+  };
+  setAcknowledgedRun: {
+    actionType: 'setAcknowledgedRun',
+    templateId: number,
+    value: boolean,
   };
 }
 
@@ -187,6 +202,21 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         {
           return state.update('templates', (templates) => templates.set(index, action.payload.template));
         }
+      },
+      setRunningTemplate: (state, action) =>
+      {
+        return state.update('runningTemplates',
+          (templates) => templates.set(action.payload.templateId, action.payload.template));
+      },
+      clearRunningTemplate: (state, action) =>
+      {
+        return state.update('runningTemplates',
+          (templates) => templates.delete(action.payload.templateId));
+      },
+      setAcknowledgedRun: (state, action) =>
+      {
+        return state.update('acknowledgedRuns',
+          (runs) => runs.set(action.payload.templateId, action.payload.value));
       },
     };
 
@@ -274,7 +304,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 
       ETLAjax.executeTemplate(template.id, options)
         .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
-        .catch(this.onErrorFactory(undefined, directDispatch, name));
+        .catch(this.onErrorFactory(action.onError, directDispatch, name));
     }
   }
 
