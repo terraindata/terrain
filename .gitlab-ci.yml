@@ -41,9 +41,8 @@ test-frontend:
   when: always
 
 test-backend:
-  before_script:
-   - yarn test-back-setup
   script:
+   - yarn test-back-setup
    - yarn test-back
   after_script:
    - yarn test-back-teardown
@@ -53,9 +52,8 @@ test-backend:
       - coverage
 
 test-sigint:
-  before_script:
-    - yarn test-sigint-setup
   script:
+    - yarn test-sigint-setup
     - ( cd sigint && yarn test )
   after_script:
     - yarn test-sigint-teardown
@@ -79,14 +77,13 @@ build-frontend-prod:
   stage: build
 
 fullstack:
-  before_script:
+  script:
     - killall node || true;
     - yarn test-fullstack-setup
-  script:
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production yarn start-midway > ./midwayConsole.log 2>&1&
-    - sleep 20
+    - sleep 10
     - yarn test-fullstack-component
     - yarn test-fullstack-login
     - yarn test-rr-builder
