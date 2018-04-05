@@ -127,6 +127,7 @@ export class GoogleAPI
       let colNames: string[] = [];
       let constructedHeader: boolean = false;
       let writeStream: any = new stream.PassThrough();
+      let potentialError: string = '';
       const analyticsBatchGet = function(analyticsBodyPassed)
       {
         request({
@@ -141,8 +142,15 @@ export class GoogleAPI
           body: analyticsBody,
         }, (err, res, body) =>
           {
+            if (err !== null && err !== undefined)
+            {
+              winston.warn(this.storedEmail);
+              winston.warn(this.storedKeyFilePath);
+              winston.warn(err);
+            }
             try
             {
+              potentialError = JSON.stringify(body, null, 2);
               const report: object = body['reports'][0];
               if (constructedHeader === false)
               {
@@ -178,6 +186,7 @@ export class GoogleAPI
             }
             catch (e)
             {
+              winston.warn(potentialError);
               winston.info('Potentially incorrect credentials. Caught error: ' + (e.toString() as string));
               reject('Potentially incorrect Google API credentials.');
             }
