@@ -172,7 +172,7 @@ class EditorActionsSection extends TerrainComponent<Props>
           onClick={this.handleRedo}
           key='redo'
         >
-          <RedoIcon/>
+          <RedoIcon />
         </div>
         <div
           className='editor-top-bar-icon'
@@ -180,7 +180,7 @@ class EditorActionsSection extends TerrainComponent<Props>
           onClick={this.handleUndo}
           key='undo'
         >
-          <UndoIcon/>
+          <UndoIcon />
         </div>
         <div
           className='editor-top-bar-icon'
@@ -188,7 +188,7 @@ class EditorActionsSection extends TerrainComponent<Props>
           onClick={this.handleSaveAsClicked}
           key='save as'
         >
-          <SaveAsIcon/>
+          <SaveAsIcon />
         </div>
         <div
           className='editor-top-bar-item'
@@ -337,10 +337,10 @@ const topBarItemDisabledStyle = [
 
 const topBarIconStyle = [
   fontColor(Colors().bg3, Colors().bg2),
-]
+];
 const topBarIconDisabledStyle = [
   fontColor(Colors().bg2, Colors().bg2),
-]
+];
 
 const topBarRunStyle = [backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)];
 const topBarNameStyle = [fontColor(Colors().text2)];

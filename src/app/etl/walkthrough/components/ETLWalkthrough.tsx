@@ -184,7 +184,7 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.StartNew,
-          buttonText: 'Start a New Import or Export',
+          buttonText: 'New Import or Export',
         },
         {
           link: ViewState.PickTemplate,
@@ -269,12 +269,12 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.PickLocalFile,
-          buttonText: 'Upload a File to Import',
+          buttonText: 'Upload a File',
           default: true,
         },
         {
           link: ViewState.PickImportSource,
-          buttonText: 'Import From an External Source',
+          buttonText: 'Use an External Source',
         },
       ],
     },
