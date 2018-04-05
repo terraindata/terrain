@@ -96,7 +96,7 @@ export class GoogleAPI
     {
       if (this.storedEmail === undefined && this.storedKeyFilePath === undefined)
       {
-        await this._getStoredGoogleAPICredentials(analytics.credentialId, 'spreadsheets');
+        await this._getStoredGoogleAPICredentials(analytics.credentialId, 'analytics');
       }
       delete analytics['credentialId'];
       // get the dateRange from the dayInterval
@@ -130,6 +130,8 @@ export class GoogleAPI
       let potentialError: string = '';
       const analyticsBatchGet = function(analyticsBodyPassed)
       {
+        winston.info(this.storedEmail);
+        winston.info(this.storedKeyFilePath);
         request({
           method: 'POST',
           url: 'https://analyticsreporting.googleapis.com/v4/reports:batchGet',
