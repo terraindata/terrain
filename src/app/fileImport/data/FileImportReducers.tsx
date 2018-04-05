@@ -479,7 +479,7 @@ FileImportReducers[ActionTypes.importFile] =
         action.payload.handleFileImportSuccess();
         action.payload.changeUploadInProgress(false);
         action.payload.schemaActions({
-          actionType: 'fetchSchema',
+          actionType: 'fetch',
         });
       },
       (err: string) =>

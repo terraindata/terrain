@@ -46,23 +46,25 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
-import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
-import { Magento } from './Magento';
+import { GoogleAnalyticsConfig, GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
+import { Magento, MagentoSourceConfig } from './Magento';
+import { Mailchimp } from './Mailchimp';
 import { MySQL, MySQLSourceConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
 export const magento: Magento = new Magento();
+export const mailchimp: Mailchimp = new Mailchimp();
 export const mySQL: MySQL = new MySQL();
 
 export interface SourceConfig
 {
   type: string;
-  params: object;
+  params: object | object[];
 }
 
 export interface ExportSourceConfig
 {
-  params: object;
+  params: object[];
   stream: stream.Readable;
 }
 
@@ -76,25 +78,28 @@ export interface ImportSourceConfig
 export class Sources
 {
 
-  public async handleTemplateSourceExport(body: object, readStream: stream.Readable): Promise<string>
+  public async handleTemplateExportSource(body: object, readStream: stream.Readable): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
       let result = '';
       const exprtSourceConfig: ExportSourceConfig | string =
         {
-          params: {},
+          params: [],
           stream: readStream,
         };
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
-      exprtSourceConfig.params = sourceConfig.params;
+      exprtSourceConfig.params = sourceConfig.params as object[];
       switch (sourceConfig.type)
       {
         case 'magento':
           result = await this._putJSONStreamIntoMagento(exprtSourceConfig);
           break;
-        default:
+        case 'mailchimp':
+          result = await this._putJSONStreamIntoMailchimp(exprtSourceConfig);
           break;
+        default:
+          return reject('Unsupported export type specified in handleTemplateExportSource');
       }
       return resolve(result);
     });
@@ -113,11 +118,17 @@ export class Sources
       const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
       switch (sourceConfig.type)
       {
-        case 'spreadsheets':
-          imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
+        case 'analytics':
+          imprtSourceConfig = await this._getStreamFromGoogleAnalytics(sourceConfig, body['body'], body['templateId']);
           break;
         case 'mysql':
           imprtSourceConfig = await this._getStreamFromMySQL(sourceConfig, body['body'], body['templateId']);
+          break;
+        case 'magento':
+          imprtSourceConfig = await this._getStreamFromMagento(sourceConfig, body['body'], body['templateId']);
+          break;
+        case 'spreadsheets':
+          imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
           break;
         default:
           break;
@@ -130,6 +141,28 @@ export class Sources
       {
         return resolve(imprtSourceConfig);
       }
+    });
+  }
+
+  private async _getStreamFromGoogleAnalytics(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig>
+  {
+    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream: stream.Readable = await googleAPI.getAnalytics(source['params'] as GoogleAnalyticsConfig) as stream.Readable;
+
+      delete body['source'];
+      body['filetype'] = 'csv';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'csv',
+          params: body,
+          stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
     });
   }
 
@@ -151,6 +184,29 @@ export class Sources
           filetype: 'csv',
           params: body,
           stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
+    });
+  }
+
+  private async _getStreamFromMagento(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig | string>
+  {
+    return new Promise<ImportSourceConfig | string>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream: stream.Readable = await magento.getMagentoRowsAsCSVStream(
+        await magento.runQuery(source['params'] as MagentoSourceConfig[]) as object[]);
+
+      delete body['source'];
+      body['filetype'] = 'json';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'json',
+          params: body,
+          stream: writeStream as stream.Readable,
         };
       return resolve(imprtSourceConfig);
     });
@@ -183,12 +239,20 @@ export class Sources
     });
   }
 
-  // export private methods
   private async _putJSONStreamIntoMagento(exprtSourceConfig: ExportSourceConfig): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(exprtSourceConfig)));
+      resolve(await magento.runQuery(await magento.getJSONStreamAsMagentoSourceConfig(
+        exprtSourceConfig) as MagentoSourceConfig[]) as string);
+    });
+  }
+
+  private async _putJSONStreamIntoMailchimp(exprtSourceConfig: ExportSourceConfig): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      resolve(await mailchimp.getJSONStreamAsMailchimpSourceConfig(exprtSourceConfig));
     });
   }
 }

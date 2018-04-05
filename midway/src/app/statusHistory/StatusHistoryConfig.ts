@@ -44,61 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import ConfigType from '../ConfigType';
 
-import DatabaseController from '../../database/DatabaseController';
-import ElasticDB from '../../database/elastic/tasty/ElasticDB';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { Permissions } from '../permissions/Permissions';
-
-import * as Tasty from '../../tasty/Tasty';
-import { deleteElasticIndex, getSchema } from '../Schema';
-import * as Util from '../Util';
-
-const Router = new KoaRouter();
-const perm: Permissions = new Permissions();
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export class StatusHistoryConfig extends ConfigType
 {
-  winston.info('getting all schema');
-  const request = ctx.request.body.body;
-  if (request !== undefined && request.database !== undefined)
-  {
-    ctx.body = await getSchema(request.database);
-  }
-  else
-  {
-    ctx.body = '';
-    // tslint:disable-next-line:no-unused-variable
-    for (const [id, database] of DatabaseRegistry.getAll())
-    {
-      ctx.body += await getSchema(id);
-    }
-  }
-});
+  public createdAt?: string = undefined;
+  public userId: number = -1;
+  public id?: number = undefined;
+  public algorithmId: number = -1;
+  public fromStatus: string = '';
+  public toStatus: string = '';
 
-Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('get schema');
-  ctx.body = await getSchema(ctx.params.database);
-});
-
-Router.post('/database/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const params = ctx.request.body.body;
-  Util.verifyParameters(params, ['language', 'dbname', 'dbid']);
-  await perm.ImportPermissions.verifyDefaultRoute(ctx.state.user, params);
-  switch (params.language)
+  constructor(props: object)
   {
-    case 'elastic':
-      await deleteElasticIndex(params.dbid, params.dbname);
-      break;
-    default:
-      throw new Error(`Deleting database of type '${params.language}' is unsupported`);
+    super();
+    ConfigType.initialize(this, props);
   }
-  ctx.body = { message: 'successfully deleted database' };
-});
+}
 
-export default Router;
+export default StatusHistoryConfig;

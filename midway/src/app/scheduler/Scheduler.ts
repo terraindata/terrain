@@ -59,7 +59,7 @@ import Credentials from '../credentials/Credentials';
 import { ExportConfig } from '../io/Export';
 import { exprt } from '../io/ExportRouter';
 import { imprt } from '../io/ImportRouter';
-import { Sources } from '../io/sources/Sources';
+import { ImportSourceConfig, Sources } from '../io/sources/Sources';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 import SchedulerConfig from './SchedulerConfig';
@@ -222,6 +222,36 @@ export class Scheduler
         jobId = 7;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
+      else if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'spreadsheets')
+      {
+        jobId = 8;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'spreadsheets')
+      {
+        jobId = 9;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'analytics')
+      {
+        jobId = 10;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'analytics')
+      {
+        jobId = 11;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'mailchimp')
+      {
+        jobId = 12;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'mailchimp')
+      {
+        jobId = 13;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
 
       req.active = true;
       req.archived = false;
@@ -241,7 +271,7 @@ export class Scheduler
   {
     return new Promise<number>(async (resolve, reject) =>
     {
-      let lastKey: number = Number(Object.keys(this.jobMap).sort().reverse()[0]);
+      let lastKey: number = Number(Object.keys(this.jobMap).sort(naturalSort).reverse()[0]);
       if (lastKey === undefined || isNaN(lastKey))
       {
         lastKey = -1;
@@ -298,6 +328,12 @@ export class Scheduler
     // 5: export via local filesystem
     // 6: import via magento (not implemented yet)
     // 7: export via magento
+    // 8: import via spreadsheets
+    // 9: export via spreadsheets (not implemented yet)
+    // 10: import via analytics
+    // 11: export via analytics (not implemented yet)
+    // 12: import via mailchimp
+    // 13: export via mailchimp
     await this.createJob(async (scheduleID: number, fields: object, // 0
       transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
@@ -688,8 +724,41 @@ export class Scheduler
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
-        // TODO add this after adding Magento as an ETL source
-        resolveJob('');
+        let successMsg: string = '';
+        let errMsg: string = '';
+        try
+        {
+          await this.setJobStatus(scheduleID, 1);
+          const magentoArgs =
+            {
+              body:
+                JSON.parse(transport['filename']),
+            };
+          const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateImportSource(magentoArgs);
+          if (typeof imprtSourceConfig === 'string')
+          {
+            errMsg = 'Schedule ' + scheduleID.toString() +
+              ': Failed to complete scheduled import from Magento. Error: ' + (imprtSourceConfig as string);
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+            return rejectJob(errMsg);
+          }
+          winston.info('Schedule ' + scheduleID.toString() + ': Starting import from Magento');
+          await imprt.upsert(imprtSourceConfig.stream as stream.Readable, fields, true);
+          await this.setJobStatus(scheduleID, 0);
+          successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from Magento.';
+          winston.info(successMsg);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
+          return resolveJob('Successfully completed scheduled import from Magento.');
+        }
+        catch (e)
+        {
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string);
+          winston.info(errMsg);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob(e.toString());
+        }
       });
     });
 
@@ -717,7 +786,8 @@ export class Scheduler
                 body:
                   JSON.parse(transport['filename']),
               };
-            const result = await sources.handleTemplateSourceExport(magentoArgs, jsonStream as stream.Readable);
+
+            const result = await sources.handleTemplateExportSource(magentoArgs, jsonStream as stream.Readable);
             successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to magento. Response: ' + result;
             await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
           }
@@ -727,6 +797,199 @@ export class Scheduler
           errMsg = 'Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string);
           winston.info(errMsg);
           await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob(e.toString());
+        }
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 8
+      sort: string, encoding?: string | null) => // import from spreadsheets
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        let successMsg: string = '';
+        let errMsg: string = '';
+        try
+        {
+          try
+          {
+            await this.setJobStatus(scheduleID, 1);
+            const spreadsheetArgs =
+              {
+                body:
+                  JSON.parse(transport['filename']),
+              };
+            spreadsheetArgs['body']['source']['params']['credentialId'] = transport['id'];
+            const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateImportSource(spreadsheetArgs);
+            if (typeof imprtSourceConfig === 'string')
+            {
+              errMsg = 'Schedule ' + scheduleID.toString() +
+                ': Failed to complete scheduled import from Google spreadsheets. Error: ' + (imprtSourceConfig as string);
+              winston.info(errMsg);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+              return rejectJob(errMsg);
+            }
+            winston.info('Schedule ' + scheduleID.toString() + ': Starting import with Google spreadsheets');
+            await imprt.upsert(imprtSourceConfig.stream as stream.Readable, fields, true);
+            await this.setJobStatus(scheduleID, 0);
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from Google spreadsheets.';
+            winston.info(successMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
+            return resolveJob('Successfully completed scheduled import from Google spreadsheets.');
+          }
+          catch (e)
+          {
+            errMsg = 'Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string);
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          }
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob('Failed to import.');
+        }
+        catch (e)
+        {
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
+          await this.setJobStatus(scheduleID, 0);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          return rejectJob(errMsg);
+        }
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 9
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // export to spreadsheets
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        // TODO add this after adding Google spreadsheets as an ETL source
+        resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 10
+      sort: string, encoding?: string | null) => // import from analytics
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        let successMsg: string = '';
+        let errMsg: string = '';
+        try
+        {
+          try
+          {
+            await this.setJobStatus(scheduleID, 1);
+            const analyticsArgs =
+              {
+                body:
+                  JSON.parse(transport['filename']),
+              };
+            analyticsArgs['body']['source']['params']['credentialId'] = transport['id'];
+            const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateImportSource(analyticsArgs);
+            if (typeof imprtSourceConfig === 'string')
+            {
+              errMsg = 'Schedule ' + scheduleID.toString() +
+                ': Failed to complete scheduled import from Google analytics. Error: ' + (imprtSourceConfig as string);
+              winston.info(errMsg);
+              await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+              return rejectJob(errMsg);
+            }
+            winston.info('Schedule ' + scheduleID.toString() + ': Starting import with Google analytics');
+            await imprt.upsert(imprtSourceConfig.stream as stream.Readable, fields, true);
+            await this.setJobStatus(scheduleID, 0);
+            successMsg = 'Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from Google analytics.';
+            winston.info(successMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, true, successMsg);
+            return resolveJob('Successfully completed scheduled import from Google analytics.');
+          }
+          catch (e)
+          {
+            errMsg = 'Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string);
+            winston.info(errMsg);
+            await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          }
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob('Failed to import.');
+        }
+        catch (e)
+        {
+          errMsg = 'Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string);
+          winston.info(errMsg);
+          await this.setJobStatus(scheduleID, 0);
+          await schedulerLogs.upsertStatusSchedule(scheduleID, false, errMsg);
+          return rejectJob(errMsg);
+        }
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 11
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // export to analytics
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        // TODO add this after adding Google analytics as an ETL source
+        resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 12
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // import from mailchimp
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        // TODO add this after adding mailchimp as an ETL source
+        resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 13
+      sort: string, encoding?: string | null) => // export to mailchimp
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        try
+        {
+          let mailchimpConfig: object = {};
+          const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
+          if (creds.length === 0)
+          {
+            return rejectJob('No Mailchimp credentials matched parameters.');
+          }
+          try
+          {
+            mailchimpConfig = JSON.parse(creds[0].meta);
+          }
+          catch (e)
+          {
+            return rejectJob(e.message);
+          }
+          await this.setJobStatus(scheduleID, 1);
+          fields['filetype'] = 'json';
+          const jsonStream: stream.Readable | string = await exprt.export(fields as ExportConfig, true);
+          if (typeof jsonStream === 'string')
+          {
+            winston.info(jsonStream as string);
+          }
+          else
+          {
+            const mailchimpArgs =
+              {
+                body: {
+                  source: {
+                    type: 'mailchimp',
+                    params: {
+                      ...mailchimpConfig,
+                    },
+                  },
+                },
+              };
+            const result = await sources.handleTemplateExportSource(mailchimpArgs, jsonStream as stream.Readable);
+          }
+        }
+        catch (e)
+        {
+          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
           await this.setJobStatus(scheduleID, 0);
           return rejectJob(e.toString());
         }

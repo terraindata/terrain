@@ -65,13 +65,14 @@ export const ItemType: {
     Category: 'CATEGORY',
   };
 
-export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT';
+export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT' | 'DEPLOYED';
 export const ItemStatus: {
   Archive: ItemStatus;
   Build: ItemStatus;
   Approve: ItemStatus;
   Live: ItemStatus;
   Default: ItemStatus;
+  Deployed: ItemStatus;
 } =
   {
     Archive: 'ARCHIVE',
@@ -79,6 +80,7 @@ export const ItemStatus: {
     Approve: 'APPROVE',
     Live: 'LIVE',
     Default: 'DEFAULT',
+    Deployed: 'DEPLOYED',
   };
 
 export class ItemC extends BaseClass

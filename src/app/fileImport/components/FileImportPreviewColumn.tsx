@@ -118,9 +118,13 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleRename()
+  public handleRename(value, blurValue?)
   {
-    const success: boolean = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
+    if (typeof value !== 'string')
+    {
+      value = blurValue;
+    }
+    const success: boolean = this.props.onColumnNameChange(this.props.columnId, value);
     if (!success)
     {
       this.setState({
@@ -201,7 +205,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             onChange={this.handleLocalColumnNameChange}
             placeholder={''}
             disabled={false}
-            onEnter={this.handleRename}
+            // onEnter={this.handleRename}
             onSelectOption={this.handleRename}
             onBlur={this.handleRename}
           />

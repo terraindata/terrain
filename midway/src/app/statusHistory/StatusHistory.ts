@@ -44,61 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
-
-import DatabaseController from '../../database/DatabaseController';
-import ElasticDB from '../../database/elastic/tasty/ElasticDB';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { Permissions } from '../permissions/Permissions';
-
 import * as Tasty from '../../tasty/Tasty';
-import { deleteElasticIndex, getSchema } from '../Schema';
-import * as Util from '../Util';
+import * as App from '../App';
+import UserConfig from '../users/UserConfig';
+import StatusHistoryConfig from './StatusHistoryConfig';
 
-const Router = new KoaRouter();
-const perm: Permissions = new Permissions();
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export class StatusHistory
 {
-  winston.info('getting all schema');
-  const request = ctx.request.body.body;
-  if (request !== undefined && request.database !== undefined)
+  private statusHistoryTable: Tasty.Table;
+
+  constructor()
   {
-    ctx.body = await getSchema(request.database);
+    this.statusHistoryTable = new Tasty.Table(
+      'statusHistory',
+      ['id'],
+      [
+        'createdAt',
+        'userId',
+        'algorithmId',
+        'fromStatus',
+        'toStatus',
+      ],
+    );
   }
-  else
+
+  public async create(user: UserConfig, id: number, obj: object, newStatus: string): Promise<StatusHistoryConfig>
   {
-    ctx.body = '';
-    // tslint:disable-next-line:no-unused-variable
-    for (const [id, database] of DatabaseRegistry.getAll())
+    if (user.id === undefined)
     {
-      ctx.body += await getSchema(id);
+      throw new Error('User ID unknown');
     }
+    // can only insert
+    const newVersion: StatusHistoryConfig =
+      {
+        userId: user.id,
+        algorithmId: id,
+        fromStatus: obj['status'],
+        toStatus: newStatus,
+      };
+    return App.DB.upsert(this.statusHistoryTable, newVersion) as Promise<StatusHistoryConfig>;
   }
-});
+}
 
-Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('get schema');
-  ctx.body = await getSchema(ctx.params.database);
-});
-
-Router.post('/database/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const params = ctx.request.body.body;
-  Util.verifyParameters(params, ['language', 'dbname', 'dbid']);
-  await perm.ImportPermissions.verifyDefaultRoute(ctx.state.user, params);
-  switch (params.language)
-  {
-    case 'elastic':
-      await deleteElasticIndex(params.dbid, params.dbname);
-      break;
-    default:
-      throw new Error(`Deleting database of type '${params.language}' is unsupported`);
-  }
-  ctx.body = { message: 'successfully deleted database' };
-});
-
-export default Router;
+export default StatusHistory;
