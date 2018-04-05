@@ -1856,6 +1856,10 @@ boom@5.x.x:
   dependencies:
     hoek "4.x.x"
 
+bottleneck@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/bottleneck/-/bottleneck-2.2.2.tgz#4a9ea7ee3e3d51d37a300b86800488cf21e247b7"
+
 bowser@^1.0.0:
   version "1.9.2"
   resolved "https://registry.yarnpkg.com/bowser/-/bowser-1.9.2.tgz#d66fc868ca5f4ba895bee1363c343fe7b37d3394"
@@ -5509,6 +5513,10 @@ js-base64@^2.1.9:
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.4.3.tgz#2e545ec2b0f2957f41356510205214e98fad6582"
 
+js-sha3@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.7.0.tgz#0a5c57b36f79882573b2d84051f8bb85dd1bd63a"
+
 js-string-escape@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
@@ -5648,15 +5656,6 @@ jsprim@^1.2.2:
 kcors@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/kcors/-/kcors-2.2.1.tgz#7160a94f2eae633436d2cef8eadd0ce232386779"
-
-keccak@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/keccak/-/keccak-1.4.0.tgz#572f8a6dbee8e7b3aa421550f9e6408ca2186f80"
-  dependencies:
-    bindings "^1.2.1"
-    inherits "^2.0.3"
-    nan "^2.2.1"
-    safe-buffer "^5.1.0"
 
 keygrip@~1.0.2:
   version "1.0.2"
@@ -6380,10 +6379,6 @@ nan@2.6.2:
 nan@>=2.5.1, nan@^2.3.0, nan@^2.3.3:
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.9.2.tgz#f564d75f5f8f36a6d9456cca7a6c4fe488ab7866"
-
-nan@^2.2.1:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
 
 nan@~2.7.0:
   version "2.7.0"

@@ -144,7 +144,10 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
             this.props.getMenuOptions !== undefined ?
               <div className='row-info-data' key='context-menu'>
                 <div className='item-list-menu-options-wrapper'>
-                  <Menu options={this.props.getMenuOptions(item, index)} />
+                  <Menu
+                    options={this.props.getMenuOptions(item, index)}
+                    overrideMultiplier={8}
+                  />
                 </div>
               </div>
               : undefined

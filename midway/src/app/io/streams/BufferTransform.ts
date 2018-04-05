@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
+import { SafeReadable } from './SafeReadable';
 
 /**
  * Consumes an input source stream and turns it into an array
  */
 export default class BufferTransform
 {
-  public static toArray(stream: Readable): Promise<any[]>
+  public static toArray(stream: SafeReadable): Promise<any[]>
   {
     return new Promise<any[]>((resolve, reject) =>
     {
@@ -71,41 +71,21 @@ export default class BufferTransform
   }
 
   private arr: any[];
-  private stream: Readable;
+  private stream: SafeReadable;
   private callback: (err, arr) => void;
 
-  private _onData: (doc) => void;
-  private _onEvent: (err) => void;
-
-  constructor(stream: Readable, callback: (err: Error, arr: any[]) => void)
+  constructor(stream: SafeReadable, callback: (err: Error | null, arr: any[]) => void)
   {
     this.arr = [];
     this.stream = stream;
-    this.callback = callback;
 
-    this._onData = this.onData.bind(this);
-    this._onEvent = this.onEvent.bind(this);
-
-    this.stream.on('data', this._onData);
-    this.stream.on('end', this._onEvent);
-    this.stream.on('error', this._onEvent);
-  }
-
-  private onData(doc: any): void
-  {
-    this.arr.push(doc);
+    this.stream.on('data', (doc) => this.arr.push(doc));
+    this.stream.on('end', () => callback(null, this.arr));
+    this.stream.on('error', callback);
   }
 
   private onEvent(err: any): void
   {
-    this._final();
     this.callback(err, this.arr);
-  }
-
-  private _final(): void
-  {
-    this.stream.removeListener('data', this._onData);
-    this.stream.removeListener('end', this._onEvent);
-    this.stream.removeListener('error', this._onEvent);
   }
 }

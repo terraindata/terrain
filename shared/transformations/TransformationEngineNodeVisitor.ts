@@ -84,6 +84,19 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     return split;
   }
 
+  private static hashHelper(toHash: string, salt: string): string
+  {
+    if (typeof toHash !== 'string')
+    {
+      throw new Error('Value to hash is not a string');
+    }
+    else if (typeof salt !== 'string')
+    {
+      throw new Error('Salt is not a string');
+    }
+    return keccak256.update(toHash + salt).hex();
+  }
+
   public applyTransformationNode(node: TransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     if (node === undefined)
@@ -504,6 +517,8 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
 
   public visitHashNode(node: HashTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.HashNode>;
+
     node.fields.forEach((field) =>
     {
       const el = yadeep.get(doc, field);
@@ -520,7 +535,8 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
           {
             kpi = kpi.push(i.toString());
           }
-          yadeep.set(doc, kpi, keccak256.update(yadeep.get(doc, kpi)).hex());
+          const toHash = yadeep.get(doc, kpi);
+          yadeep.set(doc, kpi, TransformationEngineNodeVisitor.hashHelper(toHash, opts.salt));
         }
       }
       else if (typeof el !== 'string')
@@ -535,7 +551,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, field, keccak256.update(el).hex());
+        yadeep.set(doc, field, TransformationEngineNodeVisitor.hashHelper(el, opts.salt));
       }
     });
 
