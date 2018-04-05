@@ -53,9 +53,9 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { getValueFromDocPath } from '../../../../../shared/Util';
+import * as yadeep from '../../../../../shared/util/yadeep';
 import { Credentials } from '../../credentials/Credentials';
-import CSVExportTransform from '../streams/CSVExportTransform';
+import CSVTransform from '../streams/CSVTransform';
 import { ExportSourceConfig } from './Sources';
 
 export const credentials: Credentials = new Credentials();
@@ -140,11 +140,10 @@ export class Magento
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const colNames: string[] = Object.keys(values[0]);
-      const writer = new CSVExportTransform(colNames);
+      const writer = CSVTransform.createExportStream();
       if (values.length > 0)
       {
-        for (let i = 1; i < values.length; ++i)
+        for (let i = 0; i < values.length; ++i)
         {
           writer.write(values[i]);
         }
@@ -647,7 +646,8 @@ export class Magento
                       {
                         if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
                         {
-                          const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
+                          // FIXME: make sure the path is in the format we expect
+                          const extractedDoc: object = yadeep.get(result, magentoSourceConfig.url[0]['path']);
                           resultArr.push({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
                         }
                         else
@@ -714,7 +714,8 @@ export class Magento
                       {
                         if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
                         {
-                          const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
+                          // FIXME: make sure the path is in the format we expect
+                          const extractedDoc: object = yadeep.get(result, magentoSourceConfig.url[0]['path']);
                           resultArr.push({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
                         }
                         else if (result && result['result'] !== undefined)

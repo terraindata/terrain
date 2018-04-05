@@ -71,11 +71,11 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 
   await perm.ImportPermissions.verifyExportRoute(ctx.state.user, requestObj);
 
-  const exportReturn: stream.Readable | string = await exprt.export(exprtConf, false);
+  const exportStream: stream.Readable = await exprt.export(exprtConf, false);
 
   ctx.type = 'text/plain';
   ctx.attachment(ctx.request.body.filename);
-  ctx.body = exportReturn;
+  ctx.body = exportStream;
 });
 
 Router.post('/types', passport.authenticate('access-token-local'), async (ctx, next) =>

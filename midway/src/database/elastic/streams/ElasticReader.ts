@@ -168,6 +168,7 @@ export class ElasticReader extends SafeReadable
 
     this.querying = false;
     this.doneReading = this.doneReading
+      || !this.streaming
       || length <= 0
       || this.rowsProcessed >= this.size;
 
