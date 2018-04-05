@@ -690,7 +690,7 @@ export class Import
         {
           item[field] = false;
         }
-        else if (item[field] === '')
+        else if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -706,7 +706,7 @@ export class Import
         {
           item[field] = new Date(date);
         }
-        else if (item[field] === '')
+        else if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -716,7 +716,7 @@ export class Import
         }
         break;
       case 'array':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -748,7 +748,7 @@ export class Import
         }
         break;
       case 'geo_point':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -774,7 +774,7 @@ export class Import
         }
         break;
       case 'nested':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -782,7 +782,7 @@ export class Import
         {
           try
           {
-            if (typeof item[field] === 'object')
+            if (typeof item[field] === 'string')
             {
               item[field] = JSON.parse(item[field]);
             }
