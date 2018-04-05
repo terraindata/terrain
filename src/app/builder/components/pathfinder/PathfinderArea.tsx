@@ -255,8 +255,6 @@ class PathfinderArea extends TerrainComponent<Props>
     const { path, toSkip } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
-    // console.log('PATH IS ', path);
-    // console.log("CONTEXT ", pathfinderContext);
     return (
       <ScrollingComponent
         className='pf-area'

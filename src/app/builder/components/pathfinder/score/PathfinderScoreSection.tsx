@@ -359,7 +359,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           open={score.expanded}
         >
           {
-            score.type === 'terrain' || score.type === 'linear' ?
+            (score.type === 'terrain' || score.type === 'linear') ?
               <DragAndDrop
                 draggableItems={score.type === 'terrain' ?
                   this.getScoreLines(score.lines) : this.getLinearScoreLines(score.lines)
@@ -372,7 +372,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
               null
           }
           {
-            score.type === 'terrain' || score.type === 'linear' ?
+            ((score.type === 'terrain' || score.type === 'linear') && canEdit) ?
               <PathfinderCreateLine
                 canEdit={canEdit}
                 onCreate={this.handleAddScoreLine}

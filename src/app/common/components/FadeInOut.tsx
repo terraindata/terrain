@@ -73,12 +73,21 @@ class FadeInOut extends TerrainComponent<Props>
     }
     if (this.props.open)
     {
+      if (Array.isArray(this.props.children))
+      {
+        return this.props.children.filter((child) => child !== null);
+      }
       return this.props.children;
     }
     return null;
   }
+
   public render()
   {
+    if (!this.props.children)
+    {
+      return null;
+    }
     return (
       <VelocityComponent
         animation={{

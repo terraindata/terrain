@@ -567,7 +567,6 @@ class HitsArea extends TerrainComponent<Props>
     let infoAreaContent: any = null;
     let hitsContent: any = null;
     let hitsAreOutdated: boolean = false;
-
     if (this.isDatabaseEmpty())
     {
       hitsAreOutdated = true;
@@ -590,7 +589,7 @@ class HitsArea extends TerrainComponent<Props>
         small={resultsState.errorMessage}
       />;
     }
-    if (resultsState.loading)
+    else if (resultsState.loading && (!hits || !hits.size))
     {
       infoAreaContent = <InfoArea
         large='Querying results...'

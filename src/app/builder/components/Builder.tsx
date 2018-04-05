@@ -521,8 +521,8 @@ class Builder extends TerrainComponent<Props>
 
   public shouldSave(overrideState?: BuilderState): boolean
   {
-    // empty builder, should never have to save
-    if (!this.props.params.config)
+    // empty builder or un-saveable, should never have to save
+    if (!this.props.params.config || !this.canEdit())
     {
       return false;
     }

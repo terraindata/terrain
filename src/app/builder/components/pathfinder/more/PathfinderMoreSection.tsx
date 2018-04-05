@@ -569,13 +569,16 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                       </div>,
                     )
                   }
-                  <PathfinderCreateLine
-                    canEdit={canEditScript}
-                    onCreate={this._fn(this.handleAddScriptParameter, i)}
-                    text={'Parameter'}
-                    style={{ marginBottom: 2 }}
-                    showText={true}
-                  />
+                  {
+                    canEditScript &&
+                    <PathfinderCreateLine
+                      canEdit={canEditScript}
+                      onCreate={this._fn(this.handleAddScriptParameter, i)}
+                      text={'Parameter'}
+                      style={{ marginBottom: 2 }}
+                      showText={true}
+                    />
+                  }
                   <TQLEditor
                     tql={script.script}
                     canEdit={canEditScript}
@@ -761,6 +764,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
             }
             <div>
               {
+                canEdit &&
                 tooltip(
                   <PathfinderCreateLine
                     canEdit={canEdit}

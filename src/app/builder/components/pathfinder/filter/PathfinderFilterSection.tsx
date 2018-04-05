@@ -561,14 +561,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
             )
           }
           {
-            !this.state.addingFilterLine ?
-              <PathfinderCreateLine
-                canEdit={pathfinderContext.canEdit}
-                text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
-                onCreate={this.handleAddFilter}
-              /> : null
+            !this.state.addingFilterLine && canEdit &&
+            <PathfinderCreateLine
+              canEdit={pathfinderContext.canEdit}
+              text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
+              onCreate={this.handleAddFilter}
+            />
           }
-
         </FadeInOut>
       </div>
     );

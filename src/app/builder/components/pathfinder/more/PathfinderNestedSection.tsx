@@ -308,7 +308,7 @@ class PathfinderNestedSection extends TerrainComponent<Props>
       <div className='pf-nested-section'>
         {this.renderNestedPaths()}
         {
-          keyPath.indexOf('nested') === keyPath.size - 1 ?
+          keyPath.indexOf('nested') === keyPath.size - 1 && canEdit ?
             tooltip(
               <PathfinderCreateLine
                 canEdit={canEdit}
