@@ -96,7 +96,6 @@ const BuilderReducers =
         }
 
         // abort the previous request
-        console.error(state.loadingXhr)
         state.loadingXhr.cancel();
       }
 

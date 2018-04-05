@@ -48,10 +48,10 @@ THE SOFTWARE.
 
 // Note: If anyone would like to take the time to clean up this file, be my guest.
 
+import axios from 'axios';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
-import axios from 'axios';
 
 import { QueryRequest } from '../../../shared/database/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
@@ -192,9 +192,9 @@ export const Ajax =
       }
 
       axios.interceptors.response.use(
-        response => response,
-        (error) => {
-          console.error('interceptor', error, error.response)
+        (response) => response,
+        (error) =>
+        {
           if (error && error.response)
           {
             if (error.response.status === 401)
@@ -208,15 +208,19 @@ export const Ajax =
             }
           }
 
-          return Promise.reject(error)
-        }
+          return Promise.reject(error);
+        },
       );
 
       const headers = {};
       if (config.crossDomain)
       {
         headers['Access-Control-Allow-Origin'] = '*';
-        headers['Access-Control-Allow-Headers'] = 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin';
+        headers['Access-Control-Allow-Headers'] = 'Content-Type, \
+          Access-Control-Allow-Headers, \
+          Authorization, \
+          X-Requested-With, \
+          Access-Control-Allow-Origin';
       }
 
       if (!config.noToken)
@@ -236,14 +240,18 @@ export const Ajax =
         params: method === 'get' ? data : {},
         data: method !== 'get' ? JSON.parse(data) : {},
         cancelToken: source.token,
-      }).then((response) => {
-          onLoad(response.data);
-        })
+      }).then((response) =>
+      {
+        onLoad(response.data);
+      })
         .catch((err) =>
         {
-          if (axios.isCancel(err)) {
+          if (axios.isCancel(err))
+          {
+            // Added for testing, can be removed.
             console.error('isCanceled', err.message);
-          } else {
+          } else
+          {
             const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
             config && config.onError && config.onError(routeError);
           }
