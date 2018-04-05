@@ -161,8 +161,10 @@ export class GoogleAPI
                 {
                   colNames.push(entity['name']);
                 });
-                writeStream = new CSVExportTransform(colNames);
+                writeStream = CSVTransform.createExportStream();
               }
+
+              writeStream.write(colNames);
               const rows: object[] = report['data']['rows'];
               if (Array.isArray(rows))
               {
