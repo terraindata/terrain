@@ -76,9 +76,12 @@ export default class MergeJoinTransform extends SafeReadable
   private leftSource: ElasticReader;
   private leftBuffer: object | null = null;
   private leftPosition: number = 0;
+  private leftEnded: boolean = false;
+
   private rightSource: ElasticReader;
   private rightBuffer: object | null = null;
   private rightPosition: number = 0;
+  private rightEnded: boolean = false;
 
   private mergeJoinName: string;
   private joinKey: string;
@@ -131,7 +134,7 @@ export default class MergeJoinTransform extends SafeReadable
       this.accumulateBuffer(buffers, StreamType.Left);
     });
     this.leftSource.on('error', (e) => this.emit('error', e));
-    this.leftSource.on('end', this.mergeJoin.bind(this));
+    this.leftSource.on('end', () => { this.leftEnded = true; this.mergeJoin(); });
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
@@ -149,7 +152,7 @@ export default class MergeJoinTransform extends SafeReadable
       this.accumulateBuffer(buffers, StreamType.Right);
     });
     this.rightSource.on('error', (e) => this.emit('error', e));
-    this.rightSource.on('end', this.mergeJoin.bind(this));
+    this.rightSource.on('end', () => { this.rightEnded = true; this.mergeJoin(); });
   }
 
   public _read(size: number = 1024)
@@ -204,11 +207,14 @@ export default class MergeJoinTransform extends SafeReadable
   {
     if (this.leftBuffer === null)
     {
-      this.push(null);
+      if (this.leftEnded)
+      {
+        this.push(null);
+      }
       return;
     }
 
-    if (this.rightBuffer === null)
+    if (this.rightEnded || this.rightBuffer === null)
     {
       return;
     }
@@ -257,7 +263,7 @@ export default class MergeJoinTransform extends SafeReadable
         }
       }
 
-      if (this.leftPosition === left.length - 1)
+      if (this.leftPosition === left.length - 1 && !this.leftEnded)
       {
         this.push(this.leftBuffer);
         this.leftBuffer = null;
@@ -265,7 +271,7 @@ export default class MergeJoinTransform extends SafeReadable
         return;
       }
 
-      if (this.rightPosition === right.length - 1)
+      if (this.rightPosition === right.length - 1 && !this.rightEnded)
       {
         this.rightBuffer = null;
         this.rightPosition = 0;
