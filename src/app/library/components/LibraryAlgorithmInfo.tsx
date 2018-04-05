@@ -97,7 +97,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       const xhr = this.state.algorithmStatusAjax.xhr;
       if (xhr)
       {
-        xhr.abort();
+        xhr.cancel();
       }
     }
   }

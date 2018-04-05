@@ -85,7 +85,7 @@ export interface Props
 
 interface ResultsQuery
 {
-  xhr: XMLHttpRequest;
+  xhr: any;
   queryId: string;
 }
 
@@ -181,7 +181,7 @@ export class ResultsManager extends TerrainComponent<Props>
         {
           AjaxM1.killQuery(query.queryId);
         }
-        query.xhr.abort();
+        query.xhr.cancel();
       },
     );
   }
@@ -439,7 +439,7 @@ export class ResultsManager extends TerrainComponent<Props>
       }
       if (this.state.query && this.state.query.xhr)
       {
-        this.state.query.xhr.abort();
+        this.state.query.xhr.cancel();
       }
       this.setState({
         lastQuery: query,

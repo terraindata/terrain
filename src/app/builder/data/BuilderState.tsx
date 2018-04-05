@@ -74,7 +74,7 @@ export class BuilderStateClass
   public lastActionTime: number = 0;
 
   public loading: boolean = false;
-  public loadingXhr: XMLHttpRequest = null;
+  public loadingXhr: any = null;
   public loadingAlgorithmId: ID = '';
 
   public selectedCardIds = Map<ID, boolean>({});

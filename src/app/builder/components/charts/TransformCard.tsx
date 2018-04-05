@@ -109,7 +109,7 @@ class TransformCard extends TerrainComponent<Props>
     maxDomain: List<number>;
     range: List<number>;
     bars: Bars;
-    queryXhr?: XMLHttpRequest;
+    queryXhr?: any;
     queryId?: string;
     error?: boolean;
     builderState?: any;
@@ -169,7 +169,7 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    this.state.queryXhr && this.state.queryXhr.abort(); // M1 mysql
+    this.state.queryXhr && this.state.queryXhr.cancel(); // M1 mysql
     this.killXHR('domainAggregationAjax');
     this.killXHR('aggregationAjax');
     this.killQuery();
@@ -178,7 +178,7 @@ class TransformCard extends TerrainComponent<Props>
   public killXHR(stateKey)
   {
     this.state[stateKey] && this.state[stateKey].xhr &&
-      this.state[stateKey].xhr.abort();
+      this.state[stateKey].xhr.cancel();
   }
 
   public killQuery()

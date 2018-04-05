@@ -96,10 +96,11 @@ const BuilderReducers =
         }
 
         // abort the previous request
-        state.loadingXhr.abort();
+        console.error(state.loadingXhr)
+        state.loadingXhr.cancel();
       }
 
-      const xhr: XMLHttpRequest = Ajax.getQuery(
+      const xhr: any = Ajax.getQuery(
         algorithmId,
         (query: Query) =>
         {

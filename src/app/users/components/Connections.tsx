@@ -116,7 +116,7 @@ class Connections extends TerrainComponent<Props>
     analyticsEnabled: 0,
   };
 
-  public xhr: XMLHttpRequest = null;
+  public xhr: any = null;
   public analyticsIndex: any = null;
   public analyticsType: any = null;
 
@@ -157,7 +157,7 @@ class Connections extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    this.xhr && this.xhr.abort();
+    this.xhr && this.xhr.cancel();
     this.xhr = null;
   }
 

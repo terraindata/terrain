@@ -194,17 +194,21 @@ export const Ajax =
       axios.interceptors.response.use(
         response => response,
         (error) => {
-          if (error.response.status === 401)
+          console.error('interceptor', error, error.response)
+          if (error && error.response)
           {
-            Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
-            return Promise.reject(error.statusText)
+            if (error.response.status === 401)
+            {
+              Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
+            }
+
+            if (error.response.status !== 200)
+            {
+              config && config.onError && config.onError(error.data);
+            }
           }
 
-          if (error.response.status !== 200)
-          {
-            config && config.onError && config.onError(error.data);
-            return;
-          }
+          return Promise.reject(error)
         }
       );
 
@@ -220,6 +224,9 @@ export const Ajax =
         headers['token'] = 'L9DcAxWyyeAuZXwb-bJRtA';
       }
 
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+
       const xhr = axios.request({
         method,
         url: fullUrl,
@@ -228,16 +235,23 @@ export const Ajax =
         headers,
         params: method === 'get' ? data : {},
         data: method !== 'get' ? JSON.parse(data) : {},
+        cancelToken: source.token,
       }).then((response) => {
           onLoad(response.data);
         })
         .catch((err) =>
         {
-          const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-          config && config.onError && config.onError(routeError);
+          if (axios.isCancel(err)) {
+            console.error('isCanceled', err.message);
+          } else {
+            const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+            config && config.onError && config.onError(routeError);
+          }
+
+          return Promise.reject(err);
         });
 
-      return new XMLHttpRequest();
+      return source;
     },
 
     midwayStatus(success: () => void,
@@ -677,7 +691,7 @@ export const Ajax =
         streaming?: boolean,
         streamingTo?: string,
       } = {},
-    ): { xhr: XMLHttpRequest, queryId: string }
+    ): { xhr: any, queryId: string }
     {
       const payload: QueryRequest = {
         type: 'search', // can be other things in the future
@@ -1324,7 +1338,7 @@ export const Ajax =
         id: number,
         accessToken: string,
       }) => void,
-      onError: (error) => void): XMLHttpRequest
+      onError: (error) => void): any
     {
       return Ajax.req(
         'post',

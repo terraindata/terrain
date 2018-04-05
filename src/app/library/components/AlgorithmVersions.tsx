@@ -91,7 +91,7 @@ class AlgorithmVersions extends TerrainComponent<Props>
     roles: null,
   };
 
-  public xhr: XMLHttpRequest = null;
+  public xhr: any = null;
 
   constructor(props: Props)
   {
@@ -124,7 +124,7 @@ class AlgorithmVersions extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    this.xhr && this.xhr.abort();
+    this.xhr && this.xhr.cancel();
     this.xhr = null;
   }
 
