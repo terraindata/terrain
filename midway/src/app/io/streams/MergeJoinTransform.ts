@@ -119,7 +119,7 @@ export default class MergeJoinTransform extends SafeReadable
     // set up the left source
     const leftQuery = this.setSortClause(query);
     this.leftSource = new ElasticReader(client, leftQuery, true);
-    this.leftSource.on('readable', (() =>
+    this.leftSource.on('readable', () =>
     {
       const buffers: object[] = [];
       let buffer = this.leftSource.read();
@@ -129,15 +129,15 @@ export default class MergeJoinTransform extends SafeReadable
         buffer = this.leftSource.read();
       }
       this.accumulateBuffer(buffers, StreamType.Left);
-    }).bind(this));
-    this.leftSource.on('error', ((e) => this.emit('error', e)).bind(this));
+    });
+    this.leftSource.on('error', (e) => this.emit('error', e));
     this.leftSource.on('end', this.mergeJoin.bind(this));
 
     // set up the right source
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
     this.rightSource = new ElasticReader(client, rightQuery, true);
-    this.rightSource.on('readable', (() =>
+    this.rightSource.on('readable', () =>
     {
       const buffers: object[] = [];
       let buffer = this.rightSource.read();
@@ -147,8 +147,8 @@ export default class MergeJoinTransform extends SafeReadable
         buffer = this.rightSource.read();
       }
       this.accumulateBuffer(buffers, StreamType.Right);
-    }).bind(this));
-    this.rightSource.on('error', ((e) => this.emit('error', e)).bind(this));
+    });
+    this.rightSource.on('error', (e) => this.emit('error', e));
     this.rightSource.on('end', this.mergeJoin.bind(this));
   }
 
