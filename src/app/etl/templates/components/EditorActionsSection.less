@@ -1,0 +1,53 @@
+@import "~common/Common.less";
+
+.template-list-wrapper {
+  padding: @double-spacing;
+  min-height: 30%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.template-editor-top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 0 0 32px;
+
+  .editor-top-bar-item {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    border-radius: @spacing;
+    height: @double-spacing;
+    padding: 0px @spacing + @half-spacing;
+    margin-left: @spacing;
+    cursor: pointer;
+  }
+
+  .editor-top-bar-icon {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    cursor: pointer;
+    margin-left: @spacing;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+  }
+
+  .top-bar-left-side {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .editor-top-bar-name {
+    margin-right: @spacing;
+    .normal-text;
+  }
+}
