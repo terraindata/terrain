@@ -125,35 +125,35 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     });
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-    // this.setState({
-    //   fieldOptions: source.dataSource.getChoiceOptions({
-    //     type: 'fields',
-    //     source,
-    //     schemaState: pathfinderContext.schemaState,
-    //     builderState: pathfinderContext.builderState,
-    //     noNested: true,
-    //   }),
-    // });
+    this.setState({
+      fieldOptions: source.dataSource.getChoiceOptions({
+        type: 'fields',
+        source,
+        schemaState: pathfinderContext.schemaState,
+        builderState: pathfinderContext.builderState,
+        noNested: true,
+      }),
+    });
   }
 
-  // public componentWillReceiveProps(nextProps: Props)
-  // {
-  //   if (this.props.pathfinderContext.source.dataSource
-  //     !== nextProps.pathfinderContext.source.dataSource)
-  //   {
-  //     const { pathfinderContext } = nextProps;
-  //     const { source } = pathfinderContext;
-  //     this.setState({
-  //       fieldOptions: source.dataSource.getChoiceOptions({
-  //         type: 'fields',
-  //         source,
-  //         schemaState: pathfinderContext.schemaState,
-  //         builderState: pathfinderContext.builderState,
-  //         noNested: true,
-  //       }),
-  //     });
-  //   }
-  // }
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.pathfinderContext.source.dataSource
+      !== nextProps.pathfinderContext.source.dataSource)
+    {
+      const { pathfinderContext } = nextProps;
+      const { source } = pathfinderContext;
+      this.setState({
+        fieldOptions: source.dataSource.getChoiceOptions({
+          type: 'fields',
+          source,
+          schemaState: pathfinderContext.schemaState,
+          builderState: pathfinderContext.builderState,
+          noNested: true,
+        }),
+      });
+    }
+  }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
@@ -734,9 +734,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
               defaultOpen={false}
             />
             {
-              this.renderSourceSection(more.source, more.customSource)
-            }
-            {
               this.props.keyPath.includes('nested') ?
                 <RouteSelector
                   optionSets={this.getMinMatchesOptionSets() /* TODO store in state? */}
@@ -748,17 +745,19 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 /> : null
             }
             {
-              // <DragAndDrop
-              //   draggableItems={this.getAggregationLines()}
-              //   onDrop={this.handleLinesReorder}
-              //   className='more-aggregations-drag-drop'
-              // />
-              // <PathfinderCreateLine
-              //   canEdit={canEdit}
-              //   onCreate={this.handleAddLine}
-              //   text={PathfinderText.createAggregationLine}
-              // />
+              <RouteSelector
+                optionSets={this.getCollapseOptionSets()}
+                values={List([collapseValue])}
+                onChange={this.handleCollapseChange}
+                canEdit={canEdit}
+                defaultOpen={false}
+                autoFocus={true}
+              /> 
             }
+            {
+              this.renderSourceSection(more.source, more.customSource)
+            }
+
             {
               this.renderScripts(this.props.more.scripts)
             }
