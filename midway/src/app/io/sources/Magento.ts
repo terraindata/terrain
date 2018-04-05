@@ -53,7 +53,7 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { getValueFromDocPath } from '../../../../../shared/Util';
+import * as yadeep from '../../../../../shared/util/yadeep';
 import { Credentials } from '../../credentials/Credentials';
 import CSVTransform from '../streams/CSVTransform';
 import { ExportSourceConfig } from './Sources';
@@ -646,7 +646,8 @@ export class Magento
                       {
                         if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
                         {
-                          const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
+                          // FIXME: make sure the path is in the format we expect
+                          const extractedDoc: object = yadeep.get(result, magentoSourceConfig.url[0]['path']);
                           resultArr.push({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
                         }
                         else
@@ -713,7 +714,8 @@ export class Magento
                       {
                         if (result !== undefined && magentoSourceConfig.url[0]['path'] !== undefined)
                         {
-                          const extractedDoc: object = getValueFromDocPath(result, magentoSourceConfig.url[0]['path']);
+                          // FIXME: make sure the path is in the format we expect
+                          const extractedDoc: object = yadeep.get(result, magentoSourceConfig.url[0]['path']);
                           resultArr.push({ args: sanitizedRequestArgs, status: extractedDoc, mappedKey });
                         }
                         else if (result && result['result'] !== undefined)
