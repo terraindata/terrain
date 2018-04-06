@@ -745,16 +745,16 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 /> : null
             }
             {
-                <RouteSelector
-                  optionSets={this.getCollapseOptionSets()}
-                  values={List([collapseValue])}
-                  onChange={this.handleCollapseChange}
-                  canEdit={canEdit}
-                  defaultOpen={false}
-                  autoFocus={true}
-                  showWarning={this.props.count > 500 && collapseValue !== undefined}
-                  warningMessage={`Group By is not supported when exporting over 500 results`}
-                />
+              <RouteSelector
+                optionSets={this.getCollapseOptionSets()}
+                values={List([collapseValue])}
+                onChange={this.handleCollapseChange}
+                canEdit={canEdit}
+                defaultOpen={false}
+                autoFocus={true}
+                showWarning={this.props.count > 500 && collapseValue !== undefined}
+                warningMessage={`Group By is not supported when exporting over 500 results`}
+              />
             }
             {
               this.renderSourceSection(more.source, more.customSource)

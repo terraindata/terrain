@@ -246,7 +246,7 @@ export class RouteSelector extends TerrainComponent<Props>
         {
           props.showWarning &&
           tooltip(
-            <InfoIcon 
+            <InfoIcon
               className='routeselector-warning-icon'
               style={getStyle('fill', Colors().error)}
             />,

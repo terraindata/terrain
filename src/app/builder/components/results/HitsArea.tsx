@@ -900,21 +900,21 @@ column if you have customized the results view.');
     {
       this.setState({
         showingExport: true,
-      }); 
+      });
     }
     else
     {
       // Show error modal explaining why export is not possible
       this.setState({
         showingErrorModal: true,
-      })
+      });
     }
   }
 
   public hidePopup(key)
   {
     this.setState({
-      [key]: false
+      [key]: false,
     });
   }
 
@@ -953,7 +953,7 @@ column if you have customized the results view.');
           Reduce the size or remove the group by field to export.`}
         error={true}
       />
-    )
+    );
   }
 
   public renderExport()
@@ -962,7 +962,6 @@ column if you have customized the results view.');
       filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
     // const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
     //   filetype, requireJSONHaveAllFields, exportRank, objectKey, elasticUpdate } = this.props.exportState;
-    console.log('columnNames ', columnNames);
     const content =
       <div
         style={backgroundColor(Colors().bg1)}

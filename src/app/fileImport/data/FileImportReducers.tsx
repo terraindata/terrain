@@ -365,7 +365,6 @@ FileImportReducers[ActionTypes.fetchTypesFromQuery] =
       action.payload.query,
       (namesAndTypes) =>
       {
-        console.log('get types from query');
         action.payload.setColumnNamesAndTypes(namesAndTypes);
       });
     return state;
