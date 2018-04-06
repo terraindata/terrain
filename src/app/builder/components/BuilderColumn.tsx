@@ -176,11 +176,6 @@ const BuilderColumn = createReactClass<any, any>(
       }
     },
 
-    shouldComponentUpdate(nextProps, nextState)
-    {
-      return shallowCompare(this, nextProps, nextState);
-    },
-
     componentWillMount()
     {
       // TODO fix

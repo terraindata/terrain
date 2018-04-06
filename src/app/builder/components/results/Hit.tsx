@@ -864,7 +864,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
 {
   let fields: string[];
 
-  if (config && config.fields)
+  if (config && config.fields && config.enabled)
   {
     fields = config.fields.filter((field) =>
       nested.indexOf(field) === -1,
@@ -891,9 +891,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
     fields = fields.filter((field) =>
       nested.indexOf(field) === -1,
     );
-
   }
-
   return fields;
 }
 

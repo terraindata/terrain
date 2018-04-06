@@ -153,44 +153,15 @@ class HitsArea extends TerrainComponent<Props>
   {
     this.setIndexAndResultsConfig(this.props);
     this.getNestedFields(this.props);
+    this.addListener('builder', [['query', 'path', 'source', 'dataSource'],
+      ['db', 'name']]);
+    this.addListener('query', ['tql', 'inputs', 'resultsConfig', 'algorithmId']);
   }
 
   public handleConfigChange(config: ResultsConfig, builderActions)
   {
     builderActions.changeResultsConfig(config);
     this.getNestedFields(this.props, config);
-  }
-
-  public shouldComponentUpdate(nextProps: Props, nextState: State)
-  {
-
-    for (const key in nextProps)
-    {
-      if (!_.isEqual(this.props[key], nextProps[key]))
-      {
-        if (key === 'builder' && !_.isEqual(
-          this.props.builder.query.path.source.dataSource,
-          nextProps.builder.query.path.source.dataSource) ||
-          this.props.builder.db.name !==
-          nextProps.builder.db.name)
-        {
-          return true;
-        }
-        else
-        {
-          return true;
-        }
-      }
-    }
-
-    for (const key in nextState)
-    {
-      if (!_.isEqual(this.state[key], nextState[key]))
-      {
-        return true;
-      }
-    }
-    return false;
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -295,6 +266,12 @@ class HitsArea extends TerrainComponent<Props>
           resp[0]['enabled'] = true;
           this.setState({
             resultsConfig: _ResultsConfig(resp[0]),
+          });
+        }
+        else
+        {
+          this.setState({
+            resultsConfig: _ResultsConfig({enabled: false}),
           });
         }
       },

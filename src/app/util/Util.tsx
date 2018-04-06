@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
 import * as $ from 'jquery';
 import { connect } from 'react-redux';
+import List from 'immutable';
 import { bindActionCreators } from 'redux';
 // import * as moment from 'moment';
 const moment = require('moment');
@@ -795,6 +796,26 @@ const Util = {
     // Put the sorted non starred fields after the starred fields (Starred are sorted in alpha order)
     return starredFields.sort().concat(nonStarredFields).toList();
   },
+
+  didStateChange(oldState: any, newState: any, paths?: Array<string | Array<string>>)
+  {
+    if (!paths || !paths.length)
+    {
+      return !_.isEqual(oldState, newState);
+    }
+    else
+    {
+      paths.forEach((path) =>
+      {
+        path = Array.isArray(path) ? path : [path];
+        if (!_.isEqual(oldState.getIn(path), newState.getIn(path)))
+        {
+          return true;
+        }
+      })
+    }
+    return false;
+  }
 };
 
 export default Util;
