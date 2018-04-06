@@ -60,14 +60,15 @@ export class ElasticReader extends SafeReadable
   private querying: boolean = false;
   private doneReading: boolean = false;
   private streaming: boolean = false;
+  private scrolling: boolean = false;
   private rowsProcessed: number = 0;
   private scroll: string;
   private size: number;
 
   private scrollID: string | undefined = undefined;
 
-  private MAX_SEARCH_SIZE: number = 500;
-  private DEFAULT_SEARCH_SIZE: number = 200;
+  private MAX_SEARCH_SIZE: number = 1000;
+  private DEFAULT_SEARCH_SIZE: number = 500;
   private DEFAULT_SCROLL_TIMEOUT: string = '45m';
 
   private numRequested: number = 0;
@@ -82,7 +83,9 @@ export class ElasticReader extends SafeReadable
 
     this.size = (query['size'] !== undefined) ? query['size'] as number : this.DEFAULT_SEARCH_SIZE;
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
+
     this.numRequested = this.size;
+    this.scrolling = streaming && (this.size > this.DEFAULT_SEARCH_SIZE);
 
     try
     {
@@ -90,7 +93,7 @@ export class ElasticReader extends SafeReadable
         body: this.query,
       };
 
-      if (this.streaming)
+      if (this.scrolling)
       {
         body['scroll'] = this.scroll;
       }
@@ -165,7 +168,7 @@ export class ElasticReader extends SafeReadable
 
     this.querying = false;
     this.doneReading = this.doneReading
-      || !this.streaming
+      || !this.scrolling
       || length <= 0
       || this.rowsProcessed >= this.size;
 
