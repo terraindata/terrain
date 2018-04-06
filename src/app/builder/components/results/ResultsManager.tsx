@@ -110,7 +110,7 @@ interface State
   countQuery?: ResultsQuery;
   transformQuery?: ResultsQuery;
   canQuery?: boolean;
-  queries?: List<Query>;
+  pendingQuery?: Query;
 }
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
@@ -121,7 +121,6 @@ export class ResultsManager extends TerrainComponent<Props>
 {
   public state: State = {
     canQuery: true,
-    queries: List([]),
   };
 
   // apply a function to all active queries
@@ -232,7 +231,7 @@ export class ResultsManager extends TerrainComponent<Props>
     if (!this.state.canQuery)
     {
       this.setState({
-        queries: this.state.queries.push(nextProps.query),
+        pendingQuery: nextProps.query,
       });
     }
 
@@ -568,13 +567,13 @@ export class ResultsManager extends TerrainComponent<Props>
     setTimeout(
       () =>
       {
-        if (this.state.queries && this.state.queries.size)
+        if (this.state.pendingQuery !== undefined)
         {
-          this.queryResults(this.state.queries.last(), db);
+          this.queryResults(this.state.pendingQuery, db);
         }
         this.setState({
           canQuery: true,
-          queries: List([]),
+          pendingQuery: undefined,
         });
       },
       MAX_REQUERY_RATE);
