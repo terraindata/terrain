@@ -93,6 +93,11 @@ class TemplateEditorStateC
     return this.uiState.currentEdge;
   }
 
+  public getSourceFetchStatus(id: string): FetchStatus
+  {
+    return this.uiState.fetchStatuses.get(id, FetchStatus.Unloaded);
+  }
+
   public getSourceDocuments(id: string): List<object>
   {
     return this.uiState.mergeDocuments.get(id, List([]));
@@ -114,9 +119,18 @@ export const columnOptions = List([
   ColumnOptions.Steps,
 ]);
 
+export enum FetchStatus
+{
+  Unloaded,
+  Loading,
+  Loaded,
+  Error,
+}
+
 class EditorDisplayStateC
 {
   public documents: List<object> = List([]);
+  public fetchStatuses: Immutable.Map<string, FetchStatus> = Map({});
   public mergeDocuments: Immutable.Map<string, List<object>> = Map({});
   public modalRequests: List<ModalProps> = List([]);
   public previewIndex: number = 0; // which preview document we are looking at
