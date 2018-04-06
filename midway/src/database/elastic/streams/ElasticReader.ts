@@ -67,7 +67,7 @@ export class ElasticReader extends SafeReadable
   private scrollID: string | undefined = undefined;
 
   private MAX_SEARCH_SIZE: number = 10 * 1000;
-  private DEFAULT_SEARCH_SIZE: number = 8 * 1024;
+  private DEFAULT_SEARCH_SIZE: number = 1024;
   private DEFAULT_SCROLL_TIMEOUT: string = '5m';
 
   private numRequested: number = 0;

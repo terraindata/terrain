@@ -105,6 +105,7 @@ export function getSampleRows(
       preview: numRows != null ? numRows : 0,
       complete: handleResults,
       error: handleError,
+      dynamicTyping: true,
     });
   }
   else if (getFileType(file) === FileTypes.Json)

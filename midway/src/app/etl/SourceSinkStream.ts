@@ -56,7 +56,6 @@ import
 } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
-import util from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
@@ -72,51 +71,18 @@ import ExportTransform from './ExportTransform';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
 
-export async function getSourceStream(sources: DefaultSourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
+export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
-    if (sources._default === undefined)
-    {
-      throw new Error('Default source not found.');
-    }
-
-    const src: SourceConfig = sources._default;
     let sourceStream: stream.Readable;
-
-    switch (src.type)
+    switch (source.type)
     {
       case 'Algorithm':
-        const algorithmId = src.options['algorithmId'];
+        const algorithmId = source.options['algorithmId'];
         const query: string = await Util.getQueryFromAlgorithm(algorithmId);
         const dbId: number = await Util.getDBFromAlgorithm(algorithmId);
-
-        const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
-        if (controller === undefined)
-        {
-          throw new Error(`Database ${String(dbId)} not found.`);
-        }
-
-        if (controller.getType() !== 'ElasticController')
-        {
-          throw new Error('Algorithm source only supports Elastic databases');
-        }
-
-        const qh: QueryHandler = controller.getQueryHandler();
-        const payload = {
-          database: dbId,
-          type: 'search',
-          streaming: true,
-          databasetype: 'elastic',
-          body: query,
-        };
-
-        const algorithmStream = await qh.handleQuery(payload) as stream.Readable;
-        if (algorithmStream === undefined)
-        {
-          throw new Error('Error creating new source stream from algorithm');
-        }
-
+        const algorithmStream = await getElasticReaderStream(dbId, query);
         const exportTransform = new ExportTransform();
         sourceStream = algorithmStream.pipe(exportTransform);
         break;
@@ -126,9 +92,13 @@ export async function getSourceStream(sources: DefaultSourceConfig, files?: stre
           throw new Error('No file(s) found in multipart formdata');
         }
 
-        // TODO: multi-source import
-        const importStream = files[0];
-        switch (src.fileConfig.fileType)
+        const importStream = files.find((f) => f['fieldname'] === name);
+        if (importStream === undefined)
+        {
+          throw new Error('Error finding source stream ' + name);
+        }
+
+        switch (source.fileConfig.fileType)
         {
           case 'json':
             sourceStream = importStream.pipe(JSONTransform.createImportStream());
@@ -149,18 +119,11 @@ export async function getSourceStream(sources: DefaultSourceConfig, files?: stre
   });
 }
 
-export async function getSinkStream(sinks: DefaultSinkConfig, engine: TransformationEngine): Promise<stream.Duplex>
+export async function getSinkStream(sink: SinkConfig, engine: TransformationEngine): Promise<stream.Duplex>
 {
   return new Promise<stream.Duplex>(async (resolve, reject) =>
   {
-    if (sinks._default === undefined)
-    {
-      throw new Error('Default sink not found.');
-    }
-
-    const sink: SinkConfig = sinks._default;
     let sinkStream: stream.Duplex;
-
     switch (sink.type)
     {
       case 'Download':
@@ -183,18 +146,7 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
         }
 
         const { serverId, database, table } = sink.options as any;
-        const db = await databases.select([], { name: serverId });
-        if (db.length < 1)
-        {
-          throw new Error(`Database ${String(serverId)} not found.`);
-        }
-
-        const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id);
-        if (controller === undefined)
-        {
-          throw new Error(`Database id ${String(db[0].id)} is invalid.`);
-        }
-
+        const controller = await getControllerByName(serverId);
         const client: ElasticClient = controller.getClient() as ElasticClient;
         const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
 
@@ -213,4 +165,103 @@ export async function getSinkStream(sinks: DefaultSinkConfig, engine: Transforma
 
     resolve(sinkStream);
   });
+}
+
+export async function getControllerByName(name: string): Promise<DatabaseController>
+{
+  const db = await databases.select([], { name });
+  if (db.length < 1 || db[0].id === undefined)
+  {
+    throw new Error(`Database ${String(name)} not found.`);
+  }
+
+  const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id as number);
+  if (controller === undefined)
+  {
+    throw new Error(`Database id ${String(db[0].id)} is invalid.`);
+  }
+
+  return controller;
+}
+
+export async function getMergeJoinStream(name: string, indices: object[], options: object): Promise<stream.Readable>
+{
+  const mergeJoinKey = options['outputKey'];
+  const query = {
+    size: 2147483647,
+    query: {
+      bool: {
+        filter: [
+          {
+            match: {
+              _index: indices[0]['index'],
+            },
+          },
+          {
+            match: {
+              _type: indices[0]['type'],
+            },
+          },
+        ],
+      },
+    },
+    mergeJoin: {
+      joinKey: options['leftJoinKey'],
+      [mergeJoinKey]: {
+        query: {
+          bool: {
+            filter: [
+              {
+                match: {
+                  _index: indices[1]['index'],
+                },
+              },
+              {
+                match: {
+                  _type: indices[1]['type'],
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  };
+
+  const controller = await getControllerByName(name);
+  const dbId: number = controller.getID();
+  const elasticStream = await getElasticReaderStream(dbId, JSON.stringify(query));
+  const exportTransform = new ExportTransform();
+  return elasticStream.pipe(exportTransform);
+}
+
+async function getElasticReaderStream(dbId: number, query: string): Promise<stream.Readable>
+{
+  const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
+  if (controller === undefined)
+  {
+    throw new Error(`Database ${String(dbId)} not found.`);
+  }
+
+  if (controller.getType() !== 'ElasticController')
+  {
+    throw new Error('Algorithm source only supports Elastic databases');
+  }
+
+  const qh: QueryHandler = controller.getQueryHandler();
+  const payload = {
+    database: dbId,
+    type: 'search',
+    streaming: true,
+    databasetype: 'elastic',
+    body: query,
+  };
+
+  const elasticStream = await qh.handleQuery(payload) as stream.Readable;
+  if (elasticStream === undefined)
+  {
+    throw new Error('Error creating new source stream from algorithm');
+  }
+
+  return elasticStream;
 }

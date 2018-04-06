@@ -51,7 +51,7 @@ export function mergeDocument(doc: object): object
   if (doc['_source'] !== undefined)
   {
     const sourceKeys = Object.keys(doc['_source']);
-    const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source');
+    const rootKeys = _.without(Object.keys(doc), '_index', '_type', '_id', '_score', '_source', 'sort');
     if (rootKeys.length > 0) // there were other top-level objects in the document
     {
       const duplicateRootKeys: string[] = [];

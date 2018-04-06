@@ -927,8 +927,8 @@ describe('Query route tests', () =>
         expect(respData['result'].hits.hits.length).toEqual(5);
         for (let i = 0; i < respData['result'].hits.hits.length; ++i)
         {
-          expect(respData['result'].hits.hits[i]._id === respData['result'].hits.hits[i].selfMergeJoin[0]._id);
-          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin[0]._source.movieid);
+          expect(respData['result'].hits.hits[i].movieid === respData['result'].hits.hits[i].selfMergeJoin[0].movieid);
+          expect(respData['result'].hits.hits[i]._source.movieid === respData['result'].hits.hits[i].selfMergeJoin[0].movieid);
         }
       })
       .catch((error) =>
