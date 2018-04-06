@@ -59,6 +59,7 @@ import Util from 'util/Util';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
+import { ETLState } from 'etl/ETLTypes';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
@@ -84,7 +85,7 @@ export interface Props
   router?: any;
   route?: any;
   walkthrough?: WalkthroughState;
-  templates?: List<ETLTemplate>;
+  etl?: ETLState;
   editorAct?: typeof TemplateEditorActions;
   etlAct?: typeof ETLActions;
   schemaAct?: typeof SchemaActions;
@@ -197,16 +198,75 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public executeTemplate(template: ETLTemplate)
   {
-    this.props.etlAct({
-      actionType: 'executeTemplate',
-      template,
-      onSuccess: () =>
+    const { runningTemplates } = this.props.etl;
+    if (runningTemplates.has(template.id))
+    {
+      this.props.etlAct({
+        actionType: 'addModal',
+        props: {
+          message: `Cannot run template "${template.templateName}". This template is already running`,
+          title: `Error`,
+          error: true,
+        },
+      });
+    }
+    else
+    {
+      const updateUIAfterResponse = () =>
       {
-        this.props.schemaAct({
-          actionType: 'fetch',
+        this.props.etlAct({
+          actionType: 'clearRunningTemplate',
+          templateId: template.id,
         });
-      },
-    });
+        this.props.etlAct({
+          actionType: 'setAcknowledgedRun',
+          templateId: template.id,
+          value: false,
+        });
+      };
+
+      this.props.etlAct({
+        actionType: 'setRunningTemplate',
+        templateId: template.id,
+        template,
+      });
+      this.props.etlAct({
+        actionType: 'setAcknowledgedRun',
+        templateId: template.id,
+        value: false,
+      });
+
+      this.props.etlAct({
+        actionType: 'executeTemplate',
+        template,
+        onSuccess: () =>
+        {
+          updateUIAfterResponse();
+          this.props.schemaAct({
+            actionType: 'fetch',
+          });
+          this.props.etlAct({
+            actionType: 'addModal',
+            props: {
+              message: `"${template.templateName}" finished running`,
+              title: 'Task Complete',
+            },
+          });
+        },
+        onError: (ev) =>
+        {
+          updateUIAfterResponse();
+          this.props.etlAct({
+            actionType: 'addModal',
+            props: {
+              message: `Error while executing: ${String(ev)}`,
+              title: `Error`,
+              error: true,
+            },
+          });
+        },
+      });
+    }
   }
 
   // is there a better pattern for this?
@@ -379,7 +439,7 @@ export default withRouter(Util.createContainer(
   ETLEditorPage,
   [
     ['walkthrough'],
-    ['etl', 'templates'],
+    ['etl'],
     ['templateEditor', 'isDirty'],
     ['templateEditor', 'template'],
   ],
