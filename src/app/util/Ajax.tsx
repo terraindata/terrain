@@ -66,6 +66,12 @@ import * as UserTypes from '../users/UserTypes';
 
 import AjaxM1 from './AjaxM1';
 
+interface AjaxResponse
+{
+  promise: Promise<any>;
+  cancel: (message: string) => void;
+}
+
 export const Ajax =
   {
     reduxStoreDispatch: (action) => console.error('Ajax reduxStoreDispatch property has not been set.'),
@@ -240,10 +246,11 @@ export const Ajax =
         params: method === 'get' ? data : {},
         data: method !== 'get' ? JSON.parse(data) : {},
         cancelToken: source.token,
-      }).then((response) =>
-      {
-        onLoad(response.data);
       })
+        .then((response) =>
+        {
+          onLoad(response.data);
+        })
         .catch((err) =>
         {
           if (axios.isCancel(err))
@@ -259,7 +266,10 @@ export const Ajax =
           return Promise.reject(err);
         });
 
-      return source;
+      return {
+        promise: xhr,
+        cancel: source.cancel,
+      };
     },
 
     midwayStatus(success: () => void,
