@@ -57,25 +57,25 @@ done
 if [ "$use_mysql" == 1 ] && [ $(docker ps -aq -f name=moviesdb-mysql | wc -l) != 0 ] ; then
         echo "Stopping moviesdb docker mysql image..."
         docker stop moviesdb-mysql
-        docker rm moviesdb-mysql || true
+        docker rm -f moviesdb-mysql || true
 fi
 
 if [ "$use_postgres" == 1 ] && [ $(docker ps -aq -f name=moviesdb-postgres | wc -l) != 0 ] ; then
         echo "Stopping moviesdb docker postgres image..."
         docker stop moviesdb-postgres
-        docker rm moviesdb-postgres || true
+        docker rm -f moviesdb-postgres || true
 fi
 
 if [ "$use_elastic" == 1 ] && [ $(docker ps -aq -f name=moviesdb-elk | wc -l) != 0 ] ; then
         echo "Stopping moviesdb docker elk image..."
         docker stop moviesdb-elk
-        docker rm moviesdb-elk || true
+        docker rm -f moviesdb-elk || true
 fi
 
 if [ "$use_chrome" == 1 ] && [ $(docker ps -aq -f name=chrome | wc -l) != 0 ] ; then
         echo "Stopping headless Chrome docker image..."
         docker stop chrome
-        docker rm chrome || true
+        docker rm -f chrome || true
 fi
 
 if [ "$use_sqlite" == 1 ] && [ -f ${sqlite_path} ] ; then
