@@ -105,13 +105,18 @@ class EditorColumnBar extends TerrainComponent<Props>
   {
     const { uiState } = this.props.templateEditor;
     return (
-      <div className='editor-column-bar'>
-        <div className='editor-column-header-text'>
+      <div
+        className='editor-column-title-section'
+        onClick={this.handleDropdownClicked}
+        style={fontColor(Colors().text2)}
+      >
+        <div
+          className='editor-column-header-text'
+        >
           {uiState.columnState}
         </div>
         <div
           className='editor-column-header-dropdown'
-          onClick={this.handleDropdownClicked}
         >
           <Menu
             registerButton={(button) => this.menu = button}
