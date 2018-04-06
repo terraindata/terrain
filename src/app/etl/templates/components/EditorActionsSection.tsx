@@ -119,7 +119,7 @@ class EditorActionsSection extends TerrainComponent<Props>
       modals.push(
         <Modal
           key='saveNew'
-          title='Save Template'
+          title={this.state.isSaveAs ? 'Save As' : 'Save Template'}
           open={this.state.saveTemplateModalOpen}
           showTextbox={true}
           onConfirm={this.handleSaveConfirm}
@@ -339,7 +339,7 @@ const topBarIconStyle = [
   fontColor(Colors().bg3, Colors().bg2),
 ];
 const topBarIconDisabledStyle = [
-  fontColor(Colors().bg2, Colors().bg2),
+  fontColor(Colors().darkerHighlight, Colors().darkerHighlight),
 ];
 
 const topBarRunStyle = [backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)];
