@@ -752,6 +752,8 @@ class PathfinderMoreSection extends TerrainComponent<Props>
                 canEdit={canEdit}
                 defaultOpen={false}
                 autoFocus={true}
+                showWarning={this.props.count > 500 && collapseValue !== undefined}
+                warningMessage={`Group By is not supported when exporting over 500 results`}
               />
             }
             {

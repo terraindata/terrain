@@ -1125,6 +1125,7 @@ export const Ajax =
         payload,
         (response: object) =>
         {
+          console.log(response);
           onLoad(response);
         },
       );
