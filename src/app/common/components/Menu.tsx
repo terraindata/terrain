@@ -81,6 +81,7 @@ export interface Props
   id?: ID;
   vertical?: boolean;
   openRight?: boolean; // menu will open to the right
+  registerButton?: (ref) => void;
   onChangeState?: (open: boolean) => void;
   overrideMultiplier?: number;
 }
@@ -157,6 +158,14 @@ class Menu extends TerrainComponent<Props>
     $(document).off('click', this.close);
   }
 
+  public registerMenuButton(button)
+  {
+    if (this.props.registerButton !== undefined)
+    {
+      this.props.registerButton(button);
+    }
+  }
+
   public componentWillMount()
   {
     this.props.colorsActions({
@@ -231,6 +240,7 @@ class Menu extends TerrainComponent<Props>
           className='menu-icon-wrapper'
           onClick={this.toggleOpen}
           style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
+          ref={this.registerMenuButton}
         >
           <MoreIcon className='menu-icon' />
         </div>

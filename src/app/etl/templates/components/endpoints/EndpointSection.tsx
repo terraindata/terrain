@@ -71,6 +71,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
+import TemplateEndpoint from './TemplateEndpoint';
 
 import './EndpointSection.less';
 
@@ -125,32 +126,13 @@ class EndpointSection extends TerrainComponent<Props>
 
   public renderEndpoint(endpoint: SourceConfig | SinkConfig, key)
   {
-    const { isSource, template } = this.props;
-    const name = isSource ? template.getSourceName(key) : template.getSinkName(key);
-    const content = (
-      <div
-        className='endpoint-name-section'
-        style={fontColor(Colors().text2)}
-        onClick={this.expandableToggleFactory(key)}
-      >
-        {name}
-      </div>
-    );
-    const childContent = (
-      <EndpointForm
-        isSource={isSource}
-        endpoint={endpoint}
-        onChange={this.handleEndpointChangeFactory(key)}
-      />
-    );
-
     return (
-      <ExpandableView
+      <TemplateEndpoint
         key={key}
-        content={content}
-        open={this.isEndpointOpen(key)}
-        children={childContent}
-        onToggle={this.expandableToggleFactory(key)}
+        endpointKey={key}
+        endpoint={endpoint}
+        onEndpointChange={this.handleEndpointChangeFactory(key)}
+        isSource={this.props.isSource}
       />
     );
   }
@@ -309,18 +291,6 @@ class EndpointSection extends TerrainComponent<Props>
   public isEndpointOpen(key: string)
   {
     return this.state.expandableState.get(key) !== false;
-  }
-
-  @instanceFnDecorator(_.memoize)
-  public expandableToggleFactory(key: string)
-  {
-    return () =>
-    {
-      const { expandableState } = this.state;
-      this.setState({
-        expandableState: expandableState.set(key, !this.isEndpointOpen(key)),
-      });
-    };
   }
 
   @instanceFnDecorator(_.memoize)

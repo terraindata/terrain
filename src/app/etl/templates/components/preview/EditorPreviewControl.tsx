@@ -79,14 +79,18 @@ class EditorPreviewControl extends TerrainComponent<Props>
       `${previewIndex + 1} of ${documents.size}` :
       'no preview available';
 
-    const arrowStylerStyle = _.extend({}, fontColor(Colors().text2, Colors().text1));
+    const canIncrement = documents.size > 0 && previewIndex + 1 < documents.size;
+    const canDecrement = documents.size > 0 && previewIndex > 0;
+
+    const leftArrowStyle = canDecrement ? enabledArrowStyle : disabledArrowStyle;
+    const rightArrowStyle = canIncrement ? enabledArrowStyle : disabledArrowStyle;
 
     return (
       <div className='template-editor-preview-control'>
         <div className='preview-control-row' >
           <div
             className='preview-control-arrow-styler'
-            style={arrowStylerStyle}
+            style={leftArrowStyle}
             onClick={this.handleDecrementDocument}
             key='left-arrow'
           >
@@ -97,7 +101,7 @@ class EditorPreviewControl extends TerrainComponent<Props>
           </div>
           <div
             className='preview-control-arrow-styler'
-            style={arrowStylerStyle}
+            style={rightArrowStyle}
             onClick={this.handleIncrementDocument}
             key='right-arrow'
           >
@@ -147,8 +151,10 @@ class EditorPreviewControl extends TerrainComponent<Props>
       });
     }
   }
-
 }
+
+const enabledArrowStyle = _.extend({}, fontColor(Colors().text3, Colors().text2));
+const disabledArrowStyle = _.extend({}, fontColor(Colors().text3, Colors().text3));
 
 export default Util.createContainer(
   EditorPreviewControl,
