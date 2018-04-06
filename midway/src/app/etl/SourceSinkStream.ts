@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as SFTP from 'ssh2-sftp-client';
 import * as stream from 'stream';
 
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
@@ -62,6 +63,8 @@ import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
 import { ElasticDB } from '../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
+import CredentialConfig from '../credentials/CredentialConfig';
+import { credentials } from '../credentials/CredentialRouter';
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
 import { QueryHandler } from '../query/QueryHandler';
@@ -111,6 +114,38 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         }
         break;
       case 'Sftp':
+        const credentialId = source.options['credentialId'];
+        const creds: CredentialConfig[] = await credentials.get(credentialId);
+        if (creds.length === 0)
+        {
+          throw new Error('Invalid SFTP credentials ID.');
+        }
+
+        let sftpConfig: object = {};
+        try
+        {
+          sftpConfig = JSON.parse(creds[0].meta);
+        }
+        catch (e)
+        {
+          throw new Error('Error retrieving credentials for ID ' + String(credentialId));
+        }
+
+        const sftp = new SFTP();
+        await sftp.connect(sftpConfig);
+        const sftpImportStream = sftp.get(source.options['filepath']);
+        switch (source.fileConfig.fileType)
+        {
+          case 'json':
+            sourceStream = sftpImportStream.pipe(JSONTransform.createImportStream());
+            break;
+          case 'csv':
+            sourceStream = sftpImportStream.pipe(CSVTransform.createImportStream());
+            break;
+          default:
+            throw new Error('Download file type must be either CSV or JSON.');
+        }
+        break;
       case 'Http':
       default:
         throw new Error('not implemented.');
@@ -158,6 +193,43 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
         sinkStream = new ElasticWriter(client, database, table, primaryKey);
         break;
       case 'Sftp':
+        let exportStream;
+        switch (sink.fileConfig.fileType)
+        {
+          case 'json':
+            exportStream = JSONTransform.createExportStream();
+            break;
+          case 'csv':
+            exportStream = CSVTransform.createExportStream();
+            break;
+          default:
+            throw new Error('Export file type must be either CSV or JSON.');
+        }
+
+        // get SFTP credentials
+        const credentialId = sink.options['credentialId'];
+        const creds: CredentialConfig[] = await credentials.get(credentialId);
+        if (creds.length === 0)
+        {
+          throw new Error('Invalid SFTP credentials ID.');
+        }
+
+        let sftpConfig: object = {};
+        try
+        {
+          sftpConfig = JSON.parse(creds[0].meta);
+        }
+        catch (e)
+        {
+          throw new Error('Error retrieving credentials for ID ' + String(credentialId));
+        }
+
+        const sftp = new SFTP();
+        await sftp.connect(sftpConfig);
+        sftp.put(exportStream, sink.options['filepath']).then(() => sftp.end());
+        // await sftp.end();
+        sinkStream = new stream.PassThrough();
+        break;
       case 'Http':
       default:
         throw new Error('not implemented.');
