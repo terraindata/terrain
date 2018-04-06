@@ -300,7 +300,7 @@ class HitsArea extends TerrainComponent<Props>
         else
         {
           this.setState({
-            resultsConfig: _ResultsConfig({enabled: false}),
+            resultsConfig: _ResultsConfig({ enabled: false }),
           });
         }
       },

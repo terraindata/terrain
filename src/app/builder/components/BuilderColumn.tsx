@@ -486,7 +486,8 @@ const BuilderColumn = createReactClass<any, any>(
               // 'builder-column-manual': this.state.column === COLUMNS.Manual,
               'builder-column-content-scroll':
                 this.state.column === COLUMNS.Cards ||
-                this.state.column === COLUMNS.Inputs,
+                this.state.column === COLUMNS.Inputs ||
+                this.state.column === COLUMNS.Pathfinder,
             })}
           >
             {
