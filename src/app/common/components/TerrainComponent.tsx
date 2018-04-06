@@ -102,7 +102,7 @@ class TerrainComponent<T> extends React.Component<T, any>
   } = {};
 
   public _listeners: {
-    [key: string]: Array<string | Array<string>>,
+    [key: string]: Array<string | string[]>,
   } = {};
 
   public _togMap: { [stateKey: string]: () => void } = {};
@@ -196,7 +196,7 @@ class TerrainComponent<T> extends React.Component<T, any>
     return false;
   }
 
-  public addListener(key: string, paths?: Array<string | Array<string>>)
+  public addListener(key: string, paths?: Array<string | string[]>)
   {
     this._listeners[key] = paths !== undefined ? paths : [];
   }

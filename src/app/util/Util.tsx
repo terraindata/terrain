@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
+import {List} from 'immutable';
 import * as $ from 'jquery';
 import { connect } from 'react-redux';
-import List from 'immutable';
 import { bindActionCreators } from 'redux';
 // import * as moment from 'moment';
 const moment = require('moment');
@@ -797,7 +797,7 @@ const Util = {
     return starredFields.sort().concat(nonStarredFields).toList();
   },
 
-  didStateChange(oldState: any, newState: any, paths?: Array<string | Array<string>>)
+  didStateChange(oldState: any, newState: any, paths?: Array<string | string[]>)
   {
     if (!paths || !paths.length)
     {
@@ -812,10 +812,10 @@ const Util = {
         {
           return true;
         }
-      })
+      });
     }
     return false;
-  }
+  },
 };
 
 export default Util;

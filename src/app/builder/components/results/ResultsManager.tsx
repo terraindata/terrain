@@ -76,6 +76,8 @@ import * as SpotlightTypes from '../../data/SpotlightTypes';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 
+const MAX_REQUERY_RATE = 100;
+
 export interface Props
 {
   query: Query;
@@ -107,6 +109,8 @@ interface State
   allQuery?: ResultsQuery;
   countQuery?: ResultsQuery;
   transformQuery?: ResultsQuery;
+  canQuery?: boolean;
+  queries?: List<Query>;
 }
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
@@ -115,7 +119,10 @@ let HITS_CACHE: { [primaryKey: string]: Hit };
 
 export class ResultsManager extends TerrainComponent<Props>
 {
-  public state: State = {};
+  public state: State = {
+    canQuery: true,
+    queries: List([]),
+  };
 
   // apply a function to all active queries
   public mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
@@ -197,7 +204,7 @@ export class ResultsManager extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     // TODO: the logic here is potentially broken since props appear to be updated at different times and are not consistent with eachother
-    if (this.props.db !== nextProps.db ||
+    if (this.state.canQuery && (this.props.db !== nextProps.db ||
       (
         nextProps.query
         && nextProps.query.tql
@@ -210,7 +217,7 @@ export class ResultsManager extends TerrainComponent<Props>
             // this.props.query.path !== nextProps.query.path
           )
         )
-      )
+      ))
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
@@ -221,6 +228,12 @@ export class ResultsManager extends TerrainComponent<Props>
           aggregations: {},
         });
       }
+    }
+    if (!this.state.canQuery)
+    {
+      this.setState({
+        queries: this.state.queries.push(nextProps.query),
+      });
     }
 
     if (nextProps.query && this.props.spotlights && (nextProps.resultsState.hits !== this.props.resultsState.hits))
@@ -486,6 +499,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private queryM2Results(query: Query, db: BackendInstance)
   {
+
     //
     // if (query.parseTree === null || query.parseTree.hasError())
     // {
@@ -530,6 +544,7 @@ export class ResultsManager extends TerrainComponent<Props>
     this.setState({
       lastQuery: query,
       queriedTql: eql,
+      canQuery: false, // Limit requery rate by not allowing requeries for N ms
       query: Ajax.query(
         eql,
         db,
@@ -550,6 +565,19 @@ export class ResultsManager extends TerrainComponent<Props>
       hasLoadedCount: false,
       hasLoadedTransform: false,
     });
+    setTimeout(
+      () =>
+      {
+        if (this.state.queries && this.state.queries.size)
+        {
+          this.queryResults(this.state.queries.last(), db);
+        }
+        this.setState({
+          canQuery: true,
+          queries: List([]),
+        });
+      },
+      MAX_REQUERY_RATE);
 
     // let allFieldsQueryCode;
     // try

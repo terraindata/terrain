@@ -154,7 +154,7 @@ class HitsArea extends TerrainComponent<Props>
     this.setIndexAndResultsConfig(this.props);
     this.getNestedFields(this.props);
     this.addListener('builder', [['query', 'path', 'source', 'dataSource'],
-      ['db', 'name']]);
+    ['db', 'name']]);
     this.addListener('query', ['tql', 'inputs', 'resultsConfig', 'algorithmId']);
   }
 
@@ -271,7 +271,7 @@ class HitsArea extends TerrainComponent<Props>
         else
         {
           this.setState({
-            resultsConfig: _ResultsConfig({enabled: false}),
+            resultsConfig: _ResultsConfig({ enabled: false }),
           });
         }
       },
