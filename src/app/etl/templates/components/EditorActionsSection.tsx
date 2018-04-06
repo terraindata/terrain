@@ -61,6 +61,12 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 
+const UndoIcon = require('images/icon_undo.svg');
+const RedoIcon = require('images/icon_redo.svg');
+const SaveAsIcon = require('images/icon_save_as.svg');
+
+import './EditorActionsSection.less';
+
 export interface Props
 {
   onSave: (template: ETLTemplate, isSaveAs: boolean) => void;
@@ -113,7 +119,7 @@ class EditorActionsSection extends TerrainComponent<Props>
       modals.push(
         <Modal
           key='saveNew'
-          title='Save Template'
+          title={this.state.isSaveAs ? 'Save As' : 'Save Template'}
           open={this.state.saveTemplateModalOpen}
           showTextbox={true}
           onConfirm={this.handleSaveConfirm}
@@ -161,20 +167,28 @@ class EditorActionsSection extends TerrainComponent<Props>
           {titleName}
         </div>
         <div
-          className='editor-top-bar-item'
-          style={history.canUndo() ? topBarItemStyle : topBarItemDisabledStyle}
-          onClick={this.handleUndo}
-          key='undo'
-        >
-          Undo
-        </div>
-        <div
-          className='editor-top-bar-item'
-          style={history.canRedo() ? topBarItemStyle : topBarItemDisabledStyle}
+          className='editor-top-bar-icon'
+          style={history.canRedo() ? topBarIconStyle : topBarIconDisabledStyle}
           onClick={this.handleRedo}
           key='redo'
         >
-          Redo
+          <RedoIcon />
+        </div>
+        <div
+          className='editor-top-bar-icon'
+          style={history.canUndo() ? topBarIconStyle : topBarIconDisabledStyle}
+          onClick={this.handleUndo}
+          key='undo'
+        >
+          <UndoIcon />
+        </div>
+        <div
+          className='editor-top-bar-icon'
+          style={topBarIconStyle}
+          onClick={this.handleSaveAsClicked}
+          key='save as'
+        >
+          <SaveAsIcon />
         </div>
         <div
           className='editor-top-bar-item'
@@ -191,14 +205,6 @@ class EditorActionsSection extends TerrainComponent<Props>
           key='save'
         >
           Save
-        </div>
-        <div
-          className='editor-top-bar-item'
-          style={topBarItemStyle}
-          onClick={this.handleSaveAsClicked}
-          key='save as'
-        >
-          Save As
         </div>
       </div>
     );
@@ -328,6 +334,14 @@ const topBarItemDisabledStyle = [
   backgroundColor(Colors().fadedOutBg, Colors().fadedOutBg),
   fontColor(Colors().text3),
 ];
+
+const topBarIconStyle = [
+  fontColor(Colors().bg3, Colors().bg2),
+];
+const topBarIconDisabledStyle = [
+  fontColor(Colors().darkerHighlight, Colors().darkerHighlight),
+];
+
 const topBarRunStyle = [backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)];
 const topBarNameStyle = [fontColor(Colors().text2)];
 const templateListItemStyle = [

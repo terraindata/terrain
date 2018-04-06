@@ -213,8 +213,10 @@ class TemplateEditor extends TerrainComponent<Props>
 
     return (
       <div className='template-editor-root-container'>
-        <div className='template-editor-width-spacer'>
+        <div style={{ display: 'flex', width: '100%' }}>
           {this.renderTopBar()}
+        </div>
+        <div className='template-editor-width-spacer'>
           <div className='template-editor-columns-area'>
             {this.renderEditorSection(showEditor)}
             {this.renderDocumentsSection()}
