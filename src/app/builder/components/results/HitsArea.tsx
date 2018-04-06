@@ -297,6 +297,12 @@ class HitsArea extends TerrainComponent<Props>
             resultsConfig: _ResultsConfig(resp[0]),
           });
         }
+        else
+        {
+          this.setState({
+            resultsConfig: _ResultsConfig({enabled: false}),
+          });
+        }
       },
         (error) =>
         {
