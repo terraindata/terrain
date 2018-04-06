@@ -52,6 +52,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import Dropdown from 'common/components/Dropdown';
+import Menu from 'common/components/Menu';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
@@ -60,6 +61,7 @@ import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates
 import { instanceFnDecorator } from 'src/app/Classes';
 
 const { List } = Immutable;
+const DropdownIcon = require('images/icon_carrot.svg');
 
 import './EditorColumnBar.less';
 
@@ -73,27 +75,50 @@ export interface Props
 @Radium
 class EditorColumnBar extends TerrainComponent<Props>
 {
-  @instanceFnDecorator(memoizeOne)
-  public _optionIndex(columnState: ColumnOptions)
-  {
-    return columnOptions.indexOf(columnState);
-  }
+  public menu: any = null;
 
-  public optionIndex()
+  public menuOptions = this.computeMenuOptions();
+
+  public computeMenuOptions()
   {
-    return this._optionIndex(this.props.templateEditor.uiState.columnState);
+    return columnOptions.map((option, i) =>
+    {
+
+      const onClick = () =>
+      {
+        this.props.act({
+          actionType: 'setDisplayState',
+          state: {
+            columnState: option,
+          },
+        });
+      };
+
+      return {
+        text: option,
+        onClick,
+      };
+    }).toList();
   }
 
   public render()
   {
+    const { uiState } = this.props.templateEditor;
     return (
       <div className='editor-column-bar'>
-        <Dropdown
-          options={columnOptions}
-          selectedIndex={this.optionIndex()}
-          onChange={this.handleDropdownChange}
-          canEdit={true}
-        />
+        <div className='editor-column-header-text'>
+          {uiState.columnState}
+        </div>
+        <div
+          className='editor-column-header-dropdown'
+          onClick={this.handleDropdownClicked}
+        >
+          <Menu
+            registerButton={(button) => this.menu = button}
+            options={this.menuOptions}
+          />
+          <DropdownIcon />
+        </div>
       </div>
     );
   }
@@ -107,6 +132,14 @@ class EditorColumnBar extends TerrainComponent<Props>
         columnState: columnOptions.get(columnIndex),
       },
     });
+  }
+
+  public handleDropdownClicked()
+  {
+    if (this.menu !== null)
+    {
+      this.menu.click();
+    }
   }
 }
 

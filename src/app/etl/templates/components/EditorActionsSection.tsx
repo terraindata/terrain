@@ -196,7 +196,7 @@ class EditorActionsSection extends TerrainComponent<Props>
           onClick={this.openTemplateUI}
           key='load'
         >
-          Load
+          LOAD
         </div>
         <div
           className='editor-top-bar-item'
@@ -204,7 +204,7 @@ class EditorActionsSection extends TerrainComponent<Props>
           onClick={this.handleSaveClicked}
           key='save'
         >
-          Save
+          SAVE
         </div>
       </div>
     );
@@ -329,7 +329,7 @@ class EditorActionsSection extends TerrainComponent<Props>
   }
 }
 
-const topBarItemStyle = [backgroundColor(Colors().fadedOutBg, Colors().darkerHighlight)];
+const topBarItemStyle = [backgroundColor(Colors().bg3, Colors().bg2), fontColor(Colors().active)];
 const topBarItemDisabledStyle = [
   backgroundColor(Colors().fadedOutBg, Colors().fadedOutBg),
   fontColor(Colors().text3),
