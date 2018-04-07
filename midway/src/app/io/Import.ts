@@ -1268,8 +1268,8 @@ export class Import
           if (node !== null)
           {
             const isMMDDYYYYFormat = new RegExp(/^((0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4}))$/);
-            // ts-lint:disable-next-line:max-line-length
-            const isISOFormat = new RegExp(/[0-9]{4}-?((0{1}[1-9]{1})|([1][0-2]{1}))-?(([0][1-9]{1})|([12][0-9]{1})|([3][01]))(T(((([01][0-9])|(2[0-3])):?[0-5][0-9]:?[0-5][0-9](\.[0-9]{3})?Z)|((([01][0-9])|(2[0-3])):([0-5][0-9]):[0-5][0-9](\+|\-)[0-5][0-9]:[0-5][0-9])))?$/);
+            // tslint:disable-next-line: max-line-length
+            const isISOFormat = new RegExp(/^([0-9]{4})-([0,1]{1}[0-9]{1})-([0-3]{1}[0-9]{1})( |T){0,1}([0-2]{1}[0-9]{1}):{0,1}([0-5]{1}[0-9]{1}):{0,1}([0-9]{2})(\.([0-9]{3,6})|((-|\+)?[0-9]{2}:[0-9]{2}))?Z?$/);
             if (isMMDDYYYYFormat.test(node) || isISOFormat.test(node))
             {
               try
