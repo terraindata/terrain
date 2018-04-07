@@ -627,7 +627,7 @@ function _isTypeConsistentHelper(arr: object[]): string
   return type;
 }
 
-export function getType(obj: object): string
+export function getType(obj: any): string
 {
   if (typeof obj === 'object')
   {
@@ -647,6 +647,17 @@ export function getType(obj: object): string
     {
       return 'nested';
     }
+  }
+  try
+  {
+    if (this.isDateHelper(obj as string))
+    {
+      return 'date'
+    }
+  }
+  catch (e)
+  {
+    // do nothing
   }
   if (typeof obj === 'string')
   {
