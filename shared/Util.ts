@@ -652,7 +652,7 @@ export function getType(obj: any): string
   {
     if (this.isDateHelper(obj as string))
     {
-      return 'date'
+      return 'date';
     }
   }
   catch (e)
