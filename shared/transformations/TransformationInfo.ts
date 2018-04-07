@@ -56,23 +56,24 @@ import SubstringTransformationNode from './nodes/SubstringTransformationNode';
 import TransformationNode from './nodes/TransformationNode';
 import UppercaseTransformationNode from './nodes/UppercaseTransformationNode';
 import { TransformationEngine } from './TransformationEngine';
-import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeType, { NodeOptionsType } from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
 import TransformationVisitResult from './TransformationVisitResult';
 import EngineUtil from './util/EngineUtil';
 
 type AllNodeInfoType =
   {
-    [K in TransformationNodeType]: InfoType
+    [K in TransformationNodeType]: InfoType<K>
   };
 
-export interface InfoType
+export interface InfoType<T extends TransformationNodeType = any>
 {
   humanName: string; // something we can read
   editable?: boolean; // is it editable after creation
   creatable?: boolean; // can it created by the user?
   description?: string; // description of what the transformation does
   isAvailable?: (engine: TransformationEngine, fieldId: number) => boolean;
+  shortSummary?: (meta: NodeOptionsType<T>) => string;
   type?: any;
   targetedVisitor: (visitor: TransformationNodeVisitor,
     transformationNode: TransformationNode,
@@ -96,6 +97,10 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
+        shortSummary: (meta) => {
+          const names = meta.newFieldKeyPaths.map((value) => value.last());
+          return `Split on ${meta.delimiter} into ${names.toJS()}`;
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
@@ -115,6 +120,10 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.getRepresentedType(fieldId, engine) === 'string' &&
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
+        },
+        shortSummary: (meta) => {
+          const names = meta.newFieldKeyPaths.map((value) => value.last());
+          return `Join on ${meta.delimiter} from ${names.toJS()}`;
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
@@ -208,6 +217,9 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: `Convert this field to a different type`,
         type: CastTransformationNode,
+        shortSummary: (meta) => {
+          return `Cast to ${meta.toTypename}`;
+        },
         targetedVisitor: (visitor: TransformationNodeVisitor,
           transformationNode: TransformationNode,
           docCopy: object,
@@ -223,6 +235,9 @@ const TransformationNodeInfo: AllNodeInfoType =
         isAvailable: (engine, fieldId) =>
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
+        },
+        shortSummary: (meta) => {
+          return `Hash with salt "${meta.salt}`;
         },
         type: HashTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -259,6 +274,25 @@ export abstract class TransformationInfo
   public static getReadableName(type: TransformationNodeType)
   {
     return TransformationNodeInfo[type].humanName;
+  }
+
+  public static getReadableSummary(type: TransformationNodeType, transformation: TransformationNode): string
+  {
+    const getSummary = TransformationNodeInfo[type].shortSummary;
+    if (getSummary !== undefined)
+    {
+      try {
+        return (getSummary as any)(transformation.meta);
+      }
+      catch (e)
+      {
+        return TransformationInfo.getReadableName(type);
+      }
+    }
+    else
+    {
+      return TransformationInfo.getReadableName(type);
+    }
   }
 
   public static getDescription(type: TransformationNodeType)
