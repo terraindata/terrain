@@ -70,6 +70,14 @@ export default class ExportTransform extends ADocumentTransform
     }
 
     const hits = input['hits'].hits;
-    return hits.map((hit) => this.exportt._postProcessDoc(hit, this.configuration));
+    try
+    {
+      return hits.map((hit) => this.exportt._postProcessDoc(hit, this.configuration));
+    }
+    catch (e)
+    {
+      this.emit('error', e);
+    }
+    return {};
   }
 }

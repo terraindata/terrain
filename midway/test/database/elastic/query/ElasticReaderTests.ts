@@ -49,7 +49,7 @@ import * as winston from 'winston';
 import ElasticClient from '../../../../src/database/elastic/client/ElasticClient';
 import ElasticConfig from '../../../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../../../src/database/elastic/ElasticController';
-import ElasticStream from '../../../../src/database/elastic/query/ElasticStream';
+import ElasticReader from '../../../../src/database/elastic/streams/ElasticReader';
 
 import BufferTransform from '../../../../src/app/io/streams/BufferTransform';
 
@@ -63,7 +63,7 @@ beforeAll(() =>
     hosts: ['http://localhost:9200'],
   };
 
-  elasticController = new ElasticController(config, 0, 'ElasticStreamTests');
+  elasticController = new ElasticController(config, 0, 'ElasticReaderTests');
   elasticClient = elasticController.getClient();
 });
 
@@ -126,7 +126,7 @@ test('simple elastic stream', async (done) =>
 {
   try
   {
-    const stream = new ElasticStream(elasticClient, query);
+    const stream = new ElasticReader(elasticClient, query);
     let results = [];
     stream.on('data', (chunk) =>
     {
@@ -153,7 +153,7 @@ test('elastic stream (buffer transform)', async (done) =>
 {
   try
   {
-    const stream = new ElasticStream(elasticClient, query);
+    const stream = new ElasticReader(elasticClient, query);
     const bufferTransform = new BufferTransform(stream,
       (err, response) =>
       {

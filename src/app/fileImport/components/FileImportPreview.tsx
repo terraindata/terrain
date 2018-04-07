@@ -227,15 +227,33 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      const dbName = getIndex('', this.props.builder);
-      const tableName = getType('', this.props.builder);
+      const { query } = this.props;
+      const dbName = (query.path.source.dataSource as any).index;
+      const tableName = getType('', this.props.builder) || 'data';
       Actions.setServerDbTable(this.props.serverId, '',
         typeof dbName === 'string' ? dbName : dbName.get(0),
         typeof tableName === 'string' ? tableName : tableName.get(0));
-      const stringQuery: string =
-        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      let stringQuery;
+      if (query.path !== undefined)
+      {
+        try
+        {
+          const parser: ESJSONParser = new ESJSONParser(query.tql, true);
+          stringQuery = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
+        }
+        catch (e)
+        {
+          return;
+        }
+      }
+      else
+      {
+        stringQuery =
+          ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      }
+      // Parse the TQL and set the filters so that when we fetch we get the right templates.
       Actions.fetchTypesFromQuery(this.props.serverId, stringQuery);
-    } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+    }
 
     Actions.fetchColumnAnalyzers();
 
@@ -701,11 +719,27 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleUploadFile()
   {
     this.confirmedLeave = true;
+    const { query } = this.props;
     if (this.props.exporting)
     {
-      const stringQuery: string =
-        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-
+      let stringQuery;
+      if (query.path !== undefined)
+      {
+        try
+        {
+          const parser: ESJSONParser = new ESJSONParser(query.tql, true);
+          stringQuery = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
+        }
+        catch (e)
+        {
+          return;
+        }
+      }
+      else
+      {
+        stringQuery =
+          ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      }
       Actions.exportFile(
         stringQuery,
         this.props.serverId,

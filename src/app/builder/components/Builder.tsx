@@ -86,8 +86,10 @@ import ResultsManager from './results/ResultsManager';
 
 const NewIcon = require('./../../../images/icon_new_21x17.svg?name=NewIcon');
 const OpenIcon = require('./../../../images/icon_open_11x10.svg?name=OpenIcon');
-const DuplicateIcon = require('./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon');
+const DuplicateIcon = require('./../../../images/icon_save_as.svg?name=DuplicateIcon');
 const SaveIcon = require('./../../../images/icon_save_10x10.svg?name=SaveIcon');
+const UndoIcon = require('./../../../images/icon_undo.svg?name=UndoIcon');
+const RedoIcon = require('./../../../images/icon_redo.svg?name=RedoIcon');
 
 const { Map, List } = Immutable;
 
@@ -421,28 +423,29 @@ class Builder extends TerrainComponent<Props>
   {
     return Immutable.List([
       {
-        text: 'Undo',
-        icon: null,
+        tooltip: 'Undo',
+        icon: <UndoIcon />,
         onClick: this.handleUndo,
         enabled: !!builderState.pastQueries.size,
       },
       {
-        text: 'Redo',
-        icon: null,
+        tooltip: 'Redo',
+        icon: <RedoIcon />,
         onClick: this.handleRedo,
         enabled: !!builderState.nextQueries.size,
       },
       {
-        text: 'Save',
-        icon: <SaveIcon />,
-        onClick: this.onSave,
-        enabled: this.shouldSave(builderState),
-      },
-      {
-        text: 'Save As',
-        icon: <SaveIcon />,
+        tooltip: 'Save As',
+        icon: <DuplicateIcon />,
         onClick: this.onSaveAs,
         enabled: true,
+      },
+      {
+        text: 'SAVE',
+        icon: null,
+        onClick: this.onSave,
+        enabled: this.shouldSave(builderState),
+        style: { top: -3 },
       },
       //   {
       //     text: 'Duplicate',
@@ -518,8 +521,8 @@ class Builder extends TerrainComponent<Props>
 
   public shouldSave(overrideState?: BuilderState): boolean
   {
-    // empty builder, should never have to save
-    if (!this.props.params.config)
+    // empty builder or un-saveable, should never have to save
+    if (!this.props.params.config || !this.canEdit())
     {
       return false;
     }
@@ -635,7 +638,6 @@ class Builder extends TerrainComponent<Props>
     const key = this.state.colKeys.get(index);
     const query = this.getQuery();
     const algorithm = this.getAlgorithm();
-
     return {
       minWidth: 316,
       resizeable: true,
@@ -659,6 +661,7 @@ class Builder extends TerrainComponent<Props>
         canEdit={this.canEdit()}
         cantEditReason={this.cantEditReason()}
         onNavigationException={this.handleNavigationException}
+        schema={(TerrainStore.getState() as any).schema}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
@@ -893,14 +896,12 @@ class Builder extends TerrainComponent<Props>
     const query = this.getQuery();
     const algorithmIdentifier = algorithm === undefined ? '' :
       `${algorithm.categoryId},${algorithm.groupId},${algorithm.id}`;
-
     return (
       <div
         className={classNames({
           'builder': true,
           'builder-no-column-animation': this.state.noColumnAnimation,
         })}
-        style={backgroundColor(Colors().bg1)}
       >
         {
           !config || !config.length ?

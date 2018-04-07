@@ -138,6 +138,22 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      database integer NOT NULL,
      label text NOT NULL,
      events text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS schemaMetadata
+       (id ` + primaryKeyType + ` PRIMARY KEY,
+       columnId text NOT NULL,
+       count integer NOT NULL,
+       starred bool NOT NULL,
+       countByAlgorithm text); `,
+  `CREATE TABLE IF NOT EXISTS resultsConfig
+       (id ` + primaryKeyType + ` PRIMARY KEY,
+       index text NOT NULL,
+       thumbnail text,
+       name text,
+       score text,
+       fields text,
+       formats text,
+       primaryKeys text); `
+  ,
   `CREATE TABLE IF NOT EXISTS schedulerLogs
     (id ` + primaryKeyType + ` PRIMARY KEY,
      lastFailure date,

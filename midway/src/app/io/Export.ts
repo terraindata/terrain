@@ -244,7 +244,35 @@ export class Export
             throw Error('File type must be either CSV or JSON.');
         }
 
-        resolve(respStream.pipe(documentTransform).pipe(exportTransform));
+        resolve(
+          respStream
+            .on('error', (e) =>
+            {
+              winston.error('Error in response stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            })
+            .pipe(documentTransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in document stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            })
+            .pipe(exportTransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in export stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            }),
+        );
       }
       catch (e)
       {

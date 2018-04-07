@@ -1,0 +1,59 @@
+@import "../../common/Common.less";
+
+.linear-selector-wrapper
+{
+	display: inline-flex;
+	position: relative;
+	.linear-selector-options {
+	display: inline-flex;
+	position: relative;
+	z-index: 900r;
+	height: 18px;
+	.linear-selector-label {
+	    font-size: @small-font-size;
+	    margin-right: 9px;
+	}
+	.linear-selector-option, {
+		padding: 0px 6px;
+		cursor: pointer;
+		font-size: @small-font-size;
+		border-radius: 6px;
+		padding-top: 2px;
+		overflow: hidden;
+		transition: color .15s ease-in-out;
+		.transition;
+		&.linear-selector-option-selected {
+		}
+		&.linear-selector-option-hidden {
+			width: 0px;
+			padding: 0px;
+		}
+	}
+	.linear-selector-custom {
+		.builder-tb {
+			top: -5px;
+			width: 40px;
+			input {
+				font-size: 14px;
+			}
+		}
+		&.linear-selector-option-hidden {
+			width: 0px;
+			padding: 0px;
+			.linear-selector-option {
+				width: 0px;
+				padding: 0px;
+			}
+		}
+	}
+}
+
+	.linear-selector-selected-marker {
+		position: absolute;
+		border-radius: 6px;
+	    padding-top: 3px;
+	    top: -2px;
+		z-index: 100;
+		.transition(~"all 500ms cubic-bezier(0.23, 1, 0.32, 1)");
+	}
+}

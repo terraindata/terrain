@@ -45,48 +45,70 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
+import Util from 'util/Util';
+import BuilderActions from './../../builder/data/BuilderActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RadioButtons.less';
 
+export interface RadioButtonOption
+{
+  key: string;
+  display?: string | El;
+  label?: string;
+}
+
 export interface Props
 {
-  selected?: string;
-  options: Array<{
-    value: string;
-    label?: string;
-    onClick: (optionValue?: any) => void
-  }>;
-  optionShadow?: boolean;
+  selected: string;
+  options: List<RadioButtonOption>;
+  onSelectOption?: (key?: string, radioKey?: string) => void;
+  keyPath?: KeyPath;
+  radioKey?: string;
+  action?: (keyPath, value) => void;
+  builderActions?: typeof BuilderActions;
+  canEdit?: boolean;
 }
 
 class RadioButtons extends TerrainComponent<Props>
 {
-  public static defaultProps = { optionShadow: false };
 
-  public renderOption(option)
+  public handleSelectOption(option)
   {
-    const { optionShadow } = this.props;
-    const style: any = {};
-
-    if (optionShadow)
+    if (!this.props.canEdit)
     {
-      style.boxShadow = '2px 2px 2px #222';
-      style.backgroundColor = '#666';
-      style.margin = '10px';
-      style.padding = '5px';
+      return;
     }
+    if (this.props.onSelectOption !== undefined)
+    {
+      this.props.onSelectOption(option, this.props.radioKey);
+    }
+    if (this.props.keyPath !== undefined)
+    {
+      if (this.props.action !== undefined)
+      {
+        this.props.action(this.props.keyPath, option);
+      }
+      else
+      {
+        this.props.builderActions.change(this.props.keyPath, option);
+      }
+    }
+  }
 
+  public renderOption(option: RadioButtonOption)
+  {
     return (
-      <div key={option.value} style={style} className='radio-button-option'>
+      <div key={option.key} className='radio-button-option'>
         <div
-          onClick={() => option.onClick(option.value)}
+          onClick={this._fn(this.handleSelectOption, option.key)}
           className={classNames({
             'radio-button': true,
-            'radio-button-selected': option.value === this.props.selected,
+            'radio-button-selected': option.key === this.props.selected,
           })}
         >
         </div>
-        {option.label !== undefined ? option.label : option.value}
+        <span className='radio-button-label'>{option.label}</span>
+        {option.display}
         <br />
       </div>
     );
@@ -102,4 +124,8 @@ class RadioButtons extends TerrainComponent<Props>
   }
 }
 
-export default RadioButtons;
+export default Util.createTypedContainer(
+  RadioButtons,
+  [],
+  { builderActions: BuilderActions },
+);

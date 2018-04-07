@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 // A generic type of backend, e.g. mysql or elastic
 
+import { Path } from 'app/builder/components/pathfinder/PathfinderTypes';
 import * as Immutable from 'immutable';
 import { BlockConfig } from '../../blocks/types/Block';
 import { Card } from '../../blocks/types/Card';
@@ -85,6 +86,11 @@ export interface Backend
   queryToCode(
     query: Query,
     options: CardsToCodeOptions,
+  ): string;
+
+  pathToCode(
+    path: Path,
+    inputs: List<any>,
   ): string;
 
   codeToQuery(

@@ -63,7 +63,7 @@ import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 
 import MergeJoinTransform from '../../../app/io/streams/MergeJoinTransform';
-import ElasticStream from './ElasticStream';
+import ElasticReader from '../streams/ElasticReader';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -145,7 +145,7 @@ export class ElasticQueryHandler extends QueryHandler
           let stream: SafeReadable;
           if (query['groupJoin'] !== undefined)
           {
-            stream = new GroupJoinTransform(client, request.body);
+            stream = new GroupJoinTransform(client, request.body, request.streaming);
           }
           else if (query['mergeJoin'] !== undefined)
           {
@@ -153,7 +153,7 @@ export class ElasticQueryHandler extends QueryHandler
           }
           else
           {
-            stream = new ElasticStream(client, query);
+            stream = new ElasticReader(client, query, request.streaming);
           }
 
           if (request.streaming === true)
