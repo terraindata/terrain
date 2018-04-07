@@ -650,7 +650,8 @@ export function getType(obj: any): string
   }
   try
   {
-    if (isDateHelper(obj as string))
+    const csvParser = new CSVTypeParser();
+    if (csvParser.isDateHelper(obj as string))
     {
       return 'date';
     }
