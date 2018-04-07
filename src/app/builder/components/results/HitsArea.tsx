@@ -113,6 +113,7 @@ interface State
   onHitsLoaded?: (unchanged?: boolean) => void;
 
   showingExport?: boolean;
+  showingErrorModal?: boolean;
   mapHeight?: number;
   mouseStartY?: number;
   mapMaxHeight?: number;
@@ -134,6 +135,7 @@ class HitsArea extends TerrainComponent<Props>
     expandedHitIndex: null,
     showingConfig: false,
     showingExport: false,
+    showingErrorModal: false,
     hitFormat: 'icon',
     mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
@@ -293,6 +295,12 @@ class HitsArea extends TerrainComponent<Props>
           resp[0]['enabled'] = true;
           this.setState({
             resultsConfig: _ResultsConfig(resp[0]),
+          });
+        }
+        else
+        {
+          this.setState({
+            resultsConfig: _ResultsConfig({ enabled: false }),
           });
         }
       },
@@ -885,17 +893,34 @@ column if you have customized the results view.');
     });
   }
 
-  public showExport()
+  public canExport()
   {
-    this.setState({
-      showingExport: true,
-    });
+    const { path } = this.props.builder.query;
+    return !(path.source.count > 500 && path.more.collapse !== undefined);
   }
 
-  public hideExport()
+  public showExport()
+  {
+    // Check if exporting is possible (Cannot export if size > 500 and using collapse)
+    if (this.canExport())
+    {
+      this.setState({
+        showingExport: true,
+      });
+    }
+    else
+    {
+      // Show error modal explaining why export is not possible
+      this.setState({
+        showingErrorModal: true,
+      });
+    }
+  }
+
+  public hidePopup(key)
   {
     this.setState({
-      showingExport: false,
+      [key]: false,
     });
   }
 
@@ -922,12 +947,19 @@ column if you have customized the results view.');
     }
   }
 
-  public hideConfig(config: ResultsConfig)
+  public renderErrorModal()
   {
-    // Update the default config for this index
-    this.setState({
-      showingConfig: false,
-    });
+    return (
+      <Modal
+        open={this.state.showingErrorModal}
+        onClose={this._fn(this.hidePopup, 'showingErrorModal')}
+        title={'Cannot Export'}
+        children={`
+          Group By is not supported when exporting over 500 results.
+          Reduce the size or remove the group by field to export.`}
+        error={true}
+      />
+    );
   }
 
   public renderExport()
@@ -936,7 +968,6 @@ column if you have customized the results view.');
       filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
     // const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
     //   filetype, requireJSONHaveAllFields, exportRank, objectKey, elasticUpdate } = this.props.exportState;
-
     const content =
       <div
         style={backgroundColor(Colors().bg1)}
@@ -966,7 +997,7 @@ column if you have customized the results view.');
     return (
       <Modal
         open={this.state.showingExport}
-        onClose={this.hideExport}
+        onClose={this._fn(this.hidePopup, 'showingExport')}
         title={'Export'}
         children={content}
         fill={true}
@@ -986,7 +1017,7 @@ column if you have customized the results view.');
       return <ResultsConfigComponent
         config={resultsConfig !== undefined ? resultsConfig : this.props.query.resultsConfig}
         fields={fields}
-        onClose={this.hideConfig}
+        onClose={this._fn(this.hidePopup, 'showingConfig')}
         onSaveAsDefault={this.saveConfigAsDefault}
         onConfigChange={this.handleConfigChange}
         builder={this.props.builder}
@@ -1014,6 +1045,7 @@ column if you have customized the results view.');
         {this.renderExpandedHit()}
         {this.props.showCustomizeView && this.renderConfig()}
         {this.props.showExport && this.renderExport()}
+        {this.renderErrorModal()}
       </div>
     );
   }

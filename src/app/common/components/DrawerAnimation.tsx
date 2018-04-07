@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires
-
 import { getStyle } from 'app/colors/Colors';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -191,7 +190,6 @@ class DrawerAnimation extends TerrainComponent<Props>
   private close()
   {
     this.clearTimeouts();
-
     this.setState({
       shouldRender: true, // should be unchanged
       renderMaxHeight: 0, // tell it we're closing

@@ -68,6 +68,7 @@ import './RouteSelectorStyle.less';
 import SearchInput from './SearchInput';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
+const InfoIcon = require('images/icon_info.svg');
 
 export interface RouteSelectorOption
 {
@@ -115,6 +116,8 @@ export interface Props
   autoFocus?: boolean;
   hideLine?: boolean;
   canDelete?: boolean;
+  showWarning?: boolean;
+  warningMessage?: string;
   onDelete?: () => void;
   onToggleOpen?: (open: boolean) => void;
 }
@@ -240,6 +243,16 @@ export class RouteSelector extends TerrainComponent<Props>
         style={getStyle('borderBottom', this.isOpen() ?
           '1px solid #eee' : props.hideLine ? 'none' : undefined)}
       >
+        {
+          props.showWarning &&
+          tooltip(
+            <InfoIcon
+              className='routeselector-warning-icon'
+              style={getStyle('fill', Colors().error)}
+            />,
+            props.warningMessage,
+          )
+        }
         {
           state.optionSets.map((optionSet, index) => (
             <div
