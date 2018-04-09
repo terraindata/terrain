@@ -790,3 +790,50 @@ test('duplicate a wildcard array of fields', () =>
     ],
   });
 });
+
+test('test casting objects to string', () =>
+{
+  const e = new TransformationEngine();
+
+  e.addField(List(['foo']), 'string');
+  e.addField(List(['foo', 'bar']), 'array', { valueType: 'number' });
+  e.addField(List(['foo', 'bar', '*']), 'array', { valueType: 'number' });
+  e.addField(List(['foo', 'baz']), 'object');
+  e.addField(List(['foo', 'baz', 'hey']), 'string');
+
+  e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]), { toTypename: 'string' });
+
+  const doc = {
+    foo: {
+      bar: [1, 2, 3],
+      baz: { hey: 'doggo' },
+    },
+  };
+
+  expect(e.transform(doc)).toEqual({
+    foo: '{"bar":[1,2,3],"baz":{"hey":"doggo"}}',
+  });
+});
+
+test('test casting strings to objects', () =>
+{
+  const e = new TransformationEngine();
+  e.addField(List(['foo']), 'object');
+  e.addField(List(['bar']), 'object');
+
+  e.appendTransformation(TransformationNodeType.CastNode, List([List(['foo'])]), { toTypename: 'object' });
+  e.appendTransformation(TransformationNodeType.CastNode, List([List(['bar'])]), { toTypename: 'object' });
+
+  const doc = {
+    foo: '{"bar":[1,2,3],"baz":{"hey":"doggo"}}',
+    bar: 'this should fail',
+  };
+
+  expect(e.transform(doc)).toEqual({
+    foo: {
+      bar: [1, 2, 3],
+      baz: { hey: 'doggo' },
+    },
+    bar: {},
+  });
+});

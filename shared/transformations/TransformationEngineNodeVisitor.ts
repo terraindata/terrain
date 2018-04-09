@@ -505,7 +505,22 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
             break;
           }
           case 'object': {
-            yadeep.set(doc, f, {});
+            if (typeof el === 'string')
+            {
+              try
+              {
+                const parsed = JSON.parse(el);
+                yadeep.set(doc, f, parsed);
+              }
+              catch (e)
+              {
+                yadeep.set(doc, f, {});
+              }
+            }
+            else
+            {
+              yadeep.set(doc, f, {});
+            }
             break;
           }
           case 'array': {
