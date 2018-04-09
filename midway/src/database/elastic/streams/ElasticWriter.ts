@@ -52,7 +52,7 @@ import * as winston from 'winston';
 import { ElasticMapping } from '../../../../../shared/etl/mapping/ElasticMapping';
 import ElasticClient from '../client/ElasticClient';
 
-export class ElasticWriter extends Stream.Duplex
+export class ElasticWriter extends Stream.Writable
 {
   private client: ElasticClient;
   private primaryKey: string | undefined;
@@ -60,15 +60,13 @@ export class ElasticWriter extends Stream.Duplex
   private type: string;
 
   private doneWriting: boolean = false;
-  private docsUpserted: number = 0;
-  private numErrors: number = 0;
 
   private BULK_THRESHOLD: number = 10;
 
   constructor(client: ElasticClient, index: string, type: string, primaryKey?: string)
   {
     super({
-      writableObjectMode: true,
+      objectMode: true,
       highWaterMark: 1024 * 128,
     });
 
@@ -137,24 +135,6 @@ export class ElasticWriter extends Stream.Duplex
     }
   }
 
-  public _read(size: number = 1024)
-  {
-    if (this.doneWriting)
-    {
-      this.push(null);
-      return;
-    }
-    setTimeout((() => this.push(JSON.stringify(this.progress()))).bind(this), 500);
-  }
-
-  public progress(): object
-  {
-    return {
-      successful: this.docsUpserted,
-      failed: this.numErrors,
-    };
-  }
-
   private upsert(body: object, callback: (err?: Error) => void): void
   {
     const query: Elastic.IndexDocumentParams<object> = {
@@ -168,18 +148,7 @@ export class ElasticWriter extends Stream.Duplex
       query['id'] = body[this.primaryKey];
     }
 
-    this.client.index(query, ((err: Error, response: any) =>
-    {
-      if (err !== null && err !== undefined)
-      {
-        this.numErrors++;
-      }
-      else
-      {
-        this.docsUpserted++;
-      }
-      callback(err);
-    }).bind(this));
+    this.client.index(query, callback);
   }
 
   private bulkUpsert(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
@@ -204,19 +173,7 @@ export class ElasticWriter extends Stream.Duplex
       body.push(chunk.chunk);
     }
 
-    this.client.bulk({ body }, ((err: Error, response: any) =>
-    {
-      if (err !== null && err !== undefined)
-      {
-        // TODO: better error counting
-        this.numErrors += chunks.length;
-      }
-      else
-      {
-        this.docsUpserted += chunks.length;
-      }
-      callback(err);
-    }).bind(this));
+    this.client.bulk({ body }, callback);
   }
 }
 

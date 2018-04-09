@@ -44,8 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as SFTP from 'ssh2-sftp-client';
+import * as SSH from 'ssh2';
 import * as stream from 'stream';
+import { promisify } from 'util';
 
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
@@ -67,6 +68,7 @@ import CredentialConfig from '../credentials/CredentialConfig';
 import { credentials } from '../credentials/CredentialRouter';
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
+import ProgressTransform from '../io/streams/ProgressTransform';
 import { QueryHandler } from '../query/QueryHandler';
 
 import { databases } from '../database/DatabaseRouter';
@@ -131,9 +133,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           throw new Error('Error retrieving credentials for ID ' + String(credentialId));
         }
 
-        const sftp = new SFTP();
-        await sftp.connect(sftpConfig);
-        const sftpImportStream = sftp.get(source.options['filepath']);
+        const sftp: SSH.SFTPWrapper = await getSFTPClient(sftpConfig);
+        const sftpImportStream = sftp.createReadStream(source.options['filepath']);
         switch (source.fileConfig.fileType)
         {
           case 'json':
@@ -190,10 +191,11 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
         await elasticDB.putESMapping(database, table, elasticMapping.getMapping());
 
         const primaryKey = elasticMapping.getPrimaryKey();
-        sinkStream = new ElasticWriter(client, database, table, primaryKey);
+        const elasticStream = new ElasticWriter(client, database, table, primaryKey);
+        sinkStream = new ProgressTransform(elasticStream);
         break;
       case 'Sftp':
-        let exportStream;
+        let exportStream: stream.Writable;
         switch (sink.fileConfig.fileType)
         {
           case 'json':
@@ -224,11 +226,9 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
           throw new Error('Error retrieving credentials for ID ' + String(credentialId));
         }
 
-        const sftp = new SFTP();
-        await sftp.connect(sftpConfig);
-        sftp.put(exportStream, sink.options['filepath']).then(() => sftp.end());
-        // await sftp.end();
-        sinkStream = new stream.PassThrough();
+        const sftp: SSH.SFTPWrapper = await getSFTPClient(sftpConfig);
+        const sftpStream = sftp.createWriteStream(sink.options['filepath']);
+        sinkStream = new ProgressTransform(exportStream.pipe(sftpStream));
         break;
       case 'Http':
       default:
@@ -336,4 +336,28 @@ async function getElasticReaderStream(dbId: number, query: string): Promise<stre
   }
 
   return elasticStream;
+}
+
+// TODO: move into a separate file
+async function getSFTPClient(config: object)
+{
+  return new Promise<SSH.SFTPWrapper>((resolve, reject) =>
+  {
+    const client = new SSH.Client();
+    client.on('ready', () =>
+    {
+      client.sftp((err, sftpClient) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          return reject(err);
+        }
+        else
+        {
+          return resolve(sftpClient);
+        }
+      });
+    }).on('error', reject)
+      .connect(config);
+  });
 }
