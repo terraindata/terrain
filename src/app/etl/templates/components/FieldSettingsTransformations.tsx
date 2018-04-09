@@ -164,7 +164,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     return (
       <div className='transformation-row' key={index}>
         <div className='transformation-row-text' style={style.textStyle}>
-          {TransformationInfo.getReadableName(value.typeCode)}
+          {TransformationInfo.getReadableSummary(value.typeCode, value)}
         </div>
         <div className='tef-transformation-spacer'>
           {

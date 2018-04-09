@@ -122,7 +122,7 @@ class TemplateEndpoint extends TerrainComponent<Props>
       case FetchStatus.Error:
         inner = <ErrorIcon />;
         style = fontColor(Colors().error);
-        tooltipText = 'Error while trying to load documents source';
+        tooltipText = 'Error while trying to load documents';
         break;
       case FetchStatus.Loading:
         inner = '...';
