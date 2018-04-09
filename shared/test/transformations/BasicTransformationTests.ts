@@ -262,6 +262,7 @@ test('split a field (string delimiter)', () =>
       newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
       preserveOldFields: false,
       delimiter: 'b',
+      regex: false,
     });
   const r = e.transform(TestDocs.doc2);
   expect(r['s1']).toBe('');
@@ -279,6 +280,7 @@ test('split a field (numeric index)', () =>
       newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2'])]),
       preserveOldFields: false,
       delimiter: 3,
+      regex: false,
     });
   const r = e.transform(TestDocs.doc2);
   expect(r['s1']).toBe('bob');
@@ -298,7 +300,8 @@ test('split a field (regex delimiter)', () =>
     {
       newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
       preserveOldFields: false,
-      delimiter: RegExp('[\\s,]+'),
+      delimiter: '[\\s,]+',
+      regex: true,
     });
   const r = e.transform(doc);
   expect(r['s1']).toBe('la');

@@ -153,3 +153,28 @@ test('String serialize/deserialize round trip - substring', () =>
   expect(e.equals(e2)).toBe(true);
   expect(e2.transform(TestDocs.doc1)['meta']['school']).toBe('tan');
 });
+
+test('split a field (regex delimiter) after serialize/deserialize trip', () =>
+{
+  const doc = {
+    foo: 'la dee da',
+  };
+
+  const e: TransformationEngine = new TransformationEngine(doc);
+  const opts = {
+    newFieldKeyPaths: List<KeyPath>([KeyPath(['s1']), KeyPath(['s2']), KeyPath(['s3'])]),
+    preserveOldFields: false,
+    delimiter: '[\\s,]+',
+    regex: true,
+  };
+  e.appendTransformation(
+    TransformationNodeType.SplitNode,
+    List<KeyPath>([KeyPath(['foo'])]),
+    opts);
+  const j: string = JSON.stringify(e.toJSON());
+  const e2 = TransformationEngine.load(j);
+  const r = e2.transform(doc);
+  expect(r['s1']).toBe('la');
+  expect(r['s2']).toBe('dee');
+  expect(r['s3']).toBe('da');
+});

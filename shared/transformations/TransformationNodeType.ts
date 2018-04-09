@@ -79,7 +79,8 @@ interface TransformationOptionTypes
   SplitNode: {
     newFieldKeyPaths: List<KeyPath>;
     preserveOldFields: boolean;
-    delimiter: string | RegExp | number;
+    delimiter: string | number;
+    regex: true;
   };
   JoinNode: {
     newFieldKeyPaths: List<KeyPath>;
