@@ -2,6 +2,7 @@
 
 @top-height: 24px;
 
+
 .results-area {
   padding-bottom: 2 * @standard-margin;
   margin-left: 0;
@@ -13,10 +14,11 @@
 
   .results-area-map {
     min-height: 25px;
-    width: 100%;
+    width: calc(~"100% - 7px");
     position: absolute;
     bottom: 0;
     z-index: 500;
+    border: 1px solid;
     .results-area-map-topbar {
       height: 25px;
       border-top-right-radius: 3px;
@@ -48,6 +50,11 @@
     }
   }
 
+  .results-area-results-wrapper {
+    padding-top: 30px;
+    height: calc(~"100% - 20px");
+  }
+
   .results-area-results {
     height: 100%;
     overflow-y: auto;
@@ -55,7 +62,6 @@
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    margin-top: @top-height;
 
     .transition;
 
@@ -91,10 +97,10 @@
   padding: 5px;
   box-sizing: border-box;
   height: @top-height;
-  width: 100%;
+  width: calc(~"100% - 12px");
   display: flex;
+  border-radius: 3px;
 
-  z-index: 99999999;
   position: absolute;
 
   .results-top-summary,

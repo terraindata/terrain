@@ -331,7 +331,7 @@ function isScoreCard(valueInfo: ESValueInfo): boolean
   }
 }
 
-function parseElasticWeightBlock(obj: object): Block
+export function parseElasticWeightBlock(obj: object): Block
 {
   if (obj['weight'] === 0)
   {
@@ -348,10 +348,24 @@ function parseElasticWeightBlock(obj: object): Block
       }, true));
   }
 
+  const visiblePoints = [];
+  if (obj['visiblePoints'])
+  {
+    for (let i = 0; i < obj['visiblePoints']['ranges']; ++i)
+    {
+      scorePoints.push(
+        make(Blocks, 'scorePoint', {
+          alue: obj['ranges'][i],
+          score: obj['outputs'][i],
+        }, true));
+    }
+  }
+
   const card = make(Blocks, 'elasticTransform', {
     mode: obj['mode'],
     input: obj['numerators'][0][0],
     scorePoints: List(scorePoints),
+    visiblePoints: List(visiblePoints),
   }, true);
 
   return make(Blocks, 'elasticWeight', {

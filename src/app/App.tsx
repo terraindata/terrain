@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires no-reference strict-boolean-expressions max-line-length no-console
+// tslint:disable:no-var-requires no-reference no-unused-expression strict-boolean-expressions max-line-length no-console
 
 /// <reference path="../typings/tsd.d.ts" />
 
@@ -69,7 +69,6 @@ window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.
 import { generateThemeStyles } from 'common/components/tooltip/Tooltips';
 import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
-import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
@@ -90,7 +89,9 @@ import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
 import { AuthState } from 'auth/AuthTypes';
 import { LibraryState } from 'library/LibraryTypes';
+import ContainerDimensions from 'react-container-dimensions';
 import { SchemaActions } from 'schema/data/SchemaRedux';
+import { injectGlobal } from 'styled-components';
 import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import { AuthActions } from './auth/data/AuthRedux';
@@ -99,18 +100,62 @@ import LibraryActions from './library/data/LibraryActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
 import { UserActions } from './users/data/UserRedux';
+const GilroySrc = require('app/common/fonts/Gilroy-Regular.woff');
+const GilroyLightSrc = require('app/common/fonts/Gilroy-Light.woff');
+const GilroyLightItalicSrc = require('app/common/fonts/Gilroy-LightItalic.woff');
+const GilroyBoldSrc = require('app/common/fonts/Gilroy-Bold.woff');
+const GilroySemiBoldSrc = require('app/common/fonts/Gilroy-SemiBold.woff');
 
 // Icons
-const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
-const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
-const BuilderIcon = require('./../images/icon_bldr-3.svg');
-const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
-const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
-const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
-const ControlIcon = require('./../images/icon_gear.svg');
+const LibraryIcon = require('./../images/icon-manage.svg?name=LibraryIcon');
+const BuilderIcon = require('./../images/icon-build.svg');
+const ReportingIcon = require('./../images/icon-analytics?name=ReportingIcon');
+const SchemaIcon = require('./../images/icon-schema.svg?name=SchemaIcon');
+const ImportIcon = require('./../images/icon-import.svg?name=ImportIcon');
+const ControlIcon = require('./../images/icon-control.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
+const BackgroundImage = require('./../images/background.png');
+
+injectGlobal`
+  @font-face {
+    font-family: 'Gilroy';
+    src: url(${GilroySrc}) format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+@font-face {
+    font-family: 'Gilroy-Light-Italic';
+    src: url(${GilroyLightItalicSrc}) format('woff');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Gilroy-Light';
+    src: url(${GilroyLightSrc}) format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gilroy-Bold';
+    src: url(${GilroyBoldSrc}) format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+  @font-face {
+      font-family: 'Gilroy-Semi-Bold';
+      src: url(${GilroySemiBoldSrc}) format('woff');
+      font-weight: 600;
+      font-style: normal;
+  }
+`;
+
+const RESOLUTION_BREAKPOINT_1 = 980; // First resolution breakpoint is 980px
 
 const links =
   [
@@ -190,7 +235,7 @@ class App extends TerrainComponent<Props>
   public state = {
     selectedPage: 3,
     loggedIn: false,
-    sidebarExpanded: false,
+    sidebarExpanded: true,
     loggedInAndLoaded: false,
 
     schemaLoaded: false,
@@ -251,7 +296,7 @@ class App extends TerrainComponent<Props>
     });
     this.props.colorsActions({
       actionType: 'setStyle',
-      selector: 'input:hover',
+      selector: 'input:hover &:not(input:disabled)',
       style: { 'background': Colors().inputFocusBg, 'border-color': Colors().inactiveHover },
     });
     this.props.colorsActions({
@@ -307,7 +352,7 @@ class App extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before',
-      style: { 'border-top': '7px solid ' + Colors().activeText },
+      style: { 'border-top': '7px solid ' + Colors().active },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
@@ -395,7 +440,7 @@ class App extends TerrainComponent<Props>
     // && this.state.rolessLoaded
   }
 
-  public renderApp()
+  public renderApp(width)
   {
     if (!this.state.loggedInAndLoaded)
     {
@@ -408,9 +453,12 @@ class App extends TerrainComponent<Props>
       );
     }
 
-    const sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
+    const sidebarWidth = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1 ? 205 : 36;
+    const sidebarExpanded = this.state.sidebarExpanded && width > RESOLUTION_BREAKPOINT_1;
     const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
-
+    const style = {
+      backgroundImage: `url(${BackgroundImage})`,
+    };
     const layout =
       {
         fullHeight: true,
@@ -422,7 +470,7 @@ class App extends TerrainComponent<Props>
                 links={links}
                 selectedIndex={selectedIndex}
                 expandable={true}
-                expanded={this.state.sidebarExpanded}
+                expanded={sidebarExpanded}
                 onExpand={this.toggleSidebar}
               />,
             },
@@ -431,6 +479,7 @@ class App extends TerrainComponent<Props>
               content:
                 <div
                   className='app-inner'
+                  style={style}
                 >
                   {
                     this.props.children
@@ -461,42 +510,35 @@ class App extends TerrainComponent<Props>
     }
 
     return (
-      <div
-        className='app'
-        onMouseMove={this.handleMouseMove}
-        key='app'
-        style={APP_STYLE}
-      >
-        {
-          this.state.loggedInAndLoaded &&
+      <ContainerDimensions>
+        {({ width, height }) => (
           <div
-            className='app-top-bar'
-            style={backgroundColor(Colors().bg2)}
+            className='app'
+            onMouseMove={this.handleMouseMove}
+            key='app'
+            style={APP_STYLE}
           >
-            <img
-              src={TerrainIcon}
-              className='app-top-bar-icon'
+
+            <div
+              className='app-wrapper'
+            >
+              {
+                this.renderApp(width)
+              }
+            </div>
+
+            <DeployModal />
+            <StyleTag
+              style={this.props.colors.styles}
             />
-            <AccountDropdown />
+
+            <InAppNotification />
+
+            <EasterEggs />
           </div>
-        }
-        <div
-          className='app-wrapper'
-        >
-          {
-            this.renderApp()
-          }
-        </div>
+        )}
+      </ContainerDimensions>
 
-        <DeployModal />
-        <StyleTag
-          style={this.props.colors.styles}
-        />
-
-        <InAppNotification />
-
-        <EasterEggs />
-      </div>
     );
   }
 }

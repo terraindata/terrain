@@ -113,7 +113,7 @@ class Switch extends TerrainComponent<Props>
 }
 
 const SWITCH_STYLE = {
-  'backgroundColor': Colors().bg3,
+  'backgroundColor': Colors().blockBg,
   'color': Colors().text2,
 
   ':hover': {

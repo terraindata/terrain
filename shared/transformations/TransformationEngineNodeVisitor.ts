@@ -442,7 +442,11 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     {
       const originalElement: any = yadeep.get(doc, field);
 
-      if (typeof originalElement === opts.toTypename || originalElement.constructor === Array && opts.toTypename === 'array')
+      if (
+        originalElement === undefined
+        || typeof originalElement === opts.toTypename
+        || (originalElement.constructor === Array && opts.toTypename === 'array')
+      )
       {
         return;
       }

@@ -58,7 +58,7 @@ import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { MidwayError } from 'shared/error/MidwayError';
 import Util from 'util/Util';
-import { Colors, Themes, ThemesArray } from '../../colors/Colors';
+import { Colors, OldThemesArray } from '../../colors/Colors';
 import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
@@ -104,7 +104,9 @@ class Settings extends TerrainComponent<Props>
       modalOpen: false,
       modalMessage: '',
       errorModal: false,
+      advancedResultsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS)),
       analyticsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS)),
+      simpleParser: Number(TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER)),
     };
   }
 
@@ -459,7 +461,7 @@ class Settings extends TerrainComponent<Props>
 
   public changeTheme(val)
   {
-    const theme = ThemesArray[val];
+    const theme = OldThemesArray[val];
     if (localStorage.getItem('theme') !== theme)
     {
       localStorage.setItem('theme', theme);
@@ -484,6 +486,40 @@ class Settings extends TerrainComponent<Props>
     }
   }
 
+  public handleAdvancedResultsSwitch(selected)
+  {
+    this.setState((state) =>
+    {
+      return { advancedResultsEnabled: selected };
+    });
+
+    if (TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS))
+    {
+      TerrainTools.deactivate(TerrainTools.ADVANCED_RESULTS);
+    }
+    else
+    {
+      TerrainTools.activate(TerrainTools.ADVANCED_RESULTS);
+    }
+  }
+
+  public handleSimpleParserSwitch(selected)
+  {
+    this.setState((state) =>
+    {
+      return { simpleParser: selected };
+    });
+
+    if (TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
+    {
+      TerrainTools.deactivate(TerrainTools.SIMPLE_PARSER);
+    }
+    else
+    {
+      TerrainTools.activate(TerrainTools.SIMPLE_PARSER);
+    }
+  }
+
   public renderTerrainSettingsContent()
   {
     const terrainSettingsAnalyticsContent = TerrainTools.isAdmin() ? (
@@ -503,6 +539,42 @@ class Settings extends TerrainComponent<Props>
       </div>
     ) : undefined;
 
+    const terrainSettingsAdvancedResultsContent = TerrainTools.isAdmin() ? (
+      <div>
+        <div className='settings-field-title'>
+          Advanced Results (Aggregations and Raw Results)
+        </div>
+        <div className='settings-row'>
+          <Switch
+            medium={true}
+            first='On'
+            second='Off'
+            selected={this.state.advancedResultsEnabled}
+            onChange={this.handleAdvancedResultsSwitch}
+          />
+        </div>
+      </div>
+
+    ) : undefined;
+
+    const terrainSettingsSimpleParser = TerrainTools.isAdmin() ? (
+      <div>
+        <div className='settings-field-title'>
+          Simple Parser (Pathfinder to Code Connection Only)
+        </div>
+        <div className='settings-row'>
+          <Switch
+            medium={true}
+            first='On'
+            second='Off'
+            selected={this.state.simpleParser}
+            onChange={this.handleSimpleParserSwitch}
+          />
+        </div>
+      </div>
+
+    ) : undefined;
+
     return (
       <div>
         <div className='settings-field-title'>
@@ -510,8 +582,8 @@ class Settings extends TerrainComponent<Props>
         </div>
         <div className='settings-row'>
           <Dropdown
-            options={List(ThemesArray)}
-            selectedIndex={ThemesArray.indexOf(localStorage.getItem('theme'))}
+            options={List(OldThemesArray)}
+            selectedIndex={OldThemesArray.indexOf(localStorage.getItem('theme'))}
             onChange={this.changeTheme}
             canEdit={true}
             className='settings-theme-dropdown'
@@ -519,6 +591,8 @@ class Settings extends TerrainComponent<Props>
         </div>
         <br />
         {terrainSettingsAnalyticsContent}
+        {terrainSettingsAdvancedResultsContent}
+        {terrainSettingsSimpleParser}
       </div>
     );
   }

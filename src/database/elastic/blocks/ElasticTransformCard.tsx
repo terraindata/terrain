@@ -55,6 +55,7 @@ import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card } from '../../../blocks/types/Card';
 
+import { _ScoreLine } from 'builder/components/pathfinder/PathfinderTypes';
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../app/util/TransformUtil';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
@@ -79,6 +80,7 @@ export const scorePoint = _block(
     },
   });
 
+const transformModes = ['linear', 'sigmoid', 'exponential', 'normal', 'logarithmic'];
 // When a paramaterized transform curve is used, a linear interpolation of the curve is passed
 // to the PWL script. It uses this number of points to get a good approximation of the curve
 // while maintaining efficiency.
@@ -87,7 +89,10 @@ const numPoints = 31;
 export const elasticTransform = _card(
   {
     input: '',
+    // Score points are used by the script to calculate the score and may have to be interpolated from the
+    // visible score points for parameterized curves
     scorePoints: List([]),
+    visiblePoints: List([]),
 
     // make this list<string> since the values passed from BuilderTextBox are string.
     domain: List(['0', '100']),
@@ -97,7 +102,6 @@ export const elasticTransform = _card(
     noTitle: true,
     cannotBeMoved: true,
     mode: 'linear',
-
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
@@ -217,7 +221,11 @@ export const elasticTransform = _card(
         return {
           a: 0,
           b: 1,
-          mode: block['mode'],
+          mode: transformModes.indexOf(block['mode']) !== -1 ? block['mode'] : 'linear',
+          visiblePoints: {
+            ranges: block['visiblePoints'].map((scorePt) => scorePt.value).toArray(),
+            outputs: block['visiblePoints'].map((scorePt) => scorePt.score).toArray(),
+          },
           numerators: [[block['input'], 1]],
           denominators: [],
           ranges,

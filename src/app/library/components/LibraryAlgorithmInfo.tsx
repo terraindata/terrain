@@ -159,7 +159,14 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         },
         (error) =>
         {
-          const readable: string = MidwayError.fromJSON(error).getDetail();
+          let readable;
+          try
+          {
+            readable = MidwayError.fromJSON(error).getDetail();
+          }
+          catch {
+            readable = error;
+          }
           this.setState({
             errorModalMessage: readable,
             algorithmStatusAjax: null,
