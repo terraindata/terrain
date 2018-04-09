@@ -77,6 +77,9 @@ interface Props
   canEdit: boolean;
   onCreateInput: (index: number) => void;
   language: string;
+
+  action: (keyPath, value) => void; // Need to use to keep track of whether path or cards is used (should change with Xi's parser)
+
   builderActions?: typeof BuilderActions;
 }
 
@@ -134,7 +137,7 @@ class InputComponent extends TerrainComponent<Props>
 
   public handleInputTypeChange(inputType: number)
   {
-    this.props.builderActions.change(this.getKeyPath('inputType'), inputType);
+    this.props.action(this.getKeyPath('inputType'), inputType);
 
     if (inputType === InputType.DATE)
     {
@@ -144,7 +147,8 @@ class InputComponent extends TerrainComponent<Props>
         date = new Date();
       }
       const value = Util.formatInputDate(date, this.props.language);
-      this.props.builderActions.change(this.getKeyPath('value'), value);
+
+      this.props.action(this.getKeyPath('value'), value);
     }
   }
 
@@ -164,10 +168,10 @@ class InputComponent extends TerrainComponent<Props>
 
   public changeValue(value, meta?)
   {
-    this.props.builderActions.change(this.getKeyPath('value'), value);
+    this.props.action(this.getKeyPath('value'), value);
     if (meta !== undefined)
     {
-      this.props.builderActions.change(this.getKeyPath('meta'), meta);
+      this.props.action(this.getKeyPath('meta'), meta);
     }
   }
 
@@ -182,6 +186,7 @@ class InputComponent extends TerrainComponent<Props>
             onChange={this.changeValue}
             canEdit={true}
             language={this.props.language}
+            action={this.props.action}
           />
         </div>
       );
@@ -190,12 +195,7 @@ class InputComponent extends TerrainComponent<Props>
     if (this.props.input.inputType === InputType.LOCATION)
     {
       let value = this.props.input.value && Util.asJS(this.props.input.value);
-      let markLocation: boolean = false;
-      if (value)
-      {
-        markLocation = true;
-      }
-      else
+      if (!value)
       {
         value = [0, 0];
       }
@@ -225,6 +225,7 @@ class InputComponent extends TerrainComponent<Props>
         onFocus={this.focus}
         onBlur={this.blur}
         textStyle={fontColor(colorForInputType(this.props.input.inputType))}
+        action={this.props.action}
       />
     );
   }
@@ -289,6 +290,7 @@ class InputComponent extends TerrainComponent<Props>
               language={null}
               onFocus={this.focus}
               onBlur={this.blur}
+              action={this.props.action}
               textStyle={fontColor(inputColor)}
             />
             <Dropdown

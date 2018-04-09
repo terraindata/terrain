@@ -1,0 +1,44 @@
+@import "../../../common/Common.less";
+
+.score-weight-key {
+  text-align: left;
+  background: #fff;
+  padding: 7px;
+  border-radius: 5px;
+}
+
+@h: 29px;
+.weight-graph {
+  position: relative;
+  height: @h;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 5px;
+  padding: 3px;
+  box-sizing: border-box;
+  
+  flex-grow: 2;
+  flex-basis: 200px;
+  margin: 0px (@standard-margin / 2);
+  
+  .weight-graph-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    
+    .weight-graph-bar {
+      position: absolute;
+      height: 100%;
+      .transition(~"all 0.25s");
+    }
+  }
+  
+  .weight-graph-line {
+    height: 100%;
+    top: 0px;
+    position: absolute;
+    left: 50%;
+    width: 1px;
+    background: #ccc;
+  }
+}

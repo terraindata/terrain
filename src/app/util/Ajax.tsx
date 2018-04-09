@@ -1213,6 +1213,103 @@ export const Ajax =
       );
     },
 
+    starColumn(
+      columnId: ID,
+      starred: boolean,
+      id?: number,
+      onLoad?: (resp) => void,
+      onError?: (error) => void)
+    {
+      const body = id !== undefined ? { columnId, starred, id } : { columnId, starred, id };
+      return Ajax.req('post', 'schemametadata/star', body, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
+    schemaMetadata(id?: number, onLoad?: (resp) => void, onError?: (error) => void)
+    {
+      return Ajax.req('get', 'schemametadata/', { id }, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
+    countColumn(
+      columnId: ID,
+      algorithmId?: string | number,
+      id?: number,
+      onLoad?: (resp) => void,
+      onError?: (error) => void)
+    {
+      const body = id === undefined ? { columnId, algorithmId } : { columnId, algorithmId, id };
+      return Ajax.req('post', 'schemametadata/count', body, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
+    getResultsConfig(
+      index: string,
+      onLoad?: (resp) => void,
+      onError?: (error) => void,
+    )
+    {
+      return Ajax.req('post', 'resultsconfig/', { index }, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(JSON.parse(JSON.stringify(resp)));
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
+    updateResultsConfig(
+      index: string,
+      resultsConfig: any,
+      onLoad?: (resp) => void,
+      onError?: (error) => void,
+    )
+    {
+      const body = { resultsConfig, index };
+      return Ajax.req('post', 'resultsconfig/update', body, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
     runOnDemandSchedule(
       id: ID,
       onLoad: (resp: object[]) => void,

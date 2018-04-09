@@ -170,7 +170,7 @@ export class Export
       {
         winston.info('Beginning export transformations.');
         const documentTransform: ExportTransform = new ExportTransform(this, exportConfig);
-        const transformationEngineTransform = new TransformationEngineTransform(exportConfig.transformations);
+        const TETransform = new TransformationEngineTransform(exportConfig.transformations);
         let exportTransform: stream.Transform;
         switch (exportConfig.filetype)
         {
@@ -184,9 +184,48 @@ export class Export
             throw new Error('File type must be either CSV or JSON.');
         }
 
-        resolve(respStream.pipe(documentTransform)
-          .pipe(transformationEngineTransform)
-          .pipe(exportTransform));
+        resolve(
+          respStream
+            .on('error', (e) =>
+            {
+              winston.error('Error in response stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              TETransform.destroy();
+              reject(e);
+            })
+            .pipe(documentTransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in document stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              TETransform.destroy();
+              reject(e);
+            })
+            .pipe(TETransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in transformation engine stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              TETransform.destroy();
+              reject(e);
+            })
+            .pipe(exportTransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in export stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              TETransform.destroy();
+              reject(e);
+            }),
+        );
       }
       catch (e)
       {

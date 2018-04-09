@@ -60,21 +60,22 @@ export class ElasticReader extends SafeReadable
   private querying: boolean = false;
   private doneReading: boolean = false;
   private streaming: boolean = false;
+  private scrolling: boolean = false;
   private rowsProcessed: number = 0;
   private scroll: string;
   private size: number;
 
   private scrollID: string | undefined = undefined;
 
-  private MAX_SEARCH_SIZE: number = 10 * 1000;
-  private DEFAULT_SEARCH_SIZE: number = 1024;
-  private DEFAULT_SCROLL_TIMEOUT: string = '5m';
+  private MAX_SEARCH_SIZE: number = 1000;
+  private DEFAULT_SEARCH_SIZE: number = 500;
+  private DEFAULT_SCROLL_TIMEOUT: string = '45m';
 
   private numRequested: number = 0;
 
   constructor(client: ElasticClient, query: any, streaming: boolean = false)
   {
-    super({ objectMode: true, highWaterMark: 1024 * 128 });
+    super({ objectMode: true, highWaterMark: 1024 * 8 });
 
     this.client = client;
     this.query = query;
@@ -84,16 +85,20 @@ export class ElasticReader extends SafeReadable
     this.scroll = (query['scroll'] !== undefined) ? query['scroll'] : this.DEFAULT_SCROLL_TIMEOUT;
     this.numRequested = this.size;
 
+    this.numRequested = this.size;
+    this.scrolling = streaming && (this.size > this.DEFAULT_SEARCH_SIZE);
+
     try
     {
       const body = {
         body: this.query,
       };
 
-      if (this.streaming)
+      if (this.scrolling)
       {
         body['scroll'] = this.scroll;
       }
+
       body['size'] = Math.min(this.size, this.MAX_SEARCH_SIZE);
 
       this.querying = true;
@@ -168,7 +173,7 @@ export class ElasticReader extends SafeReadable
 
     this.querying = false;
     this.doneReading = this.doneReading
-      || !this.streaming
+      || !this.scrolling
       || length <= 0
       || this.rowsProcessed >= this.size;
 

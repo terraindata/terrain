@@ -136,7 +136,7 @@ export class DatabaseControllerConfig
       this.config = {
         hosts: [dsnString],
         keepAlive: false,
-        requestTimeout: 180000,
+        requestTimeout: 600000,
       } as ElasticConfig;
     }
     else

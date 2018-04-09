@@ -46,11 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import Ajax from 'app/util/Ajax';
+import { _Hit } from 'builder/components/results/ResultTypes';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { SchemaActionType, SchemaActionTypes } from 'schema/data/SchemaRedux';
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as SchemaTypes from '../SchemaTypes';
+
 const { Map, List } = Immutable;
 
 type Server = SchemaTypes.Server;
@@ -170,83 +173,141 @@ export function parseElasticDb(elasticServer: object,
             'databaseType', 'elastic',
           );
         }
+        // Run an elastic query that gets 5 result samples to extract the sample data from
+        let results = null;
+        const db = {
+          id: elasticServer['id'],
+          name: elasticServer['name'],
+          type: elasticServer['type'],
+        };
+        const sampleQuery = {
+          query: {
+            bool: {
+              filter: [
+                {
+                  term: {
+                    _index: databaseKey,
+                  },
+                },
+                {
+                  term: {
+                    _type: tableName,
+                  },
+                },
+              ],
+            },
+          },
+          size: 5,
+        };
 
-        _.each((tableFields as any), (fieldProperties, fieldName) =>
-        {
-          // fieldPropertiesMap = fieldPropertiesMap.clear();
-          fieldPropertyIds = fieldPropertyIds.clear();
-
-          _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName) =>
+        Ajax.query(
+          JSON.stringify(sampleQuery),
+          db,
+          (resp) =>
           {
-            let fieldProperty = SchemaTypes._FieldProperty({
-              name: (fieldPropertyName as any) as string,
-              value: fieldPropertyValue,
-              serverId,
-              databaseId,
-              tableId,
-              columnId: tableId + '.' + ((fieldName as any) as string),
-              fieldPropertyParentId: '',
+            results = resp.result.hits;
+            tables = tables.setIn(
+              [tableId, 'sampleData'],
+              results.hits.map((hit) =>
+              {
+                return _Hit({
+                  fields: Immutable.Map(hit['_source']),
+                });
+              }),
+            );
+            _.each((tableFields as any), (fieldProperties, fieldName) =>
+            {
+              // fieldPropertiesMap = fieldPropertiesMap.clear();
+              fieldPropertyIds = fieldPropertyIds.clear();
+
+              _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName) =>
+              {
+                let fieldProperty = SchemaTypes._FieldProperty({
+                  name: (fieldPropertyName as any) as string,
+                  value: fieldPropertyValue,
+                  serverId,
+                  databaseId,
+                  tableId,
+                  columnId: tableId + '.' + ((fieldName as any) as string),
+                  fieldPropertyParentId: '',
+                });
+
+                const recursiveReturn = recursiveParseFieldProperties(fieldProperty, fieldPropertiesMap);
+                fieldProperty = recursiveReturn.fieldProperty;
+                fieldPropertiesMap = recursiveReturn.fieldPropertiesMap;
+
+                fieldPropertiesMap = fieldPropertiesMap.set(fieldProperty.id, fieldProperty);
+                fieldPropertyIds = fieldPropertyIds.push(fieldProperty.id);
+              });
+
+              let column = SchemaTypes._Column({
+                name: (fieldName as any) as string,
+                serverId,
+                databaseId,
+                tableId,
+                datatype: fieldProperties['type'],
+                properties: fieldProperties['properties'],
+                analyzed: fieldProperties['analyzer'] !== undefined ? true : false,
+              });
+
+              column = column.set(
+                'fieldPropertyIds', fieldPropertyIds,
+              );
+              // add sample data
+              if (results.hits)
+              {
+                const sampleData = results.hits.map((hit) =>
+                {
+                  return _Hit({
+                    fields: Map({
+                      [fieldName]: hit._source[fieldName],
+                    }),
+                  });
+                });
+                column = column.set('sampleData', sampleData);
+              }
+
+              columns = columns.set(column.id, column);
+
+              if (!columnNamesByTable.get(table.id))
+              {
+                columnNamesByTable = columnNamesByTable.set(table.id, List());
+              }
+              columnNamesByTable = columnNamesByTable.update(table.id,
+                (list) => list.push(column.name),
+              );
+
+              columnIds = columnIds.push(column.id);
+            });
+            tables = tables.setIn(
+              [tableId, 'columnIds'],
+              columnIds,
+            );
+            databases = databases.set(databaseId, database);
+            directDispatch({
+              actionType: 'setServer',
+              server,
+              databases,
+              tables,
+              columns,
+              indexes,
+              fieldProperties: fieldPropertiesMap,
+              tableNames,
+              columnNames: columnNamesByTable,
             });
 
-            const recursiveReturn = recursiveParseFieldProperties(fieldProperty, fieldPropertiesMap);
-            fieldProperty = recursiveReturn.fieldProperty;
-            fieldPropertiesMap = recursiveReturn.fieldPropertiesMap;
-
-            fieldPropertiesMap = fieldPropertiesMap.set(fieldProperty.id, fieldProperty);
-            fieldPropertyIds = fieldPropertyIds.push(fieldProperty.id);
-          });
-
-          let column = SchemaTypes._Column({
-            name: (fieldName as any) as string,
-            serverId,
-            databaseId,
-            tableId,
-            datatype: fieldProperties['type'],
-          });
-
-          column = column.set(
-            'fieldPropertyIds', fieldPropertyIds,
-          );
-
-          columns = columns.set(column.id, column);
-
-          if (!columnNamesByTable.get(table.id))
+            didSetServer = true;
+          },
+          (err) =>
           {
-            columnNamesByTable = columnNamesByTable.set(table.id, List());
-          }
-          columnNamesByTable = columnNamesByTable.update(table.id,
-            (list) => list.push(column.name),
-          );
-
-          columnIds = columnIds.push(column.id);
-        });
-
-        tables = tables.setIn(
-          [tableId, 'columnIds'],
-          columnIds,
-        );
+            //
+          });
       });
-
-    databases = databases.set(databaseId, database);
-    directDispatch({
-      actionType: 'setServer',
-      server,
-      databases,
-      tables,
-      columns,
-      indexes,
-      fieldProperties: fieldPropertiesMap,
-      tableNames,
-      columnNames: columnNamesByTable,
-    });
-
-    didSetServer = true;
   });
 
   if (!didSetServer)
   {
     // empty server, no dbs/indexes, need to set it manually
-    // TODO change this terrible code flow
     directDispatch({
       actionType: 'setServer',
       server,

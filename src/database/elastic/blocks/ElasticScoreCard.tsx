@@ -50,7 +50,7 @@ import { List } from 'immutable';
 import * as _ from 'lodash';
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
-import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
+import CardsScoreBar from '../../../app/builder/components/charts/CardsScoreBar';
 import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
@@ -64,8 +64,10 @@ export const elasticScore = _card(
     sortOrder: 'desc',
     sortType: 'number',
     sortMode: 'auto',
+    cards: List([]),
 
     static: {
+      clause: ESInterpreterDefaultConfig.getClause('script_sort'),
       language: 'elastic',
       title: 'Terrain Score Sort',
       description: 'Sort results using Terrain\'s proprietary scoring method: Transform \
@@ -143,7 +145,7 @@ export const elasticScore = _card(
                     },
                     {
                       displayType: DisplayType.COMPONENT,
-                      component: ScoreBar,
+                      component: CardsScoreBar,
                       requiresBuilderState: true,
                       key: 'elasticScore',
                       // help: ManualConfig.help['score'],
