@@ -269,7 +269,7 @@ class DocumentsHelpers extends ETLHelpers
       },
     });
     // tslint:disable-next-line
-    console.error(`error fetching ${key}: ${ev}`)
+    console.error(`error fetching ${this._template.getSourceName(key)}: ${ev}`);
     this.updateStateAfterFetch();
   }
 

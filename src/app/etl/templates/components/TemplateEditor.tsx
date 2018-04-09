@@ -111,8 +111,15 @@ class TemplateEditor extends TerrainComponent<Props>
     {
       return {};
     }
+    try
+    {
+      return engine.transform(previewDocument);
+    }
+    catch (e)
+    {
+      return {};
+    }
 
-    return engine.transform(previewDocument);
   }
 
   public getDocument()
