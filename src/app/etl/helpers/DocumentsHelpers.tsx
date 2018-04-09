@@ -76,6 +76,7 @@ import
   _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
+  FetchStatus,
   FieldMap,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
@@ -199,7 +200,7 @@ class DocumentsHelpers extends ETLHelpers
       {
         if (key !== undefined)
         {
-          this.updateStateBeforeFetch();
+          this.updateStateBeforeFetch(key);
         }
         switch (source.type)
         {
@@ -250,11 +251,23 @@ class DocumentsHelpers extends ETLHelpers
       key,
       documents,
     });
+    this.editorAct({
+      actionType: 'updateDisplayState',
+      updaters: {
+        fetchStatuses: (statuses) => statuses.set(key, FetchStatus.Loaded),
+      },
+    });
     this.updateStateAfterFetch();
   }
 
   protected onFetchDocumentsError(ev: string | MidwayError, key: string)
   {
+    this.editorAct({
+      actionType: 'updateDisplayState',
+      updaters: {
+        fetchStatuses: (statuses) => statuses.set(key, FetchStatus.Error),
+      },
+    });
     // tslint:disable-next-line
     console.error(`error fetching ${key}: ${ev}`)
     this.updateStateAfterFetch();
@@ -272,8 +285,14 @@ class DocumentsHelpers extends ETLHelpers
     }
   }
 
-  private updateStateBeforeFetch()
+  private updateStateBeforeFetch(key: string)
   {
+    this.editorAct({
+      actionType: 'updateDisplayState',
+      updaters: {
+        fetchStatuses: (statuses) => statuses.set(key, FetchStatus.Loading),
+      },
+    });
     this.editorAct({
       actionType: 'changeLoadingDocuments',
       increment: true,
