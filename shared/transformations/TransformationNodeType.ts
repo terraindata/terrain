@@ -80,7 +80,7 @@ interface TransformationOptionTypes
     newFieldKeyPaths: List<KeyPath>;
     preserveOldFields: boolean;
     delimiter: string | number;
-    regex: true;
+    regex: boolean;
   };
   JoinNode: {
     newFieldKeyPaths: List<KeyPath>;
