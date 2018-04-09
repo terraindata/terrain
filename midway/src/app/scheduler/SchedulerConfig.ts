@@ -58,7 +58,6 @@ export class SchedulerConfig extends ConfigType
   public running: boolean = undefined;                  // whether the task is running or not (TODO: lock this)
   public shouldRunNext: boolean = undefined;            // whether the job should run again or not
   public tasks: string = undefined;                     // a stringified representation of TaskConfig[]
-  public templateId: number = undefined;                // ETL template ID to use
   public workerId: number = undefined;                  // for clustering, denotes the node ID
 
   constructor(props: object)

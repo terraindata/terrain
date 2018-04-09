@@ -125,7 +125,6 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      running bool NOT NULL,
      shouldRunNext bool NOT NULL,
      tasks text NOT NULL,
-     templateId integer NOT NULL,
      workerId integer NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS credentials
     (id ` + primaryKeyType + ` PRIMARY KEY,

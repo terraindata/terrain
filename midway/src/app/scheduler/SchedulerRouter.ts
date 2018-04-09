@@ -60,13 +60,6 @@ const perm: Permissions = new Permissions();
 export const credentials: Credentials = new Credentials();
 export const scheduler: Scheduler = new Scheduler();
 
-// Get connections from credentials table, requires type=<one of allowedTypes>
-Router.get('/connections', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await credentials.getNames(ctx.query.type);
-});
-
 // Get schedule by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -137,7 +130,6 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   {
     delete schedule.id;
   }
-  AppUtil.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
   await perm.SchedulerPermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await scheduler.upsert(schedule);
 });
@@ -147,7 +139,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
   schedule.id = ctx.params.id;
-  AppUtil.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
+  AppUtil.verifyParameters(schedule, ['id', 'interval', 'name', 'priority', 'tasks']);
   await perm.SchedulerPermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await scheduler.upsert(schedule);
 });
