@@ -79,7 +79,7 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     }
     else if (opts.regex === true)
     {
-      split = (el as string).split(RegExp(opts.delimiter as string);
+      split = (el as string).split(RegExp(opts.delimiter as string));
     }
     else
     {
