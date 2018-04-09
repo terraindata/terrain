@@ -57,6 +57,7 @@ export interface Props
   className: string;
   id?: string;
   children: any;
+  onScrollBottom?: (hitsPage: number) => void;
 }
 
 class InfiniteScroll extends TerrainComponent<Props>
@@ -94,6 +95,10 @@ class InfiniteScroll extends TerrainComponent<Props>
           pages: [lastPage, lastPage + 1],
           pageBreaks: this.state.pageBreaks.set(lastPage + 1, elem.scrollTop()),
         });
+        if (this.props.onScrollBottom !== undefined)
+        {
+          this.props.onScrollBottom(lastPage + 1);
+        }
       }
     }
     // If it has scrolled up to "top", decrement visible pages

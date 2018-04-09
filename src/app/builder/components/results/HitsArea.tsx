@@ -82,7 +82,7 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const HITS_PAGE_SIZE = 15;
+const HITS_PAGE_SIZE = 20;
 
 export interface Props
 {
@@ -99,6 +99,7 @@ export interface Props
   allowSpotlights: boolean;
   onNavigationException: () => void;
   ignoreEmptyCards?: boolean;
+  onHitsScroll: (hitsPage: number) => void;
 }
 
 interface State
@@ -654,6 +655,7 @@ class HitsArea extends TerrainComponent<Props>
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
+          onScrollBottom={this.props.onHitsScroll}
           // onScroll={this.checkScroll}
           id='hits-area'
           pageSize={HITS_PAGE_SIZE}
@@ -858,7 +860,7 @@ column if you have customized the results view.');
     {
       el.scrollTop = 0;
     }
-
+    this.props.onHitsScroll(1); // Reset the hits pages
     this.setState({
       hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
     });

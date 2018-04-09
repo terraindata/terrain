@@ -149,6 +149,7 @@ const BuilderColumn = createReactClass<any, any>(
         canEdit: PropTypes.bool.isRequired,
         cantEditReason: PropTypes.string,
         onNavigationException: PropTypes.func,
+        onHitsScroll: PropTypes.func,
       },
 
     getInitialState()
@@ -277,6 +278,7 @@ const BuilderColumn = createReactClass<any, any>(
             showCustomizeView={true}
             allowSpotlights={true}
             exportState={this.props.exportState}
+            onHitsScroll={this.props.onHitsScroll}
           />;
 
         case COLUMNS.Editor:

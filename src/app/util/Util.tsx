@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
-import {List} from 'immutable';
+import { List } from 'immutable';
 import * as $ from 'jquery';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
