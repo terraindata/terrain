@@ -70,7 +70,7 @@ import { kpToString, stringToKP, validateNewFieldName } from 'shared/transformat
 import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
-import './MoveFieldModal.less';
+import './EditorFieldModal.less';
 
 export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 {
@@ -162,7 +162,7 @@ class AddFieldModalC extends TemplateEditorField<TemplateEditorFieldProps>
   {
     const { isValid, message } = this.validateKeyPath();
     return (
-      <div className='add-field-modal-wrapper'>
+      <div className='editor-field-form-wrapper'>
         <DynamicForm
           inputMap={addFieldMap}
           inputState={this.state}

@@ -467,7 +467,7 @@ export class Import
         {
           item[field] = false;
         }
-        else if (item[field] === '')
+        else if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -483,7 +483,7 @@ export class Import
         {
           item[field] = new Date(date);
         }
-        else if (item[field] === '')
+        else if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -493,7 +493,7 @@ export class Import
         }
         break;
       case 'array':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null' || item[field] === null)
         {
           item[field] = null;
         }
@@ -525,7 +525,7 @@ export class Import
         }
         break;
       case 'geo_point':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -551,7 +551,7 @@ export class Import
         }
         break;
       case 'nested':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
@@ -559,7 +559,7 @@ export class Import
         {
           try
           {
-            if (typeof item[field] === 'object')
+            if (typeof item[field] === 'string')
             {
               item[field] = JSON.parse(item[field]);
             }
@@ -717,7 +717,9 @@ export class Import
           if (node !== null)
           {
             const isMMDDYYYYFormat = new RegExp(/^((0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4}))$/);
-            if (isMMDDYYYYFormat.test(node))
+            // tslint:disable-next-line: max-line-length
+            const isISOFormat = new RegExp(/^([0-9]{4})-([0,1]{1}[0-9]{1})-([0-3]{1}[0-9]{1})( |T){0,1}([0-2]{1}[0-9]{1}):{0,1}([0-5]{1}[0-9]{1}):{0,1}([0-9]{2})(\.([0-9]{3,6})|((-|\+)?[0-9]{2}:[0-9]{2}))?Z?$/);
+            if (isMMDDYYYYFormat.test(node) || isISOFormat.test(node))
             {
               try
               {

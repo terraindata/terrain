@@ -199,9 +199,21 @@ export class ElasticDB implements TastyDB
   }
 
   /*
+   * Refreshes the given index
+   */
+  public async refreshIndex(index: string | string[])
+  {
+    return new Promise((resolve, reject) =>
+    {
+      this.client.indices.refresh({ index },
+        util.promise.makeCallback(resolve, reject));
+    });
+  }
+
+  /*
    * Deletes the given index
    */
-  public async deleteIndex(index: string)
+  public async deleteIndex(index: string | string[])
   {
     return new Promise((resolve, reject) =>
     {

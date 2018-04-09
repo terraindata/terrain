@@ -88,6 +88,7 @@ class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
         localStorage.removeItem('accessToken');
         localStorage.removeItem('id');
         Ajax.logout(_.noop);
+
         return state.set('accessToken', null).set('id', null);
       },
     };

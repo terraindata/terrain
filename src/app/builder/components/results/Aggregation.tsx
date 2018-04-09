@@ -160,7 +160,8 @@ class AggregationComponent extends TerrainComponent<Props> {
           displayType,
         });
         currentAgg.displayType = displayType;
-        this.props.builderActions.change(List(this._keyPath('query', 'aggregationList', nextProps.name)), currentAgg, true);
+
+        this.props.builderActions.changeQuery(this.props.query.setIn(['aggregationList', nextProps.name], currentAgg));
       }
     }
   }
@@ -201,7 +202,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     if (displayType !== currentAgg.displayType)
     {
       currentAgg.displayType = displayType;
-      this.props.builderActions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
+      this.props.builderActions.changeQuery(this.props.query.setIn(['aggregationList', name], currentAgg));
     }
   }
 
@@ -248,7 +249,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     const currAgg = this.props.query.aggregationList.get(this.props.name);
     currAgg.expanded = !this.state.expanded;
 
-    this.props.builderActions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
+    this.props.builderActions.changeQuery(this.props.query.setIn(['aggregationList', this.props.name], currAgg));
     this.setState({
       expanded: !this.state.expanded,
     });
@@ -258,7 +259,8 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     const currAgg = this.props.query.aggregationList.get(this.props.name);
     currAgg.displayType = type;
-    this.props.builderActions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
+
+    this.props.builderActions.changeQuery(this.props.query.setIn(['aggregationList', this.props.name], currAgg));
     this.setState({
       displayType: type,
     });

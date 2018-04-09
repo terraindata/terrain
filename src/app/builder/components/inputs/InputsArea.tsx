@@ -62,6 +62,7 @@ export interface Props
   inputs: List<Input>;
   canEdit: boolean;
   language: string;
+  action: (keyPath, value) => void; // Need to use to keep track of whether path or cards is used (should change with Xi's parser)
   builderActions?: typeof BuilderActions;
 }
 
@@ -74,7 +75,7 @@ class InputsArea extends TerrainComponent<Props>
       index = -1;
     }
 
-    this.props.builderActions.create(
+    this.props.builderActions.createInput(
       Immutable.List(['query', 'inputs']), index,
       AllBackendsMap[this.props.language].inputType,
     );
@@ -109,6 +110,7 @@ class InputsArea extends TerrainComponent<Props>
               key={input.id}
               onCreateInput={this.handleCreateInput}
               language={this.props.language}
+              action={this.props.action}
             />,
           )
         }

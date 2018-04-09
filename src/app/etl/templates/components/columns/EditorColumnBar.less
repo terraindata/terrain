@@ -1,5 +1,34 @@
 @import "~common/Common.less";
 
-.editor-column-bar {
-  margin: 0px @half-spacing;
+.editor-column-title-section {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  .editor-column-header-text {
+    font-size: @pretty-large-font-size;
+    padding: @half-spacing;
+    min-width: 100px;
+  }
+
+  .editor-column-header-dropdown {
+    position: relative;
+    padding: @half-spacing;
+    cursor: pointer;
+
+    svg {
+      transform: rotate(90deg);
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+
+    .menu-icon-wrapper {
+      visibility: hidden;
+    }
+
+    .menu-wrapper {
+      background: none;
+    }
+  }
 }

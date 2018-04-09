@@ -69,12 +69,13 @@ export default class GroupJoinTransform extends SafeReadable
   private source: ElasticReader;
   private query: object;
 
-  private maxPendingQueries: number = 4;
+  private maxPendingQueries: number = 2;
   private maxBufferedOutputs: number;
   private bufferedOutputs: Deque<Ticket>;
 
   private dropIfLessThan: number = 0;
   private parentAlias: string = 'parent';
+  private _isSourceEmpty = false;
 
   private subqueryValueInfos: { [key: string]: ESValueInfo | null } = {};
 
@@ -120,7 +121,6 @@ export default class GroupJoinTransform extends SafeReadable
           this.subqueryValueInfos[k] = valueInfo.objectChildren[k].propertyValue;
         }
       }
-
       this.maxBufferedOutputs = this.maxPendingQueries;
       this.bufferedOutputs = new Deque<Ticket>(this.maxBufferedOutputs);
 
@@ -134,6 +134,7 @@ export default class GroupJoinTransform extends SafeReadable
           response = this.source.read();
         }
       });
+      this.source.on('end', () => { this._isSourceEmpty = true; });
       this.source.on('error', (e) => this.emit('error', e));
 
     }
@@ -153,7 +154,11 @@ export default class GroupJoinTransform extends SafeReadable
 
   public _destroy(error, callback)
   {
-    this.source._destroy(error, callback);
+    this.source._destroy(error, (e) =>
+    {
+      this.push(null);
+      callback(e);
+    });
   }
 
   private dispatchSubqueryBlock(response: object): void
@@ -263,7 +268,7 @@ export default class GroupJoinTransform extends SafeReadable
             }
           }
 
-          if (this.source.isEmpty()
+          if (this._isSourceEmpty
             && this.bufferedOutputs.length === 0)
           {
             this.push(null);

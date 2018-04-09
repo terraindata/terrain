@@ -52,12 +52,17 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import { BuilderState } from 'builder/data/BuilderState';
+import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
+import { SchemaState } from 'schema/SchemaTypes';
 import ESConverter from '../../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { isInput } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
+import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
@@ -81,6 +86,8 @@ export interface Props
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
   spotlightActions?: typeof SpotlightActions;
+  builder?: BuilderState;
+  schema?: SchemaState;
 }
 
 interface ResultsQuery
@@ -199,13 +206,14 @@ export class ResultsManager extends TerrainComponent<Props>
             nextProps.query.tqlMode === 'manual' ||
             // this.props.query.cards !== nextProps.query.cards ||
             this.props.query.inputs !== nextProps.query.inputs
+            // this.props.query.path !== nextProps.query.path
           )
         )
       )
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
-      if (!this.props.query || nextProps.query.id !== this.props.query.id)
+      if (!nextProps.query || (this.props.query && nextProps.query && nextProps.query.id !== this.props.query.id))
       {
         this.changeResults({
           hits: undefined,
@@ -223,9 +231,41 @@ export class ResultsManager extends TerrainComponent<Props>
       this.props.spotlights.spotlights.map(
         (spotlight, id) =>
         {
+          const nestedFields = this.getNestedFields(nextProps).toJS();
+          let nestedIndex = -1;
+          let fields: any;
           let hitIndex = nextState.hits && nextState.hits.findIndex(
-            (h) => getPrimaryKeyFor(h, resultsConfig) === id,
+            (hit) =>
+            {
+              let hitStillInResults = getPrimaryKeyFor(hit, resultsConfig) === id;
+              if (!hitStillInResults)
+              {
+                const hitStillInNestedResults = nestedFields.map(
+                  (nestedField) =>
+                  {
+                    const nestedHits: any = hit.fields.get(nestedField);
+                    const hitStillInNestedResult = nestedHits.map(
+                      (nestedHit) => getPrimaryKeyFor({ fields: nestedHit } as Hit, resultsConfig) === id,
+                    );
+                    nestedIndex = hitStillInNestedResult.indexOf(true);
+                    if (nestedIndex !== -1)
+                    {
+                      const nestedHit = Util.asJS(nestedHits.get(nestedIndex));
+                      fields = _.extend({}, nestedHit, nestedHit['_source']);
+                      fields = { fields, primaryKey: '' } as Hit;
+                    }
+                    return hitStillInNestedResult.reduce((result, r) => result || r, false);
+                  },
+                );
+
+                hitStillInResults = hitStillInResults ||
+                  hitStillInNestedResults.reduce((result, r) => result || r, false);
+              }
+
+              return hitStillInResults;
+            },
           );
+
           if (hitIndex !== -1)
           {
             this.props.spotlightActions({
@@ -234,9 +274,9 @@ export class ResultsManager extends TerrainComponent<Props>
               hit: _.extend({
                 color: spotlight.color,
                 name: spotlight.name,
-                rank: hitIndex,
+                rank: nestedIndex !== -1 ? nestedIndex : hitIndex,
               },
-                nextState.hits.get(hitIndex).toJS(),
+                fields || nextState.hits.get(hitIndex).toJS(),
               ),
             });
             // TODO something more like this
@@ -258,6 +298,33 @@ export class ResultsManager extends TerrainComponent<Props>
         },
       );
     }
+  }
+
+  public getNestedFields(props: Props, overrideConfig?)
+  {
+    // Get the fields that are nested
+    const { builder, schema, resultsState } = props;
+    const dataSource = props.query.path.source.dataSource;
+    let nestedFields = resultsState.fields.filter((field) =>
+    {
+      const type = ElasticBlockHelpers.getTypeOfField(
+        schema,
+        builder,
+        field,
+        dataSource,
+        true,
+      );
+      return type === 'nested' || type === '';
+    }).toList();
+    // Filter out anything that it is a single object, not a list of objects
+    if (resultsState.hits && resultsState.hits.size)
+    {
+      nestedFields = nestedFields.filter((field) =>
+        List.isList(resultsState.hits.get(0).fields.get(field)),
+      ).toList();
+    }
+
+    return nestedFields;
   }
 
   public handleCountResponse(response: M1QueryResponse)
@@ -409,7 +476,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (postprocessed.hasOwnProperty('size'))
     {
-      postprocessed['size'] = Math.min(postprocessed['size'], 200);
+      postprocessed['size'] = Math.min(postprocessed['size'], MAX_HITS);
     }
 
     return ESConverter.formatES(new ESJSONParser(JSON.stringify(postprocessed)));
@@ -417,89 +484,104 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private queryM2Results(query: Query, db: BackendInstance)
   {
-    if (query.tqlMode !== 'manual')
+    //
+    // if (query.parseTree === null || query.parseTree.hasError())
+    // {
+    //   return;
+    // }
+    // TODO: This only allows that path to make queries ( when one exists )
+    let eql;
+    if (query === this.state.lastQuery)
     {
-      if (query.parseTree === null || query.parseTree.hasError())
+      return;
+    }
+    if (query.path !== undefined)
+    {
+      try
+      {
+        const parser: ESJSONParser = new ESJSONParser(query.tql, true);
+        eql = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
+        eql = this.postprocessEQL(eql);
+      }
+      catch (e)
       {
         return;
       }
     }
-    if (query !== this.state.lastQuery)
+    else
     {
-      let eql = AllBackendsMap[query.language].parseTreeToQueryString(
+      eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
         {
           replaceInputs: true,
         },
       );
-
       if (query.tqlMode !== 'manual')
       {
         eql = this.postprocessEQL(eql);
       }
-      if (this.state.query && this.state.query.xhr)
-      {
-        this.state.query.xhr.abort();
-      }
-      this.setState({
-        lastQuery: query,
-        queriedTql: eql,
-        query: Ajax.query(
-          eql,
-          db,
-          (resp) =>
-          {
-            this.handleM2QueryResponse(resp, false);
-          },
-          (err) =>
-          {
-            this.handleM2RouteError(err, false);
-          },
-        ),
-      });
-
-      // let allFieldsQueryCode;
-      // try
-      // {
-      //   allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
-      //     query,
-      //     {
-      //       allFields: true,
-      //       replaceInputs: true,
-      //     },
-      //   );
-      // }
-      // catch (err)
-      // {
-      //   console.log('Could not generate all field Elastic request, reason:' + err);
-      // }
-      // if (allFieldsQueryCode)
-      // {
-      //   this.setState({
-      //     allQuery: Ajax.query(
-      //       allFieldsQueryCode,
-      //       db,
-      //       (resp) =>
-      //       {
-      //         this.handleM2QueryResponse(resp, true);
-      //       },
-      //       (err) =>
-      //       {
-      //         this.handleM2RouteError(err, true);
-      //       },
-      //     ),
-      //   });
-      //
-      // }
-
-      this.changeResults({
-        loading: true,
-        hasLoadedResults: false,
-        hasLoadedAllFields: false,
-        hasLoadedCount: false,
-        hasLoadedTransform: false,
-      });
     }
+    if (this.state.query && this.state.query.xhr)
+    {
+      this.state.query.xhr.abort();
+    }
+    this.setState({
+      lastQuery: query,
+      queriedTql: eql,
+      query: Ajax.query(
+        eql,
+        db,
+        (resp) =>
+        {
+          this.handleM2QueryResponse(resp, false);
+        },
+        (err) =>
+        {
+          this.handleM2RouteError(err, false);
+        },
+      ),
+    });
+    this.changeResults({
+      loading: true,
+      hasLoadedResults: false,
+      hasLoadedAllFields: false,
+      hasLoadedCount: false,
+      hasLoadedTransform: false,
+    });
+
+    // let allFieldsQueryCode;
+    // try
+    // {
+    //   allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
+    //     query,
+    //     {
+    //       allFields: true,
+    //       replaceInputs: true,
+    //     },
+    //   );
+    // }
+    // catch (err)
+    // {
+    //   console.log('Could not generate all field Elastic request, reason:' + err);
+    // }
+    // if (allFieldsQueryCode)
+    // {
+    //   this.setState({
+    //     allQuery: Ajax.query(
+    //       allFieldsQueryCode,
+    //       db,
+    //       (resp) =>
+    //       {
+    //         this.handleM2QueryResponse(resp, true);
+    //       },
+    //       (err) =>
+    //       {
+    //         this.handleM2RouteError(err, true);
+    //       },
+    //     ),
+    //   });
+    //
+    // }
   }
 
   private updateResults(resultsData: any, isAllFields: boolean)
@@ -637,7 +719,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       let hitTemp = _.cloneDeep(hit);
       let rootKeys: string[] = [];
-      rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '');
+      rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '', 'fields');
       if (rootKeys.length > 0) // there were group join objects
       {
         const duplicateRootKeys: string[] = [];
@@ -659,7 +741,15 @@ export class ResultsManager extends TerrainComponent<Props>
         });
       }
       const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
-      return _.extend({}, hitTemp._source, sort, {
+      let fields = {};
+      if (hitTemp.fields !== undefined)
+      {
+        _.keys(hitTemp.fields).forEach((field) =>
+        {
+          fields[field] = hitTemp.fields[field][0];
+        });
+      }
+      return _.extend({}, hitTemp._source, sort, fields, {
         _index: hitTemp._index,
         _type: hitTemp._type,
         _score: hitTemp._score,
@@ -796,18 +886,18 @@ export class ResultsManager extends TerrainComponent<Props>
 
 function getPrimaryKeyFor(hit: Hit, config: ResultsConfig, index?: number): string
 {
-  if (config && config.primaryKeys.size)
+  if (config && config.primaryKeys.size && hit && hit.fields && hit.fields.get)
   {
     return config.primaryKeys.map(
       (field) => hit.fields.get(field),
     ).join('-and-');
   }
 
-  return index + ': ' + JSON.stringify(hit.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
+  return index + ': ' + JSON.stringify(Util.asJS(hit.fields)); // 'result-' + Math.floor(Math.random() * 100000000);
 }
 
 export default Util.createTypedContainer(
   ResultsManager,
-  ['spotlights'],
+  ['spotlights', 'builder', 'schema'],
   { spotlightActions: SpotlightActions },
 );

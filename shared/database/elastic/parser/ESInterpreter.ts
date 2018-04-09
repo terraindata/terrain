@@ -114,6 +114,14 @@ export default class ESInterpreter
       }
 
       let alias: string | null = null;
+      if (root.value && root.value.groupJoin)
+      {
+        alias = 'parent';
+      }
+      if (root.value && root.value.groupJoin && root.value.groupJoin.parentAlias)
+      {
+        alias = root.value.groupJoin.parentAlias;
+      }
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {
@@ -152,18 +160,6 @@ export default class ESInterpreter
             info.clause.mark(this, info);
           }
 
-          return true;
-        },
-        (info: ESValueInfo): boolean =>
-        {
-          if (info.clause !== undefined && info.clause.type === 'groupjoin_name' && alias === null)
-          {
-            alias = 'parent';
-          }
-          else if (info.clause !== undefined && info.clause.type === 'parentAlias' && alias !== null)
-          {
-            alias = info.value;
-          }
           return true;
         },
       );

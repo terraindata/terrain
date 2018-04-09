@@ -51,6 +51,7 @@ const { List, Map } = Immutable;
 import MidwayError from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import { SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import ETLAjax, { ExecuteConfig } from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
@@ -63,6 +64,14 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 export interface ETLActionTypes
 {
+  addModal: {
+    actionType: 'addModal';
+    props: ModalProps;
+  };
+  setModalRequests: {
+    actionType: 'setModalRequests';
+    requests: List<ModalProps>;
+  };
   setLoading: { // sort of a semaphore to track if there are pending requests for a given query
     actionType: 'setLoading';
     key: string;
@@ -77,6 +86,8 @@ export interface ETLActionTypes
   executeTemplate: {
     actionType: 'executeTemplate',
     template: ETLTemplate,
+    onSuccess?: () => void,
+    onError?: (ev: any) => void,
   };
   fetchTemplates: {
     actionType: 'fetchTemplates';
@@ -115,6 +126,20 @@ export interface ETLActionTypes
     actionType: 'updateLocalTemplates';
     template: ETLTemplate;
   };
+  setRunningTemplate: {
+    actionType: 'setRunningTemplate',
+    templateId: number,
+    template: ETLTemplate,
+  };
+  clearRunningTemplate: {
+    actionType: 'clearRunningTemplate',
+    templateId: number,
+  };
+  setAcknowledgedRun: {
+    actionType: 'setAcknowledgedRun',
+    templateId: number,
+    value: boolean,
+  };
 }
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
@@ -130,6 +155,15 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       createTemplate: (state, action) => state,
       saveAsTemplate: (state, action) => state,
       saveTemplate: (state, action) => state,
+      addModal: (state, action) =>
+      {
+        return state.set('modalRequests',
+          MultiModal.addRequest(state.modalRequests, action.payload.props));
+      },
+      setModalRequests: (state, action) =>
+      {
+        return state.set('modalRequests', action.payload.requests);
+      },
       setLoading: (state, action) =>
       {
         let value = _.get(state.loading, action.payload.key, 0);
@@ -168,6 +202,21 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         {
           return state.update('templates', (templates) => templates.set(index, action.payload.template));
         }
+      },
+      setRunningTemplate: (state, action) =>
+      {
+        return state.update('runningTemplates',
+          (templates) => templates.set(action.payload.templateId, action.payload.template));
+      },
+      clearRunningTemplate: (state, action) =>
+      {
+        return state.update('runningTemplates',
+          (templates) => templates.delete(action.payload.templateId));
+      },
+      setAcknowledgedRun: (state, action) =>
+      {
+        return state.update('acknowledgedRuns',
+          (runs) => runs.set(action.payload.templateId, action.payload.value));
       },
     };
 
@@ -244,9 +293,18 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
           _.set(options, ['files', key], (source.options as SourceOptionsType<Sources.Upload>).file);
         }
       });
+
+      const onLoad = () =>
+      {
+        if (action.onSuccess !== undefined)
+        {
+          action.onSuccess();
+        }
+      };
+
       ETLAjax.executeTemplate(template.id, options)
-        .then(this.onLoadFactory<any>([], directDispatch, name))
-        .catch(this.onErrorFactory(undefined, directDispatch, name));
+        .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
+        .catch(this.onErrorFactory(action.onError, directDispatch, name));
     }
   }
 

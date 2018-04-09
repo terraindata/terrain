@@ -281,6 +281,7 @@ const SCHEMA_STYLE_COLUMN = {
   top: 0,
   width: 'calc(100% - 6px)',
   height: verticalDivide + '%',
+  marginLeft: 5,
 };
 
 const RESULTS_STYLE_FULL_PAGE = {

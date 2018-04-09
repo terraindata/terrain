@@ -310,10 +310,6 @@ class Notifications extends TerrainComponent<Props>
         <div>Send me email notifications:</div>
         <br />
         <div className='expanded-section-indent'>
-          <RadioButtons
-            selected={emailTiming}
-            options={this.emailNotificationOptions}
-          />
         </div>
         <div className='notification-subtitle-small'>
           Send me email notifications for:

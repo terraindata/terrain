@@ -55,10 +55,11 @@ import { TransformationFormProps } from './TransformationFormBase';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { ArraySumTFF } from './ArraySumTransformationForm';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
-import { SubstringTFF, UppercaseTFF } from './SimpleTransformations';
+import { HashTFF, SubstringTFF, UppercaseTFF } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
 export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
@@ -77,6 +78,10 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return JoinTFF;
     case TransformationNodeType.CastNode:
       return CastTFF;
+    case TransformationNodeType.HashNode:
+      return HashTFF;
+    case TransformationNodeType.ArraySumNode:
+      return ArraySumTFF;
     default:
       return null;
   }

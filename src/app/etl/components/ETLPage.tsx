@@ -46,17 +46,24 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
 import FilePicker from 'common/components/FilePicker';
+import Loading from 'common/components/Loading';
+import Modal from 'common/components/Modal';
+import { MultiModal } from 'common/components/overlay/MultiModal';
+import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { ETLActions, ETLReducers } from 'etl/ETLRedux';
 import { ETLState } from 'etl/ETLTypes';
 import './ETLPage.less';
+
+const { List, Map } = Immutable;
 
 export interface Props
 {
@@ -77,15 +84,83 @@ class ETLPage extends TerrainComponent<Props>
     // TODO lock UI until done?
   }
 
+  public setModalRequests(requests)
+  {
+    this.props.act({
+      actionType: 'setModalRequests',
+      requests,
+    });
+  }
+
+  // get unacknowledged template if it exists
+  public getRunningTemplate(): ETLTemplate | undefined
+  {
+    const { runningTemplates, acknowledgedRuns } = this.props.etl;
+    return runningTemplates.find((template) => !Boolean(acknowledgedRuns.get(template.id)));
+  }
+
+  public renderRunningTemplateModal()
+  {
+    const { runningTemplates, acknowledgedRuns } = this.props.etl;
+    const template = this.getRunningTemplate();
+    const showTemplate = template !== undefined && !acknowledgedRuns.get(template.id);
+    let message = '';
+    if (showTemplate)
+    {
+      message = `"${runningTemplates.first().templateName}" is currently running`;
+    }
+
+    return (
+      <Modal
+        title={'Task In Progress'}
+        open={showTemplate}
+        onClose={this.handleCloseRunningTemplateModal}
+      >
+        <div className='etl-page-loading-modal-content'>
+          {message}
+          <Loading
+            width={150}
+            height={150}
+            loading={true}
+            loaded={false}
+          />
+        </div>
+      </Modal>
+    );
+  }
+
   public render()
   {
+    const { modalRequests } = this.props.etl;
+
     return (
       <div className='etl-page-root'>
         {
           this.props.children
         }
+        {
+          this.renderRunningTemplateModal()
+        }
+        <MultiModal
+          requests={modalRequests}
+          setRequests={this.setModalRequests}
+        />
       </div>
     );
+  }
+
+  public handleCloseRunningTemplateModal()
+  {
+    const { runningTemplates } = this.props.etl;
+    const template = this.getRunningTemplate();
+    if (template !== undefined)
+    {
+      this.props.act({
+        actionType: 'setAcknowledgedRun',
+        templateId: template.id,
+        value: true,
+      });
+    }
   }
 }
 

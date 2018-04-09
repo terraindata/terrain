@@ -173,3 +173,30 @@ function* postorder(fieldMap: FieldMap, id: number)
     yield id;
   }
 }
+
+export function preorderForEach(
+  engine: TransformationEngine,
+  fromId: number,
+  fn: (id: number) => void,
+)
+{
+  const fieldMap = createTreeFromEngine(engine);
+  for (const id of preorder(fieldMap, fromId))
+  {
+    fn(id);
+  }
+}
+
+function* preorder(fieldMap: FieldMap, id: number)
+{
+  const field = fieldMap.get(id);
+  if (field !== undefined)
+  {
+    const ids = field.childrenIds;
+    yield id;
+    for (let i = 0; i < ids.size; i++)
+    {
+      yield* preorder(fieldMap, ids.get(i));
+    }
+  }
+}

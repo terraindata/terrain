@@ -48,6 +48,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import { ModalProps } from 'common/components/overlay/MultiModal';
 
 import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
@@ -58,6 +59,10 @@ class ETLStateC
 {
   public templates: List<ETLTemplate> = List([]);
   public loading: { [k: string]: number } = {}; // a tracker to verify if we are waiting on queries
+  public modalRequests: List<ModalProps> = List([]);
+  // TODO the way we track what is running and how the ui deals with it is suboptimal
+  public runningTemplates: Immutable.Map<number, ETLTemplate> = Map();
+  public acknowledgedRuns: Immutable.Map<number, boolean> = Map();
 }
 export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor(ETLStateC);

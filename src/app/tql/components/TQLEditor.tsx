@@ -111,7 +111,8 @@ export interface Props
   placeholder?: string;
 
   builder?: BuilderState;
-
+  className?: string;
+  style?: any;
   onChange?(tql: string, noAction?: boolean, manualRequest?: boolean);
 
   toggleSyntaxPopup?(event, line);
@@ -306,7 +307,10 @@ class TQLEditor extends TerrainComponent<Props>
       />
     );
     return (
-      <div>
+      <div
+        className={this.props.className}
+        style={this.props.style}
+      >
         {
           CM
         }

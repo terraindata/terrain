@@ -50,13 +50,15 @@ import { List } from 'immutable';
 import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Circle, Map, Marker, Polyline, Popup, Rectangle, TileLayer } from 'react-leaflet';
+import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, ZoomControl } from 'react-leaflet';
+import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
 
 import Switch from 'common/components/Switch';
-import { backgroundColor, Colors } from '../../colors/Colors';
+import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
 import BuilderTextbox from './BuilderTextbox';
+import FadeInOut from './FadeInOut';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
@@ -78,12 +80,16 @@ export interface Props
   boundingRectangles?: List<BoundingRectangle> | List<{}>;
   onZoomChange?: (zoom) => void;
   zoom?: number;
+  debounce?: boolean;
   // Show/Hide certain features
   hideZoomControl?: boolean;
   hideSearchBar?: boolean;
 
   // Styling
   className?: string;
+  wrapperClassName?: string;
+  // When the text box is selected, the map will expand below it, otherwise it will be hidden
+  fadeInOut?: boolean;
 }
 
 interface LocationMarker
@@ -125,20 +131,46 @@ const UNIT_CONVERSIONS =
     NM: 1852,
   };
 
-class MapComponent extends TerrainComponent<Props>
+export const units =
+  {
+    mi: 'miles',
+    yd: 'yards',
+    ft: 'feet',
+    in: 'inches',
+    km: 'kilometers',
+    m: 'meters',
+    cm: 'centimeters',
+    mm: 'millimeters',
+    nmi: 'nautical miles',
+  };
+
+class MapComponent extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
+  public debouncedExecuteChange;
+  public map;
+  public circle;
 
   public state: {
+    mapExpanded: boolean,
     zoom: number;
     coordinateSearch: boolean;
-  }
-    = {
+    inputValue: string;
+    circleSet: boolean;
+  } = {
+      mapExpanded: false,
       zoom: 15,
       coordinateSearch: false,
+      inputValue: this.props.inputValue,
+      circleSet: false,
     };
-
   public geoCache = {};
   public reverseGeoCache = {};
+
+  constructor(props)
+  {
+    super(props);
+    this.debouncedExecuteChange = _.debounce(this.executeChange, 350);
+  }
 
   public shouldComponentUpdate(nextProps, nextState)
   {
@@ -147,10 +179,18 @@ class MapComponent extends TerrainComponent<Props>
 
   public onChange(coordinates, inputValue)
   {
+    this.setState({
+      inputValue,
+    });
     if (this.props.onChange !== undefined)
     {
-      this.props.onChange(coordinates, inputValue);
+      this.debouncedExecuteChange(coordinates, inputValue);
     }
+  }
+
+  public executeChange(coordinates, inputValue)
+  {
+    this.props.onChange(coordinates, inputValue);
   }
 
   // Create a marker icon given style parameters
@@ -198,13 +238,36 @@ class MapComponent extends TerrainComponent<Props>
     return styledIcon;
   }
 
-  public componentWillReceiveProps(nextProps: Props)
+  public componentDidUpdate(prevProps, prevState)
+  {
+    // initial update
+    if (!this.state.circleSet && this.circle && this.props.distance && this.map)
+    {
+      this.map.leafletElement.fitBounds(this.circle.leafletElement.getBounds());
+      this.setState({
+        circleSet: true,
+      });
+    }
+    else if (this.state.circleSet && this.circle && this.map &&
+      (this.props.distance !== prevProps.distance || this.props.distanceUnit !== prevProps.distanceUnit))
+    {
+      this.map.leafletElement.fitBounds(this.circle.leafletElement.getBounds());
+    }
+  }
+
+  public componentWillReceiveProps(nextProps: Props & InjectedOnClickOutProps)
   {
     // If the coordinates change, and the input value is not defined, try to reverse geocode it
     if (!_.isEqual(this.props.coordinates, nextProps.coordinates)
       && (nextProps.inputValue === undefined || nextProps.inputValue === ''))
     {
       this.reverseGeocode(nextProps.coordinates);
+    }
+    if (nextProps.inputValue !== this.props.inputValue)
+    {
+      this.setState({
+        inputValue: nextProps.inputValue,
+      });
     }
   }
 
@@ -243,7 +306,6 @@ class MapComponent extends TerrainComponent<Props>
   }
 
   // Given coordinates, find the corresponding address (this is more expensive than geocoding)
-
   public reverseGeocode(coordinates)
   {
     const location = MapUtil.getCoordinatesFromGeopoint(coordinates);
@@ -433,23 +495,23 @@ class MapComponent extends TerrainComponent<Props>
     if (coordinates !== undefined)
     {
       location = MapUtil.getCoordinatesFromGeopoint(coordinates);
-      if (!this.isValidCoordinate(location))
+    }
+    if (!this.isValidCoordinate(location) || coordinates === undefined)
+    {
+      // Try to see if it inputValue is an input, in that case get the coordinates from there
+      const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
+      if (inputs[inputValue] !== undefined)
       {
-        // Try to see if it inputValue is an input, in that case get the coordinates from there
-        const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
-        if (inputs[inputValue] !== undefined)
-        {
-          location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
-        }
-        // Double check, because input coordinates could also be invalid
-        if (location[0] === undefined || String(location[0]) === '')
-        {
-          location[0] = 0;
-        }
-        if (location[1] === undefined || String(location[1]) === '')
-        {
-          location[1] = 0;
-        }
+        location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
+      }
+      // Double check, because input coordinates could also be invalid
+      if (location[0] === undefined || String(location[0]) === '')
+      {
+        location[0] = 0;
+      }
+      if (location[1] === undefined || String(location[1]) === '')
+      {
+        location[1] = 0;
       }
     }
     return location;
@@ -463,24 +525,25 @@ class MapComponent extends TerrainComponent<Props>
     }
   }
 
-  public renderMap()
+  public renderMap(location)
   {
-    const { coordinates, inputValue, zoom } = this.props;
-    const location = this.parseLocation(coordinates, inputValue);
+    const { coordinates, zoom } = this.props;
+    const { inputValue } = this.state;
+    const mapProps = this.getMapProps(location);
     return (
       <div className={this.props.className} >
         <Map
-          {...this.getMapProps(location)}
-          zoom={zoom !== undefined ? zoom : this.state.zoom}
+          {...mapProps}
+          zoom={zoom !== undefined ? parseFloat(String(zoom)) : this.state.zoom}
           onViewportChanged={this.setZoomLevel}
           maxBounds={[[85, -180], [-85, 180]]}
           minZoom={1}
           zoomControl={!this.props.hideZoomControl}
           onClick={this.handleOnMapClick}
           onMouseDown={this.handleOnMapClick}
+          ref={(map) => { this.map = map; }}
         >
           {
-            this.props.coordinates !== undefined &&
             this.renderMarker(inputValue, location, 'black')
           }
           {
@@ -493,6 +556,7 @@ class MapComponent extends TerrainComponent<Props>
               width={7}
               fillColor={Colors().builder.cards.categories.filter}
               fillOpacity={0.2}
+              ref={(circle) => { this.circle = circle; }}
             />}
           {
             // Render addition locations (spotlights, aggregation map, etc.)
@@ -532,37 +596,47 @@ class MapComponent extends TerrainComponent<Props>
     this.reverseGeocode(newLocation);
   }
 
+  public renderCoordinateInputs(coordinates)
+  {
+    const location = MapUtil.getCoordinatesFromGeopoint(coordinates);
+    return (
+      <div className='input-map-coordinates'>
+        <BuilderTextbox
+          value={location[0]}
+          onChange={this._fn(this.handleCoordinateChange, 'latitude')}
+          canEdit={this.props.canEdit}
+          placeholder='Lat'
+          className='input-map-coordinates-latitude'
+        />
+        <BuilderTextbox
+          value={location[1]}
+          onChange={this._fn(this.handleCoordinateChange, 'longitude')}
+          canEdit={this.props.canEdit}
+          placeholder='Long'
+          className='input-map-coordinates-longitude'
+        />
+      </div>
+    );
+  }
+
   // Render search bar - either a single input for address/value or 2 inputs for coordinates
   public renderSearchBar()
   {
     const inputProps = {
-      value: this.props.inputValue,
+      value: this.state.inputValue,
       onChange: this.handleInputValueChange,
       disabled: this.props.canEdit === false,
     };
     const inputStyle = this.props.canEdit === false ? _.extend({}, backgroundColor(Colors().darkerHighlight)) : {};
     const location = MapUtil.getCoordinatesFromGeopoint(this.props.coordinates);
     return (
-      <div className='map-component-search-bar'>
+      <div
+        className='map-component-search-bar'
+        onMouseUp={this._toggle('mapExpanded')}
+      >
         {
           this.props.allowSearchByCoordinate && this.state.coordinateSearch ?
-            <div className='input-map-coordinates'>
-              <BuilderTextbox
-                value={location[0]}
-                onChange={this._fn(this.handleCoordinateChange, 'latitude')}
-                canEdit={this.props.canEdit}
-                placeholder='Latitude'
-                className='iinput-map-coordinates-latitude'
-              />
-              <BuilderTextbox
-                value={location[1]}
-                onChange={this._fn(this.handleCoordinateChange, 'longitude')}
-                canEdit={this.props.canEdit}
-                placeholder='Longitude'
-                className='input-map-coordinates-longitude'
-              />
-            </div>
-            :
+            this.renderCoordinateInputs(this.props.coordinates) :
             <PlacesAutocomplete
               inputProps={inputProps}
               onSelect={this.geocode}
@@ -588,15 +662,70 @@ class MapComponent extends TerrainComponent<Props>
       </div>);
   }
 
-  public render()
+  public handleClickOutside()
+  {
+    this.setState({
+      mapExpanded: false,
+    });
+  }
+
+  public renderDisabledOverlay()
   {
     return (
-      <div>
+      <div
+        className='map-component-disabled'
+        style={_.extend({}, backgroundColor('white'), fontColor(Colors().fontColor))}
+      >
+        <span>Enter a valid location above to view correct map.</span>
+        <br />
+        <span>Note: Some input values may not have known coordinates (ex. parent fields).</span>
+      </div>
+    );
+  }
+
+  public renderMapWrapper(location)
+  {
+    return (
+      <div style={{ position: 'relative' }}>
+        {
+          this.renderMap(location)
+        }
+        {
+          (_.isEqual(location, [0, 0]) || location === undefined) &&
+          this.renderDisabledOverlay()
+        }
+      </div>
+    );
+  }
+
+  public render()
+  {
+    const { coordinates } = this.props;
+    const { inputValue } = this.state;
+    const location = this.parseLocation(coordinates, inputValue);
+    return (
+      <div
+        className={this.props.wrapperClassName}
+      >
         {!this.props.hideSearchBar && this.renderSearchBar()}
-        {this.renderMap()}
+        {
+          this.props.fadeInOut ?
+            <div
+              className={classNames({
+                'map-component-fade-in-out': true,
+                'map-component-fade-in-out-hidden': !this.state.mapExpanded,
+              })}
+            >
+              {
+                this.renderMapWrapper(location)
+              }
+            </div>
+            :
+            this.renderMapWrapper(location)
+        }
       </div>
     );
   }
 }
 
-export default MapComponent;
+export default onClickOutside(MapComponent);

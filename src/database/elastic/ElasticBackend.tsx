@@ -50,6 +50,7 @@ import { List } from 'immutable';
 import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
 
+import { parsePath } from 'app/builder/components/pathfinder/PathfinderParser';
 import ESConverter from '../../../shared/database/elastic/formatter/ESConverter';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
@@ -92,6 +93,8 @@ export class ElasticBackend implements Backend
   queryToCode = CardsToElastic.toElastic;
 
   codeToQuery = ElasticToCards;
+
+  pathToCode = parsePath;
 
   parseQuery = ParseElasticQuery;
 

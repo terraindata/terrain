@@ -64,7 +64,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { kpToString, stringToKP, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
-import './MoveFieldModal.less';
+import './EditorFieldModal.less';
 
 export default class Injector extends TerrainComponent<TemplateEditorFieldProps>
 {
