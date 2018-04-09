@@ -97,7 +97,8 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        shortSummary: (meta) => {
+        shortSummary: (meta) =>
+        {
           const names = meta.newFieldKeyPaths.map((value) => value.last());
           return `Split on ${meta.delimiter} into ${names.toJS()}`;
         },
@@ -121,7 +122,8 @@ const TransformationNodeInfo: AllNodeInfoType =
             EngineUtil.isNamedField(engine.getOutputKeyPath(fieldId))
           );
         },
-        shortSummary: (meta) => {
+        shortSummary: (meta) =>
+        {
           const names = meta.newFieldKeyPaths.map((value) => value.last());
           return `Join on ${meta.delimiter} from ${names.toJS()}`;
         },
@@ -217,7 +219,8 @@ const TransformationNodeInfo: AllNodeInfoType =
         creatable: true,
         description: `Convert this field to a different type`,
         type: CastTransformationNode,
-        shortSummary: (meta) => {
+        shortSummary: (meta) =>
+        {
           return `Cast to ${meta.toTypename}`;
         },
         targetedVisitor: (visitor: TransformationNodeVisitor,
@@ -236,7 +239,8 @@ const TransformationNodeInfo: AllNodeInfoType =
         {
           return EngineUtil.getRepresentedType(fieldId, engine) === 'string';
         },
-        shortSummary: (meta) => {
+        shortSummary: (meta) =>
+        {
           return `Hash with salt "${meta.salt}`;
         },
         type: HashTransformationNode,
@@ -269,6 +273,8 @@ const TransformationNodeInfo: AllNodeInfoType =
       },
   };
 
+export type TNodeObject = Pick<TransformationNode, 'fields' | 'meta'>;
+
 export abstract class TransformationInfo
 {
   public static getReadableName(type: TransformationNodeType)
@@ -276,12 +282,13 @@ export abstract class TransformationInfo
     return TransformationNodeInfo[type].humanName;
   }
 
-  public static getReadableSummary(type: TransformationNodeType, transformation: TransformationNode): string
+  public static getReadableSummary(type: TransformationNodeType, transformation: TNodeObject): string
   {
     const getSummary = TransformationNodeInfo[type].shortSummary;
     if (getSummary !== undefined)
     {
-      try {
+      try
+      {
         return (getSummary as any)(transformation.meta);
       }
       catch (e)

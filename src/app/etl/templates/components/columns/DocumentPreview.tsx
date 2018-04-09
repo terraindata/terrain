@@ -88,7 +88,14 @@ class DocumentPreview extends TerrainComponent<Props>
     {
       return {};
     }
-    return engine.transform(previewDocument);
+    try
+    {
+      return engine.transform(previewDocument);
+    }
+    catch (e)
+    {
+      return {};
+    }
   }
 
   public getDocument()
