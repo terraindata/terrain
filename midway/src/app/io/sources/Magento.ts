@@ -55,7 +55,7 @@ import * as winston from 'winston';
 
 import * as yadeep from '../../../../../shared/util/yadeep';
 import { Credentials } from '../../credentials/Credentials';
-import CSVTransform from '../streams/CSVTransform';
+import JSONTransform from '../streams/JSONTransform';
 import { ExportSourceConfig } from './Sources';
 
 export const credentials: Credentials = new Credentials();
@@ -136,11 +136,11 @@ export class Magento
     });
   }
 
-  public async getMagentoRowsAsCSVStream(values: any[]): Promise<stream.Readable>
+  public async getMagentoRowsAsJSONStream(values: any[]): Promise<stream.Readable>
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
-      const writer = CSVTransform.createExportStream();
+      const writer = JSONTransform.createExportStream();
       if (values.length > 0)
       {
         for (let i = 0; i < values.length; ++i)
@@ -183,10 +183,11 @@ export class Magento
             let result: object[] = [];
             const storedResult: any[] = [];
             // chain operations
-            const deepCopyMagentoSourceConfig = _.cloneDeep(magentoSourceConfig);
+
             let i = 0;
             while (i < magentoSourceConfig.url.length)
             {
+              const deepCopyMagentoSourceConfig = _.cloneDeep(magentoSourceConfig);
               deepCopyMagentoSourceConfig['mappedParams'] = magentoSourceConfig['mappedParams'][i];
               deepCopyMagentoSourceConfig['updateParams'] = magentoSourceConfig['updateParams'][i];
               if (Array.isArray(magentoSourceConfig.url[i]['name'].match(new RegExp(/^<.*>$/g))))
@@ -364,12 +365,17 @@ export class Magento
                       if (origDataPrimaryKeys[row[returnedKeyToFilterOn]] === undefined) // not found in the exported dataset
                       {
                         const rowObj: object = {};
-                        rowObj[returnedKeyToFilterOn] = _.pick(row, keysToInclude);
+                        rowObj[row[returnedKeyToFilterOn]] = _.pick(row, keysToInclude);
                         excludedProducts.push(rowObj); // id : row
                       }
                     });
-                    storedResult.push(excludedProducts);
-                    i++;
+                    const excludedProductObj: object = {};
+                    excludedProducts.forEach((ep) =>
+                    {
+                      const epKey: any = Object.keys(ep)[0];
+                      excludedProductObj[epKey] = ep[epKey];
+                    });
+                    storedResult.push(excludedProductObj);
                     break;
                   default:
                     break;
@@ -403,6 +409,7 @@ export class Magento
                     deepCopyMagentoSourceConfig.mappedKeys.push(mappedObj);
                   });
                 }
+
                 result = await this._runSoapOperation(deepCopyMagentoSourceConfig, soapCreds, options) as object[];
                 if (magentoSourceConfig.url[i]['postProcessPath'] !== undefined
                   && magentoSourceConfig.url[i]['postProcessArray'] === true)
@@ -549,7 +556,7 @@ export class Magento
   {
     return new Promise<string | object[]>(async (resolve, reject) =>
     {
-      const THRESHOLD: number = 30;
+      const THRESHOLD: number = 3000;
       const resultArr: object[] = [];
       soap.soap.createClient(soapCreds['baseUrl'], options, async (err, client) =>
       {
@@ -674,6 +681,10 @@ export class Magento
               {
                 let j: number = 0;
                 let callbackCounter: number = 0;
+                if (magentoSourceConfig.data.length === 0)
+                {
+                  return resolve(resultArr);
+                }
                 while (j < THRESHOLD && j < magentoSourceConfig.data.length) // TODO THRESHOLD
                 {
                   const row = magentoSourceConfig.data[j];
@@ -764,7 +775,7 @@ export class Magento
       }
       else // does not exist yet
       {
-        origObj[aggParam] = objToMerge[aggParam] !== undefined ? objToMerge[aggParam] : null;
+        origObj[aggParam] = objToMerge[aggParam] !== undefined ? [].concat(objToMerge[aggParam]) : null;
       }
     });
     return origObj;

@@ -120,6 +120,11 @@ export interface Props
 
   tuningMode?: boolean;
 
+  onKeyDown?: (e) => void;
+  autoFocus?: boolean;
+
+  action?: (keyPath, value) => void;
+
   builder?: any;
   builderActions?: typeof BuilderActions;
 }
@@ -169,16 +174,20 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.builder-tb input &::placeholder',
-      style: { color: Colors().text3 + '!important' },
-    });
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.builder-tb input',
-      style: { color: Colors().text1 },
-    });
+    if (!hasSetColors)
+    {
+      hasSetColors = true;
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.builder-tb input &::placeholder',
+        style: { color: Colors().text3 + '!important' },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.builder-tb input',
+        style: { color: Colors().text1 },
+      });
+    }
   }
 
   public getCreatingType(): string
@@ -198,7 +207,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     // If you want two-way backups, use this line
     // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
     if (
-      this.props.value !== undefined
+      this.props.value !== undefined && this.props.value !== null
       && this.props.value['type'] !== undefined && this.props.value['type'] === this.getCreatingType()
       && value === ''
     )
@@ -250,9 +259,16 @@ class BuilderTextbox extends TerrainComponent<Props>
     // {
     //   value = +value;
     // }
-    if (this.props.keyPath)
+    if (this.props.keyPath && this.props.keyPath.size)
     {
-      this.props.builderActions.change(this.props.keyPath, value);
+      if (this.props.action)
+      {
+        this.props.action(this.props.keyPath, value);
+      }
+      else
+      {
+        this.props.builderActions.change(this.props.keyPath, value);
+      }
     }
     this.props.onChange && this.props.onChange(value);
   }
@@ -372,7 +388,15 @@ class BuilderTextbox extends TerrainComponent<Props>
         keyPath = List(keyPaths.get(card.id));
       }
     }
-    this.props.builderActions.change(keyPath.push(key), !this.props.value[key]);
+
+    if (this.props.action)
+    {
+      this.props.action(keyPath.push(key), !this.props.value[key]);
+    }
+    else
+    {
+      this.props.builderActions.change(keyPath.push(key), !this.props.value[key]);
+    }
   }
 
   public computeOptions()
@@ -469,6 +493,8 @@ class BuilderTextbox extends TerrainComponent<Props>
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
                 style={this.props.textStyle}
+                onKeyDown={this.props.onKeyDown}
+                autoFocus={this.props.autoFocus}
               />
           }
           {this.props.acceptsCards && this.renderSwitch()}
@@ -576,6 +602,8 @@ class BuilderTextbox extends TerrainComponent<Props>
     return isNaN(value as number);
   }
 }
+
+let hasSetColors = false;
 
 // const btbTarget =
 // {

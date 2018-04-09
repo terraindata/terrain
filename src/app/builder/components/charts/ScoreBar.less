@@ -1,5 +1,112 @@
 @import "../../../common/Common.less";
 
+.score-bar {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  
+  .score-weight-slider {
+    flex-shrink: 1
+  }
+  .score-bar-field-weight {
+    flex-shrink: 0;
+  }
+  
+  &.score-bar-alt {
+    
+    .score-bar-field-weight,
+    .score-bar-text {
+      margin: 2px 0px; // this prevents jittering during hover animation
+      margin-left: 6px;
+    }
+
+    .score-weight-slider {
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 0px;
+      .transition;
+    }
+    
+    &:not(:hover) {
+      .score-weight-slider {
+        height: 10px !important;
+        margin: 6px 0px;
+        
+        .rc-slider-handle {
+          height: 10px !important;
+          padding: 5px !important;
+        }
+        
+        .rc-slider {
+          &-handle:before {
+            opacity: 0;
+          }
+        }
+      }
+    }
+    
+    &:hover {
+      
+      .score-weight-slider {
+        height: 22px;
+      }
+    
+    }
+    
+    // beginnings of a hover-to-enlarge score bar style
+    // height: 10px;
+    // margin-top: 6px;
+    // margin-bottom: 12px;
+    // .transition;
+    
+    
+    // .score-bar-text {
+    //   font-size: 12px;
+    // }
+    
+    
+    // &:hover {
+    //   height: 22px;
+    //   margin-top: 0px;
+    //   margin-bottom: 6px;
+    // }
+    
+    .rc-slider {
+      padding: 0px;
+      
+      &-handle {
+        font-size: 8px;
+      }
+    }
+  }
+  
+  .score-bar-text,
+  .score-bar-field-weight-value {
+    width: 30px;
+    box-sizing: border-box;
+    text-align: right;
+    padding: 2px 4px;
+  }
+  
+  .score-bar-text {
+    border: none;
+    background: #eee;
+    
+  }
+  
+  .score-bar-field-weight {
+    // position: relative;
+    padding: 0;
+    font-size: 16px;
+    
+    .score-bar-field-weight-value {
+      // position: absolute;
+      // right: 6px;
+      // top: 6px;
+    }
+  }
+}
+
 .score-weight-key {
   text-align: left;
   background: #fff;
@@ -16,23 +123,26 @@
   border-radius: 5px;
   padding: 3px;
   box-sizing: border-box;
-  
+
   flex-grow: 2;
   flex-basis: 200px;
   margin: 0px (@standard-margin / 2);
-  
+
   .weight-graph-inner {
     width: 100%;
     height: 100%;
     position: relative;
-    
+
     .weight-graph-bar {
       position: absolute;
       height: 100%;
       .transition(~"all 0.25s");
+      &.weight-graph-bar-no-animate {
+        .transition.no-transition;
+      }
     }
   }
-  
+
   .weight-graph-line {
     height: 100%;
     top: 0px;
@@ -40,5 +150,22 @@
     left: 50%;
     width: 1px;
     background: #ccc;
+  }
+}
+
+.rc-slider {
+  padding: 3px;
+  
+  &-handle:before {
+    content: '| |';
+    opacity: 1;
+    .transition;
+  }
+  &-handle {
+    text-align: center;
+    color: rgba(255, 255, 255,.5);
+    font-size: 12px;
+    padding: 6px;
+    .transition(~"height 0.15s, padding 0.15s");
   }
 }

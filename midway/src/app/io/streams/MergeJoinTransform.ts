@@ -49,7 +49,6 @@ import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueIn
 import ElasticClient from '../../../database/elastic/client/ElasticClient';
 import ElasticReader from '../../../database/elastic/streams/ElasticReader';
 import SafeReadable from './SafeReadable';
-
 /**
  * Types of merge joins
  */

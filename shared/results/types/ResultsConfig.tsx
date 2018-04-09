@@ -46,9 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name max-classes-per-file member-access strict-boolean-expressions
 
+import { createRecordType } from 'app/Classes';
 import * as Immutable from 'immutable';
-import { createRecordType } from 'src/app/Classes';
 const { List, Map } = Immutable;
+import Util from 'app/util/Util';
 
 export class Format
 {
@@ -56,23 +57,32 @@ export class Format
   template: string = '';
   showRaw: boolean = false;
   showField: boolean = false;
+  config?: ResultsConfig = undefined; // For nested results
   set: (f: string, v: any) => Format;
   setIn: (f: string[], v: any) => Format;
 }
 const Format_Record = createRecordType(new Format(), 'FormatC');
 export const _Format = (config?: any) =>
 {
+  config = Util.asJS(config);
+  if (config && config['config'])
+  {
+    config['config'] = _ResultsConfig(config['config']);
+  }
   return new Format_Record(config || {}) as any as Format;
 };
 
 export class ResultsConfig
 {
+  thumbnail: string = '';
   name: string = '';
-  score: string = '_score';
+  score: string = '';
   fields: List<string> = List([]);
   enabled: boolean = false;
   formats: IMMap<string, Format> = Map<string, Format>();
   primaryKeys: List<string> = List(['_id']);
+  thumbnailWidth: number = 200;
+  smallThumbnailWidth: number = 55;
 
   set: (f: string, v: any) => ResultsConfig;
   setIn: (f: string[], v: any) => ResultsConfig;

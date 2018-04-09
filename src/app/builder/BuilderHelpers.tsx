@@ -80,7 +80,7 @@ export function getTermsForKeyPath(
 
 function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState, schemaState: SchemaState): List<string>
 {
-  if (!keyPath.size)
+  if (!keyPath || !keyPath.size)
   {
     return Immutable.List([]);
   }
