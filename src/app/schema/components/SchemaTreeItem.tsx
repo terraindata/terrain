@@ -56,6 +56,8 @@ import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
 import { serverChildrenConfig, ServerTreeInfo } from './items/ServerTreeInfo';
 import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
+const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
+const StarIcon = require('images/icon_star.svg?name=StarIcon');
 import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
@@ -83,6 +85,7 @@ class State
   public childCount: number = -1;
   public isSelected = false;
   public isHighlighted = false;
+  public starred = false;
 }
 
 const typeToRendering: {
@@ -145,6 +148,16 @@ class SchemaTreeItem extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.componentWillReceiveProps(this.props);
+    // Set initial starred value of column
+    if (this.props.type === 'column')
+    {
+      const item = this.props.schema.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+      const columnId = item.databaseId + '/' + item.name;
+      const metadata = this.props.schema.schemaMetadata.filter((d) => d.columnId === columnId).toList();
+      this.setState({
+        starred: (metadata.size && metadata.get(0).starred),
+      });
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -383,6 +396,21 @@ class SchemaTreeItem extends TerrainComponent<Props>
     );
   }
 
+  public toggleStarredColumn()
+  {
+    // Call schema store function that will set this column to starred in midway
+    const item = this.props.schema.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+    const columnId = item.databaseId + '/' + item.name;
+    this.props.schemaActions({
+      actionType: 'starColumn',
+      columnId,
+      starred: !this.state.starred,
+    });
+    this.setState({
+      starred: !this.state.starred,
+    });
+  }
+
   public render()
   {
     const { schema, type, id } = this.props;
@@ -421,6 +449,23 @@ class SchemaTreeItem extends TerrainComponent<Props>
               >
                 {
                   this.renderItemInfo()
+                }
+                {
+                  this.props.type === 'column' &&
+                  <div onClick={this.toggleStarredColumn}>
+                    <StarIcon
+                      style={this.state.starred
+                        ? Styles.selectedStarIcon : Styles.unselectedStarIcon}
+                    />
+                  </div>
+                }
+                {
+                  !hasChildren &&
+                  <div style={Styles.arrow} key='no-arrow'>
+                  </div>
+                }
+                {
+                  this.renderName()
                 }
                 {
                   isSelected ?

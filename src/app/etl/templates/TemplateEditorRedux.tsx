@@ -58,6 +58,7 @@ import
   _TemplateEditorState,
   DefaultDocumentLimit,
   EditorDisplayState,
+  FetchStatus,
   FieldMap,
   TemplateEditorHistory,
   TemplateEditorState,
@@ -290,7 +291,8 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       deleteInMergeDocuments: (state, action) =>
       {
-        return state.deleteIn(['uiState', 'mergeDocuments', action.payload.key]);
+        return state.deleteIn(['uiState', 'mergeDocuments', action.payload.key])
+          .setIn(['uiState', 'fetchStatuses', action.payload.key], FetchStatus.Unloaded);
       },
       closeSettings: (state, action) =>
       {

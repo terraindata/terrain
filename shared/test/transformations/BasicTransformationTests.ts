@@ -753,3 +753,40 @@ test('array sum transformation', () =>
   const r = e.transform(doc);
   expect(r['foosum']).toBe(10);
 });
+
+test('duplicate a wildcard array of fields', () =>
+{
+  const e = new TransformationEngine();
+  e.addField(List(['foo']), 'array', { valueType: 'object' });
+  e.addField(List(['foo', '*']), 'array', { valueType: 'object' });
+  const id3 = e.addField(List(['foo', '*', 'bar']), 'string');
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    List([e.getInputKeyPath(id3)]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['foo', '*', 'baz'])]),
+    },
+  );
+  const doc = {
+    foo: [
+      {
+        bar: 'hello',
+      },
+      {
+        bar: 'hey there',
+      },
+    ],
+  };
+  expect(e.transform(doc)).toEqual({
+    foo: [
+      {
+        bar: 'hello',
+        baz: 'hello',
+      },
+      {
+        bar: 'hey there',
+        baz: 'hey there',
+      },
+    ],
+  });
+});

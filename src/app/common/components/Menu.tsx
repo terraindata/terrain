@@ -51,6 +51,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import onClickOutside, { InjectedOnClickOutProps } from 'react-onclickoutside';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
@@ -81,12 +82,15 @@ export interface Props
   id?: ID;
   vertical?: boolean;
   openRight?: boolean; // menu will open to the right
+  registerButton?: (ref) => void;
   onChangeState?: (open: boolean) => void;
   overrideMultiplier?: number;
+  title?: string;
+  expanded?: boolean; // Force the menu to be expanded
 }
 
 @Radium
-class Menu extends TerrainComponent<Props>
+class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
 {
   public state: {
     open: boolean;
@@ -145,16 +149,19 @@ class Menu extends TerrainComponent<Props>
     );
   }
 
-  public close()
+  public handleClickOutside()
   {
     this.setState({
       open: false,
     });
-    if (this.props.onChangeState)
+  }
+
+  public registerMenuButton(button)
+  {
+    if (this.props.registerButton !== undefined)
     {
-      this.props.onChangeState(false);
+      this.props.registerButton(button);
     }
-    $(document).off('click', this.close);
   }
 
   public componentWillMount()
@@ -164,11 +171,9 @@ class Menu extends TerrainComponent<Props>
       selector: '.menu-wrapper .menu-icon .st0',
       style: { fill: Colors().text3 },
     });
-  }
-
-  public componentWillUnmount()
-  {
-    $(document).off('click', this.close);
+    this.setState({
+      open: this.props.expanded,
+    });
   }
 
   public toggleOpen(e)
@@ -183,11 +188,6 @@ class Menu extends TerrainComponent<Props>
     this.setState({
       open: !this.state.open,
     });
-
-    if (!this.state.open)
-    {
-      $(document).on('click', this.close);
-    }
   }
 
   public render()
@@ -227,13 +227,23 @@ class Menu extends TerrainComponent<Props>
           this.props.style ? this.props.style : null,
         ]}
       >
-        <div
-          className='menu-icon-wrapper'
-          onClick={this.toggleOpen}
-          style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
-        >
-          <MoreIcon className='menu-icon' />
-        </div>
+        {this.props.title !== undefined ?
+          <div
+            className='menu-icon-title'
+            onClick={this.toggleOpen}
+            style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
+          >
+            {this.props.title}
+          </div>
+          :
+          <div
+            className='menu-icon-wrapper'
+            onClick={this.toggleOpen}
+            style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
+            ref={this.registerMenuButton}
+          >
+            <MoreIcon className='menu-icon' />
+          </div>}
         {
           this.state.open &&
           <div
@@ -264,7 +274,7 @@ class Menu extends TerrainComponent<Props>
 }
 
 const MenuContainer = Util.createContainer(
-  Menu,
+  onClickOutside(Menu),
   [],
   {
     colorsActions: ColorsActions,

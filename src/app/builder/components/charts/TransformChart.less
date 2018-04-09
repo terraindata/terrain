@@ -2,14 +2,22 @@
 
 @hover-overlay: rgba(255,255,255,0.25);
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
-}
-
 .transform-chart-wrapper {
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
   position: relative;
+  
+  .left-title, .bottom-title {
+    font-size: 18px;
+    font-weight: normal;
+    .noselect;
+  }
+  .transform-chart {
+    overflow: visible;
+  }
   
   .point-edit-menu {
     position: absolute;
@@ -28,6 +36,11 @@ input[type=number]::-webkit-outer-spin-button {
     label {
       font-size: 14px;
       margin-right: 1px;
+      user-select: none;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      -webkit-user-select: none;
+      -o-user-select: none;
     }
   }
 
@@ -50,9 +63,22 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .transform-chart {
+  .bottomAxis {
+    .tick line {
+      display: none;
+    }
+  }
+
+  .tick text {
+    stroke: none;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+  }
 
   .tick line {
-    stroke: lightgrey;
     stroke-width: 1px;
   }
   
@@ -64,11 +90,11 @@ input[type=number]::-webkit-outer-spin-button {
   .point {
     cursor: pointer;
     transition: stroke-width 0.15s, stroke 0.15s;
-    stroke-width: 3px;
+    stroke-width: 2px;
     &:not(.point-disabled) {
       &:hover,
       &[active="1"] {
-        stroke-width: 5px;
+        stroke-width: 3px;
       }
     }
   }
@@ -76,9 +102,30 @@ input[type=number]::-webkit-outer-spin-button {
   .lines-bg {
     opacity: .5;
   }
-  
+  .bar {
+    .bar-path {
+    opacity: 0.7
+    }
+    .bar-percentage {
+      font-size: 12px;
+      opacity: 0;
+      user-select: none;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      -webkit-user-select: none;
+      -o-user-select: none;
+      .transition;
+    }
+    &:hover {
+      .bar-percentage {
+        opacity: 1;
+      }
+    }
+  }
+
+
   .lines {
-    stroke-width: 5px;
+    stroke-width: 2px;
     fill: none;
     .transition(~"stroke 0.15s");
     
@@ -90,10 +137,7 @@ input[type=number]::-webkit-outer-spin-button {
       stroke: #fc5218;
     }
   }
-  
-  .bar {
-    opacity: .5;
-  }
+
 
   .popup {
     font-weight: bold;

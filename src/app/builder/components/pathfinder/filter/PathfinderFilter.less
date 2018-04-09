@@ -1,0 +1,64 @@
+@import "../../../../common/Common.less";
+
+.pathfinder-column {
+	.pf-filter-section
+	{
+		.pf-filter-sample-wrapper {
+			display: flex;
+			padding-bottom: 24px;
+		}
+		.pf-filter-sample-arrow {
+		    font-size: 60px;
+		    position: relative;
+		    left: 20px;
+		    top: 78px;
+		    cursor: pointer;
+		    &.pf-filter-sample-arrow-next {
+		    	left: -20px;
+		    }
+		}
+		.pf-filter-filter-line {
+			margin-left: 12px;
+			display: flex;
+		}
+		.pf-filter-remove-filter {
+			padding-top: 6px;
+		}
+		.pf-filter-add-filter {
+			margin-left: 12px;
+			cursor: pointer;
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+		.pf-filter-sample-result
+		{
+			font-size: 14px;
+		    max-height: 200px;
+		    overflow-y: scroll;
+		    max-width: 400px;
+		    overflow-x: hidden;
+		    margin: auto;
+		    border: 1px solid;
+		    padding: 24px;
+		    border-radius: ;
+		    border-radius: 6px;
+		    .pf-filter-sample-result-row {
+		    	padding: 3px;
+		    	&:hover {
+		    		border: 1px solid #1eb4fa;
+		    		border-radius: 6px;
+		    		cursor: pointer;
+		    	}
+		    }
+			.pf-filter-sample-result-field {
+				color: black;
+			}
+			.pf-filter-sample-result-value {
+				font-style: italic;
+				margin-left: 6px;
+			}
+		}
+	}
+}
+

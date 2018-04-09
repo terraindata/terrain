@@ -197,7 +197,7 @@ export class Sources
       {
         body['templateId'] = Number(parseInt(templateId, 10));
       }
-      const writeStream: stream.Readable = await magento.getMagentoRowsAsCSVStream(
+      const writeStream: stream.Readable = await magento.getMagentoRowsAsJSONStream(
         await magento.runQuery(source['params'] as MagentoSourceConfig[]) as object[]);
 
       delete body['source'];

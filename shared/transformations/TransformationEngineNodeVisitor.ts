@@ -118,7 +118,19 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     node.fields.forEach((field) =>
     {
       const el: any = yadeep.get(doc, field);
-      yadeep.set(doc, opts.newFieldKeyPaths.get(0), el, { create: true });
+      if (opts.newFieldKeyPaths.get(0).contains('*'))
+      {
+        // assume el length is same as target length
+        for (let i: number = 0; i < el.length; i++)
+        {
+          const kpi: KeyPath = opts.newFieldKeyPaths.get(0).set(
+            opts.newFieldKeyPaths.get(0).indexOf('*'), i.toString());
+          yadeep.set(doc, kpi, el[i], { create: true });
+        }
+      } else
+      {
+        yadeep.set(doc, opts.newFieldKeyPaths.get(0), el, { create: true });
+      }
     });
 
     return {

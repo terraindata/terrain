@@ -1,0 +1,114 @@
+
+@LEFT: 12px;
+@LEFT_LARGE: 18px;
+
+@RIGHT: 12px;
+@RIGHT_LARGE: 18px;
+@RIGHT_EXTEND: 0px;
+
+.floating-input-container {
+  position: relative;
+  flex-grow: 1;
+  line-height: normal;
+  border: 1px solid;
+  border-radius: 3px;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 100px;
+  
+  height: 48px;
+  
+  &.floating-input-container-small {
+    height: 45px;
+  }
+
+  &.floating-input-container-semilarge {
+    height: 70px;
+  }
+
+  &.floating-input-container-large {
+    height: 86px;
+    
+    .floating-input-label {
+      left: @LEFT_LARGE;
+    }
+    
+    .floating-input-input,
+    .floating-input-div {
+      padding-left: @LEFT_LARGE;
+      padding-right: @RIGHT_LARGE;
+    }
+  }
+
+  &:hover {
+    border-color: currentColor;
+  }
+
+  &.floating-input-container-noBorder {
+    border: none !important;
+    background: none;
+  }
+  
+  &.floating-input-container-noBg {
+    background: transparent;
+    border: none !important;
+  }
+  
+  &.floating-input-container-isFloating {
+    .floating-input-label {
+      top: 4px;
+    }
+  }
+  
+  &.floating-input-container-extendRight {
+    .floating-input-input {
+      padding-right: @RIGHT_EXTEND;
+    }
+  }
+  
+  .floating-input-label {
+    position: absolute;
+    left: @LEFT;
+    top: 14px;
+    font-size: 16px;
+    transition: all 0.15s;
+    cursor: pointer;
+    text-transform: uppercase;
+    // font-size is in the JS
+  }
+  
+  .floating-input-input,
+  .floating-input-div {
+    padding-left: @LEFT;
+    padding-right: @RIGHT;
+    padding-top: 20px;
+    padding-bottom: 4px;
+    border-radius: 3px;
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    transition: all 0.15s;
+  }
+  
+  &.floating-input-container-showEllipsis {
+    .floating-input-input {
+      text-overflow: ellipsis;
+    }
+  }
+  
+  &.floating-input-container-noBg {
+    .floating-input-input,
+    .floating-input-input:focus, {
+      background-color: transparent;
+    }
+  }
+  
+  .floating-input-div {
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  
+}

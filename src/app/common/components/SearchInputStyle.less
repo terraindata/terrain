@@ -1,0 +1,29 @@
+@import "~common/Common.less";
+
+.search-input-wrapper {
+	position: relative;
+	width: 100%;
+	
+	.search-input {
+		width: 100%;
+		padding: 6px;
+		padding-left: 30px;
+		border: 1px solid;
+		border-radius: 99px;
+	}
+	
+	.search-input-label {
+		position: absolute;
+		left: 12px;
+		width: 18px;
+		top: 50%;
+		-webkit-transform: translateY(-50%);
+		transform: translateY(-50%);
+		
+		svg {
+			width: 12px;
+			fill: currentColor;
+			.transition;
+		}
+	}
+}

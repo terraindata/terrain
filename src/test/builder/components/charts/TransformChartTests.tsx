@@ -45,12 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-empty
 
-jest.mock('../../../../database/elastic/blocks/ElasticBlockHelpers', () => ({
-  default: {
-    getColumnType: (schema, inputKey) => 'date',
-  },
-}));
-
 import { ScorePoint, TransformCardChart } from 'builder/components/charts/TransformCardChart';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
@@ -60,6 +54,12 @@ import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 
 jest.mock('react-dom', () => ({
   findDOMNode: () => { },
+}));
+
+jest.mock('../../../../database/elastic/blocks/ElasticBlockHelpers', () => ({
+  default: {
+    getTypeOfField: (schema, inputKey) => '',
+  },
 }));
 
 describe('TransformCardChart', () =>
