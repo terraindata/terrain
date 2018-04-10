@@ -44,19 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Duplex, Readable, Writable } from 'stream';
+import { Readable, Writable } from 'stream';
 
-import { ElasticMapping } from '../../../../../shared/etl/mapping/ElasticMapping';
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import DatabaseController from '../../../database/DatabaseController';
-import ElasticClient from '../../../database/elastic/client/ElasticClient';
-import { ElasticWriter } from '../../../database/elastic/streams/ElasticWriter';
-import { ElasticDB } from '../../../database/elastic/tasty/ElasticDB';
-import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import { databases } from '../../database/DatabaseRouter';
-import { QueryHandler } from '../../query/QueryHandler';
 import AEndpointStream from './AEndpointStream';
+
+import DatabaseController from '../../../database/DatabaseController';
+import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
+import { QueryHandler } from '../../query/QueryHandler';
 
 export default class QueryEndpoint implements AEndpointStream
 {
@@ -91,7 +87,7 @@ export default class QueryEndpoint implements AEndpointStream
     return qh.handleQuery(payload) as Promise<Readable>;
   }
 
-  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable | Duplex>
+  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
     throw new Error('Query sink endpoint not implemented');
   }

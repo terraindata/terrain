@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Duplex, Readable, Writable } from 'stream';
+import { Readable, Writable } from 'stream';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
@@ -60,5 +60,5 @@ export default abstract class AEndpointStream
 
   public abstract async getSource(source: SourceConfig): Promise<Readable>;
 
-  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable | Duplex>;
+  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
 }
