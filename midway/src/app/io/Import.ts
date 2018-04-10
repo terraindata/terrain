@@ -393,6 +393,15 @@ export class Import
             const aesCtrDecrypt = new aesjs.ModeOfOperation.ctr(byteKeyDecrypt, new aesjs.Counter(5));
             obj[oldColDecryptName as string] = aesjs.utils.utf8.fromBytes(aesCtrDecrypt.decrypt(decryptedMsgBytes));
             break;
+          case 'extract':
+            const extractOldColName: string | undefined = transform['colName'];
+            const extractPath: string | undefined = transform['args']['path'];
+            if (extractOldColName === undefined || extractPath === undefined)
+            {
+              throw new Error('Extract column name and path must be provided.');
+            }
+            obj[extractOldColName] = _.get(obj[extractOldColName], extractPath, null);
+            break;
           case 'hash':
             const oldColHashName: string | undefined = transform['colName'];
             const bcryptSalt: string | undefined = transform['args']['bcryptSalt'];
