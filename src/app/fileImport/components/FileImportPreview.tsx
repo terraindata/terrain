@@ -741,8 +741,7 @@ class FileImportPreview extends TerrainComponent<Props>
           ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
       }
 
-      const fileExtension = this.props.filetype.substr(0, this.props.filetype.indexOf(' '));
-
+      const fileExtension = this.props.filetype.split(' ')[0];
       Actions.exportFile(
         stringQuery,
         this.props.serverId,
