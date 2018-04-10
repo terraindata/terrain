@@ -132,12 +132,6 @@ async function loginToBuilder(page, url)
   winston.info('Select algorithm');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
-
-  await page.waitForSelector(CARDSTARTER_SELECTOR);
-  await page.click(CARDSTARTER_SELECTOR, { clickCOunt: 2 });
-  winston.info('Start builder');
-  sleep.sleep(1);
-  await takeAndCompareScreenShot(page);
 }
 
 describe('jest-image-snapshot usage with an image received from puppeteer', () =>
