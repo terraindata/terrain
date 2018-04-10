@@ -698,7 +698,6 @@ export const Ajax =
         type: 'search', // can be other things in the future
         database: db.id as number, // should be passed by caller
         streaming: options.streaming,
-        databasetype: db.type,
         body,
       };
 
@@ -734,7 +733,6 @@ export const Ajax =
       const payload: QueryRequest = {
         type,
         database: db.id as number,
-        databasetype: db.type,
         body,
       };
 

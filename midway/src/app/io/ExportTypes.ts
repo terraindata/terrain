@@ -109,7 +109,6 @@ export class ExportTypes
         database: dbid as number,
         type: 'search',
         streaming: false,
-        databasetype: 'elastic',
         body: qry,
       };
       const qryResponse: any = await qh.handleQuery(payload);

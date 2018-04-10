@@ -325,7 +325,6 @@ async function getElasticReaderStream(dbId: number, query: string): Promise<stre
     database: dbId,
     type: 'search',
     streaming: true,
-    databasetype: 'elastic',
     body: query,
   };
 
