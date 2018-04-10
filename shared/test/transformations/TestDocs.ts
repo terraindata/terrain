@@ -43,76 +43,54 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable no-unused-expression
-import { List } from 'immutable';
-import { KeyPath } from 'shared/util/KeyPath';
 
-enum TransformationNodeType
-{
-  SplitNode = 'SplitNode',
-  JoinNode = 'JoinNode',
-  FilterNode = 'FilterNode',
-  DuplicateNode = 'DuplicateNode',
-  InsertNode = 'InsertNode',
-  UppercaseNode = 'UppercaseNode',
-  SubstringNode = 'SubstringNode',
-  CastNode = 'CastNode',
-  HashNode = 'HashNode',
-  ArraySumNode = 'ArraySumNode',
-}
+export const TestDocs = {
+  doc1: {
+    name: 'Bob',
+    age: 17,
+    meta: {
+      school: 'Stanford',
+    },
+  },
 
-// if this has errors, double check TransformationNodeType's keys are equal to its values
-type AssertEnumValuesEqualKeys = {
-  [K in keyof typeof TransformationNodeType]: K
+  doc2: {
+    name: 'Bob',
+    age: 17,
+    meta: {
+      school: 'Stanford',
+      sport: 'bobsled',
+    },
+  },
+
+  doc3: {
+    name: 'Bob',
+    arr: ['sled', [{ a: 'dog' }, { a: 'fren', b: 'doggo' }]],
+    // arr2: [{foo: {bar: {cat: 'a'}}}],
+    // arr2: [[{foo: 'a', bar: 'b'}], [{foo: 'c'}]],
+    hardarr: [['a'], ['b', ['c']]],
+  },
+
+  doc4: {
+    arr: ['a', 'b'],
+  },
+
+  doc5: {
+    arr: ['a', 'b', 'c', 'd'],
+  },
+
+  doc6: {
+    value: null,
+  },
+
+  doc7: {
+    deepArray:
+      [
+        [
+          5,
+        ],
+        [
+          6,
+        ],
+      ],
+  },
 };
-// noinspection BadExpressionStatementJS
-TransformationNodeType as AssertEnumValuesEqualKeys;
-
-// if this has errors, double check TransformationOptionTypes has a key for every TransformationNodeType
-// noinspection JSUnusedLocalSymbols
-type AssertOptionTypesExhaustive = {
-  [K in TransformationNodeType]: TransformationOptionTypes[K]
-};
-
-interface TransformationOptionTypes
-{
-  SplitNode: {
-    newFieldKeyPaths: List<KeyPath>;
-    preserveOldFields: boolean;
-    delimiter: string | number;
-    regex: boolean;
-  };
-  JoinNode: {
-    newFieldKeyPaths: List<KeyPath>;
-    preserveOldFields: boolean;
-    delimiter: string;
-  };
-  FilterNode: any;
-  DuplicateNode: {
-    newFieldKeyPaths: List<KeyPath>;
-  };
-  InsertNode: {
-    at?: number;
-    value: string | KeyPath;
-  };
-  UppercaseNode: {
-  };
-  SubstringNode: {
-    from: number;
-    length: number;
-  };
-  CastNode: {
-    toTypename: string;
-  };
-  HashNode: {
-    salt: string;
-  };
-  ArraySumNode: {
-    newFieldKeyPaths: List<KeyPath>;
-  };
-}
-
-export type NodeTypes = keyof TransformationOptionTypes;
-export type NodeOptionsType<key extends NodeTypes> = TransformationOptionTypes[key];
-
-export default TransformationNodeType;

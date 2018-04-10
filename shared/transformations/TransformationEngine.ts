@@ -274,8 +274,6 @@ export class TransformationEngine
   {
     let output: object = this.rename(doc);
     this.restoreArrays(output);
-    // console.log('BLAM');
-    // console.log(JSON.stringify(output));
 
     for (const nodeKey of this.dag.sources())
     {

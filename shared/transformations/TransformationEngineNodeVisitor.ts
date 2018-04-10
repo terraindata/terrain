@@ -77,9 +77,13 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         (el as string).slice(opts.delimiter as number),
       ];
     }
+    else if (opts.regex === true)
+    {
+      split = (el as string).split(RegExp(opts.delimiter as string));
+    }
     else
     {
-      split = (el as string).split(opts.delimiter as string | RegExp);
+      split = (el as string).split(opts.delimiter as string);
     }
     return split;
   }
