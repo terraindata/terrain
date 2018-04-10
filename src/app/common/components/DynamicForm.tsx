@@ -87,6 +87,7 @@ export interface Props<FState>
   actionBarStyle?: any; // gets applied to the bottom container style
   children?: any; // children get rendered between the buttons and the form components
   centerForm?: boolean; // if true, the form content gets centered in the container
+  validate?: (state: FState) => string | undefined; // return a string if there's an error
 }
 // if we want to allow immutable state objects, add an optional state mutator to each input declaration type
 
@@ -363,6 +364,25 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     );
   }
 
+  public renderErrors()
+  {
+    if (this.props.validate !== undefined)
+    {
+      const msg = this.props.validate(this.props.inputState);
+      if (msg !== undefined)
+      {
+        return (
+          <div
+            className='dynamic-form-errors'
+            style={fontColor(Colors().error)}
+          >
+            {msg}
+          </div>
+        );
+      }
+    }
+  }
+
   public render()
   {
     const renderMatrix: MatrixType<S> = this.computeRenderMatrix(this.props.inputMap);
@@ -372,6 +392,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           <div style={{ flexGrow: 1 }} /> : null
         }
         {renderMatrix.map(this.renderMatrixRow)}
+        {this.renderErrors()}
         {this.props.children !== undefined ? this.props.children : null}
         {this.renderConfirmBar()}
       </div>

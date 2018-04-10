@@ -117,7 +117,7 @@ class HistoryStackC<T>
       history = history.update('pastItems', (pastItems) => pastItems.push(history.currentItem));
       if (history.pastItems.size > this.maxSize)
       {
-        history = history.update('pastItems', (pastItems) => pastItems.slice(-1 * this.maxSize))
+        history = history.update('pastItems', (pastItems) => pastItems.slice(-1 * this.maxSize));
       }
     }
     history = history.set('currentItem', item);

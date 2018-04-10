@@ -76,7 +76,6 @@ interface SplitOptions
 
 // curent assumption is that you only split into 2 fields.
 // TODO extend class so it can take arbitrary # of splits
-// TODO extend class to allow regex splits too
 export class SplitTFF extends TransformationForm<SplitOptions, TransformationNodeType.SplitNode>
 {
   protected readonly inputMap: InputDeclarationMap<SplitOptions> = {

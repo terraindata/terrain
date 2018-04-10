@@ -68,7 +68,6 @@ export interface InputDeclarationOptionTypes<S = any>
   };
   NumberBox: {
     acOptions?: (state: S) => List<string>;
-    integerOnly?: boolean; // TODO not implemented yet, just an example
   };
   CheckBox: {
     large?: boolean;
