@@ -8861,6 +8861,20 @@ sqlstring@2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/sqlstring/-/sqlstring-2.3.0.tgz#525b8a4fd26d6f71aa61e822a6caf976d31ad2a8"
 
+ssh2-sftp-client@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/ssh2-sftp-client/-/ssh2-sftp-client-2.1.1.tgz#f77cedb357e9c5cd98be3a188ca9592e66cb848f"
+  dependencies:
+    ssh2 "^0.5.5"
+
+ssh2-streams@~0.1.18:
+  version "0.1.20"
+  resolved "https://registry.yarnpkg.com/ssh2-streams/-/ssh2-streams-0.1.20.tgz#51118d154555df5469ee1f67e0cf1e7e8a2c0e3a"
+  dependencies:
+    asn1 "~0.2.0"
+    semver "^5.1.0"
+    streamsearch "~0.1.2"
+
 ssh2-streams@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/ssh2-streams/-/ssh2-streams-0.2.0.tgz#cb4ccb6ead7ff02f013f429646394fda107519b3"
@@ -8868,6 +8882,12 @@ ssh2-streams@~0.2.0:
     asn1 "~0.2.0"
     semver "^5.1.0"
     streamsearch "~0.1.2"
+
+ssh2@^0.5.5:
+  version "0.5.5"
+  resolved "https://registry.yarnpkg.com/ssh2/-/ssh2-0.5.5.tgz#c7781ecd2ece7304a253cf620fab5a5c22bb2235"
+  dependencies:
+    ssh2-streams "~0.1.18"
 
 ssh2@^0.6.0:
   version "0.6.0"
