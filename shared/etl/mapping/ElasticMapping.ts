@@ -293,8 +293,6 @@ export class ElasticMapping
         const cleanedPath = this.enginePathToMappingPath(okp).toJS();
         const fieldMapping = _.get(this.mapping, cleanedPath);
         const newFieldMapping = _.omit(fieldMapping, ['properties']);
-        console.log('\n\n\n');
-        console.log(newFieldMapping);
         _.set(this.mapping, cleanedPath, newFieldMapping);
       }
     });
