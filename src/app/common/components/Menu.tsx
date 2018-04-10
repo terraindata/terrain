@@ -151,6 +151,10 @@ class Menu extends TerrainComponent<Props & InjectedOnClickOutProps>
 
   public handleClickOutside()
   {
+    if (this.props.onChangeState)
+    {
+      this.props.onChangeState(false);
+    }
     this.setState({
       open: false,
     });

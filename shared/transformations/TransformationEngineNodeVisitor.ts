@@ -77,9 +77,13 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         (el as string).slice(opts.delimiter as number),
       ];
     }
+    else if (opts.regex === true)
+    {
+      split = (el as string).split(RegExp(opts.delimiter as string));
+    }
     else
     {
-      split = (el as string).split(opts.delimiter as string | RegExp);
+      split = (el as string).split(opts.delimiter as string);
     }
     return split;
   }
@@ -438,7 +442,11 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     {
       const originalElement: any = yadeep.get(doc, field);
 
-      if (typeof originalElement === opts.toTypename || originalElement.constructor === Array && opts.toTypename === 'array')
+      if (
+        originalElement === undefined
+        || typeof originalElement === opts.toTypename
+        || (originalElement.constructor === Array && opts.toTypename === 'array')
+      )
       {
         return;
       }
