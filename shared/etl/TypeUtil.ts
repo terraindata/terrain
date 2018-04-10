@@ -135,7 +135,7 @@ export default class TypeUtil
       {
         value = JSON.parse(value) as object;
       }
-      return Object.keys(value).length === 2 && value['lat'] !== undefined && value['long'] !== undefined;
+      return Object.keys(value).length === 2 && value['lat'] !== undefined && value['lon'] !== undefined;
     }
     catch (e)
     {

@@ -277,6 +277,29 @@ export class ElasticMapping
     return defaultProps(props);
   }
 
+  protected clearGeopointMappings()
+  {
+    const ids = this.engine.getAllFieldIDs();
+    ids.forEach((id, i) =>
+    {
+      const elasticProps = this.getElasticProps(id);
+      if (elasticProps === undefined || _.get(elasticProps, 'elasticType') !== ElasticTypes.GeoPoint)
+      {
+        return;
+      }
+      else
+      {
+        const okp = this.engine.getOutputKeyPath(id);
+        const cleanedPath = this.enginePathToMappingPath(okp).toJS();
+        const fieldMapping = _.get(this.mapping, cleanedPath);
+        const newFieldMapping = _.omit(fieldMapping, ['properties']);
+        console.log('\n\n\n');
+        console.log(newFieldMapping);
+        _.set(this.mapping, cleanedPath, newFieldMapping);
+      }
+    });
+  }
+
   protected addFieldToMapping(id: number)
   {
     const config = this.getTypeConfig(id);
@@ -333,6 +356,14 @@ export class ElasticMapping
         );
       }
     });
+    try
+    {
+      this.clearGeopointMappings();
+    }
+    catch (e)
+    {
+      this.errors.push(`Error encountered while clearing Geopoint Mappings. Details: ${String(e)}`);
+    }
   }
 
   protected verifyAndSetPrimaryKey(id: number)
