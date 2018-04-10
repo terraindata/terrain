@@ -400,7 +400,7 @@ export class Import
             {
               throw new Error('Extract column name and path must be provided.');
             }
-            obj[extractOldColName] = _.get(obj[extractOldColName], path, null);
+            obj[extractOldColName] = _.get(obj[extractOldColName], extractPath, null);
             break;
           case 'hash':
             const oldColHashName: string | undefined = transform['colName'];
