@@ -1070,7 +1070,14 @@ export class Import
               }
               delete obj[field];
             }
-            const expectedFieldsNotInDocument = _.difference(imprt.originalNames, Object.keys(obj));
+            const expectedFieldsNotInDocument: string[] = [];
+            imprt.originalNames.forEach((n: string) =>
+            {
+              if (obj[n] === undefined)
+              {
+                expectedFieldsNotInDocument.push(n);
+              }
+            });
             for (const field of expectedFieldsNotInDocument)
             {
               obj[field] = null;
