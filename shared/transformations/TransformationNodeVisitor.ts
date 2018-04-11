@@ -44,8 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
 import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
+import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
+import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
+import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
@@ -107,6 +111,26 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitUppercaseNode(node: UppercaseTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitAddNode(node: AddTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitSubtractNode(node: SubtractTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitMultiplyNode(node: MultiplyTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitDivideNode(node: DivideTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
