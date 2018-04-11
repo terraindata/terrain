@@ -232,14 +232,14 @@ export async function getMergeJoinStream(name: string, indices: object[], option
     },
   };
 
-  const source: SourceConfig = {
+  const source = {
     options: {
       serverId: name,
       query: JSON.stringify(query),
     },
   };
   const endpoint = new ElasticEndpoint();
-  const elasticStream = await endpoint.getSource(source);
+  const elasticStream = await endpoint.getSource(source as any as SourceConfig);
   const exportTransform = new ExportTransform();
   return elasticStream.pipe(exportTransform);
 }
