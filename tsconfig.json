@@ -29,6 +29,7 @@
             "images/*": ["src/images/*"],
             "manual/*": ["src/app/manual/*"],
             "roles/*": ["src/app/roles/*"],
+            "scheduler/*": ["src/app/scheduler/*"],
             "schema/*": ["src/app/schema/*"],
             "shared/*": ["shared/*"],
             "src/*": ["src/*"],

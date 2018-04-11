@@ -42,40 +42,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
-import Ajax, { AjaxResponse } from 'util/Ajax';
-import Api from 'util/Api';
-export type ErrorHandler = (response: string | MidwayError) => void;
+// Copyright 2017 Terrain Data, Inc.
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import SchedulerAjax from 'scheduler/SchedulerAjax';
 
-// making this an instance in case we want stateful things like cancelling ajax requests
-class SchedulerAjax
+const axiosMock = new MockAdapter(axios);
+
+describe('SchedulerAjax', () =>
 {
-  public api: AxiosInstance = null;
-
-  public constructor(api: AxiosInstance)
+  let schedulerAjax: SchedulerAjax;
+  beforeEach(() =>
   {
-    this.api = api;
-  }
+    schedulerAjax = new SchedulerAjax(axios);
+  });
 
-  public getConnections(): Promise<any>
+  describe('#getConnections', () =>
   {
-    return this.api.get('/scheduler/connections')
-      .then((response) =>
-      {
-        return Promise.resolve(response.data);
-      });
-  }
+    it('should make a GET request to /scheduler/connections', () =>
+    {
+      axiosMock.onGet('/scheduler/connections').reply(
+        200,
+        [
+          { id: 1 },
+          { id: 2 },
+        ],
+      );
 
-  public createScheduler(schedulerConfig)
-  {
-    const body = schedulerConfig;
-    return this.api.post(`/scheduler`, { body })
-      .then((response) =>
-      {
-        return Promise.resolve(response.data);
-      });
-  }
-}
-
-export default SchedulerAjax;
+      return schedulerAjax.getConnections()
+        .then((response) =>
+        {
+          expect(response).toEqual([
+            { id: 1 },
+            { id: 2 },
+          ]);
+        },
+      );
+    });
+  });
+});

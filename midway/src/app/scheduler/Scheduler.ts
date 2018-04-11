@@ -53,8 +53,8 @@ import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
 import { Sources } from '../io/sources/Sources';
 import { Job } from '../jobs/Job';
-import SchedulerConfig from './SchedulerConfig';
 import { TaskConfig, TaskOutputConfig } from '../jobs/TaskConfig';
+import SchedulerConfig from './SchedulerConfig';
 
 export const credentials: Credentials = new Credentials();
 const sources = new Sources();

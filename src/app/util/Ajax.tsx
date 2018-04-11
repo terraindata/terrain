@@ -66,7 +66,7 @@ import * as UserTypes from '../users/UserTypes';
 
 import AjaxM1 from './AjaxM1';
 
-interface AjaxResponse
+export interface AjaxResponse
 {
   promise: Promise<any>;
   cancel: (message: string) => void;
@@ -141,7 +141,7 @@ export const Ajax =
       } = {})
     {
       const host = config.host || MIDWAY_HOST;
-      let fullUrl = host + url;
+      const fullUrl = host + url;
 
       if (config.download)
       {
@@ -172,29 +172,6 @@ export const Ajax =
         form.submit();
         form.remove();
         return;
-      }
-
-      // NOTE: MIDWAY_HOST will be replaced by the build process.
-      if (method === 'get')
-      {
-        try
-        {
-          const dataObj = JSON.parse(data);
-          fullUrl += '?' + $.param(dataObj);
-
-          if (config.urlArgs)
-          {
-            fullUrl += '&' + $.param(config.urlArgs);
-          }
-        }
-        catch (e)
-        {
-
-        }
-      }
-      else if (config.urlArgs)
-      {
-        fullUrl += '?' + $.param(config.urlArgs);
       }
 
       axios.interceptors.response.use(
@@ -243,7 +220,7 @@ export const Ajax =
         timeout: 180000,
         withCredentials: config.crossDomain,
         headers,
-        params: method === 'get' ? data : {},
+        params: method === 'get' ? Object.assign({}, JSON.parse(data), config.urlArgs) : {},
         data: method !== 'get' ? JSON.parse(data) : {},
         cancelToken: source.token,
       })

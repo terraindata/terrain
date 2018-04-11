@@ -43,39 +43,83 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
-import Ajax, { AjaxResponse } from 'util/Ajax';
+// tslint:disable:no-console
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as React from 'react';
+import SchedulerAjax from 'scheduler/SchedulerAjax';
 import Api from 'util/Api';
-export type ErrorHandler = (response: string | MidwayError) => void;
 
-// making this an instance in case we want stateful things like cancelling ajax requests
-class SchedulerAjax
-{
-  public api: AxiosInstance = null;
+class Scheduler extends TerrainComponent<any> {
 
-  public constructor(api: AxiosInstance)
+  public schedulerAjax: SchedulerAjax = new SchedulerAjax(Api.getInstance());
+  public constructor(props)
   {
-    this.api = api;
+    super(props);
+    this.state = { responseText: '' };
   }
 
-  public getConnections(): Promise<any>
+  public getConnections()
   {
-    return this.api.get('/scheduler/connections')
+    this.schedulerAjax.getConnections()
       .then((response) =>
       {
-        return Promise.resolve(response.data);
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error)
+    {
+        console.error(error);
       });
   }
 
-  public createScheduler(schedulerConfig)
+  public createScheduler()
   {
-    const body = schedulerConfig;
-    return this.api.post(`/scheduler`, { body })
+    this.schedulerAjax.createScheduler({
+      interval: '0 0 1 1 *',
+      lastRun: '',
+      Meta: '',
+      Name: 'Jmansor Scheduler',
+      pausedFilename: 'scheduler.log',
+      Priority: 1,
+      Running: false,
+      shouldRunNext: false,
+      Tasks: JSON.stringify({
+        cancel: false, // whether the tree of tasks should be cancelled
+        id: 1, // unique id that identifies this task to other tasks in the input array of TaskConfigs
+        jobStatus: 0, // 0: not running, 1: running, 2: paused
+        name: 'Import', // name of the task i.e. 'import'
+        onFailure: 3, // id of task to execute on failure
+        onSuccess: 2, // id of next task to execute (default should be next in array)
+        params: { param1: 'a' }, // input parameters for the task
+        paused: 4, // where in the tree of tasks the tasks are paused
+        taskId: 5, // maps to a statically declared task
+      }),
+      templateId: 1,
+      workerId: 0,
+    })
       .then((response) =>
       {
-        return Promise.resolve(response.data);
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error)
+    {
+        console.error(error);
       });
+  }
+
+  public render()
+  {
+    return (
+      <div>
+        <ul>
+          <li onClick={this.getConnections.bind(this)}>SchedulerAjax.getConnections()</li>
+          <li onClick={this.createScheduler.bind(this)}>SchedulerAjax.createScheduler()</li>
+        </ul>
+        <div>
+          {this.state.responseText}
+        </div>
+      </div>
+    );
   }
 }
 
-export default SchedulerAjax;
+export default Scheduler;
