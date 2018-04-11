@@ -519,6 +519,21 @@ export class TransformationEngine
         this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldKeyPath, newKeyPath));
       }
     });
+
+    _.each(this.dag.nodes(), (node) =>
+    {
+      const nfkp: List<KeyPath> | undefined = (this.dag.node(node) as TransformationNode).meta['newFieldKeyPaths'];
+      if (nfkp !== undefined)
+      {
+        for (let i: number = 0; i < nfkp.size; i++)
+        {
+          if (keyPathPrefixMatch(nfkp.get(i), oldKeyPath))
+          {
+            this.dag.node(node)['meta']['newFieldKeyPaths'] = nfkp.set(i, updateKeyPath(nfkp.get(i), oldKeyPath, newKeyPath));
+          }
+        }
+      }
+    });
   }
 
   public getInputKeyPath(fieldID: number): KeyPath

@@ -565,3 +565,37 @@ test('test casting strings to objects', () =>
     bar: {},
   });
 });
+
+test('duplicate a field and then rename that field', () =>
+{
+  const doc = {
+    foo: [
+      {
+        bar: 'hello',
+      },
+      {
+        bar: 'hey there',
+      },
+    ],
+  };
+  const e = new TransformationEngine(doc);
+  e.appendTransformation(
+    TransformationNodeType.DuplicateNode,
+    List<KeyPath>([KeyPath(['foo', '0', 'bar'])]),
+    {
+      newFieldKeyPaths: List<KeyPath>([KeyPath(['foo', '0', 'baz'])]),
+    },
+  );
+  e.setOutputKeyPath(e.getOutputFieldID(KeyPath(['foo', '0', 'baz'])), KeyPath(['foo', '0', 'nice']));
+  expect(e.transform(doc)).toEqual({
+    foo: [
+      {
+        bar: 'hello',
+        nice: 'hello',
+      },
+      {
+        bar: 'hey there',
+      },
+    ],
+  });
+});
