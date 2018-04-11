@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as request from 'request-stream';
+import * as request from 'request';
 import { Readable, Writable } from 'stream';
 
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import { HttpOptions, SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
 
@@ -60,33 +60,33 @@ export default class HTTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const url: string = source.options['url'];
-    return this.getRequestStream(url) as Promise<Readable>;
+    return this.getRequestStream(source.options as HttpOptions) as Promise<Readable>;
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const url: string = sink.options['url'];
-    return this.getRequestStream(url) as Promise<Writable>;
+    return this.getRequestStream(sink.options as HttpOptions) as Promise<Writable>;
   }
 
-  private async getRequestStream(url: string, options?: any): Promise<Readable | Writable>
+  private getRequestStream(options: HttpOptions): Promise<Readable | Writable>
   {
-    return new Promise<Readable>((resolve, reject) =>
+    return new Promise<Readable | Writable>((resolve, reject) =>
     {
-      request(url, options,
-        (err, res) =>
+      request(options)
+        .on('error', (err) =>
         {
           if (err !== null && err !== undefined)
           {
-            const e = new Error(`Error reading from source HTTP endpoint ${url} ${err.toString()}`);
+            const e = Error(`Error reading from HTTP endpoint ${options.url} ${err.toString()}`);
             return reject(e);
           }
-
+        })
+        .on('response', (res) =>
+        {
           if (res.statusCode !== 200)
           {
-            const e = new Error(`Error reading from source HTTP endpoint ${url}: ${res.statusCode} ${res.statusMessage}`);
-            return reject(err);
+            const e = new Error(`Error reading from source HTTP endpoint ${options.url}: ${res.statusCode} ${res.statusMessage}`);
+            return reject(e);
           }
 
           resolve(res);
