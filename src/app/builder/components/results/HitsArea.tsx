@@ -54,6 +54,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import { SCROLL_SIZE } from 'app/builder/components/results/ResultsManager';
 import { BuilderState } from 'app/builder/data/BuilderState';
 import { notificationManager } from 'app/common/components/InAppNotification';
 import { SchemaState } from 'app/schema/SchemaTypes';
@@ -82,8 +83,6 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const HITS_PAGE_SIZE = 20;
-
 export interface Props
 {
   resultsState: ResultsState;
@@ -99,7 +98,7 @@ export interface Props
   allowSpotlights: boolean;
   onNavigationException: () => void;
   ignoreEmptyCards?: boolean;
-  onHitsScroll: (hitsPage: number) => void;
+  onIncrementHitsPage: (hitsPage: number) => void;
 }
 
 interface State
@@ -154,9 +153,9 @@ class HitsArea extends TerrainComponent<Props>
   {
     this.setIndexAndResultsConfig(this.props);
     this.getNestedFields(this.props);
-    this.addListener('builder', [['query', 'path', 'source', 'dataSource'],
+    this.listenToKeyPath('builder', [['query', 'path', 'source', 'dataSource'],
     ['db', 'name']]);
-    this.addListener('query', ['tql', 'inputs', 'resultsConfig', 'algorithmId']);
+    this.listenToKeyPath('query', ['tql', 'inputs', 'resultsConfig', 'algorithmId']);
   }
 
   public handleConfigChange(config: ResultsConfig, builderActions)
@@ -655,10 +654,10 @@ class HitsArea extends TerrainComponent<Props>
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
-          onScrollBottom={this.props.onHitsScroll}
+          onScrollBottom={this.props.onIncrementHitsPage}
           // onScroll={this.checkScroll}
           id='hits-area'
-          pageSize={HITS_PAGE_SIZE}
+          pageSize={SCROLL_SIZE}
           totalSize={MAX_HITS}
         >
           {
@@ -860,7 +859,7 @@ column if you have customized the results view.');
     {
       el.scrollTop = 0;
     }
-    this.props.onHitsScroll(1); // Reset the hits pages
+    this.props.onIncrementHitsPage(1); // Reset the hits pages
     this.setState({
       hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
     });

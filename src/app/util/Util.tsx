@@ -797,18 +797,18 @@ const Util = {
     return starredFields.sort().concat(nonStarredFields).toList();
   },
 
-  didStateChange(oldState: any, newState: any, paths?: Array<string | string[]>)
+  didStateChange(oldState: IMap<any>, newState: IMap<any>, paths?: Array<string | string[] | KeyPath>)
   {
     if (!paths || !paths.length)
     {
-      return !_.isEqual(oldState, newState);
+      return oldState !== newState;
     }
     else
     {
-      paths.forEach((path) =>
+      paths.forEach((path: any) =>
       {
-        path = Array.isArray(path) ? path : [path];
-        if (!_.isEqual(oldState.getIn(path), newState.getIn(path)))
+        path = (Array.isArray(path) || List.isList(path)) ? path : [path];
+        if (oldState.getIn(path) !== newState.getIn(path))
         {
           return true;
         }

@@ -102,7 +102,7 @@ class TerrainComponent<T> extends React.Component<T, any>
   } = {};
 
   public _listeners: {
-    [key: string]: Array<string | string[]>,
+    [key: string]: Array<string | string[] | KeyPath>,
   } = {};
 
   public _togMap: { [stateKey: string]: () => void } = {};
@@ -169,12 +169,14 @@ class TerrainComponent<T> extends React.Component<T, any>
     {
       if (this._listeners[key] !== undefined)
       {
-        if (Util.didStateChange(this.props[key], nextProps[key], this._listeners[key]))
+        const prevValue: any = this.props[key];
+        const nextValue: any = nextProps[key];
+        if (Util.didStateChange(prevValue, nextValue, this._listeners[key]))
         {
           return true;
         }
       }
-      else if (!_.isEqual(this.props[key], nextProps[key]))
+      else if (this.props[key] !== nextProps[key])
       {
         return true;
       }
@@ -188,7 +190,7 @@ class TerrainComponent<T> extends React.Component<T, any>
           return true;
         }
       }
-      else if (!_.isEqual(this.state[key], nextState[key]))
+      else if (this.state[key] !== nextState[key])
       {
         return true;
       }
@@ -196,7 +198,7 @@ class TerrainComponent<T> extends React.Component<T, any>
     return false;
   }
 
-  public addListener(key: string, paths?: Array<string | string[]>)
+  public listenToKeyPath(key: string, paths?: Array<string | string[]>)
   {
     this._listeners[key] = paths !== undefined ? paths : [];
   }

@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
@@ -614,7 +615,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
-    this.addListener('builder', [['db', 'name'], ['query', 'path', 'source', 'dataSource']]);
+    this.listenToKeyPath('builder', [['db', 'name'], ['query', 'path', 'source', 'dataSource']]);
   }
 
   // happens on undos/redos

@@ -149,8 +149,13 @@ const BuilderColumn = createReactClass<any, any>(
         canEdit: PropTypes.bool.isRequired,
         cantEditReason: PropTypes.string,
         onNavigationException: PropTypes.func,
-        onHitsScroll: PropTypes.func,
+        onIncrementHitsPage: PropTypes.func,
       },
+
+    shouldComponentUpdate(nextProps, nextState)
+    {
+      return shallowCompare(this, nextProps, nextState);
+    },
 
     getInitialState()
     {
@@ -278,7 +283,7 @@ const BuilderColumn = createReactClass<any, any>(
             showCustomizeView={true}
             allowSpotlights={true}
             exportState={this.props.exportState}
-            onHitsScroll={this.props.onHitsScroll}
+            onIncrementHitsPage={this.props.onIncrementHitsPage}
           />;
 
         case COLUMNS.Editor:
