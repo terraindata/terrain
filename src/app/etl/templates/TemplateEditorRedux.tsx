@@ -96,6 +96,9 @@ export interface TemplateEditorActionTypes
   redoHistory: {
     actionType: 'redoHistory';
   };
+  clearHistory: {
+    actionType: 'clearHistory';
+  };
   rebuildFieldMap: {
     actionType: 'rebuildFieldMap';
   };
@@ -223,6 +226,19 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
           ).redoHistory(),
         );
         const { template, uiState } = newState.history.getCurrentItem();
+        return newState.set('template', template).set('uiState', uiState);
+      },
+      clearHistory: (state, action) =>
+      {
+        const newState = state.update('history',
+          (history: History) => history.clearHistory(),
+        );
+        const currentItem = newState.history.getCurrentItem();
+        if (currentItem == null)
+        {
+          return newState;
+        }
+        const { template, uiState } = currentItem);
         return newState.set('template', template).set('uiState', uiState);
       },
       rebuildFieldMap: (state, action) =>
