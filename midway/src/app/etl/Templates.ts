@@ -65,7 +65,8 @@ import { versions } from '../versions/VersionRouter';
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticDB from '../../database/elastic/tasty/ElasticDB';
-import { getControllerByName, getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import { getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
 import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
 export default class Templates
@@ -394,7 +395,11 @@ export default class Templates
           await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
 
           // we refresh all temporary elastic indexes to make them ready for search
-          const controller: DatabaseController = await getControllerByName(dbName);
+          const controller: DatabaseController | undefined = DatabaseRegistry.getByName(dbName);
+          if (controller === undefined)
+          {
+            throw new Error('Controller not found for database: ' + dbName);
+          }
           const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
           const indices = tempIndices.map((i) => i['index']);
           await elasticDB.refreshIndex(indices);

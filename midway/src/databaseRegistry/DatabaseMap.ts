@@ -63,6 +63,17 @@ class DatabaseMap
     return this.map.get(id);
   }
 
+  public getByName(name: string): DatabaseController | undefined
+  {
+    for (const entry of this.map.entries())
+    {
+      if (entry[1].getName() === name)
+      {
+        return entry[1];
+      }
+    }
+  }
+
   public set(id: number, database: DatabaseController)
   {
     this.map.set(id, database);

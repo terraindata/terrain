@@ -120,14 +120,14 @@ export default class ElasticEndpoint extends AEndpointStream
 
   private async getController(id: number | string | null): Promise<DatabaseController>
   {
-    let controller: DatabaseController;
+    let controller: DatabaseController | undefined;
     if (typeof id === 'string')
     {
-      controller = await this.getControllerByName(id);
+      controller = DatabaseRegistry.getByName(name);
     }
     else if (typeof id === 'number')
     {
-      controller = await this.getControllerById(id);
+      controller = DatabaseRegistry.get(id);
     }
 
     if (controller === undefined)
@@ -141,20 +141,5 @@ export default class ElasticEndpoint extends AEndpointStream
     }
 
     return controller;
-  }
-
-  private async getControllerByName(name: string): Promise<DatabaseController>
-  {
-    const db = await databases.select([], { name });
-    if (db.length < 1 || db[0].id === undefined)
-    {
-      throw new Error(`Database ${String(name)} not found.`);
-    }
-    return DatabaseRegistry.get(db[0].id as number);
-  }
-
-  private getControllerById(id: number): Promise<DatabaseController>
-  {
-    return Promise.resolve(DatabaseRegistry.get(id));
   }
 }
