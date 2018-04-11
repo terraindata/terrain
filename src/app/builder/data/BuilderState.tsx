@@ -55,12 +55,12 @@ import { CardItem } from '../components/cards/CardComponent';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
+import { AjaxResponse } from 'util/Ajax';
 import { Cards } from '../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
 import { Template, Transform } from '../../fileImport/FileImportTypes';
-import { AjaxResponse } from 'util/Ajax';
 
 export class BuilderStateClass
 {

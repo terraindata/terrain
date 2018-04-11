@@ -51,9 +51,9 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
+import { UserConfig } from '../users/UserConfig';
 import CredentialConfig from './CredentialConfig';
 import Credentials from './Credentials';
-import { UserConfig } from '../users/UserConfig';
 
 const Router = new KoaRouter();
 export const credentials: Credentials = new Credentials();
