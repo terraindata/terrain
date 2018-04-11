@@ -44,28 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../ConfigType';
+import { TaskConfig } from '../jobs/TaskConfig';
 
-export class SchedulerConfig extends ConfigType
+export interface SchedulerConfig
 {
-  public createdAt: Date = undefined;                   // when schedule was created
-  public id: number = undefined;                        // scheduled job ID
-  public interval: string = undefined;                  // time interval between scheduled runs
-  public lastModified: Date = undefined;                // when the schedule was last modified
-  public lastRun: string = undefined;                   // when the scheduled job last ran
-  public meta: string = undefined;                      // meta
-  public name: string = undefined;                      // name of the schedule
-  public priority: number = undefined;                  // priority of the scheduled job
-  public running: boolean = undefined;                  // whether the task is running or not (TODO: lock this)
-  public shouldRunNext: boolean = undefined;            // whether the job should run again or not
-  public tasks: string = undefined;                       // stringified representation of an array of TaskConfigs
-  public workerId: number = undefined;                  // for clustering, denotes the node ID
-
-  constructor(props: object)
-  {
-    super();
-    ConfigType.initialize(this, props);
-  }
+  createdAt: Date;                   // when the schedule was first created
+  id: number;                        // scheduled job ID
+  interval: string;                  // time interval between scheduled runs
+  lastModified: Date;                // when the schedule was last modified
+  lastRun: string;                   // when the scheduled job last ran
+  meta: string;                      // meta
+  name: string;                      // name of the schedule
+  priority: number;                  // priority of the scheduled job
+  running: boolean;                  // whether the task is running or not (TODO: lock this)
+  shouldRunNext: boolean;            // whether the job should run again or not
+  tasks: TaskConfig[];               // array of TaskConfigs
+  workerId: number;                  // for clustering, denotes the node ID
 }
-
 export default SchedulerConfig;

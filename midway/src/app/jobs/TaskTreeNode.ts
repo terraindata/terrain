@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { TaskConfig, TaskEnum, TaskOutputConfig } from 'shared/types/jobs/TaskConfig';
 import { Task } from './Task';
-import { TaskConfig, TaskEnum, TaskOutputConfig } from './TaskConfig';
 import { TreeVisitor } from './TreeVisitor';
 
 export class TaskTreeNode
