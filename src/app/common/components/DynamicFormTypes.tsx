@@ -68,7 +68,6 @@ export interface InputDeclarationOptionTypes<S = any>
   };
   NumberBox: {
     acOptions?: (state: S) => List<string>;
-    integerOnly?: boolean; // TODO not implemented yet, just an example
   };
   CheckBox: {
     large?: boolean;
@@ -89,7 +88,7 @@ export interface InputDeclarationType<S>
   displayName?: string; // defaults to the state name
   group?: string; // inputs with the same group value will show in a row
   getDisplayState?: (state: S) => DisplayState;
-  widthFactor?: number; // defaults to 4
+  widthFactor?: number; // defaults to 4, set to -1 to have no set width
   style?: object; // extend the cell style
 }
 

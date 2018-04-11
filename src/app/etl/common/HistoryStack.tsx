@@ -61,6 +61,7 @@ import
 type ImmHistory<T> = WithIRecord<HistoryStackC<T>>;
 class HistoryStackC<T>
 {
+  public maxSize: number = 50;
   private pastItems: List<T> = List([]);
   private nextItems: List<T> = List([]);
   private currentItem: T = null;
@@ -114,6 +115,10 @@ class HistoryStackC<T>
     if (history.currentItem !== null)
     {
       history = history.update('pastItems', (pastItems) => pastItems.push(history.currentItem));
+      if (history.pastItems.size > this.maxSize)
+      {
+        history = history.update('pastItems', (pastItems) => pastItems.slice(-1 * this.maxSize));
+      }
     }
     history = history.set('currentItem', item);
     return history;
@@ -157,7 +162,7 @@ class HistoryStackC<T>
 export type HistoryStack<T> = WithIRecord<HistoryStackC<T>>;
 
 const _RealHistoryStack = makeExtendedConstructor(HistoryStackC, true);
-export function _HistoryStack<T>(config?: ConfigType<T>, deep?: boolean): WithIRecord<HistoryStackC<T>>
+export function _HistoryStack<T>(config?: ConfigType<HistoryStackC<T>>, deep?: boolean): WithIRecord<HistoryStackC<T>>
 {
   return _RealHistoryStack(config, deep) as any;
 }
