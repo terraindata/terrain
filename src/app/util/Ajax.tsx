@@ -206,11 +206,6 @@ export const Ajax =
           Access-Control-Allow-Origin';
       }
 
-      if (!config.noToken)
-      {
-        headers['token'] = 'L9DcAxWyyeAuZXwb-bJRtA';
-      }
-
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
 
