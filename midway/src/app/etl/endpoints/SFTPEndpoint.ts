@@ -54,10 +54,11 @@ import AEndpointStream from './AEndpointStream';
 import CredentialConfig from '../../credentials/CredentialConfig';
 import { credentials } from '../../credentials/CredentialRouter';
 
-export default class SFTPEndpoint implements AEndpointStream
+export default class SFTPEndpoint extends AEndpointStream
 {
   constructor()
   {
+    super();
   }
 
   public async getSource(source: SourceConfig): Promise<Readable>

@@ -175,7 +175,7 @@ export class ElasticMapping
   }> = {};
   private engine: TransformationEngine;
   private mapping: MappingType = {};
-  private primaryKey: string = null;
+  private primaryKey: string | null = null;
   private primaryKeyAttempts: string[] = [];
 
   constructor(engine: TransformationEngine)

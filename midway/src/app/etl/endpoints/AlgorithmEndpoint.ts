@@ -52,18 +52,27 @@ import AEndpointStream from './AEndpointStream';
 
 import DatabaseController from '../../../database/DatabaseController';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
+import * as Util from '../../AppUtil';
 import { QueryHandler } from '../../query/QueryHandler';
 
-export default class AlgorithmEndpoint implements AEndpointStream
+export class AlgorithmEndpoint extends AEndpointStream
 {
   constructor()
   {
+    super();
   }
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const dbId: number = source.options['dbId'];
-    const query: string = source.options['query'];
+    const algorithmId: number = source.options['algorithmId'];
+    let dbId: number = source.options['dbId'];
+    let query: string = source.options['query'];
+
+    if (algorithmId !== undefined)
+    {
+      query = await Util.getQueryFromAlgorithm(algorithmId);
+      dbId = await Util.getDBFromAlgorithm(algorithmId);
+    }
 
     const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
     if (controller === undefined)
@@ -92,3 +101,5 @@ export default class AlgorithmEndpoint implements AEndpointStream
     throw new Error('Algorithm sink endpoint not implemented');
   }
 }
+
+export default AlgorithmEndpoint;

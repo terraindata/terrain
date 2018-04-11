@@ -59,15 +59,16 @@ import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
 import { databases } from '../../database/DatabaseRouter';
 import { QueryHandler } from '../../query/QueryHandler';
 
-export default class ElasticEndpoint implements AEndpointStream
+export default class ElasticEndpoint extends AEndpointStream
 {
   constructor()
   {
+    super();
   }
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const { serverId, dbId, database, table, language, query } = source.options as any;
+    const { serverId, dbId, language, query } = source.options as any;
 
     if (language !== 'elastic')
     {
@@ -105,7 +106,11 @@ export default class ElasticEndpoint implements AEndpointStream
     {
       const db: ElasticDB = controller.getTasty().getDB() as ElasticDB;
       const elasticMapping = new ElasticMapping(engine);
-      primaryKey = elasticMapping.getPrimaryKey();
+      const pKey: string | null = elasticMapping.getPrimaryKey();
+      if (pKey !== null)
+      {
+        primaryKey = pKey;
+      }
       await db.putESMapping(database, table, elasticMapping.getMapping());
     }
 

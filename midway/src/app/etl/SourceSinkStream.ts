@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as SSH from 'ssh2';
 import * as stream from 'stream';
-import { promisify } from 'util';
 
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
@@ -57,37 +55,31 @@ import
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-import DatabaseController from '../../database/DatabaseController';
-import ElasticClient from '../../database/elastic/client/ElasticClient';
-import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
-import { ElasticDB } from '../../database/elastic/tasty/ElasticDB';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
-import CredentialConfig from '../credentials/CredentialConfig';
-import { credentials } from '../credentials/CredentialRouter';
-import CSVTransform from '../io/streams/CSVTransform';
-import JSONTransform from '../io/streams/JSONTransform';
-import ProgressTransform from '../io/streams/ProgressTransform';
-import { QueryHandler } from '../query/QueryHandler';
-
-import { databases } from '../database/DatabaseRouter';
 import ExportTransform from './ExportTransform';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
+
+import CSVTransform from '../io/streams/CSVTransform';
+import JSONTransform from '../io/streams/JSONTransform';
+import ProgressTransform from '../io/streams/ProgressTransform';
+
+import AEndpointStream from './endpoints/AEndpointStream';
+import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
+import ElasticEndpoint from './endpoints/ElasticEndpoint';
+import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
     let sourceStream: stream.Readable;
+    let endpoint: AEndpointStream;
     switch (source.type)
     {
       case 'Algorithm':
-        const algorithmId = source.options['algorithmId'];
-        const query: string = await Util.getQueryFromAlgorithm(algorithmId);
-        const dbId: number = await Util.getDBFromAlgorithm(algorithmId);
-        const algorithmStream = await getElasticReaderStream(dbId, query);
+        endpoint = new AlgorithmEndpoint();
+        const algorithmStream = await endpoint.getSource(source);
         const exportTransform = new ExportTransform();
         sourceStream = algorithmStream.pipe(exportTransform);
         break;
@@ -116,32 +108,15 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         }
         break;
       case 'Sftp':
-        const credentialId = source.options['credentialId'];
-        const creds: CredentialConfig[] = await credentials.get(credentialId);
-        if (creds.length === 0)
-        {
-          throw new Error('Invalid SFTP credentials ID.');
-        }
-
-        let sftpConfig: object = {};
-        try
-        {
-          sftpConfig = JSON.parse(creds[0].meta);
-        }
-        catch (e)
-        {
-          throw new Error('Error retrieving credentials for ID ' + String(credentialId));
-        }
-
-        const sftp: SSH.SFTPWrapper = await getSFTPClient(sftpConfig);
-        const sftpImportStream = sftp.createReadStream(source.options['filepath']);
+        endpoint = new SFTPEndpoint();
+        const sftpStream = await endpoint.getSource(source);
         switch (source.fileConfig.fileType)
         {
           case 'json':
-            sourceStream = sftpImportStream.pipe(JSONTransform.createImportStream());
+            sourceStream = sftpStream.pipe(JSONTransform.createImportStream());
             break;
           case 'csv':
-            sourceStream = sftpImportStream.pipe(CSVTransform.createImportStream());
+            sourceStream = sftpStream.pipe(CSVTransform.createImportStream());
             break;
           default:
             throw new Error('Download file type must be either CSV or JSON.');
@@ -160,6 +135,7 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
   return new Promise<stream.Duplex>(async (resolve, reject) =>
   {
     let sinkStream: stream.Duplex;
+    let endpoint: AEndpointStream;
     switch (sink.type)
     {
       case 'Download':
@@ -181,17 +157,8 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
           throw new Error('Can only import into Elastic at the moment.');
         }
 
-        const { serverId, database, table } = sink.options as any;
-        const controller = await getControllerByName(serverId);
-        const client: ElasticClient = controller.getClient() as ElasticClient;
-        const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
-
-        // create mapping
-        const elasticMapping = new ElasticMapping(engine);
-        await elasticDB.putESMapping(database, table, elasticMapping.getMapping());
-
-        const primaryKey = elasticMapping.getPrimaryKey();
-        const elasticStream = new ElasticWriter(client, database, table, primaryKey);
+        endpoint = new ElasticEndpoint();
+        const elasticStream = await endpoint.getSink(sink, engine);
         sinkStream = new ProgressTransform(elasticStream);
         break;
       case 'Sftp':
@@ -208,26 +175,8 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
             throw new Error('Export file type must be either CSV or JSON.');
         }
 
-        // get SFTP credentials
-        const credentialId = sink.options['credentialId'];
-        const creds: CredentialConfig[] = await credentials.get(credentialId);
-        if (creds.length === 0)
-        {
-          throw new Error('Invalid SFTP credentials ID.');
-        }
-
-        let sftpConfig: object = {};
-        try
-        {
-          sftpConfig = JSON.parse(creds[0].meta);
-        }
-        catch (e)
-        {
-          throw new Error('Error retrieving credentials for ID ' + String(credentialId));
-        }
-
-        const sftp: SSH.SFTPWrapper = await getSFTPClient(sftpConfig);
-        const sftpStream = sftp.createWriteStream(sink.options['filepath']);
+        endpoint = new SFTPEndpoint();
+        const sftpStream = await endpoint.getSink(sink);
         sinkStream = new ProgressTransform(exportStream.pipe(sftpStream));
         break;
       case 'Http':
@@ -237,23 +186,6 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
 
     resolve(sinkStream);
   });
-}
-
-export async function getControllerByName(name: string): Promise<DatabaseController>
-{
-  const db = await databases.select([], { name });
-  if (db.length < 1 || db[0].id === undefined)
-  {
-    throw new Error(`Database ${String(name)} not found.`);
-  }
-
-  const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id as number);
-  if (controller === undefined)
-  {
-    throw new Error(`Database id ${String(db[0].id)} is invalid.`);
-  }
-
-  return controller;
 }
 
 export async function getMergeJoinStream(name: string, indices: object[], options: object): Promise<stream.Readable>
@@ -300,63 +232,14 @@ export async function getMergeJoinStream(name: string, indices: object[], option
     },
   };
 
-  const controller = await getControllerByName(name);
-  const dbId: number = controller.getID();
-  const elasticStream = await getElasticReaderStream(dbId, JSON.stringify(query));
+  const source: SourceConfig = {
+    options: {
+      serverId: name,
+      query: JSON.stringify(query),
+    },
+  };
+  const endpoint = new ElasticEndpoint();
+  const elasticStream = await endpoint.getSource(source);
   const exportTransform = new ExportTransform();
   return elasticStream.pipe(exportTransform);
-}
-
-async function getElasticReaderStream(dbId: number, query: string): Promise<stream.Readable>
-{
-  const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
-  if (controller === undefined)
-  {
-    throw new Error(`Database ${String(dbId)} not found.`);
-  }
-
-  if (controller.getType() !== 'ElasticController')
-  {
-    throw new Error('Algorithm source only supports Elastic databases');
-  }
-
-  const qh: QueryHandler = controller.getQueryHandler();
-  const payload = {
-    database: dbId,
-    type: 'search',
-    streaming: true,
-    body: query,
-  };
-
-  const elasticStream = await qh.handleQuery(payload) as stream.Readable;
-  if (elasticStream === undefined)
-  {
-    throw new Error('Error creating new source stream from algorithm');
-  }
-
-  return elasticStream;
-}
-
-// TODO: move into a separate file
-async function getSFTPClient(config: object)
-{
-  return new Promise<SSH.SFTPWrapper>((resolve, reject) =>
-  {
-    const client = new SSH.Client();
-    client.on('ready', () =>
-    {
-      client.sftp((err, sftpClient) =>
-      {
-        if (err !== null && err !== undefined)
-        {
-          return reject(err);
-        }
-        else
-        {
-          return resolve(sftpClient);
-        }
-      });
-    }).on('error', reject)
-      .connect(config);
-  });
 }
