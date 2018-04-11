@@ -131,7 +131,7 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     },
     Http: {
       url: '',
-      methods: 'GET',
+      method: 'GET',
       headers: {
         accept: '',
         contentType: 'application/json',
@@ -174,7 +174,7 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
     },
     Http: {
       url: '',
-      methods: 'POST',
+      method: 'POST',
       headers: {
         accept: '',
         contentType: 'application/json',
@@ -194,7 +194,7 @@ export interface SftpOptions
 export interface HttpOptions
 {
   url: string;
-  methods: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers: {
     accept: string;
     contentType: string;
