@@ -490,18 +490,21 @@ export class Import
             {
               throw new Error('Merge transformation must supply colName, mergeName, newName, and text arguments.');
             }
-            if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
+            if (obj[startCol] !== null && obj[mergeCol] !== null)
             {
-              throw new Error('Can only merge columns containing text.');
-            }
-            obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
-            if (startCol !== newCol)
-            {
-              delete obj[startCol];
-            }
-            if (mergeCol !== newCol)
-            {
-              delete obj[mergeCol];
+              if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
+              {
+                throw new Error('Can only merge columns containing text.');
+              }
+              obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
+              if (startCol !== newCol)
+              {
+                delete obj[startCol];
+              }
+              if (mergeCol !== newCol)
+              {
+                delete obj[mergeCol];
+              }
             }
             break;
           case 'duplicate':
@@ -524,17 +527,21 @@ export class Import
             {
               throw new Error('Prepend/append transformation must supply colName and text arguments.');
             }
-            if (typeof obj[colName] !== 'string')
+            if (obj[colName] !== null)
             {
-              throw new Error('Can only prepend/append to columns containing text.');
-            }
-            if (transform['name'] === 'prepend')
-            {
-              obj[colName] = text + String(obj[colName]);
-            }
-            else
-            {
-              obj[colName] = String(obj[colName]) + text;
+              if (typeof obj[colName] !== 'string')
+              {
+                console.log(obj[colName], typeof obj[colName]);
+                throw new Error('Can only prepend/append to columns containing text.');
+              }
+              if (transform['name'] === 'prepend')
+              {
+                obj[colName] = text + String(obj[colName]);
+              }
+              else
+              {
+                obj[colName] = String(obj[colName]) + text;
+              }
             }
         }
       }
