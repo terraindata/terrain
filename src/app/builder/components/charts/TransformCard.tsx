@@ -55,7 +55,7 @@ import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
 import { Card, CardString } from '../../../../blocks/types/Card';
 
-import { Ajax } from '../../../util/Ajax';
+import { Ajax, AjaxResponse } from '../../../util/Ajax';
 import AjaxM1 from '../../../util/AjaxM1';
 import * as SpotlightTypes from '../../data/SpotlightTypes';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -113,7 +113,7 @@ class TransformCard extends TerrainComponent<Props>
     maxDomain: List<number>;
     range: List<number>;
     bars: Bars;
-    queryXhr?: any;
+    queryXhr?: AjaxResponse;
     queryId?: string;
     error?: boolean;
     builderState?: any;

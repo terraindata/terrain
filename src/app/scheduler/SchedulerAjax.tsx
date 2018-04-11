@@ -46,7 +46,6 @@ THE SOFTWARE.
 import axios, { AxiosInstance } from 'axios';
 import Ajax, { AjaxResponse } from 'util/Ajax';
 import Api from 'util/Api';
-export type ErrorHandler = (response: string | MidwayError) => void;
 
 // making this an instance in case we want stateful things like cancelling ajax requests
 class SchedulerAjax

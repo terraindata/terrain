@@ -67,7 +67,7 @@ import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
 import * as FileImportTypes from '../../../fileImport/FileImportTypes';
-import { Ajax } from '../../../util/Ajax';
+import { Ajax, AjaxResponse } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import { SpotlightActions } from '../../data/SpotlightRedux';
@@ -92,7 +92,7 @@ export interface Props
 
 interface ResultsQuery
 {
-  xhr: XMLHttpRequest;
+  xhr: AjaxResponse;
   queryId: string;
 }
 

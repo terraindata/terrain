@@ -60,6 +60,7 @@ import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
 import { Template, Transform } from '../../fileImport/FileImportTypes';
+import { AjaxResponse } from 'util/Ajax';
 
 export class BuilderStateClass
 {
@@ -74,7 +75,7 @@ export class BuilderStateClass
   public lastActionTime: number = 0;
 
   public loading: boolean = false;
-  public loadingXhr: any = null;
+  public loadingXhr: AjaxResponse = null;
   public loadingAlgorithmId: ID = '';
 
   public selectedCardIds = Map<ID, boolean>({});

@@ -53,6 +53,7 @@ import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
 import CredentialConfig from './CredentialConfig';
 import Credentials from './Credentials';
+import { UserConfig } from '../users/UserConfig';
 
 const Router = new KoaRouter();
 export const credentials: Credentials = new Credentials();

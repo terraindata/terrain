@@ -69,7 +69,7 @@ import AjaxM1 from './AjaxM1';
 export interface AjaxResponse
 {
   promise: Promise<any>;
-  cancel: (message: string) => void;
+  cancel: (message?: string) => void;
 }
 
 export const Ajax =
@@ -681,7 +681,7 @@ export const Ajax =
         streaming?: boolean,
         streamingTo?: string,
       } = {},
-    ): { xhr: any, queryId: string }
+    ): { xhr: AjaxResponse, queryId: string }
     {
       const payload: QueryRequest = {
         type: 'search', // can be other things in the future
