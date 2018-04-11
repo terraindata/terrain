@@ -229,14 +229,18 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     const { displayState, yCenterOffset } = preRender;
     const widthFactor = inputInfo.widthFactor ? inputInfo.widthFactor : 4;
-    const widthBase = 56; // subject to change
 
     const style = {
-      width: `${widthFactor * widthBase}px`,
       display: displayState === DisplayState.Hidden ? 'none' : undefined,
       position: 'relative',
       top: `${-1 * yCenterOffset}px`,
     };
+
+    if (widthFactor !== -1)
+    {
+      _.extend(style, { width: `${widthFactor * widthBase}px` });
+    }
+
     if (inputInfo.style !== undefined)
     {
       return _.extend(style, inputInfo.style);
@@ -374,12 +378,16 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         return (
           <div
             className='dynamic-form-errors'
-            style={fontColor(Colors().error)}
+            style={[fontColor(Colors().error), getStyle('width', widthBase * 4)]}
           >
             {msg}
           </div>
         );
       }
+    }
+    else
+    {
+      return null;
     }
   }
 
@@ -461,6 +469,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     };
   }
 }
+
+const widthBase = 56; // subject to change
 
 interface PreRenderInfo
 {

@@ -101,7 +101,7 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
       type: DisplayType.CheckBox,
       displayName: 'Treat Delimiter as Regex?',
       group: 'row2',
-      widthFactor: 5,
+      widthFactor: -1,
     },
     preserveOldFields: {
       type: DisplayType.CheckBox,
