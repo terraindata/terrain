@@ -67,6 +67,8 @@ import ProgressTransform from '../io/streams/ProgressTransform';
 import AEndpointStream from './endpoints/AEndpointStream';
 import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
 import ElasticEndpoint from './endpoints/ElasticEndpoint';
+import FSEndpoint from './endpoints/FSEndpoint';
+import HTTPEndpoint from './endpoints/HTTPEndpoint';
 import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
@@ -123,6 +125,35 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         }
         break;
       case 'Http':
+        endpoint = new HTTPEndpoint();
+        const httpStream = await endpoint.getSource(source);
+        switch (source.fileConfig.fileType)
+        {
+          case 'json':
+            sourceStream = httpStream.pipe(JSONTransform.createImportStream());
+            break;
+          case 'csv':
+            sourceStream = httpStream.pipe(CSVTransform.createImportStream());
+            break;
+          default:
+            throw new Error('Download file type must be either CSV or JSON.');
+        }
+        break;
+      case 'Fs':
+        endpoint = new FSEndpoint();
+        const fsStream = await endpoint.getSource(source);
+        switch (source.fileConfig.fileType)
+        {
+          case 'json':
+            sourceStream = fsStream.pipe(JSONTransform.createImportStream());
+            break;
+          case 'csv':
+            sourceStream = fsStream.pipe(CSVTransform.createImportStream());
+            break;
+          default:
+            throw new Error('Download file type must be either CSV or JSON.');
+        }
+        break;
       default:
         throw new Error('not implemented.');
     }
@@ -136,6 +167,7 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
   {
     let sinkStream: stream.Duplex;
     let endpoint: AEndpointStream;
+    let exportStream: stream.Writable;
     switch (sink.type)
     {
       case 'Download':
@@ -162,7 +194,6 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
         sinkStream = new ProgressTransform(elasticStream);
         break;
       case 'Sftp':
-        let exportStream: stream.Writable;
         switch (sink.fileConfig.fileType)
         {
           case 'json':
@@ -180,6 +211,39 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
         sinkStream = new ProgressTransform(exportStream.pipe(sftpStream));
         break;
       case 'Http':
+        switch (sink.fileConfig.fileType)
+        {
+          case 'json':
+            exportStream = JSONTransform.createExportStream();
+            break;
+          case 'csv':
+            exportStream = CSVTransform.createExportStream();
+            break;
+          default:
+            throw new Error('Export file type must be either CSV or JSON.');
+        }
+
+        endpoint = new HTTPEndpoint();
+        const httpStream = await endpoint.getSink(sink);
+        sinkStream = new ProgressTransform(exportStream.pipe(httpStream));
+        break;
+      case 'Fs':
+        switch (sink.fileConfig.fileType)
+        {
+          case 'json':
+            exportStream = JSONTransform.createExportStream();
+            break;
+          case 'csv':
+            exportStream = CSVTransform.createExportStream();
+            break;
+          default:
+            throw new Error('Export file type must be either CSV or JSON.');
+        }
+
+        endpoint = new HTTPEndpoint();
+        const fsStream = await endpoint.getSink(sink);
+        sinkStream = new ProgressTransform(exportStream.pipe(fsStream));
+        break;
       default:
         throw new Error('not implemented.');
     }
