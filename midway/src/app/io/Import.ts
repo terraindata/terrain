@@ -531,7 +531,6 @@ export class Import
             {
               if (typeof obj[colName] !== 'string')
               {
-                console.log(obj[colName], typeof obj[colName]);
                 throw new Error('Can only prepend/append to columns containing text.');
               }
               if (transform['name'] === 'prepend')
