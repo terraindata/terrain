@@ -599,3 +599,61 @@ test('duplicate a field and then rename that field', () =>
     ],
   });
 });
+
+test('suite of numeric transformations', () =>
+{
+  const doc = {
+    foo: [
+      {
+        bar: [1, 2, 3],
+      },
+      {
+        bar: [3, 2, 1],
+      },
+    ],
+  };
+
+  const e = new TransformationEngine(doc);
+
+  e.appendTransformation(
+    TransformationNodeType.AddNode,
+    List<KeyPath>([KeyPath(['foo', '0', 'bar', '*'])]),
+    {
+      shift: 1,
+    },
+  );
+  e.appendTransformation(
+    TransformationNodeType.SubtractNode,
+    List<KeyPath>([KeyPath(['foo', '1', 'bar', '*'])]),
+    {
+      shift: 1,
+    },
+  );
+  e.appendTransformation(
+    TransformationNodeType.MultiplyNode,
+    List<KeyPath>([KeyPath(['foo', '0', 'bar', '*'])]),
+    {
+      factor: 3,
+    },
+  );
+  e.appendTransformation(
+    TransformationNodeType.DivideNode,
+    List<KeyPath>([KeyPath(['foo', '1', 'bar', '*'])]),
+    {
+      factor: 2,
+    },
+  );
+
+  expect(e.transform(doc)).toEqual(
+    {
+      foo: [
+        {
+          bar: [6, 9, 12],
+        },
+        {
+          bar: [1, 0.5, 0],
+        },
+      ],
+    },
+  );
+});
