@@ -79,7 +79,7 @@ export interface TemplateEditorFieldProps
   canEdit: boolean;
   noInteract: boolean; // determines if the template editor is not interactable (e.g. the side preview)
   preview: any;
-  displayKeyPath: KeyPath; // not the key path in the store, but the key path in virtual DOM
+  displayKeyPath: KeyPath; // for array fields
 
   // injected props:
   act?: typeof TemplateEditorActions;
@@ -173,6 +173,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     this.updateChecker.setChecker('currentEngine', getCurrentEngine);
     return getCurrentEngine(this.props);
+  }
+
+  protected _getArrayIndex(): number
+  {
+    const last = Number(this.props.displayKeyPath.last());
+    return Number.isNaN(last) ? -1 : last;
   }
 
   // for array types

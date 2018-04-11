@@ -69,6 +69,9 @@ export let BuilderActionTypes =
     dragCardOver: '',
     dropCard: '',
 
+    // Input actions
+    createInput: 'createInput',
+
     selectCard: '',
 
     // Change the hand-writen TQL
@@ -86,6 +89,9 @@ export let BuilderActionTypes =
     undo: '',
     redo: '',
     checkpoint: '', // inserts an undo checkpoint
+
+    // change the poath
+    changePath: '',
   };
 
 // I tried using this type to correclty classify this function,
@@ -121,7 +127,9 @@ setValuesToKeys(BuilderActionTypes, 'builder');
 export let BuilderDirtyActionTypes = {};
 [
   BuilderActionTypes.create,
+  BuilderActionTypes.createInput,
   BuilderActionTypes.change,
+  BuilderActionTypes.changePath,
   BuilderActionTypes.move,
   BuilderActionTypes.remove,
   BuilderActionTypes.nestedMove,
@@ -142,5 +150,11 @@ export let BuilderCardActionTypes = {};
   BuilderActionTypes.remove,
   BuilderActionTypes.dropCard,
 ].map((type) => BuilderCardActionTypes[type] = true);
+
+export let BuilderPathActionTypes = {};
+[
+  BuilderActionTypes.changePath,
+  // BuilderActionTypes.queryLoaded,
+].map((type) => BuilderPathActionTypes[type] = true);
 
 export default BuilderActionTypes;

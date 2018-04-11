@@ -59,12 +59,15 @@ import AddFieldModal from 'etl/templates/components/AddFieldModal';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
+import ExtractFieldModal from 'etl/templates/components/ExtractFieldModal';
 import MoveFieldModal from 'etl/templates/components/MoveFieldModal';
 import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
 
 import EditorActionsSection from './EditorActionsSection';
 import EditorColumnActionsSection from './EditorColumnActionsSection';
@@ -108,8 +111,15 @@ class TemplateEditor extends TerrainComponent<Props>
     {
       return {};
     }
+    try
+    {
+      return engine.transform(previewDocument);
+    }
+    catch (e)
+    {
+      return {};
+    }
 
-    return engine.transform(previewDocument);
   }
 
   public getDocument()
@@ -210,8 +220,10 @@ class TemplateEditor extends TerrainComponent<Props>
 
     return (
       <div className='template-editor-root-container'>
-        <div className='template-editor-width-spacer'>
+        <div style={{ display: 'flex', width: '100%' }}>
           {this.renderTopBar()}
+        </div>
+        <div className='template-editor-width-spacer'>
           <div className='template-editor-columns-area'>
             {this.renderEditorSection(showEditor)}
             {this.renderDocumentsSection()}
@@ -225,6 +237,7 @@ class TemplateEditor extends TerrainComponent<Props>
           fieldId={addFieldId}
           {...fieldModalProps}
         />
+        <ExtractFieldModal />
         <MultiModal
           requests={modalRequests}
           setRequests={this.setModalRequests}

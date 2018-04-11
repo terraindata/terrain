@@ -103,7 +103,9 @@ interface TransformationOptionTypes
   CastNode: {
     toTypename: string;
   };
-  HashNode: any;
+  HashNode: {
+    salt: string;
+  };
   ArraySumNode: {
     newFieldKeyPaths: List<KeyPath>;
   };

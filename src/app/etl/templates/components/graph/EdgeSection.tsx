@@ -78,6 +78,7 @@ import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { NodeTypes } from 'shared/etl/types/ETLTypes';
+import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 import './EdgeSection.less';
 import ETLEdgeComponent from './ETLEdgeComponent';
@@ -123,10 +124,16 @@ class EdgeSection extends TerrainComponent<Props>
     leftJoinKey: {
       type: DisplayType.TextBox,
       displayName: 'Left Join Field',
+      options: {
+        acOptions: (s) => this.calculateJoinKeys().left,
+      },
     },
     rightJoinKey: {
       type: DisplayType.TextBox,
       displayName: 'Right Join Field',
+      options: {
+        acOptions: (s) => this.calculateJoinKeys().right,
+      },
     },
     outputKey: {
       type: DisplayType.TextBox,
@@ -162,6 +169,54 @@ class EdgeSection extends TerrainComponent<Props>
   {
     const { template } = this.props.templateEditor;
     return this._calculateRightJoinOptions(template);
+  }
+
+  public getRootFieldNames(engine: TransformationEngine): List<string>
+  {
+    return engine.getAllFieldIDs()
+      .filter((id) => engine.getOutputKeyPath(id).size === 1)
+      .map((id) => engine.getOutputKeyPath(id).get(0))
+      .toList();
+  }
+
+  @instanceFnDecorator(memoizeOne)
+  public _calculateJoinKeys(rightIdIndex: number, template: ETLTemplate, mergeIntoEdgeId: number)
+  {
+    try
+    {
+      const rightId = rightIdIndex !== -1 ?
+        this._calculateRightJoinNodes(template).get(rightIdIndex)
+        :
+        -1;
+
+      const leftEngine = template.getTransformationEngine(mergeIntoEdgeId);
+      const rightEdgeId = template.findEdges((edge) => edge.from === rightId).first();
+      const rightEngine = template.getTransformationEngine(rightEdgeId);
+
+      const left = leftEngine !== undefined ? this.getRootFieldNames(leftEngine) : List([]);
+      const right = rightEngine !== undefined ? this.getRootFieldNames(rightEngine) : List([]);
+
+      return {
+        left,
+        right,
+      };
+    }
+    catch (e)
+    {
+      return {
+        left: List([]),
+        right: List([]),
+      };
+    }
+  }
+
+  public calculateJoinKeys(): { left: List<string>, right: List<string> }
+  {
+    return this._calculateJoinKeys(
+      this.state.formState.rightIdIndex,
+      this.props.templateEditor.template,
+      this.props.templateEditor.uiState.mergeIntoEdgeId,
+    );
   }
 
   public renderMergeForm()
@@ -209,6 +264,7 @@ class EdgeSection extends TerrainComponent<Props>
           onConfirm={this.confirmMerge}
           confirm={true}
           closeOnConfirm={this.validateMergeFormState()}
+          allowOverflow={true}
         >
           {this.renderMergeForm()}
         </Modal>

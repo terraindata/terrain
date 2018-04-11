@@ -52,9 +52,9 @@ import * as App from '../App';
 import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
 import { Sources } from '../io/sources/Sources';
-import { Job } from './Job';
+import { Job } from '../jobs/Job';
 import SchedulerConfig from './SchedulerConfig';
-import { TaskConfig, TaskOutputConfig } from './TaskConfig';
+import { TaskConfig, TaskOutputConfig } from '../jobs/TaskConfig';
 
 export const credentials: Credentials = new Credentials();
 const sources = new Sources();
@@ -80,7 +80,6 @@ export class Scheduler
         'running',
         'shouldRunNext',
         'tasks',
-        'templateId',
         'workerId',
       ],
     );

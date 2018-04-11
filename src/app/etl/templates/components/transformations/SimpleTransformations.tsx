@@ -92,3 +92,18 @@ export class UppercaseTFF extends TransformationForm<UppercaseOptions, Transform
   protected readonly inputMap: InputDeclarationMap<UppercaseOptions> = {};
   protected readonly initialState = {};
 }
+
+type HashOptions = NodeOptionsType<TransformationNodeType.HashNode>;
+export class HashTFF extends TransformationForm<HashOptions, TransformationNodeType.HashNode>
+{
+  protected readonly type = TransformationNodeType.HashNode;
+  protected readonly inputMap: InputDeclarationMap<HashOptions> = {
+    salt: {
+      type: DisplayType.TextBox,
+      displayName: 'Salt',
+    },
+  };
+  protected readonly initialState = {
+    salt: '',
+  };
+}

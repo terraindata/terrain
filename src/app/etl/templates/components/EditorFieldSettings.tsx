@@ -93,13 +93,22 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     this.changeViewFactory = _.memoize(this.changeViewFactory);
   }
 
+  public currentCategory()
+  {
+    if (this.state.currentCategory === ViewCategory.Settings && !this._field().canEditField())
+    {
+      return ViewCategory.Transformations;
+    }
+    return this.state.currentCategory;
+  }
+
   public renderCategory(category: ViewCategory, title: string)
   {
     return (
       <div
         className='field-settings-category'
         key={category}
-        style={this.state.currentCategory === category ? activeStyle : inactiveStyle}
+        style={this.currentCategory() === category ? activeStyle : inactiveStyle}
         onClick={this.changeViewFactory(category)}
       >
         {title}
@@ -109,14 +118,16 @@ class EditorFieldSettings extends TemplateEditorField<Props>
 
   public renderTitleBar()
   {
+    const field = this._field();
+
     return (
       <div
         className='field-settings-title-bar'
         style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}
       >
         <div className='field-settings-title-filler' />
-        {this.renderCategory(ViewCategory.Settings, 'Settings')}
-        {this.renderCategory(ViewCategory.Transformations, 'Transform')}
+        {field.canEditField() ? this.renderCategory(ViewCategory.Settings, 'Settings') : null}
+        {field.canTransformField ? this.renderCategory(ViewCategory.Transformations, 'Transform') : null}
         {
           ... this.renderExtraCategories()
         }
@@ -137,7 +148,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
   {
     const language = this._getCurrentLanguage();
     const categories = [];
-    if (language === Languages.Elastic)
+    if (language === Languages.Elastic && this._field().canEditField())
     {
       categories.push(this.renderCategory(ViewCategory.Elastic, 'Elastic'));
     }
@@ -151,20 +162,20 @@ class EditorFieldSettings extends TemplateEditorField<Props>
         {this.renderTitleBar()}
         <div className='field-settings-section'>
           {
-            this.state.currentCategory === ViewCategory.Settings ?
+            this.currentCategory() === ViewCategory.Settings ?
               <FieldMainSettings
                 {...this._passProps()}
               />
               : null
           }
           {
-            this.state.currentCategory === ViewCategory.Transformations ?
+            this.currentCategory() === ViewCategory.Transformations ?
               <FieldSettingsTransformations
                 {...this._passProps()}
               /> : null
           }
           {
-            this.state.currentCategory === ViewCategory.Elastic ?
+            this.currentCategory() === ViewCategory.Elastic ?
               <ElasticFieldSettings
                 {...this._passProps()}
               /> : null

@@ -45,25 +45,28 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 
+import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
+import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { withRouter } from 'react-router';
-
-import { Algorithm, LibraryState } from 'library/LibraryTypes';
+import { browserHistory } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
+import { ETLState } from 'etl/ETLTypes';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _ETLTemplate, ETLTemplate, getSourceFiles, restoreSourceFiles } from 'etl/templates/TemplateTypes';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -79,10 +82,15 @@ export interface Props
     algorithmId?: number,
     templateId?: number;
   };
+  router?: any;
+  route?: any;
   walkthrough?: WalkthroughState;
-  templates?: List<ETLTemplate>;
+  etl?: ETLState;
   editorAct?: typeof TemplateEditorActions;
   etlAct?: typeof ETLActions;
+  schemaAct?: typeof SchemaActions;
+  isDirty?: boolean;
+  template?: ETLTemplate;
 }
 
 function getAlgorithmId(params): number
@@ -100,7 +108,17 @@ function getTemplateId(params): number
 @Radium
 class ETLEditorPage extends TerrainComponent<Props>
 {
-  public saveTemplate(template: ETLTemplate, isSaveAs: boolean)
+  public state: {
+    leaving: boolean;
+    nextLocation: string,
+  } = {
+      leaving: false,
+      nextLocation: '',
+    };
+
+  public confirmedLeave: boolean = false;
+
+  public saveTemplate(template: ETLTemplate, isSaveAs: boolean, onSuccess?: () => void)
   {
     const { etlAct, editorAct } = this.props;
 
@@ -132,6 +150,11 @@ class ETLEditorPage extends TerrainComponent<Props>
       else
       {
         // todo handle error
+      }
+
+      if (onSuccess !== undefined)
+      {
+        onSuccess();
       }
     };
     const handleError = (ev) =>
@@ -170,22 +193,88 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public switchTemplate(template: ETLTemplate)
   {
-    Initializers.loadExistingTemplate(template.id);
+    ETLRouteUtil.gotoEditTemplate(template.id);
   }
 
   public executeTemplate(template: ETLTemplate)
   {
-    this.props.etlAct({
-      actionType: 'executeTemplate',
-      template,
-    });
+    const { runningTemplates } = this.props.etl;
+    if (runningTemplates.has(template.id))
+    {
+      this.props.etlAct({
+        actionType: 'addModal',
+        props: {
+          message: `Cannot run template "${template.templateName}". This template is already running`,
+          title: `Error`,
+          error: true,
+        },
+      });
+    }
+    else
+    {
+      const updateUIAfterResponse = () =>
+      {
+        this.props.etlAct({
+          actionType: 'clearRunningTemplate',
+          templateId: template.id,
+        });
+        this.props.etlAct({
+          actionType: 'setAcknowledgedRun',
+          templateId: template.id,
+          value: false,
+        });
+      };
+
+      this.props.etlAct({
+        actionType: 'setRunningTemplate',
+        templateId: template.id,
+        template,
+      });
+      this.props.etlAct({
+        actionType: 'setAcknowledgedRun',
+        templateId: template.id,
+        value: false,
+      });
+
+      this.props.etlAct({
+        actionType: 'executeTemplate',
+        template,
+        onSuccess: () =>
+        {
+          updateUIAfterResponse();
+          this.props.schemaAct({
+            actionType: 'fetch',
+          });
+          this.props.etlAct({
+            actionType: 'addModal',
+            props: {
+              message: `"${template.templateName}" finished running`,
+              title: 'Task Complete',
+            },
+          });
+        },
+        onError: (ev) =>
+        {
+          updateUIAfterResponse();
+          this.props.etlAct({
+            actionType: 'addModal',
+            props: {
+              message: `Error while executing: ${String(ev)}`,
+              title: `Error`,
+              error: true,
+            },
+          });
+        },
+      });
+    }
   }
 
   // is there a better pattern for this?
   public componentWillReceiveProps(nextProps)
   {
     const { params } = this.props;
-    const { nextParams } = nextProps;
+    const nextParams = nextProps.params;
+
     if (params == null || nextParams == null)
     {
       return;
@@ -206,22 +295,22 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
     else if (params.algorithmId !== nextParams.algorithmId)
     {
-      this.initFromRoute();
+      this.initFromRoute(nextProps);
     }
     else if (params.templateId !== nextParams.templateId)
     {
-      this.initFromRoute();
+      this.initFromRoute(nextProps);
     }
     else if (ETLRouteUtil.isRouteNewTemplate(this.props.location) !==
       ETLRouteUtil.isRouteNewTemplate(nextProps.location))
     {
-      this.initFromRoute();
+      this.initFromRoute(nextProps);
     }
   }
 
-  public initFromRoute()
+  public initFromRoute(props: Props)
   {
-    const { params, editorAct, walkthrough } = this.props;
+    const { params, editorAct, walkthrough } = props;
     editorAct({
       actionType: 'resetState',
     });
@@ -235,8 +324,8 @@ class ETLEditorPage extends TerrainComponent<Props>
       const templateId = getTemplateId(params);
       Initializers.loadExistingTemplate(templateId);
     }
-    else if (ETLRouteUtil.isRouteNewTemplate(this.props.location) &&
-      this.props.walkthrough.source.type != null)
+    else if (ETLRouteUtil.isRouteNewTemplate(props.location) &&
+      props.walkthrough.source.type != null)
     {
       Initializers.initNewFromWalkthrough();
     }
@@ -248,11 +337,37 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    this.initFromRoute();
+    this.initFromRoute(this.props);
+    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+  }
+
+  public routerWillLeave(nextLocation): boolean
+  {
+    if (this.confirmedLeave)
+    {
+      this.confirmedLeave = false;
+      return true;
+    }
+
+    if (this.shouldSave())
+    {
+      this.setState({
+        leaving: true,
+        nextLocation,
+      });
+      return false;
+    }
+    return true;
+  }
+
+  public shouldSave()
+  {
+    return this.props.isDirty;
   }
 
   public render()
   {
+    const { template } = this.props;
     return (
       <div
         className='template-display-wrapper'
@@ -264,8 +379,59 @@ class ETLEditorPage extends TerrainComponent<Props>
           onSwitchTemplate={this.switchTemplate}
           onExecuteTemplate={this.executeTemplate}
         />
+        <Modal
+          open={this.state.leaving}
+          message={'Save changes' + (template.templateName !== '' ? ' to ' + template.templateName : '') + ' before leaving?'}
+          title='Unsaved Changes'
+          confirmButtonText='Save'
+          confirm={true}
+          onClose={this.handleModalCancel}
+          onConfirm={this.handleModalSave}
+          thirdButtonText="Don't Save"
+          onThirdButton={this.handleModalDontSave}
+        />
       </div>
     );
+  }
+
+  public handleModalCancel()
+  {
+    this.setState({
+      leaving: false,
+    });
+  }
+
+  public handleModalDontSave()
+  {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+    });
+    browserHistory.push(this.state.nextLocation);
+  }
+
+  public handleModalSave()
+  {
+    const { template } = this.props;
+
+    const onSaveSuccess = () =>
+    {
+      this.confirmedLeave = true;
+      this.setState({
+        leaving: false,
+      });
+      browserHistory.push(this.state.nextLocation);
+    };
+
+    if (template.id !== -1)
+    {
+      this.saveTemplate(this.props.template, false, onSaveSuccess);
+    }
+    else
+    {
+      this.saveTemplate(this.props.template.set('templateName', 'New Template'), false, onSaveSuccess);
+    }
+
   }
 }
 
@@ -273,7 +439,9 @@ export default withRouter(Util.createContainer(
   ETLEditorPage,
   [
     ['walkthrough'],
-    ['etl', 'templates'],
+    ['etl'],
+    ['templateEditor', 'isDirty'],
+    ['templateEditor', 'template'],
   ],
-  { editorAct: TemplateEditorActions, etlAct: ETLActions },
+  { editorAct: TemplateEditorActions, etlAct: ETLActions, schemaAct: SchemaActions },
 ));

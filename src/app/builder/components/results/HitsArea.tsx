@@ -54,39 +54,46 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { BuilderState } from 'app/builder/data/BuilderState';
+import { notificationManager } from 'app/common/components/InAppNotification';
+import { SchemaState } from 'app/schema/SchemaTypes';
+import Ajax from 'app/util/Ajax';
+import Util from 'app/util/Util';
+import ElasticBlockHelpers, { getIndex } from 'database/elastic/blocks/ElasticBlockHelpers';
+import Radium = require('radium');
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { AllBackendsMap } from '../../../../database/AllBackends';
+import { ESParseTreeToCode } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
+import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
+import DragHandle from '../../../common/components/DragHandle';
+import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import InfoArea from '../../../common/components/InfoArea';
+import MapComponent from '../../../common/components/MapComponent';
 import Modal from '../../../common/components/Modal';
+import Switch from '../../../common/components/Switch';
+import TerrainComponent from '../../../common/components/TerrainComponent';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
+import MapUtil from '../../../util/MapUtil';
 
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 
-import Radium = require('radium');
-
-import Util from 'util/Util';
-import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
-import DragHandle from '../../../common/components/DragHandle';
-import InfiniteScroll from '../../../common/components/InfiniteScroll';
-import MapComponent from '../../../common/components/MapComponent';
-import Switch from '../../../common/components/Switch';
-import TerrainComponent from '../../../common/components/TerrainComponent';
-import MapUtil from '../../../util/MapUtil';
-
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const HITS_PAGE_SIZE = 20;
+const HITS_PAGE_SIZE = 15;
 
 export interface Props
 {
   resultsState: ResultsState;
+  builder?: BuilderState;
+  schema?: SchemaState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -102,55 +109,105 @@ interface State
 {
   hitFormat: string;
   showingConfig?: boolean;
+  hitSize: 'large' | 'small';
 
   expanded?: boolean;
   expandedHitIndex?: number;
 
-  hitsPages: number;
   onHitsLoaded?: (unchanged?: boolean) => void;
 
+  showingErrorModal?: boolean;
   mapHeight?: number;
   mouseStartY?: number;
   mapMaxHeight?: number;
   spotlightHits?: Immutable.Map<string, any>;
+
+  indexName: string;
+  resultsConfig?: any;
+  nestedFields: List<string>;
 }
 
 const MAP_MAX_HEIGHT = 300;
-const MAP_MIN_HEIGHT = 25; // height of top bar on map
+const MAP_MIN_HEIGHT = 30; // height of top bar on map
 
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
-  public static handleConfigChange(config: ResultsConfig, builderActions)
-  {
-    builderActions.changeResultsConfig(config);
-  }
-
   public state: State = {
     expanded: false,
     expandedHitIndex: null,
     showingConfig: false,
-    hitsPages: 1,
+    showingErrorModal: false,
     hitFormat: 'icon',
     mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
     mapMaxHeight: undefined,
     spotlightHits: Immutable.Map<string, any>(),
+    hitSize: 'large',
+    indexName: '',
+    resultsConfig: undefined,
+    nestedFields: List([]),
   };
-
   public hitsFodderRange = _.range(0, 25);
   public locations = {};
 
+  public componentWillMount()
+  {
+    this.setIndexAndResultsConfig(this.props);
+    this.getNestedFields(this.props);
+  }
+
+  public handleConfigChange(config: ResultsConfig, builderActions)
+  {
+    builderActions.changeResultsConfig(config);
+    this.getNestedFields(this.props, config);
+  }
+
+  public shouldComponentUpdate(nextProps: Props, nextState: State)
+  {
+
+    for (const key in nextProps)
+    {
+      if (!_.isEqual(this.props[key], nextProps[key]))
+      {
+        if (key === 'builder' && !_.isEqual(
+          this.props.builder.query.path.source.dataSource,
+          nextProps.builder.query.path.source.dataSource) ||
+          this.props.builder.db.name !==
+          nextProps.builder.db.name)
+        {
+          return true;
+        }
+        else
+        {
+          return true;
+        }
+      }
+    }
+
+    for (const key in nextState)
+    {
+      if (!_.isEqual(this.state[key], nextState[key]))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.query.cards !== this.props.query.cards
-      || nextProps.query.inputs !== this.props.query.inputs)
+    if (this.props.db.name !== nextProps.db.name ||
+      this.props.query.path.source !== nextProps.query.path.source ||
+      this.props.query.resultsConfig !== nextProps.query.resultsConfig)
     {
-      if (this.state.onHitsLoaded)
-      {
-        // reset infinite scroll
-        this.state.onHitsLoaded(false);
-      }
+      const indexChange = (this.props.query.path.source.dataSource as any).index !==
+        (nextProps.query.path.source.dataSource as any).index;
+      this.setIndexAndResultsConfig(nextProps, indexChange);
+    }
+    if (!_.isEqual(this.props.resultsState.fields, nextProps.resultsState.fields))
+    {
+      this.getNestedFields(nextProps);
     }
     if (this.props.resultsState.hits !== nextProps.resultsState.hits)
     {
@@ -172,6 +229,90 @@ class HitsArea extends TerrainComponent<Props>
     }
   }
 
+  public getNestedFields(props: Props, overrideConfig?)
+  {
+    // Get the fields that are nested
+    const { builder, schema, resultsState } = props;
+    let nestedFields = resultsState.fields.filter((field) =>
+    {
+      const type = ElasticBlockHelpers.getTypeOfField(
+        schema,
+        builder,
+        field,
+        true,
+      );
+      return type === 'nested' || type === '';
+    }).toList();
+    // Filter out anything that it is a single object, not a list of objects
+    if (resultsState.hits && resultsState.hits.size)
+    {
+      nestedFields = nestedFields.filter((field) =>
+        List.isList(resultsState.hits.get(0).fields.get(field)),
+      ).toList();
+    }
+    // If there is a results config in use, only use nested fields in that config
+    const resultsConfig = overrideConfig || this.state.resultsConfig || props.query.resultsConfig;
+    if (resultsConfig && resultsConfig.enabled)
+    {
+      nestedFields = nestedFields.filter((field) =>
+        resultsConfig.fields.indexOf(field) !== -1,
+      ).toList();
+    }
+    this.setState({
+      nestedFields,
+    });
+  }
+
+  public setIndexAndResultsConfig(props: Props, indexChange = false)
+  {
+    let indexName = '';
+    if (props.query.path &&
+      props.query.path.source &&
+      props.query.path.source.dataSource)
+    {
+      indexName = (props.query.path.source.dataSource as any).index;
+    }
+    this.setState({
+      indexName,
+    });
+    if (props.query.resultsConfig !== undefined &&
+      props.query.resultsConfig.enabled &&
+      !indexChange
+    )
+    {
+      this.setState({
+        resultsConfig: props.query.resultsConfig,
+      });
+    }
+    // Try to get results config from midway (stored by index)
+    else
+    {
+      Ajax.getResultsConfig(indexName, (resp) =>
+      {
+        if (resp.length > 0)
+        {
+          resp[0]['fields'] = JSON.parse(resp[0]['fields']);
+          resp[0]['formats'] = JSON.parse(resp[0]['formats']);
+          resp[0]['primaryKeys'] = JSON.parse(resp[0]['primaryKeys']);
+          resp[0]['enabled'] = true;
+          this.setState({
+            resultsConfig: _ResultsConfig(resp[0]),
+          });
+        }
+        else
+        {
+          this.setState({
+            resultsConfig: _ResultsConfig({ enabled: false }),
+          });
+        }
+      },
+        (error) =>
+        {
+          // console.log('error', error);
+        });
+    }
+  }
+
   public handleCollapse()
   {
     this.setState({
@@ -189,9 +330,8 @@ class HitsArea extends TerrainComponent<Props>
 
   public renderExpandedHit()
   {
-    const { expandedHitIndex } = this.state;
+    const { expandedHitIndex, hitSize } = this.state;
     const { hits } = this.props.resultsState;
-    const { resultsConfig } = this.props.query;
 
     let hit: HitClass;
 
@@ -204,7 +344,6 @@ class HitsArea extends TerrainComponent<Props>
     {
       return null;
     }
-
     // noinspection CheckTagEmptyBody
     return (
       <div className={classNames({
@@ -215,7 +354,7 @@ class HitsArea extends TerrainComponent<Props>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
         <Hit
           hit={hit}
-          resultsConfig={resultsConfig}
+          resultsConfig={this.state.resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
           allowSpotlights={this.props.allowSpotlights}
@@ -223,26 +362,13 @@ class HitsArea extends TerrainComponent<Props>
           primaryKey={hit.primaryKey}
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
+          hitSize={'large'}
+          nestedFields={this.state.nestedFields}
+          builder={this.props.builder}
+          isVisible={true}
         />
       </div>
     );
-  }
-
-  public handleRequestMoreHits(onHitsLoaded: (unchanged?: boolean) => void)
-  {
-    const { hitsPages } = this.state;
-
-    if (hitsPages * HITS_PAGE_SIZE < MAX_HITS)
-    {
-      this.setState({
-        hitsPages: hitsPages + 1,
-        onHitsLoaded,
-      });
-    }
-    else
-    {
-      onHitsLoaded(true);
-    }
   }
 
   public componentDidUpdate()
@@ -259,7 +385,8 @@ class HitsArea extends TerrainComponent<Props>
   public isQueryEmpty(): boolean
   {
     const { query, ignoreEmptyCards } = this.props;
-    return !query || (!ignoreEmptyCards && !query.cards.size);
+    const cardsAndPathEmpty = !query.cards.size && !query.path;
+    return !query || (!ignoreEmptyCards && cardsAndPathEmpty);
   }
 
   public handleSpotlightAdded(id, spotlightData)
@@ -285,15 +412,20 @@ class HitsArea extends TerrainComponent<Props>
     const allMapsData = [];
     _.keys(locations).forEach((field) =>
     {
+      let canAdd = true;
       let multiLocations = [];
       const target = locations[field];
       hits.forEach((hit, i) =>
       {
-        const { resultsConfig } = this.props.query;
-        const name = resultsConfig.enabled && resultsConfig.name !== undefined ?
+        const { resultsConfig } = this.state;
+        const name = resultsConfig && resultsConfig.enabled && resultsConfig.name !== undefined ?
           hit.fields.get(resultsConfig.name) : hit.fields.get('_id');
         const spotlight = this.state.spotlightHits.get(hit.primaryKey);
         const color = spotlight !== undefined && spotlight.color !== undefined ? spotlight.color : 'black';
+        if (!hit.fields.get(field))
+        {
+          canAdd = false;
+        }
         multiLocations.push({
           coordinates: hit.fields.get(field),
           name,
@@ -301,7 +433,10 @@ class HitsArea extends TerrainComponent<Props>
           color,
         });
       });
-      allMapsData.push({ target, multiLocations: List(multiLocations) });
+      if (canAdd)
+      {
+        allMapsData.push({ target, multiLocations: List(multiLocations) });
+      }
     });
     return allMapsData;
   }
@@ -361,7 +496,7 @@ class HitsArea extends TerrainComponent<Props>
   {
     const el = this.refs['map'];
     const cr = el['getBoundingClientRect']();
-    if (cr.height <= MAP_MIN_HEIGHT)
+    if (cr.height <= MAP_MIN_HEIGHT + 5)
     {
       this.setState({
         mapHeight: MAP_MAX_HEIGHT,
@@ -392,13 +527,14 @@ class HitsArea extends TerrainComponent<Props>
           style={{
             height: this.state.mapHeight,
             maxHeight,
+            borderColor: Colors().blockOutline,
           }}
           ref='map'
         >
           <div
             className='results-area-map-topbar'
             onMouseUp={this.toggleMapOpen}
-            style={backgroundColor(localStorage.getItem('theme') === 'DARK' ? Colors().bg3 : Colors().bg2)}
+            style={backgroundColor(Colors().blockBg)}
           >
             <div
               onMouseDown={this.handleMapMouseDown}
@@ -424,7 +560,8 @@ class HitsArea extends TerrainComponent<Props>
                 geocoder='photon'
                 canEdit={false}
               />,
-            )}
+            )
+          }
         </div>
       );
     }
@@ -435,17 +572,16 @@ class HitsArea extends TerrainComponent<Props>
   {
     const { resultsState } = this.props;
     const { hits } = resultsState;
-    const { resultsConfig } = this.props.query;
+    const { resultsConfig } = this.state;
 
     let infoAreaContent: any = null;
     let hitsContent: any = null;
     let hitsAreOutdated: boolean = false;
-
     if (this.isDatabaseEmpty())
     {
       hitsAreOutdated = true;
       infoAreaContent = <InfoArea
-        large='The database is empty, please select the database.'
+        large='The database is empty, please select a database.'
       />;
     }
     else if (this.isQueryEmpty())
@@ -463,21 +599,17 @@ class HitsArea extends TerrainComponent<Props>
         small={resultsState.errorMessage}
       />;
     }
-
-    if (!hits)
+    else if (resultsState.loading && (!hits || !hits.size))
     {
-      if (resultsState.loading)
-      {
-        infoAreaContent = <InfoArea
-          large='Querying results...'
-        />;
-      }
-      else
-      {
-        infoAreaContent = <InfoArea
-          large='Compose a query to view results here.'
-        />;
-      }
+      infoAreaContent = <InfoArea
+        large='Querying results...'
+      />;
+    }
+    else if (!hits)
+    {
+      infoAreaContent = <InfoArea
+        large='Compose a query to view results here.'
+      />;
     }
     else if (!hits.size)
     {
@@ -512,12 +644,15 @@ class HitsArea extends TerrainComponent<Props>
       // Extract the geo_distance fields and values from the query
       try
       {
-        const tqlString = AllBackendsMap[this.props.query.language].parseTreeToQueryString(
-          this.props.query,
-          {
-            replaceInputs: true,
-          },
-        );
+        // const tqlString = AllBackendsMap[this.props.query.language].parseTreeToQueryString(
+        //   this.props.query,
+        //   {
+        //     replaceInputs: true,
+        //   },
+        // );
+        const { query } = this.props;
+        const parser = new ESJSONParser(query.tql, true);
+        const tqlString = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
         const geoDistances = tqlString.match(/"geo_distance": \{[^\}]*\}/g);
         this.locations = {};
         if (geoDistances !== undefined && geoDistances !== null)
@@ -550,36 +685,28 @@ class HitsArea extends TerrainComponent<Props>
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
-          onRequestMoreItems={this.handleRequestMoreHits}
+          // onScroll={this.checkScroll}
+          id='hits-area'
+          pageSize={HITS_PAGE_SIZE}
+          totalSize={MAX_HITS}
         >
           {
             hits.map((hit, index) =>
-            {
-              if (index > this.state.hitsPages * HITS_PAGE_SIZE)
-              {
-                return null;
-              }
-
-              return (
-                <Hit
-                  hit={hit}
-                  resultsConfig={resultsConfig}
-                  onExpand={this.handleExpand}
-                  index={index}
-                  key={index}
-                  primaryKey={hit.primaryKey}
-                  allowSpotlights={this.props.allowSpotlights}
-                  locations={this.locations}
-                  onSpotlightAdded={this.handleSpotlightAdded}
-                  onSpotlightRemoved={this.handleSpotlightRemoved}
-                />
-              );
-            })
-          }
-          {
-            this.hitsFodderRange.map(
-              (i) =>
-                <div className='results-area-fodder' key={i} />,
+              <Hit
+                hit={hit}
+                resultsConfig={resultsConfig}
+                onExpand={this.handleExpand}
+                index={index}
+                key={hit.primaryKey}
+                primaryKey={hit.primaryKey}
+                allowSpotlights={this.props.allowSpotlights}
+                locations={this.locations}
+                onSpotlightAdded={this.handleSpotlightAdded}
+                onSpotlightRemoved={this.handleSpotlightRemoved}
+                hitSize={this.state.hitSize}
+                nestedFields={this.state.nestedFields}
+                builder={this.props.builder}
+              />,
             )
           }
         </InfiniteScroll>
@@ -595,7 +722,6 @@ class HitsArea extends TerrainComponent<Props>
     return (
       <div
         className='results-area-results-wrapper'
-        style={{ height: `calc(100% - ${mapHeight}px - 60px)` }}
       >
         {
           hitsContent
@@ -648,7 +774,7 @@ class HitsArea extends TerrainComponent<Props>
     return (
       <div
         className='results-top'
-        style={getStyle('boxShadow', '0px 3px 12px ' + Colors().boxShadow)}
+        style={backgroundColor(Colors().bg)}
       >
         <div className='results-top-summary'>
           {
@@ -678,20 +804,65 @@ class HitsArea extends TerrainComponent<Props>
         </div>
         }
 
-        <Switch
+        {/*<Switch
           first='Icons'
           second='Table'
           onChange={this.toggleView}
           selected={this.state.hitFormat === 'icon' ? 1 : 2}
           small={true}
-        />
+        />*/}
+        {<Switch
+          first='Large'
+          second='Small'
+          onChange={this.toggleHitSize}
+          selected={this.state.hitSize === 'large' ? 1 : 2}
+          small={true}
+        />}
       </div>
     );
   }
 
+  public toggleHitSize()
+  {
+    // Need to scroll this to the top to avoid weird bugs with infinite scroller
+    const el = document.getElementById('hits-area');
+    if (el)
+    {
+      el.scrollTop = 0;
+    }
+
+    this.setState({
+      hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
+    });
+  }
+
+  public canExport()
+  {
+    const { path } = this.props.builder.query;
+    return !(path.source.count > 500 && path.more.collapse !== undefined);
+  }
+
   public showExport()
   {
-    ETLRouteUtil.gotoEditAlgorithm(this.props.algorithmId);
+    // Check if exporting is possible (Cannot export if size > 500 and using collapse)
+    if (this.canExport())
+    {
+      ETLRouteUtil.gotoEditAlgorithm(this.props.algorithmId);
+    }
+    else
+    {
+      // Show error modal explaining why export is not possible
+      this.setState({
+        showingErrorModal: true,
+      });
+    }
+  }
+
+  public hidePopup(key)
+  {
+    this.setState({
+      [key]: false,
+    });
   }
 
   public showConfig()
@@ -701,22 +872,55 @@ class HitsArea extends TerrainComponent<Props>
     });
   }
 
-  public hideConfig()
+  public saveConfigAsDefault(config: ResultsConfig)
   {
-    this.setState({
-      showingConfig: false,
-    });
+    if (config.enabled)
+    {
+      Ajax.updateResultsConfig(this.state.indexName, config, (resp) =>
+      {
+        notificationManager.addNotification(
+          'Saved',
+          'Saved as default config for ' + this.state.indexName,
+          'info',
+          3,
+        );
+      });
+    }
+  }
+
+  public renderErrorModal()
+  {
+    return (
+      <Modal
+        open={this.state.showingErrorModal}
+        onClose={this._fn(this.hidePopup, 'showingErrorModal')}
+        title={'Cannot Export'}
+        children={`
+          Group By is not supported when exporting over 500 results.
+          Reduce the size or remove the group by field to export.`}
+        error={true}
+      />
+    );
   }
 
   public renderConfig()
   {
     if (this.state.showingConfig)
     {
+      const { props, state } = this;
+      const fields = Util.orderFields(props.resultsState.fields, props.schema,
+        props.query.algorithmId, state.indexName);
+      const { resultsConfig } = this.state;
       return <ResultsConfigComponent
-        config={this.props.query.resultsConfig}
-        fields={this.props.resultsState.fields}
-        onClose={this.hideConfig}
-        onConfigChange={HitsArea.handleConfigChange}
+        config={resultsConfig !== undefined ? resultsConfig : this.props.query.resultsConfig}
+        fields={fields}
+        onClose={this._fn(this.hidePopup, 'showingConfig')}
+        onSaveAsDefault={this.saveConfigAsDefault}
+        onConfigChange={this.handleConfigChange}
+        builder={this.props.builder}
+        schema={this.props.schema}
+        dataSource={this.props.query.path.source.dataSource}
+        sampleHit={props.resultsState.hits && props.resultsState.hits.get(0)}
       />;
     }
   }
@@ -737,6 +941,7 @@ class HitsArea extends TerrainComponent<Props>
         {this.renderHitsMap()}
         {this.renderExpandedHit()}
         {this.props.showCustomizeView && this.renderConfig()}
+        {this.renderErrorModal()}
       </div>
     );
   }
@@ -747,4 +952,9 @@ class HitsArea extends TerrainComponent<Props>
   }
 }
 
-export default HitsArea;
+export default Util.createContainer(
+  HitsArea,
+  ['builder', 'schema'],
+  {
+  },
+);
