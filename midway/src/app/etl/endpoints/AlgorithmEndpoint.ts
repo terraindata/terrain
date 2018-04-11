@@ -54,7 +54,7 @@ import DatabaseController from '../../../database/DatabaseController';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
 import { QueryHandler } from '../../query/QueryHandler';
 
-export default class QueryEndpoint implements AEndpointStream
+export default class AlgorithmEndpoint implements AEndpointStream
 {
   constructor()
   {
@@ -89,6 +89,6 @@ export default class QueryEndpoint implements AEndpointStream
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    throw new Error('Query sink endpoint not implemented');
+    throw new Error('Algorithm sink endpoint not implemented');
   }
 }
