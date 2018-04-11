@@ -93,6 +93,7 @@ const NewTheme =
     sidebarBg: NTColors.light1,
 
     textboxBg: NTColors.light1,
+    lightBlue: NTColors.blue1,
   };
 
 // Will be deprecated

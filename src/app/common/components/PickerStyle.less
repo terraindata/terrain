@@ -1,0 +1,23 @@
+@import "../../common/Common.less";
+
+.picker-wrapper {
+	display: table;
+	border-collapse: separate;
+    border-spacing: 3px;
+    background: white;
+	.picker-row {
+		display: table-row;
+	}
+	.picker-option {
+		display: table-cell;
+		width: 30px;
+    	text-align: center;
+    	vertical-align: middle;
+		height: 30px;
+		cursor: pointer;
+		.transition;
+		&:hover {
+			opacity: 0.7;
+		}
+	}
+}
