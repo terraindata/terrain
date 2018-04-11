@@ -402,6 +402,24 @@ export class Import
             }
             obj[extractOldColName] = _.get(obj[extractOldColName], extractPath, null);
             break;
+          case 'regex':
+            const regexColName: string | undefined = transform['colName'];
+            const regexFindKey: string | undefined = transform['args']['findKey'];
+            const regexReplaceKey: string | undefined = transform['args']['replaceKey'];
+            if (regexColName === undefined || regexFindKey === undefined
+              || regexReplaceKey === undefined)
+            {
+              throw new Error('Column name and regex find and replace keys must be provided.');
+            }
+            try
+            {
+              obj[regexColName] = obj[regexColName].replace(new RegExp(regexFindKey, 'g'), regexReplaceKey);
+            }
+            catch (e)
+            {
+              // do nothing
+            }
+            break;
           case 'hash':
             const oldColHashName: string | undefined = transform['colName'];
             const bcryptSalt: string | undefined = transform['args']['bcryptSalt'];
