@@ -22,7 +22,8 @@ stages:
   - test-sigint
   - build
   - deploy
-  - fullstack
+  - fullstack-meta
+  - fullstack-screenshot
 
 lint:
   script:
@@ -76,7 +77,7 @@ build-frontend-prod:
    - master
   stage: build
 
-fullstack:
+fullstack-meta:
   script:
     - killall node || true;
     - yarn test-fullstack-setup
@@ -85,9 +86,22 @@ fullstack:
     - NODE_ENV=production yarn start-midway > ./midwayConsole.log 2>&1&
     - sleep 10
     - yarn test-fullstack-component
+  stage: fullstack-meta
+  after_script:
+    - yarn test-fullstack-teardown
+    - killall node || true;
+
+fullstack-screenshot:
+  script:
+    - killall node || true;
+    - yarn test-fullstack-setup
+    - yarn clean
+    - MIDWAY_HOST=`hostname`:3000 yarn build
+    - NODE_ENV=production yarn start-midway > ./midwayConsole.log 2>&1&
+    - sleep 10
     - yarn test-fullstack-login
     - yarn test-rr-builder
-  stage: fullstack
+  stage: fullstack-screenshot
   allow_failure: true
   artifacts:
     when: on_failure
@@ -98,7 +112,6 @@ fullstack:
   after_script:
     - yarn test-fullstack-teardown
     - killall node || true;
-    - ./midway/test/scripts/copy_screenshot.sh || true;
 
 deploy:
   script:
