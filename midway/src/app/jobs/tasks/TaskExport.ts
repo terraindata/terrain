@@ -47,8 +47,8 @@ THE SOFTWARE.
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import { TaskConfig, TaskOutputConfig } from 'shared/types/jobs/TaskConfig';
 import { Task } from '../Task';
-import { TaskConfig, TaskOutputConfig } from '../TaskConfig';
 
 export class TaskExport extends Task
 {

@@ -42,55 +42,102 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import * as stream from 'stream';
+import pq = require('priorityqueue_native');
+
+import * as _ from 'lodash';
+import * as runQueue from 'run-queue';
 import * as winston from 'winston';
 
-import { TaskConfig, TaskOutputConfig } from 'shared/types/jobs/TaskConfig';
-import { Task } from '../Task';
+import { TaskConfig, TaskOutputConfig, TaskTreeConfig } from 'shared/types/jobs/TaskConfig';
+import { Job } from './Job';
+import { Task } from './Task';
+import { TaskTree } from './TaskTree';
 
-export class TaskImport extends Task
+export class JobQueue
 {
-  constructor(taskConfig: TaskConfig)
+  private jobs: Map<number, Job>;
+  private priorityQueue: pq.PriorityQueue;
+
+  constructor()
   {
-    super(taskConfig);
+    this.jobs = new Map<number, Job>();
+    this.priorityQueue = new pq.PriorityQueue();
   }
 
-  public async run(): Promise<TaskOutputConfig>
+  public cancel(id: number): boolean
   {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
+    try
     {
-      // TODO: call other functions (needs to wrap in Promise for later)
-      // example stub for import returning a stream.Readable
-      const returnStream: stream.Readable = new stream.Readable();
-      const writeStream: stream.Writable = new stream.Writable();
-      returnStream.pipe(writeStream);
-      writeStream.write('Import stream test\n');
-      const taskOutputConfig: TaskOutputConfig =
-        {
-          status: true,
-          exit: false,
-          options:
-            {
-              stream: returnStream,
-            },
-        };
-      resolve(taskOutputConfig);
-    });
+      this.jobs.get(id).cancel();
+      return true;
+    }
+    catch (e)
+    {
+      // do nothing, job was not found
+    }
+    return false;
   }
 
-  public async printNode(): Promise<TaskOutputConfig>
-  {
-    winston.info('Printing Import, params: ' + JSON.stringify(this.taskConfig.params as object));
-    return Promise.resolve(
+  /*
+    public create(args: TaskConfig[], filename: string): boolean | string
+    {
+      if (args === undefined || (Array.isArray(args) && args.length === 0))
       {
-        status: true,
-        exit: false,
-        options:
-          {
-            stream: new stream.PassThrough(),
-          },
-      } as TaskOutputConfig);
-  }
+        return false;
+      }
+      this.tasks = args;
+      const taskTreeConfig: TaskTreeConfig =
+        {
+          cancel: false,
+          filename,
+          jobStatus: 0,
+          paused: -1,
+        };
+      return this.taskTree.create(args, taskTreeConfig);
+    }
+  
+    public pause(): void
+    {
+      if (this.taskTree.isCancelled() === false)
+      {
+        this.taskTree.pause();
+      }
+    }
+  
+    public async unpause(): Promise<void>
+    {
+      if (this.taskTree.isCancelled() === true)
+      {
+        await this.run();
+      }
+    }
+  
+    public async printTree(): Promise<void>
+    {
+      await this.taskTree.printTree();
+    }
+  
+    public async run(): Promise<TaskOutputConfig>
+    {
+      return this.taskTree.visit();
+    }
+  
+    private async _jobLoop(): Promise<void>
+    {
+      // TODO check the scheduler for unlocked rows and detect which schedules should run next
+      const availableSchedules: number[] = await this._getAvailableSchedules();
+      availableSchedules.forEach((scheduleId) =>
+      {
+        this._checkSchedulerTableHelper(scheduleId).catch((err) =>
+        {
+          winston.warn(err.toString() as string);
+        });
+      });
+      setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
+    }
+  */
 }
+
+export default JobQueue;
