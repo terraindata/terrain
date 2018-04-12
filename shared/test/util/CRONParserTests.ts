@@ -82,6 +82,20 @@ test('cannot parse combined weekdays & month days', () =>
   );
 });
 
+test('cannot parse invalid weekdays', () =>
+{
+  expect(parseCRONDaySchedule('* * * * 2,4,8')).toEqual(
+    null
+  );
+});
+
+test('cannot parse invalid month days', () =>
+{
+  expect(parseCRONDaySchedule('* * 32 * *')).toEqual(
+    null
+  );
+});
+
 
 test('parses every minute', () =>
 {

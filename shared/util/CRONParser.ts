@@ -208,6 +208,56 @@ export function parseCRONHourSchedule(cron: string): CRONHourSchedule
 	return null; // cannot be parsed
 }
 
+export function canParseCRONSchedule(cron: string, skipHoursOrDays?: 'hours' | 'days'): boolean
+{
+	// assert hours and days can be parsed
+	
+	if (scheduleMeetsStandards(cron) && parseCRONHourSchedule(cron) !== null && parseCRONDaySchedule(cron) !== null)
+	{
+		return true;
+	}
+	
+	return true;
+}
+
+
+export function setCRONHours(cron: string, hours: CRONHourSchedule): string
+{
+	if (!canParseCRONSchedule(cron))
+	{
+		throw new Error ("Cannot parse this cron schedule: " + cron);
+	}
+	
+	const pieces = cron.split(' ');
+	switch (hours.type)
+	{
+		case 'minute':
+			pieces[0] = '*';
+			pieces[1] = '*';
+			break;
+		case 'hourly':
+			pieces[0] = hours.minutes.join(',');
+			pieces[1] = '*';
+			break;
+		case 'daily':
+			pieces[0] = '0';
+			pieces[1] = hours.hours.join(',');
+			break;
+		default:
+			throw new Error('Unsupported hours type: ' + JSON.stringify(hours));
+	}
+	
+	return pieces.join(' ');
+}
+
+export function setCRONDays(cron: string, days: CRONDaySchedule): string
+{
+	// TODO
+}
+
+
+/** Private *****************************************/
+
 function isValidSingleHour(hour: string)
 {
 	return isValidNumber(hour) && +hour >= 0 && +hour < 24;
@@ -223,19 +273,7 @@ function isValidNumber(num: string)
 	return !isNaN(+num);
 }
 
-export function canParseCRONSchedule(cron: string, skipHoursOrDays?: 'hours' | 'days'): boolean
-{
-	// assert hours and days can be parsed
-	
-	if (scheduleMeetsStandards(cron) && parseCRONHourSchedule(cron) !== null && parseCRONDaySchedule(cron) !== null)
-	{
-		return true;
-	}
-	
-	return true;
-}
 
-// private
 function scheduleMeetsStandards(cron: string): boolean
 {
 	// assert rest of format, besides hours and days, matches standard
