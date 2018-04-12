@@ -96,11 +96,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
       allWeights: [],
     };
 
-  public shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
-  }
-
   public componentWillMount()
   {
     this.props.colorsActions({

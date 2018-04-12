@@ -130,6 +130,8 @@ class Builder extends TerrainComponent<Props>
     saving?: boolean;
     savingAs?: boolean;
 
+    hitsPage: number;
+
   } = {
       exportState: FileImportStore.getState(),
       algorithms: this.props.library.algorithms,
@@ -149,6 +151,8 @@ class Builder extends TerrainComponent<Props>
       navigationException: false,
 
       saveAsTextboxValue: '',
+      hitsPage: 1,
+
     };
 
   public initialColSizes: any;
@@ -276,7 +280,12 @@ class Builder extends TerrainComponent<Props>
   {
     const currentOpen = this.props.location.query && this.props.location.query.o;
     const nextOpen = nextProps.location.query && nextProps.location.query.o;
-
+    if (currentOpen !== nextOpen)
+    {
+      this.setState({
+        hitsPage: 1,
+      });
+    }
     if (
       nextProps.builder.query !== this.props.builder.query
       || nextProps.builder.pastQueries !== this.props.builder.pastQueries
@@ -662,10 +671,18 @@ class Builder extends TerrainComponent<Props>
         cantEditReason={this.cantEditReason()}
         onNavigationException={this.handleNavigationException}
         schema={(TerrainStore.getState() as any).schema}
+        onIncrementHitsPage={this.incrementHitsPage}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,
     };
+  }
+
+  public incrementHitsPage(hitsPage: number)
+  {
+    this.setState({
+      hitsPage: hitsPage + 1,
+    });
   }
 
   public switchToManualCol(index)
@@ -957,6 +974,7 @@ class Builder extends TerrainComponent<Props>
           resultsState={this.props.builder.resultsState}
           db={this.props.builder.db}
           onResultsStateChange={this.props.builderActions.results}
+          hitsPage={this.state.hitsPage}
         />
       </div>
     );

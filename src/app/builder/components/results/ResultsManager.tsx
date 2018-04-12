@@ -76,6 +76,8 @@ import * as SpotlightTypes from '../../data/SpotlightTypes';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 
+export const SCROLL_SIZE = 20;
+
 export interface Props
 {
   query: Query;
@@ -84,6 +86,7 @@ export interface Props
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
+  hitsPage: number;
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
   spotlightActions?: typeof SpotlightActions;
@@ -115,7 +118,8 @@ let HITS_CACHE: { [primaryKey: string]: Hit };
 
 export class ResultsManager extends TerrainComponent<Props>
 {
-  public state: State = {};
+  public state: State = {
+  };
 
   // apply a function to all active queries
   public mapQueries(fn: (query: ResultsQuery, stateKey: string) => void)
@@ -148,19 +152,18 @@ export class ResultsManager extends TerrainComponent<Props>
     );
   }
 
-  public queryResults(query: Query, db: BackendInstance)
+  public queryResults(query: Query, db: BackendInstance, hitsPage: number, appendResults?: boolean)
   {
     if (!query || !db)
     {
       return;
     }
-
     if (db.source === 'm1')
     {
       this.queryM1Results(query, db);
     } else if (db.source === 'm2')
     {
-      this.queryM2Results(query, db);
+      this.queryM2Results(query, db, hitsPage, appendResults);
     } else
     {
       console.log('Unknown Database ' + query);
@@ -197,7 +200,7 @@ export class ResultsManager extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     // TODO: the logic here is potentially broken since props appear to be updated at different times and are not consistent with eachother
-    if (this.props.db !== nextProps.db ||
+    if ((this.props.db !== nextProps.db ||
       (
         nextProps.query
         && nextProps.query.tql
@@ -205,22 +208,30 @@ export class ResultsManager extends TerrainComponent<Props>
           (
             this.props.query.tql !== nextProps.query.tql ||
             nextProps.query.tqlMode === 'manual' ||
-            // this.props.query.cards !== nextProps.query.cards ||
             this.props.query.inputs !== nextProps.query.inputs
-            // this.props.query.path !== nextProps.query.path
           )
         )
-      )
+      ))
     )
     {
-      this.queryResults(nextProps.query, nextProps.db);
-      if (!nextProps.query || (this.props.query && nextProps.query && nextProps.query.id !== this.props.query.id))
-      {
-        this.changeResults({
-          hits: undefined,
-          aggregations: {},
-        });
-      }
+      this.queryResults(nextProps.query, nextProps.db, nextProps.hitsPage);
+    }
+    else if (
+      nextProps.query &&
+      nextProps.query.tql &&
+      nextProps.hitsPage !== this.props.hitsPage &&
+      nextProps.hitsPage <= MAX_HITS / SCROLL_SIZE
+    )
+    {
+      this.queryResults(nextProps.query, nextProps.db, nextProps.hitsPage, true);
+    }
+
+    if (!nextProps.query || (this.props.query && nextProps.query && nextProps.query.id !== this.props.query.id))
+    {
+      this.changeResults({
+        hits: undefined,
+        aggregations: {},
+      });
     }
 
     if (nextProps.query && this.props.spotlights && (nextProps.resultsState.hits !== this.props.resultsState.hits))
@@ -385,7 +396,6 @@ export class ResultsManager extends TerrainComponent<Props>
       const { filetype, filesize, preview, originalNames } = exportChanges;
       Actions.chooseFile(filetype, filesize, preview, originalNames);
     }
-
     this.props.onResultsStateChange(resultsState);
   }
 
@@ -472,19 +482,36 @@ export class ResultsManager extends TerrainComponent<Props>
     }
   }
 
-  private postprocessEQL(eql: string): string
+  private postprocessEQL(postprocessed: any, hitsPage?: number, appendResults?: boolean): string
   {
-    const postprocessed: object = (new ESJSONParser(eql)).getValue();
-
-    if (postprocessed.hasOwnProperty('size'))
+    hitsPage = hitsPage !== undefined ? hitsPage : this.props.hitsPage;
+    if (appendResults)
     {
-      postprocessed['size'] = Math.min(postprocessed['size'], MAX_HITS);
+      let from = (hitsPage - 1) * SCROLL_SIZE;
+      if (postprocessed.hasOwnProperty('from'))
+      {
+        from += postprocessed['from'];
+      }
+      let size = Math.min(SCROLL_SIZE, MAX_HITS - from);
+      if (postprocessed.hasOwnProperty('size'))
+      {
+        size = Math.min(postprocessed['size'] - from, size);
+      }
+      postprocessed['size'] = size >= 0 ? size : 0;
+      postprocessed['from'] = from;
     }
-
+    else
+    {
+      let size = Math.min(MAX_HITS, hitsPage * SCROLL_SIZE);
+      if (postprocessed.hasOwnProperty('size'))
+      {
+        postprocessed['size'] = Math.min(postprocessed['size'], size);
+      }
+    }
     return ESConverter.formatES(new ESJSONParser(JSON.stringify(postprocessed)));
   }
 
-  private queryM2Results(query: Query, db: BackendInstance)
+  private queryM2Results(query: Query, db: BackendInstance, hitsPage: number, appendResults?: boolean)
   {
     //
     // if (query.parseTree === null || query.parseTree.hasError())
@@ -493,17 +520,21 @@ export class ResultsManager extends TerrainComponent<Props>
     // }
     // TODO: This only allows that path to make queries ( when one exists )
     let eql;
-    if (query === this.state.lastQuery)
+    if (query === this.state.lastQuery && !appendResults)
     {
       return;
     }
+    let querySize; // Size set in the actual query (not imposed by postprocess)
     if (query.path !== undefined)
     {
       try
       {
         const parser: ESJSONParser = new ESJSONParser(query.tql, true);
         eql = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
-        eql = this.postprocessEQL(eql);
+        const processed: object = (new ESJSONParser(eql)).getValue();
+        querySize = processed['size'];
+        eql = this.postprocessEQL(processed, hitsPage, appendResults);
+        // console.log('post process ', eql);
       }
       catch (e)
       {
@@ -518,9 +549,11 @@ export class ResultsManager extends TerrainComponent<Props>
           replaceInputs: true,
         },
       );
+      const processed: object = (new ESJSONParser(eql)).getValue();
+      querySize = processed['size'];
       if (query.tqlMode !== 'manual')
       {
-        eql = this.postprocessEQL(eql);
+        eql = this.postprocessEQL(processed, hitsPage, appendResults);
       }
     }
     if (this.state.query && this.state.query.xhr)
@@ -535,7 +568,7 @@ export class ResultsManager extends TerrainComponent<Props>
         db,
         (resp) =>
         {
-          this.handleM2QueryResponse(resp, false);
+          this.handleM2QueryResponse(resp, false, appendResults, querySize);
         },
         (err) =>
         {
@@ -586,7 +619,7 @@ export class ResultsManager extends TerrainComponent<Props>
     // }
   }
 
-  private updateResults(resultsData: any, isAllFields: boolean)
+  private updateResults(resultsData: any, isAllFields: boolean, appendResults?: boolean, querySize?: number)
   {
     const { resultsState } = this.props;
     const hitsData = resultsData.hits;
@@ -638,7 +671,10 @@ export class ResultsManager extends TerrainComponent<Props>
     }
 
     const loading = false;
-
+    if (appendResults)
+    {
+      hits = this.props.resultsState.hits.concat(hits).toList();
+    }
     const changes: any = {
       hits,
       fields: fieldsSet.toList(),
@@ -654,7 +690,11 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (!resultsState.hasLoadedCount)
     {
-      changes['count'] = hits.size;
+      changes['count'] = Math.min(resultsData.rawResult.hits.total, MAX_HITS);
+      if (querySize !== undefined)
+      {
+        changes['count'] = Math.min(changes['count'], querySize);
+      }
     }
 
     const filteredFields = List(_.filter(fieldsSet.toArray(), (val) => !(val.charAt(0) === '_')));
@@ -700,7 +740,7 @@ export class ResultsManager extends TerrainComponent<Props>
     this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields);
   }
 
-  private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean)
+  private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean, appendResults?: boolean, querySize?: number)
   {
     const queryKey = isAllFields ? 'allQuery' : 'query';
     this.setState({
@@ -759,7 +799,7 @@ export class ResultsManager extends TerrainComponent<Props>
       });
     });
     const aggregations = resultsData.aggregations;
-    this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields);
+    this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields, appendResults, querySize);
   }
 
   private handleM1Error(response: any, isAllFields?: boolean)
