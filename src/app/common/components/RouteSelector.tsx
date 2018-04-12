@@ -805,13 +805,13 @@ export class RouteSelector extends TerrainComponent<Props>
                       </div>,
                       option.tooltip,
                     )}
-                      <FadeInOut
-                        open={isSelected}
-                      >
-                      {
-                        option.component
-                      }
-                      </FadeInOut>
+                  <FadeInOut
+                    open={isSelected}
+                  >
+                    {
+                      option.component
+                    }
+                  </FadeInOut>
                 </div>
               }
               {
