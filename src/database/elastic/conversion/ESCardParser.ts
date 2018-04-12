@@ -321,6 +321,8 @@ export default class ESCardParser extends ESParser
     return this.valueInfo.card;
   }
 
+  // delete the children object or array element
+  // NOTE: the deleted array element will be replaced with undefined
   public deleteChild(parent: ESValueInfo, index: string | number)
   {
     if (typeof index === 'string')

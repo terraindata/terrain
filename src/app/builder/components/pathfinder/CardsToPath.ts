@@ -238,7 +238,7 @@ export class CardsToPath
     };
     const newHardFilters = [];
     const newSoftFilters = [];
-    if (sourceBool.card.otherFilters)
+    if (sourceBool.card.otherFilters.size > 0)
     {
       sourceBool.card.otherFilters.map((filter: Block) =>
       {
