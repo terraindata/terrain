@@ -68,12 +68,7 @@ export default class ElasticEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const { serverId, dbId, language, query } = source.options as any;
-
-    if (language !== 'elastic')
-    {
-      throw new Error('Invalid language specified.');
-    }
+    const { serverId, dbId, query } = source.options as any;
 
     const id = (dbId !== undefined) ? dbId : (serverId !== undefined) ? serverId : null;
     const controller: DatabaseController = await this.getController(id);
@@ -91,12 +86,7 @@ export default class ElasticEndpoint extends AEndpointStream
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const { serverId, dbId, database, table, language } = sink.options as any;
-
-    if (language !== 'elastic')
-    {
-      throw new Error('Invalid language specified.');
-    }
+    const { serverId, dbId, database, table } = sink.options as any;
 
     const id = (dbId !== undefined) ? dbId : (serverId !== undefined) ? serverId : null;
     const controller: DatabaseController = await this.getController(id);
@@ -123,7 +113,7 @@ export default class ElasticEndpoint extends AEndpointStream
     let controller: DatabaseController | undefined;
     if (typeof id === 'string')
     {
-      controller = DatabaseRegistry.getByName(name);
+      controller = DatabaseRegistry.getByName(id);
     }
     else if (typeof id === 'number')
     {

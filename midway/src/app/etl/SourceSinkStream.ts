@@ -84,7 +84,7 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         endpoint = new AlgorithmEndpoint();
         const algorithmStream = await endpoint.getSource(source);
         sourceStream = algorithmStream.pipe(new ExportTransform());
-        break;
+        return resolve(sourceStream);
       case 'Upload':
         if (files === undefined || files.length === 0)
         {

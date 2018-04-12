@@ -110,7 +110,11 @@ export default class ProgressTransform extends Transform
   public _flush(error, callback)
   {
     this.push(this.progress());
-    callback();
+
+    if (callback !== undefined)
+    {
+      callback();
+    }
   }
 
   private progress()

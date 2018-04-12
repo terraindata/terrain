@@ -252,7 +252,7 @@ export default class Templates
       throw new Error('Only single sinks are supported.');
     }
 
-    winston.info('Beginning ETL pipline...');
+    winston.info('Beginning ETL pipeline...');
 
     // construct a "process DAG"
     let defaultSink;
@@ -283,11 +283,14 @@ export default class Templates
       },
     );
 
+    winston.info('Finished constructing ETL pipeline graph...');
+
     if (defaultSink === undefined)
     {
       throw new Error('Default sink not found.');
     }
 
+    winston.info('Beginning execution of ETL pipeline graph...');
     const nodes: any[] = GraphLib.alg.topsort(dag);
     const streamMap = await this.executeGraph(template, dag, nodes, files);
     return streamMap[defaultSink][defaultSink];
@@ -319,6 +322,7 @@ export default class Templates
     {
       case 'Source':
         {
+          winston.info('Processing source node', nodeId);
           const source = template.sources[node.endpoint];
           const sourceStream = await getSourceStream(node.endpoint, source, files);
 
@@ -336,6 +340,7 @@ export default class Templates
 
       case 'Sink':
         {
+          winston.info('Processing sink node', nodeId);
           const inEdges: any[] = dag.inEdges(nodeId);
           if (inEdges.length > 1)
           {
@@ -352,6 +357,7 @@ export default class Templates
 
       case 'MergeJoin':
         {
+          winston.info('Processing merge-join node', nodeId);
           const inEdges: any[] = dag.inEdges(nodeId);
 
           const done = new EventEmitter();
@@ -386,6 +392,8 @@ export default class Templates
               }
             });
           }
+
+          winston.info('Finished creating temporary indices: ', JSON.stringify(tempIndices));
 
           const dbName: string = template.sinks._default['options']['serverId'];
 
