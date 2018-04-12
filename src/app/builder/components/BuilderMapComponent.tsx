@@ -131,7 +131,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
     return (
       <div className='cards-builder-map-component'>
         <MapComponent
-          geocoder='photon'
+          geocoder='google'
           inputValue={mapInputValue}
           coordinates={locationValue !== undefined ? locationValue : [0, 0]}
           distance={distance}

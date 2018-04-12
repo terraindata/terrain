@@ -57,6 +57,7 @@ import { BuilderState } from 'builder/data/BuilderState';
 import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
 import Util from 'util/Util';
 
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -121,6 +122,7 @@ export interface Props
   // export only
   algorithmName?: string;
 
+  schemaActions?: typeof SchemaActions;
   builder?: BuilderState;
 }
 @Radium
@@ -225,15 +227,33 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      const dbName = getIndex('', this.props.builder);
-      const tableName = getType('', this.props.builder);
+      const { query } = this.props;
+      const dbName = (query.path.source.dataSource as any).index;
+      const tableName = getType('', this.props.builder) || 'data';
       Actions.setServerDbTable(this.props.serverId, '',
         typeof dbName === 'string' ? dbName : dbName.get(0),
         typeof tableName === 'string' ? tableName : tableName.get(0));
-      const stringQuery: string =
-        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      let stringQuery;
+      if (query.path !== undefined)
+      {
+        try
+        {
+          const parser: ESJSONParser = new ESJSONParser(query.tql, true);
+          stringQuery = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
+        }
+        catch (e)
+        {
+          return;
+        }
+      }
+      else
+      {
+        stringQuery =
+          ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      }
+      // Parse the TQL and set the filters so that when we fetch we get the right templates.
       Actions.fetchTypesFromQuery(this.props.serverId, stringQuery);
-    } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+    }
 
     Actions.fetchColumnAnalyzers();
 
@@ -699,24 +719,42 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleUploadFile()
   {
     this.confirmedLeave = true;
+    const { query } = this.props;
     if (this.props.exporting)
     {
-      const stringQuery: string =
-        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      let stringQuery;
+      if (query.path !== undefined)
+      {
+        try
+        {
+          const parser: ESJSONParser = new ESJSONParser(query.tql, true);
+          stringQuery = ESParseTreeToCode(parser, { replaceInputs: true }, query.inputs);
+        }
+        catch (e)
+        {
+          return;
+        }
+      }
+      else
+      {
+        stringQuery =
+          ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      }
 
+      const fileExtension = this.props.filetype.split(' ')[0];
       Actions.exportFile(
         stringQuery,
         this.props.serverId,
         this.props.exportRank,
         this.state.typeObjectKey,
-        this.props.algorithmName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
+        this.props.algorithmName + '_' + String(moment().format('MM-DD-YY')) + '.' + fileExtension,
         this.handleFileExportSuccess,
         this.handleFileExportError,
       );
     }
     else
     {
-      Actions.importFile(this.props.handleFileImportSuccess);
+      Actions.importFile(this.props.handleFileImportSuccess, this.props.schemaActions);
     }
   }
 
@@ -1448,5 +1486,5 @@ class FileImportPreview extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   FileImportPreview,
   ['builder'],
-  {},
+  { schemaActions: SchemaActions },
 );

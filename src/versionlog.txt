@@ -1,2 +1,2 @@
-Version: v2.2.0.6
-Updates: Transform chart fix, streaming export 
+Version: v3.1
+Updates: Pathfinder Customer Ready

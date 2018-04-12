@@ -62,6 +62,14 @@ const arrowSvgStyles = {
   },
 };
 
+const starSvgStyles = {
+  height: '17px',
+  width: '15px',
+  marginLeft: '3px',
+  strokeWidth: '2px',
+  stroke: Colors().active,
+};
+
 const SchemaTreeStyles =
   {
     schemaView: {
@@ -82,6 +90,18 @@ const SchemaTreeStyles =
     treeItem: [
       Styles.transition,
     ],
+
+    unselectedStarIcon: _.extend({},
+      starSvgStyles,
+      {
+        fill: 'none',
+      }),
+
+    selectedStarIcon: _.extend({},
+      starSvgStyles,
+      {
+        fill: Colors().active,
+      }),
 
     arrow: _.extend(
       {
@@ -138,12 +158,13 @@ const SchemaTreeStyles =
 
     itemInfoRow: {
       flexGrow: '1',
+      display: 'flex',
     },
 
     childrenWrapper: {
       normal: [
         {
-          paddingLeft: 11,
+          paddingLeft: 0,
         },
         Styles.transition,
       ],

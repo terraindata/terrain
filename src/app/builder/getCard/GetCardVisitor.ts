@@ -134,6 +134,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       return 'eql' + clause.type;
     } else
     {
+      if (clause.startsWith('elastic'))
+      {
+        return clause;
+      }
       return 'eql' + clause;
     }
   }
@@ -428,7 +432,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             'true',
           ]),
         },
-        tql: (boolBlock) => boolBlock['value'] === 'true',
+        tql: (boolBlock) => String(boolBlock['value']) === 'true',
         singleType: true,
         typeName: 'boolean',
       },
@@ -711,10 +715,16 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return this.visitESStructureClause(clause);
   }
 
-  public visitESStructureClause(clause: ESStructureClause): any
+  public visitESStructureClause(clause: ESStructureClause | ESWildcardStructureClause): any
   {
     // accepts are overwritten by getChildOptions
-    const accepts = this.getCardTypes(_.values(clause.structure), clause);
+
+    const baseAcceptTypes: any[] = _.values(clause.structure);
+    if (clause instanceof ESWildcardStructureClause)
+    {
+      baseAcceptTypes.push(clause.valueType);
+    }
+    const accepts = this.getCardTypes(baseAcceptTypes, clause);
 
     const init = (blocksConfig, extraConfig?, skipTemplate?) =>
     {
@@ -814,6 +824,18 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             }
           };
 
+          const handleWildCardMapField = (type: string) =>
+          {
+            const cardTypes = this.getCardTypes([type]);
+            cardTypes.map((cardType) =>
+              result.push({
+                text: (backend.blocks[cardType].static['title'] as string),
+                key: '',
+                type: cardType,
+              }),
+            );
+          };
+
           if (this.customCardTypesMap[clause.type] !== undefined)
           {
             // TODO consolidate this code with above code block, DRY
@@ -837,6 +859,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
           clause.suggestions.forEach(handler);
           clause.required.forEach(handler);
+          if (clause instanceof ESWildcardStructureClause)
+          {
+            handleWildCardMapField(clause.valueType);
+          }
           Object.keys(clause.structure).forEach(handler);
 
           return List(result);

@@ -63,6 +63,7 @@ import AExportTransform from './streams/AExportTransform';
 import CSVExportTransform from './streams/CSVExportTransform';
 import ExportTransform from './streams/ExportTransform';
 import JSONExportTransform from './streams/JSONExportTransform';
+import JSONObjectExportTransform from './streams/JSONObjectExportTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import ExportTemplates from './templates/ExportTemplates';
 import TemplateBase from './templates/TemplateBase';
@@ -125,7 +126,7 @@ export class Export
 
     if (exportConfig.filetype !== 'csv' && exportConfig.filetype !== 'json' && exportConfig.filetype !== 'json [type object]')
     {
-      throw Error('Filetype must be either CSV or JSON.');
+      throw Error('File type must be either CSV or JSON.');
     }
 
     if (headless)
@@ -237,6 +238,13 @@ export class Export
           case 'json':
             exportTransform = new JSONExportTransform();
             break;
+          case 'json [type object]':
+            if (exportConfig.objectKey === undefined)
+            {
+              throw Error('Missing object key for export type JSON [type object]');
+            }
+            exportTransform = new JSONObjectExportTransform(exportConfig.objectKey);
+            break;
           case 'csv':
             exportTransform = new CSVExportTransform(columnNames);
             break;
@@ -244,7 +252,35 @@ export class Export
             throw Error('File type must be either CSV or JSON.');
         }
 
-        resolve(respStream.pipe(documentTransform).pipe(exportTransform));
+        resolve(
+          respStream
+            .on('error', (e) =>
+            {
+              winston.error('Error in response stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            })
+            .pipe(documentTransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in document stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            })
+            .pipe(exportTransform)
+            .on('error', (e) =>
+            {
+              winston.error('Error in export stream: ', e.toString());
+              respStream.destroy();
+              documentTransform.destroy();
+              exportTransform.destroy();
+              reject(e);
+            }),
+        );
       }
       catch (e)
       {

@@ -627,7 +627,7 @@ function _isTypeConsistentHelper(arr: object[]): string
   return type;
 }
 
-export function getType(obj: object): string
+export function getType(obj: any): string
 {
   if (typeof obj === 'object')
   {
@@ -648,6 +648,18 @@ export function getType(obj: object): string
       return 'nested';
     }
   }
+  try
+  {
+    const csvParser = new CSVTypeParser();
+    if (csvParser.isDateHelper(obj as string))
+    {
+      return 'date';
+    }
+  }
+  catch (e)
+  {
+    // do nothing
+  }
   if (typeof obj === 'string')
   {
     return 'text';
@@ -664,6 +676,58 @@ export function getRootFieldFromDocPath(path: string): string | undefined
     path.split(/(\.)/g).forEach((elem) => pathAsArr = pathAsArr.concat(elem.split(/(\[\d+\])/g)));
     pathAsArr = pathAsArr.filter((elem) => elem.length !== 0);
     return pathAsArr[0];
+  }
+  catch (e)
+  {
+    return undefined;
+  }
+}
+
+function _getValueFromDocPathHelper(doc: object | object[], path: string[]): any | undefined
+{
+  try
+  {
+    let wasDot: boolean = true;
+    for (let i = 0; i < path.length; ++i)
+    {
+      if (path[i] === '[*]')
+      {
+        const docArr: object[] = [];
+        for (let j = 0; j < (doc as object[]).length; ++j)
+        {
+          const docInd: object = (doc as object[])[j];
+          docArr.push(_getValueFromDocPathHelper(docInd, path.slice(i + 1)));
+        }
+        doc = docArr;
+        break;
+      }
+      else if (path[i] === '.')
+      {
+        wasDot = true;
+      }
+      else
+      {
+        doc = _.get(doc, path[i]);
+        wasDot = false;
+      }
+    }
+  }
+  catch (e)
+  {
+    return undefined;
+  }
+  return doc;
+}
+
+export function getValueFromDocPath(doc: object, path: string): any | undefined
+{
+  try
+  {
+    let pathAsArr: string[] = [];
+    path.split(/(\.)/g).forEach((elem) => pathAsArr = pathAsArr.concat(elem.split(/(\[[\d+]\])|(\[[\*]\])/g)));
+    pathAsArr = pathAsArr.filter((elem) => elem !== undefined && elem.length !== 0);
+    doc = _getValueFromDocPathHelper(doc, pathAsArr);
+    return doc;
   }
   catch (e)
   {

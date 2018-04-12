@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
@@ -58,7 +59,6 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
-
 export interface ScorePoint
 {
   id: string;
@@ -90,6 +90,7 @@ export interface Props
   colors: [string, string];
   spotlights: any; // TODO spawtlights
   mode: string;
+  index?: string;
   schema?: SchemaState;
   builder?: BuilderState;
 }
@@ -377,8 +378,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       AllBackendsMap[this.props.language].blocks, 'scorePoint', {
         value,
         score,
-      },
-    );
+      });
     if (updatePoints)
     {
       this.updatePoints(
@@ -500,12 +500,12 @@ export class TransformCardChart extends TerrainComponent<Props>
     return points;
   }
 
-  public updatePointsSize(newSize: number, points, xDomain)
+  public updatePointsSize(newSize: number, points, scorePoints, xDomain)
   {
     const oldSize = points.size;
     if (oldSize < newSize)
     {
-      let scorePoints: ScorePoints = List([]);
+      let newScorePoints: ScorePoints = List([]);
       points = List([]);
       for (let i = 0; i < newSize; i++)
       {
@@ -518,18 +518,21 @@ export class TransformCardChart extends TerrainComponent<Props>
           id: p.id,
           selected: false,
         });
-        scorePoints = scorePoints.push(p);
+        newScorePoints = newScorePoints.push(p);
       }
-      scorePoints = scorePoints.sortBy((pt) => pt.value).toList();
-      this.updatePoints(scorePoints, true);
+      newScorePoints = newScorePoints.sortBy((pt) => pt.value).toList();
+      this.updatePoints(newScorePoints, true);
     }
     else if (oldSize > newSize)
     {
-      for (let i = oldSize - 1; i >= newSize; i--)
-      {
-        this.onDelete(points.get(i).id);
-      }
+      // This function can be very slow of new size is a lot smaller than old size
+      // for (let i = oldSize - 1; i >= newSize; i--)
+      // {
+      //   this.onDelete(points.get(i).id);
+      // }
+      scorePoints = scorePoints.splice(newSize);
       points = points.splice(newSize);
+      this.updatePoints(scorePoints, true);
     }
     return points;
   }
@@ -537,8 +540,8 @@ export class TransformCardChart extends TerrainComponent<Props>
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
-
-    let points = (overrideState.points || this.state.pointsCache).map((scorePoint) => ({
+    const scorePoints = (overrideState.points || this.state.pointsCache);
+    let points = scorePoints.map((scorePoint) => ({
       x: scorePoint.value,
       y: scorePoint.score,
       id: scorePoint.id,
@@ -552,7 +555,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     if ((mode === 'logarithmic' && points.size !== NUM_CURVE_POINTS.logarithmic)
       || (mode === 'exponential' && points.size !== NUM_CURVE_POINTS.exponential))
     {
-      points = this.updatePointsSize(NUM_CURVE_POINTS.logarithmic, points, xDomain);
+      points = this.updatePointsSize(NUM_CURVE_POINTS.logarithmic, points, scorePoints, xDomain);
     }
     else if (mode === 'sigmoid' && points.size !== NUM_CURVE_POINTS.sigmoid)
     {
@@ -599,6 +602,7 @@ export class TransformCardChart extends TerrainComponent<Props>
       colors: this.props.colors,
       contextOptions: this.getContextOptions(),
       mode,
+      index: this.props.index,
       schema: this.props.schema,
       builder: this.props.builder,
     };
@@ -612,6 +616,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
+    this.listenToKeyPath('builder', [['db', 'name'], ['query', 'path', 'source', 'dataSource']]);
   }
 
   // happens on undos/redos

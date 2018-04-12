@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import { BaseClass, makeConstructor, New, WithIRecord } from '../Classes';
 
 type stringList = string[] | List<string>;
@@ -73,7 +74,11 @@ class SchemaStateC
   public loaded: boolean = false;
   public schemaError: boolean = false;
 
+  // Keep track of schema meta data
+  public schemaMetadata: List<SchemaMetadata> = List([]);
+
   // view state
+  public modalRequests: List<ModalProps> = List([]);
   public selectedId: string = null;
   public highlightedId: string = null;
   public highlightedInSearchResults: boolean = false;
@@ -90,6 +95,25 @@ export function serverId(serverName: string)
 {
   return serverName;
 }
+
+class SchemaMetadataC extends BaseClass
+{
+  public id: number = undefined;
+  public columnId: string = '';
+  public starred: boolean = false;
+  public count: number = 0;
+  public countByAlgorithm: IMMap<ID, number> = Map<ID, number>();
+}
+export type SchemaMetadata = SchemaMetadataC & IRecord<SchemaMetadataC>;
+export const _SchemaMetadata = (config?: { [key: string]: any }) =>
+{
+  if (typeof config['countByAlgorithm'] === 'string')
+  {
+    config['countByAlgorithm'] = JSON.parse(config['countByAlgorithm']);
+  }
+  config['countByAlgorithm'] = Map<ID, number>(config['countByAlgorithm']);
+  return New<SchemaMetadata>(new SchemaMetadataC(config), config);
+};
 
 class ServerC extends SchemaBaseClass
 {
@@ -163,6 +187,7 @@ class TableC extends SchemaBaseClass
 
   public columnIds: List<string> = List();
   public indexIds: List<string> = List();
+  public sampleData: List<any> = List();
 }
 export type Table = TableC & IRecord<TableC>;
 export const _Table = (config: {
@@ -198,6 +223,8 @@ class ColumnC extends SchemaBaseClass
   public isPrimaryKey = false;
 
   public sampleData: List<any> = List();
+  public properties?: List<any> = List();
+  public analyzed?: boolean = false;
 }
 export type Column = ColumnC & IRecord<ColumnC>;
 export const _Column = (config: {
@@ -210,6 +237,8 @@ export const _Column = (config: {
   datatype: string,
   isNullable?: boolean,
   isPrimaryKey?: boolean,
+  properties?: any,
+  analyzed?: boolean;
   // fieldProperties?: any,
 
   id?: string,

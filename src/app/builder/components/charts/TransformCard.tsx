@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
 
 import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as Dimensions from 'react-dimensions';
 
@@ -65,8 +66,10 @@ import { BuilderState } from 'app/builder/data/BuilderState';
 import Util from 'app/util/Util';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
+import { isInput } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
 
@@ -83,6 +86,7 @@ export interface Props
   // spotlights?: any;
   spotlights?: SpotlightTypes.SpotlightState;
   containerWidth?: number;
+  index?: string;
 
   builder?: BuilderState;
 }
@@ -129,7 +133,11 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    this.computeBars(this.props.data.input, this.state.maxDomain, !this.props.data.hasCustomDomain);
+    // Only want to calculate this the first time that we open the chart
+    if (this.state.bars.size === 0)
+    {
+      this.computeBars(this.props.data.input, this.state.maxDomain, !this.props.data.hasCustomDomain);
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -242,6 +250,7 @@ class TransformCard extends TerrainComponent<Props>
 
   public handleUpdatePoints(points, isConcrete?: boolean)
   {
+    this.props.onChange(this._ikeyPath(this.props.keyPath, 'visiblePoints'), points, true);
     this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
     // we pass !isConcrete as the value for "isDirty" in order to tell the Store when to
     //  set an Undo checkpoint. Moving the same point in the same movement should not result
@@ -253,6 +262,7 @@ class TransformCard extends TerrainComponent<Props>
     const spotlights = this.props.spotlights.spotlights;
     const { data } = this.props;
     const width = this.props.containerWidth ? this.props.containerWidth + 55 : 300;
+    const points = data.visiblePoints && data.visiblePoints.size ? data.visiblePoints : data.scorePoints;
     return (
       <div
         className='transform-card-inner'
@@ -261,7 +271,7 @@ class TransformCard extends TerrainComponent<Props>
           onRequestDomainChange={this.handleRequestDomainChange}
           onRequestZoomToData={this.handleZoomToData}
           canEdit={this.props.canEdit}
-          points={data.scorePoints}
+          points={points}
           bars={this.state.bars}
           domain={this.state.chartDomain}
           range={this.state.range}
@@ -274,8 +284,10 @@ class TransformCard extends TerrainComponent<Props>
           colors={this.props.data.static.colors}
           mode={this.props.data.mode}
           builder={this.props.builder}
+          index={this.props.index || getIndex('', this.props.builder)}
         />
         <TransformCardPeriscope
+          onChange={this.props.onChange}
           onDomainChange={this.handleChartDomainChange}
           barsData={this.state.bars}
           domain={this.state.chartDomain}
@@ -287,7 +299,6 @@ class TransformCard extends TerrainComponent<Props>
           width={width}
           language={this.props.language}
           colors={this.props.data.static.colors}
-          builder={this.props.builder}
         />
       </div>
     );
@@ -328,8 +339,11 @@ class TransformCard extends TerrainComponent<Props>
 
     const min = this.state.maxDomain.get(0);
     const max = this.state.maxDomain.get(1);
-
     const elasticHistogram = (resp.result as ElasticQueryResult).aggregations;
+    if (!elasticHistogram)
+    {
+      return;
+    }
     const hits = (resp.result as ElasticQueryResult).hits;
     let totalDoc = 0;
     if (hits && hits.total)
@@ -337,7 +351,7 @@ class TransformCard extends TerrainComponent<Props>
       totalDoc = hits.total;
     }
     let theHist;
-    if (totalDoc > 0 && elasticHistogram.transformCard.buckets.length >= NUM_BARS)
+    if (elasticHistogram.transformCard.buckets.length >= NUM_BARS)
     {
       theHist = elasticHistogram.transformCard.buckets;
     } else
@@ -350,7 +364,7 @@ class TransformCard extends TerrainComponent<Props>
       bars.push({
         id: '' + j,
         count: theHist[j].doc_count,
-        percentage: theHist[j].doc_count / totalDoc,
+        percentage: totalDoc ? (theHist[j].doc_count / totalDoc) : 0,
         range: {
           min: theHist[j].key,
           max: theHist[j + 1].key,
@@ -418,12 +432,18 @@ class TransformCard extends TerrainComponent<Props>
   private computeScoreElasticBars(maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
     const query = overrideQuery || this.props.builder.query;
-    const tqlString = AllBackendsMap[query.language].parseTreeToQueryString(
-      query,
-      {
-        replaceInputs: true,
-      },
-    );
+    let tqlString = '';
+
+    try
+    {
+      tqlString = stringifyWithParameters(JSON.parse(query.tql), (name) => isInput(name, query.inputs));
+    } catch (e)
+    {
+      // couldn't parse the JSON
+      // TODO clear bars
+      return;
+    }
+
     const tql = JSON.parse(tqlString);
     tql['size'] = 0;
     tql['sort'] = {};
@@ -471,9 +491,19 @@ class TransformCard extends TerrainComponent<Props>
     {
       return;
     }
+    // When using pathfinder, index will be passed in, and there is no type
+    let index: string | List<string> = '';
+    let type: string | List<string> = '';
+    if (this.props.index !== undefined)
+    {
+      index = this.props.index;
+    }
+    else
+    {
+      index = getIndex('', builder);
+      type = getType('', builder);
+    }
 
-    const index: string | List<string> = getIndex('', builder);
-    const type: string | List<string> = getType('', builder);
     const filter = [];
     // If index and type are strings (there aren't multiple indexes/types) then add filters for them
     if (typeof index === 'string')
@@ -484,7 +514,7 @@ class TransformCard extends TerrainComponent<Props>
         },
       });
     }
-    if (typeof type === 'string')
+    if (typeof type === 'string' && type !== '')
     {
       filter.push({
         term: {
@@ -492,6 +522,7 @@ class TransformCard extends TerrainComponent<Props>
         },
       });
     }
+
     if (recomputeDomain)
     {
       let domainQuery;
@@ -519,7 +550,6 @@ class TransformCard extends TerrainComponent<Props>
               },
             },
           },
-          size: 0,
         };
       }
       const domainAggregationAjax = Ajax.query(
@@ -537,7 +567,8 @@ class TransformCard extends TerrainComponent<Props>
       this.setState({
         domainAggregationAjax,
       });
-    } else
+    }
+    else
     {
       const min = maxDomain.get(0);
       const max = maxDomain.get(1);
@@ -566,12 +597,12 @@ class TransformCard extends TerrainComponent<Props>
                 field: input,
                 interval,
                 extended_bounds: {
-                  min, max, // force the ES server to return NUM_BARS + 1 bins.
+                  min, max,
                 },
               },
             },
           },
-          size: 0,
+          size: 1,
         };
       }
       const aggregationAjax = Ajax.query(

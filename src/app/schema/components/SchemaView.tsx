@@ -47,8 +47,10 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands no-switch-case-fall-through strict-boolean-expressions
 
 const Radium = require('radium');
+import { MultiModal } from 'common/components/overlay/MultiModal';
 import * as $ from 'jquery';
 import * as React from 'react';
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import FadeInOut from '../../common/components/FadeInOut';
 import Util from '../../util/Util';
 import * as SchemaTypes from '../SchemaTypes';
@@ -57,8 +59,6 @@ import SchemaResults from './SchemaResults';
 import SchemaSearchResults from './SchemaSearchResults';
 import SchemaTreeList from './SchemaTreeList';
 import Styles from './SchemaTreeStyles';
-
-import { SchemaActions } from 'schema/data/SchemaRedux';
 
 export interface Props
 {
@@ -246,9 +246,22 @@ class SchemaView extends TerrainComponent<Props>
             />
           </div>
         }
+        <MultiModal
+          requests={schema.modalRequests}
+          setRequests={this.setModalRequests}
+        />
       </div>
     );
   }
+
+  public setModalRequests(requests)
+  {
+    this.props.schemaActions({
+      actionType: 'setModalRequests',
+      requests,
+    });
+  }
+
 }
 
 const SECTION_STYLE = {
@@ -268,6 +281,7 @@ const SCHEMA_STYLE_COLUMN = {
   top: 0,
   width: 'calc(100% - 6px)',
   height: verticalDivide + '%',
+  marginLeft: 5,
 };
 
 const RESULTS_STYLE_FULL_PAGE = {

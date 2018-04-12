@@ -79,13 +79,14 @@ class AggregationsArea extends TerrainComponent<Props>
   public isQueryEmpty(): boolean
   {
     const { query } = this.props;
-    return !query || (!query.cards.size);
+    const cardsAndPathEmpty = !query.cards.size && !query.path;
+    return !query || cardsAndPathEmpty;
   }
 
   public componentWillMount()
   {
-    this.props.builderActions.change(List(this._keyPath('query', 'aggregationList')),
-      this.parseAggs(this.props.resultsState.aggregations, this.props.query), true);
+    this.props.builderActions.changeQuery(this.props.query.set('aggregationList',
+      this.parseAggs(this.props.resultsState.aggregations, this.props.query)));
   }
 
   public shouldComponentUpdate(nextProps, nextState)
@@ -102,8 +103,7 @@ class AggregationsArea extends TerrainComponent<Props>
       const newAggInfo = this.parseAggs(nextProps.resultsState.aggregations, nextProps.query);
       if (newAggInfo !== this.props.query.aggregationList)
       {
-        this.props.builderActions.change(List(this._keyPath('query', 'aggregationList')),
-          newAggInfo, true);
+        this.props.builderActions.changeQuery(nextProps.query.set('aggregationList', newAggInfo));
       }
     }
   }

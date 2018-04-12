@@ -1,0 +1,43 @@
+@import "../Common.less";
+
+.range-input-wrapper 
+{
+	.range-input-ranges-wrapper{
+		display: inline-grid;
+	}
+	.range-input-create
+	{
+		margin-bottom: 6px;
+		cursor: pointer;
+		font-size: 16px;
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+	.range-input-item 
+	{
+		margin-top: 6px;
+		display: inline-flex;
+		input {
+			border-radius: 6px;
+			margin-right: 6px;
+			padding: 3px;
+			margin-bottom: 6px;
+			padding-left: 8px;
+			max-width: 100px;
+		}
+		span {
+			margin-right: 6px;
+		}
+		.range-input-item-delete 
+		{
+			cursor: pointer;
+			.transition;
+			margin-top: 7px;
+			svg {
+				height: 12px;
+				width: 12px;
+			}
+		}
+	}
+}

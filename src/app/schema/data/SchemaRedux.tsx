@@ -47,11 +47,13 @@ THE SOFTWARE.
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import { _SchemaState, Column, Database, FieldProperty, Index, SchemaState, Server, Table } from 'schema/SchemaTypes';
+import { _SchemaMetadata, _SchemaState, Column, Database, FieldProperty, Index, SchemaState, Server, Table } from 'schema/SchemaTypes';
 const { List, Map } = Immutable;
 
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import BackendInstance from 'database/types/BackendInstance';
 import * as SchemaParser from 'schema/data/SchemaParser';
+import MidwayError from 'shared/error/MidwayError';
 import Ajax from 'util/Ajax';
 import AjaxM1 from 'util/AjaxM1';
 
@@ -59,6 +61,9 @@ export interface SchemaActionTypes
 {
   fetch: {
     actionType: 'fetch';
+  };
+  reset: {
+    actionType: 'reset';
   };
   setServer: {
     actionType: 'setServer';
@@ -99,6 +104,28 @@ export interface SchemaActionTypes
     actionType: 'selectId';
     id: ID;
   };
+  starColumn: {
+    actionType: 'starColumn',
+    columnId: ID,
+    starred: boolean,
+  };
+  setSchemaMetadata: {
+    actionType: 'setSchemaMetadata',
+    schemaMetadata: any,
+  };
+  deleteElasticIndex: {
+    actionType: 'deleteElasticIndex';
+    dbid: number,
+    dbname: string,
+  };
+  addModal: {
+    actionType: 'addModal';
+    props: ModalProps;
+  };
+  setModalRequests: {
+    actionType: 'setModalRequests';
+    requests: List<ModalProps>;
+  };
 }
 
 class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
@@ -109,8 +136,21 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
     {
       fetch: (state, action) =>
       {
+        // Fetch the schema meta data
         return state
           .set('loading', true);
+      },
+
+      setSchemaMetadata: (state, action) =>
+      {
+        const { schemaMetadata } = action.payload;
+        return state
+          .set('schemaMetadata', List(schemaMetadata !== null ? schemaMetadata.map((d) => _SchemaMetadata(d)) : []));
+      },
+
+      reset: (state, action) =>
+      {
+        return _SchemaState();
       },
 
       setServer: (state, action) =>
@@ -171,14 +211,68 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
       {
         return state.set('selectedId', action.payload.id);
       },
+
+      starColumn: (state, action) =>
+      {
+        let id;
+        const { columnId, starred } = action.payload;
+        // See if information for this column is already in the schema state
+        const filtered = state.schemaMetadata.filter((d) => d.columnId === columnId).toList();
+        if (filtered.size > 0)
+        {
+          id = filtered.get(0).id;
+          state = state
+            .setIn(List(['schemaMetadata', state.schemaMetadata.indexOf(filtered.get(0)), 'starred']), starred);
+        }
+        // TOOD: NEED TO ACTUALLY JUST SET THE SCHEMA META DATA TO APPEND WHAT IS RETURNED FROM AJAX...
+        else
+        {
+          state = state
+            .set('schemaMetadata', state.schemaMetadata.push(_SchemaMetadata({ starred, columnId })));
+        }
+        Ajax.starColumn(columnId, starred, id);
+        return state;
+      },
+
+      deleteElasticIndex: (state, action) =>
+      {
+        return state;
+      },
+
+      addModal: (state, action) =>
+      {
+        return state.set('modalRequests',
+          MultiModal.addRequest(state.modalRequests, action.payload.props));
+      },
+
+      setModalRequests: (state, action) =>
+      {
+        return state.set('modalRequests', action.payload.requests);
+      },
     };
 
   public fetchAction(dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
+      actionType: 'reset',
+    });
+    directDispatch({
       actionType: 'fetch',
     });
+    // Fetch the schema
+    Ajax.schemaMetadata(undefined,
+      (resp) =>
+      {
+        directDispatch({
+          actionType: 'setSchemaMetadata',
+          schemaMetadata: resp,
+        });
+      },
+      (error) =>
+      {
+        // console.log(error);
+      });
     Ajax.getDbs(
       (dbs: object) =>
       {
@@ -246,11 +340,48 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
     );
   }
 
+  public deleteElasticIndexAction(action: SchemaActionType<'deleteElasticIndex'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+
+    Ajax.deleteDatabase(
+      action.dbid,
+      action.dbname,
+      'elastic',
+    ).then((result: any) =>
+    {
+      this.fetchAction(dispatch);
+    }).catch((err) =>
+    {
+      let errMessage = '';
+      try
+      {
+        errMessage = MidwayError.fromJSON(err).getDetail();
+      }
+      catch (e)
+      {
+        errMessage = String(err);
+      }
+      directDispatch({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Error attempting to delete index: ${errMessage}`,
+          error: true,
+        },
+      });
+    });
+  }
+
   public overrideAct(action: Unroll<SchemaActionTypes>)
   {
     if (action.actionType === 'fetch')
     {
       return this.fetchAction.bind(this);
+    }
+    else if (action.actionType === 'deleteElasticIndex')
+    {
+      return this.deleteElasticIndexAction.bind(this, action);
     }
   }
 }

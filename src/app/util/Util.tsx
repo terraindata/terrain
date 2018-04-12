@@ -45,11 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
+import { List } from 'immutable';
 import * as $ from 'jquery';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 // import * as moment from 'moment';
 const moment = require('moment');
+import { SchemaState } from 'app/schema/SchemaTypes';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -84,6 +86,19 @@ const keyPathForId = (node: any, id: string): (Array<string | number> | boolean)
 };
 
 const Util = {
+
+  // Sets all the key/value pairs on newContextMap on currentContextRecord.
+  // Updates the record with new values, but if none of the values have changed,
+  // then Immutable will return the same Record reference, for performance.
+  reconcileContext(currentContextRecord, newContextMap)
+  {
+    _.map(newContextMap, (value, key) =>
+    {
+      currentContextRecord = currentContextRecord.set(key, value);
+    });
+    return currentContextRecord;
+  },
+
   // Return a random integer [min, max)
   // assumes min of 0 if not passed.
   randInt(...args: number[]): number
@@ -206,11 +221,14 @@ const Util = {
   },
 
   // for displaying in the app
-  formatDate(date: string): string
+  formatDate(date: string, withTime?: boolean): string
   {
     const then = moment(date);
     const now = moment();
-
+    if (then.format('MM/DD/YY') === 'Invalid date')
+    {
+      return date;
+    }
     if (then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
     {
       // it was today
@@ -218,13 +236,15 @@ const Util = {
       return 'Today, ' + hour;
     }
 
+    const timeStr = withTime ? ' h:mma' : '';
+
     if (then.format('YYYY') === now.format('YYYY'))
     {
       // same year
-      return then.format('MM/DD/YY');
+      return then.format('MM/DD/YY' + timeStr);
     }
 
-    return then.format('MM/DD/YY');
+    return then.format('MM/DD/YY' + timeStr);
   },
 
   roundNumber(num, decimalPoints)
@@ -282,6 +302,10 @@ const Util = {
     {
       const day = moment(date).format('YYYY-MM-DD');
       const time = moment(date).format('HH:mm:ssZ');
+      if (day === 'Invalid date' || time === 'Invalid date')
+      {
+        return '';
+      }
       return day + 'T' + time;
     }
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
@@ -289,13 +313,11 @@ const Util = {
 
   formatNumber(n: number): string
   {
-    const precision: number = 3;
-
+    const precision = 3;
     if (!n)
     {
       return n + '';
     }
-
     const sign = n < 0 ? '-' : '';
     n = Math.abs(n);
 
@@ -332,13 +354,31 @@ const Util = {
         // if there are extra 0's after the decimal point, trim them (and the point if necessary)
         str = str.substr(0, str.length - 1);
       }
-
       return sign + str + suffix;
     }
 
     return sign + n.toExponential(precision);
   },
-
+  formattedToNumber(formattedNumber: string)
+  {
+    if (!isNaN(parseFloat(formattedNumber)))
+    {
+      const num = parseFloat(formattedNumber);
+      if (formattedNumber.indexOf('k') >= 0)
+      {
+        return 1000 * num;
+      }
+      else if (formattedNumber.indexOf('B') >= 0)
+      {
+        return 1000000000 * num;
+      }
+      else if (formattedNumber.indexOf('M') >= 0)
+      {
+        return 1000000 * num;
+      }
+    }
+    return formattedNumber;
+  },
   getId(isString: boolean = false): ID
   {
     if (isString)
@@ -706,6 +746,75 @@ const Util = {
   createTypedContainer<ComponentType>(component: ComponentType, stateToPropsKeys, dispatchToPropsMap, options = {}): ComponentType
   {
     return Util.createContainer(component, stateToPropsKeys, dispatchToPropsMap, options);
+  },
+
+  /*
+    This function sorts fields based on metadata stored about the fields.
+    The metadata available is:
+      starred (boolean) (whether the user actually went into the schema and indidcate that this field was important)
+      count (number) how many times the field has been selected across all algorithms
+      countByAlgorithm (map of algorithmIds: number) how many times the field has been used in the corresponding algorithm
+
+      columnId is $dbName/$index/$fieldName
+  */
+  orderFields(fields: List<string>, schema: SchemaState, algorithmId: ID, serverIndex: string): List<string>
+  {
+    const schemaMetadata = schema.schemaMetadata;
+    // First sort on whether or not a field has been starred
+    // If it has been, it will automaticall be at the top of the list, and all starred fields will be in alpha order
+    let starredFields = Immutable.List([]);
+    schema.schemaMetadata.forEach((d) =>
+    {
+      const pieces = Immutable.List(d.columnId.split('/'));
+      const serverName = pieces.get(0) + '/' + pieces.get(1);
+      const fieldName = pieces.last();
+      if (fields.indexOf(fieldName) !== -1 && d.starred && serverIndex === serverName)
+      {
+        starredFields = starredFields.push(fieldName);
+      }
+    });
+    let nonStarredFields = fields.filter((field) => starredFields.indexOf(field) === -1).toList();
+    // Next sort the non-starred fields by how many times they have been used ( in this algorithm and others)
+    // In case of a tie, use alpha ordering
+    nonStarredFields = nonStarredFields.sort((a, b) =>
+    {
+      let aCount = 0;
+      let bCount = 0;
+      const aData = schemaMetadata.filter((d) => d.columnId === serverIndex + '/' + a).toList();
+      const bData = schemaMetadata.filter((d) => d.columnId === serverIndex + '/' + b).toList();
+      if (aData.size > 0)
+      {
+        aCount = aData.get(0).count;
+      }
+      if (bData.size > 0)
+      {
+        bCount = bData.get(0).count;
+      }
+      // If it's a tie, use alpha sorting, otherwise use count
+      return aCount === bCount ? (a < b ? -1 : 1) : 2 * (bCount - aCount);
+    }).toList();
+    // Put the sorted non starred fields after the starred fields (Starred are sorted in alpha order)
+    return starredFields.sort().concat(nonStarredFields).toList();
+  },
+
+  didStateChange(oldState: IMap<any>, newState: IMap<any>, paths?: Array<string | string[] | KeyPath>)
+  {
+    if (!paths || !paths.length)
+    {
+      return oldState !== newState;
+    }
+    else
+    {
+      paths.forEach((path: any) =>
+      {
+        path = (Array.isArray(path) || List.isList(path)) ? path : [path];
+        if (oldState.getIn(path) !== newState.getIn(path))
+        {
+          return true;
+        }
+      });
+    }
+    return false;
   },
 };
 

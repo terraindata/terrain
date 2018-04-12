@@ -301,8 +301,20 @@ const EQLSpec: ESClause[] =
         template: {
           'query:query': {
             'bool:elasticFilter': {
-              'filter:query[]': [{ 'term:term_query': { '_index:string': '' } }, { 'term:term_query': { '_type:string': '' } }],
-              'must:query[]': [{ 'term:term_query': { ' :string': '' } }],
+              'filter:query[]': [
+                { 'term:term_query': { '_index:string': '' } },
+                {
+                  'bool:elasticFilter': {
+                    'filter:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                  },
+                },
+              ],
+              'should:query[]': [
+                {
+                  'bool:elasticFilter': {
+                    'should:query[]': [{ 'term:term_query': { ' :string': '' } }],
+                  },
+                }],
             },
           },
           'sort:elasticScore': null,
@@ -335,9 +347,13 @@ const EQLSpec: ESClause[] =
         path: ['groupjoin'],
         desc: 'Whether groupJoin should ignore documents with less than a given number of results.',
       }),
-    new ESMapClause('groupjoin_clause',
+    new ESWildcardStructureClause('groupjoin_clause',
+      {
+        parentAlias: 'string',
+        dropIfLessThan: 'number',
+      },
       'groupjoin_name',
-      'groupjoin_body',
+      'body',
       {
         path: ['groupjoin'],
         name: 'groupJoin query',
@@ -1736,6 +1752,7 @@ const EQLSpec: ESClause[] =
       {
         distance: 'distance',
         distance_type: 'distance_type',
+        boost: 'boost',
       },
       'field',
       'geo_point',
@@ -1922,7 +1939,7 @@ const EQLSpec: ESClause[] =
     new ESStructureClause('exists_query',
       {
         field: 'field',
-        null_value: 'base',
+        boost: 'boost',
       },
       {
         path: ['filter'],
@@ -2114,6 +2131,7 @@ const EQLSpec: ESClause[] =
         max_expansions: 'fuzzy_max_expansions',
         slop: 'slop',
         lenient: 'boolean',
+        boost: 'boost',
       },
       {
         path: ['match'],
@@ -2289,12 +2307,27 @@ const EQLSpec: ESClause[] =
         weight: 'function_score_weight',
         random_score: 'random_score',
         field_value_factor: 'field_value_factor',
+        boost_mode: 'boost_mode',
       },
       {
         path: ['score', 'function'],
         desc: 'Customizes the scoring of a subquery using a built-in function score.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#query-dsl-function-score-query',
-        required: ['query'],
+        required: [],
+      }),
+    new ESEnumClause('boost_mode',
+      [
+        'multiply',
+        'replace',
+        'sum',
+        'avg',
+        'max',
+        'min',
+      ],
+      {
+        path: ['score', 'function', 'function_score'],
+        desc: 'Defines how the score function interacts with the elastic _score.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html',
       }),
     new ESNumberClause('function_score_weight',
       {
@@ -2305,6 +2338,7 @@ const EQLSpec: ESClause[] =
     new ESStructureClause('random_score',
       {
         seed: 'number',
+        field: 'string',
       },
       {
         path: ['score', 'function'],

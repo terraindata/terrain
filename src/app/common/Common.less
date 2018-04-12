@@ -238,6 +238,10 @@
   opacity: 0;
   animation: fade-in 1s linear 0.15s forwards;
 }
+.fade-in-quick {
+  opacity: 0;
+  animation: fade-in 0.15s linear 0s forwards;
+}
 
 .animation-delay(@s) {
   -webkit-animation-delay: @s;
@@ -608,6 +612,22 @@
   font-size: 9px;
 }
 
+.semi-bold-text {
+  font-family: 'Gilroy-Semi-Bold', Helvetica, Arial, sans-serif;
+}
+
+.bold-text {
+  font-family: 'Gilroy-Bold', Helvetica, Arial, sans-serif;
+}
+
+.light-italic-text {
+  font-family: 'Gilroy-Light-Italic', Helvetica, Arial, sans-serif;
+}
+
+.light-text {
+  font-family: 'Gilroy-Light', Helvetica, Arial, sans-serif;
+}
+
 .title-white-text {
   .title-text;
   .white-text;
@@ -710,4 +730,3 @@
     border-color: #fff;
   }
 }
-

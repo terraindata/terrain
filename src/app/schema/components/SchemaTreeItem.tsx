@@ -56,12 +56,16 @@ import { indexChildrenConfig, IndexTreeInfo } from './items/IndexTreeInfo';
 import { serverChildrenConfig, ServerTreeInfo } from './items/ServerTreeInfo';
 import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
-import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
+const StarIcon = require('images/icon_star.svg?name=StarIcon');
 import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
+import SchemaTreeContextActions from './SchemaTreeContextActions';
 import SchemaTreeList from './SchemaTreeList';
+import Styles from './SchemaTreeStyles';
+
+import ExpandableView from 'common/components/ExpandableView';
 
 export interface Props
 {
@@ -81,6 +85,7 @@ class State
   public childCount: number = -1;
   public isSelected = false;
   public isHighlighted = false;
+  public starred = false;
 }
 
 const typeToRendering: {
@@ -143,6 +148,16 @@ class SchemaTreeItem extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.componentWillReceiveProps(this.props);
+    // Set initial starred value of column
+    if (this.props.type === 'column')
+    {
+      const item = this.props.schema.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+      const columnId = item.databaseId + '/' + item.name;
+      const metadata = this.props.schema.schemaMetadata.filter((d) => d.columnId === columnId).toList();
+      this.setState({
+        starred: (metadata.size && metadata.get(0).starred),
+      });
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -381,6 +396,21 @@ class SchemaTreeItem extends TerrainComponent<Props>
     );
   }
 
+  public toggleStarredColumn()
+  {
+    // Call schema store function that will set this column to starred in midway
+    const item = this.props.schema.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+    const columnId = item.databaseId + '/' + item.name;
+    this.props.schemaActions({
+      actionType: 'starColumn',
+      columnId,
+      starred: !this.state.starred,
+    });
+    this.setState({
+      starred: !this.state.starred,
+    });
+  }
+
   public render()
   {
     const { schema, type, id } = this.props;
@@ -388,43 +418,44 @@ class SchemaTreeItem extends TerrainComponent<Props>
     const { isSelected, isHighlighted } = this.state;
 
     const hasChildren = this.state.childCount > 0;
-
     const showing = SchemaTypes.searchIncludes(item, this.props.search);
 
-    return (
-      <div
-        style={Styles.treeItem}
+    const content = (
+      <FadeInOut
+        open={showing}
+        key='one'
       >
-        <FadeInOut
-          open={showing}
-          key='one'
-        >
-          {
-            showing &&
+        {
+          showing &&
+          <div
+            data-rel='schema-item'
+            data-id={this.props.id}
+            data-search={this.props.inSearchResults}
+          >
             <div
-              data-rel='schema-item'
-              data-id={this.props.id}
-              data-search={this.props.inSearchResults}
+              style={[
+                Styles.treeItemHeader,
+                isHighlighted && Styles.treeItemHeaderHighlighted,
+                isSelected && Styles.treeItemHeaderSelected,
+              ]}
+              onClick={this.handleHeaderClick}
+              onDoubleClick={this.handleHeaderDoubleClick}
             >
+              {
+                this.renderName()
+              }
               <div
-                style={[
-                  Styles.treeItemHeader,
-                  isHighlighted && Styles.treeItemHeaderHighlighted,
-                  isSelected && Styles.treeItemHeaderSelected,
-                ]}
-                onClick={this.handleHeaderClick}
-                onDoubleClick={this.handleHeaderDoubleClick}
+                style={Styles.itemInfoRow as any}
               >
                 {
-                  hasChildren && !this.props.search &&
-                  <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='arrow'>
-                    <ArrowIcon
-                      className={'schema-arrow-icon'}
-                      onClick={this.handleArrowClick}
-                      style={{
-                        width: 12,
-                        height: 12,
-                      }}
+                  this.renderItemInfo()
+                }
+                {
+                  this.props.type === 'column' &&
+                  <div onClick={this.toggleStarredColumn}>
+                    <StarIcon
+                      style={this.state.starred
+                        ? Styles.selectedStarIcon : Styles.unselectedStarIcon}
                     />
                   </div>
                 }
@@ -436,29 +467,41 @@ class SchemaTreeItem extends TerrainComponent<Props>
                 {
                   this.renderName()
                 }
-                <div
-                  style={Styles.itemInfoRow as any}
-                >
-                  {
-                    this.renderItemInfo()
-                  }
-                </div>
+                {
+                  isSelected ?
+                    <SchemaTreeContextActions
+                      id={this.props.id}
+                      type={this.props.type}
+                    />
+                    :
+                    null
+                }
               </div>
             </div>
-          }
-        </FadeInOut>
-
-        {
-          hasChildren &&
-          <FadeInOut
-            open={this.state.open}
-            key='two'
-          >
-            {
-              this.renderItemChildren()
-            }
-          </FadeInOut>
+          </div>
         }
+      </FadeInOut>
+    );
+
+    return (
+      <div
+        style={Styles.treeItem}
+      >
+        <ExpandableView
+          content={content}
+          open={this.state.open}
+          onToggle={this.handleArrowClick}
+          hideArrow={Boolean(!hasChildren || this.props.search)}
+        >
+          {
+            hasChildren ?
+              <span>
+                {this.renderItemChildren()}
+              </span>
+              :
+              null
+          }
+        </ExpandableView>
       </div>
     );
   }

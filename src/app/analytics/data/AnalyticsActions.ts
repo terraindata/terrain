@@ -99,6 +99,13 @@ function calculateDateRange(api, dateRangeId: number, callback)
             serverTimeDate.getUTCMonth() - 1,
             serverTimeDate.getUTCDate()));
           break;
+        case 5:
+          // 30 days since today
+          startDate = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear()-1,
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()));
+          break;
         default:
           // Fetch today's analytics by default
           startDate = new Date(Date.UTC(

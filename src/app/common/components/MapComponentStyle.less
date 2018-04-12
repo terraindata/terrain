@@ -1,3 +1,35 @@
+@import "../../common/Common.less";
+
+.map-component-fade-in-out {
+	transition: opacity .5s;
+	opacity: 1;
+	&.map-component-fade-in-out-hidden {
+		opacity: 0;
+	}
+}
+
+.map-component-disabled {
+	height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 999;
+    opacity: 0.7;
+    font-size: 12px;
+    pointer-events: none;
+    max-height: 350px;
+    top: 0px;
+    span {
+    	position: absolute;
+    	text-align: center;
+    	width: 100%;
+    	&:first-child {
+    		top: 0px;
+    	}
+    	&:last-child {
+    		bottom: 22px;
+    	}
+    }
+}
 
 .cards-builder-map-component {
 	.map-component-search-bar {

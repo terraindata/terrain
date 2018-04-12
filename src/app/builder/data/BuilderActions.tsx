@@ -63,6 +63,10 @@ const BuilderActions =
         (dispatch) =>
           dispatch($(ActionTypes.change, { keyPath, value, notDirty })),
 
+    changePath:
+      (keyPath: KeyPath, value: any, notDirty = false, fieldChange: boolean = false) =>
+        $(ActionTypes.changePath, { keyPath, value, notDirty, fieldChange }),
+
     changeQuery:
       (query: Query) =>
         $(ActionTypes.changeQuery, { query }),
@@ -70,6 +74,10 @@ const BuilderActions =
     create:
       (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
         $(ActionTypes.create, { keyPath, factoryType, index, data }),
+
+    createInput:
+      (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
+        $(ActionTypes.createInput, { keyPath, factoryType, index, data }),
 
     move:
       (keyPath: KeyPath, index: number, newIndex: number) =>
@@ -120,15 +128,15 @@ const BuilderActions =
             handleNoAlgorithm,
             db,
             dispatch,
-            onRequestDone: (query, xhr, database) => dispatch(BuilderActions.queryLoaded(query, xhr, database)),
+            onRequestDone: (query, xhr, database) => dispatch(BuilderActions.queryLoaded(query, algorithmId, xhr, database)),
             changeQuery: BuilderActions.changeQuery,
           })),
 
     // load query from server into state
     queryLoaded:
-      (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
+      (query: Query, algorithmId: ID, xhr: XMLHttpRequest, db: BackendInstance) =>
         (dispatch) =>
-          dispatch($(ActionTypes.queryLoaded, { query, xhr, db, dispatch })),
+          dispatch($(ActionTypes.queryLoaded, { query, algorithmId, xhr, db, dispatch })),
 
     save:
       (failed?: boolean) =>
@@ -147,9 +155,10 @@ const BuilderActions =
         $(ActionTypes.checkpoint, {}),
 
     changeResultsConfig:
-      (resultsConfig) =>
+      (resultsConfig, field?) =>
         $(ActionTypes.changeResultsConfig, {
           resultsConfig,
+          field,
         }),
 
     updateKeyPath:

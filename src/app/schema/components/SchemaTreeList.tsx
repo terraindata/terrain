@@ -71,7 +71,6 @@ class State
 }
 
 const NORMAL_STYLE = {
-  borderLeft: ('1px solid ' + Colors().active),
   paddingLeft: Styles.margin,
 };
 

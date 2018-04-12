@@ -1,0 +1,117 @@
+
+.drag-drop-item {
+	width: calc(~"100% + 4px");
+	margin-left: -2px;
+	border-radius: 3px;
+	border: 1px solid transparent;
+	padding: 1px;
+	cursor: pointer;
+	transition: height .3s linear .5s;
+	box-sizing: border-box;
+		&.drag-drop-item-dragging {
+		// These help the item be displayed on top of other components
+		// but, don't apply them when not dragging, or it will
+		// cause the item to appear on top of thigns it shoudln't
+		position: relative;
+		z-index: 9;
+	}
+	&.drag-drop-item-neighbor-dragging {
+		position: relative; // Need this for dropping to work properly
+	}
+	
+	.drag-drop-item-drop-zone {
+		position: absolute;
+		height: 40px;
+		width: 100%;
+		top: 21px;
+	}
+	
+	.drag-drop-item-header {
+		overflow: hidden;
+		transition: height .3s linear .5s;
+		height: 0px;
+		
+		&.drag-drop-item-header-visible {
+			height: 22px;
+		}
+	}
+}
+
+.drop {
+	width: 100%;
+    position: relative;
+	margin-top: -19px;
+	margin-bottom: -19px;
+	transition: all .3s ease-in-out;
+	.drop-area {
+		transition: height .3s ease-in-out;
+		position: relative;
+    	border-radius: 3px;
+		opacity: 0.3;
+		height: 0px;
+		top: 16px;
+	}
+}
+
+.drag-drop-group {
+	width: 100%;
+	padding: 5px;
+	border-radius: 3px;
+	margin-bottom: 3px;
+	border: 1px solid transparent;
+	cursor: pointer;
+	border-color: #e3e3e3;
+	margin-top: 3px;
+    position: relative;
+    top-margin: 10px;
+	&:hover {
+		border-color: #1eb4fa;
+	}
+	&.drag-drop-group-collapsed {
+		padding-bottom: 9px;
+	}
+}
+
+.drag-drop-group-preview, .drag-drop-item-preview {
+	box-shadow: 5px 10px 20px rgba(66,66,66,0.15);
+	opacity: 1;
+	position: relative;
+}
+
+.drag-drop-item-preview {
+	height: 73px;
+	display: inline-flex;
+	.drag-drop-item-field {
+		padding-left: 24px
+	}
+	.drag-drop-item-comparison {
+		left: -22px;
+	}
+	.drag-drop-item-value {
+		left: -41px;
+	}
+	.drag-drop-item-field, .drag-drop-item-comparison, .drag-drop-item-value {
+		width: 33%;
+		position: relative;
+		top: 20px;
+		.drag-drop-item-field-value, .drag-drop-item-comparison-value, .drag-drop-item-value-value {
+			font-size: 18px;
+			top: 16px;
+			white-space: nowrap;
+		    text-overflow: ellipsis;
+		    overflow: hidden;
+		}
+		.drag-drop-item-field-header, .drag-drop-item-comparison-header, .drag-drop-item-value-header {
+			text-transform: uppercase;
+			font-size: 12px;
+		}
+	}
+}
+
+.drag-drop-group-preview {
+	border-radius: 3px;
+	padding: 12px 3px 3px 15px;
+	height: 21px;
+	font-size: 12px;
+	text-transform: uppercase;
+}

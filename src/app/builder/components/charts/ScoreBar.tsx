@@ -44,12 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
 
+import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
+import ScoreWeightSlider from './ScoreWeightSlider';
+
+const EditableField = (props) =>
+  props.editing && props.canEdit ? props.editComponent : props.readOnlyComponent;
 
 const BORDER_RADIUS = '5px';
 const SCORE_COLORS =
@@ -59,62 +65,172 @@ const SCORE_COLORS =
     NEGATIVE: ['#d14f42'],
   };
 
-class ScoreBar extends TerrainComponent<{
-  parentData: {
-    weights: Array<{ weight: number }>;
-  };
-  data: {
-    weight: number;
-  }
-  keyPath: KeyPath;
-}>
+interface Props
 {
+  weight: number;
+  onBeforeChange?: (value: number) => void;
+  onChange?: (value: number) => void;
+  onAfterChange?: (value: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  height?: number;
+  canEdit?: boolean;
+  altStyle?: boolean;
+  round?: boolean;
+}
+
+@Radium
+class ScoreBar extends TerrainComponent<Props>
+{
+  public state = {
+    editingWeight: false,
+  };
+
   public render()
   {
-    const weights = this.props.parentData.weights;
-    const weight = this.props.data;
+    const { weight, min, max, height, canEdit, altStyle, step, round } = this.props;
 
-    let max = 0;
-    weights.map((w) =>
-    {
-      if (Math.abs(w.weight) > max)
-      {
-        max = Math.abs(w.weight);
-      }
-    });
-
-    const perc = Math.abs(weight.weight) / max * 100;
-    const style: React.CSSProperties = {
-      width: perc / 2 + '%',
-    };
-
-    if (weight.weight > 0)
-    {
-      style.left = '50%';
-      style['background'] = SCORE_COLORS.POSITIVE[Math.floor((perc - 1) / (100 / SCORE_COLORS.POSITIVE.length))];
-      style.borderTopRightRadius = BORDER_RADIUS;
-      style.borderBottomRightRadius = BORDER_RADIUS;
-    }
-    else if (weight.weight < 0)
-    {
-      style.right = '50%';
-      style['background'] = SCORE_COLORS.NEGATIVE[Math.floor((perc - 1) / (100 / SCORE_COLORS.NEGATIVE.length))];
-      style.borderTopLeftRadius = BORDER_RADIUS;
-      style.borderBottomLeftRadius = BORDER_RADIUS;
-    }
-
+    const color = Colors().active;
     return (
       <div
-        className='weight-graph'
-        style={borderColor(Colors().stroke)}
+        className={classNames({
+          'score-bar': true,
+          'score-bar-alt': altStyle,
+        })}
       >
-        <div className='weight-graph-inner'>
-          <div className='weight-graph-bar' style={style} />
-        </div>
-        <div className='weight-graph-line' />
+        <ScoreWeightSlider
+          value={weight}
+          onBeforeChange={this.handleWeightBeforeChange}
+          onChange={this.handleWeightChange}
+          onAfterChange={this.handleWeightAfterChange}
+          min={min || 0}
+          max={max || 100}
+          color={color}
+          height={height || (altStyle && 22) || 34}
+          lengthOffset={altStyle ? 12 : 34}
+          noLeftLine={altStyle}
+          rounded={altStyle}
+          noPadding={altStyle}
+          background={altStyle ? Colors().blockBg : undefined}
+          step={step}
+        />
+        <EditableField
+          editing={this.state.editingWeight}
+          canEdit={canEdit}
+          editComponent={
+            <input
+              type='text'
+              className='score-bar-text'
+              value={round ? Math.round(weight) : weight}
+              onChange={this.handleWeightTextChange}
+              onBlur={this.handleTextBlur}
+              onKeyDown={this.handleTextKeyDown}
+              style={[
+                fontColor(Colors().active),
+                borderColor(Colors().active),
+              ]}
+              onFocus={this.handleInputFocus}
+              autoFocus
+              disabled={!canEdit}
+            />
+          }
+          readOnlyComponent={
+            <div
+              className='score-bar-field-weight'
+              onClick={this.editingWeight}
+            >
+              <div
+                className='score-bar-field-weight-value'
+                style={fontColor(Colors().active)}
+              >
+                {
+                  round ? Math.round(weight) : weight
+                }
+              </div>
+            </div>
+          }
+        />
       </div>
     );
   }
+
+  private handleInputFocus(e)
+  {
+    // debugger;
+    if (e && e.target)
+    {
+      e.target.select();
+    }
+  }
+
+  private handleWeightBeforeChange(value: number)
+  {
+    if (this.state.editingWeight)
+    {
+      this.setState({
+        editingWeight: false,
+      });
+    }
+    if (this.props.onBeforeChange)
+    {
+      this.props.onBeforeChange(value);
+    }
+  }
+
+  private handleWeightChange(value: number)
+  {
+    if (this.props.canEdit && this.props.onChange)
+    {
+      this.props.onChange(value);
+    }
+  }
+
+  private handleWeightAfterChange(value: number)
+  {
+    if (this.props.onAfterChange)
+    {
+      if (this.props.round)
+      {
+        value = Math.round(value);
+      }
+
+      this.props.onAfterChange(value);
+    }
+  }
+
+  private handleWeightTextChange(e)
+  {
+    if (this.props.canEdit && this.props.onAfterChange)
+    {
+      this.props.onAfterChange(e.target.value);
+    }
+  }
+
+  private handleTextBlur()
+  {
+    this.setState({
+      editingWeight: false,
+    });
+  }
+
+  private handleTextKeyDown(e)
+  {
+    if (e.keyCode === 13)
+    {
+      this.setState({
+        editingWeight: false,
+      });
+    }
+  }
+
+  private editingWeight()
+  {
+    this.setState({
+      editingWeight: true,
+    });
+  }
+
 }
 
 export default ScoreBar;

@@ -58,6 +58,7 @@ export interface Props
   onIndexChange(index: number);
   onSelect(index: number);
   focusOverride?: boolean;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const STYLE: {
@@ -71,25 +72,34 @@ const STYLE: {
 
 class KeyboardFocus extends TerrainComponent<Props>
 {
+
   handleKeyDown(e)
   {
+    const { onIndexChange, onSelect, onKeyDown, index, length } = this.props;
+
     switch (e.keyCode)
     {
       case 40:
         // down
-        this.props.onIndexChange(Math.min(this.props.index + 1, this.props.length - 1));
+        onIndexChange(Math.min(index + 1, length - 1));
         break;
       case 38:
         // up
-        this.props.onIndexChange(Math.max(this.props.index - 1, 0));
+        onIndexChange(Math.max(index - 1, 0));
         break;
       case 13:
-        this.props.onSelect(this.props.index);
+        onSelect(index);
+    }
+
+    if (onKeyDown !== undefined)
+    {
+      onKeyDown(e);
     }
   }
 
   componentWillReceiveProps(nextProps: Props)
   {
+    // this is necessary because autofocus only triggers on initial render
     if (nextProps.focusOverride && !this.props.focusOverride)
     {
       this.refs['select']['focus']();
@@ -111,6 +121,7 @@ class KeyboardFocus extends TerrainComponent<Props>
         onBlur={this.props.onFocusLost}
         onKeyDown={this.handleKeyDown}
         ref='select'
+        autoFocus={this.props.focusOverride}
       >
       </select>
     );

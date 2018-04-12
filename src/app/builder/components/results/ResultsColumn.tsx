@@ -56,6 +56,7 @@ import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';
 import TQLEditor from 'tql/components/TQLEditor';
+import TerrainTools from 'util/TerrainTools';
 import Util from 'util/Util';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
@@ -81,6 +82,7 @@ export interface Props
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
+  onIncrementHitsPage: (hitsPage: number) => void;
   onNavigationException: () => void;
   builderActions?: typeof BuilderActions;
 }
@@ -132,7 +134,8 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public setSelectedTab(name, index)
   {
-    this.props.builderActions.change(List(this._keyPath('query', 'resultsViewMode')), name);
+    this.props.builderActions.changeQuery(this.props.query.set('resultsViewMode', name));
+
     this.setState({
       selectedTab: index,
       highlightedTabs: this.state.highlightedTabs.set(name.toLowerCase(), false),
@@ -256,6 +259,7 @@ class ResultsColumn extends TerrainComponent<Props>
             showCustomizeView={this.props.showCustomizeView}
             allowSpotlights={this.props.allowSpotlights}
             exportState={this.props.exportState}
+            onIncrementHitsPage={this.props.onIncrementHitsPage}
           />
         );
       case 1:
@@ -277,7 +281,7 @@ class ResultsColumn extends TerrainComponent<Props>
   {
     return (
       <div className='results-column-wrapper'>
-        {this.renderTabBar()}
+        {TerrainTools.isFeatureEnabled(TerrainTools.ADVANCED_RESULTS) && this.renderTabBar()}
         {this.renderContent()}
       </div>);
   }

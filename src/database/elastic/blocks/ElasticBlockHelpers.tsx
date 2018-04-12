@@ -45,10 +45,12 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:strict-boolean-expressions
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 const { Map, List } = Immutable;
-
+import Util from 'app/util/Util';
 import { BuilderState } from 'builder/data/BuilderState';
 import { SchemaState } from 'schema/SchemaTypes';
+import { FieldType, FieldTypeMapping } from '../../../../shared/builder/FieldTypes';
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
@@ -72,14 +74,22 @@ export const TransformableTypes =
     'date',
   ];
 
+const metaFields = ['_index', '_type', '_uid', '_id',
+  '_source', '_size', '_score',
+  '_all', '_field_names',
+  '_parent', '_routing',
+  '_meta'];
+
 export const ElasticBlockHelpers = {
   getColumnType(schemaState: SchemaState, builderState: BuilderState, column: string): string
   {
+    if (!schemaState || !builderState)
+    {
+      return undefined;
+    }
     const serverName = builderState.db.name;
     const index = getIndex('', builderState);
-    const type = getType('', builderState);
-
-    const key = serverName + '/' + String(index) + '.' + String(type) + '.c.' + column;
+    const key = serverName + '/' + String(index) + '.' + 'data' + '.c.' + column;
 
     if (schemaState.columns instanceof Map)
     {
@@ -110,12 +120,6 @@ export const ElasticBlockHelpers = {
       ).toList();
     }
 
-    const metaFields = ['_index', '_type', '_uid', '_id',
-      '_source', '_size',
-      '_all', '_field_names',
-      '_parent', '_routing',
-      '_meta'];
-
     if (index !== null)
     {
       const indexId = `${builderState.db.name}/${index}`;
@@ -132,7 +136,7 @@ export const ElasticBlockHelpers = {
       // else we are in the Field or Transform case...
 
       // 2. Need to get current type
-      const type = getType('', builderState);
+      const type = 'data';
 
       // 3. If Transform, return columns matching server/index/type that can be transformed
       if (matchType === AutocompleteMatchType.Transform)
@@ -148,7 +152,8 @@ export const ElasticBlockHelpers = {
           ).map(
             (column) => column.name,
           ).toList().concat(List(['_score', '_size']));
-          return transformableFields;
+          // Need to prioritize user order fields
+          return Util.orderFields(transformableFields, schemaState, -1, indexId);
         }
         return List(['_score', '_size']);
       }
@@ -159,23 +164,151 @@ export const ElasticBlockHelpers = {
 
         // 4. Return all columns matching this (server+)index+type
 
-        return schemaState.columns.filter(
+        const fields = schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === String(indexId) &&
             column.tableId === String(typeId),
         ).map(
           (column) => column.name,
         ).toList().concat(List(metaFields));
+        return Util.orderFields(fields, schemaState, -1, indexId);
       }
     }
 
     return List(metaFields);
+  },
+
+  getFieldsOfType(schemaState, builderState, fieldType, dataSource?): List<string>
+  {
+    const index = dataSource && dataSource.index || getIndex('', builderState);
+    const server = builderState.db.name;
+    if (index !== null)
+    {
+      const indexId = `${builderState.db.name}/${String(index)}`;
+      // 2. Need to get current type
+      const fields = schemaState.columns.filter(
+        (column) => column.serverId === String(server) &&
+          column.databaseId === String(indexId) &&
+          FieldTypeMapping[fieldType].indexOf(column.datatype) !== -1,
+      ).map(
+        (column) => column.name,
+      ).toList(); // concat meta fields if necessary
+      if (fieldType === FieldType.Numerical)
+      {
+        return fields.concat(List(['_score', '_size']));
+      }
+      if (fieldType === FieldType.Any)
+      {
+        return fields.concat(List(metaFields));
+      }
+      return fields;
+    }
+    if (fieldType === FieldType.Numerical)
+    {
+      return List(['_score', '_size']);
+    }
+    return List(metaFields);
+  },
+
+  // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
+  // If the field is a metaField, return string / number accrodingly
+  getTypeOfField(schemaState, builderState, field, returnDatatype?, overrideIndex?, returnAnalyzed?): any
+  {
+    if (metaFields.indexOf(field) !== -1)
+    {
+      if (field === '_score' || field === '_size')
+      {
+        if (returnDatatype)
+        {
+          return 'float';
+        }
+        return FieldType.Numerical;
+      }
+      if (returnDatatype)
+      {
+        return 'text';
+      }
+      return FieldType.Text;
+    }
+    if (!builderState.query)
+    {
+      return '';
+    }
+    const { source } = builderState.query.path;
+    let index = source && source.dataSource && source.dataSource.index ?
+      source.dataSource.index : getIndex('', builderState);
+    index = overrideIndex || index;
+    const server = builderState.db.name;
+    if (index !== null)
+    {
+      const indexId = `${builderState.db.name}/${String(index)}`;
+      const fields = schemaState.columns.filter(
+        (column) => column.serverId === String(server) &&
+          column.databaseId === String(indexId),
+      ).map(
+        (column) => column.name,
+      ).toList();
+      let wholeField = '';
+      if (field && field.indexOf('.') !== -1)
+      {
+        wholeField = field;
+        field = field.split('.')[0];
+      }
+      let col = schemaState.columns.filter(
+        (column) => column.serverId === String(server) &&
+          column.databaseId === String(indexId) &&
+          column.name === field,
+      ).toList().get(0);
+      if (wholeField && col) // it was nested, now look in the column properties for the path
+      {
+        const pieces = wholeField.split('.');
+        for (let i = 1; i < pieces.length; i++)
+        {
+          if (col.properties && pieces[i])
+          {
+            col = col.properties[pieces[i]];
+          }
+        }
+      }
+      if (col === undefined)
+      {
+        return '';
+      }
+      const dataType = col.datatype !== undefined ? col.datatype : col.type;
+      if (returnDatatype)
+      {
+        if (returnAnalyzed)
+        {
+          return { fieldType: dataType, analyzed: col.analyzed };
+        }
+        return dataType;
+      }
+      let fieldType: any = 0;
+      _.keys(FieldTypeMapping).forEach((ft) =>
+      {
+        if (FieldTypeMapping[ft].indexOf(dataType) !== -1
+          && String(ft) !== String(FieldType.Any))
+        {
+          fieldType = ft;
+        }
+      });
+      if (returnAnalyzed)
+      {
+        return { fieldType, analyzed: col.analyzed };
+      }
+      return fieldType;
+    }
+    return undefined;
   },
 };
 
 export function findCardType(name: string, builderState: BuilderState): List<Block>
 {
   let theCards = List([]);
+  if (!builderState || !builderState.query)
+  {
+    return theCards;
+  }
   forAllCards(builderState.query.cards, (card) =>
   {
     if (card.type === name)
@@ -188,6 +321,14 @@ export function findCardType(name: string, builderState: BuilderState): List<Blo
 
 export function getIndex(notSetIndex: string = null, builderState: BuilderState): string | List<string> | null
 {
+  if (builderState.query && builderState.query.path && builderState.query.path.source.dataSource)
+  {
+    const { index } = builderState.query.path.source.dataSource as any;
+    if (index)
+    {
+      return index;
+    }
+  }
   const cards = findCardType('elasticFilter', builderState);
   if (cards.size === 0)
   {
@@ -217,31 +358,7 @@ export function getIndex(notSetIndex: string = null, builderState: BuilderState)
 
 export function getType(notSetType: string = null, builderState: BuilderState): string | List<string> | null
 {
-  const cards = findCardType('elasticFilter', builderState);
-  if (cards.size === 0)
-  {
-    return notSetType;
-  }
-  else if (cards.size === 1)
-  {
-    const c = cards.get(0);
-    if (c['currentType'] === '')
-    {
-      return notSetType;
-    }
-    return c['currentType'];
-  }
-  // multiple filter cards, return all possible indexes
-  let types = List([]);
-  cards.forEach((c) =>
-  {
-    if (c['currentType'] !== '')
-    {
-      types = types.push(c['currentType']);
-    }
-  });
-  // If no types, return not set. If one, return as string. Otherwise return list
-  return (types.size === 0) ? notSetType : (types.size === 1) ? types.get(0) : types;
+  return 'data';
 }
 
 export default ElasticBlockHelpers;

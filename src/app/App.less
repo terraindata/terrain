@@ -1,11 +1,11 @@
-@import "common/fonts/Roboto.less";
+// @import "common/fonts/Roboto.less";
 @import "common/Common.less";
-
 
 body {
     padding: 0px;
     margin: 0px;
-    font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif;
+    overflow: hidden !important;
+    font-family: 'Gilroy', Helvetica, Arial, sans-serif;
 
     .black-text;
 
@@ -16,12 +16,23 @@ body {
       cursor: col-resize;
     }
 }
+:focus {
+  outline: none;
+}
 
 #app {
   height: 100%;
   position: absolute;
   top: 0px;
   width: 100%;
+}
+
+.box-size {
+  box-sizing: border-box;
+}
+
+.overflow-hidden {
+  overflow: hidden;
 }
 
 .page-placeholder {
@@ -85,7 +96,6 @@ body {
       }
     }
   }
-
 }
 
 @top-bar-height: 36px;
@@ -99,28 +109,23 @@ body {
   z-index: 999999999;
 
   .slide-down;
-
-  .app-top-bar-icon {
-    float: left;
-    height: @icon-height;
-    fill: #CDDE20;
-    padding-top: @icon-padding;
-    padding-left: @icon-padding;
-  }
 }
 
 .app-wrapper {
-  height: calc(~"100% - @{top-bar-height}");
+  height: 100%;
 }
 
 .app-inner {
   .fade-in;
   .animation-delay(0.75s);
+  background-size: cover; // background will fill entire div, cropping
+  background-position: right top; // background pinned at top right, because that's where the blue intersects
 }
 
 
 ::-webkit-scrollbar {
   width: 12px;
+  height: 7px;
   // height: 7px;
   // padding-left: 3px;
   // padding-right: 3px;
@@ -146,7 +151,7 @@ body {
 textarea, input {
   outline: none;
   margin: 0px; // because Safari gives inputs a 2px margin
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  font-family: 'Gilroy', Helvetica, Arial, sans-serif;
 }
 
 // input[type=text], input[type=email], input[type=tel],
