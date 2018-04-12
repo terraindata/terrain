@@ -78,7 +78,7 @@ import DocumentsHelpers from './DocumentsHelpers';
 
 class Initializers extends ETLHelpers
 {
-  public loadExistingTemplate(templateId: number, preserveHistory: boolean)
+  public loadExistingTemplate(templateId: number)
   {
     this._getTemplate(templateId)
       .then((template: ETLTemplate) =>
@@ -94,7 +94,7 @@ class Initializers extends ETLHelpers
         this.editorAct({
           actionType: 'setTemplate',
           template,
-          history: preserveHistory ? 'push' : 'clear',
+          history: 'clear',
         });
         this.editorAct({
           actionType: 'rebuildFieldMap',
