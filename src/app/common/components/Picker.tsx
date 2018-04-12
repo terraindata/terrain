@@ -61,6 +61,7 @@ export interface PickerOption
 {
   value: number | string;
   selected: boolean;
+  label?: string | number;
 }
 
 export interface Props
@@ -77,6 +78,16 @@ export interface Props
 @Radium
 class Picker extends TerrainComponent<Props>
 {
+
+  public getOptionName(option: PickerOption)
+  {
+    if (!option)
+    {
+      return null;
+    }
+    return option.label || option.value;
+  }
+
   public renderRow(options: List<PickerOption>, index: number)
   {
     const { canEdit, circular, onSelect, optionHeight, optionWidth } = this.props;
@@ -93,8 +104,11 @@ class Picker extends TerrainComponent<Props>
     ];
     const rowSize = this.props.rowSize || 0;
     return (
-      <div
-        className='picker-row'
+    <div
+        className={classNames({
+          'picker-row': true,
+          'picker-row-flex': !rowSize,
+        })}
         key={index}
       >
         {
@@ -108,7 +122,7 @@ class Picker extends TerrainComponent<Props>
               onClick={!disabled && this._fn(onSelect, i + index * rowSize, opt)}
               key={i}
             >
-              {opt && opt.value}
+              <span>{this.getOptionName(opt)}</span>
             </div>);
           },
           )
