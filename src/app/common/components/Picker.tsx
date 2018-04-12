@@ -75,8 +75,7 @@ export interface Props
   optionWidth?: number;
 }
 
-@Radium
-class Picker extends TerrainComponent<Props>
+export class Picker extends TerrainComponent<Props>
 {
 
   public getOptionName(option: PickerOption)
@@ -185,4 +184,4 @@ const UNEDITABLE_STYLE = [
   fontColor(Colors().fontColor2),
 ];
 
-export default Picker;
+export default Radium(Picker);
