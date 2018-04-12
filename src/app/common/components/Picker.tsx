@@ -104,7 +104,7 @@ class Picker extends TerrainComponent<Props>
     ];
     const rowSize = this.props.rowSize || 0;
     return (
-    <div
+      <div
         className={classNames({
           'picker-row': true,
           'picker-row-flex': !rowSize,
