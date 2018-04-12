@@ -55,7 +55,7 @@ import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
 import { Card, CardString } from '../../../../blocks/types/Card';
 
-import { Ajax } from '../../../util/Ajax';
+import { Ajax, AjaxResponse } from '../../../util/Ajax';
 import AjaxM1 from '../../../util/AjaxM1';
 import * as SpotlightTypes from '../../data/SpotlightTypes';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -113,7 +113,7 @@ class TransformCard extends TerrainComponent<Props>
     maxDomain: List<number>;
     range: List<number>;
     bars: Bars;
-    queryXhr?: XMLHttpRequest;
+    queryXhr?: AjaxResponse;
     queryId?: string;
     error?: boolean;
     builderState?: any;
@@ -192,7 +192,7 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    this.state.queryXhr && this.state.queryXhr.abort(); // M1 mysql
+    this.state.queryXhr && this.state.queryXhr.cancel(); // M1 mysql
     this.killXHR('domainAggregationAjax');
     this.killXHR('aggregationAjax');
     this.killQuery();
@@ -201,7 +201,7 @@ class TransformCard extends TerrainComponent<Props>
   public killXHR(stateKey)
   {
     this.state[stateKey] && this.state[stateKey].xhr &&
-      this.state[stateKey].xhr.abort();
+      this.state[stateKey].xhr.cancel();
   }
 
   public killQuery()

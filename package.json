@@ -61,7 +61,7 @@
       "json"
     ],
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/mocks/fileMock.ts",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/__mocks__/fileMock.ts",
       "^auth/(.*)$": "<rootDir>/src/app/auth/$1",
       "^analytics/(.*)$": "<rootDir>/src/app/analytics/$1",
       "^app/(.*)$": "<rootDir>/src/app/$1",
@@ -77,6 +77,7 @@
       "^library/(.*)$": "<rootDir>/src/app/library/$1",
       "^manual/(.*)$": "<rootDir>/src/app/manual/$1",
       "^roles/(.*)$": "<rootDir>/src/app/roles/$1",
+      "^scheduler/(.*)$": "<rootDir>/src/app/scheduler/$1",
       "^schema/(.*)$": "<rootDir>/src/app/schema/$1",
       "^shared/(.*)$": "<rootDir>/shared/$1",
       "^src/(.*)$": "<rootDir>/src/$1",
@@ -93,7 +94,7 @@
       "MIDWAY_HOST": "http://localhost"
     },
     "setupFiles": [
-      "<rootDir>/src/test/mocks/browserMock.ts"
+      "<rootDir>/src/test/__mocks__/browserMock.ts"
     ],
     "testURL": "http://localhost"
   },
@@ -263,6 +264,8 @@
     "@types/supertest": "^2.0.4",
     "@types/tape": "^4.2.32",
     "@types/winston": "^2.3.8",
+    "axios": "^0.18.0",
+    "axios-mock-adapter": "^1.15.0",
     "babel-cli": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
