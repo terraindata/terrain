@@ -116,11 +116,12 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      transformations text NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS schedules
     (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt date NOT NULL,
      interval text NOT NULL,
+     lastModified date NOT NULL,
      lastRun text NOT NULL,
      meta text NOT NULL,
      name text NOT NULL,
-     pausedFilename text NOT NULL,
      priority text NOT NULL,
      running bool NOT NULL,
      shouldRunNext bool NOT NULL,

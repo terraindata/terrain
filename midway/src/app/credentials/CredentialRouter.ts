@@ -71,8 +71,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   }
 });
 
-// Get connections from credentials table, requires type=<one of allowedTypes>
-Router.get('/credentials', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/names', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await credentials.getNames(ctx.query.type);
