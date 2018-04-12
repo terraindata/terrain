@@ -59,7 +59,6 @@ import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import ControlActions from '../../data/ControlActions';
 import ControlStore from '../../data/ControlStore';
-import RouteSelector from 'app/common/components/RouteSelector';
 
 import './ImportExportControl.less';
 
@@ -130,126 +129,44 @@ class ImportExportControl extends TerrainComponent<Props>
     ControlActions.importExport.fetchCredentials();
   }
 
-  public formatDayValue(value, setIndex)
-  {
-    return 'Every Day';
-  }
-
-  public formatTimeValue(value, setIndex)
-  {
-    return 'Every minute';
-  }
-
-  public getSchedulerOptionSets(schedule)
-  {
-    // Schedule name + ETL Template Options
-
-    // Status options (active/diabled)
-
-    // Day Options
-    const dayOptions = List([
-      {
-        value: 'everyday',
-        displayName: 'Every Day',
-      },
-      {
-        value: 'everyweekday',
-        displayName: 'Every weekday',
-      },
-      {
-        value: 'dayofweek',
-        displayName: 'Specific day(s) of week',
-        component: <div>Picker goes here!</div>
-      },
-      {
-        value: 'dayofmonth',
-        displayName: 'Specific day(s) of month',
-        component: <div>Picker goes here!</div>,
-      }
-    ]);
-    const dayOptionSet = {
-      key: 'day',
-      options: dayOptions,
-      forceFloat: true,
-      getCustomDisplayName: this.formatDayValue,
-      shortNameText: 'Day',
-      headerText: '',
-      column: true,
-    };
-
-    // Time Options
-    const timeOptions = List([
-      {
-        value: 'everyminute',
-        displayName: 'Every Minute',
-      },
-      {
-        value: 'everyhour',
-        displayName: 'Every Hour',
-        component: <div>Picker goes here!</div>
-      },
-      {
-        value: 'hoursofday',
-        dispayName: 'Specific Hour(s) of the Day',
-        component: <div> Picker goes here!</div>
-      }
-    ]);
-    const timeOptionSet = {
-      key: 'time',
-      options: dayOptions,
-      forceFloat: true,
-      getCustomDisplayName: this.formatTimeValue,
-      shortNameText: 'Time',
-      headerText: '',
-      column: true,
-    };
-
-    // Run now / Pause
-
-    // Schedule log
-    return List([
-      dayOptionSet,
-      timeOptionSet,
-    ]);
-  }
-
-  /*
-    optionSets?: List<RouteSelectorOptionSet>;
-    values: List<any>;
-    getOptionSets?: () => List<RouteSelectorOptionSet>;
-    relevantData?: any; // If this data changes, have to recalculate option sets
-    onChange: (key: number, value: any) => void;
-    canEdit: boolean;
-    footer?: El;
-    forceOpen?: boolean; // force it to be open no matter whwat
-    defaultOpen?: boolean; // default to open when the component mounts (but don't force open)
-    large?: boolean;
-    semilarge?: boolean;
-    noShadow?: boolean;
-    autoFocus?: boolean;
-    hideLine?: boolean;
-    canDelete?: boolean;
-    showWarning?: boolean;
-    warningMessage?: string;
-    onDelete?: () => void;
-    onToggleOpen?: (open: boolean) => void;
-  */
-
-  public handleScheduleChange(key, value)
-  {
-    console.log('key', key, 'value', value);
-  }
-
   public render()
   {
     const { schema } = this.props;
     return (
       <div className='import-export-token-control-page'>
-        <RouteSelector
-          optionSets={this.getSchedulerOptionSets(null)}
-          values={List(['day', 'time'])}
-          onChange={this.handleScheduleChange}
-          canEdit={true}
+        <div className='import-export-control-title'>
+          Manage Import Templates
+        </div>
+        <TemplateControlList
+          templates={this.state.importTemplates}
+          servers={schema.servers}
+          credentials={this.state.credentials}
+        />
+        <div className='import-export-control-title'>
+          Manage Import Schedules
+        </div>
+        <ScheduleControlList
+          templates={this.state.importTemplates}
+          scheduledJobs={this.getImportSchedules(this.state.schedules)}
+          servers={schema.servers}
+          credentials={this.state.credentials}
+        />
+        <div className='import-export-control-title'>
+          Manage export Templates
+        </div>
+        <TemplateControlList
+          templates={this.state.exportTemplates}
+          servers={schema.servers}
+          credentials={this.state.credentials}
+        />
+        <div className='import-export-control-title'>
+          Manage Export Schedules
+        </div>
+        <ScheduleControlList
+          templates={this.state.exportTemplates}
+          scheduledJobs={this.getExportSchedules(this.state.schedules)}
+          servers={schema.servers}
+          credentials={this.state.credentials}
         />
       </div>
     );

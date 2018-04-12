@@ -79,7 +79,7 @@ export interface RouteSelectorOption
   tooltip?: string;
   icon?: any;
   closeOnPick?: boolean; // close the picker when this option is picked
-  component?: El;
+  component?: El | string;
 }
 
 export interface RouteSelectorOptionSet
