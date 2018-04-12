@@ -76,9 +76,10 @@ export interface RouteSelectorOption
   displayName?: string | number | El;
   color?: string;
   sampleData?: List<any>;
-  extraContent?: string;
+  tooltip?: string;
   icon?: any;
   closeOnPick?: boolean; // close the picker when this option is picked
+  component?: El;
 }
 
 export interface RouteSelectorOptionSet
@@ -802,8 +803,11 @@ export class RouteSelector extends TerrainComponent<Props>
                           option.displayName
                         }
                       </div>,
-                      option.extraContent,
+                      option.tooltip,
                     )}
+                    {
+                      option.component
+                    }
                 </div>
               }
               {
