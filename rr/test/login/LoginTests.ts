@@ -155,7 +155,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
     await loginToBuilder(page, url);
-  }, 60000);
+  }, 100000);
 
   afterAll(async () =>
   {
