@@ -110,6 +110,11 @@ class Button extends TerrainComponent<Props>
 
     if (typeof icon === 'string')
     {
+      if (!iconConfig[icon])
+      {
+        throw new Error('Unrecognized icon type in Button: ' + icon);
+      }
+      
       iconComesAfter = iconConfig[icon].after;
       icon = iconConfig[icon].element;
     }
