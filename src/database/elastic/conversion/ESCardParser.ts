@@ -478,6 +478,7 @@ export default class ESCardParser extends ESParser
     }
   }
 
+  // NOTE: When returnAll is true, searchCard returns [] when there is no matched node.
   public searchCard(pattern, valueInfo = this.getValueInfo(), returnLastMatched: boolean = false, returnAll: boolean = false)
   {
     TerrainLog.debug('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));

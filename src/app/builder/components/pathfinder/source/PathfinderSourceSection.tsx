@@ -96,11 +96,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     });
   }
 
-  public shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
-  }
-
   public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.pathfinderContext !== nextProps.pathfinderContext)

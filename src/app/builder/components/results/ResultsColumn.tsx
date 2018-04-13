@@ -82,6 +82,7 @@ export interface Props
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
+  onIncrementHitsPage: (hitsPage: number) => void;
   onNavigationException: () => void;
   builderActions?: typeof BuilderActions;
 }
@@ -258,6 +259,7 @@ class ResultsColumn extends TerrainComponent<Props>
             showCustomizeView={this.props.showCustomizeView}
             allowSpotlights={this.props.allowSpotlights}
             exportState={this.props.exportState}
+            onIncrementHitsPage={this.props.onIncrementHitsPage}
           />
         );
       case 1:

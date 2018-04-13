@@ -97,11 +97,6 @@ class PathfinderArea extends TerrainComponent<Props>
     pathfinderContext: _PathfinderContext(this.getPathfinderContext(this.props)),
   };
 
-  public shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(nextProps, this.props) || !_.isEqual(this.state, nextState);
-  }
-
   public componentWillReceiveProps(nextProps: Props)
   {
     const { pathfinderContext } = this.state;

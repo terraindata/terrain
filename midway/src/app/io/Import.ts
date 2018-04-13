@@ -402,6 +402,24 @@ export class Import
             }
             obj[extractOldColName] = _.get(obj[extractOldColName], extractPath, null);
             break;
+          case 'regex':
+            const regexColName: string | undefined = transform['colName'];
+            const regexFindKey: string | undefined = transform['args']['findKey'];
+            const regexReplaceKey: string | undefined = transform['args']['replaceKey'];
+            if (regexColName === undefined || regexFindKey === undefined
+              || regexReplaceKey === undefined)
+            {
+              throw new Error('Column name and regex find and replace keys must be provided.');
+            }
+            try
+            {
+              obj[regexColName] = obj[regexColName].replace(new RegExp(regexFindKey, 'g'), regexReplaceKey);
+            }
+            catch (e)
+            {
+              // do nothing
+            }
+            break;
           case 'hash':
             const oldColHashName: string | undefined = transform['colName'];
             const bcryptSalt: string | undefined = transform['args']['bcryptSalt'];
@@ -472,18 +490,21 @@ export class Import
             {
               throw new Error('Merge transformation must supply colName, mergeName, newName, and text arguments.');
             }
-            if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
+            if (obj[startCol] !== null && obj[mergeCol] !== null)
             {
-              throw new Error('Can only merge columns containing text.');
-            }
-            obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
-            if (startCol !== newCol)
-            {
-              delete obj[startCol];
-            }
-            if (mergeCol !== newCol)
-            {
-              delete obj[mergeCol];
+              if (typeof obj[startCol] !== 'string' || typeof obj[mergeCol] !== 'string')
+              {
+                throw new Error('Can only merge columns containing text.');
+              }
+              obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
+              if (startCol !== newCol)
+              {
+                delete obj[startCol];
+              }
+              if (mergeCol !== newCol)
+              {
+                delete obj[mergeCol];
+              }
             }
             break;
           case 'duplicate':
@@ -506,17 +527,20 @@ export class Import
             {
               throw new Error('Prepend/append transformation must supply colName and text arguments.');
             }
-            if (typeof obj[colName] !== 'string')
+            if (obj[colName] !== null)
             {
-              throw new Error('Can only prepend/append to columns containing text.');
-            }
-            if (transform['name'] === 'prepend')
-            {
-              obj[colName] = text + String(obj[colName]);
-            }
-            else
-            {
-              obj[colName] = String(obj[colName]) + text;
+              if (typeof obj[colName] !== 'string')
+              {
+                throw new Error('Can only prepend/append to columns containing text.');
+              }
+              if (transform['name'] === 'prepend')
+              {
+                obj[colName] = text + String(obj[colName]);
+              }
+              else
+              {
+                obj[colName] = String(obj[colName]) + text;
+              }
             }
         }
       }
