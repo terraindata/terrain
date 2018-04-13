@@ -44,15 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
 
 import * as commandLineArgs from 'command-line-args';
 import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
-import { filteringRecordBuilderActions, replayBuilderActions, waitForInput } from './FullstackUtils';
 import * as winston from 'winston';
+import { filteringRecordBuilderActions, replayBuilderActions, waitForInput } from './FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
