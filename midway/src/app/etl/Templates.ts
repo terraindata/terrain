@@ -232,7 +232,7 @@ export default class Templates
     });
   }
 
-  public async execute(id: number, files?: Readable[]): Promise<Readable>
+  public async executeById(id: number, files?: Readable[]): Promise<Readable>
   {
     const ts: TemplateConfig[] = await this.get(id);
     if (ts.length < 1)
@@ -240,6 +240,11 @@ export default class Templates
       throw new Error(`Template ID ${String(id)} not found.`);
     }
     const template = ts[0];
+    return this.execute(template, files);
+  }
+
+  public async execute(template: TemplateConfig, files?: Readable[]): Promise<Readable>
+  {
     winston.info('Executing template', template.templateName);
 
     const numSources = Object.keys(template.sources).length;
