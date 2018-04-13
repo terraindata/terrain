@@ -42,23 +42,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import axios, { AxiosInstance } from 'axios';
 
-import { TaskConfig } from '../jobs/TaskConfig';
-
-export interface SchedulerConfig
+class Api
 {
-  createdAt: Date;                   // when the schedule was first created
-  id: number;                        // scheduled job ID
-  interval: string;                  // time interval between scheduled runs
-  lastModified: Date;                // when the schedule was last modified
-  lastRun: Date;                     // when the scheduled job last ran
-  meta: string;                      // meta
-  name: string;                      // name of the schedule
-  priority: number;                  // priority of the scheduled job
-  running: boolean;                  // whether the task is running or not (TODO: lock this)
-  shouldRunNext: boolean;            // whether the job should run again or not
-  tasks: TaskConfig[];               // array of TaskConfigs
-  workerId: number;                  // for clustering, denotes the node ID
+  public static getInstance(): AxiosInstance
+  {
+    const terrainAxios = axios.create(
+      {
+        headers: {},
+        data: {},
+        baseURL: 'http://localhost:3000/midway/v1',
+        timeout: 180000,
+        withCredentials: false,
+        params: {
+          id: localStorage['id'],
+          accessToken: localStorage['accessToken'],
+          body: {},
+        },
+      });
+
+    return terrainAxios;
+  }
 }
-export default SchedulerConfig;
+
+export default Api;

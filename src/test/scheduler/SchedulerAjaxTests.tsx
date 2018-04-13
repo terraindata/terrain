@@ -43,22 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import SchedulerAjax from 'scheduler/SchedulerAjax';
 
-import { TaskConfig } from '../jobs/TaskConfig';
+const axiosMock = new MockAdapter(axios);
 
-export interface SchedulerConfig
+describe('SchedulerAjax', () =>
 {
-  createdAt: Date;                   // when the schedule was first created
-  id: number;                        // scheduled job ID
-  interval: string;                  // time interval between scheduled runs
-  lastModified: Date;                // when the schedule was last modified
-  lastRun: Date;                     // when the scheduled job last ran
-  meta: string;                      // meta
-  name: string;                      // name of the schedule
-  priority: number;                  // priority of the scheduled job
-  running: boolean;                  // whether the task is running or not (TODO: lock this)
-  shouldRunNext: boolean;            // whether the job should run again or not
-  tasks: TaskConfig[];               // array of TaskConfigs
-  workerId: number;                  // for clustering, denotes the node ID
-}
-export default SchedulerConfig;
+  let schedulerAjax: SchedulerAjax;
+  beforeEach(() =>
+  {
+    schedulerAjax = new SchedulerAjax(axios);
+  });
+
+  describe('#getConnections', () =>
+  {
+    it('should make a GET request to /scheduler/connections', () =>
+    {
+      axiosMock.onGet('/scheduler/connections').reply(
+        200,
+        [
+          { id: 1 },
+          { id: 2 },
+        ],
+      );
+
+      return schedulerAjax.getConnections()
+        .then((response) =>
+        {
+          expect(response).toEqual([
+            { id: 1 },
+            { id: 2 },
+          ]);
+        },
+      );
+    });
+  });
+});
