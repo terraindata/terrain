@@ -104,7 +104,7 @@ export class Scheduler
 
   public async delete(id: number): Promise<SchedulerConfig[] | string>
   {
-    return App.DB.delete(this.schedulerTable, [id]) as Promise<SchedulerConfig[]>;
+    return App.DB.delete(this.schedulerTable, { id }) as Promise<SchedulerConfig[]>;
   }
 
   public async duplicate(id: number): Promise<SchedulerConfig[]>
