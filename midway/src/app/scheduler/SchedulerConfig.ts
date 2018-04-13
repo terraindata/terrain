@@ -52,7 +52,7 @@ export class SchedulerConfig extends ConfigType
   public id: number = undefined;                        // scheduled job ID
   public interval: string = undefined;                  // time interval between scheduled runs
   public lastModified: Date = undefined;                // when the schedule was last modified
-  public lastRun: string = undefined;                   // when the scheduled job last ran
+  public lastRun: Date = undefined;                     // when the scheduled job last ran
   public meta: string = undefined;                      // meta
   public name: string = undefined;                      // name of the schedule
   public priority: number = undefined;                  // priority of the scheduled job

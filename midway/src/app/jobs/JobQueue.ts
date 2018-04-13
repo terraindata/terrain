@@ -97,7 +97,7 @@ export class JobQueue
         };
       return this.taskTree.create(args, taskTreeConfig);
     }
-  
+
     public pause(): void
     {
       if (this.taskTree.isCancelled() === false)
@@ -105,7 +105,7 @@ export class JobQueue
         this.taskTree.pause();
       }
     }
-  
+
     public async unpause(): Promise<void>
     {
       if (this.taskTree.isCancelled() === true)
@@ -113,17 +113,17 @@ export class JobQueue
         await this.run();
       }
     }
-  
+
     public async printTree(): Promise<void>
     {
       await this.taskTree.printTree();
     }
-  
+
     public async run(): Promise<TaskOutputConfig>
     {
       return this.taskTree.visit();
     }
-  
+
     private async _jobLoop(): Promise<void>
     {
       // TODO check the scheduler for unlocked rows and detect which schedules should run next

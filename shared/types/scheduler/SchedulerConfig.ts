@@ -52,7 +52,7 @@ export interface SchedulerConfig
   id: number;                        // scheduled job ID
   interval: string;                  // time interval between scheduled runs
   lastModified: Date;                // when the schedule was last modified
-  lastRun: string;                   // when the scheduled job last ran
+  lastRun: Date;                     // when the scheduled job last ran
   meta: string;                      // meta
   name: string;                      // name of the schedule
   priority: number;                  // priority of the scheduled job

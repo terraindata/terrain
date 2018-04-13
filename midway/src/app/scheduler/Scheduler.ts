@@ -71,11 +71,12 @@ export class Scheduler
       'schedules',
       ['id'],
       [
+        'createdAt',
         'interval',
+        'lastModified',
         'lastRun',
         'meta',
         'name',
-        'pausedFilename',
         'priority',
         'running',
         'shouldRunNext',
@@ -213,7 +214,41 @@ export class Scheduler
 
   public async upsert(schedule: SchedulerConfig): Promise<SchedulerConfig[]>
   {
-    // TODO: sanitize inputs
+    const creationDate: Date = new Date();
+    if (schedule.id === undefined) // create
+    {
+      if (schedule.name === undefined || schedule.interval === undefined)
+      {
+        return Promise.reject('Schedule name and interval must be provided.');
+      }
+      schedule.createdAt = creationDate;
+      schedule.lastModified = creationDate;
+      schedule.lastRun = new Date(0); // beginning of epoch time
+      schedule.meta = schedule.meta !== undefined ? schedule.meta : '';
+      // schedule.name = schedule.name !== undefined ? schedule.name : '';
+      schedule.priority = schedule.priority !== undefined ? schedule.priority : 1;
+      schedule.running = false;
+      schedule.shouldRunNext = schedule.shouldRunNext !== undefined ? schedule.shouldRunNext : true;
+      schedule.tasks = schedule.tasks !== undefined ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
+      schedule.workerId = schedule.workerId !== undefined ? schedule.workerId : 1;
+    }
+    else
+    {
+      const existingSchedules: SchedulerConfig[] = await this.get(id);
+      if (existingSchedules.length === 0)
+      {
+        return Promise.reject('Schedule ' + ((schedule.id as any).toString() as string) + ' does not exist.');
+      }
+      schedule.lastModified = creationDate;
+
+      for (const key of schedule)
+      {
+        if (schedule[key] === undefined)
+        {
+          schedule[key] = existingSchedules[0][key];
+        }
+      }
+    }
     return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
   }
 

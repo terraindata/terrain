@@ -119,7 +119,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      createdAt date NOT NULL,
      interval text NOT NULL,
      lastModified date NOT NULL,
-     lastRun text NOT NULL,
+     lastRun date NOT NULL,
      meta text NOT NULL,
      name text NOT NULL,
      priority text NOT NULL,
