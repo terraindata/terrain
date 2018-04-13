@@ -43,63 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import SchedulerAjax from 'scheduler/SchedulerAjax';
 
-// tslint:disable:no-var-requires strict-boolean-expressions variable-name
+const axiosMock = new MockAdapter(axios);
 
-import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
-import { applyMiddleware, createStore } from 'redux';
-import logger from 'redux-logger';
-import { _FileImportState, FileImportState } from '../../fileImport/FileImportTypes';
-import { CardItem } from '../components/cards/CardComponent';
-import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
-import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
-
-import { AjaxResponse } from 'util/Ajax';
-import { Cards } from '../../../blocks/types/Card';
-import { AllBackendsMap } from '../../../database/AllBackends';
-import BackendInstance from '../../../database/types/BackendInstance';
-import Query from '../../../items/types/Query';
-import { Template, Transform } from '../../fileImport/FileImportTypes';
-
-export class BuilderStateClass
+describe('SchedulerAjax', () =>
 {
-  public algorithmId: ID = '';
-  public query: Query = null;
+  let schedulerAjax: SchedulerAjax;
+  beforeEach(() =>
+  {
+    schedulerAjax = new SchedulerAjax(axios);
+  });
 
-  // for undo/redo
-  public pastQueries: List<Query> = Immutable.List([]);
-  public nextQueries: List<Query> = Immutable.List([]);
-  public lastActionType: string = '';
-  public lastActionKeyPath: KeyPath = null;
-  public lastActionTime: number = 0;
+  describe('#getConnections', () =>
+  {
+    it('should make a GET request to /scheduler/connections', () =>
+    {
+      axiosMock.onGet('/scheduler/connections').reply(
+        200,
+        [
+          { id: 1 },
+          { id: 2 },
+        ],
+      );
 
-  public loading: boolean = false;
-  public loadingXhr: AjaxResponse = null;
-  public loadingAlgorithmId: ID = '';
-
-  public selectedCardIds = Map<ID, boolean>({});
-
-  public db: BackendInstance = {} as any;
-
-  // TODO move
-  public manual = Map<ID, Cards>({});
-  // Card examples used in the manual are stored here.
-
-  public draggingCardItem: CardItem | null = null;
-  public draggingOverKeyPath: KeyPath = Immutable.List([]);
-  public draggingOverIndex: number = -1;
-
-  public isDirty: boolean = false;
-
-  public resultsState: ResultsState = _ResultsState();
-  public exportState: FileImportState = _FileImportState();
-
-  public modelVersion = 3;
-}
-export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
-const BuilderState_Record = Immutable.Record(new BuilderStateClass());
-export const _BuilderState = (config?: any) =>
-{
-  return new BuilderState_Record(config || {}) as any as BuilderState;
-};
+      return schedulerAjax.getConnections()
+        .then((response) =>
+        {
+          expect(response).toEqual([
+            { id: 1 },
+            { id: 2 },
+          ]);
+        },
+      );
+    });
+  });
+});

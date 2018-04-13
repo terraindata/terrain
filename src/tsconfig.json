@@ -24,6 +24,7 @@
             "fileimport/*": ["app/fileimport/*"],
             "manual/*": ["app/manual/*"],
             "roles/*": ["app/roles/*"],
+            "scheduler/*": ["app/scheduler/*"],
             "schema/*": ["app/schema/*"],
             "store/*": ["app/store/*"],
             "tql/*": ["app/tql/*"],
