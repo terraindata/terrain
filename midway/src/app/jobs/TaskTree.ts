@@ -48,8 +48,8 @@ import * as fs from 'fs';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import { TaskConfig, TaskEnum, TaskOutputConfig, TaskTreeConfig } from 'shared/types/jobs/TaskConfig';
 import { Task } from './Task';
-import { TaskConfig, TaskEnum, TaskOutputConfig, TaskTreeConfig } from './TaskConfig';
 import { TaskTreeNode } from './TaskTreeNode';
 import { TaskTreePrinter } from './TaskTreePrinter';
 import { TaskTreeVisitor } from './TaskTreeVisitor';

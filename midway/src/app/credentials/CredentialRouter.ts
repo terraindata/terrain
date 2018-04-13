@@ -51,6 +51,7 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
+import { UserConfig } from '../users/UserConfig';
 import CredentialConfig from './CredentialConfig';
 import Credentials from './Credentials';
 
@@ -70,8 +71,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   }
 });
 
-// Get connections from credentials table, requires type=<one of allowedTypes>
-Router.get('/credentials', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/names', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await credentials.getNames(ctx.query.type);

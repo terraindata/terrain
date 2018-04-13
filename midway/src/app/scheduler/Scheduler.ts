@@ -47,13 +47,13 @@ THE SOFTWARE.
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import { TaskConfig, TaskOutputConfig } from 'shared/types/jobs/TaskConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
 import { Sources } from '../io/sources/Sources';
 import { Job } from '../jobs/Job';
-import { TaskConfig, TaskOutputConfig } from '../jobs/TaskConfig';
 import SchedulerConfig from './SchedulerConfig';
 
 export const credentials: Credentials = new Credentials();

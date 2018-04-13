@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { TaskConfig, TaskOutputConfig } from 'shared/types/jobs/TaskConfig';
 import { Task } from './Task';
-import { TaskConfig, TaskOutputConfig } from './TaskConfig';
 
 import { TaskDefaultExit } from './tasks/TaskDefaultExit';
 import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
