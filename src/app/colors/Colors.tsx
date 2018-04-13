@@ -405,7 +405,7 @@ const DARK: OldTheme =
     activeText: '#fff',
     inactiveHover: Color(darkActive).fade(0.25).string(),
     inactiveHoverText: '#fff',
-    activeHover: Color(darkActive).fade(0.75).string(),
+    activeHover: '#2ec4ff',
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
     scrollbarPiece: 'rgba(255,255,255,0.25)',
@@ -644,7 +644,7 @@ const LIGHT: OldTheme =
     activeText: '#fff',
     inactiveHover: Color(darkActive).fade(0.25).string(),
     inactiveHoverText: '#fff',
-    activeHover: Color(darkActive).fade(0.75).string(),
+    activeHover: '#2ec4ff',
 
     scrollbarBG: 'rgba(0,0,0,0.1)',
     scrollbarPiece: 'rgb(180, 182, 186)',
@@ -1223,17 +1223,44 @@ export function couldHover(isFocused?: boolean)
   return CACHE[isFocused ? 'couldHoverFocused' : 'couldHover'];
 }
 
-export function buttonColors()
+export function buttonColors(theme?: 'active' | 'disabled')
+// other ideas: 'alt' | 'important' | 'warning')
 {
-  if (!CACHE['buttonColors' + curTheme])
+  const key = 'buttonColors' + curTheme + theme;
+  //lk
+  if (!CACHE[key])
   {
-    CACHE['buttonColors' + curTheme] = extend({},
-      backgroundColor(Colors().inactiveHover, Colors().active),
-      fontColor(Colors().text1),
-    );
+    let text = [Colors().fontColor, Colors().fontWhite];
+    let background = [Colors().blockBg, Colors().active];
+    // currently no border color, but could add one
+
+    switch (theme)
+    {
+      case 'active':
+        text = [Colors().fontWhite, Colors().fontWhite];
+        background = [Colors().active, Colors().activeHover];
+        break;
+
+      case 'disabled':
+        text = [Colors().fontColorLightest, Colors().fontColorLightest];
+        background = [Colors().blockBg, Colors().blockBg];
+        break;
+
+      default:
+    }
+
+    CACHE[key] = {
+      'color': text[0],
+      'background': background[0],
+
+      ':hover': {
+        color: text[1],
+        background: background[1],
+      },
+    };
   }
 
-  return CACHE['buttonColors' + curTheme];
+  return CACHE[key];
 }
 
 export function disabledButtonColors()

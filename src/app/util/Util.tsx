@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
+import { List } from 'immutable';
 import * as $ from 'jquery';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -794,6 +795,26 @@ const Util = {
     }).toList();
     // Put the sorted non starred fields after the starred fields (Starred are sorted in alpha order)
     return starredFields.sort().concat(nonStarredFields).toList();
+  },
+
+  didStateChange(oldState: IMap<any>, newState: IMap<any>, paths?: Array<string | string[] | KeyPath>)
+  {
+    if (!paths || !paths.length)
+    {
+      return oldState !== newState;
+    }
+    else
+    {
+      paths.forEach((path: any) =>
+      {
+        path = (Array.isArray(path) || List.isList(path)) ? path : [path];
+        if (oldState.getIn(path) !== newState.getIn(path))
+        {
+          return true;
+        }
+      });
+    }
+    return false;
   },
 };
 

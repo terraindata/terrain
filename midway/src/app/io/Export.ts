@@ -61,6 +61,7 @@ import { QueryHandler } from '../query/QueryHandler';
 import AExportTransform from './streams/AExportTransform';
 import CSVTransform from './streams/CSVTransform';
 import ExportTransform from './streams/ExportTransform';
+import JSONObjectExportTransform from './streams/JSONObjectExportTransform';
 import JSONTransform from './streams/JSONTransform';
 import TransformationEngineTransform from './streams/TransformationEngineTransform';
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
@@ -176,6 +177,13 @@ export class Export
         {
           case 'json':
             exportTransform = JSONTransform.createExportStream();
+            break;
+          case 'json [type object]':
+            if (exportConfig.objectKey === undefined)
+            {
+              throw Error('Missing object key for export type JSON [type object]');
+            }
+            exportTransform = new JSONObjectExportTransform(exportConfig.objectKey);
             break;
           case 'csv':
             exportTransform = CSVTransform.createExportStream();

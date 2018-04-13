@@ -140,25 +140,6 @@ class TransformCard extends TerrainComponent<Props>
     }
   }
 
-  public shouldComponentUpdate(nextProps: Props, nextState)
-  {
-    for (const key in nextProps)
-    {
-      if (!_.isEqual(nextProps[key], this.props[key]))
-      {
-        return true;
-      }
-    }
-    for (const key in nextState)
-    {
-      if (!_.isEqual(nextState[key], this.state[key]))
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public componentWillReceiveProps(nextProps: Props)
   {
     if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||

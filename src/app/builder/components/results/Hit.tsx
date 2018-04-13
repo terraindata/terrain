@@ -891,9 +891,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
     fields = fields.filter((field) =>
       nested.indexOf(field) === -1,
     );
-
   }
-
   return fields;
 }
 
