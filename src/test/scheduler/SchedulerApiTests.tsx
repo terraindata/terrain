@@ -45,16 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import SchedulerAjax from 'scheduler/SchedulerAjax';
+import SchedulerApi from 'scheduler/SchedulerApi';
 
 const axiosMock = new MockAdapter(axios);
 
-describe('SchedulerAjax', () =>
+describe('SchedulerApi', () =>
 {
-  let schedulerAjax: SchedulerAjax;
+  let schedulerApi: SchedulerApi;
   beforeEach(() =>
   {
-    schedulerAjax = new SchedulerAjax(axios);
+    schedulerApi = new SchedulerApi(axios);
   });
 
   describe('#getConnections', () =>
@@ -69,7 +69,7 @@ describe('SchedulerAjax', () =>
         ],
       );
 
-      return schedulerAjax.getConnections()
+      return schedulerApi.getConnections()
         .then((response) =>
         {
           expect(response).toEqual([

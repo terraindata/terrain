@@ -46,73 +46,112 @@ THE SOFTWARE.
 // tslint:disable:no-console
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
-import SchedulerAjax from 'scheduler/SchedulerAjax';
-import Api from 'util/Api';
+import SchedulerApi from 'scheduler/SchedulerApi';
+import XHR from 'util/XHR';
 
 class Scheduler extends TerrainComponent<any> {
 
-  public schedulerAjax: SchedulerAjax = new SchedulerAjax(Api.getInstance());
+  public schedulerAjax: SchedulerApi = new SchedulerApi(XHR.getInstance());
+
   public constructor(props)
   {
     super(props);
-    this.state = { responseText: '' };
-  }
-
-  public getConnections()
-  {
-    this.schedulerAjax.getConnections()
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error)
-    {
-        console.error(error);
-      });
+    this.state = {
+      responseText: '',
+      id: '',
+    };
   }
 
   public createScheduler()
   {
     this.schedulerAjax.createScheduler({
       interval: '0 0 1 1 *',
-      lastRun: '',
-      Meta: '',
-      Name: 'Jmansor Scheduler',
-      pausedFilename: 'scheduler.log',
-      Priority: 1,
-      Running: false,
-      shouldRunNext: false,
-      Tasks: JSON.stringify({
-        cancel: false, // whether the tree of tasks should be cancelled
-        id: 1, // unique id that identifies this task to other tasks in the input array of TaskConfigs
-        jobStatus: 0, // 0: not running, 1: running, 2: paused
-        name: 'Import', // name of the task i.e. 'import'
-        onFailure: 3, // id of task to execute on failure
-        onSuccess: 2, // id of next task to execute (default should be next in array)
-        params: { param1: 'a' }, // input parameters for the task
-        paused: 4, // where in the tree of tasks the tasks are paused
-        taskId: 5, // maps to a statically declared task
-      }),
-      templateId: 1,
-      workerId: 0,
+      name: 'Jmansor Scheduler',
+      priority: 1,
+      tasks: [],
+      workerId: 10,
     })
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
       })
-      .catch((error)
-    {
-        console.error(error);
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
       });
+  }
+
+  public getSchedulers()
+  {
+    this.schedulerAjax.getSchedulers()
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public getScheduler(id?: number)
+  {
+    this.schedulerAjax.getScheduler(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public deleteScheduler(id?: number)
+  {
+    this.schedulerAjax.deleteScheduler(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public duplicateScheduler(id?: number)
+  {
+    this.schedulerAjax.duplicateScheduler(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public handleIdChange(e)
+  {
+    this.setState({
+      id: e.target.value,
+    })
   }
 
   public render()
   {
+    const { id } = this.state;
     return (
       <div>
+        id: <input style={{ width: 50 }} onChange={this.handleIdChange} value={id} />
         <ul>
-          <li onClick={this.getConnections.bind(this)}>SchedulerAjax.getConnections()</li>
-          <li onClick={this.createScheduler.bind(this)}>SchedulerAjax.createScheduler()</li>
+          <li onClick={() => this.createScheduler()}>SchedulerApi.createScheduler()</li>
+          <li onClick={() => this.getSchedulers()}>SchedulerApi.getSchedulers()</li>
+          <li onClick={() => this.getScheduler(id)}>SchedulerApi.getSchedulers({id})</li>
+          <li onClick={() => this.deleteScheduler(id)}>SchedulerApi.deleteSchedulers({id})</li>
+          <li onClick={() => this.duplicateScheduler(id)}>SchedulerApi.duplicateSchedulers({id})</li>
         </ul>
         <div>
           {this.state.responseText}

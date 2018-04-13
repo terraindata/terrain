@@ -44,27 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import axios, { AxiosInstance } from 'axios';
+import Ajax, { AjaxResponse } from 'util/Ajax';
+import XHR from 'util/XHR';
 
-class Api
+// making this an instance in case we want stateful things like cancelling ajax requests
+class SchedulerAjax
 {
-  public static getInstance(): AxiosInstance
-  {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
+  public xhr: AxiosInstance = null;
 
-    return terrainAxios;
+  public constructor(xhr: AxiosInstance)
+  {
+    this.xhr = xhr;
+  }
+
+  public createScheduler(schedulerConfig)
+  {
+    const body = schedulerConfig;
+    return this.xhr.post('/scheduler', { body });
+  }
+
+  public getSchedulers()
+  {
+    return this.xhr.get('/scheduler');
+  }
+
+  public getScheduler(id?: number)
+  {
+    return this.xhr.get(`/scheduler/${id}`);
+  }
+
+  public deleteScheduler(id?: number)
+  {
+    return this.xhr.post(`/scheduler/delete/${id}`);
+  }
+
+  public duplicateScheduler(id?: number)
+  {
+    return this.xhr.post(`/scheduler/duplicate/${id}`);
   }
 }
 
-export default Api;
+export default SchedulerAjax;
