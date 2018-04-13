@@ -178,7 +178,7 @@ export function setCRONDays(cron: string, days: CRONDaySchedule): string
   return pieces.join(' ');
 }
 
-export function parseCRONHourScheduleInternal(cron: string): CRONHourSchedule
+function parseCRONHourScheduleInternal(cron: string): CRONHourSchedule
 {
   if (scheduleMeetsStandards(cron))
   {
