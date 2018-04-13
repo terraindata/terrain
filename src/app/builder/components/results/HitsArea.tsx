@@ -54,6 +54,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import { SCROLL_SIZE } from 'app/builder/components/results/ResultsManager';
 import { BuilderState } from 'app/builder/data/BuilderState';
 import { notificationManager } from 'app/common/components/InAppNotification';
 import { SchemaState } from 'app/schema/SchemaTypes';
@@ -87,8 +88,6 @@ import ETLRouteUtil from 'etl/ETLRouteUtil';
 
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const HITS_PAGE_SIZE = 15;
-
 export interface Props
 {
   resultsState: ResultsState;
@@ -103,6 +102,7 @@ export interface Props
   allowSpotlights: boolean;
   onNavigationException: () => void;
   ignoreEmptyCards?: boolean;
+  onIncrementHitsPage: (hitsPage: number) => void;
 }
 
 interface State
@@ -155,44 +155,15 @@ class HitsArea extends TerrainComponent<Props>
   {
     this.setIndexAndResultsConfig(this.props);
     this.getNestedFields(this.props);
+    this.listenToKeyPath('builder', [['query', 'path', 'source', 'dataSource'],
+    ['db', 'name']]);
+    this.listenToKeyPath('query', ['tql', 'inputs', 'resultsConfig', 'algorithmId']);
   }
 
   public handleConfigChange(config: ResultsConfig, builderActions)
   {
     builderActions.changeResultsConfig(config);
     this.getNestedFields(this.props, config);
-  }
-
-  public shouldComponentUpdate(nextProps: Props, nextState: State)
-  {
-
-    for (const key in nextProps)
-    {
-      if (!_.isEqual(this.props[key], nextProps[key]))
-      {
-        if (key === 'builder' && !_.isEqual(
-          this.props.builder.query.path.source.dataSource,
-          nextProps.builder.query.path.source.dataSource) ||
-          this.props.builder.db.name !==
-          nextProps.builder.db.name)
-        {
-          return true;
-        }
-        else
-        {
-          return true;
-        }
-      }
-    }
-
-    for (const key in nextState)
-    {
-      if (!_.isEqual(this.state[key], nextState[key]))
-      {
-        return true;
-      }
-    }
-    return false;
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -685,9 +656,10 @@ class HitsArea extends TerrainComponent<Props>
             'results-area-results': true,
             'results-area-results-outdated': hitsAreOutdated,
           })}
+          onScrollBottom={this.props.onIncrementHitsPage}
           // onScroll={this.checkScroll}
           id='hits-area'
-          pageSize={HITS_PAGE_SIZE}
+          pageSize={SCROLL_SIZE}
           totalSize={MAX_HITS}
         >
           {
@@ -830,7 +802,7 @@ class HitsArea extends TerrainComponent<Props>
     {
       el.scrollTop = 0;
     }
-
+    this.props.onIncrementHitsPage(1); // Reset the hits pages
     this.setState({
       hitSize: this.state.hitSize === 'large' ? 'small' : 'large',
     });

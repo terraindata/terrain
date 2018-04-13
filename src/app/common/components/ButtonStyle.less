@@ -1,0 +1,67 @@
+@import "../../common/Common.less";
+
+.button {
+  display: inline-block;
+  .noselect;
+  
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: @font-size;
+  
+  opacity: 1;
+  .transition;
+  
+  &.button-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  &.button-disabled {
+    pointer-events: none;
+  }
+  
+  .button-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    svg {
+      width: 12px;
+      fill: currentColor;
+    }
+    
+  }
+  
+  &.button-with-icon-before {
+    .button-text {
+      margin-left: 12px;
+    }
+  }
+  
+  &.button-with-icon-after {
+    .button-text {
+      margin-right: 12px;
+    }
+  }
+  
+  &.button-large {
+    padding: 12px 18px;
+    font-size: @pretty-large-font-size;
+    
+    &.button-with-icon-before {
+      .button-text {
+        margin-left: 18px;
+      }
+    }
+    
+    &.button-with-icon-after {
+      .button-text {
+        margin-right: 18px;
+      }
+    }
+    
+    svg {
+      width: 18px;
+    }
+  }
+}

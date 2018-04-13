@@ -101,6 +101,10 @@ class TerrainComponent<T> extends React.Component<T, any>
     }>,
   } = {};
 
+  public _listeners: {
+    [key: string]: Array<string | string[] | KeyPath>,
+  } = {};
+
   public _togMap: { [stateKey: string]: () => void } = {};
 
   constructor(props: T)
@@ -160,15 +164,43 @@ class TerrainComponent<T> extends React.Component<T, any>
 
   public shouldComponentUpdate(nextProps: T, nextState: any)
   {
-    const shouldUpdate = shallowCompare(this, nextProps, nextState);
-
-    if (this._debugUpdates && shouldUpdate)
+    // If the key is in listeners, only look at the relevent paths (using util fn)
+    for (const key in nextProps)
     {
-      this._compareSets(this.props, nextProps, 'props');
-      this._compareSets(this.state, nextState, 'state');
+      if (this._listeners[key] !== undefined)
+      {
+        const prevValue: any = this.props[key];
+        const nextValue: any = nextProps[key];
+        if (Util.didStateChange(prevValue, nextValue, this._listeners[key]))
+        {
+          return true;
+        }
+      }
+      else if (this.props[key] !== nextProps[key])
+      {
+        return true;
+      }
     }
+    for (const key in nextState)
+    {
+      if (this._listeners[key] !== undefined)
+      {
+        if (Util.didStateChange(this.state[key], nextState[key], this._listeners[key]))
+        {
+          return true;
+        }
+      }
+      else if (this.state[key] !== nextState[key])
+      {
+        return true;
+      }
+    }
+    return false;
+  }
 
-    return shouldUpdate;
+  public listenToKeyPath(key: string, paths?: Array<string | string[]>)
+  {
+    this._listeners[key] = paths !== undefined ? paths : [];
   }
 
   // Helpers for debugging React update / perf issues

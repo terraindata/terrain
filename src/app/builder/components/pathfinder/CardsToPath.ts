@@ -238,7 +238,7 @@ export class CardsToPath
     };
     const newHardFilters = [];
     const newSoftFilters = [];
-    if (sourceBool.card.otherFilters)
+    if (sourceBool.card.otherFilters.size > 0)
     {
       sourceBool.card.otherFilters.map((filter: Block) =>
       {
@@ -281,7 +281,7 @@ export class CardsToPath
           [typeString]: [{ 'nested:nested_query': true }],
         };
         const nestedQuery = parser.searchCard(searchNestedTemplate, sourceBool, false, true);
-        if (nestedQuery !== null)
+        if (nestedQuery !== null && nestedQuery.length > 0)
         {
           const oldFilterValueInfo = sourceBool.objectChildren[t].propertyValue;
           let targetBool = hardBool;
@@ -342,43 +342,45 @@ export class CardsToPath
         );
         if (boolFilters && boolFilters.arrayChildren && boolFilters.arrayChildren.length)
         {
-          const oldFilterValueInfo = sourceBool.objectChildren[t].propertyValue;
-          let targetBool = hardBool;
-          let targetClause = 'filter';
-          if (t === 'should')
+          const geoQueries = [];
+          boolFilters.forEachElement((child, index) =>
           {
-            targetBool = softBool;
-            targetClause = 'should';
-          }
-          if (!targetBool)
-          {
-            parser.createCardIfNotExist(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
-            targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
-          }
-          if (targetBool.objectChildren[targetClause] === undefined)
-          {
-            const targetClausePattern = targetClause + ':query[]';
-            parser.createCardIfNotExist({
-              [targetClausePattern]: [],
-            }, targetBool);
-          }
-          const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
-          // Delete them and move them into the target bool
-          let movedGeo = false;
-          for (let i = boolFilters.arrayChildren.length - 1; i >= 0; i--)
-          {
-            const child = boolFilters.arrayChildren[i];
             if (child && child.objectChildren.geo_distance)
             {
-              movedGeo = true;
-              parser.deleteChild(boolFilters, i);
-              parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+              geoQueries.push(child);
+              parser.deleteChild(boolFilters, index);
             }
-            //  parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+          });
+          if (geoQueries.length > 0)
+          {
+
+            let targetBool = hardBool;
+            let targetClause = 'filter';
+            if (t === 'should')
+            {
+              targetBool = softBool;
+              targetClause = 'should';
+            }
+            if (!targetBool)
+            {
+              parser.createCardIfNotExist(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
+              targetBool = parser.searchCard(targetClause === 'should' ? softBoolTemplate : hardBoolTemplate, body);
+            }
+            if (targetBool.objectChildren[targetClause] === undefined)
+            {
+              const targetClausePattern = targetClause + ':query[]';
+              parser.createCardIfNotExist({
+                [targetClausePattern]: [],
+              }, targetBool);
+            }
+            const targetClauseValueInfo = targetBool.objectChildren[targetClause].propertyValue;
+            geoQueries.map((child, index) =>
+            {
+              parser.addChild(targetClauseValueInfo, targetClauseValueInfo.arrayChildren.length, child);
+            });
           }
         }
       }
-      parser.isMutated = true;
     }
   }
 

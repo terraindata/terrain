@@ -53,6 +53,7 @@ import Logout from './common/components/Logout';
 import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
+import UIComponentsPage from './common/UIComponentsPage';
 import ControlPage from './control/components/ControlPage';
 import ETLEditorPage from './etl/components/ETLEditorPage';
 import ETLPage from './etl/components/ETLPage';
@@ -124,6 +125,8 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/x' component={X} />
           <Route path='/x/:x' component={X} />
+
+          <Route path='/ui' component={UIComponentsPage} />
 
           <Route path='/browser' component={Redirect} />
           <Route path='/browser/:a' component={Redirect} />
