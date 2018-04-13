@@ -42,290 +42,282 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2019 Terrain Data, Inc.
 
 export const CRONWeekDayOptions = [0, 1, 2, 3, 4, 5, 6];
 export const CRONWeekDayNames =
-{
-	0: 'Sunday',
-	1: 'Monday',
-	2: 'Tuesday',
-	3: 'Wednesday',
-	4: 'Thursday',
-	5: 'Friday',
-	6: 'Saturday',
-	7: 'Sunday',
-};
-const workWeekdays = [1,2,3,4,5];
+  {
+    0: 'Sunday',
+    1: 'Monday',
+    2: 'Tuesday',
+    3: 'Wednesday',
+    4: 'Thursday',
+    5: 'Friday',
+    6: 'Saturday',
+    7: 'Sunday',
+  };
+const workWeekdays = [1, 2, 3, 4, 5];
 
 export const CRONMonthDayOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+  17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
 
 export type CRONDaySchedule =
-	{
-		type: 'daily'
-	} | 
-	{
-		type: 'weekdays'
-	} |
-	{
-		type: 'weekly',
-		weekdays: number[],
-	} |
-	{
-		type: 'monthly',
-		days: number[],
-	};
+  {
+    type: 'daily',
+  } |
+  {
+    type: 'weekdays',
+  } |
+  {
+    type: 'weekly',
+    weekdays: number[],
+  } |
+  {
+    type: 'monthly',
+    days: number[],
+  };
 
 export function parseCRONDaySchedule(cron: string): CRONDaySchedule
 {
-	if (scheduleMeetsStandards(cron))
-	{
-		// attempt to parse
-		const pieces = cron.split(' ');
-		const monthDay = pieces[2];
-		const weekDay = pieces[4];
-		
-		if (weekDay === '*')
-		{
-			if (monthDay === '*')
-			{
-				return {
-					type: 'daily',
-				};
-			}
-			
-			const monthDays = monthDay.split(',');
-			if (monthDays.every(isValidMonthDay))
-			{
-				return {
-					type: 'monthly',
-					days: monthDays.map((d) => +d),
-				};
-			}
-		}
-		else if(monthDay === '*')
-		{
-			// specified week days
-			const weekdays = weekDay.split(',');
-			if (weekdays.every(isValidWeekDay))
-			{
-				// check if it is the "weekdays" option
-				if (weekdays.every((w) => workWeekdays.indexOf(+w) !== -1)
-					&& workWeekdays.every((ww) => weekdays.indexOf(""+ww) !== -1))
-				{
-					return {
-						type: 'weekdays',
-					};
-				}
-				
-				return {
-					type: 'weekly',
-					weekdays: weekdays.map((d) => +d),
-				}
-			}
-		}
-	}
-	
-	return null; // cannot be parsed
+  if (scheduleMeetsStandards(cron))
+  {
+    // attempt to parse
+    const pieces = cron.split(' ');
+    const monthDay = pieces[2];
+    const weekDay = pieces[4];
+
+    if (weekDay === '*')
+    {
+      if (monthDay === '*')
+      {
+        return {
+          type: 'daily',
+        };
+      }
+
+      const monthDays = monthDay.split(',');
+      if (monthDays.every(isValidMonthDay))
+      {
+        return {
+          type: 'monthly',
+          days: monthDays.map((d) => +d),
+        };
+      }
+    }
+    else if (monthDay === '*')
+    {
+      // specified week days
+      const weekdays = weekDay.split(',');
+      if (weekdays.every(isValidWeekDay))
+      {
+        // check if it is the "weekdays" option
+        if (weekdays.every((w) => workWeekdays.indexOf(+w) !== -1)
+          && workWeekdays.every((ww) => weekdays.indexOf(String(ww) !== -1))
+        {
+          return {
+            type: 'weekdays',
+          };
+        }
+
+        return {
+          type: 'weekly',
+          weekdays: weekdays.map((d) => +d),
+        };
+      }
+    }
+  }
+
+  return null; // cannot be parsed
 }
 
 export function setCRONDays(cron: string, days: CRONDaySchedule): string
 {
-	if (!canParseCRONSchedule(cron))
-	{
-		throw new Error ("Cannot parse this cron schedule: " + cron);
-	}
-	
-	let pieces = cron.split(' ');
-	switch (days.type)
-	{
-		case 'daily':
-			pieces[2] = '*';
-			pieces[4] = '*';
-			break;
-		case 'weekdays':
-			pieces[2] = '*';
-			pieces[4] = workWeekdays.join(',');
-			break;
-		case 'weekly':
-			pieces[2] = '*';
-			pieces[4] = days.weekdays.join(',');
-			break;
-		case 'monthly':
-			pieces[2] = days.days.join(',');
-			pieces[4] = '*';
-			break;
-		default:
-			throw new Error('Unsupported hours type: ' + JSON.stringify(days));
-	}
-	
-	return pieces.join(' ');
+  if (!canParseCRONSchedule(cron))
+  {
+    throw new Error('Cannot parse this cron schedule: ' + cron);
+  }
+
+  const pieces = cron.split(' ');
+  switch (days.type)
+  {
+    case 'daily':
+      pieces[2] = '*';
+      pieces[4] = '*';
+      break;
+    case 'weekdays':
+      pieces[2] = '*';
+      pieces[4] = workWeekdays.join(',');
+      break;
+    case 'weekly':
+      pieces[2] = '*';
+      pieces[4] = days.weekdays.join(',');
+      break;
+    case 'monthly':
+      pieces[2] = days.days.join(',');
+      pieces[4] = '*';
+      break;
+    default:
+      throw new Error('Unsupported hours type: ' + JSON.stringify(days));
+  }
+
+  return pieces.join(' ');
 }
 
-
-
-export const CRONMinuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
-
 export const CRONHourOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-	17, 18, 19, 20, 21, 22, 23];
+  17, 18, 19, 20, 21, 22, 23];
 export const CRONHourNames = {
-	0: '12 AM', 1: '1 AM', 2: '2 AM', 3: '3 AM', 4: '4 AM', 5: '5 AM', 6: '6 AM', 7: '7 AM', 8: '8 AM', 
-	9: '9 AM', 10: '10 AM', 11: '11 AM', 12: '12 PM', 13: '1 PM', 14: '2 PM', 15: '3 PM', 16: '4 PM',
-	17: '5 PM', 18: '6 PM', 19: '7 PM', 20: '8 PM', 21: '9 PM', 22: '10 PM', 23: '11 PM',
+  0: '12 AM', 1: '1 AM', 2: '2 AM', 3: '3 AM', 4: '4 AM', 5: '5 AM', 6: '6 AM', 7: '7 AM', 8: '8 AM',
+  9: '9 AM', 10: '10 AM', 11: '11 AM', 12: '12 PM', 13: '1 PM', 14: '2 PM', 15: '3 PM', 16: '4 PM',
+  17: '5 PM', 18: '6 PM', 19: '7 PM', 20: '8 PM', 21: '9 PM', 22: '10 PM', 23: '11 PM',
 };
 
-export type CRONHourSchedule = 
-	{
-		type: 'minute',
-	} |
-	{
-		type: 'hourly',
-		minutes: number[],
-	} |
-	{
-		type: 'daily',
-		hours: number[],
-	};
+export type CRONHourSchedule =
+  {
+    type: 'minute',
+  } |
+  {
+    type: 'hourly',
+    minutes: number[],
+  } |
+  {
+    type: 'daily',
+    hours: number[],
+  };
 
 export function parseCRONHourSchedule(cron: string): CRONHourSchedule
 {
-	if (scheduleMeetsStandards(cron))
-	{
-		// attempt to parse
-		const pieces = cron.split(' ');
-		const hour = pieces[1];
-		const minute = pieces[0];
-		
-		if (hour === '*')
-		{
-			// every hour
-			if (minute === '*')
-			{
-				return { type: 'minute' }; // every minute
-			}
-			
-			const minutes = minute.split(',');
-			if (minutes.every(isValidSingleMinute))
-			{
-				return {
-					type: 'hourly',
-					minutes: minutes.map((m) => +m),
-				};
-			}
-		}
-		else if(minute === '0' || minute === '00')
-		{
-			// specific hours, on the hour
-			const hours = hour.split(',');
-			if (hours.every(isValidSingleHour))
-			{
-				return {
-					type: 'daily',
-					hours: hours.map((h) => +h),
-				};
-			}
-		}
-		// no other formats currently supported
-	}
-	
-	return null; // cannot be parsed
+  if (scheduleMeetsStandards(cron))
+  {
+    // attempt to parse
+    const pieces = cron.split(' ');
+    const hour = pieces[1];
+    const minute = pieces[0];
+
+    if (hour === '*')
+    {
+      // every hour
+      if (minute === '*')
+      {
+        return { type: 'minute' }; // every minute
+      }
+
+      const minutes = minute.split(',');
+      if (minutes.every(isValidSingleMinute))
+      {
+        return {
+          type: 'hourly',
+          minutes: minutes.map((m) => +m),
+        };
+      }
+    }
+    else if (+minute === 0)
+    {
+      // specific hours, on the hour
+      const hours = hour.split(',');
+      if (hours.every(isValidSingleHour))
+      {
+        return {
+          type: 'daily',
+          hours: hours.map((h) => +h),
+        };
+      }
+    }
+    // no other formats currently supported
+  }
+
+  return null; // cannot be parsed
 }
 
 export function setCRONHours(cron: string, hours: CRONHourSchedule): string
 {
-	if (!canParseCRONSchedule(cron))
-	{
-		throw new Error ("Cannot parse this cron schedule: " + cron);
-	}
-	
-	let pieces = cron.split(' ');
-	switch (hours.type)
-	{
-		case 'minute':
-			pieces[0] = '*';
-			pieces[1] = '*';
-			break;
-		case 'hourly':
-			pieces[0] = hours.minutes.join(',');
-			pieces[1] = '*';
-			break;
-		case 'daily':
-			pieces[0] = '0';
-			pieces[1] = hours.hours.join(',');
-			break;
-		default:
-			throw new Error('Unsupported hours type: ' + JSON.stringify(hours));
-	}
-	
-	return pieces.join(' ');
-}
+  if (!canParseCRONSchedule(cron))
+  {
+    throw new Error('Cannot parse this cron schedule: ' + cron);
+  }
 
+  const pieces = cron.split(' ');
+  switch (hours.type)
+  {
+    case 'minute':
+      pieces[0] = '*';
+      pieces[1] = '*';
+      break;
+    case 'hourly':
+      pieces[0] = hours.minutes.join(',');
+      pieces[1] = '*';
+      break;
+    case 'daily':
+      pieces[0] = '0';
+      pieces[1] = hours.hours.join(',');
+      break;
+    default:
+      throw new Error('Unsupported hours type: ' + JSON.stringify(hours));
+  }
+
+  return pieces.join(' ');
+}
 
 export function canParseCRONSchedule(cron: string): boolean
 {
-	// assert hours and days can be parsed
-	
-	if (scheduleMeetsStandards(cron) && parseCRONHourSchedule(cron) !== null && parseCRONDaySchedule(cron) !== null)
-	{
-		return true;
-	}
-	
-	return false;
+  // assert hours and days can be parsed
+
+  if (scheduleMeetsStandards(cron) && parseCRONHourSchedule(cron) !== null && parseCRONDaySchedule(cron) !== null)
+  {
+    return true;
+  }
+
+  return false;
 }
 
-
-
-/** Private *****************************************/
+// Private
 
 function isValidMonthDay(day: string): boolean
 {
-	return isValidNumber(day) && CRONMonthDayOptions.indexOf(+day) !== -1;
+  return isValidNumber(day) && CRONMonthDayOptions.indexOf(+day) !== -1;
 }
 
 function isValidWeekDay(day: string): boolean
 {
-	return isValidNumber(day) && CRONWeekDayOptions.indexOf(+day) !== -1;
+  return isValidNumber(day) && CRONWeekDayOptions.indexOf(+day) !== -1;
 }
 
 function isValidSingleHour(hour: string)
 {
-	return isValidNumber(hour) && +hour >= 0 && +hour < 24;
+  return isValidNumber(hour) && +hour >= 0 && +hour < 24;
 }
 
 function isValidSingleMinute(minute: string)
 {
-	return isValidNumber(minute) && CRONMinuteOptions.indexOf(+ minute) >= 0;
+  return isValidNumber(minute) && +minute >= 0 && +minute <= 59;
 }
 
 function isValidNumber(num: string)
 {
-	return !isNaN(+num);
+  return !isNaN(+num);
 }
-
 
 function scheduleMeetsStandards(cron: string): boolean
 {
-	// assert rest of format, besides hours and days, matches standard
-	
-	const pieces = cron.split(' ');
-	
-	if (pieces.length !== 5)
-	{
-		return false;
-	}
-	
-	if (pieces[3] !== '*')
-	{
-		// specific months not yet supported
-		return false;
-	}
-	
-	if (pieces[2] !== '*' && pieces[4] !== '*')
-	{
-		// cannot mix and match weekdays and month days right now
-		return false;
-	}
-	
-	return true;
-}
+  // assert rest of format, besides hours and days, matches standard
 
+  const pieces = cron.split(' ');
+
+  if (pieces.length !== 5)
+  {
+    return false;
+  }
+
+  if (pieces[3] !== '*')
+  {
+    // specific months not yet supported
+    return false;
+  }
+
+  if (pieces[2] !== '*' && pieces[4] !== '*')
+  {
+    // cannot mix and match weekdays and month days right now
+    return false;
+  }
+
+  return true;
+}
