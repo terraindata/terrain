@@ -171,6 +171,7 @@ export class GoogleAPI
                 writeStream = new CSVExportTransform(colNames);
               }
               const rows: object[] = report['data']['rows'];
+              // Add a full streaming implementation instead of dumping rows to an array
               if (Array.isArray(rows))
               {
                 rows.forEach((row) =>
@@ -284,7 +285,7 @@ export class GoogleAPI
   }
 
   private _postProcessGA(steps: object[], data: object[]): object[]
-  {  
+  {
     let newData: object[] = _.cloneDeep(data);
     steps.forEach((step) =>
     {
@@ -299,23 +300,23 @@ export class GoogleAPI
             // (3) for each key, create a modified copy of the aggregated object with the correct primary key
             // (4) return the array of these objects
             const patternRegExp = new RegExp(step['pattern']);
-            const patternRegExpFull = new RegExp(step['pattern'] + '.*');
+            const patternRegExpFull = new RegExp(step['pattern'] as string + '.*');
             const aggParams: string[] = step['aggParams'];
-            let newDataDict: object = {};
+            const newDataDict: object = {};
             // step 1
             data.forEach((row) =>
+            {
+              if (patternRegExpFull.test(row[step['primaryKeyName']]))
               {
-                if (patternRegExpFull.test(row[step['primaryKeyName']]))
+                const extractedPrimaryKey: string = row[step['primaryKeyName']]
+                  .replace(row[step['primaryKeyName']].replace(patternRegExp, ''), '');
+                if (newDataDict[extractedPrimaryKey] === undefined)
                 {
-                  const extractedPrimaryKey: string = row[step['primaryKeyName']]
-                    .replace(row[step['primaryKeyName']].replace(patternRegExp, ''), '');
-                  if (newDataDict[extractedPrimaryKey] === undefined)
-                  {
-                    newDataDict[extractedPrimaryKey] = [];
-                  }
-                  newDataDict[extractedPrimaryKey] = newDataDict[extractedPrimaryKey].concat(row);
+                  newDataDict[extractedPrimaryKey] = [];
                 }
-              });
+                newDataDict[extractedPrimaryKey] = newDataDict[extractedPrimaryKey].concat(row);
+              }
+            });
             const returnData: object[] = [];
             // steps 2, 3 and 4
             Object.keys(newDataDict).forEach((nDDKey) =>
@@ -342,7 +343,7 @@ export class GoogleAPI
       }
       catch (e)
       {
-        winston.warn(JSON.stringify(step) + ' error encountered: ' + (e as any).toString() as string);
+        winston.warn((JSON.stringify(step) as string) + ' error encountered: ' + ((e as any).toString() as string));
       }
     });
     return newData;
