@@ -44,50 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseController from '../database/DatabaseController';
+import * as fs from 'fs';
+import { Readable, Writable } from 'stream';
 
-/**
- * This is where we store connections to databaseRegistry being managed.
- */
-class DatabaseMap
+import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import AEndpointStream from './AEndpointStream';
+
+export default class HTTPEndpoint extends AEndpointStream
 {
-  private map: Map<number, DatabaseController>;
-
   constructor()
   {
-    this.map = new Map();
+    super();
   }
 
-  public get(id: number): DatabaseController | undefined
+  public async getSource(source: SourceConfig): Promise<Readable>
   {
-    return this.map.get(id);
+    const path: string = source.options['path'];
+    // TODO: sanitize path here to allow reading only from whitelisted locations
+    return fs.createReadStream(path);
   }
 
-  public getByName(name: string): DatabaseController | undefined
+  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    for (const entry of this.map.entries())
-    {
-      if (entry[1].getName() === name)
-      {
-        return entry[1];
-      }
-    }
-  }
-
-  public set(id: number, database: DatabaseController)
-  {
-    this.map.set(id, database);
-  }
-
-  public remove(id: number): boolean
-  {
-    return this.map.delete(id);
-  }
-
-  public getAll(): IterableIterator<[number, DatabaseController]>
-  {
-    return this.map.entries();
+    const path: string = sink.options['path'];
+    return fs.createWriteStream(path);
   }
 }
-
-export default DatabaseMap;

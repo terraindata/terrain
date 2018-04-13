@@ -44,50 +44,53 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseController from '../database/DatabaseController';
+import * as request from 'request';
+import { Readable, Writable } from 'stream';
 
-/**
- * This is where we store connections to databaseRegistry being managed.
- */
-class DatabaseMap
+import { HttpOptions, SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import AEndpointStream from './AEndpointStream';
+
+export default class HTTPEndpoint extends AEndpointStream
 {
-  private map: Map<number, DatabaseController>;
-
   constructor()
   {
-    this.map = new Map();
+    super();
   }
 
-  public get(id: number): DatabaseController | undefined
+  public async getSource(source: SourceConfig): Promise<Readable>
   {
-    return this.map.get(id);
+    return this.getRequestStream(source.options as HttpOptions) as Promise<Readable>;
   }
 
-  public getByName(name: string): DatabaseController | undefined
+  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    for (const entry of this.map.entries())
+    return this.getRequestStream(sink.options as HttpOptions) as Promise<Writable>;
+  }
+
+  private getRequestStream(options: HttpOptions): Promise<Readable | Writable>
+  {
+    return new Promise<Readable | Writable>((resolve, reject) =>
     {
-      if (entry[1].getName() === name)
-      {
-        return entry[1];
-      }
-    }
-  }
+      request(options)
+        .on('error', (err) =>
+        {
+          if (err !== null && err !== undefined)
+          {
+            const e = Error(`Error reading from HTTP endpoint ${options.url} ${err.toString()}`);
+            return reject(e);
+          }
+        })
+        .on('response', (res) =>
+        {
+          if (res.statusCode !== 200)
+          {
+            const e = new Error(`Error reading from source HTTP endpoint ${options.url}: ${res.statusCode} ${res.statusMessage}`);
+            return reject(e);
+          }
 
-  public set(id: number, database: DatabaseController)
-  {
-    this.map.set(id, database);
-  }
-
-  public remove(id: number): boolean
-  {
-    return this.map.delete(id);
-  }
-
-  public getAll(): IterableIterator<[number, DatabaseController]>
-  {
-    return this.map.entries();
+          resolve(res);
+        });
+    });
   }
 }
-
-export default DatabaseMap;

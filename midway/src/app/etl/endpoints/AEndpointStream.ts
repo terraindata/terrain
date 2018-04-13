@@ -44,50 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseController from '../database/DatabaseController';
+import { Readable, Writable } from 'stream';
+
+import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 
 /**
- * This is where we store connections to databaseRegistry being managed.
+ * Abstract class for converting a result stream to a string stream for export formatting
  */
-class DatabaseMap
+export default abstract class AEndpointStream
 {
-  private map: Map<number, DatabaseController>;
-
   constructor()
   {
-    this.map = new Map();
   }
 
-  public get(id: number): DatabaseController | undefined
-  {
-    return this.map.get(id);
-  }
+  public abstract async getSource(source: SourceConfig): Promise<Readable>;
 
-  public getByName(name: string): DatabaseController | undefined
-  {
-    for (const entry of this.map.entries())
-    {
-      if (entry[1].getName() === name)
-      {
-        return entry[1];
-      }
-    }
-  }
-
-  public set(id: number, database: DatabaseController)
-  {
-    this.map.set(id, database);
-  }
-
-  public remove(id: number): boolean
-  {
-    return this.map.delete(id);
-  }
-
-  public getAll(): IterableIterator<[number, DatabaseController]>
-  {
-    return this.map.entries();
-  }
+  public abstract async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>;
 }
-
-export default DatabaseMap;

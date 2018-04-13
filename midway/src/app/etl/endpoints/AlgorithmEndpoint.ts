@@ -44,50 +44,62 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseController from '../database/DatabaseController';
+import { Readable, Writable } from 'stream';
 
-/**
- * This is where we store connections to databaseRegistry being managed.
- */
-class DatabaseMap
+import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import AEndpointStream from './AEndpointStream';
+
+import DatabaseController from '../../../database/DatabaseController';
+import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
+import * as Util from '../../AppUtil';
+import { QueryHandler } from '../../query/QueryHandler';
+
+export class AlgorithmEndpoint extends AEndpointStream
 {
-  private map: Map<number, DatabaseController>;
-
   constructor()
   {
-    this.map = new Map();
+    super();
   }
 
-  public get(id: number): DatabaseController | undefined
+  public async getSource(source: SourceConfig): Promise<Readable>
   {
-    return this.map.get(id);
-  }
+    const algorithmId: number = source.options['algorithmId'];
+    let dbId: number = source.options['dbId'];
+    let query: string = source.options['query'];
 
-  public getByName(name: string): DatabaseController | undefined
-  {
-    for (const entry of this.map.entries())
+    if (algorithmId !== undefined)
     {
-      if (entry[1].getName() === name)
-      {
-        return entry[1];
-      }
+      query = await Util.getQueryFromAlgorithm(algorithmId);
+      dbId = await Util.getDBFromAlgorithm(algorithmId);
     }
+
+    const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
+    if (controller === undefined)
+    {
+      throw new Error(`Database ${String(dbId)} not found.`);
+    }
+
+    if (controller.getType() !== 'ElasticController')
+    {
+      throw new Error('Query endpoint only supports Elastic databases');
+    }
+
+    const qh: QueryHandler = controller.getQueryHandler();
+    const payload = {
+      database: dbId,
+      type: 'search',
+      streaming: true,
+      body: query,
+    };
+
+    return qh.handleQuery(payload) as Promise<Readable>;
   }
 
-  public set(id: number, database: DatabaseController)
+  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    this.map.set(id, database);
-  }
-
-  public remove(id: number): boolean
-  {
-    return this.map.delete(id);
-  }
-
-  public getAll(): IterableIterator<[number, DatabaseController]>
-  {
-    return this.map.entries();
+    throw new Error('Algorithm sink endpoint not implemented');
   }
 }
 
-export default DatabaseMap;
+export default AlgorithmEndpoint;

@@ -64,6 +64,7 @@ import appStats from './AppStats';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import { credentials } from './credentials/CredentialRouter';
+import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
 import { events } from './events/EventRouter';
 import Middleware from './Middleware';
@@ -84,8 +85,16 @@ export class App
 {
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
+    const dbConfig: DatabaseConfig = {
+      id: 0,
+      name: '[system]',
+      type,
+      dsn,
+      host: '',
+      isAnalytics: false,
+    };
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DatabaseControllerConfig.makeDatabaseController(type, 0, dsn);
+    const controller = DatabaseControllerConfig.makeDatabaseController(dbConfig);
     return controller.getTasty();
   }
 
