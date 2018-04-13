@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { parseCRONDaySchedule, parseCRONHourSchedule } from '../../util/CRONParser';
+import { parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays, setCRONHours, canParseCRONSchedule } from '../../util/CRONParser';
 
 
 test('parses daily', () =>
@@ -96,6 +96,79 @@ test('cannot parse invalid month days', () =>
   );
 });
 
+test('can set daily', () =>
+{
+  expect(setCRONDays('0 * 1,15 * *', { type: 'daily' })).toEqual(
+    '0 * * * *'
+  );
+});
+
+test('can set weekdays', () =>
+{
+  expect(setCRONDays('0 0,6,12,18 * * *', { type: 'weekdays' })).toEqual(
+    '0 0,6,12,18 * * 1,2,3,4,5'
+  );
+});
+
+test('can set weekly', () =>
+{
+  expect(setCRONDays('* * * * *', { type: 'weekly', weekdays: [0,2,4] })).toEqual(
+    '* * * * 0,2,4'
+  );
+});
+
+test('can set monthly', () =>
+{
+  expect(setCRONDays('0 12 * * *', { type: 'monthly', days: [1,15] })).toEqual(
+    '0 12 1,15 * *'
+  );
+});
+
+test('cannot set days if invalid schedule', () =>
+{
+  let passed = false;
+  try {
+    setCRONDays('0 0 * * 9', { type: 'monthly', days: [1,15] });
+  } catch(e)
+  {
+    passed = true;
+  }
+  expect(passed).toBe(true);
+});
+
+test('cannot set hours if invalid schedule', () =>
+{
+  let passed = false;
+  try {
+    expect(setCRONHours('0 24 * * *', { type: 'minute' })).toThrow();
+  } catch(e)
+  {
+    passed = true;
+  }
+  expect(passed).toBe(true);
+});
+
+
+test('cannot parse invalid hour schedule', () =>
+{
+  expect(canParseCRONSchedule('0 24 * * *')).toBe(false);
+});
+
+test('cannot parse invalid day schedule', () =>
+{
+  expect(canParseCRONSchedule('* * 32 * *')).toBe(false);
+});
+
+test('can parse valid hour schedule', () =>
+{
+  expect(canParseCRONSchedule('0 23 * * *')).toBe(true);
+});
+
+test('can parse valid day schedule', () =>
+{
+  expect(canParseCRONSchedule('* * 31 * *')).toBe(true);
+});
+
 
 test('parses every minute', () =>
 {
@@ -131,6 +204,11 @@ test('does not parse too granular minutes', () =>
 test('does not parse invalid minutes', () =>
 {
   expect(parseCRONHourSchedule('73 * * * *')).toEqual(null);
+});
+
+test('does not parse invalid hours', () =>
+{
+  expect(parseCRONHourSchedule('0 24 * * *')).toEqual(null);
 });
 
 test('does not parse invalid minute / hour combos', () =>

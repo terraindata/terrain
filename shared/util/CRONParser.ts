@@ -129,14 +129,37 @@ export function parseCRONDaySchedule(cron: string): CRONDaySchedule
 	return null; // cannot be parsed
 }
 
-function isValidMonthDay(day: string): boolean
+export function setCRONDays(cron: string, days: CRONDaySchedule): string
 {
-	return isValidNumber(day) && CRONMonthDayOptions.indexOf(+day) !== -1;
-}
-
-function isValidWeekDay(day: string): boolean
-{
-	return isValidNumber(day) && CRONWeekDayOptions.indexOf(+day) !== -1;
+	if (!canParseCRONSchedule(cron))
+	{
+		throw new Error ("Cannot parse this cron schedule: " + cron);
+	}
+	
+	let pieces = cron.split(' ');
+	switch (days.type)
+	{
+		case 'daily':
+			pieces[2] = '*';
+			pieces[4] = '*';
+			break;
+		case 'weekdays':
+			pieces[2] = '*';
+			pieces[4] = workWeekdays.join(',');
+			break;
+		case 'weekly':
+			pieces[2] = '*';
+			pieces[4] = days.weekdays.join(',');
+			break;
+		case 'monthly':
+			pieces[2] = days.days.join(',');
+			pieces[4] = '*';
+			break;
+		default:
+			throw new Error('Unsupported hours type: ' + JSON.stringify(days));
+	}
+	
+	return pieces.join(' ');
 }
 
 
@@ -208,19 +231,6 @@ export function parseCRONHourSchedule(cron: string): CRONHourSchedule
 	return null; // cannot be parsed
 }
 
-export function canParseCRONSchedule(cron: string, skipHoursOrDays?: 'hours' | 'days'): boolean
-{
-	// assert hours and days can be parsed
-	
-	if (scheduleMeetsStandards(cron) && parseCRONHourSchedule(cron) !== null && parseCRONDaySchedule(cron) !== null)
-	{
-		return true;
-	}
-	
-	return true;
-}
-
-
 export function setCRONHours(cron: string, hours: CRONHourSchedule): string
 {
 	if (!canParseCRONSchedule(cron))
@@ -228,7 +238,7 @@ export function setCRONHours(cron: string, hours: CRONHourSchedule): string
 		throw new Error ("Cannot parse this cron schedule: " + cron);
 	}
 	
-	const pieces = cron.split(' ');
+	let pieces = cron.split(' ');
 	switch (hours.type)
 	{
 		case 'minute':
@@ -250,13 +260,32 @@ export function setCRONHours(cron: string, hours: CRONHourSchedule): string
 	return pieces.join(' ');
 }
 
-export function setCRONDays(cron: string, days: CRONDaySchedule): string
+
+export function canParseCRONSchedule(cron: string): boolean
 {
-	// TODO
+	// assert hours and days can be parsed
+	
+	if (scheduleMeetsStandards(cron) && parseCRONHourSchedule(cron) !== null && parseCRONDaySchedule(cron) !== null)
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 
+
 /** Private *****************************************/
+
+function isValidMonthDay(day: string): boolean
+{
+	return isValidNumber(day) && CRONMonthDayOptions.indexOf(+day) !== -1;
+}
+
+function isValidWeekDay(day: string): boolean
+{
+	return isValidNumber(day) && CRONWeekDayOptions.indexOf(+day) !== -1;
+}
 
 function isValidSingleHour(hour: string)
 {
