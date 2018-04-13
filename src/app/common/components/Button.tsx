@@ -78,7 +78,7 @@ const iconConfig: {
   [icon: string]: {
     element: El,
     after?: boolean,
-  }
+  },
 } =
   {
     next: {
