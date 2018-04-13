@@ -119,6 +119,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     };
 
   public confirmedLeave: boolean = false;
+  public unregisterHook = () => null;
 
   public saveTemplate(template: ETLTemplate, isSaveAs: boolean, onSuccess?: () => void)
   {
@@ -293,7 +294,10 @@ class ETLEditorPage extends TerrainComponent<Props>
     )
     {
       // then we went from new template to saved template
-      this.initFromRoute(nextProps, true);
+      if (this.state.switchingTemplate)
+      {
+        this.initFromRoute(nextProps);
+      }
     }
     else if (
       getAlgorithmId(params) !== -1 &&
@@ -301,7 +305,10 @@ class ETLEditorPage extends TerrainComponent<Props>
     )
     {
       // then we went from an algorithm export to saved template
-      this.initFromRoute(nextProps, true);
+      if (this.state.switchingTemplate)
+      {
+        this.initFromRoute(nextProps);
+      }
     }
     else if (params.algorithmId !== nextParams.algorithmId)
     {
@@ -318,7 +325,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     }
   }
 
-  public initFromRoute(props: Props, preserveHistory: boolean = false)
+  public initFromRoute(props: Props)
   {
     const { params, editorAct, walkthrough } = props;
     editorAct({
@@ -332,7 +339,7 @@ class ETLEditorPage extends TerrainComponent<Props>
     else if (params.templateId !== undefined)
     {
       const templateId = getTemplateId(params);
-      Initializers.loadExistingTemplate(templateId, preserveHistory);
+      Initializers.loadExistingTemplate(templateId);
     }
     else if (ETLRouteUtil.isRouteNewTemplate(props.location) &&
       props.walkthrough.source.type != null)
@@ -348,7 +355,12 @@ class ETLEditorPage extends TerrainComponent<Props>
   public componentDidMount()
   {
     this.initFromRoute(this.props);
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unregisterHook = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+  }
+
+  public componentWillUnmount()
+  {
+    this.unregisterHook();
   }
 
   public routerWillLeave(nextLocation): boolean
@@ -415,17 +427,11 @@ class ETLEditorPage extends TerrainComponent<Props>
   public handleModalDontSave()
   {
     this.confirmedLeave = true;
-    if (this.state.switchingTemplate)
-    {
-      this.props.editorAct({
-        actionType: 'clearHistory',
-      });
-    }
+    browserHistory.push(this.state.nextLocation);
     this.setState({
       leaving: false,
       switchingTemplate: false,
     });
-    browserHistory.push(this.state.nextLocation);
   }
 
   public handleModalSave()
@@ -435,12 +441,6 @@ class ETLEditorPage extends TerrainComponent<Props>
     const onSaveSuccess = () =>
     {
       this.confirmedLeave = true;
-      if (this.state.switchingTemplate)
-      {
-        this.props.editorAct({
-          actionType: 'clearHistory',
-        });
-      }
       this.setState({
         leaving: false,
         switchingTemplate: false,

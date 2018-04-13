@@ -188,7 +188,7 @@ export default abstract class ETLHelpers
     console.error(ev);
   }
 
-  protected _errorHandler(description: string, showModal = false): (ev: any) => void
+  protected _editorErrorHandler(description: string, showModal = false): (ev: any) => void
   {
     return (ev) =>
     {

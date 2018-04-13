@@ -78,7 +78,7 @@ import DocumentsHelpers from './DocumentsHelpers';
 
 class Initializers extends ETLHelpers
 {
-  public loadExistingTemplate(templateId: number, preserveHistory: boolean)
+  public loadExistingTemplate(templateId: number)
   {
     this._getTemplate(templateId)
       .then((template: ETLTemplate) =>
@@ -94,7 +94,7 @@ class Initializers extends ETLHelpers
         this.editorAct({
           actionType: 'setTemplate',
           template,
-          history: preserveHistory ? 'push' : 'clear',
+          history: 'clear',
         });
         this.editorAct({
           actionType: 'rebuildFieldMap',
@@ -106,7 +106,52 @@ class Initializers extends ETLHelpers
         DocumentsHelpers.fetchSources(template.getSources().keySeq().toList());
         ETLRouteUtil.gotoEditTemplate(template.id);
       })
-      .catch(this._errorHandler('Error while loading template', true));
+      .catch(this._editorErrorHandler('Error while loading template', true));
+  }
+
+  /*
+   *  Takes the current editor in the template and replaces its transformations with
+   *  the specified template's transformations.
+   */
+  public initFromApplyTemplate(appliedId: number): void
+  {
+    const currentTemplate = this._template;
+    const typeText = currentTemplate.isImport() ? 'import' : 'export';
+    const errorHandler = this._editorErrorHandler('Cannot Apply Template', true);
+    if (currentTemplate.getSources().size !== 1)
+    {
+      return errorHandler(`Current template is not a single source ${typeText}`);
+    }
+    else if (currentTemplate.getSinks().size !== 1)
+    {
+      return errorHandler(`Current template is not a single sink ${typeText}`);
+    }
+    else if (currentTemplate.getEdges().size !== 1)
+    {
+      return errorHandler(`Current template has ${currentTemplate.getEdges().size} edges, but expected 1`);
+    }
+    this._getTemplate(appliedId).then((otherTemplate) =>
+    {
+      const otherType = otherTemplate.isImport() ? 'import' : 'export';
+      if (otherTemplate.getSources().size !== 1)
+      {
+        return errorHandler(`Selected template is not a single source ${otherType}`);
+      }
+      else if (otherTemplate.getSinks().size !== 1)
+      {
+        return errorHandler(`Selected template is not a single sink ${otherType}`);
+      }
+      const edgeToApply = otherTemplate.getEdges().first();
+      if (edgeToApply === undefined || edgeToApply.transformations == null)
+      {
+        return errorHandler(`Selected template does not have valid transformations to apply`);
+      }
+      const currentEdge = currentTemplate.getEdges().first();
+      this._try((proxy) =>
+      {
+        proxy.setEdgeTransformations(currentEdge.id, edgeToApply.transformations);
+      }).catch(errorHandler);
+    }).catch(errorHandler);
   }
 
   public initNewFromAlgorithm(algorithmId: number)
@@ -122,7 +167,7 @@ class Initializers extends ETLHelpers
     });
     DocumentsHelpers.fetchDocuments(source)
       .then(this.createInitialTemplateFn(source))
-      .catch(this._errorHandler('Could Not Create Template', true));
+      .catch(this._editorErrorHandler('Could Not Create Template', true));
   }
 
   public initNewFromWalkthrough(walkthrough: WalkthroughState = this._walkthrough)
@@ -132,7 +177,7 @@ class Initializers extends ETLHelpers
     const file = walkthrough.getFile();
     DocumentsHelpers.fetchDocuments(source)
       .then(this.createInitialTemplateFn(source, sink))
-      .catch(this._errorHandler('Could Not Create Template', true));
+      .catch(this._editorErrorHandler('Could Not Create Template', true));
   }
 
   private createInitialTemplateFn(
