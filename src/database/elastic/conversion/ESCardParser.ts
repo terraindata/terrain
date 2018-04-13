@@ -321,6 +321,8 @@ export default class ESCardParser extends ESParser
     return this.valueInfo.card;
   }
 
+  // delete the children object or array element
+  // NOTE: the deleted array element will be replaced with undefined
   public deleteChild(parent: ESValueInfo, index: string | number)
   {
     if (typeof index === 'string')
@@ -476,6 +478,7 @@ export default class ESCardParser extends ESParser
     }
   }
 
+  // NOTE: When returnAll is true, searchCard returns [] when there is no matched node.
   public searchCard(pattern, valueInfo = this.getValueInfo(), returnLastMatched: boolean = false, returnAll: boolean = false)
   {
     TerrainLog.debug('search ' + JSON.stringify(pattern) + ' from ' + JSON.stringify(valueInfo.value));
