@@ -44,40 +44,53 @@ THE SOFTWARE.
 
 // Copyright 2019 Terrain Data, Inc.
 
-export const CRONWeekDayOptions = [0, 1, 2, 3, 4, 5, 6];
-export const CRONWeekDayNames =
-  {
-    0: 'Sunday',
-    1: 'Monday',
-    2: 'Tuesday',
-    3: 'Wednesday',
-    4: 'Thursday',
-    5: 'Friday',
-    6: 'Saturday',
-    7: 'Sunday',
-  };
-const workWeekdays = [1, 2, 3, 4, 5];
+import { extend, filter, identity, isEqual, keys } from 'lodash';
 
-export const CRONMonthDayOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-  17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+import
+{
+  CRONDaySchedule, CRONHourOptions, CRONHourSchedule,
+  CRONMap, CRONMinuteOptions, CRONMonthDayOptions,
+  CRONWeekDayOptions, CRONWorkWeekdays
+} from './CRONConstants';
 
-export type CRONDaySchedule =
-  {
-    type: 'daily',
-  } |
-  {
-    type: 'weekdays',
-  } |
-  {
-    type: 'weekly',
-    weekdays: number[],
-  } |
-  {
-    type: 'monthly',
-    days: number[],
-  };
+const CACHE = {
+  days: {},
+  hours: {},
+};
 
-export function parseCRONDaySchedule(cron: string): CRONDaySchedule
+// If you promise to not change the return value, you may pass in skipCopy = true
+//  for better runtime and memory
+export function parseCRONDaySchedule(cron: string, skipCopy: boolean = false): CRONDaySchedule
+{
+  return evalCron(CACHE.days, parseCRONDayScheduleInternal, cron, skipCopy);
+}
+
+export function parseCRONHourSchedule(cron: string, skipCopy: boolean = false): CRONHourSchedule
+{
+  return evalCron(CACHE.hours, parseCRONHourScheduleInternal, cron, skipCopy);
+}
+
+function evalCron(cacheMap, parseFn, cron: string, skipCopy: boolean)
+{
+  if (cacheMap[cron] === undefined)
+  {
+    cacheMap[cron] = parseFn(cron);
+  }
+
+  const sched = cacheMap[cron];
+  if (skipCopy)
+  {
+    // skip the copy, for perf & memory optimization, if user is safe
+    return sched;
+  }
+
+  // return a deep copy to protect clients from messing up the cache values
+  return JSON.parse(JSON.stringify(sched));
+}
+
+// Days
+
+function parseCRONDayScheduleInternal(cron: string): CRONDaySchedule
 {
   if (scheduleMeetsStandards(cron))
   {
@@ -98,21 +111,23 @@ export function parseCRONDaySchedule(cron: string): CRONDaySchedule
       const monthDays = monthDay.split(',');
       if (monthDays.every(isValidMonthDay))
       {
+
         return {
           type: 'monthly',
-          days: monthDays.map((d) => +d),
+          days: fillMapFromStringList(CRONMonthDayOptions, monthDays),
         };
       }
     }
     else if (monthDay === '*')
     {
       // specified week days
-      const weekdays = weekDay.split(',');
-      if (weekdays.every(isValidWeekDay))
+      const weekdaysList = weekDay.split(',');
+      if (weekdaysList.every(isValidWeekDay))
       {
+        const weekdaysMap = fillMapFromStringList(CRONWeekDayOptions, weekdaysList);
+
         // check if it is the "weekdays" option
-        if (weekdays.every((w) => workWeekdays.indexOf(+w) !== -1)
-          && workWeekdays.every((ww) => weekdays.indexOf(String(ww) !== -1))
+        if (isEqual(weekdaysMap, CRONWorkWeekdays))
         {
           return {
             type: 'weekdays',
@@ -121,7 +136,7 @@ export function parseCRONDaySchedule(cron: string): CRONDaySchedule
 
         return {
           type: 'weekly',
-          weekdays: weekdays.map((d) => +d),
+          weekdays: weekdaysMap,
         };
       }
     }
@@ -146,14 +161,14 @@ export function setCRONDays(cron: string, days: CRONDaySchedule): string
       break;
     case 'weekdays':
       pieces[2] = '*';
-      pieces[4] = workWeekdays.join(',');
+      pieces[4] = mapToCRONString(CRONWorkWeekdays);
       break;
     case 'weekly':
       pieces[2] = '*';
-      pieces[4] = days.weekdays.join(',');
+      pieces[4] = mapToCRONString(days.weekdays);
       break;
     case 'monthly':
-      pieces[2] = days.days.join(',');
+      pieces[2] = mapToCRONString(days.days);
       pieces[4] = '*';
       break;
     default:
@@ -163,28 +178,7 @@ export function setCRONDays(cron: string, days: CRONDaySchedule): string
   return pieces.join(' ');
 }
 
-export const CRONHourOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-  17, 18, 19, 20, 21, 22, 23];
-export const CRONHourNames = {
-  0: '12 AM', 1: '1 AM', 2: '2 AM', 3: '3 AM', 4: '4 AM', 5: '5 AM', 6: '6 AM', 7: '7 AM', 8: '8 AM',
-  9: '9 AM', 10: '10 AM', 11: '11 AM', 12: '12 PM', 13: '1 PM', 14: '2 PM', 15: '3 PM', 16: '4 PM',
-  17: '5 PM', 18: '6 PM', 19: '7 PM', 20: '8 PM', 21: '9 PM', 22: '10 PM', 23: '11 PM',
-};
-
-export type CRONHourSchedule =
-  {
-    type: 'minute',
-  } |
-  {
-    type: 'hourly',
-    minutes: number[],
-  } |
-  {
-    type: 'daily',
-    hours: number[],
-  };
-
-export function parseCRONHourSchedule(cron: string): CRONHourSchedule
+export function parseCRONHourScheduleInternal(cron: string): CRONHourSchedule
 {
   if (scheduleMeetsStandards(cron))
   {
@@ -206,7 +200,7 @@ export function parseCRONHourSchedule(cron: string): CRONHourSchedule
       {
         return {
           type: 'hourly',
-          minutes: minutes.map((m) => +m),
+          minutes: fillMapFromStringList(CRONMinuteOptions, minutes),
         };
       }
     }
@@ -218,7 +212,7 @@ export function parseCRONHourSchedule(cron: string): CRONHourSchedule
       {
         return {
           type: 'daily',
-          hours: hours.map((h) => +h),
+          hours: fillMapFromStringList(CRONHourOptions, hours),
         };
       }
     }
@@ -243,12 +237,12 @@ export function setCRONHours(cron: string, hours: CRONHourSchedule): string
       pieces[1] = '*';
       break;
     case 'hourly':
-      pieces[0] = hours.minutes.join(',');
+      pieces[0] = mapToCRONString(hours.minutes);
       pieces[1] = '*';
       break;
     case 'daily':
       pieces[0] = '0';
-      pieces[1] = hours.hours.join(',');
+      pieces[1] = mapToCRONString(hours.hours);
       break;
     default:
       throw new Error('Unsupported hours type: ' + JSON.stringify(hours));
@@ -273,12 +267,12 @@ export function canParseCRONSchedule(cron: string): boolean
 
 function isValidMonthDay(day: string): boolean
 {
-  return isValidNumber(day) && CRONMonthDayOptions.indexOf(+day) !== -1;
+  return isValidNumber(day) && CRONMonthDayOptions[+day] !== undefined;
 }
 
 function isValidWeekDay(day: string): boolean
 {
-  return isValidNumber(day) && CRONWeekDayOptions.indexOf(+day) !== -1;
+  return isValidNumber(day) && CRONWeekDayOptions[+day] !== undefined;
 }
 
 function isValidSingleHour(hour: string)
@@ -320,4 +314,21 @@ function scheduleMeetsStandards(cron: string): boolean
   }
 
   return true;
+}
+
+function listToMap(list: string[]): CRONMap
+{
+  const obj = {};
+  list.map((e) => obj[+e] = true);
+  return obj;
+}
+
+function fillMapFromStringList(map: CRONMap, list: string[]): CRONMap
+{
+  return extend({}, map, listToMap(list));
+}
+
+function mapToCRONString(map: CRONMap): string
+{
+  return filter(keys(map), (v) => map[v] === true).join(',');
 }

@@ -44,7 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { range } from 'lodash';
 import { canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays, setCRONHours } from '../../util/CRONParser';
+
+function fillObj(values: number[], start: number, endInclusive: number):
+  { [val: number]: boolean }
+{
+  return range(start, endInclusive + 1).reduce(
+    (memo, v) =>
+    {
+      memo[v] = values.indexOf(v) !== -1;
+      return memo;
+    },
+    {},
+  );
+}
 
 test('parses daily', () =>
 {
@@ -63,14 +77,14 @@ test('parses weekdays', () =>
 test('parses weekly', () =>
 {
   expect(parseCRONDaySchedule('15 16 * * 2,3')).toEqual(
-    { type: 'weekly', weekdays: [2, 3] },
+    { type: 'weekly', weekdays: fillObj([2, 3], 0, 6) },
   );
 });
 
 test('parses monthly', () =>
 {
   expect(parseCRONDaySchedule('4 2 1 * *')).toEqual(
-    { type: 'monthly', days: [1] },
+    { type: 'monthly', days: fillObj([1], 1, 31) },
   );
 });
 
@@ -95,6 +109,17 @@ test('cannot parse invalid month days', () =>
   );
 });
 
+test('modifying a returned result does not screw up the cache', () =>
+{
+  const str = '* * 17,19 * *';
+  let result = parseCRONDaySchedule(str);
+  result.days[99] = true;
+  result.type = 'daily';
+  expect(parseCRONDaySchedule(str)).toEqual(
+    { type: 'monthly', days: fillObj([17, 19], 1, 31) },
+  );
+});
+
 test('can set daily', () =>
 {
   expect(setCRONDays('0 * 1,15 * *', { type: 'daily' })).toEqual(
@@ -111,14 +136,18 @@ test('can set weekdays', () =>
 
 test('can set weekly', () =>
 {
-  expect(setCRONDays('* * * * *', { type: 'weekly', weekdays: [0, 2, 4] })).toEqual(
+  expect(setCRONDays('* * * * *',
+    { type: 'weekly', weekdays: { 0: true, 2: true, 4: true } },
+  )).toEqual(
     '* * * * 0,2,4',
   );
 });
 
 test('can set monthly', () =>
 {
-  expect(setCRONDays('0 12 * * *', { type: 'monthly', days: [1, 15] })).toEqual(
+  expect(setCRONDays('0 12 * * *',
+    { type: 'monthly', days: { 1: true, 15: true } },
+  )).toEqual(
     '0 12 1,15 * *',
   );
 });
@@ -128,7 +157,9 @@ test('cannot set days if invalid schedule', () =>
   let passed = false;
   try
   {
-    setCRONDays('0 0 * * 9', { type: 'monthly', days: [1, 15] });
+    setCRONDays('0 0 * * 9',
+      { type: 'monthly', days: { 1: true, 15: true } },
+    );
   } catch (e)
   {
     passed = true;
@@ -179,21 +210,21 @@ test('parses every minute', () =>
 test('parses hourly', () =>
 {
   expect(parseCRONHourSchedule('00,15,30,45 * * * 1,2,3,4,5')).toEqual(
-    { type: 'hourly', minutes: [0, 15, 30, 45] },
+    { type: 'hourly', minutes: fillObj([0, 15, 30, 45], 0, 59) },
   );
 });
 
 test('parses hourly with arbitrary minutes', () =>
 {
   expect(parseCRONHourSchedule('3 * * * *')).toEqual(
-    { type: 'hourly', minutes: [3] },
+    { type: 'hourly', minutes: fillObj([3], 0, 59) },
   );
 });
 
 test('parses daily', () =>
 {
   expect(parseCRONHourSchedule('00 4,8,15,16 23 * *')).toEqual(
-    { type: 'daily', hours: [4, 8, 15, 16] },
+    { type: 'daily', hours: fillObj([4, 8, 15, 16], 0, 23) },
   );
 });
 
