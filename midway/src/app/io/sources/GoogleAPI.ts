@@ -99,13 +99,20 @@ export class GoogleAPI
         await this._getStoredGoogleAPICredentials(analytics.credentialId, 'analytics');
       }
       delete analytics['credentialId'];
+      let postprocessing: object[] = [];
+      const zippedRows: object[] = [];
+      if (analytics[0]['postprocessing'] !== undefined)
+      {
+        postprocessing = analytics[0]['postprocessing'];
+        delete analytics[0]['postprocessing'];
+      }
       // get the dateRange from the dayInterval
       const dayInterval: number = analytics[0]['dayInterval'];
       if (dayInterval === undefined || typeof dayInterval !== 'number')
       {
         winston.warn('Day interval must be specified in numerical format');
       }
-      const currDate: any = new Date();
+      const currDate: any = new Date(Date.now() - 1000 * 3600 * 24);
       // @ts-ignore
       const padDate = (str: string): string => str.padStart(2, '0');
       const startDate: any = new Date(currDate - 1000 * 3600 * 24 * dayInterval);
@@ -131,7 +138,7 @@ export class GoogleAPI
       const analyticsBatchGet = function(analyticsBodyPassed)
       {
         winston.info(this.storedEmail);
-        winston.info(this.storedKeyFilePath);
+        winston.info('<redacted private key contents>');
         request({
           method: 'POST',
           url: 'https://analyticsreporting.googleapis.com/v4/reports:batchGet',
@@ -147,7 +154,7 @@ export class GoogleAPI
             if (err !== null && err !== undefined)
             {
               winston.warn(this.storedEmail);
-              winston.warn(this.storedKeyFilePath);
+              winston.info('<redacted private key contents>');
               winston.warn(err);
             }
             try
@@ -164,11 +171,12 @@ export class GoogleAPI
                 writeStream = new CSVExportTransform(colNames);
               }
               const rows: object[] = report['data']['rows'];
+              // Add a full streaming implementation instead of dumping rows to an array
               if (Array.isArray(rows))
               {
                 rows.forEach((row) =>
                 {
-                  writeStream.write(_.zipObject(colNames, [].concat(row['dimensions'], row['metrics'][0]['values'])));
+                  zippedRows.push(_.zipObject(colNames, [].concat(row['dimensions'], row['metrics'][0]['values'])));
                 });
               }
               constructedHeader = true;
@@ -182,6 +190,21 @@ export class GoogleAPI
               {
                 // unfortunately old import doesnt like streaming imports if you resolve immediately
                 // so you have to wait until everything is written
+                if (Array.isArray(postprocessing) && postprocessing.length !== 0)
+                {
+                  const postProcessedRows: object[] = this._postProcessGA(postprocessing, zippedRows);
+                  postProcessedRows.forEach((pPR) =>
+                  {
+                    writeStream.write(pPR);
+                  });
+                }
+                else
+                {
+                  zippedRows.forEach((zr) =>
+                  {
+                    writeStream.write(zr);
+                  });
+                }
                 writeStream.end();
                 resolve(writeStream);
               }
@@ -259,6 +282,71 @@ export class GoogleAPI
       this.storedEmail = cred['storedEmail'];
       this.storedKeyFilePath = cred['storedKeyFilePath'];
     }
+  }
+
+  private _postProcessGA(steps: object[], data: object[]): object[]
+  {
+    let newData: object[] = _.cloneDeep(data);
+    steps.forEach((step) =>
+    {
+      try
+      {
+        switch (step['name'])
+        {
+          case 'aggregate':
+            // given an array of objects, perform the following operations:
+            // (1) group objects by a regex pattern matched primary key into an object of arrays
+            // (2) for each key, sum the specified fields of the object's value's objects
+            // (3) for each key, create a modified copy of the aggregated object with the correct primary key
+            // (4) return the array of these objects
+            const patternRegExp = new RegExp(step['pattern']);
+            const patternRegExpFull = new RegExp(step['pattern'] as string + '.*');
+            const aggParams: string[] = step['aggParams'];
+            const newDataDict: object = {};
+            // step 1
+            data.forEach((row) =>
+            {
+              if (patternRegExpFull.test(row[step['primaryKeyName']]))
+              {
+                const extractedPrimaryKey: string = row[step['primaryKeyName']]
+                  .replace(row[step['primaryKeyName']].replace(patternRegExp, ''), '');
+                if (newDataDict[extractedPrimaryKey] === undefined)
+                {
+                  newDataDict[extractedPrimaryKey] = [];
+                }
+                newDataDict[extractedPrimaryKey] = newDataDict[extractedPrimaryKey].concat(row);
+              }
+            });
+            const returnData: object[] = [];
+            // steps 2, 3 and 4
+            Object.keys(newDataDict).forEach((nDDKey) =>
+            {
+              if (Array.isArray(newDataDict[nDDKey]) && newDataDict[nDDKey].length > 0)
+              {
+                const nDDValue: object = _.cloneDeep(newDataDict[nDDKey][0]);
+                for (let i = 1; i < newDataDict[nDDKey].length; ++i)
+                {
+                  aggParams.forEach((aggParam) =>
+                  {
+                    nDDValue[aggParam] = parseFloat(nDDValue[aggParam]) + parseFloat(newDataDict[nDDKey][i][aggParam]);
+                  });
+                }
+                nDDValue[step['primaryKeyName']] = nDDKey;
+                returnData.push(nDDValue);
+              }
+            });
+            newData = returnData.slice(0);
+            break;
+          default:
+            break;
+        }
+      }
+      catch (e)
+      {
+        winston.warn((JSON.stringify(step) as string) + ' error encountered: ' + ((e as any).toString() as string));
+      }
+    });
+    return newData;
   }
 }
 
