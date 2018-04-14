@@ -79,7 +79,7 @@ export interface Props<FState>
 {
   inputMap: InputDeclarationMap<FState>; // inputMap is memoized, so be careful about changing its properties on the fly!
   inputState: FState;
-  onStateChange: (newState: FState) => void;
+  onStateChange: (newState: FState, apply?: boolean) => void;
   mainButton?: ButtonOptions; // active styling by default
   secondButton?: ButtonOptions; // buttons are rendered from right to left
   thirdButton?: ButtonOptions;
@@ -137,7 +137,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         <Autocomplete
           className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
-          onChange={this.setStateHOC(stateName)}
+          onBlur={(ev, val) => this.setStateHOC(stateName)(val)}
+          onChange={this.setStateTextBoxHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
         />
@@ -158,7 +159,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         <Autocomplete
           className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
-          onChange={this.setStateNumberBoxHOC(stateName)}
+          onBlur={(ev, val) => this.setStateNumberBoxHOC(stateName, true)(val)}
+          onChange={this.setStateNumberBoxHOC(stateName, false)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
         />
@@ -456,9 +458,19 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   }
 
   @instanceFnDecorator(_.memoize)
-  public setStateNumberBoxHOC(stateName)
+  public setStateTextBoxHOC(stateName)
   {
-    const setState = this.setStateHOC(stateName);
+    return (value) =>
+    {
+      const shallowCopy = _.clone(this.props.inputState);
+      shallowCopy[stateName] = value;
+      this.props.onStateChange(shallowCopy, false);
+    };
+  }
+
+  public setStateNumberBoxHOC(stateName, apply: boolean)
+  {
+    const setState = (apply ? this.setStateHOC.bind(this) : this.setStateTextBoxHOC.bind(this))(stateName);
     return (value) =>
     {
       const asNum = Number(value);
@@ -500,7 +512,7 @@ function noop(disabled: boolean, fn)
 }
 
 // memoized
-let getButtonStyle = (active: boolean, disabled: boolean)
+let getButtonStyle = (active: boolean, disabled: boolean) =>
 {
   if (active)
   {

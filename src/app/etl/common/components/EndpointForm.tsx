@@ -69,7 +69,7 @@ export interface Props
 {
   isSource: boolean;
   endpoint: SourceConfig | SinkConfig;
-  onChange: (newEndpoint: SourceConfig | SinkConfig) => void;
+  onChange: (newEndpoint: SourceConfig | SinkConfig, apply?: boolean) => void;
   hideTypePicker?: boolean;
 }
 
@@ -150,9 +150,9 @@ export default class EndpointForm extends TerrainComponent<Props>
     onChange(newEndpoint);
   }
 
-  public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig)
+  public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig, apply?: boolean)
   {
-    this.props.onChange(newEndpoint);
+    this.props.onChange(newEndpoint, apply);
   }
 }
 
