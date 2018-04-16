@@ -64,6 +64,8 @@ export enum FileTypes
 export interface TemplateBase
 {
   id?: number;
+  createdAt: any;
+  lastModified: any;
   archived: boolean;
   templateName: string;
   sources: any;
