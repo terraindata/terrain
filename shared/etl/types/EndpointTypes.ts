@@ -47,7 +47,12 @@ THE SOFTWARE.
 
 import { FileTypes, Languages } from './ETLTypes';
 
-type ID = number;
+export interface FileConfig
+{
+  fileType: FileTypes;
+  hasCsvHeader?: boolean;
+  jsonNewlines?: boolean;
+}
 
 export enum Sources
 {
@@ -55,6 +60,7 @@ export enum Sources
   Algorithm = 'Algorithm',
   Sftp = 'Sftp',
   Http = 'Http',
+  Fs = 'Fs',
 }
 
 export enum Sinks
@@ -63,13 +69,7 @@ export enum Sinks
   Database = 'Database',
   Sftp = 'Sftp',
   Http = 'Http',
-}
-
-export interface FileConfig
-{
-  fileType: FileTypes;
-  hasCsvHeader?: boolean;
-  jsonNewlines?: boolean;
+  Fs = 'Fs',
 }
 
 export interface SourceConfig
@@ -109,10 +109,13 @@ export interface SourceOptionsTypes // TODO check that these are right
     file?: File;
   };
   Algorithm: {
-    algorithmId: ID;
+    algorithmId: number;
   };
   Sftp: SftpOptions;
   Http: HttpOptions;
+  Fs: {
+    path: string;
+  };
 }
 
 export const SourceOptionsDefaults: SourceOptionsTypes =
@@ -137,6 +140,9 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
         contentType: 'application/json',
       },
     },
+    Fs: {
+      path: '',
+    },
   };
 
 export interface SinkOptionsTypes
@@ -146,13 +152,16 @@ export interface SinkOptionsTypes
   };
   Database: {
     language: Languages;
-    serverId: ID;
+    serverId: number;
     database: string;
     table: string;
     elasticConfig?: any; // if Language is elastic
   };
   Sftp: SftpOptions;
   Http: HttpOptions;
+  Fs: {
+    path: string;
+  };
 }
 
 export const SinkOptionsDefaults: SinkOptionsTypes =
@@ -180,6 +189,9 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
         contentType: 'application/json',
       },
     },
+    Fs: {
+      path: '',
+    },
   };
 
 export interface SftpOptions
@@ -187,7 +199,7 @@ export interface SftpOptions
   ip: string;
   port: number;
   filepath: string;
-  credentialId: ID;
+  credentialId: number;
   meta?: any;
 }
 
