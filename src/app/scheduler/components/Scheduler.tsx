@@ -45,17 +45,43 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
 import TerrainComponent from 'common/components/TerrainComponent';
+import {List, Map} from 'immutable';
 import * as React from 'react';
 import SchedulerAjax from 'scheduler/SchedulerAjax';
 import Api from 'util/Api';
+import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
+import './Schedule.less';
+import RouteSelector from 'app/common/components/RouteSelector';
 
-class Scheduler extends TerrainComponent<any> {
-
+class Scheduler extends TerrainComponent<any>
+{
   public schedulerAjax: SchedulerAjax = new SchedulerAjax(Api.getInstance());
+  public state: {
+    schedules: List<any>;
+  } = {
+    schedules: List([])
+  };
+
   public constructor(props)
   {
     super(props);
-    this.state = { responseText: '' };
+    this.getSchedules();
+  }
+
+  public getSchedules()
+  {
+    this.schedulerAjax.getSchedules()
+      .then((response) =>
+      {
+        console.log('response ', response);
+        this.setState({
+          schedules: response,
+        })
+      })
+      .catch((error) =>
+       {
+        console.log(error);
+      });
   }
 
   public getConnections()
@@ -63,28 +89,23 @@ class Scheduler extends TerrainComponent<any> {
     this.schedulerAjax.getConnections()
       .then((response) =>
       {
-        this.setState({ responseText: JSON.stringify(response) });
+        console.log('response ', response);
       })
-      .catch((error)
-    {
-        console.error(error);
+      .catch((error) =>
+       {
+        console.log(error);
       });
   }
 
-  public createScheduler()
+  public handleCreateSchedule()
   {
     this.schedulerAjax.createScheduler({
       interval: '0 0 1 1 *',
-      lastRun: '',
-      Meta: '',
-      Name: 'Jmansor Scheduler',
-      pausedFilename: 'scheduler.log',
-      Priority: 1,
-      Running: false,
-      shouldRunNext: false,
-      Tasks: JSON.stringify({
+      meta: 'Schedule 1',
+      name: '',
+      pausedFilename: '',
+      tasks: JSON.stringify({
         cancel: false, // whether the tree of tasks should be cancelled
-        id: 1, // unique id that identifies this task to other tasks in the input array of TaskConfigs
         jobStatus: 0, // 0: not running, 1: running, 2: paused
         name: 'Import', // name of the task i.e. 'import'
         onFailure: 3, // id of task to execute on failure
@@ -94,29 +115,68 @@ class Scheduler extends TerrainComponent<any> {
         taskId: 5, // maps to a statically declared task
       }),
       templateId: 1,
-      workerId: 0,
     })
       .then((response) =>
       {
-        this.setState({ responseText: JSON.stringify(response) });
+        // Action here to add the schedule to redux store
+
+        this.setState({
+          schedules: this.state.schedules.push(response[0]),
+        });
       })
-      .catch((error)
+      .catch((error) =>
     {
-        console.error(error);
+        console.log('error', error);
+      });
+  }
+
+  public getOptionSets()
+  {
+    const idOptionSet = {
+      options: List([]),
+      shortNameText: 'Id',
+      key: 'id',
+    }
+    return List([idOptionSet]);
+  }
+
+  public handleDeleteSchedule(index: number)
+  {
+    this.schedulerAjax.deleteSchedule(this.state.schedules[index].id)
+      .then((response) =>
+      {
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        console.log('error', error);
       });
   }
 
   public render()
   {
+    const { schedules } = this.state;
     return (
-      <div>
-        <ul>
-          <li onClick={this.getConnections.bind(this)}>SchedulerAjax.getConnections()</li>
-          <li onClick={this.createScheduler.bind(this)}>SchedulerAjax.createScheduler()</li>
-        </ul>
-        <div>
-          {this.state.responseText}
-        </div>
+      <div className='schedule-list-wrapper'>
+        {
+          schedules.map((schedule, i) =>
+            <RouteSelector
+              optionSets={this.getOptionSets()}
+              values={List([schedule.id])}
+              key={i}
+              canDelete={true}
+              canEdit={true}
+              onDelete={this._fn(this.handleDeleteSchedule, i)}
+              onChange={(a, b) => {}}
+            />
+          )
+        }
+        <PathfinderCreateLine
+          text='Add Schedule'
+          canEdit={true}
+          onCreate={this.handleCreateSchedule}
+          showText={true}
+        />
       </div>
     );
   }

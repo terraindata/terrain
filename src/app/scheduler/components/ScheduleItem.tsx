@@ -42,32 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-
-import * as React from 'react';
-
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:no-console
 import TerrainComponent from 'common/components/TerrainComponent';
-import ImportExportControl from './importExport/ImportExportControl';
-import Scheduler from 'app/scheduler/components/Scheduler';
+import {List, Map} from 'immutable';
+import * as React from 'react';
+import SchedulerAjax from 'scheduler/SchedulerAjax';
+import Api from 'util/Api';
+import RouteSelector, { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 
-import './ControlPage.less';
-
-export interface Props
-{
-  params?: any;
-  location?: any;
+export interface Props {
+  schedule: any;
+  index: number;
+  templateOptionSet: RouteSelectorOptionSet;
+  onDelete: (index: number) => void;
 }
 
-class ControlPage extends TerrainComponent<Props>
+class ScheduleItem extends TerrainComponent<Props>
 {
+
+  public getOptionSets()
+  {
+    return List([
+      this.props.templateOptionSet,
+    ]);
+  }
+
+  public handleChange(optionIndex: number, value: any)
+  {
+    console.log('change ', optionIndex, value);
+  }
+
   public render()
   {
     return (
-      <div className='control-body'>
-        <Scheduler />
-      </div>
+      <RouteSelector
+        optionSets={this.getOptionSets()}
+        values={List(['Template'])}
+        canEdit={true}
+        canDelete={true}
+        onChange={this.handleChange}
+      />
     );
   }
 }
 
-export default ControlPage;
+export default ScheduleItem;

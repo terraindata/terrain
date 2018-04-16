@@ -75,6 +75,24 @@ class SchedulerAjax
         return Promise.resolve(response.data);
       });
   }
+
+  public getSchedules()
+  {
+    return this.api.get('/scheduler', {})
+      .then((response) =>
+      {
+        return Promise.resolve(response.data);
+      });
+  }
+
+  public deleteSchedule(scheduleId)
+  {
+    return this.api.post('/scheduler/delete/' + scheduleId, {})
+      .then((response) =>
+      {
+        return Promise.resolve(response.data);
+      });
+  }
 }
 
 export default SchedulerAjax;
