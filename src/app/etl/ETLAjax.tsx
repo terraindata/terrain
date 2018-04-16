@@ -67,7 +67,6 @@ class ETLAjax
   {
     try
     {
-      console.log(templates);
       return List(templates)
         .map((template, index) => _ETLTemplate(template as TemplateBase, true))
         .toList();
