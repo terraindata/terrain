@@ -184,11 +184,11 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       options: [
         {
           link: ViewState.NewImport,
-          buttonText: 'New Import',
+          buttonText: 'Start a New Import',
         },
         {
           link: ViewState.PickExportAlgorithm,
-          buttonText: 'New Export',
+          buttonText: 'Start a New Export',
         },
         {
           link: ViewState.PickTemplate,
