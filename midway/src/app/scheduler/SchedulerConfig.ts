@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../ConfigType';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
+import ConfigType from '../ConfigType';
 
 export class SchedulerConfig extends SharedSchedulerConfig
 {

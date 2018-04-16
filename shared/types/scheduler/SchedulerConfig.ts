@@ -44,14 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../ConfigType';
 import { TaskConfig } from '../jobs/TaskConfig';
 
-export class SchedulerConfig extends ConfigType
+export class SchedulerConfig
 {
   public createdAt: Date = null;                   // when schedule was created
+  public cron: string = '';                        // time interval between scheduled runs
   public id: number = null;                        // scheduled job ID
-  public interval: string = '';                    // time interval between scheduled runs
   public lastModified: Date = null;                // when the schedule was last modified
   public lastRun: Date = null;                     // when the scheduled job last ran
   public meta: string = '';                        // meta

@@ -77,6 +77,20 @@ class ETLTemplateC implements ETLTemplateI
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
 
+  // Returns true if and only if there is 1 sink and it is a database
+  public isImport(): boolean
+  {
+    if (this.getSinks().size === 1)
+    {
+      const sink = this.getSinks().first();
+      if (sink.type === Sinks.Database)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public getSources()
   {
     return this.sources;

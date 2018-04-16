@@ -42,52 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import DatabaseController from '../database/DatabaseController';
+import { List } from 'immutable';
 
-/**
- * This is where we store connections to databaseRegistry being managed.
- */
-class DatabaseMap
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
+
+export default class DivideTransformationNode extends TransformationNode
 {
-  private map: Map<number, DatabaseController>;
-
-  constructor()
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.DivideNode)
   {
-    this.map = new Map();
-  }
-
-  public get(id: number): DatabaseController | undefined
-  {
-    return this.map.get(id);
-  }
-
-  public getByName(name: string): DatabaseController | undefined
-  {
-    for (const entry of this.map.entries())
-    {
-      if (entry[1].getName() === name)
-      {
-        return entry[1];
-      }
-    }
-  }
-
-  public set(id: number, database: DatabaseController)
-  {
-    this.map.set(id, database);
-  }
-
-  public remove(id: number): boolean
-  {
-    return this.map.delete(id);
-  }
-
-  public getAll(): IterableIterator<[number, DatabaseController]>
-  {
-    return this.map.entries();
+    super(id, fields, options, typeCode);
   }
 }
-
-export default DatabaseMap;

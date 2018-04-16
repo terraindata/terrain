@@ -58,13 +58,17 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import TemplateList from 'etl/templates/components/TemplateList';
+import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
+
+const loadTemplateActions: AllowedActions = {
+  delete: true,
+};
 
 class PickTemplateStep extends ETLStepComponent
 {
@@ -93,6 +97,7 @@ class PickTemplateStep extends ETLStepComponent
         <TemplateList
           onClick={this.handleLoadTemplateItemClicked}
           getRowStyle={this.getTemplateItemStyle}
+          allowedActions={loadTemplateActions}
         />
       </div>
     );

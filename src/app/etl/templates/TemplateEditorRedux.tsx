@@ -96,6 +96,9 @@ export interface TemplateEditorActionTypes
   redoHistory: {
     actionType: 'redoHistory';
   };
+  clearHistory: {
+    actionType: 'clearHistory';
+  };
   rebuildFieldMap: {
     actionType: 'rebuildFieldMap';
   };
@@ -207,22 +210,66 @@ class TemplateEditorRedux extends TerrainRedux<TemplateEditorActionTypes, Templa
       },
       undoHistory: (state, action) =>
       {
-        const newState = state.update('history',
+        // undo and redo are a bit tricky too.
+        // the currentItem in the history stack is not necessarily equivalent to the current template
+        // the current template always attempts to preserve the template name & id in the following situation
+        // - Create a new Template, then save it, then hit "undo". Since the template had no name and no id before,
+        // the item in the history stack has no name and no id. However this information should be 'sticky' and not be
+        // allowed to be undone
+
+        const currentId = state.template.id;
+        const currentName = state.template.templateName;
+
+        let newState = state.update('history',
           (history: History) => history.updateItem(
             (item) => _.defaults({ uiState: state.uiState }, item),
           ).undoHistory(),
         );
         const { template, uiState } = newState.history.getCurrentItem();
-        return newState.set('template', template).set('uiState', uiState);
+        newState = newState.set('template', template).set('uiState', uiState);
+        if (currentId !== -1 && currentId !== template.id)
+        {
+          newState = newState.update('template', (tmpl) => tmpl.set('id', currentId));
+        }
+        if (currentName !== '' && currentName !== template.templateName)
+        {
+          newState = newState.update('template', (tmpl) => tmpl.set('templateName', currentName));
+        }
+        return newState;
       },
       redoHistory: (state, action) =>
       {
-        const newState = state.update('history',
+        const currentId = state.template.id;
+        const currentName = state.template.templateName;
+
+        let newState = state.update('history',
           (history: History) => history.updateItem(
             (item) => _.defaults({ uiState: state.uiState }, item),
           ).redoHistory(),
         );
         const { template, uiState } = newState.history.getCurrentItem();
+        newState = newState.set('template', template).set('uiState', uiState);
+        if (currentId !== -1 && currentId !== template.id)
+        {
+          newState = newState.update('template', (tmpl) => tmpl.set('id', currentId));
+        }
+        if (currentName !== '' && currentName !== template.templateName)
+        {
+          newState = newState.update('template', (tmpl) => tmpl.set('templateName', currentName));
+        }
+        return newState;
+      },
+      clearHistory: (state, action) =>
+      {
+        const newState = state.update('history',
+          (history: History) => history.clearHistory(),
+        );
+        const currentItem = newState.history.getCurrentItem();
+        if (currentItem == null)
+        {
+          return newState;
+        }
+        const { template, uiState } = currentItem);
         return newState.set('template', template).set('uiState', uiState);
       },
       rebuildFieldMap: (state, action) =>

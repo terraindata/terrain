@@ -157,7 +157,6 @@ export class Export
         database: exportConfig.dbid,
         type: 'search',
         streaming: true,
-        databasetype: 'elastic',
         body: query,
       };
 

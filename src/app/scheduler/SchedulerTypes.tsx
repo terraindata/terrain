@@ -46,8 +46,8 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import { Record } from 'immutable';
 import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
-import { createRecordType } from '../Classes';
 import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
+import { createRecordType } from '../Classes';
 
 class SchedulerConfigC extends SharedSchedulerConfig
 {

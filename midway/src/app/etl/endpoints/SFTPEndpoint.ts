@@ -44,50 +44,74 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseController from '../database/DatabaseController';
+import * as SSH from 'ssh2';
+import { Readable, Writable } from 'stream';
 
-/**
- * This is where we store connections to databaseRegistry being managed.
- */
-class DatabaseMap
+import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import AEndpointStream from './AEndpointStream';
+
+import CredentialConfig from '../../credentials/CredentialConfig';
+import { credentials } from '../../credentials/CredentialRouter';
+
+export default class SFTPEndpoint extends AEndpointStream
 {
-  private map: Map<number, DatabaseController>;
-
   constructor()
   {
-    this.map = new Map();
+    super();
   }
 
-  public get(id: number): DatabaseController | undefined
+  public async getSource(source: SourceConfig): Promise<Readable>
   {
-    return this.map.get(id);
+    const credentialId = source.options['credentialId'];
+    const sftp: SSH.SFTPWrapper = await this.getSFTPClientByCredentialId(credentialId);
+    return sftp.createReadStream(source.options['filepath']);
   }
 
-  public getByName(name: string): DatabaseController | undefined
+  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    for (const entry of this.map.entries())
+    // get SFTP credentials
+    const credentialId = sink.options['credentialId'];
+    const sftp: SSH.SFTPWrapper = await this.getSFTPClientByCredentialId(credentialId);
+    return sftp.createWriteStream(sink.options['filepath']);
+  }
+
+  private async getSFTPClientByCredentialId(credentialId: number): Promise<SSH.SFTPWrapper>
+  {
+    const creds: CredentialConfig[] = await credentials.get(credentialId);
+    if (creds.length === 0)
     {
-      if (entry[1].getName() === name)
-      {
-        return entry[1];
-      }
+      throw new Error('Invalid SFTP credentials ID.');
     }
-  }
 
-  public set(id: number, database: DatabaseController)
-  {
-    this.map.set(id, database);
-  }
+    let sftpConfig: object = {};
+    try
+    {
+      sftpConfig = JSON.parse(creds[0].meta);
+    }
+    catch (e)
+    {
+      throw new Error('Error retrieving credentials for ID ' + String(credentialId));
+    }
 
-  public remove(id: number): boolean
-  {
-    return this.map.delete(id);
-  }
-
-  public getAll(): IterableIterator<[number, DatabaseController]>
-  {
-    return this.map.entries();
+    return new Promise<SSH.SFTPWrapper>((resolve, reject) =>
+    {
+      const client = new SSH.Client();
+      client.on('ready', () =>
+      {
+        client.sftp((err, sftpClient) =>
+        {
+          if (err !== null && err !== undefined)
+          {
+            return reject(err);
+          }
+          else
+          {
+            return resolve(sftpClient);
+          }
+        });
+      }).on('error', reject)
+        .connect(sftpConfig);
+    });
   }
 }
-
-export default DatabaseMap;

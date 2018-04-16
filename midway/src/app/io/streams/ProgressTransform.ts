@@ -44,50 +44,84 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DatabaseController from '../database/DatabaseController';
+import { EventEmitter } from 'events';
+import { Transform, Writable } from 'stream';
 
 /**
- * This is where we store connections to databaseRegistry being managed.
+ * Monitors progress of the writable stream
  */
-class DatabaseMap
+export default class ProgressTransform extends Transform
 {
-  private map: Map<number, DatabaseController>;
+  private writer: Writable;
+  private frequency: number = 500;
 
-  constructor()
+  private count: number = 0;
+  private errors: number = 0;
+
+  constructor(writer: Writable, frequency: number = 500)
   {
-    this.map = new Map();
+    super({
+      writableObjectMode: true,
+      readableObjectMode: true,
+    });
+
+    this.frequency = frequency;
+    this.writer = writer;
+    this.writer.on('error', (e) => this.errors++);
   }
 
-  public get(id: number): DatabaseController | undefined
+  public _transform(chunk: object | object[], encoding: string, callback: (err?: Error) => void)
   {
-    return this.map.get(id);
-  }
-
-  public getByName(name: string): DatabaseController | undefined
-  {
-    for (const entry of this.map.entries())
+    this.count++;
+    if (Array.isArray(chunk))
     {
-      if (entry[1].getName() === name)
+      let numChunks = chunk.length;
+      const done = new EventEmitter();
+      done.on('done', (err?: Error) =>
       {
-        return entry[1];
-      }
+        // note: we ignore err here because our onError handler on the writer
+        //       stream accounts for errors
+        this.push(this.progress());
+        callback();
+      });
+
+      chunk.forEach((c) => this.writer.write(chunk, (err?: Error) =>
+      {
+        this.count++;
+        if (--numChunks === 0)
+        {
+          done.emit('done', err);
+        }
+      }));
+    }
+    else
+    {
+      this.writer.write(chunk, (err?: Error) =>
+      {
+        this.count++;
+        // note: we ignore err here because our onError handler on the writer
+        //       stream accounts for errors
+        this.push(this.progress());
+        callback();
+      });
     }
   }
 
-  public set(id: number, database: DatabaseController)
+  public _flush(error, callback)
   {
-    this.map.set(id, database);
+    this.push(this.progress());
+
+    if (callback !== undefined)
+    {
+      callback();
+    }
   }
 
-  public remove(id: number): boolean
+  private progress()
   {
-    return this.map.delete(id);
-  }
-
-  public getAll(): IterableIterator<[number, DatabaseController]>
-  {
-    return this.map.entries();
+    return JSON.stringify({
+      successful: this.count,
+      failed: this.errors,
+    });
   }
 }
-
-export default DatabaseMap;

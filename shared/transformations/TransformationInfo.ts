@@ -44,8 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
 import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
+import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
+import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
+import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
 import FilterTransformationNode from './nodes/FilterTransformationNode';
@@ -270,6 +274,74 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitArraySumNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.AddNode]:
+      {
+        humanName: 'Add',
+        editable: true,
+        creatable: true,
+        description: 'Add a constant number to this field',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        type: AddTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitAddNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.SubtractNode]:
+      {
+        humanName: 'Subtract',
+        editable: true,
+        creatable: true,
+        description: 'Subtract a constant number from this field',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        type: SubtractTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitSubtractNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.MultiplyNode]:
+      {
+        humanName: 'Multiply',
+        editable: true,
+        creatable: true,
+        description: 'Multiply this field by a constant factor',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        type: MultiplyTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitMultiplyNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.DivideNode]:
+      {
+        humanName: 'Divide',
+        editable: true,
+        creatable: true,
+        description: 'Divide this field by a constant number',
+        isAvailable: (engine, fieldId) =>
+        {
+          return EngineUtil.getRepresentedType(fieldId, engine) === 'number';
+        },
+        type: DivideTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitDivideNode(transformationNode, docCopy, options),
       },
   };
 

@@ -48,7 +48,11 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { keccak256 } from 'js-sha3';
 
+import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
+import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
+import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
+import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
 import CastTransformationNode from './nodes/CastTransformationNode';
@@ -77,9 +81,13 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         (el as string).slice(opts.delimiter as number),
       ];
     }
+    else if (opts.regex === true)
+    {
+      split = (el as string).split(RegExp(opts.delimiter as string));
+    }
     else
     {
-      split = (el as string).split(opts.delimiter as string | RegExp);
+      split = (el as string).split(opts.delimiter as string);
     }
     return split;
   }
@@ -438,7 +446,11 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
     {
       const originalElement: any = yadeep.get(doc, field);
 
-      if (typeof originalElement === opts.toTypename || originalElement.constructor === Array && opts.toTypename === 'array')
+      if (
+        originalElement === undefined
+        || typeof originalElement === opts.toTypename
+        || (originalElement.constructor === Array && opts.toTypename === 'array')
+      )
       {
         return;
       }
@@ -501,7 +513,22 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
             break;
           }
           case 'object': {
-            yadeep.set(doc, f, {});
+            if (typeof el === 'string')
+            {
+              try
+              {
+                const parsed = JSON.parse(el);
+                yadeep.set(doc, f, parsed);
+              }
+              catch (e)
+              {
+                yadeep.set(doc, f, {});
+              }
+            }
+            else
+            {
+              yadeep.set(doc, f, {});
+            }
             break;
           }
           case 'array': {
@@ -606,6 +633,182 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
             } as TransformationVisitError,
           ],
         } as TransformationVisitResult;
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitAddNode(node: AddTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.AddNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, (yadeep.get(doc, kpi) as number) + opts.shift);
+        }
+      }
+      else if (typeof el !== 'number')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to add to a non-numeric (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, el + opts.shift);
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitSubtractNode(node: SubtractTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.SubtractNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, yadeep.get(doc, kpi) - opts.shift);
+        }
+      }
+      else if (typeof el !== 'number')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to subtract from a non-numeric (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, el - opts.shift);
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitMultiplyNode(node: MultiplyTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.MultiplyNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, yadeep.get(doc, kpi) * opts.factor);
+        }
+      }
+      else if (typeof el !== 'number')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to multiply a non-numeric (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, el * opts.factor);
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitDivideNode(node: DivideTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.DivideNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+          yadeep.set(doc, kpi, yadeep.get(doc, kpi) / opts.factor);
+        }
+      }
+      else if (typeof el !== 'number')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to divide a non-numeric (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        yadeep.set(doc, field, el / opts.factor);
       }
     });
 

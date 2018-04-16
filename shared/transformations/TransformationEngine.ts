@@ -274,8 +274,6 @@ export class TransformationEngine
   {
     let output: object = this.rename(doc);
     this.restoreArrays(output);
-    // console.log('BLAM');
-    // console.log(JSON.stringify(output));
 
     for (const nodeKey of this.dag.sources())
     {
@@ -519,6 +517,21 @@ export class TransformationEngine
       if (keyPathPrefixMatch(field, oldKeyPath))
       {
         this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, updateKeyPath(field, oldKeyPath, newKeyPath));
+      }
+    });
+
+    _.each(this.dag.nodes(), (node) =>
+    {
+      const nfkp: List<KeyPath> | undefined = (this.dag.node(node) as TransformationNode).meta['newFieldKeyPaths'];
+      if (nfkp !== undefined)
+      {
+        for (let i: number = 0; i < nfkp.size; i++)
+        {
+          if (keyPathPrefixMatch(nfkp.get(i), oldKeyPath))
+          {
+            this.dag.node(node)['meta']['newFieldKeyPaths'] = nfkp.set(i, updateKeyPath(nfkp.get(i), oldKeyPath, newKeyPath));
+          }
+        }
       }
     });
   }

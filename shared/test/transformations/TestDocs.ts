@@ -42,52 +42,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import DatabaseController from '../database/DatabaseController';
+export const TestDocs = {
+  doc1: {
+    name: 'Bob',
+    age: 17,
+    meta: {
+      school: 'Stanford',
+    },
+  },
 
-/**
- * This is where we store connections to databaseRegistry being managed.
- */
-class DatabaseMap
-{
-  private map: Map<number, DatabaseController>;
+  doc2: {
+    name: 'Bob',
+    age: 17,
+    meta: {
+      school: 'Stanford',
+      sport: 'bobsled',
+    },
+  },
 
-  constructor()
-  {
-    this.map = new Map();
-  }
+  doc3: {
+    name: 'Bob',
+    arr: ['sled', [{ a: 'dog' }, { a: 'fren', b: 'doggo' }]],
+    // arr2: [{foo: {bar: {cat: 'a'}}}],
+    // arr2: [[{foo: 'a', bar: 'b'}], [{foo: 'c'}]],
+    hardarr: [['a'], ['b', ['c']]],
+  },
 
-  public get(id: number): DatabaseController | undefined
-  {
-    return this.map.get(id);
-  }
+  doc4: {
+    arr: ['a', 'b'],
+  },
 
-  public getByName(name: string): DatabaseController | undefined
-  {
-    for (const entry of this.map.entries())
-    {
-      if (entry[1].getName() === name)
-      {
-        return entry[1];
-      }
-    }
-  }
+  doc5: {
+    arr: ['a', 'b', 'c', 'd'],
+  },
 
-  public set(id: number, database: DatabaseController)
-  {
-    this.map.set(id, database);
-  }
+  doc6: {
+    value: null,
+  },
 
-  public remove(id: number): boolean
-  {
-    return this.map.delete(id);
-  }
-
-  public getAll(): IterableIterator<[number, DatabaseController]>
-  {
-    return this.map.entries();
-  }
-}
-
-export default DatabaseMap;
+  doc7: {
+    deepArray:
+      [
+        [
+          5,
+        ],
+        [
+          6,
+        ],
+      ],
+  },
+};
