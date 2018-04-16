@@ -47,41 +47,17 @@ THE SOFTWARE.
 import { Record } from 'immutable';
 import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
 import { createRecordType } from '../Classes';
+import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
 
-// equivalent of SchedulerConfig defined in miday/src/app/scheduler/SchedulerConfig.ts
-class SchedulerConfigC
+class SchedulerConfigC extends SharedSchedulerConfig
 {
-  public id: ID = -1;
-  public interval: string = '';
-  public createdAt: string = '';
-  public lastModified: string = '';
-  public lastRun: string = '';
-  public meta: string = '';
-  public name: string = '';
-  public priority: number = 0;
-  public running: boolean = false;
-  public shouldRunNext: boolean = false;
-  public tasks: TaskConfig[] = [];
-  public workerId: number = 0;
+  // if extra front-end specific functions or properties are needed, add here
 }
 
 const SchedulerConfig_Record = createRecordType(new SchedulerConfigC(), 'SchedulerConfigC');
-export interface SchedulerConfig extends SchedulerConfigC, IRecord<SchedulerConfig> { }
+export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig> { }
 export const _SchedulerConfig =
-  (config: {
-    id: ID;
-    interval: string;
-    createdAt: string;
-    lastModified: string;
-    lastRun: string;
-    meta: string;
-    name: string;
-    priority: number;
-    running: boolean;
-    shouldRunNext: boolean;
-    tasks: TaskConfig[];
-    workerId: number;
-  }) =>
+  (config: object) =>
   {
     return new SchedulerConfig_Record(config) as any as SchedulerConfig;
   };

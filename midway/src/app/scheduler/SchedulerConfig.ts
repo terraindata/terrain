@@ -45,22 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ConfigType from '../ConfigType';
+import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 
-export class SchedulerConfig extends ConfigType
+export class SchedulerConfig extends SharedSchedulerConfig
 {
-  public createdAt: Date = undefined;                   // when schedule was created
-  public id: number = undefined;                        // scheduled job ID
-  public interval: string = undefined;                  // time interval between scheduled runs
-  public lastModified: Date = undefined;                // when the schedule was last modified
-  public lastRun: Date = undefined;                     // when the scheduled job last ran
-  public meta: string = undefined;                      // meta
-  public name: string = undefined;                      // name of the schedule
-  public priority: number = undefined;                  // priority of the scheduled job
-  public running: boolean = undefined;                  // whether the task is running or not (TODO: lock this)
-  public shouldRunNext: boolean = undefined;            // whether the job should run again or not
-  public tasks: string = undefined;                       // stringified representation of an array of TaskConfigs
-  public workerId: number = undefined;                  // for clustering, denotes the node ID
-
   constructor(props: object)
   {
     super();

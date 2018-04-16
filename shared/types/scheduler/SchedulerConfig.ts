@@ -44,21 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ConfigType from '../ConfigType';
 import { TaskConfig } from '../jobs/TaskConfig';
 
-export interface SchedulerConfig
+export class SchedulerConfig extends ConfigType
 {
-  createdAt: Date;                   // when the schedule was first created
-  id: number;                        // scheduled job ID
-  interval: string;                  // time interval between scheduled runs
-  lastModified: Date;                // when the schedule was last modified
-  lastRun: Date;                     // when the scheduled job last ran
-  meta: string;                      // meta
-  name: string;                      // name of the schedule
-  priority: number;                  // priority of the scheduled job
-  running: boolean;                  // whether the task is running or not (TODO: lock this)
-  shouldRunNext: boolean;            // whether the job should run again or not
-  tasks: TaskConfig[];               // array of TaskConfigs
-  workerId: number;                  // for clustering, denotes the node ID
+  public createdAt: Date = null;                   // when schedule was created
+  public id: number = null;                        // scheduled job ID
+  public interval: string = '';                    // time interval between scheduled runs
+  public lastModified: Date = null;                // when the schedule was last modified
+  public lastRun: Date = null;                     // when the scheduled job last ran
+  public meta: string = '';                        // meta
+  public name: string = '';                        // name of the schedule
+  public priority: number = 1;                     // priority of the scheduled job
+  public running: boolean = false;                 // whether the task is running or not (TODO: lock this)
+  public shouldRunNext: boolean = true;            // whether the job should run again or not
+  public tasks: string = '';                       // stringified representation of an array of TaskConfigs
+  public workerId: number = null;                  // for clustering, denotes the node ID
 }
+
 export default SchedulerConfig;
