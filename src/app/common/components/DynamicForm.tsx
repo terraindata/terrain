@@ -138,7 +138,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
           className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
           onBlur={(ev, val) => this.setStateHOC(stateName)(val)}
-          onChange={this.setStateTextBoxHOC(stateName)}
+          onChange={this.setStateNoApplyHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
         />
@@ -159,8 +159,8 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
         <Autocomplete
           className='dynamic-form-autocomplete'
           value={this.props.inputState[stateName]}
-          onBlur={(ev, val) => this.setStateNumberBoxHOC(stateName, true)(val)}
-          onChange={this.setStateNumberBoxHOC(stateName, false)}
+          onBlur={(ev, val) => this.setStateNumberBoxHOC(stateName)(val)}
+          onChange={this.setStateNoApplyNumberBoxHOC(stateName)}
           options={options.acOptions != null ? options.acOptions(state) : emptyList}
           disabled={disabled}
         />
@@ -453,12 +453,12 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     {
       const shallowCopy = _.clone(this.props.inputState);
       shallowCopy[stateName] = value;
-      this.props.onStateChange(shallowCopy);
+      this.props.onStateChange(shallowCopy, true);
     };
   }
 
   @instanceFnDecorator(_.memoize)
-  public setStateTextBoxHOC(stateName)
+  public setStateNoApplyHOC(stateName)
   {
     return (value) =>
     {
@@ -468,9 +468,24 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     };
   }
 
-  public setStateNumberBoxHOC(stateName, apply: boolean)
+  @instanceFnDecorator(_.memoize)
+  public setStateNumberBoxHOC(stateName)
   {
-    const setState = (apply ? this.setStateHOC.bind(this) : this.setStateTextBoxHOC.bind(this))(stateName);
+    const setState = this.setStateHOC(stateName);
+    return (value) =>
+    {
+      const asNum = Number(value);
+      if (!Number.isNaN(asNum))
+      {
+        setState(asNum);
+      }
+    };
+  }
+
+  @instanceFnDecorator(_.memoize)
+  public setStateNoApplyNumberBoxHOC(stateName)
+  {
+    const setState = this.setStateNoApplyHOC(stateName);
     return (value) =>
     {
       const asNum = Number(value);
