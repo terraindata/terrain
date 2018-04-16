@@ -155,11 +155,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     }
   }
 
-  public shouldComponentUpdate(nextProps: Props, nextState)
-  {
-    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
-  }
-
   public handleAddScript()
   {
     const newScript = _Script();
@@ -264,25 +259,25 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         value: 'terrain',
         displayName: PathfinderText.terrainTypeName,
         hasOther: false,
-        extraContent: PathfinderText.terrainTypeExplanation,
+        tooltip: PathfinderText.terrainTypeExplanation,
       },
       {
         value: 'linear',
         displayName: PathfinderText.fieldTypeName,
         hasOther: false,
-        extraContent: PathfinderText.fieldTypeExplanation,
+        tooltip: PathfinderText.fieldTypeExplanation,
       },
       {
         value: 'random',
         displayName: PathfinderText.randomTypeName,
         hasOther: false,
-        extraContent: PathfinderText.randomTypeExplanation,
+        tooltip: PathfinderText.randomTypeExplanation,
       },
       {
         value: 'elastic',
         displayName: PathfinderText.elasticTypeName,
         hasOther: false,
-        extraContent: PathfinderText.elasticTypeExplanation,
+        tooltip: PathfinderText.elasticTypeExplanation,
       },
     ]);
     const optionSet = {

@@ -432,7 +432,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             'true',
           ]),
         },
-        tql: (boolBlock) => boolBlock['value'] === 'true',
+        tql: (boolBlock) => String(boolBlock['value']) === 'true',
         singleType: true,
         typeName: 'boolean',
       },
