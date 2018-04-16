@@ -71,6 +71,8 @@ interface ETLTemplateI extends TemplateBase
 class ETLTemplateC implements ETLTemplateI
 {
   public id = -1;
+  public lastModified: string = null;
+  public createdAt: string = null;
   public archived = false;
   public templateName = '';
   public process = _ETLProcess();
