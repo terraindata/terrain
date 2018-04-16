@@ -117,7 +117,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
   `CREATE TABLE IF NOT EXISTS schedules
     (id ` + primaryKeyType + ` PRIMARY KEY,
      createdAt date NOT NULL,
-     interval text NOT NULL,
+     cron text NOT NULL,
      lastModified date NOT NULL,
      lastRun date NOT NULL,
      meta text NOT NULL,

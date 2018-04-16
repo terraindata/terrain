@@ -49,8 +49,8 @@ import ConfigType from '../ConfigType';
 export class SchedulerConfig extends ConfigType
 {
   public createdAt: Date = undefined;                   // when schedule was created
+  public cron: string = undefined;                      // cron format of when the schedule should run
   public id: number = undefined;                        // scheduled job ID
-  public interval: string = undefined;                  // time interval between scheduled runs
   public lastModified: Date = undefined;                // when the schedule was last modified
   public lastRun: Date = undefined;                     // when the scheduled job last ran
   public meta: string = undefined;                      // meta

@@ -49,8 +49,8 @@ import { TaskConfig } from '../jobs/TaskConfig';
 export interface SchedulerConfig
 {
   createdAt: Date;                   // when the schedule was first created
+  cron: string;                      // cron format of when the schedule should run
   id: number;                        // scheduled job ID
-  interval: string;                  // time interval between scheduled runs
   lastModified: Date;                // when the schedule was last modified
   lastRun: Date;                     // when the scheduled job last ran
   meta: string;                      // meta
