@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { DatabaseConfig } from '../app/database/DatabaseConfig';
 import DatabaseController from './DatabaseController';
 
 import ElasticConfig from './elastic/ElasticConfig';
@@ -60,30 +61,31 @@ import SQLiteController from './sqlite/SQLiteController';
 
 export class DatabaseControllerConfig
 {
-  public static makeDatabaseController(
-    type: string,
-    id: number,
-    dsnString: string,
-    analyticsIndex?: string,
-    analyticsType?: string): DatabaseController
+  public static makeDatabaseController(config: DatabaseConfig): DatabaseController
   {
-    type = type.toLowerCase();
-    const config = new DatabaseControllerConfig(type, dsnString);
+    const id = config.id as number;
+    const name = config.name;
+    const type = config.type.toLowerCase();
+    const dsn = config.dsn;
+    const analyticsIndex = config.analyticsIndex;
+    const analyticsType = config.analyticsType;
+
+    const cfg = new DatabaseControllerConfig(type, dsn);
     if (type === 'sqlite')
     {
-      return new SQLiteController(config.getConfig(), id, 'SQLite');
+      return new SQLiteController(cfg.getConfig(), id, name);
     }
     else if (type === 'mysql')
     {
-      return new MySQLController(config.getConfig(), id, 'MySQL');
+      return new MySQLController(cfg.getConfig(), id, name);
     }
     else if (type === 'postgres')
     {
-      return new PostgreSQLController(config.getConfig(), id, 'PostgreSQL');
+      return new PostgreSQLController(cfg.getConfig(), id, name);
     }
     else if (type === 'elasticsearch' || type === 'elastic')
     {
-      return new ElasticController(config.getConfig(), id, 'Elastic', analyticsIndex, analyticsType);
+      return new ElasticController(cfg.getConfig(), id, name, analyticsIndex, analyticsType);
     }
     else
     {

@@ -110,13 +110,16 @@ class ETLEditorPage extends TerrainComponent<Props>
 {
   public state: {
     leaving: boolean;
+    switchingTemplate: boolean;
     nextLocation: string,
   } = {
       leaving: false,
       nextLocation: '',
+      switchingTemplate: false,
     };
 
   public confirmedLeave: boolean = false;
+  public unregisterHook = () => null;
 
   public saveTemplate(template: ETLTemplate, isSaveAs: boolean, onSuccess?: () => void)
   {
@@ -193,6 +196,12 @@ class ETLEditorPage extends TerrainComponent<Props>
 
   public switchTemplate(template: ETLTemplate)
   {
+    if (template.id !== this.props.template.id)
+    {
+      this.setState({
+        switchingTemplate: true,
+      });
+    }
     ETLRouteUtil.gotoEditTemplate(template.id);
   }
 
@@ -285,6 +294,10 @@ class ETLEditorPage extends TerrainComponent<Props>
     )
     {
       // then we went from new template to saved template
+      if (this.state.switchingTemplate)
+      {
+        this.initFromRoute(nextProps);
+      }
     }
     else if (
       getAlgorithmId(params) !== -1 &&
@@ -292,6 +305,10 @@ class ETLEditorPage extends TerrainComponent<Props>
     )
     {
       // then we went from an algorithm export to saved template
+      if (this.state.switchingTemplate)
+      {
+        this.initFromRoute(nextProps);
+      }
     }
     else if (params.algorithmId !== nextParams.algorithmId)
     {
@@ -338,7 +355,12 @@ class ETLEditorPage extends TerrainComponent<Props>
   public componentDidMount()
   {
     this.initFromRoute(this.props);
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unregisterHook = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+  }
+
+  public componentWillUnmount()
+  {
+    this.unregisterHook();
   }
 
   public routerWillLeave(nextLocation): boolean
@@ -398,16 +420,18 @@ class ETLEditorPage extends TerrainComponent<Props>
   {
     this.setState({
       leaving: false,
+      switchingTemplate: false,
     });
   }
 
   public handleModalDontSave()
   {
     this.confirmedLeave = true;
+    browserHistory.push(this.state.nextLocation);
     this.setState({
       leaving: false,
+      switchingTemplate: false,
     });
-    browserHistory.push(this.state.nextLocation);
   }
 
   public handleModalSave()
@@ -419,6 +443,7 @@ class ETLEditorPage extends TerrainComponent<Props>
       this.confirmedLeave = true;
       this.setState({
         leaving: false,
+        switchingTemplate: false,
       });
       browserHistory.push(this.state.nextLocation);
     };

@@ -155,11 +155,6 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     }
   }
 
-  public shouldComponentUpdate(nextProps: Props, nextState)
-  {
-    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
-  }
-
   public handleAddScript()
   {
     const newScript = _Script();

@@ -44,17 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands
+// tslint:disable:variable-name strict-boolean-expressions no-console restrict-plus-operands max-line-length
 
 import * as commandLineArgs from 'command-line-args';
 import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
+import * as winston from 'winston';
 import { filteringRecordBuilderActions, replayBuilderActions, waitForInput } from './FullstackUtils';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
+const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
+const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';
 const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 
@@ -114,6 +117,14 @@ export async function loginToBuilder(page, url?)
 
 async function startBuilder(page)
 {
+  await page.waitForSelector(COLUMN_SELECTOR);
+  await page.click(COLUMN_SELECTOR);
+  winston.info('Select the column.');
+  sleep.sleep(1);
+  await page.waitForSelector(CARDS_COLUMN_SELECTOR);
+  await page.click(CARDS_COLUMN_SELECTOR);
+  winston.info('Select the card column.');
+  sleep.sleep(1);
   await page.waitForSelector(CARDSTARTER_SELECTOR);
   await page.click(CARDSTARTER_SELECTOR);
 }

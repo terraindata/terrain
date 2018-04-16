@@ -56,6 +56,8 @@ import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import * as winston from 'winston';
 import { replayBuilderActions } from '../../FullstackUtils';
 
+const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
+const CARDS_COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > div > div.menu-options-wrapper > div:nth-child(3) > div > div.menu-text-padding';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 
 expect.extend({ toMatchImageSnapshot } as any);
@@ -101,6 +103,14 @@ async function gotoStarterCard(page, url)
   await page.goto(url);
   winston.info('Start builder at : ' + String(url));
   sleep.sleep(3);
+  await page.waitForSelector(COLUMN_SELECTOR);
+  await page.click(COLUMN_SELECTOR);
+  winston.info('Select the column.');
+  sleep.sleep(1);
+  await page.waitForSelector(CARDS_COLUMN_SELECTOR);
+  await page.click(CARDS_COLUMN_SELECTOR);
+  winston.info('Select the card column.');
+  sleep.sleep(1);
   await page.waitForSelector(CARDSTARTER_SELECTOR);
   await page.click(CARDSTARTER_SELECTOR);
   winston.info('Builder is started.');

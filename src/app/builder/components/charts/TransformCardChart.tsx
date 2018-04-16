@@ -42,6 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
@@ -614,35 +615,7 @@ export class TransformCardChart extends TerrainComponent<Props>
     this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
-  }
-
-  public shouldComponentUpdate(nextProps: Props, nextState)
-  {
-    for (const key in nextProps)
-    {
-      if (!_.isEqual(nextProps[key], this.props[key]))
-      {
-        if (key === 'builder')
-        {
-          // only matters if the db name or source has changed
-          if (this.props[key].db.name !== nextProps[key].db.name)
-          {
-            return true;
-          }
-          const oldSource = this.props[key].query.path.source.dataSource;
-          const newSource = nextProps[key].query.path.source.dataSource;
-          if (!_.isEqual(newSource, oldSource))
-          {
-            return true;
-          }
-        }
-        else
-        {
-          return true;
-        }
-      }
-    }
-    return !_.isEqual(nextState, this.state);
+    this.listenToKeyPath('builder', [['db', 'name'], ['query', 'path', 'source', 'dataSource']]);
   }
 
   // happens on undos/redos

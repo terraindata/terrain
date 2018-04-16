@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { Map, List } = Immutable;
-
+import Util from 'app/util/Util';
 import { BuilderState } from 'builder/data/BuilderState';
 import { SchemaState } from 'schema/SchemaTypes';
 import { FieldType, FieldTypeMapping } from '../../../../shared/builder/FieldTypes';
@@ -152,7 +152,8 @@ export const ElasticBlockHelpers = {
           ).map(
             (column) => column.name,
           ).toList().concat(List(['_score', '_size']));
-          return transformableFields;
+          // Need to prioritize user order fields
+          return Util.orderFields(transformableFields, schemaState, -1, indexId);
         }
         return List(['_score', '_size']);
       }
@@ -163,13 +164,14 @@ export const ElasticBlockHelpers = {
 
         // 4. Return all columns matching this (server+)index+type
 
-        return schemaState.columns.filter(
+        const fields = schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === String(indexId) &&
             column.tableId === String(typeId),
         ).map(
           (column) => column.name,
         ).toList().concat(List(metaFields));
+        return Util.orderFields(fields, schemaState, -1, indexId);
       }
     }
 

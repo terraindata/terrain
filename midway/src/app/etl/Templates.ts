@@ -65,7 +65,8 @@ import { versions } from '../versions/VersionRouter';
 import { TransformationEngine } from '../../../../shared/transformations/TransformationEngine';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticDB from '../../database/elastic/tasty/ElasticDB';
-import { getControllerByName, getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import { getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
 import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
 export default class Templates
@@ -231,7 +232,7 @@ export default class Templates
     });
   }
 
-  public async execute(id: number, files?: Readable[]): Promise<Readable>
+  public async executeById(id: number, files?: Readable[]): Promise<Readable>
   {
     const ts: TemplateConfig[] = await this.get(id);
     if (ts.length < 1)
@@ -239,6 +240,11 @@ export default class Templates
       throw new Error(`Template ID ${String(id)} not found.`);
     }
     const template = ts[0];
+    return this.execute(template, files);
+  }
+
+  public async execute(template: TemplateConfig, files?: Readable[]): Promise<Readable>
+  {
     winston.info('Executing template', template.templateName);
 
     const numSources = Object.keys(template.sources).length;
@@ -251,7 +257,7 @@ export default class Templates
       throw new Error('Only single sinks are supported.');
     }
 
-    winston.info('Beginning ETL pipline...');
+    winston.info('Beginning ETL pipeline...');
 
     // construct a "process DAG"
     let defaultSink;
@@ -282,11 +288,14 @@ export default class Templates
       },
     );
 
+    winston.info('Finished constructing ETL pipeline graph...');
+
     if (defaultSink === undefined)
     {
       throw new Error('Default sink not found.');
     }
 
+    winston.info('Beginning execution of ETL pipeline graph...');
     const nodes: any[] = GraphLib.alg.topsort(dag);
     const streamMap = await this.executeGraph(template, dag, nodes, files);
     return streamMap[defaultSink][defaultSink];
@@ -318,6 +327,7 @@ export default class Templates
     {
       case 'Source':
         {
+          winston.info('Processing source node', nodeId);
           const source = template.sources[node.endpoint];
           const sourceStream = await getSourceStream(node.endpoint, source, files);
 
@@ -335,6 +345,7 @@ export default class Templates
 
       case 'Sink':
         {
+          winston.info('Processing sink node', nodeId);
           const inEdges: any[] = dag.inEdges(nodeId);
           if (inEdges.length > 1)
           {
@@ -351,6 +362,7 @@ export default class Templates
 
       case 'MergeJoin':
         {
+          winston.info('Processing merge-join node', nodeId);
           const inEdges: any[] = dag.inEdges(nodeId);
 
           const done = new EventEmitter();
@@ -386,6 +398,8 @@ export default class Templates
             });
           }
 
+          winston.info('Finished creating temporary indices: ', JSON.stringify(tempIndices));
+
           const dbName: string = template.sinks._default['options']['serverId'];
 
           // listen for the done event on the EventEmitter
@@ -394,7 +408,11 @@ export default class Templates
           await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
 
           // we refresh all temporary elastic indexes to make them ready for search
-          const controller: DatabaseController = await getControllerByName(dbName);
+          const controller: DatabaseController | undefined = DatabaseRegistry.getByName(dbName);
+          if (controller === undefined)
+          {
+            throw new Error('Controller not found for database: ' + dbName);
+          }
           const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
           const indices = tempIndices.map((i) => i['index']);
           await elasticDB.refreshIndex(indices);

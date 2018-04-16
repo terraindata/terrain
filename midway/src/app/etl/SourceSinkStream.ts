@@ -55,67 +55,76 @@ import
   SourceConfig,
 } from 'shared/etl/types/EndpointTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-import DatabaseController from '../../database/DatabaseController';
-import ElasticClient from '../../database/elastic/client/ElasticClient';
-import { ElasticWriter } from '../../database/elastic/streams/ElasticWriter';
-import { ElasticDB } from '../../database/elastic/tasty/ElasticDB';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../AppUtil';
-import CSVTransform from '../io/streams/CSVTransform';
-import JSONTransform from '../io/streams/JSONTransform';
-import { QueryHandler } from '../query/QueryHandler';
-
-import { databases } from '../database/DatabaseRouter';
 import ExportTransform from './ExportTransform';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
+
+import CSVTransform from '../io/streams/CSVTransform';
+import JSONTransform from '../io/streams/JSONTransform';
+import ProgressTransform from '../io/streams/ProgressTransform';
+
+import AEndpointStream from './endpoints/AEndpointStream';
+import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
+import ElasticEndpoint from './endpoints/ElasticEndpoint';
+import FSEndpoint from './endpoints/FSEndpoint';
+import HTTPEndpoint from './endpoints/HTTPEndpoint';
+import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
 {
   return new Promise<stream.Readable>(async (resolve, reject) =>
   {
-    let sourceStream: stream.Readable;
+    let sourceStream: stream.Readable | undefined;
+    let endpoint: AEndpointStream;
+    let importStream: stream.Readable;
     switch (source.type)
     {
       case 'Algorithm':
-        const algorithmId = source.options['algorithmId'];
-        const query: string = await Util.getQueryFromAlgorithm(algorithmId);
-        const dbId: number = await Util.getDBFromAlgorithm(algorithmId);
-        const algorithmStream = await getElasticReaderStream(dbId, query);
-        const exportTransform = new ExportTransform();
-        sourceStream = algorithmStream.pipe(exportTransform);
-        break;
+        endpoint = new AlgorithmEndpoint();
+        const algorithmStream = await endpoint.getSource(source);
+        sourceStream = algorithmStream.pipe(new ExportTransform());
+        return resolve(sourceStream);
       case 'Upload':
         if (files === undefined || files.length === 0)
         {
           throw new Error('No file(s) found in multipart formdata');
         }
-
-        const importStream = files.find((f) => f['fieldname'] === name);
-        if (importStream === undefined)
-        {
-          throw new Error('Error finding source stream ' + name);
-        }
-
-        switch (source.fileConfig.fileType)
-        {
-          case 'json':
-            sourceStream = importStream.pipe(JSONTransform.createImportStream());
-            break;
-          case 'csv':
-            sourceStream = importStream.pipe(CSVTransform.createImportStream());
-            break;
-          default:
-            throw new Error('Download file type must be either CSV or JSON.');
-        }
+        sourceStream = files.find((f) => f['fieldname'] === name);
         break;
       case 'Sftp':
+        endpoint = new SFTPEndpoint();
+        sourceStream = await endpoint.getSource(source);
+        break;
       case 'Http':
+        endpoint = new HTTPEndpoint();
+        sourceStream = await endpoint.getSource(source);
+        break;
+      // case 'Fs':
+      //   endpoint = new FSEndpoint();
+      //   sourceStream = await endpoint.getSource(source);
+      //   break;
       default:
         throw new Error('not implemented.');
     }
-    resolve(sourceStream);
+
+    if (sourceStream === undefined)
+    {
+      throw new Error('Error finding source stream ' + name);
+    }
+
+    switch (source.fileConfig.fileType)
+    {
+      case 'json':
+        importStream = sourceStream.pipe(JSONTransform.createImportStream());
+        break;
+      case 'csv':
+        importStream = sourceStream.pipe(CSVTransform.createImportStream());
+        break;
+      default:
+        throw new Error('Download file type must be either CSV or JSON.');
+    }
+    resolve(importStream);
   });
 }
 
@@ -123,65 +132,48 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
 {
   return new Promise<stream.Duplex>(async (resolve, reject) =>
   {
-    let sinkStream: stream.Duplex;
+    let endpoint: AEndpointStream;
+    let exportStream;
+
+    switch (sink.fileConfig.fileType)
+    {
+      case 'json':
+        exportStream = JSONTransform.createExportStream();
+        break;
+      case 'csv':
+        exportStream = CSVTransform.createExportStream();
+        break;
+      default:
+        throw new Error('Export file type must be either CSV or JSON.');
+    }
+
     switch (sink.type)
     {
       case 'Download':
-        switch (sink.fileConfig.fileType)
-        {
-          case 'json':
-            sinkStream = JSONTransform.createExportStream();
-            break;
-          case 'csv':
-            sinkStream = CSVTransform.createExportStream();
-            break;
-          default:
-            throw new Error('Download file type must be either CSV or JSON.');
-        }
-        break;
+        return resolve(exportStream);
       case 'Database':
         if (sink.options['language'] !== 'elastic')
         {
           throw new Error('Can only import into Elastic at the moment.');
         }
-
-        const { serverId, database, table } = sink.options as any;
-        const controller = await getControllerByName(serverId);
-        const client: ElasticClient = controller.getClient() as ElasticClient;
-        const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
-
-        // create mapping
-        const elasticMapping = new ElasticMapping(engine);
-        await elasticDB.putESMapping(database, table, elasticMapping.getMapping());
-
-        const primaryKey = elasticMapping.getPrimaryKey();
-        sinkStream = new ElasticWriter(client, database, table, primaryKey);
+        endpoint = new ElasticEndpoint();
         break;
       case 'Sftp':
+        endpoint = new SFTPEndpoint();
+        break;
       case 'Http':
+        endpoint = new HTTPEndpoint();
+        break;
+      // case 'Fs':
+      //   endpoint = new FSEndpoint();
+      //   break;
       default:
         throw new Error('not implemented.');
     }
 
-    resolve(sinkStream);
+    const sinkStream = await endpoint.getSink(sink, engine);
+    resolve(new ProgressTransform(sinkStream));
   });
-}
-
-export async function getControllerByName(name: string): Promise<DatabaseController>
-{
-  const db = await databases.select([], { name });
-  if (db.length < 1 || db[0].id === undefined)
-  {
-    throw new Error(`Database ${String(name)} not found.`);
-  }
-
-  const controller: DatabaseController | undefined = DatabaseRegistry.get(db[0].id as number);
-  if (controller === undefined)
-  {
-    throw new Error(`Database id ${String(db[0].id)} is invalid.`);
-  }
-
-  return controller;
 }
 
 export async function getMergeJoinStream(name: string, indices: object[], options: object): Promise<stream.Readable>
@@ -228,40 +220,14 @@ export async function getMergeJoinStream(name: string, indices: object[], option
     },
   };
 
-  const controller = await getControllerByName(name);
-  const dbId: number = controller.getID();
-  const elasticStream = await getElasticReaderStream(dbId, JSON.stringify(query));
+  const source = {
+    options: {
+      serverId: name,
+      query: JSON.stringify(query),
+    },
+  };
+  const endpoint = new ElasticEndpoint();
+  const elasticStream = await endpoint.getSource(source as any as SourceConfig);
   const exportTransform = new ExportTransform();
   return elasticStream.pipe(exportTransform);
-}
-
-async function getElasticReaderStream(dbId: number, query: string): Promise<stream.Readable>
-{
-  const controller: DatabaseController | undefined = DatabaseRegistry.get(dbId);
-  if (controller === undefined)
-  {
-    throw new Error(`Database ${String(dbId)} not found.`);
-  }
-
-  if (controller.getType() !== 'ElasticController')
-  {
-    throw new Error('Algorithm source only supports Elastic databases');
-  }
-
-  const qh: QueryHandler = controller.getQueryHandler();
-  const payload = {
-    database: dbId,
-    type: 'search',
-    streaming: true,
-    databasetype: 'elastic',
-    body: query,
-  };
-
-  const elasticStream = await qh.handleQuery(payload) as stream.Readable;
-  if (elasticStream === undefined)
-  {
-    throw new Error('Error creating new source stream from algorithm');
-  }
-
-  return elasticStream;
 }

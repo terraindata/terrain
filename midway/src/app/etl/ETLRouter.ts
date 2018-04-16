@@ -62,7 +62,7 @@ Router.post('/execute', async (ctx, next) =>
 {
   const { fields, files } = await asyncBusboy(ctx.req);
 
-  Util.verifyParameters(fields, ['id', 'accessToken', 'templateID']);
+  Util.verifyParameters(fields, ['id', 'accessToken']);
   const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
   if (user === null)
   {
@@ -71,8 +71,20 @@ Router.post('/execute', async (ctx, next) =>
     return;
   }
 
-  const templateID = Number(fields['templateID']);
-  ctx.body = await templates.execute(templateID, files);
+  if (fields['template'] !== undefined)
+  {
+    const template = JSON.parse(fields['template']);
+    ctx.body = await templates.execute(template, files);
+  }
+  else if (fields['templateID'] !== undefined)
+  {
+    const templateID = Number(fields['templateID']);
+    ctx.body = await templates.executeById(templateID, files);
+  }
+  else
+  {
+    throw new Error('Missing template or template ID parameter.');
+  }
 });
 
 export default Router;
