@@ -191,7 +191,7 @@ class ETLAjax
 
   // if download is provided, then the response will be downloaded as the mime type with provided filename
   public executeTemplate(
-    templateId: number,
+    template: ETLTemplate,
     options: ExecuteConfig,
   ): Promise<void>
   {
@@ -206,14 +206,14 @@ class ETLAjax
         config.downloadName = options.download.downloadFilename;
         config.mimeType = options.download.mimeType;
       }
-      const payload: any = {
-        templateID: String(templateId),
+      const templateToRun = JSON.stringify(templateForBackend(template));
+      const payload = {
+        template: templateToRun,
       };
       if (options.files !== undefined)
       {
         _.extend(payload, options.files);
       }
-
       this.reqFormData(
         'etl/execute',
         payload,
