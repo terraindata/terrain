@@ -302,7 +302,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         }
       };
 
-      ETLAjax.executeTemplate(template.id, options)
+      ETLAjax.executeTemplate(template, options)
         .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
         .catch(this.onErrorFactory(action.onError, directDispatch, name));
     }
