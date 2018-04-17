@@ -172,25 +172,25 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
     }
 
     const sinkStream = await endpoint.getSink(sink, engine);
-    resolve(new ProgressTransform(sinkStream));
+    const progressStream = new ProgressTransform(sinkStream);
+    resolve(progressStream);
   });
 }
 
-export async function getMergeJoinStream(name: string, indices: object[], options: object): Promise<stream.Readable>
+export async function getMergeJoinStream(serverId: string, indices: object[], options: object): Promise<stream.Readable>
 {
-  const mergeJoinKey = options['outputKey'];
-  const query = {
+  const query = JSON.stringify({
     size: 2147483647,
     query: {
       bool: {
         filter: [
           {
-            match: {
+            term: {
               _index: indices[0]['index'],
             },
           },
           {
-            match: {
+            term: {
               _type: indices[0]['type'],
             },
           },
@@ -199,17 +199,17 @@ export async function getMergeJoinStream(name: string, indices: object[], option
     },
     mergeJoin: {
       joinKey: options['leftJoinKey'],
-      [mergeJoinKey]: {
+      [options['outputKey']]: {
         query: {
           bool: {
             filter: [
               {
-                match: {
+                term: {
                   _index: indices[1]['index'],
                 },
               },
               {
-                match: {
+                term: {
                   _type: indices[1]['type'],
                 },
               },
@@ -218,12 +218,12 @@ export async function getMergeJoinStream(name: string, indices: object[], option
         },
       },
     },
-  };
+  });
 
   const source = {
     options: {
-      serverId: name,
-      query: JSON.stringify(query),
+      serverId,
+      query,
     },
   };
   const endpoint = new ElasticEndpoint();

@@ -381,7 +381,7 @@ export default class Templates
             const inputStream = streamMap[e.v][nodeId];
 
             // create temporary indices for all of the incoming edges to a merge join node
-            const tempIndex = 'temp_' + String(e.v) + '_' + String(e.w);
+            const tempIndex = 'temp_' + String(dag.node(e.v).endpoint) + '_' + String(e.v) + '_' + String(e.w);
             const tempSink = JSON.parse(JSON.stringify(template.sinks._default));
             tempSink['options']['database'] = tempIndex;
             tempIndices.push({
@@ -406,14 +406,14 @@ export default class Templates
             });
           }
 
-          winston.info('Finished creating temporary indices: ', JSON.stringify(tempIndices));
-
-          const dbName: string = template.sinks._default['options']['serverId'];
-
           // listen for the done event on the EventEmitter
           // nb: we use a promise here so as to not block the thread, and not have to write the
           // following code in an event-passing style
           await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
+
+          winston.info('Finished creating temporary indices: ', JSON.stringify(tempIndices));
+
+          const dbName: string = template.sinks._default['options']['serverId'];
 
           // we refresh all temporary elastic indexes to make them ready for search
           const controller: DatabaseController | undefined = DatabaseRegistry.getByName(dbName);
@@ -425,6 +425,8 @@ export default class Templates
           const indices = tempIndices.map((i) => i['index']);
           await elasticDB.refreshIndex(indices);
 
+          winston.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
+
           // pipe the merge stream to all outgoing edges
           const outEdges: any[] = dag.outEdges(nodeId);
           numPending = outEdges.length;
@@ -434,13 +436,14 @@ export default class Templates
             const transformStream = new TransformationEngineTransform([], transformationEngine);
             const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
             streamMap[nodeId][e.w] = mergeJoinStream.pipe(transformStream);
-            streamMap[nodeId][e.w].on('finish', async () =>
+            streamMap[nodeId][e.w].on('end', async () =>
             {
               if (--numPending === 0)
               {
                 // delete the temporary indices once the merge stream has been piped
                 // out to all outgoing edges
                 await elasticDB.deleteIndex(indices);
+                winston.info('Deleted temporary indices: ' + JSON.stringify(indices));
               }
             });
           }
