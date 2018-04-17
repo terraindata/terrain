@@ -119,7 +119,6 @@ class TemplateEditor extends TerrainComponent<Props>
     {
       return {};
     }
-
   }
 
   public getDocument()

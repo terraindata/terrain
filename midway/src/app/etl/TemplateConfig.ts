@@ -53,6 +53,8 @@ import { TransformationEngine } from 'shared/transformations/TransformationEngin
 export class TemplateConfig extends ConfigType implements TemplateBase
 {
   public id?: number = undefined;
+  public createdAt: Date = null;
+  public lastModified: Date = null;
   public archived: boolean = false; // TODO, add ability to filter on this in routes
   public templateName: string = '';
   public process: ETLProcess = {

@@ -140,6 +140,8 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      events text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS templates
     (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     lastModified ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      archived bool NOT NULL,
      templateName text NOT NULL,
      process text NOT NULL,

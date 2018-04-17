@@ -78,7 +78,7 @@ export interface Props
 {
   isSource?: boolean;
   endpoint: SinkConfig | SourceConfig;
-  onChange: (newConfig: SinkConfig | SourceConfig) => void;
+  onChange: (newConfig: SinkConfig | SourceConfig, apply?: boolean) => void;
 }
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
@@ -176,11 +176,11 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
     onChange(endpoint.set('fileConfig', newFileConfig));
   }
 
-  private handleOptionsFormChange(formState: State)
+  private handleOptionsFormChange(formState: State, apply?: boolean)
   {
     const { onChange, endpoint } = this.props;
     const newOptions = this.formStateToOptions(formState);
-    onChange(endpoint.set('options', newOptions));
+    onChange(endpoint.set('options', newOptions), apply);
   }
 }
 

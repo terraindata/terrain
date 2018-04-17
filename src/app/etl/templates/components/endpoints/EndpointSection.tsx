@@ -224,30 +224,6 @@ class EndpointSection extends TerrainComponent<Props>
             <div className='endpoint-type-title-text'>
               {isSource ? 'Sources' : 'Destination'}
             </div>
-            <div className='endpoint-apply-section'>
-              <div
-                key='cancel'
-                className={classNames({
-                  'options-column-button': true,
-                  'options-column-button-disabled': buttonsDisabled,
-                })}
-                style={getButtonStyle(false, buttonsDisabled)}
-                onClick={this.handleCancelChanges}
-              >
-                Cancel
-              </div>
-              <div
-                key='apply'
-                className={classNames({
-                  'options-column-button': true,
-                  'options-column-button-disabled': buttonsDisabled,
-                })}
-                style={getButtonStyle(true, buttonsDisabled)}
-                onClick={this.handleApplyChanges}
-              >
-                Apply
-              </div>
-            </div>
           </div>
         </Quarantine>
         {(endpoints as LooseEndpointsType).map(this.renderEndpoint).toList()}
@@ -255,15 +231,6 @@ class EndpointSection extends TerrainComponent<Props>
         {isSource ? this.renderNewSourceModal() : null}
       </div>
     );
-  }
-
-  public handleCancelChanges()
-  {
-    const { template, isSource } = this.props;
-    const newEndpoints = isSource ? template.getSources() : template.getSinks();
-    this.setState({
-      endpoints: newEndpoints,
-    });
   }
 
   public handleApplyChanges()
@@ -285,7 +252,7 @@ class EndpointSection extends TerrainComponent<Props>
     const source = newSource.set('name', newSourceModalName);
     this.setState({
       endpoints: (endpoints as LooseEndpointsType).set(newSourceModalName, source),
-    }, () => this.handleApplyChanges());
+    }, this.handleApplyChanges);
   }
 
   public isEndpointOpen(key: string)
@@ -296,12 +263,12 @@ class EndpointSection extends TerrainComponent<Props>
   @instanceFnDecorator(_.memoize)
   public handleEndpointChangeFactory(key: string)
   {
-    return (endpoint: SourceConfig | SinkConfig) =>
+    return (endpoint: SourceConfig | SinkConfig, apply: boolean = true) =>
     {
       const { endpoints } = this.state;
       this.setState({
         endpoints: (endpoints as LooseEndpointsType).set(key, endpoint),
-      });
+      }, apply ? this.handleApplyChanges : undefined);
     };
   }
 }
@@ -310,7 +277,7 @@ const addEndpointStyle = _.extend({},
   backgroundColor('rgba(0,0,0,0)', Colors().highlight),
 );
 // memoized
-let getButtonStyle = (active: boolean, disabled: boolean)
+let getButtonStyle = (active: boolean, disabled: boolean) =>
 {
   if (active)
   {
