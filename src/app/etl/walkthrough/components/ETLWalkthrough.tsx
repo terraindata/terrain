@@ -183,25 +183,16 @@ export const walkthroughGraph: WalkthroughGraphType<ViewState> =
       prompt: 'What Would You Like to Do?',
       options: [
         {
-          link: ViewState.StartNew,
-          buttonText: 'New Import or Export',
-        },
-        {
-          link: ViewState.PickTemplate,
-          buttonText: 'Edit an Existing Process',
-        },
-      ],
-    },
-    [ViewState.StartNew]: {
-      prompt: 'Are you Importing or Exporting?',
-      options: [
-        {
           link: ViewState.NewImport,
           buttonText: 'Start a New Import',
         },
         {
           link: ViewState.PickExportAlgorithm,
           buttonText: 'Start a New Export',
+        },
+        {
+          link: ViewState.PickTemplate,
+          buttonText: 'Edit an Existing Template',
         },
       ],
     },
