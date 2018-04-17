@@ -51,7 +51,7 @@ import { SafeReadable } from './SafeReadable';
  */
 export default class BufferTransform
 {
-  public static toArray(stream: SafeReadable): Promise<any[]>
+  public static toArray(stream: SafeReadable, size?: number): Promise<any[]>
   {
     return new Promise<any[]>((resolve, reject) =>
     {
@@ -66,7 +66,7 @@ export default class BufferTransform
           {
             resolve(arr);
           }
-        });
+        }, size);
     });
   }
 
@@ -74,13 +74,29 @@ export default class BufferTransform
   private stream: SafeReadable;
   private callback: (err, arr) => void;
 
-  constructor(stream: SafeReadable, callback: (err: Error | null, arr: any[]) => void)
+  constructor(stream: SafeReadable, callback: (err: Error | null, arr: any[]) => void, size?: number)
   {
     this.arr = [];
     this.stream = stream;
 
-    this.stream.on('data', (doc) => this.arr.push(doc));
-    this.stream.on('end', () => callback(null, this.arr));
+    // consume the whole stream
+    if (size === undefined || size <= 0)
+    {
+      this.stream.on('end', () => callback(null, this.arr));
+    }
+
+    this.stream.on('data', (doc) =>
+    {
+      if (this.arr.length >= (size as number))
+      {
+        callback(null, this.arr);
+      }
+      else
+      {
+        this.arr.push(doc);
+      }
+    });
+
     this.stream.on('error', callback);
   }
 
