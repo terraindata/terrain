@@ -50,7 +50,7 @@ import
 {
   CRONDaySchedule, CRONHourOptions, CRONHourSchedule,
   CRONMap, CRONMinuteOptions, CRONMonthDayOptions,
-  CRONWeekDayOptions, CRONWorkWeekdays
+  CRONWeekDayOptions, CRONWorkWeekdays,
 } from './CRONConstants';
 
 const CACHE = {

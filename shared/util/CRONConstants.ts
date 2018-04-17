@@ -44,22 +44,31 @@ THE SOFTWARE.
 
 // Copyright 2019 Terrain Data, Inc.
 
+import { range } from 'lodash';
+
 export interface CRONMap
 {
   [minuteHourOrDay: number]: boolean;
 }
 
+// return a map of number: boolean pairs
+// values are true if key is present in the `values` param
+export function fillCRONMap(values: number[], start: number, endInclusive: number):
+  { [val: number]: boolean }
+{
+  return range(start, endInclusive + 1).reduce(
+    (memo, v) =>
+    {
+      memo[v] = values.indexOf(v) !== -1;
+      return memo;
+    },
+    {},
+  );
+}
+
 // Days
 
-export const CRONWeekDayOptions: CRONMap = {
-  0: false,
-  1: false,
-  2: true,
-  3: true,
-  4: false,
-  5: false,
-  6: false,
-};
+export const CRONWeekDayOptions: CRONMap = fillCRONMap([], 0, 6);
 
 export const CRONWeekDayNames =
   {
@@ -72,85 +81,20 @@ export const CRONWeekDayNames =
     6: 'Saturday',
   };
 
-export const CRONWorkWeekdays: CRONMap = {
-  0: false,
-  1: true,
-  2: true,
-  3: true,
-  4: true,
-  5: true,
-  6: false,
-};
+export const CRONWorkWeekdays: CRONMap = fillCRONMap([1, 2, 3, 4, 5], 0, 6);
 
-export const CRONMonthDayOptions: CRONMap = {
-  1: false,
-  2: false,
-  3: false,
-  4: false,
-  5: false,
-  6: false,
-  7: false,
-  8: false,
-  9: false,
-  10: false,
-  11: false,
-  12: false,
-  13: false,
-  14: false,
-  15: false,
-  16: false,
-  17: false,
-  18: false,
-  19: false,
-  20: false,
-  21: false,
-  22: false,
-  23: false,
-  24: false,
-  25: false,
-  26: false,
-  27: false,
-  28: false,
-  29: false,
-  30: false,
-  31: false,
-};
+export const CRONMonthDayOptions: CRONMap = fillCRONMap([], 1, 31);
 
 export interface CRONDaySchedule
 {
   type: 'daily' | 'weekdays' | 'weekly' | 'monthly';
   weekdays?: CRONMap; // for weekly
   days?: CRONMap; // for monthly
-};
+}
 
 // Hours and Minutes
 
-export const CRONHourOptions: CRONMap = {
-  0: false,
-  1: false,
-  2: false,
-  3: false,
-  4: false,
-  5: false,
-  6: false,
-  7: false,
-  8: false,
-  9: false,
-  10: false,
-  11: false,
-  12: false,
-  13: false,
-  14: false,
-  15: false,
-  16: false,
-  17: false,
-  18: false,
-  19: false,
-  20: false,
-  21: false,
-  22: false,
-  23: false,
-};
+export const CRONHourOptions: CRONMap = fillCRONMap([], 0, 23);
 
 export const CRONHourNames = {
   0: '12 AM', 1: '1 AM', 2: '2 AM', 3: '3 AM', 4: '4 AM', 5: '5 AM', 6: '6 AM', 7: '7 AM', 8: '8 AM',
@@ -158,72 +102,11 @@ export const CRONHourNames = {
   17: '5 PM', 18: '6 PM', 19: '7 PM', 20: '8 PM', 21: '9 PM', 22: '10 PM', 23: '11 PM',
 };
 
-export const CRONMinuteOptions: CRONMap = {
-  0: false,
-  1: false,
-  2: false,
-  3: false,
-  4: false,
-  5: false,
-  6: false,
-  7: false,
-  8: false,
-  9: false,
-  10: false,
-  11: false,
-  12: false,
-  13: false,
-  14: false,
-  15: false,
-  16: false,
-  17: false,
-  18: false,
-  19: false,
-  20: false,
-  21: false,
-  22: false,
-  23: false,
-  24: false,
-  25: false,
-  26: false,
-  27: false,
-  28: false,
-  29: false,
-  30: false,
-  31: false,
-  32: false,
-  33: false,
-  34: false,
-  35: false,
-  36: false,
-  37: false,
-  38: false,
-  39: false,
-  40: false,
-  41: false,
-  42: false,
-  43: false,
-  44: false,
-  45: false,
-  46: false,
-  47: false,
-  48: false,
-  49: false,
-  50: false,
-  51: false,
-  52: false,
-  53: false,
-  54: false,
-  55: false,
-  56: false,
-  57: false,
-  58: false,
-  59: false,
-};
+export const CRONMinuteOptions: CRONMap = fillCRONMap([], 0, 59);
 
-export type CRONHourSchedule =
-  {
-    type: 'minute' | 'hourly' | 'daily';
-    minutes?: CRONMap; // for hourly
-    hours?: CRONMap; // for daily
-  };
+export interface CRONHourSchedule
+{
+  type: 'minute' | 'hourly' | 'daily';
+  minutes?: CRONMap; // for hourly
+  hours?: CRONMap; // for daily
+}
