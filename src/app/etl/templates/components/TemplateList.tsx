@@ -62,7 +62,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { ETLActions } from 'etl/ETLRedux';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import { MidwayError } from 'shared/error/MidwayError';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 

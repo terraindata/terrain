@@ -387,7 +387,7 @@ export class ResultsManager extends TerrainComponent<Props>
     let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
-        resultsState = resultsState.set(key, value),
+        resultsState = resultsState.set(key as any, value),
     );
 
     if (exportChanges)

@@ -52,6 +52,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 
+import { recordForSave, responseToRecordConfig } from 'shared/util/Classes';
 import { QueryRequest } from '../../../shared/database/types/QueryRequest';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import BackendInstance from '../../database/types/BackendInstance';
@@ -59,7 +60,6 @@ import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
 import { Item, ItemType } from '../../items/types/Item';
 import Query from '../../items/types/Query';
 import { AuthActions as Actions } from '../auth/data/AuthRedux';
-import { recordForSave, responseToRecordConfig } from '../Classes';
 import * as LibraryTypes from '../library/LibraryTypes';
 import * as UserTypes from '../users/UserTypes';
 

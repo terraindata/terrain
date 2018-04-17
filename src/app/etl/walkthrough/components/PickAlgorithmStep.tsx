@@ -54,7 +54,7 @@ import * as React from 'react';
 
 import FadeInOut from 'common/components/FadeInOut';
 
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 

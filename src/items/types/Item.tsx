@@ -49,7 +49,7 @@ THE SOFTWARE.
 /// TODO: remove when the "src" dependency is eliminated
 /// <reference path="../../../shared/typings/tsd.d.ts" />
 
-import { BaseClass } from '../../app/Classes';
+import { BaseClass } from 'shared/util/Classes';
 import BackendInstance from '../../database/types/BackendInstance';
 
 export type ItemType = 'QUERY' | 'ALGORITHM' | 'GROUP' | 'CATEGORY';

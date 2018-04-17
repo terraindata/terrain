@@ -56,7 +56,7 @@ import Util from 'util/Util';
 
 import ExpandableView from 'common/components/ExpandableView';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
 import EndpointForm from 'etl/common/components/EndpointForm';
