@@ -44,21 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { range } from 'lodash';
+import { fillCRONMap } from '../../util/CRONConstants';
 import { canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays, setCRONHours } from '../../util/CRONParser';
-
-function fillObj(values: number[], start: number, endInclusive: number):
-  { [val: number]: boolean }
-{
-  return range(start, endInclusive + 1).reduce(
-    (memo, v) =>
-    {
-      memo[v] = values.indexOf(v) !== -1;
-      return memo;
-    },
-    {},
-  );
-}
 
 test('parses daily', () =>
 {
@@ -77,14 +64,14 @@ test('parses weekdays', () =>
 test('parses weekly', () =>
 {
   expect(parseCRONDaySchedule('15 16 * * 2,3')).toEqual(
-    { type: 'weekly', weekdays: fillObj([2, 3], 0, 6) },
+    { type: 'weekly', weekdays: fillCRONMap([2, 3], 0, 6) },
   );
 });
 
 test('parses monthly', () =>
 {
   expect(parseCRONDaySchedule('4 2 1 * *')).toEqual(
-    { type: 'monthly', days: fillObj([1], 1, 31) },
+    { type: 'monthly', days: fillCRONMap([1], 1, 31) },
   );
 });
 
@@ -112,11 +99,11 @@ test('cannot parse invalid month days', () =>
 test('modifying a returned result does not screw up the cache', () =>
 {
   const str = '* * 17,19 * *';
-  let result = parseCRONDaySchedule(str);
+  const result = parseCRONDaySchedule(str);
   result.days[99] = true;
   result.type = 'daily';
   expect(parseCRONDaySchedule(str)).toEqual(
-    { type: 'monthly', days: fillObj([17, 19], 1, 31) },
+    { type: 'monthly', days: fillCRONMap([17, 19], 1, 31) },
   );
 });
 
@@ -210,21 +197,21 @@ test('parses every minute', () =>
 test('parses hourly', () =>
 {
   expect(parseCRONHourSchedule('00,15,30,45 * * * 1,2,3,4,5')).toEqual(
-    { type: 'hourly', minutes: fillObj([0, 15, 30, 45], 0, 59) },
+    { type: 'hourly', minutes: fillCRONMap([0, 15, 30, 45], 0, 59) },
   );
 });
 
 test('parses hourly with arbitrary minutes', () =>
 {
   expect(parseCRONHourSchedule('3 * * * *')).toEqual(
-    { type: 'hourly', minutes: fillObj([3], 0, 59) },
+    { type: 'hourly', minutes: fillCRONMap([3], 0, 59) },
   );
 });
 
 test('parses daily', () =>
 {
   expect(parseCRONHourSchedule('00 4,8,15,16 23 * *')).toEqual(
-    { type: 'daily', hours: fillObj([4, 8, 15, 16], 0, 23) },
+    { type: 'daily', hours: fillCRONMap([4, 8, 15, 16], 0, 23) },
   );
 });
 
