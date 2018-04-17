@@ -57,25 +57,221 @@ describe('SchedulerApi', () =>
     schedulerApi = new SchedulerApi(axios);
   });
 
-  describe('#getConnections', () =>
+  describe('#createSchedule', () =>
   {
-    it('should make a GET request to /scheduler/connections', () =>
+    it('should make a POST request to /scheduler', () =>
     {
-      axiosMock.onGet('/scheduler/connections').reply(
+      axiosMock.onPost('/scheduler').reply(
         200,
-        [
-          { id: 1 },
-          { id: 2 },
-        ],
+        { id: 1, name: 'schedule' },
       );
 
-      return schedulerApi.getConnections()
+      return schedulerApi.createSchedule({ name: 'schedule' })
         .then((response) =>
         {
-          expect(response).toEqual([
+          expect(response.data).toEqual(
+            { id: 1, name: 'schedule' },
+          );
+        },
+      );
+    });
+  });
+
+  describe('#getSchedules', () =>
+  {
+    it('should make a GET request to /scheduler', () =>
+    {
+      axiosMock.onGet('/scheduler').reply(
+        200,
+        [{ id: 1 }, { id: 2 }],
+      );
+
+      return schedulerApi.getSchedules()
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            [{ id: 1 }, { id: 2 }],
+          );
+        },
+      );
+    });
+  });
+
+  describe('#getSchedule', () =>
+  {
+    it('should make a GET request to /scheduler/:id', () =>
+    {
+      axiosMock.onGet('/scheduler/1').reply(
+        200,
+        { id: 1 },
+      );
+
+      return schedulerApi.getSchedule(1)
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
             { id: 1 },
+          );
+        },
+      );
+    });
+  });
+
+  describe('#updateSchedule', () =>
+  {
+    it('should make a POST request to /scheduler/:id', () =>
+    {
+      axiosMock.onPost('/scheduler/1', { body: { name: 'modified' } }).reply(
+        200,
+        { id: 1, name: 'modified' },
+      );
+
+      return schedulerApi.updateSchedule(1, { name: 'modified' })
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            { id: 1, name: 'modified' },
+          );
+        },
+      );
+    });
+  });
+
+  describe('#deleteSchedule', () =>
+  {
+    it('should make a POST request to /scheduler/delete/:id', () =>
+    {
+      axiosMock.onPost('/scheduler/delete/1').reply(
+        200,
+        { id: 1 },
+      );
+
+      return schedulerApi.deleteSchedule(1)
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            { id: 1 },
+          );
+        },
+      );
+    });
+  });
+
+  describe('#duplicateSchedule', () =>
+  {
+    it('should make a POST request to /scheduler/duplicate/:id', () =>
+    {
+      axiosMock.onPost('/scheduler/duplicate/1').reply(
+        200,
+        { id: 2 },
+      );
+
+      return schedulerApi.duplicateSchedule(1)
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
             { id: 2 },
-          ]);
+          );
+        },
+      );
+    });
+  });
+
+  describe('#getScheduleLog', () =>
+  {
+    it('should make a GET request to /scheduler/log/:id', () =>
+    {
+      axiosMock.onGet('/scheduler/log/1').reply(
+        200,
+        [{ id: 1 }],
+      );
+
+      return schedulerApi.getScheduleLog(1)
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            [{ id: 1 }],
+          );
+        },
+      );
+    });
+  });
+
+  describe('#pauseSchedule', () =>
+  {
+    it('should make a POST request to /scheduler/pause/:id', () =>
+    {
+      axiosMock.onPost('/scheduler/pause/1').reply(
+        200,
+        { id: 1 },
+      );
+
+      return schedulerApi.pauseSchedule(1)
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            { id: 1 },
+          );
+        },
+      );
+    });
+  });
+
+  describe('#unpauseSchedule', () =>
+  {
+    it('should make a POST request to /scheduler/unpause/:id', () =>
+    {
+      axiosMock.onPost('/scheduler/unpause/1').reply(
+        200,
+        { id: 1 },
+      );
+
+      return schedulerApi.unpauseSchedule(1)
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            { id: 1 },
+          );
+        },
+      );
+    });
+  });
+
+  describe('#runSchedule', () =>
+  {
+    it('should make a POST request to /scheduler/run/:id', () =>
+    {
+      axiosMock.onPost('/scheduler/run/1').reply(
+        200,
+        { id: 1 },
+      );
+
+      return schedulerApi.runSchedule(1)
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            { id: 1 },
+          );
+        },
+      );
+    });
+  });
+
+  describe('#setScheduleStatus', () =>
+  {
+    it('should make a POST request to /scheduler/status/:id', () =>
+    {
+      axiosMock.onPost('/scheduler/status/1').reply(
+        200,
+        { id: 1, shouldRunNext: false },
+      );
+
+      return schedulerApi.setScheduleStatus(1, false)
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            { id: 1, shouldRunNext: false },
+          );
         },
       );
     });

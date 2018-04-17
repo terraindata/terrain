@@ -115,7 +115,7 @@ class SchedulerAjax
   {
     return this.xhr.post(`/scheduler/status/${id}`,
       {
-        body: { status }
+        body: { status },
       });
   }
 }

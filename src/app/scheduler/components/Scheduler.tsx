@@ -66,7 +66,7 @@ class Scheduler extends TerrainComponent<any> {
   public createSchedule()
   {
     this.schedulerApi.createSchedule({
-      interval: '0 0 1 1 *',
+      cron: '0 0 1 1 *',
       name: `Jmansor Schedule ${Math.floor(Math.random() * 100)}`,
       priority: 1,
       tasks: [],
@@ -88,9 +88,9 @@ class Scheduler extends TerrainComponent<any> {
       .then((response) =>
       {
         this.setState({
-         responseText: JSON.stringify(response),
-         schedules: response.data,
-       });
+          responseText: JSON.stringify(response),
+          schedules: response.data,
+        });
       })
       .catch((error) =>
       {
@@ -113,7 +113,7 @@ class Scheduler extends TerrainComponent<any> {
 
   public updateSchedule(id: number)
   {
-    const changes = { name: 'Jmansor Schedule Modified' }
+    const changes = { name: 'Jmansor Schedule Modified' };
     this.schedulerApi.updateSchedule(id, changes)
       .then((response) =>
       {
@@ -220,7 +220,7 @@ class Scheduler extends TerrainComponent<any> {
   {
     this.setState({
       id: e.target.value,
-    })
+    });
   }
 
   public render()
@@ -248,11 +248,11 @@ class Scheduler extends TerrainComponent<any> {
         <div>
           {
             this.state.schedules !== null ?
-            (
-              this.state.schedules.map((s) =>
-                <div key={s.id}>{s.id} - {s.name} - {s.running ? 'running' : 'not running'} - {s.shouldRunNext.toString()}</div>
-              )
-            ) : null
+              (
+                this.state.schedules.map((s) =>
+                  <div key={s.id}>{s.id} - {s.name} - {s.running ? 'running' : 'not running'} - {s.shouldRunNext.toString()}</div>,
+                )
+              ) : null
           }
         </div>
       </div>
