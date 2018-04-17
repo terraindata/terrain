@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { SafeReadable } from './SafeReadable';
+import { Readable } from 'stream';
 
 /**
  * Consumes an input source stream and turns it into an array
  */
 export default class BufferTransform
 {
-  public static toArray(stream: SafeReadable, size?: number): Promise<any[]>
+  public static toArray(stream: Readable, size?: number): Promise<any[]>
   {
     return new Promise<any[]>((resolve, reject) =>
     {
@@ -71,10 +71,10 @@ export default class BufferTransform
   }
 
   private arr: any[];
-  private stream: SafeReadable;
+  private stream: Readable;
   private callback: (err, arr) => void;
 
-  constructor(stream: SafeReadable, callback: (err: Error | null, arr: any[]) => void, size?: number)
+  constructor(stream: Readable, callback: (err: Error | null, arr: any[]) => void, size?: number)
   {
     this.arr = [];
     this.stream = stream;
