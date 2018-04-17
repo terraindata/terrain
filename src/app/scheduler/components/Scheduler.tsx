@@ -43,281 +43,239 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console strict-boolean-expressions
-import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
-import Colors from 'app/colors/Colors';
-import RouteSelector from 'app/common/components/RouteSelector';
-import EndpointForm from 'app/etl/common/components/EndpointForm';
-import { ETLActions } from 'app/etl/ETLRedux';
-import { ETLState } from 'app/etl/ETLTypes';
-import TerrainTools from 'app/util/TerrainTools';
-import Util from 'app/util/Util';
+// tslint:disable:no-console
 import TerrainComponent from 'common/components/TerrainComponent';
-import { List, Map } from 'immutable';
-import * as _ from 'lodash';
 import * as React from 'react';
-import SchedulerAjax from 'scheduler/SchedulerAjax';
-import Api from 'util/Api';
-import './Schedule.less';
+import SchedulerApi from 'scheduler/SchedulerApi';
+import XHR from 'util/XHR';
 
-export interface Props
-{
-  // injected
-  etl?: ETLState;
-  etlActions?: typeof ETLActions;
-}
+class Scheduler<T> extends TerrainComponent<T> {
 
-class Scheduler extends TerrainComponent<Props>
-{
-  public schedulerAjax: SchedulerAjax = new SchedulerAjax(Api.getInstance());
-  public state: {
-    schedules: List<any>;
-    configurations: List<string>;
-  } = {
-      schedules: List([]),
-      configurations: List([]),
+  public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
+
+  public constructor(props)
+  {
+    super(props);
+    this.state = {
+      responseText: '',
+      schedules: null,
+      id: '',
     };
-
-  public componentWillMount()
-  {
-    this.getSchedules();
-    this.props.etlActions({
-      actionType: 'fetchTemplates',
-    });
-    this.listenToKeyPath('etl', ['templates']);
   }
 
-  public getSchedules()
+  public createSchedule(this)
   {
-    this.schedulerAjax.getSchedules()
-      .then((response) =>
-      {
-        this.updateScheduleList(response);
-      })
-      .catch((error) =>
-      {
-        console.log(error);
-      });
-  }
-
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    if (this.props.etl.templates !== nextProps.etl.templates)
-    {
-      this.updateScheduleList(this.state.schedules.toJS(), nextProps.etl.templates);
-    }
-  }
-
-  public handleConfigurationChange(scheduleId: ID, isSource: boolean, key: string, endpoint)
-  {
-  }
-
-  public getEndPointOptions(endpoints: Map<string, any>, isSource: boolean, scheduleId: ID)
-  {
-    const keys = _.keys(endpoints.toJS());
-    return List(keys.map((key) =>
-    {
-      const endpoint = endpoints.get(key);
-      return {
-        value: isSource ? 'source' + key : 'sink' + key,
-        displayName: endpoint.name,
-        component: <EndpointForm
-          isSource={isSource}
-          endpoint={endpoint}
-          onChange={this._fn(this.handleConfigurationChange, scheduleId, isSource, key)}
-        />,
-      };
-    }));
-  }
-
-  public getSourceSinkDescription(schedule)
-  {
-    return 'From (info) To (info)';
-  }
-
-  public getOptionSets(schedule)
-  {
-    // Template Option Set
-    const templateOptions = this.props.etl.templates.map((template) =>
-    {
-      return {
-        value: template.id,
-        displayName: template.templateName,
-      };
-    }).toList();
-    const templateOptionSet = {
-      key: 'template',
-      options: templateOptions,
-      shortNameText: 'Template',
-      column: true,
-      forceFloat: true,
-      getCustomDisplayName: this.getTemplateName,
-    };
-    // Configuration Option Set (Based on Template)
-    let configurationOptions = List([]);
-    let configurationHeaderText = 'Choose a Template';
-    if (schedule.get('template'))
-    {
-      configurationHeaderText = '';
-      const sources = schedule.get('template').sources;
-      const sinks = schedule.get('template').sinks;
-      console.log(sources);
-      const sourceOptions = this.getEndPointOptions(sources, true, schedule.get('id'));
-      const sinkOptions = this.getEndPointOptions(sinks, false, schedule.get('id'));
-      configurationOptions = sourceOptions.concat(sinkOptions).toList();
-    }
-    const configurationOptionSet = {
-      key: 'configuration',
-      options: configurationOptions,
-      shortNameText: 'Configuration',
-      headerText: configurationHeaderText,
-      column: true,
-      forceFloat: true,
-      getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule),
-      // ADD IN CUSTOM DISPLAY NAME THAT IS DESCRIPTION OF SOURCE / SINK
-    };
-    // CRON Option Set
-
-    // Status Options
-
-    // Buttons to Run / Pause
-    const buttonOptionSet = {
-      isButton: true,
-      onButtonClick: this._fn(this.handleRunPause, schedule),
-      key: 'run',
-      options: List([]),
-    };
-    // Log of Past Runs
-    return List([templateOptionSet, configurationOptionSet, buttonOptionSet]);
-  }
-
-  public handleRunPause(schedule)
-  {
-  }
-
-  public getValues(schedule, index: number)
-  {
-    const templateId = schedule.get('template') !== undefined ?
-      schedule.get('template').id : '';
-    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
-    return List([templateId, this.state.configurations.get(index), buttonValue]);
-  }
-
-  public getTemplateName(templateId: ID, index: number)
-  {
-    const template = this.props.etl.templates.filter((temp) => temp.id === templateId).get(0);
-    const templateName = template ? template.templateName : 'None';
-    return templateName;
-  }
-
-  public updateScheduleList(schedules: any[], templates?)
-  {
-    templates = templates || this.props.etl.templates;
-    let formattedSchedules = List([]);
-    schedules.map((schedule) =>
-    {
-      const newSchedule = schedule;
-      const task = JSON.parse(JSON.parse(schedule.tasks));
-      const templateId = task.params.templateId;
-      const temp = templates.filter((t) => t.id === templateId).get(0);
-      newSchedule['template'] = temp;
-      formattedSchedules = formattedSchedules.push(Map(newSchedule));
-    });
-    this.setState({
-      schedules: formattedSchedules,
-    });
-  }
-
-  public handleCreateSchedule()
-  {
-    this.schedulerAjax.createScheduler({
+    this.schedulerApi.createSchedule({
       cron: '0 0 1 1 *',
       meta: '',
       name: 'Schedule',
-      tasks: JSON.stringify({
+      tasks: {
         cancel: false, // whether the tree of tasks should be cancelled
         jobStatus: 0, // 0: not running, 1: running, 2: paused
         name: 'Import', // name of the task i.e. 'import'
         onFailure: 3, // id of task to execute on failure
         onSuccess: 2, // id of next task to execute (default should be next in array)
-        params: { templateId: 7 }, // input parameters for the task
+        params: { templateId: -1 }, // input parameters for the task
         paused: 4, // where in the tree of tasks the tasks are paused
         taskId: 5, // maps to a statically declared task
-      }),
+      },
     })
       .then((response) =>
       {
-        this.updateScheduleList(this.state.schedules.push(response[0]).toJS());
-      })
-      .catch((error) =>
-      {
-        console.log('error', error);
-      });
-  }
-
-  public handleDeleteSchedule(id: ID)
-  {
-    this.schedulerAjax.deleteSchedule(id)
-      .then((response) =>
-      {
+        this.setState({ responseText: JSON.stringify(response) });
         this.getSchedules();
       })
       .catch((error) =>
       {
-        console.log('error', error);
+        this.setState({ responseText: error.response.data.errors[0].detail });
       });
   }
 
-  public handleScheduleChange(scheduleIndex: number, optionSetIndex: number, value: any)
+  public getSchedules()
   {
-    console.log('change ', optionSetIndex, value);
-    switch (optionSetIndex)
-    {
-      case 1:
+    this.schedulerApi.getSchedules()
+      .then((response) =>
+      {
         this.setState({
-          configurations: this.state.configurations.set(scheduleIndex, value),
+          responseText: JSON.stringify(response),
+          schedules: response.data,
         });
-        break;
-      default:
-    }
+      })
+      .catch((error) =>
+      {
+        console.log(error);
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
   }
 
-  public canEdit(schedule)
+  public getSchedule(id: number)
   {
-    return !schedule.get('running') && TerrainTools.isAdmin();
+    this.schedulerApi.getSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public updateSchedule(id: number, newSchedule?)
+  {
+    newSchedule = newSchedule || { name: 'Jmansor Schedule Modified' };
+    this.schedulerApi.updateSchedule(id, newSchedule)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public deleteSchedule(id?: number)
+  {
+    this.schedulerApi.deleteSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public duplicateSchedule(id?: number)
+  {
+    this.schedulerApi.duplicateSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public getScheduleLog(id: number)
+  {
+    this.schedulerApi.getScheduleLog(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public pauseSchedule(id: number)
+  {
+    this.schedulerApi.pauseSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public unpauseSchedule(id: number)
+  {
+    this.schedulerApi.unpauseSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public runSchedule(id: number)
+  {
+    this.schedulerApi.runSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public setScheduleStatus(id: number)
+  {
+    this.schedulerApi.setScheduleStatus(id, false)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public handleIdChange(e)
+  {
+    this.setState({
+      id: e.target.value,
+    });
   }
 
   public render()
   {
-    const { schedules } = this.state;
+    const { id } = this.state;
     return (
-      <div className='schedule-list-wrapper'>
-        {
-          schedules.map((schedule, i) =>
-            <RouteSelector
-              key={i}
-              optionSets={this.getOptionSets(schedule)}
-              values={this.getValues(schedule, i)}
-              canEdit={this.canEdit(schedule)}
-              canDelete={this.canEdit(schedule)}
-              onDelete={this._fn(this.handleDeleteSchedule, schedule.get('id'))}
-              onChange={this._fn(this.handleScheduleChange, i)}
-            />,
-          )
-        }
-        <PathfinderCreateLine
-          text='Add Schedule'
-          canEdit={true}
-          onCreate={this.handleCreateSchedule}
-          showText={true}
-        />
+      <div>
+        id: <input style={{ width: 50 }} onChange={this.handleIdChange} value={id} />
+        <ul>
+          <li onClick={() => this.createSchedule()}>ScheduleApi.createSchedule()</li>
+          <li onClick={() => this.getSchedules()}>SchedulerApi.getSchedules()</li>
+          <li onClick={() => this.getSchedule(id)}>SchedulerApi.getSchedules({id})</li>
+          <li onClick={() => this.updateSchedule(id)}>SchedulerApi.updateSchedule({id})</li>
+          <li onClick={() => this.deleteSchedule(id)}>SchedulerApi.deleteSchedules({id})</li>
+          <li onClick={() => this.duplicateSchedule(id)}>SchedulerApi.duplicateSchedules({id})</li>
+          <li onClick={() => this.getScheduleLog(id)}>SchedulerApi.getScheduleLog({id})</li>
+          <li onClick={() => this.pauseSchedule(id)}>SchedulerApi.pauseSchedule({id})</li>
+          <li onClick={() => this.unpauseSchedule(id)}>SchedulerApi.unpauseSchedule({id})</li>
+          <li onClick={() => this.runSchedule(id)}>SchedulerApi.runSchedule({id})</li>
+          <li onClick={() => this.setScheduleStatus(id)}>SchedulerApi.setScheduleStatus({id})</li>
+        </ul>
+        <div>
+          {this.state.responseText}
+        </div>
+        <div>
+          {
+            this.state.schedules !== null ?
+              (
+                this.state.schedules.map((s) =>
+                  <div key={s.id}>{s.id} - {s.name} - {s.running ? 'running' : 'not running'} - {s.shouldRunNext.toString()}</div>,
+                )
+              ) : null
+          }
+        </div>
       </div>
     );
   }
 }
 
-export default Util.createContainer(
-  Scheduler,
-  ['etl'],
-  { etlActions: ETLActions },
-);
+export default Scheduler;

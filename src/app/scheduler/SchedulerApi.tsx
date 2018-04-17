@@ -45,52 +45,77 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 import axios, { AxiosInstance } from 'axios';
 import Ajax, { AjaxResponse } from 'util/Ajax';
-import Api from 'util/Api';
+import XHR from 'util/XHR';
 
 // making this an instance in case we want stateful things like cancelling ajax requests
 class SchedulerAjax
 {
-  public api: AxiosInstance = null;
+  public xhr: AxiosInstance = null;
 
-  public constructor(api: AxiosInstance)
+  public constructor(xhr: AxiosInstance)
   {
-    this.api = api;
+    this.xhr = xhr;
   }
 
-  public getConnections(): Promise<any>
-  {
-    return this.api.get('/scheduler/connections')
-      .then((response) =>
-      {
-        return Promise.resolve(response.data);
-      });
-  }
-
-  public createScheduler(schedulerConfig)
+  public createSchedule(schedulerConfig)
   {
     const body = schedulerConfig;
-    return this.api.post(`/scheduler`, { body })
-      .then((response) =>
-      {
-        return Promise.resolve(response.data);
-      });
+    return this.xhr.post('/scheduler', { body });
   }
 
   public getSchedules()
   {
-    return this.api.get('/scheduler', {})
-      .then((response) =>
+    return this.xhr.get('/scheduler');
+  }
+
+  public getSchedule(id: number)
+  {
+    return this.xhr.get(`/scheduler/${id}`);
+  }
+
+  public updateSchedule(id: number, changes)
+  {
+    return this.xhr.post(`/scheduler/${id}`,
       {
-        return Promise.resolve(response.data);
+        body: changes,
       });
   }
 
-  public deleteSchedule(scheduleId)
+  public deleteSchedule(id: number)
   {
-    return this.api.post('/scheduler/delete/' + String(scheduleId), {})
-      .then((response) =>
+    return this.xhr.post(`/scheduler/delete/${id}`);
+  }
+
+  public duplicateSchedule(id: number)
+  {
+    return this.xhr.post(`/scheduler/duplicate/${id}`);
+  }
+
+  public getScheduleLog(schedulerId: number)
+  {
+    return this.xhr.get(`/scheduler/log/${schedulerId}`);
+  }
+
+  public pauseSchedule(id: number)
+  {
+    return this.xhr.post(`/scheduler/pause/${id}`);
+  }
+
+  public unpauseSchedule(id: number)
+  {
+    return this.xhr.post(`/scheduler/unpause/${id}`);
+  }
+
+  public runSchedule(id: number)
+  {
+    return this.xhr.post(`/scheduler/run/${id}`);
+  }
+
+  public setScheduleStatus(id: number, status: boolean)
+  {
+    return this.xhr.post(`/scheduler/status/${id}`,
       {
-        return Promise.resolve(response.data);
+        body: { status },
       });
   }
 }
