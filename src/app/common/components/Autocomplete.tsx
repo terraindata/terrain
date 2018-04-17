@@ -232,9 +232,10 @@ class Autocomplete extends TerrainComponent<Props>
       return;
     }
 
-    const firstOptions = this.props.options && this.props.options.filter((o) => this.showOption(o, 'first'));
-    const secondOptions = this.props.options && this.props.options.filter((o) => this.showOption(o, 'second'));
-    const visibleOptions = firstOptions.concat(secondOptions).toSet().toList();
+    const firstOptions = this.props.options.filter((o) => this.showOption(o, 'first')).toList();
+    const secondOptions = this.props.options.filter((o) =>
+      this.showOption(o, 'second') && firstOptions.indexOf(o) === -1);
+    const visibleOptions = firstOptions.concat(secondOptions).toList();
     switch (event.keyCode)
     {
       case 38:
@@ -380,9 +381,9 @@ class Autocomplete extends TerrainComponent<Props>
       return null;
     }
 
-    const firstOptions = options.filter((o) => this.showOption(o, 'first'));
-    const secondOptions = options.filter((o) => this.showOption(o, 'second'));
-    return firstOptions.concat(secondOptions).toSet().toList();
+    const firstOptions = options.filter((o) => this.showOption(o, 'first')).toList();
+    const secondOptions = options.filter((o) => this.showOption(o, 'second') && firstOptions.indexOf(o) === -1);
+    return firstOptions.concat(secondOptions).toList();
   }
 
   public render()

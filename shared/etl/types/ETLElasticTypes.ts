@@ -96,7 +96,7 @@ export const JsToElasticOptions: {
   [k in FieldTypes]: ElasticTypes[]
 } = {
     array: [ElasticTypes.Auto, ElasticTypes.Array],
-    object: [ElasticTypes.Auto, ElasticTypes.Nested],
+    object: [ElasticTypes.Auto, ElasticTypes.Nested, ElasticTypes.GeoPoint],
     string: [ElasticTypes.Auto, ElasticTypes.Text, ElasticTypes.Date, ElasticTypes.GeoPoint],
     number: [ElasticTypes.Auto, ElasticTypes.Double, ElasticTypes.Long, ElasticTypes.Short, ElasticTypes.Byte,
     ElasticTypes.Integer, ElasticTypes.HalfFloat, ElasticTypes.Float],

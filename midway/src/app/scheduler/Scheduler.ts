@@ -72,7 +72,7 @@ export class Scheduler
       ['id'],
       [
         'createdAt',
-        'interval',
+        'cron',
         'lastModified',
         'lastRun',
         'meta',
@@ -217,9 +217,9 @@ export class Scheduler
     const creationDate: Date = new Date();
     if (schedule.id === undefined) // create
     {
-      if (schedule.name === undefined || schedule.interval === undefined)
+      if (schedule.name === undefined || schedule.cron === undefined)
       {
-        return Promise.reject('Schedule name and interval must be provided.');
+        return Promise.reject('Schedule name and cron must be provided.');
       }
       schedule.createdAt = creationDate;
       schedule.lastModified = creationDate;
@@ -227,7 +227,7 @@ export class Scheduler
       schedule.meta = schedule.meta !== undefined ? schedule.meta : '';
       // schedule.name = schedule.name !== undefined ? schedule.name : '';
       schedule.priority = schedule.priority !== undefined ? schedule.priority : 1;
-      schedule.running = false;
+      schedule.running = schedule.running !== undefined ? schedule.running : false;
       schedule.shouldRunNext = schedule.shouldRunNext !== undefined ? schedule.shouldRunNext : true;
       schedule.tasks = schedule.tasks !== undefined ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
       schedule.workerId = schedule.workerId !== undefined ? schedule.workerId : 1;

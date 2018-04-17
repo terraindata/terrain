@@ -132,12 +132,6 @@ async function loginToBuilder(page, url)
   winston.info('Select algorithm');
   sleep.sleep(1);
   await takeAndCompareScreenShot(page);
-
-  await page.waitForSelector(CARDSTARTER_SELECTOR);
-  await page.click(CARDSTARTER_SELECTOR, { clickCOunt: 2 });
-  winston.info('Start builder');
-  sleep.sleep(1);
-  await takeAndCompareScreenShot(page);
 }
 
 describe('jest-image-snapshot usage with an image received from puppeteer', () =>
@@ -161,7 +155,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
     await loginToBuilder(page, url);
-  }, 60000);
+  }, 100000);
 
   afterAll(async () =>
   {

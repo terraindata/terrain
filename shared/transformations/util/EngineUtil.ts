@@ -54,6 +54,8 @@ import objectify from 'shared/util/deepObjectify';
 import { KeyPath } from 'shared/util/KeyPath';
 import * as yadeep from 'shared/util/yadeep';
 
+import { ElasticTypes } from 'shared/etl/types/ETLElasticTypes';
+
 export type PathHash = string;
 export interface PathHashMap<T>
 {
@@ -279,6 +281,7 @@ export default class EngineUtil
       {
         return;
       }
+      const ikp = engine.getInputKeyPath(id);
       const okp = engine.getOutputKeyPath(id);
 
       let values = [];
@@ -291,6 +294,17 @@ export default class EngineUtil
       if (repType === 'string')
       {
         const type = TypeUtil.getCommonElasticType(values);
+        if (type === ElasticTypes.GeoPoint)
+        {
+          engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), { toTypename: 'object' });
+          engine.setFieldType(id, 'object');
+          const latField = engine.addField(ikp.push('lat'), 'number');
+          const longField = engine.addField(ikp.push('lon'), 'number');
+          engine.setOutputKeyPath(latField, okp.push('lat'));
+          engine.setOutputKeyPath(longField, okp.push('lon'));
+          engine.appendTransformation(TransformationNodeType.CastNode, List([engine.getInputKeyPath(latField)]), { toTypename: 'number' });
+          engine.appendTransformation(TransformationNodeType.CastNode, List([engine.getInputKeyPath(longField)]), { toTypename: 'number' });
+        }
         engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
       }
       else if (repType === 'number')

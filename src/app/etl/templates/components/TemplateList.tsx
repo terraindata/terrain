@@ -60,6 +60,7 @@ import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { ETLActions } from 'etl/ETLRedux';
+import Initializers from 'etl/helpers/TemplateInitializers';
 import { MidwayError } from 'shared/error/MidwayError';
 import { instanceFnDecorator } from 'src/app/Classes';
 
@@ -68,11 +69,19 @@ import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
 
+export interface AllowedActions
+{
+  delete?: boolean;
+  apply?: boolean;
+}
+
 export interface Props
 {
   onClick?: (template: ETLTemplate) => void;
   getRowStyle?: (template: ETLTemplate) => object | object[];
   filter?: (template: ETLTemplate) => boolean;
+  allowedActions?: AllowedActions;
+  onMenuItemClicked?: (template: ETLTemplate, which: keyof AllowedActions) => void;
   // injected props
   etlAct: typeof ETLActions;
   templates: List<ETLTemplate>;
@@ -131,25 +140,47 @@ class TemplateList extends TerrainComponent<Props>
     }
   }
 
-  public computeMenuOptions(template: ETLTemplate, index: number)
+  @instanceFnDecorator(memoizeOne)
+  public computeMenuOptionsFactory(allowedActions: AllowedActions)
+    : (template: ETLTemplate, index: number) => List<MenuOption>
   {
-    return List([
+    if (allowedActions === undefined)
+    {
+      return undefined;
+    }
+
+    return (template, index) =>
+    {
+      let options = List([]);
+      if (allowedActions.delete === true)
       {
-        text: 'Delete Template',
-        onClick: this.deleteTemplateClickFactory(template),
-      },
-    ]);
+        options = options.push({
+          text: 'Delete Template',
+          onClick: this.deleteTemplateClickFactory(template),
+        });
+      }
+      if (allowedActions.apply === true)
+      {
+        options = options.push({
+          text: 'Apply Template',
+          onClick: this.applyTemplateClickFactory(template),
+        });
+      }
+      return options;
+    };
   }
 
   public render()
   {
+    const computeOptions = this.computeMenuOptionsFactory(this.props.allowedActions);
+
     return (
       <ItemList
         items={this.props.templates}
         columnConfig={this.displayConfig}
         onRowClicked={this.handleOnClick}
         getRowStyle={this.getRowStyle}
-        getMenuOptions={this.computeMenuOptions}
+        getMenuOptions={computeOptions}
       />
     );
   }
@@ -162,6 +193,18 @@ class TemplateList extends TerrainComponent<Props>
       const template = templates.get(index);
       this.props.onClick(template);
     }
+  }
+
+  public applyTemplateClickFactory(template: ETLTemplate)
+  {
+    return (event) =>
+    {
+      Initializers.initFromApplyTemplate(template.id);
+      if (this.props.onMenuItemClicked !== undefined)
+      {
+        this.props.onMenuItemClicked(template, 'apply');
+      }
+    };
   }
 
   public deleteTemplateClickFactory(template: ETLTemplate)
@@ -185,6 +228,10 @@ class TemplateList extends TerrainComponent<Props>
           onConfirm,
         },
       });
+      if (this.props.onMenuItemClicked !== undefined)
+      {
+        this.props.onMenuItemClicked(template, 'delete');
+      }
     };
   }
 }

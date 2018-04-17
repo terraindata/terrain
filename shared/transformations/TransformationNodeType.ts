@@ -59,6 +59,10 @@ enum TransformationNodeType
   CastNode = 'CastNode',
   HashNode = 'HashNode',
   ArraySumNode = 'ArraySumNode',
+  AddNode = 'AddNode',
+  SubtractNode = 'SubtractNode',
+  MultiplyNode = 'MultiplyNode',
+  DivideNode = 'DivideNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
@@ -79,7 +83,8 @@ interface TransformationOptionTypes
   SplitNode: {
     newFieldKeyPaths: List<KeyPath>;
     preserveOldFields: boolean;
-    delimiter: string | RegExp | number;
+    delimiter: string | number;
+    regex: boolean;
   };
   JoinNode: {
     newFieldKeyPaths: List<KeyPath>;
@@ -108,6 +113,18 @@ interface TransformationOptionTypes
   };
   ArraySumNode: {
     newFieldKeyPaths: List<KeyPath>;
+  };
+  AddNode: {
+    shift: number;
+  };
+  SubtractNode: {
+    shift: number;
+  };
+  MultiplyNode: {
+    factor: number;
+  };
+  DivideNode: {
+    factor: number;
   };
 }
 

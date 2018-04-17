@@ -262,6 +262,7 @@ class SchemaResults extends TerrainComponent<Props>
           resultsState={this.state.resultsState}
           query={this.state.resultsQuery}
           noExtraFields={true}
+          hitsPage={1}
         />
       </div>
     );

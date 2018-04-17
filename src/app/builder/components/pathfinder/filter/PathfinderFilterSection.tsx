@@ -192,11 +192,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     return valueOptions;
   }
 
-  public shouldComponentUpdate(nextProps, nextState)
-  {
-    return !_.isEqual(nextProps, this.props) || !_.isEqual(nextState, this.state);
-  }
-
   public handleAddFilter()
   {
     if (!this.state.addingFilterLine)

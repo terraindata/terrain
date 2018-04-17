@@ -56,7 +56,7 @@ import Util from 'util/Util';
 
 import Modal from 'common/components/Modal';
 
-import TemplateList from 'etl/templates/components/TemplateList';
+import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'etl/templates/TemplateTypes';
@@ -76,6 +76,11 @@ export interface Props
   templateEditor?: TemplateEditorState;
   editorAct?: typeof TemplateEditorActions;
 }
+
+const loadTemplateActions: AllowedActions = {
+  delete: true,
+  apply: true,
+};
 
 @Radium
 class EditorActionsSection extends TerrainComponent<Props>
@@ -109,6 +114,8 @@ class EditorActionsSection extends TerrainComponent<Props>
             <TemplateList
               onClick={this.handleLoadTemplateItemClicked}
               getRowStyle={this.getTemplateItemStyle}
+              allowedActions={loadTemplateActions}
+              onMenuItemClicked={this.handleMenuItemClicked}
             />
           </div>
         </Modal>,
@@ -208,6 +215,16 @@ class EditorActionsSection extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  public handleMenuItemClicked(template, which)
+  {
+    if (which === 'apply')
+    {
+      this.setState({
+        loadTemplateOpen: false,
+      });
+    }
   }
 
   public getTemplateItemStyle(templateInList: ETLTemplate)

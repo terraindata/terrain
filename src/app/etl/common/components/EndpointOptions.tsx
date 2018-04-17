@@ -350,9 +350,9 @@ class HttpEndpoint extends EndpointForm<HttpState>
       type: DisplayType.TextBox,
       displayName: 'URL',
     },
-    methods: {
+    method: {
       type: DisplayType.Pick,
-      displayName: 'Methods',
+      displayName: 'Method',
       options: {
         pickOptions: (s) => httpMethods,
         indexResolver: (value) => httpMethods.indexOf(value),
@@ -370,11 +370,11 @@ class HttpEndpoint extends EndpointForm<HttpState>
 
   public optionsToFormState(options: HttpOptions): HttpState
   {
-    const { url, methods } = options;
+    const { url, method } = options;
     const headers = _.get(options, 'headers', {});
     return {
       url,
-      methods,
+      method,
       accept: headers['accept'],
       contentType: headers['contentType'],
     };
@@ -382,10 +382,10 @@ class HttpEndpoint extends EndpointForm<HttpState>
 
   public formStateToOptions(newState: HttpState): HttpOptions
   {
-    const { url, methods, accept, contentType } = newState;
+    const { url, method, accept, contentType } = newState;
     return {
       url,
-      methods,
+      method,
       headers: {
         accept,
         contentType,

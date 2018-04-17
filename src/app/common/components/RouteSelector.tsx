@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access no-var-requires no-console
 
+import Button from 'app/common/components/Button';
 import Ajax from 'app/util/Ajax';
 import Hit from 'builder/components/results/Hit.tsx';
 import * as classNames from 'classnames';
@@ -76,9 +77,10 @@ export interface RouteSelectorOption
   displayName?: string | number | El;
   color?: string;
   sampleData?: List<any>;
-  extraContent?: string;
+  tooltip?: string;
   icon?: any;
   closeOnPick?: boolean; // close the picker when this option is picked
+  component?: El | string;
 }
 
 export interface RouteSelectorOptionSet
@@ -87,10 +89,12 @@ export interface RouteSelectorOptionSet
   options: List<RouteSelectorOption>;
   hasOther?: boolean;
   focusOtherByDefault?: boolean;
-  shortNameText: string;
-  headerText: string;
+  shortNameText?: string;
+  headerText?: string;
   forceFloat?: boolean;
-
+  isButton?: boolean;
+  onButtonClick?: () => void;
+  icon?: El;
   hasSearch?: boolean; // NOTE not compatible with hasOther
   column?: boolean; // force a column layout
   hideSampleData?: boolean; // hide sample data, even if it's present
@@ -270,18 +274,28 @@ export class RouteSelector extends TerrainComponent<Props>
               }
               style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
             >
-              <FloatingInput
-                label={optionSet.shortNameText}
-                isTextInput={false}
-                value={this.getDisplayName(index)}
-                onClick={this.handleBoxValueClick}
-                canEdit={props.canEdit}
-                large={props.large}
-                semilarge={props.semilarge}
-                noBorder={true}
-                forceFloat={optionSet.forceFloat}
-                extendRight={true}
-              />
+              {
+                optionSet.isButton ?
+                  <Button
+                    text={this.getDisplayName(index)}
+                    onClick={optionSet.onButtonClick}
+                    disabled={!props.canEdit}
+                    icon={optionSet.icon}
+                  />
+                  :
+                  <FloatingInput
+                    label={optionSet.shortNameText}
+                    isTextInput={false}
+                    value={this.getDisplayName(index)}
+                    onClick={this.handleBoxValueClick}
+                    canEdit={props.canEdit}
+                    large={props.large}
+                    semilarge={props.semilarge}
+                    noBorder={true}
+                    forceFloat={optionSet.forceFloat}
+                    extendRight={true}
+                  />
+              }
               {/*getValueRef={this.handleValueRef}
                 forceFloat={state.picked}*/}
             </div>
@@ -761,6 +775,7 @@ export class RouteSelector extends TerrainComponent<Props>
       && optionSetIndex === state.focusedSetIndex
       && state.focusedOptionIndex !== -1
       && state.focusedSetIndex !== -1;
+    const style = option.color ? fontColor(option.color) : isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE;
     return (
       <div
         className='routeselector-option-wrapper'
@@ -781,7 +796,6 @@ export class RouteSelector extends TerrainComponent<Props>
                 (option.sampleData === undefined || optionSet.hideSampleData) &&
                 <div
                   className='routeselector-option-name'
-                  style={isSelected ? OPTION_NAME_SELECTED_STYLE : OPTION_NAME_STYLE}
                   key={'optionz-' + String(index) + '-' + String(optionSetIndex)}
                 >
                   {
@@ -796,14 +810,21 @@ export class RouteSelector extends TerrainComponent<Props>
                     tooltip(
                       <div
                         className='routeselector-option-name-inner'
-                        style={fontColor(Colors().fontColor2)}
+                        style={style}
                       >
                         {
                           option.displayName
                         }
                       </div>,
-                      option.extraContent,
+                      option.tooltip,
                     )}
+                  <FadeInOut
+                    open={isSelected}
+                  >
+                    {
+                      option.component
+                    }
+                  </FadeInOut>
                 </div>
               }
               {
@@ -1146,7 +1167,7 @@ export class RouteSelector extends TerrainComponent<Props>
 }
 
 const OPTION_NAME_STYLE = {
-  color: Colors().fontColor,
+  color: Colors().fontColor2,
 };
 
 const OPTION_NAME_SELECTED_STYLE = {

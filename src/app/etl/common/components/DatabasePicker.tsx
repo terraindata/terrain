@@ -119,6 +119,28 @@ class DatabasePicker extends TerrainComponent<Props>
     };
   }
 
+  public validateForm(state: FormState): string | undefined
+  {
+    const db = state.database;
+    if (db === '')
+    {
+      return 'Database name cannot be empty.';
+    }
+    if (db.search(/[^a-z0-9]/) !== -1)
+    {
+      return 'Invalid database name. Name should be composed of lowercase letters or numbers';
+    }
+    const table = state.table;
+    if (table === '')
+    {
+      return 'Table name cannot be empty.';
+    }
+    if (table.search(/[^a-z0-9]/) !== -1)
+    {
+      return 'Invalid table name. Name should be composed of lowercase letters or numbers';
+    }
+  }
+
   public getDisplayStateBoxes(state: FormState)
   {
     return state.serverIndex === -1 ? DisplayState.Hidden : DisplayState.Active;
@@ -222,6 +244,7 @@ class DatabasePicker extends TerrainComponent<Props>
         inputState={this.computeFormState()}
         onStateChange={this.handleStateChange}
         style={{ minHeight: this.props.constantHeight ? minHeight : '0px' }}
+        validate={this.validateForm}
       />
     );
   }

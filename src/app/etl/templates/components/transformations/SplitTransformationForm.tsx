@@ -70,12 +70,12 @@ interface SplitOptions
   leftName: string;
   rightName: string;
   preserveOldFields: boolean;
-  delimiter: any;
+  delimiter: string | number;
+  regex: boolean;
 }
 
 // curent assumption is that you only split into 2 fields.
 // TODO extend class so it can take arbitrary # of splits
-// TODO extend class to allow regex splits too
 export class SplitTFF extends TransformationForm<SplitOptions, TransformationNodeType.SplitNode>
 {
   protected readonly inputMap: InputDeclarationMap<SplitOptions> = {
@@ -95,12 +95,17 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
       type: DisplayType.TextBox,
       displayName: 'Delimiter',
       group: 'row2',
-      widthFactor: 2,
+      widthFactor: 3,
+    },
+    regex: {
+      type: DisplayType.CheckBox,
+      displayName: 'Treat Delimiter as Regex?',
+      group: 'row2',
+      widthFactor: -1,
     },
     preserveOldFields: {
       type: DisplayType.CheckBox,
       displayName: 'Keep Original Field',
-      group: 'row2',
       widthFactor: 3,
     },
   };
@@ -109,6 +114,7 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
     rightName: 'Split Field 2',
     preserveOldFields: false,
     delimiter: '-',
+    regex: false,
   };
   protected readonly type = TransformationNodeType.SplitNode; // lack of type safety here
 
@@ -130,8 +136,9 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
       return {
         leftName: meta.newFieldKeyPaths.size > 0 ? meta.newFieldKeyPaths.get(0).last() : '',
         rightName: meta.newFieldKeyPaths.size > 1 ? meta.newFieldKeyPaths.get(1).last() : '',
-        delimiter: meta.delimiter,
         preserveOldFields: meta.preserveOldFields,
+        delimiter: meta.delimiter,
+        regex: meta.regex,
       };
     }
   }
@@ -139,7 +146,7 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
   protected computeArgs()
   {
     const { engine, fieldId } = this.props;
-    const { leftName, rightName, delimiter, preserveOldFields } = this.state;
+    const { leftName, rightName, delimiter, preserveOldFields, regex } = this.state;
     const args = super.computeArgs();
 
     const currentKeyPath = engine.getOutputKeyPath(fieldId);
@@ -155,6 +162,7 @@ export class SplitTFF extends TransformationForm<SplitOptions, TransformationNod
         newFieldKeyPaths,
         delimiter,
         preserveOldFields,
+        regex,
       },
       fields: args.fields,
     };

@@ -148,7 +148,13 @@ const BuilderColumn = createReactClass<any, any>(
         canEdit: PropTypes.bool.isRequired,
         cantEditReason: PropTypes.string,
         onNavigationException: PropTypes.func,
+        onIncrementHitsPage: PropTypes.func,
       },
+
+    shouldComponentUpdate(nextProps, nextState)
+    {
+      return shallowCompare(this, nextProps, nextState);
+    },
 
     getInitialState()
     {
@@ -173,11 +179,6 @@ const BuilderColumn = createReactClass<any, any>(
       {
         this.props.switchToManualCol(this.props.index);
       }
-    },
-
-    shouldComponentUpdate(nextProps, nextState)
-    {
-      return shallowCompare(this, nextProps, nextState);
     },
 
     componentWillMount()
@@ -280,6 +281,7 @@ const BuilderColumn = createReactClass<any, any>(
             showExport={this.shouldShowExport()}
             showCustomizeView={true}
             allowSpotlights={true}
+            onIncrementHitsPage={this.props.onIncrementHitsPage}
           />;
 
         case COLUMNS.Editor:
