@@ -109,7 +109,6 @@ class Scheduler extends TerrainComponent<Props>
 
   public handleConfigurationChange(scheduleId: ID, isSource: boolean, key: string, endpoint)
   {
-
   }
 
   public getEndPointOptions(endpoints: Map<string, any>, isSource: boolean, scheduleId: ID)
@@ -143,7 +142,7 @@ class Scheduler extends TerrainComponent<Props>
          value: template.id,
          displayName: template.templateName,
        }
-     });
+     }).toList();
      const templateOptionSet = {
        key: 'template',
        options: templateOptions,
@@ -180,17 +179,26 @@ class Scheduler extends TerrainComponent<Props>
     // Status Options
 
     // Buttons to Run / Pause
-
+    const buttonOptionSet = {
+      isButton: true,
+      onButtonClick: this._fn(this.handleRunPause, schedule),
+      key: 'run',
+      options: List([]),
+    }
     // Log of Past Runs
-    return List([templateOptionSet, configurationOptionSet]);
+    return List([templateOptionSet, configurationOptionSet, buttonOptionSet]);
+  }
+
+  public handleRunPause(schedule)
+  {
   }
 
   public getValues(schedule, index: number)
   {
     const templateId = schedule.get('template') !== undefined ?
       schedule.get('template').id : '';
-
-    return List([templateId, this.state.configurations.get(index)]);
+    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
+    return List([templateId, this.state.configurations.get(index), buttonValue]);
   }
 
   public getTemplateName(templateId: ID, index: number)
