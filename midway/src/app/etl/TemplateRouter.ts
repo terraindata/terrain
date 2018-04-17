@@ -105,7 +105,6 @@ Router.post('/update/:id', passport.authenticate('access-token-local'), async (c
   {
     throw new Error('Template ID does not match the supplied id in the URL');
   }
-  console.log(JSON.stringify(template, null, 2));
   Util.verifyParameters(template, requiredParams);
   ctx.body = await templates.update(template);
 });
