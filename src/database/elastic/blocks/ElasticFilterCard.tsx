@@ -156,6 +156,8 @@ export class FilterUtils
 
     const indexFilters: Block[] = [];
     const otherFilters: Block[] = [];
+    const dummyFilters: Block[] = [];
+
     filterRows.map((row: Block) =>
     {
       if (row.boolQuery === 'filter' && row.filterOp === '=' && row.field === '_index')
@@ -166,11 +168,29 @@ export class FilterUtils
         otherFilters.push(row);
       }
     });
+
+    // make sure the dummyFilter dummy
+    if (block['dummyFilters'].size >= 1)
+    {
+      const dummyFilter = block['dummyFilters'].get(0);
+      if (dummyFilter.field === '_id' && dummyFilter.boolQuery === 'filter' && dummyFilter.key === 'exists')
+      {
+        dummyFilters.push(dummyFilter);
+      } else
+      {
+        dummyFilters.push(
+          dummyFilter.set('field', '_id')
+            .set('boolQuery', 'filter')
+            .set('key', 'exists'),
+        );
+      }
+    }
+
     // regroup the filter rows first because a new other-filter row added into
     // the index filter list or the type filter list
     block = block.set('indexFilters', Immutable.List(indexFilters));
+    block = block.set('dummyFilters', Immutable.List(dummyFilters));
     block = block.set('otherFilters', Immutable.List(otherFilters));
-
     // update the cached currentIndex;
     let indexField = '';
     if (block['indexFilters'].size > 0)
@@ -223,8 +243,10 @@ export const elasticFilter = _card({
   currentIndex: '',
   // caching the type
   currentType: '',
-  // filters divided as index/other filters
+  // filters divided as index/dummy/other filters
   indexFilters: List([]),
+  // dummyFilters are for ensuring soft bools soft.
+  dummyFilters: List([]),
   otherFilters: List([]),
   cards: Immutable.List([]),
   getChildOptions: FilterUtils.BoolQueryCard.getChildOptions,
@@ -288,11 +310,28 @@ export const elasticFilter = _card({
                   },
                   {
                     displayType: DisplayType.TEXT,
-                    key: 'value',
+                    key: 'field',
                     getAutoTerms: (schemaState, builderState) =>
                     {
                       return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Index);
                     },
+                  },
+                ],
+            },
+        },
+        {
+          displayType: DisplayType.ROWS,
+          key: 'dummyFilters',
+          english: 'Soft Bool',
+          factoryType: 'elasticFilterBlock',
+          row:
+            {
+              inner:
+                [
+                  {
+                    displayType: DisplayType.LABEL,
+                    label: 'Soft Bool',
+                    key: null,
                   },
                 ],
             },
