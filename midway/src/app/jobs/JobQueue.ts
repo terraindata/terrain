@@ -51,19 +51,39 @@ import * as runQueue from 'run-queue';
 import * as winston from 'winston';
 
 import { TaskConfig, TaskOutputConfig, TaskTreeConfig } from 'shared/types/jobs/TaskConfig';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
 import { Job } from './Job';
+import JobConfig from './JobConfig';
 import { Task } from './Task';
 import { TaskTree } from './TaskTree';
 
 export class JobQueue
 {
   private jobs: Map<number, Job>;
+  private jobTable: Tasty.Table;
   private priorityQueue: pq.PriorityQueue;
 
   constructor()
   {
     this.jobs = new Map<number, Job>();
     this.priorityQueue = new pq.PriorityQueue();
+    this.jobTable = new Tasty.Table(
+      'jobs',
+      ['id'],
+      [
+        'createdAt',
+        'meta',
+        'name',
+        'pausedFilename',
+        'priority',
+        'running',
+        'status',
+        'tasks',
+        'type',
+        'workerId',
+      ],
+    );
   }
 
   public cancel(id: number): boolean
@@ -95,6 +115,11 @@ export class JobQueue
         paused: -1,
       };
     return this.taskTree.create(args, taskTreeConfig);
+  }
+
+  public async get(id?: number, running?: boolean): Promise<JobConfig[]>
+  {
+    return this._select([], { id, running });
   }
 
   public pause(): void
@@ -149,6 +174,29 @@ export class JobQueue
       });
     });
     setTimeout(this._checkJobQueueTable.bind(this), 60000 - new Date().getTime() % 60000);
+  }
+
+  private async _select(columns: string[], filter: object, locked?: boolean): Promise<JobConfig[]>
+  {
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
+    {
+      let rawResults: object[] = [];
+      if (locked === undefined) // all
+      {
+        rawResults = await App.DB.select(this.jobTable, columns, filter);
+      }
+      else if (locked === true) // currently running
+      {
+        // TODO
+      }
+      else // currently not running
+      {
+        // TODO
+      }
+
+      const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
+      resolve(results);
+    });
   }
 }
 

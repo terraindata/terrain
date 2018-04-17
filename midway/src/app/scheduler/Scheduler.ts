@@ -234,20 +234,19 @@ export class Scheduler
     }
     else
     {
-      const existingSchedules: SchedulerConfig[] = await this.get(id);
+      const existingSchedules: SchedulerConfig[] = await this.get(schedule.id);
       if (existingSchedules.length === 0)
       {
         return Promise.reject('Schedule ' + ((schedule.id as any).toString() as string) + ' does not exist.');
       }
       schedule.lastModified = creationDate;
-
-      for (const key of schedule)
+      Object.keys(existingSchedules[0]).forEach((key) =>
       {
         if (schedule[key] === undefined)
         {
           schedule[key] = existingSchedules[0][key];
         }
-      }
+      });
     }
     return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
   }

@@ -138,7 +138,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
-  schedule.id = ctx.params.id;
+  schedule['id'] = parseInt(ctx.params.id, 10) as number;
   AppUtil.verifyParameters(schedule, ['id']);
   await perm.SchedulerPermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await scheduler.upsert(schedule);
