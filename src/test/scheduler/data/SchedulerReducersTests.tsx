@@ -42,37 +42,62 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import { Record } from 'immutable';
-import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
-import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
-import { createRecordType } from '../Classes';
+// Copyright 2018 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import Util from 'util/Util';
+import { SchedulerReducers as reducer } from 'scheduler/data/SchedulerRedux';
+import SchedulerHelper from 'test-helpers/SchedulerHelper';
+import { SchedulerState, _SchedulerState } from 'scheduler/SchedulerTypes';
 
-class SchedulerConfigC extends SharedSchedulerConfig
+describe('SchedulerReducers', () =>
 {
-  // if extra front-end specific functions or properties are needed, add here
-}
+  let scheduler = null;
 
-const SchedulerConfig_Record = createRecordType(new SchedulerConfigC(), 'SchedulerConfigC');
-export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig> { }
-export const _SchedulerConfig =
-  (config: object) =>
+  beforeEach(() => {
+    scheduler = SchedulerHelper.mockState().getState();
+  });
+
+  it('should return the inital state', () =>
   {
-    return new SchedulerConfig_Record(config) as any as SchedulerConfig;
-  };
+    expect(reducer(undefined, {})).toEqual(_SchedulerState());
+  });
 
-class SchedulerStateC
-{
-  public loading: boolean = true;
-  public schedules: Immutable.List<SchedulerConfig> = Immutable.List([]);
-}
+  describe('#getSchedulesStart', () =>
+  {
+    it('should set loading to true', () =>
+    {
+      scheduler = SchedulerHelper.mockState()
+        .loading(false)
+        .getState();
 
-const SchedulerState_Record = createRecordType(new SchedulerStateC(), 'SchedulerStateC');
-export interface SchedulerState extends SchedulerStateC, IRecord<SchedulerState> {};
-export const _SchedulerState = (config?: any) =>
-{
-  return new SchedulerState_Record(Util.extendId(config || {})) as any as SchedulerState;
-}
+      const nextState = reducer(scheduler, {
+        type: 'scheduler.getSchedulesStart'
+      });
+
+      expect(nextState.loading).toBe(true);
+    });
+  });
+
+  describe('#getSchedulesSuccess', () =>
+  {
+    it('should set loading to false', () =>
+    {
+      const nextState = reducer(scheduler, {
+        type: 'scheduler.getSchedulesSuccess'
+      });
+
+      expect(nextState.loading).toBe(false);
+    });
+  });
+
+  describe('#getSchedulesFailed', () =>
+  {
+    it('should set loading to false', () =>
+    {
+      const nextState = reducer(scheduler, {
+        type: 'scheduler.getSchedulesFailed'
+      });
+
+      expect(nextState.loading).toBe(false);
+    });
+  });
+});

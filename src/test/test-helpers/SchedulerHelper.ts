@@ -43,36 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import { Record } from 'immutable';
-import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
-import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
-import { createRecordType } from '../Classes';
+// tslint:disable:max-classes-per-file
 import * as Immutable from 'immutable';
-import Util from 'util/Util';
-
-class SchedulerConfigC extends SharedSchedulerConfig
+import
 {
-  // if extra front-end specific functions or properties are needed, add here
-}
+  SchedulerState,
+  _SchedulerState
+} from 'scheduler/SchedulerTypes';
+import { ItemType } from '../../items/types/Item';
 
-const SchedulerConfig_Record = createRecordType(new SchedulerConfigC(), 'SchedulerConfigC');
-export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig> { }
-export const _SchedulerConfig =
-  (config: object) =>
+export default class SchedulerHelper
+{
+  public static mockState()
   {
-    return new SchedulerConfig_Record(config) as any as SchedulerConfig;
-  };
-
-class SchedulerStateC
-{
-  public loading: boolean = true;
-  public schedules: Immutable.List<SchedulerConfig> = Immutable.List([]);
+    return new SchedulerStateMock();
+  }
 }
 
-const SchedulerState_Record = createRecordType(new SchedulerStateC(), 'SchedulerStateC');
-export interface SchedulerState extends SchedulerStateC, IRecord<SchedulerState> {};
-export const _SchedulerState = (config?: any) =>
+class SchedulerStateMock
 {
-  return new SchedulerState_Record(Util.extendId(config || {})) as any as SchedulerState;
+  public state;
+
+  public constructor()
+  {
+    this.state = _SchedulerState({});
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+
+  public loading(isLoading: boolean)
+  {
+    this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
 }

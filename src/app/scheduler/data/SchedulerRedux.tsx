@@ -42,37 +42,71 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import { Record } from 'immutable';
-import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
-import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
-import { createRecordType } from '../Classes';
+// Copyright 2018 Terrain Data, Inc.
+
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import * as Immutable from 'immutable';
-import Util from 'util/Util';
+import * as _ from 'lodash';
+import { SchedulerConfig, SchedulerState, _SchedulerState } from 'scheduler/SchedulerTypes';
+const { List, Map } = Immutable;
 
-class SchedulerConfigC extends SharedSchedulerConfig
+export interface SchedulerActionTypes
 {
-  // if extra front-end specific functions or properties are needed, add here
-}
-
-const SchedulerConfig_Record = createRecordType(new SchedulerConfigC(), 'SchedulerConfigC');
-export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig> { }
-export const _SchedulerConfig =
-  (config: object) =>
-  {
-    return new SchedulerConfig_Record(config) as any as SchedulerConfig;
+  getSchedulesStart: {
+    actionType: 'getSchedulesStart';
   };
-
-class SchedulerStateC
-{
-  public loading: boolean = true;
-  public schedules: Immutable.List<SchedulerConfig> = Immutable.List([]);
+  getSchedulesSuccess: {
+    actionType: 'getSchedulesSuccess';
+    schedule: SchedulerConfig;
+  };
+  getSchedulesFailed: {
+    actionType: 'getSchedulesFailed';
+  };
 }
 
-const SchedulerState_Record = createRecordType(new SchedulerStateC(), 'SchedulerStateC');
-export interface SchedulerState extends SchedulerStateC, IRecord<SchedulerState> {};
-export const _SchedulerState = (config?: any) =>
+class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
 {
-  return new SchedulerState_Record(Util.extendId(config || {})) as any as SchedulerState;
+  public namespace: string = 'scheduler';
+
+  public reducers: ConstrainedMap<SchedulerActionTypes, SchedulerState> =
+    {
+      getSchedulesStart: (state, action) =>
+      {
+        // Fetch the schema meta data
+        return state
+          .set('loading', true);
+      },
+
+      getSchedulesSuccess: (state, action) =>
+      {
+        // Fetch the schema meta data
+        return state
+          .set('loading', false);
+      },
+
+      getSchedulesFailed: (state, action) =>
+      {
+        // Fetch the schema meta data
+        return state
+          .set('loading', false);
+      },
+
+  }
+
+  public overrideAct(action: Unroll<SchedulerActionTypes>)
+  {
+    if (action.actionType === 'getSchedulesStart')
+    {
+      return this.fetchAction.bind(this);
+    }
+    else if (action.actionType === 'deleteElasticIndex')
+    {
+      return this.deleteElasticIndexAction.bind(this, action);
+    }
+  }
 }
+
+const ReduxInstance = new SchedulerRedux();
+export const SchedulerActions = ReduxInstance._actionsForExport();
+export const SchedulerReducers = ReduxInstance._reducersForExport(_SchedulerState);
+export declare type SchedulerActionType<K extends keyof SchedulerActionTypes> = GetType<K, SchedulerActionTypes>;
