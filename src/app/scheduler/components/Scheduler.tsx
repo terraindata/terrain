@@ -51,22 +51,23 @@ import XHR from 'util/XHR';
 
 class Scheduler extends TerrainComponent<any> {
 
-  public schedulerAjax: SchedulerApi = new SchedulerApi(XHR.getInstance());
+  public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
 
   public constructor(props)
   {
     super(props);
     this.state = {
       responseText: '',
+      schedules: null,
       id: '',
     };
   }
 
-  public createScheduler()
+  public createSchedule()
   {
-    this.schedulerAjax.createScheduler({
+    this.schedulerApi.createSchedule({
       interval: '0 0 1 1 *',
-      name: 'Jmansor Scheduler',
+      name: `Jmansor Schedule ${Math.floor(Math.random() * 100)}`,
       priority: 1,
       tasks: [],
       workerId: 10,
@@ -81,9 +82,25 @@ class Scheduler extends TerrainComponent<any> {
       });
   }
 
-  public getSchedulers()
+  public getSchedules()
   {
-    this.schedulerAjax.getSchedulers()
+    this.schedulerApi.getSchedules()
+      .then((response) =>
+      {
+        this.setState({
+         responseText: JSON.stringify(response),
+         schedules: response.data,
+       });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public getSchedule(id: number)
+  {
+    this.schedulerApi.getSchedule(id)
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
@@ -94,9 +111,10 @@ class Scheduler extends TerrainComponent<any> {
       });
   }
 
-  public getScheduler(id?: number)
+  public updateSchedule(id: number)
   {
-    this.schedulerAjax.getScheduler(id)
+    const changes = { name: 'Jmansor Schedule Modified' }
+    this.schedulerApi.updateSchedule(id, changes)
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
@@ -107,9 +125,9 @@ class Scheduler extends TerrainComponent<any> {
       });
   }
 
-  public deleteScheduler(id?: number)
+  public deleteSchedule(id?: number)
   {
-    this.schedulerAjax.deleteScheduler(id)
+    this.schedulerApi.deleteSchedule(id)
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
@@ -120,9 +138,74 @@ class Scheduler extends TerrainComponent<any> {
       });
   }
 
-  public duplicateScheduler(id?: number)
+  public duplicateSchedule(id?: number)
   {
-    this.schedulerAjax.duplicateScheduler(id)
+    this.schedulerApi.duplicateSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public getScheduleLog(id: number)
+  {
+    this.schedulerApi.getScheduleLog(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public pauseSchedule(id: number)
+  {
+    this.schedulerApi.pauseSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public unpauseSchedule(id: number)
+  {
+    this.schedulerApi.unpauseSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public runSchedule(id: number)
+  {
+    this.schedulerApi.runSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public setScheduleStatus(id: number)
+  {
+    this.schedulerApi.setScheduleStatus(id, false)
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
@@ -147,14 +230,30 @@ class Scheduler extends TerrainComponent<any> {
       <div>
         id: <input style={{ width: 50 }} onChange={this.handleIdChange} value={id} />
         <ul>
-          <li onClick={() => this.createScheduler()}>SchedulerApi.createScheduler()</li>
-          <li onClick={() => this.getSchedulers()}>SchedulerApi.getSchedulers()</li>
-          <li onClick={() => this.getScheduler(id)}>SchedulerApi.getSchedulers({id})</li>
-          <li onClick={() => this.deleteScheduler(id)}>SchedulerApi.deleteSchedulers({id})</li>
-          <li onClick={() => this.duplicateScheduler(id)}>SchedulerApi.duplicateSchedulers({id})</li>
+          <li onClick={() => this.createSchedule()}>ScheduleApi.createSchedule()</li>
+          <li onClick={() => this.getSchedules()}>SchedulerApi.getSchedules()</li>
+          <li onClick={() => this.getSchedule(id)}>SchedulerApi.getSchedules({id})</li>
+          <li onClick={() => this.updateSchedule(id)}>SchedulerApi.updateSchedule({id})</li>
+          <li onClick={() => this.deleteSchedule(id)}>SchedulerApi.deleteSchedules({id})</li>
+          <li onClick={() => this.duplicateSchedule(id)}>SchedulerApi.duplicateSchedules({id})</li>
+          <li onClick={() => this.getScheduleLog(id)}>SchedulerApi.getScheduleLog({id})</li>
+          <li onClick={() => this.pauseSchedule(id)}>SchedulerApi.pauseSchedule({id})</li>
+          <li onClick={() => this.unpauseSchedule(id)}>SchedulerApi.unpauseSchedule({id})</li>
+          <li onClick={() => this.runSchedule(id)}>SchedulerApi.runSchedule({id})</li>
+          <li onClick={() => this.setScheduleStatus(id)}>SchedulerApi.setScheduleStatus({id})</li>
         </ul>
         <div>
           {this.state.responseText}
+        </div>
+        <div>
+          {
+            this.state.schedules !== null ?
+            (
+              this.state.schedules.map((s) =>
+                <div key={s.id}>{s.id} - {s.name} - {s.running ? 'running' : 'not running'} - {s.shouldRunNext.toString()}</div>
+              )
+            ) : null
+          }
         </div>
       </div>
     );

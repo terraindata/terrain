@@ -57,30 +57,66 @@ class SchedulerAjax
     this.xhr = xhr;
   }
 
-  public createScheduler(schedulerConfig)
+  public createSchedule(schedulerConfig)
   {
     const body = schedulerConfig;
     return this.xhr.post('/scheduler', { body });
   }
 
-  public getSchedulers()
+  public getSchedules()
   {
     return this.xhr.get('/scheduler');
   }
 
-  public getScheduler(id?: number)
+  public getSchedule(id: number)
   {
     return this.xhr.get(`/scheduler/${id}`);
   }
 
-  public deleteScheduler(id?: number)
+  public updateSchedule(id: number, changes)
+  {
+    return this.xhr.post(`/scheduler/${id}`,
+      {
+        body: changes,
+      });
+  }
+
+  public deleteSchedule(id: number)
   {
     return this.xhr.post(`/scheduler/delete/${id}`);
   }
 
-  public duplicateScheduler(id?: number)
+  public duplicateSchedule(id: number)
   {
     return this.xhr.post(`/scheduler/duplicate/${id}`);
+  }
+
+  public getScheduleLog(schedulerId: number)
+  {
+    return this.xhr.get(`/scheduler/log/${schedulerId}`);
+  }
+
+  public pauseSchedule(id: number)
+  {
+    return this.xhr.post(`/scheduler/pause/${id}`);
+  }
+
+  public unpauseSchedule(id: number)
+  {
+    return this.xhr.post(`/scheduler/unpause/${id}`);
+  }
+
+  public runSchedule(id: number)
+  {
+    return this.xhr.post(`/scheduler/run/${id}`);
+  }
+
+  public setScheduleStatus(id: number, status: boolean)
+  {
+    return this.xhr.post(`/scheduler/status/${id}`,
+      {
+        body: { status }
+      });
   }
 }
 
