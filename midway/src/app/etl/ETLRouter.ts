@@ -97,7 +97,7 @@ interface ETLUIPreviewConfig
   size?: number;
 }
 
-Router.post('/source/preview', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/preview', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const request: ETLUIPreviewConfig = ctx.request.body.body;
   Util.verifyParameters(request, ['source']);
@@ -116,7 +116,7 @@ Router.post('/source/preview', passport.authenticate('access-token-local'), asyn
 
   // get a preview up to "size" rows from the specified source
   const sourceStream: stream.Readable = await getSourceStream('preview', source);
-  ctx.body = await BufferTransform.toArray(sourceStream, request.size);
+  ctx.body = JSON.stringify(await BufferTransform.toArray(sourceStream, request.size));
 });
 
 export default Router;

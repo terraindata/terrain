@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 import { Readable } from 'stream';
 
+import { makeCallback } from '../../../../../shared/util/Promise';
+
 /**
  * Consumes an input source stream and turns it into an array
  */
@@ -55,18 +57,7 @@ export default class BufferTransform
   {
     return new Promise<any[]>((resolve, reject) =>
     {
-      const bufferTransform = new BufferTransform(stream,
-        (err, arr) =>
-        {
-          if (err !== null || err !== undefined)
-          {
-            reject(err);
-          }
-          else
-          {
-            resolve(arr);
-          }
-        }, size);
+      return new BufferTransform(stream, makeCallback(resolve, reject), size);
     });
   }
 
@@ -79,16 +70,14 @@ export default class BufferTransform
     this.arr = [];
     this.stream = stream;
 
-    // consume the whole stream
-    if (size === undefined || size <= 0)
-    {
-      this.stream.on('end', () => callback(null, this.arr));
-    }
+    const done = () => callback(null, this.arr);
 
+    this.stream.on('end', done);
     this.stream.on('data', (doc) =>
     {
       if (this.arr.length >= (size as number))
       {
+        this.stream.removeListener('end', done);
         callback(null, this.arr);
       }
       else

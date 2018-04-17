@@ -190,3 +190,47 @@ describe('ETL Template Tests', () =>
       });
   });
 });
+
+describe('ETL Execute Tests', () =>
+{
+  // TODO: Add more tests
+});
+
+describe('ETL Preview Tests', () =>
+{
+  test('Source preview: POST /midway/v1/etl/preview', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/etl/preview')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          source: {
+            type: 'Fs',
+            name: 'Default Source',
+            fileConfig: {
+              fileType: 'json',
+              hasCsvHeader: true,
+              jsonNewlines: false,
+            },
+            options: {
+              path: './midway/test/etl/movies.json',
+            },
+          },
+        },
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const response = JSON.parse(res.text);
+        expect(response.length).toEqual(5);
+        expect(response[2].genres).toEqual('Documentary');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/etl/preview request returned an error: ' + String(error));
+      });
+  });
+});
