@@ -77,7 +77,7 @@ beforeAll(async (done) =>
         debug: true,
         db: 'postgres',
         dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
-        port: 3000,
+        port: 63000,
         databases: [
           {
             name: 'My ElasticSearch Instance',
