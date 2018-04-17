@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:member-access no-reference
 
 /// TODO: remove when the "src" dependency is eliminated
-/// <reference path="../../typings/tsd.d.ts" />
+/// <reference path="../../../shared/typings/tsd.d.ts" />
 
 import { BaseClass } from '../../app/Classes';
 import BackendInstance from '../../database/types/BackendInstance';

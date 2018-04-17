@@ -50,6 +50,8 @@ import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/Endpoin
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
+type z = IRecord<TemplateConfig>;
+console.log(5 as any as z);
 export class TemplateConfig extends ConfigType implements TemplateBase
 {
   public id?: number = undefined;
