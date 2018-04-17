@@ -205,6 +205,7 @@ class Scheduler extends TerrainComponent<Props>
   {
     const template = this.props.etl.templates.filter((temp) => temp.id === templateId).get(0);
     const templateName = template ? template.templateName : 'None';
+    return templateName;
   }
 
   public updateScheduleList(schedules: any[], templates?)
