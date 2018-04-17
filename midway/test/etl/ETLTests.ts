@@ -189,29 +189,4 @@ describe('ETL Template Tests', () =>
         fail('POST /midway/v1/etl/templates/1 request returned an error: ' + String(error));
       });
   });
-
-  // test('Check stats: GET /midway/v1/status/stats', async () =>
-  // {
-  //   await request(server)
-  //     .get('/midway/v1/status/stats')
-  //     .query({
-  //       id: 1,
-  //       accessToken: 'ImAnAdmin',
-  //     })
-  //     .expect(200)
-  //     .then((response) =>
-  //     {
-  //       const responseObject = JSON.parse(response.text);
-  //       winston.info(JSON.stringify(responseObject, null, 1));
-  //       expect(responseObject.uptime > 0);
-  //       expect(responseObject.numRequests > 0);
-  //       expect(responseObject.numRequestsCompleted > 0 && responseObject.numRequestsCompleted < responseObject.numRequests);
-  //       expect(responseObject.numRequestsPending === responseObject.numRequests - responseObject.numRequestsCompleted);
-  //       expect(responseObject.numRequestsThatThrew >= 0 && responseObject.numRequestsThatThrew < responseObject.numRequests);
-  //     })
-  //     .catch((error) =>
-  //     {
-  //       fail('GET /midway/v1/status/stats request returned an error: ' + String(error));
-  //     });
-  // });
 });
