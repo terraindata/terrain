@@ -231,10 +231,9 @@ class Scheduler extends TerrainComponent<Props>
   public handleCreateSchedule()
   {
     this.schedulerAjax.createScheduler({
-      interval: '0 0 1 1 *',
+      cron: '0 0 1 1 *',
       meta: '',
       name: 'Schedule',
-      pausedFilename: '',
       tasks: JSON.stringify({
         cancel: false, // whether the tree of tasks should be cancelled
         jobStatus: 0, // 0: not running, 1: running, 2: paused
@@ -245,7 +244,6 @@ class Scheduler extends TerrainComponent<Props>
         paused: 4, // where in the tree of tasks the tasks are paused
         taskId: 5, // maps to a statically declared task
       }),
-      templateId: 1,
     })
       .then((response) =>
       {
@@ -284,6 +282,11 @@ class Scheduler extends TerrainComponent<Props>
     }
   }
 
+  public canEdit(schedule)
+  {
+    return !schedule.get('running') && TerrainTools.isAdmin();
+  }
+
   public render()
   {
     const { schedules } = this.state;
@@ -295,8 +298,8 @@ class Scheduler extends TerrainComponent<Props>
               key={i}
               optionSets={this.getOptionSets(schedule)}
               values={this.getValues(schedule, i)}
-              canEdit={TerrainTools.isAdmin()}
-              canDelete={TerrainTools.isAdmin()}
+              canEdit={this.canEdit(schedule)}
+              canDelete={this.canEdit(schedule)}
               onDelete={this._fn(this.handleDeleteSchedule, schedule.get('id'))}
               onChange={this._fn(this.handleScheduleChange, i)}
             />,
