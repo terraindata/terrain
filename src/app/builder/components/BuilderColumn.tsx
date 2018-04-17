@@ -230,7 +230,7 @@ const BuilderColumn = createReactClass<any, any>(
     shouldShowExport()
     {
       return ['DEPLOYED', 'LIVE', 'DEFAULT'].indexOf(this.props.algorithm.status) > -1;
-    }
+    },
 
     renderContent()
     {

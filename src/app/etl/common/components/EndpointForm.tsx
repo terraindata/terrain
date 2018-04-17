@@ -166,5 +166,5 @@ interface SourceFormState
   type: Sources;
 }
 
-const sourceList = List([Sources.Upload, Sources.Algorithm, Sources.Sftp, Sources.Http]);
-const sinkList = List([Sinks.Download, Sinks.Database, Sinks.Sftp, Sinks.Http]);
+const sourceList = List(Object.keys(Sources));
+const sinkList = List(Object.keys(Sinks));
