@@ -1,0 +1,74 @@
+{
+  "id": -1,
+  "lastModified": null,
+  "createdAt": null,
+  "archived": false,
+  "templateName": "Movies JSON Export",
+  "process": {
+    "nodes": {
+      "0": {
+        "id": 0,
+        "type": "Source",
+        "options": {
+          "leftId": -1,
+          "rightId": -1,
+          "leftJoinKey": "",
+          "rightJoinKey": "",
+          "outputKey": ""
+        },
+        "endpoint": "_default"
+      },
+      "1": {
+        "id": 1,
+        "type": "Sink",
+        "options": {
+          "leftId": -1,
+          "rightId": -1,
+          "leftJoinKey": "",
+          "rightJoinKey": "",
+          "outputKey": ""
+        },
+        "endpoint": "_default"
+      }
+    },
+    "edges": {
+      "0": {
+        "id": 0,
+        "from": 0,
+        "to": 1,
+        "transformations": "{\"dag\":{\"options\":{\"directed\":true,\"multigraph\":false,\"compound\":false},\"nodes\":[{\"v\":\"0\",\"value\":{\"id\":0,\"fields\":[[\"backdroppath\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"1\",\"value\":{\"id\":1,\"fields\":[[\"runtime\"]],\"meta\":{\"toTypename\":\"number\"},\"typeCode\":\"CastNode\"}},{\"v\":\"2\",\"value\":{\"id\":2,\"fields\":[[\"genres\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"3\",\"value\":{\"id\":3,\"fields\":[[\"homepage\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"4\",\"value\":{\"id\":4,\"fields\":[[\"language\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"5\",\"value\":{\"id\":5,\"fields\":[[\"overview\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"6\",\"value\":{\"id\":6,\"fields\":[[\"status\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"7\",\"value\":{\"id\":7,\"fields\":[[\"tagline\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"8\",\"value\":{\"id\":8,\"fields\":[[\"@version\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"9\",\"value\":{\"id\":9,\"fields\":[[\"posterpath\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"10\",\"value\":{\"id\":10,\"fields\":[[\"budget\"]],\"meta\":{\"toTypename\":\"number\"},\"typeCode\":\"CastNode\"}},{\"v\":\"11\",\"value\":{\"id\":11,\"fields\":[[\"popularity\"]],\"meta\":{\"toTypename\":\"number\"},\"typeCode\":\"CastNode\"}},{\"v\":\"12\",\"value\":{\"id\":12,\"fields\":[[\"movieid\"]],\"meta\":{\"toTypename\":\"number\"},\"typeCode\":\"CastNode\"}},{\"v\":\"13\",\"value\":{\"id\":13,\"fields\":[[\"revenue\"]],\"meta\":{\"toTypename\":\"number\"},\"typeCode\":\"CastNode\"}},{\"v\":\"14\",\"value\":{\"id\":14,\"fields\":[[\"title\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"15\",\"value\":{\"id\":15,\"fields\":[[\"votecount\"]],\"meta\":{\"toTypename\":\"number\"},\"typeCode\":\"CastNode\"}},{\"v\":\"16\",\"value\":{\"id\":16,\"fields\":[[\"releasedate\"]],\"meta\":{\"toTypename\":\"string\"},\"typeCode\":\"CastNode\"}},{\"v\":\"17\",\"value\":{\"id\":17,\"fields\":[[\"voteaverage\"]],\"meta\":{\"toTypename\":\"number\"},\"typeCode\":\"CastNode\"}}],\"edges\":[]},\"doc\":{},\"uidField\":18,\"uidNode\":18,\"fieldNameToIDMap\":[[[\"genres\"],2],[[\"votecount\"],15],[[\"homepage\"],3],[[\"title\"],14],[[\"backdroppath\"],0],[[\"movieid\"],12],[[\"runtime\"],1],[[\"budget\"],10],[[\"voteaverage\"],17],[[\"language\"],4],[[\"revenue\"],13],[[\"releasedate\"],16],[[\"posterpath\"],9],[[\"@version\"],8],[[\"overview\"],5],[[\"tagline\"],7],[[\"popularity\"],11],[[\"status\"],6]],\"IDToFieldNameMap\":[[0,[\"backdroppath\"]],[1,[\"runtime\"]],[2,[\"genres\"]],[3,[\"homepage\"]],[4,[\"language\"]],[5,[\"overview\"]],[6,[\"status\"]],[7,[\"tagline\"]],[8,[\"@version\"]],[9,[\"posterpath\"]],[10,[\"budget\"]],[11,[\"popularity\"]],[12,[\"movieid\"]],[13,[\"revenue\"]],[14,[\"title\"]],[15,[\"votecount\"]],[16,[\"releasedate\"]],[17,[\"voteaverage\"]]],\"fieldTypes\":[[0,\"string\"],[1,\"number\"],[2,\"string\"],[3,\"string\"],[4,\"string\"],[5,\"string\"],[6,\"string\"],[7,\"string\"],[8,\"string\"],[9,\"string\"],[10,\"number\"],[11,\"number\"],[12,\"number\"],[13,\"number\"],[14,\"string\"],[15,\"number\"],[16,\"string\"],[17,\"number\"]],\"fieldEnabled\":[[0,true],[1,true],[2,true],[3,true],[4,true],[5,true],[6,true],[7,true],[8,true],[9,true],[10,true],[11,true],[12,true],[13,true],[14,true],[15,true],[16,true],[17,true]],\"fieldProps\":[[0,{}],[1,{}],[2,{}],[3,{}],[4,{}],[5,{}],[6,{}],[7,{}],[8,{}],[9,{}],[10,{}],[11,{}],[12,{}],[13,{}],[14,{}],[15,{}],[16,{}],[17,{}]]}"
+      }
+    },
+    "uidNode": 2,
+    "uidEdge": 1
+  },
+  "sources": {
+    "_default": {
+      "type": "Algorithm",
+      "name": "Default Source",
+      "fileConfig": {
+        "fileType": "json",
+        "hasCsvHeader": true,
+        "jsonNewlines": false
+      },
+      "options": {
+        "algorithmId": 1
+      }
+    }
+  },
+  "sinks": {
+    "_default": {
+      "type": "Download",
+      "name": "Default Sink",
+      "fileConfig": {
+        "fileType": "json",
+        "hasCsvHeader": true,
+        "jsonNewlines": false
+      },
+      "options": {
+        "filename": ""
+      }
+    }
+  }
+}
+
