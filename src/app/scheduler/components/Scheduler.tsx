@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
 import {List, Map} from 'immutable';
 import * as React from 'react';
 import SchedulerAjax from 'scheduler/SchedulerAjax';
@@ -52,20 +53,37 @@ import Api from 'util/Api';
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import './Schedule.less';
 import RouteSelector from 'app/common/components/RouteSelector';
+import Colors from 'app/colors/Colors';
+import Util from 'app/util/Util';
+import TerrainTools from 'app/util/TerrainTools';
+import { ETLState } from 'app/etl/ETLTypes';
+import { ETLActions } from 'app/etl/ETLRedux';
+import EndpointForm from 'app/etl/common/components/EndpointForm';
 
-class Scheduler extends TerrainComponent<any>
+export interface Props {
+  // injected
+  etl?: ETLState;
+  etlActions?: typeof ETLActions;
+}
+
+class Scheduler extends TerrainComponent<Props>
 {
   public schedulerAjax: SchedulerAjax = new SchedulerAjax(Api.getInstance());
   public state: {
     schedules: List<any>;
+    configurations: List<string>;
   } = {
-    schedules: List([])
+    schedules: List([]),
+    configurations: List([]),
   };
 
-  public constructor(props)
+  public componentWillMount()
   {
-    super(props);
     this.getSchedules();
+    this.props.etlActions({
+      actionType: 'fetchTemplates',
+    });
+    this.listenToKeyPath('etl', ['templates']);
   }
 
   public getSchedules()
@@ -73,10 +91,7 @@ class Scheduler extends TerrainComponent<any>
     this.schedulerAjax.getSchedules()
       .then((response) =>
       {
-        console.log('response ', response);
-        this.setState({
-          schedules: response,
-        })
+        this.updateScheduleList(response);
       })
       .catch((error) =>
        {
@@ -84,25 +99,130 @@ class Scheduler extends TerrainComponent<any>
       });
   }
 
-  public getConnections()
+  public componentWillReceiveProps(nextProps: Props)
   {
-    this.schedulerAjax.getConnections()
-      .then((response) =>
-      {
-        console.log('response ', response);
-      })
-      .catch((error) =>
-       {
-        console.log(error);
-      });
+    if (this.props.etl.templates !== nextProps.etl.templates)
+    {
+      this.updateScheduleList(this.state.schedules.toJS(), nextProps.etl.templates);
+    }
+  }
+
+  public handleConfigurationChange(scheduleId: ID, isSource: boolean, key: string, endpoint)
+  {
+
+  }
+
+  public getEndPointOptions(endpoints: Map<string, any>, isSource: boolean, scheduleId: ID)
+  {
+    const keys = _.keys(endpoints.toJS());
+    return List(keys.map((key) => {
+      const endpoint = endpoints.get(key);
+       return {
+         value: isSource ? 'source' + key : 'sink' + key,
+         displayName: endpoint.name,
+         component: <EndpointForm
+           isSource={isSource}
+           endpoint={endpoint}
+           onChange={this._fn(this.handleConfigurationChange, scheduleId, isSource, key)}
+         />
+       }
+      }));
+  }
+
+  public getSourceSinkDescription(schedule)
+  {
+    return 'From (info) To (info)'
+  }
+
+  public getOptionSets(schedule)
+  {
+    // Template Option Set
+     const templateOptions = this.props.etl.templates.map((template) =>
+     {
+       return {
+         value: template.id,
+         displayName: template.templateName,
+       }
+     });
+     const templateOptionSet = {
+       key: 'template',
+       options: templateOptions,
+       shortNameText: 'Template',
+       column: true,
+       forceFloat: true,
+       getCustomDisplayName: this.getTemplateName,
+     };
+    // Configuration Option Set (Based on Template)
+    let configurationOptions = List([]);
+    let configurationHeaderText = 'Choose a Template';
+    if (schedule.get('template'))
+    {
+      configurationHeaderText = '';
+      const sources = schedule.get('template').sources;
+      const sinks = schedule.get('template').sinks;
+      console.log(sources);
+      const sourceOptions = this.getEndPointOptions(sources, true, schedule.get('id'));
+      const sinkOptions = this.getEndPointOptions(sinks, false, schedule.get('id'));
+      configurationOptions = sourceOptions.concat(sinkOptions).toList();
+    }
+    const configurationOptionSet = {
+      key: 'configuration',
+      options: configurationOptions,
+      shortNameText: 'Configuration',
+      headerText: configurationHeaderText,
+      column: true,
+      forceFloat: true,
+      getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule)
+      // ADD IN CUSTOM DISPLAY NAME THAT IS DESCRIPTION OF SOURCE / SINK
+    }
+    // CRON Option Set
+
+    // Status Options
+
+    // Buttons to Run / Pause
+
+    // Log of Past Runs
+    return List([templateOptionSet, configurationOptionSet]);
+  }
+
+  public getValues(schedule, index: number)
+  {
+    const templateId = schedule.get('template') !== undefined ?
+      schedule.get('template').id : '';
+
+    return List([templateId, this.state.configurations.get(index)]);
+  }
+
+  public getTemplateName(templateId: ID, index: number)
+  {
+    const template = this.props.etl.templates.filter((temp) => temp.id === templateId).get(0);
+    const templateName = template ? template.templateName : 'None';
+  }
+
+  public updateScheduleList(schedules: any[], templates?)
+  {
+    templates = templates || this.props.etl.templates;
+    let formattedSchedules = List([]);
+    schedules.map((schedule) =>
+    {
+      const newSchedule = schedule;
+      const task = JSON.parse(JSON.parse(schedule.tasks));
+      const templateId = task.params.templateId;
+      const temp = templates.filter((t) => t.id === templateId).get(0);
+      newSchedule['template'] = temp;
+      formattedSchedules = formattedSchedules.push(Map(newSchedule));
+    });
+    this.setState({
+      schedules: formattedSchedules,
+    });
   }
 
   public handleCreateSchedule()
   {
     this.schedulerAjax.createScheduler({
       interval: '0 0 1 1 *',
-      meta: 'Schedule 1',
-      name: '',
+      meta: '',
+      name: 'Schedule',
       pausedFilename: '',
       tasks: JSON.stringify({
         cancel: false, // whether the tree of tasks should be cancelled
@@ -110,7 +230,7 @@ class Scheduler extends TerrainComponent<any>
         name: 'Import', // name of the task i.e. 'import'
         onFailure: 3, // id of task to execute on failure
         onSuccess: 2, // id of next task to execute (default should be next in array)
-        params: { param1: 'a' }, // input parameters for the task
+        params: { templateId: 7 }, // input parameters for the task
         paused: 4, // where in the tree of tasks the tasks are paused
         taskId: 5, // maps to a statically declared task
       }),
@@ -118,11 +238,7 @@ class Scheduler extends TerrainComponent<any>
     })
       .then((response) =>
       {
-        // Action here to add the schedule to redux store
-
-        this.setState({
-          schedules: this.state.schedules.push(response[0]),
-        });
+        this.updateScheduleList(this.state.schedules.push(response[0]).toJS());
       })
       .catch((error) =>
     {
@@ -130,27 +246,30 @@ class Scheduler extends TerrainComponent<any>
       });
   }
 
-  public getOptionSets()
+  public handleDeleteSchedule(id: ID)
   {
-    const idOptionSet = {
-      options: List([]),
-      shortNameText: 'Id',
-      key: 'id',
-    }
-    return List([idOptionSet]);
+    this.schedulerAjax.deleteSchedule(id)
+    .then((response) =>
+    {
+      this.getSchedules();
+    })
+    .catch((error) =>
+    {
+      console.log('error', error);
+    });
   }
 
-  public handleDeleteSchedule(index: number)
+  public handleScheduleChange(scheduleIndex: number, optionSetIndex: number, value: any)
   {
-    this.schedulerAjax.deleteSchedule(this.state.schedules[index].id)
-      .then((response) =>
-      {
-        this.getSchedules();
-      })
-      .catch((error) =>
-      {
-        console.log('error', error);
-      });
+    console.log('change ', optionSetIndex, value);
+    switch (optionSetIndex)
+    {
+      case 1:
+        this.setState({
+          configurations: this.state.configurations.set(scheduleIndex, value),
+        });
+      default:
+    }
   }
 
   public render()
@@ -161,13 +280,13 @@ class Scheduler extends TerrainComponent<any>
         {
           schedules.map((schedule, i) =>
             <RouteSelector
-              optionSets={this.getOptionSets()}
-              values={List([schedule.id])}
               key={i}
-              canDelete={true}
-              canEdit={true}
-              onDelete={this._fn(this.handleDeleteSchedule, i)}
-              onChange={(a, b) => {}}
+              optionSets={this.getOptionSets(schedule)}
+              values={this.getValues(schedule, i)}
+              canEdit={TerrainTools.isAdmin()}
+              canDelete={TerrainTools.isAdmin()}
+              onDelete={this._fn(this.handleDeleteSchedule, schedule.get('id'))}
+              onChange={this._fn(this.handleScheduleChange, i)}
             />
           )
         }
@@ -182,4 +301,8 @@ class Scheduler extends TerrainComponent<any>
   }
 }
 
-export default Scheduler;
+export default Util.createContainer(
+  Scheduler,
+  ['etl'],
+  {etlActions: ETLActions},
+);
