@@ -80,64 +80,76 @@ export class JobQueue
     return false;
   }
 
-  /*
-    public create(args: TaskConfig[], filename: string): boolean | string
+  public create(args: TaskConfig[], filename: string): boolean | string
+  {
+    if (args === undefined || (Array.isArray(args) && args.length === 0))
     {
-      if (args === undefined || (Array.isArray(args) && args.length === 0))
+      return false;
+    }
+    this.tasks = args;
+    const taskTreeConfig: TaskTreeConfig =
       {
-        return false;
-      }
-      this.tasks = args;
-      const taskTreeConfig: TaskTreeConfig =
-        {
-          cancel: false,
-          filename,
-          jobStatus: 0,
-          paused: -1,
-        };
-      return this.taskTree.create(args, taskTreeConfig);
-    }
+        cancel: false,
+        filename,
+        jobStatus: 0,
+        paused: -1,
+      };
+    return this.taskTree.create(args, taskTreeConfig);
+  }
 
-    public pause(): void
+  public pause(): void
+  {
+    if (this.taskTree.isCancelled() === false)
     {
-      if (this.taskTree.isCancelled() === false)
+      this.taskTree.pause();
+    }
+  }
+
+  public async unpause(): Promise<void>
+  {
+    if (this.taskTree.isCancelled() === true)
+    {
+      await this.run();
+    }
+  }
+
+  public async printTree(): Promise<void>
+  {
+    await this.taskTree.printTree();
+  }
+
+  public async run(): Promise<TaskOutputConfig>
+  {
+    return this.taskTree.visit();
+  }
+
+  private async _getAvailableJobs(): Promise<number[]>
+  {
+    return new Promise<number[]>(async (resolve, reject) =>
+    {
+      const jobIds: number[] = [];
+      const jobs: JobQueueConfig[] = await this._select([], { running: true }) as JobQueueConfig[];
+      jobs.forEach((job) =>
       {
-        this.taskTree.pause();
-      }
-    }
-
-    public async unpause(): Promise<void>
-    {
-      if (this.taskTree.isCancelled() === true)
-      {
-        await this.run();
-      }
-    }
-
-    public async printTree(): Promise<void>
-    {
-      await this.taskTree.printTree();
-    }
-
-    public async run(): Promise<TaskOutputConfig>
-    {
-      return this.taskTree.visit();
-    }
-
-    private async _jobLoop(): Promise<void>
-    {
-      // TODO check the scheduler for unlocked rows and detect which schedules should run next
-      const availableSchedules: number[] = await this._getAvailableSchedules();
-      availableSchedules.forEach((scheduleId) =>
-      {
-        this._checkSchedulerTableHelper(scheduleId).catch((err) =>
-        {
-          winston.warn(err.toString() as string);
-        });
+        jobIds.push(job.id);
       });
-      setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
-    }
-  */
+      resolve(jobIds);
+    });
+  }
+
+  private async _jobLoop(): Promise<void>
+  {
+    // TODO check the job queue for unlocked rows and detect which jobs should run next
+    const availableSchedules: number[] = await this._getAvailableJobs();
+    availableSchedules.forEach((jobId) =>
+    {
+      this._checkJobQueueTable(jobId).catch((err) =>
+      {
+        winston.warn(err.toString() as string);
+      });
+    });
+    setTimeout(this._checkJobQueueTable.bind(this), 60000 - new Date().getTime() % 60000);
+  }
 }
 
 export default JobQueue;

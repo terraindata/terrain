@@ -46,14 +46,17 @@ THE SOFTWARE.
 
 export interface JobConfig
 {
-  id: number;                        // scheduled job ID
+  createdAt: Date;                   // when the job was created
+  id: number;                        // job ID
   meta: string;                      // meta
-  name: string;                      // name of the schedule
+  name: string;                      // name of the job
   pausedFilename: string;            // filename of the stored paused output
   priority: number;                  // priority of the scheduled job
   running: boolean;                  // whether the task is running or not (TODO: lock this)
-  shouldRunNext: boolean;            // whether the job should run again or not
+  status: number;                    // the status of the job: success, failure, cancelled
   tasks: string;                     // a stringified representation of TaskConfig[]
+  type: string;                      // whether the job is a scheduled run, a scheduled ad hoc run, or an ETL run
   workerId: number;                  // for clustering, denotes the node ID
 }
+
 export default JobConfig;

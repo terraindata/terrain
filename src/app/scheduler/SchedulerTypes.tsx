@@ -43,17 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
+import { Record } from 'immutable';
+import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
+import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
+import { createRecordType } from '../Classes';
 
-import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
-import ConfigType from '../ConfigType';
-
-export class SchedulerConfig extends SharedSchedulerConfig
+class SchedulerConfigC extends SharedSchedulerConfig
 {
-  constructor(props: object)
-  {
-    super();
-    ConfigType.initialize(this, props);
-  }
+  // if extra front-end specific functions or properties are needed, add here
 }
 
-export default SchedulerConfig;
+const SchedulerConfig_Record = createRecordType(new SchedulerConfigC(), 'SchedulerConfigC');
+export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig> { }
+export const _SchedulerConfig =
+  (config: object) =>
+  {
+    return new SchedulerConfig_Record(config) as any as SchedulerConfig;
+  };
