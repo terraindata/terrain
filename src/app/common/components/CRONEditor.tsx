@@ -53,7 +53,8 @@ import * as React from 'react';
 import { borderColor, Colors, getStyle } from './../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FadeInOut from './FadeInOut';
-import { parseCRONDaySchedule, parseCRONHourSchedule } from 'shared/util/CRONParser';
+import FloatingInput from './FloatingInput';
+import { parseCRONDaySchedule, parseCRONHourSchedule, canParseCRONSchedule } from 'shared/util/CRONParser';
 import { CRONHourNames, CRONHourOptions, CRONWeekDayNames, CRONWeekDayOptions,
   CRONMonthDayOptions, CRONDaySchedule, CRONHourSchedule } from 'shared/util/CRONConstants';
 
@@ -82,11 +83,17 @@ class CRONEditor extends TerrainComponent<Props>
     );
   }
   
+  private handleOptionClick(daysOrHours: 'days' | 'hours', type: string)
+  {
+    
+  }
+  
   private renderHeader(str: string)
   {
     return (
       <div 
         className='common-list-option-style common-label-style'
+        key={str}
       >
         {
           str
@@ -99,14 +106,16 @@ class CRONEditor extends TerrainComponent<Props>
     daysOrHours: 'days' | 'hours', el?: any)
   {
     const selected = sched && sched.type === type;
-    
+    console.log(sched);
+
     return (
       <div
         className='common-list-option-style'
         style={selected ? SELECTED_OPTION_STYLE : null}
         onClick={selected ? noop : this._fn(this.handleOptionClick, daysOrHours, type)}
+        key={type}
       >
-        <div>
+        <div className='common-option-name-style'>
           {
             text
           }
@@ -127,20 +136,21 @@ class CRONEditor extends TerrainComponent<Props>
   
   private renderDays()
   {
-    const sched = parseCRONDaySchedule(this.props.cron);
+    const { cron } = this.props;
+    const sched = canParseCRONSchedule(cron) ? parseCRONDaySchedule(cron) : null;
     
     return [
       this.renderHeader('Day'),
       this.renderOption('Every day', 'daily', sched, 'days'),
       this.renderOption('Every weekday', 'weekdays', sched, 'days'),
       
-      this.renderOption('Specific weekday(s)', 'weekdays', sched, 'days',
+      this.renderOption('Specific weekday(s)', 'weekly', sched, 'days',
         <div>
           TODO
         </div>
       ),
       
-      this.renderOption('Specific day(s) of the month', 'weekdays', sched, 'days',
+      this.renderOption('Specific day(s) of the month', 'monthly', sched, 'days',
         <div>
           TODO
         </div>
@@ -150,7 +160,8 @@ class CRONEditor extends TerrainComponent<Props>
   
   private renderHours()
   {
-    const sched = parseCRONHourSchedule(this.props.cron);
+    const { cron } = this.props;
+    const sched = canParseCRONSchedule(cron) ? parseCRONHourSchedule(cron) : null;
     
     return [
       this.renderHeader('Time'),
@@ -169,7 +180,17 @@ class CRONEditor extends TerrainComponent<Props>
   {
     return [
       this.renderHeader('Custom'),
-      <div>TODO</div>
+      <div className='common-list-option-style'>
+        <div className='common-option-name-style'>
+          <FloatingInput
+            value={this.props.cron}
+            onChange={this.props.onChange}
+            label={'CRON Schedule'}
+            isTextInput={true}
+            canEdit={true}
+          />
+        </div>
+      </div>
     ];
   }
 }

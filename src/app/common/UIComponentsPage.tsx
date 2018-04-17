@@ -55,6 +55,7 @@ import TerrainComponent from './../common/components/TerrainComponent';
 import './UIComponentsPageStyle.less';
 
 import Button from './components/Button';
+import CRONEditor from './components/CRONEditor';
 
 export interface Props
 {
@@ -63,6 +64,10 @@ export interface Props
 
 class UIComponentsPage extends TerrainComponent<Props>
 {
+  state = {
+    cron: '* * * * *',
+  };
+  
   public render()
   {
     const space = <div className='space' />;
@@ -141,6 +146,12 @@ class UIComponentsPage extends TerrainComponent<Props>
         />
         {space}
 
+        <CRONEditor
+          cron={this.state.cron}
+          onChange={this._setStateWrapper('cron')}
+        />
+        {space}
+        
       </div>
     );
   }
