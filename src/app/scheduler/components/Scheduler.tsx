@@ -43,24 +43,25 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console
+// tslint:disable:no-console strict-boolean-expressions
+import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
+import Colors from 'app/colors/Colors';
+import RouteSelector from 'app/common/components/RouteSelector';
+import EndpointForm from 'app/etl/common/components/EndpointForm';
+import { ETLActions } from 'app/etl/ETLRedux';
+import { ETLState } from 'app/etl/ETLTypes';
+import TerrainTools from 'app/util/TerrainTools';
+import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
-import {List, Map} from 'immutable';
 import * as React from 'react';
 import SchedulerAjax from 'scheduler/SchedulerAjax';
 import Api from 'util/Api';
-import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import './Schedule.less';
-import RouteSelector from 'app/common/components/RouteSelector';
-import Colors from 'app/colors/Colors';
-import Util from 'app/util/Util';
-import TerrainTools from 'app/util/TerrainTools';
-import { ETLState } from 'app/etl/ETLTypes';
-import { ETLActions } from 'app/etl/ETLRedux';
-import EndpointForm from 'app/etl/common/components/EndpointForm';
 
-export interface Props {
+export interface Props
+{
   // injected
   etl?: ETLState;
   etlActions?: typeof ETLActions;
@@ -73,9 +74,9 @@ class Scheduler extends TerrainComponent<Props>
     schedules: List<any>;
     configurations: List<string>;
   } = {
-    schedules: List([]),
-    configurations: List([]),
-  };
+      schedules: List([]),
+      configurations: List([]),
+    };
 
   public componentWillMount()
   {
@@ -94,7 +95,7 @@ class Scheduler extends TerrainComponent<Props>
         this.updateScheduleList(response);
       })
       .catch((error) =>
-       {
+      {
         console.log(error);
       });
   }
@@ -114,43 +115,44 @@ class Scheduler extends TerrainComponent<Props>
   public getEndPointOptions(endpoints: Map<string, any>, isSource: boolean, scheduleId: ID)
   {
     const keys = _.keys(endpoints.toJS());
-    return List(keys.map((key) => {
+    return List(keys.map((key) =>
+    {
       const endpoint = endpoints.get(key);
-       return {
-         value: isSource ? 'source' + key : 'sink' + key,
-         displayName: endpoint.name,
-         component: <EndpointForm
-           isSource={isSource}
-           endpoint={endpoint}
-           onChange={this._fn(this.handleConfigurationChange, scheduleId, isSource, key)}
-         />
-       }
-      }));
+      return {
+        value: isSource ? 'source' + key : 'sink' + key,
+        displayName: endpoint.name,
+        component: <EndpointForm
+          isSource={isSource}
+          endpoint={endpoint}
+          onChange={this._fn(this.handleConfigurationChange, scheduleId, isSource, key)}
+        />,
+      };
+    }));
   }
 
   public getSourceSinkDescription(schedule)
   {
-    return 'From (info) To (info)'
+    return 'From (info) To (info)';
   }
 
   public getOptionSets(schedule)
   {
     // Template Option Set
-     const templateOptions = this.props.etl.templates.map((template) =>
-     {
-       return {
-         value: template.id,
-         displayName: template.templateName,
-       }
-     }).toList();
-     const templateOptionSet = {
-       key: 'template',
-       options: templateOptions,
-       shortNameText: 'Template',
-       column: true,
-       forceFloat: true,
-       getCustomDisplayName: this.getTemplateName,
-     };
+    const templateOptions = this.props.etl.templates.map((template) =>
+    {
+      return {
+        value: template.id,
+        displayName: template.templateName,
+      };
+    }).toList();
+    const templateOptionSet = {
+      key: 'template',
+      options: templateOptions,
+      shortNameText: 'Template',
+      column: true,
+      forceFloat: true,
+      getCustomDisplayName: this.getTemplateName,
+    };
     // Configuration Option Set (Based on Template)
     let configurationOptions = List([]);
     let configurationHeaderText = 'Choose a Template';
@@ -171,9 +173,9 @@ class Scheduler extends TerrainComponent<Props>
       headerText: configurationHeaderText,
       column: true,
       forceFloat: true,
-      getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule)
+      getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule),
       // ADD IN CUSTOM DISPLAY NAME THAT IS DESCRIPTION OF SOURCE / SINK
-    }
+    };
     // CRON Option Set
 
     // Status Options
@@ -184,7 +186,7 @@ class Scheduler extends TerrainComponent<Props>
       onButtonClick: this._fn(this.handleRunPause, schedule),
       key: 'run',
       options: List([]),
-    }
+    };
     // Log of Past Runs
     return List([templateOptionSet, configurationOptionSet, buttonOptionSet]);
   }
@@ -250,7 +252,7 @@ class Scheduler extends TerrainComponent<Props>
         this.updateScheduleList(this.state.schedules.push(response[0]).toJS());
       })
       .catch((error) =>
-    {
+      {
         console.log('error', error);
       });
   }
@@ -258,14 +260,14 @@ class Scheduler extends TerrainComponent<Props>
   public handleDeleteSchedule(id: ID)
   {
     this.schedulerAjax.deleteSchedule(id)
-    .then((response) =>
-    {
-      this.getSchedules();
-    })
-    .catch((error) =>
-    {
-      console.log('error', error);
-    });
+      .then((response) =>
+      {
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        console.log('error', error);
+      });
   }
 
   public handleScheduleChange(scheduleIndex: number, optionSetIndex: number, value: any)
@@ -277,6 +279,7 @@ class Scheduler extends TerrainComponent<Props>
         this.setState({
           configurations: this.state.configurations.set(scheduleIndex, value),
         });
+        break;
       default:
     }
   }
@@ -296,7 +299,7 @@ class Scheduler extends TerrainComponent<Props>
               canDelete={TerrainTools.isAdmin()}
               onDelete={this._fn(this.handleDeleteSchedule, schedule.get('id'))}
               onChange={this._fn(this.handleScheduleChange, i)}
-            />
+            />,
           )
         }
         <PathfinderCreateLine
@@ -313,5 +316,5 @@ class Scheduler extends TerrainComponent<Props>
 export default Util.createContainer(
   Scheduler,
   ['etl'],
-  {etlActions: ETLActions},
+  { etlActions: ETLActions },
 );

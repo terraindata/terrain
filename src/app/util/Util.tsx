@@ -813,7 +813,7 @@ const Util = {
         {
           return true;
         }
-      };
+      }
     }
     return false;
   },

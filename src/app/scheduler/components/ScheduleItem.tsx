@@ -44,14 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
+import RouteSelector, { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 import TerrainComponent from 'common/components/TerrainComponent';
-import {List, Map} from 'immutable';
+import { List, Map } from 'immutable';
 import * as React from 'react';
 import SchedulerAjax from 'scheduler/SchedulerAjax';
 import Api from 'util/Api';
-import RouteSelector, { RouteSelectorOptionSet } from 'app/common/components/RouteSelector';
 
-export interface Props {
+export interface Props
+{
   schedule: any;
   index: number;
   templateOptionSet: RouteSelectorOptionSet;

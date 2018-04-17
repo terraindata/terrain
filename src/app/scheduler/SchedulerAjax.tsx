@@ -87,7 +87,7 @@ class SchedulerAjax
 
   public deleteSchedule(scheduleId)
   {
-    return this.api.post('/scheduler/delete/' + scheduleId, {})
+    return this.api.post('/scheduler/delete/' + String(scheduleId), {})
       .then((response) =>
       {
         return Promise.resolve(response.data);

@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 import * as React from 'react';
 
+import Scheduler from 'app/scheduler/components/Scheduler';
 import TerrainComponent from 'common/components/TerrainComponent';
 import ImportExportControl from './importExport/ImportExportControl';
-import Scheduler from 'app/scheduler/components/Scheduler';
 
 import './ControlPage.less';
 

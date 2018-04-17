@@ -130,9 +130,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   {
     delete schedule.id;
   }
-  console.log('IS THIS VALID ? ERHGAERG ERGAERG AERGAE ');
   await perm.SchedulerPermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  console.log('PERMISSIONS PASSED');
   ctx.body = await scheduler.upsert(schedule);
 });
 
