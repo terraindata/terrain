@@ -861,7 +861,8 @@ class Builder extends TerrainComponent<Props>
   {
     let algorithm = LibraryTypes.touchAlgorithm(this.getAlgorithm());
     algorithm = algorithm.set('query', this.getQuery());
-    this.props.algorithmActions.duplicateAs(algorithm, algorithm.get('index'), this.state.saveAsTextboxValue,
+
+    this.props.algorithmActions.duplicateAs(algorithm, this.state.saveAsTextboxValue,
       (response, newAlgorithm) =>
       {
         this.onSaveSuccess(newAlgorithm);

@@ -273,7 +273,7 @@ const Actions =
             },
 
         duplicateAs:
-          (algorithm: Algorithm, index: number, algorithmName?: string, responseHandler?: (response, algorithm) => any) =>
+          (algorithm: Algorithm, algorithmName?: string, responseHandler?: (response, algorithm) => any) =>
             (dispatch) =>
             {
               algorithmName = algorithmName || Util.duplicateNameFor(algorithm.name);

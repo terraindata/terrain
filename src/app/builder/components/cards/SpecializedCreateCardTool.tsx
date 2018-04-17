@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import { Card } from '../../../../blocks/types/Card';
+import { Card, CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import BuilderActions from '../../data/BuilderActions';
@@ -138,7 +138,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
   public render()
   {
     // const accepts = this.props.data.static[] !== undefined ? this.props.data.static.accepts : emptyList;
-    const st = this.props.data.get('static');
+    const st = this.props.data.get('static') as CardConfig['static'];
     const accepts = st.accepts !== undefined ? st.accepts : emptyList;
     return (
       <div style={STYLE} >
