@@ -49,21 +49,21 @@ import { canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setC
 
 test('parses daily', () =>
 {
-  expect(parseCRONDaySchedule('0 0 * * *')).toEqual(
+  expect(parseCRONDaySchedule(' 0 0 * * *')).toEqual(
     { type: 'daily' },
   );
 });
 
 test('parses weekdays', () =>
 {
-  expect(parseCRONDaySchedule('4 8 * * 1,2,3,4,5')).toEqual(
+  expect(parseCRONDaySchedule('4 8 * *   1,2,3,4,5')).toEqual(
     { type: 'weekdays' },
   );
 });
 
 test('parses weekly', () =>
 {
-  expect(parseCRONDaySchedule('15 16 * * 2,3')).toEqual(
+  expect(parseCRONDaySchedule('15 16  * * 2,3')).toEqual(
     { type: 'weekly', weekdays: fillCRONMap([2, 3], 0, 6) },
   );
 });

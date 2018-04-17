@@ -95,7 +95,7 @@ function parseCRONDayScheduleInternal(cron: string): CRONDaySchedule
   if (scheduleMeetsStandards(cron))
   {
     // attempt to parse
-    const pieces = cron.split(' ');
+	  const pieces = getCRONPieces(cron);
     const monthDay = pieces[2];
     const weekDay = pieces[4];
 
@@ -152,7 +152,7 @@ export function setCRONDays(cron: string, days: CRONDaySchedule): string
     throw new Error('Cannot parse this cron schedule: ' + cron);
   }
 
-  const pieces = cron.split(' ');
+  const pieces = getCRONPieces(cron);
   switch (days.type)
   {
     case 'daily':
@@ -183,7 +183,7 @@ function parseCRONHourScheduleInternal(cron: string): CRONHourSchedule
   if (scheduleMeetsStandards(cron))
   {
     // attempt to parse
-    const pieces = cron.split(' ');
+    const pieces = getCRONPieces(cron);
     const hour = pieces[1];
     const minute = pieces[0];
 
@@ -229,7 +229,7 @@ export function setCRONHours(cron: string, hours: CRONHourSchedule): string
     throw new Error('Cannot parse this cron schedule: ' + cron);
   }
 
-  const pieces = cron.split(' ');
+  const pieces = getCRONPieces(cron);
   switch (hours.type)
   {
     case 'minute':
@@ -293,8 +293,13 @@ function isValidNumber(num: string)
 function scheduleMeetsStandards(cron: string): boolean
 {
   // assert rest of format, besides hours and days, matches standard
+  
+  if (!stringHasCRONCharacters(cron))
+  {
+  	return false;
+  }
 
-  const pieces = cron.split(' ');
+  let pieces = getCRONPieces(cron); // will filter out any gaps from double spaces in string
 
   if (pieces.length !== 5)
   {
@@ -312,8 +317,32 @@ function scheduleMeetsStandards(cron: string): boolean
     // cannot mix and match weekdays and month days right now
     return false;
   }
+  
+  for (const piece of pieces)
+  {
+  	if (piece.length === 0)
+  	{
+  		return false;
+  	}
+  }
 
   return true;
+}
+
+function getCRONPieces(cron: string): string[]
+{
+	return cron.split(' ').filter(isValidCRONPiece);
+}
+
+function isValidCRONPiece(piece: string): boolean
+{
+	return piece.length > 0 && stringHasCRONCharacters(piece);
+}
+
+function stringHasCRONCharacters(str: string): boolean
+{
+	const matches = str.match(/[ \*0-9,]*/g);
+	return matches !== null && matches[0].length === str.length;
 }
 
 function listToMap(list: string[]): CRONMap
