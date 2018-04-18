@@ -330,7 +330,7 @@ export const elasticFilter = _card({
                 [
                   {
                     displayType: DisplayType.LABEL,
-                    label: 'Soft Bool',
+                    label: 'Soft Filter',
                     key: null,
                   },
                 ],
