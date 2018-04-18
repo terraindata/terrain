@@ -44,53 +44,66 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
+import * as fs from 'fs';
+import * as request from 'supertest';
+import { promisify } from 'util';
+import * as winston from 'winston';
 
-import { makeCallback } from '../../../../../shared/util/Promise';
+// import { App, Credentials, DB, Scheduler } from '../../src/app/App';
+import { App, DB } from '../../src/app/App';
+import ElasticConfig from '../../src/database/elastic/ElasticConfig';
+import ElasticController from '../../src/database/elastic/ElasticController';
+import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
+import * as Tasty from '../../src/tasty/Tasty';
 
-/**
- * Consumes an input source stream and turns it into an array
- */
-export default class BufferTransform
+// let server;
+
+// tslint:disable:max-line-length
+
+// beforeAll(async (done) =>
+// {
+//   try
+//   {
+//     const options =
+//       {
+//         debug: true,
+//         db: 'postgres',
+//         dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
+//         port: 63001,
+//         databases: [
+//           {
+//             name: 'My ElasticSearch Instance',
+//             type: 'elastic',
+//             dsn: 'http://127.0.0.1:9200',
+//             host: 'http://127.0.0.1:9200',
+//             isAnalytics: true,
+//             analyticsIndex: 'terrain-analytics',
+//             analyticsType: 'events',
+//           },
+//           {
+//             name: 'MySQL Test Connection',
+//             type: 'mysql',
+//             dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
+//             host: '127.0.0.1:63306',
+//             isAnalytics: false,
+//           },
+//         ],
+//       };
+
+//     const app = new App(options);
+//     server = await app.start();
+//     done();
+//   }
+//   catch (e)
+//   {
+//     fail(e);
+//   }
+// });
+
+describe('ETL Execute Tests', () =>
 {
-  public static toArray(stream: Readable, size?: number): Promise<any[]>
+  test('ETL execute: POST /midway/v1/etl/execute', async () =>
   {
-    return new Promise<any[]>((resolve, reject) =>
-    {
-      return new BufferTransform(stream, makeCallback(resolve, reject), size);
-    });
-  }
-
-  private arr: any[];
-  private stream: Readable;
-  private callback: (err, arr) => void;
-
-  constructor(stream: Readable, callback: (err: Error | null, arr: any[]) => void, size?: number)
-  {
-    this.arr = [];
-    this.stream = stream;
-
-    const done = () => callback(null, this.arr);
-
-    this.stream.on('end', done);
-    this.stream.on('data', (doc) =>
-    {
-      if (this.arr.length >= (size as number))
-      {
-        this.stream.removeListener('end', done);
-        callback(null, this.arr);
-      }
-      else
-      {
-        this.arr.push(doc);
-      }
-    });
-
-    this.stream.on('error', callback);
-  }
-
-  private onEvent(err: any): void
-  {
-    this.callback(err, this.arr);
-  }
-}
+    // TODO: Add test
+  });
+});

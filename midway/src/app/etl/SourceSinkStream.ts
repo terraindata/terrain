@@ -116,7 +116,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
     switch (source.fileConfig.fileType)
     {
       case 'json':
-        importStream = sourceStream.pipe(JSONTransform.createImportStream());
+        const jsonNewlines: string | undefined = source.fileConfig.jsonNewlines ? undefined : '*';
+        importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonNewlines));
         break;
       case 'csv':
         importStream = sourceStream.pipe(CSVTransform.createImportStream());
