@@ -61,25 +61,184 @@ import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import Scheduler from './Scheduler';
 import {_SinkConfig, _SourceConfig } from 'app/etl/EndpointTypes';
+import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 
 export interface Props
 {
   etl?: ETLState;
   etlActions?: typeof ETLActions;
+  scheduleActions?: typeof SchedulerActions;
 }
 
-class ScheduleList extends Scheduler<Props> {
+class ScheduleList extends TerrainComponent<Props>
+{
+/*
+  These functions should be moved
+*/
+  public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
 
-  public constructor(props)
+  public createSchedule()
   {
-    super(props);
-    this.state = {
-      responseText: '',
-      schedules: List([]),
-      id: '',
-      configurationKeys: List([]),
-    };
+    this.schedulerApi.createSchedule({
+      cron: '0 0 1 1 *',
+      name: `Jmansor Schedule ${Math.floor(Math.random() * 100)}`,
+      priority: 1,
+      tasks: {params: {templateId: -1}},
+      workerId: 10,
+    })
+      .then((response) =>
+      {
+        this.getSchedules();
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
   }
+
+  public getSchedules()
+  {
+    this.props.scheduleActions({
+      actionType: 'getSchedules'
+    })
+    .then((schedules) =>
+    {
+      this.setState({
+        schedules,
+      });
+     // console.error(schedules.get(1));
+    })
+  }
+
+  public getSchedule(id: number)
+  {
+    this.schedulerApi.getSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public updateSchedule(id: number, changes: object)
+  {
+    changes = changes || { name: 'Jmansor Schedule Modified' };
+    this.schedulerApi.updateSchedule(id, changes)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public deleteSchedule(id?: number)
+  {
+    this.schedulerApi.deleteSchedule(id)
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+        this.getSchedules();
+        
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public duplicateSchedule(id?: number)
+  {
+    this.schedulerApi.duplicateSchedule(id)
+      .then((response) =>
+      {
+        this.getSchedules();
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public getScheduleLog(id: number)
+  {
+    this.schedulerApi.getScheduleLog(id)
+      .then((response) =>
+      {
+        this.getSchedules();
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public pauseSchedule(id: number)
+  {
+    this.schedulerApi.pauseSchedule(id)
+      .then((response) =>
+      {
+        this.getSchedules();
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public unpauseSchedule(id: number)
+  {
+    this.schedulerApi.unpauseSchedule(id)
+      .then((response) =>
+      {
+        this.getSchedules();
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public runSchedule(id: number)
+  {
+    this.schedulerApi.runSchedule(id)
+      .then((response) =>
+      {
+        this.getSchedules();
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  public setScheduleStatus(id: number)
+  {
+    this.schedulerApi.setScheduleStatus(id, false)
+      .then((response) =>
+      {
+        this.getSchedules();
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
+  /* UI */
 
   public componentWillMount()
   {
@@ -88,6 +247,10 @@ class ScheduleList extends Scheduler<Props> {
       actionType: 'fetchTemplates',
     });
     this.listenToKeyPath('etl', ['templates']);
+    this.setState({
+      configurationKeys: List([]),
+      schedules: List([])
+    })
   }
 
   public getSourceSinkDescription(schedule)
@@ -262,6 +425,7 @@ class ScheduleList extends Scheduler<Props> {
 
   public updateScheduleList(schedules: any[], templates?)
   {
+    console.log(schedules);
     templates = templates || this.props.etl.templates;
     let formattedSchedules = List([]);
     schedules.map((schedule) =>
@@ -337,5 +501,7 @@ class ScheduleList extends Scheduler<Props> {
 export default Util.createContainer(
   ScheduleList,
   ['etl'],
-  { etlActions: ETLActions },
+  { etlActions: ETLActions,
+    scheduleActions: SchedulerActions,
+   },
 );

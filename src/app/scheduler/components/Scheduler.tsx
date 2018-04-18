@@ -108,9 +108,9 @@ class Scheduler extends TerrainComponent<any> {
       });
   }
 
-  public updateSchedule(id: number, changes: object)
+  public updateSchedule(id: number)
   {
-    changes = changes || { name: 'Jmansor Schedule Modified' };
+    const changes ={ name: 'Jmansor Schedule Modified' };
     this.schedulerApi.updateSchedule(id, changes)
       .then((response) =>
       {
