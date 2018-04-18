@@ -182,6 +182,13 @@ class ScheduleList extends Scheduler<Props> {
       // ADD IN CUSTOM DISPLAY NAME THAT IS DESCRIPTION OF SOURCE / SINK
     };
     // CRON Option Set
+    const intervalOptionSet = {
+      column: true,
+      shortNameText: 'Interval',
+      forceFloat: true,
+      key: 'interval',
+      options: List([{value: 'CRON SELECTOR GOES HERE'}])
+    };
 
     // Status Options
     const statusOptions = List([
@@ -220,7 +227,7 @@ class ScheduleList extends Scheduler<Props> {
 
     // Log of Past Runs
 
-    return List([templateOptionSet, configurationOptionSet, statusOptionSet, buttonOptionSet]);
+    return List([templateOptionSet, configurationOptionSet, intervalOptionSet, statusOptionSet, buttonOptionSet]);
   }
 
   // TODO NEED OPTION FOR UNPAUSE
@@ -243,7 +250,7 @@ class ScheduleList extends Scheduler<Props> {
     const buttonValue = schedule.get('running') ? 'Pause' : 'Run Now';
     const status = JSON.parse(schedule.get('tasks')).jobStatus;
     const statusValue =  status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
-    return List([templateId, this.state.configurationKeys.get(index), statusValue, buttonValue]);
+    return List([templateId, this.state.configurationKeys.get(index), 'every day!', statusValue, buttonValue]);
   }
 
   public getTemplateName(templateId: ID, index: number)
