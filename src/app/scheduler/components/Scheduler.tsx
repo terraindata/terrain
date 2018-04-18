@@ -48,6 +48,8 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
+import Util from 'util/Util';
+import { SchedulerActions } from 'scheduler/data/SchedulerRedux';
 
 class Scheduler extends TerrainComponent<any> {
 
@@ -84,18 +86,13 @@ class Scheduler extends TerrainComponent<any> {
 
   public getSchedules()
   {
-    this.schedulerApi.getSchedules()
-      .then((response) =>
-      {
-        this.setState({
-          responseText: JSON.stringify(response),
-          schedules: response.data,
-        });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
+    this.props.schedulerActions({
+      actionType: 'getSchedules'
+    })
+    .then((schedules) =>
+    {
+      console.error(schedules);
+    })
   }
 
   public getSchedule(id: number)
@@ -260,4 +257,8 @@ class Scheduler extends TerrainComponent<any> {
   }
 }
 
-export default Scheduler;
+export default Util.createTypedContainer(
+  Scheduler,
+  [],
+  { schedulerActions: SchedulerActions }
+);

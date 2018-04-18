@@ -48,60 +48,81 @@ import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/Terrain
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { SchedulerConfig, SchedulerState, _SchedulerState } from 'scheduler/SchedulerTypes';
+import SchedulerApi from 'scheduler/SchedulerApi';
+import XHR from 'util/XHR';
 const { List, Map } = Immutable;
 
 export interface SchedulerActionTypes
 {
+  getSchedules?: {
+    actionType: 'getSchedules';
+  };
   getSchedulesStart: {
     actionType: 'getSchedulesStart';
   };
   getSchedulesSuccess: {
     actionType: 'getSchedulesSuccess';
-    schedule: SchedulerConfig;
+    schedules: Immutable.List<SchedulerConfig>;
   };
   getSchedulesFailed: {
     actionType: 'getSchedulesFailed';
+    error: string;
   };
 }
 
 class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
 {
   public namespace: string = 'scheduler';
+  public api: SchedulerApi = new SchedulerApi(XHR.getInstance());
 
   public reducers: ConstrainedMap<SchedulerActionTypes, SchedulerState> =
     {
       getSchedulesStart: (state, action) =>
       {
-        // Fetch the schema meta data
         return state
           .set('loading', true);
       },
 
       getSchedulesSuccess: (state, action) =>
       {
-        // Fetch the schema meta data
         return state
-          .set('loading', false);
+          .set('loading', false)
+          .set('schedules', action.payload.schedules);
       },
 
       getSchedulesFailed: (state, action) =>
       {
-        // Fetch the schema meta data
         return state
-          .set('loading', false);
+          .set('loading', false)
+          .set('error', action.payload.error);
       },
 
   }
 
+  public getSchedules(dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'getSchedulesStart'
+    });
+
+    return this.api.getSchedules()
+      .then((response) =>
+      {
+        directDispatch({
+          actionType: 'getSchedulesSuccess',
+          schedules: Immutable.List(response.data),
+        });
+
+        return response.data;
+      });
+  }
+
   public overrideAct(action: Unroll<SchedulerActionTypes>)
   {
-    if (action.actionType === 'getSchedulesStart')
+    if (action.actionType === 'getSchedules')
     {
-      return this.fetchAction.bind(this);
-    }
-    else if (action.actionType === 'deleteElasticIndex')
-    {
-      return this.deleteElasticIndexAction.bind(this, action);
+      return this.getSchedules.bind(this);
     }
   }
 }

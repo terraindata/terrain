@@ -68,6 +68,7 @@ class SchedulerStateC
 {
   public loading: boolean = true;
   public schedules: Immutable.List<SchedulerConfig> = Immutable.List([]);
+  public error: string = null;
 }
 
 const SchedulerState_Record = createRecordType(new SchedulerStateC(), 'SchedulerStateC');

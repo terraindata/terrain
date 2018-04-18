@@ -48,7 +48,7 @@ import Ajax, { AjaxResponse } from 'util/Ajax';
 import XHR from 'util/XHR';
 
 // making this an instance in case we want stateful things like cancelling ajax requests
-class SchedulerAjax
+class SchedulerApi
 {
   public xhr: AxiosInstance = null;
 
@@ -120,4 +120,4 @@ class SchedulerAjax
   }
 }
 
-export default SchedulerAjax;
+export default SchedulerApi;
