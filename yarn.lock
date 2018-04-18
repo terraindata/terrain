@@ -490,12 +490,6 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-day-picker@^5.3.0":
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/@types/react-day-picker/-/react-day-picker-5.3.0.tgz#10e931f8f1d8585f62ee47d210f708750789cbfe"
-  dependencies:
-    react-day-picker "*"
-
 "@types/react-dnd@^2.0.34":
   version "2.0.36"
   resolved "https://registry.yarnpkg.com/@types/react-dnd/-/react-dnd-2.0.36.tgz#67e08a3608f112a3af27201d1fb6f79334d43214"
@@ -7746,12 +7740,6 @@ react-data-grid-addons@^2.0.78:
 react-data-grid@^2.0.78, react-data-grid@^2.0.80:
   version "2.0.80"
   resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.80.tgz#e6ee6eb33ac9421ec8bd7ddb760f43537f6a1c1d"
-
-react-day-picker@*:
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-7.1.1.tgz#c9ab74570cbae0ed36b389837443aa3493beb3e7"
-  dependencies:
-    prop-types "^15.6.1"
 
 react-day-picker@^7.0.5:
   version "7.0.7"
