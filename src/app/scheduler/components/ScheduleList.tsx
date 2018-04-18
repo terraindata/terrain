@@ -62,9 +62,11 @@ import Util from 'app/util/Util';
 import Scheduler from './Scheduler';
 import {_SinkConfig, _SourceConfig } from 'app/etl/EndpointTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
+import { SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
 
 export interface Props
 {
+  schedulerState?: SchedulerState;
   etl?: ETLState;
   etlActions?: typeof ETLActions;
   scheduleActions?: typeof SchedulerActions;
@@ -146,7 +148,6 @@ class ScheduleList extends TerrainComponent<Props>
       {
         this.setState({ responseText: JSON.stringify(response) });
         this.getSchedules();
-        
       })
       .catch((error) =>
       {
@@ -247,10 +248,20 @@ class ScheduleList extends TerrainComponent<Props>
       actionType: 'fetchTemplates',
     });
     this.listenToKeyPath('etl', ['templates']);
+    this.listenToKeyPath('schedulerState', ['schedules']);
     this.setState({
       configurationKeys: List([]),
       schedules: List([])
     })
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.schedulerState.schedules !== nextProps.schedulerState.schedules ||
+        this.props.etl.templates !== nextProps.etl.templates)
+    {
+      this.updateScheduleList(nextProps.schedulerState.schedules, nextProps.etl.templates);
+    }
   }
 
   public getSourceSinkDescription(schedule)
@@ -299,6 +310,7 @@ class ScheduleList extends TerrainComponent<Props>
           isSource={isSource}
           endpoint={endpoint}
           onChange={this._fn(this.handleConfigurationChange, schedule, isSource, key)}
+          isSchedule={true}
         />,
       };
     }));
@@ -423,23 +435,22 @@ class ScheduleList extends TerrainComponent<Props>
     return templateName;
   }
 
-  public updateScheduleList(schedules: any[], templates?)
+  public updateScheduleList(schedules: Map<ID, SchedulerConfig>, templates)
   {
     console.log(schedules);
-    templates = templates || this.props.etl.templates;
-    let formattedSchedules = List([]);
-    schedules.map((schedule) =>
-    {
-      const newSchedule = schedule;
-      const task = JSON.parse(schedule.tasks);
-      const templateId = task.params.templateId;
-      const temp = templates.filter((t) => t.id === templateId).get(0);
-      newSchedule['template'] = temp;
-      newSchedule['overrideSources'] = task.params.overrideSources;
-      newSchedule['overrideSinks'] = task.params.overrideSinks;
-      formattedSchedules = formattedSchedules.push(Map(newSchedule));
-    });
-    return formattedSchedules;
+    // let formattedSchedules = List([]);
+    // schedules.map((schedule) =>
+    // {
+    //   const newSchedule = schedule;
+    //   const task = JSON.parse(schedule.tasks);
+    //   const templateId = task.params.templateId;
+    //   const temp = templates.filter((t) => t.id === templateId).get(0);
+    //   newSchedule['template'] = temp;
+    //   newSchedule['overrideSources'] = task.params.overrideSources;
+    //   newSchedule['overrideSinks'] = task.params.overrideSinks;
+    //   formattedSchedules = formattedSchedules.push(Map(newSchedule));
+    // });
+    // return formattedSchedules;
   }
 
   public handleScheduleChange(oldSchedule, index, optionSetIndex: number, value: any)
@@ -471,7 +482,6 @@ class ScheduleList extends TerrainComponent<Props>
   public render()
   {
     let { schedules } = this.state;
-    schedules = this.updateScheduleList(schedules);
     return (
       <div className='schedule-list-wrapper'>
         {
@@ -501,7 +511,7 @@ class ScheduleList extends TerrainComponent<Props>
 
 export default Util.createContainer(
   ScheduleList,
-  ['etl'],
+  ['etl', 'scheduleState'],
   { etlActions: ETLActions,
     scheduleActions: SchedulerActions,
    },

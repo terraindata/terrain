@@ -54,7 +54,7 @@ import { TaskConfig, TaskOutputConfig, TaskTreeConfig } from 'shared/types/jobs/
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { Job } from './Job';
-import JobConfig from './JobConfig';
+import JobConfig from 'shared/types/jobs/JobConfig';
 import { Task } from './Task';
 import { TaskTree } from './TaskTree';
 

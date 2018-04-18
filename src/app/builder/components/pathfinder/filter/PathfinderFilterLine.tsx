@@ -216,7 +216,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         autoFocus={true}
         footer={this.renderFooter()}
         onToggleOpen={this.props.onToggleOpen}
-        useTooltip={true}
       />
     );
   }
