@@ -484,6 +484,7 @@ class ScheduleList extends TerrainComponent<Props>
               canDelete={this.canEdit(schedule)}
               onDelete={this._fn(this.deleteSchedule, schedule.get('id'))}
               onChange={this._fn(this.handleScheduleChange, schedule, i)}
+              useTooltip={true}
             />,
           )
         }
