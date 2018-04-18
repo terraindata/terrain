@@ -463,22 +463,30 @@ export class Import
             {
               throw new Error('Split transformation currently only supports splitting into two columns.');
             }
-            if (typeof obj[oldCol] !== 'string')
+            if (obj[oldCol] === null)
             {
-              throw new Error('Can only split columns containing text.');
-            }
-            const oldText: string = obj[oldCol];
-            delete obj[oldCol];
-            const ind: number = oldText.indexOf(splitText);
-            if (ind === -1)
-            {
-              obj[newCols[0]] = oldText;
-              obj[newCols[1]] = '';
+              obj[newCols[0]] = null;
+              obj[newCols[1]] = null;
             }
             else
             {
-              obj[newCols[0]] = oldText.substring(0, ind);
-              obj[newCols[1]] = oldText.substring(ind + splitText.length);
+              if (typeof obj[oldCol] !== 'string')
+              {
+                throw new Error('Can only split columns containing text.');
+              }
+              const oldText: string = obj[oldCol];
+              delete obj[oldCol];
+              const ind: number = oldText.indexOf(splitText);
+              if (ind === -1)
+              {
+                obj[newCols[0]] = oldText;
+                obj[newCols[1]] = '';
+              }
+              else
+              {
+                obj[newCols[0]] = oldText.substring(0, ind);
+                obj[newCols[1]] = oldText.substring(ind + splitText.length);
+              }
             }
             break;
           case 'merge':
@@ -497,6 +505,50 @@ export class Import
                 throw new Error('Can only merge columns containing text.');
               }
               obj[newCol] = String(obj[startCol]) + mergeText + String(obj[mergeCol]);
+              if (startCol !== newCol)
+              {
+                delete obj[startCol];
+              }
+              if (mergeCol !== newCol)
+              {
+                delete obj[mergeCol];
+              }
+            }
+            else if (obj[startCol] !== null && obj[mergeCol] === null)
+            {
+              if (typeof obj[startCol] !== 'string')
+              {
+                throw new Error('Can only merge columns containing text.');
+              }
+              obj[newCol] = String(obj[startCol]) + mergeText;
+              if (startCol !== newCol)
+              {
+                delete obj[startCol];
+              }
+              if (mergeCol !== newCol)
+              {
+                delete obj[mergeCol];
+              }
+            }
+            else if (obj[startCol] === null && obj[mergeCol] !== null)
+            {
+              if (typeof obj[mergeCol] !== 'string')
+              {
+                throw new Error('Can only merge columns containing text.');
+              }
+              obj[newCol] = mergeText + String(obj[mergeCol]);
+              if (startCol !== newCol)
+              {
+                delete obj[startCol];
+              }
+              if (mergeCol !== newCol)
+              {
+                delete obj[mergeCol];
+              }
+            }
+            else
+            {
+              obj[newCol] = mergeText;
               if (startCol !== newCol)
               {
                 delete obj[startCol];
