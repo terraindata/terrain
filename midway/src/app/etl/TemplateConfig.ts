@@ -49,6 +49,7 @@ import ConfigType from '../ConfigType';
 import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/EndpointTypes';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 
 export class TemplateConfig extends ConfigType implements TemplateBase
 {
@@ -71,6 +72,12 @@ export class TemplateConfig extends ConfigType implements TemplateBase
     super();
     ConfigType.initialize(this, props);
   }
+}
+
+export function recordToConfig(template: ETLTemplate): TemplateConfig
+{
+  const asObject = templateForBackend(template);
+  return new TemplateConfig(asObject);
 }
 
 export type TemplateInDatabase = {

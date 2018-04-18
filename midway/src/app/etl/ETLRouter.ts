@@ -79,7 +79,14 @@ Router.post('/execute', async (ctx, next) =>
   else if (fields['templateID'] !== undefined)
   {
     const templateID = Number(fields['templateID']);
-    ctx.body = await templates.executeById(templateID, files);
+    if (fields['overrideSources'] !== undefined || fields['overrideSinks'] !== undefined)
+    {
+      ctx.body = await templates.executeByOverride(templateID, files, fields['overrideSources'], fields['overrideSinks']);
+    }
+    else
+    {
+      ctx.body = await templates.executeById(templateID, files);
+    }
   }
   else
   {
