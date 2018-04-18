@@ -56,181 +56,46 @@ import ElasticController from '../../src/database/elastic/ElasticController';
 import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
 import * as Tasty from '../../src/tasty/Tasty';
 
-let server;
+// let server;
 
 // tslint:disable:max-line-length
 
-beforeAll(async (done) =>
-{
-  try
-  {
-    const options =
-      {
-        debug: true,
-        db: 'postgres',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
-        port: 63001,
-        databases: [
-          {
-            name: 'My ElasticSearch Instance',
-            type: 'elastic',
-            dsn: 'http://127.0.0.1:9200',
-            host: 'http://127.0.0.1:9200',
-            isAnalytics: true,
-            analyticsIndex: 'terrain-analytics',
-            analyticsType: 'events',
-          },
-          {
-            name: 'MySQL Test Connection',
-            type: 'mysql',
-            dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
-            host: '127.0.0.1:63306',
-            isAnalytics: false,
-          },
-        ],
-      };
+// beforeAll(async (done) =>
+// {
+//   try
+//   {
+//     const options =
+//       {
+//         debug: true,
+//         db: 'postgres',
+//         dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
+//         port: 63001,
+//         databases: [
+//           {
+//             name: 'My ElasticSearch Instance',
+//             type: 'elastic',
+//             dsn: 'http://127.0.0.1:9200',
+//             host: 'http://127.0.0.1:9200',
+//             isAnalytics: true,
+//             analyticsIndex: 'terrain-analytics',
+//             analyticsType: 'events',
+//           },
+//           {
+//             name: 'MySQL Test Connection',
+//             type: 'mysql',
+//             dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
+//             host: '127.0.0.1:63306',
+//             isAnalytics: false,
+//           },
+//         ],
+//       };
 
-    const app = new App(options);
-    server = await app.start();
-    done();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
-
-describe('ETL Template Tests', () =>
-{
-  let templateId: number = -1;
-  test('Create a template: POST /midway/v1/etl/templates/create', async () =>
-  {
-    const template = await promisify(fs.readFile)('./midway/test/etl/movies_template.json', 'utf8');
-    await request(server)
-      .post('/midway/v1/etl/templates/create')
-      .send({
-        id: 1,
-        accessToken: 'ImAnAdmin',
-        body: JSON.parse(template),
-      })
-      .expect(200)
-      .then((res) =>
-      {
-        expect(res.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(res.text);
-        const response = respData[0];
-        expect(response.id).toBeGreaterThanOrEqual(1);
-        templateId = response.id;
-        expect(Date.parse(response.createdAt)).toBeLessThanOrEqual(Date.now());
-        expect(Date.parse(response.lastModified)).toBeLessThanOrEqual(Date.now());
-        expect(response.archived).toBeFalsy();
-        expect(response.templateName).toBeDefined();
-        expect(response.process).toBeDefined();
-        expect(response.sources).toBeDefined();
-        expect(response.sinks).toBeDefined();
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/etl/templates/create request returned an error: ' + String(error));
-      });
-  });
-
-  test('Get a template: GET /midway/v1/etl/templates/:id', async () =>
-  {
-    expect(templateId).toBeGreaterThan(0);
-    await request(server)
-      .get('/midway/v1/etl/templates/' + String(templateId))
-      .query({
-        id: 1,
-        accessToken: 'ImAnAdmin',
-      })
-      .expect(200)
-      .then((res) =>
-      {
-        expect(res.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(res.text);
-        const response = respData[0];
-        expect(response.id).toEqual(templateId);
-        expect(Date.parse(response.createdAt)).toBeLessThanOrEqual(Date.now());
-        expect(Date.parse(response.lastModified)).toBeLessThanOrEqual(Date.now());
-        expect(response.archived).toBeFalsy();
-        expect(response.templateName).toBeDefined();
-        expect(response.process).toBeDefined();
-        expect(response.sources).toBeDefined();
-        expect(response.sinks).toBeDefined();
-      })
-      .catch((error) =>
-      {
-        fail('GET /midway/v1/etl/templates/1 request returned an error: ' + String(error));
-      });
-  });
-
-  test('Delete a template: POST /midway/v1/etl/templates/delete', async () =>
-  {
-    expect(templateId).toBeGreaterThan(0);
-    await request(server)
-      .post('/midway/v1/etl/templates/delete')
-      .send({
-        id: 1,
-        accessToken: 'ImAnAdmin',
-        body: {
-          templateId,
-        },
-      })
-      .expect(200)
-      .then((res) =>
-      {
-        expect(res.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(res.text);
-        expect(respData).toMatchObject({});
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/etl/templates/1 request returned an error: ' + String(error));
-      });
-  });
-});
-
-describe('ETL Execute Tests', () =>
-{
-  // TODO: Add more tests
-});
-
-describe('ETL Preview Tests', () =>
-{
-  test('Source preview: POST /midway/v1/etl/preview', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/etl/preview')
-      .send({
-        id: 1,
-        accessToken: 'ImAnAdmin',
-        body: {
-          source: {
-            type: 'Fs',
-            name: 'Default Source',
-            fileConfig: {
-              fileType: 'json',
-              hasCsvHeader: true,
-              jsonNewlines: false,
-            },
-            options: {
-              path: './midway/test/etl/movies.json',
-            },
-          },
-        },
-      })
-      .expect(200)
-      .then((res) =>
-      {
-        expect(res.text).not.toBe('Unauthorized');
-        const response = JSON.parse(res.text);
-        expect(response.length).toEqual(5);
-        expect(response[2].genres).toEqual('Documentary');
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/etl/preview request returned an error: ' + String(error));
-      });
-  });
-});
+//     const app = new App(options);
+//     server = await app.start();
+//     done();
+//   }
+//   catch (e)
+//   {
+//     fail(e);
+//   }
+// });

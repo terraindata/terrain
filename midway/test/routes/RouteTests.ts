@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as fs from 'fs';
 import * as request from 'supertest';
+import { promisify } from 'util';
 import * as winston from 'winston';
 
 // import { App, Credentials, DB, Scheduler } from '../../src/app/App';
@@ -1890,6 +1891,141 @@ describe('Analytics route tests', () =>
       .catch((error) =>
       {
         fail('POST /midway/v1/items/ request returned an error: ' + String(error));
+      });
+  });
+});
+
+describe('ETL Template Tests', () =>
+{
+  let templateId: number = -1;
+  test('Create a template: POST /midway/v1/etl/templates/create', async () =>
+  {
+    const template = await promisify(fs.readFile)('./midway/test/etl/movies_template.json', 'utf8');
+    await request(server)
+      .post('/midway/v1/etl/templates/create')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: JSON.parse(template),
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        const response = respData[0];
+        expect(response.id).toBeGreaterThanOrEqual(1);
+        templateId = response.id;
+        expect(Date.parse(response.createdAt)).toBeLessThanOrEqual(Date.now());
+        expect(Date.parse(response.lastModified)).toBeLessThanOrEqual(Date.now());
+        expect(response.archived).toBeFalsy();
+        expect(response.templateName).toBeDefined();
+        expect(response.process).toBeDefined();
+        expect(response.sources).toBeDefined();
+        expect(response.sinks).toBeDefined();
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/etl/templates/create request returned an error: ' + String(error));
+      });
+  });
+
+  test('Get a template: GET /midway/v1/etl/templates/:id', async () =>
+  {
+    expect(templateId).toBeGreaterThan(0);
+    await request(server)
+      .get('/midway/v1/etl/templates/' + String(templateId))
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        const response = respData[0];
+        expect(response.id).toEqual(templateId);
+        expect(Date.parse(response.createdAt)).toBeLessThanOrEqual(Date.now());
+        expect(Date.parse(response.lastModified)).toBeLessThanOrEqual(Date.now());
+        expect(response.archived).toBeFalsy();
+        expect(response.templateName).toBeDefined();
+        expect(response.process).toBeDefined();
+        expect(response.sources).toBeDefined();
+        expect(response.sinks).toBeDefined();
+      })
+      .catch((error) =>
+      {
+        fail('GET /midway/v1/etl/templates/1 request returned an error: ' + String(error));
+      });
+  });
+
+  test('Delete a template: POST /midway/v1/etl/templates/delete', async () =>
+  {
+    expect(templateId).toBeGreaterThan(0);
+    await request(server)
+      .post('/midway/v1/etl/templates/delete')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          templateId,
+        },
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        expect(respData).toMatchObject({});
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/etl/templates/1 request returned an error: ' + String(error));
+      });
+  });
+});
+
+describe('ETL Execute Tests', () =>
+{
+  // TODO: Add more tests
+});
+
+describe('ETL Preview Tests', () =>
+{
+  test('Source preview: POST /midway/v1/etl/preview', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/etl/preview')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          source: {
+            type: 'Fs',
+            name: 'Default Source',
+            fileConfig: {
+              fileType: 'json',
+              hasCsvHeader: true,
+              jsonNewlines: false,
+            },
+            options: {
+              path: './midway/test/etl/movies.json',
+            },
+          },
+        },
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const response = JSON.parse(res.text);
+        expect(response.length).toEqual(5);
+        expect(response[2].genres).toEqual('Documentary');
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/etl/preview request returned an error: ' + String(error));
       });
   });
 });
