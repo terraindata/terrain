@@ -99,3 +99,11 @@ import * as Tasty from '../../src/tasty/Tasty';
 //     fail(e);
 //   }
 // });
+
+describe('ETL Execute Tests', () =>
+{
+  test('ETL execute: POST /midway/v1/etl/execute', async () =>
+  {
+    // TODO: Add test
+  });
+});
