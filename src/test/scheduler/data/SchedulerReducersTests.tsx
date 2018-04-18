@@ -43,81 +43,61 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
-import Ajax, { AjaxResponse } from 'util/Ajax';
-import XHR from 'util/XHR';
+import * as Immutable from 'immutable';
+import { SchedulerReducers as reducer } from 'scheduler/data/SchedulerRedux';
+import SchedulerHelper from 'test-helpers/SchedulerHelper';
+import { SchedulerState, _SchedulerState } from 'scheduler/SchedulerTypes';
 
-// making this an instance in case we want stateful things like cancelling ajax requests
-class SchedulerApi
+describe('SchedulerReducers', () =>
 {
-  public xhr: AxiosInstance = null;
+  let scheduler = null;
 
-  public constructor(xhr: AxiosInstance)
-  {
-    this.xhr = xhr;
-  }
+  beforeEach(() => {
+    scheduler = SchedulerHelper.mockState().getState();
+  });
 
-  public createSchedule(schedulerConfig)
+  it('should return the inital state', () =>
   {
-    const body = schedulerConfig;
-    return this.xhr.post('/scheduler', { body });
-  }
+    expect(reducer(undefined, {})).toEqual(_SchedulerState());
+  });
 
-  public getSchedules()
+  describe('#getSchedulesStart', () =>
   {
-    return this.xhr.get('/scheduler');
-  }
+    it('should set loading to true', () =>
+    {
+      scheduler = SchedulerHelper.mockState()
+        .loading(false)
+        .getState();
 
-  public getSchedule(id: number)
-  {
-    return this.xhr.get(`/scheduler/${id}`);
-  }
-
-  public updateSchedule(id: number, changes)
-  {
-    return this.xhr.post(`/scheduler/${id}`,
-      {
-        body: changes,
+      const nextState = reducer(scheduler, {
+        type: 'scheduler.getSchedulesStart'
       });
-  }
 
-  public deleteSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/delete/${id}`);
-  }
+      expect(nextState.loading).toBe(true);
+    });
+  });
 
-  public duplicateSchedule(id: number)
+  describe('#getSchedulesSuccess', () =>
   {
-    return this.xhr.post(`/scheduler/duplicate/${id}`);
-  }
-
-  public getScheduleLog(schedulerId: number)
-  {
-    return this.xhr.get(`/scheduler/log/${schedulerId}`);
-  }
-
-  public pauseSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/pause/${id}`);
-  }
-
-  public unpauseSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/unpause/${id}`);
-  }
-
-  public runSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/run/${id}`);
-  }
-
-  public setScheduleStatus(id: number, status: boolean)
-  {
-    return this.xhr.post(`/scheduler/status/${id}`,
-      {
-        body: { status },
+    it('should set loading to false', () =>
+    {
+      const nextState = reducer(scheduler, {
+        type: 'scheduler.getSchedulesSuccess'
       });
-  }
-}
 
-export default SchedulerApi;
+      expect(nextState.loading).toBe(false);
+    });
+  });
+
+  describe('#getSchedulesFailed', () =>
+  {
+    it('should set loading to false', () =>
+    {
+      const nextState = reducer(scheduler, {
+        type: 'scheduler.getSchedulesFailed'
+      });
+
+      expect(nextState.loading).toBe(false);
+    });
+  });
+});

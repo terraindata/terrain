@@ -42,82 +42,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
-import Ajax, { AjaxResponse } from 'util/Ajax';
-import XHR from 'util/XHR';
-
-// making this an instance in case we want stateful things like cancelling ajax requests
-class SchedulerApi
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+import * as Immutable from 'immutable';
+import
 {
-  public xhr: AxiosInstance = null;
+  SchedulerState,
+  _SchedulerState
+} from 'scheduler/SchedulerTypes';
+import { ItemType } from '../../items/types/Item';
 
-  public constructor(xhr: AxiosInstance)
+export default class SchedulerHelper
+{
+  public static mockState()
   {
-    this.xhr = xhr;
-  }
-
-  public createSchedule(schedulerConfig)
-  {
-    const body = schedulerConfig;
-    return this.xhr.post('/scheduler', { body });
-  }
-
-  public getSchedules()
-  {
-    return this.xhr.get('/scheduler');
-  }
-
-  public getSchedule(id: number)
-  {
-    return this.xhr.get(`/scheduler/${id}`);
-  }
-
-  public updateSchedule(id: number, changes)
-  {
-    return this.xhr.post(`/scheduler/${id}`,
-      {
-        body: changes,
-      });
-  }
-
-  public deleteSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/delete/${id}`);
-  }
-
-  public duplicateSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/duplicate/${id}`);
-  }
-
-  public getScheduleLog(schedulerId: number)
-  {
-    return this.xhr.get(`/scheduler/log/${schedulerId}`);
-  }
-
-  public pauseSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/pause/${id}`);
-  }
-
-  public unpauseSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/unpause/${id}`);
-  }
-
-  public runSchedule(id: number)
-  {
-    return this.xhr.post(`/scheduler/run/${id}`);
-  }
-
-  public setScheduleStatus(id: number, status: boolean)
-  {
-    return this.xhr.post(`/scheduler/status/${id}`,
-      {
-        body: { status },
-      });
+    return new SchedulerStateMock();
   }
 }
 
-export default SchedulerApi;
+class SchedulerStateMock
+{
+  public state;
+
+  public constructor()
+  {
+    this.state = _SchedulerState({});
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+
+  public loading(isLoading: boolean)
+  {
+    this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
+}

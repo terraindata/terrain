@@ -48,8 +48,10 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
+import Util from 'util/Util';
+import { SchedulerActions } from 'scheduler/data/SchedulerRedux';
 
-class Scheduler<T> extends TerrainComponent<T> {
+class Scheduler extends TerrainComponent<any> {
 
   public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
 
@@ -63,27 +65,18 @@ class Scheduler<T> extends TerrainComponent<T> {
     };
   }
 
-  public createSchedule(this)
+  public createSchedule()
   {
     this.schedulerApi.createSchedule({
       cron: '0 0 1 1 *',
-      meta: '',
-      name: 'Schedule',
-      tasks: {
-        cancel: false, // whether the tree of tasks should be cancelled
-        jobStatus: 0, // 0: not running, 1: running, 2: paused
-        name: 'Import', // name of the task i.e. 'import'
-        onFailure: 3, // id of task to execute on failure
-        onSuccess: 2, // id of next task to execute (default should be next in array)
-        params: { templateId: -1 }, // input parameters for the task
-        paused: 4, // where in the tree of tasks the tasks are paused
-        taskId: 5, // maps to a statically declared task
-      },
+      name: `Jmansor Schedule ${Math.floor(Math.random() * 100)}`,
+      priority: 1,
+      tasks: [],
+      workerId: 10,
     })
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -93,19 +86,13 @@ class Scheduler<T> extends TerrainComponent<T> {
 
   public getSchedules()
   {
-    this.schedulerApi.getSchedules()
-      .then((response) =>
-      {
-        this.setState({
-          responseText: JSON.stringify(response),
-          schedules: response.data,
-        });
-      })
-      .catch((error) =>
-      {
-        console.log(error);
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
+    this.props.schedulerActions({
+      actionType: 'getSchedules'
+    })
+    .then((schedules) =>
+    {
+      console.error(schedules.get(1));
+    })
   }
 
   public getSchedule(id: number)
@@ -121,14 +108,13 @@ class Scheduler<T> extends TerrainComponent<T> {
       });
   }
 
-  public updateSchedule(id: number, newSchedule?)
+  public updateSchedule(id: number, changes: object)
   {
-    newSchedule = newSchedule || { name: 'Jmansor Schedule Modified' };
-    this.schedulerApi.updateSchedule(id, newSchedule)
+    changes = changes || { name: 'Jmansor Schedule Modified' };
+    this.schedulerApi.updateSchedule(id, changes)
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -142,7 +128,6 @@ class Scheduler<T> extends TerrainComponent<T> {
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -156,7 +141,6 @@ class Scheduler<T> extends TerrainComponent<T> {
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -170,7 +154,6 @@ class Scheduler<T> extends TerrainComponent<T> {
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -184,7 +167,6 @@ class Scheduler<T> extends TerrainComponent<T> {
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -198,7 +180,6 @@ class Scheduler<T> extends TerrainComponent<T> {
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -212,7 +193,6 @@ class Scheduler<T> extends TerrainComponent<T> {
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -226,7 +206,6 @@ class Scheduler<T> extends TerrainComponent<T> {
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
       })
       .catch((error) =>
       {
@@ -241,9 +220,32 @@ class Scheduler<T> extends TerrainComponent<T> {
     });
   }
 
+  public renderSchedule(schedule)
+  {
+    return (
+      <div key={schedule.id} style={{ display: 'flex', justifyContent: 'space-between', width: '90%', padding: 10, borderBottom: '1px solid' }}>
+        <div style={{ flex: 1 }}>{schedule.id}</div>
+        <div style={{ flex: 1 }}>{schedule.name}</div>
+        <div style={{ flex: 1 }}>{schedule.running ? 'running' : 'not running'}</div>
+        <div style={{ flex: 1 }}>{schedule.shouldRunNext.toString()}</div>
+        <div style={{ flex: 1.5 }}>
+          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Delete</a>,
+          <a href="#" onClick={() => this.duplicateSchedule(schedule.id)}>Duplicate</a>,
+          <a href="#">Log</a>,
+          <a href="#" onClick={() => this.pauseSchedule(schedule.id)}>Pause</a>,
+          <a href="#" onClick={() => this.unpauseSchedule(schedule.id)}>Unpause</a>,
+          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Run</a>,
+          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Set Status</a>
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
+    const { scheduler } = this.props;
     const { id } = this.state;
+
     return (
       <div>
         id: <input style={{ width: 50 }} onChange={this.handleIdChange} value={id} />
@@ -263,12 +265,15 @@ class Scheduler<T> extends TerrainComponent<T> {
         <div>
           {this.state.responseText}
         </div>
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {
-            this.state.schedules !== null ?
+            scheduler.schedules !== null ?
               (
-                this.state.schedules.map((s) =>
-                  <div key={s.id}>{s.id} - {s.name} - {s.running ? 'running' : 'not running'} - {s.shouldRunNext.toString()}</div>,
+                scheduler.schedules.reduce(
+                  (scheduleRows, s, sId) => scheduleRows.concat(
+                    this.renderSchedule(s)
+                  ),
+                  []
                 )
               ) : null
           }
@@ -278,4 +283,8 @@ class Scheduler<T> extends TerrainComponent<T> {
   }
 }
 
-export default Scheduler;
+export default Util.createTypedContainer(
+  Scheduler,
+  ['scheduler'],
+  { schedulerActions: SchedulerActions }
+);
