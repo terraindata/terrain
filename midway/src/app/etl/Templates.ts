@@ -79,6 +79,8 @@ export default class Templates
       'templates',
       ['id'],
       [
+        'createdAt',
+        'lastModified',
         'archived',
         'templateName',
         'process',
@@ -173,8 +175,11 @@ export default class Templates
       {
         return reject(message);
       }
+      const currDateTime: Date = new Date(Date.now());
       const newTemplate: TemplateConfig = {
         archived: false,
+        createdAt: currDateTime,
+        lastModified: currDateTime,
         templateName: template.templateName,
         process: template.process,
         sources: template.sources,
@@ -193,8 +198,11 @@ export default class Templates
       {
         return reject(message);
       }
+      const currDateTime: Date = new Date(Date.now());
       const newTemplate: TemplateConfig = {
         archived: template.archived,
+        createdAt: template.createdAt,
+        lastModified: currDateTime,
         id: template.id,
         templateName: template.templateName,
         process: template.process,

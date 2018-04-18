@@ -78,7 +78,7 @@ export interface Props
 {
   isSource?: boolean;
   endpoint: SinkConfig | SourceConfig;
-  onChange: (newConfig: SinkConfig | SourceConfig) => void;
+  onChange: (newConfig: SinkConfig | SourceConfig, apply?: boolean) => void;
 }
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
@@ -176,11 +176,11 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
     onChange(endpoint.set('fileConfig', newFileConfig));
   }
 
-  private handleOptionsFormChange(formState: State)
+  private handleOptionsFormChange(formState: State, apply?: boolean)
   {
     const { onChange, endpoint } = this.props;
     const newOptions = this.formStateToOptions(formState);
-    onChange(endpoint.set('options', newOptions));
+    onChange(endpoint.set('options', newOptions), apply);
   }
 }
 
@@ -308,7 +308,6 @@ const AlgorithmEndpoint = Util.createContainer(
 );
 
 type SftpState = SftpOptions;
-
 class SftpEndpoint extends EndpointForm<SftpState>
 {
   public inputMap: InputDeclarationMap<SftpState> = {
@@ -441,6 +440,17 @@ class DatabaseEndpoint extends EndpointForm<DatabaseState>
   }
 }
 
+type FsState = SinkOptionsType<Sinks.Fs>;
+class FsEndpoint extends EndpointForm<FsState>
+{
+  public inputMap: InputDeclarationMap<FsState> = {
+    path: {
+      type: DisplayType.TextBox,
+      displayName: 'File path',
+    },
+  };
+}
+
 // exports
 type FormLookupMap<E extends string> =
   {
@@ -453,6 +463,7 @@ export const SourceFormMap: FormLookupMap<Sources> =
     [Sources.Algorithm]: AlgorithmEndpoint,
     [Sources.Sftp]: SftpEndpoint,
     [Sources.Http]: HttpEndpoint,
+    [Sources.Fs]: FsEndpoint,
   };
 
 export const SinkFormMap: FormLookupMap<Sinks> =
@@ -461,4 +472,5 @@ export const SinkFormMap: FormLookupMap<Sinks> =
     [Sinks.Database]: DatabaseEndpoint,
     [Sinks.Sftp]: SftpEndpoint,
     [Sinks.Http]: HttpEndpoint,
+    [Sinks.Fs]: FsEndpoint,
   };

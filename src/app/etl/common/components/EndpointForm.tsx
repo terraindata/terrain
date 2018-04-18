@@ -69,7 +69,7 @@ export interface Props
 {
   isSource: boolean;
   endpoint: SourceConfig | SinkConfig;
-  onChange: (newEndpoint: SourceConfig | SinkConfig) => void;
+  onChange: (newEndpoint: SourceConfig | SinkConfig, apply?: boolean) => void;
   hideTypePicker?: boolean;
 }
 
@@ -150,9 +150,9 @@ export default class EndpointForm extends TerrainComponent<Props>
     onChange(newEndpoint);
   }
 
-  public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig)
+  public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig, apply?: boolean)
   {
-    this.props.onChange(newEndpoint);
+    this.props.onChange(newEndpoint, apply);
   }
 }
 
@@ -166,5 +166,5 @@ interface SourceFormState
   type: Sources;
 }
 
-const sourceList = List([Sources.Upload, Sources.Algorithm, Sources.Sftp, Sources.Http]);
-const sinkList = List([Sinks.Download, Sinks.Database, Sinks.Sftp, Sinks.Http]);
+const sourceList = List(Object.keys(Sources));
+const sinkList = List(Object.keys(Sinks));

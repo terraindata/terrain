@@ -88,7 +88,7 @@ export interface Props
   endpointKey: string;
   endpoint: SourceConfig | SinkConfig;
   isSource: boolean;
-  onEndpointChange: (endpoint: SourceConfig | SinkConfig) => void;
+  onEndpointChange: (endpoint: SourceConfig | SinkConfig, apply?: boolean) => void;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
