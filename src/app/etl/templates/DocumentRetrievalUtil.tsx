@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import
 {
   _TemplateField,
@@ -58,6 +57,7 @@ import { Algorithm } from 'library/LibraryTypes';
 import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
 import { MidwayError } from 'shared/error/MidwayError';
 import { getSampleRows } from 'shared/etl/FileUtil';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
 import { toInputMap } from 'src/blocks/types/Input';
 import { AllBackendsMap } from 'src/database/AllBackends';

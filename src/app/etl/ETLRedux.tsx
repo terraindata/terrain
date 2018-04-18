@@ -52,9 +52,9 @@ import MidwayError from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
-import { SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import ETLAjax, { ExecuteConfig } from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
+import { SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';

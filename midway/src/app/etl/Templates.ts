@@ -49,11 +49,11 @@ THE SOFTWARE.
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import GraphLib = require('graphlib');
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as request from 'request';
 import { Readable, Transform } from 'stream';
 import * as winston from 'winston';
-import * as Immutable from 'immutable';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
@@ -70,7 +70,7 @@ import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
 import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
 
-import { _SinkConfig, _SourceConfig, SourceConfig as SourceRecord, SinkConfig as SinkRecord } from 'shared/etl/immutable/EndpointRecords';
+import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 
@@ -260,8 +260,9 @@ export default class Templates
   {
     let template: ETLTemplate = null;
 
-    try {
-      let sources: Immutable.Map<string, SourceRecord> =  null;
+    try
+    {
+      let sources: Immutable.Map<string, SourceRecord> = null;
       let sinks: Immutable.Map<string, SinkRecord> = null;
 
       if (overrideSources !== undefined)
@@ -285,7 +286,8 @@ export default class Templates
       template = _ETLTemplate(templateObj as TemplateBase);
       template = template.applyOverrides(sources, sinks);
     }
-    catch (e) {
+    catch (e)
+    {
       throw new Error(`Failed to create execution template: ${String(e)}`);
     }
 

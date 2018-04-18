@@ -195,13 +195,15 @@ class ETLTemplateC implements ETLTemplateI
     let template: ETLTemplate = this as any;
     if (sources !== undefined)
     {
-      sources.forEach((source, key) => {
+      sources.forEach((source, key) =>
+      {
         template = template.update('sources', (sources) => sources.set(key, source));
       });
     }
     if (sinks !== undefined)
     {
-      sinks.forEach((sink, key) => {
+      sinks.forEach((sink, key) =>
+      {
         template = template.update('sinks', (sinks) => sinks.set(key, sink));
       });
     }
@@ -249,10 +251,12 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
       .toMap();
   },
   process: _ETLProcess,
-  lastModified: (date) => {
+  lastModified: (date) =>
+  {
     return typeof date === 'string' ? new Date(date) : date;
   },
-  createdAt: (date) => {
+  createdAt: (date) =>
+  {
     return typeof date === 'string' ? new Date(date) : date;
   },
 });

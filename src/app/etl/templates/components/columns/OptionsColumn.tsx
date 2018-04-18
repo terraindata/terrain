@@ -57,8 +57,8 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 

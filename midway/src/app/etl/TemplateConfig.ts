@@ -46,10 +46,10 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import ConfigType from '../ConfigType';
 
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/EndpointTypes';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 
 export class TemplateConfig extends ConfigType implements TemplateBase
 {

@@ -57,11 +57,11 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import UploadFileButton from 'etl/common/components/UploadFileButton';
-import { _FileConfig, _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { getFileType } from 'shared/etl/FileUtil';
 import { guessFileOptions } from 'shared/etl/FileUtil';
+import { getFileType } from 'shared/etl/FileUtil';
+import { _FileConfig, _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';

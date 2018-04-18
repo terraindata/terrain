@@ -55,9 +55,9 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import DatabasePicker from 'etl/common/components/DatabasePicker';
-import { _FileConfig, _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { _FileConfig, _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { SinkOptionsType, Sinks } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
