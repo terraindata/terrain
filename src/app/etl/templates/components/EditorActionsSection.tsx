@@ -156,16 +156,6 @@ class EditorActionsSection extends TerrainComponent<Props>
     return (
       <div className='template-editor-top-bar'>
         {... this.renderRootLevelModals()}
-        <div className='top-bar-left-side'>
-          <div
-            className='editor-top-bar-item'
-            style={topBarRunStyle}
-            onClick={this.handleRun}
-            key='run'
-          >
-            Run
-          </div>
-        </div>
         <div
           className='editor-top-bar-name'
           style={topBarNameStyle}
@@ -212,6 +202,14 @@ class EditorActionsSection extends TerrainComponent<Props>
           key='save'
         >
           SAVE
+        </div>
+        <div
+          className='editor-top-bar-item'
+          style={topBarRunStyle}
+          onClick={this.handleRun}
+          key='run'
+        >
+          RUN
         </div>
       </div>
     );
@@ -359,7 +357,7 @@ const topBarIconDisabledStyle = [
   fontColor(Colors().darkerHighlight, Colors().darkerHighlight),
 ];
 
-const topBarRunStyle = [backgroundColor(Colors().active, Colors().activeHover), fontColor(Colors().activeText)];
+const topBarRunStyle = [backgroundColor(Colors().activeHover, Colors().active), fontColor(Colors().activeText)];
 const topBarNameStyle = [fontColor(Colors().text2)];
 const templateListItemStyle = [
   { cursor: 'pointer' },
