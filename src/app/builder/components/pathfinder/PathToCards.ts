@@ -521,9 +521,6 @@ export class PathToCards
 
     filterLines.map((line: FilterLine, index) =>
     {
-      console.assert((line.fieldType === FieldType.Nested) && line.filterGroup);
-
-      // this is an inner filter group
       const innerBoolValueInfo = innerBools[index];
       this.FilterGroupToBool(line.filterGroup, parser, innerBoolValueInfo, filterSection);
     });
@@ -574,7 +571,7 @@ export class PathToCards
       blocks = blocks.concat(this.filterLineToFilterBlock(boolType, line));
     });
 
-    const boolCard = boolValueInfo.card;
+    let boolCard = boolValueInfo.card;
     const keepFilters = [];
     // delete all matched terrain filter blocks
     boolCard.otherFilters.map((filterBlock: Block) =>
@@ -585,6 +582,20 @@ export class PathToCards
         keepFilters.push(filterBlock);
       }
     });
+
+    // check the dummy filter of the soft bool
+    if (filterSection === 'soft' && boolCard.dummyFilters.size === 0)
+    {
+      const dummyBlock = BlockUtils.make(ElasticBlocks, 'elasticFilterBlock',
+        {
+          field: '_id',
+          value: ' ',
+          boolQuery: 'filter',
+          filterOp: 'exists',
+        }, true);
+      boolCard = boolCard.set('dummyFilters', List([dummyBlock]));
+    }
+
     boolValueInfo.card = boolCard.set('otherFilters', List(keepFilters.concat(blocks)));
     parser.isMutated = true;
     TerrainLog.debug('P->B( end filtergroup -> bool) ', filterGroup, boolValueInfo);

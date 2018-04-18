@@ -121,6 +121,7 @@ export interface Props
   hideLine?: boolean;
   canDelete?: boolean;
   showWarning?: boolean;
+  useTooltip?: boolean;
   warningMessage?: string;
   onDelete?: () => void;
   onToggleOpen?: (open: boolean) => void;
@@ -294,6 +295,7 @@ export class RouteSelector extends TerrainComponent<Props>
                     noBorder={true}
                     forceFloat={optionSet.forceFloat}
                     extendRight={true}
+                    useTooltip={this.props.useTooltip}
                   />
               }
               {/*getValueRef={this.handleValueRef}
