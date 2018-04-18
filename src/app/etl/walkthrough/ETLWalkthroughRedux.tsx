@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 import { Ajax } from 'util/Ajax';
 import { _WalkthroughState, ViewState, WalkthroughState } from './ETLWalkthroughTypes';

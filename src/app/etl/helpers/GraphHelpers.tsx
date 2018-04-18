@@ -57,7 +57,7 @@ import Util from 'util/Util';
 
 import ETLHelpers from './ETLHelpers';
 
-import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
@@ -65,12 +65,12 @@ import
 {
   _ETLEdge, _ETLNode, _ETLProcess,
   _MergeJoinOptions, ETLEdge, ETLNode, ETLProcess, MergeJoinOptions,
-} from 'etl/templates/ETLProcess';
+} from 'shared/etl/immutable/ETLProcess';
 import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { createTreeFromEngine } from 'etl/templates/SyncUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
+import { SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';

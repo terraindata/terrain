@@ -63,7 +63,7 @@ import TemplateList from 'etl/templates/components/TemplateList';
 import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateTypes';
 
 const { List } = Immutable;
 

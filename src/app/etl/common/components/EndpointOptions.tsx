@@ -59,7 +59,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
 import

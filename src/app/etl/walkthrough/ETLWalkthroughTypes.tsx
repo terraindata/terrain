@@ -51,7 +51,7 @@ const { List, Map } = Immutable;
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig }
-  from 'etl/EndpointTypes';
+  from 'shared/etl/immutable/EndpointTypes';
 
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 

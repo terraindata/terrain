@@ -55,7 +55,7 @@ import { Algorithm, LibraryState } from 'library/LibraryTypes';
 import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
 
-import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
@@ -70,8 +70,8 @@ import
   FieldMap,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
-import { TemplateProxy } from 'etl/templates/TemplateProxy';
-import { _ETLTemplate, copyTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
+import { TemplateProxy } from 'shared/etl/immutable/TemplateProxy';
+import { _ETLTemplate, copyTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';

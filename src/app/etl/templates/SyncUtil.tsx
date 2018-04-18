@@ -48,7 +48,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
 
 import
 {
@@ -56,7 +56,7 @@ import
   TemplateField, TransformationNode,
 } from 'etl/templates/FieldTypes';
 import { FieldMap } from 'etl/templates/TemplateEditorTypes';
-import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateTypes';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
