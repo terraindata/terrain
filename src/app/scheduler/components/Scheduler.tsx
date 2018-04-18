@@ -91,7 +91,7 @@ class Scheduler extends TerrainComponent<any> {
     })
     .then((schedules) =>
     {
-      console.error(schedules);
+      console.error(schedules.get(1));
     })
   }
 
@@ -220,9 +220,32 @@ class Scheduler extends TerrainComponent<any> {
     });
   }
 
+  public renderSchedule(schedule)
+  {
+    return (
+      <div key={schedule.id} style={{ display: 'flex', justifyContent: 'space-between', width: '90%', padding: 10, borderBottom: '1px solid' }}>
+        <div style={{ flex: 1 }}>{schedule.id}</div>
+        <div style={{ flex: 1 }}>{schedule.name}</div>
+        <div style={{ flex: 1 }}>{schedule.running ? 'running' : 'not running'}</div>
+        <div style={{ flex: 1 }}>{schedule.shouldRunNext.toString()}</div>
+        <div style={{ flex: 1.5 }}>
+          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Delete</a>,
+          <a href="#" onClick={() => this.duplicateSchedule(schedule.id)}>Duplicate</a>,
+          <a href="#">Log</a>,
+          <a href="#" onClick={() => this.pauseSchedule(schedule.id)}>Pause</a>,
+          <a href="#" onClick={() => this.unpauseSchedule(schedule.id)}>Unpause</a>,
+          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Run</a>,
+          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Set Status</a>
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
+    const { scheduler } = this.props;
     const { id } = this.state;
+
     return (
       <div>
         id: <input style={{ width: 50 }} onChange={this.handleIdChange} value={id} />
@@ -242,12 +265,15 @@ class Scheduler extends TerrainComponent<any> {
         <div>
           {this.state.responseText}
         </div>
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {
-            this.state.schedules !== null ?
+            scheduler.schedules !== null ?
               (
-                this.state.schedules.map((s) =>
-                  <div key={s.id}>{s.id} - {s.name} - {s.running ? 'running' : 'not running'} - {s.shouldRunNext.toString()}</div>,
+                scheduler.schedules.reduce(
+                  (scheduleRows, s, sId) => scheduleRows.concat(
+                    this.renderSchedule(s)
+                  ),
+                  []
                 )
               ) : null
           }
@@ -259,6 +285,6 @@ class Scheduler extends TerrainComponent<any> {
 
 export default Util.createTypedContainer(
   Scheduler,
-  [],
+  ['scheduler'],
   { schedulerActions: SchedulerActions }
 );

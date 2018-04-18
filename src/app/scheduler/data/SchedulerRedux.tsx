@@ -51,6 +51,7 @@ import { SchedulerConfig, SchedulerState, _SchedulerState } from 'scheduler/Sche
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
 const { List, Map } = Immutable;
+import Util from 'util/Util';
 
 export interface SchedulerActionTypes
 {
@@ -62,7 +63,7 @@ export interface SchedulerActionTypes
   };
   getSchedulesSuccess: {
     actionType: 'getSchedulesSuccess';
-    schedules: Immutable.List<SchedulerConfig>;
+    schedules: Immutable.Map<ID, SchedulerConfig>;
   };
   getSchedulesFailed: {
     actionType: 'getSchedulesFailed';
@@ -109,12 +110,13 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.getSchedules()
       .then((response) =>
       {
+        const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(response.data, 'id');
         directDispatch({
           actionType: 'getSchedulesSuccess',
-          schedules: Immutable.List(response.data),
+          schedules,
         });
 
-        return response.data;
+        return schedules;
       });
   }
 

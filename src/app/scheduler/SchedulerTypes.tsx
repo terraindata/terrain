@@ -67,7 +67,7 @@ export const _SchedulerConfig =
 class SchedulerStateC
 {
   public loading: boolean = true;
-  public schedules: Immutable.List<SchedulerConfig> = Immutable.List([]);
+  public schedules: Immutable.Map<ID, SchedulerConfig> = Immutable.Map<ID, SchedulerConfig>({});
   public error: string = null;
 }
 
