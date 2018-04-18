@@ -56,7 +56,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
 import GraphHelpers from 'etl/helpers/GraphHelpers';

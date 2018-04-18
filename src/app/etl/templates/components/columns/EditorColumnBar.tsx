@@ -58,7 +58,7 @@ import Util from 'util/Util';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 const { List } = Immutable;
 const DropdownIcon = require('images/icon_carrot.svg');

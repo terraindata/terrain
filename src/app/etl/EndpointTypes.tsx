@@ -48,7 +48,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 import
 {

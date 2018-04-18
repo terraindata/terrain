@@ -55,7 +55,7 @@ import Util from 'util/Util';
 
 import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import DatabasePicker from 'etl/common/components/DatabasePicker';
 import UploadFileButton from 'etl/common/components/UploadFileButton';

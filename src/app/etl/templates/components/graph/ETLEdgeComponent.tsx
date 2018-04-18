@@ -62,7 +62,7 @@ import ExpandableView from 'common/components/ExpandableView';
 import Menu from 'common/components/Menu';
 import { MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';

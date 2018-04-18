@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires no-reference no-unused-expression strict-boolean-expressions max-line-length no-console
 
-/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../../shared/typings/tsd.d.ts" />
 
 require('babel-polyfill');
 
