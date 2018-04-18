@@ -49,9 +49,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TemplateField } from 'etl/templates/FieldTypes';
-import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateTypes';
+import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -69,7 +69,7 @@ import
   ETLNode,
   ETLProcess,
   MergeJoinOptions,
-} from 'shared/etl/immutable/ETLProcess';
+} from 'shared/etl/immutable/ETLProcessRecords';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 
 export type Mutator<T> = (newItem: T) => void;

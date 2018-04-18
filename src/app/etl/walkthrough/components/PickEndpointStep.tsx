@@ -60,8 +60,8 @@ import Util from 'util/Util';
 
 import EndpointForm from 'etl/common/components/EndpointForm';
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointOptions';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateTypes';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';

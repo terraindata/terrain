@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import
 {
   _TemplateField,
@@ -63,7 +63,7 @@ import
   TemplateEditorHistory,
   TemplateEditorState,
 } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate, getSourceFiles } from 'shared/etl/immutable/TemplateTypes';
+import { ETLTemplate, getSourceFiles } from 'shared/etl/immutable/TemplateRecords';
 
 import { _HistoryStack, HistoryStack } from 'etl/common/HistoryStack';
 import { Algorithm, LibraryState } from 'library/LibraryTypes';

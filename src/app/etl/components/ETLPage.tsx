@@ -55,7 +55,7 @@ import FilePicker from 'common/components/FilePicker';
 import Loading from 'common/components/Loading';
 import Modal from 'common/components/Modal';
 import { MultiModal } from 'common/components/overlay/MultiModal';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 

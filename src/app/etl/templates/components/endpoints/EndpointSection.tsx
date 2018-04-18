@@ -64,11 +64,11 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
 import EndpointForm from 'etl/common/components/EndpointForm';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
+import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateTypes';
+import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import TemplateEndpoint from './TemplateEndpoint';

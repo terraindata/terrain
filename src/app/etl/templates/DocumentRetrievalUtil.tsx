@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
+import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import
 {
   _TemplateField,

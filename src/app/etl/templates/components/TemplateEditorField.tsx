@@ -64,7 +64,7 @@ import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { SinkConfig, SinkOptionsType, Sinks, SourceConfig, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';

@@ -59,7 +59,7 @@ import Modal from 'common/components/Modal';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'shared/etl/immutable/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 const UndoIcon = require('images/icon_undo.svg');
 const RedoIcon = require('images/icon_redo.svg');

@@ -56,7 +56,7 @@ import { browserHistory } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
+import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { ETLState } from 'etl/ETLTypes';
@@ -64,7 +64,7 @@ import Initializers from 'etl/helpers/TemplateInitializers';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { _ETLTemplate, ETLTemplate, getSourceFiles, restoreSourceFiles } from 'shared/etl/immutable/TemplateTypes';
+import { _ETLTemplate, ETLTemplate, getSourceFiles, restoreSourceFiles } from 'shared/etl/immutable/TemplateRecords';
 import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';

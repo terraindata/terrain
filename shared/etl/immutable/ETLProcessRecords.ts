@@ -51,7 +51,7 @@ import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointTypes';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import
 {
