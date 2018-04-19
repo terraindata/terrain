@@ -51,7 +51,7 @@ import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
@@ -92,6 +92,46 @@ class ETLTemplateC implements ETLTemplateI
     return false;
   }
 
+  public getDescription(algorithms?: Map<ID, ItemWithName>): string
+  {
+    let sourceText = '';
+    this.getSources().forEach((source, key) =>
+    {
+      if (sourceText !== '')
+      {
+        sourceText = `${sourceText}, ${source.description(algorithms)}`;
+      }
+      else
+      {
+        sourceText = source.description(algorithms);
+      }
+    });
+    if (this.getSources().size > 1)
+    {
+      sourceText = `[${sourceText}]`;
+    }
+
+    let sinkText = '';
+    this.getSinks().forEach((sink, key) =>
+    {
+      if (sinkText !== '')
+      {
+        sinkText = `${sinkText}, ${sink.description()}`;
+      }
+      else
+      {
+        sinkText = sink.description();
+      }
+    });
+    if (this.getSinks().size > 1)
+    {
+      sinkText = `[${sinkText}]'`;
+    }
+
+    const typeText = this.isImport() ? 'Import' : 'Export';
+    return `${typeText} from ${sourceText} into ${sinkText}`;
+  }
+
   public getSources()
   {
     return this.sources;
@@ -114,14 +154,14 @@ class ETLTemplateC implements ETLTemplateI
 
   public getSourceName(key)
   {
-    const source = this.sources.get(key);
+    const source = this.getSource(key);
     const type = (source != null && source.type != null) ? source.type : '';
     return `${source != null ? source.name : ''} (${type})`;
   }
 
   public getSinkName(key)
   {
-    const sink = this.sinks.get(key);
+    const sink = this.getSink(key);
     const type = (sink != null && sink.type != null) ? sink.type : '';
     return `${sink.name} (${type})`;
   }
