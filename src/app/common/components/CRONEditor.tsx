@@ -54,7 +54,8 @@ import { borderColor, Colors, getStyle } from './../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FadeInOut from './FadeInOut';
 import FloatingInput from './FloatingInput';
-import { parseCRONDaySchedule, parseCRONHourSchedule, canParseCRONSchedule } from 'shared/util/CRONParser';
+import { parseCRONDaySchedule, parseCRONHourSchedule, canParseCRONSchedule, setCRONDays,
+  setCRONHours, setCRONType } from 'shared/util/CRONParser';
 import { CRONHourNames, CRONHourOptions, CRONWeekDayNames, CRONWeekDayOptions,
   CRONMonthDayOptions, CRONDaySchedule, CRONHourSchedule } from 'shared/util/CRONConstants';
 
@@ -85,7 +86,15 @@ class CRONEditor extends TerrainComponent<Props>
   
   private handleOptionClick(daysOrHours: 'days' | 'hours', type: string)
   {
+    const newCRON = setCRONType(this.props.cron, daysOrHours, type);
+    if (newCRON === null)
+    {
+      // this may never be used
+      alert('Not allowed');
+      return;
+    }
     
+    this.props.onChange(newCRON);
   }
   
   private renderHeader(str: string)
@@ -106,7 +115,6 @@ class CRONEditor extends TerrainComponent<Props>
     daysOrHours: 'days' | 'hours', el?: any)
   {
     const selected = sched && sched.type === type;
-    console.log(sched);
 
     return (
       <div
@@ -145,14 +153,18 @@ class CRONEditor extends TerrainComponent<Props>
       this.renderOption('Every weekday', 'weekdays', sched, 'days'),
       
       this.renderOption('Specific weekday(s)', 'weekly', sched, 'days',
-        <div>
-          TODO
+        <div key='w'>
+          {
+            JSON.stringify(sched.weekdays)
+          }
         </div>
       ),
       
       this.renderOption('Specific day(s) of the month', 'monthly', sched, 'days',
-        <div>
-          TODO
+        <div key='m'>
+          {
+            JSON.stringify(sched.days)
+          }
         </div>
       ),
     ];
@@ -166,11 +178,19 @@ class CRONEditor extends TerrainComponent<Props>
     return [
       this.renderHeader('Time'),
       this.renderOption('Every minute', 'minute', sched, 'hours'),
-      this.renderOption('Every hour', 'hourly', sched, 'hours'),
+      this.renderOption('Every hour', 'hourly', sched, 'hours',
+        <div key='h'>
+          {
+            JSON.stringify(sched.minutes)
+          }
+        </div>
+      ),
 
       this.renderOption('Specific hour(s)', 'daily', sched, 'hours',
-        <div>
-          TODO
+        <div key='d'>
+          {
+            JSON.stringify(sched.hours)
+          }
         </div>
       ),
     ];
@@ -180,7 +200,10 @@ class CRONEditor extends TerrainComponent<Props>
   {
     return [
       this.renderHeader('Custom'),
-      <div className='common-list-option-style'>
+      <div 
+        className='common-list-option-style'
+        key='c'
+      >
         <div className='common-option-name-style'>
           <FloatingInput
             value={this.props.cron}

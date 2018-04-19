@@ -51,6 +51,8 @@ import
   CRONDaySchedule, CRONHourOptions, CRONHourSchedule,
   CRONMap, CRONMinuteOptions, CRONMonthDayOptions,
   CRONWeekDayOptions, CRONWorkWeekdays,
+  defaultCRONHourOptions, defaultCRONMinuteOptions,
+  defaultCRONMonthDayOptions, defaultCRONWeekDayOptions
 } from './CRONConstants';
 
 const CACHE = {
@@ -261,6 +263,97 @@ export function canParseCRONSchedule(cron: string): boolean
   }
 
   return false;
+}
+
+// Changes the type of a CRON string
+// If the type changed to one that requires values, it will set the defaults
+export function setCRONType(cron: string, daysOrHours: 'days' | 'hours', type: string)
+{
+	switch (daysOrHours)
+	{
+		case 'days':
+			switch (type)
+			{
+				case 'daily':
+					return setCRONDays(cron, {
+						type: 'daily',
+					});
+					
+				case 'weekdays':
+					return setCRONDays(cron, {
+						type: 'weekdays',
+					});
+					
+				case 'weekly':
+					const parsedWeekDays = parseCRONDaySchedule(cron, true);
+					if (parsedWeekDays.type === 'weekly')
+					{
+						// already of type
+						return cron;
+					}
+					
+					return setCRONDays(cron, {
+						type: 'weekly',
+						weekdays: defaultCRONWeekDayOptions,
+					});
+				
+				case 'monthly':
+					const parsedDays = parseCRONDaySchedule(cron, true);
+					if (parsedDays.type === 'monthly')
+					{
+						// already of type
+						return cron;
+					}
+					
+					return setCRONDays(cron, {
+						type: 'monthly',
+						days: defaultCRONMonthDayOptions,
+					});
+					
+				default:
+					throw new Error(`Unrecognized CRON type ${daysOrHours}: ${type}`);
+			}
+			
+		case 'hours':
+			switch (type)
+			{
+				case 'minute':
+					return setCRONHours(cron, {
+						type: 'minute',
+					});
+					
+				case 'hourly':
+					const parsedMinutes = parseCRONHourSchedule(cron, true);
+					if (parsedMinutes.type === 'hourly')
+					{
+						// of same type
+						return cron;
+					}
+					
+					return setCRONHours(cron, {
+						type: 'hourly',
+						minutes: defaultCRONMinuteOptions,
+					});
+				
+				case 'daily':
+					const parsedHours = parseCRONHourSchedule(cron, true);
+					if (parsedHours.type === 'daily')
+					{
+						// of same type
+						return cron;
+					}
+					
+					return setCRONHours(cron, {
+						type: 'daily',
+						hours: defaultCRONHourOptions,
+					});
+				
+				default:
+					return null;
+			}
+		default:
+			return null;
+	}
 }
 
 // Private

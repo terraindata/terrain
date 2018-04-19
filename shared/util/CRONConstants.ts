@@ -69,6 +69,7 @@ export function fillCRONMap(values: number[], start: number, endInclusive: numbe
 // Days
 
 export const CRONWeekDayOptions: CRONMap = fillCRONMap([], 0, 6);
+export const defaultCRONWeekDayOptions = { 1: true }; // Monday
 
 export const CRONWeekDayNames =
   {
@@ -84,6 +85,7 @@ export const CRONWeekDayNames =
 export const CRONWorkWeekdays: CRONMap = fillCRONMap([1, 2, 3, 4, 5], 0, 6);
 
 export const CRONMonthDayOptions: CRONMap = fillCRONMap([], 1, 31);
+export const defaultCRONMonthDayOptions = { 1: true }; // the 1st
 
 export interface CRONDaySchedule
 {
@@ -92,9 +94,11 @@ export interface CRONDaySchedule
   days?: CRONMap; // for monthly
 }
 
+
 // Hours and Minutes
 
 export const CRONHourOptions: CRONMap = fillCRONMap([], 0, 23);
+export const defaultCRONHourOptions = { 0: true }; // 12 AM
 
 export const CRONHourNames = {
   0: '12 AM', 1: '1 AM', 2: '2 AM', 3: '3 AM', 4: '4 AM', 5: '5 AM', 6: '6 AM', 7: '7 AM', 8: '8 AM',
@@ -103,6 +107,7 @@ export const CRONHourNames = {
 };
 
 export const CRONMinuteOptions: CRONMap = fillCRONMap([], 0, 59);
+export const defaultCRONMinuteOptions = { 0: true }; //:00
 
 export interface CRONHourSchedule
 {
@@ -110,3 +115,4 @@ export interface CRONHourSchedule
   minutes?: CRONMap; // for hourly
   hours?: CRONMap; // for daily
 }
+
