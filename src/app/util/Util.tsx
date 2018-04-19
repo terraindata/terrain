@@ -817,11 +817,16 @@ const Util = {
     return false;
   },
 
-  arrayToImmutableMap(arrayToConvert: any[], idAttribute: string)
+  arrayToImmutableMap(arrayToConvert: any[], idAttribute: string, itemConstructor = null)
   {
     const immutableMap = arrayToConvert.reduce((imap, item) =>
     {
-      return imap.set(item[idAttribute], Object.assign({}, item));
+      let transformedItem = Object.assign({}, item);
+      if (itemConstructor !== null)
+      {
+        transformedItem = itemConstructor(item);
+      }
+      return imap.set(item[idAttribute], transformedItem);
     }, Immutable.Map());
 
     return immutableMap;

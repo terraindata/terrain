@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { SchedulerActions, SchedulerActionTypes } from 'scheduler/data/SchedulerRedux';
 import SchedulerApi from 'scheduler/SchedulerApi';
-import { SchedulerConfig } from 'scheduler/SchedulerTypes';
+import { _SchedulerConfig, SchedulerConfig } from 'scheduler/SchedulerTypes';
 import { createMockStore } from 'test-helpers/helpers';
 import SchedulerHelper from 'test-helpers/SchedulerHelper';
 
@@ -106,8 +106,8 @@ describe('SchedulerActions', () =>
       it('should dispatch a getSchedulesStart action followed by a getSchedulesSuccess action', () =>
       {
         const schedules = Immutable.Map<ID, any>({})
-          .set(1, { id: 1, name: 'Schedule 1' })
-          .set(2, { id: 2, name: 'Schedule 2' });
+          .set(1, _SchedulerConfig({ id: 1, name: 'Schedule 1' }))
+          .set(2, _SchedulerConfig({ id: 2, name: 'Schedule 2' }));
 
         const expectedActions = [
           {
@@ -138,7 +138,7 @@ describe('SchedulerActions', () =>
       it('should dispatch a createScheduleStart action followed by a createScheduleSuccess action', () =>
       {
         const scheduleParams = { name: 'Schedule 2' };
-        const newSchedule = { id: 2, name: 'Schedule 2' };
+        const newSchedule = _SchedulerConfig({ id: 2, name: 'Schedule 2' });
 
         const expectedActions = [
           {
