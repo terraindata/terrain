@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 import axios, { AxiosInstance } from 'axios';
 
-class HXR
+class XHR
 {
   public static getInstance(): AxiosInstance
   {
@@ -67,4 +67,4 @@ class HXR
   }
 }
 
-export default HXR;
+export default XHR;
