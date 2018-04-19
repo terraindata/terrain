@@ -101,7 +101,7 @@ class TemplateList extends TerrainComponent<Props>
     },
     {
       name: 'Description',
-      render: (template, index) => template.getDescription(),
+      render: (template, index) => template.getDescription(this.props.algorithms as any),
     },
   ];
 
