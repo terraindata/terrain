@@ -49,6 +49,7 @@ THE SOFTWARE.
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import GraphLib = require('graphlib');
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as request from 'request';
 import { Readable, Transform } from 'stream';
@@ -67,7 +68,11 @@ import DatabaseController from '../../database/DatabaseController';
 import ElasticDB from '../../database/elastic/tasty/ElasticDB';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import { getMergeJoinStream, getSinkStream, getSourceStream } from './SourceSinkStream';
-import { destringifySavedTemplate, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
+import { destringifySavedTemplate, recordToConfig, TemplateConfig, templateForSave, TemplateInDatabase } from './TemplateConfig';
+
+import { _SinkConfig, _SourceConfig, SinkConfig as SinkRecord, SourceConfig as SourceRecord } from 'shared/etl/immutable/EndpointRecords';
+import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 
 export default class Templates
 {
@@ -249,6 +254,44 @@ export default class Templates
     }
     const template = ts[0];
     return this.execute(template, files);
+  }
+
+  public async executeByOverride(id: number, files?: Readable[], overrideSources?: string, overrideSinks?: string)
+  {
+    let template: ETLTemplate = null;
+
+    try
+    {
+      let sources: Immutable.Map<string, SourceRecord>;
+      let sinks: Immutable.Map<string, SinkRecord>;
+
+      if (overrideSources !== undefined)
+      {
+        const parsed = JSON.parse(overrideSources);
+        sources = Immutable.Map<string, SourceRecord>(parsed).map((source, key) => _SourceConfig(source, true)).toMap();
+      }
+      if (overrideSinks !== undefined)
+      {
+        const parsed = JSON.parse(overrideSinks);
+        sinks = Immutable.Map<string, SinkRecord>(parsed).map((sink, key) => _SinkConfig(sink, true)).toMap();
+      }
+
+      const ts: TemplateConfig[] = await this.get(id);
+      if (ts.length < 1)
+      {
+        throw new Error(`Template ID ${String(id)} not found.`);
+      }
+      const templateObj = ts[0];
+
+      template = _ETLTemplate(templateObj as TemplateBase, true);
+      template = template.applyOverrides(sources, sinks);
+    }
+    catch (e)
+    {
+      throw new Error(`Failed to create execution template: ${String(e)}`);
+    }
+
+    return this.execute(recordToConfig(template), files);
   }
 
   public async execute(template: TemplateConfig, files?: Readable[]): Promise<Readable>

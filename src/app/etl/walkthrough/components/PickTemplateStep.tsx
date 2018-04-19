@@ -57,11 +57,11 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';

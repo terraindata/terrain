@@ -55,7 +55,7 @@ import { AuthActions as Actions } from 'src/app/auth/data/AuthRedux';
 
 import * as download from 'downloadjs';
 
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { TemplateBase } from 'shared/etl/types/ETLTypes';
 
 export type ErrorHandler = (response: string | MidwayError) => void;

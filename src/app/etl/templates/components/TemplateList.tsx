@@ -67,7 +67,7 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 export interface AllowedActions
 {

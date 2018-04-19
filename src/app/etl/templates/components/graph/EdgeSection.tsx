@@ -63,6 +63,10 @@ import Modal from 'common/components/Modal';
 import { instanceFnDecorator } from 'shared/util/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
+import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
+import GraphHelpers from 'etl/helpers/GraphHelpers';
+import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import
 {
   _FileConfig,
@@ -70,12 +74,8 @@ import
   FileConfig,
   SinkConfig,
   SourceConfig,
-} from 'etl/EndpointTypes';
-import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
-import GraphHelpers from 'etl/helpers/GraphHelpers';
-import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+} from 'shared/etl/immutable/EndpointRecords';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';

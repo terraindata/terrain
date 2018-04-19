@@ -51,9 +51,8 @@ import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
 import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -71,8 +70,8 @@ interface ETLTemplateI extends TemplateBase
 class ETLTemplateC implements ETLTemplateI
 {
   public id = -1;
-  public lastModified: string = null;
-  public createdAt: string = null;
+  public lastModified: Date = null;
+  public createdAt: Date = null;
   public archived = false;
   public templateName = '';
   public process = _ETLProcess();
@@ -188,6 +187,29 @@ class ETLTemplateC implements ETLTemplateI
     }
   }
 
+  public applyOverrides(
+    sources?: Immutable.Map<string, SourceConfig>,
+    sinks?: Immutable.Map<string, SinkConfig>,
+  ): ETLTemplate
+  {
+    let template: ETLTemplate = this as any;
+    if (sources !== undefined)
+    {
+      sources.forEach((source, key) =>
+      {
+        template = template.update('sources', (s) => s.set(key, source));
+      });
+    }
+    if (sinks !== undefined)
+    {
+      sinks.forEach((sink, key) =>
+      {
+        template = template.update('sinks', (s) => s.set(key, sink));
+      });
+    }
+    return template;
+  }
+
   public getDefaultSource(): SourceConfig
   {
     return this.getSource('_default');
@@ -229,6 +251,14 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
       .toMap();
   },
   process: _ETLProcess,
+  lastModified: (date) =>
+  {
+    return typeof date === 'string' ? new Date(date) : date;
+  },
+  createdAt: (date) =>
+  {
+    return typeof date === 'string' ? new Date(date) : date;
+  },
 });
 
 // todo, please do this more efficiently

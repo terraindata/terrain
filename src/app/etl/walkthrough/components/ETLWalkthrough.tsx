@@ -55,12 +55,12 @@ import { WalkthroughGraphType } from 'common/components/walkthrough/WalkthroughT
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { TransitionParams } from './ETLStepComponent';

@@ -50,8 +50,8 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 
-import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 

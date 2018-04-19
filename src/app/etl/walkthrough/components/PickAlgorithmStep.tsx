@@ -59,11 +59,11 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 import Util from 'util/Util';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointOptions';
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
 import { WalkthroughActions } from 'etl/walkthrough/ETLWalkthroughRedux';
 import { ViewState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { getFileType } from 'shared/etl/FileUtil';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { Sources } from 'shared/etl/types/EndpointTypes';
 import { ETLStepComponent, StepProps, TransitionParams } from './ETLStepComponent';
 import './ETLStepComponent.less';
