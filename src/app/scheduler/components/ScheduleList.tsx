@@ -49,6 +49,7 @@ import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
 import './Schedule.less';
+import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
@@ -59,23 +60,28 @@ import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
-import Scheduler from './Scheduler';
 import {_SinkConfig, _SourceConfig } from 'app/etl/EndpointTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
+import { SchedulerConfig, _SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
 
 export interface Props
 {
-  schedulerState?: SchedulerState;
+  scheduler?: SchedulerState;
   etl?: ETLState;
   etlActions?: typeof ETLActions;
-  scheduleActions?: typeof SchedulerActions;
+  schedulerActions?: typeof SchedulerActions;
 }
 
 class ScheduleList extends TerrainComponent<Props>
 {
+  public state: {
+    configurationKeys: List<string>
+  } =
+  {
+    configurationKeys: List([]),
+  }
 /*
-  These functions should be moved
+  These functions should be moved and will actually all be Redux actions (not ajax)
 */
   public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
 
@@ -95,20 +101,18 @@ class ScheduleList extends TerrainComponent<Props>
       })
       .catch((error) =>
       {
+        console.log(error);
         this.setState({ responseText: error.response.data.errors[0].detail });
       });
   }
 
   public getSchedules()
   {
-    this.props.scheduleActions({
+    this.props.schedulerActions({
       actionType: 'getSchedules'
     })
     .then((schedules) =>
     {
-      this.setState({
-        schedules,
-      });
      // console.error(schedules.get(1));
     })
   }
@@ -248,21 +252,25 @@ class ScheduleList extends TerrainComponent<Props>
       actionType: 'fetchTemplates',
     });
     this.listenToKeyPath('etl', ['templates']);
-    this.listenToKeyPath('schedulerState', ['schedules']);
+    this.listenToKeyPath('scheduler', ['schedules']);
     this.setState({
       configurationKeys: List([]),
-      schedules: List([])
-    })
+    });
   }
 
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    if (this.props.schedulerState.schedules !== nextProps.schedulerState.schedules ||
-        this.props.etl.templates !== nextProps.etl.templates)
-    {
-      this.updateScheduleList(nextProps.schedulerState.schedules, nextProps.etl.templates);
-    }
-  }
+  // public componentWillReceiveProps(nextProps: Props)
+  // {
+  //   if (!_.isEqual(this.props.scheduler.schedules, nextProps.scheduler.schedules) ||
+  //       !_.isEqual(this.props.etl.templates, nextProps.etl.templates))
+  //   {
+  //     console.log('here');
+  //     console.log(!_.isEqual(this.props.scheduler.schedules, nextProps.scheduler.schedules));
+  //     console.log(!_.isEqual(this.props.etl.templates, nextProps.etl.templates));
+  //     this.setState({
+  //       schedules: this.updateScheduleList(nextProps.scheduler.schedules, nextProps.etl.templates),
+  //     });
+  //   }
+  // }
 
   public getSourceSinkDescription(schedule)
   {
@@ -337,11 +345,12 @@ class ScheduleList extends TerrainComponent<Props>
     // Configuration Option Set (Based on Template)
     let configurationOptions = List([]);
     let configurationHeaderText = 'Choose a Template';
-    if (schedule.get('template'))
+    if (schedule.tasks && schedule.tasks.params && schedule.tasks.params.templateId !== undefined)
     {
+      const template = this.props.etl.templates.filter((temp) => temp.id === schedule.tasks.params.templateId);
       configurationHeaderText = '';
-      const sources = schedule.get('template').sources;
-      const sinks = schedule.get('template').sinks;
+      const sources = template.sources;
+      const sinks = template.sinks;
       const sourceOptions = this.getEndPointOptions(sources, true, schedule);
       const sinkOptions = this.getEndPointOptions(sinks, false, schedule);
       configurationOptions = sourceOptions.concat(sinkOptions).toList();
@@ -354,8 +363,8 @@ class ScheduleList extends TerrainComponent<Props>
       column: true,
       forceFloat: true,
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule),
-      // ADD IN CUSTOM DISPLAY NAME THAT IS DESCRIPTION OF SOURCE / SINK
     };
+
     // CRON Option Set
     const intervalOptionSet = {
       column: true,
@@ -408,22 +417,22 @@ class ScheduleList extends TerrainComponent<Props>
   // TODO NEED OPTION FOR UNPAUSE
   public handleRunPause(schedule)
   {
-    if (schedule.get('running'))
+    if (schedule.running)
     {
-      this.runSchedule(schedule.get('id'));
+      this.runSchedule(schedule.id);
     }
     else
     {
-      this.pauseSchedule(schedule.get('id'));
+      this.pauseSchedule(schedule.id);
     }
   }
 
   public getValues(schedule, index: number)
   {
-    const templateId = schedule.get('template') !== undefined ?
-      schedule.get('template').id : '';
-    const buttonValue = schedule.get('running') ? 'Pause' : 'Run Now';
-    const status = JSON.parse(schedule.get('tasks')).jobStatus;
+    const templateId = schedule.tasks && schedule.tasks.params && schedule.tasks.params.templateId !== undefined ?
+      schedule.tasks.params.templateId : -1;
+    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
+    const status = schedule.tasks.jobStatus;
     const statusValue =  status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
     return List([templateId, this.state.configurationKeys.get(index), 'every day!', statusValue, buttonValue]);
   }
@@ -435,30 +444,12 @@ class ScheduleList extends TerrainComponent<Props>
     return templateName;
   }
 
-  public updateScheduleList(schedules: Map<ID, SchedulerConfig>, templates)
-  {
-    console.log(schedules);
-    // let formattedSchedules = List([]);
-    // schedules.map((schedule) =>
-    // {
-    //   const newSchedule = schedule;
-    //   const task = JSON.parse(schedule.tasks);
-    //   const templateId = task.params.templateId;
-    //   const temp = templates.filter((t) => t.id === templateId).get(0);
-    //   newSchedule['template'] = temp;
-    //   newSchedule['overrideSources'] = task.params.overrideSources;
-    //   newSchedule['overrideSinks'] = task.params.overrideSinks;
-    //   formattedSchedules = formattedSchedules.push(Map(newSchedule));
-    // });
-    // return formattedSchedules;
-  }
-
   public handleScheduleChange(oldSchedule, index, optionSetIndex: number, value: any)
   {
     let newSchedule = oldSchedule;
     switch (optionSetIndex) {
       case 0: // Template
-        const task = JSON.parse(newSchedule.get('tasks'));
+        const task = JSON.parse(newSchedule.tasks);
         task['params']['templateId'] = value;
         newSchedule = newSchedule.set('tasks', task);
       case 1: // Configuration
@@ -481,11 +472,13 @@ class ScheduleList extends TerrainComponent<Props>
 
   public render()
   {
-    let { schedules } = this.state;
+    let { schedules } = this.props.scheduler;
+    schedules = schedules.toJS();
+    const scheduleList = _.keys(schedules).map((id) => schedules[id]);
     return (
       <div className='schedule-list-wrapper'>
         {
-          schedules.map((schedule, i) =>
+          scheduleList.map((schedule, i) =>
             <RouteSelector
               key={i}
               optionSets={this.getOptionSets(schedule)}
@@ -501,7 +494,7 @@ class ScheduleList extends TerrainComponent<Props>
         <PathfinderCreateLine
           text='Add Schedule'
           canEdit={true}
-          onCreate={this._fn(this.createSchedule, this)}
+          onCreate={this.createSchedule}
           showText={true}
         />
       </div>
@@ -511,8 +504,8 @@ class ScheduleList extends TerrainComponent<Props>
 
 export default Util.createContainer(
   ScheduleList,
-  ['etl', 'scheduleState'],
+  ['etl', 'scheduler'],
   { etlActions: ETLActions,
-    scheduleActions: SchedulerActions,
+    schedulerActions: SchedulerActions,
    },
 );

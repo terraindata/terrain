@@ -61,7 +61,19 @@ export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig>
 export const _SchedulerConfig =
   (config: object) =>
   {
-    return new SchedulerConfig_Record(config) as any as SchedulerConfig;
+    let schedule = new SchedulerConfig_Record(config) as any as SchedulerConfig;
+    console.log(schedule);
+    console.log(schedule.tasks);
+    let tasks;
+    try {
+        tasks = JSON.parse(schedule.tasks);
+    }
+    catch
+    {
+        tasks = {};
+    }
+    schedule = schedule.set('tasks', tasks);
+    return schedule;
   };
 
 class SchedulerStateC

@@ -47,7 +47,7 @@ THE SOFTWARE.
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import { SchedulerConfig, SchedulerState, _SchedulerState } from 'scheduler/SchedulerTypes';
+import { _SchedulerConfig, SchedulerConfig, SchedulerState, _SchedulerState } from 'scheduler/SchedulerTypes';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
 const { List, Map } = Immutable;
@@ -110,6 +110,8 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.getSchedules()
       .then((response) =>
       {
+        resposne.data = response.data.map((sched) => _SchedulerConfig(sched));
+        console.log(response.data);
         const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(response.data, 'id');
         directDispatch({
           actionType: 'getSchedulesSuccess',

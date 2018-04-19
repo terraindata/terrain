@@ -110,7 +110,7 @@ class Scheduler extends TerrainComponent<any> {
 
   public updateSchedule(id: number)
   {
-    const changes ={ name: 'Jmansor Schedule Modified' };
+    const changes = { name: 'Jmansor Schedule Modified' };
     this.schedulerApi.updateSchedule(id, changes)
       .then((response) =>
       {
