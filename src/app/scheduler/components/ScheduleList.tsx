@@ -258,20 +258,6 @@ class ScheduleList extends TerrainComponent<Props>
     });
   }
 
-  // public componentWillReceiveProps(nextProps: Props)
-  // {
-  //   if (!_.isEqual(this.props.scheduler.schedules, nextProps.scheduler.schedules) ||
-  //       !_.isEqual(this.props.etl.templates, nextProps.etl.templates))
-  //   {
-  //     console.log('here');
-  //     console.log(!_.isEqual(this.props.scheduler.schedules, nextProps.scheduler.schedules));
-  //     console.log(!_.isEqual(this.props.etl.templates, nextProps.etl.templates));
-  //     this.setState({
-  //       schedules: this.updateScheduleList(nextProps.scheduler.schedules, nextProps.etl.templates),
-  //     });
-  //   }
-  // }
-
   public getSourceSinkDescription(schedule)
   {
     return 'From (info) To (info)';
@@ -279,7 +265,7 @@ class ScheduleList extends TerrainComponent<Props>
 
   public handleConfigurationChange(schedule, isSource: boolean, key: string, endpoint)
   {
-    const task = JSON.parse(schedule.get('tasks'));
+    const task = schedule.task;
     const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
     if (!task['params'][sourceKey])
     {
@@ -287,10 +273,8 @@ class ScheduleList extends TerrainComponent<Props>
     }
     task['params'][sourceKey][key] = endpoint.toJS();
     const newSchedule = schedule
-      .set('tasks', JSON.stringify(task))
-      .delete('template');
-    console.log(newSchedule.toJS());
-    this.updateSchedule(newSchedule.get('id'), newSchedule.toJS());
+      .set('tasks', JSON.stringify(task));
+    this.updateSchedule(newSchedule.id, newSchedule.toJS());
   }
 
   public getEndPointOptions(endpoints: Map<string, any>, isSource: boolean, schedule)
@@ -300,15 +284,15 @@ class ScheduleList extends TerrainComponent<Props>
     return List(keys.map((key) =>
     {
       let endpoint = endpoints.get(key);
-      if (schedule.get(sourceKey) && schedule.get(sourceKey)[key])
+      if (schedule[sourceKey] && schedule[sourceKey][key])
       {
         if (isSource)
         {
-          endpoint = _SourceConfig(schedule.get(sourceKey)[key]);
+          endpoint = _SourceConfig(schedule[sourceKey][key]);
         }
         else
         {
-          endpoint = _SinkConfig(schedule.get(sourceKey)[key]);
+          endpoint = _SinkConfig(schedule[sourceKey][key]);
         }
       }
       return {
@@ -347,13 +331,16 @@ class ScheduleList extends TerrainComponent<Props>
     let configurationHeaderText = 'Choose a Template';
     if (schedule.tasks && schedule.tasks.params && schedule.tasks.params.templateId !== undefined)
     {
-      const template = this.props.etl.templates.filter((temp) => temp.id === schedule.tasks.params.templateId);
+      const template = this.props.etl.templates.filter((temp) => temp.id === schedule.tasks.params.templateId).get(0);
       configurationHeaderText = '';
-      const sources = template.sources;
-      const sinks = template.sinks;
-      const sourceOptions = this.getEndPointOptions(sources, true, schedule);
-      const sinkOptions = this.getEndPointOptions(sinks, false, schedule);
-      configurationOptions = sourceOptions.concat(sinkOptions).toList();
+      if (template)
+      {
+        const sources = template.sources;
+        const sinks = template.sinks;
+        const sourceOptions = this.getEndPointOptions(sources, true, schedule);
+        const sinkOptions = this.getEndPointOptions(sinks, false, schedule);
+        configurationOptions = sourceOptions.concat(sinkOptions).toList();
+      }
     }
     const configurationOptionSet = {
       key: 'configuration',
@@ -432,7 +419,7 @@ class ScheduleList extends TerrainComponent<Props>
     const templateId = schedule.tasks && schedule.tasks.params && schedule.tasks.params.templateId !== undefined ?
       schedule.tasks.params.templateId : -1;
     const buttonValue = schedule.running ? 'Pause' : 'Run Now';
-    const status = schedule.tasks.jobStatus;
+    const status = schedule.tasks && schedule.tasks.jobStatus !== undefined ? schedule.tasks.jobStatus : 0;
     const statusValue =  status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
     return List([templateId, this.state.configurationKeys.get(index), 'every day!', statusValue, buttonValue]);
   }
@@ -444,14 +431,14 @@ class ScheduleList extends TerrainComponent<Props>
     return templateName;
   }
 
-  public handleScheduleChange(oldSchedule, index, optionSetIndex: number, value: any)
+  public handleScheduleChange(schedule, index, optionSetIndex: number, value: any)
   {
-    let newSchedule = oldSchedule;
     switch (optionSetIndex) {
       case 0: // Template
-        const task = JSON.parse(newSchedule.tasks);
+        const task = schedule.tasks;
         task['params']['templateId'] = value;
-        newSchedule = newSchedule.set('tasks', task);
+        schedule = schedule.set('tasks', task);
+        this.updateSchedule(schedule.id, schedule.toJS());
       case 1: // Configuration
         this.setState({
           configurationKeys: this.state.configurationKeys.set(index, value),
@@ -461,34 +448,32 @@ class ScheduleList extends TerrainComponent<Props>
         break;
     }
     // Change schedule based on optionSetIndex + value
-    newSchedule = newSchedule.delete('template');
-    this.updateSchedule(newSchedule.get('id'), newSchedule.toJS());
   }
 
   public canEdit(schedule)
   {
-    return !schedule.get('running') && TerrainTools.isAdmin();
+    return !schedule.running && TerrainTools.isAdmin();
   }
 
   public render()
   {
-    let { schedules } = this.props.scheduler;
-    schedules = schedules.toJS();
-    const scheduleList = _.keys(schedules).map((id) => schedules[id]);
+    const { schedules } = this.props.scheduler;
+    const keys = schedules.keySeq().toList().sort();
+    const scheduleList = keys.map((id) => schedules.get(id));
     return (
       <div className='schedule-list-wrapper'>
         {
           scheduleList.map((schedule, i) =>
-            <RouteSelector
+             <RouteSelector
               key={i}
               optionSets={this.getOptionSets(schedule)}
               values={this.getValues(schedule, i)}
               canEdit={this.canEdit(schedule)}
               canDelete={this.canEdit(schedule)}
-              onDelete={this._fn(this.deleteSchedule, schedule.get('id'))}
+              onDelete={this._fn(this.deleteSchedule, schedule.id)}
               onChange={this._fn(this.handleScheduleChange, schedule, i)}
               useTooltip={true}
-            />,
+            />
           )
         }
         <PathfinderCreateLine

@@ -62,8 +62,6 @@ export const _SchedulerConfig =
   (config: object) =>
   {
     let schedule = new SchedulerConfig_Record(config) as any as SchedulerConfig;
-    console.log(schedule);
-    console.log(schedule.tasks);
     let tasks;
     try {
         tasks = JSON.parse(schedule.tasks);

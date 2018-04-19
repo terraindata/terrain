@@ -110,14 +110,12 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.getSchedules()
       .then((response) =>
       {
-        resposne.data = response.data.map((sched) => _SchedulerConfig(sched));
-        console.log(response.data);
+        response.data = response.data.map((sched) => _SchedulerConfig(sched));
         const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(response.data, 'id');
         directDispatch({
           actionType: 'getSchedulesSuccess',
           schedules,
         });
-
         return schedules;
       });
   }

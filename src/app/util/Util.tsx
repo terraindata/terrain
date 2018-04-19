@@ -822,7 +822,7 @@ const Util = {
   {
     const immutableMap = arrayToConvert.reduce((imap, item) =>
     {
-      return imap.set(item[idAttribute], Object.assign({}, item));
+      return imap.set(item[idAttribute], item);
     }, Immutable.Map());
 
     return immutableMap;
