@@ -231,13 +231,18 @@ class ETLAjax
     {
       const handleResponse = (response: any) =>
       {
+        let documents;
         try
         {
-          resolve(List(response));
+          documents = List(response);
         }
         catch (e)
         {
-          reject(e);
+          return reject(e);
+        }
+        if (documents !== undefined)
+        {
+          resolve(documents);
         }
       };
       const payload = {
