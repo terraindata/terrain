@@ -44,15 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import * as Immutable from 'immutable';
-import { SchedulerReducers as reducer } from 'scheduler/data/SchedulerRedux';
+import { SchedulerActionTypes, SchedulerReducers as reducer } from 'scheduler/data/SchedulerRedux';
+import { _SchedulerState, SchedulerState } from 'scheduler/SchedulerTypes';
 import SchedulerHelper from 'test-helpers/SchedulerHelper';
-import { SchedulerState, _SchedulerState } from 'scheduler/SchedulerTypes';
 
 describe('SchedulerReducers', () =>
 {
   let scheduler = null;
 
-  beforeEach(() => {
+  beforeEach(() =>
+  {
     scheduler = SchedulerHelper.mockState().getState();
   });
 
@@ -70,7 +71,7 @@ describe('SchedulerReducers', () =>
         .getState();
 
       const nextState = reducer(scheduler, {
-        type: 'scheduler.getSchedulesStart'
+        type: SchedulerActionTypes.getSchedulesStart,
       });
 
       expect(nextState.loading).toBe(true);
@@ -79,13 +80,20 @@ describe('SchedulerReducers', () =>
 
   describe('#getSchedulesSuccess', () =>
   {
-    it('should set loading to false', () =>
+    it('should set loading to false and write schedules on the store', () =>
     {
+      const schedules = Immutable.Map({
+        1: { id: 1, name: 'Schedule 1' },
+        2: { id: 2, name: 'Schedule 2' },
+      });
+
       const nextState = reducer(scheduler, {
-        type: 'scheduler.getSchedulesSuccess'
+        type: SchedulerActionTypes.getSchedulesSuccess,
+        payload: { schedules },
       });
 
       expect(nextState.loading).toBe(false);
+      expect(nextState.schedules).toEqual(schedules);
     });
   });
 
@@ -93,11 +101,49 @@ describe('SchedulerReducers', () =>
   {
     it('should set loading to false', () =>
     {
+      const error = 'Error Message';
       const nextState = reducer(scheduler, {
-        type: 'scheduler.getSchedulesFailed'
+        type: SchedulerActionTypes.getSchedulesFailed,
+        payload: { error },
       });
 
       expect(nextState.loading).toBe(false);
+      expect(nextState.error).toEqual(error);
+    });
+  });
+
+  describe('#createScheduleSuccess', () =>
+  {
+    it('should set loading to false and add the new schedule to the store', () =>
+    {
+      const scheduleParams = { id: 2, name: 'Schedule 2' };
+
+      const nextState = reducer(scheduler, {
+        type: SchedulerActionTypes.createScheduleSuccess,
+        payload: { schedule: scheduleParams },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.schedules).toEqual(scheduler.schedules.set(scheduleParams.id, scheduleParams));
+    });
+  });
+
+  describe('#deleteScheduleSuccess', () =>
+  {
+    it('should set loading to false and delete the specified schedule from the store', () =>
+    {
+      const existingSchedule = { id: 1, name: 'Schedule 1' };
+      scheduler = SchedulerHelper.mockState()
+        .addSchedule(existingSchedule)
+        .getState();
+
+      const nextState = reducer(scheduler, {
+        type: SchedulerActionTypes.deleteScheduleSuccess,
+        payload: { scheduleId: existingSchedule.id },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.schedules).toEqual(scheduler.schedules.delete(existingSchedule.id));
     });
   });
 });

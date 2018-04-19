@@ -47,8 +47,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import
 {
+  _SchedulerState,
   SchedulerState,
-  _SchedulerState
 } from 'scheduler/SchedulerTypes';
 import { ItemType } from '../../items/types/Item';
 
@@ -77,6 +77,13 @@ class SchedulerStateMock
   public loading(isLoading: boolean)
   {
     this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
+
+  public addSchedule(schedule)
+  {
+    this.state = this.state.setIn(['schedules', schedule.id], schedule);
 
     return this;
   }

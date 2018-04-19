@@ -45,11 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import { Record } from 'immutable';
+import * as Immutable from 'immutable';
+import Util from 'util/Util';
 import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
 import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from '../Classes';
-import * as Immutable from 'immutable';
-import Util from 'util/Util';
 
 class SchedulerConfigC extends SharedSchedulerConfig
 {
@@ -72,8 +72,8 @@ class SchedulerStateC
 }
 
 const SchedulerState_Record = createRecordType(new SchedulerStateC(), 'SchedulerStateC');
-export interface SchedulerState extends SchedulerStateC, IRecord<SchedulerState> {};
+export interface SchedulerState extends SchedulerStateC, IRecord<SchedulerState> { }
 export const _SchedulerState = (config?: any) =>
 {
   return new SchedulerState_Record(Util.extendId(config || {})) as any as SchedulerState;
-}
+};

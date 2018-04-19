@@ -817,7 +817,7 @@ const Util = {
     return false;
   },
 
-  arrayToImmutableMap(arrayToConvert: Array<any>, idAttribute: string)
+  arrayToImmutableMap(arrayToConvert: any[], idAttribute: string)
   {
     const immutableMap = arrayToConvert.reduce((imap, item) =>
     {
@@ -825,7 +825,7 @@ const Util = {
     }, Immutable.Map());
 
     return immutableMap;
-  }
+  },
 };
 
 export default Util;
