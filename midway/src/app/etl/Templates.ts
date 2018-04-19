@@ -262,18 +262,18 @@ export default class Templates
 
     try
     {
-      let sources: Immutable.Map<string, SourceRecord> = null;
-      let sinks: Immutable.Map<string, SinkRecord> = null;
+      let sources: Immutable.Map<string, SourceRecord>;
+      let sinks: Immutable.Map<string, SinkRecord>;
 
       if (overrideSources !== undefined)
       {
         const parsed = JSON.parse(overrideSources);
-        sources = Immutable.Map<string, SourceRecord>(parsed).map((source, key) => _SourceConfig(source)).toMap();
+        sources = Immutable.Map<string, SourceRecord>(parsed).map((source, key) => _SourceConfig(source, true)).toMap();
       }
-      if (sinks !== undefined)
+      if (overrideSinks !== undefined)
       {
         const parsed = JSON.parse(overrideSinks);
-        sinks = Immutable.Map<string, SinkRecord>(parsed).map((sink, key) => _SinkConfig(sink)).toMap();
+        sinks = Immutable.Map<string, SinkRecord>(parsed).map((sink, key) => _SinkConfig(sink, true)).toMap();
       }
 
       const ts: TemplateConfig[] = await this.get(id);
@@ -283,7 +283,7 @@ export default class Templates
       }
       const templateObj = ts[0];
 
-      template = _ETLTemplate(templateObj as TemplateBase);
+      template = _ETLTemplate(templateObj as TemplateBase, true);
       template = template.applyOverrides(sources, sinks);
     }
     catch (e)

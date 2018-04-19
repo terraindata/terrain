@@ -197,14 +197,14 @@ class ETLTemplateC implements ETLTemplateI
     {
       sources.forEach((source, key) =>
       {
-        template = template.update('sources', (sources) => sources.set(key, source));
+        template = template.update('sources', (s) => s.set(key, source));
       });
     }
     if (sinks !== undefined)
     {
       sinks.forEach((sink, key) =>
       {
-        template = template.update('sinks', (sinks) => sinks.set(key, sink));
+        template = template.update('sinks', (s) => s.set(key, sink));
       });
     }
     return template;
