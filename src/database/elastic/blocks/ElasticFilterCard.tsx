@@ -156,21 +156,29 @@ export class FilterUtils
 
     const indexFilters: Block[] = [];
     const otherFilters: Block[] = [];
-    const dummyFilters: Block[] = [];
+    let dummyFilters: Block[] = [];
 
     filterRows.map((row: Block) =>
     {
       if (row.boolQuery === 'filter' && row.filterOp === '=' && row.field === '_index')
       {
         indexFilters.push(row);
+      } else if (row.boolQuery === 'filter' && row.filterOp === 'exists' && row.field === '_id')
+      {
+        dummyFilters.push(row);
       } else
       {
         otherFilters.push(row);
       }
     });
 
-    // make sure the dummyFilter dummy
-    if (block['dummyFilters'].size >= 1)
+    // one dummy filter is enough
+    if (dummyFilters.length > 1)
+    {
+      dummyFilters = [dummyFilters[0]];
+    }
+    // check current dummyFilters in the card
+    if (dummyFilters.length === 0 && block['dummyFilters'].size > 0)
     {
       const dummyFilter = block['dummyFilters'].get(0);
       if (dummyFilter.field === '_id' && dummyFilter.boolQuery === 'filter' && dummyFilter.key === 'exists')
@@ -185,7 +193,6 @@ export class FilterUtils
         );
       }
     }
-
     // regroup the filter rows first because a new other-filter row added into
     // the index filter list or the type filter list
     block = block.set('indexFilters', Immutable.List(indexFilters));

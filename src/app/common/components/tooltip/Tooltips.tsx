@@ -324,7 +324,7 @@ export function generateThemeStyles()
 
 export function tooltip(innerComponent: any, options: TooltipProps | string)
 {
-  if (options === undefined || options === '') // don't wrap with tooltip if options is not provided
+  if (options === undefined || options === '' || options === null) // don't wrap with tooltip if options is not provided
   {
     return innerComponent;
   }
