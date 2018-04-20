@@ -71,7 +71,9 @@ import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
+import ElasticBlocks from '../../../../database/elastic/blocks/ElasticBlocks';
 import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
 import Query from '../../../../items/types/Query';
 import { PathToCards } from './PathToCards';
@@ -381,6 +383,31 @@ export class CardsToPath
           }
         }
       }
+    }
+    // if the bool:elasticFilter in the softbool do not have the dummy filter, we should add one.
+    const theSoftBool = parser.searchCard(softBoolTemplate, body);
+    if (theSoftBool !== null)
+    {
+      theSoftBool.recursivelyVisit((element: ESValueInfo) =>
+      {
+        const theCard = element.card;
+        if (theCard.type === 'elasticFilter')
+        {
+          if (theCard.dummyFilters.size === 0)
+          {
+            const dummyBlock = BlockUtils.make(ElasticBlocks, 'elasticFilterBlock',
+              {
+                field: '_id',
+                value: ' ',
+                boolQuery: 'filter',
+                filterOp: 'exists',
+              }, true);
+            element.card = theCard.set('dummyFilters', List([dummyBlock]));
+            parser.isMutated = true;
+          }
+        }
+        return true;
+      });
     }
   }
 

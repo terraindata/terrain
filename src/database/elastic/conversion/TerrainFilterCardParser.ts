@@ -78,7 +78,7 @@ export class TerrainFilterCardParser
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
     const cardTree = new ESCardParser(block);
     const boolValueInfo = cardTree.getValueInfo();
-    const filterRows = block['indexFilters'].concat(block['otherFilters']);
+    const filterRows = block['indexFilters'].concat(block['dummyFilters']).concat(block['otherFilters']);
     const filterRowMap = { filter: [], filter_not: [], must: [], must_not: [], should: [], should_not: [] };
     filterRows.map((row: Block) =>
     {
