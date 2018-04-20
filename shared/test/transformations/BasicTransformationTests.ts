@@ -311,7 +311,6 @@ test('split a field (regex delimiter)', () =>
 
 test('cast node tests', () =>
 {
-
   const e: TransformationEngine = new TransformationEngine(TestDocs.doc2);
   e.appendTransformation(
     TransformationNodeType.CastNode,
@@ -335,6 +334,64 @@ test('cast node tests', () =>
   expect(r['age']).toBe('17');
   expect(r['meta']['school']).toEqual({});
   expect(r['meta']['sport']).toEqual([]);
+});
+
+test('boolean cast tests', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(TestDocs.doc8);
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['t'])]),
+    {
+      toTypename: 'number',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['t'])]),
+    {
+      toTypename: 'boolean',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['f'])]),
+    {
+      toTypename: 'number',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['f'])]),
+    {
+      toTypename: 'boolean',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['tb'])]),
+    {
+      toTypename: 'number',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['tb'])]),
+    {
+      toTypename: 'string',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['fb'])]),
+    {
+      toTypename: 'number',
+    });
+  e.appendTransformation(
+    TransformationNodeType.CastNode,
+    List<KeyPath>([KeyPath(['fb'])]),
+    {
+      toTypename: 'string',
+    });
+  const r = e.transform(TestDocs.doc8);
+  expect(r['t']).toBe(true);
+  expect(r['f']).toEqual(false);
+  expect(r['tb']).toEqual('1');
+  expect(r['fb']).toEqual('0');
 });
 
 test('super deep transformation preserves arrays', () =>
