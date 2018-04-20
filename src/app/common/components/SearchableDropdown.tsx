@@ -346,8 +346,8 @@ class SearchableDropdown extends TerrainComponent<Props & InjectedOnClickOutProp
 
   public selectIndex(index)
   {
-    const dropdown = ReactDOM.findDOMNode(this.refs['dropdown']);
-    const opt = ReactDOM.findDOMNode(this.refs['opt' + String(index)]);
+    const dropdown = ReactDOM.findDOMNode(this.refs['dropdown']) as Element;
+    const opt = ReactDOM.findDOMNode(this.refs['opt' + String(index)]) as Element;
     if (dropdown && opt)
     {
       const acMin = dropdown.scrollTop;

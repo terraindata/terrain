@@ -114,7 +114,7 @@ const Panel = {
   {
     if (this.canDrag())
     {
-      const cr = ReactDOM.findDOMNode(this).getBoundingClientRect();
+      const cr = (ReactDOM.findDOMNode(this) as Element).getBoundingClientRect();
 
       this.setState({
         ox: x,
