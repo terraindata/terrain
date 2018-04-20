@@ -805,14 +805,15 @@ const Util = {
     }
     else
     {
-      paths.forEach((path: any) =>
+      for (let i = 0; i < paths.length; i++)
       {
+        let path: any = paths[i];
         path = (Array.isArray(path) || List.isList(path)) ? path : [path];
         if (oldState.getIn(path) !== newState.getIn(path))
         {
           return true;
         }
-      });
+      }
     }
     return false;
   },
