@@ -45,11 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as React from 'react';
-import SchedulerApi from 'scheduler/SchedulerApi';
-import XHR from 'util/XHR';
-import Util from 'util/Util';
 import { SchedulerActions } from 'scheduler/data/SchedulerRedux';
+import SchedulerApi from 'scheduler/SchedulerApi';
+import Util from 'util/Util';
+import XHR from 'util/XHR';
 
 class Scheduler extends TerrainComponent<any> {
 
@@ -67,16 +68,21 @@ class Scheduler extends TerrainComponent<any> {
 
   public createSchedule()
   {
-    this.schedulerApi.createSchedule({
+    const scheduleParams = {
       cron: '0 0 1 1 *',
       name: `Jmansor Schedule ${Math.floor(Math.random() * 100)}`,
       priority: 1,
       tasks: [],
       workerId: 10,
+    };
+
+    this.props.schedulerActions({
+      actionType: 'createSchedule',
+      schedule: scheduleParams,
     })
-      .then((response) =>
+      .then((schedule) =>
       {
-        this.setState({ responseText: JSON.stringify(response) });
+        this.setState({ responseText: JSON.stringify(schedule) });
       })
       .catch((error) =>
       {
@@ -87,12 +93,16 @@ class Scheduler extends TerrainComponent<any> {
   public getSchedules()
   {
     this.props.schedulerActions({
-      actionType: 'getSchedules'
+      actionType: 'getSchedules',
     })
-    .then((schedules) =>
-    {
-      console.error(schedules.get(1));
-    })
+      .then((schedules) =>
+      {
+        this.setState({ responseText: JSON.stringify(schedules) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
   }
 
   public getSchedule(id: number)
@@ -124,7 +134,10 @@ class Scheduler extends TerrainComponent<any> {
 
   public deleteSchedule(id?: number)
   {
-    this.schedulerApi.deleteSchedule(id)
+    this.props.schedulerActions({
+      actionType: 'deleteSchedule',
+      scheduleId: id,
+    })
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
@@ -223,19 +236,22 @@ class Scheduler extends TerrainComponent<any> {
   public renderSchedule(schedule)
   {
     return (
-      <div key={schedule.id} style={{ display: 'flex', justifyContent: 'space-between', width: '90%', padding: 10, borderBottom: '1px solid' }}>
+      <div key={schedule.id} style={{
+        display: 'flex', justifyContent: 'space-between',
+        width: '90%', padding: 10, borderBottom: '1px solid',
+      }}>
         <div style={{ flex: 1 }}>{schedule.id}</div>
         <div style={{ flex: 1 }}>{schedule.name}</div>
         <div style={{ flex: 1 }}>{schedule.running ? 'running' : 'not running'}</div>
         <div style={{ flex: 1 }}>{schedule.shouldRunNext.toString()}</div>
         <div style={{ flex: 1.5 }}>
-          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Delete</a>,
-          <a href="#" onClick={() => this.duplicateSchedule(schedule.id)}>Duplicate</a>,
-          <a href="#">Log</a>,
-          <a href="#" onClick={() => this.pauseSchedule(schedule.id)}>Pause</a>,
-          <a href="#" onClick={() => this.unpauseSchedule(schedule.id)}>Unpause</a>,
-          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Run</a>,
-          <a href="#" onClick={() => this.deleteSchedule(schedule.id)}>Set Status</a>
+          <a href='#' onClick={() => this.deleteSchedule(schedule.id)}>Delete</a>,
+          <a href='#' onClick={() => this.duplicateSchedule(schedule.id)}>Duplicate</a>,
+          <a href='#'>Log</a>,
+          <a href='#' onClick={() => this.pauseSchedule(schedule.id)}>Pause</a>,
+          <a href='#' onClick={() => this.unpauseSchedule(schedule.id)}>Unpause</a>,
+          <a href='#' onClick={() => this.deleteSchedule(schedule.id)}>Run</a>,
+          <a href='#' onClick={() => this.deleteSchedule(schedule.id)}>Set Status</a>
         </div>
       </div>
     );
@@ -271,9 +287,9 @@ class Scheduler extends TerrainComponent<any> {
               (
                 scheduler.schedules.reduce(
                   (scheduleRows, s, sId) => scheduleRows.concat(
-                    this.renderSchedule(s)
+                    this.renderSchedule(s),
                   ),
-                  []
+                  [],
                 )
               ) : null
           }
@@ -286,5 +302,5 @@ class Scheduler extends TerrainComponent<any> {
 export default Util.createTypedContainer(
   Scheduler,
   ['scheduler'],
-  { schedulerActions: SchedulerActions }
+  { schedulerActions: SchedulerActions },
 );

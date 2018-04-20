@@ -79,6 +79,10 @@ THE SOFTWARE.
 
 // The type that defines all the possible action payloads
 // Also asserts that the key is the same as the actionType
+export type AllActionNames<SelfT> = {
+  [key in keyof AllActionsType<SelfT>]: string;
+};
+
 export type AllActionsType<SelfT> =
   {
     [key in keyof SelfT]: { actionType: key, [other: string]: any }
@@ -122,6 +126,11 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     return undefined;
   }
 
+  public overrideActThunk(action: Unroll<AllActionsT>): (action: Unroll<AllActionsT>) => any
+  {
+    return undefined;
+  }
+
   // creates a function that can directly dispatch reducers onto a store
   // action creator needs to be bound first, so call this function from within a container
   public _dispatchReducerFactory(dispatch: (payload: WrappedPayload<AllActionsT>) => any):
@@ -144,10 +153,29 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     {
       return override;
     }
+
+    const overrideThunk = this.overrideActThunk(action);
+    if (overrideThunk !== undefined)
+    {
+      return (dispatch) => dispatch(overrideThunk(action));
+    }
+
     return {
       type: this.addNamespace((action as any).actionType), // Can't seem to find a way around this type assertion
       payload: action,
     };
+  }
+
+  public _actionTypesForExport(): AllActionNames<AllActionsT>
+  {
+    return Object.keys(this.reducers).reduce(
+      (actionTypes, k) =>
+      {
+        actionTypes[k] = this.addNamespace(k);
+        return actionTypes;
+      },
+      {},
+    ) as AllActionNames<AllActionsT>;
   }
 
   public _actionsForExport(): (action: Unroll<AllActionsT>) => any

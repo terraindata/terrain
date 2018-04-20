@@ -47,8 +47,14 @@ THE SOFTWARE.
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import { _SchedulerConfig, SchedulerConfig, SchedulerState, _SchedulerState } from 'scheduler/SchedulerTypes';
 import SchedulerApi from 'scheduler/SchedulerApi';
+import
+{
+  _SchedulerConfig,
+  _SchedulerState,
+  SchedulerConfig,
+  SchedulerState,
+} from 'scheduler/SchedulerTypes';
 import XHR from 'util/XHR';
 const { List, Map } = Immutable;
 import Util from 'util/Util';
@@ -67,6 +73,38 @@ export interface SchedulerActionTypes
   };
   getSchedulesFailed: {
     actionType: 'getSchedulesFailed';
+    error: string;
+  };
+
+  createSchedule?: {
+    actionType: 'createSchedule';
+    schedule: SchedulerConfig;
+  };
+  createScheduleStart: {
+    actionType: 'createScheduleStart';
+  };
+  createScheduleSuccess: {
+    actionType: 'createScheduleSuccess';
+    schedule: SchedulerConfig;
+  };
+  createScheduleFailed: {
+    actionType: 'createScheduleFailed';
+    error: string;
+  };
+
+  deleteSchedule?: {
+    actionType: 'deleteSchedule';
+    scheduleId: ID;
+  };
+  deleteScheduleStart: {
+    actionType: 'deleteScheduleStart';
+  };
+  deleteScheduleSuccess: {
+    actionType: 'deleteScheduleSuccess';
+    scheduleId: ID;
+  };
+  deleteScheduleFailed: {
+    actionType: 'deleteScheduleFailed';
     error: string;
   };
 }
@@ -98,33 +136,137 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
           .set('error', action.payload.error);
       },
 
-  }
-
-  public getSchedules(dispatch)
-  {
-    const directDispatch = this._dispatchReducerFactory(dispatch);
-    directDispatch({
-      actionType: 'getSchedulesStart'
-    });
-
-    return this.api.getSchedules()
-      .then((response) =>
+      createScheduleStart: (state, action) =>
       {
-        response.data = response.data.map((sched) => _SchedulerConfig(sched));
-        const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(response.data, 'id');
-        directDispatch({
-          actionType: 'getSchedulesSuccess',
-          schedules,
-        });
-        return schedules;
+        return state
+          .set('loading', true);
+      },
+
+      createScheduleSuccess: (state, action) =>
+      {
+        const { schedule } = action.payload;
+        return state
+          .set('loading', false)
+          .setIn(['schedules', schedule.id], schedule);
+      },
+
+      createScheduleFailed: (state, action) =>
+      {
+        return state
+          .set('loading', false)
+          .set('error', action.payload.error);
+      },
+
+      deleteScheduleStart: (state, action) =>
+      {
+        return state
+          .set('loading', true);
+      },
+
+      deleteScheduleSuccess: (state, action) =>
+      {
+        const { scheduleId } = action.payload;
+        return state
+          .set('loading', false)
+          .deleteIn(['schedules', scheduleId]);
+      },
+
+      deleteScheduleFailed: (state, action) =>
+      {
+        return state
+          .set('loading', false)
+          .set('error', action.payload.error);
+      },
+    };
+
+  public getSchedules(action)
+  {
+    return (dispatch, getState) =>
+    {
+      const directDispatch = this._dispatchReducerFactory(dispatch);
+      directDispatch({
+        actionType: 'getSchedulesStart',
       });
+
+      return this.api.getSchedules()
+        .then((response) =>
+        {
+          const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(
+            response.data,
+            'id',
+            _SchedulerConfig,
+          );
+          directDispatch({
+            actionType: 'getSchedulesSuccess',
+            schedules,
+          });
+
+          return Promise.resolve(schedules);
+        });
+    };
   }
 
-  public overrideAct(action: Unroll<SchedulerActionTypes>)
+  public createSchedule(action)
+  {
+    return (dispatch, getState) =>
+    {
+      const directDispatch = this._dispatchReducerFactory(dispatch);
+      directDispatch({
+        actionType: 'createScheduleStart',
+      });
+
+      return this.api.createSchedule(action.schedule)
+        .then((response) =>
+        {
+          const schedule: SchedulerConfig = _SchedulerConfig(response.data[0]);
+          directDispatch({
+            actionType: 'createScheduleSuccess',
+            schedule,
+          });
+
+          return Promise.resolve(schedule);
+        });
+    };
+  }
+
+  public deleteSchedule(action)
+  {
+    return (dispatch, getState) =>
+    {
+      const directDispatch = this._dispatchReducerFactory(dispatch);
+      directDispatch({
+        actionType: 'deleteScheduleStart',
+      });
+
+      return this.api.deleteSchedule(action.scheduleId)
+        .then((response) =>
+        {
+          const schedule: SchedulerConfig = response.data[0];
+          directDispatch({
+            actionType: 'deleteScheduleSuccess',
+            scheduleId: action.scheduleId,
+          });
+
+          return Promise.resolve(schedule);
+        });
+    };
+  }
+
+  public overrideActThunk(action: Unroll<SchedulerActionTypes>)
   {
     if (action.actionType === 'getSchedules')
     {
       return this.getSchedules.bind(this);
+    }
+
+    if (action.actionType === 'createSchedule')
+    {
+      return this.createSchedule.bind(this);
+    }
+
+    if (action.actionType === 'deleteSchedule')
+    {
+      return this.deleteSchedule.bind(this);
     }
   }
 }
@@ -132,4 +274,5 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
 const ReduxInstance = new SchedulerRedux();
 export const SchedulerActions = ReduxInstance._actionsForExport();
 export const SchedulerReducers = ReduxInstance._reducersForExport(_SchedulerState);
+export const SchedulerActionTypes = ReduxInstance._actionTypesForExport();
 export declare type SchedulerActionType<K extends keyof SchedulerActionTypes> = GetType<K, SchedulerActionTypes>;
