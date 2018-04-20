@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as stream from 'stream';
+import * as winston from 'winston';
 
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
@@ -78,6 +79,8 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
     let sourceStream: stream.Readable | undefined;
     let endpoint: AEndpointStream;
     let importStream: stream.Readable;
+
+    winston.info(`Processing ${source.type} source:`, JSON.stringify(source, null, 2));
     switch (source.type)
     {
       case 'Algorithm':
@@ -136,16 +139,21 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
     let endpoint: AEndpointStream;
     let exportStream;
 
-    switch (sink.fileConfig.fileType)
+    winston.info(`Processing ${sink.type} sink:`, JSON.stringify(sink, null, 2));
+
+    if (sink.type !== 'Database')
     {
-      case 'json':
-        exportStream = JSONTransform.createExportStream();
-        break;
-      case 'csv':
-        exportStream = CSVTransform.createExportStream();
-        break;
-      default:
-        throw new Error('Export file type must be either CSV or JSON.');
+      switch (sink.fileConfig.fileType)
+      {
+        case 'json':
+          exportStream = JSONTransform.createExportStream();
+          break;
+        case 'csv':
+          exportStream = CSVTransform.createExportStream();
+          break;
+        default:
+          throw new Error('Export file type must be either CSV or JSON.');
+      }
     }
 
     switch (sink.type)
