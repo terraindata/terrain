@@ -85,7 +85,7 @@ export class Users
       try
       {
         await this.create({
-          accessToken: 'ImAnAdmin',
+          accessToken: '',
           email: 'admin@terraindata.com',
           isSuperUser: true,
           name: 'Terrain Admin',
@@ -192,7 +192,7 @@ export class Users
     return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
       const results: UserConfig[] = await this.select([], { id, accessToken }) as UserConfig[];
-      if (results.length > 0)
+      if (results.length > 0 && results[0]['accessToken'].length !== 0)
       {
         resolve(results[0]);
       }
@@ -245,9 +245,9 @@ export class Users
     });
   }
 
-  public async logout(id: number, accessToken: string): Promise<UserConfig>
+  public async logout(id: number, accessToken: string): Promise<string>
   {
-    return new Promise<UserConfig>(async (resolve, reject) =>
+    return new Promise<string>(async (resolve, reject) =>
     {
       const results = await App.DB.select(this.userTable, [], { id, accessToken });
       if (results.length === 0)
@@ -257,7 +257,8 @@ export class Users
 
       const user: UserConfig = results[0] as UserConfig;
       user.accessToken = '';
-      resolve(await this.upsert(user));
+      await this.upsert(user);
+      resolve('Success');
     });
   }
 

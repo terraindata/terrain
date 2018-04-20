@@ -1479,15 +1479,20 @@ export const Ajax =
       );
     },
 
-    logout(
+    logout(accessToken: string, id: number,
       onSave: (response: any) => void)
     {
       return Ajax.req(
         'post',
         'auth/logout',
-        {},
+        {
+          accessToken,
+          id,
+        },
         onSave,
-        {},
+        {
+          noCredentials: true,
+        },
       );
     },
 
