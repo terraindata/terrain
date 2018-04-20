@@ -95,7 +95,8 @@ const LayoutManager = createReactClass<any, any>({
         return true;
       }
     }
-    return !_.isEqual(this.state, nextState)
+    return !_.isEqual(this.props.layout, nextProps.layout)
+      || !_.isEqual(this.state, nextState)
       || this.state.sizeAdjustments !== nextState.sizeAdjustments;
   },
 

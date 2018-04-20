@@ -200,7 +200,8 @@ class Builder extends TerrainComponent<Props>
   public unregisterLeaveHook1: any = () => undefined;
   public unregisterLeaveHook2: any = () => undefined;
 
-  public shouldComponentUpdate(nextProps: Props, nextState) {
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
     for (const key in nextProps)
     {
       if (key === 'builder')
@@ -933,7 +934,6 @@ class Builder extends TerrainComponent<Props>
 
   public render()
   {
-    console.log('builder rgaeg erga erg');
     const config = this.props.params.config;
     const algorithm = this.getAlgorithm();
     const query = this.getQuery();
