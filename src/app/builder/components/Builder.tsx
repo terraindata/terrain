@@ -205,6 +205,7 @@ class Builder extends TerrainComponent<Props>
     {
       if (key === 'builder')
       {
+        // TODO: Look into why === causes unnecessary rerenders
         if (!_.isEqual(this.props.builder, nextProps.builder))
         {
           return true;
