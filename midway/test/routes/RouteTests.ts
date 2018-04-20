@@ -58,6 +58,7 @@ import * as Tasty from '../../src/tasty/Tasty';
 let elasticDB: ElasticDB;
 let server;
 
+let defaultUserAccessToken: string = '';
 let exportTemplateID: number = -1;
 let persistentExportAccessToken: string = '';
 
@@ -180,11 +181,27 @@ beforeAll(async (done) =>
     fail(e);
   }
 
-  request(server)
+  await request(server)
+    .post('/midway/v1/auth/login')
+    .send({
+      email: 'admin@terraindata.com',
+      password: 'CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5',
+    })
+    .then((response) =>
+    {
+      const respData = JSON.parse(response.text);
+      defaultUserAccessToken = respData.accessToken;
+    })
+    .catch((error) =>
+    {
+      winston.warn('Error while creating access token for default user: ' + String(error));
+    });
+
+  await request(server)
     .post('/midway/v1/users/')
     .send({
       id: 1,
-      accessToken: 'ImAnAdmin',
+      accessToken: defaultUserAccessToken,
       body: {
         email: 'test@terraindata.com',
         name: 'Test Person',
@@ -233,7 +250,7 @@ describe('Status tests', () =>
       .get('/midway/v1/status/stats')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
       })
       .expect(200)
       .then((response) =>
@@ -372,7 +389,7 @@ describe('Item route tests', () =>
       .get('/midway/v1/items/')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
       })
       .expect(200)
       .then((response) =>
@@ -412,7 +429,7 @@ describe('Item route tests', () =>
       .post('/midway/v1/items/')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           name: 'Test Item',
           status: 'LIVE',
@@ -442,7 +459,7 @@ describe('Item route tests', () =>
       .get('/midway/v1/items/1')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
       })
       .expect(200)
       .then((response) =>
@@ -472,7 +489,7 @@ describe('Item route tests', () =>
       .post('/midway/v1/items/2')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: insertObject,
       })
       .expect(200)
@@ -495,7 +512,7 @@ describe('Item route tests', () =>
       .post('/midway/v1/items/314159265359')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           id: 314159265359,
           name: 'Test Item',
@@ -568,7 +585,7 @@ describe('Schema route tests', () =>
       .get('/midway/v1/schema/')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
       })
       .expect(200)
       .then((response) =>
@@ -590,7 +607,7 @@ describe('Query route tests', () =>
       .post('/midway/v1/query/')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           database: 1,
           type: 'search',
@@ -625,7 +642,7 @@ describe('Query route tests', () =>
       .post('/midway/v1/query/')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           database: 1,
           type: 'wrongtype',
@@ -676,7 +693,7 @@ describe('Query route tests', () =>
         .post('/midway/v1/query/')
         .send({
           id: 1,
-          accessToken: 'ImAnAdmin',
+          accessToken: defaultUserAccessToken,
           body: {
             database: 1,
             type: 'putTemplate',
@@ -697,7 +714,7 @@ describe('Query route tests', () =>
         .post('/midway/v1/query/')
         .send({
           id: 1,
-          accessToken: 'ImAnAdmin',
+          accessToken: defaultUserAccessToken,
           body: {
             database: 1,
             type: 'getTemplate',
@@ -728,7 +745,7 @@ describe('Query route tests', () =>
         .post('/midway/v1/query/')
         .send({
           id: 1,
-          accessToken: 'ImAnAdmin',
+          accessToken: defaultUserAccessToken,
           body: {
             database: 1,
             type: 'deleteTemplate',
@@ -745,7 +762,7 @@ describe('Query route tests', () =>
         .post('/midway/v1/query/')
         .send({
           id: 1,
-          accessToken: 'ImAnAdmin',
+          accessToken: defaultUserAccessToken,
           body: {
             database: 1,
             type: 'getTemplate',
@@ -781,7 +798,7 @@ describe('Query route tests', () =>
       .post('/midway/v1/query/')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           database: 1,
           type: 'search',
@@ -856,7 +873,7 @@ describe('Query route tests', () =>
       .post('/midway/v1/query/')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           database: 1,
           type: 'search',
@@ -939,7 +956,7 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .field('accessToken', 'ImAnAdmin')
+      .field('accessToken', defaultUserAccessToken)
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
         col1: { type: 'text' },
@@ -1002,7 +1019,7 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .field('accessToken', 'ImAnAdmin')
+      .field('accessToken', defaultUserAccessToken)
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
         col1: { type: 'text' },
@@ -1083,7 +1100,7 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .field('accessToken', 'ImAnAdmin')
+      .field('accessToken', defaultUserAccessToken)
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
         col1: { type: 'text' },
@@ -1128,7 +1145,7 @@ describe('File io templates route tests', () =>
       .post('/midway/v1/import/templates/create')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           name: 'mysql_import_template',
           dbid: 1,
@@ -1248,7 +1265,7 @@ describe('File io templates route tests', () =>
       .post('/midway/v1/export/templates/create')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           name: 'my_template',
           dbid: 1,
@@ -1304,7 +1321,7 @@ describe('File io templates route tests', () =>
       .get('/midway/v1/export/templates/')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
       })
       .expect(200)
       .then((response) =>
@@ -1343,7 +1360,7 @@ describe('File io templates route tests', () =>
       .post('/midway/v1/export/templates/')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           dbid: 1,
           dbname: 'badname',
@@ -1555,7 +1572,7 @@ describe('Credentials tests', () =>
       .post('/midway/v1/credentials')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           createdBy: 1,
           meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
@@ -1590,7 +1607,7 @@ describe('Credentials tests', () =>
       .get('/midway/v1/credentials')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
       })
       .expect(200)
       .then((response) =>
@@ -1631,7 +1648,7 @@ describe('Scheduler tests', () =>
       .post('/midway/v1/scheduler/create')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           jobType: 'export',
           schedule: '* * * * *', // next run on some leap year date
@@ -1682,7 +1699,7 @@ describe('Scheduler tests', () =>
       .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
         },
       })
@@ -1706,7 +1723,7 @@ describe('Scheduler tests', () =>
       .post('/midway/v1/scheduler/create')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           jobTypeInvalidParam: 'export',
           schedule: '* * * * *', // next run on some leap year date
@@ -1751,7 +1768,7 @@ describe('Analytics events route tests', () =>
       .get('/midway/v1/events/agg')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         database: 1,
         agg: 'distinct',
       })
@@ -1778,7 +1795,7 @@ describe('Analytics route tests', () =>
       .get('/midway/v1/events/agg')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         database: 1,
         start: new Date(2018, 2, 16, 7, 24, 4),
         end: new Date(2018, 2, 16, 7, 36, 4),
@@ -1805,7 +1822,7 @@ describe('Analytics route tests', () =>
       .get('/midway/v1/events/agg')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         database: 1,
         start: new Date(2018, 2, 16, 7, 24, 4),
         end: new Date(2018, 2, 16, 7, 36, 4),
@@ -1833,7 +1850,7 @@ describe('Analytics route tests', () =>
       .get('/midway/v1/events/agg')
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         database: 1,
         start: new Date(2018, 3, 3, 7, 24, 4),
         end: new Date(2018, 3, 3, 10, 24, 4),
@@ -1861,7 +1878,7 @@ describe('Analytics route tests', () =>
       .post('/midway/v1/events/metrics')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           database: 1,
           label: 'Clicks',

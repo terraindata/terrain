@@ -1479,8 +1479,7 @@ export const Ajax =
       );
     },
 
-    logout(accessToken: string, id: number,
-      onSave: (response: any) => void)
+    logout(accessToken: string, id: number)
     {
       return Ajax.req(
         'post',
@@ -1489,7 +1488,7 @@ export const Ajax =
           accessToken,
           id,
         },
-        onSave,
+        _.noop,
         {
           noCredentials: true,
         },

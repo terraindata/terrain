@@ -89,7 +89,7 @@ export class Users
           email: 'admin@terraindata.com',
           isSuperUser: true,
           name: 'Terrain Admin',
-          password: 'secret',
+          password: 'CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5',
           isDisabled: false,
           timezone: '',
         });
