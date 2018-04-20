@@ -838,9 +838,9 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       {
         return e === 'null';
       }
-      else if (o.filterString !== undefined)
+      else if (o.filterValue !== undefined)
       {
-        return e === o.filterString as string;
+        return e === o.filterValue;
       }
 
       return false;

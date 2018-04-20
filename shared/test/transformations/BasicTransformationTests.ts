@@ -668,7 +668,7 @@ test('test set if transformation', () =>
     TransformationNodeType.SetIfNode,
     List([List(['name'])]),
     {
-      filterString: 'Bob',
+      filterValue: 'Bob',
       newValue: 'Tim',
     },
   );

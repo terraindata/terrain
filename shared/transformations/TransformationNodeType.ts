@@ -132,7 +132,7 @@ interface TransformationOptionTypes
     filterNaN: boolean;
     filterStringNull: boolean;
     filterUndefined: boolean;
-    filterString: string | undefined;
+    filterValue: any | undefined;
     newValue: any;
   };
 }
