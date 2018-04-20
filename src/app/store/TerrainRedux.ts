@@ -126,11 +126,6 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     return undefined;
   }
 
-  public overrideActThunk(action: Unroll<AllActionsT>): (action: Unroll<AllActionsT>) => any
-  {
-    return undefined;
-  }
-
   // creates a function that can directly dispatch reducers onto a store
   // action creator needs to be bound first, so call this function from within a container
   public _dispatchReducerFactory(dispatch: (payload: WrappedPayload<AllActionsT>) => any):
@@ -152,12 +147,6 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     if (override !== undefined)
     {
       return override;
-    }
-
-    const overrideThunk = this.overrideActThunk(action);
-    if (overrideThunk !== undefined)
-    {
-      return (dispatch) => dispatch(overrideThunk(action));
     }
 
     return {
