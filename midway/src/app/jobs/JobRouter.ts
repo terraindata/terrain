@@ -47,65 +47,63 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
-import JobConfig from 'shared/types/jobs/JobConfig';
+import * as App from '../App';
 import * as AppUtil from '../AppUtil';
 import Credentials from '../credentials/Credentials';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
-import JobQueue from './JobQueue';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
 
 export const credentials: Credentials = new Credentials();
-export const jobQueue: JobQueue = new JobQueue();
 
 // Get job by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await jobQueue.get(ctx.params.id);
+  ctx.body = await App.JobQ.get(ctx.params.id);
 });
 
 Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyCancelRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = jobQueue.cancel(ctx.params.id);
+  ctx.body = App.JobQ.cancel(ctx.params.id);
 });
 
 // Delete job by id
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyDeleteRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await jobQueue.delete(ctx.params.id);
+  ctx.body = await App.JobQ.delete(ctx.params.id);
 });
 
 // Duplicate job by id; creates an identical job with '- Copy' appended to name
 Router.post('/duplicate/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyDuplicateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await jobQueue.duplicate(ctx.params.id);
+  ctx.body = await App.JobQ.duplicate(ctx.params.id);
 });
 
 // Retrieve job log by id
 Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyGetLogRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await jobQueue.getLog(ctx.params.id);
+  ctx.body = await App.JobQ.getLog(ctx.params.id);
 });
 
 // pause job by id
 Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyPauseRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = jobQueue.pause(ctx.params.id);
+  ctx.body = App.JobQ.pause(ctx.params.id);
 });
 
 // unpause paused job by id
 Router.post('/unpause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyUnpauseRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await jobQueue.unpause(ctx.params.id);
+  ctx.body = await App.JobQ.unpause(ctx.params.id);
 });
 
 // Create job
@@ -117,7 +115,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     delete job.id;
   }
   await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await jobQueue.upsert(job);
+  ctx.body = await App.JobQ.upsert(job);
 });
 
 // Update job
@@ -127,7 +125,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   job.id = ctx.params.id;
   AppUtil.verifyParameters(job, ['id', 'interval', 'name', 'priority', 'tasks']);
   await perm.JobQueuePermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await jobQueue.upsert(job);
+  ctx.body = await App.JobQ.upsert(job);
 });
 
 export default Router;

@@ -135,7 +135,7 @@ export class Scheduler
     });
   }
 
-  public async runSchedule(id: number): Promise<TaskOutputConfig | string>
+  public async runSchedule(id: number, runNow?: boolean): Promise<TaskOutputConfig | string>
   {
     return new Promise<TaskOutputConfig | string>(async (resolve, reject) =>
     {
@@ -148,24 +148,23 @@ export class Scheduler
       {
         return reject('Schedule not found.');
       }
-      await this._setRunning(id, true);
-      this.runningSchedules.set(id, new Job());
       const schedule: SchedulerConfig = schedules[0];
-      let taskConfig: TaskConfig[] = [];
-      try
+      const jobFilename: string = 'Task_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
+      const jobType: string = runNow === true ? 'Scheduled ad-hoc' : 'Scheduled';
+      const jobConfig: JobConfig =
       {
-        taskConfig = JSON.parse(schedule.tasks);
-      }
-      catch (e)
-      {
-        return reject(e);
-      }
-      if (Array.isArray(taskConfig) === false)
-      {
-        return reject('Tasks are in an incorrect format');
-      }
-      const filename: string = 'Task_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
-      const jobCreateStatus: boolean | string = await this.runningSchedules.get(id).create(taskConfig, filename);
+        meta: '',
+        name: '', // TODO give this a name if you want
+        pausedFilename: jobFilename,
+        priority: 1,
+        scheduleId: id,
+        tasks: schedule.tasks,
+        type: jobType,
+        workerId: 1, // TODO change this for clustering support
+      };
+      await this._setRunning(id, true);
+      const jobCreateStatus: boolean | string = App.JobQ.create(jobConfig);
+
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);

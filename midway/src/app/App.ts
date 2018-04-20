@@ -67,6 +67,7 @@ import { credentials } from './credentials/CredentialRouter';
 import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
 import { events } from './events/EventRouter';
+import { JobQueue } from './jobs/JobQueue';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
@@ -80,6 +81,7 @@ const CONN_RETRY_TIMEOUT = 1000;
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
+export let JobQ: JobQueue;
 
 export class App
 {
@@ -113,6 +115,7 @@ export class App
   }
 
   private DB: Tasty.Tasty;
+  private JobQ: JobQueue;
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
@@ -130,6 +133,8 @@ export class App
     winston.debug('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
+
+    this.JobQ = new JobQueue();
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -243,6 +248,9 @@ export class App
     await credentials.initializeLocalFilesystemCredential();
     winston.debug('Finished adding local filesystem credentials...');
 
+    // initialize job queue
+    await this.JobQ.initializeJobQueue();
+
     // initialize scheduler
     await scheduler.initializeScheduler();
 
@@ -280,6 +288,11 @@ export class App
   public getConfig(): Config.Config
   {
     return this.config;
+  }
+
+  public getJobQueue(): JobQueue
+  {
+    return this.JobQ;
   }
 }
 
