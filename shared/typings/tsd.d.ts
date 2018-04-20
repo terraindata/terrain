@@ -70,7 +70,7 @@ declare type IMMap<K, T> = Immutable.Map<K, T>;
 declare type KeyPath = List<string | number>;
 declare type SetFn<T> = (f: string, v: any) => T & IRecord<T>;
 declare type SetIn<T> = (f: Array<string | number> | KeyPath, v: any) => T & IRecord<T>;
-declare type Get = (f: string | number) => any;
+declare type Get<T> = <K extends keyof T>(f: K) => T[K];
 declare type GetIn = (f: Array<string | number> | KeyPath, nsv?: any) => any;
 declare type HasIn = (f: Array<string | number> | KeyPath) => boolean;
 declare type Delete<T> = (f: string) => T & IRecord<T>;
@@ -89,7 +89,7 @@ declare interface IMap<T>
 {
   set: SetFn<T>;
   setIn: SetIn<T>;
-  get: Get;
+  get: Get<T>;
   getIn: GetIn;
   hasIn: HasIn;
   delete: Delete<T>;

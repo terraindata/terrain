@@ -48,7 +48,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 import
 {
@@ -78,6 +78,11 @@ class SourceConfigC implements SourceConfigI
   public name = 'Default Source';
   public fileConfig = _FileConfig();
   public options = {};
+
+  public description(algorithms?: Map<ID, ItemWithName>): string
+  {
+    return getEndpointDescription(this as any, algorithms);
+  }
 }
 export type SourceConfig = WithIRecord<SourceConfigC>;
 export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
@@ -101,6 +106,11 @@ class SinkConfigC implements SinkConfigI
   public name = 'Default Sink';
   public fileConfig = _FileConfig();
   public options = {};
+
+  public description()
+  {
+    return getEndpointDescription(this as any);
+  }
 }
 export type SinkConfig = WithIRecord<SinkConfigC>;
 export const _SinkConfig = makeExtendedConstructor(SinkConfigC, true, {
@@ -117,3 +127,58 @@ export const _SinkConfig = makeExtendedConstructor(SinkConfigC, true, {
     return _.extend(defaults, config);
   },
 );
+
+export interface ItemWithName
+{
+  [k: string]: any;
+  name: string;
+}
+
+export function getEndpointDescription(
+  endpoint: SourceConfig | SinkConfig,
+  algorithms?: Map<ID, ItemWithName>,
+): string
+{
+  switch (endpoint.type)
+  {
+    case Sinks.Fs:
+    case Sources.Fs: {
+      const options = endpoint.options as SourceOptionsType<Sources.Fs>;
+      const text = String(options.path);
+      return `File System at '${text}'`;
+    }
+    case Sinks.Http:
+    case Sources.Http: {
+      const options = endpoint.options as SourceOptionsType<Sources.Http>;
+      const text = String(options.url);
+      return `URL '${text}'`;
+    }
+    case Sinks.Sftp:
+    case Sources.Sftp: {
+      const options = endpoint.options as SourceOptionsType<Sources.Sftp>;
+      const text = `${options.ip} at ${options.filepath}`;
+      return `SFTP Server ${text}`;
+    }
+    case Sources.Upload: {
+      return 'User Uploaded File';
+    }
+    case Sources.Algorithm: {
+      const options = endpoint.options as SourceOptionsType<Sources.Algorithm>;
+      let text = String(options.algorithmId);
+      if (algorithms !== undefined && algorithms.has(options.algorithmId))
+      {
+        text = String(algorithms.get(options.algorithmId).name);
+      }
+      return `Algorithm '${text}'`;
+    }
+    case Sinks.Database: {
+      const options = endpoint.options as SinkOptionsType<Sinks.Database>;
+      return `${options.language} Database '${options.database}', '${options.table}'`;
+    }
+    case Sinks.Download: {
+      return 'Download in Browser';
+    }
+    default:
+      return String(endpoint.type);
+  }
+}

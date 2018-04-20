@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name strict-boolean-expressions no-console no-invalid-this
+// tslint:disable:variable-name strict-boolean-expressions no-console no-invalid-this max-classes-per-file
 
 /**
  * This file provides utility functions for implementing classes
@@ -88,7 +88,43 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import * as Serialize from 'remotedev-serialize';
-import Util from './util/Util';
+
+class ClassesUtil
+{
+  public static chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  // Return a random integer [min, max)
+  // assumes min of 0 if not passed.
+  public static randInt(...args: number[]): number
+  {
+    let min: number = arguments[0];
+    let max: number = arguments[1];
+    if (arguments.length === 1)
+    {
+      min = 0;
+      max = arguments[0];
+    }
+
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  public static getId(isString: boolean = false): ID
+  {
+    if (isString)
+    {
+      return _.range(0, 5).map((i) => ClassesUtil.chars[ClassesUtil.randInt(ClassesUtil.chars.length)]).join('');
+    }
+    return Math.random();
+  }
+
+  public static extendId(obj: object, isString?: boolean): object
+  {
+    if (obj['id'])
+    {
+      return obj;
+    }
+    return _.extend({}, { id: ClassesUtil.getId(isString) }, _.omitBy(obj, (value) => value === undefined));
+  }
+}
 
 export class BaseClass
 {
@@ -178,7 +214,7 @@ export function New<T>(
 
   if (extendId)
   {
-    config = Util.extendId(config, extendId === 'string');
+    config = ClassesUtil.extendId(config, extendId === 'string');
   }
   _.forOwn(config,
     (value, key) => { instance[key] = value; },

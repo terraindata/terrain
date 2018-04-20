@@ -121,16 +121,9 @@ export default class MergeJoinTransform extends SafeReadable
     // set up the left source
     const leftQuery = this.setSortClause(query);
     this.leftSource = new ElasticReader(client, leftQuery, true);
-    this.leftSource.on('readable', () =>
+    this.leftSource.on('data', (buffer) =>
     {
-      const buffers: object[] = [];
-      let buffer = this.leftSource.read();
-      while (buffer !== null)
-      {
-        buffers.push(buffer);
-        buffer = this.leftSource.read();
-      }
-      this.accumulateBuffer(buffers, StreamType.Left);
+      this.accumulateBuffer(buffer, StreamType.Left);
     });
     this.leftSource.on('error', (e) => this.emit('error', e));
     this.leftSource.on('end', () => { this.leftEnded = true; this.mergeJoin(); });
@@ -139,16 +132,9 @@ export default class MergeJoinTransform extends SafeReadable
     delete mergeJoinQuery[this.mergeJoinName]['size'];
     const rightQuery = this.setSortClause(mergeJoinQuery[this.mergeJoinName]);
     this.rightSource = new ElasticReader(client, rightQuery, true);
-    this.rightSource.on('readable', () =>
+    this.rightSource.on('data', (buffer) =>
     {
-      const buffers: object[] = [];
-      let buffer = this.rightSource.read();
-      while (buffer !== null)
-      {
-        buffers.push(buffer);
-        buffer = this.rightSource.read();
-      }
-      this.accumulateBuffer(buffers, StreamType.Right);
+      this.accumulateBuffer(buffer, StreamType.Right);
     });
     this.rightSource.on('error', (e) => this.emit('error', e));
     this.rightSource.on('end', () => { this.rightEnded = true; this.mergeJoin(); });
@@ -165,33 +151,34 @@ export default class MergeJoinTransform extends SafeReadable
     this.rightSource._destroy(error, () => this.leftSource._destroy(error, callback));
   }
 
-  private accumulateBuffer(buffers: object[], type: StreamType): void
+  private accumulateBuffer(buffer: object | null, type: StreamType): void
   {
-    if (buffers.length === 0)
+    if (buffer === null)
     {
       return;
     }
 
-    if (buffers.length > 1)
-    {
-      if (buffers[0]['hits'].hits === undefined)
-      {
-        buffers[0]['hits'].hits = [];
-      }
-
-      for (let i = 1; i < buffers.length; ++i)
-      {
-        buffers[0]['hits'].hits = buffers[0]['hits'].hits.concat(buffers[i]['hits'].hits);
-      }
-    }
-
     if (type === StreamType.Left)
     {
-      this.leftBuffer = buffers[0];
+      if (this.leftBuffer === null)
+      {
+        this.leftBuffer = buffer;
+      }
+      else
+      {
+        this.leftBuffer['hits'].hits = this.leftBuffer['hits'].hits.concat(buffer['hits'].hits);
+      }
     }
     else if (type === StreamType.Right)
     {
-      this.rightBuffer = buffers[0];
+      if (this.rightBuffer === null)
+      {
+        this.rightBuffer = buffer;
+      }
+      else
+      {
+        this.rightBuffer['hits'].hits = this.rightBuffer['hits'].hits.concat(buffer['hits'].hits);
+      }
     }
     else
     {
@@ -213,8 +200,12 @@ export default class MergeJoinTransform extends SafeReadable
       return;
     }
 
-    if (this.rightEnded || this.rightBuffer === null)
+    if (this.rightBuffer === null)
     {
+      if (this.rightEnded && !this.leftEnded)
+      {
+        this.push(null);
+      }
       return;
     }
 
@@ -223,15 +214,15 @@ export default class MergeJoinTransform extends SafeReadable
 
     if (left.length === 0)
     {
-      this.leftPosition = 0;
       this.leftBuffer = null;
+      this.leftPosition = 0;
       return;
     }
 
     if (right.length === 0)
     {
-      this.rightPosition = 0;
       this.rightBuffer = null;
+      this.rightPosition = 0;
       return;
     }
 
@@ -242,8 +233,13 @@ export default class MergeJoinTransform extends SafeReadable
       let l = left[this.leftPosition]['_source'][this.joinKey];
       let r = right[this.rightPosition]['_source'][this.joinKey];
 
-      while (l !== r)
+      while (l !== r
+        && this.leftPosition < left.length
+        && this.rightPosition < right.length)
       {
+        l = left[this.leftPosition]['_source'][this.joinKey];
+        r = right[this.rightPosition]['_source'][this.joinKey];
+
         left[this.leftPosition][this.mergeJoinName] = [];
         if (l < r)
         {
@@ -253,44 +249,38 @@ export default class MergeJoinTransform extends SafeReadable
           }
 
           this.leftPosition++;
-          l = left[this.leftPosition]['_source'][this.joinKey];
         }
         else if (r < l)
         {
           this.rightPosition++;
-          r = right[this.rightPosition]['_source'][this.joinKey];
         }
-      }
-
-      if (this.leftPosition === left.length - 1 && !this.leftEnded)
-      {
-        this.push(this.leftBuffer);
-        this.leftBuffer = null;
-        this.leftPosition = 0;
-        return;
-      }
-
-      if (this.rightPosition === right.length - 1 && !this.rightEnded)
-      {
-        this.rightBuffer = null;
-        this.rightPosition = 0;
-        return;
       }
 
       // start merging
       left[this.leftPosition][this.mergeJoinName] = [];
-      for (let j = this.rightPosition; l === r && j < right.length; j++)
+      let j = this.rightPosition;
+      while (j < right.length && l === right[j]['_source'][this.joinKey])
       {
-        r = right[j]['_source'][this.joinKey];
         left[this.leftPosition][this.mergeJoinName].push(right[j]['_source']);
+        j++;
       }
 
       this.leftPosition++;
+      this.rightPosition++;
     }
 
-    // push the merged result out to the stream
-    this.push(this.leftBuffer);
-    this.leftBuffer = null;
+    if (this.leftPosition >= left.length)
+    {
+      this.push(this.leftBuffer);
+      this.leftBuffer = null;
+      this.leftPosition = 0;
+    }
+
+    if (this.rightPosition >= right.length)
+    {
+      this.rightBuffer = null;
+      this.rightPosition = 0;
+    }
   }
 
   private setSortClause(query: object)

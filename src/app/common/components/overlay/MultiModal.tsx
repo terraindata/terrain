@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as _ from 'lodash';
 import * as React from 'react';
-import { BaseClass, makeConstructor, New, WithIRecord } from 'src/app/Classes';
+import { BaseClass, makeConstructor, New, WithIRecord } from 'shared/util/Classes';
 
 import Modal from 'common/components/Modal';
 import { Props as _ModalProps } from 'common/components/Modal';

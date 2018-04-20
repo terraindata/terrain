@@ -56,15 +56,15 @@ import Util from 'util/Util';
 
 import ExpandableView from 'common/components/ExpandableView';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import Quarantine from 'util/RadiumQuarantine';
 
 import EndpointForm from 'etl/common/components/EndpointForm';
-import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import DocumentsHelpers from 'etl/helpers/DocumentsHelpers';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate, SinksMap, SourcesMap } from 'etl/templates/TemplateTypes';
+import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
