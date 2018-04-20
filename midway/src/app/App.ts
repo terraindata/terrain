@@ -135,6 +135,7 @@ export class App
     CFG = this.config;
 
     this.JobQ = new JobQueue();
+    JobQ = this.JobQ;
 
     this.app = new Koa();
     this.app.proxy = true;

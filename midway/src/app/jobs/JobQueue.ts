@@ -135,6 +135,7 @@ export class JobQueue
       job.tasks = (job.tasks !== undefined && job.tasks !== null) ? job.tasks : '[]';
       job.type = (job.type !== undefined && job.type !== null) ? job.type : 'default';
       job.workerId = (job.workerId !== undefined && job.workerId !== null) ? job.workerId : 1;
+      console.log(JSON.stringify(job));
       const upsertedJobs: JobConfig[] = await App.DB.upsert(this.jobTable, job) as JobConfig[];
       // check table to see if jobs need to be run
       await this._checkJobTable();

@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import { JobConfig } from 'shared/types/jobs/JobConfig';
 import { TaskConfig, TaskOutputConfig } from 'shared/types/jobs/TaskConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
@@ -163,13 +164,13 @@ export class Scheduler
         workerId: 1, // TODO change this for clustering support
       };
       await this._setRunning(id, true);
-      const jobCreateStatus: boolean | string = App.JobQ.create(jobConfig);
+      const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig);
 
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);
       }
-      const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
+      // const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
       await this._setRunning(id, false);
       this.runningSchedules.delete(id);
       // TODO: unlock row
