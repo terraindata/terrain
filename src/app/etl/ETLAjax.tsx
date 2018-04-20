@@ -48,12 +48,12 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import MidwayError from 'shared/error/MidwayError';
-import { Ajax } from 'util/Ajax';
-
-import { AuthActions as Actions } from 'src/app/auth/data/AuthRedux';
-
 import * as download from 'downloadjs';
+import MidwayError from 'shared/error/MidwayError';
+import { SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { recordForSave } from 'shared/util/Classes';
+import { AuthActions as Actions } from 'src/app/auth/data/AuthRedux';
+import { Ajax } from 'util/Ajax';
 
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { TemplateBase } from 'shared/etl/types/ETLTypes';
@@ -197,7 +197,6 @@ class ETLAjax
   {
     return new Promise((resolve, reject) =>
     {
-
       const config: ReqConfig = {
         onError: reject,
       };
@@ -219,6 +218,45 @@ class ETLAjax
         payload,
         (resp) => resolve(resp),
         config,
+      );
+    });
+  }
+
+  public fetchPreview(
+    source: SourceConfig,
+    size: number,
+  ): Promise<List<object>>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        let documents;
+        try
+        {
+          documents = List(response);
+        }
+        catch (e)
+        {
+          return reject(e);
+        }
+        if (documents !== undefined)
+        {
+          resolve(documents);
+        }
+      };
+      const payload = {
+        source: recordForSave(source),
+        size,
+      };
+      return Ajax.req(
+        'post',
+        'etl/preview',
+        payload,
+        handleResponse,
+        {
+          onError: reject,
+        },
       );
     });
   }

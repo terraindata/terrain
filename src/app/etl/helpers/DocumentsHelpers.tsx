@@ -56,8 +56,7 @@ import { MidwayError } from 'shared/error/MidwayError';
 import TerrainStore from 'src/app/store/TerrainStore';
 import Util from 'util/Util';
 
-import ETLHelpers from './ETLHelpers';
-
+import ETLAjax from 'etl/ETLAjax';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
@@ -84,6 +83,7 @@ import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+import ETLHelpers from './ETLHelpers';
 
 import Ajax from 'util/Ajax';
 
@@ -204,22 +204,6 @@ class DocumentsHelpers extends ETLHelpers
         }
         switch (source.type)
         {
-          case Sources.Algorithm: {
-            const options: SourceOptionsType<Sources.Algorithm> = source.options as any;
-            const algorithmId = options.algorithmId;
-            const onLoadAlgorithm = (algorithm: Algorithm) =>
-            {
-              if (algorithm == null)
-              {
-                return catchError('Could not find algorithm');
-              }
-              fetchDocumentsFromAlgorithm(algorithm, DefaultDocumentLimit)
-                .then(onFetchLoad)
-                .catch(catchError);
-            };
-            Ajax.getAlgorithm(algorithmId, onLoadAlgorithm);
-            break;
-          }
           case Sources.Upload: {
             const file = source.options['file'];
             if (file == null)
@@ -232,6 +216,14 @@ class DocumentsHelpers extends ETLHelpers
               .catch(catchError);
             break;
           }
+          case Sources.Algorithm:
+          case Sources.Fs:
+          case Sources.Http:
+          case Sources.Sftp:
+            ETLAjax.fetchPreview(source, DefaultDocumentLimit)
+              .then(onFetchLoad)
+              .catch(catchError);
+            break;
           default: {
             return catchError(`Failed to retrieve documents. Unsupported source type: ${source.type}`);
           }
