@@ -88,13 +88,6 @@ const LayoutManager = createReactClass<any, any>({
 
   shouldComponentUpdate(nextProps, nextState)
   {
-    for (const k in this.props.layout)
-    {
-      if (this.props.layout[k] !== nextProps.layout[k])
-      {
-        return true;
-      }
-    }
     return !_.isEqual(this.props.layout, nextProps.layout)
       || !_.isEqual(this.state, nextState)
       || this.state.sizeAdjustments !== nextState.sizeAdjustments;

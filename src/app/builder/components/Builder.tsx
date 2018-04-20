@@ -55,7 +55,6 @@ import { DragDropContext } from 'react-dnd';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';
-const shallowCompare = require('react-addons-shallow-compare');
 
 // Data
 import { ItemStatus } from '../../../items/types/Item';
