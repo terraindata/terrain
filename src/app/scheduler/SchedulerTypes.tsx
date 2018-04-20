@@ -63,12 +63,13 @@ export const _SchedulerConfig =
   {
     let schedule = new SchedulerConfig_Record(config) as any as SchedulerConfig;
     let tasks;
-    try {
-        tasks = JSON.parse(schedule.tasks);
+    try
+    {
+      tasks = JSON.parse(schedule.tasks);
     }
     catch
     {
-        tasks = {};
+      tasks = {};
     }
     schedule = schedule.set('tasks', tasks);
     return schedule;

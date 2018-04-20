@@ -43,26 +43,26 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as React from 'react';
-import SchedulerApi from 'scheduler/SchedulerApi';
-import XHR from 'util/XHR';
-import './Schedule.less';
-import * as Immutable from 'immutable';
-import { List, Map } from 'immutable';
-import * as _ from 'lodash';
+// tslint:disable:no-console strict-boolean-expressions
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Colors from 'app/colors/Colors';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
+import { _SinkConfig, _SourceConfig } from 'app/etl/EndpointTypes';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
+import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
+import { _SchedulerConfig, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
-import {_SinkConfig, _SourceConfig } from 'app/etl/EndpointTypes';
-import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { SchedulerConfig, _SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
+import TerrainComponent from 'common/components/TerrainComponent';
+import { List, Map } from 'immutable';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as React from 'react';
+import SchedulerApi from 'scheduler/SchedulerApi';
+import XHR from 'util/XHR';
+import './Schedule.less';
 
 export interface Props
 {
@@ -74,139 +74,23 @@ export interface Props
 
 class ScheduleList extends TerrainComponent<Props>
 {
-  public state: {
-    configurationKeys: List<string>
-  } =
-  {
-    configurationKeys: List([]),
-  }
-/*
-  These functions should be moved and will actually all be Redux actions (not ajax)
-*/
+
+  /*
+    This stuff will all eventually be redux actions
+  */
   public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
-
-  public createSchedule()
-  {
-    this.schedulerApi.createSchedule({
-      cron: '0 0 1 1 *',
-      name: `Jmansor Schedule ${Math.floor(Math.random() * 100)}`,
-      priority: 1,
-      tasks: {params: {templateId: -1}},
-      workerId: 10,
-    })
-      .then((response) =>
-      {
-        this.getSchedules();
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        console.log(error);
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
-  }
-
-  public getSchedules()
-  {
-    this.props.schedulerActions({
-      actionType: 'getSchedules'
-    })
-    .then((schedules) =>
+  public state: {
+    configurationKeys: List<string>,
+  } =
     {
-     // console.error(schedules.get(1));
-    })
-  }
+      configurationKeys: List([]),
+    };
 
-  public getSchedule(id: number)
+  public updateSchedule(id: number, changes)
   {
-    this.schedulerApi.getSchedule(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
-  }
-
-  public updateSchedule(id: number, changes: object)
-  {
-    changes = changes || { name: 'Jmansor Schedule Modified' };
     this.schedulerApi.updateSchedule(id, changes)
       .then((response) =>
       {
-        this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
-  }
-
-  public deleteSchedule(id?: number)
-  {
-    this.schedulerApi.deleteSchedule(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-        this.getSchedules();
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
-  }
-
-  public duplicateSchedule(id?: number)
-  {
-    this.schedulerApi.duplicateSchedule(id)
-      .then((response) =>
-      {
-        this.getSchedules();
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
-  }
-
-  public getScheduleLog(id: number)
-  {
-    this.schedulerApi.getScheduleLog(id)
-      .then((response) =>
-      {
-        this.getSchedules();
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
-  }
-
-  public pauseSchedule(id: number)
-  {
-    this.schedulerApi.pauseSchedule(id)
-      .then((response) =>
-      {
-        this.getSchedules();
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
-  }
-
-  public unpauseSchedule(id: number)
-  {
-    this.schedulerApi.unpauseSchedule(id)
-      .then((response) =>
-      {
-        this.getSchedules();
         this.setState({ responseText: JSON.stringify(response) });
       })
       .catch((error) =>
@@ -220,7 +104,6 @@ class ScheduleList extends TerrainComponent<Props>
     this.schedulerApi.runSchedule(id)
       .then((response) =>
       {
-        this.getSchedules();
         this.setState({ responseText: JSON.stringify(response) });
       })
       .catch((error) =>
@@ -229,12 +112,11 @@ class ScheduleList extends TerrainComponent<Props>
       });
   }
 
-  public setScheduleStatus(id: number)
+  public pauseSchedule(id: number)
   {
-    this.schedulerApi.setScheduleStatus(id, false)
+    this.schedulerApi.pauseSchedule(id)
       .then((response) =>
       {
-        this.getSchedules();
         this.setState({ responseText: JSON.stringify(response) });
       })
       .catch((error) =>
@@ -247,7 +129,9 @@ class ScheduleList extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.getSchedules();
+    this.props.schedulerActions({
+      actionType: 'getSchedules',
+    });
     this.props.etlActions({
       actionType: 'fetchTemplates',
     });
@@ -265,7 +149,7 @@ class ScheduleList extends TerrainComponent<Props>
 
   public handleConfigurationChange(schedule, isSource: boolean, key: string, endpoint)
   {
-    const task = schedule.task;
+    const task = schedule.tasks;
     const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
     if (!task['params'][sourceKey])
     {
@@ -284,17 +168,22 @@ class ScheduleList extends TerrainComponent<Props>
     return List(keys.map((key) =>
     {
       let endpoint = endpoints.get(key);
-      if (schedule[sourceKey] && schedule[sourceKey][key])
+      if (schedule.tasks && schedule.tasks.params)
       {
-        if (isSource)
+        const overrideEndpoints = schedule.tasks.params[sourceKey];
+        if (overrideEndpoints && overrideEndpoints[key])
         {
-          endpoint = _SourceConfig(schedule[sourceKey][key]);
-        }
-        else
-        {
-          endpoint = _SinkConfig(schedule[sourceKey][key]);
+          if (isSource)
+          {
+            endpoint = _SourceConfig(overrideEndpoints[key]);
+          }
+          else
+          {
+            endpoint = _SinkConfig(overrideEndpoints[key]);
+          }
         }
       }
+
       return {
         value: isSource ? 'source' + key : 'sink' + key,
         displayName: endpoint.name,
@@ -358,7 +247,7 @@ class ScheduleList extends TerrainComponent<Props>
       shortNameText: 'Interval',
       forceFloat: true,
       key: 'interval',
-      options: List([{value: 'CRON SELECTOR GOES HERE'}])
+      options: List([{ value: 'CRON SELECTOR GOES HERE' }]),
     };
 
     // Status Options
@@ -370,13 +259,13 @@ class ScheduleList extends TerrainComponent<Props>
       {
         value: 'running',
         displayName: 'Running',
-        color: Colors().success
+        color: Colors().success,
       },
       {
         value: 'disabled',
         displayName: 'Disabled',
         color: Colors().error,
-      }
+      },
     ]);
 
     const statusOptionSet = {
@@ -385,7 +274,7 @@ class ScheduleList extends TerrainComponent<Props>
       key: 'status',
       shortNameText: 'Status',
       forceFloat: true,
-    }
+    };
 
     // Buttons to Run / Pause
     const buttonOptionSet = {
@@ -420,7 +309,7 @@ class ScheduleList extends TerrainComponent<Props>
       schedule.tasks.params.templateId : -1;
     const buttonValue = schedule.running ? 'Pause' : 'Run Now';
     const status = schedule.tasks && schedule.tasks.jobStatus !== undefined ? schedule.tasks.jobStatus : 0;
-    const statusValue =  status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
+    const statusValue = status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
     return List([templateId, this.state.configurationKeys.get(index), 'every day!', statusValue, buttonValue]);
   }
 
@@ -433,16 +322,19 @@ class ScheduleList extends TerrainComponent<Props>
 
   public handleScheduleChange(schedule, index, optionSetIndex: number, value: any)
   {
-    switch (optionSetIndex) {
+    switch (optionSetIndex)
+    {
       case 0: // Template
         const task = schedule.tasks;
         task['params']['templateId'] = value;
         schedule = schedule.set('tasks', task);
         this.updateSchedule(schedule.id, schedule.toJS());
+        break;
       case 1: // Configuration
         this.setState({
           configurationKeys: this.state.configurationKeys.set(index, value),
-        })
+        });
+        break;
       case 2: // Button
       default:
         break;
@@ -455,6 +347,44 @@ class ScheduleList extends TerrainComponent<Props>
     return !schedule.running && TerrainTools.isAdmin();
   }
 
+  public createSchedule()
+  {
+    const blankSchedule = {
+      cron: '0 0 1 1 *',
+      name: `Schedule`,
+      priority: 1,
+      tasks: { params: { templateId: -1 } },
+      workerId: 10,
+      createdAt: '',
+      id: null,
+      lastModified: '',
+      lastRun: '',
+      meta: '',
+      running: false,
+      shouldRunNext: true,
+    };
+    this.props.schedulerActions({
+      actionType: 'createSchedule',
+      schedule: _SchedulerConfig(blankSchedule),
+    });
+  }
+
+  public deleteSchedule(id)
+  {
+    this.props.schedulerActions({
+      actionType: 'deleteSchedule',
+      scheduleId: id,
+    })
+      .then((response) =>
+      {
+        this.setState({ responseText: JSON.stringify(response) });
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error.response.data.errors[0].detail });
+      });
+  }
+
   public render()
   {
     const { schedules } = this.props.scheduler;
@@ -464,7 +394,7 @@ class ScheduleList extends TerrainComponent<Props>
       <div className='schedule-list-wrapper'>
         {
           scheduleList.map((schedule, i) =>
-             <RouteSelector
+            <RouteSelector
               key={i}
               optionSets={this.getOptionSets(schedule)}
               values={this.getValues(schedule, i)}
@@ -473,7 +403,7 @@ class ScheduleList extends TerrainComponent<Props>
               onDelete={this._fn(this.deleteSchedule, schedule.id)}
               onChange={this._fn(this.handleScheduleChange, schedule, i)}
               useTooltip={true}
-            />
+            />,
           )
         }
         <PathfinderCreateLine
@@ -490,7 +420,8 @@ class ScheduleList extends TerrainComponent<Props>
 export default Util.createContainer(
   ScheduleList,
   ['etl', 'scheduler'],
-  { etlActions: ETLActions,
+  {
+    etlActions: ETLActions,
     schedulerActions: SchedulerActions,
-   },
+  },
 );

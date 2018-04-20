@@ -58,7 +58,7 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { instanceFnDecorator } from 'src/app/Classes';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { Sinks, Sources, SchedulableSinks, SchedulableSources } from 'shared/etl/types/EndpointTypes';
+import { SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointOptions';
@@ -159,7 +159,6 @@ export default class EndpointForm extends TerrainComponent<Props>
 
 const sourceList = List(Object.keys(Sources));
 const sinkList = List(Object.keys(Sinks));
-
 
 interface SinkFormState
 {

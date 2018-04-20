@@ -50,11 +50,11 @@ import * as _ from 'lodash';
 import * as runQueue from 'run-queue';
 import * as winston from 'winston';
 
+import JobConfig from 'shared/types/jobs/JobConfig';
 import { TaskConfig, TaskOutputConfig, TaskTreeConfig } from 'shared/types/jobs/TaskConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { Job } from './Job';
-import JobConfig from 'shared/types/jobs/JobConfig';
 import { Task } from './Task';
 import { TaskTree } from './TaskTree';
 
