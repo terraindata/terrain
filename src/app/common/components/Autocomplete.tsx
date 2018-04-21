@@ -185,8 +185,8 @@ class Autocomplete extends TerrainComponent<Props>
   public selectIndex(index: number)
   {
     // scroll option into view if necessary
-    const ac = ReactDOM.findDOMNode(this.refs['ac']);
-    const opt = ReactDOM.findDOMNode(this.refs['opt' + index]);
+    const ac = ReactDOM.findDOMNode(this.refs['ac']) as Element;
+    const opt = ReactDOM.findDOMNode(this.refs['opt' + index]) as Element;
     if (ac && opt)
     {
       const acMin = ac.scrollTop;
