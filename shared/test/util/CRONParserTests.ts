@@ -45,8 +45,11 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { fillCRONMap } from '../../util/CRONConstants';
-import { canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays, setCRONHours,
-  setCRONType } from '../../util/CRONParser';
+import
+{
+  canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays, setCRONHours,
+  setCRONType,
+} from '../../util/CRONParser';
 
 test('parses daily', () =>
 {

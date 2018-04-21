@@ -64,10 +64,10 @@ export interface Props
 
 class UIComponentsPage extends TerrainComponent<Props>
 {
-  state = {
+  public state = {
     cron: '* * * * *',
   };
-  
+
   public render()
   {
     const space = <div className='space' />;
@@ -151,7 +151,7 @@ class UIComponentsPage extends TerrainComponent<Props>
           onChange={this._setStateWrapper('cron')}
         />
         {space}
-        
+
       </div>
     );
   }

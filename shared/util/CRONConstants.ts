@@ -94,7 +94,6 @@ export interface CRONDaySchedule
   days?: CRONMap; // for monthly
 }
 
-
 // Hours and Minutes
 
 export const CRONHourOptions: CRONMap = fillCRONMap([], 0, 23);
@@ -107,7 +106,7 @@ export const CRONHourNames = {
 };
 
 export const CRONMinuteOptions: CRONMap = fillCRONMap([], 0, 59);
-export const defaultCRONMinuteOptions = { 0: true }; //:00
+export const defaultCRONMinuteOptions = { 0: true }; // :00
 
 export interface CRONHourSchedule
 {
@@ -115,4 +114,3 @@ export interface CRONHourSchedule
   minutes?: CRONMap; // for hourly
   hours?: CRONMap; // for daily
 }
-

@@ -44,20 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires strict-boolean-expressions
 
-import './CRONEditorStyle.less';
 import * as classNames from 'classnames';
 import { noop } from 'lodash';
 import * as React from 'react';
+import
+{
+  CRONDaySchedule, CRONHourNames, CRONHourOptions, CRONHourSchedule,
+  CRONMonthDayOptions, CRONWeekDayNames, CRONWeekDayOptions,
+} from 'shared/util/CRONConstants';
+import
+{
+  canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays,
+  setCRONHours, setCRONType,
+} from 'shared/util/CRONParser';
 import { borderColor, Colors, getStyle } from './../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import './CRONEditorStyle.less';
 import FadeInOut from './FadeInOut';
 import FloatingInput from './FloatingInput';
-import { parseCRONDaySchedule, parseCRONHourSchedule, canParseCRONSchedule, setCRONDays,
-  setCRONHours, setCRONType } from 'shared/util/CRONParser';
-import { CRONHourNames, CRONHourOptions, CRONWeekDayNames, CRONWeekDayOptions,
-  CRONMonthDayOptions, CRONDaySchedule, CRONHourSchedule } from 'shared/util/CRONConstants';
 
 export interface Props
 {
@@ -83,7 +89,7 @@ class CRONEditor extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private handleOptionClick(daysOrHours: 'days' | 'hours', type: string)
   {
     const newCRON = setCRONType(this.props.cron, daysOrHours, type);
@@ -93,14 +99,14 @@ class CRONEditor extends TerrainComponent<Props>
       alert('Not allowed');
       return;
     }
-    
+
     this.props.onChange(newCRON);
   }
-  
+
   private renderHeader(str: string)
   {
     return (
-      <div 
+      <div
         className='common-list-option-style common-label-style'
         key={str}
       >
@@ -110,7 +116,7 @@ class CRONEditor extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private renderOption(text: string, type: string, sched: CRONDaySchedule | CRONHourSchedule,
     daysOrHours: 'days' | 'hours', el?: any)
   {
@@ -130,51 +136,51 @@ class CRONEditor extends TerrainComponent<Props>
         </div>
         {
           el &&
-            <FadeInOut
-              open={selected}
-            >
-              {
-                el
-              }
-            </FadeInOut>
+          <FadeInOut
+            open={selected}
+          >
+            {
+              el
+            }
+          </FadeInOut>
         }
       </div>
     );
   }
-  
+
   private renderDays()
   {
     const { cron } = this.props;
     const sched = canParseCRONSchedule(cron) ? parseCRONDaySchedule(cron) : null;
-    
+
     return [
       this.renderHeader('Day'),
       this.renderOption('Every day', 'daily', sched, 'days'),
       this.renderOption('Every weekday', 'weekdays', sched, 'days'),
-      
+
       this.renderOption('Specific weekday(s)', 'weekly', sched, 'days',
         <div key='w'>
           {
             JSON.stringify(sched.weekdays)
           }
-        </div>
+        </div>,
       ),
-      
+
       this.renderOption('Specific day(s) of the month', 'monthly', sched, 'days',
         <div key='m'>
           {
             JSON.stringify(sched.days)
           }
-        </div>
+        </div>,
       ),
     ];
   }
-  
+
   private renderHours()
   {
     const { cron } = this.props;
     const sched = canParseCRONSchedule(cron) ? parseCRONHourSchedule(cron) : null;
-    
+
     return [
       this.renderHeader('Time'),
       this.renderOption('Every minute', 'minute', sched, 'hours'),
@@ -183,7 +189,7 @@ class CRONEditor extends TerrainComponent<Props>
           {
             JSON.stringify(sched.minutes)
           }
-        </div>
+        </div>,
       ),
 
       this.renderOption('Specific hour(s)', 'daily', sched, 'hours',
@@ -191,16 +197,16 @@ class CRONEditor extends TerrainComponent<Props>
           {
             JSON.stringify(sched.hours)
           }
-        </div>
+        </div>,
       ),
     ];
   }
-  
+
   private renderCustom()
   {
     return [
       this.renderHeader('Custom'),
-      <div 
+      <div
         className='common-list-option-style'
         key='c'
       >
@@ -213,7 +219,7 @@ class CRONEditor extends TerrainComponent<Props>
             canEdit={true}
           />
         </div>
-      </div>
+      </div>,
     ];
   }
 }
