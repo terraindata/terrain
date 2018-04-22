@@ -181,8 +181,8 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
     }
 
     const sinkStream = await endpoint.getSink(sink, engine);
-    const progressStream = new ProgressTransform(sinkStream);
-    resolve(progressStream);
+    exportStream.pipe(sinkStream);
+    resolve(new ProgressTransform(exportStream));
   });
 }
 
