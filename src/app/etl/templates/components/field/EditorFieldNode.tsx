@@ -59,7 +59,8 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 
-import ExpandableView from 'common/components/ExpandableView';
+import NestedView from 'etl/templates/components/field/NestedView';
+// import ExpandableView from 'common/components/ExpandableView';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
@@ -247,7 +248,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         </div>
       );
       return (
-        <ExpandableView
+        <NestedView
           content={content}
           open={this.state.expandableViewOpen}
           onToggle={this.handleToggleOpen}
@@ -269,7 +270,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         />
       );
       return (
-        <ExpandableView
+        <NestedView
           content={content}
           open={false}
           onToggle={doNothing}

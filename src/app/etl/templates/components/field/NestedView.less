@@ -1,0 +1,87 @@
+@import "~common/Common.less";
+
+@arrow-spacer-size: 4px;
+.nested-view-container {
+  .transition;
+
+  border-radius: 4px;
+
+  .nested-view-content-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .nested-view-arrow-column {
+    margin-left: @half-spacing;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nested-view-arrow-spacer-top {
+    flex: 1 0 @arrow-spacer-size;
+  }
+
+  .nested-view-arrow-spacer-bottom {
+    flex: 1 0 0px;
+    width: 1px;
+    align-self: center;
+    margin-top: @arrow-spacer-size;
+    &.nested-view-open {
+      &.nested-view-has-children {
+        // border-left: 1px solid;
+      }
+    }
+  }
+
+  .nested-view-arrow-icon {
+    cursor: pointer;
+    position: relative;
+    fill: currentColor;
+    flex-grow: 0;
+    transform: rotate(90deg);
+    .transition;
+    &.nested-view-open {
+      transform: rotate(180deg);
+    }
+    &:not(.nested-view-has-children) {
+      opacity: 0;
+    }
+  }
+
+  .nested-view-content {
+    flex-grow: 1;
+  }
+
+  .nested-view-children-container {
+    overflow: visible;
+    display: none;
+    &.nested-view-open {
+      // border-left: 1px solid;
+      display: block;
+    }
+  }
+
+  .nested-view-injected-container {
+    &.nested-view-open {
+      // border-left: 1px solid;
+    }
+  }
+
+  .nested-view-checkbox-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    &.nested-view-checkbox-hidden {
+
+    }
+  }
+  
+  .nested-view-checkbox {
+    margin: 0px;
+  }
+}
