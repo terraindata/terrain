@@ -244,7 +244,7 @@ class AlgorithmEndpointC extends EndpointForm<AlgorithmState>
 
   public optionsToFormState(options: SinkOptionsType<any> | SourceOptionsType<any>)
   {
-    return _.extend({}, options, {ids: this.state.ids});
+    return _.extend({}, options, { ids: this.state.ids });
   }
 
   public computeIds(algorithmId)

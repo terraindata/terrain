@@ -46,6 +46,19 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
+export class TaskConfigClass
+{
+  public cancel: boolean = false; // whether the tree of tasks should be cancelled
+  public id: number = -1; // unique id that identifies this task to other tasks in the input array of TaskConfigs
+  public jobStatus: number = 0; // 0: not running, 1: running, 2: paused
+  public name: string = ''; // name of the task i.e. 'import'
+  public onFailure?: number = null; // id of task to execute on failure
+  public onSuccess?: number = null; // id of next task to execute (default should be next in array)
+  public params: any = {}; // input parameters for the task
+  public paused: number = null; // where in the tree of tasks the tasks are paused
+  public taskId: number = null; // maps to a statically declared task
+}
+
 export interface TaskConfig
 {
   cancel?: boolean; // whether the tree of tasks should be cancelled

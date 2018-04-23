@@ -47,11 +47,10 @@ THE SOFTWARE.
 import Colors from 'app/colors/Colors';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
-import { _SinkConfig, _SourceConfig, SourceConfig, SinkConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { _SchedulerConfig, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
+import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -59,6 +58,7 @@ import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 
 import './Schedule.less';
 
@@ -82,8 +82,6 @@ interface State
 
 class Schedule extends TerrainComponent<Props>
 {
-  /* UI */
-
   public state: State = {
     configurationKey: '',
     overrideSources: Map({}),
@@ -97,19 +95,14 @@ class Schedule extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    // console.log('will recive props ');
-    // console.log('next props ', nextProps.schedule);
-    // console.log('this props ', this.props.schedule);
-    // console.log(this.props.schedule !== nextProps.schedule);
-    // If the override sources or sinks change, update the memoized overrides
     if (this.props.schedule !== nextProps.schedule)
     {
-      const oldTask: any = this.props.schedule.tasks;
-      const newTask: any = nextProps.schedule.tasks;
-      const oldSources = oldTask && oldTask.params && oldTask.params.overrideSources;
-      const oldSinks = oldTask && oldTask.params && oldTask.params.overrideSinks;
-      const newSources = newTask && newTask.params && newTask.params.overrideSources;
-      const newSinks = newTask && newTask.params && newTask.params.overrideSinks;
+      const oldTask: TaskConfig = this.getTask();
+      const newTask: TaskConfig = this.getTask(nextProps.schedule);
+      const oldSources = oldTask.getIn(['params', 'overrideSources']);
+      const oldSinks = oldTask.getIn(['params', 'overrideSinks']);
+      const newSources = newTask.getIn(['params', 'overrideSources']);
+      const newSinks = newTask.getIn(['params', 'overrideSinks']);
       if (oldSinks !== newSinks || oldSources !== newSources)
       {
         this.updateOverrides(nextProps.schedule);
@@ -124,31 +117,29 @@ class Schedule extends TerrainComponent<Props>
 
   public updateOverrides(schedule)
   {
-    console.log('update the overrides');
-    const task: any = schedule.tasks;
+    const task = this.getTask(schedule);
     let sources = Map({});
     let sinks = Map({});
-    if (task['params'] && task['params']['overrideSources'])
+    if (task.params && task.params.get('overrideSource'))
     {
-      const sourceObj = task['params']['overrideSources'];
+      const sourceObj = task.params.get('overrideSources');
       _.keys(sourceObj).forEach((key) =>
       {
         sources = sources.set(key, _SourceConfig(sourceObj[key]));
       });
     }
-    if (task['params'] && task['params']['overrideSinks'])
+    if (task.params && task.params.get('overrideSinks'))
     {
-      const sinkObj = task['params']['overrideSinks'];
+      const sinkObj = task.params.get('overrideSinks');
       _.keys(sinkObj).forEach((key) =>
       {
         sinks = sinks.set(key, _SinkConfig(sinkObj[key]));
       });
     }
-    console.log('they are ', sources, sinks);
     this.setState({
       overrideSources: sources,
       overrideSinks: sinks,
-    })
+    });
   }
 
   public getSourceSinkDescription(schedule: SchedulerConfig, template)
@@ -163,26 +154,9 @@ class Schedule extends TerrainComponent<Props>
 
   public handleConfigurationChange(schedule: SchedulerConfig, isSource: boolean, key: string, endpoint)
   {
-    const task = Object.assign({}, schedule.tasks);
+    const task = this.getTask(schedule);
     const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
-    if (!task['params'])
-    {
-      task['params'] = {};
-    }
-    if (!task['params'][sourceKey])
-    {
-      task['params'][sourceKey] = {};
-    }
-    console.log(sourceKey, key);
-    console.log('end point ', endpoint);
-    console.log('end point js ', endpoint.toJS());
-    console.log('copy is ', Object.assign({}, endpoint.toJS()));
-    delete task['params'][sourceKey][key];
-    task['params'][sourceKey][key] = Object.assign({}, endpoint.toJS());
-    console.log(task);
-    const newSchedule = schedule
-      .set('tasks', task);
-    console.log('the new schedule is ', newSchedule);
+    const newSchedule = schedule.setIn(['tasks', 0], task.setIn(['params', sourceKey, key], endpoint));
     this.props.onChange(newSchedule);
   }
 
@@ -206,10 +180,60 @@ class Schedule extends TerrainComponent<Props>
     }));
   }
 
+  // TODO NEED OPTION FOR UNPAUSE
+  public handleRunPause(schedule)
+  {
+    if (schedule.running)
+    {
+      this.props.onRun(schedule.id);
+    }
+    else
+    {
+      this.props.onPause(schedule.id);
+    }
+  }
+
+  public handleScheduleChange(optionSetIndex: number, value: any)
+  {
+    let { schedule } = this.props;
+    switch (optionSetIndex)
+    {
+      case 0: // Template
+        let task: TaskConfig = this.getTask();
+        task = task
+          .setIn(['params', 'templateId'], value)
+          .setIn(['params', 'overrideSources'], {})
+          .setIn(['params', 'overrideSinks'], {});
+        schedule = schedule.setIn(['tasks', 0], task);
+        this.props.onChange(schedule);
+        break;
+      case 1: // Configuration
+        this.setState({
+          configurationKey: value,
+        });
+        break;
+      case 2: // CRON
+      case 3:
+      default:
+        break;
+    }
+  }
+
+  public getValues()
+  {
+    const { schedule } = this.props;
+    const task = this.getTask();
+    const templateId = this.getTemplateId(schedule);
+    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
+    const status = task && task.jobStatus !== undefined ? task.jobStatus : 0;
+    const statusValue = status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
+    return List([templateId, this.state.configurationKey, 'everyday', statusValue, buttonValue]);
+  }
+
   public getOptionSets()
   {
     const { schedule } = this.props;
-    const task: any = schedule.tasks;
+    const task: any = this.getTask();
     // Template Option Set
     const templateOptions = this.props.templates.map((t) =>
     {
@@ -231,9 +255,9 @@ class Schedule extends TerrainComponent<Props>
     let configurationOptions = List([]);
     let configurationHeaderText = 'Choose a Template';
     let template;
-    if (task && task.params && task.params.templateId !== undefined)
+    if (task && task.params && task.params.get('templateId') !== undefined)
     {
-      template = this.props.templates.filter((temp) => temp.id === task.params.templateId).get(0);
+      template = this.props.templates.filter((temp) => temp.id === task.params.get('templateId')).get(0);
       configurationHeaderText = '';
       if (template)
       {
@@ -260,7 +284,7 @@ class Schedule extends TerrainComponent<Props>
       shortNameText: 'Interval',
       forceFloat: true,
       key: 'interval',
-      options: List([{ value: 'CRON SELECTOR GOES HERE' }]),
+      options: List([{ value: 'everyday', displayName: 'CRON SELECTOR GOES HERE' }]),
     };
 
     // Status Options
@@ -303,38 +327,19 @@ class Schedule extends TerrainComponent<Props>
     return List([templateOptionSet, configurationOptionSet, intervalOptionSet, statusOptionSet, buttonOptionSet]);
   }
 
-  // TODO NEED OPTION FOR UNPAUSE
-  public handleRunPause(schedule)
+  public canEdit()
   {
-    if (schedule.running)
-    {
-      this.props.onRun(schedule.id);
-    }
-    else
-    {
-      this.props.onPause(schedule.id);
-    }
-  }
-
-  public getValues()
-  {
-    const { schedule } = this.props;
-    const task: any = schedule.tasks;
-    const templateId = this.getTemplateId(schedule);
-    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
-    const status = task && task.jobStatus !== undefined ? task.jobStatus : 0;
-    const statusValue = status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
-    return List([templateId, this.state.configurationKey, 'every day!', statusValue, buttonValue]);
+    return !this.props.schedule.running && TerrainTools.isAdmin();
   }
 
   public getTemplateId(schedule)
   {
-    const task: any = schedule.tasks;
-    if (task && task.params && task.params.templateId !== undefined )
+    const task = this.getTask();
+    if (task && task.params && task.params.get('templateId') !== undefined)
     {
-      return task.params.templateId;
+      return task.params.get('templateId');
     }
-    return -1
+    return -1;
   }
 
   public getTemplateName(templateId: ID, index: number)
@@ -344,39 +349,10 @@ class Schedule extends TerrainComponent<Props>
     return templateName;
   }
 
-  public handleScheduleChange(optionSetIndex: number, value: any)
+  public getTask(overrideSchedule?: SchedulerConfig, index: number = 0): TaskConfig
   {
-    let { schedule } = this.props;
-    switch (optionSetIndex)
-    {
-      case 0: // Template
-        const task = schedule.tasks;
-        if (task && !task['params'])
-        {
-          task['params'] = {};
-        }
-        task['params']['templateId'] = value;
-        // Get rid of overrides
-        task['params']['overrideSources'] = {};
-        task['params']['overrideSinks'] = {};
-        schedule = schedule.set('tasks', task);
-        this.props.onChange(schedule);
-        break;
-      case 1: // Configuration
-        this.setState({
-          configurationKey: value,
-        });
-        break;
-      case 2: // CRON
-      case 3:
-      default:
-        break;
-    }
-  }
-
-  public canEdit()
-  {
-    return !this.props.schedule.running && TerrainTools.isAdmin();
+    const schedule = overrideSchedule || this.props.schedule;
+    return schedule.tasks && schedule.tasks.get(index) || _TaskConfig({});
   }
 
   public render()

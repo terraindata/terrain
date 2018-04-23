@@ -48,7 +48,6 @@ import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCr
 import Colors from 'app/colors/Colors';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
-import { _SinkConfig, _SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
@@ -61,6 +60,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
+import { _SinkConfig, _SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import XHR from 'util/XHR';
 import Schedule from './Schedule';
 
@@ -140,221 +140,12 @@ class ScheduleList extends TerrainComponent<Props>
     });
     this.listenToKeyPath('etl', ['templates']);
     this.listenToKeyPath('scheduler', ['schedules']);
-    this.setState({
-      configurationKeys: List([]),
-    });
-  }
-
-  public getSourceSinkDescription(schedule, template)
-  {
-    if (!template)
-    {
-      return '--';
-    }
-    // Check for override sources and sinks TODO COMBINE W/ GET ENDPOINT OPTIONS LOGIC
-    const task = schedule.tasks;
-    let sources = Map({});
-    let sinks = Map({});
-    if (task['params'] && task['params']['overrideSources'])
-    {
-      const sourceObj = task['params']['overrideSources'];
-      _.keys(sourceObj).forEach((key) =>
-      {
-        sources = sources.set(key, _SourceConfig(sourceObj[key]));
-      });
-    }
-    if (task['params'] && task['params']['overrideSinks'])
-    {
-      const sinkObj = task['params']['overrideSinks'];
-      _.keys(sinkObj).forEach((key) =>
-      {
-        sinks = sinks.set(key, _SinkConfig(sinkObj[key]));
-      });
-    }
-    template = template.applyOverrides(sources, sinks);
-    return template.getDescription(this.props.algorithms);
-  }
-
-  public handleConfigurationChange(schedule, isSource: boolean, key: string, endpoint)
-  {
-    const task = schedule.tasks;
-    const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
-    if (!task['params'])
-    {
-      task['params'] = {};
-    }
-    if (!task['params'][sourceKey])
-    {
-      task['params'][sourceKey] = {};
-    }
-    task['params'][sourceKey][key] = endpoint.toJS();
-    const newSchedule = schedule
-      .set('tasks', JSON.stringify(task));
-    this.updateSchedule(newSchedule.id, newSchedule.toJS());
-  }
-
-  public getEndPointOptions(endpoints: Map<string, any>, isSource: boolean, schedule)
-  {
-    const keys = _.keys(endpoints.toJS());
-    const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
-    return List(keys.map((key) =>
-    {
-      let endpoint = endpoints.get(key);
-      if (schedule.tasks && schedule.tasks.params)
-      {
-        const overrideEndpoints = schedule.tasks.params[sourceKey];
-        if (overrideEndpoints && overrideEndpoints[key])
-        {
-          if (isSource)
-          {
-            endpoint = _SourceConfig(overrideEndpoints[key], true);
-          }
-          else
-          {
-            endpoint = _SinkConfig(overrideEndpoints[key], true);
-          }
-        }
-      }
-
-      return {
-        value: isSource ? 'source' + key : 'sink' + key,
-        displayName: endpoint.name,
-        component: <EndpointForm
-          isSource={isSource}
-          endpoint={endpoint}
-          onChange={this._fn(this.handleConfigurationChange, schedule, isSource, key)}
-          isSchedule={true}
-        />,
-      };
-    }));
-  }
-
-  public getOptionSets(schedule)
-  {
-    // Template Option Set
-    const templateOptions = this.props.etl.templates.map((t) =>
-    {
-      return {
-        value: t.id,
-        displayName: t.templateName,
-      };
-    }).toList();
-    const templateOptionSet = {
-      key: 'template',
-      options: templateOptions,
-      shortNameText: 'Template',
-      column: true,
-      forceFloat: true,
-      getCustomDisplayName: this.getTemplateName,
-    };
-    // Configuration Option Set (Based on Template)
-    let configurationOptions = List([]);
-    let configurationHeaderText = 'Choose a Template';
-    let template;
-    if (schedule.tasks && schedule.tasks.params && schedule.tasks.params.templateId !== undefined)
-    {
-      template = this.props.etl.templates.filter((temp) => temp.id === schedule.tasks.params.templateId).get(0);
-      configurationHeaderText = '';
-      if (template)
-      {
-        const sources = template.sources;
-        const sinks = template.sinks;
-        const sourceOptions = this.getEndPointOptions(sources, true, schedule);
-        const sinkOptions = this.getEndPointOptions(sinks, false, schedule);
-        configurationOptions = sourceOptions.concat(sinkOptions).toList();
-      }
-    }
-    const configurationOptionSet = {
-      key: 'configuration',
-      options: configurationOptions,
-      shortNameText: 'Configuration',
-      headerText: configurationHeaderText,
-      column: true,
-      forceFloat: true,
-      getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule, template),
-    };
-
-    // CRON Option Set
-    const intervalOptionSet = {
-      column: true,
-      shortNameText: 'Interval',
-      forceFloat: true,
-      key: 'interval',
-      options: List([{ value: 'CRON SELECTOR GOES HERE' }]),
-    };
-
-    // Status Options
-    const statusOptions = List([
-      {
-        value: 'active',
-        displayName: 'Active',
-      },
-      {
-        value: 'running',
-        displayName: 'Running',
-        color: Colors().success,
-      },
-      {
-        value: 'disabled',
-        displayName: 'Disabled',
-        color: Colors().error,
-      },
-    ]);
-
-    const statusOptionSet = {
-      column: true,
-      options: statusOptions,
-      key: 'status',
-      shortNameText: 'Status',
-      forceFloat: true,
-    };
-
-    // Buttons to Run / Pause
-    const buttonOptionSet = {
-      isButton: true,
-      onButtonClick: this._fn(this.handleRunPause, schedule),
-      key: 'run',
-      options: List([]),
-      column: true,
-    };
-
-    // Log of Past Runs
-
-    return List([templateOptionSet, configurationOptionSet, intervalOptionSet, statusOptionSet, buttonOptionSet]);
-  }
-
-  // TODO NEED OPTION FOR UNPAUSE
-  public handleRunPause(schedule)
-  {
-    if (schedule.running)
-    {
-      this.runSchedule(schedule.id);
-    }
-    else
-    {
-      this.pauseSchedule(schedule.id);
-    }
-  }
-
-  public getValues(schedule, index: number)
-  {
-    const templateId = schedule.tasks && schedule.tasks.params && schedule.tasks.params.templateId !== undefined ?
-      schedule.tasks.params.templateId : -1;
-    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
-    const status = schedule.tasks && schedule.tasks.jobStatus !== undefined ? schedule.tasks.jobStatus : 0;
-    const statusValue = status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
-    return List([templateId, this.state.configurationKeys.get(index), 'every day!', statusValue, buttonValue]);
-  }
-
-  public getTemplateName(templateId: ID, index: number)
-  {
-    const template = this.props.etl.templates.filter((temp) => temp.id === templateId).get(0);
-    const templateName = template ? template.templateName : 'None';
-    return templateName;
   }
 
   public handleScheduleChange(schedule: SchedulerConfig)
   {
+    schedule = schedule.set('tasks', schedule.tasks.map((task) => task.toJS()));
+    console.log(schedule.toJS());
     this.updateSchedule(schedule.id, schedule.toJS());
   }
 
@@ -369,7 +160,7 @@ class ScheduleList extends TerrainComponent<Props>
       cron: '0 0 1 1 *',
       name: `Schedule`,
       priority: 1,
-      tasks: { params: { templateId: -1 } },
+      tasks: [{ params: { templateId: -1 } }],
       workerId: 10,
       createdAt: '',
       id: null,
@@ -381,7 +172,7 @@ class ScheduleList extends TerrainComponent<Props>
     };
     this.props.schedulerActions({
       actionType: 'createSchedule',
-      schedule: _SchedulerConfig(blankSchedule),
+      schedule: blankSchedule,
     });
   }
 

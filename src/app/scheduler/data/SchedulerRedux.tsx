@@ -78,7 +78,7 @@ export interface SchedulerActionTypes
 
   createSchedule?: {
     actionType: 'createSchedule';
-    schedule: SchedulerConfig;
+    schedule: object;
   };
   createScheduleStart: {
     actionType: 'createScheduleStart';

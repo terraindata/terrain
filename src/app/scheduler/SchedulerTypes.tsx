@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import { Record } from 'immutable';
+import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
-import Util from 'util/Util';
-import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
-import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from 'shared/util/Classes';
+import Util from 'util/Util';
+import { TaskConfigClass } from '../../../shared/types/jobs/TaskConfig';
+import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
 
 class SchedulerConfigC extends SharedSchedulerConfig
 {
@@ -62,16 +62,20 @@ export const _SchedulerConfig =
   (config: object) =>
   {
     let schedule = new SchedulerConfig_Record(config) as any as SchedulerConfig;
-    let tasks;
-    try
+    let tasks: any = schedule.tasks;
+    if (typeof schedule.tasks === 'string')
     {
-      tasks = JSON.parse(schedule.tasks);
+      try
+      {
+        tasks = JSON.parse(schedule.tasks);
+      }
+      catch
+      {
+        tasks = [];
+      }
     }
-    catch
-    {
-      tasks = {};
-    }
-    schedule = schedule.set('tasks', tasks);
+    tasks = tasks.map((task) => _TaskConfig(task));
+    schedule = schedule.set('tasks', List(tasks));
     return schedule;
   };
 
@@ -88,3 +92,17 @@ export const _SchedulerState = (config?: any) =>
 {
   return new SchedulerState_Record(Util.extendId(config || {})) as any as SchedulerState;
 };
+
+class TaskConfigC extends TaskConfigClass
+{
+  // Any extra functions / properties go here
+}
+const TaskConfig_Record = createRecordType(new TaskConfigC(), 'TaskConfigC');
+export interface TaskConfig extends TaskConfigC, IMap<TaskConfig> { }
+export const _TaskConfig =
+  (config: object) =>
+  {
+    let task = new TaskConfig_Record(config) as any as TaskConfig;
+    task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
+    return task;
+  };
