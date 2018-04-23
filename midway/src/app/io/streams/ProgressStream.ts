@@ -63,6 +63,7 @@ export default class ProgressStream extends Duplex
   constructor(writer: Writable, frequency: number = 500)
   {
     super({
+      allowHalfOpen: false,
       readableObjectMode: false,
       writableObjectMode: true,
     });
@@ -110,7 +111,8 @@ export default class ProgressStream extends Duplex
       {
         this.push(this.progress());
         this.asyncRead = null;
-      }, this.frequency);
+      },
+      this.frequency);
     }
   }
 
@@ -120,12 +122,9 @@ export default class ProgressStream extends Duplex
     {
       clearTimeout(this.asyncRead);
     }
-    this.push(this.progress());
 
-    if (callback !== undefined)
-    {
-      callback();
-    }
+    this.push(this.progress());
+    this.writer.end(null, callback);
   }
 
   private progress()
