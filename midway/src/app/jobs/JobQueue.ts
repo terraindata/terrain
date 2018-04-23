@@ -48,7 +48,9 @@ import * as _ from 'lodash';
 import * as runQueue from 'run-queue';
 import * as winston from 'winston';
 
-import { TaskConfig, TaskOutputConfig, TaskTreeConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
+import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { Job } from './Job';
@@ -101,10 +103,15 @@ export class JobQueue
     return false;
   }
 
+  /*
+   * PARAMS: job.tasks (TaskConfig[] ==> string)
+   *
+   */
   public async create(job: JobConfig): Promise<JobConfig[] | string>
   {
     return new Promise<JobConfig[] | string>(async (resolve, reject) =>
     {
+      console.log('CREATED JOB');
       let tasksAsTaskConfig: TaskConfig[] = [];
       try
       {
@@ -135,8 +142,8 @@ export class JobQueue
       job.tasks = (job.tasks !== undefined && job.tasks !== null) ? job.tasks : '[]';
       job.type = (job.type !== undefined && job.type !== null) ? job.type : 'default';
       job.workerId = (job.workerId !== undefined && job.workerId !== null) ? job.workerId : 1;
-      console.log(JSON.stringify(job));
       const upsertedJobs: JobConfig[] = await App.DB.upsert(this.jobTable, job) as JobConfig[];
+      console.log(JSON.stringify(upsertedJobs, null, 2));
       // check table to see if jobs need to be run
       await this._checkJobTable();
       resolve(upsertedJobs);
@@ -271,7 +278,7 @@ export class JobQueue
         // log job result
         winston.info('Job result: ' + JSON.stringify(jobResult, null, 2));
       });
-      
+
     });
   }
 

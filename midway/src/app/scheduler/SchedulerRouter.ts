@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
+import * as App from '../App';
 import * as AppUtil from '../AppUtil';
 import Credentials from '../credentials/Credentials';
 import { Permissions } from '../permissions/Permissions';
@@ -58,68 +59,67 @@ const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
 
 export const credentials: Credentials = new Credentials();
-export const scheduler: Scheduler = new Scheduler();
 
 // Get schedule by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.get(ctx.params.id);
+  ctx.body = await App.SKDR.get(ctx.params.id);
 });
 
 Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyCancelRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = scheduler.cancel(ctx.params.id);
+  ctx.body = App.SKDR.cancel(ctx.params.id);
 });
 
 // Delete schedules by id
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyDeleteRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.delete(ctx.params.id);
+  ctx.body = await App.SKDR.delete(ctx.params.id);
 });
 
 // Duplicate schedule by id; creates an identical schedule with '- Copy' appended to name
 Router.post('/duplicate/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyDuplicateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.duplicate(ctx.params.id);
+  ctx.body = await App.SKDR.duplicate(ctx.params.id);
 });
 
 // Retrieve schedule log by id
 Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyGetLogRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.getLog(ctx.params.id);
+  ctx.body = await App.SKDR.getLog(ctx.params.id);
 });
 
 // pause schedule by id
 Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyPauseRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = scheduler.pause(ctx.params.id);
+  ctx.body = App.SKDR.pause(ctx.params.id);
 });
 
 // run schedule immediately by id
 Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.runSchedule(ctx.params.id);
+  ctx.body = await App.SKDR.runSchedule(ctx.params.id);
 });
 
 // unpause paused schedule by id
 Router.post('/unpause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyUnpauseRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.unpause(ctx.params.id);
+  ctx.body = await App.SKDR.unpause(ctx.params.id);
 });
 
 // set status of schedule by id: whether it should run next time or not
 Router.post('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.SchedulerPermissions.verifyStatusRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.setStatus(ctx.params.id, ctx.request.body.body.status);
+  ctx.body = await App.SKDR.setStatus(ctx.params.id, ctx.request.body.body.status);
 });
 
 // Create schedule
@@ -131,7 +131,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     delete schedule.id;
   }
   await perm.SchedulerPermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.upsert(schedule);
+  ctx.body = await App.SKDR.upsert(schedule);
 });
 
 // Update schedule
@@ -141,7 +141,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   schedule['id'] = parseInt(ctx.params.id, 10) as number;
   AppUtil.verifyParameters(schedule, ['id']);
   await perm.SchedulerPermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await scheduler.upsert(schedule);
+  ctx.body = await App.SKDR.upsert(schedule);
 });
 
 export default Router;
