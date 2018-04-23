@@ -63,7 +63,7 @@ import Templates from './Templates';
 
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
-import ProgressTransform from '../io/streams/ProgressTransform';
+import ProgressStream from '../io/streams/ProgressStream';
 
 import AEndpointStream from './endpoints/AEndpointStream';
 import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
@@ -182,7 +182,8 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
 
     const sinkStream = await endpoint.getSink(sink, engine);
     exportStream.pipe(sinkStream);
-    resolve(new ProgressTransform(exportStream));
+    const progressStream = new ProgressStream(exportStream);
+    resolve(progressStream);
   });
 }
 

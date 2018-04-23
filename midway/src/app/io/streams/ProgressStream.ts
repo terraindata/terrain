@@ -45,15 +45,17 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { EventEmitter } from 'events';
-import { Transform, Writable } from 'stream';
+import { Duplex, Writable } from 'stream';
+import * as winston from 'winston';
 
 /**
  * Monitors progress of the writable stream
  */
-export default class ProgressTransform extends Transform
+export default class ProgressStream extends Duplex
 {
   private writer: Writable;
-  private frequency: number = 500;
+  private frequency: number;
+  private asyncRead: any = null;
 
   private count: number = 0;
   private errors: number = 0;
@@ -61,53 +63,63 @@ export default class ProgressTransform extends Transform
   constructor(writer: Writable, frequency: number = 500)
   {
     super({
+      readableObjectMode: false,
       writableObjectMode: true,
     });
 
     this.frequency = frequency;
     this.writer = writer;
-    this.writer.on('error', (e) => this.errors++);
+    this.writer.on('error', (e) =>
+    {
+      winston.error(e.toString());
+      this.errors++;
+    });
   }
 
-  public _transform(chunk: object | object[], encoding: string, callback: (err?: Error) => void)
+  public _write(chunk: any, encoding: string, callback: (err?: Error) => void)
   {
-    this.count++;
-    if (Array.isArray(chunk))
+    this.writer.write(chunk, encoding, (err?: Error) =>
     {
-      let numChunks = chunk.length;
-      const done = new EventEmitter();
-      done.on('done', (err?: Error) =>
-      {
-        // note: we ignore err here because our onError handler on the writer
-        //       stream accounts for errors
-        this.push(this.progress());
-        callback();
-      });
+      this.count++;
+      // note: we ignore err here because our onError handler on the writer
+      //       stream accounts for errors
+      callback(err);
+    });
+  }
 
-      chunk.forEach((c) => this.writer.write(chunk, (err?: Error) =>
-      {
-        this.count++;
-        if (--numChunks === 0)
-        {
-          done.emit('done', err);
-        }
-      }));
-    }
-    else
+  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  {
+    let numChunks = chunks.length;
+    const done = new EventEmitter();
+    done.on('done', callback);
+
+    chunks.forEach((c) => this._write(c.chunk, c.encoding, (err?: Error) =>
     {
-      this.writer.write(chunk, (err?: Error) =>
+      if (--numChunks === 0)
       {
-        this.count++;
-        // note: we ignore err here because our onError handler on the writer
-        //       stream accounts for errors
+        done.emit('done', err);
+      }
+    }));
+  }
+
+  public _read()
+  {
+    if (this.asyncRead === null)
+    {
+      this.asyncRead = setTimeout(() =>
+      {
         this.push(this.progress());
-        callback();
-      });
+        this.asyncRead = null;
+      }, this.frequency);
     }
   }
 
-  public _flush(callback)
+  public _final(callback)
   {
+    if (this.asyncRead !== null)
+    {
+      clearTimeout(this.asyncRead);
+    }
     this.push(this.progress());
 
     if (callback !== undefined)
@@ -123,4 +135,5 @@ export default class ProgressTransform extends Transform
       failed: this.errors,
     }) + '\n';
   }
+
 }
