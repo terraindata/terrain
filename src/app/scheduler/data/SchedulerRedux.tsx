@@ -179,94 +179,85 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       },
     };
 
-  public getSchedules(action)
+  public getSchedules(action, dispatch)
   {
-    return (dispatch, getState) =>
-    {
-      const directDispatch = this._dispatchReducerFactory(dispatch);
-      directDispatch({
-        actionType: 'getSchedulesStart',
-      });
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'getSchedulesStart',
+    });
 
-      return this.api.getSchedules()
-        .then((response) =>
-        {
-          const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(
-            response.data,
-            'id',
-            _SchedulerConfig,
-          );
-          directDispatch({
-            actionType: 'getSchedulesSuccess',
-            schedules,
-          });
-
-          return Promise.resolve(schedules);
+    return this.api.getSchedules()
+      .then((response) =>
+      {
+        const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(
+          response.data,
+          'id',
+          _SchedulerConfig,
+        );
+        directDispatch({
+          actionType: 'getSchedulesSuccess',
+          schedules,
         });
-    };
+
+        return Promise.resolve(schedules);
+      });
   }
 
-  public createSchedule(action)
+  public createSchedule(action, dispatch)
   {
-    return (dispatch, getState) =>
-    {
-      const directDispatch = this._dispatchReducerFactory(dispatch);
-      directDispatch({
-        actionType: 'createScheduleStart',
-      });
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'createScheduleStart',
+    });
 
-      return this.api.createSchedule(action.schedule)
-        .then((response) =>
-        {
-          const schedule: SchedulerConfig = _SchedulerConfig(response.data[0]);
-          directDispatch({
-            actionType: 'createScheduleSuccess',
-            schedule,
-          });
-
-          return Promise.resolve(schedule);
+    return this.api.createSchedule(action.schedule)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = _SchedulerConfig(response.data[0]);
+        directDispatch({
+          actionType: 'createScheduleSuccess',
+          schedule,
         });
-    };
+
+        return Promise.resolve(schedule);
+      });
   }
 
-  public deleteSchedule(action)
+  public deleteSchedule(action, dispatch)
   {
-    return (dispatch, getState) =>
-    {
-      const directDispatch = this._dispatchReducerFactory(dispatch);
-      directDispatch({
-        actionType: 'deleteScheduleStart',
-      });
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'deleteScheduleStart',
+    });
 
-      return this.api.deleteSchedule(action.scheduleId)
-        .then((response) =>
-        {
-          const schedule: SchedulerConfig = response.data[0];
-          directDispatch({
-            actionType: 'deleteScheduleSuccess',
-            scheduleId: action.scheduleId,
-          });
-
-          return Promise.resolve(schedule);
+    return this.api.deleteSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'deleteScheduleSuccess',
+          scheduleId: action.scheduleId,
         });
-    };
+
+        return Promise.resolve(schedule);
+      });
   }
 
-  public overrideActThunk(action: Unroll<SchedulerActionTypes>)
+  public overrideAct(action: Unroll<SchedulerActionTypes>)
   {
     if (action.actionType === 'getSchedules')
     {
-      return this.getSchedules.bind(this);
+      return this.getSchedules.bind(this, action);
     }
 
     if (action.actionType === 'createSchedule')
     {
-      return this.createSchedule.bind(this);
+      return this.createSchedule.bind(this, action);
     }
 
     if (action.actionType === 'deleteSchedule')
     {
-      return this.deleteSchedule.bind(this);
+      return this.deleteSchedule.bind(this, action);
     }
   }
 }
