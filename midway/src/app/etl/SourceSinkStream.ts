@@ -100,10 +100,10 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         endpoint = new HTTPEndpoint();
         sourceStream = await endpoint.getSource(source);
         break;
-      // case 'Fs':
-      //   endpoint = new FSEndpoint();
-      //   sourceStream = await endpoint.getSource(source);
-      //   break;
+      case 'Fs':
+        endpoint = new FSEndpoint();
+        sourceStream = await endpoint.getSource(source);
+        break;
       default:
         throw new Error('not implemented.');
     }
@@ -164,9 +164,9 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
       case 'Http':
         endpoint = new HTTPEndpoint();
         break;
-      // case 'Fs':
-      //   endpoint = new FSEndpoint();
-      //   break;
+      case 'Fs':
+        endpoint = new FSEndpoint();
+        break;
       default:
         throw new Error('not implemented.');
     }

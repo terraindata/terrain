@@ -44,19 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface JobConfig
+export class JobConfig
 {
-  createdAt: Date;                   // when the job was created
-  id: number;                        // job ID
-  meta: string;                      // meta
-  name: string;                      // name of the job
-  pausedFilename: string;            // filename of the stored paused output
-  priority: number;                  // priority of the scheduled job
-  running: boolean;                  // whether the task is running or not (TODO: lock this)
-  status: number;                    // the status of the job: success, failure, cancelled
-  tasks: string;                     // a stringified representation of TaskConfig[]
-  type: string;                      // whether the job is a scheduled run, a scheduled ad hoc run, or an ETL run
-  workerId: number;                  // for clustering, denotes the node ID
+  public createdAt: Date = null;                   // when the job was created
+  public id: number = null;                        // job ID
+  public meta: string = '';                        // meta
+  public name: string = '';                        // name of the job
+  public pausedFilename: string = '';              // filename of the stored paused output
+  public priority: number = 1;                     // priority of the scheduled job
+  public running: boolean = false;                 // whether the task is running or not (TODO: lock this)
+  public scheduleId: number = null;                // (optional) schedule ID
+  public status: string = '';                      // the status of the job: success, failure, cancelled
+  public tasks: string = '';                       // a stringified representation of TaskConfig[]
+  public type: string = '';                        // whether the job is a scheduled run, a scheduled ad hoc run, or an ETL run
+  public workerId: number = null;                  // for clustering, denotes the node ID
 }
 
 export default JobConfig;

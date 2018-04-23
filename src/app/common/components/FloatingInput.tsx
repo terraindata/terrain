@@ -56,7 +56,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-
 const InfoIcon = require('images/icon_info.svg');
 
 export let LARGE_FONT_SIZE = '52px';
@@ -81,6 +80,7 @@ export interface Props
   isTextInput: boolean;
   value: any;
 
+  useTooltip?: boolean; // show full value in tooltip (might get cut off otherwise)
   id?: any; // a unique identifier, pass to props handlers
   onChange?: (value: any, id: any) => void;
   onClick?: (id: any) => void;
@@ -151,7 +151,7 @@ export class FloatingInput extends TerrainComponent<Props>
   public render()
   {
     const { props, state } = this;
-    const { value, onClick } = props;
+    const { value, onClick, useTooltip } = props;
 
     const isFloating = this.isFloating();
     const containerFullStyle = _.extend(
@@ -176,7 +176,11 @@ export class FloatingInput extends TerrainComponent<Props>
         onClick={this._fn(props.onClick)}
       >
         {
-          this.renderValue()
+          useTooltip
+            ?
+            tooltip(this.renderValue(), value)
+            :
+            this.renderValue()
         }
         <label
           className='floating-input-label'

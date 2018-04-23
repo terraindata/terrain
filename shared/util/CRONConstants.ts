@@ -42,81 +42,71 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-import * as _ from 'lodash';
+// Copyright 2019 Terrain Data, Inc.
 
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { SinkConfig, SourceConfig } from './EndpointTypes';
+import { range } from 'lodash';
 
-export enum Languages
+export interface CRONMap
 {
-  Elastic = 'elastic',
-  JavaScript = 'JavaScript',
+  [minuteHourOrDay: number]: boolean;
 }
 
-export enum FileTypes
+// return a map of number: boolean pairs
+// values are true if key is present in the `values` param
+export function fillCRONMap(values: number[], start: number, endInclusive: number):
+  { [val: number]: boolean }
 {
-  Json = 'json',
-  Csv = 'csv',
+  return range(start, endInclusive + 1).reduce(
+    (memo, v) =>
+    {
+      memo[v] = values.indexOf(v) !== -1;
+      return memo;
+    },
+    {},
+  );
 }
 
-export interface TemplateBase
+// Days
+
+export const CRONWeekDayOptions: CRONMap = fillCRONMap([], 0, 6);
+
+export const CRONWeekDayNames =
+  {
+    0: 'Sunday',
+    1: 'Monday',
+    2: 'Tuesday',
+    3: 'Wednesday',
+    4: 'Thursday',
+    5: 'Friday',
+    6: 'Saturday',
+  };
+
+export const CRONWorkWeekdays: CRONMap = fillCRONMap([1, 2, 3, 4, 5], 0, 6);
+
+export const CRONMonthDayOptions: CRONMap = fillCRONMap([], 1, 31);
+
+export interface CRONDaySchedule
 {
-  id?: number;
-  createdAt: any;
-  lastModified: any;
-  archived: boolean;
-  templateName: string;
-  sources: any;
-  sinks: any;
-  process: any;
+  type: 'daily' | 'weekdays' | 'weekly' | 'monthly';
+  weekdays?: CRONMap; // for weekly
+  days?: CRONMap; // for monthly
 }
 
-export type TemplateObject = {
-  [k in keyof TemplateBase]: any;
+// Hours and Minutes
+
+export const CRONHourOptions: CRONMap = fillCRONMap([], 0, 23);
+
+export const CRONHourNames = {
+  0: '12 AM', 1: '1 AM', 2: '2 AM', 3: '3 AM', 4: '4 AM', 5: '5 AM', 6: '6 AM', 7: '7 AM', 8: '8 AM',
+  9: '9 AM', 10: '10 AM', 11: '11 AM', 12: '12 PM', 13: '1 PM', 14: '2 PM', 15: '3 PM', 16: '4 PM',
+  17: '5 PM', 18: '6 PM', 19: '7 PM', 20: '8 PM', 21: '9 PM', 22: '10 PM', 23: '11 PM',
 };
 
-export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+export const CRONMinuteOptions: CRONMap = fillCRONMap([], 0, 59);
 
-export enum NodeTypes
+export interface CRONHourSchedule
 {
-  MergeJoin = 'MergeJoin',
-  Source = 'Source',
-  Sink = 'Sink',
-}
-
-export interface ETLProcess
-{
-  nodes: {
-    [id: number]: ETLNode;
-  };
-  edges: {
-    [id: number]: ETLEdge;
-  };
-  uidNode: number;
-  uidEdge: number;
-}
-
-export interface ETLEdge
-{
-  from: number;
-  to: number;
-  transformations: TransformationEngine;
-}
-
-export interface ETLNode
-{
-  type: NodeTypes;
-  options: MergeJoinOptions;
-  endpoint: string;
-}
-
-export interface MergeJoinOptions
-{
-  leftId: number;
-  rightId: number;
-  leftJoinKey: string;
-  rightJoinKey: string;
-  outputKey: string;
+  type: 'minute' | 'hourly' | 'daily';
+  minutes?: CRONMap; // for hourly
+  hours?: CRONMap; // for daily
 }

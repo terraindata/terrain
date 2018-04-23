@@ -127,6 +127,19 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      shouldRunNext bool NOT NULL,
      tasks text NOT NULL,
      workerId integer NOT NULL);`,
+  `CREATE TABLE IF NOT EXISTS jobs
+    (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     meta text NOT NULL,
+     name text NOT NULL,
+     pausedFilename text NOT NULL,
+     priority text NOT NULL,
+     running bool NOT NULL,
+     scheduleId integer,
+     status text NOT NULL,
+     tasks text NOT NULL,
+     type text NOT NULL,
+     workerId integer NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS credentials
     (id ` + primaryKeyType + ` PRIMARY KEY,
      createdBy integer NOT NULL,
@@ -141,6 +154,8 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      events text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS templates
     (id ` + primaryKeyType + ` PRIMARY KEY,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     lastModified ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      archived bool NOT NULL,
      templateName text NOT NULL,
      process text NOT NULL,

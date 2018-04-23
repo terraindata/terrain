@@ -42,81 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file
-import * as _ from 'lodash';
+// Copyright 2017 Terrain Data, Inc.
 
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { SinkConfig, SourceConfig } from './EndpointTypes';
+import SharedJobConfig from 'shared/types/jobs/JobConfig';
+import ConfigType from '../ConfigType';
 
-export enum Languages
+export class JobConfig extends SharedJobConfig
 {
-  Elastic = 'elastic',
-  JavaScript = 'JavaScript',
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
 }
 
-export enum FileTypes
-{
-  Json = 'json',
-  Csv = 'csv',
-}
-
-export interface TemplateBase
-{
-  id?: number;
-  createdAt: any;
-  lastModified: any;
-  archived: boolean;
-  templateName: string;
-  sources: any;
-  sinks: any;
-  process: any;
-}
-
-export type TemplateObject = {
-  [k in keyof TemplateBase]: any;
-};
-
-export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
-
-export enum NodeTypes
-{
-  MergeJoin = 'MergeJoin',
-  Source = 'Source',
-  Sink = 'Sink',
-}
-
-export interface ETLProcess
-{
-  nodes: {
-    [id: number]: ETLNode;
-  };
-  edges: {
-    [id: number]: ETLEdge;
-  };
-  uidNode: number;
-  uidEdge: number;
-}
-
-export interface ETLEdge
-{
-  from: number;
-  to: number;
-  transformations: TransformationEngine;
-}
-
-export interface ETLNode
-{
-  type: NodeTypes;
-  options: MergeJoinOptions;
-  endpoint: string;
-}
-
-export interface MergeJoinOptions
-{
-  leftId: number;
-  rightId: number;
-  leftJoinKey: string;
-  rightJoinKey: string;
-  outputKey: string;
-}
+export default JobConfig;
