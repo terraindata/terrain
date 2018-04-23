@@ -75,6 +75,15 @@ jest.mock('scheduler/SchedulerApi', () =>
           );
         },
 
+        updateSchedule: (schedule) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 1, name: 'Schedule 1 modified' }],
+            }),
+          );
+        },
+
         deleteSchedule: (id) =>
         {
           return new Promise(
@@ -154,6 +163,40 @@ describe('SchedulerActions', () =>
         const store = mockStore({ scheduler });
 
         return store.dispatch(SchedulerActions({ actionType: 'createSchedule', schedule: scheduleParams as SchedulerConfig }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#updateSchedule', () =>
+  {
+    describe('when the schedule is successfully updated', () =>
+    {
+      it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
+      {
+        const scheduleParams = { name: 'Schedule 1 modified' };
+        const updatedSchedule = _SchedulerConfig({ id: 1, name: 'Schedule 1 modified' });
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.updateScheduleStart,
+            payload: { actionType: 'updateScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.updateScheduleSuccess,
+            payload: { actionType: 'updateScheduleSuccess', schedule: updatedSchedule },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'updateSchedule',
+          schedule: scheduleParams as SchedulerConfig
+        }))
           .then((response) =>
           {
             expect(store.getActions()).toEqual(expectedActions);
