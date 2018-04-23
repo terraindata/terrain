@@ -92,6 +92,15 @@ jest.mock('scheduler/SchedulerApi', () =>
             }),
           );
         },
+
+        duplicateSchedule: (id) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 2, name: 'Schedule 2 duplicated' }],
+            }),
+          );
+        },
       };
     },
   };
@@ -227,6 +236,42 @@ describe('SchedulerActions', () =>
         const store = mockStore({ scheduler });
 
         return store.dispatch(SchedulerActions({ actionType: 'deleteSchedule', scheduleId: existingSchedule.id }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#duplicateSchedule', () =>
+  {
+    describe('when the schedule is successfully duplicated', () =>
+    {
+      it('should dispatch a duplicateScheduleStart action followed by a duplicateScheduleSuccess action', () =>
+      {
+        const duplicatedSchedule = { id: 2, name: 'Schedule 2 duplicated' };
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.duplicateScheduleStart,
+            payload: { actionType: 'duplicateScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.duplicateScheduleSuccess,
+            payload: {
+              actionType: 'duplicateScheduleSuccess',
+              schedule: duplicatedSchedule,
+            },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'duplicateSchedule',
+          scheduleId: duplicatedSchedule.id,
+        }))
           .then((response) =>
           {
             expect(store.getActions()).toEqual(expectedActions);

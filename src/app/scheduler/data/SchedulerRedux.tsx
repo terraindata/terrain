@@ -123,6 +123,22 @@ export interface SchedulerActionTypes
     actionType: 'deleteScheduleFailed';
     error: string;
   };
+
+  duplicateSchedule?: {
+    actionType: 'duplicateSchedule';
+    scheduleId: ID;
+  };
+  duplicateScheduleStart: {
+    actionType: 'duplicateScheduleStart';
+  };
+  duplicateScheduleSuccess: {
+    actionType: 'duplicateScheduleSuccess';
+    schedule: SchedulerConfig;
+  };
+  duplicateScheduleFailed: {
+    actionType: 'duplicateScheduleFailed';
+    error: string;
+  };
 }
 
 class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
@@ -209,6 +225,27 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       },
 
       deleteScheduleFailed: (state, action) =>
+      {
+        return state
+          .set('loading', false)
+          .set('error', action.payload.error);
+      },
+
+      duplicateScheduleStart: (state, action) =>
+      {
+        return state
+          .set('loading', true);
+      },
+
+      duplicateScheduleSuccess: (state, action) =>
+      {
+        const { schedule } = action.payload;
+        return state
+          .set('loading', false)
+          .setIn(['schedules', schedule.id], schedule);
+      },
+
+      duplicateScheduleFailed: (state, action) =>
       {
         return state
           .set('loading', false)
@@ -302,6 +339,26 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       });
   }
 
+  public duplicateSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'duplicateScheduleStart',
+    });
+
+    return this.api.duplicateSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'duplicateScheduleSuccess',
+          schedule: schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
   public overrideAct(action: Unroll<SchedulerActionTypes>)
   {
     if (action.actionType === 'getSchedules')
@@ -322,6 +379,11 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     if (action.actionType === 'deleteSchedule')
     {
       return this.deleteSchedule.bind(this, action);
+    }
+
+    if (action.actionType === 'duplicateSchedule')
+    {
+      return this.duplicateSchedule.bind(this, action);
     }
   }
 }
