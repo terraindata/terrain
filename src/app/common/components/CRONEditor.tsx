@@ -46,13 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
 
+import { List } from 'immutable';
 import * as classNames from 'classnames';
 import { noop } from 'lodash';
 import * as React from 'react';
 import
 {
-  CRONDaySchedule, CRONHourNames, CRONHourOptions, CRONHourSchedule,
-  CRONMonthDayOptions, CRONWeekDayNames, CRONWeekDayOptions,
+  CRONDaySchedule, CRONHourNames, CRONHourSchedule, CRONWeekDayNames, 
+  CRONWeekDayOptionsList, CRONMonthDayOptionsList, CRONHourOptionsList, CRONMinuteOptionsList
 } from 'shared/util/CRONConstants';
 import
 {
@@ -64,6 +65,10 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import './CRONEditorStyle.less';
 import FadeInOut from './FadeInOut';
 import FloatingInput from './FloatingInput';
+
+// these two imports need to be separate because of Radium
+import Picker from './Picker';
+import { PickerOption } from './Picker';
 
 export interface Props
 {
@@ -130,20 +135,24 @@ class CRONEditor extends TerrainComponent<Props>
         key={type}
       >
         <div className='common-option-name-style'>
+          <div>
+            {
+              text
+            }
+          </div>
           {
-            text
+            el &&
+            <FadeInOut
+              open={selected}
+            >
+              <div style={getStyle('marginTop', 6)}>
+                {
+                  el
+                }
+              </div>
+            </FadeInOut>
           }
         </div>
-        {
-          el &&
-          <FadeInOut
-            open={selected}
-          >
-            {
-              el
-            }
-          </FadeInOut>
-        }
       </div>
     );
   }
@@ -151,18 +160,21 @@ class CRONEditor extends TerrainComponent<Props>
   private renderDays()
   {
     const { cron } = this.props;
-    const sched = canParseCRONSchedule(cron) ? parseCRONDaySchedule(cron) : null;
+    const sched = canParseCRONSchedule(cron) ? parseCRONDaySchedule(cron, true) : null;
 
     return [
       this.renderHeader('Day'),
       this.renderOption('Every day', 'daily', sched, 'days'),
-      this.renderOption('Every weekday', 'weekdays', sched, 'days'),
+      this.renderOption('Every weekday', 'workweek', sched, 'days'),
 
       this.renderOption('Specific weekday(s)', 'weekly', sched, 'days',
         <div key='w'>
-          {
-            JSON.stringify(sched.weekdays)
-          }
+          <Picker
+            options={this.getWeekDayOptions(sched)}
+            canEdit={true}
+            circular={true}
+            onSelect={this.handleWeekDaySelect}
+          />
         </div>,
       ),
 
@@ -175,11 +187,52 @@ class CRONEditor extends TerrainComponent<Props>
       ),
     ];
   }
+  
+  private getWeekDayOptions(schedule: CRONDaySchedule): List<PickerOption>
+  {
+    if (!schedule || !schedule.weekdays)
+    {
+      return null;
+    }
+    
+    return List(CRONWeekDayOptionsList.map((weekDay) =>
+    {
+      return {
+        value: weekDay,
+        selected: schedule.weekdays[weekDay],
+        label: CRONWeekDayNames[weekDay].substr(0, 1),
+      }
+    }));
+  }
+  
+  private handleWeekDaySelect(index, option: PickerOption)
+  {
+    let currentSched = parseCRONDaySchedule(this.props.cron, false); // makes a copy
+    if (currentSched === null)
+    {
+      alert ('Unable to parse schedule, so unable to change schedule');
+      return;
+    }
+    
+    // toggle
+    currentSched.weekdays[option.value] = ! currentSched.weekdays[option.value];
+    
+    const newCRON = setCRONDays(this.props.cron, currentSched);
+    if (!newCRON || !canParseCRONSchedule(newCRON))
+    {
+      // tried to unselect something that is selected
+      alert (`You must have at least one day selected.`);
+      return;
+    }
+    
+    this.props.onChange(newCRON);
+  }
+  
 
   private renderHours()
   {
     const { cron } = this.props;
-    const sched = canParseCRONSchedule(cron) ? parseCRONHourSchedule(cron) : null;
+    const sched = canParseCRONSchedule(cron) ? parseCRONHourSchedule(cron, true) : null;
 
     return [
       this.renderHeader('Time'),

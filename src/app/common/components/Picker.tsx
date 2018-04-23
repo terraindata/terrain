@@ -75,6 +75,8 @@ export interface Props
   optionWidth?: number;
 }
 
+// NOTE: Do NOT import this class; import the default export (below) which includes Radium
+
 export class Picker extends TerrainComponent<Props>
 {
 
