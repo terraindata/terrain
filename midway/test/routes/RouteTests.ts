@@ -211,9 +211,13 @@ beforeAll(async (done) =>
         timezone: 'UTC',
       },
     })
-    .end(() =>
+    .then((response) =>
     {
       done();
+    })
+    .catch((error) =>
+    {
+      winston.warn('Error while creating test user: ' + String(error));
     });
 
   try
