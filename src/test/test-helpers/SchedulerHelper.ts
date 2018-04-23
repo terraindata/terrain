@@ -42,29 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
-
-class Api
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+import * as Immutable from 'immutable';
+import
 {
-  public static getInstance(): AxiosInstance
-  {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
+  _SchedulerState,
+  SchedulerState,
+} from 'scheduler/SchedulerTypes';
+import { ItemType } from '../../items/types/Item';
 
-    return terrainAxios;
+export default class SchedulerHelper
+{
+  public static mockState()
+  {
+    return new SchedulerStateMock();
   }
 }
 
-export default Api;
+class SchedulerStateMock
+{
+  public state;
+
+  public constructor()
+  {
+    this.state = _SchedulerState({});
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+
+  public loading(isLoading: boolean)
+  {
+    this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
+
+  public addSchedule(schedule)
+  {
+    this.state = this.state.setIn(['schedules', schedule.id], schedule);
+
+    return this;
+  }
+}
