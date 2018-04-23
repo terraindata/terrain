@@ -91,15 +91,18 @@ class ScheduleList extends TerrainComponent<Props>
 
   public updateSchedule(id: number, changes)
   {
-    this.schedulerApi.updateSchedule(id, changes)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
+    this.props.schedulerActions({
+      actionType: 'updateSchedule',
+      schedule: changes,
+    })
+    .then((response) =>
+    {
+      this.setState({ responseText: JSON.stringify(response) });
+    })
+    .catch((error) =>
+    {
+      this.setState({ responseText: error.response.data.errors[0].detail });
+    });
   }
 
   public runSchedule(id: number)
@@ -145,7 +148,7 @@ class ScheduleList extends TerrainComponent<Props>
   public handleScheduleChange(schedule: SchedulerConfig)
   {
     schedule = schedule.set('tasks', schedule.tasks.map((task) => task.toJS()));
-    console.log(schedule.toJS());
+    console.log('handle schedule change to ', schedule.toJS());
     this.updateSchedule(schedule.id, schedule.toJS());
   }
 
@@ -197,6 +200,7 @@ class ScheduleList extends TerrainComponent<Props>
     const { schedules } = this.props.scheduler;
     const keys = schedules.keySeq().toList().sort();
     const scheduleList = keys.map((id) => schedules.get(id));
+    console.log('SCHEDULES ARE ', schedules);
     return (
       <div className='schedule-list-wrapper'>
         {

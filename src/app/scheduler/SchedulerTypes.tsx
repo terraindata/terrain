@@ -61,6 +61,7 @@ export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig>
 export const _SchedulerConfig =
   (config: object) =>
   {
+    console.log('CONFIG IS ', config);
     let schedule = new SchedulerConfig_Record(config) as any as SchedulerConfig;
     let tasks: any = schedule.tasks;
     if (typeof schedule.tasks === 'string')
@@ -74,8 +75,13 @@ export const _SchedulerConfig =
         tasks = [];
       }
     }
+    if (!Array.isArray(tasks))
+    {
+      tasks = [tasks];
+    }
     tasks = tasks.map((task) => _TaskConfig(task));
     schedule = schedule.set('tasks', List(tasks));
+    console.log('SCHEDULE IS ', schedule);
     return schedule;
   };
 
@@ -104,5 +110,13 @@ export const _TaskConfig =
   {
     let task = new TaskConfig_Record(config) as any as TaskConfig;
     task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
+    if (task.getIn(['params', 'overrideSources']))
+    {
+      task = task.setIn(['params', 'overrideSources'], Immutable.Map(task.getIn(['params', 'overrideSources'])));
+    }
+    if (task.getIn(['params', 'overrideSinks']))
+    {
+      task = task.setIn(['params', 'overrideSinks'], Immutable.Map(task.getIn(['params', 'overrideSinks'])));
+    }
     return task;
   };
