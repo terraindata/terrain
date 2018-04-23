@@ -141,7 +141,6 @@ export class Scheduler
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      console.log('wtf');
       if (this.runningSchedules.get(id) !== undefined)
       {
         return resolve('Schedule is already running.');
@@ -166,9 +165,7 @@ export class Scheduler
           workerId: 1, // TODO change this for clustering support
         };
       await this._setRunning(id, true);
-      console.log(JSON.stringify(jobConfig, null, 2));
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig);
-      console.log('just created job...?');
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);

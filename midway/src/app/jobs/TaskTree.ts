@@ -188,6 +188,15 @@ export class TaskTree
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
+      if (this.tasks.length === 0) // nothing to do
+      {
+        const taskOutputConfig: TaskOutputConfig =
+          {
+            exit: true,
+            status: true,
+          };
+        return resolve(taskOutputConfig);
+      }
       let ind: number = 0;
       if (this.taskTreeConfig.jobStatus === 2)
       {

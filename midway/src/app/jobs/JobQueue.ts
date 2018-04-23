@@ -111,7 +111,6 @@ export class JobQueue
   {
     return new Promise<JobConfig[] | string>(async (resolve, reject) =>
     {
-      console.log('CREATED JOB');
       let tasksAsTaskConfig: TaskConfig[] = [];
       try
       {
@@ -143,7 +142,6 @@ export class JobQueue
       job.type = (job.type !== undefined && job.type !== null) ? job.type : 'default';
       job.workerId = (job.workerId !== undefined && job.workerId !== null) ? job.workerId : 1;
       const upsertedJobs: JobConfig[] = await App.DB.upsert(this.jobTable, job) as JobConfig[];
-      console.log(JSON.stringify(upsertedJobs, null, 2));
       // check table to see if jobs need to be run
       await this._checkJobTable();
       resolve(upsertedJobs);
@@ -274,7 +272,8 @@ export class JobQueue
       jobIdLst.forEach(async (jobId) =>
       {
         const jobResult: TaskOutputConfig = await this.runningJobs.get(jobId).run() as TaskOutputConfig;
-        await this.setJobStatus(nextJob.id, false);
+        const jobs: JobConfig[] = await this.get(jobId);
+        await this.setJobStatus(jobs[0].id, false);
         // log job result
         winston.info('Job result: ' + JSON.stringify(jobResult, null, 2));
       });
