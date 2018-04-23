@@ -40,7 +40,7 @@
     .headless-entry-icon-wrapper {
       padding: @quarter-spacing;
       position: relative;
-      width: @icon-size + 2px;
+      width: (@icon-size + 2px);
       display: flex;
       align-items: center;
 
@@ -97,7 +97,7 @@
 
     .headless-command-errors-spacer
     {
-      height: @command-content-height - @spacing;
+      height: (@command-content-height - @spacing);
       padding: @half-spacing;
       overflow-y: auto;
     }
@@ -106,7 +106,7 @@
       overflow: auto;
       position: relative;
       padding: @half-spacing;
-      max-height: @command-content-height - @spacing;
+      max-height: (@command-content-height - @spacing);
       .normal-text;
       font-family: monospace;
       z-index: 0;
