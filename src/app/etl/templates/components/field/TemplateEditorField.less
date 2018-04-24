@@ -78,11 +78,11 @@
 }
 
 @settings-height: 340px;
-@settings-margin-size: 2 * @double-spacing - 4px;
-@settings-extra-space: 2 * @settings-margin-size;
+@settings-margin-size: (2 * @double-spacing - 4px);
+@settings-extra-space: (2 * @settings-margin-size);
 .injected-content-container {
   width: 100%;
-  height: @settings-height + @spacing;
+  height: (@settings-height + @spacing);
 
   .injected-content-content {
     border: 1px solid;
