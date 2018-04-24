@@ -42,65 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import ESParameterSubstituter from './ESParameterSubstituter';
-import ESValueInfo from './ESValueInfo';
-
-/**
- * Fills values in for parameters in a query using a given substitutionFunction,
- * ultimately producing a new query string.
- *
- * Different possible strategies for substituting parameters:
- * + Emit new JSON, and then reparse if needed
- * + Emit new JS object and then interpret if needed
- * + Mutate VI's (reparse if needed)
- *  + traverse and replace
- * + Deep Copy + Mutate
- *  + traverse and copy
- *  + traverse and replace
- * + Immutable Substitution -> must first identify mutation locations before copy
- *  + traverse and mark, copy on return
- */
-export default class ESParameterFiller
+export class ConfigType
 {
-  public static generate(source: ESValueInfo,
-    params: { [name: string]: any }): string
+  public static initialize(obj: object, props: object)
   {
-    return ESParameterSubstituter.generate(source,
-      (param: string, runtimeParam?: string, inTerms?: boolean): string =>
+    for (const key of Object.keys(obj))
+    {
+      if (props.hasOwnProperty(key))
       {
-        const ps = param.split('.');
-        if (runtimeParam !== undefined && ps[0] === runtimeParam && params[runtimeParam] === undefined)
-        {
-          return JSON.stringify('@' + param);
-        }
-
-        let value: any = params;
-        let joinArray: boolean = false;
-        for (const p of ps)
-        {
-          // If value is an array, and p is not an index, look at inner objects of array
-          if (Array.isArray(value) && isNaN(parseFloat(p)))
-          {
-            value = value.map((val) => val[p]);
-            joinArray = inTerms !== true;
-          }
-          else
-          {
-            value = value[p];
-          }
-        }
-        // If not in a terms query, but the value is an array, join it into a string
-        if (Array.isArray(value) && joinArray)
-        {
-          value = value.join(' ');
-        }
-        if (value === undefined)
-        {
-          throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
-        }
-        return JSON.stringify(value);
-      });
+        obj[key] = props[key];
+      }
+      else if (props.hasOwnProperty(key.toLowerCase()))
+      {
+        obj[key] = props[key.toLowerCase()];
+      }
+    }
   }
 }
+
+export default ConfigType;

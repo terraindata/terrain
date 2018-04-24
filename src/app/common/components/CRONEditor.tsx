@@ -47,12 +47,13 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import { List } from 'immutable';
 import { noop } from 'lodash';
 import * as React from 'react';
 import
 {
-  CRONDaySchedule, CRONHourNames, CRONHourOptions, CRONHourSchedule,
-  CRONMonthDayOptions, CRONWeekDayNames, CRONWeekDayOptions,
+  CRONDaySchedule, CRONHourNames, CRONHourOptionsList, CRONHourSchedule,
+  CRONMinuteOptionsList, CRONMonthDayOptionsList, CRONWeekDayNames, CRONWeekDayOptionsList,
 } from 'shared/util/CRONConstants';
 import
 {
@@ -64,6 +65,10 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import './CRONEditorStyle.less';
 import FadeInOut from './FadeInOut';
 import FloatingInput from './FloatingInput';
+
+// these two imports need to be separate because of Radium
+import Picker from './Picker';
+import { PickerOption } from './Picker';
 
 export interface Props
 {
@@ -130,20 +135,24 @@ class CRONEditor extends TerrainComponent<Props>
         key={type}
       >
         <div className='common-option-name-style'>
+          <div>
+            {
+              text
+            }
+          </div>
           {
-            text
+            el &&
+            <FadeInOut
+              open={selected}
+            >
+              <div style={getStyle('marginTop', 6)}>
+                {
+                  el
+                }
+              </div>
+            </FadeInOut>
           }
         </div>
-        {
-          el &&
-          <FadeInOut
-            open={selected}
-          >
-            {
-              el
-            }
-          </FadeInOut>
-        }
       </div>
     );
   }
@@ -151,26 +160,32 @@ class CRONEditor extends TerrainComponent<Props>
   private renderDays()
   {
     const { cron } = this.props;
-    const sched = canParseCRONSchedule(cron) ? parseCRONDaySchedule(cron) : null;
+    const sched = this.canRenderCRONSchedule() ? parseCRONDaySchedule(cron, true) : null;
 
     return [
       this.renderHeader('Day'),
       this.renderOption('Every day', 'daily', sched, 'days'),
-      this.renderOption('Every weekday', 'weekdays', sched, 'days'),
+      this.renderOption('Every weekday', 'workweek', sched, 'days'),
 
       this.renderOption('Specific weekday(s)', 'weekly', sched, 'days',
-        <div key='w'>
-          {
-            JSON.stringify(sched.weekdays)
-          }
+        <div key='w' style={getStyle('margin', '0px -3px')}>
+          <Picker
+            options={this.getCRONOptions(sched, 'weekdays', CRONWeekDayOptionsList, CRONWeekDayNames, true)}
+            canEdit={true}
+            circular={true}
+            onSelect={this._fn(this.handleCRONValueSelect, 'days', 'weekdays')}
+          />
         </div>,
       ),
 
       this.renderOption('Specific day(s) of the month', 'monthly', sched, 'days',
-        <div key='m'>
-          {
-            JSON.stringify(sched.days)
-          }
+        <div key='m' style={getStyle('margin', '0px -3px')}>
+          <Picker
+            options={this.getCRONOptions(sched, 'days', CRONMonthDayOptionsList)}
+            canEdit={true}
+            onSelect={this._fn(this.handleCRONValueSelect, 'days', 'days')}
+            rowSize={7}
+          />
         </div>,
       ),
     ];
@@ -179,24 +194,31 @@ class CRONEditor extends TerrainComponent<Props>
   private renderHours()
   {
     const { cron } = this.props;
-    const sched = canParseCRONSchedule(cron) ? parseCRONHourSchedule(cron) : null;
+    const sched = this.canRenderCRONSchedule() ? parseCRONHourSchedule(cron, true) : null;
 
     return [
       this.renderHeader('Time'),
       this.renderOption('Every minute', 'minute', sched, 'hours'),
       this.renderOption('Every hour', 'hourly', sched, 'hours',
-        <div key='h'>
-          {
-            JSON.stringify(sched.minutes)
-          }
+        <div key='h' style={getStyle('margin', '0px -3px')}>
+          <Picker
+            options={this.getCRONOptions(sched, 'minutes', LimitedCRONMinuteOptionsList,
+              LimitedCRONMinuteOptionsNames)}
+            canEdit={true}
+            onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'minutes')}
+            optionWidth={50}
+          />
         </div>,
       ),
 
       this.renderOption('Specific hour(s)', 'daily', sched, 'hours',
-        <div key='d'>
-          {
-            JSON.stringify(sched.hours)
-          }
+        <div key='d' style={getStyle('margin', '0px -3px')}>
+          <Picker
+            options={this.getCRONOptions(sched, 'hours', CRONHourOptionsList, CRONHourNames, false)}
+            canEdit={true}
+            onSelect={this._fn(this.handleCRONValueSelect, 'hours', 'hours')}
+            optionWidth={70}
+          />
         </div>,
       ),
     ];
@@ -222,7 +244,94 @@ class CRONEditor extends TerrainComponent<Props>
       </div>,
     ];
   }
+
+  private getCRONOptions(schedule: CRONDaySchedule | CRONHourSchedule, scheduleKey: string, CRONOptions: number[],
+    labels?: { [k: number]: string }, substring?: boolean): List<PickerOption>
+  {
+    if (!schedule || !schedule[scheduleKey])
+    {
+      return null;
+    }
+
+    return List(CRONOptions.map((value) =>
+    {
+      let label;
+      if (labels)
+      {
+        label = labels[value];
+      }
+      if (substring)
+      {
+        label = label.substr(0, 1);
+      }
+
+      return {
+        value,
+        selected: schedule[scheduleKey][value],
+        label,
+      };
+    }));
+  }
+
+  private handleCRONValueSelect(daysOrHours: 'days' | 'hours', scheduleKey: string, index, option: PickerOption)
+  {
+    const parseFn = daysOrHours === 'days' ? parseCRONDaySchedule : parseCRONHourSchedule;
+    const currentSched = parseFn(this.props.cron, false); // makes a copy
+    if (currentSched === null)
+    {
+      alert('Unable to parse schedule, so unable to change schedule');
+      return;
+    }
+
+    // toggle
+    currentSched[scheduleKey][option.value] = !currentSched[scheduleKey][option.value];
+
+    const setFn: any = daysOrHours === 'days' ? setCRONDays : setCRONHours;
+    const newCRON = setFn(this.props.cron, currentSched);
+    if (!newCRON || !canParseCRONSchedule(newCRON))
+    {
+      // tried to unselect something that is selected
+      alert(`You must have at least one ${daysOrHours === 'days' ? 'day' : 'hour'} selected.`);
+      return;
+    }
+
+    this.props.onChange(newCRON);
+  }
+
+  // This UI imposes additional restrictions on CRON schedules
+  private canRenderCRONSchedule(): boolean
+  {
+    const { cron } = this.props;
+    if (!canParseCRONSchedule(cron))
+    {
+      return false;
+    }
+
+    const hourSched = parseCRONHourSchedule(cron);
+    if (hourSched.type === 'hourly')
+    {
+      // verify we can display the minutes
+      for (const h in hourSched.minutes)
+      {
+        if (hourSched.minutes[h] && LimitedCRONMinuteOptionsList.indexOf(+h) === -1)
+        {
+          // involves a minute that we don't display in this UI
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }
+
+const LimitedCRONMinuteOptionsList = [0, 15, 30, 45];
+const LimitedCRONMinuteOptionsNames = {
+  0: ':00',
+  15: ':15',
+  30: ':30',
+  45: ':45',
+};
 
 const SELECTED_OPTION_STYLE = {
   color: Colors().active,

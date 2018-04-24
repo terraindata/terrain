@@ -75,6 +75,8 @@ export interface Props
   optionWidth?: number;
 }
 
+// NOTE: Do NOT import this class; import the default export (below) which includes Radium
+
 export class Picker extends TerrainComponent<Props>
 {
 
@@ -157,7 +159,10 @@ export class Picker extends TerrainComponent<Props>
     }
     return (
       <div
-        className='picker-wrapper'
+        className={classNames({
+          'picker-wrapper': true,
+          'picker-wrapper-flex': !rowSize,
+        })}
       >
         {
           rows.map((row, i) =>
