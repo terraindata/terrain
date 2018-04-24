@@ -9,7 +9,7 @@
         "inlineSourceMap": true,
         "target": "es6",
         "typeRoots": [
-            "./src/typings",
+            "./shared/typings",
             "./node_modules/@types"
         ],
         "baseUrl": ".",

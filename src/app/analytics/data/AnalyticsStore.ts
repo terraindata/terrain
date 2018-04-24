@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
-import { createRecordType } from '../../Classes';
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
 class AnalyticsStateC

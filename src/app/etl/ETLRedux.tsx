@@ -52,12 +52,12 @@ import MidwayError from 'shared/error/MidwayError';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll, WrappedPayload } from 'src/app/store/TerrainRedux';
 
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
-import { SinkConfig, SourceConfig } from 'etl/EndpointTypes';
 import ETLAjax, { ExecuteConfig } from 'etl/ETLAjax';
 import { ErrorHandler } from 'etl/ETLAjax';
+import { SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 
-import { _ETLTemplate, ETLTemplate } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { _ETLState, ETLState } from './ETLTypes';
 
 import { FileTypes } from 'shared/etl/types/ETLTypes';
@@ -302,7 +302,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         }
       };
 
-      ETLAjax.executeTemplate(template.id, options)
+      ETLAjax.executeTemplate(template, options)
         .then(this.onLoadFactory<any>([onLoad], directDispatch, name))
         .catch(this.onErrorFactory(action.onError, directDispatch, name));
     }

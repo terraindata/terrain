@@ -44,92 +44,66 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:max-classes-per-file strict-boolean-expressions restrict-plus-operands
+import * as fs from 'fs';
+import * as request from 'supertest';
+import { promisify } from 'util';
+import * as winston from 'winston';
 
-import * as Immutable from 'immutable';
-import { BaseClass, New } from 'shared/util/Classes';
+// import { App, Credentials, DB, Scheduler } from '../../src/app/App';
+import { App, DB } from '../../src/app/App';
+import ElasticConfig from '../../src/database/elastic/ElasticConfig';
+import ElasticController from '../../src/database/elastic/ElasticController';
+import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
+import * as Tasty from '../../src/tasty/Tasty';
 
-class UserC extends BaseClass
+// let server;
+
+// tslint:disable:max-line-length
+
+// beforeAll(async (done) =>
+// {
+//   try
+//   {
+//     const options =
+//       {
+//         debug: true,
+//         db: 'postgres',
+//         dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
+//         port: 63001,
+//         databases: [
+//           {
+//             name: 'My ElasticSearch Instance',
+//             type: 'elastic',
+//             dsn: 'http://127.0.0.1:9200',
+//             host: 'http://127.0.0.1:9200',
+//             isAnalytics: true,
+//             analyticsIndex: 'terrain-analytics',
+//             analyticsType: 'events',
+//           },
+//           {
+//             name: 'MySQL Test Connection',
+//             type: 'mysql',
+//             dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
+//             host: '127.0.0.1:63306',
+//             isAnalytics: false,
+//           },
+//         ],
+//       };
+
+//     const app = new App(options);
+//     server = await app.start();
+//     done();
+//   }
+//   catch (e)
+//   {
+//     fail(e);
+//   }
+// });
+
+describe('ETL Execute Tests', () =>
 {
-  // db-level fields
-  public isSuperUser = false;
-  public isDisabled = false;
-  public email = '';
-
-  // metadata fields
-  public name = '';
-  public whatIDo = '';
-  public skype = '';
-  public timeZone = 158;
-  public phone = '';
-  public imgSrc = '';
-  public tutorialStepsCompleted: IMMap<string, boolean> = Immutable.Map<string, boolean>();
-
-  // notifications fields
-  public sound = 'chime';
-  public emailNotificationType = 'Activities of any kind';
-  public emailNotificationTiming = 'Once every 15 minutes';
-  public desktopNotificationType = 'Activities of any kind';
-  public emailNews = 'on';
-
-  // DB level fields
-  public dbFields = [
-    'id',
-    'email',
-    'isDisabled',
-    'isSuperUser',
-    'name',
-    'oldPassword',
-    'password',
-    'timezone',
-  ];
-
-  // "static" fields to exclude
-  public excludeFields = ['dbFields', 'excludeFields'];
-
-  // groupRoles: Immutable.Map(),
-}
-export type User = UserC & IRecord<UserC>;
-export const _User = (config: { [key: string]: any } = {}) =>
-{
-  config.tutorialStepsCompleted = Immutable.Map(config.tutorialStepsCompleted);
-  return New<User>(new UserC(config), config);
-};
-
-export type UserMap = Immutable.Map<ID, User>;
-
-class UserStateC extends BaseClass
-{
-  public loading = false;
-  public loaded = false;
-  public users = Immutable.Map<ID, User>();
-  public currentUser: User = null;
-}
-export type UserState = UserStateC & IRecord<UserStateC>;
-export const _UserState = (config?: { [key: string]: any }) =>
-  New<UserState>(new UserStateC(config), config);
-
-export function profileUrlFor(user: User): string
-{
-  if (user && user.imgSrc)
+  test('ETL execute: POST /midway/v1/etl/execute', async () =>
   {
-    return user.imgSrc;
-  }
-
-  let index: number = 0;
-  if (user)
-  {
-    if (typeof user.id === 'string')
-    {
-      index = (user.id.charCodeAt(0) % numProfileImages);
-    }
-    if (typeof user.id === 'number')
-    {
-      index = (user.id % numProfileImages);
-    }
-  }
-
-  return MIDWAY_HOST + '/midway/v1/assets/profiles/profile' + index + '.jpg';
-}
-
-const numProfileImages = 9;
+    // TODO: Add test
+  });
+});

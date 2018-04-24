@@ -56,7 +56,7 @@ import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
 import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 
 import { DynamicForm } from 'common/components/DynamicForm';

@@ -62,7 +62,6 @@ export default class ProgressTransform extends Transform
   {
     super({
       writableObjectMode: true,
-      readableObjectMode: true,
     });
 
     this.frequency = frequency;
@@ -107,7 +106,7 @@ export default class ProgressTransform extends Transform
     }
   }
 
-  public _flush(error, callback)
+  public _flush(callback)
   {
     this.push(this.progress());
 
@@ -122,6 +121,6 @@ export default class ProgressTransform extends Transform
     return JSON.stringify({
       successful: this.count,
       failed: this.errors,
-    });
+    }) + '\n';
   }
 }

@@ -56,7 +56,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { compareObjects, isVisiblyEqual, PropertyTracker, UpdateChecker } from 'etl/ETLUtil';
 import GraphHelpers from 'etl/helpers/GraphHelpers';
@@ -64,7 +64,7 @@ import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { EditorDisplayState, FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { SinkConfig, SinkOptionsType, Sinks, SourceConfig, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';

@@ -49,6 +49,7 @@ import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTra
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
+import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
@@ -131,6 +132,11 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitDivideNode(node: DivideTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitSetIfNode(node: SetIfTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }

@@ -49,11 +49,10 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 const { List, Map } = Immutable;
-import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'etl/EndpointTypes';
-import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'etl/templates/ETLProcess';
-import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
+import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -71,8 +70,8 @@ interface ETLTemplateI extends TemplateBase
 class ETLTemplateC implements ETLTemplateI
 {
   public id = -1;
-  public lastModified: string = null;
-  public createdAt: string = null;
+  public lastModified: Date = null;
+  public createdAt: Date = null;
   public archived = false;
   public templateName = '';
   public process = _ETLProcess();
@@ -91,6 +90,46 @@ class ETLTemplateC implements ETLTemplateI
       }
     }
     return false;
+  }
+
+  public getDescription(algorithms?: Map<ID, ItemWithName>): string
+  {
+    let sourceText = '';
+    this.getSources().forEach((source, key) =>
+    {
+      if (sourceText !== '')
+      {
+        sourceText = `${sourceText}, ${source.description(algorithms)}`;
+      }
+      else
+      {
+        sourceText = source.description(algorithms);
+      }
+    });
+    if (this.getSources().size > 1)
+    {
+      sourceText = `[${sourceText}]`;
+    }
+
+    let sinkText = '';
+    this.getSinks().forEach((sink, key) =>
+    {
+      if (sinkText !== '')
+      {
+        sinkText = `${sinkText}, ${sink.description()}`;
+      }
+      else
+      {
+        sinkText = sink.description();
+      }
+    });
+    if (this.getSinks().size > 1)
+    {
+      sinkText = `[${sinkText}]'`;
+    }
+
+    const typeText = this.isImport() ? 'Import' : 'Export';
+    return `${typeText} from ${sourceText} into ${sinkText}`;
   }
 
   public getSources()
@@ -115,14 +154,14 @@ class ETLTemplateC implements ETLTemplateI
 
   public getSourceName(key)
   {
-    const source = this.sources.get(key);
+    const source = this.getSource(key);
     const type = (source != null && source.type != null) ? source.type : '';
     return `${source != null ? source.name : ''} (${type})`;
   }
 
   public getSinkName(key)
   {
-    const sink = this.sinks.get(key);
+    const sink = this.getSink(key);
     const type = (sink != null && sink.type != null) ? sink.type : '';
     return `${sink.name} (${type})`;
   }
@@ -188,6 +227,29 @@ class ETLTemplateC implements ETLTemplateI
     }
   }
 
+  public applyOverrides(
+    sources?: Immutable.Map<string, SourceConfig>,
+    sinks?: Immutable.Map<string, SinkConfig>,
+  ): ETLTemplate
+  {
+    let template: ETLTemplate = this as any;
+    if (sources !== undefined)
+    {
+      sources.forEach((source, key) =>
+      {
+        template = template.update('sources', (s) => s.set(key, source));
+      });
+    }
+    if (sinks !== undefined)
+    {
+      sinks.forEach((sink, key) =>
+      {
+        template = template.update('sinks', (s) => s.set(key, sink));
+      });
+    }
+    return template;
+  }
+
   public getDefaultSource(): SourceConfig
   {
     return this.getSource('_default');
@@ -229,6 +291,14 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
       .toMap();
   },
   process: _ETLProcess,
+  lastModified: (date) =>
+  {
+    return typeof date === 'string' ? new Date(date) : date;
+  },
+  createdAt: (date) =>
+  {
+    return typeof date === 'string' ? new Date(date) : date;
+  },
 });
 
 // todo, please do this more efficiently

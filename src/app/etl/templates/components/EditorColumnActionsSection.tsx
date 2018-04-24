@@ -56,14 +56,14 @@ import Util from 'util/Util';
 
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import GraphHelpers from 'etl/helpers/GraphHelpers';
 import TemplateList from 'etl/templates/components/TemplateList';
 import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 const { List } = Immutable;
 

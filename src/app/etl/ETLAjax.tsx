@@ -48,14 +48,14 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
+import * as download from 'downloadjs';
 import MidwayError from 'shared/error/MidwayError';
+import { SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { recordForSave } from 'shared/util/Classes';
+import { AuthActions as Actions } from 'src/app/auth/data/AuthRedux';
 import { Ajax } from 'util/Ajax';
 
-import { AuthActions as Actions } from 'src/app/auth/data/AuthRedux';
-
-import * as download from 'downloadjs';
-
-import { _ETLTemplate, ETLTemplate, templateForBackend } from 'etl/templates/TemplateTypes';
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { TemplateBase } from 'shared/etl/types/ETLTypes';
 
 export type ErrorHandler = (response: string | MidwayError) => void;
@@ -191,13 +191,12 @@ class ETLAjax
 
   // if download is provided, then the response will be downloaded as the mime type with provided filename
   public executeTemplate(
-    templateId: number,
+    template: ETLTemplate,
     options: ExecuteConfig,
   ): Promise<void>
   {
     return new Promise((resolve, reject) =>
     {
-
       const config: ReqConfig = {
         onError: reject,
       };
@@ -206,19 +205,58 @@ class ETLAjax
         config.downloadName = options.download.downloadFilename;
         config.mimeType = options.download.mimeType;
       }
-      const payload: any = {
-        templateID: String(templateId),
+      const templateToRun = JSON.stringify(templateForBackend(template));
+      const payload = {
+        template: templateToRun,
       };
       if (options.files !== undefined)
       {
         _.extend(payload, options.files);
       }
-
       this.reqFormData(
         'etl/execute',
         payload,
         (resp) => resolve(resp),
         config,
+      );
+    });
+  }
+
+  public fetchPreview(
+    source: SourceConfig,
+    size: number,
+  ): Promise<List<object>>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        let documents;
+        try
+        {
+          documents = List(response);
+        }
+        catch (e)
+        {
+          return reject(e);
+        }
+        if (documents !== undefined)
+        {
+          resolve(documents);
+        }
+      };
+      const payload = {
+        source: recordForSave(source),
+        size,
+      };
+      return Ajax.req(
+        'post',
+        'etl/preview',
+        payload,
+        handleResponse,
+        {
+          onError: reject,
+        },
       );
     });
   }

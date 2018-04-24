@@ -56,9 +56,10 @@ import
   makeConstructor,
   makeExtendedConstructor,
   WithIRecord,
-} from 'src/app/Classes';
+} from 'shared/util/Classes';
 
 type ImmHistory<T> = WithIRecord<HistoryStackC<T>>;
+
 class HistoryStackC<T>
 {
   public maxSize: number = 50;

@@ -62,12 +62,12 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { ETLActions } from 'etl/ETLRedux';
 import Initializers from 'etl/helpers/TemplateInitializers';
 import { MidwayError } from 'shared/error/MidwayError';
-import { instanceFnDecorator } from 'src/app/Classes';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 export interface AllowedActions
 {
@@ -85,6 +85,7 @@ export interface Props
   // injected props
   etlAct: typeof ETLActions;
   templates: List<ETLTemplate>;
+  algorithms: Immutable.Map<ID, Algorithm>;
 }
 
 class TemplateList extends TerrainComponent<Props>
@@ -99,12 +100,8 @@ class TemplateList extends TerrainComponent<Props>
       render: (template, index) => template.id,
     },
     {
-      name: 'Source Type',
-      render: (template, index) => template.getDefaultSource().getIn(['type'], 'N/A'),
-    },
-    {
-      name: 'Sink Type',
-      render: (template, index) => template.getDefaultSink().getIn(['type'], 'N/A'),
+      name: 'Description',
+      render: (template, index) => template.getDescription(this.props.algorithms as any),
     },
   ];
 
@@ -240,6 +237,9 @@ const templateListItemStyle = {};
 
 export default Util.createContainer(
   TemplateList,
-  [['etl', 'templates']],
+  [
+    ['etl', 'templates'],
+    ['library', 'algorithms'],
+  ],
   { etlAct: ETLActions },
 );
