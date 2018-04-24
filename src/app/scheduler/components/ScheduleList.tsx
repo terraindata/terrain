@@ -132,6 +132,7 @@ class ScheduleList extends TerrainComponent<Props>
     const { schedules } = this.props;
     const keys = schedules.keySeq().toList().sort();
     const scheduleList = keys.map((id) => schedules.get(id));
+    console.log(schedules.toJS());
     return (
       <div className='schedule-list-wrapper'>
         {

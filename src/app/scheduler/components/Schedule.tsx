@@ -105,9 +105,8 @@ class Schedule extends TerrainComponent<Props>
 
   public getEndPointOptions(endpoints: Map<string, any>, isSource: boolean, schedule)
   {
-    const keys = _.keys(endpoints.toJS());
     const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
-    return List(keys.map((key) =>
+    return List(endpoints.keySeq().toList().map((key) =>
     {
       const endpoint = (this.getParam(sourceKey) as any).get(key) || endpoints.get(key);
       return {
