@@ -94,6 +94,7 @@ export interface RouteSelectorOptionSet
   forceFloat?: boolean;
   isButton?: boolean;
   onButtonClick?: () => void;
+  canUseButton: boolean;
   icon?: El;
   hasSearch?: boolean; // NOTE not compatible with hasOther
   column?: boolean; // force a column layout
@@ -280,8 +281,8 @@ export class RouteSelector extends TerrainComponent<Props>
                   <Button
                     text={this.getDisplayName(index)}
                     onClick={optionSet.onButtonClick}
-                    disabled={!props.canEdit}
                     icon={optionSet.icon}
+                    disabled={!optionSet.canUseButton}
                   />
                   :
                   <FloatingInput

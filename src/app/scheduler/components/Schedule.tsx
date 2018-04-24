@@ -203,7 +203,8 @@ class Schedule extends TerrainComponent<Props>
   {
     const { schedule } = this.props;
     const templateId = this.getTemplateId(schedule);
-    return List([templateId, this.state.configurationKey]);
+    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
+    return List([templateId, this.state.configurationKey, buttonValue]);
   }
 
   public getOptionSets()
@@ -250,8 +251,22 @@ class Schedule extends TerrainComponent<Props>
       forceFloat: true,
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule, template),
     };
+    
+    const buttonOptionSet = {
+      isButton: true,
+      onButtonClick: this._fn(this.handleRunPause, schedule),
+      key: 'run',
+      options: List([]),
+      column: true,
+      canUseButton: TerrainTools.isAdmin(),
+    };
 
-    return List([templateOptionSet, configurationOptionSet]);
+    return List([templateOptionSet, configurationOptionSet, buttonOptionSet]);
+  }
+
+  public handleRunPause(schedule)
+  {
+    !schedule.running ? this.props.onRun(schedule.id) : this.props.onPause(schedule.id);
   }
 
   public canEdit()
