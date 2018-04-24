@@ -62,8 +62,8 @@ import './Schedule.less';
 
 export interface Props
 {
-  scheduler?: SchedulerState;
-  etl?: ETLState;
+  schedules?: Immutable.Map<ID, SchedulerConfig>;
+  templates?: any;
   etlActions?: typeof ETLActions;
   schedulerActions?: typeof SchedulerActions;
   algorithms: Immutable.Map<ID, Algorithm>;
@@ -99,8 +99,6 @@ class ScheduleList extends TerrainComponent<Props>
     this.props.etlActions({
       actionType: 'fetchTemplates',
     });
-    this.listenToKeyPath('etl', ['templates']);
-    this.listenToKeyPath('scheduler', ['schedules']);
   }
 
   public handleScheduleChange(schedule: SchedulerConfig)
@@ -131,7 +129,7 @@ class ScheduleList extends TerrainComponent<Props>
 
   public render()
   {
-    const { schedules } = this.props.scheduler;
+    const { schedules } = this.props;
     const keys = schedules.keySeq().toList().sort();
     const scheduleList = keys.map((id) => schedules.get(id));
     return (
@@ -145,7 +143,7 @@ class ScheduleList extends TerrainComponent<Props>
               onRun={this.runSchedule}
               onPause={this.pauseSchedule}
               onChange={this.handleScheduleChange}
-              templates={this.props.etl.templates}
+              templates={this.props.templates}
               algorithms={this.props.algorithms}
             />,
           )
@@ -164,8 +162,8 @@ class ScheduleList extends TerrainComponent<Props>
 export default Util.createContainer(
   ScheduleList,
   [
-    'etl',
-    'scheduler',
+    ['etl', 'templates'],
+    ['scheduler', 'schedules'],
     ['library', 'algorithms'],
   ],
   {
