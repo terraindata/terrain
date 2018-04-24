@@ -98,19 +98,15 @@ class ETLTemplateC implements ETLTemplateI
   ): boolean
   {
     const template = this.applyOverrides(overrideSources, overrideSinks);
-    for (const key in template.sources.toJS())
+    const invalidSources = template.getSources().find((v) => SchedulableSources.indexOf(v.type) === -1);
+    if (invalidSources)
     {
-      if (SchedulableSources.indexOf(this.getSource(key).type) === -1)
-      {
-        return false;
-      }
+      return false;
     }
-    for (const key in template.sinks.toJS())
+    const invalidSinks = template.getSinks().find((v) => SchedulableSinks.indexOf(v.type) === -1);
+    if (invalidSinks)
     {
-      if (SchedulableSinks.indexOf(this.getSink(key).type) === -1)
-      {
-        return false;
-      }
+      return false;
     }
     return true;
   }
