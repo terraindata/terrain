@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import ConfigType from '../ConfigType';
 
+import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/EndpointTypes';
 import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -71,6 +72,12 @@ export class TemplateConfig extends ConfigType implements TemplateBase
     super();
     ConfigType.initialize(this, props);
   }
+}
+
+export function recordToConfig(template: ETLTemplate): TemplateConfig
+{
+  const asObject = templateForBackend(template);
+  return new TemplateConfig(asObject);
 }
 
 export type TemplateInDatabase = {

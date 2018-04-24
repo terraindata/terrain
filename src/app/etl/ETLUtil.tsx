@@ -56,7 +56,7 @@ import MidwayQueryResponse from 'src/database/types/MidwayQueryResponse';
 import { _Query, Query, queryForSave } from 'src/items/types/Query';
 import { Ajax } from 'util/Ajax';
 
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 export class UpdateChecker
 {

@@ -203,13 +203,13 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
 
       highlightId: (state, action) =>
       {
-        return state.set('highlightedId', action.payload.id)
+        return state.set('highlightedId', action.payload.id as string)
           .set('highlightedInSearchResults', action.payload.inSearchResults);
       },
 
       selectId: (state, action) =>
       {
-        return state.set('selectedId', action.payload.id);
+        return state.set('selectedId', action.payload.id as string);
       },
 
       starColumn: (state, action) =>

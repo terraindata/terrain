@@ -155,7 +155,6 @@ export interface SinkOptionsTypes
     serverId: number;
     database: string;
     table: string;
-    elasticConfig?: any; // if Language is elastic
   };
   Sftp: SftpOptions;
   Http: HttpOptions;

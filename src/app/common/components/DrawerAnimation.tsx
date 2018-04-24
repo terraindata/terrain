@@ -168,7 +168,7 @@ class DrawerAnimation extends TerrainComponent<Props>
           // scroll the content into view
           setTimeout(() =>
           {
-            const el = ReactDOM.findDOMNode(this.state.contentRef);
+            const el = ReactDOM.findDOMNode(this.state.contentRef) as Element;
             if (el !== undefined)
             {
               el.scrollIntoView({

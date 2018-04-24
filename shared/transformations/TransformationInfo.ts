@@ -49,6 +49,7 @@ import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTra
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
+import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import CastTransformationNode from './nodes/CastTransformationNode';
 import DuplicateTransformationNode from './nodes/DuplicateTransformationNode';
@@ -342,6 +343,23 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitDivideNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.SetIfNode]:
+      {
+        humanName: 'Set If',
+        editable: true,
+        creatable: true,
+        description: 'Checks if a field matches a certain special value, and if so, replaces that value',
+        isAvailable: (engine, fieldId) =>
+        {
+          return true;
+        },
+        type: SetIfTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitSetIfNode(transformationNode, docCopy, options),
       },
   };
 

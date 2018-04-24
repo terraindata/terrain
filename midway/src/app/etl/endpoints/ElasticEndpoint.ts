@@ -75,7 +75,7 @@ export default class ElasticEndpoint extends AEndpointStream
 
     const qh: QueryHandler = controller.getQueryHandler();
     const payload = {
-      database: dbId,
+      database: controller.getID(),
       type: 'search',
       streaming: true,
       body: query,

@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-reference
 
-/// <reference path="../../typings/tsd.d.ts" />
+/// <reference path="../../../shared/typings/tsd.d.ts" />
 
 import * as _ from 'lodash';
 import * as test from 'tape';

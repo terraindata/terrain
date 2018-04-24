@@ -47,9 +47,9 @@ THE SOFTWARE.
 import { Record } from 'immutable';
 import * as Immutable from 'immutable';
 import Util from 'util/Util';
-import { TaskConfig } from '../../../shared/types/jobs/TaskConfig';
-import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
-import { createRecordType } from '../Classes';
+import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
+import { createRecordType } from 'shared/util/Classes';
 
 class SchedulerConfigC extends SharedSchedulerConfig
 {

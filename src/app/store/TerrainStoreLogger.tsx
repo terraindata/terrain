@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as hdr from 'hdr-histogram-js';
 import * as TerrainLog from 'loglevel';
-import { AllRecordNameArray, RecordsSerializer, resetRecordNameArray } from '../Classes';
+import { AllRecordNameArray, RecordsSerializer, resetRecordNameArray } from 'shared/util/Classes';
 
 export default class TerrainStoreLogger
 {

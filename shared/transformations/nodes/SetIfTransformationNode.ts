@@ -43,77 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file strict-boolean-expressions import-spacing
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
+import { List } from 'immutable';
 
-import
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
+
+export default class SetIfTransformationNode extends TransformationNode
 {
-  FileConfig as FileConfigI,
-  SinkConfig as SinkConfigI,
-  SinkOptionsDefaults, SinkOptionsType,
-  Sinks,
-  SourceConfig as SourceConfigI,
-  SourceOptionsDefaults, SourceOptionsType,
-  Sources,
-} from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-
-class FileConfigC implements FileConfigI
-{
-  public fileType: FileTypes = FileTypes.Json;
-  public hasCsvHeader = true;
-  public jsonNewlines = false;
-}
-export type FileConfig = WithIRecord<FileConfigC>;
-export const _FileConfig = makeConstructor(FileConfigC);
-
-class SourceConfigC implements SourceConfigI
-{
-  public type = null;
-  public name = 'Default Source';
-  public fileConfig = _FileConfig();
-  public options = {};
-}
-export type SourceConfig = WithIRecord<SourceConfigC>;
-export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
-  fileConfig: _FileConfig,
-},
-  (cfg?, deep?) =>
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.SetIfNode)
   {
-    const config = cfg || {};
-    const defaults: Partial<SourceConfig> = {};
-    if (config.type !== undefined)
-    {
-      defaults.options = SourceOptionsDefaults[config.type];
-    }
-    return _.extend(defaults, config);
-  },
-);
-
-class SinkConfigC implements SinkConfigI
-{
-  public type = null;
-  public name = 'Default Sink';
-  public fileConfig = _FileConfig();
-  public options = {};
+    super(id, fields, options, typeCode);
+  }
 }
-export type SinkConfig = WithIRecord<SinkConfigC>;
-export const _SinkConfig = makeExtendedConstructor(SinkConfigC, true, {
-  fileConfig: _FileConfig,
-},
-  (cfg?, deep?) =>
-  {
-    const config = cfg || {};
-    const defaults: Partial<SourceConfig> = {};
-    if (config.type !== undefined)
-    {
-      defaults.options = SinkOptionsDefaults[config.type];
-    }
-    return _.extend(defaults, config);
-  },
-);
