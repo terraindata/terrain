@@ -174,7 +174,9 @@ export const Ajax =
         return;
       }
 
-      axios.interceptors.response.use(
+      const axiosInstance = axios.create();
+
+      axiosInstance.interceptors.response.use(
         (response) => response,
         (error) =>
         {
@@ -209,7 +211,7 @@ export const Ajax =
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
 
-      const xhr = axios.request({
+      const xhr = axiosInstance.request({
         method,
         url: fullUrl,
         timeout: 180000,
