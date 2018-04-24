@@ -246,6 +246,10 @@ export class Scheduler
           schedule[key] = existingSchedules[0][key];
         }
       });
+      if (typeof schedule.tasks !== 'string')
+      {
+        schedule.tasks = JSON.stringify(schedule.tasks);
+      }
     }
     return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
   }
