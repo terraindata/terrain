@@ -57,6 +57,7 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import { leftColumnWidth } from 'etl/templates/components/field/NestedView';
 import { _TemplateField, TemplateField } from 'etl/templates/FieldTypes';
 import { Languages } from 'shared/etl/types/ETLTypes';
 
@@ -65,9 +66,13 @@ import FieldMainSettings from './FieldMainSettings';
 import FieldSettingsTransformations from './FieldSettingsTransformations';
 import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 
+import EditorFieldPreview from './EditorFieldPreview';
 import './FieldSettings.less';
 
-export type Props = TemplateEditorFieldProps;
+export interface Props extends TemplateEditorFieldProps
+{
+  labelOverride?: string;
+}
 
 const CloseIcon = require('images/icon_close.svg');
 
@@ -123,7 +128,6 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     return (
       <div
         className='field-settings-title-bar'
-        style={[borderColor(Colors().boxShadow)]}
       >
         <div className='field-settings-title-filler' />
         {field.canEditField() ? this.renderCategory(ViewCategory.Settings, 'Settings') : null}
@@ -144,6 +148,20 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     );
   }
 
+  public renderLabelSection()
+  {
+    const field = this._field();
+    const labelOverride = this.props.labelOverride;
+
+    return (
+      <EditorFieldPreview
+        labelOnly={true}
+        labelOverride={labelOverride}
+        {...this._passProps()}
+      />
+    );
+  }
+
   public renderExtraCategories(): any[]
   {
     const language = this._getCurrentLanguage();
@@ -159,7 +177,13 @@ class EditorFieldSettings extends TemplateEditorField<Props>
   {
     return (
       <div className='template-editor-field-settings' style={fontColor(Colors().text2)}>
-        {this.renderTitleBar()}
+        <div
+          className='field-settings-top-row'
+          style={topRowStyle}
+        >
+          {this.renderLabelSection()}
+          {this.renderTitleBar()}
+        </div>
         <div className='field-settings-section'>
           {
             this.currentCategory() === ViewCategory.Settings ?
@@ -206,6 +230,10 @@ class EditorFieldSettings extends TemplateEditorField<Props>
 const activeStyle = fontColor(Colors().active, Colors().active);
 const inactiveStyle = fontColor(Colors().text2, Colors().inactiveHover);
 
+const topRowStyle = {
+  borderColor: Colors().boxShadow,
+  paddingLeft: `${leftColumnWidth}px`,
+};
 export default Util.createTypedContainer(
   EditorFieldSettings,
   mapStateKeys,

@@ -201,6 +201,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
             style={[backgroundColor(Colors().bg3)]}
           >
             <EditorFieldSettings
+              labelOverride={this.props.previewLabel}
               {...this._passProps()}
             />
           </div> : null

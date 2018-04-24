@@ -74,10 +74,6 @@ export interface Props
   onCheckboxClicked?: () => void;
 }
 
-const checkboxSize = 18;
-const checkboxMargin = 6;
-const arrowSize = 12;
-
 class ExpandableView extends TerrainComponent<Props>
 {
   public renderArrowSection()
@@ -88,8 +84,8 @@ class ExpandableView extends TerrainComponent<Props>
         className='nested-view-arrow-column'
         style={{
           color: Colors().text3,
-          marginLeft: '12px',
-          marginRight: hasChildren ? '3px' : '0px',
+          marginLeft: `${arrowColumnMargin}px`,
+          marginRight: `${arrowSpacing}px`,
         }}
       >
         <div className='nested-view-arrow-spacer-top' />
@@ -100,12 +96,7 @@ class ExpandableView extends TerrainComponent<Props>
             'nested-view-has-children': hasChildren,
           })}
           onClick={hasChildren ? this.props.onToggle : undefined}
-          style={{
-            width: arrowSize,
-            height: arrowSize,
-            padding: `3px 3px 3px 0px`,
-            margin: `-2px 0px`,
-          }}
+          style={arrowStyle}
         />
         <div
           className={classNames({
@@ -220,7 +211,7 @@ class ExpandableView extends TerrainComponent<Props>
           className='nested-view-content-row'
           style={{
             paddingTop: '0px',
-            paddingBottom: this.props.children == null ? '0px' : '3px',
+            paddingBottom: '0px',
           }}
         >
           {
@@ -229,7 +220,12 @@ class ExpandableView extends TerrainComponent<Props>
           {
             this.props.hideControls ? null : this.renderCheckboxSection()
           }
-          <div className='nested-view-content'>
+          <div
+            className='nested-view-content'
+            style={{
+              padding: this.props.children == null ? '0px' : '0px',
+            }}
+          >
             {this.props.content}
           </div>
         </div>
@@ -258,7 +254,7 @@ class ExpandableView extends TerrainComponent<Props>
     {
       return {
         margin: '0px 6px',
-        padding: '6px',
+        padding: '0px',
         boxShadow: `inset 0 -1px 0 0 ${Colors().boxShadow}`,
         backgroundColor: Colors().bg3,
       };
@@ -266,3 +262,18 @@ class ExpandableView extends TerrainComponent<Props>
   }
 }
 export default ExpandableView;
+
+const checkboxSize = 18;
+const checkboxMargin = 6;
+const arrowSize = 12;
+const arrowSpacing = 3;
+const arrowColumnMargin = 12;
+
+const arrowStyle = {
+  width: arrowSize,
+  height: arrowSize,
+  padding: `${arrowSpacing}px ${arrowSpacing}px ${arrowSpacing}px 0px`,
+  margin: `-2px 0px`,
+};
+
+export const leftColumnWidth = arrowSize + arrowSpacing + arrowColumnMargin + 3;

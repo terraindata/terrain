@@ -1,16 +1,22 @@
 @import "~common/Common.less";
 
-@title-bar-height: 56px;
+@title-bar-height: 57px;
 // EditorFieldSettings
 .template-editor-field-settings {
   padding: 0px;
   flex: 1;
 
+  .field-settings-top-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid;
+  }
+
   .field-settings-title-bar {
+    flex-grow: 1;
     height: @title-bar-height;
     display: flex;
     position: relative;
-    border-bottom: 1px solid;
     box-sizing: border-box;
 
     .field-settings-category {

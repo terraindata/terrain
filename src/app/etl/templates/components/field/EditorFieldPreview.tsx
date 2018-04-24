@@ -70,6 +70,7 @@ const KeyIcon = require('images/icon_key-2.svg');
 export interface Props extends TemplateEditorFieldProps
 {
   toggleOpen?: () => void;
+  labelOnly?: boolean;
   labelOverride?: string;
 }
 
@@ -137,7 +138,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
   public render()
   {
-    const { canEdit, preview, labelOverride } = this.props;
+    const { canEdit, preview, labelOverride, labelOnly } = this.props;
     const field = this._field();
     const settingsOpen = this._settingsAreOpen();
 
@@ -161,7 +162,7 @@ class EditorFieldPreview extends TemplateEditorField<Props>
 
     const menuOptions = this.getMenuOptions();
     const showMenu = menuOptions.size > 0 && (this.state.hovered || this.state.menuOpen);
-    const hidePreviewValue = field.isArray() || field.isNested();
+    const hidePreviewValue = field.isArray() || field.isNested() || labelOnly;
 
     return (
       <div className='template-editor-field-block'>
@@ -193,20 +194,23 @@ class EditorFieldPreview extends TemplateEditorField<Props>
                 :
                 null
             }
-            <div
-              className={classNames({
-                'field-preview-menu': true,
-                'field-preview-menu-hidden': !showMenu,
-              })}
-            >
-              <Menu
-                options={menuOptions}
-                small={true}
-                openRight={true}
-                onChangeState={this.handleMenuStateChange}
-                overrideMultiplier={7}
-              />
-            </div>
+            {
+              labelOnly ? null :
+                <div
+                  className={classNames({
+                    'field-preview-menu': true,
+                    'field-preview-menu-hidden': !showMenu,
+                  })}
+                >
+                  <Menu
+                    options={menuOptions}
+                    small={true}
+                    openRight={true}
+                    onChangeState={this.handleMenuStateChange}
+                    overrideMultiplier={7}
+                  />
+                </div>
+            }
           </div>
           {
             !hidePreviewValue &&
