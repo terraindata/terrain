@@ -45,9 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
-import Colors from 'app/colors/Colors';
-import RouteSelector from 'app/common/components/RouteSelector';
-import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
@@ -57,13 +54,10 @@ import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
-import { _SinkConfig, _SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import XHR from 'util/XHR';
 import Schedule from './Schedule';
-
 import './Schedule.less';
 
 export interface Props
@@ -111,13 +105,7 @@ class ScheduleList extends TerrainComponent<Props>
 
   public handleScheduleChange(schedule: SchedulerConfig)
   {
-    schedule = schedule.set('tasks', schedule.tasks.map((task) => task.toJS()));
     this.updateSchedule(schedule.id, schedule.toJS());
-  }
-
-  public canEdit(schedule)
-  {
-    return !schedule.running && TerrainTools.isAdmin();
   }
 
   public createSchedule()
@@ -125,16 +113,7 @@ class ScheduleList extends TerrainComponent<Props>
     const blankSchedule = {
       cron: '0 0 1 1 *',
       name: `Schedule`,
-      priority: 1,
       tasks: [{ params: { templateId: -1 } }],
-      workerId: 10,
-      createdAt: '',
-      id: null,
-      lastModified: '',
-      lastRun: '',
-      meta: '',
-      running: false,
-      shouldRunNext: true,
     };
     this.props.schedulerActions({
       actionType: 'createSchedule',
@@ -173,7 +152,7 @@ class ScheduleList extends TerrainComponent<Props>
         }
         <PathfinderCreateLine
           text='Add Schedule'
-          canEdit={true}
+          canEdit={TerrainTools.isAdmin()}
           onCreate={this.createSchedule}
           showText={true}
         />

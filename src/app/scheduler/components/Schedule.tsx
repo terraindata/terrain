@@ -47,9 +47,6 @@ THE SOFTWARE.
 import Colors from 'app/colors/Colors';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
-import { ETLActions } from 'app/etl/ETLRedux';
-import { ETLState } from 'app/etl/ETLTypes';
-import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
 import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
@@ -59,8 +56,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-
-import './Schedule.less';
 
 export interface Props
 {
@@ -180,17 +175,9 @@ class Schedule extends TerrainComponent<Props>
     }));
   }
 
-  // TODO NEED OPTION FOR UNPAUSE
   public handleRunPause(schedule)
   {
-    if (schedule.running)
-    {
-      this.props.onRun(schedule.id);
-    }
-    else
-    {
-      this.props.onPause(schedule.id);
-    }
+    schedule.running ? this.props.onRun(schedule.id) : this.props.onPause(schedule.id);
   }
 
   public handleScheduleChange(optionSetIndex: number, value: any)
@@ -212,8 +199,6 @@ class Schedule extends TerrainComponent<Props>
           configurationKey: value,
         });
         break;
-      case 2: // CRON
-      case 3:
       default:
         break;
     }
@@ -222,18 +207,15 @@ class Schedule extends TerrainComponent<Props>
   public getValues()
   {
     const { schedule } = this.props;
-    const task = this.getTask();
     const templateId = this.getTemplateId(schedule);
     const buttonValue = schedule.running ? 'Pause' : 'Run Now';
-    const status = task && task.jobStatus !== undefined ? task.jobStatus : 0;
-    const statusValue = status === 0 ? 'Active' : status === 1 ? 'Running' : 'Paused';
-    return List([templateId, this.state.configurationKey, 'everyday', statusValue, buttonValue]);
+    return List([templateId, this.state.configurationKey, buttonValue]);
   }
 
   public getOptionSets()
   {
     const { schedule } = this.props;
-    const task: any = this.getTask();
+    const task = this.getTask();
     // Template Option Set
     const templateOptions = this.props.templates.map((t) =>
     {
@@ -250,7 +232,6 @@ class Schedule extends TerrainComponent<Props>
       forceFloat: true,
       getCustomDisplayName: this.getTemplateName,
     };
-
     // Configuration Option Set (Based on Template)
     let configurationOptions = List([]);
     let configurationHeaderText = 'Choose a Template';
@@ -258,13 +239,11 @@ class Schedule extends TerrainComponent<Props>
     if (task && task.params && task.params.get('templateId') !== undefined)
     {
       template = this.props.templates.filter((temp) => temp.id === task.params.get('templateId')).get(0);
-      configurationHeaderText = '';
       if (template)
       {
-        const sources = template.sources;
-        const sinks = template.sinks;
-        const sourceOptions = this.getEndPointOptions(sources, true, schedule);
-        const sinkOptions = this.getEndPointOptions(sinks, false, schedule);
+        configurationHeaderText = '';
+        const sourceOptions = this.getEndPointOptions(template.sources, true, schedule);
+        const sinkOptions = this.getEndPointOptions(template.sinks, false, schedule);
         configurationOptions = sourceOptions.concat(sinkOptions).toList();
       }
     }
@@ -278,41 +257,6 @@ class Schedule extends TerrainComponent<Props>
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule, template),
     };
 
-    // CRON Option Set
-    const intervalOptionSet = {
-      column: true,
-      shortNameText: 'Interval',
-      forceFloat: true,
-      key: 'interval',
-      options: List([{ value: 'everyday', displayName: 'CRON SELECTOR GOES HERE' }]),
-    };
-
-    // Status Options
-    const statusOptions = List([
-      {
-        value: 'active',
-        displayName: 'Active',
-      },
-      {
-        value: 'running',
-        displayName: 'Running',
-        color: Colors().success,
-      },
-      {
-        value: 'disabled',
-        displayName: 'Disabled',
-        color: Colors().error,
-      },
-    ]);
-
-    const statusOptionSet = {
-      column: true,
-      options: statusOptions,
-      key: 'status',
-      shortNameText: 'Status',
-      forceFloat: true,
-    };
-
     // Buttons to Run / Pause
     const buttonOptionSet = {
       isButton: true,
@@ -322,9 +266,7 @@ class Schedule extends TerrainComponent<Props>
       column: true,
     };
 
-    // Log of Past Runs
-
-    return List([templateOptionSet, configurationOptionSet, intervalOptionSet, statusOptionSet, buttonOptionSet]);
+    return List([templateOptionSet, configurationOptionSet, buttonOptionSet]);
   }
 
   public canEdit()
