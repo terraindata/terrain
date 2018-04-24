@@ -49,7 +49,11 @@ import * as stream from 'stream';
 export class TaskInputConfigTypes
 {
   public logStream: stream.Readable = null;
+  public overrideSinks?: string = '';
+  public overrideSources?: string = '';
   public stream: stream.Readable = null;
+  public templateId?: string | number = null;
+  public template?: string = '';
 }
 
 export default TaskInputConfigTypes;

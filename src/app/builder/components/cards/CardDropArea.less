@@ -43,8 +43,8 @@
       .card-drop-area-could-drop-marker {
         @r: 6px;
         position: absolute;
-        width: @r * 2;
-        height: @r * 2;
+        width: (@r * 2);
+        height: (@r * 2);
         border-radius: @r;
         right: @r;
         top: calc(~"50% - @{r}");
@@ -68,8 +68,8 @@
       background: rgba(0,0,0,0) !important;
       border-radius: 99999px !important;
       @r: 4px;
-      top: -1 * @r !important;
-      left: -1 * @r !important;
+      top: (-1 * @r) !important;
+      left: (-1 * @r) !important;
       border: @r solid #000;
     }
   }

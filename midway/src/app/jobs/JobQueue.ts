@@ -90,25 +90,28 @@ export class JobQueue
     );
   }
 
-  public cancel(id: number): boolean
+  public cancel(id: number): Promise<JobConfig[]>
   {
-    try
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
-      this.runningJobs.get(id).cancel();
-      return true;
-    }
-    catch (e)
-    {
-      // do nothing, job was not found
-    }
-    return false;
+      try
+      {
+        this.runningJobs.get(id).cancel();
+        return resolve(await this.get(id) as JobConfig[]);
+      }
+      catch (e)
+      {
+        // do nothing, job was not found
+      }
+      return reject('Job not found.');
+    });
   }
 
   /*
    * PARAMS: job.tasks (TaskConfig[] ==> string)
    *
    */
-  public async create(job: JobConfig): Promise<JobConfig[] | string>
+  public async create(job: JobConfig, runNow?: boolean): Promise<JobConfig[] | string>
   {
     return new Promise<JobConfig[] | string>(async (resolve, reject) =>
     {
@@ -147,6 +150,12 @@ export class JobQueue
       job.tasks = (job.tasks !== undefined && job.tasks !== null) ? job.tasks : '[]';
       job.type = (job.type !== undefined && job.type !== null) ? job.type : 'default';
       job.workerId = (job.workerId !== undefined && job.workerId !== null) ? job.workerId : 1;
+
+      if (runNow === true)
+      {
+        job = await this._setRunNow(job);
+      }
+
       const upsertedJobs: JobConfig[] = await App.DB.upsert(this.jobTable, job) as JobConfig[];
       // check table to see if jobs need to be run
       await this._checkJobTable();
@@ -178,18 +187,21 @@ export class JobQueue
     return Promise.resolve({}); // TODO implement this
   }
 
-  public pause(id: number): boolean
+  public pause(id: number): Promise<JobConfig[]>
   {
-    try
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
-      this.runningJobs.get(id).pause();
-      return true;
-    }
-    catch (e)
-    {
-      // do nothing, job was not found
-    }
-    return false;
+      try
+      {
+        this.runningJobs.get(id).pause();
+        return resolve(await this.get(id) as JobConfig[]);
+      }
+      catch (e)
+      {
+        // do nothing, job was not found
+      }
+      return reject('Job not found.');
+    });
   }
 
   public async run(id: number): Promise<JobConfig[] | string>
@@ -202,34 +214,20 @@ export class JobQueue
         return reject('Job not found.');
       }
 
-      let maxRunNowPriority: number = 1;
-      const query = new Tasty.Query(this.jobTable).filter(this.jobTable['status'].equals('PENDING'))
-        .filter(this.jobTable['running'].equals('false')).filter(this.jobTable['priority'].equals(0))
-        .sort(this.jobTable['runNowPriority'], 'desc').take(1);
-      const queryStr: string = App.DB.getDB().generateString(query);
-      const rawResults = await App.DB.getDB().execute([queryStr]);
-
-      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
-      if (jobs.length !== 0)
-      {
-        maxRunNowPriority = jobs[0].runNowPriority;
-      }
-
-      getJobs[0].priority = 0;
-      getJobs[0].runNowPriority = maxRunNowPriority + 1;
+      getJobs[0] = await this._setRunNow(getJobs[0]);
       resolve(await App.DB.upsert(this.jobTable, getJobs[0]) as JobConfig[]);
     });
   }
 
-  public async unpause(id: number): Promise<boolean>
+  public async unpause(id: number): Promise<JobConfig[]>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
       try
       {
         if (this.runningJobs.has(id))
         {
-          resolve(true);
+          resolve(await this.get(id) as JobConfig[]);
           await this.runningJobs.get(id).run();
         }
       }
@@ -237,24 +235,10 @@ export class JobQueue
       {
         // do nothing, job was not found
       }
-      return resolve(false);
+      return reject('Job not found.');
     });
 
   }
-
-  // public async run(): Promise<TaskOutputConfig>
-  // {
-  //   this.runningJobs.set(job.id, new Job());
-  //   this.tasks = args;
-  //   const taskTreeConfig: TaskTreeConfig =
-  //     {
-  //       cancel: false,
-  //       filename: filename !== undefined ? filename : '',
-  //       jobStatus: 0,
-  //       paused: -1,
-  //     };
-  //   return this.taskTree.create(tasksAsTaskConfig, taskTreeConfig);
-  // }
 
   public async initializeJobQueue(): Promise<void>
   {
@@ -275,7 +259,7 @@ export class JobQueue
         return resolve(false);
       }
       jobs[0].running = running;
-      jobs[0]['status'] = status;
+      jobs[0].status = status;
       const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
       resolve(true);
     });
@@ -320,6 +304,7 @@ export class JobQueue
           {
             winston.warn(((e as any).toString() as string));
           }
+
           const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
           winston.info('created job');
           if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
@@ -385,6 +370,30 @@ export class JobQueue
 
       const results: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
       resolve(results);
+    });
+  }
+
+  // sets a job to be the top of the priority queue
+  private async _setRunNow(job: JobConfig): Promise<JobConfig>
+  {
+    return new Promise<JobConfig>(async (resolve, reject) =>
+    {
+      let maxRunNowPriority: number = 1;
+      const query = new Tasty.Query(this.jobTable).filter(this.jobTable['status'].equals('PENDING'))
+        .filter(this.jobTable['running'].equals('false')).filter(this.jobTable['priority'].equals(0))
+        .sort(this.jobTable['runNowPriority'], 'desc').take(1);
+      const queryStr: string = App.DB.getDB().generateString(query);
+      const rawResults = await App.DB.getDB().execute([queryStr]);
+
+      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
+      if (jobs.length !== 0)
+      {
+        maxRunNowPriority = jobs[0].runNowPriority;
+      }
+
+      job.priority = 0;
+      job.runNowPriority = maxRunNowPriority + 1;
+      return resolve(job as JobConfig);
     });
   }
 }

@@ -154,12 +154,12 @@
     @line-offset: 3px;
     .builder-resize-handle-line:first-child {
       // left: calc(@handle-width / 3);
-      left: @handle-width / 2 - @line-offset - 1px;
+      left: (@handle-width / 2 - @line-offset - 1px);
     }
 
     .builder-resize-handle-line:last-child {
       // left: calc(@handle-width * 2 / 3);
-      left: @handle-width / 2 + @line-offset - 1px;
+      left: (@handle-width / 2 + @line-offset - 1px);
     }
   }
 

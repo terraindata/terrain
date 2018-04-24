@@ -16,7 +16,7 @@
   left: 0px;
   width: 100%;
   background: @bg;
-  height: @w + 2 * @m;
+  height: (@w + 2 * @m);
   
   z-index: 9999;
   
@@ -88,7 +88,7 @@
   }
   
   .paging-previous {
-    left: @w + 2 * @m;
+    left: (@w + 2 * @m);
   }
   
   .paging-last {
@@ -96,23 +96,23 @@
   }
   
   .paging-next {
-    right: @w + 2 * @m;
+    right: (@w + 2 * @m);
   }
   
   .paging-pages {
-    left: 2 * @w + 3 * @m;
+    left: (2 * @w + 3 * @m);
     width: calc(~"100% - 5 * @{w} - 7 * @{m}");
     overflow: hidden;
     position: relative;
     top: @m;
-    left: @w * 2 + 3 * @m;
+    left: (@w * 2 + 3 * @m);
     padding-bottom: @m;
     
     max-height: 250px;
   }
   
   .paging-all-pages {
-    right: @w * 2 + 3 * @m;
+    right: (@w * 2 + 3 * @m);
   }
   
 }

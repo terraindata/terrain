@@ -218,6 +218,42 @@ export default class Templates
     });
   }
 
+  public async executeETL(
+    fields?: {
+      template?: string,
+      templateId?: string | number,
+      overrideSources?: string,
+      overrideSinks?: string,
+    },
+    files?: Readable[],
+  )
+  {
+    return new Promise<any>(async (resolve, reject) =>
+    {
+      if (fields.template !== undefined)
+      {
+        const template = JSON.parse(fields.template);
+        resolve(await this.execute(template, files));
+      }
+      else if (fields.templateId !== undefined)
+      {
+        const templateId = Number(fields.templateId);
+        if (fields.overrideSources !== undefined || fields.overrideSinks !== undefined)
+        {
+          resolve(await this.executeByOverride(templateId, files, fields.overrideSources, fields.overrideSinks));
+        }
+        else
+        {
+          resolve(await this.executeById(templateId, files));
+        }
+      }
+      else
+      {
+        reject(new Error('Missing template or template ID parameter.'));
+      }
+    });
+  }
+
   public async upsert(newTemplate: TemplateConfig): Promise<TemplateConfig[]>
   {
     return new Promise<TemplateConfig[]>(async (resolve, reject) =>
