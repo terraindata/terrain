@@ -13,7 +13,6 @@
   }
 
   .nested-view-arrow-column {
-    margin-left: @half-spacing;
     align-self: stretch;
     display: flex;
     flex-direction: column;
@@ -28,11 +27,6 @@
     width: 1px;
     align-self: center;
     margin-top: @arrow-spacer-size;
-    &.nested-view-open {
-      &.nested-view-has-children {
-        // border-left: 1px solid;
-      }
-    }
   }
 
   .nested-view-arrow-icon {
@@ -40,10 +34,10 @@
     position: relative;
     fill: currentColor;
     flex-grow: 0;
-    transform: rotate(90deg);
+    transform: rotate(0deg);
     .transition;
     &.nested-view-open {
-      transform: rotate(180deg);
+      transform: rotate(90deg);
     }
     &:not(.nested-view-has-children) {
       opacity: 0;
@@ -58,15 +52,12 @@
     overflow: visible;
     display: none;
     &.nested-view-open {
-      // border-left: 1px solid;
       display: block;
     }
   }
 
   .nested-view-injected-container {
-    &.nested-view-open {
-      // border-left: 1px solid;
-    }
+
   }
 
   .nested-view-checkbox-column {

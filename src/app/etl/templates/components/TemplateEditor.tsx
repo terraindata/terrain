@@ -55,14 +55,14 @@ import Util from 'util/Util';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import { ETLActions } from 'etl/ETLRedux';
-import AddFieldModal from 'etl/templates/components/field/AddFieldModal';
 import DocumentsPreviewColumn from 'etl/templates/components/columns/DocumentsPreviewColumn';
 import EditorColumnBar from 'etl/templates/components/columns/EditorColumnBar';
 import { EndpointsColumn, StepsColumn } from 'etl/templates/components/columns/OptionsColumn';
+import AddFieldModal from 'etl/templates/components/field/AddFieldModal';
 import ExtractFieldModal from 'etl/templates/components/field/ExtractFieldModal';
 import MoveFieldModal from 'etl/templates/components/field/MoveFieldModal';
-import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import RootFieldNode from 'etl/templates/components/field/RootFieldNode';
+import EditorPreviewControl from 'etl/templates/components/preview/EditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';

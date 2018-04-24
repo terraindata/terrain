@@ -58,6 +58,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/a
 
 import './NestedView.less';
 const ArrowIcon = require('images/icon_arrow.svg');
+const ExpandIcon = require('images/icon_carrot.svg');
 
 export interface Props
 {
@@ -67,8 +68,6 @@ export interface Props
   style?: any;
   children?: any; // the expandable content rendered beneath the content
   injectedContent?: any;
-  hideContent?: boolean;
-  hideArrow?: boolean;
   showCheckbox?: boolean;
   checked?: boolean;
   onCheckboxClicked?: () => void;
@@ -77,27 +76,23 @@ export interface Props
 const checkboxSize = 18;
 const checkboxMargin = 6;
 const arrowSize = 12;
-const arrowPadding = 2;
-const containerLeftPadding = arrowPadding + arrowSize / 2;
-const containerLeftMargin = containerLeftPadding - 1;
 
 class ExpandableView extends TerrainComponent<Props>
 {
   public renderArrowSection()
   {
-    if (this.props.hideArrow)
-    {
-      return null;
-    }
-
     const hasChildren = this.props.children !== undefined && this.props.children !== null;
     return (
       <div
         className='nested-view-arrow-column'
-        style={fontColor(Colors().text3)}
+        style={{
+          color: Colors().text3,
+          marginLeft: '12px',
+          marginRight: hasChildren ? '3px' : '0px',
+        }}
       >
         <div className='nested-view-arrow-spacer-top' />
-        <ArrowIcon
+        <ExpandIcon
           className={classNames({
             'nested-view-arrow-icon': true,
             'nested-view-open': this.props.open,
@@ -107,8 +102,8 @@ class ExpandableView extends TerrainComponent<Props>
           style={{
             width: arrowSize,
             height: arrowSize,
-            padding: `${arrowPadding}px`,
-            margin: `-${arrowPadding}px 0px`,
+            padding: `3px 3px 3px 0px`,
+            margin: `-2px 0px`,
           }}
         />
         <div
@@ -127,40 +122,39 @@ class ExpandableView extends TerrainComponent<Props>
 
   public renderCheckboxSection()
   {
-    return null;
-    // if (!this.props.showCheckbox)
-    // {
-    //   return (
-    //     <div
-    //       className='nested-view-checkbox-column nested-view-checkbox-hidden'
-    //       style={{
-    //         width: '0px',
-    //         height: '0px',
-    //         paddingLeft: '0px',
-    //       }}
-    //     >
-    //     </div>
-    //   );
-    // }
-    // else
-    // {
-    //   return (
-    //     <div
-    //       className='nested-view-checkbox-column'
-    //       style={{
-    //         width: `${checkboxSize}px`,
-    //         height: `${checkboxSize}px`,
-    //         marginLeft: `${checkboxMargin}px`,
-    //       }}
-    //     >
-    //       <CheckBox
-    //         checked={this.props.checked}
-    //         className='nested-view-checkbox'
-    //         onChange={this.props.onCheckboxClicked}
-    //       />
-    //     </div>
-    //   );
-    // }
+    if (!this.props.showCheckbox)
+    {
+      return (
+        <div
+          className='nested-view-checkbox-column nested-view-checkbox-hidden'
+          style={{
+            width: '0px',
+            height: '0px',
+            paddingLeft: '0px',
+          }}
+        >
+        </div>
+      );
+    }
+    else
+    {
+      return (
+        <div
+          className='nested-view-checkbox-column'
+          style={{
+            width: `${checkboxSize}px`,
+            height: `${checkboxSize}px`,
+            marginLeft: `${checkboxMargin}px`,
+          }}
+        >
+          <CheckBox
+            checked={this.props.checked}
+            className='nested-view-checkbox'
+            onChange={this.props.onCheckboxClicked}
+          />
+        </div>
+      );
+    }
   }
 
   public renderChildren()
@@ -174,11 +168,6 @@ class ExpandableView extends TerrainComponent<Props>
             'nested-view-children-container': true,
             'nested-view-open': this.props.open,
           })}
-          style={{
-            /*marginLeft: this.props.hideArrow ? '' : `${containerLeftMargin}px`,
-            paddingLeft: this.props.hideArrow ? '' : containerLeftPadding,*/
-            // borderLeft: this.props.hideArrow ? '0px solid' : `1px solid ${leftBorderColor}`,
-          }}
         >
           {this.props.children}
         </div>
@@ -197,8 +186,6 @@ class ExpandableView extends TerrainComponent<Props>
             'nested-view-open': this.props.open,
           })}
           style={{
-            marginLeft: containerLeftMargin,
-            paddingLeft: containerLeftPadding,
             borderColor: this.getBorderColor(),
           }}
         >
@@ -219,31 +206,31 @@ class ExpandableView extends TerrainComponent<Props>
 
   public render()
   {
+    const rootStyle = this.getStyle(this.props.children != null);
+    const style = this.props.style !== undefined ? _.extend({}, rootStyle, this.props.style) : rootStyle;
+
     return (
       <div className={classNames({
         'nested-view-container': true,
       })}
-        style={this.getStyle(this.props.children != null)}
+        style={style}
       >
-        {
-          this.props.hideContent ? <div /> :
-            <div
-              className='nested-view-content-row'
-              style={{
-                paddingBottom: this.props.children == null ? '0px' : '3px'
-              }}
-            >
-              {
-                this.renderArrowSection()
-              }
-              {
-                this.renderCheckboxSection()
-              }
-              <div className='nested-view-content'>
-                {this.props.content}
-              </div>
-            </div>
-        }
+        <div
+          className='nested-view-content-row'
+          style={{
+            paddingBottom: this.props.children == null ? '0px' : '3px',
+          }}
+        >
+          {
+            this.renderArrowSection()
+          }
+          {
+            this.renderCheckboxSection()
+          }
+          <div className='nested-view-content'>
+            {this.props.content}
+          </div>
+        </div>
         {
           this.renderInjectedContent()
         }
@@ -262,8 +249,8 @@ class ExpandableView extends TerrainComponent<Props>
         backgroundColor: Colors().bg2,
         margin: '6px',
         padding: '6px 0px',
-        border: `2px solid ${Colors().bg3}`
-      }
+        border: `2px solid ${Colors().bg3}`,
+      };
     }
     else
     {
@@ -272,7 +259,7 @@ class ExpandableView extends TerrainComponent<Props>
         padding: '6px',
         boxShadow: 'inset 0 -1px 0 0 rgba(227, 227, 227, 0.78)',
         backgroundColor: Colors().bg3,
-      }
+      };
     }
   }
 }
