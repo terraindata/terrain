@@ -60,7 +60,7 @@ export default class ESParameterSubstituter
     return (new ESParameterSubstituter(source, substitutionFunction)).result;
   }
 
-  private substitutionFunction: (param: string, runtimeParam?: string) => string;
+  private substitutionFunction: (param: string, runtimeParam?: string, inTerms?: boolean) => string;
   private result: string;
 
   public constructor(source: ESValueInfo,
@@ -86,7 +86,7 @@ export default class ESParameterSubstituter
       case ESJSONType.string:
         if (source.parameter !== undefined)
         {
-          this.appendParameter(source.parameter, inShould && inTerms, alias);
+          this.appendParameter(source.parameter, inShould && inTerms, inTerms, alias);
           break;
         }
 
@@ -94,7 +94,7 @@ export default class ESParameterSubstituter
         break;
 
       case ESJSONType.parameter:
-        this.appendParameter(source.parameter as string, inShould && inTerms, alias);
+        this.appendParameter(source.parameter as string, inShould && inTerms, inTerms, alias);
         break;
 
       case ESJSONType.array:
@@ -137,7 +137,7 @@ export default class ESParameterSubstituter
               inShould = true;
             }
 
-            if (inShould && property.propertyName.value === 'terms')
+            if (property.propertyName.value === 'terms')
             {
               inTerms = true;
             }
@@ -169,9 +169,9 @@ export default class ESParameterSubstituter
     }
   }
 
-  private appendParameter(param: string, replaceNullWithEmptyArray: boolean, alias?: string): void
+  private appendParameter(param: string, replaceNullWithEmptyArray: boolean, inTerms: boolean, alias?: string): void
   {
-    let subst = this.substitutionFunction(param, alias);
+    let subst = this.substitutionFunction(param, alias, inTerms);
     if (replaceNullWithEmptyArray && subst === 'null')
     {
       subst = '[]';

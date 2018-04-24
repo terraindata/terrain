@@ -151,6 +151,10 @@ export class Scheduler
         return reject('Schedule not found.');
       }
       const schedule: SchedulerConfig = schedules[0];
+      if (schedule.running === true)
+      {
+        return reject('Schedule ' + (id.toString() as string) + ' is already running.');
+      }
       const jobFilename: string = 'Task_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
       const jobType: string = runNow === true ? 'Scheduled ad-hoc' : 'Scheduled';
       const jobConfig: JobConfig =
@@ -171,14 +175,12 @@ export class Scheduler
           workerId: 1, // TODO change this for clustering support
         };
       await this.setRunning(id, true);
-      const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig);
+      const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);
       }
-      // const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
       this.runningSchedules.delete(id);
-      // TODO: unlock row
       return resolve('Running schedule ' + ((id as number).toString() as string));
     });
   }
