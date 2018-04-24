@@ -44,40 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { Task } from './Task';
-import { TreeVisitor } from './TreeVisitor';
-
-import { TaskDefaultExit } from './tasks/TaskDefaultExit';
-import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
-import { TaskExport } from './tasks/TaskExport';
-import { TaskImport } from './tasks/TaskImport';
-
-export class TaskTreeVisitor extends TreeVisitor
+export interface TaskTreeConfig
 {
-  public async visitNode(node: Task): Promise<TaskOutputConfig>
-  {
-    return node.run();
-  }
-
-  public visitDefaultExitNode(node: TaskDefaultExit): Promise<TaskOutputConfig>
-  {
-    return node.run();
-  }
-
-  public visitDefaultFailureNode(node: TaskDefaultFailure): Promise<TaskOutputConfig>
-  {
-    return node.run();
-  }
-
-  public visitExportNode(node: TaskExport): Promise<TaskOutputConfig>
-  {
-    return node.run();
-  }
-
-  public visitImportNode(node: TaskImport): Promise<TaskOutputConfig>
-  {
-    return node.run();
-  }
+  cancel: boolean;
+  filename: string;
+  jobStatus: number;
+  paused: number;
 }
+
+export default TaskTreeConfig;

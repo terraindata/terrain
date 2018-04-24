@@ -46,7 +46,10 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
-import { TaskConfig, TaskEnum, TaskInputConfig, TaskOutputConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskEnum } from 'shared/types/jobs/TaskEnum';
+import { TaskInputConfig } from 'shared/types/jobs/TaskInputConfig';
+import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 
 export abstract class Task
 {

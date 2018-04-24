@@ -48,45 +48,15 @@ import * as stream from 'stream';
 
 export class TaskConfig
 {
-  public cancel: boolean = false; // whether the tree of tasks should be cancelled
-  public id: number = -1; // unique id that identifies this task to other tasks in the input array of TaskConfigs
-  public jobStatus: number = 0; // 0: not running, 1: running, 2: paused
-  public name: string = ''; // name of the task i.e. 'import'
-  public onFailure?: number = null; // id of task to execute on failure
-  public onSuccess?: number = null; // id of next task to execute (default should be next in array)
-  public params: any = {}; // input parameters for the task
-  public paused: number = null; // where in the tree of tasks the tasks are paused
-  public taskId: number = null; // maps to a statically declared task
+  public cancel: boolean = null;     // whether the tree of tasks should be cancelled
+  public id: number = null;          // unique id that identifies this task to other tasks in the input array of TaskConfigs
+  public jobStatus: number = null;   // 0: not running, 1: running, 2: paused
+  public name: string = '';          // name of the task i.e. 'import'
+  public onFailure: number = null;   // id of task to Pexecute on failure
+  public onSuccess: number = null;   // id of next task to execute (default should be next in array)
+  public params: ATaskConfig = {}; // input parameters for the task
+  public paused: number = null;      // where in the tree of tasks the tasks are paused
+  public taskId: number = null;      // maps to a statically declared task
 }
 
-export enum TaskEnum
-{
-  taskDefaultExit,
-  taskDefaultFailure,
-  taskExport, // TODO implement this
-  taskImport, // TODO implement this
-}
-
-export interface TaskInputConfig
-{
-  options?: TaskInputConfigTypes;
-}
-
-export interface TaskOutputConfig extends TaskInputConfig
-{
-  exit: boolean;
-  status: boolean;
-}
-
-export interface TaskTreeConfig
-{
-  cancel: boolean;
-  filename: string;
-  jobStatus: number;
-  paused: number;
-}
-
-interface TaskInputConfigTypes
-{
-  stream: stream.Readable;
-}
+export default TaskConfig;

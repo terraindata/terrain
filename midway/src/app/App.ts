@@ -71,7 +71,7 @@ import { JobQueue } from './jobs/JobQueue';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
-import { scheduler } from './scheduler/SchedulerRouter';
+import { Scheduler } from './scheduler/Scheduler';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
 
@@ -82,6 +82,7 @@ export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
 export let JobQ: JobQueue;
+export let SKDR: Scheduler;
 
 export class App
 {
@@ -116,6 +117,7 @@ export class App
 
   private DB: Tasty.Tasty;
   private JobQ: JobQueue;
+  private SKDR: Scheduler;
   private app: Koa;
   private config: Config.Config;
   private heapAvail: number;
@@ -136,6 +138,9 @@ export class App
 
     this.JobQ = new JobQueue();
     JobQ = this.JobQ;
+
+    this.SKDR = new Scheduler();
+    SKDR = this.SKDR;
 
     this.app = new Koa();
     this.app.proxy = true;
@@ -253,7 +258,7 @@ export class App
     await this.JobQ.initializeJobQueue();
 
     // initialize scheduler
-    await scheduler.initializeScheduler();
+    await this.SKDR.initializeScheduler();
 
     // connect to configured databases
     const dbs = await databases.select(['id'], {});

@@ -47,7 +47,9 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import * as winston from 'winston';
 
-import { TaskConfig, TaskOutputConfig, TaskTreeConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
+import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
 import { Task } from './Task';
 import { TaskTree } from './TaskTree';
 
