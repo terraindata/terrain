@@ -122,13 +122,13 @@ export class ExportTemplates
     });
   }
 
-  public async updateAccessToken(user: UserConfig, templateID: number): Promise<ExportTemplateConfig>
+  public async updateAccessToken(user: UserConfig, templateId: number): Promise<ExportTemplateConfig>
   {
     return new Promise<ExportTemplateConfig>(async (resolve, reject) =>
     {
-      if (templateID !== undefined)
+      if (templateId !== undefined)
       {
-        const results: ExportTemplateConfig[] = await this.get(templateID);
+        const results: ExportTemplateConfig[] = await this.get(templateId);
         // template id specified but template not found
         if (results.length === 0)
         {

@@ -51,6 +51,10 @@ import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { Task } from '../Task';
 
+import Templates from '../../etl/Templates';
+
+const templates: Templates = new Templates();
+
 export class TaskETL extends Task
 {
   constructor(taskConfig: TaskConfig)
@@ -62,29 +66,40 @@ export class TaskETL extends Task
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
-      // TODO: call other functions (needs to wrap in Promise for later)
-      // example stub for export returning a stream.Readable
-      const returnStream: stream.Readable = new stream.Readable();
-      const writeStream: stream.Writable = new stream.Writable();
-      returnStream.pipe(writeStream);
-      writeStream.write('Export stream test\n');
       const taskOutputConfig: TaskOutputConfig =
         {
           exit: false,
           options:
             {
               logStream: null,
-              stream: returnStream,
+              stream: new stream.PassThrough(),
             },
           status: true,
         };
-      resolve(taskOutputConfig);
+
+      templates.executeETL(this.taskConfig.params as object).then((result) =>
+      {
+        taskOutputConfig.options.stream = result;
+        resolve(taskOutputConfig);
+      }).catch((err) =>
+      {
+        taskOutputConfig.status = false;
+        try
+        {
+          winston.warn('Error while running ETL task: ' + ((err as any).toString() as string));
+        }
+        catch (e)
+        {
+          winston.warn('Tried to print out ETL output error and failed');
+        }
+        resolve(taskOutputConfig);
+      });
     });
   }
 
   public async printNode(): Promise<TaskOutputConfig>
   {
-    winston.info('Printing Export, params: ' + JSON.stringify(this.taskConfig.params as object));
+    winston.info('Printing ETL Task, params: ' + JSON.stringify(this.taskConfig.params as object));
     return Promise.resolve(
       {
         exit: false,
