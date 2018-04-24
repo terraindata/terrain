@@ -50,7 +50,6 @@ import Util from 'util/Util';
 import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from 'shared/util/Classes';
-import Util from 'util/Util';
 
 class SchedulerConfigC extends SharedSchedulerConfig
 {
