@@ -71,79 +71,27 @@ export interface Props
 interface State
 {
   configurationKey: string;
-  overrideSources: Immutable.Map<string, SourceConfig>;
-  overrideSinks: Immutable.Map<string, SinkConfig>;
 }
 
 class Schedule extends TerrainComponent<Props>
 {
   public state: State = {
     configurationKey: '',
-    overrideSources: Map({}),
-    overrideSinks: Map({}),
   };
-
-  public componentDidMount()
-  {
-    this.updateOverrides(this.props.schedule);
-  }
-
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    if (this.props.schedule !== nextProps.schedule)
-    {
-      const oldTask: TaskConfig = this.getTask();
-      const newTask: TaskConfig = this.getTask(nextProps.schedule);
-      const oldSources = oldTask.getIn(['params', 'overrideSources']);
-      const oldSinks = oldTask.getIn(['params', 'overrideSinks']);
-      const newSources = newTask.getIn(['params', 'overrideSources']);
-      const newSinks = newTask.getIn(['params', 'overrideSinks']);
-      if (oldSinks !== newSinks || oldSources !== newSources)
-      {
-        this.updateOverrides(nextProps.schedule);
-      }
-    }
-  }
 
   public shouldComponentUpdate(nextProps: Props, nextState: State)
   {
     return nextProps !== this.props || nextState !== this.state;
   }
 
-  public updateOverrides(schedule)
+  public getSourceSinkDescription(template)
   {
-    const task = this.getTask(schedule);
-    let sources = Map({});
-    let sinks = Map({});
-    if (task.params && task.params.get('overrideSources'))
-    {
-      const sourceObj = task.params.get('overrideSources');
-      _.keys(Util.asJS(sourceObj)).forEach((key) =>
-      {
-        sources = sources.set(key, _SourceConfig(sourceObj.get(key)));
-      });
-    }
-    if (task.params && task.params.get('overrideSinks'))
-    {
-      const sinkObj = task.params.get('overrideSinks');
-      _.keys(Util.asJS(sinkObj)).forEach((key) =>
-      {
-        sinks = sinks.set(key, _SinkConfig(sinkObj.get(key)));
-      });
-    }
-    this.setState({
-      overrideSources: sources,
-      overrideSinks: sinks,
-    });
-  }
-
-  public getSourceSinkDescription(schedule: SchedulerConfig, template)
-  {
+    const { schedule } = this.props;
     if (!template)
     {
       return '--';
     }
-    template = template.applyOverrides(this.state.overrideSources, this.state.overrideSinks);
+    template = template.applyOverrides(this.getParam('overrideSources'), this.getParam('overrideSinks'));
     return template.getDescription(this.props.algorithms);
   }
 
@@ -161,7 +109,7 @@ class Schedule extends TerrainComponent<Props>
     const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
     return List(keys.map((key) =>
     {
-      const endpoint = (this.state[sourceKey] as any).get(key) || endpoints.get(key);
+      const endpoint = (this.getParam(sourceKey) as any).get(key) || endpoints.get(key);
       return {
         value: isSource ? 'source' + key : 'sink' + key,
         displayName: endpoint.name,
@@ -202,7 +150,7 @@ class Schedule extends TerrainComponent<Props>
   public getValues()
   {
     const { schedule } = this.props;
-    const templateId = this.getTemplateId(schedule);
+    const templateId = this.getParam('templateId', -1);
     return List([templateId, this.state.configurationKey]);
   }
 
@@ -248,7 +196,7 @@ class Schedule extends TerrainComponent<Props>
       headerText: configurationHeaderText,
       column: true,
       forceFloat: true,
-      getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule, template),
+      getCustomDisplayName: this._fn(this.getSourceSinkDescription, template),
     };
 
     return List([templateOptionSet, configurationOptionSet]);
@@ -257,16 +205,6 @@ class Schedule extends TerrainComponent<Props>
   public canEdit()
   {
     return !this.props.schedule.running && TerrainTools.isAdmin();
-  }
-
-  public getTemplateId(schedule)
-  {
-    const task = this.getTask();
-    if (task && task.params && task.params.get('templateId') !== undefined)
-    {
-      return task.params.get('templateId');
-    }
-    return -1;
   }
 
   public getTemplateName(templateId: ID, index: number)
@@ -280,6 +218,16 @@ class Schedule extends TerrainComponent<Props>
   {
     const schedule = overrideSchedule || this.props.schedule;
     return (schedule.tasks && schedule.tasks.get(index)) || _TaskConfig({});
+  }
+
+  public getParam(key, defaultValue?)
+  {
+    const task = this.getTask();
+    if (task && task.params && task.params.get(key) !== undefined)
+    {
+      return task.params.get(key);
+    }
+    return defaultValue;
   }
 
   public render()
