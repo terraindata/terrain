@@ -58,7 +58,7 @@ export class SchedulerConfig
   public priority: number = 1;                     // priority of the scheduled job
   public running: boolean = false;                 // whether the task is running or not (TODO: lock this)
   public shouldRunNext: boolean = true;            // whether the job should run again or not
-  public tasks: string = '';                       // stringified representation of an array of TaskConfigs
+  public tasks: any = '';                       // stringified representation of an array of TaskConfigs
   public workerId: number = null;                  // for clustering, denotes the node ID
 }
 
