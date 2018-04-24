@@ -47,7 +47,8 @@ THE SOFTWARE.
 export class JobConfig
 {
   public createdAt: Date = null;                   // when the job was created
-  public id: number = null;                        // job ID
+  public id: number = undefined;                   // job ID
+  public logId: number = null;                     // jobLog table ID
   public meta: string = '';                        // meta
   public name: string = '';                        // name of the job
   public pausedFilename: string = '';              // filename of the stored paused output

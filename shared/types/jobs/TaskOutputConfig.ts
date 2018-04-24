@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import TaskInputConfig from './TaskInputConfig';
 
-export interface TaskOutputConfig extends TaskInputConfig
+export class TaskOutputConfig extends TaskInputConfig
 {
   public exit: boolean = null;
   public status: boolean = null;
