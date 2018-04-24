@@ -49,7 +49,7 @@ import TaskInputConfigTypes from './TaskInputConfigTypes';
 
 export class TaskInputConfig extends ATaskConfig
 {
-  public options: TaskInputConfigTypes = null;
+
 }
 
 export default TaskInputConfig;

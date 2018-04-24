@@ -46,10 +46,11 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
-import Util from 'util/Util';
+import { _SinkConfig, _SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from 'shared/util/Classes';
+import Util from 'util/Util';
 
 class SchedulerConfigC extends SharedSchedulerConfig
 {
@@ -100,6 +101,7 @@ class TaskConfigC extends SharedTaskConfig
 {
   // Any extra functions / properties go here
 }
+
 const TaskConfig_Record = createRecordType(new TaskConfigC(), 'TaskConfigC');
 export interface TaskConfig extends TaskConfigC, IMap<TaskConfig> { }
 export const _TaskConfig =
@@ -109,11 +111,17 @@ export const _TaskConfig =
     task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
     if (task.getIn(['params', 'overrideSources']))
     {
-      task = task.setIn(['params', 'overrideSources'], Immutable.Map(task.getIn(['params', 'overrideSources'])));
+      task = task.setIn(
+        ['params', 'overrideSources'],
+        Util.objectToImmutableMap(task.getIn(['params', 'overrideSources']), _SourceConfig),
+      );
     }
     if (task.getIn(['params', 'overrideSinks']))
     {
-      task = task.setIn(['params', 'overrideSinks'], Immutable.Map(task.getIn(['params', 'overrideSinks'])));
+      task = task.setIn(
+        ['params', 'overrideSinks'],
+        Util.objectToImmutableMap(task.getIn(['params', 'overrideSinks']), _SinkConfig),
+      );
     }
     return task;
   };

@@ -48,7 +48,7 @@ export enum TaskEnum
 {
   taskDefaultExit,
   taskDefaultFailure,
-  taskETL, // TODO implement this
+  taskETL,
 }
 
 export default TaskEnum;

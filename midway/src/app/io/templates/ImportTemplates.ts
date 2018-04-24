@@ -116,13 +116,13 @@ export class ImportTemplates
     });
   }
 
-  public async updateAccessToken(user: UserConfig, templateID: number): Promise<ImportTemplateConfig>
+  public async updateAccessToken(user: UserConfig, templateId: number): Promise<ImportTemplateConfig>
   {
     return new Promise<ImportTemplateConfig>(async (resolve, reject) =>
     {
-      if (templateID !== undefined)
+      if (templateId !== undefined)
       {
-        const results: ImportTemplateConfig[] = await this.get(templateID);
+        const results: ImportTemplateConfig[] = await this.get(templateId);
         // template id specified but template not found
         if (results.length === 0)
         {

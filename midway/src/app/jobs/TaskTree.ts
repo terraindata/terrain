@@ -94,7 +94,14 @@ export class TaskTree
     taskConfigs.forEach((task) =>
     {
       idSet.add(task.id);
+      task.cancel = (task.cancel !== undefined && task.cancel !== null) ? task.cancel : false;
+      task.jobStatus = (task.jobStatus !== undefined && task.jobStatus !== null) ? task.jobStatus : 0;
+      task.name = (task.name !== undefined && task.name !== null) ? task.name : '';
+      task.params = (task.params !== undefined && task.params !== null) ? task.params : null;
+      task.paused = (task.paused !== undefined && task.paused !== null) ? task.paused : null;
+      task.taskId = (task.taskId !== undefined && task.taskId !== null) ? task.taskId : TaskEnum.taskDefaultExit;
     });
+
     if (taskConfigs.length !== idSet.size) // there were duplicates
     {
       return 'All tasks must have unique IDs';
@@ -103,6 +110,7 @@ export class TaskTree
     this.taskTreeConfig = taskTreeConfig;
 
     taskConfigs = this._appendDefaults(taskConfigs);
+
     for (let i = 0; i < taskConfigs.length - 2; ++i)
     {
       if (i < taskConfigs.length - 3) // not the last original task
