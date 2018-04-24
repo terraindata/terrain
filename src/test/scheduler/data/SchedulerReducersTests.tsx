@@ -137,7 +137,7 @@ describe('SchedulerReducers', () =>
         .addSchedule(existingSchedule)
         .getState();
 
-      const updatedSchedule = { id: 1, name: 'Schedule 1 modified' }
+      const updatedSchedule = { id: 1, name: 'Schedule 1 modified' };
 
       const nextState = reducer(scheduler, {
         type: SchedulerActionTypes.updateScheduleSuccess,
