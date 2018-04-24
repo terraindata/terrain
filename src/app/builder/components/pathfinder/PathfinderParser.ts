@@ -646,7 +646,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
         }),
       });
     case 'isin':
-      field = line.analyzed ? line.field + '.keyword' : line.field;
+      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
       try
       {
         return Map({
@@ -680,7 +680,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
 
     case 'isnotin':
       let parsed = value;
-      field = line.analyzed ? line.field + '.keyword' : line.field;
+      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
       try
       {
         parsed = JSON.parse(String(value).toLowerCase());
