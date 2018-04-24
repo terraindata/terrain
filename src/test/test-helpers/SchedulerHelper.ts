@@ -42,78 +42,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:max-classes-per-file strict-boolean-expressions import-spacing
-
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-const { List, Map } = Immutable;
-import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'src/app/Classes';
-
 import
 {
-  FileConfig as FileConfigI,
-  SinkConfig as SinkConfigI,
-  SinkOptionsDefaults, SinkOptionsType,
-  Sinks,
-  SourceConfig as SourceConfigI,
-  SourceOptionsDefaults, SourceOptionsType,
-  Sources,
-} from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
-import { TransformationEngine } from 'shared/transformations/TransformationEngine';
+  _SchedulerState,
+  SchedulerState,
+} from 'scheduler/SchedulerTypes';
+import { ItemType } from '../../items/types/Item';
 
-class FileConfigC implements FileConfigI
+export default class SchedulerHelper
 {
-  public fileType: FileTypes = FileTypes.Json;
-  public hasCsvHeader = true;
-  public jsonNewlines = false;
-}
-export type FileConfig = WithIRecord<FileConfigC>;
-export const _FileConfig = makeConstructor(FileConfigC);
-
-class SourceConfigC implements SourceConfigI
-{
-  public type = null;
-  public name = 'Default Source';
-  public fileConfig = _FileConfig();
-  public options = {};
-}
-export type SourceConfig = WithIRecord<SourceConfigC>;
-export const _SourceConfig = makeExtendedConstructor(SourceConfigC, true, {
-  fileConfig: _FileConfig,
-},
-  (cfg?, deep?) =>
+  public static mockState()
   {
-    const config = cfg || {};
-    const defaults: Partial<SourceConfig> = {};
-    if (config.type !== undefined)
-    {
-      defaults.options = SourceOptionsDefaults[config.type];
-    }
-    return _.extend(defaults, config);
-  },
-);
-
-class SinkConfigC implements SinkConfigI
-{
-  public type = null;
-  public name = 'Default Sink';
-  public fileConfig = _FileConfig();
-  public options = {};
+    return new SchedulerStateMock();
+  }
 }
-export type SinkConfig = WithIRecord<SinkConfigC>;
-export const _SinkConfig = makeExtendedConstructor(SinkConfigC, true, {
-  fileConfig: _FileConfig,
-},
-  (cfg?, deep?) =>
+
+class SchedulerStateMock
+{
+  public state;
+
+  public constructor()
   {
-    const config = cfg || {};
-    const defaults: Partial<SourceConfig> = {};
-    if (config.type !== undefined)
-    {
-      defaults.options = SinkOptionsDefaults[config.type];
-    }
-    return _.extend(defaults, config);
-  },
-);
+    this.state = _SchedulerState({});
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+
+  public loading(isLoading: boolean)
+  {
+    this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
+
+  public addSchedule(schedule)
+  {
+    this.state = this.state.setIn(['schedules', schedule.id], schedule);
+
+    return this;
+  }
+}

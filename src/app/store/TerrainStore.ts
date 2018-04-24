@@ -64,6 +64,7 @@ import TerrainStoreLogger from 'store/TerrainStoreLogger';
 import { UserReducers } from 'users/data/UserRedux';
 import Ajax from 'util/Ajax';
 import { ColorsReducers } from '../colors/data/ColorsRedux';
+import { SchedulerReducers } from '../scheduler/data/SchedulerRedux';
 
 const reducers = {
   analytics: AnalyticsReducer,
@@ -79,6 +80,7 @@ const reducers = {
   spotlights: SpotlightReducers,
   walkthrough: WalkthroughReducers,
   builderCards: BuilderCardsReducers,
+  scheduler: SchedulerReducers,
 };
 
 const rootReducer = combineReducers(reducers);

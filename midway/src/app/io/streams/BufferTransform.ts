@@ -44,43 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { SafeReadable } from './SafeReadable';
+import { Readable } from 'stream';
+
+import { makeCallback } from '../../../../../shared/util/Promise';
 
 /**
  * Consumes an input source stream and turns it into an array
  */
 export default class BufferTransform
 {
-  public static toArray(stream: SafeReadable): Promise<any[]>
+  public static toArray(stream: Readable, size?: number): Promise<any[]>
   {
     return new Promise<any[]>((resolve, reject) =>
     {
-      const bufferTransform = new BufferTransform(stream,
-        (err, arr) =>
-        {
-          if (err !== null || err !== undefined)
-          {
-            reject(err);
-          }
-          else
-          {
-            resolve(arr);
-          }
-        });
+      return new BufferTransform(stream, makeCallback(resolve, reject), size);
     });
   }
 
   private arr: any[];
-  private stream: SafeReadable;
+  private stream: Readable;
   private callback: (err, arr) => void;
 
-  constructor(stream: SafeReadable, callback: (err: Error | null, arr: any[]) => void)
+  constructor(stream: Readable, callback: (err: Error | null, arr: any[]) => void, size?: number)
   {
     this.arr = [];
     this.stream = stream;
 
-    this.stream.on('data', (doc) => this.arr.push(doc));
-    this.stream.on('end', () => callback(null, this.arr));
+    const done = () => callback(null, this.arr);
+
+    this.stream.on('end', done);
+    this.stream.on('data', (doc) =>
+    {
+      if (this.arr.length >= (size as number))
+      {
+        this.stream.removeListener('end', done);
+        callback(null, this.arr);
+      }
+      else
+      {
+        this.arr.push(doc);
+      }
+    });
+
     this.stream.on('error', callback);
   }
 

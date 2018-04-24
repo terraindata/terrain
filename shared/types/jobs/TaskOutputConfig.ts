@@ -42,42 +42,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import SchedulerAjax from 'scheduler/SchedulerAjax';
+// Copyright 2018 Terrain Data, Inc.
 
-const axiosMock = new MockAdapter(axios);
+import TaskInputConfig from './TaskInputConfig';
 
-describe('SchedulerAjax', () =>
+export interface TaskOutputConfig extends TaskInputConfig
 {
-  let schedulerAjax: SchedulerAjax;
-  beforeEach(() =>
-  {
-    schedulerAjax = new SchedulerAjax(axios);
-  });
+  public exit: boolean = null;
+  public status: boolean = null;
+}
 
-  describe('#getConnections', () =>
-  {
-    it('should make a GET request to /scheduler/connections', () =>
-    {
-      axiosMock.onGet('/scheduler/connections').reply(
-        200,
-        [
-          { id: 1 },
-          { id: 2 },
-        ],
-      );
-
-      return schedulerAjax.getConnections()
-        .then((response) =>
-        {
-          expect(response).toEqual([
-            { id: 1 },
-            { id: 2 },
-          ]);
-        },
-      );
-    });
-  });
-});
+export default TaskOutputConfig;

@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import { Record } from 'immutable';
-import { createRecordType } from '../Classes';
+import { createRecordType } from 'shared/util/Classes';
 
 // equivalent of SchedulerConfig defined in miday/src/app/scheduler/SchedulerConfig.ts
 class SchedulerConfigC

@@ -48,7 +48,8 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { JobConfig } from 'shared/types/jobs/JobConfig';
-import { TaskConfig, TaskOutputConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import CredentialConfig from '../credentials/CredentialConfig';
@@ -136,9 +137,9 @@ export class Scheduler
     });
   }
 
-  public async runSchedule(id: number, runNow?: boolean): Promise<TaskOutputConfig | string>
+  public async runSchedule(id: number, runNow?: boolean): Promise<string>
   {
-    return new Promise<TaskOutputConfig | string>(async (resolve, reject) =>
+    return new Promise<string>(async (resolve, reject) =>
     {
       if (this.runningSchedules.get(id) !== undefined)
       {
@@ -165,7 +166,6 @@ export class Scheduler
         };
       await this._setRunning(id, true);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig);
-
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);
@@ -174,7 +174,7 @@ export class Scheduler
       await this._setRunning(id, false);
       this.runningSchedules.delete(id);
       // TODO: unlock row
-      return resolve(result as TaskOutputConfig);
+      return resolve('Running schedule ' + ((id as number).toString() as string));
     });
   }
 
@@ -225,7 +225,6 @@ export class Scheduler
       schedule.lastModified = creationDate;
       schedule.lastRun = new Date(0); // beginning of epoch time
       schedule.meta = schedule.meta !== undefined ? schedule.meta : '';
-      // schedule.name = schedule.name !== undefined ? schedule.name : '';
       schedule.priority = schedule.priority !== undefined ? schedule.priority : 1;
       schedule.running = schedule.running !== undefined ? schedule.running : false;
       schedule.shouldRunNext = schedule.shouldRunNext !== undefined ? schedule.shouldRunNext : true;
@@ -267,15 +266,8 @@ export class Scheduler
 
   private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
   {
-    const result: TaskOutputConfig | string = await this.runSchedule(scheduleId);
-    if (typeof result === 'string')
-    {
-      winston.warn(result as string);
-    }
-    else if ((result as TaskOutputConfig).exit === true)
-    {
-      winston.info('Schedule ' + scheduleId.toString() as string + ' successfully completed');
-    }
+    const result: string = await this.runSchedule(scheduleId);
+    winston.info(result as string);
   }
 
   private async _getAvailableSchedules(): Promise<number[]>
@@ -283,7 +275,7 @@ export class Scheduler
     return new Promise<number[]>(async (resolve, reject) =>
     {
       const scheduleIds: number[] = [];
-      const schedules: SchedulerConfig[] = await this._select([], { running: true }) as SchedulerConfig[];
+      const schedules: SchedulerConfig[] = await this._select([], { running: false }) as SchedulerConfig[];
       schedules.forEach((schedule) =>
       {
         scheduleIds.push(schedule.id);

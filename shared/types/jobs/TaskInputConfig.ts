@@ -43,38 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
-import Ajax, { AjaxResponse } from 'util/Ajax';
-import Api from 'util/Api';
 
-// making this an instance in case we want stateful things like cancelling ajax requests
-class SchedulerAjax
+import ATask from './ATask';
+import TaskInputConfigTypes from './TaskInputConfigTypes';
+
+export class TaskInputConfig extends ATask
 {
-  public api: AxiosInstance = null;
-
-  public constructor(api: AxiosInstance)
-  {
-    this.api = api;
-  }
-
-  public getConnections(): Promise<any>
-  {
-    return this.api.get('/scheduler/connections')
-      .then((response) =>
-      {
-        return Promise.resolve(response.data);
-      });
-  }
-
-  public createScheduler(schedulerConfig)
-  {
-    const body = schedulerConfig;
-    return this.api.post(`/scheduler`, { body })
-      .then((response) =>
-      {
-        return Promise.resolve(response.data);
-      });
-  }
+  public options: TaskInputConfigTypes = null;
 }
 
-export default SchedulerAjax;
+export default TaskInputConfig;

@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
-import { BaseClass, makeConstructor, New, WithIRecord } from '../Classes';
+import { BaseClass, makeConstructor, New, WithIRecord } from 'shared/util/Classes';
 
 type stringList = string[] | List<string>;
 

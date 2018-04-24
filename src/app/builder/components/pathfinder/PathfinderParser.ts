@@ -456,7 +456,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
   if (List.isList(line) && !ignoreNested)
   {
     // In this case it is a nested query, disguised as a normal filter line
-    const path = line.get(0).field.split('.')[0];
+    const path = (line as any).get(0).field.split('.')[0];
     const inner = parseFilters(_FilterGroup({ lines: line, minMatches: 'all' }), inputs, false, true).toJS());
     return Map({
       nested: {

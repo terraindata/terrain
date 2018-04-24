@@ -47,10 +47,14 @@ THE SOFTWARE.
 import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as stream from 'stream';
 
+import { SinkConfig, SourceConfig } from '../../../../shared/etl/types/EndpointTypes';
 import * as Util from '../AppUtil';
+import BufferTransform from '../io/streams/BufferTransform';
 import { Permissions } from '../permissions/Permissions';
 import { users } from '../users/UserRouter';
+import { getSourceStream } from './SourceSinkStream';
 import TemplateRouter, { templates } from './TemplateRouter';
 
 const Router = new KoaRouter();
@@ -79,12 +83,47 @@ Router.post('/execute', async (ctx, next) =>
   else if (fields['templateID'] !== undefined)
   {
     const templateID = Number(fields['templateID']);
-    ctx.body = await templates.executeById(templateID, files);
+    if (fields['overrideSources'] !== undefined || fields['overrideSinks'] !== undefined)
+    {
+      ctx.body = await templates.executeByOverride(templateID, files, fields['overrideSources'], fields['overrideSinks']);
+    }
+    else
+    {
+      ctx.body = await templates.executeById(templateID, files);
+    }
   }
   else
   {
     throw new Error('Missing template or template ID parameter.');
   }
+});
+
+interface ETLUIPreviewConfig
+{
+  source: SourceConfig;
+  size?: number;
+}
+
+Router.post('/preview', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const request: ETLUIPreviewConfig = ctx.request.body.body;
+  Util.verifyParameters(request, ['source']);
+
+  const source: SourceConfig = request.source;
+  // it's not possible to get a preview of sources of "Upload" type
+  if (source.type === 'Upload')
+  {
+    throw new Error('Preview of "Upload" sources is not allowed');
+  }
+
+  if (request.size === undefined)
+  {
+    request.size = 100;
+  }
+
+  // get a preview up to "size" rows from the specified source
+  const sourceStream: stream.Readable = await getSourceStream('preview', source);
+  ctx.body = JSON.stringify(await BufferTransform.toArray(sourceStream, request.size));
 });
 
 export default Router;

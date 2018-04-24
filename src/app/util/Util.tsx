@@ -437,7 +437,7 @@ const Util = {
 
   attr(target, key: string): string
   {
-    return ReactDOM.findDOMNode(target).getAttribute(key);
+    return (ReactDOM.findDOMNode(target) as Element).getAttribute(key);
   },
 
   // corrects a given index so that it is appropriate
@@ -816,6 +816,21 @@ const Util = {
       }
     }
     return false;
+  },
+
+  arrayToImmutableMap(arrayToConvert: any[], idAttribute: string, itemConstructor = null)
+  {
+    const immutableMap = arrayToConvert.reduce((imap, item) =>
+    {
+      let transformedItem = Object.assign({}, item);
+      if (itemConstructor !== null)
+      {
+        transformedItem = itemConstructor(item);
+      }
+      return imap.set(item[idAttribute], transformedItem);
+    }, Immutable.Map());
+
+    return immutableMap;
   },
 };
 

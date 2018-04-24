@@ -48,7 +48,10 @@ import * as fs from 'fs';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { TaskConfig, TaskEnum, TaskOutputConfig, TaskTreeConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskEnum } from 'shared/types/jobs/TaskEnum';
+import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
+import { TaskTreeConfig } from 'shared/types/jobs/TaskTreeConfig';
 import { Task } from './Task';
 import { TaskTreeNode } from './TaskTreeNode';
 import { TaskTreePrinter } from './TaskTreePrinter';
@@ -185,6 +188,15 @@ export class TaskTree
   {
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
+      if (this.tasks.length === 0) // nothing to do
+      {
+        const taskOutputConfig: TaskOutputConfig =
+          {
+            exit: true,
+            status: true,
+          };
+        return resolve(taskOutputConfig);
+      }
       let ind: number = 0;
       if (this.taskTreeConfig.jobStatus === 2)
       {

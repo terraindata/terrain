@@ -52,6 +52,7 @@ import AddTransformationNode from 'shared/transformations/nodes/AddTransformatio
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
+import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
 import SubtractTransformationNode from 'shared/transformations/nodes/SubtractTransformationNode';
 import { KeyPath } from '../util/KeyPath';
 import * as yadeep from '../util/yadeep';
@@ -809,6 +810,74 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       else
       {
         yadeep.set(doc, field, el / opts.factor);
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitSetIfNode(node: SetIfTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const setIfHelper = (o: NodeOptionsType<TransformationNodeType.SetIfNode>, e: any) =>
+    {
+      if (o.filterNaN)
+      {
+        return isNaN(e);
+      }
+      else if (o.filterUndefined)
+      {
+        return e === undefined;
+      }
+      else if (o.filterNull)
+      {
+        return e === null;
+      }
+      else if (o.filterStringNull)
+      {
+        return e === 'null';
+      }
+      else if (o.filterValue !== undefined)
+      {
+        return e === o.filterValue;
+      }
+
+      return false;
+    };
+
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.SetIfNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+
+          const eli = yadeep.get(doc, kpi);
+          if (setIfHelper(opts, eli))
+          {
+            yadeep.set(doc, kpi, opts.newValue, { create: true });
+          }
+        }
+      }
+      else
+      {
+        if (setIfHelper(opts, el))
+        {
+          yadeep.set(doc, field, opts.newValue, { create: true });
+        }
       }
     });
 

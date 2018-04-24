@@ -59,7 +59,7 @@ import Modal from 'common/components/Modal';
 import TemplateList, { AllowedActions } from 'etl/templates/components/TemplateList';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { ColumnOptions, columnOptions, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
-import { ETLTemplate } from 'etl/templates/TemplateTypes';
+import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 
 const UndoIcon = require('images/icon_undo.svg');
 const RedoIcon = require('images/icon_redo.svg');
@@ -280,20 +280,7 @@ class EditorActionsSection extends TerrainComponent<Props>
   {
     const { editorAct, templateEditor } = this.props;
     const template = templateEditor.template;
-    if (templateEditor.isDirty || template.id === -1)
-    {
-      editorAct({
-        actionType: 'addModal',
-        props: {
-          title: 'Please Save',
-          message: `You Have Unsaved Changes. Please Save Them Before Running This Template`,
-        },
-      });
-    }
-    else
-    {
-      this.props.onExecuteTemplate(template);
-    }
+    this.props.onExecuteTemplate(template);
   }
 
   public handleSaveClicked()

@@ -63,6 +63,7 @@ enum TransformationNodeType
   SubtractNode = 'SubtractNode',
   MultiplyNode = 'MultiplyNode',
   DivideNode = 'DivideNode',
+  SetIfNode = 'SetIfNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
@@ -125,6 +126,14 @@ interface TransformationOptionTypes
   };
   DivideNode: {
     factor: number;
+  };
+  SetIfNode: {
+    filterNull: boolean;
+    filterNaN: boolean;
+    filterStringNull: boolean;
+    filterUndefined: boolean;
+    filterValue: any | undefined;
+    newValue: any;
   };
 }
 
