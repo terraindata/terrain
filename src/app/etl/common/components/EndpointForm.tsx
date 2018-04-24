@@ -58,7 +58,7 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { SchedulableSinks, SchedulableSources, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointOptions';
@@ -71,6 +71,7 @@ export interface Props
   endpoint: SourceConfig | SinkConfig;
   onChange: (newEndpoint: SourceConfig | SinkConfig, apply?: boolean) => void;
   hideTypePicker?: boolean;
+  isSchedule?: boolean;
 }
 
 export default class EndpointForm extends TerrainComponent<Props>
@@ -81,8 +82,8 @@ export default class EndpointForm extends TerrainComponent<Props>
         type: DisplayType.Pick,
         displayName: 'Sink Type',
         options: {
-          pickOptions: (s) => sinkList,
-          indexResolver: (value) => sinkList.indexOf(value),
+          pickOptions: (s) => this.props.isSchedule ? List(SchedulableSinks) : sinkList,
+          indexResolver: (value) => (this.props.isSchedule ? List(SchedulableSinks) : sinkList).indexOf(value)
         },
       },
     };
@@ -93,8 +94,8 @@ export default class EndpointForm extends TerrainComponent<Props>
         type: DisplayType.Pick,
         displayName: 'Source Type',
         options: {
-          pickOptions: (s) => sourceList,
-          indexResolver: (value) => sourceList.indexOf(value),
+          pickOptions: (s) => this.props.isSchedule ? List(SchedulableSources) : sourceList,
+          indexResolver: (value) => (this.props.isSchedule ? List(SchedulableSources) : sourceList).indexOf(value),
         },
       },
     };
