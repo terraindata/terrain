@@ -393,7 +393,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
       }
       else
       {
-        filter = filter.push(lineInfo);
+        must = must.push(lineInfo);
       }
     }
     else if (line.filterGroup)
