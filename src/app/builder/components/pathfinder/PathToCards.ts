@@ -322,21 +322,24 @@ export class PathToCards
     }
   }
 
-  private static processNestedQueryFilterGroup(filterLines: FilterLine[], parser: ESCardParser, boolValueInfo: ESValueInfo, boolType, filterSection: 'soft' | 'hard')
+  private static processNestedQueryFilterGroup(filterLines: FilterLine[], parser: ESCardParser, boolValueInfo: ESValueInfo, boolType, filterSection: 'soft' | 'hard', isNegative: boolean = false)
   {
+    const searchType = isNegative ? 'must_not' : boolType;
+    const searchTypePattern = searchType + ':query[]';
     const boolTypeFiltersType = boolType + ':query[]';
     let filterCard;
     let nestedQueries;
     TerrainLog.debug('P->B: ' + filterLines.length + ' nestedGroup ');
-    nestedQueries = parser.searchCard({ [boolTypeFiltersType]: [{ 'nested:nested_query': true }] }, boolValueInfo, false, true);
+    const nestedCardSearchPattern = { [searchTypePattern]: [{ 'nested:nested_query': true }] };
+    nestedQueries = parser.searchCard(nestedCardSearchPattern, boolValueInfo, false, true);
     const paths = Set(filterLines.map((line) => line.field.split('.')[0])).toArray();
     if (nestedQueries === null)
     {
       TerrainLog.debug('P->B: found 0(null) nestedBools from the boolCard', boolValueInfo);
       if (paths.length > 0)
       {
-        parser.createCardIfNotExist({ [boolTypeFiltersType]: [] }, boolValueInfo);
-        filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
+        parser.createCardIfNotExist({ [searchTypePattern]: [] }, boolValueInfo);
+        filterCard = boolValueInfo.objectChildren[searchType].propertyValue;
         // create filterGroup.groupCount queries
         nestedQueries = [];
         const usedPaths = [];
@@ -380,7 +383,7 @@ export class PathToCards
         return false;
       });
       TerrainLog.debug('P->B: found ' + nestedQueries.length + ' nestedBools from the boolCard', boolValueInfo);
-      filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
+      filterCard = boolValueInfo.objectChildren[searchType].propertyValue;
       if (nestedQueries.length < paths.length)
       {
         const usedPaths = [];
@@ -414,7 +417,7 @@ export class PathToCards
       {
         if (paths.length > 0)
         {
-          filterCard = boolValueInfo.objectChildren[boolType].propertyValue;
+          filterCard = boolValueInfo.objectChildren[searchType].propertyValue;
           for (let i = nestedQueries.length; i > paths.length; i = i - 1)
           {
             parser.deleteChild(filterCard, i - 1);
@@ -431,6 +434,22 @@ export class PathToCards
     filterLines.forEach((line: FilterLine) =>
     {
       const path = line.field.split('.')[0];
+      if (isNegative)
+      {
+        switch (line.comparison)
+        {
+          case 'notexists':
+            line = line.set('comparison', 'exists');
+            break;
+          case 'notequal':
+            line = line.set('comparison', 'equal');
+            break;
+          case 'isnotin':
+            line = line.set('comparison', 'isin');
+            break;
+          default:
+        }
+      }
       if (filterLinePathMap[path])
       {
         filterLinePathMap[path].push(line);
@@ -545,12 +564,20 @@ export class PathToCards
       }
     }
 
-    const filterLineMap = { filter: [], nested: [], group: [] };
+    const filterLineMap = { filter: [], nested: [], negativeNested: [], group: [] };
     filterGroup.lines.map((line: FilterLine) =>
     {
       if (line && line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
       {
-        filterLineMap.nested.push(line);
+        if (line.comparison === 'notexists' ||
+          line.comparison === 'notequal' ||
+          line.comparison === 'isnotin')
+        {
+          filterLineMap.negativeNested.push(line);
+        } else
+        {
+          filterLineMap.nested.push(line);
+        }
       } else if (line && line.filterGroup)
       {
         filterLineMap.group.push(line);
@@ -563,7 +590,8 @@ export class PathToCards
     TerrainLog.debug('P->B(filtergroup -> bool):' +
       'find ' + filterLineMap.filter.length + 'normal filters,' +
       '\n' + filterLineMap.group.length + 'innerGroup filters,' +
-      '\n' + filterLineMap.nested.length + 'nested group filters,');
+      '\n' + filterLineMap.nested.length + 'nested group filters,' +
+      '\n' + filterLineMap.negativeNested.length + 'negative nested group filters,');
 
     // normal filters first
     filterLineMap.filter.map((line: FilterLine) =>
@@ -605,6 +633,8 @@ export class PathToCards
     this.processInnerGroup(filterLineMap.group, parser, boolValueInfo, boolType, filterSection);
     // handle nested query filter group
     this.processNestedQueryFilterGroup(filterLineMap.nested, parser, boolValueInfo, boolType, filterSection);
+    // handle nested query filter group
+    this.processNestedQueryFilterGroup(filterLineMap.negativeNested, parser, boolValueInfo, boolType, filterSection, true);
   }
 
   private static updateCollapse(collapse: string, parser: ESCardParser, body: ESValueInfo)
