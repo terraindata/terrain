@@ -53,8 +53,13 @@ import { Task } from '../Task';
 
 const taskOutputConfig: TaskOutputConfig =
   {
-    status: false,
     exit: true,
+    options:
+      {
+        logStream: null,
+        stream: null,
+      },
+    status: false,
   };
 
 export class TaskDefaultFailure extends Task

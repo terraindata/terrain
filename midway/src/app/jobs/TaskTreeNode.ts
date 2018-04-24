@@ -60,10 +60,8 @@ export class TaskTreeNode
         return v.visitDefaultExitNode(node);
       case TaskEnum.taskDefaultFailure:
         return v.visitDefaultFailureNode(node);
-      case TaskEnum.taskExport:
-        return v.visitExportNode(node);
-      case TaskEnum.taskImport:
-        return v.visitImportNode(node);
+      case TaskEnum.taskETL:
+        return v.visitETLNode(node);
       default:
         return v.visitDefaultExitNode(node);
     }

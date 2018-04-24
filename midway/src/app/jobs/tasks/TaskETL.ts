@@ -42,7 +42,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
 import * as stream from 'stream';
 import * as winston from 'winston';
@@ -51,7 +51,7 @@ import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import { Task } from '../Task';
 
-export class TaskImport extends Task
+export class TaskETL extends Task
 {
   constructor(taskConfig: TaskConfig)
   {
@@ -63,19 +63,20 @@ export class TaskImport extends Task
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
       // TODO: call other functions (needs to wrap in Promise for later)
-      // example stub for import returning a stream.Readable
+      // example stub for export returning a stream.Readable
       const returnStream: stream.Readable = new stream.Readable();
       const writeStream: stream.Writable = new stream.Writable();
       returnStream.pipe(writeStream);
-      writeStream.write('Import stream test\n');
+      writeStream.write('Export stream test\n');
       const taskOutputConfig: TaskOutputConfig =
         {
-          status: true,
           exit: false,
           options:
             {
+              logStream: null,
               stream: returnStream,
             },
+          status: true,
         };
       resolve(taskOutputConfig);
     });
@@ -83,15 +84,16 @@ export class TaskImport extends Task
 
   public async printNode(): Promise<TaskOutputConfig>
   {
-    winston.info('Printing Import, params: ' + JSON.stringify(this.taskConfig.params as object));
+    winston.info('Printing Export, params: ' + JSON.stringify(this.taskConfig.params as object));
     return Promise.resolve(
       {
-        status: true,
         exit: false,
         options:
           {
+            logStream: null,
             stream: new stream.PassThrough(),
           },
+        status: true,
       } as TaskOutputConfig);
   }
 }

@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 import * as stream from 'stream';
 
+import ATaskConfig from './ATaskConfig';
+
 export class TaskConfig
 {
   public cancel: boolean = null;     // whether the tree of tasks should be cancelled

@@ -51,8 +51,7 @@ import { TreeVisitor } from './TreeVisitor';
 
 import { TaskDefaultExit } from './tasks/TaskDefaultExit';
 import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
-import { TaskExport } from './tasks/TaskExport';
-import { TaskImport } from './tasks/TaskImport';
+import { TaskETL } from './tasks/TaskETL';
 
 export class TaskTreePrinter extends TreeVisitor
 {
@@ -71,12 +70,7 @@ export class TaskTreePrinter extends TreeVisitor
     return node.printNode();
   }
 
-  public async visitExportNode(node: TaskExport): Promise<TaskOutputConfig>
-  {
-    return node.printNode();
-  }
-
-  public async visitImportNode(node: TaskImport): Promise<TaskOutputConfig>
+  public async visitETLNode(node: TaskETL): Promise<TaskOutputConfig>
   {
     return node.printNode();
   }
