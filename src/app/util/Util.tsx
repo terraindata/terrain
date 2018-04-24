@@ -832,6 +832,20 @@ const Util = {
 
     return immutableMap;
   },
+
+  arrayToImmutableList(arrayToConvert: any[], itemConstructor = null)
+  {
+    const immutableList = arrayToConvert.map((item) =>
+    {
+      if (itemConstructor !== null)
+      {
+        return itemConstructor(item);
+      }
+      return item;
+    });
+
+    return List(immutableList);
+  },
 };
 
 export default Util;
