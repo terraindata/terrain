@@ -153,16 +153,16 @@ export class Scheduler
       const jobFilename: string = 'Task_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
       const jobType: string = runNow === true ? 'Scheduled ad-hoc' : 'Scheduled';
       const jobConfig: JobConfig =
-      {
-        meta: '',
-        name: '', // TODO give this a name if you want
-        pausedFilename: jobFilename,
-        priority: 1,
-        scheduleId: id,
-        tasks: schedule.tasks,
-        type: jobType,
-        workerId: 1, // TODO change this for clustering support
-      };
+        {
+          meta: '',
+          name: '', // TODO give this a name if you want
+          pausedFilename: jobFilename,
+          priority: 1,
+          scheduleId: id,
+          tasks: schedule.tasks,
+          type: jobType,
+          workerId: 1, // TODO change this for clustering support
+        };
       await this._setRunning(id, true);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig);
 

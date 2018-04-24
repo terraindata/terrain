@@ -61,7 +61,7 @@ test('parses daily', () =>
 test('parses weekdays 1 to 5 individually', () =>
 {
   expect(parseCRONDaySchedule('4 8 * *   1,2,3,4,5')).toEqual(
-    { type: 'weekly', weekdays: fillCRONMap([1,2,3,4,5], 0, 6) },
+    { type: 'weekly', weekdays: fillCRONMap([1, 2, 3, 4, 5], 0, 6) },
   );
 });
 
@@ -274,4 +274,18 @@ test('can set cron type to hourly', () =>
 test('can set cron type to daily (hours)', () =>
 {
   expect(setCRONType('* * * * *', 'hours', 'daily')).toEqual('0 0 * * *');
+});
+
+test('throws error when setting a bad CRON type', () =>
+{
+  let threw = false;
+  try
+  {
+    setCRONType('* * * * *', 'days', 'minute');
+  }
+  catch (e)
+  {
+    threw = true;
+  }
+  expect(threw).toEqual(true);
 });

@@ -271,7 +271,7 @@ export class JobQueue
         // log job result
         winston.info('Job result: ' + JSON.stringify(jobResult, null, 2));
       });
-      
+
     });
   }
 

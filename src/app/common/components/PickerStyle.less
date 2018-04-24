@@ -3,9 +3,13 @@
 .picker-wrapper {
 	display: table;
 	border-collapse: separate;
-  border-spacing: 0px;
+  border-spacing: 3px;
   background: white;
   font-size: @font-size;
+  
+  &.picker-wrapper-flex {
+  	border-spacing: 0px;
+  }
     
 	.picker-row {
 		display: table-row;
@@ -28,7 +32,7 @@
   	vertical-align: middle;
 		height: 30px;
 		cursor: pointer;
-		margin: 3px 1.5px;
+		margin: 3px 3px;
 		.transition;
 		
 		&:hover {

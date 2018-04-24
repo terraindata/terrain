@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2019 Terrain Data, Inc.
 
-import { range, keys } from 'lodash';
+import { keys, range } from 'lodash';
 
 export interface CRONMap
 {
@@ -70,21 +70,24 @@ export function fillCRONMap(values: number[], start: number, endInclusive: numbe
 // iteration converts the keys to strings
 export function cronMapToList(m: CRONMap, includeAll = false): number[]
 {
-	let arr = [];
-	for (const s in m)
-	{
-		const k = +s;
-		let i = arr.length;
-		for(; i > 0 && arr[i - 1] > k; i--); // optimized reverse search
-		arr.splice(i, 0, k);
-	}
-	
-	if (includeAll)
-	{
-		return arr;
-	}
-	
-	return arr.filter((v) => m[v]);
+  const arr = [];
+  for (const s in m)
+  {
+    if (m.hasOwnProperty(s))
+    {
+      const k = +s;
+      let i;
+      for (i = arr.length; i > 0 && arr[i - 1] > k; i--) {  } // optimized reverse search
+      arr.splice(i, 0, k);
+    }
+  }
+
+  if (includeAll)
+  {
+    return arr;
+  }
+
+  return arr.filter((v) => m[v]);
 }
 
 // Days

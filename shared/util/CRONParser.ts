@@ -143,10 +143,10 @@ function parseCRONDayScheduleInternal(cron: string): CRONDaySchedule
       }
       else if (weekdaysList[0] === '1-5')
       {
-      	// special case for "weekdays" i.e., work week
-      	return {
-      		type: 'workweek',
-      	};
+        // special case for "weekdays" i.e., work week
+        return {
+          type: 'workweek',
+        };
       }
     }
   }

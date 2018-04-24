@@ -159,7 +159,10 @@ export class Picker extends TerrainComponent<Props>
     }
     return (
       <div
-        className='picker-wrapper'
+        className={classNames({
+          'picker-wrapper': true,
+          'picker-wrapper-flex': !rowSize,
+        })}
       >
         {
           rows.map((row, i) =>
