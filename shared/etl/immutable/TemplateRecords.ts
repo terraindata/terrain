@@ -100,14 +100,14 @@ class ETLTemplateC implements ETLTemplateI
     const template = this.applyOverrides(overrideSources, overrideSinks);
     for (const key in template.sources.toJS())
     {
-      if (SchedulableSources.indexOf(template.sources.get(key).type) === -1)
+      if (SchedulableSources.indexOf(this.getSource(key).type) === -1)
       {
         return false;
       }
     }
     for (const key in template.sinks.toJS())
     {
-      if (SchedulableSinks.indexOf(template.sinks.get(key).type) === -1)
+      if (SchedulableSinks.indexOf(this.getSink(key).type) === -1)
       {
         return false;
       }
