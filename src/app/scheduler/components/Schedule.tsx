@@ -175,11 +175,6 @@ class Schedule extends TerrainComponent<Props>
     }));
   }
 
-  public handleRunPause(schedule)
-  {
-    schedule.running ? this.props.onRun(schedule.id) : this.props.onPause(schedule.id);
-  }
-
   public handleScheduleChange(optionSetIndex: number, value: any)
   {
     let { schedule } = this.props;
@@ -208,8 +203,7 @@ class Schedule extends TerrainComponent<Props>
   {
     const { schedule } = this.props;
     const templateId = this.getTemplateId(schedule);
-    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
-    return List([templateId, this.state.configurationKey, buttonValue]);
+    return List([templateId, this.state.configurationKey]);
   }
 
   public getOptionSets()
@@ -257,16 +251,7 @@ class Schedule extends TerrainComponent<Props>
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule, template),
     };
 
-    // Buttons to Run / Pause
-    const buttonOptionSet = {
-      isButton: true,
-      onButtonClick: this._fn(this.handleRunPause, schedule),
-      key: 'run',
-      options: List([]),
-      column: true,
-    };
-
-    return List([templateOptionSet, configurationOptionSet, buttonOptionSet]);
+    return List([templateOptionSet, configurationOptionSet]);
   }
 
   public canEdit()
