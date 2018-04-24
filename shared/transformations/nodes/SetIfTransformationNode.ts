@@ -42,75 +42,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2019 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import { range } from 'lodash';
+import { List } from 'immutable';
 
-export interface CRONMap
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
+
+export default class SetIfTransformationNode extends TransformationNode
 {
-  [minuteHourOrDay: number]: boolean;
-}
-
-// return a map of number: boolean pairs
-// values are true if key is present in the `values` param
-export function fillCRONMap(values: number[], start: number, endInclusive: number):
-  { [val: number]: boolean }
-{
-  return range(start, endInclusive + 1).reduce(
-    (memo, v) =>
-    {
-      memo[v] = values.indexOf(v) !== -1;
-      return memo;
-    },
-    {},
-  );
-}
-
-// Days
-
-export const CRONWeekDayOptions: CRONMap = fillCRONMap([], 0, 6);
-export const defaultCRONWeekDayOptions = { 1: true }; // Monday
-
-export const CRONWeekDayNames =
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.SetIfNode)
   {
-    0: 'Sunday',
-    1: 'Monday',
-    2: 'Tuesday',
-    3: 'Wednesday',
-    4: 'Thursday',
-    5: 'Friday',
-    6: 'Saturday',
-  };
-
-export const CRONWorkWeekdays: CRONMap = fillCRONMap([1, 2, 3, 4, 5], 0, 6);
-
-export const CRONMonthDayOptions: CRONMap = fillCRONMap([], 1, 31);
-export const defaultCRONMonthDayOptions = { 1: true }; // the 1st
-
-export interface CRONDaySchedule
-{
-  type: 'daily' | 'weekdays' | 'weekly' | 'monthly';
-  weekdays?: CRONMap; // for weekly
-  days?: CRONMap; // for monthly
-}
-
-// Hours and Minutes
-
-export const CRONHourOptions: CRONMap = fillCRONMap([], 0, 23);
-export const defaultCRONHourOptions = { 0: true }; // 12 AM
-
-export const CRONHourNames = {
-  0: '12 AM', 1: '1 AM', 2: '2 AM', 3: '3 AM', 4: '4 AM', 5: '5 AM', 6: '6 AM', 7: '7 AM', 8: '8 AM',
-  9: '9 AM', 10: '10 AM', 11: '11 AM', 12: '12 PM', 13: '1 PM', 14: '2 PM', 15: '3 PM', 16: '4 PM',
-  17: '5 PM', 18: '6 PM', 19: '7 PM', 20: '8 PM', 21: '9 PM', 22: '10 PM', 23: '11 PM',
-};
-
-export const CRONMinuteOptions: CRONMap = fillCRONMap([], 0, 59);
-export const defaultCRONMinuteOptions = { 0: true }; // :00
-
-export interface CRONHourSchedule
-{
-  type: 'minute' | 'hourly' | 'daily';
-  minutes?: CRONMap; // for hourly
-  hours?: CRONMap; // for daily
+    super(id, fields, options, typeCode);
+  }
 }

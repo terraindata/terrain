@@ -657,3 +657,32 @@ test('suite of numeric transformations', () =>
     },
   );
 });
+
+test('test set if transformation', () =>
+{
+  const e = new TransformationEngine(TestDocs.doc1);
+
+  e.addField(List(['bleep']), 'string');
+
+  e.appendTransformation(
+    TransformationNodeType.SetIfNode,
+    List([List(['name'])]),
+    {
+      filterValue: 'Bob',
+      newValue: 'Tim',
+    },
+  );
+
+  e.appendTransformation(
+    TransformationNodeType.SetIfNode,
+    List([List(['bleep'])]),
+    {
+      filterUndefined: true,
+      newValue: 'bloop',
+    },
+  );
+
+  const r = e.transform(TestDocs.doc1);
+  expect(r['name']).toEqual('Tim');
+  expect(r['bleep']).toEqual('bloop');
+});

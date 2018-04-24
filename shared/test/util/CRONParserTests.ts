@@ -45,25 +45,29 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { fillCRONMap } from '../../util/CRONConstants';
-import { canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays, setCRONHours } from '../../util/CRONParser';
+import
+{
+  canParseCRONSchedule, parseCRONDaySchedule, parseCRONHourSchedule, setCRONDays, setCRONHours,
+  setCRONType,
+} from '../../util/CRONParser';
 
 test('parses daily', () =>
 {
-  expect(parseCRONDaySchedule('0 0 * * *')).toEqual(
+  expect(parseCRONDaySchedule(' 0 0 * * *')).toEqual(
     { type: 'daily' },
   );
 });
 
 test('parses weekdays', () =>
 {
-  expect(parseCRONDaySchedule('4 8 * * 1,2,3,4,5')).toEqual(
+  expect(parseCRONDaySchedule('4 8 * *   1,2,3,4,5')).toEqual(
     { type: 'weekdays' },
   );
 });
 
 test('parses weekly', () =>
 {
-  expect(parseCRONDaySchedule('15 16 * * 2,3')).toEqual(
+  expect(parseCRONDaySchedule('15 16  * * 2,3')).toEqual(
     { type: 'weekly', weekdays: fillCRONMap([2, 3], 0, 6) },
   );
 });
@@ -228,4 +232,39 @@ test('does not parse invalid minutes', () =>
 test('does not parse invalid minute / hour combos', () =>
 {
   expect(parseCRONHourSchedule('0,30 0,6,12,18 * * *')).toEqual(null);
+});
+
+test('can set cron type to daily', () =>
+{
+  expect(setCRONType('* * * * *', 'days', 'daily')).toEqual('* * * * *');
+});
+
+test('can set cron type to weekdays', () =>
+{
+  expect(setCRONType('0 * * * *', 'days', 'weekdays')).toEqual('0 * * * 1,2,3,4,5');
+});
+
+test('can set cron type to weekly', () =>
+{
+  expect(setCRONType('0 12 * * *', 'days', 'weekly')).toEqual('0 12 * * 1');
+});
+
+test('can set cron type to monthly', () =>
+{
+  expect(setCRONType('0 0 * * *', 'days', 'monthly')).toEqual('0 0 1 * *');
+});
+
+test('can set cron type to minute', () =>
+{
+  expect(setCRONType('0 0 * * *', 'hours', 'minute')).toEqual('* * * * *');
+});
+
+test('can set cron type to hourly', () =>
+{
+  expect(setCRONType('* * * * *', 'hours', 'hourly')).toEqual('0 * * * *');
+});
+
+test('can set cron type to daily (hours)', () =>
+{
+  expect(setCRONType('* * * * *', 'hours', 'daily')).toEqual('0 0 * * *');
 });
