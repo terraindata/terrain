@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
-import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
 import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
@@ -79,8 +78,7 @@ export const _SchedulerConfig =
     {
       tasks = [tasks];
     }
-    tasks = tasks.map((task) => _TaskConfig(task));
-    schedule = schedule.set('tasks', List(tasks));
+    schedule = schedule.set('tasks', Util.arrayToImmutableList(tasks, _TaskConfig));
     return schedule;
   };
 
