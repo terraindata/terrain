@@ -45,13 +45,13 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import { EventEmitter } from 'events';
-import { Duplex, Writable } from 'stream';
+import { Duplex, Transform, Writable } from 'stream';
 import * as winston from 'winston';
 
 /**
  * Monitors progress of the writable stream
  */
-export default class ProgressStream extends Duplex
+export default class ProgressStream extends Transform
 {
   private writer: Writable;
   private frequency: number;
@@ -124,7 +124,7 @@ export default class ProgressStream extends Duplex
     }
 
     this.push(this.progress());
-    this.writer.end(null, callback);
+    this.writer.end(callback);
   }
 
   private progress()

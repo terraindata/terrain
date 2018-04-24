@@ -146,7 +146,14 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
       switch (sink.fileConfig.fileType)
       {
         case 'json':
-          exportStream = JSONTransform.createExportStream();
+          if (sink.fileConfig.jsonNewlines)
+          {
+            exportStream = JSONTransform.createExportStream('{\n"' + 'exportKey' + '":[', ',\n', ']\n}\n');
+          }
+          else
+          {
+            exportStream = JSONTransform.createExportStream();
+          }
           break;
         case 'csv':
           exportStream = CSVTransform.createExportStream();
@@ -181,7 +188,7 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
     }
 
     const sinkStream = await endpoint.getSink(sink, engine);
-    const writableStream = exportStream.pipe(sinkStream, { end: true });
+    const writableStream = exportStream.pipe(sinkStream);
     const progressStream = new ProgressStream(exportStream);
     resolve(progressStream);
   });
