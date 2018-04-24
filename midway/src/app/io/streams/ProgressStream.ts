@@ -112,7 +112,7 @@ export default class ProgressStream extends Transform
         this.push(this.progress());
         this.asyncRead = null;
       },
-      this.frequency);
+        this.frequency);
     }
   }
 

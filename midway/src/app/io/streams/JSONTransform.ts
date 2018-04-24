@@ -53,7 +53,7 @@ import JSONExportTransform from './JSONExportTransform';
  * Import/Export from a JSON format. *
  * Additional configuration options are possible.
  */
- export class JSONTransform
+export class JSONTransform
 {
   public static createImportStream(pattern?: any, map?: any): Transform
   {

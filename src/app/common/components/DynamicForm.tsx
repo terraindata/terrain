@@ -95,7 +95,7 @@ export interface Props<FState>
 export class DynamicForm<S> extends TerrainComponent<Props<S>>
 {
   public renderFnLookup:
-    { [K in DisplayType]: renderSignature<S> } =
+    {[K in DisplayType]: renderSignature<S> } =
     {
       [DisplayType.CheckBox]: this.renderCheckBox,
       [DisplayType.NumberBox]: this.renderNumberBox,
@@ -105,7 +105,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
     };
 
   public yOffsetLookup:
-    { [K in DisplayType]: number } =
+    {[K in DisplayType]: number } =
     {
       [DisplayType.CheckBox]: -6,
       [DisplayType.NumberBox]: 0,
