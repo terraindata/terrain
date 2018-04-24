@@ -279,7 +279,7 @@ class Schedule extends TerrainComponent<Props>
   public getTask(overrideSchedule?: SchedulerConfig, index: number = 0): TaskConfig
   {
     const schedule = overrideSchedule || this.props.schedule;
-    return schedule.tasks && schedule.tasks.get(index) || _TaskConfig({});
+    return (schedule.tasks && schedule.tasks.get(index)) || _TaskConfig({});
   }
 
   public render()
