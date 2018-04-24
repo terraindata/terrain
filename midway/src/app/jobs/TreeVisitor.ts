@@ -50,8 +50,7 @@ import { Task } from './Task';
 
 import { TaskDefaultExit } from './tasks/TaskDefaultExit';
 import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
-import { TaskExport } from './tasks/TaskExport';
-import { TaskImport } from './tasks/TaskImport';
+import { TaskETL } from './tasks/TaskETL';
 
 export abstract class TreeVisitor
 {
@@ -65,7 +64,5 @@ export abstract class TreeVisitor
 
   public abstract async visitDefaultFailureNode(node: TaskDefaultFailure): Promise<TaskOutputConfig>;
 
-  public abstract async visitExportNode(node: TaskExport): Promise<TaskOutputConfig>;
-
-  public abstract async visitImportNode(node: TaskImport): Promise<TaskOutputConfig>;
+  public abstract async visitETLNode(node: TaskETL): Promise<TaskOutputConfig>;
 }

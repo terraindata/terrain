@@ -94,12 +94,6 @@ export abstract class Task
   }
 
   public abstract async printNode(): Promise<TaskOutputConfig>;
-  // {
-  //   return Promise.resolve({
-  //     status: true,
-  //     exit: true,
-  //   } as TaskOutputConfig);
-  // }
 
   public recurse(tasks: Task[], traversedNodes: number[]): boolean
   {
@@ -118,16 +112,6 @@ export abstract class Task
   }
 
   public abstract async run(): Promise<TaskOutputConfig>;
-  // {
-  //   return new Promise<TaskOutputConfig>(async (resolve, reject) =>
-  //   {
-  //     // TODO: call other functions (needs to wrap in Promise for later)
-  //     resolve({
-  //       status: true,
-  //       exit: true,
-  //     } as TaskOutputConfig);
-  //   });
-  // }
 }
 
 export default Task;

@@ -51,8 +51,7 @@ import { TreeVisitor } from './TreeVisitor';
 
 import { TaskDefaultExit } from './tasks/TaskDefaultExit';
 import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
-import { TaskExport } from './tasks/TaskExport';
-import { TaskImport } from './tasks/TaskImport';
+import { TaskETL } from './tasks/TaskETL';
 
 export class TaskTreeVisitor extends TreeVisitor
 {
@@ -71,12 +70,7 @@ export class TaskTreeVisitor extends TreeVisitor
     return node.run();
   }
 
-  public visitExportNode(node: TaskExport): Promise<TaskOutputConfig>
-  {
-    return node.run();
-  }
-
-  public visitImportNode(node: TaskImport): Promise<TaskOutputConfig>
+  public visitETLNode(node: TaskETL): Promise<TaskOutputConfig>
   {
     return node.run();
   }

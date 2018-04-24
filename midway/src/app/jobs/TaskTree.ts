@@ -59,8 +59,7 @@ import { TaskTreeVisitor } from './TaskTreeVisitor';
 
 import { TaskDefaultExit } from './tasks/TaskDefaultExit';
 import { TaskDefaultFailure } from './tasks/TaskDefaultFailure';
-import { TaskExport } from './tasks/TaskExport';
-import { TaskImport } from './tasks/TaskImport';
+import { TaskETL } from './tasks/TaskETL';
 
 const taskTreeNode = new TaskTreeNode();
 const taskTreePrinter = new TaskTreePrinter();
@@ -135,11 +134,8 @@ export class TaskTree
         case TaskEnum.taskDefaultFailure:
           this.tasks.push(new TaskDefaultFailure(taskConfig));
           break;
-        case TaskEnum.taskExport:
-          this.tasks.push(new TaskExport(taskConfig));
-          break;
-        case TaskEnum.taskImport:
-          this.tasks.push(new TaskImport(taskConfig));
+        case TaskEnum.taskETL:
+          this.tasks.push(new TaskETL(taskConfig));
           break;
         default:
           this.tasks.push(new TaskDefaultExit(taskConfig));
@@ -193,6 +189,11 @@ export class TaskTree
         const taskOutputConfig: TaskOutputConfig =
           {
             exit: true,
+            options:
+              {
+                logStream: null,
+                stream: null,
+              },
             status: true,
           };
         return resolve(taskOutputConfig);
@@ -253,29 +254,43 @@ export class TaskTree
     const defaults: TaskConfig[] =
       [
         {
+          cancel: false,
           id: maxId + 1,
           jobStatus: 0,
           name: 'Default Exit',
+          onFailure: null,
+          onSuccess: null,
           params:
             {
+              exit: true,
               options:
                 {
+                  logStream: new stream.PassThrough(),
                   stream: new stream.PassThrough(),
                 },
+              status: true,
             },
+          paused: null,
           taskId: TaskEnum.taskDefaultExit,
         },
         {
+          cancel: false,
           id: maxId + 2,
           jobStatus: 0,
           name: 'Default Failure',
+          onFailure: null,
+          onSuccess: null,
           params:
             {
+              exit: true,
               options:
                 {
+                  logStream: new stream.PassThrough(),
                   stream: new stream.PassThrough(),
                 },
+              status: false,
             },
+          paused: null,
           taskId: TaskEnum.taskDefaultFailure,
         },
       ];

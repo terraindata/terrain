@@ -92,6 +92,22 @@ export interface SchedulerActionTypes
     error: string;
   };
 
+  updateSchedule?: {
+    actionType: 'updateSchedule';
+    schedule: SchedulerConfig;
+  };
+  updateScheduleStart: {
+    actionType: 'updateScheduleStart';
+  };
+  updateScheduleSuccess: {
+    actionType: 'updateScheduleSuccess';
+    schedule: SchedulerConfig;
+  };
+  updateScheduleFailed: {
+    actionType: 'updateScheduleFailed';
+    error: string;
+  };
+
   deleteSchedule?: {
     actionType: 'deleteSchedule';
     scheduleId: ID;
@@ -151,6 +167,27 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       },
 
       createScheduleFailed: (state, action) =>
+      {
+        return state
+          .set('loading', false)
+          .set('error', action.payload.error);
+      },
+
+      updateScheduleStart: (state, action) =>
+      {
+        return state
+          .set('loading', true);
+      },
+
+      updateScheduleSuccess: (state, action) =>
+      {
+        const { schedule } = action.payload;
+        return state
+          .set('loading', false)
+          .setIn(['schedules', schedule.id], schedule);
+      },
+
+      updateScheduleFailed: (state, action) =>
       {
         return state
           .set('loading', false)
@@ -223,6 +260,28 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       });
   }
 
+  public updateSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    const { schedule } = action;
+
+    return this.api.updateSchedule(schedule.id, schedule)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = _SchedulerConfig(response.data[0]);
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
   public deleteSchedule(action, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
@@ -253,6 +312,11 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     if (action.actionType === 'createSchedule')
     {
       return this.createSchedule.bind(this, action);
+    }
+
+    if (action.actionType === 'updateSchedule')
+    {
+      return this.updateSchedule.bind(this, action);
     }
 
     if (action.actionType === 'deleteSchedule')

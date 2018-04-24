@@ -48,8 +48,8 @@ import * as stream from 'stream';
 
 export class TaskInputConfigTypes
 {
-  public stream: stream.Readable = null;
   public logStream: stream.Readable = null;
+  public stream: stream.Readable = null;
 }
 
 export default TaskInputConfigTypes;

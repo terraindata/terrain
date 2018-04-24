@@ -155,23 +155,27 @@ export class Scheduler
       const jobType: string = runNow === true ? 'Scheduled ad-hoc' : 'Scheduled';
       const jobConfig: JobConfig =
         {
+          createdAt: null,
+          id: null,
+          logId: null,
           meta: '',
           name: '', // TODO give this a name if you want
           pausedFilename: jobFilename,
           priority: 1,
+          running: null,
           scheduleId: id,
+          status: '',
           tasks: schedule.tasks,
           type: jobType,
           workerId: 1, // TODO change this for clustering support
         };
-      await this._setRunning(id, true);
+      await this.setRunning(id, true);
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);
       }
       // const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
-      await this._setRunning(id, false);
       this.runningSchedules.delete(id);
       // TODO: unlock row
       return resolve('Running schedule ' + ((id as number).toString() as string));
@@ -187,6 +191,27 @@ export class Scheduler
       return true;
     }
     return false;
+  }
+
+  public async setRunning(id: number, running: boolean): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      const schedules: SchedulerConfig[] = await this.get(id);
+      if (schedules.length !== 0)
+      {
+        schedules[0].running = running;
+        const result: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[];
+        if (Array.isArray(result) && result.length > 0)
+        {
+          return resolve(true);
+        }
+        else
+        {
+          return resolve(false);
+        }
+      }
+    });
   }
 
   public async setStatus(id: number, status: boolean): Promise<boolean>
@@ -246,6 +271,10 @@ export class Scheduler
           schedule[key] = existingSchedules[0][key];
         }
       });
+      if (typeof schedule.tasks !== 'string')
+      {
+        schedule.tasks = JSON.stringify(schedule.tasks);
+      }
     }
     return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
   }
@@ -304,27 +333,6 @@ export class Scheduler
 
       const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
       resolve(results);
-    });
-  }
-
-  private async _setRunning(id: number, running: boolean): Promise<boolean>
-  {
-    return new Promise<boolean>(async (resolve, reject) =>
-    {
-      const schedules: SchedulerConfig[] = await this.get(id);
-      if (schedules.length !== 0)
-      {
-        schedules[0].running = running;
-        const result: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[];
-        if (Array.isArray(result) && result.length > 0)
-        {
-          return resolve(true);
-        }
-        else
-        {
-          return resolve(false);
-        }
-      }
     });
   }
 

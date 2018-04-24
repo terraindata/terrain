@@ -130,6 +130,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
   `CREATE TABLE IF NOT EXISTS jobs
     (id ` + primaryKeyType + ` PRIMARY KEY,
      createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     logId integer,
      meta text NOT NULL,
      name text NOT NULL,
      pausedFilename text NOT NULL,

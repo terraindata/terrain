@@ -120,8 +120,11 @@ class Scheduler extends TerrainComponent<any> {
 
   public updateSchedule(id: number)
   {
-    const changes = { name: 'Jmansor Schedule Modified' };
-    this.schedulerApi.updateSchedule(id, changes)
+    const changes = { id, name: 'Jmansor Schedule Modified' };
+    this.props.schedulerActions({
+      actionType: 'updateSchedule',
+      schedule: changes,
+    })
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });
@@ -245,6 +248,7 @@ class Scheduler extends TerrainComponent<any> {
         <div style={{ flex: 1 }}>{schedule.running ? 'running' : 'not running'}</div>
         <div style={{ flex: 1 }}>{schedule.shouldRunNext.toString()}</div>
         <div style={{ flex: 1.5 }}>
+          <a href='#' onClick={() => this.updateSchedule(schedule.id)}>Update</a>,
           <a href='#' onClick={() => this.deleteSchedule(schedule.id)}>Delete</a>,
           <a href='#' onClick={() => this.duplicateSchedule(schedule.id)}>Duplicate</a>,
           <a href='#'>Log</a>,

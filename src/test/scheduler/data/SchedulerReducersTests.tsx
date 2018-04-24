@@ -128,6 +128,27 @@ describe('SchedulerReducers', () =>
     });
   });
 
+  describe('#updateScheduleSuccess', () =>
+  {
+    it('should set loading to false and update the specified schedule in the store', () =>
+    {
+      const existingSchedule = { id: 1, name: 'Schedule 1' };
+      scheduler = SchedulerHelper.mockState()
+        .addSchedule(existingSchedule)
+        .getState();
+
+      const updatedSchedule = { id: 1, name: 'Schedule 1 modified' }
+
+      const nextState = reducer(scheduler, {
+        type: SchedulerActionTypes.updateScheduleSuccess,
+        payload: { schedule: updatedSchedule },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.schedules.get(1).name).toEqual('Schedule 1 modified');
+    });
+  });
+
   describe('#deleteScheduleSuccess', () =>
   {
     it('should set loading to false and delete the specified schedule from the store', () =>
