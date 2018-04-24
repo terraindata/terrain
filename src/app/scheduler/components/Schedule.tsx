@@ -45,12 +45,14 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
 import Colors from 'app/colors/Colors';
+import CRONEditor from 'app/common/components/CRONEditor';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
+import cronstrue from 'cronstrue';
 import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -199,11 +201,32 @@ class Schedule extends TerrainComponent<Props>
     }
   }
 
+  public getIntervalDisplayName(value)
+  {
+    const { schedule } = this.props;
+    return cronstrue.toString(schedule.cron);
+  }
+
+  public handleIntervalChange(cron)
+  {
+    this.props.onChange(this.props.schedule.set('cron', cron));
+  }
+
+  public getIntervalComponent(props)
+  {
+    return (
+      <CRONEditor
+        cron={props.value}
+        onChange={this.handleIntervalChange}
+      />
+    );
+  }
+
   public getValues()
   {
     const { schedule } = this.props;
     const templateId = this.getTemplateId(schedule);
-    return List([templateId, this.state.configurationKey]);
+    return List([templateId, this.state.configurationKey, schedule.cron]);
   }
 
   public getOptionSets()
@@ -251,7 +274,19 @@ class Schedule extends TerrainComponent<Props>
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, schedule, template),
     };
 
-    return List([templateOptionSet, configurationOptionSet]);
+    // Interval options
+    const intervalOptionSet = {
+      key: 'interval',
+      options: List([]),
+      shortNameText: 'Interval',
+      headerText: '',
+      column: true,
+      forceFloat: true,
+      getCustomDisplayName: this.getIntervalDisplayName,
+      getValueComponent: this.getIntervalComponent,
+    };
+
+    return List([templateOptionSet, configurationOptionSet, intervalOptionSet]);
   }
 
   public canEdit()
