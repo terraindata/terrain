@@ -63,6 +63,8 @@ let defaultUserAccessToken: string = '';
 let exportTemplateID: number = -1;
 let persistentExportAccessToken: string = '';
 
+let templateId: number = -1; // ETL
+
 let mySQLImportTemplateID: number = -1;
 let persistentImportMySQLAccessToken: string = '';
 
@@ -1652,33 +1654,29 @@ describe('Credentials tests', () =>
 
 describe('Scheduler tests', () =>
 {
-  test('POST /midway/v1/scheduler/create scheduled export', async () =>
+  test('POST /midway/v1/scheduler/create scheduled ETL export', async () =>
   {
     await request(server)
-      .post('/midway/v1/scheduler/create')
+      .post('/midway/v1/scheduler/')
       .send({
         id: 1,
         accessToken: defaultUserAccessToken,
         body: {
-          jobType: 'export',
-          schedule: '* * * * *', // next run on some leap year date
-          sort: 'asc',
-          transport:
-            {
-              type: 'local',
-              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
-            },
-          name: 'Test Local Export',
-          paramsJob:
-            {
-              dbid: 1,
-              dbname: 'movies',
-              templateId: exportTemplateID,
-              filetype: 'csv',
-              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
-                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
-            },
-          filetype: 'json',
+          cron: '0 2 29 2 0', // some absurd leap year date at 2 AM
+          name: 'test ETL',
+          priority: 1,
+          shouldRunNext: true,
+          tasks:
+            [
+              {
+                id: 1,
+                taskId: 2,
+                params:
+                  {
+                    templateId, // ETL template ID
+                  },
+              },
+            ],
         },
       })
       .expect(200)
@@ -1692,18 +1690,10 @@ describe('Scheduler tests', () =>
         const result = JSON.parse(response.text);
         expect(Object.keys(result).lastIndexOf('errors')).toEqual(-1);
         schedulerExportId = result['id'];
-        expect(await new Promise<boolean>(async (resolve, reject) =>
-        {
-          function verifyFileWritten()
-          {
-            resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
-          }
-          setTimeout(verifyFileWritten, (60 - (Math.floor(Date.now() / 1000) % 60) + 3) * 1000);
-        })).toBe(true);
       });
   }, 70000);
 
-  test('POST /midway/v1/scheduler/run/<scheduled export ID> run now', async () =>
+  test('POST /midway/v1/scheduler/run/<schedule ID> run now', async () =>
   {
     await request(server)
       .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
@@ -1735,25 +1725,17 @@ describe('Scheduler tests', () =>
         id: 1,
         accessToken: defaultUserAccessToken,
         body: {
-          jobTypeInvalidParam: 'export',
-          schedule: '* * * * *', // next run on some leap year date
-          sort: 'asc',
-          transport:
-            {
-              type: 'local',
-              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
-            },
-          name: 'Test Local Export',
-          paramsJob:
-            {
-              dbid: 1,
-              dbname: 'movies',
-              templateId: exportTemplateID,
-              filetype: 'csv',
-              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
-                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
-            },
-          filetype: 'json',
+          invalidCronName: '0 2 29 2 0', // some absurd leap year date at 2 AM
+          name: 'invalid test ETL',
+          priority: 1,
+          shouldRunNext: true,
+          tasks:
+            [
+              {
+                id: 1,
+                taskId: 0,
+              },
+            ],
         },
       })
       .expect(400)
@@ -1918,7 +1900,6 @@ describe('Analytics route tests', () =>
 
 describe('ETL Template Tests', () =>
 {
-  let templateId: number = -1;
   test('Create a template: POST /midway/v1/etl/templates/create', async () =>
   {
     const template = await promisify(fs.readFile)('./midway/test/etl/movies_template.json', 'utf8');
