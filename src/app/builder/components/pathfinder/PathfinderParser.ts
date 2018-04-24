@@ -353,7 +353,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   });
   let must = List([]);
   let mustNot = List([]);
-  let filter = List([]);
+  const filter = List([]);
   let should = List([]);
   let useShould = false;
   if (filterGroup.minMatches !== 'all' || inMatchQualityContext)
