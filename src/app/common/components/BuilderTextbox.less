@@ -135,8 +135,8 @@
     position: absolute;
     right: @card-chip-margin;
     width: @card-chip-width;
-    height: @input-height / 2 + @standard-margin + 2px;
-    top: @input-height / 2 - 1px;
+    height: (@input-height / 2 + @standard-margin + 2px);
+    top: (@input-height / 2 - 1px);
     z-index: 9; // put it on top of the child card's background
     .transition;
 
@@ -144,7 +144,7 @@
       .transition;
       position: absolute;
       left: 14px;
-      bottom: -1 * @t;
+      bottom: (-1 * @t);
       width: 0px;
       height: 0px;
       // http://html-tuts.com/css-arrows-up-down-left-right-triangle/
@@ -156,13 +156,13 @@
   }
   &.builder-tb-cards-top {
     .builder-tb-cards-arrow {
-      top: -1 * @standard-margin;
-      height: @input-height / 2 + @standard-margin - 1px;
+      top: (-1 * @standard-margin);
+      height: (@input-height / 2 + @standard-margin - 1px);
       border-bottom: 1px solid #fff;
       border-top-width: 0px;
 
       .builder-tb-cards-arrow-inner {
-        bottom: -1 * @t;
+        bottom: (-1 * @t);
         top: auto;
       }
     }

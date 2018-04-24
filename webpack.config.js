@@ -147,16 +147,19 @@ module.exports =
     }),
     new HardSourceWebpackPlugin({
       cacheDirectory: './.cache/hard-source/dev/[confighash]',
-      recordsPath: './.cache/hard-source/dev/[confighash]/records.json',
     }),
     new ForkTsCheckerWebpackPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.bundle.js',
-      minChunks(module, count) {
-        const context = module.context;
-        return context && context.indexOf('node_modules') >= 0;
-      },
-    }),
   ],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /node_modules/,
+          chunks: "initial",
+          name: "vendor",
+          enforce: true
+        }
+      }
+    },
+  },
 };
