@@ -77,61 +77,25 @@ export interface Props
 
 class ScheduleList extends TerrainComponent<Props>
 {
-
-  /*
-    This stuff will all eventually be redux actions
-  */
   public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
-  public state: {
-    configurationKeys: List<string>,
-  } =
-    {
-      configurationKeys: List([]),
-    };
 
   public updateSchedule(id: number, changes)
   {
     this.props.schedulerActions({
       actionType: 'updateSchedule',
       schedule: changes,
-    })
-    .then((response) =>
-    {
-      this.setState({ responseText: JSON.stringify(response) });
-    })
-    .catch((error) =>
-    {
-      this.setState({ responseText: error.response.data.errors[0].detail });
     });
   }
 
   public runSchedule(id: number)
   {
-    this.schedulerApi.runSchedule(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
+    this.schedulerApi.runSchedule(id);
   }
 
   public pauseSchedule(id: number)
   {
-    this.schedulerApi.pauseSchedule(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
+    this.schedulerApi.pauseSchedule(id);
   }
-
-  /* UI */
 
   public componentWillMount()
   {
@@ -148,7 +112,6 @@ class ScheduleList extends TerrainComponent<Props>
   public handleScheduleChange(schedule: SchedulerConfig)
   {
     schedule = schedule.set('tasks', schedule.tasks.map((task) => task.toJS()));
-    console.log('handle schedule change to ', schedule.toJS());
     this.updateSchedule(schedule.id, schedule.toJS());
   }
 
@@ -184,15 +147,7 @@ class ScheduleList extends TerrainComponent<Props>
     this.props.schedulerActions({
       actionType: 'deleteSchedule',
       scheduleId: id,
-    })
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error.response.data.errors[0].detail });
-      });
+    });
   }
 
   public render()
@@ -200,7 +155,6 @@ class ScheduleList extends TerrainComponent<Props>
     const { schedules } = this.props.scheduler;
     const keys = schedules.keySeq().toList().sort();
     const scheduleList = keys.map((id) => schedules.get(id));
-    console.log('SCHEDULES ARE ', schedules);
     return (
       <div className='schedule-list-wrapper'>
         {

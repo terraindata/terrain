@@ -120,12 +120,12 @@ class Schedule extends TerrainComponent<Props>
     const task = this.getTask(schedule);
     let sources = Map({});
     let sinks = Map({});
-    if (task.params && task.params.get('overrideSource'))
+    if (task.params && task.params.get('overrideSources'))
     {
       const sourceObj = task.params.get('overrideSources');
       _.keys(Util.asJS(sourceObj)).forEach((key) =>
       {
-        sources = sources.set(key, _SourceConfig(sourceObj[key]));
+        sources = sources.set(key, _SourceConfig(sourceObj.get(key)));
       });
     }
     if (task.params && task.params.get('overrideSinks'))
@@ -133,7 +133,7 @@ class Schedule extends TerrainComponent<Props>
       const sinkObj = task.params.get('overrideSinks');
       _.keys(Util.asJS(sinkObj)).forEach((key) =>
       {
-        sinks = sinks.set(key, _SinkConfig(sinkObj[key]));
+        sinks = sinks.set(key, _SinkConfig(sinkObj.get(key)));
       });
     }
     this.setState({
@@ -156,9 +156,6 @@ class Schedule extends TerrainComponent<Props>
   {
     const task = this.getTask(schedule);
     const sourceKey = isSource ? 'overrideSources' : 'overrideSinks';
-    console.log(task.get('params'));
-    console.log(task.getIn(['params', sourceKey]));
-    console.log(task.getIn(['params', sourceKey, key]));
     const newSchedule = schedule.setIn(['tasks', 0], task.setIn(['params', sourceKey, key], endpoint));
     this.props.onChange(newSchedule);
   }
@@ -361,7 +358,6 @@ class Schedule extends TerrainComponent<Props>
   public render()
   {
     const { schedule } = this.props;
-    console.log('RENDER SCHEDULE ', schedule);
     return (
       <RouteSelector
         optionSets={this.getOptionSets()}

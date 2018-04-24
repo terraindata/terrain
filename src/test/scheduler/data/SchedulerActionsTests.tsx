@@ -195,7 +195,7 @@ describe('SchedulerActions', () =>
 
         return store.dispatch(SchedulerActions({
           actionType: 'updateSchedule',
-          schedule: scheduleParams as SchedulerConfig
+          schedule: scheduleParams as SchedulerConfig,
         }))
           .then((response) =>
           {

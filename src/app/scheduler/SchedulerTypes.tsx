@@ -48,7 +48,7 @@ import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
 import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
-import { TaskConfigClass } from '../../../shared/types/jobs/TaskConfig';
+import { TaskConfig as SharedTaskConfig } from '../../../shared/types/jobs/TaskConfig';
 import SharedSchedulerConfig from '../../../shared/types/scheduler/SchedulerConfig';
 
 class SchedulerConfigC extends SharedSchedulerConfig
@@ -61,7 +61,6 @@ export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig>
 export const _SchedulerConfig =
   (config: object) =>
   {
-    console.log('CONFIG IS ', config);
     let schedule = new SchedulerConfig_Record(config) as any as SchedulerConfig;
     let tasks: any = schedule.tasks;
     if (typeof schedule.tasks === 'string')
@@ -81,7 +80,6 @@ export const _SchedulerConfig =
     }
     tasks = tasks.map((task) => _TaskConfig(task));
     schedule = schedule.set('tasks', List(tasks));
-    console.log('SCHEDULE IS ', schedule);
     return schedule;
   };
 
@@ -99,7 +97,7 @@ export const _SchedulerState = (config?: any) =>
   return new SchedulerState_Record(Util.extendId(config || {})) as any as SchedulerState;
 };
 
-class TaskConfigC extends TaskConfigClass
+class TaskConfigC extends SharedTaskConfig
 {
   // Any extra functions / properties go here
 }
