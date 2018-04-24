@@ -277,6 +277,11 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
       return {
         a: 0,
         b: 1,
+        mode: line.transformData.mode,
+        visiblePoints: {
+          ranges: line.transformData.visiblePoints.map((scorePt) => scorePt.value).toArray(),
+          outputs: line.transformData.visiblePoints.map((scorePt) => scorePt.score).toArray(),
+        },
         weight: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
         numerators: [[line.field, 1]],
         denominators: [],
