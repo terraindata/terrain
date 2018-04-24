@@ -158,7 +158,7 @@ export class RouteSelector extends TerrainComponent<Props>
     return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
   }
 
-  public componentWillMount()
+  public componentDidMount()
   {
     // if (this.props.optionSets && !this.props.optionSets.get(0).hideSampleData)
     // {
