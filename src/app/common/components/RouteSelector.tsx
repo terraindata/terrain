@@ -905,7 +905,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
     const option = state.optionSets.get(optionSetIndex).options.find((opt) => opt.value === value);
 
-    if ((option && option.closeOnPick))
+    if (option && option.closeOnPick)
     {
       this.close();
     }
