@@ -70,6 +70,7 @@ export interface Props
   injectedContent?: any;
   showCheckbox?: boolean;
   checked?: boolean;
+  hideControls?: boolean;
   onCheckboxClicked?: () => void;
 }
 
@@ -218,14 +219,15 @@ class ExpandableView extends TerrainComponent<Props>
         <div
           className='nested-view-content-row'
           style={{
+            paddingTop: '0px',
             paddingBottom: this.props.children == null ? '0px' : '3px',
           }}
         >
           {
-            this.renderArrowSection()
+            this.props.hideControls ? null : this.renderArrowSection()
           }
           {
-            this.renderCheckboxSection()
+            this.props.hideControls ? null : this.renderCheckboxSection()
           }
           <div className='nested-view-content'>
             {this.props.content}
@@ -247,8 +249,8 @@ class ExpandableView extends TerrainComponent<Props>
     {
       return {
         backgroundColor: Colors().bg2,
-        margin: '6px',
-        padding: '6px 0px',
+        margin: '6px 6px 0px 6px',
+        padding: '0px 0px 6px 0px',
         border: `2px solid ${Colors().bg3}`,
       };
     }
@@ -257,7 +259,7 @@ class ExpandableView extends TerrainComponent<Props>
       return {
         margin: '0px 6px',
         padding: '6px',
-        boxShadow: 'inset 0 -1px 0 0 rgba(227, 227, 227, 0.78)',
+        boxShadow: `inset 0 -1px 0 0 ${Colors().boxShadow}`,
         backgroundColor: Colors().bg3,
       };
     }

@@ -123,7 +123,7 @@ class EditorFieldSettings extends TemplateEditorField<Props>
     return (
       <div
         className='field-settings-title-bar'
-        style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}
+        style={[borderColor(Colors().boxShadow)]}
       >
         <div className='field-settings-title-filler' />
         {field.canEditField() ? this.renderCategory(ViewCategory.Settings, 'Settings') : null}
