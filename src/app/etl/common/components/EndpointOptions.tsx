@@ -65,7 +65,7 @@ import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from
 import
 {
   FileConfig as FileConfigI, HttpOptions,
-  SftpOptions, SinkOptionsType, Sinks,
+  SQLOptions, SftpOptions, SinkOptionsType, Sinks,
   SourceOptionsType, Sources,
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
@@ -451,6 +451,41 @@ class FsEndpoint extends EndpointForm<FsState>
   };
 }
 
+type SQLState = SQLOptions;
+class SQLEndpoint extends EndpointForm<SQLState>
+{
+  public inputMap: InputDeclarationMap<SQLState> = {
+    ip: {
+      type: DisplayType.TextBox,
+      displayName: 'IP Address',
+      group: 'addr row',
+      widthFactor: 3,
+    },
+    port: {
+      type: DisplayType.NumberBox,
+      displayName: 'Port',
+      group: 'addr row',
+      widthFactor: 1,
+    },
+    database: {
+      type: DisplayType.TextBox,
+      displayName: 'Database',
+    },
+    table: {
+      type: DisplayType.TextBox,
+      displayName: 'Table',
+    },
+    credentialId: {
+      type: DisplayType.NumberBox,
+      displayName: 'Credential ID',
+    },
+    query: {
+      type: DisplayType.TextBox,
+      displayName: 'Query',
+    },
+  };
+}
+
 // exports
 type FormLookupMap<E extends string> =
   {
@@ -464,6 +499,8 @@ export const SourceFormMap: FormLookupMap<Sources> =
     [Sources.Sftp]: SftpEndpoint,
     [Sources.Http]: HttpEndpoint,
     [Sources.Fs]: FsEndpoint,
+    [Sources.Mysql]: SQLEndpoint,
+    [Sources.Postgresql]: SQLEndpoint,
   };
 
 export const SinkFormMap: FormLookupMap<Sinks> =
