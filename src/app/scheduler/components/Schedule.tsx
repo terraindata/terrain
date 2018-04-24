@@ -151,7 +151,7 @@ class Schedule extends TerrainComponent<Props>
     const { schedule } = this.props;
     const templateId = this.getParam('templateId', -1);
     const buttonValue = schedule.running ? 'Pause' : 'Run Now';
-    return List([templateId, this.state.configurationKey]);
+    return List([templateId, this.state.configurationKey, buttonValue]);
   }
 
   public getOptionSets()
