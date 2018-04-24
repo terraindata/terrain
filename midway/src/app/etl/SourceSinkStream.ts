@@ -148,7 +148,7 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
         case 'json':
           if (sink.fileConfig.jsonNewlines)
           {
-            exportStream = JSONTransform.createExportStream('{\n"' + 'exportKey' + '":[', ',\n', ']\n}\n');
+            exportStream = JSONTransform.createExportStream('', ',\n', '');
           }
           else
           {
