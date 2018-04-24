@@ -158,13 +158,16 @@ class Schedule extends TerrainComponent<Props>
     const { schedule } = this.props;
     const task = this.getTask();
     // Template Option Set
-    const templateOptions = this.props.templates.map((t) =>
+    const templateOptions = this.props.templates.filter((t) =>
+      t.canSchedule()
+    ).map((t) =>
     {
       return {
         value: t.id,
         displayName: t.templateName,
       };
     }).toList();
+
     const templateOptionSet = {
       key: 'template',
       options: templateOptions,

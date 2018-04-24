@@ -90,18 +90,21 @@ export class JobQueue
     );
   }
 
-  public cancel(id: number): boolean
+  public cancel(id: number): Promise<JobConfig[]>
   {
-    try
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
-      this.runningJobs.get(id).cancel();
-      return true;
-    }
-    catch (e)
-    {
-      // do nothing, job was not found
-    }
-    return false;
+      try
+      {
+        this.runningJobs.get(id).cancel();
+        return resolve(await this.get(id) as JobConfig[]);
+      }
+      catch (e)
+      {
+        // do nothing, job was not found
+      }
+      return reject('Job not found.');
+    });
   }
 
   /*
@@ -184,18 +187,21 @@ export class JobQueue
     return Promise.resolve({}); // TODO implement this
   }
 
-  public pause(id: number): boolean
+  public pause(id: number): Promise<JobConfig[]>
   {
-    try
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
-      this.runningJobs.get(id).pause();
-      return true;
-    }
-    catch (e)
-    {
-      // do nothing, job was not found
-    }
-    return false;
+      try
+      {
+        this.runningJobs.get(id).pause();
+        return resolve(await this.get(id) as JobConfig[]);
+      }
+      catch (e)
+      {
+        // do nothing, job was not found
+      }
+      return reject('Job not found.');
+    });
   }
 
   public async run(id: number): Promise<JobConfig[] | string>
@@ -213,15 +219,15 @@ export class JobQueue
     });
   }
 
-  public async unpause(id: number): Promise<boolean>
+  public async unpause(id: number): Promise<JobConfig[]>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
       try
       {
         if (this.runningJobs.has(id))
         {
-          resolve(true);
+          resolve(await this.get(id) as JobConfig[]);
           await this.runningJobs.get(id).run();
         }
       }
@@ -229,7 +235,7 @@ export class JobQueue
       {
         // do nothing, job was not found
       }
-      return resolve(false);
+      return reject('Job not found.');
     });
 
   }
@@ -253,7 +259,7 @@ export class JobQueue
         return resolve(false);
       }
       jobs[0].running = running;
-      jobs[0]['status'] = status;
+      jobs[0].status = status;
       const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
       resolve(true);
     });
