@@ -78,11 +78,11 @@ Middleware.passport.serializeUser((user, done) =>
 {
   if (user !== undefined)
   {
-    done(null, user.id);
+    done(null, user['id']);
   }
 });
 
-Middleware.passport.deserializeUser(async (id, done) =>
+Middleware.passport.deserializeUser(async (id: number, done) =>
 {
   try
   {
