@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as _ from 'lodash';
-import * as runQueue from 'run-queue';
 import * as winston from 'winston';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
@@ -75,11 +74,13 @@ export class JobQueue
       ['id'],
       [
         'createdAt',
+        'logId',
         'meta',
         'name',
         'pausedFilename',
         'priority',
         'running',
+        'runNowPriority',
         'scheduleId',
         'status',
         'tasks',
@@ -93,7 +94,7 @@ export class JobQueue
   {
     try
     {
-      this.jobs.get(id).cancel();
+      this.runningJobs.get(id).cancel();
       return true;
     }
     catch (e)
@@ -131,13 +132,18 @@ export class JobQueue
       // != undefined is a way to include both undefined and null
       const creationDate: Date = new Date();
       job.createdAt = creationDate;
+      if (job.id === null)
+      {
+        delete job.id;
+      }
       job.meta = (job.meta !== undefined && job.meta !== null) ? job.meta : '';
       job.name = (job.name !== undefined && job.name !== null) ? job.name : '';
       job.pausedFilename = (job.pausedFilename !== undefined && job.pausedFilename !== null) ? job.pausedFilename : '';
       job.priority = (job.priority !== undefined && job.priority !== null) ? job.priority : 1;
       job.running = (job.running !== undefined && job.running !== null) ? job.running : false;
+      job.runNowPriority = (job.runNowPriority !== undefined && job.runNowPriority !== null) ? job.runNowPriority : 1;
       job.scheduleId = (job.scheduleId !== undefined) ? job.scheduleId : null;
-      job.status = (job.status !== undefined && job.status !== null) ? job.status : 'pending';
+      job.status = (job.status !== undefined && job.status !== null && job.status !== '') ? job.status : 'PENDING';
       job.tasks = (job.tasks !== undefined && job.tasks !== null) ? job.tasks : '[]';
       job.type = (job.type !== undefined && job.type !== null) ? job.type : 'default';
       job.workerId = (job.workerId !== undefined && job.workerId !== null) ? job.workerId : 1;
@@ -148,54 +154,116 @@ export class JobQueue
     });
   }
 
+  public async delete(id: number): Promise<JobConfig[] | string>
+  {
+    return new Promise<JobConfig[]>(async (resolve, reject) =>
+    {
+      const jobs: JobConfig[] = await this.get(id);
+      if (jobs.length === 0)
+      {
+        return reject('Job does not exist');
+      }
+      const doNothing: JobConfig[] = await App.DB.delete(this.jobTable, { id }) as JobConfig[];
+      resolve([jobs[0]] as JobConfig[]);
+    });
+  }
+
   public async get(id?: number, running?: boolean): Promise<JobConfig[]>
   {
     return this._select([], { id, running });
   }
 
-  public pause(): void
+  public async getLog(id: number): Promise<object>
   {
-    if (this.taskTree.isCancelled() === false)
+    return Promise.resolve({}); // TODO implement this
+  }
+
+  public pause(id: number): boolean
+  {
+    try
     {
-      this.taskTree.pause();
+      this.runningJobs.get(id).pause();
+      return true;
     }
-  }
-
-  public async unpause(): Promise<void>
-  {
-    if (this.taskTree.isCancelled() === true)
+    catch (e)
     {
-      await this.run();
+      // do nothing, job was not found
     }
+    return false;
   }
 
-  public async printTree(): Promise<void>
+  public async run(id: number): Promise<JobConfig[] | string>
   {
-    await this.taskTree.printTree();
-  }
-
-  public async run(): Promise<TaskOutputConfig>
-  {
-    this.jobs.set(job.id, new Job());
-    this.tasks = args;
-    const taskTreeConfig: TaskTreeConfig =
+    return new Promise<JobConfig[] | string>(async (resolve, reject) =>
+    {
+      const getJobs: JobConfig[] = await this.get(id, false) as JobConfig[];
+      if (getJobs.length === 0)
       {
-        cancel: false,
-        filename: filename !== undefined ? filename : '',
-        jobStatus: 0,
-        paused: -1,
-      };
-    return this.taskTree.create(tasksAsTaskConfig, taskTreeConfig);
+        return reject('Job not found.');
+      }
+
+      let maxRunNowPriority: number = 1;
+      const query = new Tasty.Query(this.jobTable).filter(this.jobTable['status'].equals('PENDING'))
+        .filter(this.jobTable['running'].equals('false')).filter(this.jobTable['priority'].equals(0))
+        .sort(this.jobTable['runNowPriority'], 'desc').take(1);
+      const queryStr: string = App.DB.getDB().generateString(query);
+      const rawResults = await App.DB.getDB().execute([queryStr]);
+
+      const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
+      if (jobs.length !== 0)
+      {
+        maxRunNowPriority = jobs[0].runNowPriority;
+      }
+
+      getJobs[0].priority = 0;
+      getJobs[0].runNowPriority = maxRunNowPriority + 1;
+      resolve(await App.DB.upsert(this.jobTable, getJobs[0]) as JobConfig[]);
+    });
   }
+
+  public async unpause(id: number): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      try
+      {
+        if (this.runningJobs.has(id))
+        {
+          resolve(true);
+          await this.runningJobs.get(id).run();
+        }
+      }
+      catch (e)
+      {
+        // do nothing, job was not found
+      }
+      return resolve(false);
+    });
+
+  }
+
+  // public async run(): Promise<TaskOutputConfig>
+  // {
+  //   this.runningJobs.set(job.id, new Job());
+  //   this.tasks = args;
+  //   const taskTreeConfig: TaskTreeConfig =
+  //     {
+  //       cancel: false,
+  //       filename: filename !== undefined ? filename : '',
+  //       jobStatus: 0,
+  //       paused: -1,
+  //     };
+  //   return this.taskTree.create(tasksAsTaskConfig, taskTreeConfig);
+  // }
 
   public async initializeJobQueue(): Promise<void>
   {
     setTimeout(this._jobLoop.bind(this), INTERVAL - new Date().getTime() % INTERVAL);
   }
 
-  public async setJobStatus(id: number, running: boolean): Promise<bool>
+  public async setJobStatus(id: number, running: boolean, status: string): Promise<boolean>
   {
-    return new Promise<bool>(async (resolve, reject) =>
+    return new Promise<boolean>(async (resolve, reject) =>
     {
       const jobs: JobConfig[] = await this._select([], { id }) as JobConfig[];
       if (jobs.length === 0)
@@ -207,14 +275,15 @@ export class JobQueue
         return resolve(false);
       }
       jobs[0].running = running;
-      await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
+      jobs[0]['status'] = status;
+      const doNothing: JobConfig[] = await App.DB.upsert(this.jobTable, jobs[0]) as JobConfig[];
       resolve(true);
     });
   }
 
   private async _checkJobTable(): Promise<void>
   {
-    return new Promise<object>(async (resolve, reject) =>
+    return new Promise<void>(async (resolve, reject) =>
     {
       const jobIdLst: number[] = [];
       const numRunningJobs: number = this.runningJobs.size;
@@ -223,8 +292,9 @@ export class JobQueue
       {
         return resolve();
       }
-      const query = new Tasty.Query(this.jobTable).filter(this.jobTable['running'].equals(false))
-        .sort(this.jobTable['priority'], 'asc').sort(this.jobTable['createdAt'], 'asc').take(newJobSlots);
+      const query = new Tasty.Query(this.jobTable).filter(this.jobTable['status'].equals('PENDING'))
+        .filter(this.jobTable['running'].equals('false')).sort(this.jobTable['priority'], 'asc')
+        .sort(this.jobTable['runNowPriority'], 'desc').sort(this.jobTable['createdAt'], 'asc').take(newJobSlots);
       const queryStr: string = App.DB.getDB().generateString(query);
       const rawResults = await App.DB.getDB().execute([queryStr]);
       const jobs: JobConfig[] = rawResults.map((result: object) => new JobConfig(result));
@@ -259,7 +329,7 @@ export class JobQueue
           // update the table to running = true
 
           this.runningJobs.set(nextJob.id, newJob);
-          const status: boolean = await this.setJobStatus(nextJob.id, true);
+          const status: boolean = await this.setJobStatus(nextJob.id, true, 'RUNNING');
           if (!status)
           {
             winston.warn('Job running status was not toggled.');
@@ -268,12 +338,16 @@ export class JobQueue
           ++i;
         }
       }
+
       resolve();
       jobIdLst.forEach(async (jobId) =>
       {
         const jobResult: TaskOutputConfig = await this.runningJobs.get(jobId).run() as TaskOutputConfig;
-        const jobs: JobConfig[] = await this.get(jobId);
-        await this.setJobStatus(jobs[0].id, false);
+        const jobsFromId: JobConfig[] = await this.get(jobId);
+        const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
+        await this.setJobStatus(jobsFromId[0].id, false, jobStatus);
+        await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
+        this.runningJobs.delete(jobId);
         // log job result
         winston.info('Job result: ' + JSON.stringify(jobResult, null, 2));
       });

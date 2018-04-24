@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import ATask from './ATask';
+import ATaskConfig from './ATaskConfig';
 import TaskInputConfigTypes from './TaskInputConfigTypes';
 
-export class TaskInputConfig extends ATask
+export class TaskInputConfig extends ATaskConfig
 {
   public options: TaskInputConfigTypes = null;
 }

@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
+import { JobConfig } from 'shared/types/jobs/JobConfig';
 import * as App from '../App';
 import * as AppUtil from '../AppUtil';
 import Credentials from '../credentials/Credentials';
@@ -78,13 +79,6 @@ Router.post('/delete/:id', passport.authenticate('access-token-local'), async (c
   ctx.body = await App.JobQ.delete(ctx.params.id);
 });
 
-// Duplicate job by id; creates an identical job with '- Copy' appended to name
-Router.post('/duplicate/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.JobQueuePermissions.verifyDuplicateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.duplicate(ctx.params.id);
-});
-
 // Retrieve job log by id
 Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -97,6 +91,12 @@ Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ct
 {
   await perm.JobQueuePermissions.verifyPauseRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = App.JobQ.pause(ctx.params.id);
+});
+
+Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.JobQueuePermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await App.JobQ.run(ctx.params.id);
 });
 
 // unpause paused job by id
@@ -115,17 +115,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     delete job.id;
   }
   await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.upsert(job);
-});
-
-// Update job
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const job: JobConfig = ctx.request.body.body;
-  job.id = ctx.params.id;
-  AppUtil.verifyParameters(job, ['id', 'interval', 'name', 'priority', 'tasks']);
-  await perm.JobQueuePermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.upsert(job);
+  ctx.body = await App.JobQ.create(job);
 });
 
 export default Router;
