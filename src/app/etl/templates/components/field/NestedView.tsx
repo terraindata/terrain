@@ -167,30 +167,6 @@ class ExpandableView extends TerrainComponent<Props>
     );
   }
 
-  public renderInjectedContent()
-  {
-    if (this.props.injectedContent !== null && this.props.injectedContent !== undefined)
-    {
-      return (
-        <div
-          className={classNames({
-            'nested-view-injected-container': true,
-            'nested-view-open': this.props.open,
-          })}
-          style={{
-            borderColor: this.getBorderColor(),
-          }}
-        >
-          {this.props.injectedContent}
-        </div>
-      );
-    }
-    else
-    {
-      return null;
-    }
-  }
-
   public getBorderColor()
   {
     return Colors().inactiveHover;
@@ -198,7 +174,7 @@ class ExpandableView extends TerrainComponent<Props>
 
   public render()
   {
-    const rootStyle = this.getStyle(this.props.children != null);
+    const rootStyle = this.getStyle(this.props.children != null, this.props.open);
     const style = this.props.style !== undefined ? _.extend({}, rootStyle, this.props.style) : rootStyle;
 
     return (
@@ -230,24 +206,23 @@ class ExpandableView extends TerrainComponent<Props>
           </div>
         </div>
         {
-          this.renderInjectedContent()
-        }
-        {
           this.renderChildren()
         }
       </div>
     );
   }
 
-  public getStyle(hasChildren: boolean)
+  public getStyle(hasChildren: boolean, isOpen: boolean)
   {
     if (hasChildren)
     {
       return {
         backgroundColor: Colors().bg2,
         margin: '6px 6px 0px 6px',
-        padding: '0px 0px 6px 0px',
+        padding: `0px 0px ${isOpen ? 6 : 0}px 0px`,
         border: `2px solid ${Colors().bg3}`,
+        borderBottomLeftRadius: '0px',
+        borderBottomRightRadius: '0px',
       };
     }
     else

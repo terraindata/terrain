@@ -71,7 +71,6 @@ export interface Props extends TemplateEditorFieldProps
   previewLabel?: string;
 }
 
-@Radium
 class EditorFieldNodeC extends TemplateEditorField<Props>
 {
   public state: {
@@ -198,7 +197,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         {showSettings ?
           <div
             className='editor-field-node-settings-content'
-            style={[backgroundColor(Colors().bg3)]}
+            style={backgroundColor(Colors().bg3)}
           >
             <EditorFieldSettings
               labelOverride={this.props.previewLabel}
@@ -277,7 +276,6 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }
     else
     {
-
       return (
         <NestedView
           content={content}
