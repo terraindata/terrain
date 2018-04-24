@@ -75,27 +75,7 @@ Router.post('/execute', async (ctx, next) =>
     return;
   }
 
-  if (fields['template'] !== undefined)
-  {
-    const template = JSON.parse(fields['template']);
-    ctx.body = await templates.execute(template, files);
-  }
-  else if (fields['templateID'] !== undefined)
-  {
-    const templateID = Number(fields['templateID']);
-    if (fields['overrideSources'] !== undefined || fields['overrideSinks'] !== undefined)
-    {
-      ctx.body = await templates.executeByOverride(templateID, files, fields['overrideSources'], fields['overrideSinks']);
-    }
-    else
-    {
-      ctx.body = await templates.executeById(templateID, files);
-    }
-  }
-  else
-  {
-    throw new Error('Missing template or template ID parameter.');
-  }
+  ctx.body = await templates.executeETL(fields, files);
 });
 
 interface ETLUIPreviewConfig

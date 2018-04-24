@@ -1,22 +1,22 @@
 @import "../../common/Common.less";
 
 @option-height: 26px;
-@dropdown-height: @option-height + 7px;
+@dropdownHeight: (@option-height + 7px);
 @border-radius: 3px;
 
 .dropdown-wrapper {
  cursor: pointer;
- 
- height: @dropdown-height;
+
+ height: @dropdownHeight;
  &.dropdown-wrapper-larger {
   height: 48px;
  }
- 
+
  box-sizing: border-box;
  z-index: 0;
  transition: height 0.15s;
  margin: 0px (@standard-margin / 2);
- 
+
  font-size: @font-size;
 
  &:last-child {
@@ -71,23 +71,23 @@
 
   &:not(.dropdown-up) {
     .dropdown-options-wrapper {
-      top: @dropdown-height -1;
+      top: @dropdownHeight -1px;
       left: -1px;
     }
     &.dropdown-wrapper-larger {
       .dropdown-options-wrapper {
-        top: 48px + 1px;
+        top: (48px + 1px);
       }
     }
   }
 
   &.dropdown-up {
     .dropdown-options-wrapper {
-      bottom:  @dropdown-height;
+      bottom:  @dropdownHeight;
     }
     &.dropdown-wrapper-larger {
       .dropdown-options-wrapper {
-        bottom: 48px + 1px;
+        bottom: (48px + 1px);
       }
     }
   }
@@ -102,7 +102,7 @@
     transition: all 0.05s;
     border-radius: @border-radius;
   }
-  
+
   .dropdown-value {
     width: 100%;
     height: 100%;
@@ -110,8 +110,8 @@
     box-sizing: border-box;
     padding-right: 28px; // apply padding that exists in options menu
     padding-top: 2px;
-    
-    
+
+
     border: 1px solid;
     svg {
         height: 14px;
@@ -165,9 +165,9 @@
         }
       }
     }
-    
- 
-    // draw arrow icon   
+
+
+    // draw arrow icon
     &:before {
         content: "";
         width: 0px;
@@ -175,7 +175,7 @@
         position: absolute;
         right: 6px;
         top: 12px;
-        
+
         .transition;
         opacity: 0.25;
 
@@ -183,7 +183,7 @@
         border-right: 7px solid transparent;
         border-left: 7px solid transparent;
     }
-   
+
     &.dropdown-value-larger {
       padding-top: 0px;
       padding-left: 0px;
@@ -197,7 +197,7 @@
       opacity: 1;
     }
   }
-  
+
   &.dropdown-open {
     .dropdown-value:before {
       // rotate arrow
@@ -205,7 +205,7 @@
       opacity: 1;
     }
   }
-  
+
   .dropdown-option {
     background: @white;
   }
