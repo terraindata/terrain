@@ -48,7 +48,7 @@ import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
 import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from 'shared/util/Classes';
 
