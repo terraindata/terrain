@@ -79,7 +79,7 @@ function cartesianProductOf(...vars: any[])
       {
         return x.concat([y]);
       });
-    }), true);
+    }));
   }, [[]]);
 }
 const classCombinations = cartesianProductOf(['regular', 'small', 'big', 'circle'], ['top', 'bottom', 'left', 'right']);

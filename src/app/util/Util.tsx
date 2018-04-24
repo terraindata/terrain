@@ -437,7 +437,7 @@ const Util = {
 
   attr(target, key: string): string
   {
-    return ReactDOM.findDOMNode(target).getAttribute(key);
+    return (ReactDOM.findDOMNode(target) as Element).getAttribute(key);
   },
 
   // corrects a given index so that it is appropriate

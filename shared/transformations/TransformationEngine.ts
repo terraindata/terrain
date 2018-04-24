@@ -132,7 +132,7 @@ export class TransformationEngine
     return parsed;
   }
 
-  private dag: any = new Graph({ isDirected: true });
+  private dag: any = new Graph({ directed: true });
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;

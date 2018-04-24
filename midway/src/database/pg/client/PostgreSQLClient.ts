@@ -64,12 +64,12 @@ class PostgreSQLClient
     this.config = config;
     this.delegate = new pg.Pool(config);
 
-    this.delegate.on('acquire', (connection: pg.Client) =>
+    this.delegate.on('acquire', (connection: pg.PoolClient) =>
     {
       this.controller.log('PostgreSQLClient', 'Connection acquired ');
     });
 
-    this.delegate.on('remove' as any, (connection: pg.Client) =>
+    this.delegate.on('remove' as any, (connection: pg.PoolClient) =>
     {
       this.controller.log('PostgreSQLClient', 'Connection released ');
     });
