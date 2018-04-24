@@ -440,6 +440,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
 function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean, inputs, ignoreNested = false)
 {
   line = line as FilterLine;
+  let field;
   const lineValue = String(line.value);
   let value: any = String(line.value || '');
   const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
@@ -645,11 +646,12 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
         }),
       });
     case 'isin':
+      field = line.analyzed ? line.field + '.keyword' : line.field;
       try
       {
         return Map({
           terms: {
-            [line.field]: JSON.parse(String(value).toLowerCase()),
+            [field]: JSON.parse(String(value).toLowerCase()),
             boost,
           },
         });
@@ -663,14 +665,14 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
           pieces = pieces.map((piece) => piece.toLowerCase().trim());
           return Map({
             terms: {
-              [line.field]: pieces,
+              [field]: pieces,
               boost,
             },
           });
         }
         return Map({
           terms: {
-            [line.field]: value,
+            [field]: value,
             boost,
           },
         });
@@ -678,6 +680,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
 
     case 'isnotin':
       let parsed = value;
+      field = line.analyzed ? line.field + '.keyword' : line.field;
       try
       {
         parsed = JSON.parse(String(value).toLowerCase());
@@ -697,7 +700,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
           bool: {
             must_not: {
               terms: {
-                [line.field]: parsed,
+                [field]: parsed,
               },
             },
             boost,
@@ -708,7 +711,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
       {
         return Map({
           terms: {
-            [line.field]: parsed,
+            [field]: parsed,
             boost,
           },
         });
