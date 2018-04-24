@@ -225,7 +225,7 @@ export class ResultsManager extends TerrainComponent<Props>
       this.queryResults(nextProps.query, nextProps.db, nextProps.hitsPage, true);
     }
 
-    if (!nextProps.query || (this.props.query && nextProps.query && nextProps.query.id !== this.props.query.id))
+    if ((!nextProps.query && this.props.query) || (this.props.query && nextProps.query && nextProps.query.id !== this.props.query.id))
     {
       this.changeResults({
         hits: undefined,

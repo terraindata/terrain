@@ -90,7 +90,6 @@ const DuplicateIcon = require('./../../../images/icon_save_as.svg?name=Duplicate
 const SaveIcon = require('./../../../images/icon_save_10x10.svg?name=SaveIcon');
 const UndoIcon = require('./../../../images/icon_undo.svg?name=UndoIcon');
 const RedoIcon = require('./../../../images/icon_redo.svg?name=RedoIcon');
-
 const { Map, List } = Immutable;
 
 export interface Props
@@ -198,6 +197,33 @@ class Builder extends TerrainComponent<Props>
 
   public unregisterLeaveHook1: any = () => undefined;
   public unregisterLeaveHook2: any = () => undefined;
+
+  public shouldComponentUpdate(nextProps: Props, nextState)
+  {
+    for (const key in nextProps)
+    {
+      if (key === 'builder')
+      {
+        // TODO: Look into why === causes unnecessary rerenders
+        if (!_.isEqual(this.props.builder, nextProps.builder))
+        {
+          return true;
+        }
+      }
+      else if (this.props[key] !== nextProps[key])
+      {
+        return true;
+      }
+    }
+    for (const key in nextState)
+    {
+      if (this.state[key] !== nextState[key])
+      {
+        return true;
+      }
+    }
+    return false;
+  }
 
   public componentWillMount()
   {
