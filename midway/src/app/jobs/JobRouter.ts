@@ -93,6 +93,12 @@ Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ct
   ctx.body = App.JobQ.pause(ctx.params.id);
 });
 
+Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.JobQueuePermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await App.JobQ.run(ctx.params.id);
+});
+
 // unpause paused job by id
 Router.post('/unpause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

@@ -136,6 +136,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      pausedFilename text NOT NULL,
      priority text NOT NULL,
      running bool NOT NULL,
+     runNowPriority integer NOT NULL,
      scheduleId integer,
      status text NOT NULL,
      tasks text NOT NULL,

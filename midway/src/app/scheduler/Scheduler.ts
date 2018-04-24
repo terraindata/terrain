@@ -163,6 +163,7 @@ export class Scheduler
           pausedFilename: jobFilename,
           priority: 1,
           running: null,
+          runNowPriority: null,
           scheduleId: id,
           status: '',
           tasks: schedule.tasks,

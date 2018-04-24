@@ -54,6 +54,7 @@ export class JobConfig
   public pausedFilename: string = '';              // filename of the stored paused output
   public priority: number = 1;                     // priority of the scheduled job
   public running: boolean = false;                 // whether the task is running or not (TODO: lock this)
+  public runNowPriority: number = null;            // determines the order of jobs set to run manually. 1 is lowest priority
   public scheduleId: number = null;                // (optional) schedule ID
   public status: string = '';                      // the status of the job: success, failure, cancelled
   public tasks: string = '';                       // a stringified representation of TaskConfig[]
