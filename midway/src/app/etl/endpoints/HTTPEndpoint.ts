@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as request from 'request';
-import { Readable, Writable } from 'stream';
+import { PassThrough, Readable, Writable } from 'stream';
 
 import { HttpOptions, SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
@@ -89,7 +89,8 @@ export default class HTTPEndpoint extends AEndpointStream
             return reject(e);
           }
 
-          resolve(res);
+          const passThrough = new PassThrough({ highWaterMark: 128 * 1024 });
+          resolve(res.pipe(passThrough));
         });
     });
   }

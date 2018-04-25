@@ -122,7 +122,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      lastRun ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      meta text NOT NULL,
      name text NOT NULL,
-     priority text NOT NULL,
+     priority integer NOT NULL,
      running bool NOT NULL,
      shouldRunNext bool NOT NULL,
      tasks text NOT NULL,
