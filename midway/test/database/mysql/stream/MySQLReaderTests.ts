@@ -83,7 +83,7 @@ const expectedResponse = [
   },
 ];
 
-test('simple mysql reader stream', async (done) =>
+test('simple mysql reader stream', (done) =>
 {
   try
   {
@@ -107,7 +107,7 @@ test('simple mysql reader stream', async (done) =>
   }
 });
 
-test('mysql stream (buffer transform)', async (done) =>
+test('mysql stream (buffer transform)', (done) =>
 {
   try
   {

@@ -89,11 +89,13 @@ export class PostgreSQLReader extends SafeReadable
       {
         if (err !== null && err !== undefined)
         {
-          this.stream = client.query(this.query) as Readable;
-          this.stream.on('end', () => this.push(null));
-          this.stream.on('data', (d) => this.push(d));
-          this.stream.on('error', (e) => this.emit('error', e));
+          throw err;
         }
+
+        this.stream = client.query(this.query);
+        this.stream.on('end', () => this.push(null));
+        this.stream.on('data', (d) => this.push(d));
+        this.stream.on('error', (e) => this.emit('error', e));
       });
     }
     catch (e)

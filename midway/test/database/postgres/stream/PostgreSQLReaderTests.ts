@@ -81,7 +81,7 @@ const expectedResponse = [
   },
 ];
 
-test('simple PostgreSQL reader stream', async (done) =>
+test('simple PostgreSQL reader stream', (done) =>
 {
   try
   {
@@ -105,7 +105,7 @@ test('simple PostgreSQL reader stream', async (done) =>
   }
 });
 
-test('PostgreSQL stream (buffer transform)', async (done) =>
+test('PostgreSQL stream (buffer transform)', (done) =>
 {
   try
   {
