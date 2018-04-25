@@ -233,6 +233,8 @@ export class TaskTree
         {
           break;
         }
+        console.log(this.tasks);
+        console.log(ind);
         this.tasks[ind].setInputConfig(result);
         if (this.taskTreeConfig.jobStatus === 2) // was paused
         {

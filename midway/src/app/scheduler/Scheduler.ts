@@ -56,6 +56,7 @@ import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
 import { Sources } from '../io/sources/Sources';
 import { Job } from '../jobs/Job';
+import { UserConfig } from '../users/UserConfig';
 import SchedulerConfig from './SchedulerConfig';
 
 export const credentials: Credentials = new Credentials();
@@ -74,6 +75,7 @@ export class Scheduler
       ['id'],
       [
         'createdAt',
+        'createdBy',
         'cron',
         'lastModified',
         'lastRun',
@@ -140,7 +142,7 @@ export class Scheduler
     });
   }
 
-  public async runSchedule(id: number, runNow?: boolean): Promise<SchedulerConfig[] | string>
+  public async runSchedule(id: number, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
   {
     return new Promise<SchedulerConfig[] | string>(async (resolve, reject) =>
     {
@@ -163,6 +165,7 @@ export class Scheduler
       const jobConfig: JobConfig =
         {
           createdAt: null,
+          createdBy: schedule.createdBy,
           id: null,
           logId: null,
           meta: '',
@@ -178,7 +181,7 @@ export class Scheduler
           workerId: 1, // TODO change this for clustering support
         };
       await this.setRunning(id, true);
-      const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow);
+      const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);
@@ -190,9 +193,9 @@ export class Scheduler
 
   public pause(id: number): Promise<SchedulerConfig[] | string>
   {
-    if (this.runningSchedules[id] !== undefined)
+    if (this.runningSchedules.get(id) !== undefined)
     {
-      this.runningSchedules[id].pause();
+      this.runningSchedules.get(id).pause();
       return this.get(id) as Promise<SchedulerConfig[]>;
     }
     return Promise.reject('Schedule not found.');
@@ -224,9 +227,9 @@ export class Scheduler
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      if (this.runningSchedules[id] !== undefined)
+      if (this.runningSchedules.get(id) !== undefined)
       {
-        await this.runningSchedules[id].unpause();
+        await this.runningSchedules.get(id).unpause();
         // wait for the unpause to resolve first
         return resolve(await this.get(id) as SchedulerConfig[]);
       }
@@ -234,7 +237,7 @@ export class Scheduler
     });
   }
 
-  public async upsert(schedule: SchedulerConfig): Promise<SchedulerConfig[]>
+  public async upsert(schedule: SchedulerConfig, user?: UserConfig): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -246,6 +249,7 @@ export class Scheduler
           return Promise.reject('Schedule name and cron must be provided.');
         }
         schedule.createdAt = creationDate;
+        schedule.createdBy = user !== undefined ? user.id : null;
         schedule.lastModified = creationDate;
         schedule.lastRun = new Date(0); // beginning of epoch time
         schedule.meta = schedule.meta !== undefined ? schedule.meta : '';

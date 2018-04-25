@@ -74,6 +74,7 @@ export class JobQueue
       ['id'],
       [
         'createdAt',
+        'createdBy',
         'logId',
         'meta',
         'name',
@@ -118,7 +119,7 @@ export class JobQueue
    * PARAMS: job.tasks (TaskConfig[] ==> string)
    *
    */
-  public async create(job: JobConfig, runNow?: boolean): Promise<JobConfig[] | string>
+  public async create(job: JobConfig, runNow?: boolean, userId?: number): Promise<JobConfig[] | string>
   {
     return new Promise<JobConfig[] | string>(async (resolve, reject) =>
     {
@@ -146,6 +147,7 @@ export class JobQueue
       {
         delete job.id;
       }
+      job.createdBy = userId !== undefined ? userId : null;
       job.meta = (job.meta !== undefined && job.meta !== null) ? job.meta : '';
       job.name = (job.name !== undefined && job.name !== null) ? job.name : '';
       job.pausedFilename = (job.pausedFilename !== undefined && job.pausedFilename !== null) ? job.pausedFilename : '';
