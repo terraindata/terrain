@@ -139,6 +139,21 @@ export interface SchedulerActionTypes
     actionType: 'duplicateScheduleFailed';
     error: string;
   };
+
+  pauseSchedule?: {
+    actionType: 'pauseSchedule';
+    scheduleId: ID;
+  };
+
+  unpauseSchedule?: {
+    actionType: 'unpauseSchedule';
+    scheduleId: ID;
+  };
+
+  runSchedule?: {
+    actionType: 'runSchedule';
+    scheduleId: ID;
+  };
 }
 
 class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
@@ -304,9 +319,9 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       actionType: 'updateScheduleStart',
     });
 
-    const { schedule } = action;
+    const { schedule: scheduleChanges } = action;
 
-    return this.api.updateSchedule(schedule.id, schedule)
+    return this.api.updateSchedule(scheduleChanges.id, scheduleChanges)
       .then((response) =>
       {
         const schedule: SchedulerConfig = _SchedulerConfig(response.data[0]);
@@ -352,7 +367,67 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
         const schedule: SchedulerConfig = response.data[0];
         directDispatch({
           actionType: 'duplicateScheduleSuccess',
-          schedule: schedule,
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public pauseSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.pauseSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public unpauseSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.unpauseSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public runSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.runSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
         });
 
         return Promise.resolve(schedule);
@@ -361,29 +436,20 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
 
   public overrideAct(action: Unroll<SchedulerActionTypes>)
   {
-    if (action.actionType === 'getSchedules')
-    {
-      return this.getSchedules.bind(this, action);
-    }
+    const asyncActions = [
+      'getSchedules',
+      'createSchedule',
+      'updateSchedule',
+      'deleteSchedule',
+      'duplicateSchedule',
+      'pauseSchedule',
+      'unpauseSchedule',
+      'runSchedule',
+    ];
 
-    if (action.actionType === 'createSchedule')
+    if (asyncActions.indexOf(action.actionType) > -1)
     {
-      return this.createSchedule.bind(this, action);
-    }
-
-    if (action.actionType === 'updateSchedule')
-    {
-      return this.updateSchedule.bind(this, action);
-    }
-
-    if (action.actionType === 'deleteSchedule')
-    {
-      return this.deleteSchedule.bind(this, action);
-    }
-
-    if (action.actionType === 'duplicateSchedule')
-    {
-      return this.duplicateSchedule.bind(this, action);
+      return this[action.actionType].bind(this, action);
     }
   }
 }

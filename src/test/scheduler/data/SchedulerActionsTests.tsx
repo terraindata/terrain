@@ -101,9 +101,36 @@ jest.mock('scheduler/SchedulerApi', () =>
             }),
           );
         },
-      };
-    },
-  };
+
+        pauseSchedule: (id) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 2, name: 'Schedule 2 paused' }],
+            }),
+          );
+        },
+
+        unpauseSchedule: (id) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 2, name: 'Schedule 2 unpaused' }],
+            }),
+          );
+        },
+
+        runSchedule: (id) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 2, name: 'Schedule 2 running' }],
+            }),
+          );
+        },
+      }
+    }
+  }
 });
 
 const mockStore = createMockStore();
@@ -271,6 +298,114 @@ describe('SchedulerActions', () =>
         return store.dispatch(SchedulerActions({
           actionType: 'duplicateSchedule',
           scheduleId: duplicatedSchedule.id,
+        }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#pauseSchedule', () =>
+  {
+    describe('when the schedule is successfully paused', () =>
+    {
+      it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
+      {
+        const pausedSchedule = { id: 2, name: 'Schedule 2 paused' };
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.updateScheduleStart,
+            payload: { actionType: 'updateScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.updateScheduleSuccess,
+            payload: {
+              actionType: 'updateScheduleSuccess',
+              schedule: pausedSchedule,
+            },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'pauseSchedule',
+          scheduleId: pausedSchedule.id,
+        }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#unpauseSchedule', () =>
+  {
+    describe('when the schedule is successfully unpaused', () =>
+    {
+      it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
+      {
+        const unpausedSchedule = { id: 2, name: 'Schedule 2 unpaused' };
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.updateScheduleStart,
+            payload: { actionType: 'updateScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.updateScheduleSuccess,
+            payload: {
+              actionType: 'updateScheduleSuccess',
+              schedule: unpausedSchedule,
+            },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'unpauseSchedule',
+          scheduleId: unpausedSchedule.id,
+        }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#runSchedule', () =>
+  {
+    describe('when the schedule is successfully run', () =>
+    {
+      it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
+      {
+        const runningSchedule = { id: 2, name: 'Schedule 2 running' };
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.updateScheduleStart,
+            payload: { actionType: 'updateScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.updateScheduleSuccess,
+            payload: {
+              actionType: 'updateScheduleSuccess',
+              schedule: runningSchedule,
+            },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'runSchedule',
+          scheduleId: runningSchedule.id,
         }))
           .then((response) =>
           {
