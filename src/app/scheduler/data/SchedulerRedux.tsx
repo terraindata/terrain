@@ -189,7 +189,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
         const { schedule } = action.payload;
         return state
           .set('loading', false)
-          .setIn(['schedules', schedule.id], schedule);
+          .setIn(['schedules', schedule.id], _SchedulerConfig(schedule));
       },
 
       createScheduleFailed: (state, action) =>
