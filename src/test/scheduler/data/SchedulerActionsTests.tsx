@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { SchedulerActions, SchedulerActionTypes } from 'scheduler/data/SchedulerRedux';
 import SchedulerApi from 'scheduler/SchedulerApi';
-import { _SchedulerConfig, SchedulerConfig } from 'scheduler/SchedulerTypes';
+import { SchedulerConfig } from 'scheduler/SchedulerTypes';
 import { createMockStore } from 'test-helpers/helpers';
 import SchedulerHelper from 'test-helpers/SchedulerHelper';
 
@@ -128,9 +128,9 @@ jest.mock('scheduler/SchedulerApi', () =>
             }),
           );
         },
-      }
-    }
-  }
+      };
+    },
+  };
 });
 
 const mockStore = createMockStore();
@@ -150,9 +150,7 @@ describe('SchedulerActions', () =>
     {
       it('should dispatch a getSchedulesStart action followed by a getSchedulesSuccess action', () =>
       {
-        const schedules = Immutable.Map<ID, any>({})
-          .set(1, _SchedulerConfig({ id: 1, name: 'Schedule 1' }))
-          .set(2, _SchedulerConfig({ id: 2, name: 'Schedule 2' }));
+        const schedules = [{ id: 1, name: 'Schedule 1' }, { id: 2, name: 'Schedule 2' }];
 
         const expectedActions = [
           {
@@ -183,7 +181,7 @@ describe('SchedulerActions', () =>
       it('should dispatch a createScheduleStart action followed by a createScheduleSuccess action', () =>
       {
         const scheduleParams = { name: 'Schedule 2' };
-        const newSchedule = _SchedulerConfig({ id: 2, name: 'Schedule 2' });
+        const newSchedule = { id: 2, name: 'Schedule 2' };
 
         const expectedActions = [
           {
@@ -214,7 +212,7 @@ describe('SchedulerActions', () =>
       it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
       {
         const scheduleParams = { name: 'Schedule 1 modified' };
-        const updatedSchedule = _SchedulerConfig({ id: 1, name: 'Schedule 1 modified' });
+        const updatedSchedule = { id: 1, name: 'Schedule 1 modified' };
 
         const expectedActions = [
           {
@@ -231,7 +229,7 @@ describe('SchedulerActions', () =>
 
         return store.dispatch(SchedulerActions({
           actionType: 'updateSchedule',
-          schedule: scheduleParams as SchedulerConfig
+          schedule: scheduleParams as SchedulerConfig,
         }))
           .then((response) =>
           {
@@ -275,19 +273,19 @@ describe('SchedulerActions', () =>
   {
     describe('when the schedule is successfully duplicated', () =>
     {
-      it('should dispatch a duplicateScheduleStart action followed by a duplicateScheduleSuccess action', () =>
+      it('should dispatch a createScheduleStart action followed by a createScheduleSuccess action', () =>
       {
         const duplicatedSchedule = { id: 2, name: 'Schedule 2 duplicated' };
 
         const expectedActions = [
           {
-            type: SchedulerActionTypes.duplicateScheduleStart,
-            payload: { actionType: 'duplicateScheduleStart' },
+            type: SchedulerActionTypes.createScheduleStart,
+            payload: { actionType: 'createScheduleStart' },
           },
           {
-            type: SchedulerActionTypes.duplicateScheduleSuccess,
+            type: SchedulerActionTypes.createScheduleSuccess,
             payload: {
-              actionType: 'duplicateScheduleSuccess',
+              actionType: 'createScheduleSuccess',
               schedule: duplicatedSchedule,
             },
           },
