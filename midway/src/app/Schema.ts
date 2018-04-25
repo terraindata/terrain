@@ -117,6 +117,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
   `CREATE TABLE IF NOT EXISTS schedules
     (id ` + primaryKeyType + ` PRIMARY KEY,
      createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     createdBy integer,
      cron text NOT NULL,
      lastModified date NOT NULL,
      lastRun ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
@@ -130,6 +131,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
   `CREATE TABLE IF NOT EXISTS jobs
     (id ` + primaryKeyType + ` PRIMARY KEY,
      createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
+     createdBy integer,
      logId integer,
      meta text NOT NULL,
      name text NOT NULL,

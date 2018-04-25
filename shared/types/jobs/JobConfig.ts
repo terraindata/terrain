@@ -47,6 +47,7 @@ THE SOFTWARE.
 export class JobConfig
 {
   public createdAt: Date = null;                   // when the job was created
+  public createdBy: number = null;                 // who created the job (user ID)
   public id: number = undefined;                   // job ID
   public logId: number = null;                     // jobLog table ID
   public meta: string = '';                        // meta

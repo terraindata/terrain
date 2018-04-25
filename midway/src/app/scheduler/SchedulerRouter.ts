@@ -131,7 +131,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     delete schedule.id;
   }
   await perm.SchedulerPermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.upsert(schedule);
+  ctx.body = await App.SKDR.upsert(schedule, ctx.state.user);
 });
 
 // Update schedule
@@ -141,7 +141,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   schedule['id'] = parseInt(ctx.params.id, 10) as number;
   AppUtil.verifyParameters(schedule, ['id']);
   await perm.SchedulerPermissions.verifyUpdateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.SKDR.upsert(schedule);
+  ctx.body = await App.SKDR.upsert(schedule, ctx.state.user);
 });
 
 export default Router;

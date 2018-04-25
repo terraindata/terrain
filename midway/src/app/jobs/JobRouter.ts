@@ -115,7 +115,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     delete job.id;
   }
   await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.create(job);
+  ctx.body = await App.JobQ.create(job, false, ctx.state.user.id);
 });
 
 export default Router;

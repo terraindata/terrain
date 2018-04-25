@@ -49,6 +49,7 @@ import { TaskConfig } from '../jobs/TaskConfig';
 export class SchedulerConfig
 {
   public createdAt: Date = null;                   // when schedule was created
+  public createdBy: number = null;                 // user ID that created/last modified the schedule
   public cron: string = '';                        // time interval between scheduled runs
   public id: number = null;                        // scheduled job ID
   public lastModified: Date = null;                // when the schedule was last modified
