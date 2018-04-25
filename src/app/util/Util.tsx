@@ -757,7 +757,7 @@ const Util = {
 
       columnId is $dbName/$index/$fieldName
   */
-  orderFields(fields: List<string>, schema: SchemaState, algorithmId: ID, serverIndex: string): List<string>
+  orderFields(fields: List<string>, schema: SchemaState, algorithmId: ID, serverIndex: string, removeKeyword?): List<string>
   {
     const schemaMetadata = schema.schemaMetadata;
     // First sort on whether or not a field has been starred
@@ -794,7 +794,13 @@ const Util = {
       return aCount === bCount ? (a < b ? -1 : 1) : 2 * (bCount - aCount);
     }).toList();
     // Put the sorted non starred fields after the starred fields (Starred are sorted in alpha order)
-    return starredFields.sort().concat(nonStarredFields).toList();
+    let combined = starredFields.sort().concat(nonStarredFields);
+    // If a field with .keyword is used in the query, it gets added to the fields so this filters those out if desired
+    if (removeKeyword)
+    {
+      combined = combined.filter((field) => field.indexOf('.keyword') === -1)
+    }
+    return combined.toList();
   },
 
   didStateChange(oldState: IMap<any>, newState: IMap<any>, paths?: Array<string | string[] | KeyPath>)
