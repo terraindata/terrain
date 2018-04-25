@@ -798,7 +798,7 @@ const Util = {
     // If a field with .keyword is used in the query, it gets added to the fields so this filters those out if desired
     if (removeKeyword)
     {
-      combined = combined.filter((field) => field.indexOf('.keyword') === -1)
+      combined = combined.filter((field) => field.indexOf('.keyword') === -1);
     }
     return combined.toList();
   },
