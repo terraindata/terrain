@@ -85,6 +85,7 @@ export interface Props
   onConfigChange: (config: ResultsConfig, builderActions: typeof BuilderActions) => void;
   onSaveAsDefault: (config: ResultsConfig) => void;
   onClose: (config: ResultsConfig) => void;
+  algorithmId?: ID;
   colorsActions: typeof ColorsActions;
   builderActions?: typeof BuilderActions;
   dataSource?: any;
@@ -329,6 +330,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
       }
     }
     fields = fields.push('_score');
+    fields = Util.orderFields(fields, schema, this.props.algorithmId, indexId, true);
     return (
       <ResultsConfigComponent
         {...this.props}
