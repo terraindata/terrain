@@ -111,16 +111,36 @@ export const _TaskConfig =
     task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
     if (task.getIn(['params', 'overrideSources']))
     {
+      let overrideSources = task.getIn(['params', 'overrideSources']);
+      if (typeof overrideSources === 'string')
+      {
+        try {
+          overrideSources = JSON.parse(overrideSources);
+        }
+        catch {
+          overrideSources = {};
+        }
+      }
       task = task.setIn(
         ['params', 'overrideSources'],
-        Util.objectToImmutableMap(task.getIn(['params', 'overrideSources']), _SourceConfig),
+        Util.objectToImmutableMap(overrideSources, _SourceConfig),
       );
     }
     if (task.getIn(['params', 'overrideSinks']))
     {
+      let overrideSinks = task.getIn(['params', 'overrideSinks']);
+      if (typeof overrideSinks === 'string')
+      {
+        try {
+          overrideSinks = JSON.parse(overrideSinks);
+        }
+        catch {
+          overrideSinks = {};
+        }
+      }
       task = task.setIn(
         ['params', 'overrideSinks'],
-        Util.objectToImmutableMap(task.getIn(['params', 'overrideSinks']), _SinkConfig),
+        Util.objectToImmutableMap(overrideSinks, _SinkConfig),
       );
     }
     return task;

@@ -83,6 +83,12 @@ class ScheduleList extends TerrainComponent<Props>
 
   public handleScheduleChange(schedule: SchedulerConfig)
   {
+    // Stringify the override source and sinks
+    schedule = schedule
+      .setIn(['tasks', 0, 'params', 'overrideSinks'],
+      JSON.stringify(schedule.getIn(['tasks', 0, 'params', 'overrideSinks'])))
+      .setIn(['tasks', 0, 'params', 'overrideSources'],
+      JSON.stringify(schedule.getIn(['tasks', 0, 'params', 'overrideSources'])));
     this.props.schedulerActions({
       actionType: 'updateSchedule',
       schedule: schedule.toJS(),
