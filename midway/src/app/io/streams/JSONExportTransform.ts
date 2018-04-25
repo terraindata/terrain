@@ -51,19 +51,23 @@ import AExportTransform from './AExportTransform';
  *
  * Could add additional config options.
  */
-export default class JSONObjectExportTransform extends AExportTransform
+export default class JSONExportTransform extends AExportTransform
 {
-  private key: string;
+  private open: string;
+  private sep: string;
+  private close: string;
 
-  constructor(key: string)
+  constructor(open: string = '[\n', sep: string = ',\n', close: string = '\n]')
   {
     super();
-    this.key = key;
+    this.open = open;
+    this.sep = sep;
+    this.close = close;
   }
 
   protected preamble(): string
   {
-    return '{\n"' + this.key + '":[';
+    return this.open;
   }
 
   protected transform(input: object, chunkNumber: number): string
@@ -73,11 +77,11 @@ export default class JSONObjectExportTransform extends AExportTransform
 
   protected delimiter(): string
   {
-    return ',\n';
+    return this.sep;
   }
 
   protected conclusion(chunkNumber: number): string
   {
-    return ']\n}\n';
+    return this.close;
   }
 }

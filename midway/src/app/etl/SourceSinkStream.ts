@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as stream from 'stream';
+import * as winston from 'winston';
 
 import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import
@@ -62,7 +63,7 @@ import Templates from './Templates';
 
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
-import ProgressTransform from '../io/streams/ProgressTransform';
+import ProgressStream from '../io/streams/ProgressStream';
 
 import AEndpointStream from './endpoints/AEndpointStream';
 import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
@@ -78,54 +79,64 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
     let sourceStream: stream.Readable | undefined;
     let endpoint: AEndpointStream;
     let importStream: stream.Readable;
-    switch (source.type)
-    {
-      case 'Algorithm':
-        endpoint = new AlgorithmEndpoint();
-        const algorithmStream = await endpoint.getSource(source);
-        sourceStream = algorithmStream.pipe(new ExportTransform());
-        return resolve(sourceStream);
-      case 'Upload':
-        if (files === undefined || files.length === 0)
-        {
-          throw new Error('No file(s) found in multipart formdata');
-        }
-        sourceStream = files.find((f) => f['fieldname'] === name);
-        break;
-      case 'Sftp':
-        endpoint = new SFTPEndpoint();
-        sourceStream = await endpoint.getSource(source);
-        break;
-      case 'Http':
-        endpoint = new HTTPEndpoint();
-        sourceStream = await endpoint.getSource(source);
-        break;
-      case 'Fs':
-        endpoint = new FSEndpoint();
-        sourceStream = await endpoint.getSource(source);
-        break;
-      default:
-        throw new Error('not implemented.');
-    }
 
-    if (sourceStream === undefined)
-    {
-      throw new Error('Error finding source stream ' + name);
-    }
+    winston.info(`Processing ${source.type} source:`, JSON.stringify(source, null, 2));
 
-    switch (source.fileConfig.fileType)
+    try
     {
-      case 'json':
-        const jsonNewlines: string | undefined = source.fileConfig.jsonNewlines ? undefined : '*';
-        importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonNewlines));
-        break;
-      case 'csv':
-        importStream = sourceStream.pipe(CSVTransform.createImportStream());
-        break;
-      default:
-        throw new Error('Download file type must be either CSV or JSON.');
+      switch (source.type)
+      {
+        case 'Algorithm':
+          endpoint = new AlgorithmEndpoint();
+          const algorithmStream = await endpoint.getSource(source);
+          sourceStream = algorithmStream.pipe(new ExportTransform());
+          return resolve(sourceStream);
+        case 'Upload':
+          if (files === undefined || files.length === 0)
+          {
+            throw new Error('No file(s) found in multipart formdata');
+          }
+          sourceStream = files.find((f) => f['fieldname'] === name);
+          break;
+        case 'Sftp':
+          endpoint = new SFTPEndpoint();
+          sourceStream = await endpoint.getSource(source);
+          break;
+        case 'Http':
+          endpoint = new HTTPEndpoint();
+          sourceStream = await endpoint.getSource(source);
+          break;
+        case 'Fs':
+          endpoint = new FSEndpoint();
+          sourceStream = await endpoint.getSource(source);
+          break;
+        default:
+          throw new Error('not implemented.');
+      }
+
+      if (sourceStream === undefined)
+      {
+        throw new Error('Error finding source stream ' + name);
+      }
+
+      switch (source.fileConfig.fileType)
+      {
+        case 'json':
+          const jsonNewlines: string | undefined = source.fileConfig.jsonNewlines ? undefined : '*';
+          importStream = sourceStream.pipe(JSONTransform.createImportStream(jsonNewlines));
+          break;
+        case 'csv':
+          importStream = sourceStream.pipe(CSVTransform.createImportStream());
+          break;
+        default:
+          throw new Error('Download file type must be either CSV or JSON.');
+      }
+      resolve(importStream);
     }
-    resolve(importStream);
+    catch (e)
+    {
+      return reject(e);
+    }
   });
 }
 
@@ -136,45 +147,65 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
     let endpoint: AEndpointStream;
     let exportStream;
 
-    switch (sink.fileConfig.fileType)
-    {
-      case 'json':
-        exportStream = JSONTransform.createExportStream();
-        break;
-      case 'csv':
-        exportStream = CSVTransform.createExportStream();
-        break;
-      default:
-        throw new Error('Export file type must be either CSV or JSON.');
-    }
+    winston.info(`Processing ${sink.type} sink:`, JSON.stringify(sink, null, 2));
 
-    switch (sink.type)
+    try
     {
-      case 'Download':
-        return resolve(exportStream);
-      case 'Database':
-        if (sink.options['language'] !== 'elastic')
+      if (sink.type !== 'Database')
+      {
+        switch (sink.fileConfig.fileType)
         {
-          throw new Error('Can only import into Elastic at the moment.');
+          case 'json':
+            if (sink.fileConfig.jsonNewlines)
+            {
+              exportStream = JSONTransform.createExportStream('', ',\n', '');
+            }
+            else
+            {
+              exportStream = JSONTransform.createExportStream();
+            }
+            break;
+          case 'csv':
+            exportStream = CSVTransform.createExportStream();
+            break;
+          default:
+            throw new Error('Export file type must be either CSV or JSON.');
         }
-        endpoint = new ElasticEndpoint();
-        break;
-      case 'Sftp':
-        endpoint = new SFTPEndpoint();
-        break;
-      case 'Http':
-        endpoint = new HTTPEndpoint();
-        break;
-      case 'Fs':
-        endpoint = new FSEndpoint();
-        break;
-      default:
-        throw new Error('not implemented.');
-    }
+      }
 
-    const sinkStream = await endpoint.getSink(sink, engine);
-    const progressStream = new ProgressTransform(sinkStream);
-    resolve(progressStream);
+      switch (sink.type)
+      {
+        case 'Download':
+          return resolve(exportStream);
+        case 'Database':
+          if (sink.options['language'] !== 'elastic')
+          {
+            throw new Error('Can only import into Elastic at the moment.');
+          }
+          endpoint = new ElasticEndpoint();
+          break;
+        case 'Sftp':
+          endpoint = new SFTPEndpoint();
+          break;
+        case 'Http':
+          endpoint = new HTTPEndpoint();
+          break;
+        case 'Fs':
+          endpoint = new FSEndpoint();
+          break;
+        default:
+          throw new Error('not implemented.');
+      }
+
+      const sinkStream = await endpoint.getSink(sink, engine);
+      const writableStream = exportStream.pipe(sinkStream);
+      const progressStream = new ProgressStream(exportStream);
+      resolve(progressStream);
+    }
+    catch (e)
+    {
+      reject(e);
+    }
   });
 }
 
@@ -227,8 +258,16 @@ export async function getMergeJoinStream(serverId: string, indices: object[], op
       query,
     },
   };
-  const endpoint = new ElasticEndpoint();
-  const elasticStream = await endpoint.getSource(source as any as SourceConfig);
-  const exportTransform = new ExportTransform();
-  return elasticStream.pipe(exportTransform);
+
+  try
+  {
+    const endpoint = new ElasticEndpoint();
+    const elasticStream = await endpoint.getSource(source as any as SourceConfig);
+    const exportTransform = new ExportTransform();
+    return elasticStream.pipe(exportTransform);
+  }
+  catch (e)
+  {
+    return Promise.reject(e);
+  }
 }
