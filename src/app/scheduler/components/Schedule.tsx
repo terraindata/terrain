@@ -236,7 +236,7 @@ class Schedule extends TerrainComponent<Props>
       key: 'interval',
       options: List([]),
       shortNameText: 'Interval',
-      headerText: '',
+      headerText: !template ? 'Choose a Template' : '',
       column: true,
       forceFloat: true,
       getCustomDisplayName: !template ? (value) => '--' : this.getIntervalDisplayName,
