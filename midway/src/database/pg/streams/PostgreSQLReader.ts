@@ -44,82 +44,86 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as pg from 'pg';
+import * as PGQueryStream from 'pg-query-stream';
+import { Readable } from 'stream';
 import * as winston from 'winston';
 
-import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
-import MySQLController from '../../../../src/database/mysql/MySQLController';
+import SafeReadable from '../../../app/io/streams/SafeReadable';
+import PostgreSQLConfig from '../PostgreSQLConfig';
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import MySQLQueries from '../../../tasty/MySQLQueries';
-import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../TestUtil';
-
-function getExpectedFile(): string
+export class PostgreSQLReader extends SafeReadable
 {
-  return __filename.split('.')[0] + '.expected';
-}
+  private config: PostgreSQLConfig;
+  private stream: Readable | null = null;
+  private query: PGQueryStream;
 
-let tasty: Tasty.Tasty;
-let mysqlController: MySQLController;
-
-beforeAll(async () =>
-{
-  (winston as any).level = 'debug';
-  const config: MySQLConfig =
-    {
-      connectionLimit: 20,
-      database: 'moviesdb',
-      host: 'localhost',
-      port: 63306,
-      password: 'r3curs1v3$',
-      user: 't3rr41n-demo',
-      dateStrings: true,
-    };
-
-  try
+  constructor(config: PostgreSQLConfig, query: string, table?: string)
   {
-    mysqlController = new MySQLController(config, 0, 'MySQLExecutorTests');
-    tasty = mysqlController.getTasty();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
+    super({ objectMode: true, highWaterMark: 1024 * 8 });
+    this.config = config;
 
-function runTest(testObj: object)
-{
-  const testName: string = 'MySQL: execute ' + String(testObj[0]);
-  test(testName, async (done) =>
-  {
     try
     {
-      const results = await tasty.getDB().execute(testObj[1]);
-      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
+      let queryString: string;
+      if (query === '')
+      {
+        if (table !== undefined)
+        {
+          queryString = 'select * from ' + table + ' limit 100;';
+        }
+        else
+        {
+          queryString = 'select 1;';
+        }
+      }
+      else
+      {
+        queryString = query;
+      }
+
+      this.query = new PGQueryStream(queryString);
+
+      const client: pg.Client = new pg.Client(config);
+      client.connect((err) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          throw err;
+        }
+
+        this.stream = client.query(this.query);
+        this.stream.on('end', () => this.push(null));
+        this.stream.on('data', (d) => this.push(d));
+        this.stream.on('error', (e) => this.emit('error', e));
+      });
     }
     catch (e)
     {
-      fail(e);
+      this.emit('error', e);
     }
-    done();
-  });
+  }
+
+  public _read(size?: number)
+  {
+    if (this.stream !== null)
+    {
+      return this.stream.read(size);
+    }
+  }
+
+  public _destroy(error, callback)
+  {
+    if (this.stream !== null)
+    {
+      this.stream.destroy(error);
+    }
+
+    if (callback !== undefined)
+    {
+      callback();
+    }
+  }
 }
 
-const tests = MySQLQueries.concat(SQLQueries);
-
-for (let i = 0; i < tests.length; i++)
-{
-  runTest(tests[i]);
-}
-
-afterAll(async () =>
-{
-  try
-  {
-    await tasty.destroy();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
+export default PostgreSQLReader;
