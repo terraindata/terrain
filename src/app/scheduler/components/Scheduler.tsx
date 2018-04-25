@@ -153,7 +153,10 @@ class Scheduler extends TerrainComponent<any> {
 
   public duplicateSchedule(id?: number)
   {
-    this.schedulerApi.duplicateSchedule(id)
+    this.props.schedulerActions({
+      actionType: 'duplicateSchedule',
+      scheduleId: id,
+    })
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response) });

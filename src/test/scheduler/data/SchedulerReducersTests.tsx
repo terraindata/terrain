@@ -167,4 +167,20 @@ describe('SchedulerReducers', () =>
       expect(nextState.schedules).toEqual(scheduler.schedules.delete(existingSchedule.id));
     });
   });
+
+  describe('#duplicateScheduleSuccess', () =>
+  {
+    it('should set loading to false and add the duplicated schedule to the store', () =>
+    {
+      const duplicatedSchedule = { id: 2, name: 'Schedule 2' };
+
+      const nextState = reducer(scheduler, {
+        type: SchedulerActionTypes.duplicateScheduleSuccess,
+        payload: { schedule: duplicatedSchedule },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.schedules).toEqual(scheduler.schedules.set(duplicatedSchedule.id, duplicatedSchedule));
+    });
+  });
 });
