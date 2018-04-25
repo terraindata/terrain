@@ -101,7 +101,7 @@ export default class PostgreSQLEndpoint extends AEndpointStream
         reject(new Error('Error retrieving credentials for ID ' + String(credentialId)));
       }
 
-      resolve(PostgreSQLConfig);
+      resolve(postgreSQLConfig);
     });
   }
 }
