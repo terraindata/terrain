@@ -128,17 +128,6 @@ export interface SchedulerActionTypes
     actionType: 'duplicateSchedule';
     scheduleId: ID;
   };
-  duplicateScheduleStart: {
-    actionType: 'duplicateScheduleStart';
-  };
-  duplicateScheduleSuccess: {
-    actionType: 'duplicateScheduleSuccess';
-    schedule: SchedulerConfig;
-  };
-  duplicateScheduleFailed: {
-    actionType: 'duplicateScheduleFailed';
-    error: string;
-  };
 
   pauseSchedule?: {
     actionType: 'pauseSchedule';
@@ -246,27 +235,6 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       },
 
       deleteScheduleFailed: (state, action) =>
-      {
-        return state
-          .set('loading', false)
-          .set('error', action.payload.error);
-      },
-
-      duplicateScheduleStart: (state, action) =>
-      {
-        return state
-          .set('loading', true);
-      },
-
-      duplicateScheduleSuccess: (state, action) =>
-      {
-        const { schedule } = action.payload;
-        return state
-          .set('loading', false)
-          .setIn(['schedules', schedule.id], _SchedulerConfig(schedule));
-      },
-
-      duplicateScheduleFailed: (state, action) =>
       {
         return state
           .set('loading', false)
