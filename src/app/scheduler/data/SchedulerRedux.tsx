@@ -69,7 +69,7 @@ export interface SchedulerActionTypes
   };
   getSchedulesSuccess: {
     actionType: 'getSchedulesSuccess';
-    schedules: Immutable.Map<ID, SchedulerConfig>;
+    schedules: SchedulerConfig[];
   };
   getSchedulesFailed: {
     actionType: 'getSchedulesFailed';
@@ -128,17 +128,6 @@ export interface SchedulerActionTypes
     actionType: 'duplicateSchedule';
     scheduleId: ID;
   };
-  duplicateScheduleStart: {
-    actionType: 'duplicateScheduleStart';
-  };
-  duplicateScheduleSuccess: {
-    actionType: 'duplicateScheduleSuccess';
-    schedule: SchedulerConfig;
-  };
-  duplicateScheduleFailed: {
-    actionType: 'duplicateScheduleFailed';
-    error: string;
-  };
 
   pauseSchedule?: {
     actionType: 'pauseSchedule';
@@ -171,9 +160,15 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
 
       getSchedulesSuccess: (state, action) =>
       {
+        const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(
+          action.payload.schedules,
+          'id',
+          _SchedulerConfig,
+        );
+
         return state
           .set('loading', false)
-          .set('schedules', action.payload.schedules);
+          .set('schedules', schedules);
       },
 
       getSchedulesFailed: (state, action) =>
@@ -245,27 +240,6 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
           .set('loading', false)
           .set('error', action.payload.error);
       },
-
-      duplicateScheduleStart: (state, action) =>
-      {
-        return state
-          .set('loading', true);
-      },
-
-      duplicateScheduleSuccess: (state, action) =>
-      {
-        const { schedule } = action.payload;
-        return state
-          .set('loading', false)
-          .setIn(['schedules', schedule.id], schedule);
-      },
-
-      duplicateScheduleFailed: (state, action) =>
-      {
-        return state
-          .set('loading', false)
-          .set('error', action.payload.error);
-      },
     };
 
   public getSchedules(action, dispatch)
@@ -278,11 +252,8 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.getSchedules()
       .then((response) =>
       {
-        const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(
-          response.data,
-          'id',
-          _SchedulerConfig,
-        );
+        const schedules = response.data;
+
         directDispatch({
           actionType: 'getSchedulesSuccess',
           schedules,
@@ -302,7 +273,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.createSchedule(action.schedule)
       .then((response) =>
       {
-        const schedule: SchedulerConfig = _SchedulerConfig(response.data[0]);
+        const schedule: SchedulerConfig = response.data[0];
         directDispatch({
           actionType: 'createScheduleSuccess',
           schedule,
@@ -325,6 +296,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       .then((response) =>
       {
         const sched: SchedulerConfig = response.data[0];
+        const schedule: SchedulerConfig = response.data[0];
         directDispatch({
           actionType: 'updateScheduleSuccess',
           schedule: sched,
@@ -358,7 +330,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
-      actionType: 'duplicateScheduleStart',
+      actionType: 'createScheduleStart',
     });
 
     return this.api.duplicateSchedule(action.scheduleId)
@@ -366,7 +338,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       {
         const schedule: SchedulerConfig = response.data[0];
         directDispatch({
-          actionType: 'duplicateScheduleSuccess',
+          actionType: 'createScheduleSuccess',
           schedule,
         });
 
