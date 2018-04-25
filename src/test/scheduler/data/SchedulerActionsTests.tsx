@@ -128,9 +128,9 @@ jest.mock('scheduler/SchedulerApi', () =>
             }),
           );
         },
-      }
-    }
-  }
+      };
+    },
+  };
 });
 
 const mockStore = createMockStore();

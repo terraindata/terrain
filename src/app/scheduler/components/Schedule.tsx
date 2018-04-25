@@ -66,6 +66,7 @@ export interface Props
   onChange: (newSchedule: SchedulerConfig) => void;
   onRun: (id: ID) => void;
   onPause: (id: ID) => void;
+  onUnpause: (id: ID) => void;
 }
 
 interface State
@@ -150,7 +151,9 @@ class Schedule extends TerrainComponent<Props>
   {
     const { schedule } = this.props;
     const templateId = this.getParam('templateId', -1);
-    const buttonValue = schedule.running ? 'Pause' : 'Run Now';
+    const buttonValue = templateId === -1 ? '' :
+      schedule.running ? 'Pause' :
+        this.getTask().paused ? 'Unpause' : 'Run Now';
     return List([templateId, this.state.configurationKey, buttonValue]);
   }
 
@@ -160,7 +163,7 @@ class Schedule extends TerrainComponent<Props>
     const task = this.getTask();
     // Template Option Set
     const templateOptions = this.props.templates.filter((t) =>
-      t.canSchedule()
+      t.canSchedule(),
     ).map((t) =>
     {
       return {
@@ -201,10 +204,10 @@ class Schedule extends TerrainComponent<Props>
       forceFloat: true,
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, template),
     };
-    
+
     const buttonOptionSet = {
-      isButton: true,
-      onButtonClick: this._fn(this.handleRunPause, schedule),
+      isButton: template !== undefined,
+      onButtonClick: this.handleRunPause,
       key: 'run',
       options: List([]),
       column: true,
@@ -214,9 +217,12 @@ class Schedule extends TerrainComponent<Props>
     return List([templateOptionSet, configurationOptionSet, buttonOptionSet]);
   }
 
-  public handleRunPause(schedule)
+  public handleRunPause()
   {
-    !schedule.running ? this.props.onRun(schedule.id) : this.props.onPause(schedule.id);
+    const { schedule } = this.props;
+    schedule.running ? this.props.onPause(schedule.id) :
+      this.getTask().paused ? this.props.onUnpause(schedule.id) :
+        this.props.onRun(schedule.id);
   }
 
   public canEdit()
@@ -250,6 +256,7 @@ class Schedule extends TerrainComponent<Props>
   public render()
   {
     const { schedule } = this.props;
+    console.log(schedule);
     return (
       <RouteSelector
         optionSets={this.getOptionSets()}

@@ -71,26 +71,6 @@ export interface Props
 
 class ScheduleList extends TerrainComponent<Props>
 {
-  public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
-
-  public updateSchedule(id: number, changes)
-  {
-    this.props.schedulerActions({
-      actionType: 'updateSchedule',
-      schedule: changes,
-    });
-  }
-
-  public runSchedule(id: number)
-  {
-    this.schedulerApi.runSchedule(id);
-  }
-
-  public pauseSchedule(id: number)
-  {
-    this.schedulerApi.pauseSchedule(id);
-  }
-
   public componentWillMount()
   {
     this.props.schedulerActions({
@@ -103,7 +83,10 @@ class ScheduleList extends TerrainComponent<Props>
 
   public handleScheduleChange(schedule: SchedulerConfig)
   {
-    this.updateSchedule(schedule.id, schedule.toJS());
+    this.props.schedulerActions({
+      actionType: 'updateSchedule',
+      schedule: schedule.toJS(),
+    });
   }
 
   public createSchedule()
@@ -111,7 +94,7 @@ class ScheduleList extends TerrainComponent<Props>
     const blankSchedule = {
       cron: '0 0 1 1 *',
       name: `Schedule`,
-      tasks: [{ params: { templateId: -1, id: 1 } }],
+      tasks: [{ params: { templateId: -1 }, id: 1, taskId: 2 }],
     };
     this.props.schedulerActions({
       actionType: 'createSchedule',
@@ -119,11 +102,11 @@ class ScheduleList extends TerrainComponent<Props>
     });
   }
 
-  public deleteSchedule(id)
+  public performAction(action, scheduleId: ID)
   {
     this.props.schedulerActions({
-      actionType: 'deleteSchedule',
-      scheduleId: id,
+      actionType: action,
+      scheduleId,
     });
   }
 
@@ -139,9 +122,10 @@ class ScheduleList extends TerrainComponent<Props>
             <Schedule
               key={i}
               schedule={schedule}
-              onDelete={this.deleteSchedule}
-              onRun={this.runSchedule}
-              onPause={this.pauseSchedule}
+              onDelete={this._fn(this.performAction, 'deleteSchedule')}
+              onRun={this._fn(this.performAction, 'runSchedule')}
+              onPause={this._fn(this.performAction, 'pauseSchedule')}
+              onUnpause={this._fn(this.performAction, 'unpauseSchedule')}
               onChange={this.handleScheduleChange}
               templates={this.props.templates}
               algorithms={this.props.algorithms}

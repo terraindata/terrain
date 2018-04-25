@@ -215,7 +215,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
         const { schedule } = action.payload;
         return state
           .set('loading', false)
-          .setIn(['schedules', schedule.id], schedule);
+          .setIn(['schedules', schedule.id], _SchedulerConfig(schedule));
       },
 
       updateScheduleFailed: (state, action) =>
@@ -324,7 +324,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.updateSchedule(scheduleChanges.id, scheduleChanges)
       .then((response) =>
       {
-        const sched: SchedulerConfig = _SchedulerConfig(response.data[0]);
+        const sched: SchedulerConfig = response.data[0];
         directDispatch({
           actionType: 'updateScheduleSuccess',
           schedule: sched,
@@ -420,7 +420,6 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     directDispatch({
       actionType: 'updateScheduleStart',
     });
-
     return this.api.runSchedule(action.scheduleId)
       .then((response) =>
       {
