@@ -77,7 +77,7 @@ export function cronMapToList(m: CRONMap, includeAll = false): number[]
     {
       const k = +s;
       let i;
-      for (i = arr.length; i > 0 && arr[i - 1] > k; i--) {  } // optimized reverse search
+      for (i = arr.length; i > 0 && arr[i - 1] > k; i--) { } // optimized reverse search
       arr.splice(i, 0, k);
     }
   }

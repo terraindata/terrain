@@ -45,12 +45,14 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
 import Colors from 'app/colors/Colors';
+import CRONEditor from 'app/common/components/CRONEditor';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
+import cronstrue from 'cronstrue';
 import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -146,11 +148,39 @@ class Schedule extends TerrainComponent<Props>
     }
   }
 
+  public getIntervalDisplayName(value)
+  {
+    const { schedule } = this.props;
+    try
+    {
+      return cronstrue.toString(value);
+    }
+    catch
+    {
+      return value;
+    }
+  }
+
+  public handleIntervalChange(cron)
+  {
+    this.props.onChange(this.props.schedule.set('cron', cron));
+  }
+
+  public getIntervalComponent(props)
+  {
+    return (
+      <CRONEditor
+        cron={props.value}
+        onChange={this.handleIntervalChange}
+      />
+    );
+  }
+
   public getValues()
   {
     const { schedule } = this.props;
     const templateId = this.getParam('templateId', -1);
-    return List([templateId, this.state.configurationKey]);
+    return List([templateId, this.state.configurationKey, schedule.cron]);
   }
 
   public getOptionSets()
@@ -159,7 +189,7 @@ class Schedule extends TerrainComponent<Props>
     const task = this.getTask();
     // Template Option Set
     const templateOptions = this.props.templates.filter((t) =>
-      t.canSchedule()
+      t.canSchedule(),
     ).map((t) =>
     {
       return {
@@ -201,7 +231,19 @@ class Schedule extends TerrainComponent<Props>
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, template),
     };
 
-    return List([templateOptionSet, configurationOptionSet]);
+    // Interval options
+    const intervalOptionSet = {
+      key: 'interval',
+      options: List([]),
+      shortNameText: 'Interval',
+      headerText: !template ? 'Choose a Template' : '',
+      column: true,
+      forceFloat: true,
+      getCustomDisplayName: !template ? (value) => '--' : this.getIntervalDisplayName,
+      getValueComponent: !template ? (props) => null : this.getIntervalComponent,
+    };
+
+    return List([templateOptionSet, configurationOptionSet, intervalOptionSet]);
   }
 
   public canEdit()
