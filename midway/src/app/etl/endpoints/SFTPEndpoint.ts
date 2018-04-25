@@ -91,7 +91,7 @@ export default class SFTPEndpoint extends AEndpointStream
     }
     catch (e)
     {
-      throw new Error('Error retrieving credentials for ID ' + String(credentialId));
+      throw new Error('Retrieving credentials for ID ' + String(credentialId));
     }
 
     return new Promise<SSH.SFTPWrapper>((resolve, reject) =>
