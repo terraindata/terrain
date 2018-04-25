@@ -67,7 +67,7 @@ export default class PostgreSQLEndpoint extends AEndpointStream
     const config: PostgreSQLConfig = await this.getConfig(credentialId, source.options);
     const table = source.options['table'];
     const query: string = source.options['query'];
-    return new PostgreSQLReader(config, table, query);
+    return new PostgreSQLReader(config, query, table);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>

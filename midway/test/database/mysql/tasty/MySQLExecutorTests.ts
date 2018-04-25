@@ -64,7 +64,6 @@ let mysqlController: MySQLController;
 
 beforeAll(async () =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
   (winston as any).level = 'debug';
   const config: MySQLConfig =
     {

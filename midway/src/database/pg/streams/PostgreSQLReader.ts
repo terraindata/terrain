@@ -50,34 +50,51 @@ import { Readable } from 'stream';
 import * as winston from 'winston';
 
 import SafeReadable from '../../../app/io/streams/SafeReadable';
-import PostgreSQLClient from '../client/PostgreSQLClient';
 import PostgreSQLConfig from '../PostgreSQLConfig';
-import PostgreSQLController from '../PostgreSQLController';
 
 export class PostgreSQLReader extends SafeReadable
 {
   private config: PostgreSQLConfig;
-  private controller: PostgreSQLController;
   private stream: Readable | null = null;
   private query: PGQueryStream;
 
-  constructor(config: PostgreSQLConfig, table: string, query: string)
+  constructor(config: PostgreSQLConfig, query: string, table?: string)
   {
     super({ objectMode: true, highWaterMark: 1024 * 8 });
     this.config = config;
 
     try
     {
-      const queryString = query === '' ? 'select * from ' + table + ' limit 100;' : query;
+      let queryString: string;
+      if (query === '')
+      {
+        if (table !== undefined)
+        {
+          queryString = 'select * from ' + table + ' limit 100;';
+        }
+        else
+        {
+          queryString = 'select 1;';
+        }
+      }
+      else
+      {
+        queryString = query;
+      }
+
       this.query = new PGQueryStream(queryString);
 
-      this.controller = new PostgreSQLController(config, 0, 'PostgreSQLReader');
-      const client: PostgreSQLClient = this.controller.getClient();
-
-      this.stream = client.query(this.query) as Readable;
-      this.stream.on('end', () => this.push(null));
-      this.stream.on('data', (d) => this.push(d));
-      this.stream.on('error', (e) => this.emit('error', e));
+      const client: pg.Client = new pg.Client(config);
+      client.connect((err) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          this.stream = client.query(this.query) as Readable;
+          this.stream.on('end', () => this.push(null));
+          this.stream.on('data', (d) => this.push(d));
+          this.stream.on('error', (e) => this.emit('error', e));
+        }
+      });
     }
     catch (e)
     {

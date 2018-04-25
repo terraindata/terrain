@@ -65,8 +65,8 @@ import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from
 import
 {
   FileConfig as FileConfigI, HttpOptions,
-  SQLOptions, SftpOptions, SinkOptionsType, Sinks,
-  SourceOptionsType, Sources,
+  SftpOptions, SinkOptionsType, Sinks, SourceOptionsType,
+  Sources, SQLOptions,
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 

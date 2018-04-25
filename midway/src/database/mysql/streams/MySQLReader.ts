@@ -60,11 +60,26 @@ export class MySQLReader extends SafeReadable
   private stream: Readable | null = null;
   private query: string;
 
-  constructor(config: MySQLConfig, table: string, query: string)
+  constructor(config: MySQLConfig, query: string, table?: string)
   {
     super({ objectMode: true, highWaterMark: 1024 * 8 });
     this.config = config;
-    this.query = query === '' ? 'select * from ' + table + ' limit 100;' : query;
+
+    if (query === '')
+    {
+      if (table !== undefined)
+      {
+        this.query = 'select * from ' + table + ' limit 100;';
+      }
+      else
+      {
+        this.query = 'select 1;';
+      }
+    }
+    else
+    {
+      this.query = query;
+    }
 
     this.controller = new MySQLController(config, 0, 'MySQLReader');
     const client: MySQLClient = this.controller.getClient();

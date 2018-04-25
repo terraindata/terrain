@@ -67,7 +67,7 @@ export default class MySQLEndpoint extends AEndpointStream
     const config: MySQLConfig = await this.getConfig(credentialId, source.options);
     const table = source.options['table'];
     const query: string = source.options['query'];
-    return new MySQLReader(config, table, query);
+    return new MySQLReader(config, query, table);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
