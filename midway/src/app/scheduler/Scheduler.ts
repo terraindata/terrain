@@ -100,9 +100,9 @@ export class Scheduler
 
   public cancel(id: number): Promise<SchedulerConfig[] | string>
   {
-    if (this.runningSchedules[id] !== undefined)
+    if (this.runningSchedules.get(id) !== undefined)
     {
-      this.runningSchedules[id].cancel();
+      this.runningSchedules.get(id).cancel();
       // TODO: unlock row
       return this.get(id) as Promise<SchedulerConfig[]>;
     }
