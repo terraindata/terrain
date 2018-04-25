@@ -151,7 +151,14 @@ class Schedule extends TerrainComponent<Props>
   public getIntervalDisplayName(value)
   {
     const { schedule } = this.props;
-    return cronstrue.toString(schedule.cron);
+    try
+    {
+      return cronstrue.toString(value);
+    }
+    catch
+    {
+      return value;
+    }
   }
 
   public handleIntervalChange(cron)
@@ -182,7 +189,7 @@ class Schedule extends TerrainComponent<Props>
     const task = this.getTask();
     // Template Option Set
     const templateOptions = this.props.templates.filter((t) =>
-      t.canSchedule()
+      t.canSchedule(),
     ).map((t) =>
     {
       return {
@@ -232,8 +239,8 @@ class Schedule extends TerrainComponent<Props>
       headerText: '',
       column: true,
       forceFloat: true,
-      getCustomDisplayName: this.getIntervalDisplayName,
-      getValueComponent: this.getIntervalComponent,
+      getCustomDisplayName: !template ? (value) => '--' : this.getIntervalDisplayName,
+      getValueComponent: !template ? (props) => null : this.getIntervalComponent,
     };
 
     return List([templateOptionSet, configurationOptionSet, intervalOptionSet]);
