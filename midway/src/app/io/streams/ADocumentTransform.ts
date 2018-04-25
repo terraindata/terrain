@@ -78,7 +78,10 @@ export default abstract class ADocumentTransform extends Transform
   public _flush(callback)
   {
     this.conclusion(this.chunkNumber);
-    callback();
+    if (callback !== undefined)
+    {
+      callback();
+    }
   }
 
   protected abstract transform(input: object, chunkNumber: number): object | object[];

@@ -42,42 +42,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import AExportTransform from './AExportTransform';
-
-/**
- * Converts result stream to JSON text stream
- *
- * Could add additional config options.
- */
-export default class JSONObjectExportTransform extends AExportTransform
+export class ConfigType
 {
-  private key: string;
-
-  constructor(key: string)
+  public static initialize(obj: object, props: object)
   {
-    super();
-    this.key = key;
-  }
-
-  protected preamble(): string
-  {
-    return '{\n"' + this.key + '":[';
-  }
-
-  protected transform(input: object, chunkNumber: number): string
-  {
-    return JSON.stringify(input);
-  }
-
-  protected delimiter(): string
-  {
-    return ',\n';
-  }
-
-  protected conclusion(chunkNumber: number): string
-  {
-    return ']\n}\n';
+    for (const key of Object.keys(obj))
+    {
+      if (props.hasOwnProperty(key))
+      {
+        obj[key] = props[key];
+      }
+      else if (props.hasOwnProperty(key.toLowerCase()))
+      {
+        obj[key] = props[key.toLowerCase()];
+      }
+    }
   }
 }
+
+export default ConfigType;

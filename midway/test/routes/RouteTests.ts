@@ -1907,7 +1907,7 @@ describe('ETL Template Tests', () =>
       .post('/midway/v1/etl/templates/create')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: JSON.parse(template),
       })
       .expect(200)
@@ -1939,7 +1939,7 @@ describe('ETL Template Tests', () =>
       .get('/midway/v1/etl/templates/' + String(templateId))
       .query({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
       })
       .expect(200)
       .then((res) =>
@@ -1969,7 +1969,7 @@ describe('ETL Template Tests', () =>
       .post('/midway/v1/etl/templates/delete')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           templateId,
         },
@@ -2001,7 +2001,7 @@ describe('ETL Preview Tests', () =>
       .post('/midway/v1/etl/preview')
       .send({
         id: 1,
-        accessToken: 'ImAnAdmin',
+        accessToken: defaultUserAccessToken,
         body: {
           source: {
             type: 'Fs',

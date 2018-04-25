@@ -44,83 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { EventEmitter } from 'events';
-import { Transform, Writable } from 'stream';
+import AExportTransform from './AExportTransform';
 
 /**
- * Monitors progress of the writable stream
+ * Converts result stream to JSON text stream
+ *
+ * Could add additional config options.
  */
-export default class ProgressTransform extends Transform
+export default class JSONExportTransform extends AExportTransform
 {
-  private writer: Writable;
-  private frequency: number = 500;
+  private open: string;
+  private sep: string;
+  private close: string;
 
-  private count: number = 0;
-  private errors: number = 0;
-
-  constructor(writer: Writable, frequency: number = 500)
+  constructor(open: string = '[\n', sep: string = ',\n', close: string = '\n]')
   {
-    super({
-      writableObjectMode: true,
-    });
-
-    this.frequency = frequency;
-    this.writer = writer;
-    this.writer.on('error', (e) => this.errors++);
+    super();
+    this.open = open;
+    this.sep = sep;
+    this.close = close;
   }
 
-  public _transform(chunk: object | object[], encoding: string, callback: (err?: Error) => void)
+  protected preamble(): string
   {
-    this.count++;
-    if (Array.isArray(chunk))
-    {
-      let numChunks = chunk.length;
-      const done = new EventEmitter();
-      done.on('done', (err?: Error) =>
-      {
-        // note: we ignore err here because our onError handler on the writer
-        //       stream accounts for errors
-        this.push(this.progress());
-        callback();
-      });
-
-      chunk.forEach((c) => this.writer.write(chunk, (err?: Error) =>
-      {
-        this.count++;
-        if (--numChunks === 0)
-        {
-          done.emit('done', err);
-        }
-      }));
-    }
-    else
-    {
-      this.writer.write(chunk, (err?: Error) =>
-      {
-        this.count++;
-        // note: we ignore err here because our onError handler on the writer
-        //       stream accounts for errors
-        this.push(this.progress());
-        callback();
-      });
-    }
+    return this.open;
   }
 
-  public _flush(callback)
+  protected transform(input: object, chunkNumber: number): string
   {
-    this.push(this.progress());
-
-    if (callback !== undefined)
-    {
-      callback();
-    }
+    return JSON.stringify(input);
   }
 
-  private progress()
+  protected delimiter(): string
   {
-    return JSON.stringify({
-      successful: this.count,
-      failed: this.errors,
-    }) + '\n';
+    return this.sep;
+  }
+
+  protected conclusion(chunkNumber: number): string
+  {
+    return this.close;
   }
 }

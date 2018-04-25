@@ -44,67 +44,95 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as asyncBusboy from 'async-busboy';
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as stream from 'stream';
+import { EventEmitter } from 'events';
+import { Duplex, Transform, Writable } from 'stream';
+import * as winston from 'winston';
 
-import { SinkConfig, SourceConfig } from '../../../../shared/etl/types/EndpointTypes';
-import * as Util from '../AppUtil';
-import BufferTransform from '../io/streams/BufferTransform';
-import { Permissions } from '../permissions/Permissions';
-import { users } from '../users/UserRouter';
-import { getSourceStream } from './SourceSinkStream';
-import TemplateRouter, { templates } from './TemplateRouter';
-
-const Router = new KoaRouter();
-const perm: Permissions = new Permissions();
-
-Router.use('/templates', TemplateRouter.routes(), TemplateRouter.allowedMethods());
-
-Router.post('/execute', async (ctx, next) =>
+/**
+ * Monitors progress of the writable stream
+ */
+export default class ProgressStream extends Transform
 {
-  const { fields, files } = await asyncBusboy(ctx.req);
+  private writer: Writable;
+  private frequency: number;
+  private asyncRead: any = null;
 
-  Util.verifyParameters(fields, ['id', 'accessToken']);
-  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-  if (user === null)
+  private count: number = 0;
+  private errors: number = 0;
+
+  constructor(writer: Writable, frequency: number = 500)
   {
-    ctx.body = 'Unauthorized';
-    ctx.status = 400;
-    return;
+    super({
+      allowHalfOpen: false,
+      readableObjectMode: false,
+      writableObjectMode: true,
+    });
+
+    this.frequency = frequency;
+    this.writer = writer;
+    this.writer.on('error', (e) =>
+    {
+      winston.error(e.toString());
+      this.errors++;
+    });
   }
 
-  ctx.body = await templates.executeETL(fields, files);
-});
+  public _write(chunk: any, encoding: string, callback: (err?: Error) => void)
+  {
+    this.writer.write(chunk, encoding, (err?: Error) =>
+    {
+      this.count++;
+      // note: we ignore err here because our onError handler on the writer
+      //       stream accounts for errors
+      callback(err);
+    });
+  }
 
-interface ETLUIPreviewConfig
-{
-  source: SourceConfig;
-  size?: number;
+  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  {
+    let numChunks = chunks.length;
+    const done = new EventEmitter();
+    done.on('done', callback);
+
+    chunks.forEach((c) => this._write(c.chunk, c.encoding, (err?: Error) =>
+    {
+      if (--numChunks === 0)
+      {
+        done.emit('done', err);
+      }
+    }));
+  }
+
+  public _read()
+  {
+    if (this.asyncRead === null)
+    {
+      this.asyncRead = setTimeout(() =>
+      {
+        this.push(this.progress());
+        this.asyncRead = null;
+      },
+        this.frequency);
+    }
+  }
+
+  public _final(callback)
+  {
+    if (this.asyncRead !== null)
+    {
+      clearTimeout(this.asyncRead);
+    }
+
+    this.push(this.progress());
+    this.writer.end(callback);
+  }
+
+  private progress()
+  {
+    return JSON.stringify({
+      successful: this.count,
+      failed: this.errors,
+    }) + '\n';
+  }
+
 }
-
-Router.post('/preview', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const request: ETLUIPreviewConfig = ctx.request.body.body;
-  Util.verifyParameters(request, ['source']);
-
-  const source: SourceConfig = request.source;
-  // it's not possible to get a preview of sources of "Upload" type
-  if (source.type === 'Upload')
-  {
-    throw new Error('Preview of "Upload" sources is not allowed');
-  }
-
-  if (request.size === undefined)
-  {
-    request.size = 100;
-  }
-
-  // get a preview up to "size" rows from the specified source
-  const sourceStream: stream.Readable = await getSourceStream('preview', source);
-  const results = await BufferTransform.toArray(sourceStream, request.size);
-  ctx.body = JSON.stringify(results);
-});
-
-export default Router;
