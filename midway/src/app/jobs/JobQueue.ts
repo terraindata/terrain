@@ -96,14 +96,21 @@ export class JobQueue
     {
       try
       {
+        // send the cancel signal to the Job
         this.runningJobs.get(id).cancel();
+
+        // delete the Job from the runningJobs map
+        this.runningJobs.delete(id);
+
+        // set status to CANCELLED
+        await this._setJobStatus(id, false, 'CANCELLED');
         return resolve(await this.get(id) as JobConfig[]);
       }
       catch (e)
       {
         // do nothing, job was not found
       }
-      return reject('Job not found.');
+      return reject([] as JobConfig[]);
     });
   }
 
@@ -159,7 +166,7 @@ export class JobQueue
       const upsertedJobs: JobConfig[] = await App.DB.upsert(this.jobTable, job) as JobConfig[];
       // check table to see if jobs need to be run
       await this._checkJobTable();
-      resolve(upsertedJobs);
+      return resolve(upsertedJobs);
     });
   }
 
@@ -173,7 +180,7 @@ export class JobQueue
         return reject('Job does not exist');
       }
       const doNothing: JobConfig[] = await App.DB.delete(this.jobTable, { id }) as JobConfig[];
-      resolve([jobs[0]] as JobConfig[]);
+      return resolve([jobs[0]] as JobConfig[]);
     });
   }
 
@@ -187,20 +194,21 @@ export class JobQueue
     return Promise.resolve({}); // TODO implement this
   }
 
-  public pause(id: number): Promise<JobConfig[]>
+  public async pause(id: number): Promise<JobConfig[]>
   {
     return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
       try
       {
         this.runningJobs.get(id).pause();
+        await this._setJobStatus(id, true, 'PAUSED');
         return resolve(await this.get(id) as JobConfig[]);
       }
       catch (e)
       {
         // do nothing, job was not found
       }
-      return reject('Job not found.');
+      return reject([] as JobConfig[]);
     });
   }
 
@@ -214,6 +222,7 @@ export class JobQueue
         return reject('Job not found.');
       }
 
+      await this._setJobStatus(id, true, 'RUNNING');
       getJobs[0] = await this._setRunNow(getJobs[0]);
       resolve(await App.DB.upsert(this.jobTable, getJobs[0]) as JobConfig[]);
     });
@@ -227,8 +236,19 @@ export class JobQueue
       {
         if (this.runningJobs.has(id))
         {
+          // set job status back to RUNNING
+          await this._setJobStatus(id, true, 'RUNNING');
+
+          // resolve updated job so that we can continue execution without blocking on the response
           resolve(await this.get(id) as JobConfig[]);
-          await this.runningJobs.get(id).run();
+
+          // run job as normal
+          const jobResult: TaskOutputConfig = await this.runningJobs.get(id).run() as TaskOutputConfig;
+          const jobsFromId: JobConfig[] = await this.get(id);
+          const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
+          await this._setJobStatus(id, false, jobStatus);
+          await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
+          this.runningJobs.delete(id);
         }
       }
       catch (e)
@@ -242,6 +262,9 @@ export class JobQueue
 
   public async initializeJobQueue(): Promise<void>
   {
+    // set all jobs that are currently running to ABORTED
+    await this._resetAllRunningJobs();
+
     setTimeout(this._jobLoop.bind(this), INTERVAL - new Date().getTime() % INTERVAL);
   }
 
@@ -313,7 +336,7 @@ export class JobQueue
         await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
         await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
         this.runningJobs.delete(jobId);
-        // log job result
+        // TODO: log job result
         winston.info('Job result: ' + JSON.stringify(jobResult, null, 2));
       });
 
@@ -328,6 +351,21 @@ export class JobQueue
       winston.warn(err.toString() as string);
     });
     setTimeout(this._jobLoop.bind(this), INTERVAL - new Date().getTime() % INTERVAL);
+  }
+
+  private async _resetAllRunningJobs(): Promise<void>
+  {
+    return new Promise<void>(async (resolve, reject) =>
+    {
+      const runningJobs: JobConfig[] = await this._select([], { running: true }) as JobConfig[];
+      runningJobs.forEach(async (val) =>
+      {
+        val.running = false;
+        val.status = 'ABORTED';
+        const updatedJob: JobConfig[] = await App.DB.upsert(this.jobTable, val) as JobConfig[];
+      });
+      resolve();
+    });
   }
 
   private async _select(columns: string[], filter: object, locked?: boolean): Promise<JobConfig[]>
@@ -353,6 +391,7 @@ export class JobQueue
     });
   }
 
+  // Status codes: SUCCESS FAILURE PAUSED CANCELLED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
   private async _setJobStatus(id: number, running: boolean, status: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>

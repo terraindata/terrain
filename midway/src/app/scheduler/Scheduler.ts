@@ -90,23 +90,21 @@ export class Scheduler
 
   public async initializeScheduler(): Promise<void>
   {
+    // reset all schedules that are currently running back to not running
+    await this._resetAllRunningSchedules();
+
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
   public cancel(id: number): Promise<SchedulerConfig[] | string>
   {
-    return new Promise<SchedulerConfig[] | string>(async (resolve, reject) =>
+    if (this.runningSchedules[id] !== undefined)
     {
-
-      if (this.runningSchedules[id] !== undefined)
-      {
-        this.runningSchedules[id].cancel();
-        // TODO: unlock row
-        return resolve(await this.get(id) as SchedulerConfig[]);
-      }
-      return reject('Schedule not found.');
-    });
-
+      this.runningSchedules[id].cancel();
+      // TODO: unlock row
+      return this.get(id) as Promise<SchedulerConfig[]>;
+    }
+    return Promise.reject('Schedule not found.');
   }
 
   public async delete(id: number): Promise<SchedulerConfig[] | string>
@@ -192,17 +190,12 @@ export class Scheduler
 
   public pause(id: number): Promise<SchedulerConfig[] | string>
   {
-    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
+    if (this.runningSchedules[id] !== undefined)
     {
-
-      if (this.runningSchedules[id] !== undefined)
-      {
-        this.runningSchedules[id].pause();
-        // TODO: unlock row
-        return resolve(await this.get(id) as SchedulerConfig[]);
-      }
-      return reject('Schedule not found.');
-    });
+      this.runningSchedules[id].pause();
+      return this.get(id) as Promise<SchedulerConfig[]>;
+    }
+    return Promise.reject('Schedule not found.');
   }
 
   public async setRunning(id: number, running: boolean): Promise<SchedulerConfig[]>
@@ -213,22 +206,18 @@ export class Scheduler
       if (schedules.length !== 0)
       {
         schedules[0].running = running;
-        const result: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[];
-        return resolve(result);
+        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
     });
   }
 
   public async setStatus(id: number, status: boolean): Promise<SchedulerConfig[]>
   {
-    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
+    if (typeof status !== 'boolean' || status === undefined)
     {
-      if (typeof status !== 'boolean' || status === undefined)
-      {
-        return reject([] as SchedulerConfig[]);
-      }
-      return resolve(await this._setStatus(id, status));
-    });
+      return Promise.reject([] as SchedulerConfig[]);
+    }
+    return this._setStatus(id, status) as Promise<SchedulerConfig[]>;
   }
 
   public async unpause(id: number): Promise<SchedulerConfig[]>
@@ -238,10 +227,10 @@ export class Scheduler
       if (this.runningSchedules[id] !== undefined)
       {
         await this.runningSchedules[id].unpause();
-        // TODO: unlock row
+        // wait for the unpause to resolve first
         return resolve(await this.get(id) as SchedulerConfig[]);
       }
-      return reject('Schedule not found.');
+      return reject([] as SchedulerConfig[]);
     });
   }
 
@@ -324,6 +313,20 @@ export class Scheduler
         scheduleIds.push(schedule.id);
       });
       resolve(scheduleIds);
+    });
+  }
+
+  private async _resetAllRunningSchedules(): Promise<void>
+  {
+    return new Promise<void>(async (resolve, reject) =>
+    {
+      const runningSchedules: SchedulerConfig[] = await this._select([], { running: true }) as SchedulerConfig[];
+      runningSchedules.forEach(async (val) =>
+      {
+        val.running = false;
+        const updatedSchedule: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, val) as SchedulerConfig[];
+      });
+      resolve();
     });
   }
 
