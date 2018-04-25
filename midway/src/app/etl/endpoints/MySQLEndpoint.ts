@@ -44,16 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as SSH from 'ssh2';
 import { Readable, Writable } from 'stream';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import MySQLConfig from '../../../database/mysql/MySQLConfig';
+import MySQLReader from '../../../database/mysql/streams/MySQLReader';
 import CredentialConfig from '../../credentials/CredentialConfig';
 import { credentials } from '../../credentials/CredentialRouter';
 import AEndpointStream from './AEndpointStream';
 
-export default class SFTPEndpoint extends AEndpointStream
+export default class MySQLEndpoint extends AEndpointStream
 {
   constructor()
   {
@@ -63,54 +64,44 @@ export default class SFTPEndpoint extends AEndpointStream
   public async getSource(source: SourceConfig): Promise<Readable>
   {
     const credentialId = source.options['credentialId'];
-    const sftp: SSH.SFTPWrapper = await this.getSFTPClientByCredentialId(credentialId);
-    return sftp.createReadStream(source.options['filepath']);
+    const config: MySQLConfig = await this.getConfig(credentialId, source.options);
+    const table = source.options['table'];
+    const query: string = source.options['query'];
+    return new MySQLReader(config, table, query);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    // get SFTP credentials
     const credentialId = sink.options['credentialId'];
-    const sftp: SSH.SFTPWrapper = await this.getSFTPClientByCredentialId(credentialId);
-    return sftp.createWriteStream(sink.options['filepath']);
+    const config: MySQLConfig = await this.getConfig(credentialId, sink.options);
+    const table = sink.options['table'];
+    const query: string = sink.options['query'];
+
+    throw new Error('not implemented');
+    // return new MySQLWriter(config, database, table);
   }
 
-  private async getSFTPClientByCredentialId(credentialId: number): Promise<SSH.SFTPWrapper>
+  private async getConfig(credentialId: number, options?: object): Promise<MySQLConfig>
   {
-    const creds: CredentialConfig[] = await credentials.get(credentialId);
-    if (creds.length === 0)
+    return new Promise(async (resolve, reject) =>
     {
-      throw new Error('Invalid SFTP credentials ID.');
-    }
-
-    let sftpConfig: object = {};
-    try
-    {
-      sftpConfig = JSON.parse(creds[0].meta);
-    }
-    catch (e)
-    {
-      throw new Error('Retrieving credentials for ID ' + String(credentialId));
-    }
-
-    return new Promise<SSH.SFTPWrapper>((resolve, reject) =>
-    {
-      const client = new SSH.Client();
-      client.on('ready', () =>
+      const creds: CredentialConfig[] = await credentials.get(credentialId);
+      if (creds.length === 0)
       {
-        client.sftp((err, sftpClient) =>
-        {
-          if (err !== null && err !== undefined)
-          {
-            return reject(err);
-          }
-          else
-          {
-            return resolve(sftpClient);
-          }
-        });
-      }).on('error', reject)
-        .connect(sftpConfig);
+        reject(new Error('Invalid MySQL credentials ID.'));
+      }
+
+      let mysqlConfig: MySQLConfig = {};
+      try
+      {
+        mysqlConfig = JSON.parse(creds[0].meta);
+      }
+      catch (e)
+      {
+        reject(new Error('Error retrieving credentials for ID ' + String(credentialId)));
+      }
+
+      resolve(mysqlConfig);
     });
   }
 }
