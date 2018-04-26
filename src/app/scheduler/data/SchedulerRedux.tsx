@@ -53,7 +53,6 @@ import
   _SchedulerConfig,
   _SchedulerState,
   SchedulerConfig,
-  scheduleForDatabase,
   SchedulerState,
 } from 'scheduler/SchedulerTypes';
 import XHR from 'util/XHR';
@@ -303,7 +302,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
 
     const { schedule: scheduleChanges } = action;
 
-    return this.api.updateSchedule(scheduleChanges.id, scheduleForDatabase(scheduleChanges))
+    return this.api.updateSchedule(scheduleChanges.id, scheduleChanges)
       .then((response) =>
       {
         const schedule: SchedulerConfig = response.data[0];
