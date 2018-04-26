@@ -44,13 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2019 Terrain Data, Inc.
 
+/*
+ * Not currently supported by the CRON parser:
+ * - dashes/ranges (using "-"); except "1-5" in week days
+ * - names/letters (JAN or SUN); numbers only
+ * - mixing weekdays and days of the month
+ * - specific months
+ */
+
 import { extend, filter, identity, isEqual, keys } from 'lodash';
 
 import
 {
   CRONDaySchedule, CRONHourOptions, CRONHourSchedule,
   CRONMap, CRONMinuteOptions, CRONMonthDayOptions,
-  CRONWeekDayOptions, CRONWorkWeekdays,
+  CRONWeekDayOptions,
   defaultCRONHourOptions, defaultCRONMinuteOptions,
   defaultCRONMonthDayOptions, defaultCRONWeekDayOptions,
 } from './CRONConstants';
@@ -128,17 +136,16 @@ function parseCRONDayScheduleInternal(cron: string): CRONDaySchedule
       {
         const weekdaysMap = fillMapFromStringList(CRONWeekDayOptions, weekdaysList);
 
-        // check if it is the "weekdays" option
-        if (isEqual(weekdaysMap, CRONWorkWeekdays))
-        {
-          return {
-            type: 'weekdays',
-          };
-        }
-
         return {
           type: 'weekly',
           weekdays: weekdaysMap,
+        };
+      }
+      else if (weekdaysList[0] === '1-5')
+      {
+        // special case for "weekdays" i.e., work week
+        return {
+          type: 'workweek',
         };
       }
     }
@@ -161,9 +168,9 @@ export function setCRONDays(cron: string, days: CRONDaySchedule): string
       pieces[2] = '*';
       pieces[4] = '*';
       break;
-    case 'weekdays':
+    case 'workweek':
       pieces[2] = '*';
-      pieces[4] = mapToCRONString(CRONWorkWeekdays);
+      pieces[4] = '1-5';
       break;
     case 'weekly':
       pieces[2] = '*';
@@ -279,9 +286,9 @@ export function setCRONType(cron: string, daysOrHours: 'days' | 'hours', type: s
             type: 'daily',
           });
 
-        case 'weekdays':
+        case 'workweek':
           return setCRONDays(cron, {
-            type: 'weekdays',
+            type: 'workweek',
           });
 
         case 'weekly':
@@ -434,7 +441,7 @@ function isValidCRONPiece(piece: string): boolean
 
 function stringHasCRONCharacters(str: string): boolean
 {
-  const matches = str.match(/[ \*0-9,]*/g);
+  const matches = str.match(/[ \*0-9,\-]*/g);
   return matches !== null && matches[0].length === str.length;
 }
 

@@ -218,6 +218,46 @@ export default class Templates
     });
   }
 
+  public async executeETL(
+    fields?: {
+      template?: string,
+      templateId?: string | number,
+      overrideSources?: string,
+      overrideSinks?: string,
+    },
+    files?: Readable[],
+  ): Promise<Readable>
+  {
+    try
+    {
+      if (fields.template !== undefined)
+      {
+        const template = JSON.parse(fields.template);
+        return this.execute(template, files);
+      }
+      else if (fields.templateId !== undefined)
+      {
+        const templateId = Number(fields.templateId);
+        if (fields.overrideSources !== undefined || fields.overrideSinks !== undefined)
+        {
+          return this.executeByOverride(templateId, files, fields.overrideSources, fields.overrideSinks);
+        }
+        else
+        {
+          return this.executeById(templateId, files);
+        }
+      }
+      else
+      {
+        throw new Error('Missing template or template ID parameter.');
+      }
+    }
+    catch (e)
+    {
+      return Promise.reject(e);
+    }
+  }
+
   public async upsert(newTemplate: TemplateConfig): Promise<TemplateConfig[]>
   {
     return new Promise<TemplateConfig[]>(async (resolve, reject) =>
@@ -371,132 +411,139 @@ export default class Templates
       });
     }
 
-    const nodeId = nodes.shift();
-    const node = dag.node(nodeId);
-
-    switch (node.type)
+    try
     {
-      case 'Source':
-        {
-          winston.info('Processing source node', nodeId);
-          const source = template.sources[node.endpoint];
-          const sourceStream = await getSourceStream(node.endpoint, source, files);
+      const nodeId = nodes.shift();
+      const node = dag.node(nodeId);
 
-          // apply transformations to all of the outgoing edges of the "Source" node and store
-          // the resulting streams in the streamMap
-          const outEdges: any[] = dag.outEdges(nodeId);
-          for (const e of outEdges)
+      switch (node.type)
+      {
+        case 'Source':
           {
-            const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
-            const transformStream = new TransformationEngineTransform([], transformationEngine);
-            streamMap[nodeId][e.w] = sourceStream.pipe(transformStream);
-          }
-          return this.executeGraph(template, dag, nodes, files, streamMap);
-        }
+            winston.info('Processing source node', nodeId);
+            const source = template.sources[node.endpoint];
+            const sourceStream = await getSourceStream(node.endpoint, source, files);
 
-      case 'Sink':
-        {
-          winston.info('Processing sink node', nodeId);
-          const inEdges: any[] = dag.inEdges(nodeId);
-          if (inEdges.length > 1)
-          {
-            throw new Error('Sinks can only have one incoming edge.');
-          }
-
-          const e = inEdges[0];
-          const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
-          const sink = template.sinks[node.endpoint];
-          const sinkStream = await getSinkStream(sink, transformationEngine);
-          streamMap[nodeId][nodeId] = streamMap[e.v][nodeId].pipe(sinkStream);
-          return this.executeGraph(template, dag, nodes, files, streamMap);
-        }
-
-      case 'MergeJoin':
-        {
-          winston.info('Processing merge-join node', nodeId);
-          const inEdges: any[] = dag.inEdges(nodeId);
-
-          const done = new EventEmitter();
-          let numPending = inEdges.length;
-          const tempIndices: object[] = [];
-          for (const e of inEdges)
-          {
-            const inputStream = streamMap[e.v][nodeId];
-
-            // create temporary indices for all of the incoming edges to a merge join node
-            const tempIndex = 'temp_' + String(dag.node(e.v).endpoint) + '_' + String(e.v) + '_' + String(e.w);
-            const tempSink = JSON.parse(JSON.stringify(template.sinks._default));
-            tempSink['options']['database'] = tempIndex;
-            tempIndices.push({
-              index: tempIndex,
-              type: tempSink['options']['table'],
-            });
-
-            // and insert incoming streams into the temporary index
-            const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
-            const tempSinkStream = await getSinkStream(tempSink, transformationEngine);
-            inputStream.pipe(tempSinkStream);
-
-            // wait for the stream to be completely written out to the sink by attaching the
-            // "finish" event handler; when all the incoming streams have finished, throw a "done"
-            // event to proceed...
-            tempSinkStream.on('finish', () =>
+            // apply transformations to all of the outgoing edges of the "Source" node and store
+            // the resulting streams in the streamMap
+            const outEdges: any[] = dag.outEdges(nodeId);
+            for (const e of outEdges)
             {
-              if (--numPending === 0)
-              {
-                done.emit('done');
-              }
-            });
+              const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+              const transformStream = new TransformationEngineTransform([], transformationEngine);
+              streamMap[nodeId][e.w] = sourceStream.pipe(transformStream);
+            }
+            return this.executeGraph(template, dag, nodes, files, streamMap);
           }
 
-          // listen for the done event on the EventEmitter
-          // nb: we use a promise here so as to not block the thread, and not have to write the
-          // following code in an event-passing style
-          await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
-
-          winston.info('Finished creating temporary indices: ', JSON.stringify(tempIndices));
-
-          const dbName: string = template.sinks._default['options']['serverId'];
-
-          // we refresh all temporary elastic indexes to make them ready for search
-          const controller: DatabaseController | undefined = DatabaseRegistry.getByName(dbName);
-          if (controller === undefined)
+        case 'Sink':
           {
-            throw new Error('Controller not found for database: ' + dbName);
-          }
-          const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
-          const indices = tempIndices.map((i) => i['index']);
-          await elasticDB.refreshIndex(indices);
-
-          winston.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
-
-          // pipe the merge stream to all outgoing edges
-          const outEdges: any[] = dag.outEdges(nodeId);
-          numPending = outEdges.length;
-          for (const e of outEdges)
-          {
-            const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
-            const transformStream = new TransformationEngineTransform([], transformationEngine);
-            const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
-            streamMap[nodeId][e.w] = mergeJoinStream.pipe(transformStream);
-            streamMap[nodeId][e.w].on('end', async () =>
+            winston.info('Processing sink node', nodeId);
+            const inEdges: any[] = dag.inEdges(nodeId);
+            if (inEdges.length > 1)
             {
-              if (--numPending === 0)
-              {
-                // delete the temporary indices once the merge stream has been piped
-                // out to all outgoing edges
-                await elasticDB.deleteIndex(indices);
-                winston.info('Deleted temporary indices: ' + JSON.stringify(indices));
-              }
-            });
+              throw new Error('Sinks can only have one incoming edge.');
+            }
+
+            const e = inEdges[0];
+            const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+            const sink = template.sinks[node.endpoint];
+            const sinkStream = await getSinkStream(sink, transformationEngine);
+            streamMap[nodeId][nodeId] = streamMap[e.v][nodeId].pipe(sinkStream);
+            return this.executeGraph(template, dag, nodes, files, streamMap);
           }
 
-          return this.executeGraph(template, dag, nodes, files, streamMap);
-        }
+        case 'MergeJoin':
+          {
+            winston.info('Processing merge-join node', nodeId);
+            const inEdges: any[] = dag.inEdges(nodeId);
 
-      default:
-        throw new Error('Unknown node in process graph');
+            const done = new EventEmitter();
+            let numPending = inEdges.length;
+            const tempIndices: object[] = [];
+            for (const e of inEdges)
+            {
+              const inputStream = streamMap[e.v][nodeId];
+
+              // create temporary indices for all of the incoming edges to a merge join node
+              const tempIndex = 'temp_' + String(dag.node(e.v).endpoint) + '_' + String(e.v) + '_' + String(e.w);
+              const tempSink = JSON.parse(JSON.stringify(template.sinks._default));
+              tempSink['options']['database'] = tempIndex;
+              tempIndices.push({
+                index: tempIndex,
+                type: tempSink['options']['table'],
+              });
+
+              // and insert incoming streams into the temporary index
+              const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+              const tempSinkStream = await getSinkStream(tempSink, transformationEngine);
+              inputStream.pipe(tempSinkStream);
+
+              // wait for the stream to be completely written out to the sink by attaching the
+              // "finish" event handler; when all the incoming streams have finished, throw a "done"
+              // event to proceed...
+              tempSinkStream.on('finish', () =>
+              {
+                if (--numPending === 0)
+                {
+                  done.emit('done');
+                }
+              });
+            }
+
+            // listen for the done event on the EventEmitter
+            // nb: we use a promise here so as to not block the thread, and not have to write the
+            // following code in an event-passing style
+            await new Promise((resolve, reject) => done.on('done', resolve).on('error', reject));
+
+            winston.info('Finished creating temporary indices: ', JSON.stringify(tempIndices));
+
+            const dbName: string = template.sinks._default['options']['serverId'];
+
+            // we refresh all temporary elastic indexes to make them ready for search
+            const controller: DatabaseController | undefined = DatabaseRegistry.getByName(dbName);
+            if (controller === undefined)
+            {
+              throw new Error('Controller not found for database: ' + dbName);
+            }
+            const elasticDB: ElasticDB = controller.getTasty().getDB() as ElasticDB;
+            const indices = tempIndices.map((i) => i['index']);
+            await elasticDB.refreshIndex(indices);
+
+            winston.info('Finished refreshing temporary indices; now ready for searching / sorting ...');
+
+            // pipe the merge stream to all outgoing edges
+            const outEdges: any[] = dag.outEdges(nodeId);
+            numPending = outEdges.length;
+            for (const e of outEdges)
+            {
+              const transformationEngine: TransformationEngine = TransformationEngine.load(dag.edge(e));
+              const transformStream = new TransformationEngineTransform([], transformationEngine);
+              const mergeJoinStream = await getMergeJoinStream(dbName, tempIndices, node.options);
+              streamMap[nodeId][e.w] = mergeJoinStream.pipe(transformStream);
+              streamMap[nodeId][e.w].on('end', async () =>
+              {
+                if (--numPending === 0)
+                {
+                  // delete the temporary indices once the merge stream has been piped
+                  // out to all outgoing edges
+                  await elasticDB.deleteIndex(indices);
+                  winston.info('Deleted temporary indices: ' + JSON.stringify(indices));
+                }
+              });
+            }
+
+            return this.executeGraph(template, dag, nodes, files, streamMap);
+          }
+
+        default:
+          throw new Error('Unknown node in process graph');
+      }
     }
-
+    catch (e)
+    {
+      winston.error(e);
+      throw new Error(`Failed to execute ETL pipeline: ${String(e)}`);
+    }
   }
 }

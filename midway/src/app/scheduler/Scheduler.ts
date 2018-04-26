@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as cronParser from 'cron-parser';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -56,6 +57,7 @@ import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
 import { Sources } from '../io/sources/Sources';
 import { Job } from '../jobs/Job';
+import { UserConfig } from '../users/UserConfig';
 import SchedulerConfig from './SchedulerConfig';
 
 export const credentials: Credentials = new Credentials();
@@ -74,6 +76,7 @@ export class Scheduler
       ['id'],
       [
         'createdAt',
+        'createdBy',
         'cron',
         'lastModified',
         'lastRun',
@@ -90,18 +93,21 @@ export class Scheduler
 
   public async initializeScheduler(): Promise<void>
   {
+    // reset all schedules that are currently running back to not running
+    await this._resetAllRunningSchedules();
+
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
-  public cancel(id: number): boolean
+  public cancel(id: number): Promise<SchedulerConfig[] | string>
   {
     if (this.runningSchedules[id] !== undefined)
     {
       this.runningSchedules[id].cancel();
       // TODO: unlock row
-      return true;
+      return this.get(id) as Promise<SchedulerConfig[]>;
     }
-    return false;
+    return Promise.reject('Schedule not found.');
   }
 
   public async delete(id: number): Promise<SchedulerConfig[] | string>
@@ -137,9 +143,9 @@ export class Scheduler
     });
   }
 
-  public async runSchedule(id: number, runNow?: boolean): Promise<string>
+  public async runSchedule(id: number, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<SchedulerConfig[] | string>(async (resolve, reject) =>
     {
       if (this.runningSchedules.get(id) !== undefined)
       {
@@ -151,11 +157,16 @@ export class Scheduler
         return reject('Schedule not found.');
       }
       const schedule: SchedulerConfig = schedules[0];
-      const jobFilename: string = 'Task_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
+      if (schedule.running === true)
+      {
+        return reject('Schedule ' + (id.toString() as string) + ' is already running.');
+      }
+      const jobFilename: string = 'Job_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
       const jobType: string = runNow === true ? 'Scheduled ad-hoc' : 'Scheduled';
       const jobConfig: JobConfig =
         {
           createdAt: null,
+          createdBy: schedule.createdBy,
           id: null,
           logId: null,
           meta: '',
@@ -163,6 +174,7 @@ export class Scheduler
           pausedFilename: jobFilename,
           priority: 1,
           running: null,
+          runNowPriority: null,
           scheduleId: id,
           status: '',
           tasks: schedule.tasks,
@@ -170,113 +182,111 @@ export class Scheduler
           workerId: 1, // TODO change this for clustering support
         };
       await this.setRunning(id, true);
-      const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig);
+      const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);
       if (typeof jobCreateStatus === 'string')
       {
         return reject(jobCreateStatus as string);
       }
-      // const result: TaskOutputConfig = await this.runningSchedules.get(id).run();
       this.runningSchedules.delete(id);
-      // TODO: unlock row
-      return resolve('Running schedule ' + ((id as number).toString() as string));
+      return resolve(await this.get(id) as SchedulerConfig[]);
     });
   }
 
-  public pause(id: number): boolean
+  public pause(id: number): Promise<SchedulerConfig[] | string>
   {
-    if (this.runningSchedules[id] !== undefined)
+    if (this.runningSchedules.get(id) !== undefined)
     {
-      this.runningSchedules[id].pause();
-      // TODO: unlock row
-      return true;
+      this.runningSchedules.get(id).pause();
+      return this.get(id) as Promise<SchedulerConfig[]>;
     }
-    return false;
+    return Promise.reject('Schedule not found.');
   }
 
-  public async setRunning(id: number, running: boolean): Promise<boolean>
+  public async setRunning(id: number, running: boolean): Promise<SchedulerConfig[]>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
       const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length !== 0)
       {
+        if (running === true)
+        {
+          schedules[0].lastRun = new Date();
+        }
         schedules[0].running = running;
-        const result: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[];
-        if (Array.isArray(result) && result.length > 0)
-        {
-          return resolve(true);
-        }
-        else
-        {
-          return resolve(false);
-        }
+        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
     });
   }
 
-  public async setStatus(id: number, status: boolean): Promise<boolean>
+  public async setStatus(id: number, status: boolean): Promise<SchedulerConfig[]>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
+    if (typeof status !== 'boolean' || status === undefined)
     {
-      if (typeof status !== 'boolean' || status === undefined)
+      return Promise.reject([] as SchedulerConfig[]);
+    }
+    return this._setStatus(id, status) as Promise<SchedulerConfig[]>;
+  }
+
+  public async unpause(id: number): Promise<SchedulerConfig[]>
+  {
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
+    {
+      if (this.runningSchedules.get(id) !== undefined)
       {
-        return reject(false);
+        await this.runningSchedules.get(id).unpause();
+        // wait for the unpause to resolve first
+        return resolve(await this.get(id) as SchedulerConfig[]);
       }
-      return this._setStatus(id, status);
+      return reject([] as SchedulerConfig[]);
     });
   }
 
-  public async unpause(id: number): Promise<boolean>
+  public async upsert(schedule: SchedulerConfig, user?: UserConfig): Promise<SchedulerConfig[]>
   {
-    if (this.runningSchedules[id] !== undefined)
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      await this.runningSchedules[id].unpause();
-      // TODO: unlock row
-      return true;
-    }
-    return false;
-  }
-
-  public async upsert(schedule: SchedulerConfig): Promise<SchedulerConfig[]>
-  {
-    const creationDate: Date = new Date();
-    if (schedule.id === undefined) // create
-    {
-      if (schedule.name === undefined || schedule.cron === undefined)
+      const creationDate: Date = new Date();
+      if (schedule.id === undefined) // create
       {
-        return Promise.reject('Schedule name and cron must be provided.');
-      }
-      schedule.createdAt = creationDate;
-      schedule.lastModified = creationDate;
-      schedule.lastRun = new Date(0); // beginning of epoch time
-      schedule.meta = schedule.meta !== undefined ? schedule.meta : '';
-      schedule.priority = schedule.priority !== undefined ? schedule.priority : 1;
-      schedule.running = schedule.running !== undefined ? schedule.running : false;
-      schedule.shouldRunNext = schedule.shouldRunNext !== undefined ? schedule.shouldRunNext : true;
-      schedule.tasks = schedule.tasks !== undefined ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
-      schedule.workerId = schedule.workerId !== undefined ? schedule.workerId : 1;
-    }
-    else
-    {
-      const existingSchedules: SchedulerConfig[] = await this.get(schedule.id);
-      if (existingSchedules.length === 0)
-      {
-        return Promise.reject('Schedule ' + ((schedule.id as any).toString() as string) + ' does not exist.');
-      }
-      schedule.lastModified = creationDate;
-      Object.keys(existingSchedules[0]).forEach((key) =>
-      {
-        if (schedule[key] === undefined)
+        if (schedule.name === undefined || schedule.cron === undefined)
         {
-          schedule[key] = existingSchedules[0][key];
+          return Promise.reject('Schedule name and cron must be provided.');
         }
-      });
-      if (typeof schedule.tasks !== 'string')
-      {
-        schedule.tasks = JSON.stringify(schedule.tasks);
+        schedule.createdAt = creationDate;
+        schedule.createdBy = user !== undefined ? user.id : null;
+        schedule.lastModified = creationDate;
+        schedule.lastRun = new Date(0); // beginning of epoch time
+        schedule.meta = (schedule.meta !== undefined && schedule.meta !== null) ? schedule.meta : '';
+        schedule.priority = (schedule.priority !== undefined && schedule.priority !== null) ? schedule.priority : 1;
+        schedule.running = (schedule.running !== undefined && schedule.running !== null) ? schedule.running : false;
+        schedule.shouldRunNext = (schedule.shouldRunNext !== undefined && schedule.shouldRunNext !== null)
+          ? schedule.shouldRunNext : true;
+        schedule.tasks = (schedule.tasks !== undefined && schedule.tasks !== null) ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
+        schedule.workerId = (schedule.workerId !== undefined && schedule.workerId !== null) ? schedule.workerId : 1;
       }
-    }
-    return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig[]>;
+      else
+      {
+        const existingSchedules: SchedulerConfig[] = await this.get(schedule.id);
+        if (existingSchedules.length === 0)
+        {
+          return Promise.reject('Schedule ' + ((schedule.id as any).toString() as string) + ' does not exist.');
+        }
+        schedule.lastModified = creationDate;
+        Object.keys(existingSchedules[0]).forEach((key) =>
+        {
+          if (schedule[key] === undefined)
+          {
+            schedule[key] = existingSchedules[0][key];
+          }
+        });
+        if (typeof schedule.tasks !== 'string')
+        {
+          schedule.tasks = JSON.stringify(schedule.tasks);
+        }
+      }
+      return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
+    });
   }
 
   private async _checkSchedulerTable(): Promise<void>
@@ -295,8 +305,11 @@ export class Scheduler
 
   private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
   {
-    const result: string = await this.runSchedule(scheduleId);
-    winston.info(result as string);
+    const result: SchedulerConfig[] | string = await this.runSchedule(scheduleId);
+    if (typeof result === 'string')
+    {
+      winston.info(result as string);
+    }
   }
 
   private async _getAvailableSchedules(): Promise<number[]>
@@ -307,9 +320,39 @@ export class Scheduler
       const schedules: SchedulerConfig[] = await this._select([], { running: false }) as SchedulerConfig[];
       schedules.forEach((schedule) =>
       {
-        scheduleIds.push(schedule.id);
+        try
+        {
+          const lastRun = new Date(schedule.lastRun);
+          const currTime = new Date();
+          const currIntervalCronDate = cronParser.parseExpression(schedule.cron);
+          const prevInterval = currIntervalCronDate.prev().toDate();
+
+          if (prevInterval.valueOf() > lastRun.valueOf() && currTime.valueOf() > lastRun.valueOf()
+            && schedule.shouldRunNext === true)
+          {
+            scheduleIds.push(schedule.id);
+          }
+        }
+        catch (e)
+        {
+          winston.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
+        }
       });
       resolve(scheduleIds);
+    });
+  }
+
+  private async _resetAllRunningSchedules(): Promise<void>
+  {
+    return new Promise<void>(async (resolve, reject) =>
+    {
+      const runningSchedules: SchedulerConfig[] = await this._select([], { running: true }) as SchedulerConfig[];
+      runningSchedules.forEach(async (val) =>
+      {
+        val.running = false;
+        const updatedSchedule: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, val) as SchedulerConfig[];
+      });
+      resolve();
     });
   }
 
@@ -336,23 +379,19 @@ export class Scheduler
     });
   }
 
-  private async _setStatus(id: number, status: boolean): Promise<boolean>
+  private async _setStatus(id: number, status: boolean): Promise<SchedulerConfig[]>
   {
-    return new Promise<boolean>(async (resolve, reject) =>
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
       const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length !== 0)
       {
         schedules[0].shouldRunNext = status;
-        const result: SchedulerConfig[] = await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[];
-        if (Array.isArray(result) && result.length > 0)
-        {
-          return resolve(true);
-        }
-        else
-        {
-          return resolve(false);
-        }
+        return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
+      }
+      else
+      {
+        return resolve([] as SchedulerConfig[]);
       }
     });
   }

@@ -44,63 +44,95 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParameterSubstituter from './ESParameterSubstituter';
-import ESValueInfo from './ESValueInfo';
+import { EventEmitter } from 'events';
+import { Duplex, Transform, Writable } from 'stream';
+import * as winston from 'winston';
 
 /**
- * Fills values in for parameters in a query using a given substitutionFunction,
- * ultimately producing a new query string.
- *
- * Different possible strategies for substituting parameters:
- * + Emit new JSON, and then reparse if needed
- * + Emit new JS object and then interpret if needed
- * + Mutate VI's (reparse if needed)
- *  + traverse and replace
- * + Deep Copy + Mutate
- *  + traverse and copy
- *  + traverse and replace
- * + Immutable Substitution -> must first identify mutation locations before copy
- *  + traverse and mark, copy on return
+ * Monitors progress of the writable stream
  */
-export default class ESParameterFiller
+export default class ProgressStream extends Transform
 {
-  public static generate(source: ESValueInfo,
-    params: { [name: string]: any }): string
-  {
-    return ESParameterSubstituter.generate(source,
-      (param: string, runtimeParam?: string, inTerms?: boolean): string =>
-      {
-        const ps = param.split('.');
-        if (runtimeParam !== undefined && ps[0] === runtimeParam && params[runtimeParam] === undefined)
-        {
-          return JSON.stringify('@' + param);
-        }
+  private writer: Writable;
+  private frequency: number;
+  private asyncRead: any = null;
 
-        let value: any = params;
-        let joinArray: boolean = false;
-        for (const p of ps)
-        {
-          // If value is an array, and p is not an index, look at inner objects of array
-          if (Array.isArray(value) && isNaN(parseFloat(p)))
-          {
-            value = value.map((val) => val[p]);
-            joinArray = inTerms !== true;
-          }
-          else
-          {
-            value = value[p];
-          }
-        }
-        // If not in a terms query, but the value is an array, join it into a string
-        if (Array.isArray(value) && joinArray)
-        {
-          value = value.join(' ');
-        }
-        if (value === undefined)
-        {
-          throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
-        }
-        return JSON.stringify(value);
-      });
+  private count: number = 0;
+  private errors: number = 0;
+
+  constructor(writer: Writable, frequency: number = 500)
+  {
+    super({
+      allowHalfOpen: false,
+      readableObjectMode: false,
+      writableObjectMode: true,
+    });
+
+    this.frequency = frequency;
+    this.writer = writer;
+    this.writer.on('error', (e) =>
+    {
+      winston.error(e.toString());
+      this.errors++;
+    });
   }
+
+  public _write(chunk: any, encoding: string, callback: (err?: Error) => void)
+  {
+    this.writer.write(chunk, encoding, (err?: Error) =>
+    {
+      this.count++;
+      // note: we ignore err here because our onError handler on the writer
+      //       stream accounts for errors
+      callback(err);
+    });
+  }
+
+  public _writev(chunks: Array<{ chunk: any, encoding: string }>, callback: (err?: Error) => void): void
+  {
+    let numChunks = chunks.length;
+    const done = new EventEmitter();
+    done.on('done', callback);
+
+    chunks.forEach((c) => this._write(c.chunk, c.encoding, (err?: Error) =>
+    {
+      if (--numChunks === 0)
+      {
+        done.emit('done', err);
+      }
+    }));
+  }
+
+  public _read()
+  {
+    if (this.asyncRead === null)
+    {
+      this.asyncRead = setTimeout(() =>
+      {
+        this.push(this.progress());
+        this.asyncRead = null;
+      },
+        this.frequency);
+    }
+  }
+
+  public _final(callback)
+  {
+    if (this.asyncRead !== null)
+    {
+      clearTimeout(this.asyncRead);
+    }
+
+    this.push(this.progress());
+    this.writer.end(callback);
+  }
+
+  private progress()
+  {
+    return JSON.stringify({
+      successful: this.count,
+      failed: this.errors,
+    }) + '\n';
+  }
+
 }

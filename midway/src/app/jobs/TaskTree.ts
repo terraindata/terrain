@@ -91,10 +91,27 @@ export class TaskTree
   {
     // verify that each task has a unique id
     const idSet: Set<number> = new Set<number>();
-    taskConfigs.forEach((task) =>
+    let invalidIds: boolean = false;
+    taskConfigs.forEach((task, i) =>
     {
+      if (task.id !== i)
+      {
+        invalidIds = true;
+      }
       idSet.add(task.id);
+      task.cancel = (task.cancel !== undefined && task.cancel !== null) ? task.cancel : false;
+      task.jobStatus = (task.jobStatus !== undefined && task.jobStatus !== null) ? task.jobStatus : 0;
+      task.name = (task.name !== undefined && task.name !== null) ? task.name : '';
+      task.params = (task.params !== undefined && task.params !== null) ? task.params : null;
+      task.paused = (task.paused !== undefined && task.paused !== null) ? task.paused : null;
+      task.taskId = (task.taskId !== undefined && task.taskId !== null) ? task.taskId : TaskEnum.taskDefaultExit;
     });
+
+    if (invalidIds)
+    {
+      return 'IDs are not in a valid order. IDs must be zero-indexed.';
+    }
+
     if (taskConfigs.length !== idSet.size) // there were duplicates
     {
       return 'All tasks must have unique IDs';
@@ -103,23 +120,24 @@ export class TaskTree
     this.taskTreeConfig = taskTreeConfig;
 
     taskConfigs = this._appendDefaults(taskConfigs);
+
     for (let i = 0; i < taskConfigs.length - 2; ++i)
     {
       if (i < taskConfigs.length - 3) // not the last original task
       {
-        if (taskConfigs[i].onSuccess === undefined) // set onSuccess to the next task in the queue
+        if (taskConfigs[i].onSuccess === undefined || taskConfigs[i].onSuccess === null) // set onSuccess to the next task in the queue
         {
           taskConfigs[i].onSuccess = taskConfigs[i + 1].id;
         }
       }
       else
       {
-        if (taskConfigs[i].onSuccess === undefined) // default exit
+        if (taskConfigs[i].onSuccess === undefined || taskConfigs[i].onSuccess === null) // default exit
         {
           taskConfigs[i].onSuccess = taskConfigs[taskConfigs.length - 2].id;
         }
       }
-      if (taskConfigs[i].onFailure === undefined) // default failure
+      if (taskConfigs[i].onFailure === undefined || taskConfigs[i].onFailure === null) // default failure
       {
         taskConfigs[i].onFailure = taskConfigs[taskConfigs.length - 1].id;
       }
@@ -225,6 +243,7 @@ export class TaskTree
         {
           break;
         }
+
         this.tasks[ind].setInputConfig(result);
         if (this.taskTreeConfig.jobStatus === 2) // was paused
         {

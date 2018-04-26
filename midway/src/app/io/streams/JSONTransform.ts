@@ -47,11 +47,13 @@ THE SOFTWARE.
 import * as JSONStream from 'JSONStream';
 import { Transform } from 'stream';
 
+import JSONExportTransform from './JSONExportTransform';
+
 /**
  * Import/Export from a JSON format. *
  * Additional configuration options are possible.
  */
-export default class JSONTransform
+export class JSONTransform
 {
   public static createImportStream(pattern?: any, map?: any): Transform
   {
@@ -60,6 +62,8 @@ export default class JSONTransform
 
   public static createExportStream(open?: any, sep?: any, close?: any): Transform
   {
-    return JSONStream.stringify(open, sep, close);
+    return new JSONExportTransform(open, sep, close);
   }
 }
+
+export default JSONTransform;

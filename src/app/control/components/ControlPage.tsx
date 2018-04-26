@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 
+import ScheduleList from 'app/scheduler/components/ScheduleList';
 import TerrainComponent from 'common/components/TerrainComponent';
 import ImportExportControl from './importExport/ImportExportControl';
 
@@ -63,7 +64,7 @@ class ControlPage extends TerrainComponent<Props>
   {
     return (
       <div className='control-body'>
-        <ImportExportControl />
+        <ScheduleList />
       </div>
     );
   }

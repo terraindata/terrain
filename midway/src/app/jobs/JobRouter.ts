@@ -69,7 +69,7 @@ Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, nex
 Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyCancelRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = App.JobQ.cancel(ctx.params.id);
+  ctx.body = await App.JobQ.cancel(ctx.params.id);
 });
 
 // Delete job by id
@@ -90,7 +90,13 @@ Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, 
 Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.JobQueuePermissions.verifyPauseRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = App.JobQ.pause(ctx.params.id);
+  ctx.body = await App.JobQ.pause(ctx.params.id);
+});
+
+Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.JobQueuePermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await App.JobQ.run(ctx.params.id);
 });
 
 // unpause paused job by id
@@ -109,7 +115,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     delete job.id;
   }
   await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.create(job);
+  ctx.body = await App.JobQ.create(job, false, ctx.state.user.id);
 });
 
 export default Router;

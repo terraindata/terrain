@@ -44,9 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
-import { Record } from 'immutable';
+import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import { _SinkConfig, _SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';
@@ -61,7 +62,25 @@ export interface SchedulerConfig extends SchedulerConfigC, IMap<SchedulerConfig>
 export const _SchedulerConfig =
   (config: object) =>
   {
-    return new SchedulerConfig_Record(config) as any as SchedulerConfig;
+    let schedule = new SchedulerConfig_Record(config) as any as SchedulerConfig;
+    let tasks: any = schedule.tasks;
+    if (typeof schedule.tasks === 'string')
+    {
+      try
+      {
+        tasks = JSON.parse(schedule.tasks);
+      }
+      catch
+      {
+        tasks = [];
+      }
+    }
+    if (!Array.isArray(tasks))
+    {
+      tasks = [tasks];
+    }
+    schedule = schedule.set('tasks', Util.arrayToImmutableList(tasks, _TaskConfig));
+    return schedule;
   };
 
 class SchedulerStateC
@@ -77,3 +96,32 @@ export const _SchedulerState = (config?: any) =>
 {
   return new SchedulerState_Record(Util.extendId(config || {})) as any as SchedulerState;
 };
+
+class TaskConfigC extends SharedTaskConfig
+{
+  // Any extra functions / properties go here
+}
+
+const TaskConfig_Record = createRecordType(new TaskConfigC(), 'TaskConfigC');
+export interface TaskConfig extends TaskConfigC, IMap<TaskConfig> { }
+export const _TaskConfig =
+  (config: object) =>
+  {
+    let task = new TaskConfig_Record(config) as any as TaskConfig;
+    task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
+    if (task.getIn(['params', 'overrideSources']))
+    {
+      task = task.setIn(
+        ['params', 'overrideSources'],
+        Util.objectToImmutableMap(task.getIn(['params', 'overrideSources']), _SourceConfig),
+      );
+    }
+    if (task.getIn(['params', 'overrideSinks']))
+    {
+      task = task.setIn(
+        ['params', 'overrideSinks'],
+        Util.objectToImmutableMap(task.getIn(['params', 'overrideSinks']), _SinkConfig),
+      );
+    }
+    return task;
+  };

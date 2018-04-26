@@ -13,9 +13,9 @@
 /* Margin and Padding */
 
 @spacing: 12px;
-@half-spacing: @spacing / 2;
-@quarter-spacing: @spacing / 4;
-@double-spacing: @spacing * 2;
+@half-spacing: (@spacing / 2);
+@quarter-spacing: (@spacing / 4);
+@double-spacing: (@spacing * 2);
 
 
 /* Colors -- Important: Coordinate with Colors.tsx */
@@ -106,7 +106,7 @@
 }
 
 .standard-margin-top {
-  margin-top: 2 * @standard-margin;
+  margin-top: (2 * @standard-margin);
 }
 
 .standard-margin-container {
@@ -288,7 +288,7 @@
   transform: rotate(-90deg);
 }
 
-.rotate (deg) {
+.rotate (@deg) {
   -moz-transform: rotate(@deg);
   -webkit-transform: rotate(@deg);
   -o-transform: rotate(@deg);
@@ -329,9 +329,9 @@
 
 .can-select {
   -o-user-select: text !important;
-    -moz-user-select: text !important;
-    -webkit-user-select: text !important;
-    user-select: text !important;
+  -moz-user-select: text !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
 }
 
 .close {
@@ -370,21 +370,21 @@
   50% {-webkit-transform:rotate(-6deg);}
   100% {-webkit-transform:rotate(6deg);}
 }
- 
+
 /* firefox */
 @-moz-keyframes wiggle {
   0% {-moz-transform:rotate(6deg);}
   50% {-moz-transform:rotate(-6deg);}
   100% {-moz-transform:rotate(6deg);}
 }
- 
+
 /* anyone brave enough to implement the ideal method */
 @keyframes wiggle {
   0% {transform:rotate(6deg);}
   50% {transform:rotate(-6deg);}
   100% {transform:rotate(6deg);}
 }
- 
+
 .wiggle {
   transform-origin: bottom center;
   -webkit-animation: wiggle 0.5s forwards;

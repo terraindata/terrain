@@ -56,7 +56,7 @@ export class TaskConfig
   public name: string = '';          // name of the task i.e. 'import'
   public onFailure: number = null;   // id of task to Pexecute on failure
   public onSuccess: number = null;   // id of next task to execute (default should be next in array)
-  public params: ATaskConfig = {}; // input parameters for the task
+  public params: any = null; // input parameters for the task
   public paused: number = null;      // where in the tree of tasks the tasks are paused
   public taskId: number = null;      // maps to a statically declared task
 }

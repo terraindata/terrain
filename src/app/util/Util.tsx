@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import * as $ from 'jquery';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -830,6 +830,30 @@ const Util = {
       return imap.set(item[idAttribute], transformedItem);
     }, Immutable.Map());
 
+    return immutableMap;
+  },
+
+  arrayToImmutableList(arrayToConvert: any[], itemConstructor = null)
+  {
+    const immutableList = arrayToConvert.map((item) =>
+    {
+      if (itemConstructor !== null)
+      {
+        return itemConstructor(item);
+      }
+      return item;
+    });
+
+    return List(immutableList);
+  },
+
+  objectToImmutableMap(objectToConvert: any, itemConstructor = null)
+  {
+    let immutableMap = Map({});
+    for (const key in objectToConvert)
+    {
+      immutableMap = immutableMap.set(key, itemConstructor ? itemConstructor(objectToConvert[key]) : objectToConvert[key]);
+    }
     return immutableMap;
   },
 };
