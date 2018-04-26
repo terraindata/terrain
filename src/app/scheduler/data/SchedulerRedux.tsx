@@ -305,14 +305,14 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.updateSchedule(scheduleChanges.id, scheduleChanges)
       .then((response) =>
       {
-        const sched: SchedulerConfig = response.data[0];
+
         const schedule: SchedulerConfig = response.data[0];
         directDispatch({
           actionType: 'updateScheduleSuccess',
-          schedule: sched,
+          schedule,
         });
 
-        return Promise.resolve(sched);
+        return Promise.resolve(schedule);
       });
   }
 
