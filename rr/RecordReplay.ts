@@ -64,6 +64,7 @@ const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-are
 const optionDefinitions = [
   { name: 'record', alias: 'r', type: Boolean },
   { name: 'replay', alias: 'p', type: Boolean },
+  { name: 'column', alias: 'c', type: String },
   { name: 'help', alias: 'h' },
   { name: 'directory', alias: 'd', type: String },
   { name: 'url', alias: 'u', type: String },
@@ -90,6 +91,11 @@ const usageSections = [
         name: 'replay',
         typeLabel: 'boolean',
         description: 'Replay the actions.',
+      },
+      {
+        name: 'column',
+        typeLabel: 'string',
+        description: 'Which column (builder/pathfinder) to start.',
       },
       {
         name: 'directory',
@@ -139,13 +145,16 @@ async function loadPage(page, url)
   }
 }
 
-async function recordBuilderActions(browser, url)
+async function recordBuilderActions(browser, url, column: 'builder' | 'pathfinder')
 {
   const page = await browser.newPage();
   await page.setViewport({ width: 1600, height: 1200 });
   await loginToBuilder(page, url);
-  sleep.sleep(1);
-  await startBuilder(page);
+  sleep.sleep(3);
+  if (column === 'builder')
+  {
+    await startBuilder(page);
+  }
   const records = await page.evaluate(() =>
   {
     window['TerrainTools'].setLogLevel();
@@ -191,6 +200,16 @@ async function rr()
   {
     actionFileName = options['directory'] + '/actions.json';
   }
+  let startColumn: 'builder' | 'pathfinder' = 'pathfinder';
+  if (options['column'] !== undefined)
+  {
+    if (options['column'] !== 'builder' && options['column'] !== 'pathfinder')
+    {
+      console.log(usage);
+      return;
+    }
+    startColumn = options['column'];
+  }
 
   const browser = await puppeteer.launch({ headless: false });
 
@@ -198,7 +217,7 @@ async function rr()
   {
     try
     {
-      const actions = await recordBuilderActions(browser, url);
+      const actions = await recordBuilderActions(browser, url, startColumn);
       // saving to options['directory']/actions.json
       jsonfile.writeFileSync(actionFileName, actions);
     } catch (e)
@@ -221,7 +240,10 @@ async function rr()
       await page.goto(url);
       await loginToBuilder(page, url);
       sleep.sleep(1);
-      await startBuilder(page);
+      if (startColumn === 'builder')
+      {
+        await startBuilder(page);
+      }
       await replayBuilderActions(page, url, actions, serializeRecords);
     } catch (e)
     {

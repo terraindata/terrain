@@ -552,6 +552,25 @@ class PathfinderContextC extends BaseClass
 export type PathfinderContext = PathfinderContextC & IRecord<PathfinderContextC>;
 export const _PathfinderContext = (config?: { [key: string]: any }) =>
   New<PathfinderContext>(new PathfinderContextC(config), config);
+export const pathFinderTypeLoader = [
+  _ChoiceOption,
+  _Path,
+  _FilterGroup,
+  _Score,
+  _Line,
+  _ScoreLine,
+  _TransformData,
+  _ScorePoint,
+  _More,
+  _AggregationLine,
+  _Sample,
+  _Script,
+  _Param,
+  _FilterLine,
+  _DistanceValue,
+  _Source,
+  _PathfinderContext,
+];
 
 /* Consider splitting these things below into its own class */
 
@@ -643,7 +662,7 @@ class ElasticDataSourceC extends DataSource
           value: source.value,
           sampleData: List(sampleData),
         });
-      }).toList();
+      }).sortBy((choice) => choice.displayName).toList();
     }
 
     if (context.type === 'fields')
