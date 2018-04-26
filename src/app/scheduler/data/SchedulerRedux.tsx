@@ -455,7 +455,6 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       });
   }
 
-
   public overrideAct(action: Unroll<SchedulerActionTypes>)
   {
     const asyncActions = [

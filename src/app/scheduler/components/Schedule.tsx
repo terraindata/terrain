@@ -260,7 +260,7 @@ class Schedule extends TerrainComponent<Props>
       options: List([]),
       columb: true,
       hideSampleData: true,
-      canUseButton: this.canEdit()
+      canUseButton: this.canEdit(),
     };
 
     const buttonOptionSet = {
