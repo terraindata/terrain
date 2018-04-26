@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as cronParser from 'cron-parser';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -208,6 +209,10 @@ export class Scheduler
       const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length !== 0)
       {
+        if (running === true)
+        {
+          schedules[0].lastRun = new Date();
+        }
         schedules[0].running = running;
         return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
@@ -252,12 +257,13 @@ export class Scheduler
         schedule.createdBy = user !== undefined ? user.id : null;
         schedule.lastModified = creationDate;
         schedule.lastRun = new Date(0); // beginning of epoch time
-        schedule.meta = schedule.meta !== undefined ? schedule.meta : '';
-        schedule.priority = schedule.priority !== undefined ? schedule.priority : 1;
-        schedule.running = schedule.running !== undefined ? schedule.running : false;
-        schedule.shouldRunNext = schedule.shouldRunNext !== undefined ? schedule.shouldRunNext : true;
-        schedule.tasks = schedule.tasks !== undefined ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
-        schedule.workerId = schedule.workerId !== undefined ? schedule.workerId : 1;
+        schedule.meta = (schedule.meta !== undefined && schedule.meta !== null) ? schedule.meta : '';
+        schedule.priority = (schedule.priority !== undefined && schedule.priority !== null) ? schedule.priority : 1;
+        schedule.running = (schedule.running !== undefined && schedule.running !== null) ? schedule.running : false;
+        schedule.shouldRunNext = (schedule.shouldRunNext !== undefined && schedule.shouldRunNext !== null)
+          ? schedule.shouldRunNext : true;
+        schedule.tasks = (schedule.tasks !== undefined && schedule.tasks !== null) ? JSON.stringify(schedule.tasks) : JSON.stringify([]);
+        schedule.workerId = (schedule.workerId !== undefined && schedule.workerId !== null) ? schedule.workerId : 1;
       }
       else
       {
@@ -314,7 +320,23 @@ export class Scheduler
       const schedules: SchedulerConfig[] = await this._select([], { running: false }) as SchedulerConfig[];
       schedules.forEach((schedule) =>
       {
-        scheduleIds.push(schedule.id);
+        try
+        {
+          const lastRun = new Date(schedule.lastRun);
+          const currTime = new Date();
+          const currIntervalCronDate = cronParser.parseExpression(schedule.cron);
+          const prevInterval = currIntervalCronDate.prev().toDate();
+
+          if (prevInterval.valueOf() > lastRun.valueOf() && currTime.valueOf() > lastRun.valueOf()
+            && schedule.shouldRunNext === true)
+          {
+            scheduleIds.push(schedule.id);
+          }
+        }
+        catch (e)
+        {
+          winston.warn('Error while trying to parse scheduler cron: ' + ((e as any).toString() as string));
+        }
       });
       resolve(scheduleIds);
     });
