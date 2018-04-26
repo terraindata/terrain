@@ -139,7 +139,7 @@ describe('Replay a builder action', () =>
     {
       await takeBuilderActionScreenshot(page);
     });
-  }, 300000);
+  }, 600000);
 
   afterAll(async () =>
   {
