@@ -111,7 +111,7 @@
     "codemirror": "^5.28.0",
     "color": "^3.0.0",
     "command-line-args": "^5.0.2",
-    "command-line-usage": "^5.0.4",
+    "command-line-usage": "^4.1.0",
     "create-react-class": "^15.6.3",
     "cronstrue": "^0.10.10",
     "csv-string": "^2.3.2",
