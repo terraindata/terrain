@@ -63,6 +63,102 @@ export type ErrorHandler = (response: string | MidwayError) => void;
 // making this an instance in case we want stateful things like cancelling ajax requests
 class ETLAjax
 {
+  // Get integrations
+  public getIntegrations(): Promise<Map<ID, any>>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        resolve(response);
+      }
+      return Ajax.req(
+        'get',
+        'integrations/',
+        {},
+        handleResponse,
+        {
+          onError: reject,
+        });
+    });
+  }
+  // Get ingegatrion by id
+  public getIntegration(integrationId: ID): Promise<any>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        resolve(response);
+      }
+      return Ajax.req(
+        'get',
+        `integrations/${integrationId}`,
+        {},
+        handleResponse,
+        {
+          onError: reject,
+        });
+    });
+  }
+  // Create integration
+  public createIntegration(integration: any): Promise<any>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        resolve(response);
+      }
+      return Ajax.req(
+        'post',
+        `integrations/`,
+        {integration},
+        handleResponse,
+        {
+          onError: reject,
+        });
+    });
+  }
+  // Update integration by id
+  public updateIntegration(integrationId: ID, integration: any): Promise<any>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        resolve(response);
+      }
+      return Ajax.req(
+        'post',
+        `integrations/${integrationId}`,
+        {integration},
+        handleResponse,
+        {
+          onError: reject,
+        });
+    });
+  }
+  // Delete integration
+  public deleteIntegration(integrationId: ID): Promise<any>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const handleResponse = (response: any) =>
+      {
+        resolve(response);
+      }
+      return Ajax.req(
+        'post',
+        `integrations/delete/${integrationId}`,
+        {},
+        handleResponse,
+        {
+          onError: reject,
+        });
+    });
+  }
+  
   public templatesToImmutable(templates: TemplateBase[]): List<ETLTemplate>
   {
     try
