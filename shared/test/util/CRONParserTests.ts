@@ -58,10 +58,17 @@ test('parses daily', () =>
   );
 });
 
-test('parses weekdays', () =>
+test('parses weekdays 1 to 5 individually', () =>
 {
   expect(parseCRONDaySchedule('4 8 * *   1,2,3,4,5')).toEqual(
-    { type: 'weekdays' },
+    { type: 'weekly', weekdays: fillCRONMap([1, 2, 3, 4, 5], 0, 6) },
+  );
+});
+
+test('parses workweek', () =>
+{
+  expect(parseCRONDaySchedule('4 8 * *   1-5')).toEqual(
+    { type: 'workweek' },
   );
 });
 
@@ -118,10 +125,10 @@ test('can set daily', () =>
   );
 });
 
-test('can set weekdays', () =>
+test('can set workweek', () =>
 {
-  expect(setCRONDays('0 0,6,12,18 * * *', { type: 'weekdays' })).toEqual(
-    '0 0,6,12,18 * * 1,2,3,4,5',
+  expect(setCRONDays('0 0,6,12,18 * * *', { type: 'workweek' })).toEqual(
+    '0 0,6,12,18 * * 1-5',
   );
 });
 
@@ -239,9 +246,9 @@ test('can set cron type to daily', () =>
   expect(setCRONType('* * * * *', 'days', 'daily')).toEqual('* * * * *');
 });
 
-test('can set cron type to weekdays', () =>
+test('can set cron type to workweek', () =>
 {
-  expect(setCRONType('0 * * * *', 'days', 'weekdays')).toEqual('0 * * * 1,2,3,4,5');
+  expect(setCRONType('0 * * * *', 'days', 'workweek')).toEqual('0 * * * 1-5');
 });
 
 test('can set cron type to weekly', () =>
@@ -267,4 +274,18 @@ test('can set cron type to hourly', () =>
 test('can set cron type to daily (hours)', () =>
 {
   expect(setCRONType('* * * * *', 'hours', 'daily')).toEqual('0 0 * * *');
+});
+
+test('throws error when setting a bad CRON type', () =>
+{
+  let threw = false;
+  try
+  {
+    setCRONType('* * * * *', 'days', 'minute');
+  }
+  catch (e)
+  {
+    threw = true;
+  }
+  expect(threw).toEqual(true);
 });

@@ -96,6 +96,7 @@ const NewTheme =
 
     textboxBg: NTColors.light1,
     lightBlue: NTColors.blue1,
+
     success: NTColors.green,
   };
 

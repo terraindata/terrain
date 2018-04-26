@@ -78,7 +78,7 @@ export interface SchedulerActionTypes
 
   createSchedule?: {
     actionType: 'createSchedule';
-    schedule: SchedulerConfig;
+    schedule: object;
   };
   createScheduleStart: {
     actionType: 'createScheduleStart';
@@ -296,6 +296,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       .then((response) =>
       {
         const schedule: SchedulerConfig = response.data[0];
+
         directDispatch({
           actionType: 'updateScheduleSuccess',
           schedule,

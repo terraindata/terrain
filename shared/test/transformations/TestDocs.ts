@@ -93,4 +93,11 @@ export const TestDocs = {
         ],
       ],
   },
+
+  doc8: {
+    t: '1',
+    f: '',
+    tb: true,
+    fb: false,
+  },
 };
