@@ -60,7 +60,8 @@ const CATEGORY_ITEM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:n
 const CREATE_GROUP_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-2 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
 const CREATE_GROUP_BUTTON_SELECTOR = 'body > div.ReactModalPortal > div > div > div > div > div.modal-buttons > div.button.modal-confirm-button';
 const CREATE_ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
-const ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
+// const ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
+const ALGORITHM_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
