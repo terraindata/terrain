@@ -54,6 +54,7 @@ import * as request from 'then-request';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import * as winston from 'winston';
+import TerrainTools from '../../../src/app/util/TerrainTools';
 import { replayBuilderActions } from '../../FullstackUtils';
 
 const COLUMN_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div:nth-child(1) > div.tabs-content > div > div > div:nth-child(1) > div > div > div.builder-title-bar > div.builder-title-bar-title > span > span > svg';
@@ -98,23 +99,11 @@ async function takeBuilderActionScreenshot(page)
   await takeAndCompareScreenShot(page);
 }
 
-async function gotoStarterCard(page, url)
+async function gotoStarterPage(page, url)
 {
   await page.goto(url);
   winston.info('Start builder at : ' + String(url));
   sleep.sleep(3);
-  await page.waitForSelector(COLUMN_SELECTOR);
-  await page.click(COLUMN_SELECTOR);
-  winston.info('Select the column.');
-  sleep.sleep(1);
-  await page.waitForSelector(CARDS_COLUMN_SELECTOR);
-  await page.click(CARDS_COLUMN_SELECTOR);
-  winston.info('Select the card column.');
-  sleep.sleep(1);
-  await page.waitForSelector(CARDSTARTER_SELECTOR);
-  await page.click(CARDSTARTER_SELECTOR);
-  winston.info('Builder is started.');
-  sleep.sleep(1);
 }
 
 describe('Replay a builder action', () =>
@@ -136,11 +125,16 @@ describe('Replay a builder action', () =>
     page = await browser.newPage();
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000/builder/!3`;
-    await gotoStarterCard(page, url);
+    await gotoStarterPage(page, url);
     await takeBuilderActionScreenshot(page);
     const actions = actionFileData['actions'];
     const serializeRecords = actionFileData['records'];
     console.log('Replaying ' + actions.length + ' actions.');
+    //    console.log('Active the simple Parser.');
+    //    await page.evaluate(() =>
+    //    {
+    //      window['TerrainTools'].activate('simple_parser');
+    //    });
     await replayBuilderActions(page, url, actions, serializeRecords, async () =>
     {
       await takeBuilderActionScreenshot(page);
