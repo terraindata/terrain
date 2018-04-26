@@ -60,6 +60,7 @@ class ETLStateC
   public templates: List<ETLTemplate> = List([]);
   public loading: { [k: string]: number } = {}; // a tracker to verify if we are waiting on queries
   public modalRequests: List<ModalProps> = List([]);
+  public integrations: IMMap<ID, any> = Map<ID, any>();
   // TODO the way we track what is running and how the ui deals with it is suboptimal
   public runningTemplates: Immutable.Map<number, ETLTemplate> = Map();
   public acknowledgedRuns: Immutable.Map<number, boolean> = Map();
