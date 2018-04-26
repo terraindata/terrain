@@ -109,39 +109,39 @@ export const _TaskConfig =
   {
     let task = new TaskConfig_Record(config) as any as TaskConfig;
     task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
-    if (task.getIn(['params', 'overrideSources']))
-    {
-      let overrideSources = task.getIn(['params', 'overrideSources']);
-      if (typeof overrideSources === 'string')
-      {
-        try {
-          overrideSources = JSON.parse(overrideSources);
-        }
-        catch {
-          overrideSources = {};
-        }
-      }
-      task = task.setIn(
-        ['params', 'overrideSources'],
-        Util.objectToImmutableMap(overrideSources, _SourceConfig),
-      );
-    }
-    if (task.getIn(['params', 'overrideSinks']))
-    {
-      let overrideSinks = task.getIn(['params', 'overrideSinks']);
-      if (typeof overrideSinks === 'string')
-      {
-        try {
-          overrideSinks = JSON.parse(overrideSinks);
-        }
-        catch {
-          overrideSinks = {};
-        }
-      }
-      task = task.setIn(
-        ['params', 'overrideSinks'],
-        Util.objectToImmutableMap(overrideSinks, _SinkConfig),
-      );
-    }
+    task = task.setIn(['params', 'overrideSources'],
+      Util.objectToImmutableMap(parseToObject(task, ['params', 'overrideSources']), _SourceConfig));
+    task = task.setIn(['params', 'overrideSinks'],
+      Util.objectToImmutableMap(parseToObject(task, ['params', 'overrideSinks']), _SinkConfig));
     return task;
   };
+
+// TODO - not sure if should move to Util (seems kinda specific) or ways to generalize this more
+function parseToObject(parent, keyPath, defaultVal = {}): object
+{
+  if (parent.getIn(keyPath))
+  {
+    const obj = parent.getIn(keyPath);
+    if (typeof obj === 'string')
+    {
+      try
+      {
+        return JSON.parse(obj);
+      }
+      catch {
+        return defaultVal;
+      }
+    }
+    return obj;
+  }
+  return defaultVal;
+}
+
+/* Do any work to prepare a schedule to be saved to the database */
+export function scheduleForDatabase(schedule: SchedulerConfig): object
+{
+  schedule = schedule
+    .updateIn(['tasks', 0, 'params', 'overrideSinks'], (value) => JSON.stringify(value))
+    .updateIn(['tasks', 0, 'params', 'overrideSources'], (value) => JSON.stringify(value));
+  return schedule.toJS();
+}

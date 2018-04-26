@@ -234,7 +234,7 @@ class Schedule extends TerrainComponent<Props>
       column: true,
       forceFloat: true,
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, template),
-      hideSampleData: true,      
+      hideSampleData: true,
     };
 
     const intervalOptionSet = {
@@ -256,7 +256,7 @@ class Schedule extends TerrainComponent<Props>
       options: List([]),
       column: true,
       canUseButton: TerrainTools.isAdmin(),
-      hideSampleData: true,      
+      hideSampleData: true,
     };
 
     return List([templateOptionSet, configurationOptionSet, intervalOptionSet, buttonOptionSet]);

@@ -48,7 +48,7 @@ import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCr
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { _SchedulerConfig, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
+import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -83,15 +83,9 @@ class ScheduleList extends TerrainComponent<Props>
 
   public handleScheduleChange(schedule: SchedulerConfig)
   {
-    // Stringify the override source and sinks
-    schedule = schedule
-      .setIn(['tasks', 0, 'params', 'overrideSinks'],
-      JSON.stringify(schedule.getIn(['tasks', 0, 'params', 'overrideSinks'])))
-      .setIn(['tasks', 0, 'params', 'overrideSources'],
-      JSON.stringify(schedule.getIn(['tasks', 0, 'params', 'overrideSources'])));
     this.props.schedulerActions({
       actionType: 'updateSchedule',
-      schedule: schedule.toJS(),
+      schedule: scheduleForDatabase(schedule),
     });
   }
 
