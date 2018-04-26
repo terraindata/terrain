@@ -53,6 +53,7 @@ import
   _SchedulerConfig,
   _SchedulerState,
   SchedulerConfig,
+  scheduleForDatabase,
   SchedulerState,
 } from 'scheduler/SchedulerTypes';
 import XHR from 'util/XHR';
@@ -78,7 +79,7 @@ export interface SchedulerActionTypes
 
   createSchedule?: {
     actionType: 'createSchedule';
-    schedule: object;
+    schedule: any;
   };
   createScheduleStart: {
     actionType: 'createScheduleStart';
@@ -292,17 +293,16 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
 
     const { schedule: scheduleChanges } = action;
 
-    return this.api.updateSchedule(scheduleChanges.id, scheduleChanges)
+    return this.api.updateSchedule(scheduleChanges.id, scheduleForDatabase(scheduleChanges))
       .then((response) =>
       {
-        const sched: SchedulerConfig = response.data[0];
         const schedule: SchedulerConfig = response.data[0];
         directDispatch({
           actionType: 'updateScheduleSuccess',
-          schedule: sched,
+          schedule,
         });
 
-        return Promise.resolve(sched);
+        return Promise.resolve(schedule);
       });
   }
 

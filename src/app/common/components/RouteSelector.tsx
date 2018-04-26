@@ -94,7 +94,7 @@ export interface RouteSelectorOptionSet
   forceFloat?: boolean;
   isButton?: boolean;
   onButtonClick?: () => void;
-  canUseButton: boolean;
+  canUseButton?: boolean;
   icon?: El;
   hasSearch?: boolean; // NOTE not compatible with hasOther
   column?: boolean; // force a column layout
