@@ -44,27 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as CredentialP from './CredentialPermissions';
 import * as ImportP from './ImportPermissions';
+import * as IntegrationP from './IntegrationPermissions';
 import * as JobQueueP from './JobQueuePermissions';
 import * as SchedulerP from './SchedulerPermissions';
 
-export let CredentialPermissions: CredentialP.CredentialPermissions = new CredentialP.CredentialPermissions();
 export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
+export let IntegrationPermissions: IntegrationP.IntegrationPermissions = new IntegrationP.IntegrationPermissions();
 export let JobQueuePermissions: JobQueueP.JobQueuePermissions = new JobQueueP.JobQueuePermissions();
 export let SchedulerPermissions: SchedulerP.SchedulerPermissions = new SchedulerP.SchedulerPermissions();
 
 export class Permissions
 {
-  public CredentialPermissions: CredentialP.CredentialPermissions;
   public ImportPermissions: ImportP.ImportPermissions;
+  public IntegrationPermissions: IntegrationP.IntegrationPermissions;
   public JobQueuePermissions: JobQueueP.JobQueuePermissions;
   public SchedulerPermissions: SchedulerP.SchedulerPermissions;
 
   constructor()
   {
-    this.CredentialPermissions = CredentialPermissions;
     this.ImportPermissions = ImportPermissions;
+    this.IntegrationPermissions = IntegrationPermissions;
     this.JobQueuePermissions = JobQueuePermissions;
     this.SchedulerPermissions = SchedulerPermissions;
   }

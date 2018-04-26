@@ -44,12 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// NB: this file should never be exposed directly via API routes except to localhost!
-// It must only be called from inside midway and exposed via those routes, or exposed
-// via /credentials to localhost for testing purposes
-
 import aesjs = require('aes-js');
 import sha1 = require('sha1');
+
+import IntegrationConfig from 'shared/types/integrations/IntegrationConfig';
+import IntegrationSimpleConfig from 'shared/types/integrations/IntegrationSimpleConfig';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
@@ -57,25 +56,27 @@ import * as Util from '../AppUtil';
 import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 import { versions } from '../versions/VersionRouter';
-import CredentialConfig from './CredentialConfig';
 
-export class Credentials
+export class Integrations
 {
-  private credentialTable: Tasty.Table;
+  private integrationTable: Tasty.Table;
   private key: any;
   private privateKey: string;
 
   constructor()
   {
-    this.credentialTable = new Tasty.Table(
-      'credentials',
+    this.integrationTable = new Tasty.Table(
+      'endpoints',
       ['id'],
       [
+        'authConfig',
+        'connectionConfig',
         'createdBy',
         'meta',
         'name',
-        'permissions',
+        'readPermission',
         'type',
+        'writePermission',
       ],
     );
 
@@ -88,39 +89,27 @@ export class Credentials
     this.key = aesjs.utils.utf8.toBytes(this.privateKey);
   }
 
-  public async get(id?: number, type?: string): Promise<CredentialConfig[]>
+  public async get(id?: number, type?: string): Promise<IntegrationConfig[]>
   {
-    return new Promise<CredentialConfig[]>(async (resolve, reject) =>
+    return new Promise<IntegrationConfig[]>(async (resolve, reject) =>
     {
-      const rawCreds = await App.DB.select(this.credentialTable, [], { id, type });
-      const creds = rawCreds.map((result: object) => new CredentialConfig(result));
-      return resolve(await Promise.all(creds.map(async (cred) =>
+      const rawIntegrations = await App.DB.select(this.integrationTable, [], { id, type });
+      const integrations = rawIntegrations.map((result: object) => new IntegrationConfig(result));
+      return resolve(await Promise.all(integrations.map(async (integration) =>
       {
-        cred.meta = await this._decrypt(cred.meta);
-        return cred;
+        integration.authConfig = await this._decrypt(integration.authConfig);
+        return integration;
       })));
     });
   }
-
-  public async getAsStrings(id?: number, type?: string): Promise<string[]>
-  {
-    return new Promise<string[]>(async (resolve, reject) =>
-    {
-      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { id, type }) as CredentialConfig[];
-      return resolve(await Promise.all(creds.map(async (cred) =>
-      {
-        return this._decrypt(cred.meta);
-      })));
-    });
-  }
-
+ 
   // returns a string of credentials that match given type
   public async getByType(type?: string): Promise<string[]>
   {
     return new Promise<string[]>(async (resolve, reject) =>
     {
-      const rawCreds = await App.DB.select(this.credentialTable, [], { type });
-      const creds = rawCreds.map((result: object) => new CredentialConfig(result));
+      const rawCreds = await App.DB.select(this.integrationTable, [], { type });
+      const creds = rawCreds.map((result: object) => new IntegrationConfig(result));
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
         return this._decrypt(cred.meta);
@@ -129,22 +118,13 @@ export class Credentials
   }
 
   // returns a string of names and ids that match given type
-  public async getNames(type?: string): Promise<object[]>
+  public async getSimple(type?: string): Promise<IntegrationSimpleConfig[]>
   {
-    return new Promise<object[]>(async (resolve, reject) =>
+    return new Promise<IntegrationSimpleConfig[]>(async (resolve, reject) =>
     {
-      const rawCreds = await App.DB.select(this.credentialTable, [], { type });
-      const creds = rawCreds.map((result: object) => new CredentialConfig(result));
-      return resolve(await Promise.all(creds.map(async (cred) =>
-      {
-        return {
-          createdBy: cred.createdBy,
-          id: cred['id'],
-          name: cred.name,
-          permissions: cred['permissions'],
-          type: cred.type,
-        };
-      })));
+      const rawIntegrations = await App.DB.select(this.integrationTable, [], { type });
+      const integrations: IntegrationSimpleConfig[] = rawIntegrations.map((result: object) => new IntegrationSimpleConfig(result));
+      return resolve(integrations);
     });
   }
 
@@ -157,7 +137,7 @@ export class Credentials
       if (localConfigs.length === 0)
       {
         const seedUser = userExists[0];
-        const localCred: CredentialConfig =
+        const localCred: IntegrationConfig =
           {
             createdBy: seedUser.id as number,
             meta: '',
@@ -170,9 +150,9 @@ export class Credentials
     }
   }
 
-  public async upsert(user: UserConfig, cred: CredentialConfig): Promise<CredentialConfig>
+  public async upsert(user: UserConfig, cred: IntegrationConfig): Promise<IntegrationConfig>
   {
-    return new Promise<CredentialConfig>(async (resolve, reject) =>
+    return new Promise<IntegrationConfig>(async (resolve, reject) =>
     {
       // check privileges
       if (!user.isSuperUser)
@@ -183,7 +163,7 @@ export class Credentials
       if (cred.id !== undefined)
       {
         cred.permissions = cred.permissions === undefined ? 0 : cred.permissions;
-        const creds: CredentialConfig[] = await this.get(cred.id);
+        const creds: IntegrationConfig[] = await this.get(cred.id);
         if (creds.length === 0)
         {
           // cred id specified but cred not found
@@ -214,12 +194,12 @@ export class Credentials
         cred.createdBy = user.id !== undefined ? user.id : -1;
         cred.meta = await this._encrypt(cred.meta);
       }
-      let newCredObj: object = await App.DB.upsert(this.credentialTable, cred) as object;
+      let newCredObj: object = await App.DB.upsert(this.integrationTable, cred) as object;
 
-      const newCred: CredentialConfig[] = newCredObj as CredentialConfig[];
+      const newCred: IntegrationConfig[] = newCredObj as IntegrationConfig[];
       newCred[0].meta = ''; // sanitize credentials
       newCredObj = newCred as object;
-      return resolve(newCredObj as CredentialConfig);
+      return resolve(newCredObj as IntegrationConfig);
     });
   }
 

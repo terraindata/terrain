@@ -44,22 +44,51 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../ConfigType';
+// NB: This router only exists for testing purposes.
+// If using a proxy, be sure to set app.proxy = true
 
-export class CredentialConfig extends ConfigType
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import IntegrationConfig from 'shared/types/integrations/IntegrationConfig';
+import * as Util from '../AppUtil';
+import { Permissions } from '../permissions/Permissions';
+import { UserConfig } from '../users/UserConfig';
+import Integrations from './Integrations';
+
+const Router = new KoaRouter();
+export const integrations: Integrations = new Integrations();
+const perm: Permissions = new Permissions();
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  public id?: number = undefined;
-  public createdBy: number = -1;
-  public meta: string = '';
-  public name: string = '';
-  public permissions?: number = undefined;
-  public type: string = '';
-
-  constructor(props: object)
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
   {
-    super();
-    ConfigType.initialize(this, props);
+    ctx.body = 'Unauthorized';
   }
-}
+  else
+  {
+    ctx.body = await integrations.get();
+  }
+});
 
-export default CredentialConfig;
+Router.get('/names', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await integrations.getNames(ctx.query.type);
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
+  {
+    ctx.body = 'Unauthorized';
+  }
+  else
+  {
+    const integration: IntegrationConfig = ctx.request.body.body;
+    Util.verifyParameters(integration, ['name', 'type', 'meta']);
+    ctx.body = await integrations.upsert(ctx.state.user, integration);
+  }
+});
+
+export default Router;

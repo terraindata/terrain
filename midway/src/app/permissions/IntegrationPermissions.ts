@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import UserConfig from '../users/UserConfig';
 
-export class CredentialPermissions
+export class IntegrationPermissions
 {
   public async verifyPermission(user: UserConfig, params: object): Promise<string>
   {
@@ -61,4 +61,4 @@ export class CredentialPermissions
   }
 }
 
-export default CredentialPermissions;
+export default IntegrationPermissions;
