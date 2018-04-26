@@ -48,7 +48,7 @@ import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCr
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
+import { _SchedulerConfig, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -85,7 +85,7 @@ class ScheduleList extends TerrainComponent<Props>
   {
     this.props.schedulerActions({
       actionType: 'updateSchedule',
-      schedule: scheduleForDatabase(schedule),
+      schedule: schedule,
     });
   }
 

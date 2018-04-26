@@ -116,7 +116,6 @@ export const _TaskConfig =
     return task;
   };
 
-// TODO - not sure if should move to Util (seems kinda specific) or ways to generalize this more
 function parseToObject(parent, keyPath, defaultVal = {}): object
 {
   if (parent.getIn(keyPath))
