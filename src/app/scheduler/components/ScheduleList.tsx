@@ -126,6 +126,8 @@ class ScheduleList extends TerrainComponent<Props>
               onRun={this._fn(this.performAction, 'runSchedule')}
               onPause={this._fn(this.performAction, 'pauseSchedule')}
               onUnpause={this._fn(this.performAction, 'unpauseSchedule')}
+              onDisable={this._fn(this.performAction, 'disableSchedule')}
+              onEnable={this._fn(this.performAction, 'enableSchedule')}
               onChange={this.handleScheduleChange}
               templates={this.props.templates}
               algorithms={this.props.algorithms}

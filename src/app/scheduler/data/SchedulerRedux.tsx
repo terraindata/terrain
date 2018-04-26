@@ -143,6 +143,16 @@ export interface SchedulerActionTypes
     actionType: 'runSchedule';
     scheduleId: ID;
   };
+
+  disableSchedule?: {
+    actionType: 'disableSchedule';
+    scheduleId: ID;
+  };
+
+  enableSchedule?: {
+    actionType: 'enableSchedule';
+    scheduleId: ID;
+  };
 }
 
 class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
@@ -405,6 +415,47 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       });
   }
 
+  public disableSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.setScheduleStatus(action.scheduleId, false)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public enableSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.setScheduleStatus(action.scheduleId, true)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+
   public overrideAct(action: Unroll<SchedulerActionTypes>)
   {
     const asyncActions = [
@@ -416,6 +467,8 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       'pauseSchedule',
       'unpauseSchedule',
       'runSchedule',
+      'disableSchedule',
+      'enableSchedule',
     ];
 
     if (asyncActions.indexOf(action.actionType) > -1)

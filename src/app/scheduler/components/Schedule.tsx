@@ -69,6 +69,8 @@ export interface Props
   onRun: (id: ID) => void;
   onPause: (id: ID) => void;
   onUnpause: (id: ID) => void;
+  onDisable: (id: ID) => void;
+  onEnable: (id: ID) => void;
 }
 
 interface State
@@ -181,10 +183,12 @@ class Schedule extends TerrainComponent<Props>
   {
     const { schedule } = this.props;
     const templateId = this.getParam('templateId', -1);
+    const statusValue = templateId === -1 ? '' : schedule.running ? 'Running' :
+      schedule.shouldRunNext ? 'Disable' : 'Enable';
     const buttonValue = templateId === -1 ? '' :
       schedule.running ? 'Pause' :
         this.getTask().paused ? 'Unpause' : 'Run Now';
-    return List([templateId, this.state.configurationKey, schedule.cron, buttonValue]);
+    return List([templateId, this.state.configurationKey, schedule.cron, statusValue, buttonValue]);
   }
 
   public getOptionSets()
@@ -249,6 +253,16 @@ class Schedule extends TerrainComponent<Props>
       hideSampleData: true,
     };
 
+    const statusOptionSet = {
+      isButton: template !== undefined && !schedule.running,
+      onButtonClick: this.handleEnableDisable,
+      key: 'disable',
+      options: List([]),
+      columb: true,
+      hideSampleData: true,
+      canUseButton: this.canEdit()
+    };
+
     const buttonOptionSet = {
       isButton: template !== undefined,
       onButtonClick: this.handleRunPause,
@@ -259,7 +273,13 @@ class Schedule extends TerrainComponent<Props>
       hideSampleData: true,
     };
 
-    return List([templateOptionSet, configurationOptionSet, intervalOptionSet, buttonOptionSet]);
+    return List([templateOptionSet, configurationOptionSet, intervalOptionSet, statusOptionSet, buttonOptionSet]);
+  }
+
+  public handleEnableDisable()
+  {
+    const { schedule } = this.props;
+    schedule.shouldRunNext ? this.props.onDisable(schedule.id) : this.props.onEnable(schedule.id);
   }
 
   public handleRunPause()
