@@ -165,14 +165,9 @@ class Schedule extends TerrainComponent<Props>
     }
   }
 
-  public handleIntervalChange(cron)
+  public handleScheduleValueChange(key, value)
   {
-    this.props.onChange(this.props.schedule.set('cron', cron));
-  }
-
-  public handleScheduleNameChange(name)
-  {
-    this.props.onChange(this.props.schedule.set('name', name));
+    this.props.onChange(this.props.schedule.set(key, value))
   }
 
   public getIntervalComponent(props)
@@ -180,7 +175,7 @@ class Schedule extends TerrainComponent<Props>
     return (
       <CRONEditor
         cron={props.value}
-        onChange={this.handleIntervalChange}
+        onChange={this._fn(this.handleScheduleValueChange, 'cron')}
       />
     );
   }
@@ -191,7 +186,7 @@ class Schedule extends TerrainComponent<Props>
       <FloatingInput
         isTextInput={true}
         value={this.getScheduleName('', props.value, -1)}
-        onChange={this.handleScheduleNameChange}
+        onChange={this._fn(this.handleScheduleValueChange, 'name')}
         label={'Name'}
         canEdit={this.canEdit()}
         debounce={true}
