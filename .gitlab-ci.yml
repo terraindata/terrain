@@ -108,6 +108,7 @@ fullstack-screenshot:
     when: on_failure
     expire_in: 1 week
     paths:
+    - rr/test/pathfinder/__image_snapshots__/__diff_output__
     - rr/test/builder/__image_snapshots__/__diff_output__
     - rr/test/login/__image_snapshots__/__diff_output__
   after_script:
