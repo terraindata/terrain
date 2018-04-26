@@ -84,6 +84,7 @@ function recursiveRemoveFunctionValue(action)
         {
           if (action[k].search('ffunction') !== -1)
           {
+            // removing something like `\"getChoiceOptions\":{\"$jsan\":\"ffunction (context) { /* ... */ }\"}`
             delete action[k];
             return true;
           }
