@@ -61,6 +61,8 @@ export enum Sources
   Sftp = 'Sftp',
   Http = 'Http',
   Fs = 'Fs',
+  Mysql = 'Mysql',
+  Postgresql = 'Postgresql',
 }
 
 export enum Sinks
@@ -122,6 +124,8 @@ export interface SourceOptionsTypes // TODO check that these are right
   Fs: {
     path: string;
   };
+  Mysql: SQLOptions;
+  Postgresql: SQLOptions;
 }
 
 export const SourceOptionsDefaults: SourceOptionsTypes =
@@ -133,13 +137,13 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       algorithmId: -1,
     },
     Sftp: {
-      ip: '0.0.0.0',
+      ip: '127.0.0.1',
       port: 22,
       filepath: 'filename.json',
       credentialId: -1,
     },
     Http: {
-      url: '',
+      url: 'http://localhost',
       method: 'GET',
       headers: {
         accept: '',
@@ -148,6 +152,20 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
     },
     Fs: {
       path: '',
+    },
+    Mysql: {
+      ip: '127.0.0.1',
+      port: 3306,
+      database: 'databasename',
+      table: 'tablename',
+      credentialId: -1,
+    },
+    Postgresql: {
+      ip: '127.0.0.1',
+      port: 5432,
+      database: 'databasename',
+      table: 'tablename',
+      credentialId: -1,
     },
   };
 
@@ -181,13 +199,13 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       table: '',
     },
     Sftp: {
-      ip: '0.0.0.0',
+      ip: '127.0.0.1',
       port: 22,
       filepath: 'filename.json',
       credentialId: -1,
     },
     Http: {
-      url: '',
+      url: 'http://localhost',
       method: 'POST',
       headers: {
         accept: '',
@@ -216,6 +234,17 @@ export interface HttpOptions
     accept: string;
     contentType: string;
   };
+}
+
+export interface SQLOptions
+{
+  ip: string;
+  port: number;
+  database: string;
+  table: string;
+  credentialId: number;
+  meta?: any;
+  query?: string;
 }
 
 export type SourceTypes = keyof SourceOptionsTypes;

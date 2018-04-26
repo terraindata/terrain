@@ -2,7 +2,7 @@
 
 @main-column-basis: 900px;
 @preview-column-basis: 480px;
-@total-column-basis: @main-column-basis + @preview-column-basis + 64px;
+@total-column-basis: (@main-column-basis + @preview-column-basis + 64px);
 .template-editor-root-container {
   position: relative;
   display: flex;
@@ -99,8 +99,8 @@
     border-radius: 3px;
 
     .template-editor-full-area {
-      padding: @spacing;
-      padding-right: @double-spacing;
+      padding-top: @half-spacing;
+      padding-right: @spacing;
     }
   }
 }

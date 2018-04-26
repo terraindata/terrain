@@ -61,7 +61,7 @@ const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 
 import ExpandableView from 'common/components/ExpandableView';
-import EditorFieldNode from 'etl/templates/components/EditorFieldNode';
+import EditorFieldNode from 'etl/templates/components/field/EditorFieldNode';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { FieldMap, TemplateEditorState } from 'etl/templates/TemplateEditorTypes';

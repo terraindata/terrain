@@ -53,7 +53,7 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import RootFieldNode from 'etl/templates/components/RootFieldNode';
+import RootFieldNode from 'etl/templates/components/field/RootFieldNode';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateEditorTypes';
 

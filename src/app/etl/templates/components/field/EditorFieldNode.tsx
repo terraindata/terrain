@@ -59,7 +59,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 
-import ExpandableView from 'common/components/ExpandableView';
+import NestedView from 'etl/templates/components/field/NestedView';
 import { TemplateField } from 'etl/templates/FieldTypes';
 import EditorFieldPreview from './EditorFieldPreview';
 import EditorFieldSettings from './EditorFieldSettings';
@@ -71,7 +71,6 @@ export interface Props extends TemplateEditorFieldProps
   previewLabel?: string;
 }
 
-@Radium
 class EditorFieldNodeC extends TemplateEditorField<Props>
 {
   public state: {
@@ -186,22 +185,27 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }));
   }
 
-  public renderSettingsContainer()
+  public renderSettings()
   {
     const showSettings = this._settingsAreOpen();
 
     return (
-      <FadeInOut open={showSettings}>
-        <div className='injected-content-container'>
-          {showSettings ?
-            <div className='injected-content-content' style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}>
-              <EditorFieldSettings
-                {...this._passProps()}
-              />
-            </div> : null
-          }
-        </div>
-      </FadeInOut>
+      <div
+        className='editor-field-node-settings-container'
+        style={showSettings ? { height: '300px' } : { height: '0px' }}
+      >
+        {showSettings ?
+          <div
+            className='editor-field-node-settings-content'
+            style={backgroundColor(Colors().bg3)}
+          >
+            <EditorFieldSettings
+              labelOverride={this.props.previewLabel}
+              {...this._passProps()}
+            />
+          </div> : null
+        }
+      </div>
     );
   }
 
@@ -216,27 +220,37 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     };
   }
 
+  public renderRow()
+  {
+    const settingsOpen = this._settingsAreOpen();
+    return (
+      <div className='editor-field-main-row'>
+        {this.renderSettings()}
+        {settingsOpen ? null :
+          <EditorFieldPreview
+            labelOverride={this.props.previewLabel}
+            {...this._passProps()}
+          />
+        }
+      </div>
+    );
+  }
+
   public render()
   {
     const { canEdit, preview, displayKeyPath, previewLabel } = this.props;
     const field = this._field();
 
-    const injectedContent = this.renderSettingsContainer();
     const style = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.5') : {};
 
     const { checked, showCheckbox } = this.getCheckboxState();
 
+    const content = this.renderRow();
+    const showSettings = this._settingsAreOpen();
+
     if (field.isArray() || field.isNested())
     {
-      const content = (
-        <EditorFieldPreview
-          toggleOpen={this.handleToggleOpen}
-          labelOverride={previewLabel}
-          {...this._passProps()}
-        />
-      );
-
       const childrenComponent = (
         <div className='template-editor-children-container'>
           {
@@ -247,12 +261,12 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
         </div>
       );
       return (
-        <ExpandableView
+        <NestedView
           content={content}
           open={this.state.expandableViewOpen}
           onToggle={this.handleToggleOpen}
           children={childrenComponent}
-          injectedContent={injectedContent}
+          hideControls={showSettings}
           style={style}
           showCheckbox={showCheckbox}
           checked={checked}
@@ -262,19 +276,13 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
     }
     else
     {
-      const content = (
-        <EditorFieldPreview
-          labelOverride={previewLabel}
-          {...this._passProps()}
-        />
-      );
       return (
-        <ExpandableView
+        <NestedView
           content={content}
           open={false}
           onToggle={doNothing}
           children={null}
-          injectedContent={injectedContent}
+          hideControls={showSettings}
           style={style}
           showCheckbox={showCheckbox}
           checked={checked}
