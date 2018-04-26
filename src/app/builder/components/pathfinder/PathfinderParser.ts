@@ -277,6 +277,11 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
       return {
         a: 0,
         b: 1,
+        mode: line.transformData.mode,
+        visiblePoints: {
+          ranges: line.transformData.visiblePoints.map((scorePt) => scorePt.value).toArray(),
+          outputs: line.transformData.visiblePoints.map((scorePt) => scorePt.score).toArray(),
+        },
         weight: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
         numerators: [[line.field, 1]],
         denominators: [],
@@ -353,7 +358,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   });
   let must = List([]);
   let mustNot = List([]);
-  let filter = List([]);
+  const filter = List([]);
   let should = List([]);
   let useShould = false;
   if (filterGroup.minMatches !== 'all' || inMatchQualityContext)
@@ -393,7 +398,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
       }
       else
       {
-        filter = filter.push(lineInfo);
+        must = must.push(lineInfo);
       }
     }
     else if (line.filterGroup)
@@ -646,7 +651,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
         }),
       });
     case 'isin':
-      field = line.analyzed ? line.field + '.keyword' : line.field;
+      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
       try
       {
         return Map({
@@ -680,7 +685,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
 
     case 'isnotin':
       let parsed = value;
-      field = line.analyzed ? line.field + '.keyword' : line.field;
+      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
       try
       {
         parsed = JSON.parse(String(value).toLowerCase());
