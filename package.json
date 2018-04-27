@@ -75,7 +75,7 @@
       "^etl/(.*)$": "<rootDir>/src/app/etl/$1",
       "^fileImport/(.*)$": "<rootDir>/src/app/fileImport/$1",
       "^images/(.*)$": "<rootDir>/src/images/$1",
-      "^jobs/(.*)$": "<rootDir>/src/jobs/$1",
+      "^jobs/(.*)$": "<rootDir>/src/app/jobs/$1",
       "^library/(.*)$": "<rootDir>/src/app/library/$1",
       "^manual/(.*)$": "<rootDir>/src/app/manual/$1",
       "^roles/(.*)$": "<rootDir>/src/app/roles/$1",
