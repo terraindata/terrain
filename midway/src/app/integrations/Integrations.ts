@@ -47,8 +47,9 @@ THE SOFTWARE.
 import aesjs = require('aes-js');
 import sha1 = require('sha1');
 
-import IntegrationConfig from 'shared/types/integrations/IntegrationConfig';
-import IntegrationSimpleConfig from 'shared/types/integrations/IntegrationSimpleConfig';
+import IntegrationConfig from './IntegrationConfig';
+import { IntegrationPermissionEnum, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
+import IntegrationSimpleConfig from './IntegrationSimpleConfig';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
@@ -89,7 +90,21 @@ export class Integrations
     this.key = aesjs.utils.utf8.toBytes(this.privateKey);
   }
 
-  public async get(id?: number, type?: string): Promise<IntegrationConfig[]>
+  public async delete(user: UserConfig, id: number): Promise<IntegrationConfig[] | string>
+  {
+    return new Promise<IntegrationConfig[] | string>(async (resolve, reject) =>
+    {
+      const deletedIntegrations: IntegrationConfig[] = await this.get(user, id);
+      if (deletedIntegrations.length === 0)
+      {
+        return reject('Integration does not exist.');
+      }
+      await App.DB.delete(this.integrationTable, { id }) as IntegrationConfig[];
+      return resolve(deletedIntegrations);
+    });
+  }
+
+  public async get(user: UserConfig, id?: number, type?: string): Promise<IntegrationConfig[]>
   {
     return new Promise<IntegrationConfig[]>(async (resolve, reject) =>
     {
@@ -104,7 +119,7 @@ export class Integrations
   }
  
   // returns a string of credentials that match given type
-  public async getByType(type?: string): Promise<string[]>
+  public async getByType(user: UserConfig, type?: string): Promise<string[]>
   {
     return new Promise<string[]>(async (resolve, reject) =>
     {
@@ -118,7 +133,7 @@ export class Integrations
   }
 
   // returns a string of names and ids that match given type
-  public async getSimple(type?: string): Promise<IntegrationSimpleConfig[]>
+  public async getSimple(user: UserConfig, type?: string): Promise<IntegrationSimpleConfig[]>
   {
     return new Promise<IntegrationSimpleConfig[]>(async (resolve, reject) =>
     {
@@ -128,78 +143,109 @@ export class Integrations
     });
   }
 
-  public async initializeLocalFilesystemCredential(): Promise<void>
+  public async initializeLocalFilesystemIntegration(): Promise<void>
   {
     const userExists = await users.select([], { email: 'admin@terraindata.com' });
     if (userExists.length !== 0)
     {
-      const localConfigs: string[] = await this.getByType('local');
+      const localConfigs: string[] = await this.getByType(userExists[0], 'local');
       if (localConfigs.length === 0)
       {
         const seedUser = userExists[0];
         const localCred: IntegrationConfig =
           {
+            authConfig: null,
+            connectionConfig: null,
             createdBy: seedUser.id as number,
+            id: undefined,
+            lastModified: null,
             meta: '',
             name: 'Local Filesystem Config',
-            permissions: 0,
+            readPermission: IntegrationPermissionEnum.Admin,
             type: 'local',
+            writePermission: IntegrationPermissionEnum.Admin,
           };
         await this.upsert(seedUser, localCred);
       }
     }
   }
 
-  public async upsert(user: UserConfig, cred: IntegrationConfig): Promise<IntegrationConfig>
+  public async upsert(user: UserConfig, integration: IntegrationConfig): Promise<IntegrationConfig>
   {
     return new Promise<IntegrationConfig>(async (resolve, reject) =>
     {
       // check privileges
       if (!user.isSuperUser)
       {
-        return reject('Cannot create/update credentials as non-super user.');
+        return reject('Cannot create/update integrations as non-super user.');
       }
+      const defaultCreatedBy: number = user.id !== undefined ? user.id : -1;
       // if modifying existing credential, check for existence
-      if (cred.id !== undefined)
+      if (integration.id !== undefined)
       {
-        cred.permissions = cred.permissions === undefined ? 0 : cred.permissions;
-        const creds: IntegrationConfig[] = await this.get(cred.id);
-        if (creds.length === 0)
+        const integrations: IntegrationConfig[] = await this.get(user, integration.id);
+        if (integrations.length === 0)
         {
-          // cred id specified but cred not found
-          return reject('Invalid credential id passed');
+          // integration id specified but integration not found
+          return reject('Invalid integration id passed');
         }
 
-        if (creds[0].createdBy !== user.id)
-        {
-          return reject('Only the user who created this credential can modify it.');
-        }
-        const id = creds[0].id;
+        const id = integrations[0].id;
         if (id === undefined)
         {
-          return reject('Credential does not have an id');
+          return reject('Integration does not have an id');
         }
 
-        // insert a version to save the past state of this credential
-        await versions.create(user, 'credentials', id, creds[0]);
-
-        if (cred.meta !== undefined)
-        {
-          cred.meta = await this._encrypt(cred.meta);
-        }
-        cred = Util.updateObject(creds[0], cred);
+        // insert a version to save the past state of this integration
+        await versions.create(user, 'integrations', id, integrations[0]);
+        integration = Util.updateObject(integrations[0], integration);
       }
       else
       {
-        cred.createdBy = user.id !== undefined ? user.id : -1;
-        cred.meta = await this._encrypt(cred.meta);
+        integration.createdBy = defaultCreatedBy;
       }
-      let newCredObj: object = await App.DB.upsert(this.integrationTable, cred) as object;
 
-      const newCred: IntegrationConfig[] = newCredObj as IntegrationConfig[];
-      newCred[0].meta = ''; // sanitize credentials
-      newCredObj = newCred as object;
-      return resolve(newCredObj as IntegrationConfig);
+      // set default values
+      if (integration.authConfig !== undefined && integration.authConfig !== null)
+      {
+        if (typeof integration.authConfig === 'object')
+        {
+          integration.authConfig = await this._encrypt(JSON.stringify(integration.authConfig)) as string;
+        }
+        else if (typeof integration.authConfig === 'string')
+        {
+          integration.authConfig = await this._encrypt(integration.authConfig) as string;
+        }
+      }
+      if (integration.connectionConfig !== undefined && integration.connectionConfig !== null)
+      {
+        if (typeof integration.connectionConfig === 'object')
+        {
+          integration.connectionConfig = JSON.stringify(integration.connectionConfig);
+        }
+        else if (typeof integration.connectionConfig === 'string')
+        {
+          integration.connectionConfig = integration.connectionConfig;
+        }
+      }
+      integration.createdBy = (integration.createdBy !== undefined && integration.createdBy !== null)
+        ? integration.createdBy : defaultCreatedBy ;
+      integration.lastModified = new Date();
+      integration.meta = (integration.meta !== undefined && integration.meta !== null) ? integration.meta : '';
+      integration.name = (integration.name !== undefined && integration.name !== null) ? integration.name : '';
+      integration.readPermission = (integration.readPermission !== undefined || integration.readPermission !== null)
+        ? integration.readPermission : IntegrationPermissionEnum.Admin;
+      integration.type = (integration.type !== undefined && integration.type !== null)
+        ? integration.type : IntegrationPermissionEnum.Default;
+      integration.writePermission = (integration.writePermission !== undefined || integration.writePermission !== null)
+        ? integration.writePermission : IntegrationPermissionEnum.Admin;
+
+      let newIntegrationObj: object = await App.DB.upsert(this.integrationTable, integration) as object;
+
+      const newIntegration: IntegrationConfig[] = newIntegrationObj as IntegrationConfig[];
+      newIntegration[0].authConfig = ''; // sanitize integrations
+      newIntegrationObj = newIntegration as object;
+      return resolve(newIntegrationObj as IntegrationConfig);
     });
   }
 
@@ -228,4 +274,4 @@ export class Integrations
   }
 }
 
-export default Credentials;
+export default Integrations;

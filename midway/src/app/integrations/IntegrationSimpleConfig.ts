@@ -42,47 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-// NB: This router only exists for testing purposes.
-// If using a proxy, be sure to set app.proxy = true
+import SharedIntegrationSimpleConfig from 'shared/types/integrations/IntegrationSimpleConfig';
+import ConfigType from '../ConfigType';
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import IntegrationConfig from 'shared/types/integrations/IntegrationConfig';
-import * as Util from '../AppUtil';
-import { Permissions } from '../permissions/Permissions';
-import { UserConfig } from '../users/UserConfig';
-import Integrations from './Integrations';
-
-const Router = new KoaRouter();
-export const integrations: Integrations = new Integrations();
-const perm: Permissions = new Permissions();
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export class IntegrationSimpleConfig extends SharedIntegrationSimpleConfig
 {
-  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await integrations.get(ctx.state.user);
-});
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
 
-Router.get('/simple', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await integrations.getSimple(ctx.state.user, ctx.query.type);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  const integration: IntegrationConfig = ctx.request.body.body;
-  Util.verifyParameters(integration, ['name', 'type', 'meta']);
-  ctx.body = await integrations.upsert(ctx.state.user, integration);
-});
-
-Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await integrations.upsert(ctx.state.user, ctx.params.id);
-});
-
-export default Router;
+export default IntegrationSimpleConfig;

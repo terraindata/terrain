@@ -112,7 +112,16 @@ export class Scheduler
 
   public async delete(id: number): Promise<SchedulerConfig[] | string>
   {
-    return App.DB.delete(this.schedulerTable, { id }) as Promise<SchedulerConfig[]>;
+    return new Promise<SchedulerConfig[] | string>
+    {
+      const deletedSchedules: SchedulerConfig[] = await this.select(id);
+      if (deletedSchedules.length === 0)
+      {
+        return reject('Schedule does not exist.');
+      }
+      await App.DB.delete(this.schedulerTable, { id }) as SchedulerConfig[];
+      return resolve(deletedSchedules as SchedulerConfig[]);
+    }
   }
 
   public async duplicate(id: number): Promise<SchedulerConfig[]>

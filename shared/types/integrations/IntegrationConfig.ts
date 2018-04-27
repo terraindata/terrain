@@ -42,47 +42,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-// NB: This router only exists for testing purposes.
-// If using a proxy, be sure to set app.proxy = true
+import EndpointTypes from 'shared/etl/types/EndpointTypes';
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import IntegrationConfig from 'shared/types/integrations/IntegrationConfig';
-import * as Util from '../AppUtil';
-import { Permissions } from '../permissions/Permissions';
-import { UserConfig } from '../users/UserConfig';
-import Integrations from './Integrations';
-
-const Router = new KoaRouter();
-export const integrations: Integrations = new Integrations();
-const perm: Permissions = new Permissions();
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export class IntegrationConfig implements EndpointTypes
 {
-  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await integrations.get(ctx.state.user);
-});
+  public authConfig: any = null;
+  public connectionConfig: any = null;
+  public createdBy: number = null;
+  public id: number = null;
+  public lastModified: Date = null;
+  public meta: string = '';
+  public name: string = '';
+  public readPermission: string = '';
+  public type: string = '';
+  public writePermission: string = '';
+}
 
-Router.get('/simple', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await integrations.getSimple(ctx.state.user, ctx.query.type);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  const integration: IntegrationConfig = ctx.request.body.body;
-  Util.verifyParameters(integration, ['name', 'type', 'meta']);
-  ctx.body = await integrations.upsert(ctx.state.user, integration);
-});
-
-Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await integrations.upsert(ctx.state.user, ctx.params.id);
-});
-
-export default Router;
+export default IntegrationConfig;
