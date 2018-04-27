@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // import Bottleneck = require('bottleneck');
+// TODO change credentials to integrations
 import jsonStream = require('JSONStream');
 import soap = require('strong-soap');
 
