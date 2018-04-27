@@ -67,7 +67,7 @@ import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
 import * as FileImportTypes from '../../../fileImport/FileImportTypes';
-import { Ajax } from '../../../util/Ajax';
+import { Ajax, AjaxResponse } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import { SpotlightActions } from '../../data/SpotlightRedux';
@@ -95,7 +95,7 @@ export interface Props
 
 interface ResultsQuery
 {
-  xhr: XMLHttpRequest;
+  xhr: AjaxResponse;
   queryId: string;
 }
 
@@ -191,7 +191,7 @@ export class ResultsManager extends TerrainComponent<Props>
         {
           AjaxM1.killQuery(query.queryId);
         }
-        query.xhr.abort();
+        query.xhr.cancel();
       },
     );
   }
@@ -556,7 +556,7 @@ export class ResultsManager extends TerrainComponent<Props>
     }
     if (this.state.query && this.state.query.xhr)
     {
-      this.state.query.xhr.abort();
+      this.state.query.xhr.cancel();
     }
     this.setState({
       lastQuery: query,

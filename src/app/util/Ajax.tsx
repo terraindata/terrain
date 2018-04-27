@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 // Note: If anyone would like to take the time to clean up this file, be my guest.
 
+import axios from 'axios';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
@@ -64,6 +65,12 @@ import * as LibraryTypes from '../library/LibraryTypes';
 import * as UserTypes from '../users/UserTypes';
 
 import AjaxM1 from './AjaxM1';
+
+export interface AjaxResponse
+{
+  promise: Promise<any>;
+  cancel: (message?: string) => void;
+}
 
 export const Ajax =
   {
@@ -106,23 +113,7 @@ export const Ajax =
         JSON.stringify(data),
         (response) =>
         {
-          let responseData: object = null;
-          try
-          {
-            responseData = JSON.parse(response);
-          }
-          catch (e)
-          {
-            // parsing error, we create a new QueryResponse so that callers wont need to worry about the format
-            // anymore.
-            config.onError && config.onError(e);
-          }
-
-          if (responseData !== undefined)
-          {
-            // needs to be outside of the try/catch so that any errors it throws aren't caught
-            onLoad(responseData);
-          }
+          onLoad(response);
         },
         _.extend({
           onError: config.onError,
@@ -150,7 +141,7 @@ export const Ajax =
       } = {})
     {
       const host = config.host || MIDWAY_HOST;
-      let fullUrl = host + url;
+      const fullUrl = host + url;
 
       if (config.download)
       {
@@ -183,76 +174,76 @@ export const Ajax =
         return;
       }
 
-      const xhr = new XMLHttpRequest();
-      xhr.timeout = 180000;
-      xhr.onerror = (err: any) =>
-      {
-        const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
-        config && config.onError && config.onError(routeError);
-      };
+      const axiosInstance = axios.create();
 
-      xhr.onload = (ev: Event) =>
-      {
-        if (xhr.status === 401)
+      axiosInstance.interceptors.response.use(
+        (response) => response,
+        (error) =>
         {
-          // TODO re-enable
-          Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
-        }
-
-        if (xhr.status !== 200)
-        {
-          config && config.onError && config.onError(xhr.responseText);
-          return;
-        }
-
-        onLoad(xhr.responseText);
-      };
-
-      // NOTE: MIDWAY_HOST will be replaced by the build process.
-      if (method === 'get')
-      {
-        try
-        {
-          const dataObj = JSON.parse(data);
-          fullUrl += '?' + $.param(dataObj);
-
-          if (config.urlArgs)
+          if (error && error.response)
           {
-            fullUrl += '&' + $.param(config.urlArgs);
+            if (error.response.status === 401)
+            {
+              Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
+            }
+
+            if (error.response.status !== 200)
+            {
+              config && config.onError && config.onError(error.data);
+            }
           }
-        }
-        catch (e)
-        {
 
-        }
-      }
-      else if (config.urlArgs)
-      {
-        fullUrl += '?' + $.param(config.urlArgs);
-      }
+          return Promise.reject(error);
+        },
+      );
 
-      xhr.open(method, fullUrl, true);
-
-      if (config.json)
-      {
-        xhr.setRequestHeader('Content-Type', 'application/json');
-      }
-
-      if (!config.noToken)
-      {
-        const token = 'L9DcAxWyyeAuZXwb-bJRtA'; // hardcoded token in pa-terraformer02. TODO change?
-        xhr.setRequestHeader('token', token);
-      }
-
+      const headers = {};
       if (config.crossDomain)
       {
-        xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-        xhr.setRequestHeader('Access-Control-Allow-Headers',
-          'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Access-Control-Allow-Origin');
+        headers['Access-Control-Allow-Origin'] = '*';
+        headers['Access-Control-Allow-Headers'] = 'Content-Type, \
+          Access-Control-Allow-Headers, \
+          Authorization, \
+          X-Requested-With, \
+          Access-Control-Allow-Origin';
       }
 
-      xhr.send(data);
-      return xhr;
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+
+      const xhr = axiosInstance.request({
+        method,
+        url: fullUrl,
+        timeout: 180000,
+        withCredentials: config.crossDomain,
+        headers,
+        params: method === 'get' ? Object.assign({}, JSON.parse(data), config.urlArgs) : {},
+        data: method !== 'get' ? JSON.parse(data) : {},
+        cancelToken: source.token,
+      })
+        .then((response) =>
+        {
+          onLoad(response.data);
+        })
+        .catch((err) =>
+        {
+          if (axios.isCancel(err))
+          {
+            // Added for testing, can be removed.
+            console.error('isCanceled', err.message);
+          } else
+          {
+            const routeError: MidwayError = new MidwayError(400, 'The Connection Has Been Lost.', JSON.stringify(err), {});
+            config && config.onError && config.onError(routeError);
+          }
+
+          return Promise.reject(err);
+        });
+
+      return {
+        promise: xhr,
+        cancel: source.cancel,
+      };
     },
 
     midwayStatus(success: () => void,
@@ -692,7 +683,7 @@ export const Ajax =
         streaming?: boolean,
         streamingTo?: string,
       } = {},
-    ): { xhr: XMLHttpRequest, queryId: string }
+    ): { xhr: AjaxResponse, queryId: string }
     {
       const payload: QueryRequest = {
         type: 'search', // can be other things in the future
@@ -1434,7 +1425,7 @@ export const Ajax =
         id: number,
         accessToken: string,
       }) => void,
-      onError: (error) => void): XMLHttpRequest
+      onError: (error) => void): any
     {
       return Ajax.req(
         'post',

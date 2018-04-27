@@ -54,7 +54,7 @@ import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Co
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import * as UserTypes from './../../users/UserTypes';
-import Ajax from './../../util/Ajax';
+import Ajax, { AjaxResponse } from './../../util/Ajax';
 import Util from './../../util/Util';
 import * as LibraryTypes from './../LibraryTypes';
 // import * as moment from 'moment';
@@ -91,7 +91,7 @@ class AlgorithmVersions extends TerrainComponent<Props>
     roles: null,
   };
 
-  public xhr: XMLHttpRequest = null;
+  public xhr: AjaxResponse = null;
 
   constructor(props: Props)
   {
@@ -124,7 +124,7 @@ class AlgorithmVersions extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    this.xhr && this.xhr.abort();
+    this.xhr && this.xhr.cancel();
     this.xhr = null;
   }
 

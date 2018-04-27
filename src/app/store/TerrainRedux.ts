@@ -79,6 +79,10 @@ THE SOFTWARE.
 
 // The type that defines all the possible action payloads
 // Also asserts that the key is the same as the actionType
+export type AllActionNames<SelfT> = {
+  [key in keyof AllActionsType<SelfT>]: string;
+};
+
 export type AllActionsType<SelfT> =
   {
     [key in keyof SelfT]: { actionType: key, [other: string]: any }
@@ -144,10 +148,23 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     {
       return override;
     }
+
     return {
       type: this.addNamespace((action as any).actionType), // Can't seem to find a way around this type assertion
       payload: action,
     };
+  }
+
+  public _actionTypesForExport(): AllActionNames<AllActionsT>
+  {
+    return Object.keys(this.reducers).reduce(
+      (actionTypes, k) =>
+      {
+        actionTypes[k] = this.addNamespace(k);
+        return actionTypes;
+      },
+      {},
+    ) as AllActionNames<AllActionsT>;
   }
 
   public _actionsForExport(): (action: Unroll<AllActionsT>) => any

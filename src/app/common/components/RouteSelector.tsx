@@ -77,9 +77,10 @@ export interface RouteSelectorOption
   displayName?: string | number | El;
   color?: string;
   sampleData?: List<any>;
-  extraContent?: string;
+  tooltip?: string;
   icon?: any;
   closeOnPick?: boolean; // close the picker when this option is picked
+  component?: El | string;
 }
 
 export interface RouteSelectorOptionSet
@@ -93,13 +94,14 @@ export interface RouteSelectorOptionSet
   forceFloat?: boolean;
   isButton?: boolean;
   onButtonClick?: () => void;
+  canUseButton?: boolean;
   icon?: El;
   hasSearch?: boolean; // NOTE not compatible with hasOther
   column?: boolean; // force a column layout
   hideSampleData?: boolean; // hide sample data, even if it's present
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
-
   getValueComponent?: (props: { value: any }) => React.ReactElement<any>;
+  headerBelowValueComponent?: boolean;
 }
 
 export interface Props
@@ -279,8 +281,8 @@ export class RouteSelector extends TerrainComponent<Props>
                   <Button
                     text={this.getDisplayName(index)}
                     onClick={optionSet.onButtonClick}
-                    disabled={!props.canEdit}
                     icon={optionSet.icon}
+                    disabled={!optionSet.canUseButton}
                   />
                   :
                   <FloatingInput
@@ -467,6 +469,7 @@ export class RouteSelector extends TerrainComponent<Props>
         </div>
       );
     }
+    const headerText = <div className='routeselector-header'>{optionSet.headerText}</div>;
     return (
       <div
         className='routeselector-option-set'
@@ -474,14 +477,8 @@ export class RouteSelector extends TerrainComponent<Props>
         style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
       >
         {
-          optionSet.headerText &&
-          <div
-            className='routeselector-header'
-          >
-            {
-              optionSet.headerText
-            }
-          </div>
+          (optionSet.headerText && !optionSet.headerBelowValueComponent) &&
+          headerText
         }
 
         {
@@ -513,7 +510,10 @@ export class RouteSelector extends TerrainComponent<Props>
         {
           getValueComponentContent
         }
-
+        {
+          (optionSet.headerText && optionSet.headerBelowValueComponent) &&
+          headerText
+        }
         <div
           className={classNames({
             'routeselector-options': true,
@@ -817,8 +817,15 @@ export class RouteSelector extends TerrainComponent<Props>
                           option.displayName
                         }
                       </div>,
-                      option.extraContent,
+                      option.tooltip,
                     )}
+                  <FadeInOut
+                    open={isSelected}
+                  >
+                    {
+                      option.component
+                    }
+                  </FadeInOut>
                 </div>
               }
               {
@@ -897,7 +904,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
     const option = state.optionSets.get(optionSetIndex).options.find((opt) => opt.value === value);
 
-    if (optionSetIndex === state.optionSets.size - 1 || (option && option.closeOnPick))
+    if (option && option.closeOnPick)
     {
       this.close();
     }

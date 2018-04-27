@@ -221,7 +221,7 @@ export default class Templates
   public async executeETL(
     fields?: {
       template?: string,
-      templateID?: string | number,
+      templateId?: string | number,
       overrideSources?: string,
       overrideSinks?: string,
     },
@@ -235,16 +235,16 @@ export default class Templates
         const template = JSON.parse(fields.template);
         return this.execute(template, files);
       }
-      else if (fields.templateID !== undefined)
+      else if (fields.templateId !== undefined)
       {
-        const templateID = Number(fields.templateID);
+        const templateId = Number(fields.templateId);
         if (fields.overrideSources !== undefined || fields.overrideSinks !== undefined)
         {
-          return this.executeByOverride(templateID, files, fields.overrideSources, fields.overrideSinks);
+          return this.executeByOverride(templateId, files, fields.overrideSources, fields.overrideSinks);
         }
         else
         {
-          return this.executeById(templateID, files);
+          return this.executeById(templateId, files);
         }
       }
       else

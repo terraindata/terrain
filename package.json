@@ -6,12 +6,12 @@
   "private": true,
   "scripts": {
     "start": "yarn start-postgres && yarn start-midway",
-    "start-midway": "nodemon --exec ./node_modules/.bin/ts-node -r tsconfig-paths/register -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./midway/src/Midway.ts",
+    "start-midway": "nodemon --exec ./node_modules/.bin/ts-node --transpileOnly -r tsconfig-paths/register -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./midway/src/Midway.ts",
     "start-postgres": "docker-compose -f midway-postgres-docker.yml up -d",
     "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback --compress --progress --info --mode development",
     "stop-postgres": "docker-compose -f midway-postgres-docker.yml down",
     "test": "yarn test-back && yarn test-front",
-    "test-front": "jest src --forceExit",
+    "test-front": "jest src --forceExit --coverage",
     "test-back-setup": "./midway/test/scripts/setup_env.sh --use-chrome=0",
     "test-sigint-setup": "./midway/test/scripts/setup_env.sh --use-mysql=0 --use-sqlite=0 --use-chrome=0",
     "test-back": "jest midway shared --forceExit",
@@ -35,6 +35,7 @@
     "rr": "./node_modules/.bin/ts-node ./rr/RecordReplay.ts",
     "test-fullstack-login": "jest ./rr/test/login --forceExit",
     "test-rr-builder": "jest ./rr/test/builder --forceExit",
+    "test-rr-pathfinder": "jest ./rr/test/pathfinder --forceExit",
     "test-fullstack-component": "jest ./rr/test/components --forceExit",
     "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
   },
@@ -61,7 +62,7 @@
       "json"
     ],
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/mocks/fileMock.ts",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/__mocks__/fileMock.ts",
       "^auth/(.*)$": "<rootDir>/src/app/auth/$1",
       "^analytics/(.*)$": "<rootDir>/src/app/analytics/$1",
       "^app/(.*)$": "<rootDir>/src/app/$1",
@@ -77,6 +78,7 @@
       "^library/(.*)$": "<rootDir>/src/app/library/$1",
       "^manual/(.*)$": "<rootDir>/src/app/manual/$1",
       "^roles/(.*)$": "<rootDir>/src/app/roles/$1",
+      "^scheduler/(.*)$": "<rootDir>/src/app/scheduler/$1",
       "^schema/(.*)$": "<rootDir>/src/app/schema/$1",
       "^shared/(.*)$": "<rootDir>/shared/$1",
       "^src/(.*)$": "<rootDir>/src/$1",
@@ -93,7 +95,7 @@
       "MIDWAY_HOST": "http://localhost"
     },
     "setupFiles": [
-      "<rootDir>/src/test/mocks/browserMock.ts"
+      "<rootDir>/src/test/__mocks__/browserMock.ts"
     ],
     "testURL": "http://localhost"
   },
@@ -111,8 +113,9 @@
     "codemirror": "^5.28.0",
     "color": "^3.0.0",
     "command-line-args": "^5.0.2",
-    "command-line-usage": "^5.0.4",
+    "command-line-usage": "^4.1.0",
     "create-react-class": "^15.6.3",
+    "cron-parser": "^2.4.5",
     "cronstrue": "^0.10.10",
     "csv-string": "^2.3.2",
     "d3": "^3.5.14",
@@ -262,6 +265,8 @@
     "@types/supertest": "^2.0.4",
     "@types/tape": "^4.2.32",
     "@types/winston": "^2.3.9",
+    "axios": "^0.18.0",
+    "axios-mock-adapter": "^1.15.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",

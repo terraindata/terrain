@@ -225,7 +225,7 @@ export class Users
         const passwordsMatch: boolean = await this.comparePassword(password, user.password);
         if (passwordsMatch)
         {
-          if (user.accessToken.length === 0)
+          if (user.accessToken.length === 0 || user.accessToken === 'ImAnAdmin')
           {
             user.accessToken = srs(
               {

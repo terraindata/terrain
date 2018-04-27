@@ -44,24 +44,74 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../ConfigType';
+import * as stream from 'stream';
 
-export class SchedulerLogConfig extends ConfigType
+import { TaskConfig } from 'shared/types/jobs/TaskConfig';
+import { TaskEnum } from 'shared/types/jobs/TaskEnum';
+import { TaskInputConfig } from 'shared/types/jobs/TaskInputConfig';
+import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
+
+export abstract class Task
 {
-  public id?: number = undefined;
-  public lastFailure: Date | null = undefined;
-  public lastRun: Date | null = undefined;
-  public lastSuccess: Date | null = undefined;
-  public meta: string = undefined;
-  public numberOfRuns: number = undefined;
-  public scheduleId: number = undefined;
-  public status: string = undefined;
-
-  constructor(props: object)
+  protected taskConfig: TaskConfig;
+  constructor(taskConfig: TaskConfig)
   {
-    super();
-    ConfigType.initialize(this, props);
+    this.taskConfig = taskConfig;
   }
+
+  public getCancelStatus(): boolean
+  {
+    if (this.taskConfig.cancel === true)
+    {
+      return true;
+    }
+    return false;
+  }
+
+  public getOnFailure(): number
+  {
+    return this.taskConfig.onFailure;
+  }
+
+  public getOnSuccess(): number
+  {
+    return this.taskConfig.onSuccess;
+  }
+
+  public getTaskId(): number
+  {
+    return this.taskConfig.taskId;
+  }
+
+  public setInputConfig(taskOutputConfig: TaskOutputConfig): void
+  {
+    this.taskConfig.params['options'] = taskOutputConfig['options'];
+  }
+
+  public setInputConfigStream(lastStream: stream.Readable): void
+  {
+    this.taskConfig.params['options']['stream'] = lastStream;
+  }
+
+  public abstract async printNode(): Promise<TaskOutputConfig>;
+
+  public recurse(tasks: Task[], traversedNodes: number[]): boolean
+  {
+    if (this.taskConfig.taskId === TaskEnum.taskDefaultExit || this.taskConfig.taskId === TaskEnum.taskDefaultFailure)
+    {
+      return true;
+    }
+    if (traversedNodes.includes(this.taskConfig.id)
+      || this.taskConfig.onSuccess === undefined || this.taskConfig.onFailure === undefined
+      || tasks[this.taskConfig.onSuccess] === undefined || tasks[this.taskConfig.onFailure] === undefined)
+    {
+      return false;
+    }
+    return tasks[this.taskConfig.onSuccess].recurse(tasks, traversedNodes.concat(this.taskConfig.id))
+      && tasks[this.taskConfig.onFailure].recurse(tasks, traversedNodes.concat(this.taskConfig.id));
+  }
+
+  public abstract async run(): Promise<TaskOutputConfig>;
 }
 
-export default SchedulerLogConfig;
+export default Task;

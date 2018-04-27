@@ -46,19 +46,27 @@ THE SOFTWARE.
 
 import * as CredentialP from './CredentialPermissions';
 import * as ImportP from './ImportPermissions';
+import * as JobQueueP from './JobQueuePermissions';
+import * as SchedulerP from './SchedulerPermissions';
 
 export let CredentialPermissions: CredentialP.CredentialPermissions = new CredentialP.CredentialPermissions();
 export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
+export let JobQueuePermissions: JobQueueP.JobQueuePermissions = new JobQueueP.JobQueuePermissions();
+export let SchedulerPermissions: SchedulerP.SchedulerPermissions = new SchedulerP.SchedulerPermissions();
 
 export class Permissions
 {
-  public ImportPermissions: ImportP.ImportPermissions;
   public CredentialPermissions: CredentialP.CredentialPermissions;
+  public ImportPermissions: ImportP.ImportPermissions;
+  public JobQueuePermissions: JobQueueP.JobQueuePermissions;
+  public SchedulerPermissions: SchedulerP.SchedulerPermissions;
 
   constructor()
   {
-    this.ImportPermissions = ImportPermissions;
     this.CredentialPermissions = CredentialPermissions;
+    this.ImportPermissions = ImportPermissions;
+    this.JobQueuePermissions = JobQueuePermissions;
+    this.SchedulerPermissions = SchedulerPermissions;
   }
 }
 

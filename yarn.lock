@@ -737,6 +737,12 @@ ansi-align@^2.0.0:
   dependencies:
     string-width "^2.0.0"
 
+ansi-escape-sequences@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/ansi-escape-sequences/-/ansi-escape-sequences-4.0.0.tgz#e0ecb042958b71e42942d35c1fcf1d9b00a0f67e"
+  dependencies:
+    array-back "^2.0.0"
+
 ansi-escapes@^1.0.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-1.4.0.tgz#d3a8a83b319aa67793662b13e761c7911422306e"
@@ -1046,6 +1052,19 @@ aws4@^1.2.1, aws4@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
+axios-mock-adapter@^1.15.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/axios-mock-adapter/-/axios-mock-adapter-1.15.0.tgz#fbc06825d8302c95c3334d21023bba996255d45d"
+  dependencies:
+    deep-equal "^1.0.1"
+
+axios@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.18.0.tgz#32d53e4851efdc0a11993b6cd000789d70c05102"
+  dependencies:
+    follow-redirects "^1.3.0"
+    is-buffer "^1.1.5"
+
 babel-cli@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-cli/-/babel-cli-6.26.0.tgz#502ab54874d7db88ad00b887a06383ce03d002f1"
@@ -1266,6 +1285,14 @@ babel-plugin-check-es2015-constants@^6.22.0:
     babel-runtime "^6.22.0"
 
 babel-plugin-istanbul@^4.1.4:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/babel-plugin-istanbul/-/babel-plugin-istanbul-4.1.5.tgz#6760cdd977f411d3e175bb064f2bc327d99b2b6e"
+  dependencies:
+    find-up "^2.1.0"
+    istanbul-lib-instrument "^1.7.5"
+    test-exclude "^4.1.1"
+
+babel-plugin-istanbul@^4.1.5:
   version "4.1.6"
   resolved "https://registry.yarnpkg.com/babel-plugin-istanbul/-/babel-plugin-istanbul-4.1.6.tgz#36c59b2192efce81c5b378321b74175add1c9a45"
   dependencies:
@@ -1273,14 +1300,6 @@ babel-plugin-istanbul@^4.1.4:
     find-up "^2.1.0"
     istanbul-lib-instrument "^1.10.1"
     test-exclude "^4.2.1"
-
-babel-plugin-istanbul@^4.1.5:
-  version "4.1.5"
-  resolved "https://registry.yarnpkg.com/babel-plugin-istanbul/-/babel-plugin-istanbul-4.1.5.tgz#6760cdd977f411d3e175bb064f2bc327d99b2b6e"
-  dependencies:
-    find-up "^2.1.0"
-    istanbul-lib-instrument "^1.7.5"
-    test-exclude "^4.1.1"
 
 babel-plugin-jest-hoist@^22.4.3:
   version "22.4.3"
@@ -2647,13 +2666,13 @@ command-line-args@^5.0.2:
     lodash.camelcase "^4.3.0"
     typical "^2.6.1"
 
-command-line-usage@^5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/command-line-usage/-/command-line-usage-5.0.4.tgz#d6d910c249d5c39e908af23b1aa769487de2f74d"
+command-line-usage@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/command-line-usage/-/command-line-usage-4.1.0.tgz#a6b3b2e2703b4dcf8bd46ae19e118a9a52972882"
   dependencies:
+    ansi-escape-sequences "^4.0.0"
     array-back "^2.0.0"
-    chalk "^2.3.2"
-    table-layout "^0.4.3"
+    table-layout "^0.4.2"
     typical "^2.6.1"
 
 commander@*:
@@ -2914,6 +2933,13 @@ create-react-class@^15.5.2, create-react-class@^15.6.0, create-react-class@^15.6
 cron-parser@^2.4.0:
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/cron-parser/-/cron-parser-2.4.4.tgz#6d3b7e78ff348a88e60d837097540725b77942ae"
+  dependencies:
+    is-nan "^1.2.1"
+    moment-timezone "^0.5.0"
+
+cron-parser@^2.4.5:
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/cron-parser/-/cron-parser-2.4.5.tgz#33629810a4b491004c363f4b6996133bbc22e16f"
   dependencies:
     is-nan "^1.2.1"
     moment-timezone "^0.5.0"
@@ -4213,7 +4239,7 @@ flux-standard-action@^0.6.0:
   dependencies:
     lodash.isplainobject "^3.2.0"
 
-follow-redirects@^1.0.0:
+follow-redirects@^1.0.0, follow-redirects@^1.3.0:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.4.1.tgz#d8120f4518190f55aac65bb6fc7b85fcd666d6aa"
   dependencies:
@@ -4343,12 +4369,19 @@ fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
 
-fsevents@^1.0.0, fsevents@^1.1.1:
+fsevents@^1.0.0:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-1.1.3.tgz#11f82318f5fe7bb2cd22965a108e9306208216d8"
   dependencies:
     nan "^2.3.0"
     node-pre-gyp "^0.6.39"
+
+fsevents@^1.1.1:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-1.2.0.tgz#e11a5ff285471e4cc43ab9cd09bb7986c565dcdc"
+  dependencies:
+    nan "^2.9.2"
+    node-pre-gyp "^0.9.0"
 
 fsevents@^1.1.2:
   version "1.2.2"
@@ -5544,8 +5577,8 @@ isstream@0.1.x, isstream@~0.1.2:
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
 istanbul-api@^1.1.14:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/istanbul-api/-/istanbul-api-1.3.1.tgz#4c3b05d18c0016d1022e079b98dc82c40f488954"
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/istanbul-api/-/istanbul-api-1.3.2.tgz#b2cfe6d15ae6a28ee282e7a823b8e9faa235e6cf"
   dependencies:
     async "^2.1.4"
     compare-versions "^3.1.0"
@@ -5555,7 +5588,7 @@ istanbul-api@^1.1.14:
     istanbul-lib-instrument "^1.10.1"
     istanbul-lib-report "^1.1.4"
     istanbul-lib-source-maps "^1.2.4"
-    istanbul-reports "^1.3.0"
+    istanbul-reports "^1.4.0"
     js-yaml "^3.7.0"
     mkdirp "^0.5.1"
     once "^1.4.0"
@@ -5607,17 +5640,7 @@ istanbul-lib-report@^1.1.4:
     path-parse "^1.0.5"
     supports-color "^3.1.2"
 
-istanbul-lib-source-maps@^1.2.1:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/istanbul-lib-source-maps/-/istanbul-lib-source-maps-1.2.3.tgz#20fb54b14e14b3fb6edb6aca3571fd2143db44e6"
-  dependencies:
-    debug "^3.1.0"
-    istanbul-lib-coverage "^1.1.2"
-    mkdirp "^0.5.1"
-    rimraf "^2.6.1"
-    source-map "^0.5.3"
-
-istanbul-lib-source-maps@^1.2.4:
+istanbul-lib-source-maps@^1.2.1, istanbul-lib-source-maps@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/istanbul-lib-source-maps/-/istanbul-lib-source-maps-1.2.4.tgz#cc7ccad61629f4efff8e2f78adb8c522c9976ec7"
   dependencies:
@@ -5627,9 +5650,9 @@ istanbul-lib-source-maps@^1.2.4:
     rimraf "^2.6.1"
     source-map "^0.5.3"
 
-istanbul-reports@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/istanbul-reports/-/istanbul-reports-1.3.0.tgz#2f322e81e1d9520767597dca3c20a0cce89a3554"
+istanbul-reports@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/istanbul-reports/-/istanbul-reports-1.4.0.tgz#3d7b44b912ecbe7652a603662b962120739646a1"
   dependencies:
     handlebars "^4.0.3"
 
@@ -8210,6 +8233,10 @@ pretty-format@^22.4.3:
     ansi-regex "^3.0.0"
     ansi-styles "^3.2.0"
 
+priorityqueue_native@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/priorityqueue_native/-/priorityqueue_native-1.0.5.tgz#08642cb89d44320bf4be4df55e7c0bbe4a4c726b"
+
 private@^0.1.6, private@^0.1.7, private@~0.1.5:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/private/-/private-0.1.8.tgz#2381edb3689f7a53d653190060fcf822d2f368ff"
@@ -10265,7 +10292,7 @@ symbol-tree@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.2.tgz#ae27db38f660a7ae2e1c3b7d1bc290819b8519e6"
 
-table-layout@^0.4.3:
+table-layout@^0.4.2:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/table-layout/-/table-layout-0.4.3.tgz#07509e1d72599f2c128a58ac67682ec4ba002af0"
   dependencies:
