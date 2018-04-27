@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { pathFinderTypeLoader } from 'builder/components/pathfinder/PathfinderTypes';
 import * as hdr from 'hdr-histogram-js';
 import * as TerrainLog from 'loglevel';
 import { AllRecordNameArray, RecordsSerializer, resetRecordNameArray } from 'shared/util/Classes';
@@ -121,6 +122,7 @@ export default class TerrainStoreLogger
 
   public static serializeAllRecordName()
   {
+    this.loadRecordTypes();
     return AllRecordNameArray;
   }
 
@@ -131,14 +133,23 @@ export default class TerrainStoreLogger
    */
   public static resetSerializeRecordArray(recordNames: string[]): boolean
   {
+    this.loadRecordTypes();
     const resetResult = resetRecordNameArray(recordNames);
     if (resetResult === false)
     {
       // resetting failed
-      TerrainLog.error('DeSerialization Record Name is not as same as serialization Record name: (DeSer)'
-        + String(recordNames) + ': (Ser)' + String(AllRecordNameArray));
+      TerrainLog.warn('DeSerialization Record Name is not as same as serialization Record name: (DeSer)');
       return false;
     }
     return true;
+  }
+
+  private static loadRecordTypes()
+  {
+    // make sure we load all pathfinder types
+    for (const f of pathFinderTypeLoader)
+    {
+      const t = f();
+    }
   }
 }
