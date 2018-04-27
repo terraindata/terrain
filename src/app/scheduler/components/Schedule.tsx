@@ -167,7 +167,7 @@ class Schedule extends TerrainComponent<Props>
 
   public handleScheduleValueChange(key, value)
   {
-    this.props.onChange(this.props.schedule.set(key, value))
+    this.props.onChange(this.props.schedule.set(key, value));
   }
 
   public getIntervalComponent(props)
