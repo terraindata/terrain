@@ -48,7 +48,7 @@ import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCr
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
-import { _SchedulerConfig, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
+import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig, SchedulerState } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -71,26 +71,6 @@ export interface Props
 
 class ScheduleList extends TerrainComponent<Props>
 {
-  public schedulerApi: SchedulerApi = new SchedulerApi(XHR.getInstance());
-
-  public updateSchedule(id: number, changes)
-  {
-    this.props.schedulerActions({
-      actionType: 'updateSchedule',
-      schedule: changes,
-    });
-  }
-
-  public runSchedule(id: number)
-  {
-    this.schedulerApi.runSchedule(id);
-  }
-
-  public pauseSchedule(id: number)
-  {
-    this.schedulerApi.pauseSchedule(id);
-  }
-
   public componentWillMount()
   {
     this.props.schedulerActions({
@@ -103,15 +83,18 @@ class ScheduleList extends TerrainComponent<Props>
 
   public handleScheduleChange(schedule: SchedulerConfig)
   {
-    this.updateSchedule(schedule.id, schedule.toJS());
+    this.props.schedulerActions({
+      actionType: 'updateSchedule',
+      schedule: scheduleForDatabase(schedule),
+    });
   }
 
   public createSchedule()
   {
     const blankSchedule = {
       cron: '0 0 * * 1',
-      name: `Schedule`,
-      tasks: [{ params: { templateId: -1, id: 1 } }],
+      name: '',
+      tasks: [{ params: { templateId: -1 }, id: 0, taskId: 2 }],
     };
     this.props.schedulerActions({
       actionType: 'createSchedule',
@@ -119,11 +102,11 @@ class ScheduleList extends TerrainComponent<Props>
     });
   }
 
-  public deleteSchedule(id)
+  public performAction(action, scheduleId: ID)
   {
     this.props.schedulerActions({
-      actionType: 'deleteSchedule',
-      scheduleId: id,
+      actionType: action,
+      scheduleId,
     });
   }
 
@@ -139,9 +122,12 @@ class ScheduleList extends TerrainComponent<Props>
             <Schedule
               key={i}
               schedule={schedule}
-              onDelete={this.deleteSchedule}
-              onRun={this.runSchedule}
-              onPause={this.pauseSchedule}
+              onDelete={this._fn(this.performAction, 'deleteSchedule')}
+              onRun={this._fn(this.performAction, 'runSchedule')}
+              onPause={this._fn(this.performAction, 'pauseSchedule')}
+              onUnpause={this._fn(this.performAction, 'unpauseSchedule')}
+              onDisable={this._fn(this.performAction, 'disableSchedule')}
+              onEnable={this._fn(this.performAction, 'enableSchedule')}
               onChange={this.handleScheduleChange}
               templates={this.props.templates}
               algorithms={this.props.algorithms}

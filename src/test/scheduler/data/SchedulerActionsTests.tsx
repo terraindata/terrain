@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import { SchedulerActions, SchedulerActionTypes } from 'scheduler/data/SchedulerRedux';
 import SchedulerApi from 'scheduler/SchedulerApi';
-import { _SchedulerConfig, SchedulerConfig } from 'scheduler/SchedulerTypes';
+import { SchedulerConfig } from 'scheduler/SchedulerTypes';
 import { createMockStore } from 'test-helpers/helpers';
 import SchedulerHelper from 'test-helpers/SchedulerHelper';
 
@@ -92,6 +92,42 @@ jest.mock('scheduler/SchedulerApi', () =>
             }),
           );
         },
+
+        duplicateSchedule: (id) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 2, name: 'Schedule 2 duplicated' }],
+            }),
+          );
+        },
+
+        pauseSchedule: (id) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 2, name: 'Schedule 2 paused' }],
+            }),
+          );
+        },
+
+        unpauseSchedule: (id) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 2, name: 'Schedule 2 unpaused' }],
+            }),
+          );
+        },
+
+        runSchedule: (id) =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 2, name: 'Schedule 2 running' }],
+            }),
+          );
+        },
       };
     },
   };
@@ -114,9 +150,7 @@ describe('SchedulerActions', () =>
     {
       it('should dispatch a getSchedulesStart action followed by a getSchedulesSuccess action', () =>
       {
-        const schedules = Immutable.Map<ID, any>({})
-          .set(1, _SchedulerConfig({ id: 1, name: 'Schedule 1' }))
-          .set(2, _SchedulerConfig({ id: 2, name: 'Schedule 2' }));
+        const schedules = [{ id: 1, name: 'Schedule 1' }, { id: 2, name: 'Schedule 2' }];
 
         const expectedActions = [
           {
@@ -147,7 +181,7 @@ describe('SchedulerActions', () =>
       it('should dispatch a createScheduleStart action followed by a createScheduleSuccess action', () =>
       {
         const scheduleParams = { name: 'Schedule 2' };
-        const newSchedule = _SchedulerConfig({ id: 2, name: 'Schedule 2' });
+        const newSchedule = { id: 2, name: 'Schedule 2' };
 
         const expectedActions = [
           {
@@ -178,7 +212,7 @@ describe('SchedulerActions', () =>
       it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
       {
         const scheduleParams = { name: 'Schedule 1 modified' };
-        const updatedSchedule = _SchedulerConfig({ id: 1, name: 'Schedule 1 modified' });
+        const updatedSchedule = { id: 1, name: 'Schedule 1 modified' };
 
         const expectedActions = [
           {
@@ -227,6 +261,150 @@ describe('SchedulerActions', () =>
         const store = mockStore({ scheduler });
 
         return store.dispatch(SchedulerActions({ actionType: 'deleteSchedule', scheduleId: existingSchedule.id }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#duplicateSchedule', () =>
+  {
+    describe('when the schedule is successfully duplicated', () =>
+    {
+      it('should dispatch a createScheduleStart action followed by a createScheduleSuccess action', () =>
+      {
+        const duplicatedSchedule = { id: 2, name: 'Schedule 2 duplicated' };
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.createScheduleStart,
+            payload: { actionType: 'createScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.createScheduleSuccess,
+            payload: {
+              actionType: 'createScheduleSuccess',
+              schedule: duplicatedSchedule,
+            },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'duplicateSchedule',
+          scheduleId: duplicatedSchedule.id,
+        }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#pauseSchedule', () =>
+  {
+    describe('when the schedule is successfully paused', () =>
+    {
+      it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
+      {
+        const pausedSchedule = { id: 2, name: 'Schedule 2 paused' };
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.updateScheduleStart,
+            payload: { actionType: 'updateScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.updateScheduleSuccess,
+            payload: {
+              actionType: 'updateScheduleSuccess',
+              schedule: pausedSchedule,
+            },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'pauseSchedule',
+          scheduleId: pausedSchedule.id,
+        }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#unpauseSchedule', () =>
+  {
+    describe('when the schedule is successfully unpaused', () =>
+    {
+      it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
+      {
+        const unpausedSchedule = { id: 2, name: 'Schedule 2 unpaused' };
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.updateScheduleStart,
+            payload: { actionType: 'updateScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.updateScheduleSuccess,
+            payload: {
+              actionType: 'updateScheduleSuccess',
+              schedule: unpausedSchedule,
+            },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'unpauseSchedule',
+          scheduleId: unpausedSchedule.id,
+        }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+
+  describe('#runSchedule', () =>
+  {
+    describe('when the schedule is successfully run', () =>
+    {
+      it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
+      {
+        const runningSchedule = { id: 2, name: 'Schedule 2 running' };
+
+        const expectedActions = [
+          {
+            type: SchedulerActionTypes.updateScheduleStart,
+            payload: { actionType: 'updateScheduleStart' },
+          },
+          {
+            type: SchedulerActionTypes.updateScheduleSuccess,
+            payload: {
+              actionType: 'updateScheduleSuccess',
+              schedule: runningSchedule,
+            },
+          },
+        ];
+
+        const store = mockStore({ scheduler });
+
+        return store.dispatch(SchedulerActions({
+          actionType: 'runSchedule',
+          scheduleId: runningSchedule.id,
+        }))
           .then((response) =>
           {
             expect(store.getActions()).toEqual(expectedActions);

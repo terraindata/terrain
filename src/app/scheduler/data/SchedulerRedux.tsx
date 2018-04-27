@@ -69,7 +69,7 @@ export interface SchedulerActionTypes
   };
   getSchedulesSuccess: {
     actionType: 'getSchedulesSuccess';
-    schedules: Immutable.Map<ID, SchedulerConfig>;
+    schedules: SchedulerConfig[];
   };
   getSchedulesFailed: {
     actionType: 'getSchedulesFailed';
@@ -78,7 +78,7 @@ export interface SchedulerActionTypes
 
   createSchedule?: {
     actionType: 'createSchedule';
-    schedule: object;
+    schedule: any;
   };
   createScheduleStart: {
     actionType: 'createScheduleStart';
@@ -123,6 +123,36 @@ export interface SchedulerActionTypes
     actionType: 'deleteScheduleFailed';
     error: string;
   };
+
+  duplicateSchedule?: {
+    actionType: 'duplicateSchedule';
+    scheduleId: ID;
+  };
+
+  pauseSchedule?: {
+    actionType: 'pauseSchedule';
+    scheduleId: ID;
+  };
+
+  unpauseSchedule?: {
+    actionType: 'unpauseSchedule';
+    scheduleId: ID;
+  };
+
+  runSchedule?: {
+    actionType: 'runSchedule';
+    scheduleId: ID;
+  };
+
+  disableSchedule?: {
+    actionType: 'disableSchedule';
+    scheduleId: ID;
+  };
+
+  enableSchedule?: {
+    actionType: 'enableSchedule';
+    scheduleId: ID;
+  };
 }
 
 class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
@@ -140,9 +170,15 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
 
       getSchedulesSuccess: (state, action) =>
       {
+        const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(
+          action.payload.schedules,
+          'id',
+          _SchedulerConfig,
+        );
+
         return state
           .set('loading', false)
-          .set('schedules', action.payload.schedules);
+          .set('schedules', schedules);
       },
 
       getSchedulesFailed: (state, action) =>
@@ -163,7 +199,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
         const { schedule } = action.payload;
         return state
           .set('loading', false)
-          .setIn(['schedules', schedule.id], schedule);
+          .setIn(['schedules', schedule.id], _SchedulerConfig(schedule));
       },
 
       createScheduleFailed: (state, action) =>
@@ -184,7 +220,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
         const { schedule } = action.payload;
         return state
           .set('loading', false)
-          .setIn(['schedules', schedule.id], schedule);
+          .setIn(['schedules', schedule.id], _SchedulerConfig(schedule));
       },
 
       updateScheduleFailed: (state, action) =>
@@ -226,11 +262,8 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.getSchedules()
       .then((response) =>
       {
-        const schedules: Immutable.Map<ID, SchedulerConfig> = Util.arrayToImmutableMap(
-          response.data,
-          'id',
-          _SchedulerConfig,
-        );
+        const schedules = response.data;
+
         directDispatch({
           actionType: 'getSchedulesSuccess',
           schedules,
@@ -250,7 +283,7 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
     return this.api.createSchedule(action.schedule)
       .then((response) =>
       {
-        const schedule: SchedulerConfig = _SchedulerConfig(response.data[0]);
+        const schedule: SchedulerConfig = response.data[0];
         directDispatch({
           actionType: 'createScheduleSuccess',
           schedule,
@@ -267,18 +300,18 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       actionType: 'updateScheduleStart',
     });
 
-    const { schedule } = action;
+    const { schedule: scheduleChanges } = action;
 
-    return this.api.updateSchedule(schedule.id, schedule)
+    return this.api.updateSchedule(scheduleChanges.id, scheduleChanges)
       .then((response) =>
       {
-        const sched: SchedulerConfig = _SchedulerConfig(response.data[0]);
+        const schedule: SchedulerConfig = response.data[0];
         directDispatch({
           actionType: 'updateScheduleSuccess',
-          schedule: sched,
+          schedule,
         });
 
-        return Promise.resolve(sched);
+        return Promise.resolve(schedule);
       });
   }
 
@@ -302,26 +335,143 @@ class SchedulerRedux extends TerrainRedux<SchedulerActionTypes, SchedulerState>
       });
   }
 
+  public duplicateSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'createScheduleStart',
+    });
+
+    return this.api.duplicateSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'createScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public pauseSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.pauseSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public unpauseSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.unpauseSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public runSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+    return this.api.runSchedule(action.scheduleId)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public disableSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.setScheduleStatus(action.scheduleId, false)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
+  public enableSchedule(action, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'updateScheduleStart',
+    });
+
+    return this.api.setScheduleStatus(action.scheduleId, true)
+      .then((response) =>
+      {
+        const schedule: SchedulerConfig = response.data[0];
+        directDispatch({
+          actionType: 'updateScheduleSuccess',
+          schedule,
+        });
+
+        return Promise.resolve(schedule);
+      });
+  }
+
   public overrideAct(action: Unroll<SchedulerActionTypes>)
   {
-    if (action.actionType === 'getSchedules')
-    {
-      return this.getSchedules.bind(this, action);
-    }
+    const asyncActions = [
+      'getSchedules',
+      'createSchedule',
+      'updateSchedule',
+      'deleteSchedule',
+      'duplicateSchedule',
+      'pauseSchedule',
+      'unpauseSchedule',
+      'runSchedule',
+      'disableSchedule',
+      'enableSchedule',
+    ];
 
-    if (action.actionType === 'createSchedule')
+    if (asyncActions.indexOf(action.actionType) > -1)
     {
-      return this.createSchedule.bind(this, action);
-    }
-
-    if (action.actionType === 'updateSchedule')
-    {
-      return this.updateSchedule.bind(this, action);
-    }
-
-    if (action.actionType === 'deleteSchedule')
-    {
-      return this.deleteSchedule.bind(this, action);
+      return this[action.actionType].bind(this, action);
     }
   }
 }

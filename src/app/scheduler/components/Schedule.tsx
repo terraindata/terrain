@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-console strict-boolean-expressions
 import Colors from 'app/colors/Colors';
 import CRONEditor from 'app/common/components/CRONEditor';
+import FloatingInput from 'app/common/components/FloatingInput';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
@@ -68,6 +69,9 @@ export interface Props
   onChange: (newSchedule: SchedulerConfig) => void;
   onRun: (id: ID) => void;
   onPause: (id: ID) => void;
+  onUnpause: (id: ID) => void;
+  onDisable: (id: ID) => void;
+  onEnable: (id: ID) => void;
 }
 
 interface State
@@ -161,9 +165,9 @@ class Schedule extends TerrainComponent<Props>
     }
   }
 
-  public handleIntervalChange(cron)
+  public handleScheduleValueChange(key, value)
   {
-    this.props.onChange(this.props.schedule.set('cron', cron));
+    this.props.onChange(this.props.schedule.set(key, value));
   }
 
   public getIntervalComponent(props)
@@ -171,7 +175,21 @@ class Schedule extends TerrainComponent<Props>
     return (
       <CRONEditor
         cron={props.value}
-        onChange={this.handleIntervalChange}
+        onChange={this._fn(this.handleScheduleValueChange, 'cron')}
+      />
+    );
+  }
+
+  public getScheduleNameInput(props)
+  {
+    return (
+      <FloatingInput
+        isTextInput={true}
+        value={this.getScheduleName('', props.value, -1)}
+        onChange={this._fn(this.handleScheduleValueChange, 'name')}
+        label={'Name'}
+        canEdit={this.canEdit()}
+        debounce={true}
       />
     );
   }
@@ -180,7 +198,12 @@ class Schedule extends TerrainComponent<Props>
   {
     const { schedule } = this.props;
     const templateId = this.getParam('templateId', -1);
-    return List([templateId, this.state.configurationKey, schedule.cron]);
+    const statusValue = templateId === -1 ? '' : schedule.running ? 'Running' :
+      schedule.shouldRunNext ? 'Disable' : 'Enable';
+    const buttonValue = templateId === -1 ? '' :
+      schedule.running ? 'Pause' :
+        this.getTask().paused ? 'Unpause' : 'Run Now';
+    return List([templateId, this.state.configurationKey, schedule.cron, statusValue, buttonValue]);
   }
 
   public getOptionSets()
@@ -201,11 +224,16 @@ class Schedule extends TerrainComponent<Props>
     const templateOptionSet = {
       key: 'template',
       options: templateOptions,
-      shortNameText: 'Template',
+      shortNameText: 'Schedule',
+      headerText: 'Template',
       column: true,
       forceFloat: true,
-      getCustomDisplayName: this.getTemplateName,
+      getCustomDisplayName: this._fn(this.getScheduleName, '--'),
+      hideSampleData: true,
+      getValueComponent: this.getScheduleNameInput,
+      headerBelowValueComponent: true,
     };
+
     // Configuration Option Set (Based on Template)
     let configurationOptions = List([]);
     let configurationHeaderText = 'Choose a Template';
@@ -229,9 +257,9 @@ class Schedule extends TerrainComponent<Props>
       column: true,
       forceFloat: true,
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, template),
+      hideSampleData: true,
     };
 
-    // Interval options
     const intervalOptionSet = {
       key: 'interval',
       options: List([]),
@@ -241,9 +269,44 @@ class Schedule extends TerrainComponent<Props>
       forceFloat: true,
       getCustomDisplayName: !template ? (value) => '--' : this.getIntervalDisplayName,
       getValueComponent: !template ? (props) => null : this.getIntervalComponent,
+      hideSampleData: true,
     };
 
-    return List([templateOptionSet, configurationOptionSet, intervalOptionSet]);
+    const statusOptionSet = {
+      isButton: template !== undefined && !schedule.running,
+      onButtonClick: this.handleEnableDisable,
+      key: 'disable',
+      options: List([]),
+      column: true,
+      hideSampleData: true,
+      canUseButton: this.canEdit(),
+    };
+
+    const buttonOptionSet = {
+      isButton: template !== undefined,
+      onButtonClick: this.handleRunPause,
+      key: 'run',
+      options: List([]),
+      column: true,
+      canUseButton: TerrainTools.isAdmin(),
+      hideSampleData: true,
+    };
+
+    return List([templateOptionSet, configurationOptionSet, intervalOptionSet, statusOptionSet, buttonOptionSet]);
+  }
+
+  public handleEnableDisable()
+  {
+    const { schedule } = this.props;
+    schedule.shouldRunNext ? this.props.onDisable(schedule.id) : this.props.onEnable(schedule.id);
+  }
+
+  public handleRunPause()
+  {
+    const { schedule } = this.props;
+    schedule.running ? this.props.onPause(schedule.id) :
+      this.getTask().paused ? this.props.onUnpause(schedule.id) :
+        this.props.onRun(schedule.id);
   }
 
   public canEdit()
@@ -251,10 +314,14 @@ class Schedule extends TerrainComponent<Props>
     return !this.props.schedule.running && TerrainTools.isAdmin();
   }
 
-  public getTemplateName(templateId: ID, index: number)
+  public getScheduleName(defaultVal: string, templateId: ID, index: number)
   {
+    if (this.props.schedule.name)
+    {
+      return this.props.schedule.name;
+    }
     const template = this.props.templates.filter((temp) => temp.id === templateId).get(0);
-    const templateName = template ? template.templateName : 'None';
+    const templateName = template ? template.templateName : defaultVal;
     return templateName;
   }
 

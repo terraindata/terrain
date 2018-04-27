@@ -109,19 +109,38 @@ export const _TaskConfig =
   {
     let task = new TaskConfig_Record(config) as any as TaskConfig;
     task = task.set('params', task.params ? Immutable.Map(task.params) : Immutable.Map({}));
-    if (task.getIn(['params', 'overrideSources']))
-    {
-      task = task.setIn(
-        ['params', 'overrideSources'],
-        Util.objectToImmutableMap(task.getIn(['params', 'overrideSources']), _SourceConfig),
-      );
-    }
-    if (task.getIn(['params', 'overrideSinks']))
-    {
-      task = task.setIn(
-        ['params', 'overrideSinks'],
-        Util.objectToImmutableMap(task.getIn(['params', 'overrideSinks']), _SinkConfig),
-      );
-    }
+    task = task.setIn(['params', 'overrideSources'],
+      Util.objectToImmutableMap(parseToObject(task, ['params', 'overrideSources']), _SourceConfig));
+    task = task.setIn(['params', 'overrideSinks'],
+      Util.objectToImmutableMap(parseToObject(task, ['params', 'overrideSinks']), _SinkConfig));
     return task;
   };
+
+function parseToObject(parent, keyPath, defaultVal = {}): object
+{
+  if (parent.getIn(keyPath))
+  {
+    const obj = parent.getIn(keyPath);
+    if (typeof obj === 'string')
+    {
+      try
+      {
+        return JSON.parse(obj);
+      }
+      catch {
+        return defaultVal;
+      }
+    }
+    return obj;
+  }
+  return defaultVal;
+}
+
+/* Do any work to prepare a schedule to be saved to the database */
+export function scheduleForDatabase(schedule: SchedulerConfig): object
+{
+  schedule = schedule
+    .updateIn(['tasks', 0, 'params', 'overrideSinks'], (value) => JSON.stringify(value))
+    .updateIn(['tasks', 0, 'params', 'overrideSources'], (value) => JSON.stringify(value));
+  return schedule.toJS();
+}

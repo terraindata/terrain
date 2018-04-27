@@ -325,6 +325,7 @@ export class Export
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
     const type: string = SharedUtil.elastic.getType(item);
+
     if (type === 'null')
     {
       return true;
