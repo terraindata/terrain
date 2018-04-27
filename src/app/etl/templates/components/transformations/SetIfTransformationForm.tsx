@@ -44,75 +44,98 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-var-requires no-empty-interface max-classes-per-file
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
+import * as React from 'react';
+
+import EngineUtil from 'shared/transformations/util/EngineUtil';
+import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
-import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
 import TransformationNodeType from 'shared/transformations/TransformationNodeType';
-import { TransformationFormProps } from './TransformationFormBase';
+import { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
+import { TransformationArgs, TransformationForm, TransformationFormProps } from './TransformationFormBase';
+
+import { DynamicForm } from 'common/components/DynamicForm';
+import { KeyPath as EnginePath } from 'shared/util/KeyPath';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import { ArraySumTFF } from './ArraySumTransformationForm';
-import { CastTFF } from './CastTransformationForm';
-import { DuplicateTFF } from './DuplicateTransformationForm';
-import { JoinTFF } from './JoinTransformationForm';
-import { SetIfTFF } from './SetIfTransformationForm';
-import { AddTFF, DivideTFF, HashTFF, MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF } from './SimpleTransformations';
-import { SplitTFF } from './SplitTransformationForm';
-
-export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
+type SetOptions = NodeOptionsType<TransformationNodeType.SetIfNode>;
+export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeType.SetIfNode>
 {
-  switch (type)
-  {
-    case TransformationNodeType.UppercaseNode:
-      return UppercaseTFF;
-    case TransformationNodeType.SubstringNode:
-      return SubstringTFF;
-    case TransformationNodeType.DuplicateNode:
-      return DuplicateTFF;
-    case TransformationNodeType.SplitNode:
-      return SplitTFF;
-    case TransformationNodeType.JoinNode:
-      return JoinTFF;
-    case TransformationNodeType.CastNode:
-      return CastTFF;
-    case TransformationNodeType.HashNode:
-      return HashTFF;
-    case TransformationNodeType.ArraySumNode:
-      return ArraySumTFF;
-    case TransformationNodeType.AddNode:
-      return AddTFF;
-    case TransformationNodeType.SubtractNode:
-      return SubtractTFF;
-    case TransformationNodeType.MultiplyNode:
-      return MultiplyTFF;
-    case TransformationNodeType.DivideNode:
-      return DivideTFF;
-    case TransformationNodeType.SetIfNode:
-      return SetIfTFF;
-    default:
-      return null;
-  }
-}
+  protected readonly type = TransformationNodeType.SetIfNode;
+  protected readonly inputMap: InputDeclarationMap<SetOptions> = {
+    filterNull: {
+      type: DisplayType.CheckBox,
+      displayName: 'Set If Null',
+    },
+    filterNaN: {
+      type: DisplayType.CheckBox,
+      displayName: 'Set If NaN',
+      getDisplayState: this.numberDisplayState,
+    },
+    filterUndefined: {
+      type: DisplayType.CheckBox,
+      displayName: 'Set if Undefined',
+    },
+    filterValue: {
+      type: DisplayType.TextBox,
+      displayName: 'Custom Value',
+      getDisplayState: this.stringDisplayState,
+    },
+    newValue: {
+      type: DisplayType.TextBox,
+      displayName: 'New Value',
+    },
+  };
 
-export const availableTransformations: List<TransformationNodeType> = determineAvailableTransformations();
-// all transformation types for which getTransformationForm does not return null
+  protected readonly initialState = {
+    filterNull: false,
+    filterNaN: false,
+    filterStringNull: false,
+    filterUndefined: false,
+    filterValue: '',
+    newValue: '',
+  };
 
-function determineAvailableTransformations(): List<TransformationNodeType>
-{
-  let typeList = List([]);
-  for (const type in TransformationNodeType)
+  protected numberDisplayState(state: SetOptions)
   {
-    if (
-      getTransformationForm(type as TransformationNodeType) !== null
-      && TransformationInfo.canCreate(type as TransformationNodeType)
-    )
+    if (EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'number')
     {
-      typeList = typeList.push(type);
+      return DisplayState.Active;
+    }
+    else
+    {
+      return DisplayState.Hidden;
     }
   }
-  return typeList;
+
+  protected stringDisplayState(state: SetOptions)
+  {
+    if (EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'string')
+    {
+      return DisplayState.Active;
+    }
+    else
+    {
+      return DisplayState.Hidden;
+    }
+  }
+
+  protected computeArgs()
+  {
+    const { newValue } = this.state;
+    const isNumber = EngineUtil.getRepresentedType(this.props.fieldId, this.props.engine) === 'number';
+    const args = super.computeArgs();
+    const options = _.extend({}, args.options, {
+      newValue: isNumber ? Number(newValue) : newValue,
+    });
+    return _.extend({}, args, { options });
+  }
 }

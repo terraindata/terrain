@@ -134,9 +134,12 @@ export class AddTFF extends TransformationForm<AddOptions, TransformationNodeTyp
   protected computeArgs()
   {
     const { shift } = this.state;
-    return _.extend({}, super.computeArgs(), {
+    const args = super.computeArgs();
+
+    const options = _.extend({}, args.options, {
       shift: Number(shift),
     });
+    return _.extend({}, args, { options });
   }
 }
 
@@ -153,12 +156,16 @@ export class SubtractTFF extends TransformationForm<SubtractOptions, Transformat
   protected readonly initialState = {
     shift: 0,
   };
+
   protected computeArgs()
   {
     const { shift } = this.state;
-    return _.extend({}, super.computeArgs(), {
+    const args = super.computeArgs();
+
+    const options = _.extend({}, args.options, {
       shift: Number(shift),
     });
+    return _.extend({}, args, { options });
   }
 }
 
@@ -175,12 +182,16 @@ export class MultiplyTFF extends TransformationForm<MultiplyOptions, Transformat
   protected readonly initialState = {
     factor: 0,
   };
+
   protected computeArgs()
   {
     const { factor } = this.state;
-    return _.extend({}, super.computeArgs(), {
+    const args = super.computeArgs();
+
+    const options = _.extend({}, args.options, {
       factor: Number(factor),
     });
+    return _.extend({}, args, { options });
   }
 }
 
@@ -197,11 +208,15 @@ export class DivideTFF extends TransformationForm<DivideOptions, TransformationN
   protected readonly initialState = {
     factor: 0,
   };
+
   protected computeArgs()
   {
     const { factor } = this.state;
-    return _.extend({}, super.computeArgs(), {
+    const args = super.computeArgs();
+
+    const options = _.extend({}, args.options, {
       factor: Number(factor),
     });
+    return _.extend({}, args, { options });
   }
 }
