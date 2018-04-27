@@ -64,13 +64,13 @@ export type ErrorHandler = (response: string | MidwayError) => void;
 class ETLAjax
 {
   // Get integrations
-  public getIntegrations(): Promise<Map<ID, any>>
+  public getIntegrations(): Promise<any[]>
   {
     return new Promise((resolve, reject) =>
     {
       const handleResponse = (response: any) =>
       {
-        resolve(response);
+        resolve(response.data);
       }
       return Ajax.req(
         'get',

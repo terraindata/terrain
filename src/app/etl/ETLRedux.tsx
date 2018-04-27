@@ -169,11 +169,7 @@ export interface ETLActionTypes
   };
   deleteIntegrationSuccess: {
     actionType: 'deleteIntegrationSuccess';
-    integration: IntegrationConfig;
-  };
-  createIntegrationSuccess: {
-    actionType: 'createIntegrationSuccess';
-    integration: IntegrationConfig;
+    integrationId: ID;
   };
 }
 
@@ -266,13 +262,17 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
             _IntegrationConfig,
           );
 
-        return state
-          .set('loading', false)
-          .set('schedules', integrations);
+        return state.set('integrations', integrations);
       },
-      updateIntegrationSuccess: (state, action) => state,
-      deleteIntegrationSuccess: (state, action) => state,
-      createIntegrationSuccess: (state, action) => state,
+      deleteIntegrationSuccess: (state, action) =>
+      {
+        return state.deleteIn(['integrations', action.payload.integrationId]);
+      },
+      updateIntegrationSuccess: (state, action) =>
+      {
+        const integration = _IntegrationConfig(action.payload.integration);
+        return state.setIn(['integrations', integration.id], integration);
+      },
     };
 
   // TODO, add a thing to the state where we can log errors?
@@ -494,11 +494,58 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   public getIntegrations(action: ETLActionType<'getIntegrations'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
-    const name = action.actionType;
+    return ETLAjax.getIntegrations()
+      .then((response) =>
+      {
+        directDispatch({
+          actionType: 'getIntegrationsSuccess',
+          integrations: response,
+        });
+        return Promise.resolve(response);
+      });
+  }
 
-    ETLAjax.getIntegrations()
-      .then(this.onLoadFactory([action.onLoad], directDispatch, name))
-      .catch(this.onErrorFactory(action.onError, directDispatch, name));
+  public updateIntegration(action: ETLActionType<'updateIntegration'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const {integrationId, integration} = action;
+    return ETLAjax.updateIntegration(integrationId, integration)
+      .then((response) =>
+      {
+        directDispatch({
+          actionType: 'updateIntegrationSuccess',
+          integration: response,
+        });
+        return Promise.resolve(response);
+      });
+  }
+
+  public createIntegration(action: ETLActionType<'createIntegration'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    return ETLAjax.createIntegration(action.integration)
+      .then((response) =>
+      {
+        directDispatch({
+          actionType: 'updateIntegrationSuccess',
+          integration: response,
+        });
+        return Promise.resolve(response);
+      });
+  }
+
+  public deleteIntegration(action: ETLActionType<'deleteIntegration'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    return ETLAjax.deleteIntegration(action.integrationId)
+      .then((response) =>
+      {
+        directDispatch({
+          actionType: 'deleteIntegraton',
+          integrationId: response,
+        });
+        return Promise.resolve(response);
+      });
   }
 
   public overrideAct(action: Unroll<ETLActionTypes>)
