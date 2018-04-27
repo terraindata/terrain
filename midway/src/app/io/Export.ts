@@ -651,6 +651,10 @@ export class Export
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
     const type: string = SharedUtil.getType(item);
+    if (typeObj['type'] === 'text' && type === 'date')
+    {
+      return true;
+    }
     if (type === 'null')
     {
       return true;

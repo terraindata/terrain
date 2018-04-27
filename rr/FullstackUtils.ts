@@ -61,6 +61,53 @@ function ignoreBuilderAction(action: string): boolean
   return false;
 }
 
+function recursiveRemoveFunctionValue(action)
+{
+  if (!action)
+  {
+    return false;
+  }
+  if (typeof action === 'object')
+  {
+    if (Array.isArray(action))
+    {
+      for (const v of action)
+      {
+        recursiveRemoveFunctionValue(v);
+      }
+    } else
+    {
+      // object
+      for (const k of Object.keys(action))
+      {
+        if (typeof action[k] === 'string')
+        {
+          if (action[k].search('ffunction') !== -1)
+          {
+            // removing something like `\"getChoiceOptions\":{\"$jsan\":\"ffunction (context) { /* ... */ }\"}`
+            delete action[k];
+            return true;
+          }
+        } else if (typeof action[k] === 'object')
+        {
+          if (recursiveRemoveFunctionValue(action[k]) === true)
+          {
+            delete action[k];
+          }
+        }
+      }
+    }
+    return false;
+  }
+}
+
+function removeFunctionFromBuilderAction(action: string): string
+{
+  const a = JSON.parse(action);
+  recursiveRemoveFunctionValue(a);
+  return JSON.stringify(a);
+}
+
 export async function getChromeDebugAddress()
 {
   try
@@ -97,13 +144,12 @@ export async function replayBuilderActions(page, url, actions, records, actionCa
   }, records);
   if (loadRecords === false)
   {
-    console.log('Failed to load the serialization records: ' + records);
-    return;
+    console.warn('Serialization records are changed.');
   }
   // replay the log
   for (let i = 0; i < actions.length; i = i + 1)
   {
-    const action = actions[i];
+    let action = actions[i];
     console.log('Replaying Action ' + typeof action + ':' + action);
 
     if (ignoreBuilderAction(action))
@@ -111,6 +157,7 @@ export async function replayBuilderActions(page, url, actions, records, actionCa
       console.log('Ignoring action: ' + String(action));
       continue;
     }
+    action = removeFunctionFromBuilderAction(action);
     await page.mouse.move(0, 0);
     await page.evaluate((act) =>
     {

@@ -116,12 +116,13 @@ function addNewRecord(rec: Immutable.Record.Class, name: string)
 export function resetRecordNameArray(recordName: string[]): boolean
 {
   // fast-path checking
-  let alreadySame = false;
+  let ret = true;
+  let alreadySame = true;
   for (const i in recordName)
   {
     if (recordName[i] !== AllRecordArray[i])
     {
-      alreadySame = true;
+      alreadySame = false;
     }
   }
   if (alreadySame === true)
@@ -148,12 +149,15 @@ export function resetRecordNameArray(recordName: string[]): boolean
       newRecordArray.push(matchedRecord);
     } else
     {
-      return false;
+      TerrainLog.warn(name + ' Record type is missing.');
+      const TagRecord = Immutable.Record({ missingRecord: name });
+      newRecordArray.push(TagRecord);
+      ret = false;
     }
   }
   AllRecordArray = newRecordArray;
   RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
-  return true;
+  return ret;
 }
 
 export function Constructor<T>(instance)
