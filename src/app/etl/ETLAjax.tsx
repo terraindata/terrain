@@ -158,7 +158,7 @@ class ETLAjax
         });
     });
   }
-  
+
   public templatesToImmutable(templates: TemplateBase[]): List<ETLTemplate>
   {
     try

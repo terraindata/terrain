@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:import-spacing
-
+import Util from 'app/util/Util';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
@@ -59,6 +59,7 @@ import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/t
 
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { AuthConfigType, ConnectionConfigType } from 'shared/etl/types/IntegrationTypes';
+import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { _ETLState, ETLState } from './ETLTypes';
 
 import { FileTypes } from 'shared/etl/types/ETLTypes';
@@ -141,6 +142,39 @@ export interface ETLActionTypes
     templateId: number,
     value: boolean,
   };
+  // Integration Action Types
+  getIntegrations: {
+    actionType: 'getIntegrations',
+  };
+  updateIntegration: {
+    actionType: 'updateIntegration',
+    integrationId: ID,
+    integration: IntegrationConfig,
+  };
+  deleteIntegration: {
+    actionType: 'deleteIntegraton',
+    integrationId: ID,
+  };
+  createIntegration: {
+    actionType: 'createIntegration',
+    integration: IntegrationConfig,
+  };
+  getIntegrationsSuccess: {
+    actionType: 'getIntegrationsSuccess',
+    integrations: IntegrationConfig[],
+  }
+  updateIntegrationSuccess: {
+    actionType: 'updateIntegrationSuccess';
+    integration: IntegrationConfig;
+  };
+  deleteIntegrationSuccess: {
+    actionType: 'deleteIntegrationSuccess';
+    integration: IntegrationConfig;
+  };
+  createIntegrationSuccess: {
+    actionType: 'createIntegrationSuccess';
+    integration: IntegrationConfig;
+  };
 }
 
 class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
@@ -219,6 +253,26 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return state.update('acknowledgedRuns',
           (runs) => runs.set(action.payload.templateId, action.payload.value));
       },
+      // overriden reducers
+      getIntegrations: (state, action) => state,
+      updateIntegration: (state, action) => state,
+      createIntegration: (state, action) => state,
+      deleteIntegration: (state, action) => state,
+      getIntegrationsSuccess: (state, action) =>
+      {
+        const integrations: Map<ID, IntegrationConfig> = Util.arrayToImmutableMap(
+            action.payload.integrations,
+            'id',
+            _IntegrationConfig,
+          );
+
+        return state
+          .set('loading', false)
+          .set('schedules', integrations);
+      },
+      updateIntegrationSuccess: (state, action) => state,
+      deleteIntegrationSuccess: (state, action) => state,
+      createIntegrationSuccess: (state, action) => state,
     };
 
   // TODO, add a thing to the state where we can log errors?
@@ -437,6 +491,16 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
+  public getIntegrations(action: ETLActionType<'getIntegrations'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+
+    ETLAjax.getIntegrations()
+      .then(this.onLoadFactory([action.onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
+  }
+
   public overrideAct(action: Unroll<ETLActionTypes>)
   {
     switch (action.actionType)
@@ -455,6 +519,14 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.saveAsTemplate.bind(this, action);
       case 'saveTemplate':
         return this.saveTemplate.bind(this, action);
+      case 'getIntegrations':
+        return this.getIntegrations.bind(this, action);
+      case 'updateIntegration':
+        return this.updateIntegration.bind(this, action);
+      case 'createIntegration':
+        return this.createIntegration.bind(this, action);
+     case 'deleteIntegraton':
+       return this.deleteIntegration.bind(this, action);
       default:
         return undefined;
     }
