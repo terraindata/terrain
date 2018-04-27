@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
+// tslint:disable:no-var-requires max-classes-per-file
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -57,108 +57,75 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
-import { FileTypes } from 'shared/etl/types/ETLTypes';
+import { LibraryState } from 'library/LibraryTypes';
 
-import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormClasses';
+import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { Integrations } from 'shared/etl/types/IntegrationTypes';
+import { IntegrationFormMap } from 'etl/common/components/IntegrationFormClasses';
 
 const { List } = Immutable;
 
 export interface Props
 {
-  isSource: boolean;
-  endpoint: SourceConfig | SinkConfig;
-  onChange: (newEndpoint: SourceConfig | SinkConfig, apply?: boolean) => void;
-  hideTypePicker?: boolean;
+  integration: IntegrationConfig;
+  onChange: (newConfig: IntegrationConfig) => void;
 }
 
-export default class EndpointForm extends TerrainComponent<Props>
+export default class IntegrationForm extends TerrainComponent<Props>
 {
-  public sinkTypeMap: InputDeclarationMap<SinkFormState> =
-    {
-      type: {
-        type: DisplayType.Pick,
-        displayName: 'Sink Type',
-        options: {
-          pickOptions: (s) => sinkList,
-          indexResolver: (value) => sinkList.indexOf(value),
-        },
-      },
-    };
-
-  public sourceTypeMap: InputDeclarationMap<SourceFormState> =
-    {
-      type: {
-        type: DisplayType.Pick,
-        displayName: 'Source Type',
-        options: {
-          pickOptions: (s) => sourceList,
-          indexResolver: (value) => sourceList.indexOf(value),
-        },
-      },
-    };
+  public typeMap: InputDeclarationMap<{ type: Integrations }> = {
+    type: {
+      type: DisplayType.Pick,
+      displayName: 'Type',
+      options: {
+        pickOptions: (s) => integrationList,
+        indexResolver: (value) => integrationList.indexOf(value),
+      }
+    }
+  };
 
   public render()
   {
-    const { isSource, endpoint, onChange, hideTypePicker } = this.props;
-    const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
-    const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
+    const { integration, onChange } = this.props;
+    const FormClass = IntegrationFormMap[integration.type];
 
     return (
-      <div className='endpoint-block'>
-        {
-          hideTypePicker === true ? null :
-            <DynamicForm
-              inputMap={mapToUse}
-              inputState={this.typeValueToState(endpoint)}
-              onStateChange={this.handleTypeChange}
-            />
-        }
+      <div className='integration-form-block'>
+        <DynamicForm
+          inputMap={this.typeMap}
+          inputState={this.typeValueToState(integration)}
+          onStateChange={this.handleTypeChange}
+        />
         {
           FormClass != null ?
             <FormClass
-              endpoint={endpoint}
-              onChange={this.handleEndpointChange}
+              integration={integration}
+              onChange={this.handleIntegrationChange}
             />
             : null
         }
-
       </div>
     );
   }
 
   @instanceFnDecorator(memoizeOne)
-  public typeValueToState(value: SinkConfig | SourceConfig)
+  public typeValueToState(value: IntegrationConfig)
   {
     return {
-      type: value.type,
-    };
+      type: value.type
+    }
   }
 
-  public handleTypeChange(state: SinkFormState | SourceFormState)
+  public handleTypeChange(state: { type: Integrations})
   {
-    const { isSource, endpoint, onChange } = this.props;
-    const constructorToUse = isSource ? _SourceConfig : _SinkConfig;
-    const newEndpoint = constructorToUse({ type: state.type });
-    onChange(newEndpoint);
+    const newIntegration = _IntegrationConfig({ type: state.type });
+    this.props.onChange(newIntegration);
   }
 
-  public handleEndpointChange(newEndpoint: SinkConfig | SourceConfig, apply?: boolean)
+  public handleIntegrationChange(newIntegration: IntegrationConfig)
   {
-    this.props.onChange(newEndpoint, apply);
+    this.props.onChange(newIntegration);
   }
 }
 
-interface SinkFormState
-{
-  type: Sinks;
-}
-
-interface SourceFormState
-{
-  type: Sources;
-}
-
-const sourceList = List(Object.keys(Sources));
-const sinkList = List(Object.keys(Sinks));
+const integrationList = List(Object.keys(Integrations));

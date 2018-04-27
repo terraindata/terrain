@@ -70,8 +70,6 @@ import
 } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, Languages } from 'shared/etl/types/ETLTypes';
 
-import './EndpointOptions.less';
-
 const { List } = Immutable;
 
 export interface Props
