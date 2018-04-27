@@ -27,6 +27,7 @@
             "etl/*": ["src/app/etl/*"],
             "fileImport/*": ["src/app/fileImport/*"],
             "images/*": ["src/images/*"],
+            "jobs/*": ["src/app/jobs/*"],
             "manual/*": ["src/app/manual/*"],
             "roles/*": ["src/app/roles/*"],
             "scheduler/*": ["src/app/scheduler/*"],
