@@ -83,6 +83,15 @@ export class SubstringTFF extends TransformationForm<SubstringOptions, Transform
     from: 0,
     length: 5,
   };
+
+  protected computeArgs()
+  {
+    const { from, length } = this.state;
+    return _.extend({}, super.computeArgs(), {
+      from: Number(from),
+      length: Number(length),
+    });
+  }
 }
 
 type UppercaseOptions = NodeOptionsType<TransformationNodeType.UppercaseNode>;
@@ -106,4 +115,93 @@ export class HashTFF extends TransformationForm<HashOptions, TransformationNodeT
   protected readonly initialState = {
     salt: '',
   };
+}
+
+type AddOptions = NodeOptionsType<TransformationNodeType.AddNode>;
+export class AddTFF extends TransformationForm<AddOptions, TransformationNodeType.AddNode>
+{
+  protected readonly type = TransformationNodeType.AddNode;
+  protected readonly inputMap: InputDeclarationMap<AddOptions> = {
+    shift: {
+      type: DisplayType.NumberBox,
+      displayName: 'Add Value',
+    },
+  };
+  protected readonly initialState = {
+    shift: 0,
+  };
+
+  protected computeArgs()
+  {
+    const { shift } = this.state;
+    return _.extend({}, super.computeArgs(), {
+      shift: Number(shift),
+    });
+  }
+}
+
+type SubtractOptions = NodeOptionsType<TransformationNodeType.SubtractNode>;
+export class SubtractTFF extends TransformationForm<SubtractOptions, TransformationNodeType.SubtractNode>
+{
+  protected readonly type = TransformationNodeType.SubtractNode;
+  protected readonly inputMap: InputDeclarationMap<SubtractOptions> = {
+    shift: {
+      type: DisplayType.NumberBox,
+      displayName: 'Subtract Value',
+    },
+  };
+  protected readonly initialState = {
+    shift: 0,
+  };
+  protected computeArgs()
+  {
+    const { shift } = this.state;
+    return _.extend({}, super.computeArgs(), {
+      shift: Number(shift),
+    });
+  }
+}
+
+type MultiplyOptions = NodeOptionsType<TransformationNodeType.MultiplyNode>;
+export class MultiplyTFF extends TransformationForm<MultiplyOptions, TransformationNodeType.MultiplyNode>
+{
+  protected readonly type = TransformationNodeType.MultiplyNode;
+  protected readonly inputMap: InputDeclarationMap<MultiplyOptions> = {
+    factor: {
+      type: DisplayType.NumberBox,
+      displayName: 'Multiply Value',
+    },
+  };
+  protected readonly initialState = {
+    factor: 0,
+  };
+  protected computeArgs()
+  {
+    const { factor } = this.state;
+    return _.extend({}, super.computeArgs(), {
+      factor: Number(factor),
+    });
+  }
+}
+
+type DivideOptions = NodeOptionsType<TransformationNodeType.DivideNode>;
+export class DivideTFF extends TransformationForm<DivideOptions, TransformationNodeType.DivideNode>
+{
+  protected readonly type = TransformationNodeType.DivideNode;
+  protected readonly inputMap: InputDeclarationMap<DivideOptions> = {
+    factor: {
+      type: DisplayType.NumberBox,
+      displayName: 'Divide Value',
+    },
+  };
+  protected readonly initialState = {
+    factor: 0,
+  };
+  protected computeArgs()
+  {
+    const { factor } = this.state;
+    return _.extend({}, super.computeArgs(), {
+      factor: Number(factor),
+    });
+  }
 }

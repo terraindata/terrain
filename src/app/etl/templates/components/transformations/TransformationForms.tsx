@@ -59,7 +59,7 @@ import { ArraySumTFF } from './ArraySumTransformationForm';
 import { CastTFF } from './CastTransformationForm';
 import { DuplicateTFF } from './DuplicateTransformationForm';
 import { JoinTFF } from './JoinTransformationForm';
-import { HashTFF, SubstringTFF, UppercaseTFF } from './SimpleTransformations';
+import { AddTFF, DivideTFF, HashTFF, MultiplyTFF, SubstringTFF, SubtractTFF, UppercaseTFF } from './SimpleTransformations';
 import { SplitTFF } from './SplitTransformationForm';
 
 export function getTransformationForm(type: TransformationNodeType): React.ComponentClass<TransformationFormProps>
@@ -82,6 +82,14 @@ export function getTransformationForm(type: TransformationNodeType): React.Compo
       return HashTFF;
     case TransformationNodeType.ArraySumNode:
       return ArraySumTFF;
+    case TransformationNodeType.AddNode:
+      return AddTFF;
+    case TransformationNodeType.SubtractNode:
+      return SubtractTFF;
+    case TransformationNodeType.MultiplyNode:
+      return MultiplyTFF;
+    case TransformationNodeType.DivideNode:
+      return DivideTFF;
     default:
       return null;
   }
