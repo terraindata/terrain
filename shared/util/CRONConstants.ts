@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2019 Terrain Data, Inc.
 
-import { range } from 'lodash';
+import { keys, range } from 'lodash';
 
 export interface CRONMap
 {
@@ -66,9 +66,35 @@ export function fillCRONMap(values: number[], start: number, endInclusive: numbe
   );
 }
 
+// handles sorting by value, and also type conversion since
+// iteration converts the keys to strings
+export function cronMapToList(m: CRONMap, includeAll = false): number[]
+{
+  const arr = [];
+  for (const s in m)
+  {
+    if (m.hasOwnProperty(s))
+    {
+      const k = +s;
+      let i;
+      for (i = arr.length; i > 0 && arr[i - 1] > k; i--) { } // optimized reverse search
+      arr.splice(i, 0, k);
+    }
+  }
+
+  if (includeAll)
+  {
+    return arr;
+  }
+
+  return arr.filter((v) => m[v]);
+}
+
 // Days
 
 export const CRONWeekDayOptions: CRONMap = fillCRONMap([], 0, 6);
+export const CRONWeekDayOptionsList: number[] = cronMapToList(CRONWeekDayOptions, true);
+export const defaultCRONWeekDayOptions = { 1: true }; // Monday
 
 export const CRONWeekDayNames =
   {
@@ -81,13 +107,13 @@ export const CRONWeekDayNames =
     6: 'Saturday',
   };
 
-export const CRONWorkWeekdays: CRONMap = fillCRONMap([1, 2, 3, 4, 5], 0, 6);
-
 export const CRONMonthDayOptions: CRONMap = fillCRONMap([], 1, 31);
+export const CRONMonthDayOptionsList: number[] = cronMapToList(CRONMonthDayOptions, true);
+export const defaultCRONMonthDayOptions = { 1: true }; // the 1st
 
 export interface CRONDaySchedule
 {
-  type: 'daily' | 'weekdays' | 'weekly' | 'monthly';
+  type: 'daily' | 'workweek' | 'weekly' | 'monthly';
   weekdays?: CRONMap; // for weekly
   days?: CRONMap; // for monthly
 }
@@ -95,6 +121,8 @@ export interface CRONDaySchedule
 // Hours and Minutes
 
 export const CRONHourOptions: CRONMap = fillCRONMap([], 0, 23);
+export const CRONHourOptionsList: number[] = cronMapToList(CRONHourOptions, true);
+export const defaultCRONHourOptions = { 0: true }; // 12 AM
 
 export const CRONHourNames = {
   0: '12 AM', 1: '1 AM', 2: '2 AM', 3: '3 AM', 4: '4 AM', 5: '5 AM', 6: '6 AM', 7: '7 AM', 8: '8 AM',
@@ -103,6 +131,8 @@ export const CRONHourNames = {
 };
 
 export const CRONMinuteOptions: CRONMap = fillCRONMap([], 0, 59);
+export const CRONMinuteOptionsList: number[] = cronMapToList(CRONMinuteOptions, true);
+export const defaultCRONMinuteOptions = { 0: true }; // :00
 
 export interface CRONHourSchedule
 {

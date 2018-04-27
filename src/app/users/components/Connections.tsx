@@ -62,7 +62,7 @@ import Dropdown from '../../common/components/Dropdown';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import Ajax from '../../util/Ajax';
+import Ajax, { AjaxResponse } from '../../util/Ajax';
 import { UserActions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 
@@ -116,7 +116,7 @@ class Connections extends TerrainComponent<Props>
     analyticsEnabled: 0,
   };
 
-  public xhr: XMLHttpRequest = null;
+  public xhr: AjaxResponse = null;
   public analyticsIndex: any = null;
   public analyticsType: any = null;
 
@@ -157,7 +157,7 @@ class Connections extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    this.xhr && this.xhr.abort();
+    this.xhr && this.xhr.cancel();
     this.xhr = null;
   }
 

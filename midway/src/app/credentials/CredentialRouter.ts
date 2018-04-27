@@ -50,11 +50,14 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as Util from '../AppUtil';
+import { Permissions } from '../permissions/Permissions';
+import { UserConfig } from '../users/UserConfig';
 import CredentialConfig from './CredentialConfig';
 import Credentials from './Credentials';
 
 const Router = new KoaRouter();
 export const credentials: Credentials = new Credentials();
+const perm: Permissions = new Permissions();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -66,6 +69,12 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   {
     ctx.body = await credentials.get();
   }
+});
+
+Router.get('/names', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await credentials.getNames(ctx.query.type);
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>

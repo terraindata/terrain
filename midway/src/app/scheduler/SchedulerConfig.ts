@@ -44,25 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 import ConfigType from '../ConfigType';
 
-export class SchedulerConfig extends ConfigType
+export class SchedulerConfig extends SharedSchedulerConfig
 {
-  public active?: boolean = undefined;                  // whether the schedule is running (different from currentlyRunning)
-  public archived?: boolean = undefined;                // whether the schedule has been archived (deleted) or not
-  public currentlyRunning?: boolean = undefined;        // whether the job is currently running
-  public name: string = '';                             // name of the schedule
-  public id?: number = undefined;                       // schedule ID
-  public jobId?: number = undefined;                    // corresponds to job ID
-  public jobType?: string = undefined;                  // import or export etc.
-  public paramsJob?: object = undefined;                // parameters passed for the job, excluding info like filename
-  public paramsScheduleArr?: any[] = undefined;         // parameters passed for the schedule
-  public paramsScheduleStr?: string = undefined;        // JSON stringified representation of paramsScheduleArr
-  public schedule: string = '';                         // cronjob format for when the schedule should run
-  public sort?: string = undefined;                     // for regex expression file matching, which end of the list should be used
-  public transport?: object = undefined;                // sftp and relevant parameters, https, local filesystem, etc.
-  public transportStr?: string = undefined;             // JSON stringified representation of transport
-
   constructor(props: object)
   {
     super();

@@ -75,6 +75,8 @@ const NTColors =
     blue2: '#55c6fa',
     blue3: '#1a9cd9',
     blue4: '#157eb0',
+
+    green: '#72ee7c',
   };
 
 const NewTheme =
@@ -93,6 +95,9 @@ const NewTheme =
     sidebarBg: NTColors.light1,
 
     textboxBg: NTColors.light1,
+    lightBlue: NTColors.blue1,
+
+    success: NTColors.green,
   };
 
 // Will be deprecated

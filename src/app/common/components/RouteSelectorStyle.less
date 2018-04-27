@@ -169,7 +169,7 @@
 		}
 		
 		.routeselector-header {
-			margin: 18px 38px;
+			margin: 18px 18px;
 			margin-bottom: 0px;
 			font-size: 16px;
 		}
@@ -195,6 +195,8 @@
 		
 		.routeselector-value-component {
 			margin-top: 12px;
+			max-height: 330px;
+			overflow-y: auto;
 		}
 		
 		.routeselector-options {
@@ -226,11 +228,9 @@
 			}
 			
 			.routeselector-option {
+				.common-list-option-style;
+				
 				max-height: @option-max-height;
-				border: 1px solid rgba(255,255,255,0);
-				border-radius: 4px;
-				padding: 3px;
-				.transition;
 				
 				margin-right: 6px; // TODO remove when scorebars are removed
 				
@@ -239,7 +239,6 @@
 				// margin: 6px;
 				// border: 2px solid #eee;
 				
-				cursor: pointer;
 				position: relative;
 				
 				display: flex;
@@ -388,9 +387,8 @@
 }
 
 .routeselector-option-name {
-	padding: 6px 12px;
-	font-size: 14px;
-	max-width: 100%;
+	.common-option-name-style;
+	
   // overflow: hidden; // TODO figure out how to make this work without making the name smaller
   //  current turning this on will clip the name
   text-overflow: ellipsis;

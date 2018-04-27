@@ -88,6 +88,7 @@ module.exports =
       library: path.resolve(__dirname, 'src/app/library'),
       manual: path.resolve(__dirname, 'src/app/manual'),
       roles: path.resolve(__dirname, 'src/app/roles'),
+      scheduler: path.resolve(__dirname, 'src/app/scheduler'),
       schema: path.resolve(__dirname, 'src/app/schema'),
       shared: path.resolve(__dirname, 'shared'),
       src: path.resolve(__dirname, 'src'),

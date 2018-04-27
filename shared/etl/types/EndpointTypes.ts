@@ -74,6 +74,12 @@ export enum Sinks
   Fs = 'Fs',
 }
 
+export const SchedulableSinks: Sinks[] =
+  [Sinks.Database, Sinks.Sftp, Sinks.Http, Sinks.Fs];
+
+export const SchedulableSources: Sources[] =
+  [Sources.Algorithm, Sources.Sftp, Sources.Http, Sources.Fs];
+
 export interface SourceConfig
 {
   type: SourceTypes;
