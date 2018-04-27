@@ -8230,10 +8230,6 @@ pretty-format@^22.4.3:
     ansi-regex "^3.0.0"
     ansi-styles "^3.2.0"
 
-priorityqueue_native@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/priorityqueue_native/-/priorityqueue_native-1.0.5.tgz#08642cb89d44320bf4be4df55e7c0bbe4a4c726b"
-
 private@^0.1.6, private@^0.1.7, private@~0.1.5:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/private/-/private-0.1.8.tgz#2381edb3689f7a53d653190060fcf822d2f368ff"
