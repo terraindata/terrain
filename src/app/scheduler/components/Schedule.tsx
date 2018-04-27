@@ -46,6 +46,7 @@ THE SOFTWARE.
 // tslint:disable:no-console strict-boolean-expressions
 import Colors from 'app/colors/Colors';
 import CRONEditor from 'app/common/components/CRONEditor';
+import FloatingInput from 'app/common/components/FloatingInput';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
 import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
@@ -164,9 +165,9 @@ class Schedule extends TerrainComponent<Props>
     }
   }
 
-  public handleIntervalChange(cron)
+  public handleScheduleValueChange(key, value)
   {
-    this.props.onChange(this.props.schedule.set('cron', cron));
+    this.props.onChange(this.props.schedule.set(key, value));
   }
 
   public getIntervalComponent(props)
@@ -174,7 +175,21 @@ class Schedule extends TerrainComponent<Props>
     return (
       <CRONEditor
         cron={props.value}
-        onChange={this.handleIntervalChange}
+        onChange={this._fn(this.handleScheduleValueChange, 'cron')}
+      />
+    );
+  }
+
+  public getScheduleNameInput(props)
+  {
+    return (
+      <FloatingInput
+        isTextInput={true}
+        value={this.getScheduleName('', props.value, -1)}
+        onChange={this._fn(this.handleScheduleValueChange, 'name')}
+        label={'Name'}
+        canEdit={this.canEdit()}
+        debounce={true}
       />
     );
   }
@@ -209,12 +224,16 @@ class Schedule extends TerrainComponent<Props>
     const templateOptionSet = {
       key: 'template',
       options: templateOptions,
-      shortNameText: 'Template',
+      shortNameText: 'Schedule',
+      headerText: 'Template',
       column: true,
       forceFloat: true,
-      getCustomDisplayName: this.getTemplateName,
+      getCustomDisplayName: this._fn(this.getScheduleName, '--'),
       hideSampleData: true,
+      getValueComponent: this.getScheduleNameInput,
+      headerBelowValueComponent: true,
     };
+
     // Configuration Option Set (Based on Template)
     let configurationOptions = List([]);
     let configurationHeaderText = 'Choose a Template';
@@ -258,7 +277,7 @@ class Schedule extends TerrainComponent<Props>
       onButtonClick: this.handleEnableDisable,
       key: 'disable',
       options: List([]),
-      columb: true,
+      column: true,
       hideSampleData: true,
       canUseButton: this.canEdit(),
     };
@@ -295,10 +314,14 @@ class Schedule extends TerrainComponent<Props>
     return !this.props.schedule.running && TerrainTools.isAdmin();
   }
 
-  public getTemplateName(templateId: ID, index: number)
+  public getScheduleName(defaultVal: string, templateId: ID, index: number)
   {
+    if (this.props.schedule.name)
+    {
+      return this.props.schedule.name;
+    }
     const template = this.props.templates.filter((temp) => temp.id === templateId).get(0);
-    const templateName = template ? template.templateName : 'None';
+    const templateName = template ? template.templateName : defaultVal;
     return templateName;
   }
 
