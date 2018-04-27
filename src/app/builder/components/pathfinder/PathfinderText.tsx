@@ -58,8 +58,8 @@ export const PathfinderText = {
   // Filter sections
   hardFilterSectionTitle: 'Must Match',
   hardFilterSectionSubtitle: 'When conditions are met, results are visible. When conditions are not met, results are hidden.',
-  hardFilterAdd: 'Factor',
-  softFilterAdd: 'Factor',
+  hardFilterAdd: 'Create Filter',
+  softFilterAdd: 'Create Match',
   softFilterSectionTitle: 'Should Match',
   softFilterSectionSubtitle: 'When conditions are met, results are rewarded. When conditions are not met, there is no impact.',
   includeDistanceExplanation: 'Include distance from each result to this location as a field',
@@ -68,9 +68,9 @@ export const PathfinderText = {
   // createFilterLine: 'criteria',
   // createFilterGroup: 'group of filter conditions',
 
-  createScoreLine: 'field',
+  createScoreLine: 'Add Score Factor',
   createAggregationLine: 'metadata',
-  createNestedLine: 'personalization algorithm',
+  createNestedLine: 'add personalization algorithm',
 
   // Score section
   scoreSectionTitle: 'Rank',
