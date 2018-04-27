@@ -277,7 +277,7 @@ class Schedule extends TerrainComponent<Props>
       onButtonClick: this.handleEnableDisable,
       key: 'disable',
       options: List([]),
-      columb: true,
+      column: true,
       hideSampleData: true,
       canUseButton: this.canEdit(),
     };
