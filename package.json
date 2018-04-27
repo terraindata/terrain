@@ -35,6 +35,7 @@
     "rr": "./node_modules/.bin/ts-node ./rr/RecordReplay.ts",
     "test-fullstack-login": "jest ./rr/test/login --forceExit",
     "test-rr-builder": "jest ./rr/test/builder --forceExit",
+    "test-rr-pathfinder": "jest ./rr/test/pathfinder --forceExit",
     "test-fullstack-component": "jest ./rr/test/components --forceExit",
     "clean": "rm -rf .cache && rm -rf .cache-loader && rm -rf midway/src/assets/.cache"
   },
@@ -112,7 +113,7 @@
     "codemirror": "^5.28.0",
     "color": "^3.0.0",
     "command-line-args": "^5.0.2",
-    "command-line-usage": "^5.0.4",
+    "command-line-usage": "^4.1.0",
     "create-react-class": "^15.6.3",
     "cron-parser": "^2.4.5",
     "cronstrue": "^0.10.10",
