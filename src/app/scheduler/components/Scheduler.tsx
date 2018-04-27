@@ -257,7 +257,7 @@ class Scheduler extends TerrainComponent<any> {
           <a href='#'>Log</a>,
           <a href='#' onClick={() => this.pauseSchedule(schedule.id)}>Pause</a>,
           <a href='#' onClick={() => this.unpauseSchedule(schedule.id)}>Unpause</a>,
-          <a href='#' onClick={() => this.deleteSchedule(schedule.id)}>Run</a>,
+          <a href='#' onClick={() => this.runSchedule(schedule.id)}>Run</a>,
           <a href='#' onClick={() => this.deleteSchedule(schedule.id)}>Set Status</a>
         </div>
       </div>
