@@ -52,6 +52,7 @@ import
 {
   _SchedulerConfig,
   _SchedulerState,
+  scheduleForDatabase,
   SchedulerConfig,
   SchedulerState,
 } from 'scheduler/SchedulerTypes';

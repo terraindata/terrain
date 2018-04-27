@@ -211,7 +211,7 @@ describe('SchedulerActions', () =>
     {
       it('should dispatch a updateScheduleStart action followed by a updateScheduleSuccess action', () =>
       {
-        const scheduleParams = { name: 'Schedule 1 modified' };
+        const scheduleParams = { id: 1, name: 'Schedule 1 modified' };
         const updatedSchedule = { id: 1, name: 'Schedule 1 modified' };
 
         const expectedActions = [

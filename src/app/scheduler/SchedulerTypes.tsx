@@ -48,7 +48,6 @@ import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
 import { _SinkConfig, _SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TaskConfig as SharedTaskConfig } from 'shared/types/jobs/TaskConfig';
-import { JobConfig as SharedJobConfig } from 'shared/types/jobs/JobConfig';
 import SharedSchedulerConfig from 'shared/types/scheduler/SchedulerConfig';
 import { createRecordType } from 'shared/util/Classes';
 import Util from 'util/Util';

@@ -43,54 +43,38 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
+import { List, Record } from 'immutable';
 import * as Immutable from 'immutable';
+import { JobConfig as SharedJobConfig } from 'shared/types/jobs/JobConfig';
+import { createRecordType } from 'shared/util/Classes';
+import Util from 'util/Util';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
-import { AuthReducers } from 'auth/data/AuthRedux';
-import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
-import BuilderReducers from 'builder/data/BuilderReducers';
-import { ETLReducers } from 'etl/ETLRedux';
-import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
-import { WalkthroughReducers } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { JobsReducers } from 'jobs/data/JobsRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import TerrainStoreLogger from 'store/TerrainStoreLogger';
-import { UserReducers } from 'users/data/UserRedux';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
-import { SchedulerReducers } from '../scheduler/data/SchedulerRedux';
+class JobConfigC extends SharedJobConfig
+{
+  // if extra front-end specific functions or properties are needed, add here
+}
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  auth: AuthReducers,
-  builder: BuilderReducers,
-  colors: ColorsReducers,
-  etl: ETLReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducers,
-  spotlights: SpotlightReducers,
-  walkthrough: WalkthroughReducers,
-  builderCards: BuilderCardsReducers,
-  scheduler: SchedulerReducers,
-  jobs: JobsReducers,
+const JobConfig_Record = createRecordType(new JobConfigC(), 'JobConfigC');
+export interface JobConfig extends JobConfigC, IMap<JobConfig> { }
+export const _JobConfig =
+  (config: object) =>
+  {
+    const job = new JobConfig_Record(config) as any as JobConfig;
+
+    return job;
+  };
+
+class JobsStateC
+{
+  public loading: boolean = true;
+  public jobs: Immutable.Map<ID, JobConfig> = Immutable.Map<ID, JobConfig>({});
+  public error: string = null;
+}
+
+const JobsState_Record = createRecordType(new JobsStateC(), 'JobsStateC');
+export interface JobsState extends JobsStateC, IRecord<JobsState> { }
+export const _JobsState = (config?: any) =>
+{
+  return new JobsState_Record(Util.extendId(config || {})) as any as JobsState;
 };
-
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;

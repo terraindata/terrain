@@ -42,55 +42,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-
+// Copyright 2018 Terrain Data, Inc.
 import * as Immutable from 'immutable';
+import { JobsActionTypes, JobsReducers as reducer } from 'jobs/data/JobsRedux';
+import { _JobConfig, _JobsState, JobsState } from 'jobs/JobsTypes';
+import JobsHelper from 'test-helpers/JobsHelper';
+import Util from 'util/Util';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
-import { AuthReducers } from 'auth/data/AuthRedux';
-import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
-import BuilderReducers from 'builder/data/BuilderReducers';
-import { ETLReducers } from 'etl/ETLRedux';
-import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
-import { WalkthroughReducers } from 'etl/walkthrough/ETLWalkthroughRedux';
-import { JobsReducers } from 'jobs/data/JobsRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import TerrainStoreLogger from 'store/TerrainStoreLogger';
-import { UserReducers } from 'users/data/UserRedux';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
-import { SchedulerReducers } from '../scheduler/data/SchedulerRedux';
+describe('JobsReducers', () =>
+{
+  let jobs = null;
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  auth: AuthReducers,
-  builder: BuilderReducers,
-  colors: ColorsReducers,
-  etl: ETLReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducers,
-  spotlights: SpotlightReducers,
-  walkthrough: WalkthroughReducers,
-  builderCards: BuilderCardsReducers,
-  scheduler: SchedulerReducers,
-  jobs: JobsReducers,
-};
+  beforeEach(() =>
+  {
+    jobs = JobsHelper.mockState().getState();
+  });
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+  it('should return the inital state', () =>
+  {
+    expect(reducer(undefined, {})).toEqual(_JobsState());
+  });
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax), TerrainStoreLogger.reduxMiddleWare),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
+  describe('#getJobsStart', () =>
+  {
+    it('should set loading to true', () =>
+    {
+      jobs = JobsHelper.mockState()
+        .loading(false)
+        .getState();
 
-export default terrainStore;
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsStart,
+      });
+
+      expect(nextState.loading).toBe(true);
+    });
+  });
+
+  describe('#getJobsSuccess', () =>
+  {
+    it('should set loading to false and write jobs on the store', () =>
+    {
+      const fetchedJobs = [
+        { id: 1, name: 'Job 1' },
+        { id: 2, name: 'Job 2' },
+      ];
+
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsSuccess,
+        payload: { jobs: fetchedJobs },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.jobs).toEqual(Util.arrayToImmutableMap(fetchedJobs, 'id', _JobConfig));
+    });
+  });
+
+  describe('#getJobsFailed', () =>
+  {
+    it('should set loading to false', () =>
+    {
+      const error = 'Error Message';
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsFailed,
+        payload: { error },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.error).toEqual(error);
+    });
+  });
+});

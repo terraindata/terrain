@@ -47,8 +47,8 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
 
-import Scheduler from 'scheduler/components/Scheduler';
 import Jobs from 'jobs/components/Jobs';
+import Scheduler from 'scheduler/components/Scheduler';
 import App from './App';
 import Builder from './builder/components/Builder';
 import Logout from './common/components/Logout';

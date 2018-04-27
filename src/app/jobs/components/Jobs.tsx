@@ -46,8 +46,9 @@ THE SOFTWARE.
 // tslint:disable:no-console
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import * as React from 'react';
+import { JobsActions } from 'jobs/data/JobsRedux';
 import JobsApi from 'jobs/JobsApi';
+import * as React from 'react';
 import Util from 'util/Util';
 import XHR from 'util/XHR';
 
@@ -72,14 +73,14 @@ class Jobs extends TerrainComponent<any> {
 
   public getJobs()
   {
-    this.jobsApi.getJobs()
+    this.props.jobsActions({ actionType: 'getJobs' })
       .then((response) =>
       {
         this.setState({ responseText: JSON.stringify(response), jobs: response.data });
       })
       .catch((error) =>
       {
-        console.error(error)
+        console.error(error);
         this.setState({ responseText: error.response.data.errors[0].detail });
       });
   }
@@ -105,7 +106,7 @@ class Jobs extends TerrainComponent<any> {
         width: '90%', padding: 10, borderBottom: '1px solid',
       }}>
         <div style={{ flex: 1 }}>{job.id}</div>
-        <div style={{ flex: 1 }}>{job.name || 'not defined'}</div>
+        <div style={{ flex: 1 }}>{job.name ? job.name : 'not defined'}</div>
         <div style={{ flex: 1 }}>{job.pausedFilename}</div>
         <div style={{ flex: 1 }}>{job.priority}</div>
         <div style={{ flex: 1 }}>{job.running ? 'running' : 'not running'}</div>
@@ -121,7 +122,7 @@ class Jobs extends TerrainComponent<any> {
 
   public render()
   {
-    const { jobs } = this.state;
+    const { jobs } = this.props;
     const { id } = this.state;
 
     return (
@@ -131,10 +132,10 @@ class Jobs extends TerrainComponent<any> {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {
-            jobs !== null ?
+            jobs.jobs !== null ?
               (
-                jobs.reduce(
-                  (jobRows, j, sId) => jobRows.concat(
+                jobs.jobs.reduce(
+                  (scheduleRows, j, sId) => scheduleRows.concat(
                     this.renderJob(j),
                   ),
                   [],
@@ -147,4 +148,8 @@ class Jobs extends TerrainComponent<any> {
   }
 }
 
-export default Jobs;
+export default Util.createTypedContainer(
+  Jobs,
+  ['jobs'],
+  { jobsActions: JobsActions },
+);
