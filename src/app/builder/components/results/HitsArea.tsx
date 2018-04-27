@@ -881,7 +881,7 @@ class HitsArea extends TerrainComponent<Props>
     {
       const { props, state } = this;
       const fields = Util.orderFields(props.resultsState.fields, props.schema,
-        props.query.algorithmId, state.indexName);
+        props.query.algorithmId, state.indexName, true);
       const { resultsConfig } = this.state;
       return <ResultsConfigComponent
         config={resultsConfig !== undefined ? resultsConfig : this.props.query.resultsConfig}
@@ -893,6 +893,7 @@ class HitsArea extends TerrainComponent<Props>
         schema={this.props.schema}
         dataSource={this.props.query.path.source.dataSource}
         sampleHit={props.resultsState.hits && props.resultsState.hits.get(0)}
+        algorithmId={props.query.algorithmId}
       />;
     }
   }

@@ -105,6 +105,8 @@ export enum PathfinderSteps
 
 /**
  * Section: Classes representing parts of the view
+ * Note (Adding Classes): Please add the constructor of the new Record class
+ * to `pathFinderTypeLoader`
  */
 
 class ChoiceOptionC extends BaseClass
@@ -553,6 +555,32 @@ export type PathfinderContext = PathfinderContextC & IRecord<PathfinderContextC>
 export const _PathfinderContext = (config?: { [key: string]: any }) =>
   New<PathfinderContext>(new PathfinderContextC(config), config);
 
+/**
+ * The pathfinder Record types are registered lazily when using the constructors. If some cases need
+ * to load all pathfinder types, e.g. replying pathfinder actions, types can be loaded by calling constructors
+ * in this list.
+ */
+
+export const pathFinderTypeLoader = [
+  _ChoiceOption,
+  _Path,
+  _FilterGroup,
+  _Score,
+  _Line,
+  _ScoreLine,
+  _TransformData,
+  _ScorePoint,
+  _More,
+  _AggregationLine,
+  _Sample,
+  _Script,
+  _Param,
+  _FilterLine,
+  _DistanceValue,
+  _Source,
+  _PathfinderContext,
+];
+
 /* Consider splitting these things below into its own class */
 
 // This type union shows what contexts and parameters are allowable
@@ -643,7 +671,7 @@ class ElasticDataSourceC extends DataSource
           value: source.value,
           sampleData: List(sampleData),
         });
-      }).toList();
+      }).sortBy((choice) => choice.displayName).toList();
     }
 
     if (context.type === 'fields')

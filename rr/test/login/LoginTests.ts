@@ -60,7 +60,8 @@ const CATEGORY_ITEM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:n
 const CREATE_GROUP_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-2 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
 const CREATE_GROUP_BUTTON_SELECTOR = 'body > div.ReactModalPortal > div > div > div > div > div.modal-buttons > div.button.modal-confirm-button';
 const CREATE_ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div.info-area > div.info-area-buttons-container > div';
-const ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
+// const ALGORITHM_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
+const ALGORITHM_SELECTOR = '#app > div.app > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-3 > div.library-column-content > div:nth-child(2) > div.library-category.library-category-BUILD.library-category-open > div > div:nth-child(1) > a > div > div > div > div.library-item-content > div > div.flex-grow';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
@@ -91,7 +92,7 @@ async function loginToBuilder(page, url)
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type('admin@terraindata.com');
   await page.click(PASSWORD_SELECTOR);
-  await page.keyboard.type('secret');
+  await page.keyboard.type('CnAATPys6tEB*ypTvqRRP5@2fUzTuY!C^LZP#tBQcJiC*5');
   await page.click(BUTTON_SELECTOR);
   sleep.sleep(1);
   winston.info('Goto the starting page.');
@@ -155,7 +156,7 @@ describe('jest-image-snapshot usage with an image received from puppeteer', () =
     await page.setViewport({ width: 1600, height: 1200 });
     const url = `http://${ip.address()}:3000`;
     await loginToBuilder(page, url);
-  }, 100000);
+  }, 200000);
 
   afterAll(async () =>
   {
