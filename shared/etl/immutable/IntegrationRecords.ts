@@ -42,84 +42,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file strict-boolean-expressions import-spacing
 
-import * as winston from 'winston';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+const { List, Map } = Immutable;
+import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
-import MySQLController from '../../../../src/database/mysql/MySQLController';
-
-import * as Tasty from '../../../../src/tasty/Tasty';
-import MySQLQueries from '../../../tasty/MySQLQueries';
-import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../TestUtil';
-
-function getExpectedFile(): string
+import
 {
-  return __filename.split('.')[0] + '.expected';
+  AuthConfigType,
+  ConnectionConfigType,
+  IntegrationConfigBase,
+  Integrations,
+} from 'shared/etl/types/IntegrationTypes';
+
+class IntegrationConfigC implements IntegrationConfigBase
+{
+  public id = -1;
+  public name = '';
+  public type = null;
+  public authConfig: AuthConfigType<Integrations> = {} as any;
+  public connectionConfig: ConnectionConfigType<Integrations> = {} as any;
+  public createdBy = -1;
+  public lastModified: Date = null;
+  public readPermission = null;
+  public writePermission = null;
+  public meta = null;
 }
-
-let tasty: Tasty.Tasty;
-let mysqlController: MySQLController;
-
-beforeAll(async () =>
-{
-  (winston as any).level = 'debug';
-  const config: MySQLConfig =
-    {
-      connectionLimit: 20,
-      database: 'moviesdb',
-      host: 'localhost',
-      port: 63306,
-      password: 'r3curs1v3$',
-      user: 't3rr41n-demo',
-      dateStrings: true,
-    };
-
-  try
+export type IntegrationConfig = WithIRecord<IntegrationConfigC>;
+export const _IntegrationConfig = makeExtendedConstructor(IntegrationConfigC, true, {
+  lastModified: (date) =>
   {
-    mysqlController = new MySQLController(config, 0, 'MySQLExecutorTests');
-    tasty = mysqlController.getTasty();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
-
-function runTest(testObj: object)
-{
-  const testName: string = 'MySQL: execute ' + String(testObj[0]);
-  test(testName, async (done) =>
-  {
-    try
-    {
-      const results = await tasty.getDB().execute(testObj[1]);
-      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
-    }
-    catch (e)
-    {
-      fail(e);
-    }
-    done();
-  });
-}
-
-const tests = MySQLQueries.concat(SQLQueries);
-
-for (let i = 0; i < tests.length; i++)
-{
-  runTest(tests[i]);
-}
-
-afterAll(async () =>
-{
-  try
-  {
-    await tasty.destroy();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
+    return typeof date === 'string' ? new Date(date) : date;
+  },
 });

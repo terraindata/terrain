@@ -70,6 +70,8 @@ import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
 import ElasticEndpoint from './endpoints/ElasticEndpoint';
 import FSEndpoint from './endpoints/FSEndpoint';
 import HTTPEndpoint from './endpoints/HTTPEndpoint';
+import MySQLEndpoint from './endpoints/MySQLEndpoint';
+import PostgreSQLEndpoint from './endpoints/PostgreSQLEndpoint';
 import SFTPEndpoint from './endpoints/SFTPEndpoint';
 
 export async function getSourceStream(name: string, source: SourceConfig, files?: stream.Readable[]): Promise<stream.Readable>
@@ -110,6 +112,14 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           endpoint = new FSEndpoint();
           sourceStream = await endpoint.getSource(source);
           break;
+        case 'Mysql':
+          endpoint = new MySQLEndpoint();
+          sourceStream = await endpoint.getSource(source);
+          return resolve(sourceStream);
+        case 'Postgresql':
+          endpoint = new PostgreSQLEndpoint();
+          sourceStream = await endpoint.getSource(source);
+          return resolve(sourceStream);
         default:
           throw new Error('not implemented.');
       }

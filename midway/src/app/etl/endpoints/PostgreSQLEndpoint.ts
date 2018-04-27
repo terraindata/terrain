@@ -44,82 +44,64 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
+import { Readable, Writable } from 'stream';
 
-import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
-import MySQLController from '../../../../src/database/mysql/MySQLController';
+import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
+import PostgreSQLConfig from '../../../database/pg/PostgreSQLConfig';
+import PostgreSQLReader from '../../../database/pg/streams/PostgreSQLReader';
+import CredentialConfig from '../../credentials/CredentialConfig';
+import { credentials } from '../../credentials/CredentialRouter';
+import AEndpointStream from './AEndpointStream';
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import MySQLQueries from '../../../tasty/MySQLQueries';
-import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../TestUtil';
-
-function getExpectedFile(): string
+export default class PostgreSQLEndpoint extends AEndpointStream
 {
-  return __filename.split('.')[0] + '.expected';
-}
+  constructor()
+  {
+    super();
+  }
 
-let tasty: Tasty.Tasty;
-let mysqlController: MySQLController;
+  public async getSource(source: SourceConfig): Promise<Readable>
+  {
+    const credentialId = source.options['credentialId'];
+    const config: PostgreSQLConfig = await this.getConfig(credentialId, source.options);
+    const table = source.options['table'];
+    const query: string = source.options['query'];
+    return new PostgreSQLReader(config, query, table);
+  }
 
-beforeAll(async () =>
-{
-  (winston as any).level = 'debug';
-  const config: MySQLConfig =
+  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
+  {
+    const credentialId = sink.options['credentialId'];
+    const config: PostgreSQLConfig = await this.getConfig(credentialId, sink.options);
+    const table = sink.options['table'];
+    const query: string = sink.options['query'];
+
+    throw new Error('not implemented');
+    // return new PostgreSQLWriter(config, database, table);
+  }
+
+  private async getConfig(credentialId: number, options?: object): Promise<PostgreSQLConfig>
+  {
+    return new Promise(async (resolve, reject) =>
     {
-      connectionLimit: 20,
-      database: 'moviesdb',
-      host: 'localhost',
-      port: 63306,
-      password: 'r3curs1v3$',
-      user: 't3rr41n-demo',
-      dateStrings: true,
-    };
+      const creds: CredentialConfig[] = await credentials.get(credentialId);
+      if (creds.length === 0)
+      {
+        reject(new Error('Invalid PostgreSQL credentials ID.'));
+      }
 
-  try
-  {
-    mysqlController = new MySQLController(config, 0, 'MySQLExecutorTests');
-    tasty = mysqlController.getTasty();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
+      let postgreSQLConfig: PostgreSQLConfig = {};
+      try
+      {
+        postgreSQLConfig = JSON.parse(creds[0].meta);
+      }
+      catch (e)
+      {
+        reject(new Error('Error retrieving credentials for ID ' + String(credentialId)));
+      }
 
-function runTest(testObj: object)
-{
-  const testName: string = 'MySQL: execute ' + String(testObj[0]);
-  test(testName, async (done) =>
-  {
-    try
-    {
-      const results = await tasty.getDB().execute(testObj[1]);
-      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
-    }
-    catch (e)
-    {
-      fail(e);
-    }
-    done();
-  });
+      resolve(postgreSQLConfig);
+    });
+  }
 }
-
-const tests = MySQLQueries.concat(SQLQueries);
-
-for (let i = 0; i < tests.length; i++)
-{
-  runTest(tests[i]);
-}
-
-afterAll(async () =>
-{
-  try
-  {
-    await tasty.destroy();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});

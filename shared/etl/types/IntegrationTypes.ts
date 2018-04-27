@@ -42,84 +42,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file no-unused-expression
 
-import * as winston from 'winston';
-
-import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
-import MySQLController from '../../../../src/database/mysql/MySQLController';
-
-import * as Tasty from '../../../../src/tasty/Tasty';
-import MySQLQueries from '../../../tasty/MySQLQueries';
-import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../TestUtil';
-
-function getExpectedFile(): string
+export enum Integrations
 {
-  return __filename.split('.')[0] + '.expected';
+  Sftp = 'Sftp',
 }
 
-let tasty: Tasty.Tasty;
-let mysqlController: MySQLController;
-
-beforeAll(async () =>
+export interface IntegrationConfigBase
 {
-  (winston as any).level = 'debug';
-  const config: MySQLConfig =
-    {
-      connectionLimit: 20,
-      database: 'moviesdb',
-      host: 'localhost',
-      port: 63306,
-      password: 'r3curs1v3$',
-      user: 't3rr41n-demo',
-      dateStrings: true,
-    };
-
-  try
-  {
-    mysqlController = new MySQLController(config, 0, 'MySQLExecutorTests');
-    tasty = mysqlController.getTasty();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
-
-function runTest(testObj: object)
-{
-  const testName: string = 'MySQL: execute ' + String(testObj[0]);
-  test(testName, async (done) =>
-  {
-    try
-    {
-      const results = await tasty.getDB().execute(testObj[1]);
-      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
-    }
-    catch (e)
-    {
-      fail(e);
-    }
-    done();
-  });
+  id?: number;
+  name: string;
+  type: Integrations;
+  authConfig: any;
+  connectionConfig: any;
+  createdBy: number;
+  lastModified: any;
+  readPermission: any;
+  writePermission: any;
+  meta?: any;
 }
 
-const tests = MySQLQueries.concat(SQLQueries);
-
-for (let i = 0; i < tests.length; i++)
+export interface AuthConfigTypes
 {
-  runTest(tests[i]);
+  Sftp: {
+    key: string;
+  };
 }
 
-afterAll(async () =>
+export interface ConnectionConfigTypes
 {
-  try
-  {
-    await tasty.destroy();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
+  Sftp: {
+    ip: string;
+    port: number;
+  };
+}
+
+export type AuthTypes = keyof AuthConfigTypes;
+export type AuthConfigType<key extends AuthTypes> = AuthConfigTypes[key];
+export type ConnectionTypes = keyof ConnectionConfigTypes;
+export type ConnectionConfigType<key extends ConnectionTypes> = ConnectionConfigTypes[key];
+
+// Type wizardry
+type IntegrationNamingAssertion = {
+  [K in keyof typeof Integrations]: K;
+};
+Integrations as IntegrationNamingAssertion;
+
+type AuthAssertTypesExhaustive = {
+  [K in Integrations]: AuthConfigTypes[K];
+};
+type ConnectionAssertTypesExhaustive = {
+  [K in Integrations]: ConnectionConfigTypes[K];
+};

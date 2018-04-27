@@ -120,7 +120,10 @@ export function walkthroughFactory<ViewEnum, Context = any>(graph: WalkthroughGr
     public renderNode(node: WalkthroughGraphNode<ViewEnum, Context>)
     {
       return (
-        <div className='walkthrough-step-view'>
+        <div
+          className='walkthrough-step-view'
+          style={backgroundColor(Colors().fadedOutBg)}
+        >
           <div className='walkthrough-step-prompt'>
             {node.prompt}
           </div>

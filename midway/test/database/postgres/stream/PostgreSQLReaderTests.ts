@@ -46,40 +46,58 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
-import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
-import MySQLController from '../../../../src/database/mysql/MySQLController';
+import BufferTransform from '../../../../src/app/io/streams/BufferTransform';
+import PostgreSQLConfig from '../../../../src/database/pg/PostgreSQLConfig';
+import PostgreSQLReader from '../../../../src/database/pg/streams/PostgreSQLReader';
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import MySQLQueries from '../../../tasty/MySQLQueries';
-import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../TestUtil';
+(winston as any).level = 'debug';
 
-function getExpectedFile(): string
+const pgConfig: PostgreSQLConfig =
+  {
+    database: 'moviesdb',
+    host: 'localhost',
+    port: 65432,
+    password: 'r3curs1v3$',
+    user: 't3rr41n-demo',
+  };
+
+const query = 'SELECT movieid, title, budget \n  FROM movies\n  LIMIT 3';
+
+const expectedResponse = [
+  {
+    movieid: 1,
+    title: 'Toy Story (1995)',
+    budget: 30000000,
+  },
+  {
+    movieid: 2,
+    title: 'Jumanji (1995)',
+    budget: 65000000,
+  },
+  {
+    movieid: 3,
+    title: 'Grumpier Old Men (1995)',
+    budget: 0,
+  },
+];
+
+test('simple PostgreSQL reader stream', (done) =>
 {
-  return __filename.split('.')[0] + '.expected';
-}
-
-let tasty: Tasty.Tasty;
-let mysqlController: MySQLController;
-
-beforeAll(async () =>
-{
-  (winston as any).level = 'debug';
-  const config: MySQLConfig =
-    {
-      connectionLimit: 20,
-      database: 'moviesdb',
-      host: 'localhost',
-      port: 63306,
-      password: 'r3curs1v3$',
-      user: 't3rr41n-demo',
-      dateStrings: true,
-    };
-
   try
   {
-    mysqlController = new MySQLController(config, 0, 'MySQLExecutorTests');
-    tasty = mysqlController.getTasty();
+    const stream = new PostgreSQLReader(pgConfig, query, 'movies');
+    let results = [];
+    stream.on('data', (chunk) =>
+    {
+      results = results.concat(chunk);
+    });
+
+    stream.on('end', () =>
+    {
+      expect(results.length).toEqual(3);
+      expect(results).toMatchObject(expectedResponse);
+      done();
+    });
   }
   catch (e)
   {
@@ -87,36 +105,20 @@ beforeAll(async () =>
   }
 });
 
-function runTest(testObj: object)
-{
-  const testName: string = 'MySQL: execute ' + String(testObj[0]);
-  test(testName, async (done) =>
-  {
-    try
-    {
-      const results = await tasty.getDB().execute(testObj[1]);
-      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
-    }
-    catch (e)
-    {
-      fail(e);
-    }
-    done();
-  });
-}
-
-const tests = MySQLQueries.concat(SQLQueries);
-
-for (let i = 0; i < tests.length; i++)
-{
-  runTest(tests[i]);
-}
-
-afterAll(async () =>
+test('PostgreSQL stream (buffer transform)', (done) =>
 {
   try
   {
-    await tasty.destroy();
+    const stream = new PostgreSQLReader(pgConfig, query, 'movies');
+    const bufferTransform = new BufferTransform(stream,
+      (err, response) =>
+      {
+        expect(err).toBeFalsy();
+        expect(response).toBeDefined();
+        expect(response.length).toEqual(3);
+        expect(response).toMatchObject(expectedResponse);
+        done();
+      });
   }
   catch (e)
   {

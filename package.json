@@ -162,7 +162,7 @@
     "papaparse": "^4.4.0",
     "passport-local": "^1.0.0",
     "pg": "^7.4.1",
-    "priorityqueue_native": "^1.0.5",
+    "pg-query-stream": "^1.1.1",
     "promise-queue": "^2.2.3",
     "prop-types": "^15.6.1",
     "radium": "^0.19.6",

@@ -77,7 +77,8 @@ class SourceConfigC implements SourceConfigI
   public type = null;
   public name = 'Default Source';
   public fileConfig = _FileConfig();
-  public options = {};
+  public options = {} as any;
+  public integrationId = -1;
 
   public description(algorithms?: Map<ID, ItemWithName>): string
   {
@@ -105,7 +106,8 @@ class SinkConfigC implements SinkConfigI
   public type = null;
   public name = 'Default Sink';
   public fileConfig = _FileConfig();
-  public options = {};
+  public options = {} as any;
+  public integrationId = -1;
 
   public description()
   {

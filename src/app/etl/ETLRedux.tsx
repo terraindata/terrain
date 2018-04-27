@@ -58,6 +58,7 @@ import { SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import { AuthConfigType, ConnectionConfigType } from 'shared/etl/types/IntegrationTypes';
 import { _ETLState, ETLState } from './ETLTypes';
 
 import { FileTypes } from 'shared/etl/types/ETLTypes';
