@@ -51,6 +51,7 @@ import { SchedulerActions } from 'scheduler/data/SchedulerRedux';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import Util from 'util/Util';
 import XHR from 'util/XHR';
+import { notificationManager } from './../../common/components/InAppNotification';
 
 class Scheduler extends TerrainComponent<any> {
 
@@ -66,10 +67,52 @@ class Scheduler extends TerrainComponent<any> {
     };
   }
 
+  public componentDidMount()
+  {
+    this.getSchedules();
+  }
+
   public createSchedule()
   {
     const scheduleParams = {
-      cron: '0 0 1 1 *',
+      cron: '* * 10 * *',
+      name: `Jmansor Schedule ${Math.floor(Math.random() * 100)}`,
+      priority: 1,
+      tasks: [],
+      workerId: 10,
+    };
+
+    this.props.schedulerActions({
+      actionType: 'createSchedule',
+      schedule: scheduleParams,
+    })
+      .then((schedule) =>
+      {
+        this.setState({ responseText: JSON.stringify(schedule) });
+        notificationManager.addNotification(
+          'Schedule created',
+          schedule.name,
+          'info',
+          4,
+        );
+      })
+      .catch((error) =>
+      {
+        this.setState({ responseText: error });
+        notificationManager.addNotification(
+          error,
+          '',
+          'error',
+          4,
+        );
+      });
+  }
+
+  public createInvalidSchedule()
+  {
+    const scheduleParams = {
+      // Remove cron property so the endpoint returns an error
+      // cron: '* * 10 * *',
       name: `Jmansor Schedule ${Math.floor(Math.random() * 100)}`,
       priority: 1,
       tasks: [],
@@ -86,7 +129,13 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
+        notificationManager.addNotification(
+          error,
+          '',
+          'error',
+          4,
+        );
       });
   }
 
@@ -101,7 +150,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -114,7 +163,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -131,7 +180,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -147,7 +196,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -163,7 +212,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -176,7 +225,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -189,7 +238,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -202,7 +251,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -215,7 +264,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -228,7 +277,7 @@ class Scheduler extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -273,19 +322,10 @@ class Scheduler extends TerrainComponent<any> {
       <div>
         id: <input style={{ width: 50 }} onChange={this.handleIdChange} value={id} />
         <ul>
-          <li onClick={() => this.createSchedule()}>ScheduleApi.createSchedule()</li>
-          <li onClick={() => this.getSchedules()}>SchedulerApi.getSchedules()</li>
-          <li onClick={() => this.getSchedule(id)}>SchedulerApi.getSchedules({id})</li>
-          <li onClick={() => this.updateSchedule(id)}>SchedulerApi.updateSchedule({id})</li>
-          <li onClick={() => this.deleteSchedule(id)}>SchedulerApi.deleteSchedules({id})</li>
-          <li onClick={() => this.duplicateSchedule(id)}>SchedulerApi.duplicateSchedules({id})</li>
-          <li onClick={() => this.getScheduleLog(id)}>SchedulerApi.getScheduleLog({id})</li>
-          <li onClick={() => this.pauseSchedule(id)}>SchedulerApi.pauseSchedule({id})</li>
-          <li onClick={() => this.unpauseSchedule(id)}>SchedulerApi.unpauseSchedule({id})</li>
-          <li onClick={() => this.runSchedule(id)}>SchedulerApi.runSchedule({id})</li>
-          <li onClick={() => this.setScheduleStatus(id)}>SchedulerApi.setScheduleStatus({id})</li>
+          <li onClick={() => this.createSchedule()}>Create Schedule</li>
+          <li onClick={() => this.createInvalidSchedule()}>Create Invalid Schedule and handle error</li>
         </ul>
-        <div>
+        <div style={{ display: 'none' }}>
           {this.state.responseText}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>

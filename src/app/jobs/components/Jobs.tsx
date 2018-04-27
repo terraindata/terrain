@@ -81,7 +81,7 @@ class Jobs extends TerrainComponent<any> {
       .catch((error) =>
       {
         console.error(error);
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
@@ -94,7 +94,7 @@ class Jobs extends TerrainComponent<any> {
       })
       .catch((error) =>
       {
-        this.setState({ responseText: error.response.data.errors[0].detail });
+        this.setState({ responseText: error });
       });
   }
 
