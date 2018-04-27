@@ -59,9 +59,9 @@ import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { LibraryState } from 'library/LibraryTypes';
 
+import { IntegrationFormMap } from 'etl/common/components/IntegrationFormClasses';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { Integrations } from 'shared/etl/types/IntegrationTypes';
-import { IntegrationFormMap } from 'etl/common/components/IntegrationFormClasses';
 
 const { List } = Immutable;
 
@@ -80,8 +80,8 @@ export default class IntegrationForm extends TerrainComponent<Props>
       options: {
         pickOptions: (s) => integrationList,
         indexResolver: (value) => integrationList.indexOf(value),
-      }
-    }
+      },
+    },
   };
 
   public render()
@@ -112,14 +112,18 @@ export default class IntegrationForm extends TerrainComponent<Props>
   public typeValueToState(value: IntegrationConfig)
   {
     return {
-      type: value.type
-    }
+      type: value.type,
+    };
   }
 
-  public handleTypeChange(state: { type: Integrations})
+  public handleTypeChange(state: { type: Integrations })
   {
-    const newIntegration = _IntegrationConfig({ type: state.type });
-    this.props.onChange(newIntegration);
+    const { integration, onChange } = this.props;
+    const newIntegration = integration
+      .set('authConfig', {})
+      .set('connectionConfig', {})
+      .set('type', state.type);
+    onChange(newIntegration);
   }
 
   public handleIntegrationChange(newIntegration: IntegrationConfig)

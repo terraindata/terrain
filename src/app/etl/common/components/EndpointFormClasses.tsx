@@ -81,7 +81,7 @@ export interface Props
 
 const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
 
-abstract class EndpointForm<State, P extends Props = Props> extends TerrainComponent<P>
+abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainComponent<P>
 {
   public abstract inputMap: InputDeclarationMap<State>;
   public showFileConfig = true; // override this to hide
@@ -183,7 +183,7 @@ abstract class EndpointForm<State, P extends Props = Props> extends TerrainCompo
 }
 
 type UploadState = SourceOptionsType<Sources.Upload>;
-class UploadEndpoint extends EndpointForm<UploadState>
+class UploadEndpoint extends EndpointFormBase<UploadState>
 {
   public inputMap: InputDeclarationMap<UploadState> = {
     file: {
@@ -214,7 +214,7 @@ class UploadEndpoint extends EndpointForm<UploadState>
 }
 
 type AlgorithmState = SourceOptionsType<Sources.Algorithm>;
-class AlgorithmEndpointC extends EndpointForm<AlgorithmState>
+class AlgorithmEndpointC extends EndpointFormBase<AlgorithmState>
 {
   public showFileConfig = false;
   public state: {
@@ -306,7 +306,7 @@ const AlgorithmEndpoint = Util.createContainer(
 );
 
 type SftpState = SftpOptions;
-class SftpEndpoint extends EndpointForm<SftpState>
+class SftpEndpoint extends EndpointFormBase<SftpState>
 {
   public inputMap: InputDeclarationMap<SftpState> = {
     ip: {
@@ -340,7 +340,7 @@ interface HttpState extends Partial<HttpOptions>
 
 const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 
-class HttpEndpoint extends EndpointForm<HttpState>
+class HttpEndpoint extends EndpointFormBase<HttpState>
 {
   public inputMap: InputDeclarationMap<HttpState> = {
     url: {
@@ -392,7 +392,7 @@ class HttpEndpoint extends EndpointForm<HttpState>
 }
 
 type DownloadState = SinkOptionsType<Sinks.Download>;
-class DownloadEndpoint extends EndpointForm<DownloadState>
+class DownloadEndpoint extends EndpointFormBase<DownloadState>
 {
   public inputMap: InputDeclarationMap<DownloadState> = {
 
@@ -401,7 +401,7 @@ class DownloadEndpoint extends EndpointForm<DownloadState>
 
 type DatabaseState = SinkOptionsType<Sinks.Database>;
 
-class DatabaseEndpoint extends EndpointForm<DatabaseState>
+class DatabaseEndpoint extends EndpointFormBase<DatabaseState>
 {
   public showFileConfig = false;
   public inputMap: InputDeclarationMap<DatabaseState> = {
@@ -439,7 +439,7 @@ class DatabaseEndpoint extends EndpointForm<DatabaseState>
 }
 
 type FsState = SinkOptionsType<Sinks.Fs>;
-class FsEndpoint extends EndpointForm<FsState>
+class FsEndpoint extends EndpointFormBase<FsState>
 {
   public inputMap: InputDeclarationMap<FsState> = {
     path: {
@@ -450,7 +450,7 @@ class FsEndpoint extends EndpointForm<FsState>
 }
 
 type SQLState = SQLOptions;
-class SQLEndpoint extends EndpointForm<SQLState>
+class SQLEndpoint extends EndpointFormBase<SQLState>
 {
   public inputMap: InputDeclarationMap<SQLState> = {
     ip: {

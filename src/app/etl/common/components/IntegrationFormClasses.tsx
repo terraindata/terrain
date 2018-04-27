@@ -57,7 +57,121 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 import { instanceFnDecorator } from 'shared/util/Classes';
 
-import './EndpointOptions.less';
-
+import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { AuthConfigType, ConnectionConfigType, Integrations } from 'shared/etl/types/IntegrationTypes';
 const { List } = Immutable;
 
+export interface Props
+{
+  integration: IntegrationConfig;
+  onChange: (newIntegration: IntegrationConfig) => void;
+}
+
+abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props = Props> extends TerrainComponent<P>
+{
+  public abstract authMap: InputDeclarationMap<AuthState>;
+  public abstract connectionMap: InputDeclarationMap<ConnectionState>;
+
+  constructor(props)
+  {
+    super(props);
+    this.handleAuthFormChange = this.handleAuthFormChange.bind(this);
+    this.handleConnectionFormChange = this.handleConnectionFormChange.bind(this);
+  }
+
+  /*
+   * Override these converstion methods to customize form behavior / structure
+   */
+  public authConfigToState(config): AuthState
+  {
+    return config as AuthState;
+  }
+
+  public connectionConfigToState(config): ConnectionState
+  {
+    return config as ConnectionState;
+  }
+
+  public authStateToConfig(state: AuthState)
+  {
+    return state as any;
+  }
+
+  public connectionStateToConfig(state: ConnectionState)
+  {
+    return state as any;
+  }
+
+  public render()
+  {
+    const { authConfig, connectionConfig } = this.props.integration;
+    const authState = this.authConfigToState(authConfig);
+    const connectionState = this.connectionConfigToState(connectionConfig);
+
+    return (
+      <div>
+        <DynamicForm
+          inputMap={this.authMap}
+          inputState={authState}
+          onStateChange={this.handleAuthFormChange}
+        />
+        <DynamicForm
+          inputMap={this.connectionMap}
+          inputState={connectionState}
+          onStateChange={this.handleConnectionFormChange}
+        />
+      </div>
+    );
+  }
+
+  private handleAuthFormChange(state: AuthState)
+  {
+    const { onChange, integration } = this.props;
+    const newConfig = this.authStateToConfig(state);
+    onChange(integration.set('authConfig', newConfig));
+  }
+
+  private handleConnectionFormChange(state: ConnectionState)
+  {
+    const { onChange, integration } = this.props;
+    const newConfig = this.connectionStateToConfig(state);
+    onChange(integration.set('connectionConfig', newConfig));
+  }
+}
+
+type SftpAuthT = AuthConfigType<Integrations.Sftp>;
+type SftpConnectionT = ConnectionConfigType<Integrations.Sftp>;
+class SftpForm extends IntegrationFormBase<SftpAuthT, SftpConnectionT>
+{
+  public authMap: InputDeclarationMap<SftpAuthT> = {
+    key: {
+      type: DisplayType.TextBox,
+      displayName: 'Private Key',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<SftpConnectionT> = {
+    ip: {
+      type: DisplayType.TextBox,
+      displayName: 'IP Address',
+      group: 'addr row',
+      widthFactor: 3,
+    },
+    port: {
+      type: DisplayType.NumberBox,
+      displayName: 'Port',
+      group: 'addr row',
+      widthFactor: 1,
+    },
+  };
+}
+
+type FormLookupMap =
+  {
+    [k in Integrations]: React.ComponentClass<Props>
+  };
+
+export const IntegrationFormMap: FormLookupMap =
+  {
+    [Integrations.Sftp]: SftpForm,
+  };
