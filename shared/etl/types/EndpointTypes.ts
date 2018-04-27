@@ -85,8 +85,8 @@ export interface SourceConfig
   type: SourceTypes;
   name: string;
   fileConfig: FileConfig;
-  options: SourceOptionsType<SourceTypes>;
-  // a union of all possible option types
+  options: SourceOptionsType<SourceTypes>; // a union of all possible option types
+  integrationId: number;
 }
 
 export interface DefaultSourceConfig
@@ -100,8 +100,8 @@ export interface SinkConfig
   type: SinkTypes;
   name: string;
   fileConfig: FileConfig;
-  options: SinkOptionsType<SinkTypes>;
-  // a union of all possible option types
+  options: SinkOptionsType<SinkTypes>; // a union of all possible option types
+  integrationId: number;
 }
 
 export interface DefaultSinkConfig
@@ -219,10 +219,10 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
 
 export interface SftpOptions
 {
-  ip: string;
-  port: number;
+  ip: string; // get rid of this when integration ui / backend support is created
+  port: number; // get rid of this when integration ui / backend support is created
   filepath: string;
-  credentialId: number;
+  credentialId: number; // get rid of this when integration ui / backend support is created
   meta?: any;
 }
 
