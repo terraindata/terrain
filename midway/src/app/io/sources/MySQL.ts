@@ -49,10 +49,10 @@ import * as stream from 'stream';
 import * as Tasty from '../../../../src/tasty/Tasty';
 import DatabaseController from '../../../database/DatabaseController';
 import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
-import { Credentials } from '../../credentials/Credentials';
+import { Integrations } from '../../integrations/Integrations';
 import CSVTransform from '../streams/CSVTransform';
 
-export const credentials: Credentials = new Credentials();
+export const integrations: Integrations = new Integrations();
 
 let tasty: Tasty.Tasty;
 

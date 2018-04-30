@@ -42,24 +42,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import ConfigType from '../ConfigType';
-
-export class CredentialConfig extends ConfigType
+export enum IntegrationPermissionEnum
 {
-  public id?: number = undefined;
-  public createdBy: number = -1;
-  public meta: string = '';
-  public name: string = '';
-  public permissions?: number = undefined;
-  public type: string = '';
+  Admin = 'Admin',
+  Regular = 'Regular',
+  Default = 'Default',
+}
 
-  constructor(props: object)
+export class IntegrationPermissionLevels
+{
+  public static isAllowedAccess(existingLevel: string, checkLevel: string): boolean
   {
-    super();
-    ConfigType.initialize(this, props);
+    if (checkLevel === IntegrationPermissionEnum.Admin)
+    {
+      return true;
+    }
+    if ((existingLevel === IntegrationPermissionEnum.Regular || existingLevel === IntegrationPermissionEnum.Default)
+      && checkLevel === IntegrationPermissionEnum.Regular)
+    {
+      return true;
+    }
+    if (existingLevel === IntegrationPermissionEnum.Default && checkLevel === IntegrationPermissionEnum.Default)
+    {
+      return true;
+    }
+    return false;
   }
 }
 
-export default CredentialConfig;
+export default IntegrationPermissionLevels;

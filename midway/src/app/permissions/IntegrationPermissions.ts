@@ -44,30 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as ImportP from './ImportPermissions';
-import * as IntegrationP from './IntegrationPermissions';
-import * as JobQueueP from './JobQueuePermissions';
-import * as SchedulerP from './SchedulerPermissions';
+import UserConfig from '../users/UserConfig';
 
-export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
-export let IntegrationPermissions: IntegrationP.IntegrationPermissions = new IntegrationP.IntegrationPermissions();
-export let JobQueuePermissions: JobQueueP.JobQueuePermissions = new JobQueueP.JobQueuePermissions();
-export let SchedulerPermissions: SchedulerP.SchedulerPermissions = new SchedulerP.SchedulerPermissions();
-
-export class Permissions
+export class IntegrationPermissions
 {
-  public ImportPermissions: ImportP.ImportPermissions;
-  public IntegrationPermissions: IntegrationP.IntegrationPermissions;
-  public JobQueuePermissions: JobQueueP.JobQueuePermissions;
-  public SchedulerPermissions: SchedulerP.SchedulerPermissions;
-
-  constructor()
+  public async verifyPermission(user: UserConfig, params: object): Promise<string>
   {
-    this.ImportPermissions = ImportPermissions;
-    this.IntegrationPermissions = IntegrationPermissions;
-    this.JobQueuePermissions = JobQueuePermissions;
-    this.SchedulerPermissions = SchedulerPermissions;
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (!user.isSuperUser)
+      {
+        return reject('User must be a super user.');
+      }
+      return resolve();
+    });
   }
 }
 
-export default Permissions;
+export default IntegrationPermissions;

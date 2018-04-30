@@ -42,32 +42,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import * as ImportP from './ImportPermissions';
-import * as IntegrationP from './IntegrationPermissions';
-import * as JobQueueP from './JobQueuePermissions';
-import * as SchedulerP from './SchedulerPermissions';
+import EndpointTypes from 'shared/etl/types/EndpointTypes';
 
-export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
-export let IntegrationPermissions: IntegrationP.IntegrationPermissions = new IntegrationP.IntegrationPermissions();
-export let JobQueuePermissions: JobQueueP.JobQueuePermissions = new JobQueueP.JobQueuePermissions();
-export let SchedulerPermissions: SchedulerP.SchedulerPermissions = new SchedulerP.SchedulerPermissions();
-
-export class Permissions
+export class IntegrationConfig implements EndpointTypes
 {
-  public ImportPermissions: ImportP.ImportPermissions;
-  public IntegrationPermissions: IntegrationP.IntegrationPermissions;
-  public JobQueuePermissions: JobQueueP.JobQueuePermissions;
-  public SchedulerPermissions: SchedulerP.SchedulerPermissions;
-
-  constructor()
-  {
-    this.ImportPermissions = ImportPermissions;
-    this.IntegrationPermissions = IntegrationPermissions;
-    this.JobQueuePermissions = JobQueuePermissions;
-    this.SchedulerPermissions = SchedulerPermissions;
-  }
+  public authConfig: any = null;
+  public connectionConfig: any = null;
+  public createdBy: number = null;
+  public id: number = null;
+  public lastModified: Date = null;
+  public meta: string = '';
+  public name: string = '';
+  public readPermission: string = '';
+  public type: string = '';
+  public writePermission: string = '';
 }
 
-export default Permissions;
+export default IntegrationConfig;

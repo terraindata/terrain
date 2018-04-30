@@ -53,14 +53,14 @@ import { TaskConfig } from 'shared/types/jobs/TaskConfig';
 import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import CredentialConfig from '../credentials/CredentialConfig';
-import Credentials from '../credentials/Credentials';
+import IntegrationConfig from '../integrations/IntegrationConfig';
+import Integrations from '../integrations/Integrations';
 import { Sources } from '../io/sources/Sources';
 import { Job } from '../jobs/Job';
 import { UserConfig } from '../users/UserConfig';
 import SchedulerConfig from './SchedulerConfig';
 
-export const credentials: Credentials = new Credentials();
+export const integrations: Integrations = new Integrations();
 const sources = new Sources();
 
 export class Scheduler
@@ -112,7 +112,16 @@ export class Scheduler
 
   public async delete(id: number): Promise<SchedulerConfig[] | string>
   {
-    return App.DB.delete(this.schedulerTable, { id }) as Promise<SchedulerConfig[]>;
+    return new Promise<SchedulerConfig[] | string>
+    {
+      const deletedSchedules: SchedulerConfig[] = await this.select(id);
+      if (deletedSchedules.length === 0)
+      {
+        return reject('Schedule does not exist.');
+      }
+      await App.DB.delete(this.schedulerTable, { id }) as SchedulerConfig[];
+      return resolve(deletedSchedules as SchedulerConfig[]);
+    }
   }
 
   public async duplicate(id: number): Promise<SchedulerConfig[]>

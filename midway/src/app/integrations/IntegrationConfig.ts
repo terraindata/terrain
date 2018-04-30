@@ -42,23 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import UserConfig from '../users/UserConfig';
+import SharedIntegrationConfig from 'shared/types/integrations/IntegrationConfig';
+import ConfigType from '../ConfigType';
 
-export class CredentialPermissions
+export class IntegrationConfig extends SharedIntegrationConfig
 {
-  public async verifyPermission(user: UserConfig, params: object): Promise<string>
+  constructor(props: object)
   {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      if (!user.isSuperUser)
-      {
-        return reject('User must be a super user.');
-      }
-      return resolve();
-    });
+    super();
+    ConfigType.initialize(this, props);
   }
 }
 
-export default CredentialPermissions;
+export default IntegrationConfig;

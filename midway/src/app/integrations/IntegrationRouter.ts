@@ -42,77 +42,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
+
+// NB: This router only exists for testing purposes.
+// If using a proxy, be sure to set app.proxy = true
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-
-import { JobConfig } from 'shared/types/jobs/JobConfig';
-import * as App from '../App';
-import * as AppUtil from '../AppUtil';
+import IntegrationConfig from 'shared/types/integrations/IntegrationConfig';
+import * as Util from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
-import UserConfig from '../users/UserConfig';
+import { UserConfig } from '../users/UserConfig';
+import Integrations from './Integrations';
 
 const Router = new KoaRouter();
+export const integrations: Integrations = new Integrations();
 const perm: Permissions = new Permissions();
 
-// Get job by search parameter, or all if none provided
-Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  await perm.JobQueuePermissions.verifyGetRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.get(ctx.params.id);
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await integrations.get(ctx.state.user);
 });
 
-Router.post('/cancel/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/simple', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  await perm.JobQueuePermissions.verifyCancelRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.cancel(ctx.params.id);
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await integrations.getSimple(ctx.state.user, ctx.query.type);
 });
 
-// Delete job by id
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  const integration: IntegrationConfig = ctx.request.body.body;
+  Util.verifyParameters(integration, ['name', 'type', 'meta']);
+  ctx.body = await integrations.upsert(ctx.state.user, integration);
+});
+
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  await perm.JobQueuePermissions.verifyDeleteRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.delete(ctx.params.id);
-});
-
-// Retrieve job log by id
-Router.get('/log/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.JobQueuePermissions.verifyGetLogRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.getLog(ctx.params.id);
-});
-
-// pause job by id
-Router.post('/pause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.JobQueuePermissions.verifyPauseRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.pause(ctx.params.id);
-});
-
-Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.JobQueuePermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.run(ctx.params.id);
-});
-
-// unpause paused job by id
-Router.post('/unpause/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.JobQueuePermissions.verifyUnpauseRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.unpause(ctx.params.id);
-});
-
-// Create job
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const job: JobConfig = ctx.request.body.body;
-  if (job.id !== undefined)
-  {
-    delete job.id;
-  }
-  await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.create(job, false, ctx.state.user.id);
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await integrations.upsert(ctx.state.user, ctx.params.id);
 });
 
 export default Router;

@@ -49,7 +49,7 @@ import * as KoaRouter from 'koa-router';
 
 import * as App from '../App';
 import * as AppUtil from '../AppUtil';
-import Credentials from '../credentials/Credentials';
+import Integrations from '../integrations/Integrations';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
 import Scheduler from './Scheduler';
@@ -58,7 +58,7 @@ import SchedulerConfig from './SchedulerConfig';
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
 
-export const credentials: Credentials = new Credentials();
+export const integrations: Integrations = new Integrations();
 
 // Get schedule by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>

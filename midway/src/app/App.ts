@@ -63,10 +63,10 @@ import * as Tasty from '../tasty/Tasty';
 import appStats from './AppStats';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
-import { credentials } from './credentials/CredentialRouter';
 import { DatabaseConfig } from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
 import { events } from './events/EventRouter';
+import { integrations } from './integrations/IntegrationRouter';
 import { JobQueue } from './jobs/JobQueue';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
@@ -250,9 +250,9 @@ export class App
     await users.initializeDefaultUser();
     winston.debug('Finished creating a default user...');
 
-    // add local filesystem credential config
-    await credentials.initializeLocalFilesystemCredential();
-    winston.debug('Finished adding local filesystem credentials...');
+    // add local filesystem integration config
+    await integrations.initializeLocalFilesystemIntegration();
+    winston.debug('Finished adding local filesystem integration...');
 
     // initialize job queue
     await this.JobQ.initializeJobQueue();
