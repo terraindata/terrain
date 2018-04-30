@@ -254,9 +254,6 @@ export default class EngineUtil
       const bestType = TypeUtil.getCommonJsType(values);
       if (bestType !== EngineUtil.getRepresentedType(id, engine))
       {
-        const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
-          toTypename: bestType,
-        };
         if (EngineUtil.isNamedField(ikp))
         {
           engine.setFieldType(id, bestType);
@@ -265,7 +262,7 @@ export default class EngineUtil
         {
           engine.setFieldProp(id, valueTypeKeyPath, bestType);
         }
-        engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
+        EngineUtil.castField(engine, id, bestType as FieldTypes);
       }
     });
   }
@@ -302,8 +299,8 @@ export default class EngineUtil
           const longField = engine.addField(ikp.push('lon'), 'number');
           engine.setOutputKeyPath(latField, okp.push('lat'));
           engine.setOutputKeyPath(longField, okp.push('lon'));
-          engine.appendTransformation(TransformationNodeType.CastNode, List([engine.getInputKeyPath(latField)]), { toTypename: 'number' });
-          engine.appendTransformation(TransformationNodeType.CastNode, List([engine.getInputKeyPath(longField)]), { toTypename: 'number' });
+          EngineUtil.castField(engine, latField, 'number');
+          EngineUtil.castField(engine, longField, 'number');
         }
         engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
       }
@@ -313,6 +310,17 @@ export default class EngineUtil
         engine.setFieldProp(id, List(['elastic', 'elasticType']), type);
       }
     });
+  }
+
+  // cast the field to the specified type (or the field's current type if type is not specified)
+  public static castField(engine: TransformationEngine, fieldId: number, type?: FieldTypes)
+  {
+    const ikp = engine.getInputKeyPath(fieldId);
+    const toType = type === undefined ? EngineUtil.getRepresentedType(fieldId, engine) : type;
+    const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
+      toTypename: toType,
+    };
+    engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
   }
 
   // for each field make an initial type cast based on the js type
@@ -332,12 +340,7 @@ export default class EngineUtil
         return;
       }
 
-      const ikp = engine.getInputKeyPath(id);
-      const repType = EngineUtil.getRepresentedType(id, engine);
-      const transformOptions: NodeOptionsType<TransformationNodeType.CastNode> = {
-        toTypename: repType,
-      };
-      engine.appendTransformation(TransformationNodeType.CastNode, List([ikp]), transformOptions);
+      EngineUtil.castField(engine, id);
     });
   }
 

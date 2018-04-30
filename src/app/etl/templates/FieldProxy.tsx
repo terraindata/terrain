@@ -49,9 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { TemplateField } from 'etl/templates/FieldTypes';
 import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
-import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -59,10 +57,9 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 /*
- *  The FieldProxy structures act as the binding between the TemplateEditorField
- *  tree structure and the flattened structure of the transformation engine
- *  The proxy objects are generated synchronously and aren't meant to be persisted
- *  (don't hold references to proxies across call contexts!)
+ *  Should this file in be /shared?
+ *  Proxy objects are generated synchronously and aren't meant to be persisted
+ *  Don't hold references to proxies across call contexts
  */
 export class EngineProxy
 {
@@ -191,21 +188,20 @@ export class EngineProxy
     this.requestRebuild();
   }
 
-  public addField(keypath: List<string>, type: string, valueType?: string, dontAddWildcard?: boolean)
+  public addField(keypath: List<string>, type: string, valueType: FieldTypes = 'string')
   {
     let newId: number;
     if (type === 'array')
     {
       newId = this.engine.addField(keypath, type, { valueType });
-      if (!dontAddWildcard)
-      {
-        this.engine.addField(keypath.push('*'), 'array', { valueType });
-      }
+      const wildId = this.engine.addField(keypath.push('*'), 'array', { valueType });
+      EngineUtil.castField(this.engine, wildId, valueType);
     }
     else
     {
       newId = this.engine.addField(keypath, type);
     }
+    EngineUtil.castField(this.engine, newId, type as FieldTypes);
     this.requestRebuild();
     return newId;
   }
@@ -215,15 +211,7 @@ export class EngineProxy
     const pathToAdd = List([name]);
     if (validateNewFieldName(this.engine, -1, pathToAdd).isValid)
     {
-      if (type === 'array')
-      {
-        this.engine.addField(pathToAdd, type, { valueType: 'string' });
-        this.engine.addField(pathToAdd.push('*'), 'array', { valueType: 'string' });
-      }
-      else
-      {
-        this.engine.addField(pathToAdd, type);
-      }
+      this.addField(pathToAdd, type);
       this.requestRebuild();
     }
   }
@@ -287,6 +275,7 @@ export class FieldProxy
   {
     if (validateRename(this.engine, this.fieldId, newPath).isValid)
     {
+      // Transformation Engine automatically reassigns child output paths
       this.engine.setOutputKeyPath(this.fieldId, newPath);
 
       for (let i = 1; i < newPath.size; i++)
@@ -308,15 +297,7 @@ export class FieldProxy
     const newPath = this.engine.getOutputKeyPath(this.fieldId).push(name);
     if (validateNewFieldName(this.engine, this.fieldId, newPath).isValid)
     {
-      if (type === 'array')
-      {
-        this.engine.addField(newPath, type, { valueType: 'string' });
-        this.engine.addField(newPath.push('*'), 'array', { valueType: 'string' });
-      }
-      else
-      {
-        this.engine.addField(newPath, type);
-      }
+      this.engineProxy.addField(newPath, type);
       this.syncWithEngine(true);
     }
     else
@@ -336,6 +317,7 @@ export class FieldProxy
     {
       this.engine.setFieldType(this.fieldId, newType);
     }
+    EngineUtil.castField(this.engine, this.fieldId, newType);
     this.syncWithEngine(true);
   }
 
