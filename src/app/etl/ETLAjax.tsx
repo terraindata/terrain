@@ -63,8 +63,7 @@ export type ErrorHandler = (response: string | MidwayError) => void;
 // making this an instance in case we want stateful things like cancelling ajax requests
 class ETLAjax
 {
-  // Get integrations
-  public getIntegrations(): Promise<any[]>
+  public getIntegrations(simple?: boolean): Promise<any[]>
   {
     return new Promise((resolve, reject) =>
     {
@@ -74,7 +73,7 @@ class ETLAjax
       }
       return Ajax.req(
         'get',
-        'integrations/',
+        simple ? 'integrations/simple' : 'integrations/',
         {},
         handleResponse,
         {
@@ -82,8 +81,8 @@ class ETLAjax
         });
     });
   }
-  // Get ingegatrion by id
-  public getIntegration(integrationId: ID): Promise<any>
+
+  public getIntegration(integrationId: ID, simple?: boolean): Promise<any>
   {
     return new Promise((resolve, reject) =>
     {
@@ -93,7 +92,7 @@ class ETLAjax
       }
       return Ajax.req(
         'get',
-        `integrations/${integrationId}`,
+        simple ? `integrations/simple/${integrationId}` : `integrations/${integrationId}`,
         {},
         handleResponse,
         {
@@ -101,7 +100,7 @@ class ETLAjax
         });
     });
   }
-  // Create integration
+
   public createIntegration(integration: any): Promise<any>
   {
     return new Promise((resolve, reject) =>
@@ -120,7 +119,7 @@ class ETLAjax
         });
     });
   }
-  // Update integration by id
+
   public updateIntegration(integrationId: ID, integration: any): Promise<any>
   {
     return new Promise((resolve, reject) =>
@@ -139,7 +138,7 @@ class ETLAjax
         });
     });
   }
-  // Delete integration
+
   public deleteIntegration(integrationId: ID): Promise<any>
   {
     return new Promise((resolve, reject) =>

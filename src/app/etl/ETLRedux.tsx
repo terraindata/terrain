@@ -145,6 +145,7 @@ export interface ETLActionTypes
   // Integration Action Types
   getIntegrations: {
     actionType: 'getIntegrations',
+    simple: boolean,
   };
   updateIntegration: {
     actionType: 'updateIntegration',
@@ -494,7 +495,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   public getIntegrations(action: ETLActionType<'getIntegrations'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
-    return ETLAjax.getIntegrations()
+    return ETLAjax.getIntegrations(action.simple)
       .then((response) =>
       {
         directDispatch({
