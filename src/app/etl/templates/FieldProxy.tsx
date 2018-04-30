@@ -151,20 +151,17 @@ export class EngineProxy
     this.duplicateField(specifiedSourceId, destKP, true);
   }
 
-  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
+  public copyField(sourceId: number, destKP: List<string>, despecify = false): number
   {
-    const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
+    const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
     };
-
     this.addTransformation(
       TransformationNodeType.DuplicateNode,
       List([this.engine.getInputKeyPath(sourceId)]),
-      options,
+      optionsNew,
     );
-
     const newFieldId = this.engine.getInputFieldID(destKP);
-
     EngineUtil.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
 
     let idToCopy = sourceId;
@@ -185,6 +182,21 @@ export class EngineProxy
         EngineUtil.transferField(childId, destKP.concat(pathAfterRoot).toList(), this.engine);
       }
     });
+    return newFieldId;
+  }
+
+  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
+  {
+    const originalOKP = this.engine.getOutputKeyPath(sourceId);
+    this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, '_' + originalOKP.last()));
+    const tempDestKP = this.getSyntheticInputPath(destKP);
+    const tempOriginalKP = this.getSyntheticInputPath(originalOKP);
+    const destId = this.copyField(sourceId, tempDestKP, despecify);
+    const newOrigId = this.copyField(sourceId, tempOriginalKP , despecify);
+    this.engine.setOutputKeyPath(destId, destKP);
+    this.engine.setOutputKeyPath(newOrigId, originalOKP);
+    this.engine.disableField(sourceId);
+
     this.requestRebuild();
   }
 
@@ -227,6 +239,17 @@ export class EngineProxy
       this.engine.disableField(fieldId);
     }
     this.requestRebuild(fieldId);
+  }
+
+  // this is not deterministic
+  private getSyntheticInputPath(keypath: List<string>): List<string>
+  {
+    return keypath.unshift(`_synthetic_${this.randomId()}`);
+  }
+
+  private randomId(): string
+  {
+    return Math.random().toString(36).substring(2);
   }
 }
 
