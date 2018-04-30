@@ -243,7 +243,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           },
         ]),
         hasOther: true,
-        shortNameText: 'Size',
+        shortNameText: 'Number of Results',
         headerText: 'Size',
         column: true,
         hideSampleData: true,
