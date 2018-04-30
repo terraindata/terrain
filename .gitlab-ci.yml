@@ -25,50 +25,50 @@ stages:
   - fullstack-meta
   - fullstack-screenshot
 
-lint:
-  script:
-   - yarn lint-parallel
-  stage: lint
-
-style:
-  script:
-   - yarn style
-  stage: style
-
-test-frontend:
-  script:
-   - yarn test-front
-  stage: test-front
-  when: always
-
-test-backend:
-  script:
-   - timeout 240 yarn test-back-setup
-   - yarn test-back
-  after_script:
-   - timeout 240 yarn test-back-teardown
-  stage: test-back
-  artifacts:
-    paths:
-      - coverage
-
-test-sigint:
-  script:
-    - timeout 240 yarn test-sigint-setup
-    - ( cd sigint && yarn test )
-  after_script:
-    - timeout 240 yarn test-sigint-teardown
-  stage: test-sigint
-
-build-frontend:
-  script:
-   - yarn build
-  stage: build
-
-build-analytics-js:
-  script:
-   - ( cd analytics.js && yarn build )
-  stage: build
+#lint:
+#  script:
+#   - yarn lint-parallel
+#  stage: lint
+#
+#style:
+#  script:
+#   - yarn style
+#  stage: style
+#
+#test-frontend:
+#  script:
+#   - yarn test-front
+#  stage: test-front
+#  when: always
+#
+#test-backend:
+#  script:
+#   - timeout 240 yarn test-back-setup
+#   - yarn test-back
+#  after_script:
+#   - timeout 240 yarn test-back-teardown
+#  stage: test-back
+#  artifacts:
+#    paths:
+#      - coverage
+#
+#test-sigint:
+#  script:
+#    - timeout 240 yarn test-sigint-setup
+#    - ( cd sigint && yarn test )
+#  after_script:
+#    - timeout 240 yarn test-sigint-teardown
+#  stage: test-sigint
+#
+#build-frontend:
+#  script:
+#   - yarn build
+#  stage: build
+#
+#build-analytics-js:
+#  script:
+#   - ( cd analytics.js && yarn build )
+#  stage: build
 
 #build-frontend-prod:
 #  script:
@@ -88,47 +88,48 @@ fullstack-meta:
     - yarn test-fullstack-component
   stage: fullstack-meta
   after_script:
+    - cat ./midwayConsole.log || true
     - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
-fullstack-screenshot:
-  script:
-    - pkill node || true;
-    - timeout 240 yarn test-fullstack-setup
-    - yarn clean
-    - MIDWAY_HOST=`hostname`:3000 yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
-    - yarn test-fullstack-login
-    - yarn test-rr-pathfinder
-    - yarn test-rr-builder
-  stage: fullstack-screenshot
-  allow_failure: true
-  artifacts:
-    when: on_failure
-    expire_in: 1 week
-    paths:
-    - rr/test/pathfinder/__image_snapshots__/__diff_output__
-    - rr/test/builder/__image_snapshots__/__diff_output__
-    - rr/test/login/__image_snapshots__/__diff_output__
-  after_script:
-    - timeout 240 yarn test-fullstack-teardown
-    - pkill node || true;
-
-deploy:
-  script:
-   - MIDWAY_HOST=pa-terraformer01.terrain.int:33000 yarn build-prod
-   - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
-   - fuser -k -n tcp 33000 || true
-   - cd /opt/Search && NODE_ENV=production yarn start -- --port 33000 &
-  only:
-   - master
-  stage: deploy
-  tags:
-    - shell
-    - deploy
-  when: manual
-  environment:
-    name: production
-    url: http://pa-terraformer01.terrain.int:3000
+#fullstack-screenshot:
+#  script:
+#    - pkill node || true;
+#    - timeout 240 yarn test-fullstack-setup
+#    - yarn clean
+#    - MIDWAY_HOST=`hostname`:3000 yarn build
+#    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+#    - sleep 10
+#    - yarn test-fullstack-login
+#    - yarn test-rr-pathfinder
+#    - yarn test-rr-builder
+#  stage: fullstack-screenshot
+#  allow_failure: true
+#  artifacts:
+#    when: on_failure
+#    expire_in: 1 week
+#    paths:
+#    - rr/test/pathfinder/__image_snapshots__/__diff_output__
+#    - rr/test/builder/__image_snapshots__/__diff_output__
+#    - rr/test/login/__image_snapshots__/__diff_output__
+#  after_script:
+#    - timeout 240 yarn test-fullstack-teardown
+#    - pkill node || true;
+#
+#deploy:
+#  script:
+#   - MIDWAY_HOST=pa-terraformer01.terrain.int:33000 yarn build-prod
+#   - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
+#   - fuser -k -n tcp 33000 || true
+#   - cd /opt/Search && NODE_ENV=production yarn start -- --port 33000 &
+#  only:
+#   - master
+#  stage: deploy
+#  tags:
+#    - shell
+#    - deploy
+#  when: manual
+#  environment:
+#    name: production
+#    url: http://pa-terraformer01.terrain.int:3000
 
