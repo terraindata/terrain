@@ -408,17 +408,13 @@ class HitComponent extends TerrainComponent<Props> {
     const config = this.props.resultsConfig;
     let format = config && config.enabled && config.formats && config.formats.get(field);
     format = _Format(Util.asJS(format));
-    let allValues = Util.asJS(this.props.hit.fields.get(field)) || [];
+    const allValues = Util.asJS(this.props.hit.fields.get(field)) || [];
     if (allValues.length === undefined)
     {
       return null;
     }
     const expandState = this.state.nestedStates.get(field);
     const size = allValues.length;
-    if (expandState === NestedState.Normal || !expandState)
-    {
-      allValues = allValues.slice(0, 1);
-    }
     const depth = this.props.depth ? this.props.depth : 0;
     const maxFields = this.getNumberOfFields(allValues[0], format);
     return (
