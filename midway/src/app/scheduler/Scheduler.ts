@@ -112,19 +112,19 @@ export class Scheduler
 
   public async delete(id: number): Promise<SchedulerConfig[] | string>
   {
-    return new Promise<SchedulerConfig[] | string>
-    {
-      const deletedSchedules: SchedulerConfig[] = await this.select(id);
-      if (deletedSchedules.length === 0)
+    return new Promise < SchedulerConfig[] | string >
       {
-        return reject('Schedule does not exist.');
-      }
-      await App.DB.delete(this.schedulerTable, { id }) as SchedulerConfig[];
-      return resolve(deletedSchedules as SchedulerConfig[]);
+        const deletedSchedules: SchedulerConfig[] = await this.select(id);
+        if(deletedSchedules.length === 0; )
+    {
+      return reject('Schedule does not exist.');
     }
+    await App.DB.delete(this.schedulerTable, { id }) as SchedulerConfig[];
+    return resolve(deletedSchedules as SchedulerConfig[]);
   }
+}
 
-  public async duplicate(id: number): Promise<SchedulerConfig[]>
+  public async; duplicate(id: number); : Promise < SchedulerConfig[] >
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -136,23 +136,23 @@ export class Scheduler
         resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
     });
-  }
+  };
 
-  public async get(id?: number, running?: boolean): Promise<SchedulerConfig[]>
+  public async; get(id ? : number, running ? : boolean); : Promise < SchedulerConfig[] >
   {
     return this._select([], { id, running });
-  }
+  };
 
-  public async getLog(id?: number): Promise<object[]>
+  public async; getLog(id ? : number); : Promise < object[] >
   {
     return new Promise<object[]>(async (resolve, reject) =>
     {
       // TODO add extensive logging support
       resolve([{}]);
     });
-  }
+  };
 
-  public async runSchedule(id: number, runNow?: boolean, userId?: number): Promise<SchedulerConfig[] | string>
+  public async; runSchedule(id: number, runNow ? : boolean, userId ? : number); : Promise < SchedulerConfig[] | string >
   {
     return new Promise<SchedulerConfig[] | string>(async (resolve, reject) =>
     {
@@ -199,19 +199,19 @@ export class Scheduler
       this.runningSchedules.delete(id);
       return resolve(await this.get(id) as SchedulerConfig[]);
     });
-  }
+  };
 
-  public pause(id: number): Promise<SchedulerConfig[] | string>
+  public pause(id: number); : Promise < SchedulerConfig[] | string >
   {
-    if (this.runningSchedules.get(id) !== undefined)
-    {
-      this.runningSchedules.get(id).pause();
-      return this.get(id) as Promise<SchedulerConfig[]>;
-    }
-    return Promise.reject('Schedule not found.');
+    if(this.runningSchedules.get(id) !== undefined; )
+{
+  this.runningSchedules.get(id).pause();
+  return this.get(id) as Promise<SchedulerConfig[]>;
+}
+return Promise.reject('Schedule not found.');
   }
 
-  public async setRunning(id: number, running: boolean): Promise<SchedulerConfig[]>
+  public async; setRunning(id: number, running: boolean); : Promise < SchedulerConfig[] >
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -226,18 +226,18 @@ export class Scheduler
         return resolve(await App.DB.upsert(this.schedulerTable, schedules[0]) as SchedulerConfig[]);
       }
     });
-  }
+  };
 
-  public async setStatus(id: number, status: boolean): Promise<SchedulerConfig[]>
+  public async; setStatus(id: number, status: boolean); : Promise < SchedulerConfig[] >
   {
-    if (typeof status !== 'boolean' || status === undefined)
-    {
-      return Promise.reject([] as SchedulerConfig[]);
-    }
-    return this._setStatus(id, status) as Promise<SchedulerConfig[]>;
+    if(typeof status !== 'boolean' || status === undefined; )
+{
+  return Promise.reject([] as SchedulerConfig[]);
+}
+return this._setStatus(id, status) as Promise<SchedulerConfig[]>;
   }
 
-  public async unpause(id: number): Promise<SchedulerConfig[]>
+  public async; unpause(id: number); : Promise < SchedulerConfig[] >
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -249,9 +249,9 @@ export class Scheduler
       }
       return reject([] as SchedulerConfig[]);
     });
-  }
+  };
 
-  public async upsert(schedule: SchedulerConfig, user?: UserConfig): Promise<SchedulerConfig[]>
+  public async; upsert(schedule: SchedulerConfig, user ? : UserConfig); : Promise < SchedulerConfig[] >
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -296,9 +296,9 @@ export class Scheduler
       }
       return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
     });
-  }
+  };
 
-  private async _checkSchedulerTable(): Promise<void>
+  private async; _checkSchedulerTable(); : Promise < void >
   {
     // TODO check the scheduler for unlocked rows and detect which schedules should run next
     const availableSchedules: number[] = await this._getAvailableSchedules();
@@ -309,19 +309,19 @@ export class Scheduler
         winston.warn(err.toString() as string);
       });
     });
-    setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
+    setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000; )
   }
 
-  private async _checkSchedulerTableHelper(scheduleId: number): Promise<void>
+  private async; _checkSchedulerTableHelper(scheduleId: number); : Promise < void >
   {
     const result: SchedulerConfig[] | string = await this.runSchedule(scheduleId);
-    if (typeof result === 'string')
-    {
-      winston.info(result as string);
-    }
+    if(typeof result === 'string'; )
+{
+  winston.info(result as string);
+}
   }
 
-  private async _getAvailableSchedules(): Promise<number[]>
+  private async; _getAvailableSchedules(); : Promise < number[] >
   {
     return new Promise<number[]>(async (resolve, reject) =>
     {
@@ -349,9 +349,9 @@ export class Scheduler
       });
       resolve(scheduleIds);
     });
-  }
+  };
 
-  private async _resetAllRunningSchedules(): Promise<void>
+  private async; _resetAllRunningSchedules(); : Promise < void >
   {
     return new Promise<void>(async (resolve, reject) =>
     {
@@ -363,9 +363,9 @@ export class Scheduler
       });
       resolve();
     });
-  }
+  };
 
-  private async _select(columns: string[], filter: object, locked?: boolean): Promise<SchedulerConfig[]>
+  private async; _select(columns: string[], filter: object, locked ? : boolean); : Promise < SchedulerConfig[] >
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -386,9 +386,9 @@ export class Scheduler
       const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
       resolve(results);
     });
-  }
+  };
 
-  private async _setStatus(id: number, status: boolean): Promise<SchedulerConfig[]>
+  private async; _setStatus(id: number, status: boolean); : Promise < SchedulerConfig[] >
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -403,7 +403,7 @@ export class Scheduler
         return resolve([] as SchedulerConfig[]);
       }
     });
-  }
+  };
 }
 
 export default Scheduler;

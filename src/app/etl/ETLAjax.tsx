@@ -70,7 +70,7 @@ class ETLAjax
       const handleResponse = (response: any) =>
       {
         resolve(response.data);
-      }
+      };
       return Ajax.req(
         'get',
         simple ? 'integrations/simple' : 'integrations/',
@@ -89,7 +89,7 @@ class ETLAjax
       const handleResponse = (response: any) =>
       {
         resolve(response);
-      }
+      };
       return Ajax.req(
         'get',
         simple ? `integrations/simple/${integrationId}` : `integrations/${integrationId}`,
@@ -108,11 +108,11 @@ class ETLAjax
       const handleResponse = (response: any) =>
       {
         resolve(response);
-      }
+      };
       return Ajax.req(
         'post',
         `integrations/`,
-        {integration},
+        { integration },
         handleResponse,
         {
           onError: reject,
@@ -127,11 +127,11 @@ class ETLAjax
       const handleResponse = (response: any) =>
       {
         resolve(response);
-      }
+      };
       return Ajax.req(
         'post',
         `integrations/${integrationId}`,
-        {integration},
+        { integration },
         handleResponse,
         {
           onError: reject,
@@ -146,7 +146,7 @@ class ETLAjax
       const handleResponse = (response: any) =>
       {
         resolve(response);
-      }
+      };
       return Ajax.req(
         'post',
         `integrations/delete/${integrationId}`,

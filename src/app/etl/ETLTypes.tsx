@@ -51,8 +51,8 @@ const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
-import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 class ETLStateC
