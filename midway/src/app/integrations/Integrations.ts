@@ -67,7 +67,7 @@ export class Integrations
   constructor()
   {
     this.integrationTable = new Tasty.Table(
-      'endpoints',
+      'integrations',
       ['id'],
       [
         'authConfig',

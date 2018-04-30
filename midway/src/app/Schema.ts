@@ -144,7 +144,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      tasks text NOT NULL,
      type text NOT NULL,
      workerId integer NOT NULL);`,
-  `CREATE TABLE IF NOT EXISTS endpoints
+  `CREATE TABLE IF NOT EXISTS integrations
     (id ` + primaryKeyType + ` PRIMARY KEY,
      authConfig text NOT NULL,
      connectionConfig text NOT NULL,
