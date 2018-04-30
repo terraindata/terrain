@@ -143,33 +143,6 @@ export class Integrations
     });
   }
 
-  public async initializeLocalFilesystemIntegration(): Promise<void>
-  {
-    const userExists = await users.select([], { email: 'admin@terraindata.com' });
-    if (userExists.length !== 0)
-    {
-      const localConfigs: string[] = await this.getByType(userExists[0], 'local');
-      if (localConfigs.length === 0)
-      {
-        const seedUser = userExists[0];
-        const localCred: IntegrationConfig =
-          {
-            authConfig: null,
-            connectionConfig: null,
-            createdBy: seedUser.id as number,
-            id: undefined,
-            lastModified: null,
-            meta: '',
-            name: 'Local Filesystem Config',
-            readPermission: IntegrationPermissionEnum.Admin,
-            type: 'local',
-            writePermission: IntegrationPermissionEnum.Admin,
-          };
-        await this.upsert(seedUser, localCred);
-      }
-    }
-  }
-
   public async upsert(user: UserConfig, integration: IntegrationConfig): Promise<IntegrationConfig>
   {
     return new Promise<IntegrationConfig>(async (resolve, reject) =>
