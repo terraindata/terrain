@@ -58,8 +58,8 @@ export const PathfinderText = {
   // Filter sections
   hardFilterSectionTitle: 'Must Match',
   hardFilterSectionSubtitle: 'When conditions are met, results are visible. When conditions are not met, results are hidden.',
-  hardFilterAdd: 'Create Filter',
-  softFilterAdd: 'Create Match',
+  hardFilterAdd: 'Add Filter',
+  softFilterAdd: 'Add Match',
   softFilterSectionTitle: 'Should Match',
   softFilterSectionSubtitle: 'When conditions are met, results are rewarded. When conditions are not met, there is no impact.',
   includeDistanceExplanation: 'Include distance from each result to this location as a field',
@@ -115,6 +115,7 @@ export const PathfinderText = {
   moreSectionSubtitle:
     'Add advanced functionality to your algorithm, like grouping by a field, adding scripts, and adding personalization algorithms',
   sizeTitle: 'Number of Results',
+  sizeSubTitle: 'Size',
   
   // Collapse
   collapseTitle: 'Group by',
