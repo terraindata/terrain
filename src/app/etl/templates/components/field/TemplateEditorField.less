@@ -18,7 +18,7 @@
 .template-editor-field-block {
   display: flex;
   flex-direction: column;
-  padding: @quarter-spacing;
+  padding: @half-spacing;
 
   .field-preview-label-group {
     flex: 0 0 200px;
@@ -74,26 +74,34 @@
   .field-preview-row {
     display: flex;
     min-width: 0;
+    padding: @half-spacing;
   }
 }
 
-@settings-height: 340px;
-@settings-margin-size: 2 * @double-spacing - 4px;
-@settings-extra-space: 2 * @settings-margin-size;
-.injected-content-container {
-  width: 100%;
-  height: @settings-height + @spacing;
+.editor-field-main-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
 
-  .injected-content-content {
-    border: 1px solid;
+@settings-height: 340px;
+@settings-margin-size: (2 * @double-spacing - 4px);
+@settings-extra-space: (2 * @settings-margin-size);
+.editor-field-node-settings-container {
+  height: (@settings-height + @spacing);
+  position: relative;
+  left: -1px;
+  .transition;
+
+  .editor-field-node-settings-content {
+    border-radius: 4px;
+    box-sizing: border-box;
+    width: ~"calc(100% + 2px)";
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: @settings-height;
-    width: ~"calc(100% - @{settings-extra-space})";
-    left: @settings-margin-size;
     box-shadow: 2px 3px 10px rgba(0,0,0,0.25);
-    position: absolute;
   }
 }
 

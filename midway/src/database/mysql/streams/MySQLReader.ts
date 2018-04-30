@@ -44,82 +44,83 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as mysql from 'mysql';
+import { Readable } from 'stream';
 import * as winston from 'winston';
 
-import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
-import MySQLController from '../../../../src/database/mysql/MySQLController';
+import SafeReadable from '../../../app/io/streams/SafeReadable';
+import MySQLClient from '../client/MySQLClient';
+import MySQLConfig from '../MySQLConfig';
+import MySQLController from '../MySQLController';
 
-import * as Tasty from '../../../../src/tasty/Tasty';
-import MySQLQueries from '../../../tasty/MySQLQueries';
-import SQLQueries from '../../../tasty/SQLQueries';
-import * as Utils from '../../TestUtil';
-
-function getExpectedFile(): string
+export class MySQLReader extends SafeReadable
 {
-  return __filename.split('.')[0] + '.expected';
-}
+  private config: MySQLConfig;
+  private controller: MySQLController;
+  private stream: Readable | null = null;
+  private query: string;
 
-let tasty: Tasty.Tasty;
-let mysqlController: MySQLController;
+  constructor(config: MySQLConfig, query: string, table?: string)
+  {
+    super({ objectMode: true, highWaterMark: 1024 * 8 });
+    this.config = config;
 
-beforeAll(async () =>
-{
-  (winston as any).level = 'debug';
-  const config: MySQLConfig =
+    if (query === '')
     {
-      connectionLimit: 20,
-      database: 'moviesdb',
-      host: 'localhost',
-      port: 63306,
-      password: 'r3curs1v3$',
-      user: 't3rr41n-demo',
-      dateStrings: true,
-    };
-
-  try
-  {
-    mysqlController = new MySQLController(config, 0, 'MySQLExecutorTests');
-    tasty = mysqlController.getTasty();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
-
-function runTest(testObj: object)
-{
-  const testName: string = 'MySQL: execute ' + String(testObj[0]);
-  test(testName, async (done) =>
-  {
-    try
-    {
-      const results = await tasty.getDB().execute(testObj[1]);
-      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
+      if (table !== undefined)
+      {
+        this.query = 'select * from ' + table + ' limit 100;';
+      }
+      else
+      {
+        this.query = 'select 1;';
+      }
     }
-    catch (e)
+    else
     {
-      fail(e);
+      this.query = query;
     }
-    done();
-  });
+
+    this.controller = new MySQLController(config, 0, 'MySQLReader');
+    const client: MySQLClient = this.controller.getClient();
+    client.getConnection((err, connection) =>
+    {
+      try
+      {
+        const q = connection.query(this.query);
+        q.on('error', (e) => this.emit('error', e));
+        this.stream = q.stream();
+        this.stream.on('end', () => this.push(null));
+        this.stream.on('data', (d) => this.push(d));
+        this.stream.on('error', (e) => this.emit('error', e));
+      }
+      catch (e)
+      {
+        this.emit('error', e);
+      }
+    });
+  }
+
+  public _read(size?: number)
+  {
+    if (this.stream !== null)
+    {
+      return this.stream.read(size);
+    }
+  }
+
+  public _destroy(error, callback)
+  {
+    if (this.stream !== null)
+    {
+      this.stream.destroy(error);
+    }
+
+    if (callback !== undefined)
+    {
+      callback();
+    }
+  }
 }
 
-const tests = MySQLQueries.concat(SQLQueries);
-
-for (let i = 0; i < tests.length; i++)
-{
-  runTest(tests[i]);
-}
-
-afterAll(async () =>
-{
-  try
-  {
-    await tasty.destroy();
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-});
+export default MySQLReader;

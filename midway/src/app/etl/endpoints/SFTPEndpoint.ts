@@ -49,10 +49,9 @@ import { Readable, Writable } from 'stream';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import AEndpointStream from './AEndpointStream';
-
 import CredentialConfig from '../../credentials/CredentialConfig';
 import { credentials } from '../../credentials/CredentialRouter';
+import AEndpointStream from './AEndpointStream';
 
 export default class SFTPEndpoint extends AEndpointStream
 {

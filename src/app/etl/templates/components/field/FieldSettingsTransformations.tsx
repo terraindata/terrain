@@ -72,7 +72,7 @@ import { mapDispatchKeys, mapStateKeys, TemplateEditorField, TemplateEditorField
 
 import { TransformationInfo } from 'shared/transformations/TransformationInfo';
 
-import './transformations/TransformationEditor.less';
+import 'etl/templates/components/transformations/TransformationEditor.less';
 
 const EditIcon = require('images/icon_edit.svg');
 const DeleteIcon = require('images/icon_close.svg');
