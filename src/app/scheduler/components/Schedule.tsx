@@ -140,6 +140,13 @@ class Schedule extends TerrainComponent<Props>
           .setIn(['params', 'overrideSources'], Map({}))
           .setIn(['params', 'overrideSinks'], Map({}));
         schedule = schedule.setIn(['tasks', 0], task);
+        if (!schedule.name)
+        {
+          schedule = schedule.set(
+            'name',
+            this.props.templates.filter((t) => t.id === value).get(0).templateName,
+          );
+        }
         this.props.onChange(schedule);
         break;
       case 1: // Configuration
@@ -232,6 +239,7 @@ class Schedule extends TerrainComponent<Props>
       hideSampleData: true,
       getValueComponent: this.getScheduleNameInput,
       headerBelowValueComponent: true,
+      overrideWidthPercentage: 24,
     };
 
     // Configuration Option Set (Based on Template)
@@ -258,6 +266,7 @@ class Schedule extends TerrainComponent<Props>
       forceFloat: true,
       getCustomDisplayName: this._fn(this.getSourceSinkDescription, template),
       hideSampleData: true,
+      overrideWidthPercentage: 24,
     };
 
     const intervalOptionSet = {
@@ -270,6 +279,7 @@ class Schedule extends TerrainComponent<Props>
       getCustomDisplayName: !template ? (value) => '--' : this.getIntervalDisplayName,
       getValueComponent: !template ? (props) => null : this.getIntervalComponent,
       hideSampleData: true,
+      overrideWidthPercentage: 24,
     };
 
     const statusOptionSet = {
@@ -280,6 +290,7 @@ class Schedule extends TerrainComponent<Props>
       column: true,
       hideSampleData: true,
       canUseButton: this.canEdit(),
+      overrideWidthPercentage: 14,
     };
 
     const buttonOptionSet = {
@@ -290,6 +301,7 @@ class Schedule extends TerrainComponent<Props>
       column: true,
       canUseButton: TerrainTools.isAdmin(),
       hideSampleData: true,
+      overrideWidthPercentage: 14,
     };
 
     return List([templateOptionSet, configurationOptionSet, intervalOptionSet, statusOptionSet, buttonOptionSet]);

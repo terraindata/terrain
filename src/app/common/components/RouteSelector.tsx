@@ -102,6 +102,7 @@ export interface RouteSelectorOptionSet
   getCustomDisplayName?: (value, setIndex: number) => string | undefined;
   getValueComponent?: (props: { value: any }) => React.ReactElement<any>;
   headerBelowValueComponent?: boolean;
+  overrideWidthPercentage?: number; // If used for one optionSet, this should be set for all optionSets
 }
 
 export interface Props
@@ -238,7 +239,6 @@ export class RouteSelector extends TerrainComponent<Props>
   private renderBoxValue()
   {
     const { props, state } = this;
-
     return (
       <div
         className={classNames({
@@ -274,7 +274,9 @@ export class RouteSelector extends TerrainComponent<Props>
                 /* could try Mousedown to make it slightly snappier,
                 but this led to weird issues with closing it */
               }
-              style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
+              style={getStyle('minWidth', optionSet.overrideWidthPercentage ?
+                String(optionSet.overrideWidthPercentage) + '%' :
+                String(100 / state.optionSets.size + 3) + '%')}
             >
               {
                 optionSet.isButton ?
@@ -474,7 +476,9 @@ export class RouteSelector extends TerrainComponent<Props>
       <div
         className='routeselector-option-set'
         key={optionSet.key}
-        style={getStyle('width', String(100 / state.optionSets.size + 3) + '%')}
+        style={getStyle('minWidth', optionSet.overrideWidthPercentage ?
+          String(optionSet.overrideWidthPercentage) + '%' :
+          String(100 / state.optionSets.size + 3) + '%')}
       >
         {
           (optionSet.headerText && !optionSet.headerBelowValueComponent) &&

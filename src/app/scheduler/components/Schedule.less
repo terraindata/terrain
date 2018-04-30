@@ -2,11 +2,41 @@
 
 .schedule-list-wrapper {
 	padding: 12px;
-	.routeselector-picker {
-		.routeselector-value-component {
-			.floating-input-container {
-				margin-left: 12px;
-				width: calc(~"100% - 12px");
+	.routeselector {
+		.routeselector-box-values {
+			padding-right: 50px;
+			.button {
+				max-width: 100%;
+			}
+			.routeselector-delete {
+				position: relative;
+				left: -22px;
+			}
+		}
+		.routeselector-picker {
+			.routeselector-picker-inner {
+				padding-right: 50px;
+			}
+			.routeselector-value-component {
+				.floating-input-container {
+					margin-left: 12px;
+					width: calc(~"100% - 12px");
+				}
+			}
+		}
+		.dynamic-form {
+			max-width: 100%;
+			.dynamic-form-cell {
+				max-width: 100%;
+				.dropdown-option {
+					height: auto;
+				}
+			}
+			.dynamic-form-errors {
+				max-width: 100%;
+			}
+			.dropdown-value {
+				overflow: hidden;
 			}
 		}
 	}

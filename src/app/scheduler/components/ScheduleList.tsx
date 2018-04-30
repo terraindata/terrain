@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
+import Modal from 'app/common/components/Modal';
 import { ETLActions } from 'app/etl/ETLRedux';
 import { ETLState } from 'app/etl/ETLTypes';
 import { SchedulerActions } from 'app/scheduler/data/SchedulerRedux';
@@ -52,8 +53,8 @@ import { _SchedulerConfig, scheduleForDatabase, SchedulerConfig, SchedulerState 
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as React from 'react';
 import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
@@ -71,6 +72,13 @@ export interface Props
 
 class ScheduleList extends TerrainComponent<Props>
 {
+  public state: {
+    confirmModalOpen: boolean,
+    deleteScheduleId: ID,
+  } = {
+      confirmModalOpen: false,
+      deleteScheduleId: -1,
+    };
   public componentWillMount()
   {
     this.props.schedulerActions({
@@ -102,11 +110,20 @@ class ScheduleList extends TerrainComponent<Props>
     });
   }
 
-  public performAction(action, scheduleId: ID)
+  public performAction(action, scheduleId?: ID)
   {
+    scheduleId = scheduleId !== undefined ? scheduleId : this.state.deleteScheduleId;
     this.props.schedulerActions({
       actionType: action,
       scheduleId,
+    });
+  }
+
+  public confirmDeleteSchedule(scheduleId: ID)
+  {
+    this.setState({
+      confirmModalOpen: true,
+      deleteScheduleId: scheduleId,
     });
   }
 
@@ -115,6 +132,7 @@ class ScheduleList extends TerrainComponent<Props>
     const { schedules } = this.props;
     const keys = schedules.keySeq().toList().sort();
     const scheduleList = keys.map((id) => schedules.get(id));
+    const toDelete = schedules.get(this.state.deleteScheduleId) ? schedules.get(this.state.deleteScheduleId).name : '';
     return (
       <div className='schedule-list-wrapper'>
         {
@@ -122,7 +140,7 @@ class ScheduleList extends TerrainComponent<Props>
             <Schedule
               key={i}
               schedule={schedule}
-              onDelete={this._fn(this.performAction, 'deleteSchedule')}
+              onDelete={this.confirmDeleteSchedule}
               onRun={this._fn(this.performAction, 'runSchedule')}
               onPause={this._fn(this.performAction, 'pauseSchedule')}
               onUnpause={this._fn(this.performAction, 'unpauseSchedule')}
@@ -139,6 +157,15 @@ class ScheduleList extends TerrainComponent<Props>
           canEdit={TerrainTools.isAdmin()}
           onCreate={this.createSchedule}
           showText={true}
+        />
+        <Modal
+          open={this.state.confirmModalOpen}
+          confirm={true}
+          title={'Confirm Action'}
+          message={`Are you sure you want to delete ${toDelete}?`}
+          confirmButtonText={'Yes'}
+          onConfirm={this._fn(this.performAction, 'deleteSchedule')}
+          onClose={this._toggle('confirmModalOpen')}
         />
       </div>
     );
