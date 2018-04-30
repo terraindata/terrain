@@ -99,7 +99,7 @@ export class Scheduler
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
-  public cancel(id: number): Promise<SchedulerConfig[] | string>
+  public cancel(id: number): Promise<SchedulerConfig[]>
   {
     if (this.runningSchedules.get(id) !== undefined)
     {
@@ -107,7 +107,7 @@ export class Scheduler
       // TODO: unlock row
       return this.get(id) as Promise<SchedulerConfig[]>;
     }
-    return Promise.reject('Schedule not found.');
+    return Promise.reject(new Error('Schedule not found.'));
   }
 
   public async delete(id: number): Promise<SchedulerConfig[] | string>
@@ -158,17 +158,17 @@ export class Scheduler
     {
       if (this.runningSchedules.get(id) !== undefined)
       {
-        return resolve('Schedule is already running.');
+        return reject(new Error('Schedule is already running.'));
       }
       const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length === 0)
       {
-        return reject('Schedule not found.');
+        return reject(new Error('Schedule not found.'));
       }
       const schedule: SchedulerConfig = schedules[0];
       if (schedule.running === true)
       {
-        return reject('Schedule ' + (id.toString() as string) + ' is already running.');
+        return reject(new Error('Schedule ' + (id.toString() as string) + ' is already running.'));
       }
       const jobFilename: string = 'Job_' + (id.toString() as string) + '_' + new Date().toISOString() + '.bin';
       const jobType: string = runNow === true ? 'Scheduled ad-hoc' : 'Scheduled';
@@ -194,7 +194,7 @@ export class Scheduler
       const jobCreateStatus: JobConfig[] | string = await App.JobQ.create(jobConfig, runNow, userId);
       if (typeof jobCreateStatus === 'string')
       {
-        return reject(jobCreateStatus as string);
+        return reject(new Error(jobCreateStatus as string));
       }
       this.runningSchedules.delete(id);
       return resolve(await this.get(id) as SchedulerConfig[]);
@@ -208,7 +208,7 @@ export class Scheduler
       this.runningSchedules.get(id).pause();
       return this.get(id) as Promise<SchedulerConfig[]>;
     }
-    return Promise.reject('Schedule not found.');
+    return Promise.reject(new Error('Schedule not found.'));
   }
 
   public async setRunning(id: number, running: boolean): Promise<SchedulerConfig[]>
@@ -232,7 +232,7 @@ export class Scheduler
   {
     if (typeof status !== 'boolean' || status === undefined)
     {
-      return Promise.reject([] as SchedulerConfig[]);
+      return Promise.resolve([] as SchedulerConfig[]);
     }
     return this._setStatus(id, status) as Promise<SchedulerConfig[]>;
   }
@@ -247,7 +247,7 @@ export class Scheduler
         // wait for the unpause to resolve first
         return resolve(await this.get(id) as SchedulerConfig[]);
       }
-      return reject([] as SchedulerConfig[]);
+      return resolve([] as SchedulerConfig[]);
     });
   }
 
@@ -260,10 +260,10 @@ export class Scheduler
       {
         if (schedule.name === undefined || schedule.cron === undefined)
         {
-          return Promise.reject('Schedule name and cron must be provided.');
+          return reject(new Error('Schedule name and cron must be provided.'));
         }
         schedule.createdAt = creationDate;
-        schedule.createdBy = user !== undefined ? user.id : null;
+        schedule.createdBy = user !== undefined ? user.id : -1;
         schedule.lastModified = creationDate;
         schedule.lastRun = new Date(0); // beginning of epoch time
         schedule.meta = (schedule.meta !== undefined && schedule.meta !== null) ? schedule.meta : '';
@@ -279,7 +279,7 @@ export class Scheduler
         const existingSchedules: SchedulerConfig[] = await this.get(schedule.id);
         if (existingSchedules.length === 0)
         {
-          return Promise.reject('Schedule ' + ((schedule.id as any).toString() as string) + ' does not exist.');
+          return reject(new Error('Schedule ' + ((schedule.id as any).toString() as string) + ' does not exist.'));
         }
         schedule.lastModified = creationDate;
         Object.keys(existingSchedules[0]).forEach((key) =>
