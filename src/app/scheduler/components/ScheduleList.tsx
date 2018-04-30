@@ -62,7 +62,6 @@ import SchedulerApi from 'scheduler/SchedulerApi';
 import XHR from 'util/XHR';
 import Schedule from './Schedule';
 import './Schedule.less';
-
 const RefreshIcon = require('images/icon_refresh.svg?name=RefreshIcon');
 
 export interface Props
