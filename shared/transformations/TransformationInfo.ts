@@ -352,7 +352,8 @@ const TransformationNodeInfo: AllNodeInfoType =
         description: 'Checks if a field matches a certain special value, and if so, replaces that value',
         isAvailable: (engine, fieldId) =>
         {
-          return true;
+          const type = EngineUtil.getRepresentedType(fieldId, engine);
+          return type === 'number' || type === 'string' || type === 'boolean';
         },
         type: SetIfTransformationNode,
         targetedVisitor: (visitor: TransformationNodeVisitor,
