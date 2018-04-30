@@ -99,7 +99,7 @@ export class Scheduler
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
-  public cancel(id: number): Promise<SchedulerConfig[] | string>
+  public cancel(id: number): Promise<SchedulerConfig[]>
   {
     if (this.runningSchedules.get(id) !== undefined)
     {
@@ -107,7 +107,7 @@ export class Scheduler
       // TODO: unlock row
       return this.get(id) as Promise<SchedulerConfig[]>;
     }
-    return Promise.reject('Schedule not found.');
+    return Promise.reject(new Error('Schedule not found.'));
   }
 
   public async delete(id: number): Promise<SchedulerConfig[] | string>
@@ -149,7 +149,7 @@ export class Scheduler
     {
       if (this.runningSchedules.get(id) !== undefined)
       {
-        return resolve(new Error('Schedule is already running.'));
+        return reject(new Error('Schedule is already running.'));
       }
       const schedules: SchedulerConfig[] = await this.get(id);
       if (schedules.length === 0)
@@ -199,7 +199,7 @@ export class Scheduler
       this.runningSchedules.get(id).pause();
       return this.get(id) as Promise<SchedulerConfig[]>;
     }
-    return reject(new Error('Schedule not found.'));
+    return Promise.reject(new Error('Schedule not found.'));
   }
 
   public async setRunning(id: number, running: boolean): Promise<SchedulerConfig[]>
