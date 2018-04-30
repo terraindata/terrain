@@ -95,7 +95,6 @@ export class Scheduler
   {
     // reset all schedules that are currently running back to not running
     await this._resetAllRunningSchedules();
-
     setTimeout(this._checkSchedulerTable.bind(this), 60000 - new Date().getTime() % 60000);
   }
 
@@ -110,18 +109,18 @@ export class Scheduler
     return Promise.reject(new Error('Schedule not found.'));
   }
 
-  public async delete(id: number): Promise<SchedulerConfig[] | string>
+  public async delete(id: number): Promise<SchedulerConfig[]>
   {
-    return new Promise<SchedulerConfig[] | string>
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      const deletedSchedules: SchedulerConfig[] = await this.select(id);
+      const deletedSchedules: SchedulerConfig[] = await this.get(id);
       if (deletedSchedules.length === 0)
       {
-        return reject('Schedule does not exist.');
+        return reject(new Error('Schedule does not exist.'));
       }
-      await App.DB.delete(this.schedulerTable, { id }) as SchedulerConfig[];
+      await App.DB.delete(this.schedulerTable, { id });
       return resolve(deletedSchedules as SchedulerConfig[]);
-    }
+    });
   }
 
   public async duplicate(id: number): Promise<SchedulerConfig[]>

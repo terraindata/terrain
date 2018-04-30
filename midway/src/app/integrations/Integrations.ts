@@ -99,7 +99,7 @@ export class Integrations
       {
         return reject('Integration does not exist.');
       }
-      await App.DB.delete(this.integrationTable, { id }) as IntegrationConfig[];
+      await App.DB.delete(this.integrationTable, { id });
       return resolve(deletedIntegrations);
     });
   }
@@ -117,7 +117,7 @@ export class Integrations
       })));
     });
   }
- 
+
   // returns a string of credentials that match given type
   public async getByType(user: UserConfig, type?: string): Promise<string[]>
   {
@@ -229,7 +229,7 @@ export class Integrations
         }
       }
       integration.createdBy = (integration.createdBy !== undefined && integration.createdBy !== null)
-        ? integration.createdBy : defaultCreatedBy ;
+        ? integration.createdBy : defaultCreatedBy;
       integration.lastModified = new Date();
       integration.meta = (integration.meta !== undefined && integration.meta !== null) ? integration.meta : '';
       integration.name = (integration.name !== undefined && integration.name !== null) ? integration.name : '';
