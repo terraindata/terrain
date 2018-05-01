@@ -88,12 +88,12 @@ class PathfinderCreateLine extends TerrainComponent<Props>
             <div className='pf-create-fill' />
             <PFAddIcon />
           </div>
-          
-              <div className='pf-create-text'>
-                {
-                  text
-                }
-              </div>
+
+          <div className='pf-create-text'>
+            {
+              text
+            }
+          </div>
         </div>
       </div>
     );
