@@ -1037,6 +1037,14 @@ export class Import
     {
       return true;
     }
+    if (thisType === 'nested' && typeObj['type'] === 'geo_point')
+    {
+      const itemKeys: string[] = Object.keys(item).sort();
+      if (itemKeys.length === 2 && itemKeys[0] === 'lat' && itemKeys[1] === 'lon' && !isNaN(item['lat']) && !isNaN(item['lon']))
+      {
+        return true;
+      }
+    }
     if (thisType === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
     {
       return true;
