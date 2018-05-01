@@ -87,13 +87,13 @@ describe('Testing the card parser', () =>
   it('parse card', async () =>
   {
     page = await browser.newPage();
-    console.log('Created a new browser page.');
+    winston.info('Created a new browser page.');
     await page.setViewport({ width: 1600, height: 1200 });
-    console.log('Set the page view to 1600x1200.');
+    winston.info('Set the page view to 1600x1200.');
     const url = `http://${ip.address()}:3000`;
-    console.log('Get url:' + url);
+    winston.info('Get url:' + url);
     await page.goto(url);
-    console.log('Visited url:' + url);
+    winston.info('Visited url:' + url);
     await page.waitForSelector(USERNAME_SELECTOR);
     winston.info('Loaded the page ' + url);
     for (const testName of Object.keys(expected))
