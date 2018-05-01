@@ -63,24 +63,24 @@ const { List, Map } = Immutable;
 export interface Props
 {
   integrationType?: string;
-  integrations: IMMap<ID, IntegrationConfig>; // TODO injected from etl store
+  integrations: IMMap<ID, IntegrationConfig>;
   selectedIntegration: ID;
   onChange: (id: ID) => void;
 }
 
-export default class IntegrationForm extends TerrainComponent<Props>
+export default class IntegrationPicker extends TerrainComponent<Props>
 {
   public state: {
-    filterIntegrations: IMMap<ID, IntegrationConfig>
+    filteredIntegrations: IMMap<ID, IntegrationConfig>,
+    integrationIds: List<ID>,
   } = {
-    filterIntegrations: Map(),
+    filteredIntegrations: Map(),
+    integrationIds: List(),
   }
 
-  public componentWillMount()
+  public componentDidMount()
   {
-    this.setState({
-      filterIntegrations: this.filterIntegrations(this.props.integrationType, this.props.integrations),
-    });
+    this.filterIntegrations(this.props.integrationType, this.props.integrations);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -88,19 +88,26 @@ export default class IntegrationForm extends TerrainComponent<Props>
     if (this.props.integrationType !== nextProps.integrationType ||
         this.props.integrations !== nextProps.integrations)
     {
-      this.setState({
-        filterIntegrations: this.filterIntegrations(nextProps.integrationType, nextProps.integrations),
-      });
+      this.filterIntegrations(nextProps.integrationType, nextProps.integrations);
     }
   }
 
   public filterIntegrations(type: string, integrations: Immutable.Map<ID, IntegrationConfig>)
   {
+    let filtered;
     if (!type)
     {
-      return integrations;
+      filtered = integrations;
     }
-    return integrations.filter((integration) => integration.type === type);
+    else
+    {
+      filtered = integrations.filter((integration) => integration.type === type);
+    }
+    const integrationIds = filtered.toList().map((i) => i.id).sort().toList();
+    this.setState({
+      filteredIntegrations: filtered,
+      integrationIds,
+    });
   }
 
   public handleIntegrationChange(newState)
@@ -111,17 +118,16 @@ export default class IntegrationForm extends TerrainComponent<Props>
   public render()
   {
     const { onChange, selectedIntegration } = this.props;
-    const { filterIntegrations } = this.state;
-    const integrationsList = filterIntegrations.toList().map((i) => i.id).sort().toList();
+    const { filteredIntegrations, integrationIds } = this.state;
     const inputMap =
     {
       id: {
         type: DisplayType.Pick,
         displayName: 'Integration',
         options: {
-          pickOptions: (s) => integrationsList,
-          indexResolver: (value) =>  integrationsList.indexOf(value),
-          displayNames: (s) => filterIntegrations.map((i) => i.name),
+          pickOptions: (s) => integrationIds,
+          indexResolver: (value) =>  integrationIds.indexOf(value),
+          displayNames: (s) => filteredIntegrations.map((i) => i.name),
         },
       },
     };
