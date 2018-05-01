@@ -10,14 +10,7 @@
 
 .routeselector-wrapper {
 	width: 100%;
-	.routeselector-warning-icon {
-		height: 16px;
-		width: 16px;
-		position: absolute;
-	    z-index: 99;
-	    left: 5px;
-	    top: 30px;
-	}
+
 }
 
 .routeselector {
@@ -38,6 +31,11 @@
 		position: relative;
 		overflow: hidden;
 		
+		max-height: 0;
+		&.routeselector-box-values-showing {
+			max-height: 100;
+		}
+		
 		&:hover {
 		.routeselector-delete {
 			opacity: 1;
@@ -47,7 +45,7 @@
 	    z-index: 1;
 		}
 			
-	  .transition;
+	  .transition(~"all 0.5s");
 	    
 		display: flex;
 		align-items: center;
@@ -58,6 +56,7 @@
 		border-bottom: 1px solid #eee;
 		
 		cursor: pointer;
+		
 		
 		&.routeselector-box-values-open {
 			z-index: 1004;
@@ -72,8 +71,16 @@
     	border-top-right-radius: @br;
     }
 	}
-
 	
+	.routeselector-warning-icon {
+		height: 16px;
+		width: 16px;
+		position: absolute;
+    z-index: 99;
+    left: 5px;
+    top: 30px;
+	}
+
 	.routeselector-box-value {
 		overflow-x: hidden;
     	flex-grow: 1;

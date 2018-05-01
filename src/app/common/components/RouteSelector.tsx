@@ -68,6 +68,8 @@ import KeyboardFocus from './KeyboardFocus';
 import './RouteSelectorStyle.less';
 import SearchInput from './SearchInput';
 
+const { VelocityTransitionGroup, VelocityComponent } = require('velocity-react');
+
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 const InfoIcon = require('images/icon_info.svg');
 
@@ -137,6 +139,8 @@ export class RouteSelector extends TerrainComponent<Props>
 
     focusedSetIndex: this.props.defaultOpen ? 0 : -1,
     focusedOptionIndex: 0,
+    
+    showBoxValues: false,
 
     columnRefs: Map<number, any>({}),
     pickerRef: null,
@@ -178,6 +182,11 @@ export class RouteSelector extends TerrainComponent<Props>
           this.getResultConfigs(this.state.optionSets.get(0).options);
         }
       });
+    
+    // needed to be in a timeout, not in the above setState, for some reason.
+    setTimeout(() => this.setState({
+      showBoxValues: true,
+    }), 100);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -245,6 +254,7 @@ export class RouteSelector extends TerrainComponent<Props>
           'routeselector-box-values': true,
           'routeselector-box-values-open': this.isOpen(),
           'routeselector-box-values-force-open': props.forceOpen,
+          'routeselector-box-values-showing': state.showBoxValues,
         })}
         style={getStyle('borderBottom', this.isOpen() ?
           '1px solid #eee' : props.hideLine ? 'none' : undefined)}
