@@ -155,7 +155,7 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
   return new Promise<stream.Duplex>(async (resolve, reject) =>
   {
     let endpoint: AEndpointStream;
-    let exportStream;
+    let transformStream;
 
     winston.info(`Processing ${sink.type} sink:`, JSON.stringify(sink, null, 2));
 
@@ -168,15 +168,15 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
           case 'json':
             if (sink.fileConfig.jsonNewlines)
             {
-              exportStream = JSONTransform.createExportStream('', ',\n', '');
+              transformStream = JSONTransform.createExportStream('', ',\n', '');
             }
             else
             {
-              exportStream = JSONTransform.createExportStream();
+              transformStream = JSONTransform.createExportStream();
             }
             break;
           case 'csv':
-            exportStream = CSVTransform.createExportStream();
+            transformStream = CSVTransform.createExportStream();
             break;
           default:
             throw new Error('Export file type must be either CSV or JSON.');
@@ -186,7 +186,7 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
       switch (sink.type)
       {
         case 'Download':
-          return resolve(exportStream);
+          return resolve(transformStream);
         case 'Database':
           if (sink.options['language'] !== 'elastic')
           {
@@ -208,9 +208,17 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
       }
 
       const sinkStream = await endpoint.getSink(sink, engine);
-      const writableStream = exportStream.pipe(sinkStream);
-      const progressStream = new ProgressStream(exportStream);
-      resolve(progressStream);
+      if (transformStream !== undefined)
+      {
+        const writableStream = transformStream.pipe(sinkStream);
+        const progressStream = new ProgressStream(transformStream);
+        resolve(progressStream);
+      }
+      else
+      {
+        const progressStream = new ProgressStream(sinkStream);
+        resolve(progressStream);
+      }
     }
     catch (e)
     {
