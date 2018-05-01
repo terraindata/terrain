@@ -42,53 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-// NB: This router only exists for testing purposes.
-// If using a proxy, be sure to set app.proxy = true
+import SharedIntegrationSimpleConfig from 'shared/types/integrations/IntegrationSimpleConfig';
+import ConfigType from '../ConfigType';
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as Util from '../AppUtil';
-import { Permissions } from '../permissions/Permissions';
-import { UserConfig } from '../users/UserConfig';
-import CredentialConfig from './CredentialConfig';
-import Credentials from './Credentials';
-
-const Router = new KoaRouter();
-export const credentials: Credentials = new Credentials();
-const perm: Permissions = new Permissions();
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+export class IntegrationSimpleConfig extends SharedIntegrationSimpleConfig
 {
-  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
+  constructor(props: object)
   {
-    ctx.body = 'Unauthorized';
+    super();
+    ConfigType.initialize(this, props);
   }
-  else
-  {
-    ctx.body = await credentials.get();
-  }
-});
+}
 
-Router.get('/names', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await credentials.getNames(ctx.query.type);
-});
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
-  {
-    ctx.body = 'Unauthorized';
-  }
-  else
-  {
-    const cred: CredentialConfig = ctx.request.body.body;
-    Util.verifyParameters(cred, ['name', 'type', 'meta']);
-    ctx.body = await credentials.upsert(ctx.state.user, cred);
-  }
-});
-
-export default Router;
+export default IntegrationSimpleConfig;

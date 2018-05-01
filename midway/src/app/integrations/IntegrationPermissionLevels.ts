@@ -42,76 +42,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
-import * as SSH from 'ssh2';
-import { Readable, Writable } from 'stream';
-
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../integrations/IntegrationRouter';
-import AEndpointStream from './AEndpointStream';
-
-export default class SFTPEndpoint extends AEndpointStream
+export enum IntegrationPermission
 {
-  constructor()
-  {
-    super();
-  }
+  Admin = 'Admin',
+  Regular = 'Regular',
+  Default = 'Default',
+}
 
-  public async getSource(source: SourceConfig): Promise<Readable>
+export class IntegrationPermissionLevels
+{
+  public static isAllowedAccess(existingLevel: string, checkLevel: string): boolean
   {
-    const integrationId = source.options['integrationId'];
-    const sftp: SSH.SFTPWrapper = await this.getSFTPClientByintegrationId(integrationId);
-    return sftp.createReadStream(source.options['filepath']);
-  }
-
-  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
-  {
-    const integrationId = sink.options['integrationId'];
-    const sftp: SSH.SFTPWrapper = await this.getSFTPClientByintegrationId(integrationId);
-    return sftp.createWriteStream(sink.options['filepath']);
-  }
-
-  private async getSFTPClientByintegrationId(integrationId: number): Promise<SSH.SFTPWrapper>
-  {
-    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-    if (integration.length === 0)
+    if (checkLevel === IntegrationPermission.Admin)
     {
-      throw new Error('Invalid SFTP integration ID.');
+      return true;
     }
 
-    let sftpConfig: object = {};
-    try
+    if ((existingLevel === IntegrationPermission.Regular || existingLevel === IntegrationPermission.Default)
+      && checkLevel === IntegrationPermission.Regular)
     {
-      const connectionConfig = JSON.parse(integration[0].connectionConfig);
-      const authConfig = JSON.parse(integration[0].authConfig);
-      sftpConfig = Object.assign(connectionConfig, authConfig);
-    }
-    catch (e)
-    {
-      throw new Error('Retrieving integration ID ' + String(integrationId));
+      return true;
     }
 
-    return new Promise<SSH.SFTPWrapper>((resolve, reject) =>
+    if (existingLevel === IntegrationPermission.Default && checkLevel === IntegrationPermission.Default)
     {
-      const client = new SSH.Client();
-      client.on('ready', () =>
-      {
-        client.sftp((err, sftpClient) =>
-        {
-          if (err !== null && err !== undefined)
-          {
-            return reject(err);
-          }
-          else
-          {
-            return resolve(sftpClient);
-          }
-        });
-      }).on('error', reject)
-        .connect(sftpConfig);
-    });
+      return true;
+    }
+
+    return false;
   }
 }
+
+export default IntegrationPermissionLevels;

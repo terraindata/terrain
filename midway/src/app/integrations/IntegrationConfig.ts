@@ -42,19 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
+import SharedIntegrationConfig from 'shared/types/integrations/IntegrationConfig';
 import ConfigType from '../ConfigType';
 
-export class CredentialConfig extends ConfigType
+export class IntegrationConfig extends SharedIntegrationConfig
 {
-  public id?: number = undefined;
-  public createdBy: number = -1;
-  public meta: string = '';
-  public name: string = '';
-  public permissions?: number = undefined;
-  public type: string = '';
-
   constructor(props: object)
   {
     super();
@@ -62,4 +56,4 @@ export class CredentialConfig extends ConfigType
   }
 }
 
-export default CredentialConfig;
+export default IntegrationConfig;
