@@ -157,7 +157,7 @@ class FieldSettingsTransformations extends TemplateEditorField<Props>
     return { textStyle, buttonStyle };
   }
 
-  public renderTransformationListItem(value: TransformationNode, index)
+  public renderTransformationListItem(value: TransformationNode, index: number)
   {
     const style = this.transformationListItemStyle(index === this.state.currentIndex && this.state.viewState === ViewState.EDIT);
     const canEdit = TransformationInfo.canEdit(value.typeCode);

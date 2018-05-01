@@ -176,18 +176,25 @@ export default class EngineUtil
     const hashedPaths = List(Object.keys(pathTypes));
     hashedPaths.forEach((hashedPath, i) =>
     {
-      if (EngineUtil.isAValidField(EngineUtil.unhashPath(hashedPath), pathTypes))
+      const unhashedPath = EngineUtil.unhashPath(hashedPath);
+      if (EngineUtil.isAValidField(unhashedPath, pathTypes))
       {
         let fieldType = pathTypes[hashedPath];
-        const valueType = pathValueTypes[hashedPath];
+        let valueType = pathValueTypes[hashedPath];
         if (valueType !== undefined)
         {
           fieldType = 'array';
         }
-        const id = engine.addField(EngineUtil.unhashPath(hashedPath), fieldType);
+        if (EngineUtil.isWildcardField(unhashedPath))
+        {
+          valueType = fieldType;
+          fieldType = 'array';
+        }
+
+        const id = engine.addField(unhashedPath, fieldType);
         if (valueType !== undefined)
         {
-          engine.setFieldProp(id, valueTypeKeyPath, valueType);
+          engine.setFieldProp(id, valueTypeKeyPath, valueType !== null ? valueType : 'string');
         }
       }
     });
@@ -446,9 +453,17 @@ export default class EngineUtil
   }
 
   // warning types get typed as strings, but should emit a warning
-  private static mergeTypes(type1: FieldTypes, type2: FieldTypes): FieldTypes | 'warning' | 'softWarning'
+  private static mergeTypes(type1: FieldTypes = null, type2: FieldTypes = null): FieldTypes | 'warning' | 'softWarning'
   {
-    if (CompatibilityMatrix[type1][type2] !== undefined)
+    if (type1 === null)
+    {
+      return type2;
+    }
+    else if (type2 === null)
+    {
+      return type1;
+    }
+    else if (CompatibilityMatrix[type1][type2] !== undefined)
     {
       return CompatibilityMatrix[type1][type2];
     }

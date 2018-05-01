@@ -192,7 +192,7 @@ export class EngineProxy
     const tempDestKP = this.getSyntheticInputPath(destKP);
     const tempOriginalKP = this.getSyntheticInputPath(originalOKP);
     const destId = this.copyField(sourceId, tempDestKP, despecify);
-    const newOrigId = this.copyField(sourceId, tempOriginalKP , despecify);
+    const newOrigId = this.copyField(sourceId, tempOriginalKP, despecify);
     this.engine.setOutputKeyPath(destId, destKP);
     this.engine.setOutputKeyPath(newOrigId, originalOKP);
     this.engine.disableField(sourceId);

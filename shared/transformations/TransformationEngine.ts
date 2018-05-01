@@ -678,9 +678,14 @@ export class TransformationEngine
     // const arrayKey: any = [key.toString()];
     // const arrayID: number = this.addField(currentKeyPath.push(arrayKey), 'array');
     // console.log('x2 ' + currentKeyPath.push(key.toString()));
+    let arrayType = arrayTypeOfValues(obj[key]);
+    if (arrayType === undefined)
+    {
+      arrayType = null;
+    }
     const arrayID: number = this.addField(currentKeyPath.push(key.toString()), 'array');
     ids = ids.push(arrayID);
-    this.setFieldProp(arrayID, KeyPath(['valueType']), arrayTypeOfValues(obj[key]));
+    this.setFieldProp(arrayID, KeyPath(['valueType']), arrayType);
     // console.log('adding awid ' + currentKeyPath.push(key.toString()).push('*'));
     let awkp: KeyPath = currentKeyPath.push(key.toString());
     awkp = awkp.slice(0, awkp.size - depth + 1).toList();
@@ -690,7 +695,7 @@ export class TransformationEngine
     }
     // console.log('x4 ' + awkp);
     const arrayWildcardID: number = this.addField(awkp, 'array');
-    this.setFieldProp(arrayWildcardID, KeyPath(['valueType']), arrayTypeOfValues(obj[key]));
+    this.setFieldProp(arrayWildcardID, KeyPath(['valueType']), arrayType);
     ids = ids.push(arrayWildcardID);
     // this.setFieldProp(arrayID, KeyPath(['arrayLength']), obj[key].length);
     for (let i: number = 0; i < obj[key].length; i++)
