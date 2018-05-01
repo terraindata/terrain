@@ -46,62 +46,62 @@
         <div class="no-results text-center" ng-hide="results.length">No results</div>
         <div class="row justify-content-between justify-content-md-center align-items-start">
           <div class="col col-md-4 p-3 col-sm-6 col-xs-1 col-lg-2" ng-cloak ng-repeat="result in results" ng-init="$last && doneLoading()">
-            <div id="result-{{result.MovieId}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.MovieId}}" style="background-image:url(http://image.tmdb.org/t/p/w185/{{result.Posterpath}})" ng-click="cardDisplay(result)">
-              <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.Posterpath.length" alt={{result.Title}}>
+            <div id="result-{{result.movieid}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.movieid}}" style="background-image:url(http://image.tmdb.org/t/p/w185/{{result.posterpath}})" ng-click="cardDisplay(result)">
+              <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
               <div ng-init="cardLoad(result)"></div>
               <div class="card-body">
-                <h6 class="card-title">{{result.Title}}</h6>
+                <h6 class="card-title">{{result.title}}</h6>
               </div>
             </div>
-            <div class="modal fade" id="showDetail-{{result.MovieId}}" tabindex="-1" role="dialog" aria-labelledby="showDetailLabel" aria-hidden="true">
+            <div class="modal fade" id="showDetail-{{result.movieid}}" tabindex="-1" role="dialog" aria-labelledby="showDetailLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="showDetailLabel">{{result.Title}}</h5>
+                    <h5 class="modal-title" id="showDetailLabel">{{result.title}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span class="fa fa-times" aria-hidden="true"></span>
                     </button>
                   </div>
                   <div class="modal-body text-center p-4 m-4">
-                    <img class="img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.Posterpath}}" ng-if="result.Posterpath.length" alt={{result.Title}}>
-                    <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.Posterpath.length" alt={{result.Title}}>
-                    <p class="text-muted">{{result.Tagline}}</p>
+                    <img class="img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
+                    <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
+                    <p class="text-muted">{{result.tagline}}</p>
                     <br/>
-                    <p class="font-weight-bold text-info">{{result.Overview}}</p>
+                    <p class="font-weight-bold text-info">{{result.overview}}</p>
                     <br/>
                     <table class="table table-sm table-striped">
                       <tbody class="text-right">
                         <tr>
                           <td class="text-muted">Vote Count</td>
-                          <td>{{result.Votecount}}</td>
+                          <td>{{result.votecount}}</td>
                         </tr>
                         <tr>
                           <td class="text-muted">Vote Average</td>
-                          <td>{{result.Voteaverage}}</td>
+                          <td>{{result.voteaverage}}</td>
                         </tr>
                         <tr>
                           <td class="text-muted">Budget</td>
-                          <td>{{result.Budget | currency}}</td>
+                          <td>{{result.budget | currency}}</td>
                         </tr>
                         <tr>
                           <td class="text-muted">Revenue</td>
-                          <td>{{result.Revenue | currency}}</td>
+                          <td>{{result.revenue | currency}}</td>
                         </tr>
                         <tr>
                           <td class="text-muted">Release Date</td>
-                          <td>{{result.ReleaseDate | date}}</td>
+                          <td>{{result.releasedate | date}}</td>
                         </tr>
                         <tr>
                           <td class="text-muted">Runtime</td>
-                          <td>{{Result.Runtime}} minutes</td>
+                          <td>{{result.runtime}} minutes</td>
                         </tr>
                         <tr>
                           <td class="text-muted">Language</td>
-                          <td>{{result.Language}}</td>
+                          <td>{{result.language}}</td>
                         </tr>
                         <tr>
                           <td class="text-muted">Genre(s)</td>
-                          <td style="overflow: hidden; max-width: 40px; word-wrap: break-word;">{{result.Genres}}</td>
+                          <td style="overflow: hidden; max-width: 40px; word-wrap: break-word;">{{result.genres}}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -132,10 +132,10 @@
                   <tbody>
                     <tr ng-cloak ng-repeat="item in cart">
                       <td class="align-middle">
-                        <img class="thumbnail img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{item.Posterpath}}" ng-if="item.Posterpath.length" alt={{item.Title}}>
-                        <img class="thumbnail card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!item.Posterpath.length" alt={{item.Title}}>
+                        <img class="thumbnail img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{item.posterpath}}" ng-if="item.posterpath.length" alt={{item.title}}>
+                        <img class="thumbnail card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!item.posterpath.length" alt={{item.title}}>
                       </td>
-                      <td class="align-middle font-weight-bold">{{item.Title}}</td>
+                      <td class="align-middle font-weight-bold">{{item.title}}</td>
                       <td class="align-middle">
                         <button type="button" class="close" ng-click="removeItem(item)" aria-label="Trash">
                           <span class="fa fa-trash" aria-hidden="true"></span>

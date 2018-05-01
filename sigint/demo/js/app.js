@@ -143,7 +143,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
   $scope.cardLoad = function(result)
   {
-    setTimeout(TerrainAnalytics.logEvent('impression', $scope.algorithmID, {itemName: result.MovieId, itemType: 'movie'}),1);
+    setTimeout(TerrainAnalytics.logEvent('impression', $scope.algorithmID, {itemName: result.movieid, itemType: 'movie'}),1);
   }
 
   $scope.doneLoading = function()
@@ -153,7 +153,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
   $scope.cardDisplay = function(result)
   {
-    setTimeout(TerrainAnalytics.logEvent('impression', $scope.algorithmID, {itemName: result.MovieId, itemType: 'movieDetail'}),1);
+    setTimeout(TerrainAnalytics.logEvent('impression', $scope.algorithmID, {itemName: result.movieid, itemType: 'movieDetail'}),1);
   }
 
   $scope.loadMore();

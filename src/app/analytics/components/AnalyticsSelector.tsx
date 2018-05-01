@@ -79,7 +79,6 @@ const DATE_RANGES = Immutable.List([
   { value: '2', label: 'Today' },
   { value: '3', label: 'Last 7 days' },
   { value: '4', label: 'Last Month' },
-  { value: '5', label: 'Last Year' },
 ]);
 
 class AnalyticsSelector extends TerrainComponent<Props>
