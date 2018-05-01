@@ -94,7 +94,7 @@ export interface SchedulerActionTypes
 
   updateSchedule?: {
     actionType: 'updateSchedule';
-    schedule: SchedulerConfig;
+    schedule: any;
   };
   updateScheduleStart: {
     actionType: 'updateScheduleStart';
