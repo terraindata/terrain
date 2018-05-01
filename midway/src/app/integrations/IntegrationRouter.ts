@@ -74,7 +74,7 @@ Router.get('/simple', passport.authenticate('access-token-local'), async (ctx, n
 Router.post('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  const integration: IntegrationConfig = ctx.request.body.body;
+  const integration: IntegrationConfig = ctx.request.body.body as IntegrationConfig;
   Util.verifyParameters(integration, ['name', 'type', 'createdBy']);
 
   if (integration['authConfig'] === null && integration['connectionConfig'] === null)

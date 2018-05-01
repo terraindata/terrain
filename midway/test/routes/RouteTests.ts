@@ -1390,105 +1390,105 @@ describe('File io templates route tests', () =>
       });
   });
 
-  test('Headless import via MySQL: POST /midway/v1/import/headless', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/import/headless')
-      .send({
-        templateId: mySQLImportTemplateID,
-        persistentAccessToken: persistentImportMySQLAccessToken,
-        body: {
-          source: {
-            type: 'mysql',
-            params: {
-              id: 2,
-              tablename: 'movies',
-              query: 'SELECT * FROM movies LIMIT 10;',
-            },
-          },
-          filetype: 'csv',
-        },
-      })
-      .expect(200)
-      .then(async (response) =>
-      {
-        expect(response.text).not.toBe('Unauthorized');
-        try
-        {
-          await elasticDB.refresh('mysqlimport');
-          const result: object = await elasticDB.query([
-            {
-              index: 'mysqlimport',
-              type: 'data',
-              body: {
-                sort: [{ movieid: 'asc' }],
-              },
-            },
-          ]);
-          expect(result['hits']['hits'].length).toBeGreaterThan(0);
-          expect(result['hits']['hits'][0]['_source'])
-            .toMatchObject({
-              movieid: 1,
-              title: 'Toy Story (1995)',
-              genres: 'Adventure|Animation|Children|Comedy|Fantasy',
-              backdroppath: '/dji4Fm0gCDVb9DQQMRvAI8YNnTz.jpg',
-              overview: 'Woody the cowboy is young Andy’s favorite toy. Yet this changes when Andy get the new super toy Buzz Lightyear for his birthday. Now that Woody is no longer number one he plans his revenge on Buzz. Toy Story is a milestone in film history for being the first feature film to use entirely computer animation.',
-              posterpath: '/uMZqKhT4YA6mqo2yczoznv7IDmv.jpg',
-              status: 'Released',
-              tagline: 'The adventure takes off!',
-              releasedate: '1995-10-30T08:00:00.000Z',
-              budget: 30000000,
-              revenue: 361958736,
-              votecount: 3022,
-              popularity: 2.45948,
-              voteaverage: 7.5,
-              homepage: 'http://toystory.disney.com/toy-story',
-              language: 'en',
-              runtime: 81,
-            });
-        }
-        catch (e)
-        {
-          fail(e);
-        }
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
-      });
-  });
+  // test('Headless import via MySQL: POST /midway/v1/import/headless', async () =>
+  // {
+  //   await request(server)
+  //     .post('/midway/v1/import/headless')
+  //     .send({
+  //       templateId: mySQLImportTemplateID,
+  //       persistentAccessToken: persistentImportMySQLAccessToken,
+  //       body: {
+  //         source: {
+  //           type: 'mysql',
+  //           params: {
+  //             id: 2,
+  //             tablename: 'movies',
+  //             query: 'SELECT * FROM movies LIMIT 10;',
+  //           },
+  //         },
+  //         filetype: 'csv',
+  //       },
+  //     })
+  //     .expect(200)
+  //     .then(async (response) =>
+  //     {
+  //       expect(response.text).not.toBe('Unauthorized');
+  //       try
+  //       {
+  //         await elasticDB.refresh('mysqlimport');
+  //         const result: object = await elasticDB.query([
+  //           {
+  //             index: 'mysqlimport',
+  //             type: 'data',
+  //             body: {
+  //               sort: [{ movieid: 'asc' }],
+  //             },
+  //           },
+  //         ]);
+  //         expect(result['hits']['hits'].length).toBeGreaterThan(0);
+  //         expect(result['hits']['hits'][0]['_source'])
+  //           .toMatchObject({
+  //             movieid: 1,
+  //             title: 'Toy Story (1995)',
+  //             genres: 'Adventure|Animation|Children|Comedy|Fantasy',
+  //             backdroppath: '/dji4Fm0gCDVb9DQQMRvAI8YNnTz.jpg',
+  //             overview: 'Woody the cowboy is young Andy’s favorite toy. Yet this changes when Andy get the new super toy Buzz Lightyear for his birthday. Now that Woody is no longer number one he plans his revenge on Buzz. Toy Story is a milestone in film history for being the first feature film to use entirely computer animation.',
+  //             posterpath: '/uMZqKhT4YA6mqo2yczoznv7IDmv.jpg',
+  //             status: 'Released',
+  //             tagline: 'The adventure takes off!',
+  //             releasedate: '1995-10-30T08:00:00.000Z',
+  //             budget: 30000000,
+  //             revenue: 361958736,
+  //             votecount: 3022,
+  //             popularity: 2.45948,
+  //             voteaverage: 7.5,
+  //             homepage: 'http://toystory.disney.com/toy-story',
+  //             language: 'en',
+  //             runtime: 81,
+  //           });
+  //       }
+  //       catch (e)
+  //       {
+  //         fail(e);
+  //       }
+  //     })
+  //     .catch((error) =>
+  //     {
+  //       fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
+  //     });
+  // });
 
-  test('Headless import via MySQL with bad SQL: POST /midway/v1/import/headless', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/import/headless')
-      .send({
-        templateId: mySQLImportTemplateID,
-        persistentAccessToken: persistentImportMySQLAccessToken,
-        body: {
-          source: {
-            type: 'mysql',
-            params: {
-              id: 2,
-              tablename: 'movies',
-              query: 'SELECT * FROM moviesss LIMIT 10;',
-            },
-          },
-          filetype: 'csv',
-        },
-      })
-      .expect(400)
-      .then((response) =>
-      {
-        expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(response.text);
-        expect(respData['errors'].length).toBeGreaterThan(0);
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
-      });
-  });
+  // test('Headless import via MySQL with bad SQL: POST /midway/v1/import/headless', async () =>
+  // {
+  //   await request(server)
+  //     .post('/midway/v1/import/headless')
+  //     .send({
+  //       templateId: mySQLImportTemplateID,
+  //       persistentAccessToken: persistentImportMySQLAccessToken,
+  //       body: {
+  //         source: {
+  //           type: 'mysql',
+  //           params: {
+  //             id: 2,
+  //             tablename: 'movies',
+  //             query: 'SELECT * FROM moviesss LIMIT 10;',
+  //           },
+  //         },
+  //         filetype: 'csv',
+  //       },
+  //     })
+  //     .expect(400)
+  //     .then((response) =>
+  //     {
+  //       expect(response.text).not.toBe('Unauthorized');
+  //       const respData = JSON.parse(response.text);
+  //       expect(respData['errors'].length).toBeGreaterThan(0);
+  //     })
+  //     .catch((error) =>
+  //     {
+  //       fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
+  //     });
+  // });
 
   test('Post headless export: POST /midway/v1/export/headless', async () =>
   {
@@ -1603,7 +1603,7 @@ describe('Integration tests', () =>
       .send({
         id: 1,
         accessToken: defaultUserAccessToken,
-        body: JSON.stringify(integration),
+        body: integration,
       })
       .expect(200)
       .then((response) =>
