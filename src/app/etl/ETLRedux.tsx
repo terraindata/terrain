@@ -155,7 +155,7 @@ export interface ETLActionTypes
     onError?: ErrorHandler,
   };
   deleteIntegration: {
-    actionType: 'deleteIntegraton',
+    actionType: 'deleteIntegration',
     integrationId: ID,
     onError?: ErrorHandler,
   };
@@ -476,7 +476,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
     const updateTemplate = this.handleResponseFactory(directDispatch);
-    this.beforeSaveOrCreateF(name, directDispatch);
+    this.beforeSaveOrCreate(name, directDispatch);
 
     const newTemplate = action.template.set('id', -1);
     ETLAjax.createTemplate(newTemplate)
@@ -500,11 +500,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
-    directDispatch({
-      actionType: 'setLoading',
-      isLoading: true,
-      key: name,
-    });
+    this.beforeSaveOrCreate(name, directDispatch);
     const onLoad = (response) =>
     {
       directDispatch({
@@ -521,11 +517,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const { integrationId, integration, actionType: name } = action;
-    directDispatch({
-      actionType: 'setLoading',
-      isLoading: true,
-      key: name,
-    });
+    this.beforeSaveOrCreate(name, directDispatch);
     const onLoad = (response) =>
     {
       directDispatch({
@@ -542,11 +534,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
-    directDispatch({
-      actionType: 'setLoading',
-      isLoading: true,
-      key: name,
-    });
+    this.beforeSaveOrCreate(name, directDispatch);
     const onLoad = (response) =>
     {
       directDispatch({
@@ -563,11 +551,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     const name = action.actionType;
-    directDispatch({
-      actionType: 'setLoading',
-      isLoading: true,
-      key: name,
-    });
+    this.beforeSaveOrCreate(name, directDispatch);
     const onLoad = (response) =>
     {
       directDispatch({
@@ -604,7 +588,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.updateIntegration.bind(this, action);
       case 'createIntegration':
         return this.createIntegration.bind(this, action);
-      case 'deleteIntegraton':
+      case 'deleteIntegration':
         return this.deleteIntegration.bind(this, action);
       default:
         return undefined;
