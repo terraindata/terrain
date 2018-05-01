@@ -57,8 +57,6 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import CredentialConfig from '../credentials/CredentialConfig';
-import Credentials from '../credentials/Credentials';
 import TransformationEngineTransform from '../io/streams/TransformationEngineTransform';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';

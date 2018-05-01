@@ -44,21 +44,56 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import UserConfig from '../users/UserConfig';
+// NB: This router only exists for testing purposes.
+// If using a proxy, be sure to set app.proxy = true
 
-export class CredentialPermissions
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import IntegrationConfig from 'shared/types/integrations/IntegrationConfig';
+import * as Util from '../AppUtil';
+import { Permissions } from '../permissions/Permissions';
+import { UserConfig } from '../users/UserConfig';
+import Integrations from './Integrations';
+
+const Router = new KoaRouter();
+export const integrations: Integrations = new Integrations();
+const perm: Permissions = new Permissions();
+
+Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  public async verifyPermission(user: UserConfig, params: object): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      if (!user.isSuperUser)
-      {
-        return reject('User must be a super user.');
-      }
-      return resolve();
-    });
-  }
-}
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await integrations.get(ctx.state.user, ctx.params.id);
+});
 
-export default CredentialPermissions;
+Router.get('/simple', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await integrations.getSimple(ctx.state.user, ctx.query.type);
+});
+
+Router.post('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  const integration: IntegrationConfig = ctx.request.body.body as IntegrationConfig;
+  Util.verifyParameters(integration, ['name', 'type', 'createdBy']);
+
+  if (integration['authConfig'] === null && integration['connectionConfig'] === null)
+  {
+    throw new Error('Connection or authentication configuration is missing.');
+  }
+
+  if (integration.id === undefined && ctx.params.id !== undefined)
+  {
+    integration.id = ctx.params.id;
+  }
+
+  ctx.body = await integrations.upsert(ctx.state.user, integration);
+});
+
+Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await integrations.delete(ctx.state.user, ctx.params.id);
+});
+
+export default Router;

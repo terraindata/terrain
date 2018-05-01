@@ -103,8 +103,8 @@ export class JobQueue
         // delete the Job from the runningJobs map
         this.runningJobs.delete(id);
 
-        // set status to CANCELLED
-        await this._setJobStatus(id, false, 'CANCELLED');
+        // set status to CANCELED
+        await this._setJobStatus(id, false, 'CANCELED');
         return resolve(await this.get(id) as JobConfig[]);
       }
       catch (e)
@@ -393,7 +393,7 @@ export class JobQueue
     });
   }
 
-  // Status codes: SUCCESS FAILURE PAUSED CANCELLED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
+  // Status codes: SUCCESS FAILURE PAUSED CANCELED RUNNING ABORTED (PAUSED/RUNNING when midway was restarted)
   private async _setJobStatus(id: number, running: boolean, status: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>

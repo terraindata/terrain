@@ -44,66 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable, Writable } from 'stream';
+import UserConfig from '../users/UserConfig';
 
-import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
-import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import MySQLConfig from '../../../database/mysql/MySQLConfig';
-import MySQLReader from '../../../database/mysql/streams/MySQLReader';
-import IntegrationConfig from '../../integrations/IntegrationConfig';
-import { integrations } from '../../integrations/IntegrationRouter';
-import AEndpointStream from './AEndpointStream';
-
-export default class MySQLEndpoint extends AEndpointStream
+export class IntegrationPermissions
 {
-  constructor()
+  public async verifyPermission(user: UserConfig, params: object): Promise<string>
   {
-    super();
-  }
-
-  public async getSource(source: SourceConfig): Promise<Readable>
-  {
-    const integrationId = source.options['integrationId'];
-    const config: MySQLConfig = await this.getConfig(integrationId, source.options);
-    const table = source.options['table'];
-    const query: string = source.options['query'];
-    return new MySQLReader(config, query, table);
-  }
-
-  public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
-  {
-    const integrationId = sink.options['integrationId'];
-    const config: MySQLConfig = await this.getConfig(integrationId, sink.options);
-    const table = sink.options['table'];
-    const query: string = sink.options['query'];
-
-    throw new Error('not implemented');
-    // return new MySQLWriter(config, database, table);
-  }
-
-  private async getConfig(integrationId: number, options?: object): Promise<MySQLConfig>
-  {
-    return new Promise(async (resolve, reject) =>
+    return new Promise<string>(async (resolve, reject) =>
     {
-      const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
-      if (integration.length === 0)
+      if (!user.isSuperUser)
       {
-        return reject(new Error('Invalid MySQL integration ID.'));
+        return reject('User must be a super user.');
       }
-
-      let mysqlConfig: MySQLConfig = {};
-      try
-      {
-        const connectionConfig = JSON.parse(integration[0].connectionConfig);
-        const authConfig = JSON.parse(integration[0].authConfig);
-        mysqlConfig = Object.assign(connectionConfig, authConfig);
-      }
-      catch (e)
-      {
-        return reject(new Error('Retrieving integration ID ' + String(integrationId)));
-      }
-
-      resolve(mysqlConfig);
+      return resolve();
     });
   }
 }
+
+export default IntegrationPermissions;

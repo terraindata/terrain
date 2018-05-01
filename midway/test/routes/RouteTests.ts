@@ -49,7 +49,6 @@ import * as request from 'supertest';
 import { promisify } from 'util';
 import * as winston from 'winston';
 
-// import { App, Credentials, DB, Scheduler } from '../../src/app/App';
 import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
@@ -104,11 +103,6 @@ beforeAll(async (done) =>
 
     const app = new App(options);
     server = await app.start();
-
-    // await Credentials.initializeLocalFilesystemCredential();
-
-    // await Scheduler.initializeJobs();
-    // await Scheduler.initializeSchedules();
 
     const config: ElasticConfig = {
       hosts: ['http://localhost:9200'],
@@ -1396,105 +1390,105 @@ describe('File io templates route tests', () =>
       });
   });
 
-  test('Headless import via MySQL: POST /midway/v1/import/headless', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/import/headless')
-      .send({
-        templateId: mySQLImportTemplateID,
-        persistentAccessToken: persistentImportMySQLAccessToken,
-        body: {
-          source: {
-            type: 'mysql',
-            params: {
-              id: 2,
-              tablename: 'movies',
-              query: 'SELECT * FROM movies LIMIT 10;',
-            },
-          },
-          filetype: 'csv',
-        },
-      })
-      .expect(200)
-      .then(async (response) =>
-      {
-        expect(response.text).not.toBe('Unauthorized');
-        try
-        {
-          await elasticDB.refresh('mysqlimport');
-          const result: object = await elasticDB.query([
-            {
-              index: 'mysqlimport',
-              type: 'data',
-              body: {
-                sort: [{ movieid: 'asc' }],
-              },
-            },
-          ]);
-          expect(result['hits']['hits'].length).toBeGreaterThan(0);
-          expect(result['hits']['hits'][0]['_source'])
-            .toMatchObject({
-              movieid: 1,
-              title: 'Toy Story (1995)',
-              genres: 'Adventure|Animation|Children|Comedy|Fantasy',
-              backdroppath: '/dji4Fm0gCDVb9DQQMRvAI8YNnTz.jpg',
-              overview: 'Woody the cowboy is young Andy’s favorite toy. Yet this changes when Andy get the new super toy Buzz Lightyear for his birthday. Now that Woody is no longer number one he plans his revenge on Buzz. Toy Story is a milestone in film history for being the first feature film to use entirely computer animation.',
-              posterpath: '/uMZqKhT4YA6mqo2yczoznv7IDmv.jpg',
-              status: 'Released',
-              tagline: 'The adventure takes off!',
-              releasedate: '1995-10-30T08:00:00.000Z',
-              budget: 30000000,
-              revenue: 361958736,
-              votecount: 3022,
-              popularity: 2.45948,
-              voteaverage: 7.5,
-              homepage: 'http://toystory.disney.com/toy-story',
-              language: 'en',
-              runtime: 81,
-            });
-        }
-        catch (e)
-        {
-          fail(e);
-        }
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
-      });
-  });
+  // test('Headless import via MySQL: POST /midway/v1/import/headless', async () =>
+  // {
+  //   await request(server)
+  //     .post('/midway/v1/import/headless')
+  //     .send({
+  //       templateId: mySQLImportTemplateID,
+  //       persistentAccessToken: persistentImportMySQLAccessToken,
+  //       body: {
+  //         source: {
+  //           type: 'mysql',
+  //           params: {
+  //             id: 2,
+  //             tablename: 'movies',
+  //             query: 'SELECT * FROM movies LIMIT 10;',
+  //           },
+  //         },
+  //         filetype: 'csv',
+  //       },
+  //     })
+  //     .expect(200)
+  //     .then(async (response) =>
+  //     {
+  //       expect(response.text).not.toBe('Unauthorized');
+  //       try
+  //       {
+  //         await elasticDB.refresh('mysqlimport');
+  //         const result: object = await elasticDB.query([
+  //           {
+  //             index: 'mysqlimport',
+  //             type: 'data',
+  //             body: {
+  //               sort: [{ movieid: 'asc' }],
+  //             },
+  //           },
+  //         ]);
+  //         expect(result['hits']['hits'].length).toBeGreaterThan(0);
+  //         expect(result['hits']['hits'][0]['_source'])
+  //           .toMatchObject({
+  //             movieid: 1,
+  //             title: 'Toy Story (1995)',
+  //             genres: 'Adventure|Animation|Children|Comedy|Fantasy',
+  //             backdroppath: '/dji4Fm0gCDVb9DQQMRvAI8YNnTz.jpg',
+  //             overview: 'Woody the cowboy is young Andy’s favorite toy. Yet this changes when Andy get the new super toy Buzz Lightyear for his birthday. Now that Woody is no longer number one he plans his revenge on Buzz. Toy Story is a milestone in film history for being the first feature film to use entirely computer animation.',
+  //             posterpath: '/uMZqKhT4YA6mqo2yczoznv7IDmv.jpg',
+  //             status: 'Released',
+  //             tagline: 'The adventure takes off!',
+  //             releasedate: '1995-10-30T08:00:00.000Z',
+  //             budget: 30000000,
+  //             revenue: 361958736,
+  //             votecount: 3022,
+  //             popularity: 2.45948,
+  //             voteaverage: 7.5,
+  //             homepage: 'http://toystory.disney.com/toy-story',
+  //             language: 'en',
+  //             runtime: 81,
+  //           });
+  //       }
+  //       catch (e)
+  //       {
+  //         fail(e);
+  //       }
+  //     })
+  //     .catch((error) =>
+  //     {
+  //       fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
+  //     });
+  // });
 
-  test('Headless import via MySQL with bad SQL: POST /midway/v1/import/headless', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/import/headless')
-      .send({
-        templateId: mySQLImportTemplateID,
-        persistentAccessToken: persistentImportMySQLAccessToken,
-        body: {
-          source: {
-            type: 'mysql',
-            params: {
-              id: 2,
-              tablename: 'movies',
-              query: 'SELECT * FROM moviesss LIMIT 10;',
-            },
-          },
-          filetype: 'csv',
-        },
-      })
-      .expect(400)
-      .then((response) =>
-      {
-        expect(response.text).not.toBe('Unauthorized');
-        const respData = JSON.parse(response.text);
-        expect(respData['errors'].length).toBeGreaterThan(0);
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
-      });
-  });
+  // test('Headless import via MySQL with bad SQL: POST /midway/v1/import/headless', async () =>
+  // {
+  //   await request(server)
+  //     .post('/midway/v1/import/headless')
+  //     .send({
+  //       templateId: mySQLImportTemplateID,
+  //       persistentAccessToken: persistentImportMySQLAccessToken,
+  //       body: {
+  //         source: {
+  //           type: 'mysql',
+  //           params: {
+  //             id: 2,
+  //             tablename: 'movies',
+  //             query: 'SELECT * FROM moviesss LIMIT 10;',
+  //           },
+  //         },
+  //         filetype: 'csv',
+  //       },
+  //     })
+  //     .expect(400)
+  //     .then((response) =>
+  //     {
+  //       expect(response.text).not.toBe('Unauthorized');
+  //       const respData = JSON.parse(response.text);
+  //       expect(respData['errors'].length).toBeGreaterThan(0);
+  //     })
+  //     .catch((error) =>
+  //     {
+  //       fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
+  //     });
+  // });
 
   test('Post headless export: POST /midway/v1/export/headless', async () =>
   {
@@ -1581,47 +1575,58 @@ describe('File io templates route tests', () =>
   });
 });
 
-describe('Credentials tests', () =>
+describe('Integration tests', () =>
 {
-  test('POST /midway/v1/credentials', async () =>
+  let integrationId = 0;
+  const integration = {
+    authConfig: {
+      username: 'testuser',
+      password: 'Terrain123!',
+    },
+    connectionConfig: {
+      host: '10.1.1.103',
+      port: 22,
+    },
+    createdBy: 1,
+    lastModified: new Date(),
+    meta: '',
+    readPermission: '',
+    writePermission: '',
+    type: 'sftp',
+    name: 'My SFTP Integration',
+  };
+
+  test('POST /midway/v1/integrations', async () =>
   {
     await request(server)
-      .post('/midway/v1/credentials')
+      .post('/midway/v1/integrations')
       .send({
         id: 1,
         accessToken: defaultUserAccessToken,
-        body: {
-          createdBy: 1,
-          meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
-          name: 'SFTP Test 1',
-          type: 'sftp',
-          permissions: 1,
-        },
+        body: integration,
       })
       .expect(200)
       .then((response) =>
       {
-        const result: object = JSON.parse(response.text);
-        expect(Array.isArray(result)).toBe(true);
-        const resultAsArray: object[] = result as object[];
-        expect(resultAsArray[0]).toMatchObject({
-          createdBy: 1,
-          meta: '',
-          name: 'SFTP Test 1',
-          type: 'sftp',
-          permissions: 1,
-        });
+        const result = JSON.parse(response.text);
+        const expected = JSON.parse(JSON.stringify(integration));
+        expected.authConfig = null;
+        delete result.lastModified;
+        delete expected.lastModified;
+        expect(result).toMatchObject(expected);
+        integrationId = result['id'];
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
+        fail('POST /midway/v1/integrations request returned an error: ' + String(error));
       });
   });
 
-  test('GET /midway/v1/credentials', async () =>
+  test('GET /midway/v1/integrations', async () =>
   {
+    expect(integrationId).toBeGreaterThan(0);
     await request(server)
-      .get('/midway/v1/credentials')
+      .get('/midway/v1/integrations/' + String(integrationId))
       .query({
         id: 1,
         accessToken: defaultUserAccessToken,
@@ -1630,29 +1635,37 @@ describe('Credentials tests', () =>
       .then((response) =>
       {
         const result = JSON.parse(response.text);
-        expect(result.length).toBeGreaterThanOrEqual(2);
-        expect(result).toEqual(expect.arrayContaining([
-          {
-            createdBy: 1,
-            id: 1,
-            meta: '',
-            name: 'Local Filesystem Config',
-            permissions: 0,
-            type: 'local',
-          },
-          {
-            createdBy: 1,
-            id: 2,
-            meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
-            name: 'SFTP Test 1',
-            permissions: 1,
-            type: 'sftp',
-          },
-        ]));
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toEqual(1);
+        const expected = JSON.parse(JSON.stringify(integration));
+        delete expected.lastModified;
+        expect(result[0]).toMatchObject(expected);
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
+        fail('POST /midway/v1/integrations request returned an error: ' + String(error));
+      });
+  });
+
+  test('Delete an integration: POST /midway/v1/integrations/delete', async () =>
+  {
+    expect(integrationId).toBeGreaterThan(0);
+    await request(server)
+      .post('/midway/v1/integrations/delete/' + String(integrationId))
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+      })
+      .expect(200)
+      .then((res) =>
+      {
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        expect(respData).toMatchObject({});
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/integrations/1 request returned an error: ' + String(error));
       });
   });
 });
