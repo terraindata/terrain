@@ -1603,7 +1603,7 @@ describe('Integration tests', () =>
       .send({
         id: 1,
         accessToken: defaultUserAccessToken,
-        body: JSON.stringify(integration),
+        body: integration,
       })
       .expect(200)
       .then((response) =>
