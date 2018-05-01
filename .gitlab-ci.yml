@@ -25,50 +25,50 @@ stages:
   - fullstack-meta
   - fullstack-screenshot
 
-lint:
-  script:
-   - yarn lint-parallel
-  stage: lint
-
-style:
-  script:
-   - yarn style
-  stage: style
-
-test-frontend:
-  script:
-   - yarn test-front
-  stage: test-front
-  when: always
-
-test-backend:
-  script:
-   - timeout 240 yarn test-back-setup
-   - yarn test-back
-  after_script:
-   - timeout 240 yarn test-back-teardown
-  stage: test-back
-  artifacts:
-    paths:
-      - coverage
-
-test-sigint:
-  script:
-    - timeout 240 yarn test-sigint-setup
-    - ( cd sigint && yarn test )
-  after_script:
-    - timeout 240 yarn test-sigint-teardown
-  stage: test-sigint
-
-build-frontend:
-  script:
-   - yarn build
-  stage: build
-
-build-analytics-js:
-  script:
-   - ( cd analytics.js && yarn build )
-  stage: build
+#lint:
+#  script:
+#   - yarn lint-parallel
+#  stage: lint
+#
+#style:
+#  script:
+#   - yarn style
+#  stage: style
+#
+#test-frontend:
+#  script:
+#   - yarn test-front
+#  stage: test-front
+#  when: always
+#
+#test-backend:
+#  script:
+#   - timeout 240 yarn test-back-setup
+#   - yarn test-back
+#  after_script:
+#   - timeout 240 yarn test-back-teardown
+#  stage: test-back
+#  artifacts:
+#    paths:
+#      - coverage
+#
+#test-sigint:
+#  script:
+#    - timeout 240 yarn test-sigint-setup
+#    - ( cd sigint && yarn test )
+#  after_script:
+#    - timeout 240 yarn test-sigint-teardown
+#  stage: test-sigint
+#
+#build-frontend:
+#  script:
+#   - yarn build
+#  stage: build
+#
+#build-analytics-js:
+#  script:
+#   - ( cd analytics.js && yarn build )
+#  stage: build
 
 #build-frontend-prod:
 #  script:
@@ -77,20 +77,20 @@ build-analytics-js:
 #   - master
 #  stage: build
 
-fullstack-meta:
-  script:
-    - pkill node || true;
-    - timeout 240 yarn test-fullstack-setup
-    - yarn clean
-    - MIDWAY_HOST=`hostname`:3000 yarn build
-    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-    - sleep 10
-    - yarn test-fullstack-component
-  stage: fullstack-meta
-  after_script:
-    - tail -n20 ./midwayConsole.log || true
-    - timeout 240 yarn test-fullstack-teardown
-    - pkill node || true;
+#fullstack-meta:
+#  script:
+#    - pkill node || true;
+#    - timeout 240 yarn test-fullstack-setup
+#    - yarn clean
+#    - MIDWAY_HOST=`hostname`:3000 yarn build
+#    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+#    - sleep 10
+#    - yarn test-fullstack-component
+#  stage: fullstack-meta
+#  after_script:
+#    - tail -n20 ./midwayConsole.log || true
+#    - timeout 240 yarn test-fullstack-teardown
+#    - pkill node || true;
 
 fullstack-screenshot:
   script:

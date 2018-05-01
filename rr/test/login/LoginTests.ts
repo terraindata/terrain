@@ -97,8 +97,6 @@ async function loginToBuilder(page, url)
   winston.info('Goto the starting page.');
 
   await page.waitForSelector(CREATE_CATEGORY_SELECTOR);
-  sleep.sleep(1);
-  await takeAndCompareScreenShot(page);
   await page.click(CREATE_CATEGORY_SELECTOR);
   winston.info('Create category');
   sleep.sleep(1);
