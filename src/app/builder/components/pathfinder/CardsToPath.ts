@@ -71,7 +71,9 @@ import * as TerrainLog from 'loglevel';
 import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import ESJSONType from '../../../../../shared/database/elastic/parser/ESJSONType';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
+import * as BlockUtils from '../../../../blocks/BlockUtils';
 import Block from '../../../../blocks/types/Block';
+import ElasticBlocks from '../../../../database/elastic/blocks/ElasticBlocks';
 import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
 import Query from '../../../../items/types/Query';
 import { PathToCards } from './PathToCards';
@@ -382,6 +384,31 @@ export class CardsToPath
         }
       }
     }
+    // if the bool:elasticFilter in the softbool do not have the dummy filter, we should add one.
+    const theSoftBool = parser.searchCard(softBoolTemplate, body);
+    if (theSoftBool !== null)
+    {
+      theSoftBool.recursivelyVisit((element: ESValueInfo) =>
+      {
+        const theCard = element.card;
+        if (theCard.type === 'elasticFilter')
+        {
+          if (theCard.dummyFilters.size === 0)
+          {
+            const dummyBlock = BlockUtils.make(ElasticBlocks, 'elasticFilterBlock',
+              {
+                field: '_id',
+                value: ' ',
+                boolQuery: 'filter',
+                filterOp: 'exists',
+              }, true);
+            element.card = theCard.set('dummyFilters', List([dummyBlock]));
+            parser.isMutated = true;
+          }
+        }
+        return true;
+      });
+    }
   }
 
   private static TerrainFilterBlockToFilterLine(row: Block): FilterLine
@@ -549,6 +576,59 @@ export class CardsToPath
     return filterLines;
   }
 
+  private static extractNestedQueryToFilter(queries: ESValueInfo, parser: ESCardParser, flip: boolean = false)
+  {
+    const filters = [];
+    queries.forEachElement((query: ESValueInfo) =>
+    {
+      if (query.objectChildren.nested)
+      {
+        const nestedQuery = query.objectChildren.nested.propertyValue;
+        const boolQuery = parser.searchCard({ 'query:query': { 'bool:elasticFilter': true } }, nestedQuery);
+        if (boolQuery !== null)
+        {
+          // create filter group
+          // let newFilterGroup = _FilterGroup();
+          boolQuery.card.otherFilters.forEach((filter) =>
+          {
+            // TODO convert boolQuery from must to filter ?
+            let line = this.TerrainFilterBlockToFilterLine(filter);
+            if (line)
+            {
+              if (flip)
+              {
+                // we only handle `exits`, `equal`, and `isin`
+                let keep = true;
+                switch (line.comparison)
+                {
+                  case 'exists':
+                    line = line.set('comparison', 'notexists');
+                    break;
+                  case 'equal':
+                    line = line.set('comparison', 'notequal');
+                    break;
+                  case 'isin':
+                    line = line.set('comparison', 'isnotin');
+                    break;
+                  default:
+                    keep = false;
+                }
+                if (keep === true)
+                {
+                  filters.push(line);
+                }
+              } else
+              {
+                filters.push(line);
+              }
+            }
+          });
+        }
+      }
+    });
+    return filters;
+  }
+
   private static processNestedQueryFilterGroup(parentFilterGroup: FilterGroup, parser: ESCardParser, parentBool: ESValueInfo, sectionType: 'hard' | 'soft')
   {
     // let search whether we have an inner bool or not
@@ -562,34 +642,25 @@ export class CardsToPath
       from = parentBool.objectChildren.should;
     }
 
-    const newLines = [];
+    let newLines = [];
     if (from)
     {
       const queries = from.propertyValue;
       if (queries.jsonType === ESJSONType.array)
       {
-        queries.forEachElement((query: ESValueInfo) =>
-        {
-          if (query.objectChildren.nested)
-          {
-            const nestedQuery = query.objectChildren.nested.propertyValue;
-            const boolQuery = parser.searchCard({ 'query:query': { 'bool:elasticFilter': true } }, nestedQuery);
-            if (boolQuery !== null)
-            {
-              // create filter group
-              // let newFilterGroup = _FilterGroup();
-              boolQuery.card.otherFilters.forEach((filter) =>
-              {
-                // TODO convert boolQuery from must to filter ?
-                const line = this.TerrainFilterBlockToFilterLine(filter);
-                if (line)
-                {
-                  newLines.push(line);
-                }
-              });
-            }
-          }
-        });
+        const r = this.extractNestedQueryToFilter(queries, parser);
+        newLines = newLines.concat(r);
+      }
+    }
+
+    // negative filter lines
+    if (parentBool.objectChildren.must_not)
+    {
+      const queries = parentBool.objectChildren.must_not.propertyValue;
+      if (queries.jsonType === ESJSONType.array)
+      {
+        const r = this.extractNestedQueryToFilter(queries, parser, true);
+        newLines = newLines.concat(r);
       }
     }
     return List(newLines);

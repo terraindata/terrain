@@ -79,7 +79,7 @@ function cartesianProductOf(...vars: any[])
       {
         return x.concat([y]);
       });
-    }), true);
+    }));
   }, [[]]);
 }
 const classCombinations = cartesianProductOf(['regular', 'small', 'big', 'circle'], ['top', 'bottom', 'left', 'right']);
@@ -324,7 +324,7 @@ export function generateThemeStyles()
 
 export function tooltip(innerComponent: any, options: TooltipProps | string)
 {
-  if (options === undefined || options === '') // don't wrap with tooltip if options is not provided
+  if (options === undefined || options === '' || options === null) // don't wrap with tooltip if options is not provided
   {
     return innerComponent;
   }

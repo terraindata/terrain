@@ -43,10 +43,10 @@ test-frontend:
 
 test-backend:
   script:
-   - yarn test-back-setup
+   - timeout 240 yarn test-back-setup
    - yarn test-back
   after_script:
-   - yarn test-back-teardown
+   - timeout 240 yarn test-back-teardown
   stage: test-back
   artifacts:
     paths:
@@ -54,10 +54,10 @@ test-backend:
 
 test-sigint:
   script:
-    - yarn test-sigint-setup
+    - timeout 240 yarn test-sigint-setup
     - ( cd sigint && yarn test )
   after_script:
-    - yarn test-sigint-teardown
+    - timeout 240 yarn test-sigint-teardown
   stage: test-sigint
 
 build-frontend:
@@ -70,36 +70,37 @@ build-analytics-js:
    - ( cd analytics.js && yarn build )
   stage: build
 
-build-frontend-prod:
-  script:
-   - yarn build-prod
-  only:
-   - master
-  stage: build
+#build-frontend-prod:
+#  script:
+#   - yarn build-prod
+#  only:
+#   - master
+#  stage: build
 
 fullstack-meta:
   script:
-    - killall node || true;
-    - yarn test-fullstack-setup
+    - pkill node || true;
+    - timeout 240 yarn test-fullstack-setup
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
-    - NODE_ENV=production yarn start-midway > ./midwayConsole.log 2>&1&
+    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 10
     - yarn test-fullstack-component
   stage: fullstack-meta
   after_script:
-    - yarn test-fullstack-teardown
-    - killall node || true;
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
 
 fullstack-screenshot:
   script:
-    - killall node || true;
-    - yarn test-fullstack-setup
+    - pkill node || true;
+    - timeout 240 yarn test-fullstack-setup
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
-    - NODE_ENV=production yarn start-midway > ./midwayConsole.log 2>&1&
+    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 10
     - yarn test-fullstack-login
+    - yarn test-rr-pathfinder
     - yarn test-rr-builder
   stage: fullstack-screenshot
   allow_failure: true
@@ -107,11 +108,12 @@ fullstack-screenshot:
     when: on_failure
     expire_in: 1 week
     paths:
+    - rr/test/pathfinder/__image_snapshots__/__diff_output__
     - rr/test/builder/__image_snapshots__/__diff_output__
     - rr/test/login/__image_snapshots__/__diff_output__
   after_script:
-    - yarn test-fullstack-teardown
-    - killall node || true;
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
 
 deploy:
   script:

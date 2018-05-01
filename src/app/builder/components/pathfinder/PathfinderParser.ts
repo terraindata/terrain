@@ -277,6 +277,11 @@ function parseTerrainScore(score: Score, simpleParser: boolean = false)
       return {
         a: 0,
         b: 1,
+        mode: line.transformData.mode,
+        visiblePoints: {
+          ranges: line.transformData.visiblePoints.map((scorePt) => scorePt.value).toArray(),
+          outputs: line.transformData.visiblePoints.map((scorePt) => scorePt.score).toArray(),
+        },
         weight: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
         numerators: [[line.field, 1]],
         denominators: [],
@@ -307,7 +312,8 @@ function groupNestedFilters(filterGroup: FilterGroup): FilterGroup
 {
   const nestedLines = filterGroup.lines.filter((line) =>
   {
-    return line.field && line.field.indexOf('.') !== -1 && line.comparison !== 'notexists';
+    return ((line.field && line.field.indexOf('.') !== -1) || line.fieldType === FieldType.Nested)
+      && line.comparison !== 'notexists';
   }).toList();
   let nestedPathMap: Map<string, List<FilterLine>> = Map({});
   nestedLines.forEach((line) =>
@@ -353,7 +359,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   });
   let must = List([]);
   let mustNot = List([]);
-  let filter = List([]);
+  const filter = List([]);
   let should = List([]);
   let useShould = false;
   if (filterGroup.minMatches !== 'all' || inMatchQualityContext)
@@ -367,7 +373,10 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   filterGroup.lines.forEach((line) =>
   {
     // Special case for a nested filter that is do not exist
-    if (line.field && line.field.indexOf('.') !== -1 && line.comparison === 'notexists')
+    if (((line.field && line.field.indexOf('.') !== -1) ||
+      line.fieldType === FieldType.Nested)
+      && line.comparison === 'notexists'
+    )
     {
       const inner = parseFilterLine(List([line.set('comparison', 'exists')]), useShould, inputs, ignoreNested);
       if (useShould)
@@ -393,7 +402,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
       }
       else
       {
-        filter = filter.push(lineInfo);
+        must = must.push(lineInfo);
       }
     }
     else if (line.filterGroup)
@@ -440,6 +449,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
 function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean, inputs, ignoreNested = false)
 {
   line = line as FilterLine;
+  let field;
   const lineValue = String(line.value);
   let value: any = String(line.value || '');
   const boost = typeof line.boost === 'string' ? parseFloat(line.boost) : line.boost;
@@ -645,11 +655,12 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
         }),
       });
     case 'isin':
+      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
       try
       {
         return Map({
           terms: {
-            [line.field]: JSON.parse(String(value).toLowerCase()),
+            [field]: JSON.parse(String(value).toLowerCase()),
             boost,
           },
         });
@@ -663,14 +674,14 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
           pieces = pieces.map((piece) => piece.toLowerCase().trim());
           return Map({
             terms: {
-              [line.field]: pieces,
+              [field]: pieces,
               boost,
             },
           });
         }
         return Map({
           terms: {
-            [line.field]: value,
+            [field]: value,
             boost,
           },
         });
@@ -678,6 +689,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
 
     case 'isnotin':
       let parsed = value;
+      field = line.analyzed && line.fieldType === FieldType.Text ? line.field + '.keyword' : line.field;
       try
       {
         parsed = JSON.parse(String(value).toLowerCase());
@@ -697,7 +709,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
           bool: {
             must_not: {
               terms: {
-                [line.field]: parsed,
+                [field]: parsed,
               },
             },
             boost,
@@ -708,7 +720,7 @@ function parseFilterLine(line: FilterLine | List<FilterLine>, useShould: boolean
       {
         return Map({
           terms: {
-            [line.field]: parsed,
+            [field]: parsed,
             boost,
           },
         });

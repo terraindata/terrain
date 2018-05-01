@@ -68,7 +68,7 @@ export default class ESParameterFiller
     params: { [name: string]: any }): string
   {
     return ESParameterSubstituter.generate(source,
-      (param: string, runtimeParam?: string): string =>
+      (param: string, runtimeParam?: string, inTerms?: boolean): string =>
       {
         const ps = param.split('.');
         if (runtimeParam !== undefined && ps[0] === runtimeParam && params[runtimeParam] === undefined)
@@ -76,17 +76,30 @@ export default class ESParameterFiller
           return JSON.stringify('@' + param);
         }
 
-        let value = params;
+        let value: any = params;
+        let joinArray: boolean = false;
         for (const p of ps)
         {
-          value = value[p];
+          // If value is an array, and p is not an index, look at inner objects of array
+          if (Array.isArray(value) && isNaN(parseFloat(p)))
+          {
+            value = value.map((val) => val[p]);
+            joinArray = inTerms !== true;
+          }
+          else
+          {
+            value = value[p];
+          }
         }
-
+        // If not in a terms query, but the value is an array, join it into a string
+        if (Array.isArray(value) && joinArray)
+        {
+          value = value.join(' ');
+        }
         if (value === undefined)
         {
           throw new Error('Undefined parameter ' + param + ' in ' + JSON.stringify(params, null, 2));
         }
-
         return JSON.stringify(value);
       });
   }

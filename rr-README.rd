@@ -40,10 +40,20 @@ fullstack:
 You need to create a similar testing environment before starting the fullstack tests.
 
 1. Run `yarn run test-fullstack-setup` to start the containers. You might need to remove existing postgres containers before running this command.
-2. Run `rm -rf ./midway/src/assets/.cache/; MIDWAY_HOST=your-machine-ip:3000 yarn run build` to build the front-end. Please remember to replace the `your-machine-ip` with your local machine's IP address, like 192.168.1.12.
+2. Run `yarn run clean; MIDWAY_HOST=your-machine-ip:3000 yarn run build` to build the front-end. Please remember to replace the `your-machine-ip` with your local machine's IP address, like 192.168.1.12.
 3. Run ` ./midway/test/scripts/reset_fullstack_midway.sh` to reset the `midway` database and start the midway. Please notice that because the script drops the midway database then creates a new one and restarts the chrome container, so there won't be any algorithm in the database. After this, you should be able to load the app from http://your-machine-ip:3000
 4. Run `yarn run test-fullstack-login` to start the login test. If you want to update the baseline screenshots, run the command with `-u` parameter.
 5. Run other tests that needs an algorithm, such as `yarn run test-rr-builder`. Same as the above case, `-u` forces the test to generate the baseline screenshots.
+
+## Update fullstack screenshots
+Make sure you remove the midway postgres container before starting the fullstack tests.
+1. `yarn run test-fullstack-setup`
+2. `yarn run clean; MIDAY_HOST=your-machine-ip:3000 yarn run build`
+3. `./midway/test/scripts/reset_fullstack_midway.sh`
+4. Run `yarn run test-fullstack-login` before you run other screenshots based tests, if you want to update the screenshots of the login test, add `-u` to the command
+5. `yarn run test-rr-pathfinder -u ` to update the screenshots, then run `yarn run test-rr-pathfinder` to test the replay.
+6. Same for `yarn run test-rr-builder -u`
+
 
 
 ## Record and replay
