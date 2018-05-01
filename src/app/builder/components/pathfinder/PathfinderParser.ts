@@ -312,7 +312,8 @@ function groupNestedFilters(filterGroup: FilterGroup): FilterGroup
 {
   const nestedLines = filterGroup.lines.filter((line) =>
   {
-    return line.field && line.field.indexOf('.') !== -1 && line.comparison !== 'notexists';
+    return ((line.field && line.field.indexOf('.') !== -1) || line.fieldType === FieldType.Nested)
+      && line.comparison !== 'notexists';
   }).toList();
   let nestedPathMap: Map<string, List<FilterLine>> = Map({});
   nestedLines.forEach((line) =>
@@ -372,7 +373,10 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   filterGroup.lines.forEach((line) =>
   {
     // Special case for a nested filter that is do not exist
-    if (line.field && line.field.indexOf('.') !== -1 && line.comparison === 'notexists')
+    if (((line.field && line.field.indexOf('.') !== -1) ||
+      line.fieldType === FieldType.Nested)
+      && line.comparison === 'notexists'
+    )
     {
       const inner = parseFilterLine(List([line.set('comparison', 'exists')]), useShould, inputs, ignoreNested);
       if (useShould)

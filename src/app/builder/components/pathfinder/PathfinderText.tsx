@@ -115,7 +115,7 @@ export const PathfinderText = {
   moreSectionSubtitle:
     'Add advanced functionality to your algorithm, like grouping by a field, adding scripts, and adding personalization algorithms',
   sizeTitle: 'Number of Results',
-  
+
   // Collapse
   collapseTitle: 'Group by',
   collapseTootlip: 'Force algorithm to only show the top result with matching values for this field',

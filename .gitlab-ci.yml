@@ -43,10 +43,10 @@ test-frontend:
 
 test-backend:
   script:
-   - timeout 60 yarn test-back-setup
+   - timeout 240 yarn test-back-setup
    - yarn test-back
   after_script:
-   - timeout 60 yarn test-back-teardown
+   - timeout 240 yarn test-back-teardown
   stage: test-back
   artifacts:
     paths:
@@ -54,10 +54,10 @@ test-backend:
 
 test-sigint:
   script:
-    - timeout 60 yarn test-sigint-setup
+    - timeout 240 yarn test-sigint-setup
     - ( cd sigint && yarn test )
   after_script:
-    - timeout 60 yarn test-sigint-teardown
+    - timeout 240 yarn test-sigint-teardown
   stage: test-sigint
 
 build-frontend:
@@ -70,17 +70,10 @@ build-analytics-js:
    - ( cd analytics.js && yarn build )
   stage: build
 
-#build-frontend-prod:
-#  script:
-#   - yarn build-prod
-#  only:
-#   - master
-#  stage: build
-
 fullstack-meta:
   script:
     - pkill node || true;
-    - timeout 60 yarn test-fullstack-setup
+    - timeout 240 yarn test-fullstack-setup
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
@@ -88,13 +81,14 @@ fullstack-meta:
     - yarn test-fullstack-component
   stage: fullstack-meta
   after_script:
-    - timeout 60 yarn test-fullstack-teardown
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
 fullstack-screenshot:
   script:
     - pkill node || true;
-    - timeout 60 yarn test-fullstack-setup
+    - timeout 240 yarn test-fullstack-setup
     - yarn clean
     - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
@@ -112,7 +106,8 @@ fullstack-screenshot:
     - rr/test/builder/__image_snapshots__/__diff_output__
     - rr/test/login/__image_snapshots__/__diff_output__
   after_script:
-    - timeout 60 yarn test-fullstack-teardown
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
 deploy:
@@ -132,3 +127,9 @@ deploy:
     name: production
     url: http://pa-terraformer01.terrain.int:3000
 
+#build-frontend-prod:
+#  script:
+#   - yarn build-prod
+#  only:
+#   - master
+#  stage: build
