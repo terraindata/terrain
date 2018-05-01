@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import EndpointTypes from 'shared/etl/types/EndpointTypes';
-
-export class IntegrationConfig implements EndpointTypes
+export class IntegrationConfig
 {
   public authConfig: any = null;
   public connectionConfig: any = null;

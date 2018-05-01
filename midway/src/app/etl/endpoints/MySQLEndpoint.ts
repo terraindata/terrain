@@ -50,8 +50,8 @@ import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/Endpoi
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import MySQLConfig from '../../../database/mysql/MySQLConfig';
 import MySQLReader from '../../../database/mysql/streams/MySQLReader';
-import CredentialConfig from '../../credentials/CredentialConfig';
-import { credentials } from '../../credentials/CredentialRouter';
+import IntegrationConfig from '../../integrations/IntegrationConfig';
+import { integrations } from '../../integrations/IntegrationRouter';
 import AEndpointStream from './AEndpointStream';
 
 export default class MySQLEndpoint extends AEndpointStream
@@ -63,8 +63,8 @@ export default class MySQLEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const credentialId = source.options['credentialId'];
-    const config: MySQLConfig = await this.getConfig(credentialId, source.options);
+    const integrationId = source.options['integrationId'];
+    const config: MySQLConfig = await this.getConfig(integrationId, source.options);
     const table = source.options['table'];
     const query: string = source.options['query'];
     return new MySQLReader(config, query, table);
@@ -72,8 +72,8 @@ export default class MySQLEndpoint extends AEndpointStream
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const credentialId = sink.options['credentialId'];
-    const config: MySQLConfig = await this.getConfig(credentialId, sink.options);
+    const integrationId = sink.options['integrationId'];
+    const config: MySQLConfig = await this.getConfig(integrationId, sink.options);
     const table = sink.options['table'];
     const query: string = sink.options['query'];
 
@@ -81,24 +81,26 @@ export default class MySQLEndpoint extends AEndpointStream
     // return new MySQLWriter(config, database, table);
   }
 
-  private async getConfig(credentialId: number, options?: object): Promise<MySQLConfig>
+  private async getConfig(integrationId: number, options?: object): Promise<MySQLConfig>
   {
     return new Promise(async (resolve, reject) =>
     {
-      const creds: CredentialConfig[] = await credentials.get(credentialId);
-      if (creds.length === 0)
+      const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
+      if (integration.length === 0)
       {
-        reject(new Error('Invalid MySQL credentials ID.'));
+        return reject(new Error('Invalid MySQL integration ID.'));
       }
 
       let mysqlConfig: MySQLConfig = {};
       try
       {
-        mysqlConfig = JSON.parse(creds[0].meta);
+        const connectionConfig = JSON.parse(integration[0].connectionConfig);
+        const authConfig = JSON.parse(integration[0].authConfig);
+        mysqlConfig = Object.assign(connectionConfig, authConfig);
       }
       catch (e)
       {
-        reject(new Error('Error retrieving credentials for ID ' + String(credentialId)));
+        return reject(new Error('Retrieving integration ID ' + String(integrationId)));
       }
 
       resolve(mysqlConfig);

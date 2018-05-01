@@ -118,7 +118,7 @@ export class Integrations
     });
   }
 
-  // returns a string of credentials that match given type
+  // returns a string of integrations that match given type
   public async getByType(user: UserConfig, type?: string): Promise<string[]>
   {
     return new Promise<string[]>(async (resolve, reject) =>
@@ -153,7 +153,7 @@ export class Integrations
         return reject('Cannot create/update integrations as non-super user.');
       }
       const defaultCreatedBy: number = user.id !== undefined ? user.id : -1;
-      // if modifying existing credential, check for existence
+      // if modifying existing integration, check for existence
       if (integration.id !== undefined)
       {
         const integrations: IntegrationConfig[] = await this.get(user, integration.id);
