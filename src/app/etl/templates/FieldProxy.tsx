@@ -49,9 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { TemplateField } from 'etl/templates/FieldTypes';
 import { postorderForEach, preorderForEach } from 'etl/templates/SyncUtil';
-import { FieldMap } from 'etl/templates/TemplateEditorTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -59,10 +57,9 @@ import EngineUtil from 'shared/transformations/util/EngineUtil';
 import { validateNewFieldName, validateRename } from 'shared/transformations/util/TransformationsUtil';
 import { KeyPath as EnginePath, WayPoint } from 'shared/util/KeyPath';
 /*
- *  The FieldProxy structures act as the binding between the TemplateEditorField
- *  tree structure and the flattened structure of the transformation engine
- *  The proxy objects are generated synchronously and aren't meant to be persisted
- *  (don't hold references to proxies across call contexts!)
+ *  Should this file in be /shared?
+ *  Proxy objects are generated synchronously and aren't meant to be persisted
+ *  Don't hold references to proxies across call contexts
  */
 export class EngineProxy
 {
@@ -154,20 +151,17 @@ export class EngineProxy
     this.duplicateField(specifiedSourceId, destKP, true);
   }
 
-  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
+  public copyField(sourceId: number, destKP: List<string>, despecify = false): number
   {
-    const options: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
+    const optionsNew: NodeOptionsType<TransformationNodeType.DuplicateNode> = {
       newFieldKeyPaths: List([destKP]),
     };
-
     this.addTransformation(
       TransformationNodeType.DuplicateNode,
       List([this.engine.getInputKeyPath(sourceId)]),
-      options,
+      optionsNew,
     );
-
     const newFieldId = this.engine.getInputFieldID(destKP);
-
     EngineUtil.transferFieldData(sourceId, newFieldId, this.engine, this.engine);
 
     let idToCopy = sourceId;
@@ -188,24 +182,38 @@ export class EngineProxy
         EngineUtil.transferField(childId, destKP.concat(pathAfterRoot).toList(), this.engine);
       }
     });
+    return newFieldId;
+  }
+
+  public duplicateField(sourceId: number, destKP: List<string>, despecify = false)
+  {
+    const originalOKP = this.engine.getOutputKeyPath(sourceId);
+    this.engine.setOutputKeyPath(sourceId, originalOKP.set(-1, '_' + originalOKP.last()));
+    const tempDestKP = this.getSyntheticInputPath(destKP);
+    const tempOriginalKP = this.getSyntheticInputPath(originalOKP);
+    const destId = this.copyField(sourceId, tempDestKP, despecify);
+    const newOrigId = this.copyField(sourceId, tempOriginalKP, despecify);
+    this.engine.setOutputKeyPath(destId, destKP);
+    this.engine.setOutputKeyPath(newOrigId, originalOKP);
+    this.engine.disableField(sourceId);
+
     this.requestRebuild();
   }
 
-  public addField(keypath: List<string>, type: string, valueType?: string, dontAddWildcard?: boolean)
+  public addField(keypath: List<string>, type: string, valueType: FieldTypes = 'string')
   {
     let newId: number;
     if (type === 'array')
     {
       newId = this.engine.addField(keypath, type, { valueType });
-      if (!dontAddWildcard)
-      {
-        this.engine.addField(keypath.push('*'), 'array', { valueType });
-      }
+      const wildId = this.engine.addField(keypath.push('*'), 'array', { valueType });
+      EngineUtil.castField(this.engine, wildId, valueType);
     }
     else
     {
       newId = this.engine.addField(keypath, type);
     }
+    EngineUtil.castField(this.engine, newId, type as FieldTypes);
     this.requestRebuild();
     return newId;
   }
@@ -215,15 +223,7 @@ export class EngineProxy
     const pathToAdd = List([name]);
     if (validateNewFieldName(this.engine, -1, pathToAdd).isValid)
     {
-      if (type === 'array')
-      {
-        this.engine.addField(pathToAdd, type, { valueType: 'string' });
-        this.engine.addField(pathToAdd.push('*'), 'array', { valueType: 'string' });
-      }
-      else
-      {
-        this.engine.addField(pathToAdd, type);
-      }
+      this.addField(pathToAdd, type);
       this.requestRebuild();
     }
   }
@@ -239,6 +239,17 @@ export class EngineProxy
       this.engine.disableField(fieldId);
     }
     this.requestRebuild(fieldId);
+  }
+
+  // this is not deterministic
+  private getSyntheticInputPath(keypath: List<string>): List<string>
+  {
+    return keypath.unshift(`_synthetic_${this.randomId()}`);
+  }
+
+  private randomId(): string
+  {
+    return Math.random().toString(36).substring(2);
   }
 }
 
@@ -287,6 +298,7 @@ export class FieldProxy
   {
     if (validateRename(this.engine, this.fieldId, newPath).isValid)
     {
+      // Transformation Engine automatically reassigns child output paths
       this.engine.setOutputKeyPath(this.fieldId, newPath);
 
       for (let i = 1; i < newPath.size; i++)
@@ -308,15 +320,7 @@ export class FieldProxy
     const newPath = this.engine.getOutputKeyPath(this.fieldId).push(name);
     if (validateNewFieldName(this.engine, this.fieldId, newPath).isValid)
     {
-      if (type === 'array')
-      {
-        this.engine.addField(newPath, type, { valueType: 'string' });
-        this.engine.addField(newPath.push('*'), 'array', { valueType: 'string' });
-      }
-      else
-      {
-        this.engine.addField(newPath, type);
-      }
+      this.engineProxy.addField(newPath, type);
       this.syncWithEngine(true);
     }
     else
@@ -336,6 +340,7 @@ export class FieldProxy
     {
       this.engine.setFieldType(this.fieldId, newType);
     }
+    EngineUtil.castField(this.engine, this.fieldId, newType);
     this.syncWithEngine(true);
   }
 

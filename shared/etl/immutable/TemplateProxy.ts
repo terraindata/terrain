@@ -260,7 +260,6 @@ export class TemplateProxy
     {
       EngineUtil.addInitialTypeCasts(engine);
     }
-
   }
 
   private createNode(node: ETLNode): number

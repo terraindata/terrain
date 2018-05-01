@@ -74,15 +74,21 @@ export class SetIfTFF extends TransformationForm<SetOptions, TransformationNodeT
     filterNull: {
       type: DisplayType.CheckBox,
       displayName: 'Set If Null',
+      group: 'checkboxes',
+      widthFactor: 2,
     },
     filterNaN: {
       type: DisplayType.CheckBox,
       displayName: 'Set If NaN',
+      group: 'checkboxes',
       getDisplayState: this.numberDisplayState,
+      widthFactor: 2,
     },
     filterUndefined: {
       type: DisplayType.CheckBox,
       displayName: 'Set if Undefined',
+      group: 'checkboxes',
+      widthFactor: 3,
     },
     filterValue: {
       type: DisplayType.TextBox,
