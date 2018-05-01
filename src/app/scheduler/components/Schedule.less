@@ -2,6 +2,40 @@
 
 .schedule-list-wrapper {
 	padding: 12px;
+	border-radius: 4px;
+	border: 1px solid;
+	margin: 20px;
+	.schedule-list-header {
+		height: 20px;
+	    overflow: hidden;
+	    padding-bottom: 6px;
+	    padding-left: 6px;
+		.schedule-list-title {
+			font-size: @pretty-large-font-size;
+		}
+		.schedule-list-refresh-wrapper {
+			position: relative;
+			float: right;
+			top: -23px;
+			left: -1px;
+			.schedule-list-refresh {
+				height: 20px;
+				width: 20px;
+				cursor: pointer;
+			}
+		}
+	}
+	.schedule-list-schedules-wrapper {
+		border-radius: 4px;
+	}
+	.routeselector-picker {
+		.routeselector-value-component {
+			.floating-input-container {
+				margin-left: 12px;
+				width: calc(~"100% - 12px");
+			}
+		}
+	}
 	.routeselector {
 		.routeselector-box-values {
 			padding-right: 50px;
