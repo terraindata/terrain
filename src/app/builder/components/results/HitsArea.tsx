@@ -216,7 +216,8 @@ class HitsArea extends TerrainComponent<Props>
     if (resultsState.hits && resultsState.hits.size)
     {
       nestedFields = nestedFields.filter((field) =>
-        List.isList(resultsState.hits.get(0).fields.get(field)),
+        List.isList(resultsState.hits.get(0).fields.get(field)) ||
+        !resultsState.hits.get(0).fields.get(field),
       ).toList();
     }
     // If there is a results config in use, only use nested fields in that config

@@ -757,6 +757,13 @@ export class ResultsManager extends TerrainComponent<Props>
       return;
     }
     const resultsData = response.getResultsData();
+    if (appendResults && resultsData.hits.hits.length === 0)
+    {
+      this.changeResults({
+        loading: false,
+      });
+      return;
+    }
     const hits = resultsData.hits.hits.map((hit) =>
     {
       let hitTemp = _.cloneDeep(hit);
