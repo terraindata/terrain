@@ -192,11 +192,11 @@ export class Integrations
       integration.lastModified = new Date();
       integration.meta = (integration.meta !== undefined && integration.meta !== null) ? integration.meta : '';
       integration.name = (integration.name !== undefined && integration.name !== null) ? integration.name : '';
-      integration.readPermission = (integration.readPermission !== undefined || integration.readPermission !== null)
+      integration.readPermission = (integration.readPermission !== undefined && integration.readPermission !== null)
         ? integration.readPermission : IntegrationPermission.Admin;
       integration.type = (integration.type !== undefined && integration.type !== null)
         ? integration.type : IntegrationPermission.Default;
-      integration.writePermission = (integration.writePermission !== undefined || integration.writePermission !== null)
+      integration.writePermission = (integration.writePermission !== undefined && integration.writePermission !== null)
         ? integration.writePermission : IntegrationPermission.Admin;
 
       const newIntegration: IntegrationConfig[] = await App.DB.upsert(this.integrationTable, integration) as IntegrationConfig[];
