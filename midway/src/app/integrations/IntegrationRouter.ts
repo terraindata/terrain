@@ -59,10 +59,10 @@ const Router = new KoaRouter();
 export const integrations: Integrations = new Integrations();
 const perm: Permissions = new Permissions();
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await integrations.get(ctx.state.user);
+  ctx.body = await integrations.get(ctx.state.user, ctx.params.id);
 });
 
 Router.get('/simple', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -71,18 +71,29 @@ Router.get('/simple', passport.authenticate('access-token-local'), async (ctx, n
   ctx.body = await integrations.getSimple(ctx.state.user, ctx.query.type);
 });
 
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
   const integration: IntegrationConfig = ctx.request.body.body;
-  Util.verifyParameters(integration, ['name', 'type', 'meta']);
+  Util.verifyParameters(integration, ['name', 'type', 'createdBy']);
+
+  if (integration['authConfig'] === null && integration['connectionConfig'] === null)
+  {
+    throw new Error('Connection or authentication configuration is missing.');
+  }
+
+  if (integration.id === undefined && ctx.params.id !== undefined)
+  {
+    integration.id = ctx.params.id;
+  }
+
   ctx.body = await integrations.upsert(ctx.state.user, integration);
 });
 
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.IntegrationPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await integrations.upsert(ctx.state.user, ctx.params.id);
+  ctx.body = await integrations.delete(ctx.state.user, ctx.params.id);
 });
 
 export default Router;

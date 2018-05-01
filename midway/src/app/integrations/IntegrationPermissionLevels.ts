@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-export enum IntegrationPermissionEnum
+export enum IntegrationPermission
 {
   Admin = 'Admin',
   Regular = 'Regular',
@@ -55,19 +55,22 @@ export class IntegrationPermissionLevels
 {
   public static isAllowedAccess(existingLevel: string, checkLevel: string): boolean
   {
-    if (checkLevel === IntegrationPermissionEnum.Admin)
+    if (checkLevel === IntegrationPermission.Admin)
     {
       return true;
     }
-    if ((existingLevel === IntegrationPermissionEnum.Regular || existingLevel === IntegrationPermissionEnum.Default)
-      && checkLevel === IntegrationPermissionEnum.Regular)
+
+    if ((existingLevel === IntegrationPermission.Regular || existingLevel === IntegrationPermission.Default)
+      && checkLevel === IntegrationPermission.Regular)
     {
       return true;
     }
-    if (existingLevel === IntegrationPermissionEnum.Default && checkLevel === IntegrationPermissionEnum.Default)
+
+    if (existingLevel === IntegrationPermission.Default && checkLevel === IntegrationPermission.Default)
     {
       return true;
     }
+
     return false;
   }
 }

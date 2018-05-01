@@ -111,7 +111,7 @@ export class JobQueue
       {
         // do nothing, job was not found
       }
-      return reject([] as JobConfig[]);
+      return resolve([] as JobConfig[]);
     });
   }
 
@@ -172,14 +172,14 @@ export class JobQueue
     });
   }
 
-  public async delete(id: number): Promise<JobConfig[] | string>
+  public async delete(id: number): Promise<JobConfig[]>
   {
     return new Promise<JobConfig[]>(async (resolve, reject) =>
     {
       const jobs: JobConfig[] = await this.get(id);
       if (jobs.length === 0)
       {
-        return reject('Job does not exist');
+        return reject(new Error('Job does not exist'));
       }
       const doNothing: JobConfig[] = await App.DB.delete(this.jobTable, { id }) as JobConfig[];
       return resolve([jobs[0]] as JobConfig[]);
@@ -210,7 +210,7 @@ export class JobQueue
       {
         // do nothing, job was not found
       }
-      return reject([] as JobConfig[]);
+      return resolve([] as JobConfig[]);
     });
   }
 
@@ -221,7 +221,7 @@ export class JobQueue
       const getJobs: JobConfig[] = await this.get(id, false) as JobConfig[];
       if (getJobs.length === 0)
       {
-        return reject('Job not found.');
+        return reject(new Error('Job not found.'));
       }
 
       await this._setJobStatus(id, true, 'RUNNING');
@@ -257,7 +257,7 @@ export class JobQueue
       {
         // do nothing, job was not found
       }
-      return reject('Job not found.');
+      return reject(new Error('Job not found.'));
     });
 
   }

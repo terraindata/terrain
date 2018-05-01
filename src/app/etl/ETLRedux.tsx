@@ -145,7 +145,7 @@ export interface ETLActionTypes
   // Integration Action Types
   getIntegrations: {
     actionType: 'getIntegrations',
-    simple: boolean,
+    simple?: boolean,
     onError?: ErrorHandler,
   };
   updateIntegration: {
@@ -554,7 +554,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         integration: response,
       });
     };
-    return ETLAjax.createIntegration(action.integration)
+    return ETLAjax.createIntegration(action.integration.toJS())
       .then(this.onLoadFactory([onLoad], directDispatch, name))
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
@@ -571,8 +571,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     const onLoad = (response) =>
     {
       directDispatch({
-        actionType: 'deleteIntegraton',
-        integrationId: response,
+        actionType: 'deleteIntegrationSuccess',
+        integrationId: response[0].id,
       });
     };
     return ETLAjax.deleteIntegration(action.integrationId)

@@ -49,7 +49,6 @@ import * as request from 'supertest';
 import { promisify } from 'util';
 import * as winston from 'winston';
 
-// import { App, Credentials, DB, Scheduler } from '../../src/app/App';
 import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
@@ -68,7 +67,7 @@ let templateId: number = -1; // ETL
 let mySQLImportTemplateID: number = -1;
 let persistentImportMySQLAccessToken: string = '';
 
-let schedulerExportId = -1;
+let schedulerExportId = '';
 
 // tslint:disable:max-line-length
 
@@ -104,11 +103,6 @@ beforeAll(async (done) =>
 
     const app = new App(options);
     server = await app.start();
-
-    // await Credentials.initializeLocalFilesystemCredential();
-
-    // await Scheduler.initializeJobs();
-    // await Scheduler.initializeSchedules();
 
     const config: ElasticConfig = {
       hosts: ['http://localhost:9200'],
@@ -231,6 +225,11 @@ beforeAll(async (done) =>
   {
     // do nothing
   }
+});
+
+afterAll(async (done) =>
+{
+  await DB.getDB().execute(['DROP TABLE IF EXISTS jobs;', 'DROP TABLE IF EXISTS schedules;']);
 });
 
 describe('Status tests', () =>
@@ -1576,47 +1575,58 @@ describe('File io templates route tests', () =>
   });
 });
 
-describe('Credentials tests', () =>
+describe('Integration tests', () =>
 {
-  test('POST /midway/v1/credentials', async () =>
+  let integrationId = 0;
+  const integration = {
+    authConfig: {
+      username: 'testuser',
+      password: 'Terrain123!',
+    },
+    connectionConfig: {
+      host: '10.1.1.103',
+      port: 22,
+    },
+    createdBy: 1,
+    lastModified: new Date(),
+    meta: '',
+    readPermission: '',
+    writePermission: '',
+    type: 'sftp',
+    name: 'My SFTP Integration',
+  };
+
+  test('POST /midway/v1/integrations', async () =>
   {
     await request(server)
-      .post('/midway/v1/credentials')
+      .post('/midway/v1/integrations')
       .send({
         id: 1,
         accessToken: defaultUserAccessToken,
-        body: {
-          createdBy: 1,
-          meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
-          name: 'SFTP Test 1',
-          type: 'sftp',
-          permissions: 1,
-        },
+        body: JSON.stringify(integration),
       })
       .expect(200)
       .then((response) =>
       {
-        const result: object = JSON.parse(response.text);
-        expect(Array.isArray(result)).toBe(true);
-        const resultAsArray: object[] = result as object[];
-        expect(resultAsArray[0]).toMatchObject({
-          createdBy: 1,
-          meta: '',
-          name: 'SFTP Test 1',
-          type: 'sftp',
-          permissions: 1,
-        });
+        const result = JSON.parse(response.text);
+        const expected = JSON.parse(JSON.stringify(integration));
+        expected.authConfig = null;
+        delete result.lastModified;
+        delete expected.lastModified;
+        expect(result).toMatchObject(expected);
+        integrationId = result['id'];
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
+        fail('POST /midway/v1/integrations request returned an error: ' + String(error));
       });
   });
 
-  test('GET /midway/v1/credentials', async () =>
+  test('GET /midway/v1/integrations', async () =>
   {
+    expect(integrationId).toBeGreaterThan(0);
     await request(server)
-      .get('/midway/v1/credentials')
+      .get('/midway/v1/integrations/' + String(integrationId))
       .query({
         id: 1,
         accessToken: defaultUserAccessToken,
@@ -1625,129 +1635,37 @@ describe('Credentials tests', () =>
       .then((response) =>
       {
         const result = JSON.parse(response.text);
-        expect(result.length).toBeGreaterThanOrEqual(2);
-        expect(result).toEqual(expect.arrayContaining([
-          {
-            createdBy: 1,
-            id: 1,
-            meta: '',
-            name: 'Local Filesystem Config',
-            permissions: 0,
-            type: 'local',
-          },
-          {
-            createdBy: 1,
-            id: 2,
-            meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
-            name: 'SFTP Test 1',
-            permissions: 1,
-            type: 'sftp',
-          },
-        ]));
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toEqual(1);
+        const expected = JSON.parse(JSON.stringify(integration));
+        delete expected.lastModified;
+        expect(result[0]).toMatchObject(expected);
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
-      });
-  });
-});
-
-describe('Scheduler tests', () =>
-{
-  test('POST /midway/v1/scheduler/create scheduled ETL export', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/scheduler/')
-      .send({
-        id: 1,
-        accessToken: defaultUserAccessToken,
-        body: {
-          cron: '0 2 29 2 0', // some absurd leap year date at 2 AM
-          name: 'test ETL',
-          priority: 1,
-          shouldRunNext: true,
-          tasks:
-            [
-              {
-                id: 1,
-                taskId: 2,
-                params:
-                  {
-                    templateId, // ETL template ID
-                  },
-              },
-            ],
-        },
-      })
-      .expect(200)
-      .then(async (response) =>
-      {
-        expect(response.text).not.toBe('');
-        if (response.text === '')
-        {
-          fail('POST /scheduler/create request returned empty response body');
-        }
-        const result = JSON.parse(response.text);
-        expect(Object.keys(result).lastIndexOf('errors')).toEqual(-1);
-        schedulerExportId = result['id'];
-      });
-  }, 70000);
-
-  test('POST /midway/v1/scheduler/run/<schedule ID> run now', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
-      .send({
-        id: 1,
-        accessToken: defaultUserAccessToken,
-        body: {
-        },
-      })
-      .expect(200)
-      .then(async (responseRun) =>
-      {
-        expect(await new Promise<boolean>(async (resolve, reject) =>
-        {
-          function verifyFileWritten()
-          {
-            resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
-          }
-          setTimeout(verifyFileWritten, 3000);
-        })).toBe(true);
+        fail('POST /midway/v1/integrations request returned an error: ' + String(error));
       });
   });
 
-  test('POST /midway/v1/scheduler/create INVALID scheduled export', async () =>
+  test('Delete an integration: POST /midway/v1/integrations/delete', async () =>
   {
+    expect(integrationId).toBeGreaterThan(0);
     await request(server)
-      .post('/midway/v1/scheduler/create')
+      .post('/midway/v1/integrations/delete/' + String(integrationId))
       .send({
         id: 1,
         accessToken: defaultUserAccessToken,
-        body: {
-          invalidCronName: '0 2 29 2 0', // some absurd leap year date at 2 AM
-          name: 'invalid test ETL',
-          priority: 1,
-          shouldRunNext: true,
-          tasks:
-            [
-              {
-                id: 1,
-                taskId: 0,
-              },
-            ],
-        },
       })
-      .expect(400)
-      .then(async (response) =>
+      .expect(200)
+      .then((res) =>
       {
-        expect(response.text).not.toBe('');
-        if (response.text === '')
-        {
-          fail('POST /scheduler/create request returned empty response body');
-        }
-        const result = JSON.parse(response.text);
-        expect(Object.keys(result).lastIndexOf('errors')).not.toEqual(-1);
+        expect(res.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(res.text);
+        expect(respData).toMatchObject({});
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/integrations/1 request returned an error: ' + String(error));
       });
   });
 });
@@ -2028,6 +1946,110 @@ describe('ETL Preview Tests', () =>
       .catch((error) =>
       {
         fail('POST /midway/v1/etl/preview request returned an error: ' + String(error));
+      });
+  });
+});
+
+describe('Scheduler tests', () =>
+{
+  test('POST /midway/v1/scheduler/ create scheduled ETL export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/')
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+        body: {
+          cron: '0 2 29 2 0', // some absurd leap year date at 2 AM
+          name: 'test ETL',
+          priority: 1,
+          shouldRunNext: true,
+          tasks:
+            [
+              {
+                id: 1,
+                taskId: 2,
+                params:
+                  {
+                    templateId, // ETL template ID
+                  },
+              },
+            ],
+        },
+      })
+      .expect(200)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/create request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(result.length).not.toEqual(0);
+        expect(Object.keys(result).lastIndexOf('errors')).toEqual(-1);
+        schedulerExportId = result[0]['id'];
+      });
+  }, 70000);
+
+  /*
+    TODO: Add this test case back when we add ETL execute tests
+    test('POST /midway/v1/scheduler/run/<schedule ID> run now', async () =>
+    {
+      await request(server)
+        .post('/midway/v1/scheduler/run/' + schedulerExportId.toString())
+        .send({
+          id: 1,
+          accessToken: defaultUserAccessToken,
+          body: {
+          },
+        })
+        .expect(200)
+        .then(async (responseRun) =>
+        {
+          expect(await new Promise<boolean>(async (resolve, reject) =>
+          {
+            function verifyFileWritten()
+            {
+              resolve(fs.existsSync(process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json'));
+            }
+            setTimeout(verifyFileWritten, 3000);
+          })).toBe(true);
+        });
+    });
+    */
+
+  test('POST /midway/v1/scheduler/ create INVALID scheduled export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/')
+      .send({
+        id: 1,
+        accessToken: defaultUserAccessToken,
+        body: {
+          invalidCronName: '0 2 29 2 0', // some absurd leap year date at 2 AM
+          name: 'invalid test ETL',
+          priority: 1,
+          shouldRunNext: true,
+          tasks:
+            [
+              {
+                id: 1,
+                taskId: 0,
+              },
+            ],
+        },
+      })
+      .expect(400)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/ create INVALID scheduled export request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Object.keys(result).lastIndexOf('errors')).not.toEqual(-1);
       });
   });
 });

@@ -69,11 +69,11 @@ class ETLAjax
     {
       const handleResponse = (response: any) =>
       {
-        resolve(response.data);
+        resolve(response);
       };
       return Ajax.req(
         'get',
-        simple ? 'integrations/simple' : 'integrations/',
+        simple ? 'integrations/simple/' : 'integrations/',
         {},
         handleResponse,
         {
@@ -112,7 +112,7 @@ class ETLAjax
       return Ajax.req(
         'post',
         `integrations/`,
-        { integration },
+        integration,
         handleResponse,
         {
           onError: reject,
@@ -131,7 +131,7 @@ class ETLAjax
       return Ajax.req(
         'post',
         `integrations/${integrationId}`,
-        { integration },
+        integration,
         handleResponse,
         {
           onError: reject,

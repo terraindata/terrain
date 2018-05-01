@@ -85,7 +85,7 @@ class ScheduleList extends TerrainComponent<Props>
   {
     this.props.schedulerActions({
       actionType: 'updateSchedule',
-      schedule: scheduleForDatabase(schedule),
+      schedule: scheduleForDatabase(schedule) as SchedulerConfig,
     });
   }
 

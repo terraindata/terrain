@@ -48,7 +48,7 @@ import aesjs = require('aes-js');
 import sha1 = require('sha1');
 
 import IntegrationConfig from './IntegrationConfig';
-import { IntegrationPermissionEnum, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
+import { IntegrationPermission, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
 import IntegrationSimpleConfig from './IntegrationSimpleConfig';
 
 import * as Tasty from '../../tasty/Tasty';
@@ -67,7 +67,7 @@ export class Integrations
   constructor()
   {
     this.integrationTable = new Tasty.Table(
-      'endpoints',
+      'integrations',
       ['id'],
       [
         'authConfig',
@@ -99,7 +99,7 @@ export class Integrations
       {
         return reject('Integration does not exist.');
       }
-      await App.DB.delete(this.integrationTable, { id }) as IntegrationConfig[];
+      await App.DB.delete(this.integrationTable, { id });
       return resolve(deletedIntegrations);
     });
   }
@@ -109,25 +109,19 @@ export class Integrations
     return new Promise<IntegrationConfig[]>(async (resolve, reject) =>
     {
       const rawIntegrations = await App.DB.select(this.integrationTable, [], { id, type });
-      const integrations = rawIntegrations.map((result: object) => new IntegrationConfig(result));
-      return resolve(await Promise.all(integrations.map(async (integration) =>
+      const integrations: IntegrationConfig[] = rawIntegrations.map((result: object) => new IntegrationConfig(result));
+      resolve(await Promise.all(integrations.map(async (integration) =>
       {
-        integration.authConfig = await this._decrypt(integration.authConfig);
-        return integration;
-      })));
-    });
-  }
+        if (integration.authConfig !== '')
+        {
+          integration.authConfig = JSON.parse(await this._decrypt(integration.authConfig));
+        }
 
-  // returns a string of credentials that match given type
-  public async getByType(user: UserConfig, type?: string): Promise<string[]>
-  {
-    return new Promise<string[]>(async (resolve, reject) =>
-    {
-      const rawCreds = await App.DB.select(this.integrationTable, [], { type });
-      const creds = rawCreds.map((result: object) => new IntegrationConfig(result));
-      return resolve(await Promise.all(creds.map(async (cred) =>
-      {
-        return this._decrypt(cred.meta);
+        if (integration.connectionConfig !== '')
+        {
+          integration.connectionConfig = JSON.parse(integration.connectionConfig);
+        }
+        return integration;
       })));
     });
   }
@@ -135,39 +129,8 @@ export class Integrations
   // returns a string of names and ids that match given type
   public async getSimple(user: UserConfig, type?: string): Promise<IntegrationSimpleConfig[]>
   {
-    return new Promise<IntegrationSimpleConfig[]>(async (resolve, reject) =>
-    {
-      const rawIntegrations = await App.DB.select(this.integrationTable, [], { type });
-      const integrations: IntegrationSimpleConfig[] = rawIntegrations.map((result: object) => new IntegrationSimpleConfig(result));
-      return resolve(integrations);
-    });
-  }
-
-  public async initializeLocalFilesystemIntegration(): Promise<void>
-  {
-    const userExists = await users.select([], { email: 'admin@terraindata.com' });
-    if (userExists.length !== 0)
-    {
-      const localConfigs: string[] = await this.getByType(userExists[0], 'local');
-      if (localConfigs.length === 0)
-      {
-        const seedUser = userExists[0];
-        const localCred: IntegrationConfig =
-          {
-            authConfig: null,
-            connectionConfig: null,
-            createdBy: seedUser.id as number,
-            id: undefined,
-            lastModified: null,
-            meta: '',
-            name: 'Local Filesystem Config',
-            readPermission: IntegrationPermissionEnum.Admin,
-            type: 'local',
-            writePermission: IntegrationPermissionEnum.Admin,
-          };
-        await this.upsert(seedUser, localCred);
-      }
-    }
+    const rawIntegrations = await App.DB.select(this.integrationTable, [], { type });
+    return rawIntegrations.map((result: object) => new IntegrationSimpleConfig(result));
   }
 
   public async upsert(user: UserConfig, integration: IntegrationConfig): Promise<IntegrationConfig>
@@ -180,7 +143,7 @@ export class Integrations
         return reject('Cannot create/update integrations as non-super user.');
       }
       const defaultCreatedBy: number = user.id !== undefined ? user.id : -1;
-      // if modifying existing credential, check for existence
+      // if modifying existing integration, check for existence
       if (integration.id !== undefined)
       {
         const integrations: IntegrationConfig[] = await this.get(user, integration.id);
@@ -208,44 +171,41 @@ export class Integrations
       // set default values
       if (integration.authConfig !== undefined && integration.authConfig !== null)
       {
-        if (typeof integration.authConfig === 'object')
-        {
-          integration.authConfig = await this._encrypt(JSON.stringify(integration.authConfig)) as string;
-        }
-        else if (typeof integration.authConfig === 'string')
-        {
-          integration.authConfig = await this._encrypt(integration.authConfig) as string;
-        }
+        integration.authConfig = await this._encrypt(JSON.stringify(integration.authConfig)) as string;
       }
+      else
+      {
+        integration.authConfig = '';
+      }
+
       if (integration.connectionConfig !== undefined && integration.connectionConfig !== null)
       {
-        if (typeof integration.connectionConfig === 'object')
-        {
-          integration.connectionConfig = JSON.stringify(integration.connectionConfig);
-        }
-        else if (typeof integration.connectionConfig === 'string')
-        {
-          integration.connectionConfig = integration.connectionConfig;
-        }
+        integration.connectionConfig = JSON.stringify(integration.connectionConfig);
       }
+      else
+      {
+        integration.connectionConfig = '';
+      }
+
       integration.createdBy = (integration.createdBy !== undefined && integration.createdBy !== null)
         ? integration.createdBy : defaultCreatedBy;
       integration.lastModified = new Date();
       integration.meta = (integration.meta !== undefined && integration.meta !== null) ? integration.meta : '';
       integration.name = (integration.name !== undefined && integration.name !== null) ? integration.name : '';
-      integration.readPermission = (integration.readPermission !== undefined || integration.readPermission !== null)
-        ? integration.readPermission : IntegrationPermissionEnum.Admin;
+      integration.readPermission = (integration.readPermission !== undefined && integration.readPermission !== null)
+        ? integration.readPermission : IntegrationPermission.Admin;
       integration.type = (integration.type !== undefined && integration.type !== null)
-        ? integration.type : IntegrationPermissionEnum.Default;
-      integration.writePermission = (integration.writePermission !== undefined || integration.writePermission !== null)
-        ? integration.writePermission : IntegrationPermissionEnum.Admin;
+        ? integration.type : IntegrationPermission.Default;
+      integration.writePermission = (integration.writePermission !== undefined && integration.writePermission !== null)
+        ? integration.writePermission : IntegrationPermission.Admin;
 
-      let newIntegrationObj: object = await App.DB.upsert(this.integrationTable, integration) as object;
-
-      const newIntegration: IntegrationConfig[] = newIntegrationObj as IntegrationConfig[];
-      newIntegration[0].authConfig = ''; // sanitize integrations
-      newIntegrationObj = newIntegration as object;
-      return resolve(newIntegrationObj as IntegrationConfig);
+      const newIntegration: IntegrationConfig[] = await App.DB.upsert(this.integrationTable, integration) as IntegrationConfig[];
+      newIntegration[0].authConfig = null; // sanitize integrations
+      if (newIntegration[0].connectionConfig !== '')
+      {
+        newIntegration[0].connectionConfig = JSON.parse(newIntegration[0].connectionConfig);
+      }
+      resolve(newIntegration[0]);
     });
   }
 

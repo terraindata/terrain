@@ -250,10 +250,6 @@ export class App
     await users.initializeDefaultUser();
     winston.debug('Finished creating a default user...');
 
-    // add local filesystem integration config
-    await integrations.initializeLocalFilesystemIntegration();
-    winston.debug('Finished adding local filesystem integration...');
-
     // initialize job queue
     await this.JobQ.initializeJobQueue();
 

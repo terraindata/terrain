@@ -48,8 +48,6 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
 import * as Util from '../AppUtil';
-import Credentials from '../credentials/Credentials';
-import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
 import { TemplateConfig } from './TemplateConfig';
 import Templates from './Templates';
