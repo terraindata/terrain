@@ -70,13 +70,6 @@ build-analytics-js:
    - ( cd analytics.js && yarn build )
   stage: build
 
-#build-frontend-prod:
-#  script:
-#   - yarn build-prod
-#  only:
-#   - master
-#  stage: build
-
 fullstack-meta:
   script:
     - pkill node || true;
@@ -88,6 +81,7 @@ fullstack-meta:
     - yarn test-fullstack-component
   stage: fullstack-meta
   after_script:
+    - tail -n20 ./midwayConsole.log || true
     - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
@@ -112,6 +106,7 @@ fullstack-screenshot:
     - rr/test/builder/__image_snapshots__/__diff_output__
     - rr/test/login/__image_snapshots__/__diff_output__
   after_script:
+    - tail -n20 ./midwayConsole.log || true
     - timeout 240 yarn test-fullstack-teardown
     - pkill node || true;
 
@@ -132,3 +127,9 @@ deploy:
     name: production
     url: http://pa-terraformer01.terrain.int:3000
 
+#build-frontend-prod:
+#  script:
+#   - yarn build-prod
+#  only:
+#   - master
+#  stage: build
