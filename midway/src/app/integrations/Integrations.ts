@@ -48,7 +48,7 @@ import aesjs = require('aes-js');
 import sha1 = require('sha1');
 
 import IntegrationConfig from './IntegrationConfig';
-import { IntegrationPermissionEnum, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
+import { IntegrationPermission, IntegrationPermissionLevels } from './IntegrationPermissionLevels';
 import IntegrationSimpleConfig from './IntegrationSimpleConfig';
 
 import * as Tasty from '../../tasty/Tasty';
@@ -207,11 +207,11 @@ export class Integrations
       integration.meta = (integration.meta !== undefined && integration.meta !== null) ? integration.meta : '';
       integration.name = (integration.name !== undefined && integration.name !== null) ? integration.name : '';
       integration.readPermission = (integration.readPermission !== undefined || integration.readPermission !== null)
-        ? integration.readPermission : IntegrationPermissionEnum.Admin;
+        ? integration.readPermission : IntegrationPermission.Admin;
       integration.type = (integration.type !== undefined && integration.type !== null)
-        ? integration.type : IntegrationPermissionEnum.Default;
+        ? integration.type : IntegrationPermission.Default;
       integration.writePermission = (integration.writePermission !== undefined || integration.writePermission !== null)
-        ? integration.writePermission : IntegrationPermissionEnum.Admin;
+        ? integration.writePermission : IntegrationPermission.Admin;
 
       let newIntegrationObj: object = await App.DB.upsert(this.integrationTable, integration) as object;
 
