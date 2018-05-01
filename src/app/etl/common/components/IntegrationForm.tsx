@@ -69,6 +69,7 @@ export interface Props
 {
   integration: IntegrationConfig;
   onChange: (newConfig: IntegrationConfig) => void;
+  hideType?: boolean;
 }
 
 export default class IntegrationForm extends TerrainComponent<Props>
@@ -86,16 +87,19 @@ export default class IntegrationForm extends TerrainComponent<Props>
 
   public render()
   {
-    const { integration, onChange } = this.props;
+    const { integration, onChange, hideType } = this.props;
     const FormClass = IntegrationFormMap[integration.type];
 
     return (
       <div className='integration-form-block'>
-        <DynamicForm
-          inputMap={this.typeMap}
-          inputState={this.typeValueToState(integration)}
-          onStateChange={this.handleTypeChange}
-        />
+        {
+          !hideType &&
+          <DynamicForm
+            inputMap={this.typeMap}
+            inputState={this.typeValueToState(integration)}
+            onStateChange={this.handleTypeChange}
+          />
+        }
         {
           FormClass != null ?
             <FormClass

@@ -63,6 +63,10 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormClasses';
 
+import IntegrationForm from 'etl/common/components/IntegrationForm';
+import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import Dropdown from 'app/common/components/Dropdown';
+
 const { List } = Immutable;
 
 export interface Props
@@ -76,6 +80,29 @@ export interface Props
 
 export default class EndpointForm extends TerrainComponent<Props>
 {
+  public state:
+  {
+    integrations: List<IntegrationConfig>;
+  } = {
+    integrations: List([
+      _IntegrationConfig({
+        type: 'Sftp',
+        name: 'Integration number 1',
+        id: 1,
+      }),
+      _IntegrationConfig({
+        type: 'Sftp',
+        name: 'Integration number 2',
+        id: 2,
+      }),
+      _IntegrationConfig({
+        type: ':)',
+        name: 'Not an sftp one',
+        id: 3,
+      })
+    ])
+  }
+
   public sinkTypeMap: InputDeclarationMap<SinkFormState> =
     {
       type: {
@@ -100,12 +127,28 @@ export default class EndpointForm extends TerrainComponent<Props>
       },
     };
 
+  public handleIntegrationChange(newInt)
+  {
+    const index = this.state.integrations.map((i) => i.id).toList().indexOf(newInt.id);
+    this.setState({
+      integrations: this.state.integrations.set(index, newInt),
+    });
+  }
+
+  public handleIntegrationPickerChange(index: number)
+  {
+    const newIntegrationId = this.state.integrations.get(index).id;
+    this.handleEndpointChange(this.props.endpoint.set('integrationId', newIntegrationId));
+  }
+
   public render()
   {
     const { isSource, endpoint, onChange, hideTypePicker } = this.props;
     const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
     const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
-
+    const integration = this.state.integrations.filter((i) => i.id === endpoint.integrationId).first();
+    let displayNames: IMMap<number, string> = Immutable.Map();
+    this.state.integrations.forEach((i) => displayNames = displayNames.set(parseFloat(String(i.id)), i.name));
     return (
       <div className='endpoint-block'>
         {
@@ -117,7 +160,26 @@ export default class EndpointForm extends TerrainComponent<Props>
             />
         }
         {
-          FormClass != null ?
+          endpoint.type &&
+          // Integration Picker (TODO Make this a class)
+          <Dropdown
+            options={this.state.integrations.map((i) => i.id).toList()}
+            optionsDisplayName={displayNames}
+            onChange={this.handleIntegrationPickerChange}
+            selectedIndex={this.state.integrations.map((i) => i.id).toList().indexOf(endpoint.integrationId)}
+            canEdit={true}
+          />
+        }
+        {
+          integration &&
+          <IntegrationForm
+            integration={integration}
+            onChange={this.handleIntegrationChange}
+            hideType={true}
+          />
+        }
+        {
+          (FormClass != null && integration) ?
             <FormClass
               endpoint={endpoint}
               onChange={this.handleEndpointChange}

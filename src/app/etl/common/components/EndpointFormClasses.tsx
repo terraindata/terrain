@@ -314,18 +314,18 @@ type SftpState = SftpOptions;
 class SftpEndpoint extends EndpointFormBase<SftpState>
 {
   public inputMap: InputDeclarationMap<SftpState> = {
-    ip: {
-      type: DisplayType.TextBox,
-      displayName: 'IP Address',
-      group: 'addr row',
-      widthFactor: 3,
-    },
-    port: {
-      type: DisplayType.NumberBox,
-      displayName: 'Port',
-      group: 'addr row',
-      widthFactor: 1,
-    },
+    // ip: {
+    //   type: DisplayType.TextBox,
+    //   displayName: 'IP Address',
+    //   group: 'addr row',
+    //   widthFactor: 3,
+    // },
+    // port: {
+    //   type: DisplayType.NumberBox,
+    //   displayName: 'Port',
+    //   group: 'addr row',
+    //   widthFactor: 1,
+    // },
     filepath: {
       type: DisplayType.TextBox,
       displayName: 'Filepath',
