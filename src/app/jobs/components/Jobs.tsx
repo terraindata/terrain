@@ -51,6 +51,7 @@ import JobsApi from 'jobs/JobsApi';
 import * as React from 'react';
 import Util from 'util/Util';
 import XHR from 'util/XHR';
+import SimpleTable from 'common/components/SimpleTable';
 
 class Jobs extends TerrainComponent<any> {
 
@@ -125,24 +126,30 @@ class Jobs extends TerrainComponent<any> {
     const { jobs } = this.props;
     const { id } = this.state;
 
+    const jobsHeader = [
+      {
+        columnKey: 'id',
+        columnLabel: 'Id'
+      },
+      {
+        columnKey: 'name',
+        columnLabel: 'Name'
+      },
+      {
+        columnKey: 'status',
+        columnLabel: 'Status'
+      },
+    ]
+
     return (
       <div>
         <div>
           {this.state.responseText}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {
-            jobs.jobs !== null ?
-              (
-                jobs.jobs.reduce(
-                  (scheduleRows, j, sId) => scheduleRows.concat(
-                    this.renderJob(j),
-                  ),
-                  [],
-                )
-              ) : null
-          }
-        </div>
+        <SimpleTable
+          header={jobsHeader}
+          data={jobs.jobs}
+        />
       </div>
     );
   }
