@@ -46,7 +46,7 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, validJSTypes } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -68,17 +68,92 @@ export default class EngineUtil
   /*
    *  Verify
    *  Fields:
-   *  1: All fields have valid names (no * or number names) (unfixable)
+   *  1: All fields have valid names (no * or number names)
    *  2: No dangling fields (fields without parents, or fields with children that aren't arrays or objects)
-   *  3: All fields have valid types & value types if applicable (maybe fixable)
-   *  5: No duplicate output key paths or input key paths
+   *  3: All fields have valid types & value types if applicable
+   *  4: No duplicate output key paths or input key paths
    *  Transformations:
-   *  1: All newFieldKeyPaths point to some field's outputKeyPath (unfixable)
-   *  2: All field's current type matches the most recent cast
+   *  1: TODO All newFieldKeyPaths point to some field's outputKeyPath
+   *  2: TODO All field's current type matches the most recent cast
    */
   public static verifyIntegrity(engine: TransformationEngine)
   {
+    const errors = [];
+    try
+    {
+      const fields = engine.getAllFieldIDs();
+      const pathTypes: PathHashMap<FieldTypes> = {};
+      const seenIKP = {};
+      const seenOKP = {};
+      fields.forEach((id) =>
+      {
+        const hashedOKP = EngineUtil.hashPath(engine.getOutputKeyPath(id));
+        const hashedIKP = EngineUtil.hashPath(engine.getInputKeyPath(id));
+        if (seenIKP[hashedIKP] !== undefined)
+        {
+          errors.push(`Duplicate Input path detected: ${hashedIKP}`);
+        }
+        else
+        {
+          seenIKP[hashedIKP] = id;
+        }
+        if (seenOKP[hashedOKP] !== undefined)
+        {
+          errors.push(`Duplicate Output path detected: ${hashedOKP}`);
+        }
+        else
+        {
+          seenOKP[hashedOKP] = id;
+        }
+        const strippedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id));
+        pathTypes[EngineUtil.hashPath(strippedPath)] = engine.getFieldType(id) as FieldTypes;
+      });
+      fields.forEach((id) =>
+      {
+        const okp = engine.getOutputKeyPath(id);
+        if (okp.size > 1)
+        {
+          const parentPath = okp.slice(0, -1).toList();
+          const parentID = engine.getOutputFieldID(parentPath);
+          if (engine.getFieldType(parentID) !== 'array' && engine.getFieldType(parentID) !== 'object')
+          {
+            errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
+          }
+        }
+        if (okp.last() === '*')
+        {
+          if (engine.getFieldType(id) !== 'array')
+          {
+            errors.push(`Field ${okp.toJS()} is not of type array, but has name '*'. This is not allowed`);
+          }
+        }
+        const fieldType = engine.getFieldType(id);
+        if (!EngineUtil.fieldHasValidType(engine, id))
+        {
+          errors.push(`Field ${okp.toJS()} has an invalid type: ${fieldType}`);
+        }
+      });
+    }
+    catch (e)
+    {
+      errors.push(`Error while trying to verify transformation engine integrity: ${String(e)}`);
+    }
+    return errors;
+  }
 
+  public static fieldHasValidType(engine: TransformationEngine, id: number)
+  {
+    const fieldType = engine.getFieldType(id) as FieldTypes;
+    const valueType = engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
+    if (validJSTypes.indexOf(fieldType) === -1)
+    {
+      return false;
+    }
+    if (fieldType === 'array' && validJSTypes.indexOf(valueType) === -1)
+    {
+      return false;
+    }
+    return true;
   }
 
   // root is considered to be a named field

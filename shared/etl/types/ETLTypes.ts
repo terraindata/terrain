@@ -78,6 +78,7 @@ export type TemplateObject = {
 };
 
 export type FieldTypes = 'array' | 'object' | 'string' | 'number' | 'boolean';
+export const validJSTypes: FieldTypes[] = ['array', 'object', 'string', 'number', 'boolean'];
 
 export enum NodeTypes
 {

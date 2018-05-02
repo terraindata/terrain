@@ -49,9 +49,9 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
 
-import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { ETLTemplate, SinksMap, SourcesMap } from 'shared/etl/immutable/TemplateRecords';
+import { ElasticMapping } from 'shared/etl/mapping/ElasticMapping';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FieldTypes, Languages } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -85,15 +85,20 @@ export default class TemplateUtil
    */
   public static verifyIntegrity(template: ETLTemplate): string[]
   {
-    const errors = [];
-    try {
-      template.getEdges().forEach((edge: ETLEdge, key) => {
-        if (!EngineUtil.verifyIntegrity(edge.transformations))
+    let errors = [];
+    try
+    {
+      template.getEdges().forEach((edge: ETLEdge, key) =>
+      {
+        const engineErrors = EngineUtil.verifyIntegrity(edge.transformations);
+        if (engineErrors.length > 0)
         {
+          errors = errors.concat(engineErrors);
           errors.push(`Engine ${key} malformed`);
         }
       });
-      template.getSources().forEach((source: SourceConfig, key) => {
+      template.getSources().forEach((source: SourceConfig, key) =>
+      {
         if (source == null)
         {
           errors.push(`Source for key ${key} is undefined or null`);
@@ -115,7 +120,8 @@ export default class TemplateUtil
           }
         }
       });
-      template.getSinks().forEach((sink: SourceConfig, key) => {
+      template.getSinks().forEach((sink: SourceConfig, key) =>
+      {
         if (sink == null)
         {
           errors.push(`Sink for key ${key} is undefined or null`);
@@ -137,7 +143,8 @@ export default class TemplateUtil
           }
         }
       });
-      template.process.nodes.forEach((node: ETLNode, id) => {
+      template.process.nodes.forEach((node: ETLNode, id) =>
+      {
         if (node.type === NodeTypes.Sink)
         {
           if (template.getSink(node.endpoint) === undefined)
@@ -160,7 +167,7 @@ export default class TemplateUtil
     }
     catch (e)
     {
-      errors.push(`Error while trying to verify integrity: ${String(e)}`);
+      errors.push(`Error while trying to verify template integrity: ${String(e)}`);
     }
     return errors;
   }
@@ -174,7 +181,8 @@ export default class TemplateUtil
   public static verifyExecutable(template: ETLTemplate): string[]
   {
     let errors = [];
-    try {
+    try
+    {
       const templateErrors = TemplateUtil.verifyIntegrity(template);
       if (templateErrors.length !== 0)
       {
@@ -187,7 +195,8 @@ export default class TemplateUtil
         errors.push(`Source ${invalidSource.name} is an Upload Source, but it is missing a file`);
       }
       const invalidSink = template.getSinks().filter((sink) => sink.type === Sinks.Database)
-        .find((sink, key) => {
+        .find((sink, key) =>
+        {
           const options = sink.options as SinkOptionsType<Sinks.Database>;
           switch (options.language)
           {
@@ -212,7 +221,7 @@ export default class TemplateUtil
     }
     catch (e)
     {
-      errors.push(`Error while trying to verify integrity: ${String(e)}`);
+      errors.push(`Error while trying to determine if template is executable: ${String(e)}`);
     }
     return errors;
   }
@@ -226,12 +235,12 @@ export default class TemplateUtil
   public static canSchedule(template: ETLTemplate): boolean
   {
     const invalidSources = template.getSources().find((v) => SchedulableSources.indexOf(v.type) === -1);
-    if (invalidSources)
+    if (invalidSources !== undefined)
     {
       return false;
     }
     const invalidSinks = template.getSinks().find((v) => SchedulableSinks.indexOf(v.type) === -1);
-    if (invalidSinks)
+    if (invalidSinks !== undefined)
     {
       return false;
     }
