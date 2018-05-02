@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import * as _ from 'lodash';
+import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { TaskConfig } from 'shared/types/jobs/TaskConfig';
@@ -233,7 +234,7 @@ export class JobQueue
     });
   }
 
-  public async run(id: number, runImmediately: boolean): Promise<JobConfig[] | stream.Readable> // runs the job and
+  public async run(id: number, runImmediately: boolean = false): Promise<JobConfig[] | stream.Readable> // runs the job and
   {
     return new Promise<JobConfig[] | stream.Readable>(async (resolve, reject) =>
     {
