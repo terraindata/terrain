@@ -137,8 +137,6 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       algorithmId: -1,
     },
     Sftp: {
-      ip: '127.0.0.1',
-      port: 22,
       filepath: 'filename.json',
       credentialId: -1,
     },
@@ -199,8 +197,6 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       table: '',
     },
     Sftp: {
-      // ip: '127.0.0.1',
-      // port: 22,
       filepath: 'filename.json',
       credentialId: -1,
     },

@@ -86,8 +86,8 @@ export default class IntegrationPicker extends TerrainComponent<Props>
         pickOptions: (s) => this.state.integrationIds,
         indexResolver: (value) => this.state.integrationIds.indexOf(value),
         displayNames: (s) => this.state.filteredIntegrations.map((i) => i.name),
-      }
-    }
+      },
+    },
   };
 
   public componentDidMount()

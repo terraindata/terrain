@@ -158,7 +158,7 @@ export function getEndpointDescription(
     case Sinks.Sftp:
     case Sources.Sftp: {
       const options = endpoint.options as SourceOptionsType<Sources.Sftp>;
-      const text = `${options.ip} at ${options.filepath}`;
+      const text = `${options.filepath}`;
       return `SFTP Server ${text}`;
     }
     case Sources.Upload: {
