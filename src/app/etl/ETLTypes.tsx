@@ -51,8 +51,8 @@ const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 
 import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
+import { IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
-
 import { makeConstructor, makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
 class ETLStateC
@@ -60,6 +60,7 @@ class ETLStateC
   public templates: List<ETLTemplate> = List([]);
   public loading: { [k: string]: number } = {}; // a tracker to verify if we are waiting on queries
   public modalRequests: List<ModalProps> = List([]);
+  public integrations: IMMap<ID, IntegrationConfig> = Map<ID, IntegrationConfig>();
   // TODO the way we track what is running and how the ui deals with it is suboptimal
   public runningTemplates: Immutable.Map<number, ETLTemplate> = Map();
   public acknowledgedRuns: Immutable.Map<number, boolean> = Map();

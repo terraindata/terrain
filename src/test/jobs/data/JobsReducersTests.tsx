@@ -42,62 +42,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import { JobsActionTypes, JobsReducers as reducer } from 'jobs/data/JobsRedux';
+import { _JobConfig, _JobsState, JobsState } from 'jobs/JobsTypes';
+import JobsHelper from 'test-helpers/JobsHelper';
+import Util from 'util/Util';
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-import { backgroundColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
-
-const PFAddIcon = require('./../../../../images/icon_add.svg?name=PFAddIcon');
-
-export interface Props
+describe('JobsReducers', () =>
 {
-  text: string;
-  canEdit: boolean;
-  onCreate: () => void;
-  style?: any;
-  showText?: boolean;
-}
+  let jobs = null;
 
-@Radium
-class PathfinderCreateLine extends TerrainComponent<Props>
-{
-  public render()
+  beforeEach(() =>
   {
-    const { onCreate, canEdit, text, style } = this.props;
+    jobs = JobsHelper.mockState().getState();
+  });
 
-    if (!canEdit)
+  it('should return the inital state', () =>
+  {
+    expect(reducer(undefined, {})).toEqual(_JobsState());
+  });
+
+  describe('#getJobsStart', () =>
+  {
+    it('should set loading to true', () =>
     {
-      return null;
-    }
-    return (
-      <div>
-        <div
-          className='pf-create'
-          style={_.extend({}, style,
-            fontColor(Colors().active),
-            getStyle('fill', Colors().active),
-            backgroundColor(Colors().fontWhite),
-          )}
-          onClick={onCreate}
-        >
-          <div className='pf-create-icon'>
-            <div className='pf-create-fill' />
-            <PFAddIcon />
-          </div>
+      jobs = JobsHelper.mockState()
+        .loading(false)
+        .getState();
 
-          <div className='pf-create-text'>
-            {
-              text
-            }
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsStart,
+      });
 
-export default PathfinderCreateLine;
+      expect(nextState.loading).toBe(true);
+    });
+  });
+
+  describe('#getJobsSuccess', () =>
+  {
+    it('should set loading to false and write jobs on the store', () =>
+    {
+      const fetchedJobs = [
+        { id: 1, name: 'Job 1' },
+        { id: 2, name: 'Job 2' },
+      ];
+
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsSuccess,
+        payload: { jobs: fetchedJobs },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.jobs).toEqual(Util.arrayToImmutableMap(fetchedJobs, 'id', _JobConfig));
+    });
+  });
+
+  describe('#getJobsFailed', () =>
+  {
+    it('should set loading to false', () =>
+    {
+      const error = 'Error Message';
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsFailed,
+        payload: { error },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.error).toEqual(error);
+    });
+  });
+});

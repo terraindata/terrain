@@ -63,6 +63,20 @@ class XHR
         },
       });
 
+    terrainAxios.interceptors.response.use(
+      (response) => response,
+      (error) =>
+      {
+        let processedError = error;
+        if (processedError && processedError.response)
+        {
+          processedError = error.response.data.errors[0].detail;
+        }
+
+        return Promise.reject(processedError);
+      },
+    );
+
     return terrainAxios;
   }
 }

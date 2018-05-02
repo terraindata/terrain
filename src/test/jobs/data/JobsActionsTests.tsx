@@ -43,61 +43,70 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:object-literal-shorthand only-arrow-functions
+import * as Immutable from 'immutable';
+import { JobsActions, JobsActionTypes } from 'jobs/data/JobsRedux';
+import JobsApi from 'jobs/JobsApi';
+import { createMockStore } from 'test-helpers/helpers';
+import JobsHelper from 'test-helpers/JobsHelper';
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-import { backgroundColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
-
-const PFAddIcon = require('./../../../../images/icon_add.svg?name=PFAddIcon');
-
-export interface Props
+jest.mock('jobs/JobsApi', () =>
 {
-  text: string;
-  canEdit: boolean;
-  onCreate: () => void;
-  style?: any;
-  showText?: boolean;
-}
-
-@Radium
-class PathfinderCreateLine extends TerrainComponent<Props>
-{
-  public render()
-  {
-    const { onCreate, canEdit, text, style } = this.props;
-
-    if (!canEdit)
+  return {
+    default: function()
     {
-      return null;
-    }
-    return (
-      <div>
-        <div
-          className='pf-create'
-          style={_.extend({}, style,
-            fontColor(Colors().active),
-            getStyle('fill', Colors().active),
-            backgroundColor(Colors().fontWhite),
-          )}
-          onClick={onCreate}
-        >
-          <div className='pf-create-icon'>
-            <div className='pf-create-fill' />
-            <PFAddIcon />
-          </div>
+      return {
+        getJobs: () =>
+        {
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 1, name: 'Job 1' }, { id: 2, name: 'Job 2' }],
+            }),
+          );
+        },
+      };
+    },
+  };
+});
 
-          <div className='pf-create-text'>
-            {
-              text
-            }
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
+const mockStore = createMockStore();
 
-export default PathfinderCreateLine;
+describe('JobsActions', () =>
+{
+  let jobs = null;
+
+  beforeEach(() =>
+  {
+    jobs = JobsHelper.mockState().getState();
+  });
+
+  describe('#getJobs', () =>
+  {
+    describe('when the jobs are successfully returned', () =>
+    {
+      it('should dispatch a getJobsStart action followed by a getJobsSuccess action', () =>
+      {
+        const fetchedJobs = [{ id: 1, name: 'Job 1' }, { id: 2, name: 'Job 2' }];
+
+        const expectedActions = [
+          {
+            type: JobsActionTypes.getJobsStart,
+            payload: { actionType: 'getJobsStart' },
+          },
+          {
+            type: JobsActionTypes.getJobsSuccess,
+            payload: { actionType: 'getJobsSuccess', jobs: fetchedJobs },
+          },
+        ];
+
+        const store = mockStore({ jobs });
+
+        return store.dispatch(JobsActions({ actionType: 'getJobs' }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+});
