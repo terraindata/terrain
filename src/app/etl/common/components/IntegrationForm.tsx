@@ -89,7 +89,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
   {
     const { integration, onChange, hideType } = this.props;
     const FormClass = IntegrationFormMap[integration.type];
-
+    console.log('integration is ', integration);
     return (
       <div className='integration-form-block'>
         {
@@ -132,6 +132,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
 
   public handleIntegrationChange(newIntegration: IntegrationConfig)
   {
+    console.log('HERE got something new');
     this.props.onChange(newIntegration);
   }
 }

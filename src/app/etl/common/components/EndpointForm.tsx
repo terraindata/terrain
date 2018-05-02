@@ -116,6 +116,7 @@ class EndpointForm extends TerrainComponent<Props>
 
   public handleIntegrationChange(newIntegration: IntegrationConfig)
   {
+    console.log('handle integration change ', newIntegration);
     this.props.etlActions({
       actionType: 'updateIntegration',
       integrationId: newIntegration.id,
@@ -133,6 +134,7 @@ class EndpointForm extends TerrainComponent<Props>
     const { isSource, endpoint, onChange, hideTypePicker, integrations} = this.props;
     const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
     const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
+    console.log('endpoitn form ', integrations.get(endpoint.integrationId));
     return (
       <div className='endpoint-block'>
         {

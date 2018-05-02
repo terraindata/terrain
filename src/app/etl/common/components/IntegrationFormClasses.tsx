@@ -84,12 +84,12 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
    */
   public authConfigToState(config): AuthState
   {
-    return config as AuthState;
+    return (config || {}) as AuthState;
   }
 
   public connectionConfigToState(config): ConnectionState
   {
-    return config as ConnectionState;
+    return (config || {}) as ConnectionState;
   }
 
   public authStateToConfig(state: AuthState)
@@ -104,6 +104,7 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   public render()
   {
+    console.log('integration form class ', this.props.integration);
     const { authConfig, connectionConfig } = this.props.integration;
     const authState = this.authConfigToState(authConfig);
     const connectionState = this.connectionConfigToState(connectionConfig);
@@ -125,6 +126,7 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   private handleAuthFormChange(state: AuthState)
   {
+    console.log('handle auth form change ');
     const { onChange, integration } = this.props;
     const newConfig = this.authStateToConfig(state);
     onChange(integration.set('authConfig', newConfig));
@@ -132,6 +134,7 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   private handleConnectionFormChange(state: ConnectionState)
   {
+    console.log('handle connection form change ');
     const { onChange, integration } = this.props;
     const newConfig = this.connectionStateToConfig(state);
     onChange(integration.set('connectionConfig', newConfig));
