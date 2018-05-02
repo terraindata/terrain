@@ -47,8 +47,6 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
@@ -58,119 +56,100 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
-import { AuthConfigType, ConnectionConfigType, Integrations } from 'shared/etl/types/IntegrationTypes';
-const { List } = Immutable;
+import { Integrations } from 'shared/etl/types/IntegrationTypes';
+
+const { List, Map } = Immutable;
 
 export interface Props
 {
-  integration: IntegrationConfig;
-  onChange: (newIntegration: IntegrationConfig) => void;
+  integrationType?: string;
+  integrations: IMMap<ID, IntegrationConfig>;
+  selectedIntegration: ID;
+  onChange: (id: ID) => void;
 }
 
-abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props = Props> extends TerrainComponent<P>
+export default class IntegrationPicker extends TerrainComponent<Props>
 {
-  public abstract authMap: InputDeclarationMap<AuthState>;
-  public abstract connectionMap: InputDeclarationMap<ConnectionState>;
+  public state: {
+    filteredIntegrations: IMMap<ID, IntegrationConfig>,
+    integrationIds: List<ID>,
+  } = {
+      filteredIntegrations: Map(),
+      integrationIds: List(),
+    };
 
-  constructor(props)
+  public inputMap = {
+    id: {
+      type: DisplayType.Pick,
+      displayName: 'Integration',
+      options: {
+        pickOptions: (s) => this.state.integrationIds,
+        indexResolver: (value) => this.state.integrationIds.indexOf(value),
+        displayNames: (s) => this.state.filteredIntegrations.map((i) => i.name),
+      },
+    },
+  };
+
+  public componentDidMount()
   {
-    super(props);
-    this.handleAuthFormChange = this.handleAuthFormChange.bind(this);
-    this.handleConnectionFormChange = this.handleConnectionFormChange.bind(this);
+    this.filterIntegrations(this.props.integrationType, this.props.integrations);
   }
 
-  /*
-   * Override these converstion methods to customize form behavior / structure
-   */
-  public authConfigToState(config): AuthState
+  public componentWillReceiveProps(nextProps: Props)
   {
-    return (config || {}) as AuthState;
+    if (this.props.integrationType !== nextProps.integrationType ||
+      this.props.integrations !== nextProps.integrations)
+    {
+      this.filterIntegrations(nextProps.integrationType, nextProps.integrations);
+    }
   }
 
-  public connectionConfigToState(config): ConnectionState
+  public filterIntegrations(type: string, integrations: Immutable.Map<ID, IntegrationConfig>)
   {
-    return (config || {}) as ConnectionState;
+    let filtered;
+    if (!type)
+    {
+      filtered = integrations;
+    }
+    else
+    {
+      filtered = integrations.filter((integration) => integration.type === type);
+    }
+    const integrationIds = filtered.toList().map((i) => i.id).sort().toList();
+    this.setState({
+      filteredIntegrations: filtered,
+      integrationIds,
+    });
   }
 
-  public authStateToConfig(state: AuthState)
+  public getIntegrationMapOptions()
   {
-    return state as any;
+    const { filteredIntegrations, integrationIds } = this.state;
+    return {
+      pickOptions: (s) => integrationIds,
+      indexResolver: (value) => integrationIds.indexOf(value),
+      displayNames: (s) => filteredIntegrations.map((i) => i.name),
+    };
   }
 
-  public connectionStateToConfig(state: ConnectionState)
-  {
-    return state as any;
+  public handleIntegrationChange(newState)
+{
+    this.props.onChange(newState.id);
   }
 
   public render()
   {
-    const { authConfig, connectionConfig } = this.props.integration;
-    const authState = this.authConfigToState(authConfig);
-    const connectionState = this.connectionConfigToState(connectionConfig);
+    const { onChange, selectedIntegration } = this.props;
     return (
-      <div>
-        <DynamicForm
-          inputMap={this.authMap}
-          inputState={authState}
-          onStateChange={this.handleAuthFormChange}
-        />
-        <DynamicForm
-          inputMap={this.connectionMap}
-          inputState={connectionState}
-          onStateChange={this.handleConnectionFormChange}
-        />
+      <div className='integration-form-block'>
+        {
+          <DynamicForm
+            inputMap={this.inputMap}
+            inputState={{ id: selectedIntegration }}
+            onStateChange={this.handleIntegrationChange}
+          />
+        }
       </div>
     );
   }
-
-  private handleAuthFormChange(state: AuthState)
-  {
-    const { onChange, integration } = this.props;
-    const newConfig = this.authStateToConfig(state);
-    onChange(integration.set('authConfig', newConfig));
-  }
-
-  private handleConnectionFormChange(state: ConnectionState)
-  {
-    const { onChange, integration } = this.props;
-    const newConfig = this.connectionStateToConfig(state);
-    onChange(integration.set('connectionConfig', newConfig));
-  }
 }
-
-type SftpAuthT = AuthConfigType<Integrations.Sftp>;
-type SftpConnectionT = ConnectionConfigType<Integrations.Sftp>;
-class SftpForm extends IntegrationFormBase<SftpAuthT, SftpConnectionT>
-{
-  public authMap: InputDeclarationMap<SftpAuthT> = {
-    key: {
-      type: DisplayType.TextBox,
-      displayName: 'Private Key',
-    },
-  };
-
-  public connectionMap: InputDeclarationMap<SftpConnectionT> = {
-    ip: {
-      type: DisplayType.TextBox,
-      displayName: 'IP Address',
-      group: 'addr row',
-      widthFactor: 3,
-    },
-    port: {
-      type: DisplayType.NumberBox,
-      displayName: 'Port',
-      group: 'addr row',
-      widthFactor: 1,
-    },
-  };
-}
-
-type FormLookupMap =
-  {
-    [k in Integrations]: React.ComponentClass<Props>
-  };
-
-export const IntegrationFormMap: FormLookupMap =
-  {
-    [Integrations.Sftp]: SftpForm,
-  };

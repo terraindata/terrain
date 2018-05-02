@@ -62,14 +62,14 @@ export default class SFTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    const integrationId = source.options['integrationId'];
+    const integrationId = source['integrationId'];
     const sftp: SSH.SFTPWrapper = await this.getSFTPClientByintegrationId(integrationId);
     return sftp.createReadStream(source.options['filepath']);
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    const integrationId = sink.options['integrationId'];
+    const integrationId = sink['integrationId'];
     const sftp: SSH.SFTPWrapper = await this.getSFTPClientByintegrationId(integrationId);
     return sftp.createWriteStream(sink.options['filepath']);
   }

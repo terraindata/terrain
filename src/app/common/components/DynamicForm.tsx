@@ -208,6 +208,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
       selectedIndex = this.props.inputState[stateName];
       onChange = this.setStateHOC(stateName);
     }
+    const displayNames = options.displayNames != null ? options.displayNames(state) : undefined;
     return (
       <div className='dynamic-form-default-block' key={index}>
         <div className='dynamic-form-label' style={fontColor(Colors().text2)}> {inputInfo.displayName} </div>
@@ -218,6 +219,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
             onChange={onChange}
             options={pickOptions}
             canEdit={!disabled}
+            optionsDisplayName={displayNames}
           />
         </span>
       </div>
