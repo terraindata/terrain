@@ -50,7 +50,7 @@ import { List } from 'immutable';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import './Table.less';
+import './SimpleTable.less';
 
 import TerrainComponent from './TerrainComponent';
 
