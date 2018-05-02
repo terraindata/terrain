@@ -84,11 +84,14 @@ class PathfinderCreateLine extends TerrainComponent<Props>
           )}
           onClick={onCreate}
         >
-          <div className='pf-create-content'>
+          <div className='pf-create-icon'>
+            <div className='pf-create-fill' />
             <PFAddIcon />
+          </div>
+
+          <div className='pf-create-text'>
             {
-              this.props.showText &&
-              <span>{text}</span>
+              text
             }
           </div>
         </div>

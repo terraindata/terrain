@@ -137,30 +137,79 @@
 	border-radius: 4px;
 	margin-top: 1px;
 	display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-	.pf-create-content {
-		position: absolute;
-		top: calc(~"50% - @{svg-width} / 2");
-	}
-	span {
-		margin-left: 6px;
-		top: -1px;
-		position: relative;
-	}
-	@svg-width: 14px;
-	@svg-big: 18px;
-	svg {
-		width: @svg-width;
-		.transition;
-	}
-
-	&:hover {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  
+  .pf-create-icon {
+		@svg-width: 14px;
+		@svg-big: 18px;
 		svg {
-			@svg-big: 18px;
-			width: @svg-big;
+			width: @svg-width;
+			.transition;
+			fill: currentColor;
+			position: relative;
+			z-index: 1;
 		}
-	}
+		
+		.transition;
+		padding: 12px;
+		margin-right: 12px;
+		background: #fff;
+		border-radius: 99px;
+		position: relative;
+		top: 0px;
+		opacity: 1;
+  }
+  
+  .pf-create-fill {
+		// background: currentColor;
+		// background: #e3e3e3;
+  // 	width: 0px;
+  // 	height: 0px;
+  // 	left: 50%;
+  // 	top: 50%;		
+  // 	position: absolute;
+  // 	.transition;
+  // 	border-radius: 99px;
+  }
+  
+  .pf-create-text {
+  	.dead-center;
+  	
+  	top: 100%;
+  	.transition;
+  	opacity: 0;
+  }
+  
+  &:hover {
+  	
+	  .pf-create-text {
+	  	.dead-center;
+	  	opacity: 1;
+	  }
+	  
+	  .pf-create-icon {
+	  	top: -100%;
+	  	opacity: 0;
+	  }
+  
+  	// .pf-create-icon {
+  	// 	.pf-create-fill {
+  	// 		width: 100%;
+  	// 		height: 100%;
+  	// 		left: 0px;
+  	// 		top: 0px;
+  	// 		z-index: 0;
+  	// 	}
+  		
+  	// 	svg {
+  	// 		// fill: #fff;
+  	// 	}
+  	// }
+  	
+  	
+  }
 }
