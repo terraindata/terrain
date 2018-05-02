@@ -65,6 +65,22 @@ const valueTypeKeyPath = List(['valueType']);
 
 export default class EngineUtil
 {
+  /*
+   *  Verify
+   *  Fields:
+   *  1: All fields have valid names (no * or number names) (unfixable)
+   *  2: No dangling fields (fields without parents, or fields with children that aren't arrays or objects)
+   *  3: All fields have valid types & value types if applicable (maybe fixable)
+   *  5: No duplicate output key paths or input key paths
+   *  Transformations:
+   *  1: All newFieldKeyPaths point to some field's outputKeyPath (unfixable)
+   *  2: All field's current type matches the most recent cast
+   */
+  public static verifyIntegrity(engine: TransformationEngine)
+  {
+
+  }
+
   // root is considered to be a named field
   public static isNamedField(
     keypath: KeyPath,
@@ -148,7 +164,7 @@ export default class EngineUtil
   }
 
   // takes an engine path and the path type mapping and returns true if
-  // all of the path's parent paths represent array
+  // all of the path's parent paths represent array or object fields
   public static isAValidField(keypath: KeyPath, pathTypes: PathHashMap<FieldTypes>): boolean
   {
     if (keypath.size === 0)
@@ -167,6 +183,7 @@ export default class EngineUtil
     return true;
   }
 
+  // Add the fields in the pathTypes and pathValueTypes map to the given engine
   public static addFieldsToEngine(
     pathTypes: PathHashMap<FieldTypes>,
     pathValueTypes: PathHashMap<FieldTypes>,
@@ -200,6 +217,7 @@ export default class EngineUtil
     });
   }
 
+  // get the type of a field. If it represents an array wildcard, get the valueType
   public static getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
   {
     const kp = engine.getOutputKeyPath(id);
@@ -213,6 +231,7 @@ export default class EngineUtil
     }
   }
 
+  // take two engines and return an engine whose fields most closely resembles the result of the merge
   public static mergeJoinEngines(
     leftEngine: TransformationEngine,
     rightEngine: TransformationEngine,
@@ -351,6 +370,7 @@ export default class EngineUtil
     });
   }
 
+  // return the best guess engine from the given documents
   public static createEngineFromDocuments(documents: List<object>):
     {
       engine: TransformationEngine,
