@@ -441,6 +441,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
   {
     return (value) =>
     {
+      const shallowCopy = _.clone(this.props.inputState);
       const newValue = transformValue(value, this.props.inputState);
       shallowCopy[stateName] = newValue;
       this.props.onStateChange(shallowCopy);
