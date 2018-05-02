@@ -44,14 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console
+import SimpleTable from 'common/components/SimpleTable';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import { JobsActions } from 'jobs/data/JobsRedux';
+import { getFailedJobs, getSuccessfulJobs } from 'jobs/data/JobsSelectors';
 import JobsApi from 'jobs/JobsApi';
 import * as React from 'react';
 import Util from 'util/Util';
 import XHR from 'util/XHR';
-import SimpleTable from 'common/components/SimpleTable';
 
 class Jobs extends TerrainComponent<any> {
 
@@ -99,56 +100,42 @@ class Jobs extends TerrainComponent<any> {
       });
   }
 
-  public renderJob(job)
-  {
-    return (
-      <div key={job.id} style={{
-        display: 'flex', justifyContent: 'space-between',
-        width: '90%', padding: 10, borderBottom: '1px solid',
-      }}>
-        <div style={{ flex: 1 }}>{job.id}</div>
-        <div style={{ flex: 1 }}>{job.name ? job.name : 'not defined'}</div>
-        <div style={{ flex: 1 }}>{job.pausedFilename}</div>
-        <div style={{ flex: 1 }}>{job.priority}</div>
-        <div style={{ flex: 1 }}>{job.running ? 'running' : 'not running'}</div>
-        <div style={{ flex: 1 }}>{job.runNowPriority}</div>
-        <div style={{ flex: 1 }}>{job.scheduleId}</div>
-        <div style={{ flex: 1 }}>{job.status}</div>
-        <div style={{ flex: 1 }}>{job.tasks}</div>
-        <div style={{ flex: 1 }}>{job.type}</div>
-        <div style={{ flex: 1 }}>{job.workerId}</div>
-      </div>
-    );
-  }
-
   public render()
   {
-    const { jobs } = this.props;
+    const { successfulJobs, failedJobs } = this.props;
     const { id } = this.state;
 
     const jobsHeader = [
       {
         columnKey: 'id',
-        columnLabel: 'Id'
+        columnLabel: 'Id',
       },
       {
         columnKey: 'name',
-        columnLabel: 'Name'
+        columnLabel: 'Name',
       },
       {
         columnKey: 'status',
-        columnLabel: 'Status'
+        columnLabel: 'Status',
       },
-    ]
+    ];
 
     return (
       <div>
         <div>
           {this.state.responseText}
         </div>
+
+        <h2>Successful Jobs</h2>
         <SimpleTable
           header={jobsHeader}
-          data={jobs.jobs}
+          data={successfulJobs}
+        />
+
+        <h2>Failed Jobs</h2>
+        <SimpleTable
+          header={jobsHeader}
+          data={failedJobs}
         />
       </div>
     );
@@ -157,6 +144,9 @@ class Jobs extends TerrainComponent<any> {
 
 export default Util.createTypedContainer(
   Jobs,
-  ['jobs'],
+  {
+    successfulJobs: getSuccessfulJobs,
+    failedJobs: getFailedJobs,
+  },
   { jobsActions: JobsActions },
 );

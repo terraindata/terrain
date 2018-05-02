@@ -46,11 +46,11 @@ THE SOFTWARE.
 // tslint:disable:no-empty
 
 import SimpleTable from 'app/common/components/SimpleTable';
-import { _SchedulerConfig } from 'scheduler/SchedulerTypes';
 import { mount, shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import { List, Map, Record } from 'immutable';
 import * as React from 'react';
+import { _SchedulerConfig } from 'scheduler/SchedulerTypes';
 
 describe('SimpleTable', () =>
 {
@@ -59,15 +59,15 @@ describe('SimpleTable', () =>
   const columns = [
     {
       columnKey: 'id',
-      columnLabel: 'Id'
+      columnLabel: 'Id',
     },
     {
       columnKey: 'name',
-      columnLabel: 'Name'
+      columnLabel: 'Name',
     },
     {
       columnKey: 'status',
-      columnLabel: 'Status'
+      columnLabel: 'Status',
     },
   ];
 
@@ -93,7 +93,7 @@ describe('SimpleTable', () =>
   {
     tableComponent = shallow(
       <SimpleTable
-        { ...tableState }
+        {...tableState}
       />,
     );
   });

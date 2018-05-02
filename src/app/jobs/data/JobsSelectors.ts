@@ -42,72 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import { createSelector } from 'reselect';
 
-// tslint:disable:no-var-requires strict-boolean-expressions
+const getJobs = (state) => state.get('jobs').jobs;
 
-import { List } from 'immutable';
-import * as Immutable from 'immutable';
-import * as React from 'react';
+export const getSuccessfulJobs = createSelector(
+  getJobs,
+  (jobs) => jobs.filter((j) => j.status === 'SUCCESS'),
+);
 
-import './SimpleTable.less';
-
-import TerrainComponent from './TerrainComponent';
-
-export interface SimpleTableColumn
-{
-  columnKey: string;
-  columnLabel: string;
-}
-
-export interface Props
-{
-  header: SimpleTableColumn[];
-  data: Immutable.Map<ID, any>;
-}
-
-export class SimpleTable extends TerrainComponent<Props>
-{
-  public state: {};
-
-  public render()
-  {
-    const { header, data } = this.props;
-
-    const columnKeys = header.reduce((keys, column) => keys.concat(column.columnKey), []);
-
-    return (
-      <table className='simple-table'>
-        <thead className='simple-table-header'>
-          <tr className='simple-table-row'>
-            {
-              header.map((column, index) =>
-              {
-                return <th key={column.columnKey} className='simple-table-cell'>{column.columnLabel}</th>;
-              })
-            }
-          </tr>
-        </thead>
-        <tbody className='simple-table-body'>
-          {
-            data.valueSeq().map((entry) =>
-            {
-              return (
-                <tr key={entry.id} className='simple-table-row'>
-                  {
-                    columnKeys.map((key, index) =>
-                    {
-                      return <td key={key} className='simple-table-cell'>{entry[key]}</td>;
-                    })
-                  }
-                </tr>
-              );
-            })
-          }
-        </tbody>
-      </table>
-    );
-  }
-}
-
-export default SimpleTable;
+export const getFailedJobs = createSelector(
+  getJobs,
+  (jobs) => jobs.filter((j) => j.status === 'FAILURE'),
+);
