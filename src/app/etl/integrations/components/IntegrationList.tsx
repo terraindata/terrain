@@ -55,8 +55,9 @@ import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 import XHR from 'util/XHR';
-import { IntegrationFormMap } from 'etl/common/components/IntegrationFormClasses';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import Integration from 'app/etl/integrations/components/Integration';
+import './IntegrationStyle.less';
 
 export interface Props
 {
@@ -126,15 +127,12 @@ class IntegrationList extends TerrainComponent<Props>
       <div className='schedule-list-wrapper'>
         {
           integrationList.map((integration, i) =>
-            <div key={i}>
-              {'Integration ' + integration.id}
-              <br/>
-              {'Type: ' + integration.type}
-              <br/>
-              {'Name: ' + integration.name}
-              <br/>
-              <br/>
-            </div>
+            <Integration
+              integration={integration}
+              onDelete={this.confirmDeleteIntegration}
+              onChange={this.handleIntegrationChange}
+              key={i}
+            />
           )
         }
         <PathfinderCreateLine
