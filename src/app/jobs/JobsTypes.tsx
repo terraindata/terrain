@@ -42,43 +42,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
+import { List, Record } from 'immutable';
+import * as Immutable from 'immutable';
+import { JobConfig as SharedJobConfig } from 'shared/types/jobs/JobConfig';
+import { createRecordType } from 'shared/util/Classes';
+import Util from 'util/Util';
 
-class XHR
+class JobConfigC extends SharedJobConfig
 {
-  public static getInstance(): AxiosInstance
-  {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
-
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
-      {
-        let processedError = error;
-        if (processedError && processedError.response)
-        {
-          processedError = error.response.data.errors[0].detail;
-        }
-
-        return Promise.reject(processedError);
-      },
-    );
-
-    return terrainAxios;
-  }
+  // if extra front-end specific functions or properties are needed, add here
 }
 
-export default XHR;
+const JobConfig_Record = createRecordType(new JobConfigC(), 'JobConfigC');
+export interface JobConfig extends JobConfigC, IMap<JobConfig> { }
+export const _JobConfig =
+  (config: object) =>
+  {
+    const job = new JobConfig_Record(config) as any as JobConfig;
+
+    return job;
+  };
+
+class JobsStateC
+{
+  public loading: boolean = true;
+  public jobs: Immutable.Map<ID, JobConfig> = Immutable.Map<ID, JobConfig>({});
+  public error: string = null;
+}
+
+const JobsState_Record = createRecordType(new JobsStateC(), 'JobsStateC');
+export interface JobsState extends JobsStateC, IRecord<JobsState> { }
+export const _JobsState = (config?: any) =>
+{
+  return new JobsState_Record(Util.extendId(config || {})) as any as JobsState;
+};

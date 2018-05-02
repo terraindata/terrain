@@ -43,42 +43,73 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
+import * as Immutable from 'immutable';
+import { JobsActionTypes, JobsReducers as reducer } from 'jobs/data/JobsRedux';
+import { _JobConfig, _JobsState, JobsState } from 'jobs/JobsTypes';
+import JobsHelper from 'test-helpers/JobsHelper';
+import Util from 'util/Util';
 
-class XHR
+describe('JobsReducers', () =>
 {
-  public static getInstance(): AxiosInstance
+  let jobs = null;
+
+  beforeEach(() =>
   {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
+    jobs = JobsHelper.mockState().getState();
+  });
+
+  it('should return the inital state', () =>
+  {
+    expect(reducer(undefined, {})).toEqual(_JobsState());
+  });
+
+  describe('#getJobsStart', () =>
+  {
+    it('should set loading to true', () =>
+    {
+      jobs = JobsHelper.mockState()
+        .loading(false)
+        .getState();
+
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsStart,
       });
 
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
-      {
-        let processedError = error;
-        if (processedError && processedError.response)
-        {
-          processedError = error.response.data.errors[0].detail;
-        }
+      expect(nextState.loading).toBe(true);
+    });
+  });
 
-        return Promise.reject(processedError);
-      },
-    );
+  describe('#getJobsSuccess', () =>
+  {
+    it('should set loading to false and write jobs on the store', () =>
+    {
+      const fetchedJobs = [
+        { id: 1, name: 'Job 1' },
+        { id: 2, name: 'Job 2' },
+      ];
 
-    return terrainAxios;
-  }
-}
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsSuccess,
+        payload: { jobs: fetchedJobs },
+      });
 
-export default XHR;
+      expect(nextState.loading).toBe(false);
+      expect(nextState.jobs).toEqual(Util.arrayToImmutableMap(fetchedJobs, 'id', _JobConfig));
+    });
+  });
+
+  describe('#getJobsFailed', () =>
+  {
+    it('should set loading to false', () =>
+    {
+      const error = 'Error Message';
+      const nextState = reducer(jobs, {
+        type: JobsActionTypes.getJobsFailed,
+        payload: { error },
+      });
+
+      expect(nextState.loading).toBe(false);
+      expect(nextState.error).toEqual(error);
+    });
+  });
+});

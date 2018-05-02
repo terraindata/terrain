@@ -54,6 +54,7 @@ import BuilderReducers from 'builder/data/BuilderReducers';
 import { ETLReducers } from 'etl/ETLRedux';
 import { TemplateEditorReducers } from 'etl/templates/TemplateEditorRedux';
 import { WalkthroughReducers } from 'etl/walkthrough/ETLWalkthroughRedux';
+import { JobsReducers } from 'jobs/data/JobsRedux';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
@@ -81,6 +82,7 @@ const reducers = {
   walkthrough: WalkthroughReducers,
   builderCards: BuilderCardsReducers,
   scheduler: SchedulerReducers,
+  jobs: JobsReducers,
 };
 
 const rootReducer = combineReducers(reducers);

@@ -42,43 +42,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
-
-class XHR
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
+import * as Immutable from 'immutable';
+import
 {
-  public static getInstance(): AxiosInstance
+  _JobsState,
+  JobsState,
+} from 'jobs/JobsTypes';
+import { ItemType } from '../../items/types/Item';
+
+export default class SchedulerHelper
+{
+  public static mockState()
   {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
-
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
-      {
-        let processedError = error;
-        if (processedError && processedError.response)
-        {
-          processedError = error.response.data.errors[0].detail;
-        }
-
-        return Promise.reject(processedError);
-      },
-    );
-
-    return terrainAxios;
+    return new JobsStateMock();
   }
 }
 
-export default XHR;
+class JobsStateMock
+{
+  public state;
+
+  public constructor()
+  {
+    this.state = _JobsState({});
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+
+  public loading(isLoading: boolean)
+  {
+    this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
+}

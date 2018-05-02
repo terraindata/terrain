@@ -42,43 +42,71 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:object-literal-shorthand only-arrow-functions
+import * as Immutable from 'immutable';
+import { JobsActions, JobsActionTypes } from 'jobs/data/JobsRedux';
+import JobsApi from 'jobs/JobsApi';
+import { createMockStore } from 'test-helpers/helpers';
+import JobsHelper from 'test-helpers/JobsHelper';
 
-class XHR
+jest.mock('jobs/JobsApi', () =>
 {
-  public static getInstance(): AxiosInstance
-  {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
-
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
-      {
-        let processedError = error;
-        if (processedError && processedError.response)
+  return {
+    default: function()
+    {
+      return {
+        getJobs: () =>
         {
-          processedError = error.response.data.errors[0].detail;
-        }
+          return new Promise(
+            (resolve, reject) => resolve({
+              data: [{ id: 1, name: 'Job 1' }, { id: 2, name: 'Job 2' }],
+            }),
+          );
+        },
+      };
+    },
+  };
+});
 
-        return Promise.reject(processedError);
-      },
-    );
+const mockStore = createMockStore();
 
-    return terrainAxios;
-  }
-}
+describe('JobsActions', () =>
+{
+  let jobs = null;
 
-export default XHR;
+  beforeEach(() =>
+  {
+    jobs = JobsHelper.mockState().getState();
+  });
+
+  describe('#getJobs', () =>
+  {
+    describe('when the jobs are successfully returned', () =>
+    {
+      it('should dispatch a getJobsStart action followed by a getJobsSuccess action', () =>
+      {
+        const fetchedJobs = [{ id: 1, name: 'Job 1' }, { id: 2, name: 'Job 2' }];
+
+        const expectedActions = [
+          {
+            type: JobsActionTypes.getJobsStart,
+            payload: { actionType: 'getJobsStart' },
+          },
+          {
+            type: JobsActionTypes.getJobsSuccess,
+            payload: { actionType: 'getJobsSuccess', jobs: fetchedJobs },
+          },
+        ];
+
+        const store = mockStore({ jobs });
+
+        return store.dispatch(JobsActions({ actionType: 'getJobs' }))
+          .then((response) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+          });
+      });
+    });
+  });
+});

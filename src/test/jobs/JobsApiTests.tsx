@@ -42,43 +42,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-import axios, { AxiosInstance } from 'axios';
+// Copyright 2017 Terrain Data, Inc.
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import JobsApi from 'jobs/JobsApi';
 
-class XHR
+const axiosMock = new MockAdapter(axios);
+
+describe('JobsApi', () =>
 {
-  public static getInstance(): AxiosInstance
+  let jobsApi: JobsApi;
+  beforeEach(() =>
   {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
+    jobsApi = new JobsApi(axios);
+  });
 
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
-      {
-        let processedError = error;
-        if (processedError && processedError.response)
+  describe('#getJobs', () =>
+  {
+    it('should make a GET request to /jobs', () =>
+    {
+      axiosMock.onGet('/jobs').reply(
+        200,
+        [{ id: 1 }, { id: 2 }],
+      );
+
+      return jobsApi.getJobs()
+        .then((response) =>
         {
-          processedError = error.response.data.errors[0].detail;
-        }
-
-        return Promise.reject(processedError);
-      },
-    );
-
-    return terrainAxios;
-  }
-}
-
-export default XHR;
+          expect(response.data).toEqual(
+            [{ id: 1 }, { id: 2 }],
+          );
+        },
+      );
+    });
+  });
+});

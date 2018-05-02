@@ -44,41 +44,28 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 import axios, { AxiosInstance } from 'axios';
+import Ajax, { AjaxResponse } from 'util/Ajax';
+import XHR from 'util/XHR';
 
-class XHR
+// making this an instance in case we want stateful things like cancelling ajax requests
+class JobsApi
 {
-  public static getInstance(): AxiosInstance
+  public xhr: AxiosInstance = null;
+
+  public constructor(xhr: AxiosInstance)
   {
-    const terrainAxios = axios.create(
-      {
-        headers: {},
-        data: {},
-        baseURL: 'http://localhost:3000/midway/v1',
-        timeout: 180000,
-        withCredentials: false,
-        params: {
-          id: localStorage['id'],
-          accessToken: localStorage['accessToken'],
-          body: {},
-        },
-      });
+    this.xhr = xhr;
+  }
 
-    terrainAxios.interceptors.response.use(
-      (response) => response,
-      (error) =>
-      {
-        let processedError = error;
-        if (processedError && processedError.response)
-        {
-          processedError = error.response.data.errors[0].detail;
-        }
+  public getJobs()
+  {
+    return this.xhr.get('/jobs');
+  }
 
-        return Promise.reject(processedError);
-      },
-    );
-
-    return terrainAxios;
+  public getJob(id: number)
+  {
+    return this.xhr.get(`/jobs/${id}`);
   }
 }
 
-export default XHR;
+export default JobsApi;
