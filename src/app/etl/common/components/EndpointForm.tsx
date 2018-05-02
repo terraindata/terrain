@@ -66,6 +66,7 @@ import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormCl
 import IntegrationForm from 'etl/common/components/IntegrationForm';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import IntegrationPicker from 'etl/common/components/IntegrationPicker';
+import { ETLActions } from 'etl/ETLRedux';
 
 const { List, Map } = Immutable;
 
@@ -77,10 +78,18 @@ export interface Props
   hideTypePicker?: boolean;
   isSchedule?: boolean;
   integrations?: IMMap<ID, IntegrationConfig>;
+  etlActions?: typeof ETLActions;
 }
 
 class EndpointForm extends TerrainComponent<Props>
 {
+  public componentDidMount()
+  {
+    this.props.etlActions({
+      actionType: 'getIntegrations',
+    })
+  }
+
   public sinkTypeMap: InputDeclarationMap<SinkFormState> =
     {
       type: {
@@ -105,12 +114,13 @@ class EndpointForm extends TerrainComponent<Props>
       },
     };
 
-  public handleIntegrationChange(newInt)
+  public handleIntegrationChange(newIntegration: IntegrationConfig)
   {
-    // const index = this.state.integrations.map((i) => i.id).toList().indexOf(newInt.id);
-    // this.setState({
-    //   integrations: this.state.integrations.set(index, newInt),
-    // });
+    this.props.etlActions({
+      actionType: 'updateIntegration',
+      integrationId: newIntegration.id,
+      integration: newIntegration,
+    });
   }
 
   public handleIntegrationPickerChange(id: ID)
@@ -201,5 +211,7 @@ const sinkList = List(Object.keys(Sinks));
 export default Util.createContainer(
   EndpointForm,
   [['etl', 'integrations']],
-  {}
+  {
+    etlActions: ETLActions,
+  }
 );
