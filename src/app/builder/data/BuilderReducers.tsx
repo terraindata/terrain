@@ -71,6 +71,7 @@ import
 } from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
 const { List, Map } = Immutable;
+import * as TerrainLog from 'loglevel';
 
 const BuilderReducers =
   {
@@ -403,11 +404,16 @@ const BuilderReducers =
         action.payload.changeQuery,
       );
       state = state.set('query', query);
+      if (query.cardsAndCodeInSync === false)
+      {
+        TerrainLog.debug('Cards and code not sync (from TQL mutation).');
+        return state;
+      }
       if (!TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
       {
         const { parser, path } = CardsToPath.updatePath(query, state.db.name);
         state = state.setIn(['query', 'path'], path);
-        if (parser)
+        if (parser && parser.isMutated)
         {
           const newCards = ESCardParser.parseAndUpdateCards(List([parser.getValueInfo().card]), state.query);
           state = state.setIn(['query', 'cards'], newCards);
