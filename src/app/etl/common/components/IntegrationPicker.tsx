@@ -78,6 +78,18 @@ export default class IntegrationPicker extends TerrainComponent<Props>
       integrationIds: List(),
     };
 
+  public inputMap = {
+    id: {
+      type: DisplayType.Pick,
+      displayName: 'Integration',
+      options: {
+        pickOptions: (s) => this.state.integrationIds,
+        indexResolver: (value) => this.state.integrationIds.indexOf(value),
+        displayNames: (s) => this.state.filteredIntegrations.map((i) => i.name),
+      }
+    }
+  };
+
   public componentDidMount()
   {
     this.filterIntegrations(this.props.integrationType, this.props.integrations);
@@ -110,32 +122,29 @@ export default class IntegrationPicker extends TerrainComponent<Props>
     });
   }
 
-  public handleIntegrationChange(newState)
+  public getIntegrationMapOptions()
   {
+    const { filteredIntegrations, integrationIds } = this.state;
+    return {
+      pickOptions: (s) => integrationIds,
+      indexResolver: (value) => integrationIds.indexOf(value),
+      displayNames: (s) => filteredIntegrations.map((i) => i.name),
+    };
+  }
+
+  public handleIntegrationChange(newState)
+{
     this.props.onChange(newState.id);
   }
 
   public render()
   {
     const { onChange, selectedIntegration } = this.props;
-    const { filteredIntegrations, integrationIds } = this.state;
-    const inputMap =
-      {
-        id: {
-          type: DisplayType.Pick,
-          displayName: 'Integration',
-          options: {
-            pickOptions: (s) => integrationIds,
-            indexResolver: (value) => integrationIds.indexOf(value),
-            displayNames: (s) => filteredIntegrations.map((i) => i.name),
-          },
-        },
-      };
     return (
       <div className='integration-form-block'>
         {
           <DynamicForm
-            inputMap={inputMap}
+            inputMap={this.inputMap}
             inputState={{ id: selectedIntegration }}
             onStateChange={this.handleIntegrationChange}
           />
