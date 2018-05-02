@@ -67,6 +67,7 @@ import IntegrationForm from 'etl/common/components/IntegrationForm';
 import IntegrationPicker from 'etl/common/components/IntegrationPicker';
 import { ETLActions } from 'etl/ETLRedux';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { Integrations } from 'shared/etl/types/IntegrationTypes';
 
 const { List, Map } = Immutable;
 
@@ -133,6 +134,14 @@ class EndpointForm extends TerrainComponent<Props>
     const { isSource, endpoint, onChange, hideTypePicker, integrations } = this.props;
     const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
     const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
+    const isIntegrationType =
+      endpoint.type != null &&
+      endpoint.type !== '' &&
+      integrationList.indexOf(endpoint.type) !== -1
+    ;
+    const showIntegrationForm = endpoint.integrationId != null && endpoint.integrationId >= 0;
+    const showForm = showIntegrationForm ||
+      (endpoint.type != null && endpoint.type !== '' && integrationList.indexOf(endpoint.type) === -1);
     return (
       <div className='endpoint-block'>
         {
@@ -144,7 +153,7 @@ class EndpointForm extends TerrainComponent<Props>
             />
         }
         {
-          (endpoint.type != null && endpoint.type !== '') ?
+          isIntegrationType ?
             <IntegrationPicker
               integrationType={endpoint.type}
               integrations={integrations}
@@ -155,7 +164,7 @@ class EndpointForm extends TerrainComponent<Props>
             null
         }
         {
-          (endpoint.integrationId != null && endpoint.integrationId >= 0) ?
+          showIntegrationForm ?
             <IntegrationForm
               integration={integrations.get(endpoint.integrationId)}
               onChange={this.handleIntegrationChange}
@@ -165,7 +174,7 @@ class EndpointForm extends TerrainComponent<Props>
             null
         }
         {
-          (endpoint.integrationId != null && endpoint.integrationId >= 0) ?
+          showForm ?
             <FormClass
               endpoint={endpoint}
               onChange={this.handleEndpointChange}
@@ -211,6 +220,7 @@ interface SourceFormState
 
 const sourceList = List(Object.keys(Sources));
 const sinkList = List(Object.keys(Sinks));
+const integrationList = List(Object.keys(Integrations));
 
 export default Util.createContainer(
   EndpointForm,
