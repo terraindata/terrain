@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires max-classes-per-file
+// tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -74,9 +74,9 @@ export default class IntegrationPicker extends TerrainComponent<Props>
     filteredIntegrations: IMMap<ID, IntegrationConfig>,
     integrationIds: List<ID>,
   } = {
-    filteredIntegrations: Map(),
-    integrationIds: List(),
-  }
+      filteredIntegrations: Map(),
+      integrationIds: List(),
+    };
 
   public componentDidMount()
   {
@@ -86,7 +86,7 @@ export default class IntegrationPicker extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.integrationType !== nextProps.integrationType ||
-        this.props.integrations !== nextProps.integrations)
+      this.props.integrations !== nextProps.integrations)
     {
       this.filterIntegrations(nextProps.integrationType, nextProps.integrations);
     }
@@ -120,23 +120,23 @@ export default class IntegrationPicker extends TerrainComponent<Props>
     const { onChange, selectedIntegration } = this.props;
     const { filteredIntegrations, integrationIds } = this.state;
     const inputMap =
-    {
-      id: {
-        type: DisplayType.Pick,
-        displayName: 'Integration',
-        options: {
-          pickOptions: (s) => integrationIds,
-          indexResolver: (value) =>  integrationIds.indexOf(value),
-          displayNames: (s) => filteredIntegrations.map((i) => i.name),
+      {
+        id: {
+          type: DisplayType.Pick,
+          displayName: 'Integration',
+          options: {
+            pickOptions: (s) => integrationIds,
+            indexResolver: (value) => integrationIds.indexOf(value),
+            displayNames: (s) => filteredIntegrations.map((i) => i.name),
+          },
         },
-      },
-    };
+      };
     return (
       <div className='integration-form-block'>
         {
           <DynamicForm
             inputMap={inputMap}
-            inputState={{id: selectedIntegration}}
+            inputState={{ id: selectedIntegration }}
             onStateChange={this.handleIntegrationChange}
           />
         }

@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires max-classes-per-file
+// tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -104,7 +104,6 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   public render()
   {
-    console.log('integration form class ', this.props.integration);
     const { authConfig, connectionConfig } = this.props.integration;
     const authState = this.authConfigToState(authConfig);
     const connectionState = this.connectionConfigToState(connectionConfig);
@@ -126,7 +125,6 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   private handleAuthFormChange(state: AuthState)
   {
-    console.log('handle auth form change ');
     const { onChange, integration } = this.props;
     const newConfig = this.authStateToConfig(state);
     onChange(integration.set('authConfig', newConfig));
@@ -134,7 +132,6 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
 
   private handleConnectionFormChange(state: ConnectionState)
   {
-    console.log('handle connection form change ');
     const { onChange, integration } = this.props;
     const newConfig = this.connectionStateToConfig(state);
     onChange(integration.set('connectionConfig', newConfig));
