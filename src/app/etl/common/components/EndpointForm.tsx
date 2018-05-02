@@ -87,7 +87,7 @@ class EndpointForm extends TerrainComponent<Props>
   {
     this.props.etlActions({
       actionType: 'getIntegrations',
-    })
+    });
   }
 
   public sinkTypeMap: InputDeclarationMap<SinkFormState> =

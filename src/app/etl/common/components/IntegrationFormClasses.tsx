@@ -107,7 +107,6 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
     const { authConfig, connectionConfig } = this.props.integration;
     const authState = this.authConfigToState(authConfig);
     const connectionState = this.connectionConfigToState(connectionConfig);
-
     return (
       <div>
         <DynamicForm
