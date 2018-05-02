@@ -139,7 +139,7 @@ export class RouteSelector extends TerrainComponent<Props>
 
     focusedSetIndex: this.props.defaultOpen ? 0 : -1,
     focusedOptionIndex: 0,
-    
+
     showBoxValues: false,
 
     columnRefs: Map<number, any>({}),
@@ -182,7 +182,7 @@ export class RouteSelector extends TerrainComponent<Props>
           this.getResultConfigs(this.state.optionSets.get(0).options);
         }
       });
-    
+
     // needed to be in a timeout, not in the above setState, for some reason.
     setTimeout(() => this.setState({
       showBoxValues: true,

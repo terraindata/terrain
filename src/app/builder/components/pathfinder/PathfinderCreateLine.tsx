@@ -92,7 +92,7 @@ class PathfinderCreateLine extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private handleCreate()
   {
     if (this.props.canEdit)

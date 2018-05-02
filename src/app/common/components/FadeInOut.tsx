@@ -62,7 +62,7 @@ class FadeInOut extends TerrainComponent<Props>
   public renderChildren()
   {
     const { children, open, dontUnmount } = this.props;
-    
+
     if (dontUnmount)
     {
       return (

@@ -79,7 +79,7 @@ export class SearchInput extends TerrainComponent<Props>
     isFocused: false,
     myId: String(Math.random()) + '-searchinput',
   };
-  
+
   valueRef = null;
 
   public componentWillReceiveProps(nextProps: Props)
@@ -93,13 +93,12 @@ export class SearchInput extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    console.log(this.props);
     // strategy recommended by https://stackoverflow.com/questions/28889826/react-set-focus-on-input-after-render
     // (read the comments for why -- autoFocus prop is unreliable)
     if (this.props.autoFocus)
     {
       this.autoFocus();
-      // setTimeout(this.autoFocus.bind(this), 1000);
+      setTimeout(this.autoFocus.bind(this), 100);
     }
   }
 
@@ -107,7 +106,7 @@ export class SearchInput extends TerrainComponent<Props>
   {
     const { props, state } = this;
     const { value, onClick } = props;
-    console.log('render focus', props.autoFocus);
+
     return (
       <div
         onClick={props.onClick}
@@ -197,16 +196,13 @@ export class SearchInput extends TerrainComponent<Props>
 
   private autoFocus()
   {
-    console.log('autofocus()');
     // force focus, needed if component has mounted and autoFocus flag changes
     const { valueRef } = this;
     if (valueRef)
     {
-      console.log('autofocus() 2');
       const valueEl = ReactDOM.findDOMNode(valueRef);
       if (valueEl && valueEl['focus'])
       {
-        console.log('autofocus() 3');
         valueEl['focus']();
       }
     }
