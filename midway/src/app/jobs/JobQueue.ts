@@ -63,12 +63,16 @@ export class JobQueue
 {
   private jobTable: Tasty.Table;
   private maxConcurrentJobs: number;
+  private maxConcurrentRunNowJobs: number;
   private runningJobs: Map<number, Job>;
+  private runningRunNowJobs: Map<number, Job>;
 
   constructor()
   {
     this.maxConcurrentJobs = 1;
+    this.maxConcurrentRunNowJobs = 50; // if we hit this limit something went very, very wrong (which means it'll happen someday)
     this.runningJobs = new Map<number, Job>();
+    this.runningRunNowJobs = new Map<number, Job>();
     this.jobTable = new Tasty.Table(
       'jobs',
       ['id'],
@@ -97,15 +101,30 @@ export class JobQueue
     {
       try
       {
-        // send the cancel signal to the Job
-        this.runningJobs.get(id).cancel();
+        if (this.runningJobs.get(id) !== undefined)
+        {
+          // send the cancel signal to the Job
+          this.runningJobs.get(id).cancel();
 
-        // delete the Job from the runningJobs map
-        this.runningJobs.delete(id);
+          // delete the Job from the runningJobs map
+          this.runningJobs.delete(id);
 
-        // set status to CANCELED
-        await this._setJobStatus(id, false, 'CANCELED');
-        return resolve(await this.get(id) as JobConfig[]);
+          // set status to CANCELED
+          await this._setJobStatus(id, false, 'CANCELED');
+          return resolve(await this.get(id) as JobConfig[]);
+        }
+        else if (this.runningRunNowJobs.get(id) !== undefined)
+        {
+          // send the cancel signal to the Run Now Job
+          this.runningRunNowJobs.get(id).cancel();
+
+          // delete the Run Now Job from the runningRunNowJobs map
+          this.runningRunNowJobs.delete(id);
+
+          // set status to CANCELED
+          await this._setJobStatus(id, false, 'CANCELED');
+          return resolve(await this.get(id) as JobConfig[]);
+        }
       }
       catch (e)
       {
@@ -214,9 +233,9 @@ export class JobQueue
     });
   }
 
-  public async run(id: number): Promise<JobConfig[] | string>
+  public async run(id: number, runImmediately: boolean): Promise<JobConfig[] | stream.Readable> // runs the job and
   {
-    return new Promise<JobConfig[] | string>(async (resolve, reject) =>
+    return new Promise<JobConfig[] | stream.Readable>(async (resolve, reject) =>
     {
       const getJobs: JobConfig[] = await this.get(id, false) as JobConfig[];
       if (getJobs.length === 0)
@@ -224,9 +243,53 @@ export class JobQueue
         return reject(new Error('Job not found.'));
       }
 
-      await this._setJobStatus(id, true, 'RUNNING');
-      getJobs[0] = await this._setRunNow(getJobs[0]);
-      resolve(await App.DB.upsert(this.jobTable, getJobs[0]) as JobConfig[]);
+      if (runImmediately === true)
+      {
+        if (this.runningRunNowJobs.size >= this.maxConcurrentRunNowJobs)
+        {
+          return reject(new Error('Too many jobs set to run now currently in the queue.'));
+        }
+        const status: boolean = await this._setJobStatus(getJobs[0].id, true, 'RUNNING');
+        if (!status)
+        {
+          winston.warn('Job running status was not toggled.');
+        }
+        const newJob: Job = new Job();
+        let newJobTasks: TaskConfig[] = [];
+        try
+        {
+          newJobTasks = JSON.parse(getJobs[0].tasks);
+        }
+        catch (e)
+        {
+          winston.warn(((e as any).toString() as string));
+        }
+
+        const jobCreationStatus: boolean | string = newJob.create(newJobTasks, 'some random filename');
+        winston.info('created job');
+        if (typeof jobCreationStatus === 'string' || (jobCreationStatus as boolean) !== true)
+        {
+          winston.warn('Error while creating job: ' + (jobCreationStatus as string));
+        }
+        // update the table to running = true
+        this.runningRunNowJobs.set(getJobs[0].id, newJob);
+        // actually run the job
+
+        const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
+        const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
+        const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
+        await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
+        await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
+        this.runningJobs.delete(getJobs[0].id);
+        // TODO: log job result
+        return resolve(jobResult['outputStream'] as stream.Readable);
+      }
+      else
+      {
+        await this._setJobStatus(id, true, 'RUNNING');
+        getJobs[0] = await this._setRunNow(getJobs[0]);
+        return resolve(await App.DB.upsert(this.jobTable, getJobs[0]) as JobConfig[]);
+      }
     });
   }
 
@@ -415,7 +478,7 @@ export class JobQueue
     });
   }
 
-  // sets a job to be the top of the priority queue
+  // sets a job to be the top of the running priority queue
   private async _setRunNow(job: JobConfig): Promise<JobConfig>
   {
     return new Promise<JobConfig>(async (resolve, reject) =>
