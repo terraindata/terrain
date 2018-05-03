@@ -69,7 +69,7 @@ export interface Props<T>
 {
   items: List<T>;
   columnConfig: HeaderConfig<T>;
-  onRowClicked?: (index, item: T) => void; // callback for when a row is clicked
+  onRowClicked?: (index) => void; // callback for when a row is clicked
   getRowStyle?: (index) => object[] | object;
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
   state?: any; // for specifying dependencies so ItemList knows when to rerender

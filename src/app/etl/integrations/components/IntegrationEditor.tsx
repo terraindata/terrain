@@ -108,7 +108,6 @@ class IntegrationEditor extends TerrainComponent<Props>
       (oldIntegrationId !== integrationId ||
         this.props.integrations !== nextProps.integrations))
     {
-      console.log('need to update!');
       this.setState({
         integration: nextProps.integrations.get(integrationId),
       });

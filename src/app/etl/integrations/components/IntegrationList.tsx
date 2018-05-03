@@ -51,7 +51,6 @@ import Modal from 'app/common/components/Modal';
 import { ETLActions } from 'app/etl/ETLRedux';
 import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { ETLState } from 'app/etl/ETLTypes';
-import Integration from 'app/etl/integrations/components/Integration';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -74,14 +73,6 @@ export interface Props
 
 class IntegrationList extends TerrainComponent<Props>
 {
-  public state: {
-    confirmModalOpen: boolean,
-    deleteIntegrationId: ID,
-  } = {
-      confirmModalOpen: false,
-      deleteIntegrationId: -1,
-    };
-
   public componentWillMount()
   {
     this.props.etlActions({
@@ -107,28 +98,10 @@ class IntegrationList extends TerrainComponent<Props>
     });
   }
 
-  public deleteIntegration()
-  {
-    this.props.etlActions({
-      actionType: 'deleteIntegration',
-      integrationId: this.state.deleteIntegrationId,
-    });
-  }
-
-  public confirmDeleteIntegration(integrationId: ID)
-  {
-    console.log('integration id ', integrationId);
-    this.setState({
-      confirmModalOpen: true,
-      deleteIntegrationId: integrationId,
-    });
-  }
-
   public handleRowClick(index: number)
   {
     const { integrations } = this.props;
     const keys = integrations.keySeq().toList().sort();
-    // TODO move this to parent component
     EtlRouteUtil.gotoEditIntegration(keys.get(index));
   }
 
@@ -151,8 +124,6 @@ class IntegrationList extends TerrainComponent<Props>
     const { integrations } = this.props;
     const keys = integrations.keySeq().toList().sort();
     const integrationList = keys.map((id) => integrations.get(id));
-    const toDelete = integrations.get(this.state.deleteIntegrationId) ?
-      integrations.get(this.state.deleteIntegrationId).name : '';
     return (
       <div
         className='integration-page'
@@ -202,15 +173,6 @@ class IntegrationList extends TerrainComponent<Props>
             canEdit={TerrainTools.isAdmin()}
             onCreate={this.createIntegration}
             showText={true}
-          />
-          <Modal
-            open={this.state.confirmModalOpen}
-            confirm={true}
-            title={'Confirm Action'}
-            message={`Are you sure you want to delete ${toDelete}?`}
-            confirmButtonText={'Yes'}
-            onConfirm={this.deleteIntegration}
-            onClose={this._toggle('confirmModalOpen')}
           />
         </div>
       </div>
