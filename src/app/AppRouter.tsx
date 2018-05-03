@@ -73,8 +73,8 @@ import Settings from './users/components/Settings';
 import Team from './users/components/Team';
 import X from './x/components/X';
 
-import IntegrationList from './etl/integrations/components/IntegrationList';
 import IntegrationEditor from './etl/integrations/components/IntegrationEditor';
+import IntegrationList from './etl/integrations/components/IntegrationList';
 
 class AppRouter extends TerrainComponent<{}> {
   public render()

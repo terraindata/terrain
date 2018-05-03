@@ -123,7 +123,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
   public renderRow(item: T, index: number)
   {
     const onClick = this.getRowClickedFn(index);
-    const style = this.getRowStyle(this.props.getRowStyle ? this.props.getRowStyle(index) : undefined);
+    const style = this.getRowStyle(this.props.getRowStyle !== undefined ? this.props.getRowStyle(index) : undefined);
     return (
       <Quarantine key={index}>
         <div
@@ -164,29 +164,30 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
       this.props.items.size > 0 ?
         <div className='item-list-table'>
           {
-            !this.props.hideHeaders &&
-            <div
-              className={classNames({
-                'row-info-header': true,
-              })}
-              key='header'
-            >
-              {
-                this.props.columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
+            !this.props.hideHeaders ?
+              <div
+                className={classNames({
+                  'row-info-header': true,
+                })}
+                key='header'
+              >
                 {
-                  return (
-                    <div className='row-info-data' key={i}>
-                      {headerItem.name}
-                    </div>
-                  );
-                })
-              }
-              {
-                this.props.getMenuOptions !== undefined ?
-                  <div className='row-info-data' key='context-menu' />
-                  : undefined
-              }
-            </div>
+                  this.props.columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
+                  {
+                    return (
+                      <div className='row-info-data' key={i}>
+                        {headerItem.name}
+                      </div>
+                    );
+                  })
+                }
+                {
+                  this.props.getMenuOptions !== undefined ?
+                    <div className='row-info-data' key='context-menu' />
+                    : undefined
+                }
+              </div>
+              : null
           }
           {
             this.props.items.map(this.renderRow).toList()

@@ -92,7 +92,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
     {
       return (
         <div>
-            No Integration Selected
+          No Integration Selected
         </div>
       );
     }

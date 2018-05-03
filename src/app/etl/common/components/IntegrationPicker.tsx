@@ -133,7 +133,7 @@ export default class IntegrationPicker extends TerrainComponent<Props>
   }
 
   public handleIntegrationChange(newState)
-{
+  {
     this.props.onChange(newState.id);
   }
 

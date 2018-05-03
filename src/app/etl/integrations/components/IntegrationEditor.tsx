@@ -45,18 +45,18 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
 import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
+import Button from 'app/common/components/Button';
+import { ETLActions } from 'app/etl/ETLRedux';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
+import IntegrationForm from 'etl/common/components/IntegrationForm';
 import { List, Map } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
-import IntegrationForm from 'etl/common/components/IntegrationForm';
-import { ETLActions } from 'app/etl/ETLRedux';
-import Button from 'app/common/components/Button';
 import { browserHistory } from 'react-router';
+import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 
 export interface Props
 {
@@ -85,7 +85,7 @@ class IntegrationEditor extends TerrainComponent<Props>
 {
   public state = {
     integration: null,
-  }
+  };
 
   public componentDidMount()
   {
@@ -106,11 +106,11 @@ class IntegrationEditor extends TerrainComponent<Props>
     const integrationId = getIntegrationId(nextParams);
     if (integrationId !== -1 &&
       (oldIntegrationId !== integrationId ||
-      this.props.integrations !== nextProps.integrations))
+        this.props.integrations !== nextProps.integrations))
     {
       console.log('need to update!');
       this.setState({
-        integration: nextProps.integrations.get(integrationId);
+        integration: nextProps.integrations.get(integrationId),
       });
     }
   }
@@ -178,4 +178,3 @@ export default Util.createContainer(
     etlActions: ETLActions,
   },
 );
-

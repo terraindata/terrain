@@ -43,26 +43,26 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console strict-boolean-expressions
-import * as _ from 'lodash';
+// tslint:disable:no-console strict-boolean-expressions no-var-requires
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
+import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
+import FloatingInput from 'app/common/components/FloatingInput';
 import Modal from 'app/common/components/Modal';
 import { ETLActions } from 'app/etl/ETLRedux';
+import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 import { ETLState } from 'app/etl/ETLTypes';
+import Integration from 'app/etl/integrations/components/Integration';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
-import XHR from 'util/XHR';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
-import Integration from 'app/etl/integrations/components/Integration';
+import XHR from 'util/XHR';
 import './IntegrationStyle.less';
-import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
-import FloatingInput from 'app/common/components/FloatingInput';
-import Colors, {backgroundColor, borderColor} from 'app/colors/Colors';
-import EtlRouteUtil from 'app/etl/ETLRouteUtil';
 
 const Color = require('color');
 
@@ -78,9 +78,9 @@ class IntegrationList extends TerrainComponent<Props>
     confirmModalOpen: boolean,
     deleteIntegrationId: ID,
   } = {
-    confirmModalOpen: false,
-    deleteIntegrationId: -1,
-  };
+      confirmModalOpen: false,
+      deleteIntegrationId: -1,
+    };
 
   public componentWillMount()
   {
@@ -100,7 +100,7 @@ class IntegrationList extends TerrainComponent<Props>
 
   public createIntegration()
   {
-    const blankIntegration = _IntegrationConfig({id: undefined});
+    const blankIntegration = _IntegrationConfig({ id: undefined });
     this.props.etlActions({
       actionType: 'createIntegration',
       integration: blankIntegration,
@@ -112,7 +112,7 @@ class IntegrationList extends TerrainComponent<Props>
     this.props.etlActions({
       actionType: 'deleteIntegration',
       integrationId: this.state.deleteIntegrationId,
-    })
+    });
   }
 
   public confirmDeleteIntegration(integrationId: ID)
@@ -160,8 +160,8 @@ class IntegrationList extends TerrainComponent<Props>
         <div
           className='integration-list-wrapper'
           style={_.extend({},
-              backgroundColor(Colors().blockBg),
-              borderColor(Colors().blockOutline)
+            backgroundColor(Colors().blockBg),
+            borderColor(Colors().blockOutline),
           )}
         >
           <div
@@ -172,27 +172,27 @@ class IntegrationList extends TerrainComponent<Props>
           <ItemList
             items={integrationList.toList()}
             columnConfig={[
-                {
-                  name: 'id',
-                  render: this._fn(this.renderProperty, 'id')
-                },
-                {
-                  name: 'name',
-                  render: this._fn(this.renderProperty, 'name'),
-                },
-                {
-                  name: 'type',
-                  render: this._fn(this.renderProperty, 'type'),
-                },
-                {
-                  name: 'createdBy',
-                  render: this._fn(this.renderProperty, 'createdBy'),
-                },
-                {
-                  name: 'lastModified',
-                  render: this._fn(this.renderProperty, 'lastModified'),
-                }
-              ]}
+              {
+                name: 'id',
+                render: this._fn(this.renderProperty, 'id'),
+              },
+              {
+                name: 'name',
+                render: this._fn(this.renderProperty, 'name'),
+              },
+              {
+                name: 'type',
+                render: this._fn(this.renderProperty, 'type'),
+              },
+              {
+                name: 'createdBy',
+                render: this._fn(this.renderProperty, 'createdBy'),
+              },
+              {
+                name: 'lastModified',
+                render: this._fn(this.renderProperty, 'lastModified'),
+              },
+            ]}
             onRowClicked={this.handleRowClick}
             hideHeaders={true}
             getRowStyle={(i) => rowStyle}
