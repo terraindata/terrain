@@ -406,7 +406,7 @@ const BuilderReducers =
       state = state.set('query', query);
       if (query.cardsAndCodeInSync === false)
       {
-        TerrainLog.debug('Cards and code not sync (from TQL mutation).');
+        TerrainLog.debug('Cards and code not synchronized (from TQL mutation).');
         return state;
       }
       if (!TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))

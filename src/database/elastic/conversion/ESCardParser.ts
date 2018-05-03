@@ -252,6 +252,12 @@ export default class ESCardParser extends ESParser
     return rootCard;
   }
 
+  /*
+  `isMutated` indicates whether the cards or valueinfos are mutated.
+   If the flag is ture, please call `this.updateCard()` to generate a new card with the mutations.
+   This flag is implicitly set by some functions from this class that mutate the cards/valueinfo.
+   However, if other code mutates the cards/valueInfo directly, please remember to set this flag to true.
+   */
   public isMutated: boolean;
 
   public constructor(rootCard: Block, cardPath: KeyPath = Immutable.List([]))
