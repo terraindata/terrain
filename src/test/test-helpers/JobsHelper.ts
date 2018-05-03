@@ -43,23 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-import ConfigType from '../ConfigType';
-
-export class CredentialConfig extends ConfigType
+// tslint:disable:max-classes-per-file
+import * as Immutable from 'immutable';
+import
 {
-  public id?: number = undefined;
-  public createdBy: number = -1;
-  public meta: string = '';
-  public name: string = '';
-  public permissions?: number = undefined;
-  public type: string = '';
+  _JobsState,
+  JobsState,
+} from 'jobs/JobsTypes';
+import { ItemType } from '../../items/types/Item';
 
-  constructor(props: object)
+export default class SchedulerHelper
+{
+  public static mockState()
   {
-    super();
-    ConfigType.initialize(this, props);
+    return new JobsStateMock();
   }
 }
 
-export default CredentialConfig;
+class JobsStateMock
+{
+  public state;
+
+  public constructor()
+  {
+    this.state = _JobsState({});
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+
+  public loading(isLoading: boolean)
+  {
+    this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
+}

@@ -85,10 +85,9 @@ async function loginToBuilder(page, url)
   await page.goto(url);
   sleep.sleep(5);
   winston.info('Goto the login page ' + url);
-  await takeAndCompareScreenShot(page);
-
   await page.waitForSelector(USERNAME_SELECTOR);
   winston.info('Username selector is ready.');
+  await takeAndCompareScreenShot(page);
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type('admin@terraindata.com');
   await page.click(PASSWORD_SELECTOR);
@@ -96,7 +95,6 @@ async function loginToBuilder(page, url)
   await page.click(BUTTON_SELECTOR);
   sleep.sleep(1);
   winston.info('Goto the starting page.');
-  await takeAndCompareScreenShot(page);
 
   await page.waitForSelector(CREATE_CATEGORY_SELECTOR);
   await page.click(CREATE_CATEGORY_SELECTOR);

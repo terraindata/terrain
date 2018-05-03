@@ -137,8 +137,6 @@ export const SourceOptionsDefaults: SourceOptionsTypes =
       algorithmId: -1,
     },
     Sftp: {
-      ip: '127.0.0.1',
-      port: 22,
       filepath: 'filename.json',
       credentialId: -1,
     },
@@ -199,8 +197,6 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
       table: '',
     },
     Sftp: {
-      ip: '127.0.0.1',
-      port: 22,
       filepath: 'filename.json',
       credentialId: -1,
     },
@@ -219,8 +215,8 @@ export const SinkOptionsDefaults: SinkOptionsTypes =
 
 export interface SftpOptions
 {
-  ip: string; // get rid of this when integration ui / backend support is created
-  port: number; // get rid of this when integration ui / backend support is created
+  // ip: string; // get rid of this when integration ui / backend support is created
+  // port: number; // get rid of this when integration ui / backend support is created
   filepath: string;
   credentialId: number; // get rid of this when integration ui / backend support is created
   meta?: any;

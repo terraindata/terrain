@@ -36,6 +36,8 @@
 			max-height: 100;
 		}
 		
+		padding-right: (@close-width + 10);
+
 		&:hover {
 		.routeselector-delete {
 			opacity: 1;
@@ -108,11 +110,14 @@
   	opacity: 0;
   	margin: 12px;
   	width: @close-width;
+  	margin-left: 6px;
   	.noselect;
   }
 
   	.routeselector-delete {
   		opacity: 0;
+  		position: relative;
+  		left: -22px;
   		&.close {
   			margin-top: 0px;
   		}
@@ -170,7 +175,7 @@
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: top;
-			padding-right: @close-width;
+			padding-right: (@close-width + 10);
 	   		min-height: @picker-height;
 	   		max-height: @picker-height;
 		}

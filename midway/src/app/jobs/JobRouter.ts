@@ -50,14 +50,11 @@ import * as KoaRouter from 'koa-router';
 import { JobConfig } from 'shared/types/jobs/JobConfig';
 import * as App from '../App';
 import * as AppUtil from '../AppUtil';
-import Credentials from '../credentials/Credentials';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
-
-export const credentials: Credentials = new Credentials();
 
 // Get job by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>

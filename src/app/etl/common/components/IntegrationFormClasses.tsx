@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires max-classes-per-file
+// tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -84,12 +84,12 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
    */
   public authConfigToState(config): AuthState
   {
-    return config as AuthState;
+    return (config || {}) as AuthState;
   }
 
   public connectionConfigToState(config): ConnectionState
   {
-    return config as ConnectionState;
+    return (config || {}) as ConnectionState;
   }
 
   public authStateToConfig(state: AuthState)
@@ -107,7 +107,6 @@ abstract class IntegrationFormBase<AuthState, ConnectionState, P extends Props =
     const { authConfig, connectionConfig } = this.props.integration;
     const authState = this.authConfigToState(authConfig);
     const connectionState = this.connectionConfigToState(connectionConfig);
-
     return (
       <div>
         <DynamicForm

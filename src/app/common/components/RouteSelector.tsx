@@ -286,7 +286,7 @@ export class RouteSelector extends TerrainComponent<Props>
               }
               style={getStyle('minWidth', optionSet.overrideWidthPercentage ?
                 String(optionSet.overrideWidthPercentage) + '%' :
-                String(100 / state.optionSets.size + 3) + '%')}
+                String(100 / state.optionSets.size) + '%')}
             >
               {
                 optionSet.isButton ?
@@ -488,7 +488,7 @@ export class RouteSelector extends TerrainComponent<Props>
         key={optionSet.key}
         style={getStyle('minWidth', optionSet.overrideWidthPercentage ?
           String(optionSet.overrideWidthPercentage) + '%' :
-          String(100 / state.optionSets.size + 3) + '%')}
+          String(100 / state.optionSets.size) + '%')}
       >
         {
           (optionSet.headerText && !optionSet.headerBelowValueComponent) &&

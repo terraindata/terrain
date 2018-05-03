@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires max-classes-per-file
+// tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -69,6 +69,7 @@ export interface Props
 {
   integration: IntegrationConfig;
   onChange: (newConfig: IntegrationConfig) => void;
+  hideType?: boolean;
 }
 
 export default class IntegrationForm extends TerrainComponent<Props>
@@ -86,16 +87,18 @@ export default class IntegrationForm extends TerrainComponent<Props>
 
   public render()
   {
-    const { integration, onChange } = this.props;
+    const { integration, onChange, hideType } = this.props;
     const FormClass = IntegrationFormMap[integration.type];
-
     return (
       <div className='integration-form-block'>
-        <DynamicForm
-          inputMap={this.typeMap}
-          inputState={this.typeValueToState(integration)}
-          onStateChange={this.handleTypeChange}
-        />
+        {
+          !hideType &&
+          <DynamicForm
+            inputMap={this.typeMap}
+            inputState={this.typeValueToState(integration)}
+            onStateChange={this.handleTypeChange}
+          />
+        }
         {
           FormClass != null ?
             <FormClass

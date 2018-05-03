@@ -75,6 +75,7 @@ export interface InputDeclarationOptionTypes<S = any>
   Pick: {
     pickOptions: (state: S) => List<string>,
     indexResolver?: (option) => number,
+    displayNames?: (state: S) => Immutable.Map<any, string>,
   };
   Custom: {
     render: (state: S, disabled: boolean) => any,
