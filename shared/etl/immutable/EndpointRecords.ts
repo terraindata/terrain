@@ -86,7 +86,7 @@ class SourceConfigC implements SourceConfigI
     {
       return false;
     }
-    else if (this.fileConfig == null || !(this.fileConfig.fileType in FileTypes))
+    else if (this.fileConfig == null)
     {
       return false;
     }
@@ -128,7 +128,7 @@ class SinkConfigC implements SinkConfigI
     {
       return false;
     }
-    else if (this.fileConfig == null || !(this.fileConfig.fileType in FileTypes))
+    else if (this.fileConfig == null)
     {
       return false;
     }

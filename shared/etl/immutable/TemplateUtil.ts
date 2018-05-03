@@ -109,14 +109,14 @@ export default class TemplateUtil
         }
         else if (!source.verifyIntegrity())
         {
-          errors.push(`Source ${source.name} failed integrity check`);
+          errors.push(`Source "${source.name}" failed integrity check`);
         }
         else
         {
           const nodes = template.findNodes((n) => n.type === NodeTypes.Source && n.endpoint === key);
-          if (nodes.size !== 0)
+          if (nodes.size !== 1)
           {
-            errors.push(`Source ${source.name} should have 1 associated node, but there were ${nodes.size}`);
+            errors.push(`Source "${source.name}" should have 1 associated node, but there were ${nodes.size}`);
           }
         }
       });
@@ -132,14 +132,14 @@ export default class TemplateUtil
         }
         else if (!sink.verifyIntegrity())
         {
-          errors.push(`Sink ${sink.name} failed integrity check`);
+          errors.push(`Sink "${sink.name}"" failed integrity check`);
         }
         else
         {
           const nodes = template.findNodes((n) => n.type === NodeTypes.Sink && n.endpoint === key);
-          if (nodes.size !== 0)
+          if (nodes.size !== 1)
           {
-            errors.push(`Sink ${sink.name} should have 1 associated node, but there were ${nodes.size}`);
+            errors.push(`Sink "${sink.name}"" should have 1 associated node, but there were ${nodes.size}`);
           }
         }
       });
@@ -201,7 +201,7 @@ export default class TemplateUtil
           switch (options.language)
           {
             case Languages.Elastic:
-              const node = template.findNodes((n) => n.endpoint === key).first();
+              const node = template.findNodes((n) => n.type === NodeTypes.Sink && n.endpoint === key).first();
               const edge = template.findEdges((e) => e.to === node).first();
               const mapping = new ElasticMapping(template.getEdge(edge).transformations);
               if (mapping.getErrors().length > 0)

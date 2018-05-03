@@ -368,6 +368,19 @@ export default class EngineUtil
     });
   }
 
+  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
+  {
+    // Elastic side effects
+    const elasticProps = engine.getFieldProp(fieldId, List(['elastic']));
+    if (elasticProps !== undefined)
+    {
+      const newProps = _.extend({}, elasticProps, {
+        elasticType: ElasticTypes.Auto,
+      });
+      engine.setFieldProp(fieldId, List(['elastic']), newProps);
+    }
+  }
+
   // attempt to detect date types and integer float
   // does not add type casts
   public static autodetectElasticTypes(engine: TransformationEngine, documents: List<object>)
