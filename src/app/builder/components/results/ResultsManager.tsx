@@ -258,9 +258,10 @@ export class ResultsManager extends TerrainComponent<Props>
                     const hitStillInNestedResult = nestedHits.map(
                       (nestedHit) => getPrimaryKeyFor({ fields: nestedHit } as Hit, resultsConfig) === id,
                     );
-                    nestedIndex = hitStillInNestedResult.indexOf(true);
-                    if (nestedIndex !== -1)
+                    const i = hitStillInNestedResult.indexOf(true);
+                    if (i !== -1)
                     {
+                      nestedIndex = i;
                       const nestedHit = Util.asJS(nestedHits.get(nestedIndex));
                       fields = _.extend({}, nestedHit, nestedHit['_source']);
                       fields = { fields, primaryKey: '' } as Hit;
@@ -322,10 +323,10 @@ export class ResultsManager extends TerrainComponent<Props>
         schema,
         builder,
         field,
-        dataSource,
         true,
+        (dataSource as any).index,
       );
-      return type === 'nested' || type === '';
+      return type === '';
     }).toList();
     // Filter out anything that it is a single object, not a list of objects
     if (resultsState.hits && resultsState.hits.size)
@@ -755,6 +756,13 @@ export class ResultsManager extends TerrainComponent<Props>
       return;
     }
     const resultsData = response.getResultsData();
+    if (appendResults && resultsData.hits.hits.length === 0)
+    {
+      this.changeResults({
+        loading: false,
+      });
+      return;
+    }
     const hits = resultsData.hits.hits.map((hit) =>
     {
       let hitTemp = _.cloneDeep(hit);

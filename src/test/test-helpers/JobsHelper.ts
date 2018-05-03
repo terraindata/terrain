@@ -43,61 +43,41 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-import { backgroundColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
-
-const PFAddIcon = require('./../../../../images/icon_add.svg?name=PFAddIcon');
-
-export interface Props
+// tslint:disable:max-classes-per-file
+import * as Immutable from 'immutable';
+import
 {
-  text: string;
-  canEdit: boolean;
-  onCreate: () => void;
-  style?: any;
-  showText?: boolean;
-}
+  _JobsState,
+  JobsState,
+} from 'jobs/JobsTypes';
+import { ItemType } from '../../items/types/Item';
 
-@Radium
-class PathfinderCreateLine extends TerrainComponent<Props>
+export default class SchedulerHelper
 {
-  public render()
+  public static mockState()
   {
-    const { onCreate, canEdit, text, style } = this.props;
-
-    if (!canEdit)
-    {
-      return null;
-    }
-    return (
-      <div>
-        <div
-          className='pf-create'
-          style={_.extend({}, style,
-            fontColor(Colors().active),
-            getStyle('fill', Colors().active),
-            backgroundColor(Colors().fontWhite),
-          )}
-          onClick={onCreate}
-        >
-          <div className='pf-create-icon'>
-            <div className='pf-create-fill' />
-            <PFAddIcon />
-          </div>
-
-          <div className='pf-create-text'>
-            {
-              text
-            }
-          </div>
-        </div>
-      </div>
-    );
+    return new JobsStateMock();
   }
 }
 
-export default PathfinderCreateLine;
+class JobsStateMock
+{
+  public state;
+
+  public constructor()
+  {
+    this.state = _JobsState({});
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+
+  public loading(isLoading: boolean)
+  {
+    this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
+}

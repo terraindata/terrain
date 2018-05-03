@@ -43,61 +43,38 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
+import { List, Record } from 'immutable';
+import * as Immutable from 'immutable';
+import { JobConfig as SharedJobConfig } from 'shared/types/jobs/JobConfig';
+import { createRecordType } from 'shared/util/Classes';
+import Util from 'util/Util';
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-import { backgroundColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
-
-const PFAddIcon = require('./../../../../images/icon_add.svg?name=PFAddIcon');
-
-export interface Props
+class JobConfigC extends SharedJobConfig
 {
-  text: string;
-  canEdit: boolean;
-  onCreate: () => void;
-  style?: any;
-  showText?: boolean;
+  // if extra front-end specific functions or properties are needed, add here
 }
 
-@Radium
-class PathfinderCreateLine extends TerrainComponent<Props>
-{
-  public render()
+const JobConfig_Record = createRecordType(new JobConfigC(), 'JobConfigC');
+export interface JobConfig extends JobConfigC, IMap<JobConfig> { }
+export const _JobConfig =
+  (config: object) =>
   {
-    const { onCreate, canEdit, text, style } = this.props;
+    const job = new JobConfig_Record(config) as any as JobConfig;
 
-    if (!canEdit)
-    {
-      return null;
-    }
-    return (
-      <div>
-        <div
-          className='pf-create'
-          style={_.extend({}, style,
-            fontColor(Colors().active),
-            getStyle('fill', Colors().active),
-            backgroundColor(Colors().fontWhite),
-          )}
-          onClick={onCreate}
-        >
-          <div className='pf-create-icon'>
-            <div className='pf-create-fill' />
-            <PFAddIcon />
-          </div>
+    return job;
+  };
 
-          <div className='pf-create-text'>
-            {
-              text
-            }
-          </div>
-        </div>
-      </div>
-    );
-  }
+class JobsStateC
+{
+  public loading: boolean = true;
+  public jobs: Immutable.Map<ID, JobConfig> = Immutable.Map<ID, JobConfig>({});
+  public error: string = null;
 }
 
-export default PathfinderCreateLine;
+const JobsState_Record = createRecordType(new JobsStateC(), 'JobsStateC');
+export interface JobsState extends JobsStateC, IRecord<JobsState> { }
+export const _JobsState = (config?: any) =>
+{
+  return new JobsState_Record(Util.extendId(config || {})) as any as JobsState;
+};

@@ -42,62 +42,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import axios, { AxiosInstance } from 'axios';
+import Ajax, { AjaxResponse } from 'util/Ajax';
+import XHR from 'util/XHR';
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-import { backgroundColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
-
-const PFAddIcon = require('./../../../../images/icon_add.svg?name=PFAddIcon');
-
-export interface Props
+// making this an instance in case we want stateful things like cancelling ajax requests
+class JobsApi
 {
-  text: string;
-  canEdit: boolean;
-  onCreate: () => void;
-  style?: any;
-  showText?: boolean;
-}
+  public xhr: AxiosInstance = null;
 
-@Radium
-class PathfinderCreateLine extends TerrainComponent<Props>
-{
-  public render()
+  public constructor(xhr: AxiosInstance)
   {
-    const { onCreate, canEdit, text, style } = this.props;
+    this.xhr = xhr;
+  }
 
-    if (!canEdit)
-    {
-      return null;
-    }
-    return (
-      <div>
-        <div
-          className='pf-create'
-          style={_.extend({}, style,
-            fontColor(Colors().active),
-            getStyle('fill', Colors().active),
-            backgroundColor(Colors().fontWhite),
-          )}
-          onClick={onCreate}
-        >
-          <div className='pf-create-icon'>
-            <div className='pf-create-fill' />
-            <PFAddIcon />
-          </div>
+  public getJobs()
+  {
+    return this.xhr.get('/jobs');
+  }
 
-          <div className='pf-create-text'>
-            {
-              text
-            }
-          </div>
-        </div>
-      </div>
-    );
+  public getJob(id: number)
+  {
+    return this.xhr.get(`/jobs/${id}`);
   }
 }
 
-export default PathfinderCreateLine;
+export default JobsApi;

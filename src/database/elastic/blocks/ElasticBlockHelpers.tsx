@@ -238,6 +238,10 @@ export const ElasticBlockHelpers = {
     let index = source && source.dataSource && source.dataSource.index ?
       source.dataSource.index : getIndex('', builderState);
     index = overrideIndex || index;
+    if (!index)
+    {
+      return undefined;
+    }
     const server = builderState.db.name;
     if (index !== null)
     {

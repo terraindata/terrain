@@ -43,61 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import JobsApi from 'jobs/JobsApi';
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-import { backgroundColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
-import * as React from 'react';
+const axiosMock = new MockAdapter(axios);
 
-const PFAddIcon = require('./../../../../images/icon_add.svg?name=PFAddIcon');
-
-export interface Props
+describe('JobsApi', () =>
 {
-  text: string;
-  canEdit: boolean;
-  onCreate: () => void;
-  style?: any;
-  showText?: boolean;
-}
-
-@Radium
-class PathfinderCreateLine extends TerrainComponent<Props>
-{
-  public render()
+  let jobsApi: JobsApi;
+  beforeEach(() =>
   {
-    const { onCreate, canEdit, text, style } = this.props;
+    jobsApi = new JobsApi(axios);
+  });
 
-    if (!canEdit)
+  describe('#getJobs', () =>
+  {
+    it('should make a GET request to /jobs', () =>
     {
-      return null;
-    }
-    return (
-      <div>
-        <div
-          className='pf-create'
-          style={_.extend({}, style,
-            fontColor(Colors().active),
-            getStyle('fill', Colors().active),
-            backgroundColor(Colors().fontWhite),
-          )}
-          onClick={onCreate}
-        >
-          <div className='pf-create-icon'>
-            <div className='pf-create-fill' />
-            <PFAddIcon />
-          </div>
+      axiosMock.onGet('/jobs').reply(
+        200,
+        [{ id: 1 }, { id: 2 }],
+      );
 
-          <div className='pf-create-text'>
-            {
-              text
-            }
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-export default PathfinderCreateLine;
+      return jobsApi.getJobs()
+        .then((response) =>
+        {
+          expect(response.data).toEqual(
+            [{ id: 1 }, { id: 2 }],
+          );
+        },
+      );
+    });
+  });
+});
