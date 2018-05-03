@@ -148,6 +148,12 @@ export interface ETLActionTypes
     simple?: boolean,
     onError?: ErrorHandler,
   };
+  getIntegration: {
+    actionType: 'getIntegration',
+    integrationId: ID,
+    simple?: boolean;
+    onError?: ErrorHandler,
+  };
   updateIntegration: {
     actionType: 'updateIntegration',
     integrationId: ID,
@@ -168,9 +174,9 @@ export interface ETLActionTypes
     actionType: 'getIntegrationsSuccess',
     integrations: IntegrationConfig[],
   };
-  updateIntegrationSuccess: {
-    actionType: 'updateIntegrationSuccess';
-    integration: IntegrationConfig;
+  getIntegrationSuccess: {
+    actionType: 'getIntegrationSuccess',
+    integration: IntegrationConfig,
   };
   deleteIntegrationSuccess: {
     actionType: 'deleteIntegrationSuccess';
@@ -256,6 +262,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       },
       // overriden reducers
       getIntegrations: (state, action) => state,
+      getIntegration: (state, action) => state,
       updateIntegration: (state, action) => state,
       createIntegration: (state, action) => state,
       deleteIntegration: (state, action) => state,
@@ -273,7 +280,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       {
         return state.deleteIn(['integrations', action.payload.integrationId]);
       },
-      updateIntegrationSuccess: (state, action) =>
+      getIntegrationSuccess: (state, action) =>
       {
         const integration = _IntegrationConfig(action.payload.integration);
         return state.setIn(['integrations', integration.id], integration);
@@ -513,6 +520,23 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
+  public getIntegration(action: ETLActionType<'getIntegration'>, dispatch)
+  {
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    const name = action.actionType;
+    this.beforeSaveOrCreate(name, directDispatch);
+    const onLoad = (response) =>
+    {
+      directDispatch({
+        actionType: 'getIntegrationSuccess',
+        integration: response[0],
+      });
+    };
+    ETLAjax.getIntegration(action.integrationId, action.simple)
+      .then(this.onLoadFactory([onLoad], directDispatch, name))
+      .catch(this.onErrorFactory(action.onError, directDispatch, name));
+  }
+
   public updateIntegration(action: ETLActionType<'updateIntegration'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
@@ -520,12 +544,15 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     this.beforeSaveOrCreate(name, directDispatch);
     const onLoad = (response) =>
     {
-      directDispatch({
-        actionType: 'updateIntegrationSuccess',
-        integration: response,
-      });
+      this.getIntegration(
+        {
+          actionType: 'getIntegration',
+          integrationId: response.id,
+        },
+        dispatch,
+      );
     };
-    return ETLAjax.updateIntegration(integrationId, integration)
+    return ETLAjax.updateIntegration(integrationId, integration.toJS())
       .then(this.onLoadFactory([onLoad], directDispatch, name))
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
@@ -538,8 +565,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     const onLoad = (response) =>
     {
       directDispatch({
-        actionType: 'updateIntegrationSuccess',
-        integration: response,
+        actionType: 'getIntegration',
+        integrationId: response.id,
       });
     };
     return ETLAjax.createIntegration(action.integration.toJS())
@@ -584,6 +611,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
         return this.saveTemplate.bind(this, action);
       case 'getIntegrations':
         return this.getIntegrations.bind(this, action);
+      case 'getIntegration':
+        return this.getIntegration.bind(this, action);
       case 'updateIntegration':
         return this.updateIntegration.bind(this, action);
       case 'createIntegration':

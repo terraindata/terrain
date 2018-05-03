@@ -63,7 +63,13 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormClasses';
 
-const { List } = Immutable;
+import IntegrationForm from 'etl/common/components/IntegrationForm';
+import IntegrationPicker from 'etl/common/components/IntegrationPicker';
+import { ETLActions } from 'etl/ETLRedux';
+import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { Integrations } from 'shared/etl/types/IntegrationTypes';
+
+const { List, Map } = Immutable;
 
 export interface Props
 {
@@ -72,9 +78,11 @@ export interface Props
   onChange: (newEndpoint: SourceConfig | SinkConfig, apply?: boolean) => void;
   hideTypePicker?: boolean;
   isSchedule?: boolean;
+  integrations?: IMMap<ID, IntegrationConfig>;
+  etlActions?: typeof ETLActions;
 }
 
-export default class EndpointForm extends TerrainComponent<Props>
+class EndpointForm extends TerrainComponent<Props>
 {
   public sinkTypeMap: InputDeclarationMap<SinkFormState> =
     {
@@ -100,12 +108,40 @@ export default class EndpointForm extends TerrainComponent<Props>
       },
     };
 
+  public componentDidMount()
+  {
+    this.props.etlActions({
+      actionType: 'getIntegrations',
+    });
+  }
+
+  public handleIntegrationChange(newIntegration: IntegrationConfig)
+  {
+    this.props.etlActions({
+      actionType: 'updateIntegration',
+      integrationId: newIntegration.id,
+      integration: newIntegration,
+    });
+  }
+
+  public handleIntegrationPickerChange(id: ID)
+  {
+    this.handleEndpointChange(this.props.endpoint.set('integrationId', id));
+  }
+
   public render()
   {
-    const { isSource, endpoint, onChange, hideTypePicker } = this.props;
+    const { isSource, endpoint, onChange, hideTypePicker, integrations } = this.props;
     const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
     const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
-
+    const isIntegrationType =
+      endpoint.type != null &&
+      endpoint.type !== '' &&
+      integrationList.indexOf(endpoint.type) !== -1
+    ;
+    const showIntegrationForm = endpoint.integrationId != null && endpoint.integrationId >= 0;
+    const showForm = showIntegrationForm ||
+      (endpoint.type != null && endpoint.type !== '' && integrationList.indexOf(endpoint.type) === -1);
     return (
       <div className='endpoint-block'>
         {
@@ -117,7 +153,28 @@ export default class EndpointForm extends TerrainComponent<Props>
             />
         }
         {
-          FormClass != null ?
+          isIntegrationType ?
+            <IntegrationPicker
+              integrationType={endpoint.type}
+              integrations={integrations}
+              selectedIntegration={endpoint.integrationId}
+              onChange={this.handleIntegrationPickerChange}
+            />
+            :
+            null
+        }
+        {
+          showIntegrationForm ?
+            <IntegrationForm
+              integration={integrations.get(endpoint.integrationId)}
+              onChange={this.handleIntegrationChange}
+              hideType={true}
+            />
+            :
+            null
+        }
+        {
+          showForm ?
             <FormClass
               endpoint={endpoint}
               onChange={this.handleEndpointChange}
@@ -163,3 +220,12 @@ interface SourceFormState
 
 const sourceList = List(Object.keys(Sources));
 const sinkList = List(Object.keys(Sinks));
+const integrationList = List(Object.keys(Integrations));
+
+export default Util.createContainer(
+  EndpointForm,
+  [['etl', 'integrations']],
+  {
+    etlActions: ETLActions,
+  },
+);

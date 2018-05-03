@@ -47,6 +47,7 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
 
+import Jobs from 'jobs/components/Jobs';
 import Scheduler from 'scheduler/components/Scheduler';
 import App from './App';
 import Builder from './builder/components/Builder';
@@ -161,15 +162,10 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/scheduler'>
             <IndexRoute component={Scheduler} />
-            <Route path=':categoryId' component={analyticsLibrary}>
-              <IndexRoute component={analyticsLibrary} />
-              <Route path=':groupId' component={analyticsLibrary}>
-                <IndexRoute component={analyticsLibrary} />
-                <Route path=':algorithmId' component={analyticsLibrary}>
-                  <IndexRoute component={analyticsLibrary} />
-                </Route>
-              </Route>
-            </Route>
+          </Route>
+
+          <Route path='/jobs'>
+            <IndexRoute component={Jobs} />
           </Route>
         </Route>
       </Router>
