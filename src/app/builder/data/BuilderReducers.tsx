@@ -71,6 +71,7 @@ import
 } from './BuilderActionTypes';
 import { _BuilderState, BuilderState } from './BuilderState';
 const { List, Map } = Immutable;
+import * as TerrainLog from 'loglevel';
 
 const BuilderReducers =
   {
@@ -398,16 +399,24 @@ const BuilderReducers =
       query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
       query = query.set('tqlMode', action.payload.tqlMode);
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
+      // update cards
       query = AllBackendsMap[query.language].codeToQuery(
         query,
         action.payload.changeQuery,
       );
       state = state.set('query', query);
+      if (query.cardsAndCodeInSync === false)
+      {
+        TerrainLog.debug('Cards and code not synchronized (from TQL mutation).');
+        return state;
+      }
       if (!TerrainTools.isFeatureEnabled(TerrainTools.SIMPLE_PARSER))
       {
         const { parser, path } = CardsToPath.updatePath(query, state.db.name);
         state = state.setIn(['query', 'path'], path);
-        if (parser)
+        // Because updatePath might update cards, we have to propagate the builder changes back to the editor
+        // if the cards are mutated.
+        if (parser && parser.isMutated)
         {
           const newCards = ESCardParser.parseAndUpdateCards(List([parser.getValueInfo().card]), state.query);
           state = state.setIn(['query', 'cards'], newCards);
@@ -631,7 +640,7 @@ const BuilderReducersWrapper = (
         // update path
         const { path, parser } = CardsToPath.updatePath(state.query, state.db.name);
         state = state.setIn(['query', 'path'], path);
-        if (parser)
+        if (parser && parser.isMutated)
         {
           state = state.setIn(['query', 'cards'], List([parser.getValueInfo().card]));
           state = state
