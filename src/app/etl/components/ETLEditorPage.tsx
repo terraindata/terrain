@@ -67,6 +67,7 @@ import { WalkthroughState } from 'etl/walkthrough/ETLWalkthroughTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { _FileConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate, getSourceFiles, restoreSourceFiles } from 'shared/etl/immutable/TemplateRecords';
+import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -208,7 +209,19 @@ class ETLEditorPage extends TerrainComponent<Props>
   public executeTemplate(template: ETLTemplate)
   {
     const { runningTemplates } = this.props.etl;
-    if (runningTemplates.has(template.id))
+    const verifyErrors = TemplateUtil.verifyExecutable(template);
+    if (verifyErrors.length > 0)
+    {
+      this.props.etlAct({
+        actionType: 'addModal',
+        props: {
+          message: `Cannot run template "${template.templateName}": ${JSON.stringify(verifyErrors)}`,
+          title: `Error`,
+          error: true,
+        },
+      });
+    }
+    else if (runningTemplates.has(template.id))
     {
       this.props.etlAct({
         actionType: 'addModal',

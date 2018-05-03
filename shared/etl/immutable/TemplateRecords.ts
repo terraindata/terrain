@@ -54,6 +54,7 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
 import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
+import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -102,17 +103,7 @@ class ETLTemplateC implements ETLTemplateI
   ): boolean
   {
     const template = this.applyOverrides(overrideSources, overrideSinks);
-    const invalidSources = template.getSources().find((v) => SchedulableSources.indexOf(v.type) === -1);
-    if (invalidSources)
-    {
-      return false;
-    }
-    const invalidSinks = template.getSinks().find((v) => SchedulableSinks.indexOf(v.type) === -1);
-    if (invalidSinks)
-    {
-      return false;
-    }
-    return true;
+    return TemplateUtil.canSchedule(template);
   }
 
   public getDescription(algorithms?: Map<ID, ItemWithName>): string

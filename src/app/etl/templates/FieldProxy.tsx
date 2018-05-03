@@ -329,7 +329,6 @@ export class FieldProxy
     }
   }
 
-  // todo add cast transformation
   public changeType(newType: FieldTypes)
   {
     if (EngineUtil.isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
@@ -340,6 +339,7 @@ export class FieldProxy
     {
       this.engine.setFieldType(this.fieldId, newType);
     }
+    EngineUtil.changeFieldTypeSideEffects(this.engine, this.fieldId, newType);
     EngineUtil.castField(this.engine, this.fieldId, newType);
     this.syncWithEngine(true);
   }
