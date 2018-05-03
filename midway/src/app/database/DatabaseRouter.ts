@@ -86,8 +86,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   }
 
   ctx.body = await databases.upsert(ctx.state.user, db);
-  const id = Number(ctx.body[0].id);
-  await databases.connect(ctx.state.user, id);
+  await databases.connect(ctx.state.user, db.id);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -107,6 +106,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   }
 
   ctx.body = await databases.upsert(ctx.state.user, db);
+  await databases.connect(ctx.state.user, db.id);
 });
 
 Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
