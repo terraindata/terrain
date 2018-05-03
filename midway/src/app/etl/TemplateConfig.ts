@@ -48,7 +48,7 @@ import ConfigType from '../ConfigType';
 
 import { _ETLTemplate, ETLTemplate, templateForBackend } from 'shared/etl/immutable/TemplateRecords';
 import { DefaultSinkConfig, DefaultSourceConfig } from 'shared/etl/types/EndpointTypes';
-import { ETLProcess, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
+import { ETLProcess, TemplateBase, TemplateMeta, TemplateObject, TemplateSettings } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 
 export class TemplateConfig extends ConfigType implements TemplateBase
@@ -66,6 +66,9 @@ export class TemplateConfig extends ConfigType implements TemplateBase
   };
   public sources: DefaultSourceConfig = {};
   public sinks: DefaultSinkConfig = {};
+  public settings: TemplateSettings = {};
+  public meta: TemplateMeta = {};
+  public uiData = {};
 
   constructor(props: object)
   {
@@ -84,21 +87,22 @@ export type TemplateInDatabase = {
   [k in keyof TemplateBase]: string | number | boolean;
 };
 
+// deserialize fields of an object in-place
+export function parseKeys<T>(obj: T, keys: Array<(keyof T)>)
+{
+  for (const key of keys)
+  {
+    if (obj[key] != null && typeof obj[key] === 'string')
+    {
+      obj[key] = JSON.parse(obj[key] as any);
+    }
+  }
+}
+
 export function destringifySavedTemplate(obj: TemplateInDatabase): TemplateConfig
 {
   const newObj: TemplateObject = _.extend({}, obj);
-  if (newObj.sources != null)
-  {
-    newObj.sources = JSON.parse(newObj.sources as string);
-  }
-  if (newObj.sinks != null)
-  {
-    newObj.sinks = JSON.parse(newObj.sinks as string);
-  }
-  if (newObj.process != null)
-  {
-    newObj.process = JSON.parse(newObj.process as string);
-  }
+  parseKeys(newObj, ['sources', 'sinks', 'process', 'settings', 'meta', 'uiData']);
   return new TemplateConfig(newObj);
 }
 
@@ -108,5 +112,8 @@ export function templateForSave(template: TemplateObject): TemplateInDatabase
   obj.sources = JSON.stringify(template.sources);
   obj.sinks = JSON.stringify(template.sinks);
   obj.process = JSON.stringify(template.process);
+  obj.settings = JSON.stringify(obj.settings);
+  obj.meta = JSON.stringify(obj.meta);
+  obj.uiData = JSON.stringify(obj.uiData);
   return obj;
 }

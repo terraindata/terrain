@@ -167,7 +167,10 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      templateName text NOT NULL,
      process text NOT NULL,
      sources text NOT NULL,
-     sinks text NOT NULL); `,
+     sinks text NOT NULL,
+     settings text NOT NULL,
+     meta text NOT NULL,
+     uiData text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS schemaMetadata
        (id ` + primaryKeyType + ` PRIMARY KEY,
        columnId text NOT NULL,
