@@ -162,7 +162,7 @@ export default class IntegrationForm extends TerrainComponent<Props>
     onChange(newIntegration);
   }
 
-  public handleNameChange(state: {name: string})
+  public handleNameChange(state: { name: string })
   {
     const { integration, onChange } = this.props;
     onChange(integration.set('name', state.name));

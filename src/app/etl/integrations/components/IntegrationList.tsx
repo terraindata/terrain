@@ -60,9 +60,9 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { User } from 'users/UserTypes';
 import XHR from 'util/XHR';
 import './IntegrationStyle.less';
-import { User } from 'users/UserTypes';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 const Color = require('color');
 
@@ -138,16 +138,16 @@ class IntegrationList extends TerrainComponent<Props>
     switch (name)
     {
       case 'createdBy':
-        const user = this.props.users.get(value)
+        const user = this.props.users.get(value);
         const userName = user ? user.name ? user.name : user.email : value;
-        return {label: 'Created By', value: userName }
+        return { label: 'Created By', value: userName };
       case 'lastModified':
-        return {label: 'Last Modified', value: Util.formatDate(value, true)}
+        return { label: 'Last Modified', value: Util.formatDate(value, true) };
       case 'id':
       case 'name':
       case 'type':
       default:
-        return {label: name, value }
+        return { label: name, value };
     }
   }
 
