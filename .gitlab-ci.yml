@@ -78,6 +78,7 @@ fullstack-meta:
     - MIDWAY_HOST=`hostname`:3000 yarn build
     - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
     - sleep 10
+    - yarn test-fullstack-import
     - yarn test-fullstack-component
   stage: fullstack-meta
   after_script:

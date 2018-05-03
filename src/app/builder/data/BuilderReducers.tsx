@@ -399,6 +399,7 @@ const BuilderReducers =
       query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
       query = query.set('tqlMode', action.payload.tqlMode);
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
+      // update cards
       query = AllBackendsMap[query.language].codeToQuery(
         query,
         action.payload.changeQuery,
@@ -413,6 +414,8 @@ const BuilderReducers =
       {
         const { parser, path } = CardsToPath.updatePath(query, state.db.name);
         state = state.setIn(['query', 'path'], path);
+        // Because updatePath might update cards, we have to propagate the builder changes back to the editor
+        // if the cards are mutated.
         if (parser && parser.isMutated)
         {
           const newCards = ESCardParser.parseAndUpdateCards(List([parser.getValueInfo().card]), state.query);
@@ -637,7 +640,7 @@ const BuilderReducersWrapper = (
         // update path
         const { path, parser } = CardsToPath.updatePath(state.query, state.db.name);
         state = state.setIn(['query', 'path'], path);
-        if (parser)
+        if (parser && parser.isMutated)
         {
           state = state.setIn(['query', 'cards'], List([parser.getValueInfo().card]));
           state = state
