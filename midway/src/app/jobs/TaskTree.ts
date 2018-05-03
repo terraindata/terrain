@@ -207,12 +207,9 @@ export class TaskTree
         const taskOutputConfig: TaskOutputConfig =
           {
             exit: true,
-            options:
-              {
-                logStream: null,
-                stream: null,
-              },
             status: true,
+            logStream: null,
+            outputStream: null,
           };
         return resolve(taskOutputConfig);
       }
@@ -285,7 +282,7 @@ export class TaskTree
               options:
                 {
                   logStream: new stream.PassThrough(),
-                  stream: new stream.PassThrough(),
+                  inputStreams: [new stream.PassThrough()],
                 },
               status: true,
             },
@@ -305,7 +302,7 @@ export class TaskTree
               options:
                 {
                   logStream: new stream.PassThrough(),
-                  stream: new stream.PassThrough(),
+                  inputStreams: [new stream.PassThrough()],
                 },
               status: false,
             },

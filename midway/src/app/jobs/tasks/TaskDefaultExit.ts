@@ -57,7 +57,7 @@ const taskOutputConfig: TaskOutputConfig =
     options:
       {
         logStream: null,
-        stream: null,
+        inputStreams: null,
       },
     status: true,
   };
