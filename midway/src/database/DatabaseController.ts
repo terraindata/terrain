@@ -112,13 +112,13 @@ abstract class DatabaseController
     this.status = status;
   }
 
-  public abstract getClient(): object;
+  public abstract getClient();
 
   public abstract getTasty(): Tasty.Tasty;
 
   public abstract getQueryHandler(): QueryHandler;
 
-  public abstract getAnalyticsDB(): object;
+  public abstract getAnalyticsDB();
 }
 
 export default DatabaseController;
