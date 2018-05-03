@@ -70,7 +70,6 @@ export class Databases
         'type',
         'dsn',
         'host',
-        'status',
         'isAnalytics',
         'analyticsIndex',
         'analyticsType',
@@ -159,14 +158,12 @@ export class Databases
       await metrics.initialize(db.id);
     }
 
-    return this.upsert(user, { id, status: 'CONNECTED' } as DatabaseConfig);
+    return db;
   }
 
-  public async disconnect(user: UserConfig, id: number): Promise<DatabaseConfig>
+  public async disconnect(user: UserConfig, id: number): Promise<boolean>
   {
-    await DatabaseRegistry.remove(id);
-    // TODO: clean up controller?
-    return this.upsert(user, { id, status: 'DISCONNECTED' } as DatabaseConfig);
+    return DatabaseRegistry.remove(id);
   }
 
   public async schema(id: number): Promise<string>
