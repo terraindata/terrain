@@ -44,73 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+const { List, Map } = Immutable;
+import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import * as Util from '../AppUtil';
-import UserConfig from '../users/UserConfig';
-import { TemplateConfig } from './TemplateConfig';
-import Templates from './Templates';
+import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes';
 
-const Router = new KoaRouter();
-
-export const templates: Templates = new Templates();
-
-// return all templates
-Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+class TemplateSettingsC implements TemplateSettingsI
 {
-  const id = ctx.params.id !== undefined ? ctx.params.id : undefined;
-  ctx.body = await templates.get(id);
-});
-
-// Create a new template
-Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const template: TemplateConfig = ctx.request.body.body;
-  const requiredParams = [
-    'templateName',
-    'process',
-    'sources',
-    'sinks',
-    'settings',
-    'meta',
-    'uiData',
-  ];
-  Util.verifyParameters(template, requiredParams);
-  ctx.body = await templates.create(template);
-});
-
-// Delete a template
-Router.post('/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const params = ctx.request.body.body;
-  const requiredParams = [
-    'templateId',
-  ];
-  Util.verifyParameters(params, requiredParams);
-  await templates.delete(params.templateId);
-  ctx.body = {};
-});
-
-Router.post('/update/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const template: TemplateConfig = ctx.request.body.body;
-  const requiredParams = [
-    'id',
-    'templateName',
-    'process',
-    'sources',
-    'sinks',
-    'settings',
-    'meta',
-    'uiData',
-  ];
-  if (template.id !== Number(ctx.params.id))
-  {
-    throw new Error('Template ID does not match the supplied id in the URL');
-  }
-  Util.verifyParameters(template, requiredParams);
-  ctx.body = await templates.update(template);
-});
-
-export default Router;
+  public abortThreshhold = 0;
+}
+export type TemplateSettings = WithIRecord<TemplateSettingsC>;
+export const _TemplateSettings = makeExtendedConstructor(TemplateSettingsC, true);

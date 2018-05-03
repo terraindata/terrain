@@ -71,6 +71,20 @@ export interface TemplateBase
   sources: any;
   sinks: any;
   process: any;
+  settings: any;
+  meta: any;
+  uiData: any;
+}
+
+export interface TemplateSettings
+{
+  abortThreshhold?: number;
+}
+
+// currently unused
+export interface TemplateMeta
+{
+  placeholder?: any;
 }
 
 export type TemplateObject = {

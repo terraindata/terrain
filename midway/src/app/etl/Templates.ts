@@ -89,6 +89,9 @@ export default class Templates
         'process',
         'sources',
         'sinks',
+        'settings',
+        'meta',
+        'uiData',
       ],
     );
   }
@@ -187,6 +190,9 @@ export default class Templates
         process: template.process,
         sources: template.sources,
         sinks: template.sinks,
+        settings: template.settings,
+        meta: template.meta,
+        uiData: template.uiData,
       };
       resolve(await this.upsert(newTemplate));
     });
@@ -211,6 +217,9 @@ export default class Templates
         process: template.process,
         sources: template.sources,
         sinks: template.sinks,
+        settings: template.settings,
+        meta: template.meta,
+        uiData: template.uiData,
       };
       resolve(await this.upsert(newTemplate));
     });
