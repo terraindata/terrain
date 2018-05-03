@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
+import * as _ from 'lodash';
 import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import Modal from 'app/common/components/Modal';
 import { ETLActions } from 'app/etl/ETLRedux';
@@ -58,6 +59,12 @@ import XHR from 'util/XHR';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import Integration from 'app/etl/integrations/components/Integration';
 import './IntegrationStyle.less';
+import { HeaderConfig, HeaderConfigItem, ItemList } from 'etl/common/components/ItemList';
+import FloatingInput from 'app/common/components/FloatingInput';
+import Colors, {backgroundColor, borderColor} from 'app/colors/Colors';
+import EtlRouteUtil from 'app/etl/ETLRouteUtil';
+
+const Color = require('color');
 
 export interface Props
 {
@@ -100,20 +107,43 @@ class IntegrationList extends TerrainComponent<Props>
     });
   }
 
-  public deleteIntegration(integrationId: ID)
+  public deleteIntegration()
   {
     this.props.etlActions({
       actionType: 'deleteIntegration',
-      integrationId,
+      integrationId: this.state.deleteIntegrationId,
     })
   }
 
   public confirmDeleteIntegration(integrationId: ID)
   {
+    console.log('integration id ', integrationId);
     this.setState({
       confirmModalOpen: true,
       deleteIntegrationId: integrationId,
     });
+  }
+
+  public handleRowClick(index: number)
+  {
+    const { integrations } = this.props;
+    const keys = integrations.keySeq().toList().sort();
+    // TODO move this to parent component
+    EtlRouteUtil.gotoEditIntegration(keys.get(index));
+  }
+
+  public renderProperty(propertyName, item: IntegrationConfig, index: number)
+  {
+    return (
+      <FloatingInput
+        label={propertyName}
+        value={item.get(propertyName)}
+        isTextInput={false}
+        noBorder={true}
+        forceFloat={true}
+        noBg={true}
+      />
+    );
   }
 
   public render()
@@ -124,36 +154,74 @@ class IntegrationList extends TerrainComponent<Props>
     const toDelete = integrations.get(this.state.deleteIntegrationId) ?
       integrations.get(this.state.deleteIntegrationId).name : '';
     return (
-      <div className='schedule-list-wrapper'>
-        {
-          integrationList.map((integration, i) =>
-            <Integration
-              integration={integration}
-              onDelete={this.confirmDeleteIntegration}
-              onChange={this.handleIntegrationChange}
-              key={i}
-            />
-          )
-        }
-        <PathfinderCreateLine
-          text='Add Integration'
-          canEdit={TerrainTools.isAdmin()}
-          onCreate={this.createIntegration}
-          showText={true}
-        />
-        <Modal
-          open={this.state.confirmModalOpen}
-          confirm={true}
-          title={'Confirm Action'}
-          message={`Are you sure you want to delete ${toDelete}?`}
-          confirmButtonText={'Yes'}
-          onConfirm={this.deleteIntegration}
-          onClose={this._toggle('confirmModalOpen')}
-        />
+      <div
+        className='integration-page'
+      >
+        <div
+          className='integration-list-wrapper'
+          style={_.extend({},
+              backgroundColor(Colors().blockBg),
+              borderColor(Colors().blockOutline)
+          )}
+        >
+          <div
+            className='integration-list-header'
+          >
+            Integrations
+          </div>
+          <ItemList
+            items={integrationList.toList()}
+            columnConfig={[
+                {
+                  name: 'id',
+                  render: this._fn(this.renderProperty, 'id')
+                },
+                {
+                  name: 'name',
+                  render: this._fn(this.renderProperty, 'name'),
+                },
+                {
+                  name: 'type',
+                  render: this._fn(this.renderProperty, 'type'),
+                },
+                {
+                  name: 'createdBy',
+                  render: this._fn(this.renderProperty, 'createdBy'),
+                },
+                {
+                  name: 'lastModified',
+                  render: this._fn(this.renderProperty, 'lastModified'),
+                }
+              ]}
+            onRowClicked={this.handleRowClick}
+            hideHeaders={true}
+            getRowStyle={(i) => rowStyle}
+          />
+          <PathfinderCreateLine
+            text='Add Integration'
+            canEdit={TerrainTools.isAdmin()}
+            onCreate={this.createIntegration}
+            showText={true}
+          />
+          <Modal
+            open={this.state.confirmModalOpen}
+            confirm={true}
+            title={'Confirm Action'}
+            message={`Are you sure you want to delete ${toDelete}?`}
+            confirmButtonText={'Yes'}
+            onConfirm={this.deleteIntegration}
+            onClose={this._toggle('confirmModalOpen')}
+          />
+        </div>
       </div>
     );
   }
 }
+
+const rowStyle = [
+  { cursor: 'pointer' },
+  backgroundColor(Colors().fontWhite, Color(Colors().activeHover).fade(0.9)),
+];
 
 export default Util.createContainer(
   IntegrationList,

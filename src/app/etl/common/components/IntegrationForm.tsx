@@ -88,6 +88,14 @@ export default class IntegrationForm extends TerrainComponent<Props>
   public render()
   {
     const { integration, onChange, hideType } = this.props;
+    if (!integration)
+    {
+      return (
+        <div>
+            No Integration Selected
+        </div>
+      );
+    }
     const FormClass = IntegrationFormMap[integration.type];
     return (
       <div className='integration-form-block'>

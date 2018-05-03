@@ -74,4 +74,9 @@ export default class ETLRouteUtil
   {
     return location.pathname === '/etl/edit/new';
   }
+
+  public static gotoEditIntegration(integrationId)
+  {
+    browserHistory.push(`/etl/edit/integrationId=${integrationId}`);
+  }
 }

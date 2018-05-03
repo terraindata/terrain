@@ -44,8 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
-import Colors from 'app/colors/Colors';
-import FloatingInput from 'app/common/components/FloatingInput';
+import Colors, { backgroundColor, borderColor } from 'app/colors/Colors';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -55,74 +54,128 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
 import IntegrationForm from 'etl/common/components/IntegrationForm';
+import { ETLActions } from 'app/etl/ETLRedux';
+import Button from 'app/common/components/Button';
+import { browserHistory } from 'react-router';
 
 export interface Props
 {
-  integration: IntegrationConfig;
-  onDelete: (integrationId: ID) => void;
-  onChange: (integration: IntegrationConfig) => void;
+  location?: any;
+  params?: {
+    integrationId?: number;
+  };
+  router?: any;
+  route?: any;
+  integrations?: Map<ID, IntegrationConfig>;
+  etlActions?: typeof ETLActions;
 }
 
 interface State
 {
-  open: boolean;
+  integration: IntegrationConfig;
 }
 
-class Schedule extends TerrainComponent<Props>
+function getIntegrationId(params): number
 {
-  public state: State = {
-    open: false,
-  };
+  const asNumber = (params != null && params.integrationId != null) ? Number(params.integrationId) : NaN;
+  return Number.isNaN(asNumber) ? -1 : asNumber;
+}
+
+class IntegrationEditor extends TerrainComponent<Props>
+{
+  public state = {
+    integration: null,
+  }
+
+  public componentDidMount()
+  {
+    const { integrations, params } = this.props;
+    this.setState({
+      integration: integrations.get(getIntegrationId(params)),
+    });
+    this.props.etlActions({
+      actionType: 'getIntegrations',
+    });
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    const { params } = this.props;
+    const nextParams = nextProps.params;
+    const oldIntegrationId = getIntegrationId(params);
+    const integrationId = getIntegrationId(nextParams);
+    if (integrationId !== -1 &&
+      (oldIntegrationId !== integrationId ||
+      this.props.integrations !== nextProps.integrations))
+    {
+      console.log('need to update!');
+      this.setState({
+        integration: nextProps.integrations.get(integrationId);
+      });
+    }
+  }
+
+  public handleIntegrationChange(newIntegration)
+  {
+    this.setState({
+      integration: newIntegration,
+    });
+  }
+
+  public save()
+  {
+    const { integration } = this.state;
+    this.props.etlActions({
+      actionType: 'updateIntegration',
+      integrationId: integration.id,
+      integration,
+    });
+    // Update route to go back
+    browserHistory.push('/etl/integrations');
+  }
+
+  public cancel()
+  {
+    // Go back don't save
+    browserHistory.push('/etl/integrations');
+  }
 
   public render()
   {
-    const { integration, onChange } = this.props;
-    const { open } = this.state;
-    console.log(integration);
+    const { integration } = this.state;
     return (
       <div
-        onClick={this._toggle('open')}
         className='integration-wrapper'
       >
-        <div
-          className='integration-preview-wrapper'
-        >
-          <FloatingInput
-            label={'Id'}
-            value={integration.id}
-            isTextInput={false}
+        <IntegrationForm
+          integration={integration}
+          onChange={this.handleIntegrationChange}
+        />
+        <div>
+          <Button
+            text={'Cancel'}
+            onClick={this.cancel}
           />
-          <FloatingInput
-            label={'name'}
-            value={integration.name}
-            isTextInput={false}
-          />
-          <FloatingInput
-            label={'type'}
-            value={integration.type}
-            isTextInput={false}
-          />
-          <FloatingInput
-            label={'created by'}
-            value={integration.createdBy}
-            isTextInput={false}
-          />
-          <FloatingInput
-            label={'last update'}
-            value={integration.lastModified}
-            isTextInput={false}
-          />
+          {
+            integration &&
+            <Button
+              text={'Save'}
+              onClick={this.save}
+            />
+          }
         </div>
-        {
-          open &&
-          <IntegrationForm
-            integration={integration}
-            onChange={onChange}
-          />
-        }  
       </div>
     );
   }
 }
 
-export default Schedule;
+export default Util.createContainer(
+  IntegrationEditor,
+  [
+    ['etl', 'integrations'],
+  ],
+  {
+    etlActions: ETLActions,
+  },
+);
+

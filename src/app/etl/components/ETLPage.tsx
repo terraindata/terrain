@@ -62,7 +62,6 @@ import Util from 'util/Util';
 import { ETLActions, ETLReducers } from 'etl/ETLRedux';
 import { ETLState } from 'etl/ETLTypes';
 import './ETLPage.less';
-import IntegrationList from 'app/etl/integrations/components/IntegrationList';
 
 const { List, Map } = Immutable;
 
@@ -132,9 +131,22 @@ class ETLPage extends TerrainComponent<Props>
 
   public render()
   {
+    const { modalRequests } = this.props.etl;
+
     return (
-      <IntegrationList />
-    );    
+      <div className='etl-page-root'>
+        {
+          this.props.children
+        }
+        {
+          this.renderRunningTemplateModal()
+        }
+        <MultiModal
+          requests={modalRequests}
+          setRequests={this.setModalRequests}
+        />
+      </div>
+    );
   }
 
   public handleCloseRunningTemplateModal()
