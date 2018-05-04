@@ -73,6 +73,7 @@ import Profile from './users/components/Profile';
 import Settings from './users/components/Settings';
 import Team from './users/components/Team';
 import X from './x/components/X';
+import DataTabs from 'etl/components/DataTabs';
 
 class AppRouter extends TerrainComponent<{}> {
   public render()
@@ -141,8 +142,12 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/control' component={ControlPage} />
 
           <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
+<<<<<<< HEAD
 
           <Route path='/data' component={ETLPage}>
+=======
+          <Route path='/etl/:tab' component={DataTabs}>
+>>>>>>> Added react-tabs. Created generic TerrainTabs component.
             <IndexRoute component={ETLWalkthrough} />
             <Route path='new/:step' component={ETLWalkthrough} />
             <Route path='template' component={TemplateList} />
