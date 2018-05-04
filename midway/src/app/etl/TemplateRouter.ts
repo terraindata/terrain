@@ -72,6 +72,9 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
     'process',
     'sources',
     'sinks',
+    'settings',
+    'meta',
+    'uiData',
   ];
   Util.verifyParameters(template, requiredParams);
   ctx.body = await templates.create(template);
@@ -98,6 +101,9 @@ Router.post('/update/:id', passport.authenticate('access-token-local'), async (c
     'process',
     'sources',
     'sinks',
+    'settings',
+    'meta',
+    'uiData',
   ];
   if (template.id !== Number(ctx.params.id))
   {

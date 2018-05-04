@@ -130,13 +130,13 @@ class IntegrationEditor extends TerrainComponent<Props>
       integration,
     });
     // Update route to go back
-    browserHistory.push('/etl/integrations');
+    browserHistory.push('/data/integrations');
   }
 
   public cancel()
   {
     // Go back don't save
-    browserHistory.push('/etl/integrations');
+    browserHistory.push('/data/integrations');
   }
 
   public render()
