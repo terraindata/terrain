@@ -147,6 +147,11 @@ class IntegrationEditorPage extends TerrainComponent<Props>
         className='integration-wrapper'
         style={backgroundColor('rgba(255, 255, 255, 0.75)')}
       >
+        <div
+          className='integration-editor-header'
+        >
+          Edit Integration
+        </div>
         <IntegrationForm
           integration={integration}
           onChange={this.handleIntegrationChange}
