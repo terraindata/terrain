@@ -59,6 +59,7 @@ import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import AExportTransform from './streams/AExportTransform';
 import CSVExportTransform from './streams/CSVExportTransform';
 import ExportTransform from './streams/ExportTransform';
@@ -359,7 +360,21 @@ export class Export
       {
         if (algorithms[0].meta !== undefined)
         {
-          return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
+          const query = JSON.parse(algorithms[0].meta as string)['query'];
+          const inputMap = ESInterpreter.toInputMap(query.inputs);
+          const queryTree = new ESInterpreter(query.tql, inputMap);
+          if (queryTree.hasError())
+          {
+            return reject('Errors when interpreting the query:' + JSON.stringify(queryTree.getErrors()));
+          }
+          try
+          {
+            const queryString = queryTree.toCode({ replaceInputs: true });
+            return resolve(queryString);
+          } catch (e)
+          {
+            reject('Error when the interpreter generates the code:' + JSON.stringify(e));
+          }
         }
       }
       catch (e)
