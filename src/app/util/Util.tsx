@@ -390,6 +390,10 @@ const Util = {
 
   extendId(obj: object, isString?: boolean): object
   {
+    if (!obj)
+    {
+      obj = {};
+    }
     if (obj['id'])
     {
       return obj;

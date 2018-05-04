@@ -138,7 +138,7 @@ class EndpointForm extends TerrainComponent<Props>
       endpoint.type != null &&
       endpoint.type !== '' &&
       integrationList.indexOf(endpoint.type) !== -1
-    ;
+      ;
     const showIntegrationForm = endpoint.integrationId != null && endpoint.integrationId >= 0;
     const showForm = showIntegrationForm ||
       (endpoint.type != null && endpoint.type !== '' && integrationList.indexOf(endpoint.type) === -1);
