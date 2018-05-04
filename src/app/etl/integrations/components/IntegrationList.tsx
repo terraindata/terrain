@@ -60,6 +60,7 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { _IntegrationConfig, IntegrationConfig } from 'shared/etl/immutable/IntegrationRecords';
+import { User } from 'users/UserTypes';
 import XHR from 'util/XHR';
 import './IntegrationStyle.less';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
@@ -69,6 +70,7 @@ export interface Props
 {
   integrations?: Map<ID, IntegrationConfig>;
   etlActions?: typeof ETLActions;
+  users?: Immutable.Map<ID, User>;
 }
 
 class IntegrationList extends TerrainComponent<Props>
@@ -131,12 +133,31 @@ class IntegrationList extends TerrainComponent<Props>
     EtlRouteUtil.gotoEditIntegration(keys.get(index));
   }
 
+  public formatValue(name, value)
+  {
+    switch (name)
+    {
+      case 'createdBy':
+        const user = this.props.users.get(value);
+        const userName = user ? user.name ? user.name : user.email : value;
+        return { label: 'Created By', value: userName };
+      case 'lastModified':
+        return { label: 'Last Modified', value: Util.formatDate(value, true) };
+      case 'id':
+      case 'name':
+      case 'type':
+      default:
+        return { label: name, value };
+    }
+  }
+
   public renderProperty(propertyName, item: IntegrationConfig, index: number)
   {
+    const { label, value } = this.formatValue(propertyName, item.get(propertyName));
     return (
       <FloatingInput
-        label={propertyName}
-        value={item.get(propertyName)}
+        label={label}
+        value={value}
         isTextInput={false}
         noBorder={true}
         forceFloat={true}
@@ -237,6 +258,7 @@ export default Util.createContainer(
   IntegrationList,
   [
     ['etl', 'integrations'],
+    ['users', 'users'],
   ],
   {
     etlActions: ETLActions,

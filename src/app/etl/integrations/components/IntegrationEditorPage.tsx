@@ -145,21 +145,32 @@ class IntegrationEditorPage extends TerrainComponent<Props>
     return (
       <div
         className='integration-wrapper'
+        style={backgroundColor('rgba(255, 255, 255, 0.75)')}
       >
+        <div
+          className='integration-editor-header'
+        >
+          Edit Integration
+        </div>
         <IntegrationForm
           integration={integration}
           onChange={this.handleIntegrationChange}
         />
-        <div>
+        <div
+          className='integration-buttons'
+        >
           <Button
             text={'Cancel'}
             onClick={this.cancel}
+            size={'small'}
           />
           {
             integration &&
             <Button
               text={'Save'}
               onClick={this.save}
+              size={'small'}
+              theme={'active'}
             />
           }
         </div>
