@@ -743,3 +743,19 @@ test('test set if transformation', () =>
   expect(r['name']).toEqual('Tim');
   expect(r['bleep']).toEqual('bloop');
 });
+
+test('duplicate a disabled array', () =>
+{
+  const doc = {
+    foo: [1, 2, 3],
+  };
+  const e = new TransformationEngine(doc);
+  const kp = List(['foo']);
+  e.appendTransformation(TransformationNodeType.DuplicateNode, List([kp]), {
+    newFieldKeyPaths: List([List(['copy of foo'])]),
+  });
+  e.disableField(e.getInputFieldID(kp));
+  expect(e.transform(doc)).toEqual({
+    'copy of foo': [1, 2, 3],
+  });
+});

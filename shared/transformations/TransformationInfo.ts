@@ -84,6 +84,7 @@ export interface InfoType<T extends TransformationNodeType = any>
     transformationNode: TransformationNode,
     docCopy: object,
     options: object) => TransformationVisitResult;
+  newFieldType?: string;
 }
 
 const TransformationNodeInfo: AllNodeInfoType =
@@ -112,6 +113,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitSplitNode(transformationNode, docCopy, options),
+        newFieldType: 'string',
       },
     [TransformationNodeType.JoinNode]:
       {
@@ -137,6 +139,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitJoinNode(transformationNode, docCopy, options),
+        newFieldType: 'string',
       },
     [TransformationNodeType.FilterNode]: // what does this do?
       {
@@ -169,6 +172,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitDuplicateNode(transformationNode, docCopy, options),
+        newFieldType: 'same',
       },
     [TransformationNodeType.InsertNode]:
       {
@@ -275,6 +279,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitArraySumNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
       },
     [TransformationNodeType.AddNode]:
       {
@@ -429,6 +434,11 @@ export abstract class TransformationInfo
   public static getType(type: TransformationNodeType): any
   {
     return TransformationNodeInfo[type].type;
+  }
+
+  public static getNewFieldType(type: TransformationNodeType): any
+  {
+    return TransformationNodeInfo[type].newFieldType;
   }
 
   public static applyTargetedVisitor(visitor: TransformationNodeVisitor,
