@@ -165,6 +165,166 @@ class SftpForm extends IntegrationFormBase<SftpAuthT, SftpConnectionT>
   };
 }
 
+type HttpAuthT = AuthConfigType<Integrations.Http>;
+type HttpConnectionT = ConnectionConfigType<Integrations.Http>;
+class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
+{
+  public authMap: InputDeclarationMap<HttpAuthT> = {
+    jwt: {
+      type: DisplayType.TextBox,
+      displayName: 'JSON Web Token',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+    url: {
+      type: DisplayType.TextBox,
+      displayName: 'Url',
+    },
+  };
+}
+
+type FsAuthT = AuthConfigType<Integrations.Fs>;
+type FsConnectionT = ConnectionConfigType<Integrations.Fs>;
+class FsForm extends IntegrationFormBase<HttpAuthT, FsConnectionT>
+{
+  public authMap: InputDeclarationMap<HttpAuthT> = {
+    user: {
+      type: DisplayType.TextBox,
+      displayName: 'User',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<HttpConnectionT> = {};
+}
+
+type MysqlAuthT = AuthConfigType<Integrations.Mysql>;
+type MysqlConnectionT = ConnectionConfigType<Integrations.Mysql>;
+class MysqlForm extends IntegrationFormBase<HttpAuthT, MysqlConnectionT>
+{
+  public authMap: InputDeclarationMap<HttpAuthT> = {
+    password: {
+      type: DisplayType.TextBox,
+      displayName: 'Password',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+    user: {
+      type: DisplayType.TextBox,
+      displayName: 'User',
+    },
+    host: {
+      type: DisplayType.TextBox,
+      displayName: 'Host',
+      group: 'addr row',
+      widthFactor: 3,
+    },
+    port: {
+      type: DisplayType.NumberBox,
+      displayName: 'Port',
+      group: 'addr row',
+      widthFactor: 1,
+    },
+    database: {
+      type: DisplayType.TextBox,
+      displayName: 'Database',
+    },
+  };
+}
+
+type PostgresqlAuthT = AuthConfigType<Integrations.Postgresql>;
+type PostgresqlConnectionT = ConnectionConfigType<Integrations.Postgresql>;
+class PostgresqlForm extends IntegrationFormBase<PostgresqlAuthT, PostgresqlConnectionT>
+{
+  public authMap: InputDeclarationMap<HttpAuthT> = {
+    password: {
+      type: DisplayType.TextBox,
+      displayName: 'Password',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+    user: {
+      type: DisplayType.TextBox,
+      displayName: 'User',
+    },
+    host: {
+      type: DisplayType.TextBox,
+      displayName: 'Host',
+      group: 'addr row',
+      widthFactor: 3,
+    },
+    port: {
+      type: DisplayType.NumberBox,
+      displayName: 'Port',
+      group: 'addr row',
+      widthFactor: 1,
+    },
+    database: {
+      type: DisplayType.TextBox,
+      displayName: 'Database',
+    },
+  };
+}
+
+type MagentoAuthT = AuthConfigType<Integrations.Magento>;
+type MagentoConnectionT = ConnectionConfigType<Integrations.Magento>;
+class MagentoForm extends IntegrationFormBase<MagentoAuthT, MagentoConnectionT>
+{
+  public authMap: InputDeclarationMap<HttpAuthT> = {
+    apiKey: {
+      type: DisplayType.TextBox,
+      displayName: 'API Key',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+    apiUser: {
+      type: DisplayType.TextBox,
+      displayName: 'API User',
+    },
+  };
+}
+
+type GoogleAPIAuthT = AuthConfigType<Integrations.GoogleAPI>;
+type GoogleAPIConnectionT = ConnectionConfigType<Integrations.GoogleAPI>;
+class GoogleAPIForm extends IntegrationFormBase<GoogleAPIAuthT, GoogleAPIConnectionT>
+{
+  public authMap: InputDeclarationMap<HttpAuthT> = {
+    privateKey: {
+      type: DisplayType.TextBox,
+      displayName: 'Private Key',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+    email: {
+      type: DisplayType.TextBox,
+      displayName: 'Email',
+    },
+  };
+}
+
+type MailchimpAuthT = AuthConfigType<Integrations.Mailchimp>;
+type MailchimpConnectionT = ConnectionConfigType<Integrations.Mailchimp>;
+class MailchimpForm extends IntegrationFormBase<MailchimpAuthT, MailchimpConnectionT>
+{
+  public authMap: InputDeclarationMap<HttpAuthT> = {
+    apiKey: {
+      type: DisplayType.TextBox,
+      displayName: 'API Key',
+    },
+  };
+
+  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+    host: {
+      type: DisplayType.TextBox,
+      displayName: 'Host',
+    },
+  };
+}
+
 type FormLookupMap =
   {
     [k in Integrations]: React.ComponentClass<Props>
@@ -173,4 +333,11 @@ type FormLookupMap =
 export const IntegrationFormMap: FormLookupMap =
   {
     [Integrations.Sftp]: SftpForm,
+    [Integrations.Http]: HttpForm,
+    [Integrations.Fs]: FsForm,
+    [Integrations.Mysql]: MysqlForm,
+    [Integrations.Postgresql]: PostgresqlForm,
+    [Integrations.Magento]: MagentoForm,
+    [Integrations.GoogleAPI]: GoogleAPIForm,
+    [Integrations.Mailchimp]: MailchimpForm,
   };
