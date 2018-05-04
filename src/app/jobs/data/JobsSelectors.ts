@@ -43,110 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console
-import SimpleTable from 'common/components/SimpleTable';
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
-import { JobsActions } from 'jobs/data/JobsRedux';
-import { getFailedJobs, getSuccessfulJobs } from 'jobs/data/JobsSelectors';
-import JobsApi from 'jobs/JobsApi';
-import * as React from 'react';
-import Util from 'util/Util';
-import XHR from 'util/XHR';
+import { createSelector } from 'reselect';
 
-class Jobs extends TerrainComponent<any> {
+const getJobs = (state) => state.get('jobs').jobs;
 
-  public jobsApi: JobsApi = new JobsApi(XHR.getInstance());
+export const getSuccessfulJobs = createSelector(
+  getJobs,
+  (jobs) => jobs.filter((j) => j.status === 'SUCCESS'),
+);
 
-  public constructor(props)
-  {
-    super(props);
-    this.state = {
-      responseText: '',
-      jobs: null,
-      id: '',
-    };
-  }
-
-  public componentDidMount()
-  {
-    this.getJobs();
-  }
-
-  public getJobs()
-  {
-    this.props.jobsActions({ actionType: 'getJobs' })
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response), jobs: response.data });
-      })
-      .catch((error) =>
-      {
-        console.error(error);
-        this.setState({ responseText: error });
-      });
-  }
-
-  public getJob(id: number)
-  {
-    this.jobsApi.getJob(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error });
-      });
-  }
-
-  public render()
-  {
-    const { successfulJobs, failedJobs } = this.props;
-    const { id } = this.state;
-
-    const jobsHeader = [
-      {
-        columnKey: 'id',
-        columnLabel: 'Id',
-      },
-      {
-        columnKey: 'name',
-        columnLabel: 'Name',
-      },
-      {
-        columnKey: 'status',
-        columnLabel: 'Status',
-      },
-    ];
-
-    return (
-      <div>
-        <div>
-          {this.state.responseText}
-        </div>
-
-        <h2>Successful Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={successfulJobs}
-        />
-
-        <h2>Failed Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={failedJobs}
-        />
-      </div>
-    );
-  }
-}
-
-export default Util.createTypedContainer(
-  Jobs,
-  {
-    successfulJobs: getSuccessfulJobs,
-    failedJobs: getFailedJobs,
-  },
-  { jobsActions: JobsActions },
+export const getFailedJobs = createSelector(
+  getJobs,
+  (jobs) => jobs.filter((j) => j.status === 'FAILURE'),
 );

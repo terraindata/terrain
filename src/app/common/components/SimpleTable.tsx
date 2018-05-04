@@ -42,111 +42,72 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console
-import SimpleTable from 'common/components/SimpleTable';
-import TerrainComponent from 'common/components/TerrainComponent';
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires strict-boolean-expressions
+
+import { List } from 'immutable';
 import * as Immutable from 'immutable';
-import { JobsActions } from 'jobs/data/JobsRedux';
-import { getFailedJobs, getSuccessfulJobs } from 'jobs/data/JobsSelectors';
-import JobsApi from 'jobs/JobsApi';
 import * as React from 'react';
-import Util from 'util/Util';
-import XHR from 'util/XHR';
 
-class Jobs extends TerrainComponent<any> {
+import './SimpleTable.less';
 
-  public jobsApi: JobsApi = new JobsApi(XHR.getInstance());
+import TerrainComponent from './TerrainComponent';
 
-  public constructor(props)
-  {
-    super(props);
-    this.state = {
-      responseText: '',
-      jobs: null,
-      id: '',
-    };
-  }
+export interface SimpleTableColumn
+{
+  columnKey: string;
+  columnLabel: string;
+}
 
-  public componentDidMount()
-  {
-    this.getJobs();
-  }
+export interface Props
+{
+  header: SimpleTableColumn[];
+  data: Immutable.Map<ID, any>;
+}
 
-  public getJobs()
-  {
-    this.props.jobsActions({ actionType: 'getJobs' })
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response), jobs: response.data });
-      })
-      .catch((error) =>
-      {
-        console.error(error);
-        this.setState({ responseText: error });
-      });
-  }
-
-  public getJob(id: number)
-  {
-    this.jobsApi.getJob(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error });
-      });
-  }
+export class SimpleTable extends TerrainComponent<Props>
+{
+  public state: {};
 
   public render()
   {
-    const { successfulJobs, failedJobs } = this.props;
-    const { id } = this.state;
+    const { header, data } = this.props;
 
-    const jobsHeader = [
-      {
-        columnKey: 'id',
-        columnLabel: 'Id',
-      },
-      {
-        columnKey: 'name',
-        columnLabel: 'Name',
-      },
-      {
-        columnKey: 'status',
-        columnLabel: 'Status',
-      },
-    ];
+    const columnKeys = header.reduce((keys, column) => keys.concat(column.columnKey), []);
 
     return (
-      <div>
-        <div>
-          {this.state.responseText}
-        </div>
-
-        <h2>Successful Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={successfulJobs}
-        />
-
-        <h2>Failed Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={failedJobs}
-        />
-      </div>
+      <table className='simple-table'>
+        <thead className='simple-table-header'>
+          <tr className='simple-table-row'>
+            {
+              header.map((column, index) =>
+              {
+                return <th key={column.columnKey} className='simple-table-cell'>{column.columnLabel}</th>;
+              })
+            }
+          </tr>
+        </thead>
+        <tbody className='simple-table-body'>
+          {
+            data.valueSeq().map((entry) =>
+            {
+              return (
+                <tr key={entry.id} className='simple-table-row'>
+                  {
+                    columnKeys.map((key, index) =>
+                    {
+                      return <td key={key} className='simple-table-cell'>{entry[key]}</td>;
+                    })
+                  }
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
     );
   }
 }
 
-export default Util.createTypedContainer(
-  Jobs,
-  {
-    successfulJobs: getSuccessfulJobs,
-    failedJobs: getFailedJobs,
-  },
-  { jobsActions: JobsActions },
-);
+export default SimpleTable;

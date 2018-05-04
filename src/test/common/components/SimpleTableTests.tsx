@@ -42,111 +42,85 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console
-import SimpleTable from 'common/components/SimpleTable';
-import TerrainComponent from 'common/components/TerrainComponent';
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-empty
+
+import SimpleTable from 'app/common/components/SimpleTable';
+import { mount, shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import { JobsActions } from 'jobs/data/JobsRedux';
-import { getFailedJobs, getSuccessfulJobs } from 'jobs/data/JobsSelectors';
-import JobsApi from 'jobs/JobsApi';
+import { List, Map, Record } from 'immutable';
 import * as React from 'react';
-import Util from 'util/Util';
-import XHR from 'util/XHR';
+import { _SchedulerConfig } from 'scheduler/SchedulerTypes';
 
-class Jobs extends TerrainComponent<any> {
+describe('SimpleTable', () =>
+{
+  let tableComponent = null;
 
-  public jobsApi: JobsApi = new JobsApi(XHR.getInstance());
+  const columns = [
+    {
+      columnKey: 'id',
+      columnLabel: 'Id',
+    },
+    {
+      columnKey: 'name',
+      columnLabel: 'Name',
+    },
+    {
+      columnKey: 'status',
+      columnLabel: 'Status',
+    },
+  ];
 
-  public constructor(props)
+  let tableData = Immutable.Map<ID, any>({});
+  const TableItem = Record({ id: 0, name: '', status: '' });
+  tableData = tableData.set(1, new TableItem({
+    id: 1,
+    name: 'item 1',
+    status: 'success',
+  }));
+  tableData = tableData.set(2, new TableItem({
+    id: 2,
+    name: 'item 2',
+    status: 'failure',
+  }));
+
+  const tableState = {
+    header: columns,
+    data: tableData,
+  };
+
+  beforeEach(() =>
   {
-    super(props);
-    this.state = {
-      responseText: '',
-      jobs: null,
-      id: '',
-    };
-  }
-
-  public componentDidMount()
-  {
-    this.getJobs();
-  }
-
-  public getJobs()
-  {
-    this.props.jobsActions({ actionType: 'getJobs' })
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response), jobs: response.data });
-      })
-      .catch((error) =>
-      {
-        console.error(error);
-        this.setState({ responseText: error });
-      });
-  }
-
-  public getJob(id: number)
-  {
-    this.jobsApi.getJob(id)
-      .then((response) =>
-      {
-        this.setState({ responseText: JSON.stringify(response) });
-      })
-      .catch((error) =>
-      {
-        this.setState({ responseText: error });
-      });
-  }
-
-  public render()
-  {
-    const { successfulJobs, failedJobs } = this.props;
-    const { id } = this.state;
-
-    const jobsHeader = [
-      {
-        columnKey: 'id',
-        columnLabel: 'Id',
-      },
-      {
-        columnKey: 'name',
-        columnLabel: 'Name',
-      },
-      {
-        columnKey: 'status',
-        columnLabel: 'Status',
-      },
-    ];
-
-    return (
-      <div>
-        <div>
-          {this.state.responseText}
-        </div>
-
-        <h2>Successful Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={successfulJobs}
-        />
-
-        <h2>Failed Jobs</h2>
-        <SimpleTable
-          header={jobsHeader}
-          data={failedJobs}
-        />
-      </div>
+    tableComponent = shallow(
+      <SimpleTable
+        {...tableState}
+      />,
     );
-  }
-}
+  });
 
-export default Util.createTypedContainer(
-  Jobs,
+  describe('#render', () =>
   {
-    successfulJobs: getSuccessfulJobs,
-    failedJobs: getFailedJobs,
-  },
-  { jobsActions: JobsActions },
-);
+    it('should have a header and a body', () =>
+    {
+      expect(tableComponent.find('.simple-table')).toHaveLength(1);
+      expect(tableComponent.find('.simple-table-header')).toHaveLength(1);
+      expect(tableComponent.find('.simple-table-body')).toHaveLength(1);
+
+      expect(tableComponent.find('.simple-table-header .simple-table-cell'))
+        .toHaveLength(columns.length);
+
+      expect(tableComponent.find('.simple-table-body .simple-table-row'))
+        .toHaveLength(2);
+
+      expect(tableComponent.find('.simple-table-body .simple-table-cell'))
+        .toHaveLength(2 * columns.length);
+
+      expect(tableComponent.find('.simple-table-body .simple-table-cell').at(0).text())
+        .toEqual('1');
+      expect(tableComponent.find('.simple-table-body .simple-table-cell').at(1).text())
+        .toEqual('item 1');
+      expect(tableComponent.find('.simple-table-body .simple-table-cell').at(2).text())
+        .toEqual('success');
+    });
+  });
+});
