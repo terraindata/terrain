@@ -345,7 +345,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   // If the line is not a filterGroup
   // Parse the line and add it to must, mustNot or filter
   // If the line is a filterGroup
-  // must.push ({bool: {should: parseFilters(filterGroup.lines)}, minimum_should_match: minMatches})
+  // must.push ( parseFilters(filterGroup.lines)}, minimum_should_match: minMatches)
   // If the minMatches is not all
   // add all the filter conditions to should, set minimum_should_match on the outside of that bool
   // By adding all the filter conditions to should, do same process as above
@@ -375,7 +375,14 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
     if (line.filterGroup)
     {
       const nestedFilter = parseFilters(line.filterGroup, inputs, inMatchQualityContext);
-      must = must.push(nestedFilter);
+      if (useShould)
+      {
+        should = should.push(nestedFilter);
+      }
+      else
+      {
+        must = must.push(nestedFilter);
+      }
     }
     // Special case for a nested filter that is do not exist
     else if (((line.field && line.field.indexOf('.') !== -1) ||
