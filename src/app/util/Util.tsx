@@ -707,18 +707,38 @@ const Util = {
     const mapStateToProps = (state) =>
     {
       const stateToProps = {};
-      stateToPropsKeys.forEach((key) =>
+
+      if (_.isArray(stateToPropsKeys))
       {
-        if (_.isArray(key))
+        stateToPropsKeys.forEach((key) =>
         {
-          const stateKey = _.last(key);
-          stateToProps[stateKey] = state.getIn(key);
-        }
-        else
+          if (_.isArray(key))
+          {
+            const stateKey = _.last(key);
+            stateToProps[stateKey] = state.getIn(key);
+          }
+          else
+          {
+            stateToProps[key] = state.get(key);
+          }
+        });
+      }
+
+      if (_.isPlainObject(stateToPropsKeys))
+      {
+        Object.keys(stateToPropsKeys).map((key, index) =>
         {
-          stateToProps[key] = state.get(key);
-        }
-      });
+          const value = stateToPropsKeys[key];
+          if (_.isFunction(value))
+          {
+            stateToProps[key] = value(state);
+          }
+          else
+          {
+            stateToProps[key] = value;
+          }
+        });
+      }
 
       return stateToProps;
     };

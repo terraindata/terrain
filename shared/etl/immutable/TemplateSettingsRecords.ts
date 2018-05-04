@@ -44,43 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
-import * as winston from 'winston';
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
+const { List, Map } = Immutable;
+import { makeExtendedConstructor, recordForSave, WithIRecord } from 'shared/util/Classes';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { Task } from '../Task';
+import { TemplateSettings as TemplateSettingsI } from 'shared/etl/types/ETLTypes';
 
-const taskOutputConfig: TaskOutputConfig =
-  {
-    exit: true,
-    options:
-      {
-        logStream: null,
-        inputStreams: null,
-      },
-    status: false,
-  };
-
-export class TaskDefaultFailure extends Task
+class TemplateSettingsC implements TemplateSettingsI
 {
-  constructor(taskConfig: TaskConfig)
-  {
-    super(taskConfig);
-  }
-
-  public async run(): Promise<TaskOutputConfig>
-  {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
-    {
-      // TODO: call other functions (needs to wrap in Promise for later)
-      resolve(taskOutputConfig);
-    });
-  }
-
-  public async printNode(): Promise<TaskOutputConfig>
-  {
-    winston.info('Printing Default Failure, params: ' + JSON.stringify(taskOutputConfig as object));
-    return Promise.resolve(taskOutputConfig);
-  }
+  public abortThreshhold = 0;
 }
+export type TemplateSettings = WithIRecord<TemplateSettingsC>;
+export const _TemplateSettings = makeExtendedConstructor(TemplateSettingsC, true);
