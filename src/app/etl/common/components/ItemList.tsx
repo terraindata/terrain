@@ -74,6 +74,7 @@ export interface Props<T>
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
   state?: any; // for specifying dependencies so ItemList knows when to rerender
   hideHeaders?: boolean;
+  getActions?: (index: number, item: T) => El;
 }
 
 const memoize = _.memoize;
@@ -152,6 +153,14 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
                 </div>
               </div>
               : undefined
+          }
+          {
+            this.props.getActions !== undefined ?
+              <div className='row-info-actions'>
+                {this.props.getActions(index, item)}
+              </div>
+              :
+              null
           }
         </div>
       </Quarantine>
