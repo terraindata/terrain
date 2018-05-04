@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESParameterFiller from 'shared/database/elastic/parser/EQLParameterFiller';
+import CardsToCodeOptions from 'shared/database/types/CardsToCodeOptions';
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
@@ -59,12 +61,32 @@ export const ESInterpreterDefaultConfig = new EQLConfig();
  */
 export default class ESInterpreter
 {
+  /*
+   * Same as Input.tsx::toInputMap.
+   */
+  public static toInputMap(inputs: [any]): object
+  {
+    const inputMap: object = {};
+    inputs.map((input) =>
+    {
+      let value: any;
+      try
+      {
+        value = JSON.parse(input.value);
+      }
+      catch (e)
+      {
+        value = input.value;
+      }
+      inputMap[input.key] = value;
+    });
+    return inputMap;
+  }
   public config: EQLConfig; // query language description
   public params: { [name: string]: null | ESClause }; // input parameter clause types
   public parser: ESParser | null; // source parser
   public rootValueInfo: ESValueInfo;
   public errors: ESParserError[];
-
   /**
    * Runs the interpreter on the given query string. Read needed data by calling the
    * public member functions below. You can also pass in an existing ESJSONParser
@@ -197,5 +219,29 @@ export default class ESInterpreter
   public hasError()
   {
     return this.hasInterpretingError() || this.hasJSONParsingError();
+  }
+
+  public getInterpretingErrorMessages(): string[]
+  {
+    const ret: string[] = [];
+    for (const e of this.errors)
+    {
+      ret.push(e.message);
+    }
+    return ret;
+  }
+  public getErrors(): string[]
+  {
+    return this.getInterpretingErrorMessages().concat(this.parser.getErrorMessages());
+  }
+
+  public toCode(options: CardsToCodeOptions)
+  {
+    let queryObj = this.rootValueInfo.value;
+    if (options.replaceInputs === true)
+    {
+      queryObj = ESParameterFiller.generate(this.rootValueInfo, this.params);
+    }
+    return JSON.stringify(queryObj);
   }
 }

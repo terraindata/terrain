@@ -87,13 +87,25 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
     $scope.loadMore();
   };
 
+  // https://stackoverflow.com/a/49502367/4451284
+  $scope.titlecase = function(str){
+     var titlecasesentence = str.split(' ');
+     titlecasesentence = titlecasesentence.map(function(word) {
+       const firstletter = word.charAt(0).toUpperCase();
+       word = firstletter.concat(word.slice(1,word.length));
+  
+       return word;
+     }).join(' ');
+     return titlecasesentence;
+  };
+
   $scope.loadMore = function()
   {
     if ($scope.busy) return;
     if ($scope.done) return;
     $scope.busy = true;
 
-    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++ + '&v=' + $scope.algorithmID)
+    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.titlecase($scope.searchTerm) + '&p=' + $scope.page++ + '&v=' + $scope.algorithmID)
     .then((response) =>
     {
       if (response.status === 200)

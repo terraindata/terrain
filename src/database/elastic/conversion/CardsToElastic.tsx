@@ -49,9 +49,9 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
+import Options from '../../../../shared/database/types/CardsToCodeOptions';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import Query from '../../../items/types/Query';
-import Options from '../../types/CardsToCodeOptions';
 
 import { isInput, isRuntimeInput } from '../../../blocks/types/Input';
 import ESCardParser from './ESCardParser';
