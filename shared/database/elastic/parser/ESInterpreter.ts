@@ -67,7 +67,7 @@ export default class ESInterpreter
   public static toInputMap(inputs: [any]): object
   {
     const inputMap: object = {};
-    inputs.map((input: Input) =>
+    inputs.map((input) =>
     {
       let value: any;
       try
