@@ -54,12 +54,15 @@ describe('TerrainTabs', () =>
   let tabsComponent = null;
   const tabs = [
     {
+      key: 'tab1',
       label: 'Tab 1',
     },
     {
+      key: 'tab2',
       label: 'Tab 2',
     },
     {
+      key: 'tab3',
       label: 'Tab 3',
     },
   ];
@@ -90,8 +93,35 @@ describe('TerrainTabs', () =>
     expect(tabsComponent.find('TabPanel').at(2).find('#tab-content-3')).toHaveLength(1);
   });
 
-  it('should activate the tab matching the browser route by default', () => {
-    tabsComponent.setProps({ routeMap: { '/path/to/tab': 'tab1' }, params: { tab: 'tab1' } });
-    expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
+  describe('when there is no specified selectedTab', () =>
+  {
+    it('should activate the tab matching the browser route by default', () => {
+      expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(0);
+    });
+  });
+
+  describe('when a selectedTab is specified', () =>
+  {
+    it('should activate the tab matching the browser route by default', () => {
+      tabsComponent = shallow(
+        <TerrainTabs tabs={tabs} selectedTab={'tab2'}>
+          <div id="tab-content-1" />
+          <div id="tab-content-2" />
+          <div id="tab-content-3" />
+        </TerrainTabs>,
+      );
+
+      expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
+    });
   })
+
+
+  describe('#getTabIndex', () =>
+  {
+    it('should return the tab index', () =>
+    {
+      expect(tabsComponent.instance().getTabIndex('tab1')).toEqual(0);
+      expect(tabsComponent.instance().getTabIndex('tab3')).toEqual(2);
+    });
+  });
 });

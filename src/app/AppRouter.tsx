@@ -142,12 +142,8 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/control' component={ControlPage} />
 
           <Route path='/import' component={FileImport /*TODO get rid of this once ETL is merged*/} />
-<<<<<<< HEAD
 
-          <Route path='/data' component={ETLPage}>
-=======
-          <Route path='/etl/:tab' component={DataTabs}>
->>>>>>> Added react-tabs. Created generic TerrainTabs component.
+          <Route path='/data/:tab' component={DataTabs}>
             <IndexRoute component={ETLWalkthrough} />
             <Route path='new/:step' component={ETLWalkthrough} />
             <Route path='template' component={TemplateList} />

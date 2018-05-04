@@ -50,20 +50,15 @@ import 'react-tabs/style/react-tabs.less';
 
 interface TabConfig
 {
+  key: string;
   label: string;
-}
-
-interface RoutesToTabs
-{
-  [tabKey: string]: string;
 }
 
 interface TabsProps
 {
   tabs: TabConfig[];
   children: any;
-  routesToTabs?: RoutesToTabs;
-  params?: { tab: string }; // this one is injected by ReactRouter, params.tab indicates the current tab
+  selectedTab?: string;
 }
 
 interface TabsState
@@ -77,9 +72,25 @@ class TerrainTabs extends TerrainComponent<TabsProps>
     tabIndex: 0,
   };
 
+  public componentWillMount()
+  {
+    const { selectedTab } = this.props;
+    if (selectedTab !== undefined)
+    {
+      const tabIndex = this.getTabIndex(selectedTab);
+
+      this.setState({ tabIndex });
+    }
+  }
+
   public handleSelect(tabIndex: number)
   {
-    this.setState({ tabIndex })
+    this.setState({ tabIndex });
+  }
+
+  public getTabIndex(tabKey)
+  {
+    return this.props.tabs.findIndex((tab) => tab.key === tabKey);
   }
 
   public render()
@@ -94,7 +105,6 @@ class TerrainTabs extends TerrainComponent<TabsProps>
             tabs.map((tab, index) => <Tab key={index}>{tab.label}</Tab>)
           }
         </TabList>
-
         {
           children.map((child, index) => (<TabPanel key={index}>{child}</TabPanel>))
         }

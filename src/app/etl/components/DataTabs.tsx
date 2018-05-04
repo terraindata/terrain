@@ -62,14 +62,14 @@ interface DataTabsProps
 class DataTabs extends TerrainComponent<DataTabsProps>
 {
   public tabs = [
-    { label: 'Templates' },
-    { label: 'Integrations' },
-    { label: 'Import / Export Run Now' },
+    { key: 'templates', label: 'Templates' },
+    { key: 'integrations', label: 'Integrations' },
+    { key: 'runnow', label: 'Import / Export Run Now' },
   ];
 
   public state = {
-    tabIndex: this.tabs.indexOf(this.props.params.tab)
-  }
+    tabIndex: this.tabs.indexOf(this.props.params.tab);
+  };
 
   public componentDidMount()
   {
@@ -86,6 +86,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     return (
       <TerrainTabs
         tabs={this.tabs}
+        selectedTab={params.tab}
       >
         <TemplateList />
         <h2>Any content 2</h2>
