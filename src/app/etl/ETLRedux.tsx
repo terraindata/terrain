@@ -631,5 +631,6 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
 const ReduxInstance = new ETLRedux();
 export const ETLActions = ReduxInstance._actionsForExport();
 export const ETLReducers = ReduxInstance._reducersForExport(_ETLState);
+export const ETLActionTypes = ReduxInstance._actionTypesForExport();
 export declare type ETLActionType<K extends keyof ETLActionTypes> =
   GetType<K, ETLActionTypes>;
