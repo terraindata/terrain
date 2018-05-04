@@ -564,10 +564,13 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     this.beforeSaveOrCreate(name, directDispatch);
     const onLoad = (response) =>
     {
-      directDispatch({
-        actionType: 'getIntegration',
-        integrationId: response.id,
-      });
+      this.getIntegration(
+        {
+          actionType: 'getIntegration',
+          integrationId: response.id,
+        },
+        dispatch,
+      );
     };
     return ETLAjax.createIntegration(action.integration.toJS())
       .then(this.onLoadFactory([onLoad], directDispatch, name))
