@@ -277,7 +277,7 @@ export default class EngineUtil
         {
           fieldType = 'array';
         }
-        if (EngineUtil.isWildcardField(unhashedPath))
+        if (valueType === undefined && EngineUtil.isWildcardField(unhashedPath))
         {
           valueType = fieldType;
           fieldType = 'array';

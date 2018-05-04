@@ -169,6 +169,7 @@ class EndpointForm extends TerrainComponent<Props>
               integration={integrations.get(endpoint.integrationId)}
               onChange={this.handleIntegrationChange}
               hideType={true}
+              hideName={true}
             />
             :
             null

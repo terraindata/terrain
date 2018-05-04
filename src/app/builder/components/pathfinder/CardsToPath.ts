@@ -267,12 +267,14 @@ export class CardsToPath
         parser.createCardIfNotExist(hardBoolTemplate, body);
         hardBool = parser.searchCard(hardBoolTemplate, body);
         hardBool.card = hardBool.card.set('otherFilters', hardBool.card.otherFilters.concat(List(newHardFilters)));
+        parser.isMutated = true;
       }
       if (newSoftFilters.length > 0)
       {
         parser.createCardIfNotExist(softBoolTemplate, body);
         softBool = parser.searchCard(softBoolTemplate, body);
         softBool.card = softBool.card.set('otherFilters', softBool.card.otherFilters.concat(List(newSoftFilters)));
+        parser.isMutated = true;
       }
 
       // now let's check the nested query

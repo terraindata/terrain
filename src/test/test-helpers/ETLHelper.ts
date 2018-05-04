@@ -43,67 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:restrict-plus-operands strict-boolean-expressions
-
+// tslint:disable:max-classes-per-file
+import { _ETLState, ETLState } from 'app/etl/EtlTypes';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
+import { ItemType } from '../../items/types/Item';
 
-import Options from '../../../../shared/database/types/CardsToCodeOptions';
-import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
-import Query from '../../../items/types/Query';
-
-import { isInput, isRuntimeInput } from '../../../blocks/types/Input';
-import ESCardParser from './ESCardParser';
-import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
-
-class CardsToElastic
+export default class ETLHelper
 {
-  public static toElastic(query: Query, options: Options = {}): string
+  public static mockState()
   {
-    let body = {};
-    const rootCard = query.cards.get(0);
-    if (rootCard && rootCard.type === 'eqlbody')
-    {
-      const rootCardValue = CardsToElastic.blockToElastic(rootCard, options, query);
-      if (rootCardValue !== null)
-      {
-        body = rootCardValue;
-      }
-    }
-    const eql = ESQueryToCode(body as ESQueryObject, options, query.inputs);
-    return eql;
-  }
-
-  public static blockToElastic(
-    block: Block,
-    options: Options = {},
-    query: Query,
-  ): string | object | number | boolean
-  {
-    if (typeof block !== 'object')
-    {
-      return block;
-    }
-
-    if (block && block.static && block.static.tql)
-    {
-      const tql = block.static.tql as TQLRecursiveObjectFn;
-      let value = tql(
-        block,
-        (_block, _options) => CardsToElastic.blockToElastic(_block, _options, query),
-        options,
-      );
-
-      if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
-        && (isInput(block['value'], query.inputs) || isRuntimeInput(block['value'])))
-      {
-        value = block['value'];
-      }
-      return value;
-    }
-    return null;
+    return new ETLStateMock();
   }
 }
 
-export default CardsToElastic;
+class ETLStateMock
+{
+  public state;
+
+  public constructor()
+  {
+    this.state = _ETLState({});
+  }
+
+  public getState()
+  {
+    return this.state;
+  }
+
+  public loading(isLoading: boolean)
+  {
+    this.state = this.state.set('loading', isLoading);
+
+    return this;
+  }
+
+  public addIntegration(integration)
+  {
+    this.state = this.state.setIn(['integrations', integration.id], integration);
+
+    return this;
+  }
+}

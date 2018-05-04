@@ -5,7 +5,8 @@
   "main": "lib/analytics.ts",
   "private": true,
   "scripts": {
-    "build": "mkdir build ; webpack --config webpack.config.js --output-filename ./build/bundle.js",
+    "build": "mkdir -p build ; webpack --config webpack.config.js --output-filename ./build/bundle.js --mode development",
+    "build-prod": "mkdir -p build ; webpack --config webpack.config.js --output-filename ./build/bundle.js --mode production",
     "lint": "tslint -c tslint.json --fix --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;"
@@ -43,10 +44,10 @@
     "object-sizeof": "^1.2.0"
   },
   "devDependencies": {
-    "ts-loader": "^2.3.7",
-    "tslint": "^5.8.0",
-    "typescript": "^2.6.2",
-    "typescript-formatter": "^7.0.1",
-    "webpack": "^3.10.0"
+    "ts-loader": "^4.2.0",
+    "tslint": "^5.10.0",
+    "typescript": "^2.8.3",
+    "typescript-formatter": "^7.2.0",
+    "webpack": "^4.7.0"
   }
 }

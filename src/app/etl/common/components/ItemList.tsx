@@ -73,6 +73,8 @@ export interface Props<T>
   getRowStyle?: (index) => object[] | object;
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
   state?: any; // for specifying dependencies so ItemList knows when to rerender
+  hideHeaders?: boolean;
+  getActions?: (index: number, item: T) => El;
 }
 
 const memoize = _.memoize;
@@ -122,7 +124,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
   public renderRow(item: T, index: number)
   {
     const onClick = this.getRowClickedFn(index);
-    const style = this.getRowStyle(this.props.getRowStyle(index));
+    const style = this.getRowStyle(this.props.getRowStyle !== undefined ? this.props.getRowStyle(index) : undefined);
     return (
       <Quarantine key={index}>
         <div
@@ -152,6 +154,14 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
               </div>
               : undefined
           }
+          {
+            this.props.getActions !== undefined ?
+              <div className='row-info-actions'>
+                {this.props.getActions(index, item)}
+              </div>
+              :
+              null
+          }
         </div>
       </Quarantine>
     );
@@ -162,28 +172,32 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
     return (
       this.props.items.size > 0 ?
         <div className='item-list-table'>
-          <div
-            className={classNames({
-              'row-info-header': true,
-            })}
-            key='header'
-          >
-            {
-              this.props.columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
-              {
-                return (
-                  <div className='row-info-data' key={i}>
-                    {headerItem.name}
-                  </div>
-                );
-              })
-            }
-            {
-              this.props.getMenuOptions !== undefined ?
-                <div className='row-info-data' key='context-menu' />
-                : undefined
-            }
-          </div>
+          {
+            !this.props.hideHeaders ?
+              <div
+                className={classNames({
+                  'row-info-header': true,
+                })}
+                key='header'
+              >
+                {
+                  this.props.columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
+                  {
+                    return (
+                      <div className='row-info-data' key={i}>
+                        {headerItem.name}
+                      </div>
+                    );
+                  })
+                }
+                {
+                  this.props.getMenuOptions !== undefined ?
+                    <div className='row-info-data' key='context-menu' />
+                    : undefined
+                }
+              </div>
+              : null
+          }
           {
             this.props.items.map(this.renderRow).toList()
           }
