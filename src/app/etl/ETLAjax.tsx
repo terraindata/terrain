@@ -317,6 +317,56 @@ class ETLAjax
     });
   }
 
+  public createExecuteJob(
+    template: ETLTemplate,
+    files?: {
+      [id: string]: File,
+    },
+  ): Promise<number>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const config: ReqConfig = {
+        onError: reject,
+      };
+      const templateToRun = JSON.stringify(templateForBackend(template));
+      const payload = {
+        template: templateToRun,
+      };
+      if (files !== undefined)
+      {
+        _.extend(payload, files);
+      }
+      this.reqFormData(
+        'etl/create',
+        payload,
+        (resp) => resolve(resp),
+        config,
+      );
+    });
+  }
+
+  public runExecuteJob(
+    jobId: number,
+    downloadFilename?: string;,
+  ): Promise<any>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      Ajax.req(
+        'post',
+        `jobs/run/${jobId}?immediate=true`,
+        {},
+        (resp) => resolve(resp),
+        {
+          onError: reject,
+          download: downloadFilename !== undefined,
+          downloadFilename,
+        },
+      );
+    });
+  }
+
   public fetchPreview(
     source: SourceConfig,
     size: number,
