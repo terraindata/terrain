@@ -9,6 +9,11 @@
 	border-radius: 4px;
 	margin: 12px;
 	border: 1px solid;
+	.close {
+		position: absolute;
+    	left: -16px;
+    	top: 27px;
+	}
 	.integration-list-header {
 		height: 20px;
 	    overflow: hidden;
@@ -29,19 +34,25 @@
 			}
 		}
 	}
-	.integration-wrapper {
-		.integration-preview-wrapper {
-			display: flex;
-			border: 1px solid;
-			padding: 12px;
-			border-radius: 4px;
-			.integration-delete {
-				height: 12px;
-				flex-basis: 70px;
-				position: relative;
-				top: 17px;
-				left: 5px;
+}
+
+.integration-wrapper {
+	padding: 24px;
+	border-radius: 4px;
+	align-items: center;
+	.integration-editor-header {
+		font-size: @pretty-large-font-size;
+		padding-bottom: 6px;
+		text-align: center;
+	}
+	.integration-buttons {
+		float: right;
+		margin-top: 12px;
+		.button {
+			box-shadow: 0px 1px 6px -1px grey;
+			&:first-child {
+				margin-right: 12px;
 			}
 		}
-	}	
-}
+	}
+}	
