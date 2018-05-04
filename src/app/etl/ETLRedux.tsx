@@ -169,6 +169,7 @@ export interface ETLActionTypes
     actionType: 'createIntegration',
     integration: IntegrationConfig,
     onError?: ErrorHandler,
+    onLoad?: (result: IntegrationConfig) => void,
   };
   getIntegrationsSuccess: {
     actionType: 'getIntegrationsSuccess',
@@ -573,7 +574,7 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       );
     };
     return ETLAjax.createIntegration(action.integration.toJS())
-      .then(this.onLoadFactory([onLoad], directDispatch, name))
+      .then(this.onLoadFactory([onLoad, action.onLoad], directDispatch, name))
       .catch(this.onErrorFactory(action.onError, directDispatch, name));
   }
 
