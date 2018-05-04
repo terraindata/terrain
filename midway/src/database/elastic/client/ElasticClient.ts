@@ -302,7 +302,7 @@ class ElasticClient
         if (err !== null && err !== undefined)
         {
           this.controller.setStatus(DatabaseControllerStatus.CONN_TIMEOUT);
-          resolve(false);
+          return resolve(false);
         }
 
         this.controller.setStatus(DatabaseControllerStatus.CONNECTED);

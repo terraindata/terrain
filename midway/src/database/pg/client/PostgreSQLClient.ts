@@ -105,7 +105,7 @@ class PostgreSQLClient
           {
             this.controller.setStatus(DatabaseControllerStatus.DISCONNECTED);
           }
-          resolve(false);
+          return resolve(false);
         }
 
         this.controller.setStatus(DatabaseControllerStatus.CONNECTED);

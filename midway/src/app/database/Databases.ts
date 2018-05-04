@@ -147,6 +147,7 @@ export class Databases
     }
 
     const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.id, db.dsn, db.analyticsIndex, db.analyticsType);
+    controller.setConfig(db);
     const connected: boolean = await controller.getClient().isConnected();
     DatabaseRegistry.set(db.id, controller);
 

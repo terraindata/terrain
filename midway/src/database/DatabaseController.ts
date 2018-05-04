@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as winston from 'winston';
 
+import { DatabaseConfig } from '../app/database/DatabaseConfig';
 import QueryHandler from '../app/query/QueryHandler';
 import * as Tasty from '../tasty/Tasty';
 import DatabaseControllerStatus from './DatabaseControllerStatus';
@@ -61,6 +62,7 @@ abstract class DatabaseController
   private type: string;                     // connection type
   private name: string;                     // connection name
   private header: string;                   // log entry header
+  private config: DatabaseConfig;           // database configuration
   private status: DatabaseControllerStatus; // controller status
 
   constructor(type: string, id: number, name: string)
@@ -70,6 +72,7 @@ abstract class DatabaseController
     this.type = type;
     this.name = name;
     this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
+    this.config = null;
     this.status = DatabaseControllerStatus.UNKNOWN;
   }
 
@@ -105,6 +108,16 @@ abstract class DatabaseController
   public getStatus(): DatabaseControllerStatus
   {
     return this.status;
+  }
+
+  public getConfig(): DatabaseConfig
+  {
+    return this.config;
+  }
+
+  public setConfig(config: DatabaseConfig)
+  {
+    this.config = config;
   }
 
   public setStatus(status: DatabaseControllerStatus)
