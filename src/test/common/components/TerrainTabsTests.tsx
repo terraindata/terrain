@@ -42,12 +42,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-empty
 
 import TerrainTabs from 'common/components/TerrainTabs';
 import { shallow } from 'enzyme';
 import * as React from 'react';
+import * as router from 'react-router';
 
 describe('TerrainTabs', () =>
 {
@@ -113,8 +114,7 @@ describe('TerrainTabs', () =>
 
       expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(1);
     });
-  })
-
+  });
 
   describe('#getTabIndex', () =>
   {
@@ -122,6 +122,42 @@ describe('TerrainTabs', () =>
     {
       expect(tabsComponent.instance().getTabIndex('tab1')).toEqual(0);
       expect(tabsComponent.instance().getTabIndex('tab3')).toEqual(2);
+    });
+  });
+
+  describe('#handleSelect', () =>
+  {
+    describe('when there is no tabToRouteMap specified', () =>
+    {
+      it('should update the selected tab index', () =>
+      {
+        tabsComponent.instance().handleSelect(1);
+
+        expect(tabsComponent.state().tabIndex).toEqual(1);
+      });
+    });
+
+    describe('when tabToRouteMap is specified', () =>
+    {
+      it('should update the selected tab index and update the browser address bar', () =>
+      {
+        router.browserHistory.replace = jest.fn();
+        tabsComponent = shallow(
+          <TerrainTabs
+            tabs={tabs}
+            tabToRouteMap={{ 'tab1': '/path/to/tab1', 'tab2': '/path/to/tab2' }}
+          >
+            <div id="tab-content-1" />
+            <div id="tab-content-2" />
+            <div id="tab-content-3" />
+          </TerrainTabs>,
+        );
+
+        tabsComponent.instance().handleSelect(1);
+
+        expect(tabsComponent.state().tabIndex).toEqual(1);
+        expect(router.browserHistory.replace).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });

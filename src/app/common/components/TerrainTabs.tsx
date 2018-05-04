@@ -47,6 +47,7 @@ import * as React from 'react';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.less';
+import { browserHistory } from 'react-router';
 
 interface TabConfig
 {
@@ -59,6 +60,7 @@ interface TabsProps
   tabs: TabConfig[];
   children: any;
   selectedTab?: string;
+  tabToRouteMap?: { [tabKey: string]: string };
 }
 
 interface TabsState
@@ -85,7 +87,15 @@ class TerrainTabs extends TerrainComponent<TabsProps>
 
   public handleSelect(tabIndex: number)
   {
+    const { tabs, tabToRouteMap } = this.props;
+
     this.setState({ tabIndex });
+
+    if (tabToRouteMap !== undefined)
+    {
+      const tabKey = tabs[tabIndex].key;
+      browserHistory.replace(tabToRouteMap[tabKey]);
+    }
   }
 
   public getTabIndex(tabKey)

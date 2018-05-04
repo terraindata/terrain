@@ -67,8 +67,14 @@ class DataTabs extends TerrainComponent<DataTabsProps>
     { key: 'runnow', label: 'Import / Export Run Now' },
   ];
 
+  public tabToRouteMap = {
+    templates: '/data/templates',
+    integrations: '/data/integrations',
+    runnow: '/data/runnow',
+  };
+
   public state = {
-    tabIndex: this.tabs.indexOf(this.props.params.tab);
+    tabIndex: this.tabs.indexOf(this.props.params.tab),
   };
 
   public componentDidMount()
@@ -87,11 +93,12 @@ class DataTabs extends TerrainComponent<DataTabsProps>
       <TerrainTabs
         tabs={this.tabs}
         selectedTab={params.tab}
+        tabToRouteMap={this.tabToRouteMap}
       >
         <TemplateList />
         <h2>Any content 2</h2>
         <h2>Any content 3</h2>
-     </Tabs>
+     </TerrainTabs>
     );
   }
 }
