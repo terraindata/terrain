@@ -43,12 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as Immutable from 'immutable';
+import { ETLActionTypes, ETLReducers as reducer } from 'app/etl/ETLRedux';
 import { _ETLState, ETLState } from 'app/etl/EtlTypes';
-import { _IntegrationConfig, IntegrationConfig } from '../../../../shared/etl/immutable/IntegrationRecords';
+import * as Immutable from 'immutable';
 import ETLHelper from 'test-helpers/ETLHelper';
 import Util from 'util/Util';
-import { ETLActionTypes, ETLReducers as reducer } from 'app/etl/ETLRedux';
+import { _IntegrationConfig, IntegrationConfig } from '../../../../shared/etl/immutable/IntegrationRecords';
 
 describe('IntegrationReducers', () =>
 {
