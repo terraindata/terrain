@@ -49,10 +49,14 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as stream from 'stream';
 
-import { SinkConfig, SourceConfig } from '../../../../shared/etl/types/EndpointTypes';
+import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
+import { JobConfig } from 'shared/types/jobs/JobConfig';
+import { TaskEnum } from 'shared/types/jobs/TaskEnum';
+import * as App from '../App';
 import * as Util from '../AppUtil';
 import BufferTransform from '../io/streams/BufferTransform';
 import { Permissions } from '../permissions/Permissions';
+import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 import { getSourceStream } from './SourceSinkStream';
 import TemplateRouter, { templates } from './TemplateRouter';
@@ -76,6 +80,51 @@ Router.post('/execute', async (ctx, next) =>
   }
 
   ctx.body = await templates.executeETL(fields, files);
+});
+
+Router.post('/create', async (ctx, next) =>
+{
+  const { fields, files } = await asyncBusboy(ctx.req);
+
+  Util.verifyParameters(fields, ['id', 'accessToken']);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
+  {
+    ctx.body = 'Unauthorized';
+    ctx.status = 400;
+    return;
+  }
+
+  // verify if the user has permissions to create this job and run this ETL pipeline
+  await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
+  const job: JobConfig = {
+    meta: null,
+    pausedFilename: null,
+    running: false,
+    runNowPriority: null,
+    scheduleId: null,
+    status: null,
+    workerId: null,
+
+    createdAt: new Date(),
+    createdBy: ctx.state.user.id,
+    name: null,
+    priority: -1,
+    type: 'ETL',
+    tasks: JSON.stringify([
+      {
+        taskId: TaskEnum.taskETL,
+        params: {
+          overrideSinks: fields['overrideSinks'],
+          overrideSources: fields['overrideSources'],
+          template: fields['template'],
+          templateId: fields['templateId'],
+          inputStreams: files,
+        },
+      },
+    ]),
+  };
+  ctx.body = await App.JobQ.create(job, false, ctx.state.user.id);
 });
 
 interface ETLUIPreviewConfig

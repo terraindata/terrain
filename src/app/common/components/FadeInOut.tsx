@@ -61,23 +61,32 @@ class FadeInOut extends TerrainComponent<Props>
 {
   public renderChildren()
   {
-    if (this.props.dontUnmount)
+    const { children, open, dontUnmount } = this.props;
+
+    if (dontUnmount)
     {
       return (
         <div
-          style={!this.props.open ? { opacity: 0, zIndex: -10, height: 0 } : {}}
+          style={!open ? { opacity: 0, zIndex: -10, height: 0 } : {}}
         >
-          {this.props.children}
-        </div>;
-      )
+          {
+            children
+          }
+        </div>
+      );
     }
-    if (this.props.open)
+    if (open)
     {
-      if (Array.isArray(this.props.children))
-      {
-        return this.props.children.filter((child) => child !== null);
-      }
-      return this.props.children;
+      // need to wrap the contents in a div so that Velocity makes a single transition-in for
+      //  the combined height calculation of all children (in case of array)
+      // otherwise, if some children entries have negative margin, you can get strange jitters.
+      return (
+        <div>
+          {
+            children
+          }
+        </div>
+      );
     }
     return null;
   }

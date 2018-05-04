@@ -52,31 +52,31 @@ export default class ETLRouteUtil
 {
   public static gotoWalkthroughStep(step)
   {
-    browserHistory.push(`/etl/new/${step}`);
+    browserHistory.push(`/data/new/${step}`);
   }
 
   public static gotoNewTemplate()
   {
-    browserHistory.push(`/etl/edit/new`);
+    browserHistory.push(`/data/template/edit/new`);
   }
 
   public static gotoEditAlgorithm(algorithmId)
   {
-    browserHistory.push(`/etl/edit/algorithmId=${algorithmId}`);
+    browserHistory.push(`/data/template/edit/algorithmId=${algorithmId}`);
   }
 
   public static gotoEditTemplate(templateId)
   {
-    browserHistory.push(`/etl/edit/templateId=${templateId}`);
+    browserHistory.push(`/data/template/edit/templateId=${templateId}`);
   }
 
   public static isRouteNewTemplate(location)
   {
-    return location.pathname === '/etl/edit/new';
+    return location.pathname === '/data/template/edit/new';
   }
 
   public static gotoEditIntegration(integrationId)
   {
-    browserHistory.push(`/etl/edit/integrationId=${integrationId}`);
+    browserHistory.push(`/data/integrations/edit/integrationId=${integrationId}`);
   }
 }

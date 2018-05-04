@@ -43,44 +43,84 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-empty
 
-import * as stream from 'stream';
-import * as winston from 'winston';
+import SimpleTable from 'app/common/components/SimpleTable';
+import { mount, shallow } from 'enzyme';
+import * as Immutable from 'immutable';
+import { List, Map, Record } from 'immutable';
+import * as React from 'react';
+import { _SchedulerConfig } from 'scheduler/SchedulerTypes';
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { Task } from '../Task';
+describe('SimpleTable', () =>
+{
+  let tableComponent = null;
 
-const taskOutputConfig: TaskOutputConfig =
-  {
-    exit: true,
-    options:
-      {
-        logStream: null,
-        inputStreams: null,
-      },
-    status: false,
+  const columns = [
+    {
+      columnKey: 'id',
+      columnLabel: 'Id',
+    },
+    {
+      columnKey: 'name',
+      columnLabel: 'Name',
+    },
+    {
+      columnKey: 'status',
+      columnLabel: 'Status',
+    },
+  ];
+
+  let tableData = Immutable.Map<ID, any>({});
+  const TableItem = Record({ id: 0, name: '', status: '' });
+  tableData = tableData.set(1, new TableItem({
+    id: 1,
+    name: 'item 1',
+    status: 'success',
+  }));
+  tableData = tableData.set(2, new TableItem({
+    id: 2,
+    name: 'item 2',
+    status: 'failure',
+  }));
+
+  const tableState = {
+    header: columns,
+    data: tableData,
   };
 
-export class TaskDefaultFailure extends Task
-{
-  constructor(taskConfig: TaskConfig)
+  beforeEach(() =>
   {
-    super(taskConfig);
-  }
+    tableComponent = shallow(
+      <SimpleTable
+        {...tableState}
+      />,
+    );
+  });
 
-  public async run(): Promise<TaskOutputConfig>
+  describe('#render', () =>
   {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
+    it('should have a header and a body', () =>
     {
-      // TODO: call other functions (needs to wrap in Promise for later)
-      resolve(taskOutputConfig);
-    });
-  }
+      expect(tableComponent.find('.simple-table')).toHaveLength(1);
+      expect(tableComponent.find('.simple-table-header')).toHaveLength(1);
+      expect(tableComponent.find('.simple-table-body')).toHaveLength(1);
 
-  public async printNode(): Promise<TaskOutputConfig>
-  {
-    winston.info('Printing Default Failure, params: ' + JSON.stringify(taskOutputConfig as object));
-    return Promise.resolve(taskOutputConfig);
-  }
-}
+      expect(tableComponent.find('.simple-table-header .simple-table-cell'))
+        .toHaveLength(columns.length);
+
+      expect(tableComponent.find('.simple-table-body .simple-table-row'))
+        .toHaveLength(2);
+
+      expect(tableComponent.find('.simple-table-body .simple-table-cell'))
+        .toHaveLength(2 * columns.length);
+
+      expect(tableComponent.find('.simple-table-body .simple-table-cell').at(0).text())
+        .toEqual('1');
+      expect(tableComponent.find('.simple-table-body .simple-table-cell').at(1).text())
+        .toEqual('item 1');
+      expect(tableComponent.find('.simple-table-body .simple-table-cell').at(2).text())
+        .toEqual('success');
+    });
+  });
+});

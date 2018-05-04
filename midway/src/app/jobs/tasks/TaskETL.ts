@@ -69,17 +69,12 @@ export class TaskETL extends Task
       const taskOutputConfig: TaskOutputConfig =
         {
           exit: false,
-          options:
-            {
-              logStream: null,
-              stream: new stream.PassThrough(),
-            },
           status: true,
         };
 
       templates.executeETL(this.taskConfig.params as object).then((result) =>
       {
-        taskOutputConfig.options.stream = result;
+        taskOutputConfig.outputStream = result;
         resolve(taskOutputConfig);
       }).catch((err) =>
       {
@@ -103,11 +98,6 @@ export class TaskETL extends Task
     return Promise.resolve(
       {
         exit: false,
-        options:
-          {
-            logStream: null,
-            stream: new stream.PassThrough(),
-          },
         status: true,
       } as TaskOutputConfig);
   }
