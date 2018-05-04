@@ -59,6 +59,7 @@ export enum FileTypes
 {
   Json = 'json',
   Csv = 'csv',
+  Xml = 'xml',
 }
 
 export interface TemplateBase

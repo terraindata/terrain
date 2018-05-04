@@ -138,6 +138,10 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
         case 'csv':
           importStream = sourceStream.pipe(CSVTransform.createImportStream());
           break;
+        case 'xml':
+          // TODO:
+          importStream = sourceStream.pipe(new stream.PassThrough());
+          break;
         default:
           throw new Error('Download file type must be either CSV or JSON.');
       }
@@ -177,6 +181,10 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
             break;
           case 'csv':
             transformStream = CSVTransform.createExportStream();
+            break;
+          case 'xml':
+            // TODO:
+            transformStream = new stream.PassThrough();
             break;
           default:
             throw new Error('Export file type must be either CSV or JSON.');
