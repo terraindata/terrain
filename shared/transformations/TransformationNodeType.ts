@@ -137,8 +137,9 @@ interface TransformationOptionTypes
     newValue: any;
   };
   FindReplaceNode: {
-    find: string; // can be a plain string or a regex
+    find: string;
     replace: string;
+    regex: boolean;
   };
 }
 

@@ -779,6 +779,7 @@ test('test find replace transformation', () =>
     {
       find: '\\d',
       replace: 'N',
+      regex: true,
     },
   );
 

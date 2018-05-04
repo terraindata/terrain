@@ -908,7 +908,14 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
             kpi = kpi.push(i.toString());
           }
 
-          yadeep.set(doc, kpi, yadeep.get(doc, kpi).replace(new RegExp(opts.find, 'g'), opts.replace));
+          if (opts.regex)
+          {
+            yadeep.set(doc, kpi, yadeep.get(doc, kpi).replace(new RegExp(opts.find, 'g'), opts.replace));
+          }
+          else
+          {
+            yadeep.set(doc, kpi, yadeep.get(doc, kpi).split(opts.find).join(opts.replace));
+          }
         }
       }
       else if (typeof el !== 'string')
@@ -923,7 +930,14 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
       }
       else
       {
-        yadeep.set(doc, field, el.replace(new RegExp(opts.find, 'g'), opts.replace));
+        if (opts.regex)
+        {
+          yadeep.set(doc, field, el.replace(new RegExp(opts.find, 'g'), opts.replace));
+        }
+        else
+        {
+          yadeep.set(doc, field, el.split(opts.find).join(opts.replace));
+        }
       }
     });
 
