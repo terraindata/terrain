@@ -105,7 +105,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
 
 export default Util.createContainer(
   DataTabs,
-  ['etl'],
+  [],
   { etlActions: ETLActions },
 );
 
