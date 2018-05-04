@@ -81,7 +81,7 @@ function getIntegrationId(params): number
   return Number.isNaN(asNumber) ? -1 : asNumber;
 }
 
-class IntegrationEditor extends TerrainComponent<Props>
+class IntegrationEditorPage extends TerrainComponent<Props>
 {
   public state = {
     integration: null,
@@ -169,7 +169,7 @@ class IntegrationEditor extends TerrainComponent<Props>
 }
 
 export default Util.createContainer(
-  IntegrationEditor,
+  IntegrationEditorPage,
   [
     ['etl', 'integrations'],
   ],

@@ -74,7 +74,7 @@ import Settings from './users/components/Settings';
 import Team from './users/components/Team';
 import X from './x/components/X';
 
-import IntegrationEditor from './etl/integrations/components/IntegrationEditor';
+import IntegrationEditorPage from './etl/integrations/components/IntegrationEditorPage';
 import IntegrationList from './etl/integrations/components/IntegrationList';
 
 class AppRouter extends TerrainComponent<{}> {
@@ -153,7 +153,7 @@ class AppRouter extends TerrainComponent<{}> {
             <Route path='template/edit/algorithmId=:algorithmId' component={ETLEditorPage} />
             <Route path='template/edit/templateId=:templateId' component={ETLEditorPage} />
             <Route path='integrations' component={IntegrationList} />
-            <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditor} />
+            <Route path='integrations/edit/integrationId=:integrationId' component={IntegrationEditorPage} />
           </Route>
 
           <Route path='/analytics'>
