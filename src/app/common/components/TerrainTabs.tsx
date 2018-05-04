@@ -76,12 +76,21 @@ class TerrainTabs extends TerrainComponent<TabsProps>
 
   public componentWillMount()
   {
-    const { selectedTab } = this.props;
+    const { tabs, tabToRouteMap, selectedTab } = this.props;
     if (selectedTab !== undefined)
     {
       const tabIndex = this.getTabIndex(selectedTab);
 
       this.setState({ tabIndex });
+    }
+    else
+    {
+      if (tabToRouteMap !== undefined)
+      {
+        const { tabIndex } = this.state;
+        const tabKey = tabs[tabIndex].key;
+        browserHistory.replace(tabToRouteMap[tabKey]);
+      }
     }
   }
 

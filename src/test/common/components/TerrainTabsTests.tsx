@@ -68,6 +68,8 @@ describe('TerrainTabs', () =>
     },
   ];
 
+  router.browserHistory.replace = jest.fn();
+
   beforeEach(() =>
   {
     tabsComponent = shallow(
@@ -77,6 +79,8 @@ describe('TerrainTabs', () =>
         <div id="tab-content-3" />
       </TerrainTabs>,
     );
+
+    router.browserHistory.replace.mockClear();
   });
 
   it('should display the tabbed layout', () =>
@@ -97,7 +101,19 @@ describe('TerrainTabs', () =>
   describe('when there is no specified selectedTab', () =>
   {
     it('should activate the tab matching the browser route by default', () => {
+      tabsComponent = shallow(
+        <TerrainTabs
+          tabs={tabs}
+          tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
+        >
+          <div id="tab-content-1" />
+          <div id="tab-content-2" />
+          <div id="tab-content-3" />
+        </TerrainTabs>,
+      );
+
       expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(0);
+      expect(router.browserHistory.replace).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -141,11 +157,10 @@ describe('TerrainTabs', () =>
     {
       it('should update the selected tab index and update the browser address bar', () =>
       {
-        router.browserHistory.replace = jest.fn();
         tabsComponent = shallow(
           <TerrainTabs
             tabs={tabs}
-            tabToRouteMap={{ 'tab1': '/path/to/tab1', 'tab2': '/path/to/tab2' }}
+            tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
           >
             <div id="tab-content-1" />
             <div id="tab-content-2" />
@@ -156,7 +171,7 @@ describe('TerrainTabs', () =>
         tabsComponent.instance().handleSelect(1);
 
         expect(tabsComponent.state().tabIndex).toEqual(1);
-        expect(router.browserHistory.replace).toHaveBeenCalledTimes(1);
+        expect(router.browserHistory.replace).toHaveBeenCalledTimes(2);
       });
     });
   });
