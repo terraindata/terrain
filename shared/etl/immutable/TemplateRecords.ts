@@ -53,6 +53,8 @@ import { instanceFnDecorator, makeConstructor, makeExtendedConstructor, recordFo
 
 import { _SinkConfig, _SourceConfig, ItemWithName, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLProcess, ETLEdge, ETLNode, ETLProcess } from 'shared/etl/immutable/ETLProcessRecords';
+import { _TemplateSettings, TemplateSettings } from 'shared/etl/immutable/TemplateSettingsRecords';
+import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { SchedulableSinks, SchedulableSources, SinkOptionsType, Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { Languages, NodeTypes, TemplateBase, TemplateObject } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -77,6 +79,9 @@ class ETLTemplateC implements ETLTemplateI
   public process = _ETLProcess();
   public sources = Map<string, SourceConfig>();
   public sinks = Map<string, SinkConfig>();
+  public settings = _TemplateSettings();
+  public meta = {};
+  public uiData = {};
 
   // Returns true if and only if there is 1 sink and it is a database
   public isImport(): boolean
@@ -98,17 +103,7 @@ class ETLTemplateC implements ETLTemplateI
   ): boolean
   {
     const template = this.applyOverrides(overrideSources, overrideSinks);
-    const invalidSources = template.getSources().find((v) => SchedulableSources.indexOf(v.type) === -1);
-    if (invalidSources)
-    {
-      return false;
-    }
-    const invalidSinks = template.getSinks().find((v) => SchedulableSinks.indexOf(v.type) === -1);
-    if (invalidSinks)
-    {
-      return false;
-    }
-    return true;
+    return TemplateUtil.canSchedule(template);
   }
 
   public getDescription(algorithms?: Map<ID, ItemWithName>): string
@@ -318,6 +313,7 @@ export const _ETLTemplate = makeExtendedConstructor(ETLTemplateC, true, {
   {
     return typeof date === 'string' ? new Date(date) : date;
   },
+  settings: _TemplateSettings,
 });
 
 // todo, please do this more efficiently
@@ -371,6 +367,7 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
 
   obj.sources = recordForSave(obj.sources);
   obj.sinks = recordForSave(obj.sinks);
+  obj.settings = recordForSave(obj.settings);
 
   obj.process = obj.process.update('edges', (edges) => edges.map((edge, key) =>
   {
@@ -379,6 +376,7 @@ export function templateForBackend(template: ETLTemplate): TemplateBase
 
   obj.process = recordForSave(obj.process);
 
+  // strip file from upload sources
   _.forOwn(obj.sources, (source, key) =>
   {
     if (source.type === Sources.Upload)

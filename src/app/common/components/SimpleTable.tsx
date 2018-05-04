@@ -44,43 +44,70 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as stream from 'stream';
-import * as winston from 'winston';
+// tslint:disable:no-var-requires strict-boolean-expressions
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { Task } from '../Task';
+import { List } from 'immutable';
+import * as Immutable from 'immutable';
+import * as React from 'react';
 
-const taskOutputConfig: TaskOutputConfig =
-  {
-    exit: true,
-    options:
-      {
-        logStream: null,
-        inputStreams: null,
-      },
-    status: false,
-  };
+import './SimpleTable.less';
 
-export class TaskDefaultFailure extends Task
+import TerrainComponent from './TerrainComponent';
+
+export interface SimpleTableColumn
 {
-  constructor(taskConfig: TaskConfig)
-  {
-    super(taskConfig);
-  }
+  columnKey: string;
+  columnLabel: string;
+}
 
-  public async run(): Promise<TaskOutputConfig>
-  {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
-    {
-      // TODO: call other functions (needs to wrap in Promise for later)
-      resolve(taskOutputConfig);
-    });
-  }
+export interface Props
+{
+  header: SimpleTableColumn[];
+  data: Immutable.Map<ID, any>;
+}
 
-  public async printNode(): Promise<TaskOutputConfig>
+export class SimpleTable extends TerrainComponent<Props>
+{
+  public state: {};
+
+  public render()
   {
-    winston.info('Printing Default Failure, params: ' + JSON.stringify(taskOutputConfig as object));
-    return Promise.resolve(taskOutputConfig);
+    const { header, data } = this.props;
+
+    const columnKeys = header.reduce((keys, column) => keys.concat(column.columnKey), []);
+
+    return (
+      <table className='simple-table'>
+        <thead className='simple-table-header'>
+          <tr className='simple-table-row'>
+            {
+              header.map((column, index) =>
+              {
+                return <th key={column.columnKey} className='simple-table-cell'>{column.columnLabel}</th>;
+              })
+            }
+          </tr>
+        </thead>
+        <tbody className='simple-table-body'>
+          {
+            data.valueSeq().map((entry) =>
+            {
+              return (
+                <tr key={entry.id} className='simple-table-row'>
+                  {
+                    columnKeys.map((key, index) =>
+                    {
+                      return <td key={key} className='simple-table-cell'>{entry[key]}</td>;
+                    })
+                  }
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    );
   }
 }
+
+export default SimpleTable;
