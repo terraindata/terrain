@@ -42,45 +42,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
+import { createSelector } from 'reselect';
 
-import * as stream from 'stream';
-import * as winston from 'winston';
+const getJobs = (state) => state.get('jobs').jobs;
 
-import { TaskConfig } from 'shared/types/jobs/TaskConfig';
-import { TaskOutputConfig } from 'shared/types/jobs/TaskOutputConfig';
-import { Task } from '../Task';
+export const getSuccessfulJobs = createSelector(
+  getJobs,
+  (jobs) => jobs.filter((j) => j.status === 'SUCCESS'),
+);
 
-const taskOutputConfig: TaskOutputConfig =
-  {
-    exit: true,
-    options:
-      {
-        logStream: null,
-        inputStreams: null,
-      },
-    status: false,
-  };
-
-export class TaskDefaultFailure extends Task
-{
-  constructor(taskConfig: TaskConfig)
-  {
-    super(taskConfig);
-  }
-
-  public async run(): Promise<TaskOutputConfig>
-  {
-    return new Promise<TaskOutputConfig>(async (resolve, reject) =>
-    {
-      // TODO: call other functions (needs to wrap in Promise for later)
-      resolve(taskOutputConfig);
-    });
-  }
-
-  public async printNode(): Promise<TaskOutputConfig>
-  {
-    winston.info('Printing Default Failure, params: ' + JSON.stringify(taskOutputConfig as object));
-    return Promise.resolve(taskOutputConfig);
-  }
-}
+export const getFailedJobs = createSelector(
+  getJobs,
+  (jobs) => jobs.filter((j) => j.status === 'FAILURE'),
+);

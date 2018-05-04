@@ -556,9 +556,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
             )
           }
           {
-            !this.state.addingFilterLine && canEdit &&
+            canEdit &&
             <PathfinderCreateLine
-              canEdit={pathfinderContext.canEdit}
+              canEdit={pathfinderContext.canEdit && !this.state.addingFilterLine}
               text={isSoftFilter ? PathfinderText.softFilterAdd : PathfinderText.hardFilterAdd}
               onCreate={this.handleAddFilter}
             />

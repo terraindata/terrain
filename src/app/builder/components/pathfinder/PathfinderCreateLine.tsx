@@ -69,10 +69,6 @@ class PathfinderCreateLine extends TerrainComponent<Props>
   {
     const { onCreate, canEdit, text, style } = this.props;
 
-    if (!canEdit)
-    {
-      return null;
-    }
     return (
       <div>
         <div
@@ -81,8 +77,9 @@ class PathfinderCreateLine extends TerrainComponent<Props>
             fontColor(Colors().active),
             getStyle('fill', Colors().active),
             backgroundColor(Colors().fontWhite),
+            canEdit ? {} : fontColor(Colors().text3),
           )}
-          onClick={onCreate}
+          onClick={this.handleCreate}
         >
           <div className='pf-create-icon'>
             <div className='pf-create-fill' />
@@ -97,6 +94,14 @@ class PathfinderCreateLine extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  private handleCreate()
+  {
+    if (this.props.canEdit)
+    {
+      this.props.onCreate();
+    }
   }
 }
 
