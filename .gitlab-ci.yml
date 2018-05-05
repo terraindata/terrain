@@ -4,7 +4,6 @@ variables:
   GIT_SUBMODULE_STRATEGY: "recursive"
   GET_SOURCES_ATTEMPTS: "3"
   CI_SERVER_URL: https://git.terrain.int
-  CI_DEBUG_TRACE: "true"
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -74,9 +73,9 @@ build-frontend:
 
 build-analytics-js:
   before_script:
-   - .monorepo.gitlab/build_if_changed.sh analytics.js bash -c "( cd analytics.js && yarn )"
+   - .monorepo.gitlab/build_if_changed.sh analytics.js "bash -c \"( cd analytics.js && yarn )\""
   script:
-   - .monorepo.gitlab/build_if_changed.sh analytics.js bash -c "( cd analytics.js && yarn build )"
+   - .monorepo.gitlab/build_if_changed.sh analytics.js "bash -c \"( cd analytics.js && yarn build )\""
   stage: style-and-compilation
 
 fullstack-meta:
