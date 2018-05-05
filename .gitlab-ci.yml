@@ -21,55 +21,55 @@ stages:
   - fullstack-tests
   - deploy
 
-#lint:
-#  script:
-#   - yarn lint-parallel
-#  stage: style-and-compilation
-#
-#diff-style:
-#  script:
-#   - yarn diff-style
-#  stage: style-and-compilation
-#  except:
-#   - master
-#
-#style:
-#  script:
-#   - yarn style
-#  stage: style-and-compilation
-#  only:
-#   - master
-#
-#test-frontend:
-#  script:
-#   - yarn test-front
-#  stage: standard-tests
-#  when: always
-#
-#test-backend:
-#  script:
-#   - timeout 240 yarn test-back-setup
-#   - yarn test-back
-#  after_script:
-#   - timeout 240 yarn test-back-teardown
-#  stage: standard-tests
-#  artifacts:
-#    paths:
-#      - coverage
-#
-#test-sigint:
-#  before_script:
-#    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
-#  script:
-#    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
-#  after_script:
-#    - .monorepo.gitlab/build_if_changed.sh sigint "timeout 240 yarn test-sigint-teardown"
-#  stage: standard-tests
-#
-#build-frontend:
-#  script:
-#   - yarn build
-#  stage: style-and-compilation
+lint:
+  script:
+   - yarn lint-parallel
+  stage: style-and-compilation
+
+diff-style:
+  script:
+   - yarn diff-style
+  stage: style-and-compilation
+  except:
+   - master
+
+style:
+  script:
+   - yarn style
+  stage: style-and-compilation
+  only:
+   - master
+
+test-frontend:
+  script:
+   - yarn test-front
+  stage: standard-tests
+  when: always
+
+test-backend:
+  script:
+   - timeout 240 yarn test-back-setup
+   - yarn test-back
+  after_script:
+   - timeout 240 yarn test-back-teardown
+  stage: standard-tests
+  artifacts:
+    paths:
+      - coverage
+
+test-sigint:
+  before_script:
+    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
+  script:
+    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
+  after_script:
+    - .monorepo.gitlab/build_if_changed.sh sigint "timeout 240 yarn test-sigint-teardown"
+  stage: standard-tests
+
+build-frontend:
+  script:
+   - yarn build
+  stage: style-and-compilation
 
 build-analytics-js:
   before_script:
@@ -78,63 +78,63 @@ build-analytics-js:
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn build )"
   stage: style-and-compilation
 
-#fullstack-meta:
-#  script:
-#    - pkill node || true;
-#    - timeout 240 yarn test-fullstack-setup
-#    - yarn clean
-#    - MIDWAY_HOST=`hostname`:3000 yarn build
-#    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-#    - sleep 10
-#    - yarn test-fullstack-import
-#    - yarn test-fullstack-component
-#  stage: fullstack-tests
-#  after_script:
-#    - tail -n20 ./midwayConsole.log || true
-#    - timeout 240 yarn test-fullstack-teardown
-#    - pkill node || true;
-#
-#fullstack-screenshot:
-#  script:
-#    - pkill node || true;
-#    - timeout 240 yarn test-fullstack-setup
-#    - yarn clean
-#    - MIDWAY_HOST=`hostname`:3000 yarn build
-#    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
-#    - sleep 10
-#    - yarn test-fullstack-login
-#    - yarn test-rr-pathfinder
-#    - yarn test-rr-builder
-#  stage: fullstack-tests
-#  allow_failure: true
-#  artifacts:
-#    when: on_failure
-#    expire_in: 1 week
-#    paths:
-#    - rr/test/pathfinder/__image_snapshots__/__diff_output__
-#    - rr/test/builder/__image_snapshots__/__diff_output__
-#    - rr/test/login/__image_snapshots__/__diff_output__
-#  after_script:
-#    - tail -n20 ./midwayConsole.log || true
-#    - timeout 240 yarn test-fullstack-teardown
-#    - pkill node || true;
-#
-#deploy:
-#  script:
-#   - MIDWAY_HOST=pa-terraformer01.terrain.int:33000 yarn build-prod
-#   - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
-#   - fuser -k -n tcp 33000 || true
-#   - cd /opt/Search && NODE_ENV=production yarn start -- --port 33000 &
-#  only:
-#   - master
-#  stage: deploy
-#  tags:
-#    - shell
-#    - deploy
-#  when: manual
-#  environment:
-#    name: production
-#    url: http://pa-terraformer01.terrain.int:3000
+fullstack-meta:
+  script:
+    - pkill node || true;
+    - timeout 240 yarn test-fullstack-setup
+    - yarn clean
+    - MIDWAY_HOST=`hostname`:3000 yarn build
+    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 10
+    - yarn test-fullstack-import
+    - yarn test-fullstack-component
+  stage: fullstack-tests
+  after_script:
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
+
+fullstack-screenshot:
+  script:
+    - pkill node || true;
+    - timeout 240 yarn test-fullstack-setup
+    - yarn clean
+    - MIDWAY_HOST=`hostname`:3000 yarn build
+    - NODE_ENV=production nohup yarn start-midway > ./midwayConsole.log < /dev/null 2>&1&
+    - sleep 10
+    - yarn test-fullstack-login
+    - yarn test-rr-pathfinder
+    - yarn test-rr-builder
+  stage: fullstack-tests
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths:
+    - rr/test/pathfinder/__image_snapshots__/__diff_output__
+    - rr/test/builder/__image_snapshots__/__diff_output__
+    - rr/test/login/__image_snapshots__/__diff_output__
+  after_script:
+    - tail -n20 ./midwayConsole.log || true
+    - timeout 240 yarn test-fullstack-teardown
+    - pkill node || true;
+
+deploy:
+  script:
+   - MIDWAY_HOST=pa-terraformer01.terrain.int:33000 yarn build-prod
+   - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
+   - fuser -k -n tcp 33000 || true
+   - cd /opt/Search && NODE_ENV=production yarn start -- --port 33000 &
+  only:
+   - master
+  stage: deploy
+  tags:
+    - shell
+    - deploy
+  when: manual
+  environment:
+    name: production
+    url: http://pa-terraformer01.terrain.int:3000
 
 #build-frontend-prod:
 #  script:
