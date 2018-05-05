@@ -49,7 +49,7 @@
   ],
   "pre-commit": [
     "lint",
-    "style"
+    "diff-style"
   ],
   "jest": {
     "transform": {

@@ -25,10 +25,19 @@ lint:
    - yarn lint-parallel
   stage: style-and-compilation
 
+diff-style:
+  script:
+   - yarn diff-style
+  stage: style-and-compilation
+  except:
+   - master
+
 style:
   script:
    - yarn style
   stage: style-and-compilation
+  only:
+   - master
 
 test-frontend:
   script:
