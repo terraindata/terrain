@@ -60,9 +60,9 @@ test-backend:
 
 test-sigint:
   before_script:
-    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
+    - .monorepo.gitlab/build_if_changed.sh sigint bash -c "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
   script:
-    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
+    - .monorepo.gitlab/build_if_changed.sh sigint bash -c "( cd sigint && yarn test )"
   after_script:
     - .monorepo.gitlab/build_if_changed.sh sigint timeout 240 yarn test-sigint-teardown
   stage: standard-tests
@@ -74,9 +74,9 @@ build-frontend:
 
 build-analytics-js:
   before_script:
-   - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn )"
+   - .monorepo.gitlab/build_if_changed.sh analytics.js bash -c "( cd analytics.js && yarn )"
   script:
-   - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn build )"
+   - .monorepo.gitlab/build_if_changed.sh analytics.js bash -c "( cd analytics.js && yarn build )"
   stage: style-and-compilation
 
 fullstack-meta:
