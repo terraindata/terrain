@@ -15,30 +15,25 @@ before_script:
   - ( cd analytics.js && yarn )
 
 stages:
-  - lint
-  - style
-  - test-front
-  - test-back
-  - test-sigint
-  - build
+  - style-and-compilation
+  - standard-tests
+  - fullstack-tests
   - deploy
-  - fullstack-meta
-  - fullstack-screenshot
 
 lint:
   script:
    - yarn lint-parallel
-  stage: lint
+  stage: style-and-compilation
 
 style:
   script:
    - yarn style
-  stage: style
+  stage: style-and-compilation
 
 test-frontend:
   script:
    - yarn test-front
-  stage: test-front
+  stage: standard-tests
   when: always
 
 test-backend:
@@ -47,7 +42,7 @@ test-backend:
    - yarn test-back
   after_script:
    - timeout 240 yarn test-back-teardown
-  stage: test-back
+  stage: standard-tests
   artifacts:
     paths:
       - coverage
@@ -58,17 +53,17 @@ test-sigint:
     - ( cd sigint && yarn test )
   after_script:
     - timeout 240 yarn test-sigint-teardown
-  stage: test-sigint
+  stage: standard-tests
 
 build-frontend:
   script:
    - yarn build
-  stage: build
+  stage: style-and-compilation
 
 build-analytics-js:
   script:
    - ( cd analytics.js && yarn build )
-  stage: build
+  stage: style-and-compilation
 
 fullstack-meta:
   script:
@@ -80,7 +75,7 @@ fullstack-meta:
     - sleep 10
     - yarn test-fullstack-import
     - yarn test-fullstack-component
-  stage: fullstack-meta
+  stage: fullstack-tests
   after_script:
     - tail -n20 ./midwayConsole.log || true
     - timeout 240 yarn test-fullstack-teardown
@@ -97,7 +92,7 @@ fullstack-screenshot:
     - yarn test-fullstack-login
     - yarn test-rr-pathfinder
     - yarn test-rr-builder
-  stage: fullstack-screenshot
+  stage: fullstack-tests
   allow_failure: true
   artifacts:
     when: on_failure
