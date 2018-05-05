@@ -17,9 +17,9 @@ before_script:
 
 stages:
   - style-and-compilation
-  - standard-tests
-  - fullstack-tests
-  - deploy
+  #- standard-tests
+  #- fullstack-tests
+  #- deploy
 
 lint:
   script:
