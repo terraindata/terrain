@@ -1,7 +1,9 @@
 variables:
   GIT_SSL_NO_VERIFY: "true"
-  GIT_STRATEGY: "clone"
+  GIT_STRATEGY: "recursive"
   GET_SOURCES_ATTEMPTS: "3"
+  CI_SERVER_URL: https://git.terrain.int
+
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -10,9 +12,8 @@ cache:
   - node_modules
 
 before_script:
+  - .monorepo.gitlab/last_green_commit.sh
   - yarn
-  - ( cd sigint && yarn )
-  - ( cd analytics.js && yarn )
 
 stages:
   - style-and-compilation
@@ -57,11 +58,12 @@ test-backend:
       - coverage
 
 test-sigint:
+  before_script:
+    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
   script:
-    - timeout 240 yarn test-sigint-setup
-    - ( cd sigint && yarn test )
+    - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
   after_script:
-    - timeout 240 yarn test-sigint-teardown
+    - .monorepo.gitlab/build_if_changed.sh sigint timeout 240 yarn test-sigint-teardown
   stage: standard-tests
 
 build-frontend:
@@ -70,8 +72,10 @@ build-frontend:
   stage: style-and-compilation
 
 build-analytics-js:
+  before_script:
+   - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn )"
   script:
-   - ( cd analytics.js && yarn build )
+   - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn build )"
   stage: style-and-compilation
 
 fullstack-meta:
