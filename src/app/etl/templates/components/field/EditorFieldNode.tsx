@@ -91,6 +91,7 @@ class EditorFieldNodeC extends TemplateEditorField<Props>
   {
     const { canEdit, preview, displayKeyPath } = this.props;
     const field = this._field();
+
     const childFieldIds = field.childrenIds;
     return childFieldIds.map((childId, index) =>
     {

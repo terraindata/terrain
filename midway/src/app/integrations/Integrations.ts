@@ -77,6 +77,7 @@ export class Integrations
         'name',
         'readPermission',
         'type',
+        'lastModified',
         'writePermission',
       ],
     );

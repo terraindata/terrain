@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
+import Options from '../../../../shared/database/types/CardsToCodeOptions';
 import { Query } from '../../../items/types/Query';
-import Options from '../../types/CardsToCodeOptions';
 
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import ESParameterFiller from '../../../../shared/database/elastic/parser/EQLParameterFiller';
