@@ -12,8 +12,7 @@ cache:
   - node_modules
 
 before_script:
-  - export
-  - .monorepo.gitlab/last_green_commit.sh
+  - . .monorepo.gitlab/last_green_commit.sh
   - yarn
 
 stages:
