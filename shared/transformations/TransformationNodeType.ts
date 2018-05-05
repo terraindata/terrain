@@ -64,6 +64,7 @@ enum TransformationNodeType
   MultiplyNode = 'MultiplyNode',
   DivideNode = 'DivideNode',
   SetIfNode = 'SetIfNode',
+  FindReplaceNode = 'FindReplaceNode',
 }
 
 // if this has errors, double check TransformationNodeType's keys are equal to its values
@@ -134,6 +135,10 @@ interface TransformationOptionTypes
     filterUndefined: boolean;
     filterValue: any | undefined;
     newValue: any;
+  };
+  FindReplaceNode: {
+    find: string; // can be a plain string or a regex
+    replace: string;
   };
 }
 

@@ -47,6 +47,7 @@ THE SOFTWARE.
 import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
 import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
+import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
@@ -137,6 +138,11 @@ export default abstract class TransformationNodeVisitor
   }
 
   public visitSetIfNode(node: SetIfTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    return this.visitDefault(node, doc, options);
+  }
+
+  public visitFindReplaceNode(node: FindReplaceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
   {
     return this.visitDefault(node, doc, options);
   }
