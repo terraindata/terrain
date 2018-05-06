@@ -89,6 +89,8 @@ build-analytics-js:
 # Dummy task that will push new cache while all other jobs have `policy: pull` set
 update-cache:
   stage: style-and-compilation
+  script:
+      - echo "The cache should be updated at the end of this job..."
   cache:
     key: search-node-modules
     paths:
