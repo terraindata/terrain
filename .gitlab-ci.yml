@@ -8,8 +8,13 @@ variables:
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
+  key: search-node-modules
   paths:
-  - node_modules
+   - node_modules
+  policy: pull
+#cache:
+#  paths:
+#  - node_modules
 
 before_script:
   - . .monorepo.gitlab/last_green_commit.sh
@@ -75,7 +80,21 @@ build-analytics-js:
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn )"
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn build )"
   stage: style-and-compilation
-#
+#  cache:
+#    key: search-node-modules
+#    paths:
+#     - node_modules
+#    policy: pull
+
+# Dummy task that will push new cache while all other jobs have `policy: pull` set
+update-cache:
+  stage: style-and-compilation
+  cache:
+    key: search-node-modules
+    paths:
+     - node_modules
+    policy: pull-push
+
 #fullstack-meta:
 #  script:
 #    - pkill node || true;
