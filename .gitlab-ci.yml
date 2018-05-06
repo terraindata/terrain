@@ -28,11 +28,15 @@ stages:
   - deploy
 
 lint:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
   script:
    - yarn lint-parallel
   stage: style-and-compilation
 
 diff-style:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
   script:
    - yarn diff-style
   stage: style-and-compilation
@@ -40,6 +44,8 @@ diff-style:
    - master
 
 style:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
   script:
    - yarn style
   stage: style-and-compilation
@@ -64,6 +70,8 @@ test-backend:
       - coverage
 
 test-sigint:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
   script:
     - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn ) && timeout 240 yarn test-sigint-setup"
     - .monorepo.gitlab/build_if_changed.sh sigint "( cd sigint && yarn test )"
@@ -77,6 +85,8 @@ build-frontend:
   stage: style-and-compilation
 
 build-analytics-js:
+  before_script:
+    - . .monorepo.gitlab/last_green_commit.sh
   script:
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn )"
    - .monorepo.gitlab/build_if_changed.sh analytics.js "( cd analytics.js && yarn build )"
