@@ -17,6 +17,10 @@ before_script:
   - . .monorepo.gitlab/last_green_commit.sh
   - yarn
 
+# Stages defined which groups of jobs run in parallel,
+# and they are executed in order.  Things more likely
+# to fail should come sooner, and as many jobs as
+# possible should be run in parallel.
 stages:
   - style-and-compilation
   - standard-tests
