@@ -44,68 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-export const TestDocs = {
-  doc1: {
-    name: 'Bob',
-    age: 17,
-    meta: {
-      school: 'Stanford',
-    },
-  },
+import { List } from 'immutable';
 
-  doc2: {
-    name: 'Bob',
-    age: 17,
-    meta: {
-      school: 'Stanford',
-      sport: 'bobsled',
-    },
-  },
+import { KeyPath } from '../../util/KeyPath';
+import TransformationNodeType from '../TransformationNodeType';
+import TransformationNode from './TransformationNode';
 
-  doc3: {
-    name: 'Bob',
-    arr: ['sled', [{ a: 'dog' }, { a: 'fren', b: 'doggo' }]],
-    // arr2: [{foo: {bar: {cat: 'a'}}}],
-    // arr2: [[{foo: 'a', bar: 'b'}], [{foo: 'c'}]],
-    hardarr: [['a'], ['b', ['c']]],
-  },
-
-  doc4: {
-    arr: ['a', 'b'],
-  },
-
-  doc5: {
-    arr: ['a', 'b', 'c', 'd'],
-  },
-
-  doc6: {
-    value: null,
-  },
-
-  doc7: {
-    deepArray:
-      [
-        [
-          5,
-        ],
-        [
-          6,
-        ],
-      ],
-  },
-
-  doc8: {
-    t: '1',
-    f: '',
-    tb: true,
-    fb: false,
-  },
-
-  doc9: {
-    name: 'Bob',
-    age: '17 years',
-    meta: {
-      school: 'Stanford',
-    },
-  },
-};
+export default class FindReplaceTransformationNode extends TransformationNode
+{
+  public constructor(id: number,
+    fields: List<KeyPath>,
+    options: object = {},
+    typeCode: TransformationNodeType = TransformationNodeType.FindReplaceNode)
+  {
+    super(id, fields, options, typeCode);
+  }
+}
