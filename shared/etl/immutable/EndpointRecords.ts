@@ -178,8 +178,8 @@ export function getEndpointDescription(
     case Sinks.Http:
     case Sources.Http: {
       const options = endpoint.options as SourceOptionsType<Sources.Http>;
-      const text = String(options.url);
-      return `URL '${text}'`;
+      const text = String(options.method);
+      return `'${text}' Integration ${endpoint.integrationId}`;
     }
     case Sinks.Sftp:
     case Sources.Sftp: {

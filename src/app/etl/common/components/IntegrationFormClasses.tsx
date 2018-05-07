@@ -186,30 +186,30 @@ class HttpForm extends IntegrationFormBase<HttpAuthT, HttpConnectionT>
 
 type FsAuthT = AuthConfigType<Integrations.Fs>;
 type FsConnectionT = ConnectionConfigType<Integrations.Fs>;
-class FsForm extends IntegrationFormBase<HttpAuthT, FsConnectionT>
+class FsForm extends IntegrationFormBase<FsAuthT, FsConnectionT>
 {
-  public authMap: InputDeclarationMap<HttpAuthT> = {
+  public authMap: InputDeclarationMap<FsAuthT> = {
     user: {
       type: DisplayType.TextBox,
       displayName: 'User',
     },
   };
 
-  public connectionMap: InputDeclarationMap<HttpConnectionT> = {};
+  public connectionMap: InputDeclarationMap<FsConnectionT> = {};
 }
 
 type MysqlAuthT = AuthConfigType<Integrations.Mysql>;
 type MysqlConnectionT = ConnectionConfigType<Integrations.Mysql>;
-class MysqlForm extends IntegrationFormBase<HttpAuthT, MysqlConnectionT>
+class MysqlForm extends IntegrationFormBase<MysqlAuthT, MysqlConnectionT>
 {
-  public authMap: InputDeclarationMap<HttpAuthT> = {
+  public authMap: InputDeclarationMap<MysqlAuthT> = {
     password: {
       type: DisplayType.TextBox,
       displayName: 'Password',
     },
   };
 
-  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+  public connectionMap: InputDeclarationMap<MysqlConnectionT> = {
     user: {
       type: DisplayType.TextBox,
       displayName: 'User',
@@ -237,14 +237,14 @@ type PostgresqlAuthT = AuthConfigType<Integrations.Postgresql>;
 type PostgresqlConnectionT = ConnectionConfigType<Integrations.Postgresql>;
 class PostgresqlForm extends IntegrationFormBase<PostgresqlAuthT, PostgresqlConnectionT>
 {
-  public authMap: InputDeclarationMap<HttpAuthT> = {
+  public authMap: InputDeclarationMap<PostgresqlAuthT> = {
     password: {
       type: DisplayType.TextBox,
       displayName: 'Password',
     },
   };
 
-  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+  public connectionMap: InputDeclarationMap<PostgresqlConnectionT> = {
     user: {
       type: DisplayType.TextBox,
       displayName: 'User',
@@ -272,14 +272,14 @@ type MagentoAuthT = AuthConfigType<Integrations.Magento>;
 type MagentoConnectionT = ConnectionConfigType<Integrations.Magento>;
 class MagentoForm extends IntegrationFormBase<MagentoAuthT, MagentoConnectionT>
 {
-  public authMap: InputDeclarationMap<HttpAuthT> = {
+  public authMap: InputDeclarationMap<MagentoAuthT> = {
     apiKey: {
       type: DisplayType.TextBox,
       displayName: 'API Key',
     },
   };
 
-  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+  public connectionMap: InputDeclarationMap<MagentoConnectionT> = {
     apiUser: {
       type: DisplayType.TextBox,
       displayName: 'API User',
@@ -291,14 +291,14 @@ type GoogleAPIAuthT = AuthConfigType<Integrations.GoogleAPI>;
 type GoogleAPIConnectionT = ConnectionConfigType<Integrations.GoogleAPI>;
 class GoogleAPIForm extends IntegrationFormBase<GoogleAPIAuthT, GoogleAPIConnectionT>
 {
-  public authMap: InputDeclarationMap<HttpAuthT> = {
+  public authMap: InputDeclarationMap<GoogleAPIAuthT> = {
     privateKey: {
       type: DisplayType.TextBox,
       displayName: 'Private Key',
     },
   };
 
-  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+  public connectionMap: InputDeclarationMap<GoogleAPIConnectionT> = {
     email: {
       type: DisplayType.TextBox,
       displayName: 'Email',
@@ -310,14 +310,14 @@ type MailchimpAuthT = AuthConfigType<Integrations.Mailchimp>;
 type MailchimpConnectionT = ConnectionConfigType<Integrations.Mailchimp>;
 class MailchimpForm extends IntegrationFormBase<MailchimpAuthT, MailchimpConnectionT>
 {
-  public authMap: InputDeclarationMap<HttpAuthT> = {
+  public authMap: InputDeclarationMap<MailchimpAuthT> = {
     apiKey: {
       type: DisplayType.TextBox,
       displayName: 'API Key',
     },
   };
 
-  public connectionMap: InputDeclarationMap<HttpConnectionT> = {
+  public connectionMap: InputDeclarationMap<MailchimpConnectionT> = {
     host: {
       type: DisplayType.TextBox,
       displayName: 'Host',
