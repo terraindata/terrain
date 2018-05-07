@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
-import { _ETLState, ETLState } from 'app/etl/EtlTypes';
+import { _ETLState, ETLState } from 'app/etl/ETLTypes';
 import * as Immutable from 'immutable';
 import { ItemType } from '../../items/types/Item';
 
