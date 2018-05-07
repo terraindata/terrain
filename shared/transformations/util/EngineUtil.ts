@@ -141,6 +141,7 @@ export default class EngineUtil
     return errors;
   }
 
+  // check to make sure the field's types exist and if its an array that it has a valid valueType
   public static fieldHasValidType(engine: TransformationEngine, id: number)
   {
     const fieldType = engine.getFieldType(id) as FieldTypes;

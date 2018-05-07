@@ -61,6 +61,7 @@ import { DynamicForm } from 'common/components/DynamicForm';
 import { DisplayState, DisplayType, InputDeclarationMap } from 'common/components/DynamicFormTypes';
 
 import { availableTransformations, getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { InfoType, TransformationInfo } from 'shared/transformations/TransformationInfo';
@@ -75,10 +76,10 @@ interface FormState
 
 export interface Props
 {
-  onTransformationCreated: (structuralChanges: boolean) => void;
   onClose: () => void;
   engine: TransformationEngine;
   fieldID: number;
+  tryMutateEngine: (tryFn: (proxy: EngineProxy) => void) => void;
 }
 
 @Radium
@@ -129,8 +130,8 @@ export class TransformationCreator extends TerrainComponent<Props>
           isCreate={true}
           engine={this.props.engine}
           fieldId={this.props.fieldID}
-          onEditOrCreate={this.props.onTransformationCreated}
           onClose={this.props.onClose}
+          tryMutateEngine={this.props.tryMutateEngine}
         />
       );
     }
