@@ -47,6 +47,7 @@ THE SOFTWARE.
 import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
 import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
+import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
@@ -366,6 +367,24 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitSetIfNode(transformationNode, docCopy, options),
+      },
+    [TransformationNodeType.FindReplaceNode]:
+      {
+        humanName: 'Find/Replace',
+        editable: true,
+        creatable: true,
+        description: 'Finds and replaces certain patterns of characters in a string',
+        isAvailable: (engine, fieldId) =>
+        {
+          const type = EngineUtil.getRepresentedType(fieldId, engine);
+          return type === 'string';
+        },
+        type: FindReplaceTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitFindReplaceNode(transformationNode, docCopy, options),
       },
   };
 
