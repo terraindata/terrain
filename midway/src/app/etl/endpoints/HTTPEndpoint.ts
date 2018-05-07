@@ -96,7 +96,7 @@ export default class HTTPEndpoint extends AEndpointStream
         {
           if (err !== null && err !== undefined)
           {
-            const e = Error(`Error reading from HTTP endpoint ${err.toString()}`);
+            const e = Error(`Error reading from HTTP endpoint ${httpConfig.url} ${err.toString()}`);
             return reject(e);
           }
         })
