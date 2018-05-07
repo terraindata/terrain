@@ -47,6 +47,7 @@ import * as React from 'react';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.less';
+import 'common/components/TerrainTabs.less';
 import { browserHistory } from 'react-router';
 
 interface TabConfig

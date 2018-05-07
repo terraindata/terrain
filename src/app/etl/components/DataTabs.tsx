@@ -47,6 +47,7 @@ import * as React from 'react';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import TemplateList from 'etl/templates/components/TemplateList';
+import IntegrationList from 'etl/integrations/components/IntegrationList';
 import { ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import Util from 'util/Util';
 import { ETLActions } from 'etl/ETLRedux';
@@ -96,7 +97,7 @@ class DataTabs extends TerrainComponent<DataTabsProps>
         tabToRouteMap={this.tabToRouteMap}
       >
         <TemplateList />
-        <h2>Any content 2</h2>
+        <IntegrationList />
         <h2>Any content 3</h2>
      </TerrainTabs>
     );
