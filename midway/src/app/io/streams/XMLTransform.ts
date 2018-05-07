@@ -44,34 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
+import * as expatStream from 'expat-stream';
 import { Transform } from 'stream';
 
+import XMLExportTransform from './XMLExportTransform';
+
 /**
- * Import/Export from a CSV format. *
+ * Import/Export from a XML format
  * Additional configuration options are possible.
  */
-export default class CSVTransform
+export default class XMLTransform
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
+  public static createImportStream(filter?: object): Transform
   {
-    return csv({
-      headers,
-      delimiter,
-    });
+    return expatStream.XmlStream(filter);
   }
 
-  public static createExportStream(
-    headers: boolean = true,
-    rowDelimiter: string = '\r\n',
-  ): Transform
+  public static createExportStream(): Transform
   {
-    return csv.createWriteStream({
-      headers,
-      rowDelimiter,
-    });
+    return new XMLExportTransform();
   }
 }

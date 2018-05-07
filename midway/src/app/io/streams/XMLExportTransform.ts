@@ -42,36 +42,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2018 Terrain Data, Inc.
+// Copyright 2017 Terrain Data, Inc.
 
-import * as csv from 'fast-csv';
-import { Transform } from 'stream';
+import * as js2xmlparser from 'js2xmlparser';
+import AExportTransform from './AExportTransform';
 
 /**
- * Import/Export from a CSV format. *
- * Additional configuration options are possible.
+ * Converts result stream to XML text stream
  */
-export default class CSVTransform
+export default class XMLExportTransform extends AExportTransform
 {
-  public static createImportStream(
-    headers: boolean = true,
-    delimiter: string = ',',
-  ): Transform
+  private root: string;
+
+  constructor(root: string = 'item')
   {
-    return csv({
-      headers,
-      delimiter,
-    });
+    super();
+    this.root = root;
   }
 
-  public static createExportStream(
-    headers: boolean = true,
-    rowDelimiter: string = '\r\n',
-  ): Transform
+  protected preamble(): string
   {
-    return csv.createWriteStream({
-      headers,
-      rowDelimiter,
-    });
+    return '\n';
+  }
+
+  protected transform(input: object, chunkNumber: number): string
+  {
+    return js2xmlparser.parse(this.root, input);
+  }
+
+  protected delimiter(): string
+  {
+    return '\n';
+  }
+
+  protected conclusion(chunkNumber: number): string
+  {
+    return '\n';
   }
 }
