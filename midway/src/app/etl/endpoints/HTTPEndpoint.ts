@@ -49,9 +49,9 @@ import { PassThrough, Readable, Writable } from 'stream';
 
 import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
-import AEndpointStream from './AEndpointStream';
 import IntegrationConfig from '../../integrations/IntegrationConfig';
 import { integrations } from '../../integrations/IntegrationRouter';
+import AEndpointStream from './AEndpointStream';
 
 export default class HTTPEndpoint extends AEndpointStream
 {
@@ -70,7 +70,7 @@ export default class HTTPEndpoint extends AEndpointStream
     return this.getRequestStreamByIntegrationId(sink.integrationId) as Promise<Writable>;
   }
 
-  private async getRequestStreamByIntegrationId(integrationId: number): Promise<Readable | Writable >
+  private async getRequestStreamByIntegrationId(integrationId: number): Promise<Readable | Writable>
   {
     const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
     if (integration.length === 0)
