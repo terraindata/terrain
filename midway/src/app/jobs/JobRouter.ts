@@ -96,10 +96,20 @@ Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx,
   ctx.body = await App.JobQ.run(ctx.params.id);
 });
 
-Router.post('/runnow/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/runnow/:id', async (ctx, next) =>
 {
+  const { fields, files } = await asyncBusboy(ctx.req);
+
+  Util.verifyParameters(fields, ['id', 'accessToken']);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
+  {
+    ctx.body = 'Unauthorized';
+    ctx.status = 400;
+    return;
+  }
   await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
-  ctx.body = await App.JobQ.runNow(ctx.params.id);
+  ctx.body = await App.JobQ.runNow(ctx.params.id, fields, files);
 });
 
 // unpause paused job by id
