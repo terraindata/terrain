@@ -49,6 +49,7 @@ import CRONEditor from 'app/common/components/CRONEditor';
 import FloatingInput from 'app/common/components/FloatingInput';
 import RouteSelector from 'app/common/components/RouteSelector';
 import EndpointForm from 'app/etl/common/components/EndpointForm';
+import ETLRouteutil from 'app/etl/ETLRouteUtil';
 import { _SchedulerConfig, _TaskConfig, SchedulerConfig, SchedulerState, TaskConfig } from 'app/scheduler/SchedulerTypes';
 import TerrainTools from 'app/util/TerrainTools';
 import Util from 'app/util/Util';
@@ -59,7 +60,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
-import ETLRouteutil from 'app/etl/ETLRouteUtil';
 
 export interface Props
 {
@@ -221,11 +221,11 @@ class Schedule extends TerrainComponent<Props>
     // Template Option Set
     console.log('Templates are ', this.props.templates);
     const templateOptions = this.props.templates.filter((t) =>
-      {
-        console.log(t.toJS());
-        console.log(t.canSchedule());
-        return t.canSchedule()
-      },
+    {
+      console.log(t.toJS());
+      console.log(t.canSchedule());
+      return t.canSchedule();
+    },
     ).map((t) =>
     {
       return {
@@ -240,11 +240,11 @@ class Schedule extends TerrainComponent<Props>
         <div>
           There are no schedulable templates. Create one in the
             <span
-              className='schedule-link'
-              onClick={ETLRouteutil.gotoNewTemplate}
-              style={fontColor(Colors().active)}
-            >
-              Template Editor
+            className='schedule-link'
+            onClick={ETLRouteutil.gotoNewTemplate}
+            style={fontColor(Colors().active)}
+          >
+            Template Editor
             </span>
         </div>;
     }
