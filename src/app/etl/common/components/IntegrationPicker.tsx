@@ -66,6 +66,7 @@ export interface Props
   integrations: IMMap<ID, IntegrationConfig>;
   selectedIntegration: ID;
   onChange: (id: ID) => void;
+  createIntegration: () => void;
 }
 
 export default class IntegrationPicker extends TerrainComponent<Props>
@@ -86,6 +87,7 @@ export default class IntegrationPicker extends TerrainComponent<Props>
         pickOptions: (s) => this.state.integrationIds,
         indexResolver: (value) => this.state.integrationIds.indexOf(value),
         displayNames: (s) => this.state.filteredIntegrations.map((i) => i.name),
+        textColor: (index) => this.state.integrationIds.get(index) === 'custom' ? Colors().active : '',
       },
     },
   };
@@ -116,25 +118,23 @@ export default class IntegrationPicker extends TerrainComponent<Props>
       filtered = integrations.filter((integration) => integration.type === type);
     }
     const integrationIds = filtered.toList().map((i) => i.id).sort().toList();
+    filtered = filtered.set('custom', { name: '+ New Integration' });
     this.setState({
       filteredIntegrations: filtered,
-      integrationIds,
+      integrationIds: integrationIds.push('custom'),
     });
   }
 
-  public getIntegrationMapOptions()
+  public handleIntegrationChange(newState: { id: ID })
   {
-    const { filteredIntegrations, integrationIds } = this.state;
-    return {
-      pickOptions: (s) => integrationIds,
-      indexResolver: (value) => integrationIds.indexOf(value),
-      displayNames: (s) => filteredIntegrations.map((i) => i.name),
-    };
-  }
-
-  public handleIntegrationChange(newState)
-  {
-    this.props.onChange(newState.id);
+    if (newState.id === 'custom')
+    {
+      this.props.createIntegration();
+    }
+    else
+    {
+      this.props.onChange(newState.id);
+    }
   }
 
   public render()

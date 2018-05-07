@@ -70,7 +70,7 @@ class FadeInOut extends TerrainComponent<Props>
           style={!open ? { opacity: 0, zIndex: -10, height: 0 } : {}}
         >
           {
-            children
+            children !== undefined ? children : null
           }
         </div>
       );
