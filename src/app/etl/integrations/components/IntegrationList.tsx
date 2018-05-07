@@ -73,7 +73,7 @@ export interface Props
   users?: Immutable.Map<ID, User>;
 }
 
-class IntegrationList extends TerrainComponent<Props>
+export class IntegrationListTest extends TerrainComponent<Props>
 {
   public state: {
     confirmModalOpen: boolean,
@@ -254,8 +254,8 @@ const rowStyle = [
   backgroundColor(Colors().fontWhite, Color(Colors().activeHover).fade(0.9)),
 ];
 
-export default Util.createContainer(
-  IntegrationList,
+const IntegrationList = Util.createContainer(
+  IntegrationListTest,
   [
     ['etl', 'integrations'],
     ['users', 'users'],
@@ -264,3 +264,5 @@ export default Util.createContainer(
     etlActions: ETLActions,
   },
 );
+
+export default IntegrationList;
