@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 // tslint:disable:no-console strict-boolean-expressions
-import Colors from 'app/colors/Colors';
+import Colors, { fontColor } from 'app/colors/Colors';
 import CRONEditor from 'app/common/components/CRONEditor';
 import FloatingInput from 'app/common/components/FloatingInput';
 import RouteSelector from 'app/common/components/RouteSelector';
@@ -59,6 +59,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { _SinkConfig, _SourceConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
+import ETLRouteutil from 'app/etl/ETLRouteUtil';
 
 export interface Props
 {
@@ -218,8 +219,13 @@ class Schedule extends TerrainComponent<Props>
     const { schedule } = this.props;
     const task = this.getTask();
     // Template Option Set
+    console.log('Templates are ', this.props.templates);
     const templateOptions = this.props.templates.filter((t) =>
-      t.canSchedule(),
+      {
+        console.log(t.toJS());
+        console.log(t.canSchedule());
+        return t.canSchedule()
+      },
     ).map((t) =>
     {
       return {
@@ -227,12 +233,27 @@ class Schedule extends TerrainComponent<Props>
         displayName: t.templateName,
       };
     }).toList();
+    let templateHeaderText: string | El = 'Template';
+    if (templateOptions.size === 0)
+    {
+      templateHeaderText =
+        <div>
+          There are no schedulable templates. Create one in the
+            <span
+              className='schedule-link'
+              onClick={ETLRouteutil.gotoNewTemplate}
+              style={fontColor(Colors().active)}
+            >
+              Template Editor
+            </span>
+        </div>;
+    }
 
     const templateOptionSet = {
       key: 'template',
       options: templateOptions,
       shortNameText: 'Schedule',
-      headerText: 'Template',
+      headerText: templateHeaderText,
       column: true,
       forceFloat: true,
       getCustomDisplayName: this._fn(this.getScheduleName, '--'),
