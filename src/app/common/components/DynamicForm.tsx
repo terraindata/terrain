@@ -220,6 +220,7 @@ export class DynamicForm<S> extends TerrainComponent<Props<S>>
             options={pickOptions}
             canEdit={!disabled}
             optionsDisplayName={displayNames}
+            textColor={options.textColor}
           />
         </span>
       </div>

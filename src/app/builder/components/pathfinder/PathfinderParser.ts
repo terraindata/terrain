@@ -313,7 +313,7 @@ function groupNestedFilters(filterGroup: FilterGroup): FilterGroup
   const nestedLines = filterGroup.lines.filter((line) =>
   {
     return ((line.field && line.field.indexOf('.') !== -1) || line.fieldType === FieldType.Nested)
-      && line.comparison !== 'notexists';
+      && line.comparison !== 'notexists' && !line.filterGroup;
   }).toList();
   let nestedPathMap: Map<string, List<FilterLine>> = Map({});
   nestedLines.forEach((line) =>
@@ -345,7 +345,7 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   // If the line is not a filterGroup
   // Parse the line and add it to must, mustNot or filter
   // If the line is a filterGroup
-  // must.push ({bool: {should: parseFilters(filterGroup.lines)}, minimum_should_match: minMatches})
+  // must.push ( parseFilters(filterGroup.lines)}, minimum_should_match: minMatches)
   // If the minMatches is not all
   // add all the filter conditions to should, set minimum_should_match on the outside of that bool
   // By adding all the filter conditions to should, do same process as above
@@ -372,8 +372,20 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
   }
   filterGroup.lines.forEach((line) =>
   {
+    if (line.filterGroup)
+    {
+      const nestedFilter = parseFilters(line.filterGroup, inputs, inMatchQualityContext);
+      if (useShould)
+      {
+        should = should.push(nestedFilter);
+      }
+      else
+      {
+        must = must.push(nestedFilter);
+      }
+    }
     // Special case for a nested filter that is do not exist
-    if (((line.field && line.field.indexOf('.') !== -1) ||
+    else if (((line.field && line.field.indexOf('.') !== -1) ||
       line.fieldType === FieldType.Nested)
       && line.comparison === 'notexists'
     )
@@ -404,11 +416,6 @@ function parseFilters(filterGroup: FilterGroup, inputs, inMatchQualityContext = 
       {
         must = must.push(lineInfo);
       }
-    }
-    else if (line.filterGroup)
-    {
-      const nestedFilter = parseFilters(line.filterGroup, inputs, inMatchQualityContext);
-      must = must.push(nestedFilter);
     }
   });
   if (useShould)

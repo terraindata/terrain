@@ -50,10 +50,10 @@ THE SOFTWARE.
 
 import { Path } from 'app/builder/components/pathfinder/PathfinderTypes';
 import * as Immutable from 'immutable';
+import CardsToCodeOptions from '../../../shared/database/types/CardsToCodeOptions';
 import { BlockConfig } from '../../blocks/types/Block';
 import { Card } from '../../blocks/types/Card';
 import Query from '../../items/types/Query';
-import CardsToCodeOptions from './CardsToCodeOptions';
 
 export interface Backend
 {

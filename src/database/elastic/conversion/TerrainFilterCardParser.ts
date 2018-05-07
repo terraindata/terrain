@@ -380,17 +380,22 @@ export class TerrainFilterCardParser
     // we have to put the queryCard in a bool query  bool : { must_not : queryCard}
     if (block.boolQuery === 'filter_not' || block.boolQuery === 'should_not')
     {
+      const queryTemplate = {
+        'bool:bool_query': { 'boost:boost': 1 },
+      };
+      if (block['boost'] !== '')
+      {
+        queryTemplate['bool:bool_query']['boost:boost'] = block['boost'];
+      }
       let boolCard = BlockUtils.make(ElasticBlocks, 'eqlquery',
         {
-          template: {
-            'bool:bool_query': {},
-          },
+          template: queryTemplate,
           key: 'bool',
           doNotCustom: true,
         });
       queryCard = queryCard.set('key', 'must_not');
-      const mustNotCard = boolCard.cards.get(0);
-      boolCard = boolCard.setIn(['cards', 0, 'cards'], List([queryCard]));
+      const currentCards = boolCard.cards.get(0).cards;
+      boolCard = boolCard.setIn(['cards', 0, 'cards'], currentCards.push(queryCard));
       return boolCard;
     }
     return queryCard;

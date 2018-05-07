@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as request from 'request';
 
+import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { ItemConfig } from '../app/items/ItemConfig';
 import { items } from '../app/items/ItemRouter';
 
@@ -109,7 +110,23 @@ export async function getQueryFromAlgorithm(algorithmId: number): Promise<string
     {
       if (algorithms[0].meta !== undefined)
       {
-        return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
+        const query = JSON.parse(algorithms[0].meta as string)['query'];
+        const inputMap = ESInterpreter.toInputMap(query.inputs);
+        const queryTree = new ESInterpreter(query.tql, inputMap);
+        if (queryTree.hasError())
+        {
+          return reject('Errors when interpreting the query:' + JSON.stringify(queryTree.getErrors()));
+        }
+
+        try
+        {
+          const queryString = queryTree.toCode({ replaceInputs: true });
+          return resolve(queryString);
+        }
+        catch (e)
+        {
+          return reject('Error when the interpreter generates the code:' + JSON.stringify(e));
+        }
       }
     }
     catch (e)

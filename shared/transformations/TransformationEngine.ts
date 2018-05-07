@@ -246,8 +246,21 @@ export class TransformationEngine
       {
         for (let i: number = 0; i < options['newFieldKeyPaths'].size; i++)
         {
-          // TODO infer types of new fields
-          this.addField(options['newFieldKeyPaths'].get(i), 'string');
+          let inferredTypeNameOfNewFields: string;
+          if (TransformationInfo.getNewFieldType(nodeType) === 'same' && fieldNames.size > 0)
+          {
+            inferredTypeNameOfNewFields = this.getFieldType(this.getInputFieldID(fieldNames.get(0)));
+          }
+          else if (TransformationInfo.getNewFieldType(nodeType))
+          {
+            inferredTypeNameOfNewFields = TransformationInfo.getNewFieldType(nodeType);
+          }
+          else
+          {
+            // TODO add warning here
+            inferredTypeNameOfNewFields = 'string'; // for lack of a better guess...
+          }
+          this.addField(options['newFieldKeyPaths'].get(i), inferredTypeNameOfNewFields);
         }
       }
       if (options['preserveOldFields'] === false)
@@ -851,7 +864,9 @@ export class TransformationEngine
     // representation, convert it back to an array
     this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
     {
-      if (yadeep.get(output, value) !== undefined && this.fieldEnabled.get(key) === true)
+      // Need to do this regardless of whether the field is enabled, e.g. in case we're
+      // duplicating a disabled array
+      if (yadeep.get(output, value) !== undefined)
       {
         if (this.fieldTypes.get(key) === 'array' && !value.includes('*'))
         {

@@ -100,4 +100,12 @@ export const TestDocs = {
     tb: true,
     fb: false,
   },
+
+  doc9: {
+    name: 'Bob',
+    age: '17 years',
+    meta: {
+      school: 'Stanford',
+    },
+  },
 };

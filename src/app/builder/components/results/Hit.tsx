@@ -883,7 +883,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig, nested: string[
     // If there is a path
     const server: string = builderState.db.name;
     let serverIndex = server + '/' + getIndex('', builder);
-    if (builderState.query.path !== undefined &&
+    if (builderState && builderState.query && builderState.query.path !== undefined &&
       builderState.query.path.source !== undefined &&
       builderState.query.path.source.dataSource !== undefined)
     {
