@@ -144,15 +144,15 @@ class EndpointForm extends TerrainComponent<Props>
 
   public createIntegration()
   {
+    this.setState({
+      usingCustomIntegration: true,
+    });
     this.props.etlActions({
       actionType: 'createIntegration',
       integration: _IntegrationConfig({ id: undefined, type: this.props.endpoint.type }),
       onLoad: (integration) =>
       {
         this.handleEndpointChange(this.props.endpoint.set('integrationId', integration.id));
-        this.setState({
-          usingCustomIntegration: true,
-        });
       },
     });
   }
