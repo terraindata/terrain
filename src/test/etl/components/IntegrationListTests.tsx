@@ -45,14 +45,14 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-empty
 
-import {IntegrationListTest as IntegrationList} from 'app/etl/integrations/components/IntegrationList';
 import { ItemList } from 'app/etl/common/components/ItemList';
+import { IntegrationListTest as IntegrationList } from 'app/etl/integrations/components/IntegrationList';
+import Util from 'app/util/Util';
 import { mount, shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 import { _IntegrationConfig } from '../../../../shared/etl/immutable/IntegrationRecords';
-import Util from 'app/util/Util';
 
 const integrations = Map({
   1: _IntegrationConfig({
@@ -86,9 +86,9 @@ describe('IntegrationList', () =>
   let listComponent = null;
   const listState = {
     integrations: Map({}),
-    etlActions: (options: {actionType: string}) => {},
+    etlActions: (options: { actionType: string }) => { },
     users: Map({
-      1: {name: 'User 1'} as any,
+      1: { name: 'User 1' } as any,
     }),
   };
 
@@ -108,22 +108,24 @@ describe('IntegrationList', () =>
     expect(listComponent.find(ItemList).render().text()).toEqual(' List Has No Items ');
   });
 
-  describe('#render', () => {
+  describe('#render', () =>
+  {
     it('should render an item list with integrations as rows', () =>
     {
-      listComponent.setProps({integrations});
-       expect(listComponent.find(ItemList)).toHaveLength(1);
-       expect(listComponent.find(ItemList).render().find('.row-info')).toHaveLength(2);
-       expect(listComponent.find(ItemList).render().find('.row-info-data')).toHaveLength(10);
+      listComponent.setProps({ integrations });
+      expect(listComponent.find(ItemList)).toHaveLength(1);
+      expect(listComponent.find(ItemList).render().find('.row-info')).toHaveLength(2);
+      expect(listComponent.find(ItemList).render().find('.row-info-data')).toHaveLength(10);
     });
   });
 
-  describe('#formatValue', () => {
+  describe('#formatValue', () =>
+  {
     it('should format created by and last modified values', () =>
     {
-      expect(listComponent.instance().formatValue('createdBy', '1')).toEqual({label: 'Created By', value: 'User 1'});
+      expect(listComponent.instance().formatValue('createdBy', '1')).toEqual({ label: 'Created By', value: 'User 1' });
       expect(listComponent.instance().formatValue('lastModified', '2018-05-03 22:21:42.207+00'))
-        .toEqual({label: 'Last Modified', value: Util.formatDate('2018-05-03 22:21:42.207+00', true)});
+        .toEqual({ label: 'Last Modified', value: Util.formatDate('2018-05-03 22:21:42.207+00', true) });
     });
   });
 });
