@@ -74,9 +74,9 @@ describe('TerrainTabs', () =>
   {
     tabsComponent = shallow(
       <TerrainTabs tabs={tabs}>
-        <div id="tab-content-1" />
-        <div id="tab-content-2" />
-        <div id="tab-content-3" />
+        <div id='tab-content-1' />
+        <div id='tab-content-2' />
+        <div id='tab-content-3' />
       </TerrainTabs>,
     );
 
@@ -100,15 +100,16 @@ describe('TerrainTabs', () =>
 
   describe('when there is no specified selectedTab', () =>
   {
-    it('should activate the tab matching the browser route by default', () => {
+    it('should activate the tab matching the browser route by default', () =>
+    {
       tabsComponent = shallow(
         <TerrainTabs
           tabs={tabs}
           tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
         >
-          <div id="tab-content-1" />
-          <div id="tab-content-2" />
-          <div id="tab-content-3" />
+          <div id='tab-content-1' />
+          <div id='tab-content-2' />
+          <div id='tab-content-3' />
         </TerrainTabs>,
       );
 
@@ -119,12 +120,13 @@ describe('TerrainTabs', () =>
 
   describe('when a selectedTab is specified', () =>
   {
-    it('should activate the tab matching the browser route by default', () => {
+    it('should activate the tab matching the browser route by default', () =>
+    {
       tabsComponent = shallow(
         <TerrainTabs tabs={tabs} selectedTab={'tab2'}>
-          <div id="tab-content-1" />
-          <div id="tab-content-2" />
-          <div id="tab-content-3" />
+          <div id='tab-content-1' />
+          <div id='tab-content-2' />
+          <div id='tab-content-3' />
         </TerrainTabs>,
       );
 
@@ -162,9 +164,9 @@ describe('TerrainTabs', () =>
             tabs={tabs}
             tabToRouteMap={{ tab1: '/path/to/tab1', tab2: '/path/to/tab2' }}
           >
-            <div id="tab-content-1" />
-            <div id="tab-content-2" />
-            <div id="tab-content-3" />
+            <div id='tab-content-1' />
+            <div id='tab-content-2' />
+            <div id='tab-content-3' />
           </TerrainTabs>,
         );
 

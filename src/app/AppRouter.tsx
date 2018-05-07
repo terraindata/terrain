@@ -47,6 +47,7 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { IndexRoute, Route, Router } from 'react-router';
 
+import DataTabs from 'etl/components/DataTabs';
 import TemplateList from 'etl/templates/components/TemplateList';
 import Jobs from 'jobs/components/Jobs';
 import Scheduler from 'scheduler/components/Scheduler';
@@ -73,7 +74,6 @@ import Profile from './users/components/Profile';
 import Settings from './users/components/Settings';
 import Team from './users/components/Team';
 import X from './x/components/X';
-import DataTabs from 'etl/components/DataTabs';
 
 import IntegrationEditorPage from './etl/integrations/components/IntegrationEditorPage';
 import IntegrationList from './etl/integrations/components/IntegrationList';

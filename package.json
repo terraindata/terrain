@@ -30,6 +30,7 @@
     "lint-sigint": "tslint -c sigint/tslint.json --fix --project sigint/tsconfig.json",
     "lint-analytics-js": "( cd analytics.js && tslint -c tslint.json --fix --project tsconfig.json )",
     "style": "find midway src shared analytics.js sigint rr -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) -not -path '*/node_modules/*' -not -path '*/build/*'  | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
+    "style-branch": "run(){ git diff --name-only HEAD $(git merge-base HEAD $1) | egrep '.ts$|.tsx$' | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1; }; run",
     "fix": "yarn style && yarn lint-parallel;",
     "diff-style": "git ls-files -m  \\*.ts\\* | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
     "rr": "./node_modules/.bin/ts-node ./rr/RecordReplay.ts",
@@ -64,6 +65,7 @@
     ],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/__mocks__/fileMock.ts",
+       "^.+\\.less$": "<rootDir>/src/test/__mocks__/styleMock.ts",
       "^auth/(.*)$": "<rootDir>/src/app/auth/$1",
       "^analytics/(.*)$": "<rootDir>/src/app/analytics/$1",
       "^app/(.*)$": "<rootDir>/src/app/$1",

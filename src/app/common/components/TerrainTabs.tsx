@@ -43,12 +43,11 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-import * as React from 'react';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.less';
 import 'common/components/TerrainTabs.less';
+import * as React from 'react';
 import { browserHistory } from 'react-router';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 interface TabConfig
 {
@@ -134,4 +133,3 @@ class TerrainTabs extends TerrainComponent<TabsProps>
 }
 
 export default TerrainTabs;
-
