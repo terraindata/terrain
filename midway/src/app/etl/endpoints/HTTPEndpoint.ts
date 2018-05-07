@@ -47,9 +47,11 @@ THE SOFTWARE.
 import * as request from 'request';
 import { PassThrough, Readable, Writable } from 'stream';
 
-import { HttpOptions, SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
+import { SinkConfig, SourceConfig } from '../../../../../shared/etl/types/EndpointTypes';
 import { TransformationEngine } from '../../../../../shared/transformations/TransformationEngine';
 import AEndpointStream from './AEndpointStream';
+import IntegrationConfig from '../../integrations/IntegrationConfig';
+import { integrations } from '../../integrations/IntegrationRouter';
 
 export default class HTTPEndpoint extends AEndpointStream
 {
@@ -60,19 +62,36 @@ export default class HTTPEndpoint extends AEndpointStream
 
   public async getSource(source: SourceConfig): Promise<Readable>
   {
-    return this.getRequestStream(source.options as HttpOptions) as Promise<Readable>;
+    return this.getRequestStreamByIntegrationId(source.integrationId) as Promise<Readable>;
   }
 
   public async getSink(sink: SinkConfig, engine?: TransformationEngine): Promise<Writable>
   {
-    return this.getRequestStream(sink.options as HttpOptions) as Promise<Writable>;
+    return this.getRequestStreamByIntegrationId(sink.integrationId) as Promise<Writable>;
   }
 
-  private getRequestStream(options: HttpOptions): Promise<Readable | Writable>
+  private async getRequestStreamByIntegrationId(integrationId: number): Promise<Readable | Writable >
   {
+    const integration: IntegrationConfig[] = await integrations.get(null, integrationId);
+    if (integration.length === 0)
+    {
+      throw new Error('Invalid HTTP Integration ID');
+    }
+    let httpConfig: any = {};
+    try
+    {
+      const connectionconfig = JSON.parse(integration[0].connectionConfig);
+      const authConfig = JSON.parse(integration[0].authConfig);
+      httpConfig = Object.assign(connectionconfig, authConfig);
+    }
+    catch (e)
+    {
+      throw new Error('Retrieveing integration ID ' + String(integrationId));
+    }
+
     return new Promise<Readable | Writable>((resolve, reject) =>
     {
-      request(options)
+      request(httpConfig.url)
         .on('error', (err) =>
         {
           if (err !== null && err !== undefined)
