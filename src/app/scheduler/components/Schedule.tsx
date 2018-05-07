@@ -374,6 +374,17 @@ class Schedule extends TerrainComponent<Props>
     return defaultValue;
   }
 
+  public renderFooter()
+  {
+    return (
+      <div
+        className='schedule-footer'
+      >
+        Note: Not all templates can be scheduled, including upload and download templates. Only schedulable templates are shown.
+      </div>
+    );
+  }
+
   public render()
   {
     const { schedule } = this.props;
@@ -386,6 +397,7 @@ class Schedule extends TerrainComponent<Props>
         onDelete={this._fn(this.props.onDelete, schedule.id)}
         onChange={this.handleScheduleChange}
         useTooltip={true}
+        footer={this.renderFooter()}
       />
     );
   }
