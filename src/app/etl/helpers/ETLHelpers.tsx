@@ -131,7 +131,16 @@ export default abstract class ETLHelpers
       };
       const accessor = () => template;
       const proxy = new TemplateProxy(accessor, mutator);
-      tryFn(proxy);
+
+      try
+      {
+        tryFn(proxy);
+      }
+      catch (e)
+      {
+        return reject(`${String(e)}`);
+      }
+
       const errors = TemplateUtil.verifyIntegrity(template);
       if (errors.length === 0)
       {
