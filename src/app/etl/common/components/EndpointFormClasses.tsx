@@ -58,6 +58,7 @@ import { DisplayState, DisplayType, InputDeclarationMap } from 'common/component
 import { instanceFnDecorator } from 'shared/util/Classes';
 
 import DatabasePicker from 'etl/common/components/DatabasePicker';
+import FileConfigForm from 'etl/common/components/FileConfigForm';
 import UploadFileButton from 'etl/common/components/UploadFileButton';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryState } from 'library/LibraryTypes';
@@ -86,34 +87,6 @@ abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainC
   public abstract inputMap: InputDeclarationMap<State>;
   public showFileConfig = true; // override this to hide
 
-  public fileConfigInputMap: InputDeclarationMap<FileConfigI> =
-    {
-      fileType: {
-        type: DisplayType.Pick,
-        displayName: 'File Type',
-        widthFactor: 2,
-        group: 'file type',
-        options: {
-          pickOptions: (s: FileConfigI) => fileTypeList,
-          indexResolver: (value) => fileTypeList.indexOf(value),
-        },
-      },
-      hasCsvHeader: {
-        type: DisplayType.CheckBox,
-        displayName: 'File Has CSV Header',
-        group: 'file type',
-        widthFactor: 4,
-        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Csv ? DisplayState.Active : DisplayState.Hidden,
-      },
-      jsonNewlines: {
-        type: DisplayType.CheckBox,
-        displayName: 'Objects separated by newlines',
-        group: 'file type',
-        widthFactor: 4,
-        getDisplayState: (s: FileConfigI) => s.fileType === FileTypes.Json ? DisplayState.Active : DisplayState.Hidden,
-      },
-    };
-
   constructor(props)
   {
     super(props);
@@ -133,17 +106,6 @@ abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainC
     return newState;
   }
 
-  @instanceFnDecorator(memoizeOne)
-  public fileConfigToFormState(config: FileConfig): FileConfigI
-  {
-    const { fileType, hasCsvHeader, jsonNewlines } = config;
-    return {
-      fileType,
-      hasCsvHeader,
-      jsonNewlines,
-    };
-  }
-
   public render()
   {
     const { fileConfig, options } = this.props.endpoint;
@@ -157,21 +119,19 @@ abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainC
         />
         {
           this.showFileConfig ?
-            <DynamicForm
-              inputMap={this.fileConfigInputMap}
-              inputState={this.fileConfigToFormState(fileConfig)}
-              onStateChange={this.handleFileConfigChange}
+            <FileConfigForm
+              fileConfig={fileConfig}
+              onChange={this.handleFileConfigChange}
             /> : null
         }
       </div>
     );
   }
 
-  private handleFileConfigChange(configState: FileConfigI)
+  private handleFileConfigChange(config: FileConfig, apply?: boolean)
   {
     const { onChange, endpoint } = this.props;
-    const newFileConfig = _FileConfig(configState);
-    onChange(endpoint.set('fileConfig', newFileConfig));
+    onChange(endpoint.set('fileConfig', config), apply);
   }
 
   private handleOptionsFormChange(formState: State, apply?: boolean)

@@ -61,6 +61,9 @@ export function getFileType(file: File): FileTypes
       return FileTypes.Csv;
     case 'application/json':
       return FileTypes.Json;
+    case 'application/xml':
+    case 'text/xml':
+      return FileTypes.Xml;
     default:
       return FileTypes.Json;
   }
@@ -157,6 +160,7 @@ export function guessFileOptions(file: File): Promise<FileConfig>
       fileType,
       hasCsvHeader: true,
       jsonNewlines: false,
+      xmlPath: '',
     };
     guessJsonFileOptions(
       file,
