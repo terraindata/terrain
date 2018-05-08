@@ -61,6 +61,8 @@ export function getFileType(file: File): FileTypes
       return FileTypes.Csv;
     case 'application/json':
       return FileTypes.Json;
+    case 'text/xml':
+      return FileTypes.Xml;
     default:
       return FileTypes.Json;
   }
