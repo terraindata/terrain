@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2018 Terrain Data, Inc.
-// tslint:disable:no-console strict-boolean-expressions
+// tslint:disable:strict-boolean-expressions
 import Colors, { fontColor } from 'app/colors/Colors';
 import CRONEditor from 'app/common/components/CRONEditor';
 import FloatingInput from 'app/common/components/FloatingInput';
@@ -219,11 +219,8 @@ class Schedule extends TerrainComponent<Props>
     const { schedule } = this.props;
     const task = this.getTask();
     // Template Option Set
-    console.log('Templates are ', this.props.templates);
     const templateOptions = this.props.templates.filter((t) =>
     {
-      console.log(t.toJS());
-      console.log(t.canSchedule());
       return t.canSchedule();
     },
     ).map((t) =>
@@ -240,7 +237,7 @@ class Schedule extends TerrainComponent<Props>
         <div>
           There are no schedulable templates. Create one in the
             <span
-            className='schedule-link'
+            className='link'
             onClick={ETLRouteutil.gotoNewTemplate}
             style={fontColor(Colors().active)}
           >
