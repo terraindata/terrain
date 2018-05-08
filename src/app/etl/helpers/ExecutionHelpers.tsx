@@ -58,7 +58,7 @@ import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
-import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
+import { Sinks, SourceOptionsType, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes, NodeTypes } from 'shared/etl/types/ETLTypes';
 import ETLHelpers from './ETLHelpers';
 
@@ -88,21 +88,54 @@ class ExecutionHelpers extends ETLHelpers
     };
   }
 
-  public createExecuteJob(template: ETLTemplate): Promise<number>
+  public createExecuteJob(): Promise<number>
   {
-    return new Promise((resolve, reject) =>
+    return new Promise<number>((resolve, reject) =>
     {
-
+      this.etlAct({
+        actionType: 'createExecuteJob',
+        onLoad: resolve,
+        onError: reject,
+      });
     });
   }
 
   public runExecuteJobFactory(template: ETLTemplate): (id: number) => Promise<void>
   {
-    return (jobid: number) =>
+    return (jobId: number) =>
     {
-      return new Promise((resolve, reject) =>
-      {
+      const defaultSink = template.getDefaultSink();
 
+      let mimeType;
+      let downloadName;
+      if (defaultSink.type === Sinks.Download)
+      {
+        const extension = defaultSink.fileConfig.fileType === FileTypes.Json ?
+          '.json' : '.csv';
+        mimeType = defaultSink.fileConfig.fileType === FileTypes.Json ?
+          'application/json' : 'text/csv';
+        downloadName = `Export_${template.id}${extension}`;
+      }
+      const files = {};
+      template.getSources().forEach((source, key) =>
+      {
+        if (source.type === Sources.Upload)
+        {
+          files[key] = (source.options as SourceOptionsType<Sources.Upload>).file;
+        }
+      });
+      return new Promise<void>((resolve, reject) =>
+      {
+        this.etlAct({
+          actionType: 'runExecuteJob',
+          jobId,
+          template,
+          files,
+          downloadName,
+          mimeType,
+          onLoad: resolve,
+          onError: reject,
+        });
       });
     };
   }
@@ -160,6 +193,9 @@ class ExecutionHelpers extends ETLHelpers
           title: 'Task Complete',
         },
       });
+      this.schemaAct({
+        actionType: 'fetch',
+      });
     };
     const updateUIAfterError = (ev) =>
     {
@@ -175,8 +211,7 @@ class ExecutionHelpers extends ETLHelpers
     };
 
     this.beforeRunTemplate(template);
-
-    this.createExecuteJob(template)
+    this.createExecuteJob()
       .then(this.runExecuteJobFactory(template))
       .then(updateUIAfterSuccess)
       .catch(updateUIAfterError);

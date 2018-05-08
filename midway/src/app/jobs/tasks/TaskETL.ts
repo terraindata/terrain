@@ -72,7 +72,7 @@ export class TaskETL extends Task
           status: true,
         };
 
-      templates.executeETL(this.taskConfig.params as object).then((result) =>
+      templates.executeETL(this.taskConfig.params as object, this.taskConfig.params.inputStreams).then((result) =>
       {
         taskOutputConfig.outputStream = result;
         resolve(taskOutputConfig);
