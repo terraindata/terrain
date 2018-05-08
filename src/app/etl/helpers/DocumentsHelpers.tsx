@@ -216,6 +216,8 @@ class DocumentsHelpers extends ETLHelpers
               .catch(catchError);
             break;
           }
+          case Sources.Mysql:
+          case Sources.Postgresql:
           case Sources.Algorithm:
           case Sources.Fs:
           case Sources.Http:
