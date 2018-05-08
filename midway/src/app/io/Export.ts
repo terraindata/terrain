@@ -59,7 +59,6 @@ import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
-import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import AExportTransform from './streams/AExportTransform';
 import CSVExportTransform from './streams/CSVExportTransform';
 import ExportTransform from './streams/ExportTransform';
@@ -294,6 +293,21 @@ export class Export
   {
     // merge groupJoins with _source if necessary
     doc = Export.mergeGroupJoin(doc);
+    const columnTypes = cfg.exportConfig.columnTypes;
+    const newSource = _.extend({}, doc['_source']);
+    if (newSource['fields'] != null)
+    {
+      for (const k of Object.keys(newSource['fields']))
+      {
+        const value = newSource['fields'][k];
+        if (k !== 'fields' && newSource[k] === undefined && columnTypes[k] !== undefined &&
+          Array.isArray(value) && value.length > 0 && value[0] != null)
+        {
+          newSource[k] = value[0];
+        }
+      }
+      doc['_source'] = newSource;
+    }
 
     // extract field after doing all merge joins
     cfg.extractTransformations.forEach((transform) =>
@@ -360,21 +374,7 @@ export class Export
       {
         if (algorithms[0].meta !== undefined)
         {
-          const query = JSON.parse(algorithms[0].meta as string)['query'];
-          const inputMap = ESInterpreter.toInputMap(query.inputs);
-          const queryTree = new ESInterpreter(query.tql, inputMap);
-          if (queryTree.hasError())
-          {
-            return reject('Errors when interpreting the query:' + JSON.stringify(queryTree.getErrors()));
-          }
-          try
-          {
-            const queryString = queryTree.toCode({ replaceInputs: true });
-            return resolve(queryString);
-          } catch (e)
-          {
-            reject('Error when the interpreter generates the code:' + JSON.stringify(e));
-          }
+          return resolve(JSON.parse(algorithms[0].meta as string)['query']['tql']);
         }
       }
       catch (e)
@@ -456,6 +456,15 @@ export class Export
           {
             delete obj[mergeCol];
           }
+          break;
+        case 'extract':
+          const extractOldColName: string | undefined = transform['colName'];
+          const extractPath: string | undefined = transform['args']['path'];
+          if (extractOldColName === undefined || extractPath === undefined)
+          {
+            throw new Error('Extract column name and path must be provided.');
+          }
+          obj[extractOldColName] = _.get(obj[extractOldColName], extractPath, null);
           break;
         case 'duplicate':
           colName = transform['colName'];
