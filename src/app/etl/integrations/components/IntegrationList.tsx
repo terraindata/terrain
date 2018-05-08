@@ -140,29 +140,23 @@ export class IntegrationListTest extends TerrainComponent<Props>
       case 'createdBy':
         const user = this.props.users.get(value);
         const userName = user ? user.name ? user.name : user.email : value;
-        return { label: 'Created By', value: userName };
+        return userName;
       case 'lastModified':
-        return { label: 'Last Modified', value: Util.formatDate(value, true) };
+        return Util.formatDate(value, true);
       case 'id':
       case 'name':
       case 'type':
       default:
-        return { label: name, value };
+        return value;
     }
   }
 
   public renderProperty(propertyName, item: IntegrationConfig, index: number)
   {
-    const { label, value } = this.formatValue(propertyName, item.get(propertyName));
     return (
-      <FloatingInput
-        label={label}
-        value={value}
-        isTextInput={false}
-        noBorder={true}
-        forceFloat={true}
-        noBg={true}
-      />
+      <div>
+        {this.formatValue(propertyName, item.get(propertyName))}
+      </div>
     );
   }
 
@@ -189,16 +183,7 @@ export class IntegrationListTest extends TerrainComponent<Props>
       >
         <div
           className='integration-list-wrapper'
-          style={_.extend({},
-            backgroundColor(Colors().blockBg),
-            borderColor(Colors().blockOutline),
-          )}
         >
-          <div
-            className='integration-list-header'
-          >
-            Integrations
-          </div>
           <ItemList
             items={integrationList.toList()}
             columnConfig={[
@@ -215,17 +200,16 @@ export class IntegrationListTest extends TerrainComponent<Props>
                 render: this._fn(this.renderProperty, 'type'),
               },
               {
-                name: 'createdBy',
+                name: 'created By',
                 render: this._fn(this.renderProperty, 'createdBy'),
               },
               {
-                name: 'lastModified',
+                name: 'last Modified',
                 render: this._fn(this.renderProperty, 'lastModified'),
               },
             ]}
             onRowClicked={this.handleRowClick}
             hideHeaders={true}
-            getRowStyle={(i) => rowStyle}
             getActions={this.getIntegrationActions}
           />
           <PathfinderCreateLine
@@ -248,11 +232,6 @@ export class IntegrationListTest extends TerrainComponent<Props>
     );
   }
 }
-
-const rowStyle = [
-  { cursor: 'pointer' },
-  backgroundColor(Colors().fontWhite, Color(Colors().activeHover).fade(0.9)),
-];
 
 const IntegrationList = Util.createContainer(
   IntegrationListTest,
