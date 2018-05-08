@@ -70,7 +70,6 @@ export class Databases
         'type',
         'dsn',
         'host',
-        'status',
         'isAnalytics',
         'analyticsIndex',
         'analyticsType',
@@ -133,7 +132,7 @@ export class Databases
     return App.DB.upsert(this.databaseTable, db) as Promise<DatabaseConfig>;
   }
 
-  public async connect(user: UserConfig, id: number): Promise<DatabaseConfig>
+  public async connect(user: UserConfig, id: number): Promise<object>
   {
     const results: DatabaseConfig[] = await this.get(id);
     if (results.length === 0)
@@ -148,25 +147,42 @@ export class Databases
     }
 
     const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.id, db.dsn, db.analyticsIndex, db.analyticsType);
+    controller.setConfig(db);
+    const connected: boolean = await controller.getClient().isConnected();
     DatabaseRegistry.set(db.id, controller);
 
-    // try to provision built-in scripts to the connected database
-    await Scripts.provisionScripts(controller);
-
-    // pre-populate the database with pre-defined metrics
-    if (db.isAnalytics)
+    if (connected)
     {
-      await metrics.initialize(db.id);
+      // try to provision built-in scripts to the connected database
+      await Scripts.provisionScripts(controller);
+
+      // pre-populate the database with pre-defined metrics
+      if (db.isAnalytics)
+      {
+        await metrics.initialize(db.id);
+      }
     }
 
-    return this.upsert(user, { id, status: 'CONNECTED' } as DatabaseConfig);
+    return {
+      status: connected,
+    };
   }
 
-  public async disconnect(user: UserConfig, id: number): Promise<DatabaseConfig>
+  public async disconnect(user: UserConfig, id: number): Promise<void>
   {
-    await DatabaseRegistry.remove(id);
-    // TODO: clean up controller?
-    return this.upsert(user, { id, status: 'DISCONNECTED' } as DatabaseConfig);
+    const controller = DatabaseRegistry.get(id);
+    if (controller === undefined)
+    {
+      throw new Error('Invalid db id passed (schema)');
+    }
+
+    if (controller.getClient().end !== undefined)
+    {
+      controller.getClient().end(() =>
+      {
+        DatabaseRegistry.remove(id);
+      });
+    }
   }
 
   public async schema(id: number): Promise<string>

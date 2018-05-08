@@ -45,8 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as winston from 'winston';
+
+import { DatabaseConfig } from '../app/database/DatabaseConfig';
 import QueryHandler from '../app/query/QueryHandler';
 import * as Tasty from '../tasty/Tasty';
+import DatabaseControllerStatus from './DatabaseControllerStatus';
 
 /**
  * An client which acts as a selective isomorphic wrapper around
@@ -54,11 +57,13 @@ import * as Tasty from '../tasty/Tasty';
  */
 abstract class DatabaseController
 {
-  private id: number; // unique id
-  private lsn: number; // log sequence number
-  private type: string; // connection type
-  private name: string; // connection name
-  private header: string; // log entry header
+  private id: number;                       // unique id
+  private lsn: number;                      // log sequence number
+  private type: string;                     // connection type
+  private name: string;                     // connection name
+  private header: string;                   // log entry header
+  private config: DatabaseConfig;           // database configuration
+  private status: DatabaseControllerStatus; // controller status
 
   constructor(type: string, id: number, name: string)
   {
@@ -67,6 +72,8 @@ abstract class DatabaseController
     this.type = type;
     this.name = name;
     this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
+    this.config = null;
+    this.status = DatabaseControllerStatus.UNKNOWN;
   }
 
   public log(methodName: string, info?: any, moreInfo?: any)
@@ -98,13 +105,33 @@ abstract class DatabaseController
     return this.name;
   }
 
-  public abstract getClient(): object;
+  public getStatus(): DatabaseControllerStatus
+  {
+    return this.status;
+  }
+
+  public getConfig(): DatabaseConfig
+  {
+    return this.config;
+  }
+
+  public setConfig(config: DatabaseConfig)
+  {
+    this.config = config;
+  }
+
+  public setStatus(status: DatabaseControllerStatus)
+  {
+    this.status = status;
+  }
+
+  public abstract getClient();
 
   public abstract getTasty(): Tasty.Tasty;
 
   public abstract getQueryHandler(): QueryHandler;
 
-  public abstract getAnalyticsDB(): object;
+  public abstract getAnalyticsDB();
 }
 
 export default DatabaseController;
