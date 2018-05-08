@@ -57,7 +57,7 @@ const taskOutputConfig: TaskOutputConfig =
     options:
       {
         logStream: null,
-        inputStreams: null,
+        outputStream: null,
       },
     status: true,
   };
@@ -74,6 +74,8 @@ export class TaskDefaultExit extends Task
     return new Promise<TaskOutputConfig>(async (resolve, reject) =>
     {
       // TODO: call other functions (needs to wrap in Promise for later)
+      taskOutputConfig['options']['outputStream'] = this.taskConfig['params']['options']['inputStreams'][0];
+      taskOutputConfig['options']['logStream'] = this.taskConfig['params']['options']['logStream'];
       resolve(taskOutputConfig);
     });
   }

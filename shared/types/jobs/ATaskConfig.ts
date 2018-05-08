@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { Readable } from 'stream';
 import TaskConfigTypes from './TaskConfigTypes';
 
 export abstract class ATaskConfig

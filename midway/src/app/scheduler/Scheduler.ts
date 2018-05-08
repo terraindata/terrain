@@ -382,7 +382,7 @@ export class Scheduler
         // TODO
       }
 
-      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
+      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result as SchedulerConfig));
       resolve(results);
     });
   }

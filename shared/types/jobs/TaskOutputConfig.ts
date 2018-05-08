@@ -53,10 +53,10 @@ export class TaskOutputConfig extends ATaskConfig
   public exit: boolean = null;
   public status: boolean = null;
   public options: object =
-  {
-    logStream?: Readable;
-    outputStream?: Readable;
-  };
+    {
+      logStream?: Readable;
+      outputStream?: Readable;
+    };
 }
 
 export default TaskOutputConfig;
