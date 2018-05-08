@@ -44,54 +44,76 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-
-import { makeCallback } from '../../../../../shared/util/Promise';
+import { Readable, Transform } from 'stream';
+import * as xmlNodes from 'xml-nodes';
+import * as xml2js from 'xml2js';
 
 /**
- * Consumes an input source stream and turns it into an array
+ * Converts result stream to XML text stream
  */
-export default class BufferTransform
+export default class XMLImportTransform extends Transform
 {
-  public static toArray(stream: Readable, size?: number): Promise<any[]>
+  private path: string;
+  private filterStream: Transform;
+
+  private doneReading: boolean;
+
+  constructor(path: string)
   {
-    return new Promise<any[]>((resolve, reject) =>
+    super({
+      writableObjectMode: false,
+      readableObjectMode: true,
+    });
+    this.path = path;
+    this.doneReading = false;
+    this.filterStream = new xmlNodes(path);
+
+    this.filterStream.on('readable', () =>
     {
-      return new BufferTransform(stream, makeCallback(resolve, reject), size);
+      let result = this.filterStream.read();
+      while (result !== null)
+      {
+        this.parseXML(result);
+        result = this.filterStream.read();
+      }
+    });
+    this.filterStream.on('end', () => { this.doneReading = true; });
+    this.filterStream.on('error', (e) => this.emit('error', e));
+  }
+
+  public _destroy(error, callback)
+  {
+    this.filterStream._destroy(error, (e) =>
+    {
+      this.push(null);
+      callback(e);
     });
   }
 
-  private arr: any[];
-  private stream: Readable;
-  private callback: (err, arr) => void;
-
-  constructor(stream: Readable, callback: (err: Error | null, arr: any[]) => void, size?: number)
+  public _write(chunk, encoding, callback)
   {
-    this.arr = [];
-    this.stream = stream;
-
-    const done = () => callback(null, this.arr);
-
-    this.stream.on('end', done);
-    this.stream.on('data', (doc) =>
-    {
-      if (this.arr.length >= (size as number))
-      {
-        this.stream.removeListener('end', done);
-        this.stream.destroy();
-        callback(null, this.arr);
-      }
-      else
-      {
-        this.arr.push(doc);
-      }
-    });
-
-    this.stream.on('error', callback);
+    this.filterStream.write(chunk, callback);
   }
 
-  private onEvent(err: any): void
+  private parseXML(result: string): void
   {
-    this.callback(err, this.arr);
+    if (this.doneReading)
+    {
+      this.push(null);
+      return;
+    }
+
+    xml2js.parseString(result, {
+      explicitRoot: false,
+      explicitArray: false,
+      mergeAttrs: true,
+    }, (err, obj) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          this.emit('error', err);
+        }
+        this.push(obj);
+      });
   }
 }

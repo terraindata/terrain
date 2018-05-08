@@ -45,8 +45,9 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import { Transform } from 'stream';
-import xmlToJSON = require('xml-to-json-stream');
+
 import XMLExportTransform from './XMLExportTransform';
+import XMLImportTransform from './XMLImportTransform';
 
 /**
  * Import/Export from a XML format
@@ -54,9 +55,9 @@ import XMLExportTransform from './XMLExportTransform';
  */
 export default class XMLTransform
 {
-  public static createImportStream(): Transform
+  public static createImportStream(path?: string): Transform
   {
-    return xmlToJSON().createStream();
+    return new XMLImportTransform(path);
   }
 
   public static createExportStream(): Transform

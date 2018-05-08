@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as js2xmlparser from 'js2xmlparser';
+import * as xml2js from 'xml2js';
+
 import AExportTransform from './AExportTransform';
 
 /**
@@ -52,12 +53,12 @@ import AExportTransform from './AExportTransform';
  */
 export default class XMLExportTransform extends AExportTransform
 {
-  private root: string;
+  private builder: xml2js.Builder;
 
-  constructor(root: string = 'item')
+  constructor()
   {
     super();
-    this.root = root;
+    this.builder = new xml2js.Builder();
   }
 
   protected preamble(): string
@@ -67,7 +68,7 @@ export default class XMLExportTransform extends AExportTransform
 
   protected transform(input: object, chunkNumber: number): string
   {
-    return js2xmlparser.parse(this.root, input);
+    return this.builder.buildObject(input);
   }
 
   protected delimiter(): string

@@ -325,6 +325,36 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
     };
   }
 
+  public getFileTypeExtension(fileType: any): string
+  {
+    switch (fileType)
+    {
+      case FileTypes.Json:
+        return '.json';
+      case FileTypes.Csv:
+        return '.csv';
+      case FileTypes.Xml:
+        return '.xml';
+      default:
+        return '.txt';
+    }
+  }
+
+  public getFileTypeMIMEType(fileType: any): string
+  {
+    switch (fileType)
+    {
+      case FileTypes.Json:
+        return 'application/json';
+      case FileTypes.Csv:
+        return 'text/csv';
+      case FileTypes.Xml:
+        return 'text/xml';
+      default:
+        return 'text';
+    }
+  }
+
   public executeTemplate(action: ETLActionType<'executeTemplate'>, dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
@@ -344,10 +374,8 @@ class ETLRedux extends TerrainRedux<ETLActionTypes, ETLState>
       const options: ExecuteConfig = {};
       if (defaultSink.type === Sinks.Download)
       {
-        const extension = defaultSink.fileConfig.fileType === FileTypes.Json ?
-          '.json' : '.csv';
-        const mimeType = defaultSink.fileConfig.fileType === FileTypes.Json ?
-          'application/json' : 'text/csv';
+        const extension = this.getFileTypeExtension(defaultSink.fileConfig.fileType);
+        const mimeType = this.getFileTypeMIMEType(defaultSink.fileConfig.fileType);
         const downloadFilename = `Export_${template.id}${extension}`;
         options.download = {
           downloadFilename,

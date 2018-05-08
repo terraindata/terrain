@@ -140,7 +140,9 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           importStream = sourceStream.pipe(CSVTransform.createImportStream());
           break;
         case 'xml':
-          importStream = sourceStream.pipe(XMLTransform.createImportStream()).pipe(JSONTransform.createImportStream());
+          // const xmlPath: string | undefined = source.fileConfig.xmlPath;
+          const xmlPath = 'property';
+          importStream = sourceStream.pipe(XMLTransform.createImportStream(xmlPath));
           break;
         default:
           throw new Error('Download file type must be either CSV, JSON or XML.');

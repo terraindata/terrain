@@ -147,6 +147,10 @@ export function getSampleRows(
     };
     fr.readAsText(fileChunk);
   }
+  else if (getFileType(file) === FileTypes.Xml)
+  {
+    // TODO
+  }
 }
 // TODO for json, use a streaming implementation
 
