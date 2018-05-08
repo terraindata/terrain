@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
@@ -52,6 +53,7 @@ import * as App from '../App';
 import * as AppUtil from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
+import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
@@ -100,7 +102,7 @@ Router.post('/runnow/:id', async (ctx, next) =>
 {
   const { fields, files } = await asyncBusboy(ctx.req);
 
-  Util.verifyParameters(fields, ['id', 'accessToken']);
+  AppUtil.verifyParameters(fields, ['id', 'accessToken']);
   const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
   if (user === null)
   {
