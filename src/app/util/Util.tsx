@@ -388,9 +388,9 @@ const Util = {
     return Math.random();
   },
 
-  extendId(obj: object, isString?: boolean): object
+  extendId(obj: object = {}, isString?: boolean): object
   {
-    if (!obj)
+    if (obj === null)
     {
       obj = {};
     }
