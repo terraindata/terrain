@@ -55,6 +55,7 @@ import Util from 'util/Util';
 import { ETLActions } from 'etl/ETLRedux';
 import ETLRouteUtil from 'etl/ETLRouteUtil';
 import { TemplateEditorActions } from 'etl/templates/TemplateEditorRedux';
+import { getMimeType } from 'shared/etl/FileUtil';
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { _ETLTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
 import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
@@ -110,10 +111,9 @@ class ExecutionHelpers extends ETLHelpers
       let downloadName;
       if (defaultSink.type === Sinks.Download)
       {
-        const extension = defaultSink.fileConfig.fileType === FileTypes.Json ?
-          '.json' : '.csv';
-        mimeType = defaultSink.fileConfig.fileType === FileTypes.Json ?
-          'application/json' : 'text/csv';
+        const fileType = defaultSink.fileConfig.fileType;
+        const extension = `.${fileType}`;
+        mimeType = getMimeType(fileType);
         downloadName = `Export_${template.id}${extension}`;
       }
       const files = {};

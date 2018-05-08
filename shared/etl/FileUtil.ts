@@ -53,19 +53,42 @@ import { FileTypes } from './types/ETLTypes';
 import { FileConfig } from 'shared/etl/types/EndpointTypes';
 import Util from 'shared/Util';
 
+export const mimeToFileType: { [k: string]: FileTypes } = {
+  'text/csv': FileTypes.Csv,
+  'application/json': FileTypes.Json,
+  'application/xml': FileTypes.Xml,
+  'text/xml': FileTypes.Xml,
+};
+
+export const fileTypeToMime = {
+  [FileTypes.Csv]: 'text/csv',
+  [FileTypes.Json]: 'application/json',
+  [FileTypes.Xml]: 'text/xml',
+};
+
 export function getFileType(file: File): FileTypes
 {
-  switch (file.type)
+  const type = mimeToFileType[file.type];
+  if (type !== undefined)
   {
-    case 'text/csv':
-      return FileTypes.Csv;
-    case 'application/json':
-      return FileTypes.Json;
-    case 'application/xml':
-    case 'text/xml':
-      return FileTypes.Xml;
-    default:
-      return FileTypes.Json;
+    return type;
+  }
+  else
+  {
+    return FileTypes.Json;
+  }
+}
+
+export function getMimeType(type: FileTypes): string
+{
+  const mime = fileTypeToMime[type];
+  if (mime !== undefined)
+  {
+    return mime;
+  }
+  else
+  {
+    return 'application/json';
   }
 }
 
