@@ -77,6 +77,7 @@ export function getSampleRows(
   opts?: {
     hasCsvHeader?: boolean;
     jsonNewlines?: boolean;
+    xmlPath?: string;
   },
 )
 {
@@ -147,6 +148,10 @@ export function getSampleRows(
       }
     };
     fr.readAsText(fileChunk);
+  }
+  else if (getFileType(file) === FileTypes.Xml)
+  {
+    onError(`XML File Parsing not supported`);
   }
 }
 // TODO for json, use a streaming implementation
