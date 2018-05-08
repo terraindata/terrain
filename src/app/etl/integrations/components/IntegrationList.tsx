@@ -140,23 +140,22 @@ class IntegrationList extends TerrainComponent<Props>
       case 'createdBy':
         const user = this.props.users.get(value);
         const userName = user ? user.name ? user.name : user.email : value;
-        return { label: 'Created By', value: userName };
+        return userName;
       case 'lastModified':
-        return { label: 'Last Modified', value: Util.formatDate(value, true) };
+        return Util.formatDate(value, true);
       case 'id':
       case 'name':
       case 'type':
       default:
-        return { label: name, value };
+        return value;
     }
   }
 
   public renderProperty(propertyName, item: IntegrationConfig, index: number)
   {
-    const { label, value } = this.formatValue(propertyName, item.get(propertyName));
     return (
       <div>
-        {value}
+        {this.formatValue(propertyName, item.get(propertyName))}
       </div>
     );
   }
@@ -201,11 +200,11 @@ class IntegrationList extends TerrainComponent<Props>
                 render: this._fn(this.renderProperty, 'type'),
               },
               {
-                name: 'createdBy',
+                name: 'created By',
                 render: this._fn(this.renderProperty, 'createdBy'),
               },
               {
-                name: 'lastModified',
+                name: 'last Modified',
                 render: this._fn(this.renderProperty, 'lastModified'),
               },
             ]}
