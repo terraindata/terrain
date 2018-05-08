@@ -79,7 +79,7 @@ export interface Props
   onChange: (newConfig: SinkConfig | SourceConfig, apply?: boolean) => void;
 }
 
-const fileTypeList = List([FileTypes.Json, FileTypes.Csv]);
+const fileTypeList = List([FileTypes.Json, FileTypes.Csv, FileTypes.Xml]);
 
 abstract class EndpointFormBase<State, P extends Props = Props> extends TerrainComponent<P>
 {

@@ -64,6 +64,7 @@ import Templates from './Templates';
 import CSVTransform from '../io/streams/CSVTransform';
 import JSONTransform from '../io/streams/JSONTransform';
 import ProgressStream from '../io/streams/ProgressStream';
+import XMLTransform from '../io/streams/XMLTransform';
 
 import AEndpointStream from './endpoints/AEndpointStream';
 import AlgorithmEndpoint from './endpoints/AlgorithmEndpoint';
@@ -139,11 +140,10 @@ export async function getSourceStream(name: string, source: SourceConfig, files?
           importStream = sourceStream.pipe(CSVTransform.createImportStream());
           break;
         case 'xml':
-          // TODO:
-          importStream = sourceStream.pipe(new stream.PassThrough());
+          importStream = sourceStream.pipe(XMLTransform.createImportStream()).pipe(JSONTransform.createImportStream());
           break;
         default:
-          throw new Error('Download file type must be either CSV or JSON.');
+          throw new Error('Download file type must be either CSV, JSON or XML.');
       }
       resolve(importStream);
     }
@@ -183,11 +183,10 @@ export async function getSinkStream(sink: SinkConfig, engine: TransformationEngi
             transformStream = CSVTransform.createExportStream();
             break;
           case 'xml':
-            // TODO:
-            transformStream = new stream.PassThrough();
+            transformStream = XMLTransform.createExportStream();
             break;
           default:
-            throw new Error('Export file type must be either CSV or JSON.');
+            throw new Error('Export file type must be either CSV, JSON or XML.');
         }
       }
 
