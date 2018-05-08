@@ -178,6 +178,7 @@ class TemplateList extends TerrainComponent<Props>
         onRowClicked={this.handleOnClick}
         getRowStyle={this.getRowStyle}
         getMenuOptions={computeOptions}
+        itemsName='template'
       />
     );
   }

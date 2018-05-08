@@ -226,6 +226,7 @@ class IntegrationList extends TerrainComponent<Props>
             hideHeaders={true}
             getRowStyle={(i) => rowStyle}
             getActions={this.getIntegrationActions}
+            itemsName='integration'
           />
           <PathfinderCreateLine
             text='Add Integration'

@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import { List } from 'immutable';
@@ -75,6 +76,7 @@ export interface Props<T>
   state?: any; // for specifying dependencies so ItemList knows when to rerender
   hideHeaders?: boolean;
   getActions?: (index: number, item: T) => El;
+  itemsName?: string;
 }
 
 const memoize = _.memoize;
@@ -203,7 +205,9 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
           }
         </div>
         :
-        <div> List Has No Items </div>
+        <div className='item-list-message'>
+          There aren't yet any {this.props.itemsName || 'item'}s
+        </div>
     );
   }
 }
