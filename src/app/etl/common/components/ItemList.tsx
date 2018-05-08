@@ -50,7 +50,7 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, fontColor, Colors } from 'app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
 import { Menu, MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { instanceFnDecorator } from 'shared/util/Classes';
@@ -119,7 +119,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
                   key={i}
                   style={_.extend(
                     {},
-                    {width: `${100 / columnConfig.length}%`},
+                    { width: `${100 / columnConfig.length}%` },
                     fontColor(Colors().active),
                   )}
                 >
@@ -155,7 +155,7 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
 
   public render()
   {
-    const { columnConfig, items, getMenuOptions} = this.props;
+    const { columnConfig, items, getMenuOptions } = this.props;
     return (
       items.size > 0 ?
         <div
@@ -163,30 +163,30 @@ export class ItemList<T> extends TerrainComponent<Props<T>>
           style={backgroundColor(Colors().blockOutline)}
         >
           {
-              <div
-                className='row-info-header'
-                key='header'
-              >
+            <div
+              className='row-info-header'
+              key='header'
+            >
+              {
+                columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
                 {
-                  columnConfig.map((headerItem: HeaderConfigItem<T>, i: number) =>
-                  {
-                    return (
-                      <div
-                        className='row-info-data'
-                        key={i}
-                        style={{width: `${100 / columnConfig.length}%`}}
-                      >
-                        {headerItem.name}
-                      </div>
-                    );
-                  })
-                }
-                {
-                  getMenuOptions !== undefined ?
-                    <div className='row-info-data' key='context-menu' />
-                    : undefined
-                }
-              </div>
+                  return (
+                    <div
+                      className='row-info-data'
+                      key={i}
+                      style={{ width: `${100 / columnConfig.length}%` }}
+                    >
+                      {headerItem.name}
+                    </div>
+                  );
+                })
+              }
+              {
+                getMenuOptions !== undefined ?
+                  <div className='row-info-data' key='context-menu' />
+                  : undefined
+              }
+            </div>
           }
           {
             items.map(this.renderRow).toList()

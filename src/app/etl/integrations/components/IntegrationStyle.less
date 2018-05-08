@@ -9,7 +9,14 @@
 	margin: 12px;
 	max-height: calc(100% - 30px);
     overflow: auto;
+    .row-info:hover {
+		.close {
+	    	opacity: 1;
+		}
+    }
 	.close {
+		opacity: 0;
+		.transition;
 		position: absolute;
     	left: -16px;
     	top: 27px;
