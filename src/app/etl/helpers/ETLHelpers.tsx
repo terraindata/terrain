@@ -73,6 +73,7 @@ import { _WalkthroughState, WalkthroughState } from 'etl/walkthrough/ETLWalkthro
 import { _FileConfig, _SinkConfig, _SourceConfig, FileConfig, SinkConfig, SourceConfig } from 'shared/etl/immutable/EndpointRecords';
 import { TemplateProxy } from 'shared/etl/immutable/TemplateProxy';
 import { _ETLTemplate, copyTemplate, ETLTemplate } from 'shared/etl/immutable/TemplateRecords';
+import TemplateUtil from 'shared/etl/immutable/TemplateUtil';
 import { Sinks, Sources } from 'shared/etl/types/EndpointTypes';
 import { FileTypes } from 'shared/etl/types/ETLTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
@@ -130,8 +131,18 @@ export default abstract class ETLHelpers
       };
       const accessor = () => template;
       const proxy = new TemplateProxy(accessor, mutator);
-      tryFn(proxy);
-      if (1 === 1) // placeholder, todo check if engine is in valid state
+
+      try
+      {
+        tryFn(proxy);
+      }
+      catch (e)
+      {
+        return reject(`${String(e)}`);
+      }
+
+      const errors = TemplateUtil.verifyIntegrity(template);
+      if (errors.length === 0)
       {
         this.editorAct({
           actionType: 'setTemplate',
@@ -149,7 +160,7 @@ export default abstract class ETLHelpers
       }
       else
       {
-        reject('failure');
+        reject(String(errors));
       }
     });
   }

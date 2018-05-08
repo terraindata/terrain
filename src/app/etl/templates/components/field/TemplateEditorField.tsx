@@ -212,7 +212,22 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       this.props.act({
         actionType: 'updateEngineVersion',
       });
-    }).catch(this._logError);
+    }).catch(this._showError('Could not perform action'));
+  }
+
+  protected _showError(subject: string)
+  {
+    return (err) =>
+    {
+      this.props.act({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `${subject}: ${String(err)}`,
+          error: true,
+        },
+      });
+    };
   }
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps
@@ -281,12 +296,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   private getUIStateValue(): EditorDisplayState
   {
     return (this.props as Props & Injected).templateEditor.uiState;
-  }
-
-  protected _logError(ev)
-  {
-    // tslint:disable-next-line
-    console.error(ev);
   }
 }
 

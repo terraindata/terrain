@@ -141,6 +141,7 @@ export default class EngineUtil
     return errors;
   }
 
+  // check to make sure the field's types exist and if its an array that it has a valid valueType
   public static fieldHasValidType(engine: TransformationEngine, id: number)
   {
     const fieldType = engine.getFieldType(id) as FieldTypes;
@@ -154,6 +155,28 @@ export default class EngineUtil
       return false;
     }
     return true;
+  }
+
+  // get all fields that are computed from this field
+  public static getFieldDependents(engine: TransformationEngine, fieldId: number): List<number>
+  {
+    const transformations = engine.getTransformations(fieldId);
+    const asSet = transformations.flatMap((id) =>
+    {
+      const transformation = engine.getTransformationInfo(id);
+      const nfkp: List<List<string>> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
+      if (nfkp === undefined)
+      {
+        return undefined;
+      }
+      else
+      {
+        return nfkp;
+      }
+    }).map((kp) => engine.getOutputFieldID(kp))
+      .toList()
+      .toSet();
+    return List(asSet);
   }
 
   // root is considered to be a named field
