@@ -48,7 +48,7 @@ THE SOFTWARE.
 import TerrainTabs from 'common/components/TerrainTabs';
 import { shallow } from 'enzyme';
 import * as React from 'react';
-import * as router from 'react-router';
+import { browserHistory } from 'react-router';
 
 describe('TerrainTabs', () =>
 {
@@ -68,8 +68,6 @@ describe('TerrainTabs', () =>
     },
   ];
 
-  router.browserHistory.replace = jest.fn();
-
   beforeEach(() =>
   {
     tabsComponent = shallow(
@@ -79,8 +77,6 @@ describe('TerrainTabs', () =>
         <div id='tab-content-3' />
       </TerrainTabs>,
     );
-
-    router.browserHistory.replace.mockClear();
   });
 
   it('should display the tabbed layout', () =>
@@ -114,7 +110,7 @@ describe('TerrainTabs', () =>
       );
 
       expect(tabsComponent.find('Tabs').props().selectedIndex).toEqual(0);
-      expect(router.browserHistory.replace).toHaveBeenCalledTimes(1);
+      expect(browserHistory.replace).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -173,7 +169,7 @@ describe('TerrainTabs', () =>
         tabsComponent.instance().handleSelect(1);
 
         expect(tabsComponent.state().tabIndex).toEqual(1);
-        expect(router.browserHistory.replace).toHaveBeenCalledTimes(2);
+        expect(browserHistory.replace).toHaveBeenCalledTimes(2);
       });
     });
   });

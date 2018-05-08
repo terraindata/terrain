@@ -101,7 +101,8 @@
     "setupFiles": [
       "<rootDir>/src/test/__mocks__/browserMock.ts"
     ],
-    "testURL": "http://localhost"
+    "testURL": "http://localhost",
+    "clearMocks": true
   },
   "dependencies": {
     "JSONStream": "^1.3.2",
