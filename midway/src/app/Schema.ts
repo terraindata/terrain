@@ -153,6 +153,7 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      name text NOT NULL,
      readPermission text NOT NULL,
      type text NOT NULL,
+     lastModified ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      writePermission text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS metrics
     (id ` + primaryKeyType + ` PRIMARY KEY,
@@ -167,7 +168,10 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      templateName text NOT NULL,
      process text NOT NULL,
      sources text NOT NULL,
-     sinks text NOT NULL); `,
+     sinks text NOT NULL,
+     settings text NOT NULL,
+     meta text NOT NULL,
+     uiData text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS schemaMetadata
        (id ` + primaryKeyType + ` PRIMARY KEY,
        columnId text NOT NULL,

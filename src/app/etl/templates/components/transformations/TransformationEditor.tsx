@@ -58,6 +58,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import { getTransformationForm } from 'etl/templates/components/transformations/TransformationForms';
+import { EngineProxy, FieldProxy } from 'etl/templates/FieldProxy';
 import { TransformationNode } from 'etl/templates/FieldTypes';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import { TransformationInfo } from 'shared/transformations/TransformationInfo';
@@ -68,10 +69,10 @@ import './TransformationEditor.less';
 export interface Props
 {
   transformation?: TransformationNode;
-  onTransformationChange: (structuralChanges: boolean) => void;
   onClose: () => void;
   engine: TransformationEngine;
   fieldID: number;
+  tryMutateEngine: (tryFn: (proxy: EngineProxy) => void) => void;
 }
 
 @Radium
@@ -87,9 +88,9 @@ export class TransformationEditor extends TerrainComponent<Props>
             isCreate={false}
             engine={this.props.engine}
             fieldId={this.props.fieldID}
-            onEditOrCreate={this.props.onTransformationChange}
             onClose={this.props.onClose}
             transformation={this.props.transformation}
+            tryMutateEngine={this.props.tryMutateEngine}
           />
         </div>
       </div>

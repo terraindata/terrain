@@ -70,6 +70,7 @@ export interface Props
   integration: IntegrationConfig;
   onChange: (newConfig: IntegrationConfig) => void;
   hideType?: boolean;
+  hideName?: boolean;
 }
 
 export default class IntegrationForm extends TerrainComponent<Props>
@@ -85,12 +86,36 @@ export default class IntegrationForm extends TerrainComponent<Props>
     },
   };
 
+  public nameMap: InputDeclarationMap<{ name: string }> = {
+    name: {
+      type: DisplayType.TextBox,
+      displayName: 'Name',
+      options: {},
+    },
+  };
+
   public render()
   {
-    const { integration, onChange, hideType } = this.props;
+    const { integration, onChange, hideName, hideType } = this.props;
+    if (!integration)
+    {
+      return (
+        <div>
+          No Integration Selected
+        </div>
+      );
+    }
     const FormClass = IntegrationFormMap[integration.type];
     return (
       <div className='integration-form-block'>
+        {
+          !hideName &&
+          <DynamicForm
+            inputMap={this.nameMap}
+            inputState={this.nameValueToState(integration)}
+            onStateChange={this.handleNameChange}
+          />
+        }
         {
           !hideType &&
           <DynamicForm
@@ -119,6 +144,14 @@ export default class IntegrationForm extends TerrainComponent<Props>
     };
   }
 
+  @instanceFnDecorator(memoizeOne)
+  public nameValueToState(value: IntegrationConfig)
+  {
+    return {
+      name: value.name,
+    };
+  }
+
   public handleTypeChange(state: { type: Integrations })
   {
     const { integration, onChange } = this.props;
@@ -127,6 +160,12 @@ export default class IntegrationForm extends TerrainComponent<Props>
       .set('connectionConfig', {})
       .set('type', state.type);
     onChange(newIntegration);
+  }
+
+  public handleNameChange(state: { name: string })
+  {
+    const { integration, onChange } = this.props;
+    onChange(integration.set('name', state.name));
   }
 
   public handleIntegrationChange(newIntegration: IntegrationConfig)

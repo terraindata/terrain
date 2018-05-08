@@ -44,12 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { Readable } from 'stream';
 import TaskInputConfigTypes from './TaskInputConfigTypes';
 
 export abstract class ATaskConfig
 {
   public exit: boolean = null;
-  public options: TaskInputConfigTypes = null;
+  public options?: TaskInputConfigTypes = null;
   public status: boolean = null;
 
   public cancel?: () => null;

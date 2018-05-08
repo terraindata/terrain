@@ -50,6 +50,7 @@ import { keccak256 } from 'js-sha3';
 
 import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
+import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
@@ -877,6 +878,65 @@ export default class TransformationEngineNodeVisitor extends TransformationNodeV
         if (setIfHelper(opts, el))
         {
           yadeep.set(doc, field, opts.newValue, { create: true });
+        }
+      }
+    });
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public visitFindReplaceNode(node: FindReplaceTransformationNode, doc: object, options: object = {}): TransformationVisitResult
+  {
+    const opts = node.meta as NodeOptionsType<TransformationNodeType.FindReplaceNode>;
+
+    node.fields.forEach((field) =>
+    {
+      const el = yadeep.get(doc, field);
+      if (Array.isArray(el))
+      {
+        for (let i: number = 0; i < el.length; i++)
+        {
+          let kpi: KeyPath = field;
+          if (kpi.contains('*'))
+          {
+            kpi = kpi.set(kpi.indexOf('*'), i.toString());
+          }
+          else
+          {
+            kpi = kpi.push(i.toString());
+          }
+
+          if (opts.regex)
+          {
+            yadeep.set(doc, kpi, yadeep.get(doc, kpi).replace(new RegExp(opts.find, 'g'), opts.replace));
+          }
+          else
+          {
+            yadeep.set(doc, kpi, yadeep.get(doc, kpi).split(opts.find).join(opts.replace));
+          }
+        }
+      }
+      else if (typeof el !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to do a find/replace on a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      else
+      {
+        if (opts.regex)
+        {
+          yadeep.set(doc, field, el.replace(new RegExp(opts.find, 'g'), opts.replace));
+        }
+        else
+        {
+          yadeep.set(doc, field, el.split(opts.find).join(opts.replace));
         }
       }
     });

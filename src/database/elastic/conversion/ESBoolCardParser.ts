@@ -407,7 +407,13 @@ export default class ESBoolCardParser
       return [];
     }
 
-    if (boolValueInfo.childrenSize() > 0)
+    if (boolValueInfo.childrenSize() === 1)
+    {
+      if (boolValueInfo.objectChildren['boost'] === undefined)
+      {
+        return [];
+      }
+    } else if (boolValueInfo.childrenSize() > 1)
     {
       return [];
     }

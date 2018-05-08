@@ -47,6 +47,7 @@ THE SOFTWARE.
 import AddTransformationNode from 'shared/transformations/nodes/AddTransformationNode';
 import ArraySumTransformationNode from 'shared/transformations/nodes/ArraySumTransformationNode';
 import DivideTransformationNode from 'shared/transformations/nodes/DivideTransformationNode';
+import FindReplaceTransformationNode from 'shared/transformations/nodes/FindReplaceTransformationNode';
 import HashTransformationNode from 'shared/transformations/nodes/HashTransformationNode';
 import MultiplyTransformationNode from 'shared/transformations/nodes/MultiplyTransformationNode';
 import SetIfTransformationNode from 'shared/transformations/nodes/SetIfTransformationNode';
@@ -84,6 +85,7 @@ export interface InfoType<T extends TransformationNodeType = any>
     transformationNode: TransformationNode,
     docCopy: object,
     options: object) => TransformationVisitResult;
+  newFieldType?: string;
 }
 
 const TransformationNodeInfo: AllNodeInfoType =
@@ -112,6 +114,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitSplitNode(transformationNode, docCopy, options),
+        newFieldType: 'string',
       },
     [TransformationNodeType.JoinNode]:
       {
@@ -137,6 +140,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitJoinNode(transformationNode, docCopy, options),
+        newFieldType: 'string',
       },
     [TransformationNodeType.FilterNode]: // what does this do?
       {
@@ -169,6 +173,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitDuplicateNode(transformationNode, docCopy, options),
+        newFieldType: 'same',
       },
     [TransformationNodeType.InsertNode]:
       {
@@ -275,6 +280,7 @@ const TransformationNodeInfo: AllNodeInfoType =
           docCopy: object,
           options: object) =>
           visitor.visitArraySumNode(transformationNode, docCopy, options),
+        newFieldType: 'number',
       },
     [TransformationNodeType.AddNode]:
       {
@@ -362,6 +368,24 @@ const TransformationNodeInfo: AllNodeInfoType =
           options: object) =>
           visitor.visitSetIfNode(transformationNode, docCopy, options),
       },
+    [TransformationNodeType.FindReplaceNode]:
+      {
+        humanName: 'Find/Replace',
+        editable: true,
+        creatable: true,
+        description: 'Finds and replaces certain patterns of characters in a string',
+        isAvailable: (engine, fieldId) =>
+        {
+          const type = EngineUtil.getRepresentedType(fieldId, engine);
+          return type === 'string';
+        },
+        type: FindReplaceTransformationNode,
+        targetedVisitor: (visitor: TransformationNodeVisitor,
+          transformationNode: TransformationNode,
+          docCopy: object,
+          options: object) =>
+          visitor.visitFindReplaceNode(transformationNode, docCopy, options),
+      },
   };
 
 export type TNodeObject = Pick<TransformationNode, 'fields' | 'meta'>;
@@ -429,6 +453,11 @@ export abstract class TransformationInfo
   public static getType(type: TransformationNodeType): any
   {
     return TransformationNodeInfo[type].type;
+  }
+
+  public static getNewFieldType(type: TransformationNodeType): any
+  {
+    return TransformationNodeInfo[type].newFieldType;
   }
 
   public static applyTargetedVisitor(visitor: TransformationNodeVisitor,

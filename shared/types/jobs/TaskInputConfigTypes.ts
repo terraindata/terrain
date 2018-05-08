@@ -51,7 +51,7 @@ export class TaskInputConfigTypes
   public logStream: stream.Readable = null;
   public overrideSinks?: string = '';
   public overrideSources?: string = '';
-  public stream: stream.Readable = null;
+  public inputStreams: stream.Readable[] = null;
   public templateId?: string | number = null;
   public template?: string = '';
 }

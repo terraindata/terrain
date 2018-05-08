@@ -63,6 +63,7 @@ import { FileTypes } from 'shared/etl/types/ETLTypes';
 
 import { SinkFormMap, SourceFormMap } from 'etl/common/components/EndpointFormClasses';
 
+import FadeInOut from 'app/common/components/FadeInOut';
 import IntegrationForm from 'etl/common/components/IntegrationForm';
 import IntegrationPicker from 'etl/common/components/IntegrationPicker';
 import { ETLActions } from 'etl/ETLRedux';
@@ -80,6 +81,11 @@ export interface Props
   isSchedule?: boolean;
   integrations?: IMMap<ID, IntegrationConfig>;
   etlActions?: typeof ETLActions;
+}
+
+interface State
+{
+  usingCustomIntegration: boolean;
 }
 
 class EndpointForm extends TerrainComponent<Props>
@@ -108,6 +114,10 @@ class EndpointForm extends TerrainComponent<Props>
       },
     };
 
+  public state: State = {
+    usingCustomIntegration: false,
+  };
+
   public componentDidMount()
   {
     this.props.etlActions({
@@ -127,11 +137,30 @@ class EndpointForm extends TerrainComponent<Props>
   public handleIntegrationPickerChange(id: ID)
   {
     this.handleEndpointChange(this.props.endpoint.set('integrationId', id));
+    this.setState({
+      usingCustomIntegration: false,
+    });
+  }
+
+  public createIntegration()
+  {
+    this.setState({
+      usingCustomIntegration: true,
+    });
+    this.props.etlActions({
+      actionType: 'createIntegration',
+      integration: _IntegrationConfig({ id: undefined, type: this.props.endpoint.type }),
+      onLoad: (integration) =>
+      {
+        this.handleEndpointChange(this.props.endpoint.set('integrationId', integration.id));
+      },
+    });
   }
 
   public render()
   {
     const { isSource, endpoint, onChange, hideTypePicker, integrations } = this.props;
+    const { usingCustomIntegration } = this.state;
     const mapToUse = isSource ? this.sourceTypeMap : this.sinkTypeMap;
     const FormClass = isSource ? SourceFormMap[endpoint.type] : SinkFormMap[endpoint.type];
     const isIntegrationType =
@@ -157,31 +186,31 @@ class EndpointForm extends TerrainComponent<Props>
             <IntegrationPicker
               integrationType={endpoint.type}
               integrations={integrations}
-              selectedIntegration={endpoint.integrationId}
+              selectedIntegration={usingCustomIntegration ? 'custom' : endpoint.integrationId}
               onChange={this.handleIntegrationPickerChange}
+              createIntegration={this.createIntegration}
             />
             :
             null
         }
-        {
-          showIntegrationForm ?
-            <IntegrationForm
-              integration={integrations.get(endpoint.integrationId)}
-              onChange={this.handleIntegrationChange}
-              hideType={true}
-            />
-            :
-            null
-        }
-        {
-          showForm ?
-            <FormClass
-              endpoint={endpoint}
-              onChange={this.handleEndpointChange}
-            />
-            : null
-        }
-
+        <FadeInOut
+          open={showIntegrationForm}
+        >
+          <IntegrationForm
+            integration={integrations.get(endpoint.integrationId)}
+            onChange={this.handleIntegrationChange}
+            hideType={true}
+            hideName={!usingCustomIntegration}
+          />
+        </FadeInOut>
+        <FadeInOut
+          open={showForm}
+        >
+          <FormClass
+            endpoint={endpoint}
+            onChange={this.handleEndpointChange}
+          />
+        </FadeInOut>
       </div>
     );
   }

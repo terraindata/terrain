@@ -275,6 +275,14 @@ export class FieldProxy
   {
     postorderForEach(this.engine, rootId, (fieldId) =>
     {
+      const dependents: List<number> = EngineUtil.getFieldDependents(this.engine, fieldId);
+      if (dependents.size > 0)
+      {
+        const paths = JSON.stringify(
+          dependents.map((id) => this.engine.getOutputKeyPath(id),
+          ).toList().toJS(), null, 2);
+        throw new Error(`Cannot delete field. This field has ${dependents.size} dependent fields: ${paths}`);
+      }
       this.engine.deleteField(fieldId);
     });
     this.syncWithEngine(true);
@@ -329,7 +337,6 @@ export class FieldProxy
     }
   }
 
-  // todo add cast transformation
   public changeType(newType: FieldTypes)
   {
     if (EngineUtil.isWildcardField(this.engine.getInputKeyPath(this.fieldId)))
@@ -340,6 +347,7 @@ export class FieldProxy
     {
       this.engine.setFieldType(this.fieldId, newType);
     }
+    EngineUtil.changeFieldTypeSideEffects(this.engine, this.fieldId, newType);
     EngineUtil.castField(this.engine, this.fieldId, newType);
     this.syncWithEngine(true);
   }

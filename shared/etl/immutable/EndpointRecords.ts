@@ -80,6 +80,19 @@ class SourceConfigC implements SourceConfigI
   public options = {} as any;
   public integrationId = -1;
 
+  public verifyIntegrity(): boolean
+  {
+    if (this.type == null)
+    {
+      return false;
+    }
+    else if (this.fileConfig == null)
+    {
+      return false;
+    }
+    return true;
+  }
+
   public description(algorithms?: Map<ID, ItemWithName>): string
   {
     return getEndpointDescription(this as any, algorithms);
@@ -108,6 +121,19 @@ class SinkConfigC implements SinkConfigI
   public fileConfig = _FileConfig();
   public options = {} as any;
   public integrationId = -1;
+
+  public verifyIntegrity(): boolean
+  {
+    if (this.type == null)
+    {
+      return false;
+    }
+    else if (this.fileConfig == null)
+    {
+      return false;
+    }
+    return true;
+  }
 
   public description()
   {
@@ -152,8 +178,8 @@ export function getEndpointDescription(
     case Sinks.Http:
     case Sources.Http: {
       const options = endpoint.options as SourceOptionsType<Sources.Http>;
-      const text = String(options.url);
-      return `URL '${text}'`;
+      const text = String(options.method);
+      return `'${text}' Integration ${endpoint.integrationId}`;
     }
     case Sinks.Sftp:
     case Sources.Sftp: {

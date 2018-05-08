@@ -49,10 +49,14 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as stream from 'stream';
 
-import { SinkConfig, SourceConfig } from '../../../../shared/etl/types/EndpointTypes';
+import { SinkConfig, SourceConfig } from 'shared/etl/types/EndpointTypes';
+import { JobConfig } from 'shared/types/jobs/JobConfig';
+import { TaskEnum } from 'shared/types/jobs/TaskEnum';
+import * as App from '../App';
 import * as Util from '../AppUtil';
 import BufferTransform from '../io/streams/BufferTransform';
 import { Permissions } from '../permissions/Permissions';
+import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
 import { getSourceStream } from './SourceSinkStream';
 import TemplateRouter, { templates } from './TemplateRouter';
@@ -76,6 +80,34 @@ Router.post('/execute', async (ctx, next) =>
   }
 
   ctx.body = await templates.executeETL(fields, files);
+});
+
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // verify if the user has permissions to create this job and run this ETL pipeline
+  await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
+  const job: JobConfig = {
+    meta: null,
+    pausedFilename: null,
+    running: false,
+    runNowPriority: null,
+    scheduleId: null,
+    status: null,
+    workerId: null,
+
+    createdAt: new Date(),
+    createdBy: ctx.state.user.id,
+    name: null,
+    priority: -1,
+    type: 'ETL',
+    tasks: JSON.stringify([
+      {
+        taskId: TaskEnum.taskETL,
+        params: null,
+      },
+    ]),
+  };
+  ctx.body = await App.JobQ.create(job, false, ctx.state.user.id);
 });
 
 interface ETLUIPreviewConfig

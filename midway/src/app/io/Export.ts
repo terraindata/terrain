@@ -58,6 +58,7 @@ import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
 import { QueryHandler } from '../query/QueryHandler';
 
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import AExportTransform from './streams/AExportTransform';
 import CSVTransform from './streams/CSVTransform';
 import ExportTransform from './streams/ExportTransform';

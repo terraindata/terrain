@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import * as asyncBusboy from 'async-busboy';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
@@ -52,6 +53,7 @@ import * as App from '../App';
 import * as AppUtil from '../AppUtil';
 import { Permissions } from '../permissions/Permissions';
 import UserConfig from '../users/UserConfig';
+import { users } from '../users/UserRouter';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
@@ -94,6 +96,22 @@ Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx,
 {
   await perm.JobQueuePermissions.verifyRunRoute(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await App.JobQ.run(ctx.params.id);
+});
+
+Router.post('/runnow/:id', async (ctx, next) =>
+{
+  const { fields, files } = await asyncBusboy(ctx.req);
+
+  AppUtil.verifyParameters(fields, ['id', 'accessToken']);
+  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
+  if (user === null)
+  {
+    ctx.body = 'Unauthorized';
+    ctx.status = 400;
+    return;
+  }
+  await perm.JobQueuePermissions.verifyRunNowRoute(ctx.state.user as UserConfig, ctx.req);
+  ctx.body = await App.JobQ.runNow(ctx.params.id, fields, files);
 });
 
 // unpause paused job by id

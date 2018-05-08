@@ -743,3 +743,47 @@ test('test set if transformation', () =>
   expect(r['name']).toEqual('Tim');
   expect(r['bleep']).toEqual('bloop');
 });
+
+test('duplicate a disabled array', () =>
+{
+  const doc = {
+    foo: [1, 2, 3],
+  };
+  const e = new TransformationEngine(doc);
+  const kp = List(['foo']);
+  e.appendTransformation(TransformationNodeType.DuplicateNode, List([kp]), {
+    newFieldKeyPaths: List([List(['copy of foo'])]),
+  });
+  e.disableField(e.getInputFieldID(kp));
+  expect(e.transform(doc)).toEqual({
+    'copy of foo': [1, 2, 3],
+  });
+});
+
+test('test find replace transformation', () =>
+{
+  const e = new TransformationEngine(TestDocs.doc9);
+
+  e.appendTransformation(
+    TransformationNodeType.FindReplaceNode,
+    List([List(['meta', 'school'])]),
+    {
+      find: 'n',
+      replace: 'b',
+    },
+  );
+
+  e.appendTransformation(
+    TransformationNodeType.FindReplaceNode,
+    List([List(['age'])]),
+    {
+      find: '\\d',
+      replace: 'N',
+      regex: true,
+    },
+  );
+
+  const r = e.transform(TestDocs.doc9);
+  expect(r['meta']['school']).toEqual('Stabford');
+  expect(r['age']).toEqual('NN years');
+});

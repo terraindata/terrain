@@ -314,7 +314,14 @@ class AddRootFieldModalC extends TerrainComponent<RootFieldProps>
       }
     }).catch((e) =>
     {
-      // TODO
+      this.props.act({
+        actionType: 'addModal',
+        props: {
+          title: 'Error',
+          message: `Could not add field: ${String(e)}`,
+          error: true,
+        },
+      });
     });
   }
 }

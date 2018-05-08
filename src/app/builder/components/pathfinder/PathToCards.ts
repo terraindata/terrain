@@ -567,7 +567,14 @@ export class PathToCards
     const filterLineMap = { filter: [], nested: [], negativeNested: [], group: [] };
     filterGroup.lines.map((line: FilterLine) =>
     {
-      if (line && line.field && line.field.indexOf('.') !== -1 && !ignoreNested)
+      if (line && line.filterGroup)
+      {
+        filterLineMap.group.push(line);
+      }
+      else if (line && (
+        (line.field && line.field.indexOf('.') !== -1) ||
+        line.fieldType === FieldType.Nested)
+        && !ignoreNested)
       {
         if (line.comparison === 'notexists' ||
           line.comparison === 'notequal' ||
@@ -578,10 +585,8 @@ export class PathToCards
         {
           filterLineMap.nested.push(line);
         }
-      } else if (line && line.filterGroup)
-      {
-        filterLineMap.group.push(line);
-      } else if (line)
+      }
+      else if (line)
       {
         filterLineMap.filter.push(line);
       }

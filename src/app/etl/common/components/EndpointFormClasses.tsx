@@ -314,18 +314,6 @@ type SftpState = SftpOptions;
 class SftpEndpoint extends EndpointFormBase<SftpState>
 {
   public inputMap: InputDeclarationMap<SftpState> = {
-    // ip: {
-    //   type: DisplayType.TextBox,
-    //   displayName: 'IP Address',
-    //   group: 'addr row',
-    //   widthFactor: 3,
-    // },
-    // port: {
-    //   type: DisplayType.NumberBox,
-    //   displayName: 'Port',
-    //   group: 'addr row',
-    //   widthFactor: 1,
-    // },
     filepath: {
       type: DisplayType.TextBox,
       displayName: 'Filepath',
@@ -348,10 +336,6 @@ const httpMethods = List(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
 class HttpEndpoint extends EndpointFormBase<HttpState>
 {
   public inputMap: InputDeclarationMap<HttpState> = {
-    url: {
-      type: DisplayType.TextBox,
-      displayName: 'URL',
-    },
     method: {
       type: DisplayType.Pick,
       displayName: 'Method',
@@ -372,10 +356,9 @@ class HttpEndpoint extends EndpointFormBase<HttpState>
 
   public optionsToFormState(options: HttpOptions): HttpState
   {
-    const { url, method } = options;
+    const { method } = options;
     const headers = _.get(options, 'headers', {});
     return {
-      url,
       method,
       accept: headers['accept'],
       contentType: headers['contentType'],
@@ -384,9 +367,8 @@ class HttpEndpoint extends EndpointFormBase<HttpState>
 
   public formStateToOptions(newState: HttpState): HttpOptions
   {
-    const { url, method, accept, contentType } = newState;
+    const { method, accept, contentType } = newState;
     return {
-      url,
       method,
       headers: {
         accept,
@@ -458,30 +440,6 @@ type SQLState = SQLOptions;
 class SQLEndpoint extends EndpointFormBase<SQLState>
 {
   public inputMap: InputDeclarationMap<SQLState> = {
-    ip: {
-      type: DisplayType.TextBox,
-      displayName: 'IP Address',
-      group: 'addr row',
-      widthFactor: 3,
-    },
-    port: {
-      type: DisplayType.NumberBox,
-      displayName: 'Port',
-      group: 'addr row',
-      widthFactor: 1,
-    },
-    database: {
-      type: DisplayType.TextBox,
-      displayName: 'Database',
-    },
-    table: {
-      type: DisplayType.TextBox,
-      displayName: 'Table',
-    },
-    credentialId: {
-      type: DisplayType.NumberBox,
-      displayName: 'Credential ID',
-    },
     query: {
       type: DisplayType.TextBox,
       displayName: 'Query',

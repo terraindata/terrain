@@ -46,7 +46,7 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 
-import { FieldTypes } from 'shared/etl/types/ETLTypes';
+import { FieldTypes, validJSTypes } from 'shared/etl/types/ETLTypes';
 import TypeUtil from 'shared/etl/TypeUtil';
 import { TransformationEngine } from 'shared/transformations/TransformationEngine';
 import TransformationNodeType, { NodeOptionsType } from 'shared/transformations/TransformationNodeType';
@@ -65,6 +65,120 @@ const valueTypeKeyPath = List(['valueType']);
 
 export default class EngineUtil
 {
+  /*
+   *  Verify
+   *  Fields:
+   *  1: All fields have valid names (no * or number names)
+   *  2: No dangling fields (fields without parents, or fields with children that aren't arrays or objects)
+   *  3: All fields have valid types & value types if applicable
+   *  4: No duplicate output key paths or input key paths
+   *  Transformations:
+   *  1: TODO All newFieldKeyPaths point to some field's outputKeyPath
+   *  2: TODO All field's current type matches the most recent cast
+   */
+  public static verifyIntegrity(engine: TransformationEngine)
+  {
+    const errors = [];
+    try
+    {
+      const fields = engine.getAllFieldIDs();
+      const pathTypes: PathHashMap<FieldTypes> = {};
+      const seenIKP = {};
+      const seenOKP = {};
+      fields.forEach((id) =>
+      {
+        const hashedOKP = EngineUtil.hashPath(engine.getOutputKeyPath(id));
+        const hashedIKP = EngineUtil.hashPath(engine.getInputKeyPath(id));
+        if (seenIKP[hashedIKP] !== undefined)
+        {
+          errors.push(`Duplicate Input path detected: ${hashedIKP}`);
+        }
+        else
+        {
+          seenIKP[hashedIKP] = id;
+        }
+        if (seenOKP[hashedOKP] !== undefined)
+        {
+          errors.push(`Duplicate Output path detected: ${hashedOKP}`);
+        }
+        else
+        {
+          seenOKP[hashedOKP] = id;
+        }
+        const strippedPath = EngineUtil.turnIndicesIntoValue(engine.getOutputKeyPath(id));
+        pathTypes[EngineUtil.hashPath(strippedPath)] = engine.getFieldType(id) as FieldTypes;
+      });
+      fields.forEach((id) =>
+      {
+        const okp = engine.getOutputKeyPath(id);
+        if (okp.size > 1)
+        {
+          const parentPath = okp.slice(0, -1).toList();
+          const parentID = engine.getOutputFieldID(parentPath);
+          if (engine.getFieldType(parentID) !== 'array' && engine.getFieldType(parentID) !== 'object')
+          {
+            errors.push(`Field ${okp.toJS()} has a parent that is not an array or object`);
+          }
+        }
+        if (okp.last() === '*')
+        {
+          if (engine.getFieldType(id) !== 'array')
+          {
+            errors.push(`Field ${okp.toJS()} is not of type array, but has name '*'. This is not allowed`);
+          }
+        }
+        const fieldType = engine.getFieldType(id);
+        if (!EngineUtil.fieldHasValidType(engine, id))
+        {
+          errors.push(`Field ${okp.toJS()} has an invalid type: ${fieldType}`);
+        }
+      });
+    }
+    catch (e)
+    {
+      errors.push(`Error while trying to verify transformation engine integrity: ${String(e)}`);
+    }
+    return errors;
+  }
+
+  // check to make sure the field's types exist and if its an array that it has a valid valueType
+  public static fieldHasValidType(engine: TransformationEngine, id: number)
+  {
+    const fieldType = engine.getFieldType(id) as FieldTypes;
+    const valueType = engine.getFieldProp(id, valueTypeKeyPath) as FieldTypes;
+    if (validJSTypes.indexOf(fieldType) === -1)
+    {
+      return false;
+    }
+    if (fieldType === 'array' && validJSTypes.indexOf(valueType) === -1)
+    {
+      return false;
+    }
+    return true;
+  }
+
+  // get all fields that are computed from this field
+  public static getFieldDependents(engine: TransformationEngine, fieldId: number): List<number>
+  {
+    const transformations = engine.getTransformations(fieldId);
+    const asSet = transformations.flatMap((id) =>
+    {
+      const transformation = engine.getTransformationInfo(id);
+      const nfkp: List<List<string>> = _.get(transformation, ['meta', 'newFieldKeyPaths']);
+      if (nfkp === undefined)
+      {
+        return undefined;
+      }
+      else
+      {
+        return nfkp;
+      }
+    }).map((kp) => engine.getOutputFieldID(kp))
+      .toList()
+      .toSet();
+    return List(asSet);
+  }
+
   // root is considered to be a named field
   public static isNamedField(
     keypath: KeyPath,
@@ -148,7 +262,7 @@ export default class EngineUtil
   }
 
   // takes an engine path and the path type mapping and returns true if
-  // all of the path's parent paths represent array
+  // all of the path's parent paths represent array or object fields
   public static isAValidField(keypath: KeyPath, pathTypes: PathHashMap<FieldTypes>): boolean
   {
     if (keypath.size === 0)
@@ -167,6 +281,7 @@ export default class EngineUtil
     return true;
   }
 
+  // Add the fields in the pathTypes and pathValueTypes map to the given engine
   public static addFieldsToEngine(
     pathTypes: PathHashMap<FieldTypes>,
     pathValueTypes: PathHashMap<FieldTypes>,
@@ -185,7 +300,7 @@ export default class EngineUtil
         {
           fieldType = 'array';
         }
-        if (EngineUtil.isWildcardField(unhashedPath))
+        if (valueType === undefined && EngineUtil.isWildcardField(unhashedPath))
         {
           valueType = fieldType;
           fieldType = 'array';
@@ -200,6 +315,7 @@ export default class EngineUtil
     });
   }
 
+  // get the type of a field. If it represents an array wildcard, get the valueType
   public static getRepresentedType(id: number, engine: TransformationEngine): FieldTypes
   {
     const kp = engine.getOutputKeyPath(id);
@@ -213,6 +329,7 @@ export default class EngineUtil
     }
   }
 
+  // take two engines and return an engine whose fields most closely resembles the result of the merge
   public static mergeJoinEngines(
     leftEngine: TransformationEngine,
     rightEngine: TransformationEngine,
@@ -272,6 +389,19 @@ export default class EngineUtil
         EngineUtil.castField(engine, id, bestType as FieldTypes);
       }
     });
+  }
+
+  public static changeFieldTypeSideEffects(engine: TransformationEngine, fieldId: number, newType: FieldTypes)
+  {
+    // Elastic side effects
+    const elasticProps = engine.getFieldProp(fieldId, List(['elastic']));
+    if (elasticProps !== undefined)
+    {
+      const newProps = _.extend({}, elasticProps, {
+        elasticType: ElasticTypes.Auto,
+      });
+      engine.setFieldProp(fieldId, List(['elastic']), newProps);
+    }
   }
 
   // attempt to detect date types and integer float
@@ -351,6 +481,7 @@ export default class EngineUtil
     });
   }
 
+  // return the best guess engine from the given documents
   public static createEngineFromDocuments(documents: List<object>):
     {
       engine: TransformationEngine,
