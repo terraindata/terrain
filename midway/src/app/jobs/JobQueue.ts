@@ -255,6 +255,7 @@ export class JobQueue
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
+      console.log('RUNNING NOW');
       const getJobs: JobConfig[] = await this.get(id, false) as JobConfig[];
       if (getJobs.length === 0)
       {
@@ -298,11 +299,12 @@ export class JobQueue
       // update the table to running = true
       this.runningRunNowJobs.set(getJobs[0].id, newJob);
       // actually run the job
-
+      console.log('actually run');
       const jobResult: TaskOutputConfig = await this.runningRunNowJobs.get(getJobs[0].id).run() as TaskOutputConfig;
       const jobsFromId: JobConfig[] = await this.get(getJobs[0].id);
       const jobStatus: string = jobResult.status === true ? 'SUCCESS' : 'FAILURE';
       await this._setJobStatus(jobsFromId[0].id, false, jobStatus);
+      console.log(jobsFromId[0]);
       await App.SKDR.setRunning(jobsFromId[0].scheduleId, false);
       this.runningJobs.delete(getJobs[0].id);
       // TODO: log job result

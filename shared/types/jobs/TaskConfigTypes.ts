@@ -44,16 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import { Readable } from 'stream';
-import TaskConfigTypes from './TaskConfigTypes';
+import * as stream from 'stream';
 
-export abstract class ATaskConfig
+export class TaskConfigTypes
 {
-  public exit: boolean = null;
-  public options?: TaskConfigTypes = null;
-  public status: boolean = null;
-
-  public cancel?: () => null;
+  public logStream: stream.Readable = null;
 }
 
-export default ATaskConfig;
+export default TaskConfigTypes;

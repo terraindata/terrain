@@ -225,7 +225,9 @@ export class TaskTree
         this.tasks[ind].setInputConfigStream(lastStream as stream.Readable);
       }
       this.taskTreeConfig.jobStatus = 1;
+      console.log(JSON.stringify(this.tasks, null, 2));
       let result: TaskOutputConfig = await taskTreeNode.accept(taskTreeVisitor, this.tasks[ind]);
+      console.log(result);
       while (result.exit !== true)
       {
         switch (result.status)
@@ -236,12 +238,14 @@ export class TaskTree
           default:
             ind = this.tasks[ind].getOnFailure();
         }
+        console.log('INDEX IS ', ind);
         if (this.taskTreeConfig.cancel === true)
         {
           break;
         }
 
         this.tasks[ind].setInputConfig(result);
+        console.log(this.tasks[ind]);
         if (this.taskTreeConfig.jobStatus === 2) // was paused
         {
           const saveResults: boolean | string = await this._saveToFile(result['options']['stream'], this.taskTreeConfig.filename);
