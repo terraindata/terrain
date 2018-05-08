@@ -82,19 +82,8 @@ Router.post('/execute', async (ctx, next) =>
   ctx.body = await templates.executeETL(fields, files);
 });
 
-Router.post('/create', async (ctx, next) =>
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const { fields, files } = await asyncBusboy(ctx.req);
-
-  Util.verifyParameters(fields, ['id', 'accessToken']);
-  const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
-  if (user === null)
-  {
-    ctx.body = 'Unauthorized';
-    ctx.status = 400;
-    return;
-  }
-
   // verify if the user has permissions to create this job and run this ETL pipeline
   await perm.JobQueuePermissions.verifyCreateRoute(ctx.state.user as UserConfig, ctx.req);
   const job: JobConfig = {
@@ -114,13 +103,7 @@ Router.post('/create', async (ctx, next) =>
     tasks: JSON.stringify([
       {
         taskId: TaskEnum.taskETL,
-        params: {
-          overrideSinks: fields['overrideSinks'],
-          overrideSources: fields['overrideSources'],
-          template: fields['template'],
-          templateId: fields['templateId'],
-          inputStreams: files,
-        },
+        params: null,
       },
     ]),
   };

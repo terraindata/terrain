@@ -184,7 +184,7 @@ class Dropdown extends TerrainComponent<Props>
 
     if (focused)
     {
-      _.extend(style, {
+      _.extend({}, style, {
         borderColor: Colors().active,
         // color: Colors().text1,
       });
@@ -192,7 +192,7 @@ class Dropdown extends TerrainComponent<Props>
 
     if (selected)
     {
-      _.extend(style, {
+      _.extend({}, style, {
         'borderColor': customColor || Colors().active,
         // 'color': Colors().activeText,
         ':hover': {
@@ -235,7 +235,6 @@ class Dropdown extends TerrainComponent<Props>
         title: '',
       };
     }
-
     return (
       tooltip(<div
         className={classNames({

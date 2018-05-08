@@ -48,6 +48,13 @@ THE SOFTWARE.
 export enum Integrations
 {
   Sftp = 'Sftp',
+  Http = 'Http',
+  Fs = 'Fs',
+  Mysql = 'Mysql',
+  Postgresql = 'Postgresql',
+  Magento = 'Magento',
+  GoogleAPI = 'GoogleAPI',
+  Mailchimp = 'Mailchimp',
 }
 
 export interface IntegrationConfigBase
@@ -69,6 +76,27 @@ export interface AuthConfigTypes
   Sftp: {
     key: string;
   };
+  Http: {
+    jwt: string;
+  };
+  Fs: {
+    user: string;
+  };
+  Mysql: {
+    password: string;
+  };
+  Postgresql: {
+    password: string;
+  };
+  Magento: {
+    apiKey: string;
+  };
+  GoogleAPI: {
+    privateKey: string;
+  };
+  Mailchimp: {
+    apiKey: string;
+  };
 }
 
 export interface ConnectionConfigTypes
@@ -76,6 +104,31 @@ export interface ConnectionConfigTypes
   Sftp: {
     ip: string;
     port: number;
+  };
+  Http: {
+    url: string;
+  };
+  Fs: {};
+  Mysql: {
+    user: string;
+    host: string;
+    port: number;
+    database: string;
+  };
+  Postgresql: {
+    user: string;
+    host: string;
+    port: number;
+    database: string;
+  };
+  Magento: {
+    apiUser: string;
+  };
+  GoogleAPI: {
+    email: string;
+  };
+  Mailchimp: {
+    host: string;
   };
 }
 
