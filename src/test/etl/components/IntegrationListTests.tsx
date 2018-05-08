@@ -114,8 +114,9 @@ describe('IntegrationList', () =>
     {
       listComponent.setProps({ integrations });
       expect(listComponent.find(ItemList)).toHaveLength(1);
+      expect(listComponent.find(ItemList).render().find('.row-info-header')).toHaveLength(1);
       expect(listComponent.find(ItemList).render().find('.row-info')).toHaveLength(2);
-      expect(listComponent.find(ItemList).render().find('.row-info-data')).toHaveLength(10);
+      expect(listComponent.find(ItemList).render().find('.row-info-data')).toHaveLength(15);
     });
   });
 
@@ -123,9 +124,9 @@ describe('IntegrationList', () =>
   {
     it('should format created by and last modified values', () =>
     {
-      expect(listComponent.instance().formatValue('createdBy', '1')).toEqual({ label: 'Created By', value: 'User 1' });
+      expect(listComponent.instance().formatValue('createdBy', '1')).toEqual('User 1');
       expect(listComponent.instance().formatValue('lastModified', '2018-05-03 22:21:42.207+00'))
-        .toEqual({ label: 'Last Modified', value: Util.formatDate('2018-05-03 22:21:42.207+00', true) });
+        .toEqual(Util.formatDate('2018-05-03 22:21:42.207+00', true));
     });
   });
 });
