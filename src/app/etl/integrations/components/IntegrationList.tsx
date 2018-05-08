@@ -155,14 +155,9 @@ class IntegrationList extends TerrainComponent<Props>
   {
     const { label, value } = this.formatValue(propertyName, item.get(propertyName));
     return (
-      <FloatingInput
-        label={label}
-        value={value}
-        isTextInput={false}
-        noBorder={true}
-        forceFloat={true}
-        noBg={true}
-      />
+      <div>
+        {value}
+      </div>
     );
   }
 
@@ -189,16 +184,7 @@ class IntegrationList extends TerrainComponent<Props>
       >
         <div
           className='integration-list-wrapper'
-          style={_.extend({},
-            backgroundColor(Colors().blockBg),
-            borderColor(Colors().blockOutline),
-          )}
         >
-          <div
-            className='integration-list-header'
-          >
-            Integrations
-          </div>
           <ItemList
             items={integrationList.toList()}
             columnConfig={[
@@ -225,7 +211,6 @@ class IntegrationList extends TerrainComponent<Props>
             ]}
             onRowClicked={this.handleRowClick}
             hideHeaders={true}
-            getRowStyle={(i) => rowStyle}
             getActions={this.getIntegrationActions}
           />
           <PathfinderCreateLine
@@ -248,11 +233,6 @@ class IntegrationList extends TerrainComponent<Props>
     );
   }
 }
-
-const rowStyle = [
-  { cursor: 'pointer' },
-  backgroundColor(Colors().fontWhite, Color(Colors().activeHover).fade(0.9)),
-];
 
 export default Util.createContainer(
   IntegrationList,
